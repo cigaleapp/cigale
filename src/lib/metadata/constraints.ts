@@ -25,9 +25,7 @@ export function metadataValueValidatorNumeric(
 
 export function metadataValueValidatorString(metadata: typeof MetadataString.infer) {
 	if (metadata.pattern) {
-		return type(metadata.pattern.regex).describe(
-			`string matching ${metadata.pattern.display}`
-		);
+		return type(metadata.pattern.regex).describe(`string matching ${metadata.pattern.display}`);
 	}
 
 	if (metadata.regex) {
