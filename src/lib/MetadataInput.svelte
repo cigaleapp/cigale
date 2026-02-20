@@ -1,16 +1,20 @@
 <script lang="ts">
 	import Icon from '@iconify/svelte';
 	import { ArkErrors, type } from 'arktype';
+	import { convert } from 'convert';
 	import * as dates from 'date-fns';
 	import { fade } from 'svelte/transition';
 
 	import IconIncrement from '~icons/ri/add-line';
+	import IconCheck from '~icons/ri/check-line';
 	import IconError from '~icons/ri/error-warning-fill';
 	import IconDecrement from '~icons/ri/subtract-line';
 	import * as idb from '$lib/idb.svelte.js';
 
+	import ButtonIcon from './ButtonIcon.svelte';
 	import ButtonInk from './ButtonInk.svelte';
 	import { generateId, type Metadata, type MetadataEnumVariant } from './database.js';
+	import DropdownMenu from './DropdownMenu.svelte';
 	import FilePreview from './FilePreview.svelte';
 	import { promptForFiles } from './files.js';
 	import { formatBytesSize } from './i18n.js';
@@ -22,18 +26,32 @@
 	import OverflowableText from './OverflowableText.svelte';
 	import RadioButtons from './RadioButtons.svelte';
 	import type { MetadataFile, RuntimeValue } from './schemas/metadata.js';
+	import { availableUnitsFor, findUnit, NumericUnit } from './schemas/units.js';
 	import { uiState } from './state.svelte.js';
 	import Switch from './Switch.svelte';
 	import { toasts } from './toasts.svelte.js';
 	import { tooltip } from './tooltips.js';
-	import { compareBy, gradientedColor, pick, readableOn, round, safeJSONParse } from './utils.js';
+	import {
+		compareBy,
+		gradientedColor,
+		mapValues,
+		pick,
+		readableOn,
+		round,
+		safeJSONParse
+	} from './utils.js';
 	import WorldLocationCombobox from './WorldLocationCombobox.svelte';
 
 	interface Props {
 		definition: Metadata;
 		value: undefined | RuntimeValue;
-		// eslint-disable-next-line no-unused-vars
-		onblur: (value: undefined | RuntimeValue) => void;
+		unit: typeof NumericUnit.infer | undefined;
+		onblur: (
+			// eslint-disable-next-line no-unused-vars
+			value: undefined | RuntimeValue,
+			// eslint-disable-next-line no-unused-vars
+			unit?: typeof NumericUnit.infer | undefined
+		) => void;
 		validationErrors: ArkErrors | undefined;
 		id: string;
 		disabled?: boolean;
@@ -42,8 +60,9 @@
 		isCompactEnum?: boolean;
 	}
 
-	const {
+	let {
 		value,
+		unit: valueUnit = $bindable(),
 		confidences = {},
 		validationErrors,
 		id,
@@ -72,6 +91,19 @@
 			windowIsFocused = false;
 		};
 	});
+
+	const selectedUnit = $derived.by(() => {
+		if (!('unit' in definition)) return;
+		if (!definition.unit) return;
+
+		const u = findUnit(valueUnit ?? definition.unit);
+		if (!u) return;
+
+		return {
+			names: u.names,
+			symbols: 'symbols' in u ? u.symbols : []
+		};
+	});
 </script>
 
 <div
@@ -88,7 +120,7 @@
 				{#if isCompactEnum}
 					<RadioButtons
 						value={value?.toString()}
-						onchange={onblur}
+						onchange={(v) => onblur(v)}
 						cards={options.every((opt) => opt.icon || opt.color)}
 						options={options
 							.toSorted(compareBy(({ index }) => index))
@@ -150,7 +182,14 @@
 					onblur={(e) => onblur(e.currentTarget.value)}
 				/>
 			{/snippet}
-			{#snippet numeric(val, { range: interval })}
+			{#snippet numeric(val, { range: intervalInBaseUnit, unit: baseUnit })}
+				{@const interval = intervalInBaseUnit
+					? mapValues(pick(intervalInBaseUnit, 'min', 'max'), (v) =>
+							valueUnit && v !== undefined
+								? Number(convert(v, baseUnit).to(valueUnit))
+								: v
+						)
+					: undefined}
 				<div class="underscored">
 					<input
 						{id}
@@ -175,11 +214,65 @@
 								parsedValue = undefined;
 							}
 
-							onblur(parsedValue);
+							onblur(parsedValue, selectedUnit?.names[0]);
 						}}
 						value={temporaryValue ?? val?.toString() ?? ''}
 					/>
 				</div>
+
+				{#if baseUnit}
+					<DropdownMenu
+						items={[
+							{
+								label: 'Unité',
+								items: availableUnitsFor(baseUnit).map((u) => {
+									const unitNames = (uu: typeof u) =>
+										new Set([...uu.names, ...uu.symbols]);
+
+									const unitName = u.names[0] || u.symbols[0];
+
+									return {
+										data: u,
+										key: u.symbols[0] || u.names[0],
+										type: 'selectable',
+										label: unitName,
+										selected: Boolean(
+											selectedUnit &&
+											!unitNames(u).isDisjointFrom(unitNames(selectedUnit))
+										),
+										onclick() {
+											if (val === undefined) return;
+											const converted = convert(
+												val,
+												valueUnit ?? baseUnit
+											).to(unitName);
+											onblur(converted, unitName);
+											valueUnit = unitName;
+										}
+									};
+								})
+							}
+						]}
+					>
+						{#snippet trigger(props)}
+							<ButtonIcon help="Utiliser une autre unité" {...props}>
+								{selectedUnit?.symbols[0] ?? selectedUnit?.names[0] ?? ''}
+							</ButtonIcon>
+						{/snippet}
+
+						{#snippet item({ names, symbols }, { selected })}
+							<div class="unit">
+								<span class="symbol">{symbols.at(0) ?? ''}</span>
+								<span class="name">{names[0]}</span>
+								<div class="icon">
+									{#if selected}
+										<IconCheck />
+									{/if}
+								</div>
+							</div>
+						{/snippet}
+					</DropdownMenu>
+				{/if}
 
 				{#if interval?.min !== undefined && interval?.max !== undefined}
 					<div class="range-input">
@@ -187,13 +280,13 @@
 							min={interval.min}
 							max={interval.max}
 							granularity={definition.type === 'integer' ? 1 : 1e-6}
-							ticks={5}
+							ticks={1}
 							value={val}
 							onvalue={(v) => {
 								temporaryValue = v;
 							}}
 							onblur={() => {
-								onblur(temporaryValue);
+								onblur(temporaryValue, valueUnit);
 							}}
 						/>
 					</div>
@@ -205,7 +298,7 @@
 						aria-label="Décrémenter"
 						onclick={() => {
 							if (value !== undefined && typeof value !== 'number') return;
-							onblur(round((value ?? 0) - 1, 5));
+							onblur(round((value ?? 0) - 1, 5), valueUnit);
 						}}
 					>
 						<IconDecrement />
@@ -215,7 +308,7 @@
 						aria-label="Incrémenter"
 						onclick={() => {
 							if (value !== undefined && typeof value !== 'number') return;
-							onblur(round((value ?? 0) + 1, 5));
+							onblur(round((value ?? 0) + 1, 5), valueUnit);
 						}}
 					>
 						<IconIncrement />
@@ -461,7 +554,7 @@
 
 	.metadata-input:has(.range-input) {
 		.range-input {
-			width: 14ch;
+			width: 12ch;
 			margin-left: 1em;
 			display: flex;
 			align-items: center;
@@ -474,6 +567,17 @@
 		/* .increment, .decrement {
 			display: none;
 		} */
+	}
+
+	.unit {
+		display: grid;
+		grid-template-columns: 5ch 1fr 2em;
+
+		.icon {
+			display: flex;
+			align-items: center;
+			justify-content: end;
+		}
 	}
 
 	.increment-decrement-buttons {

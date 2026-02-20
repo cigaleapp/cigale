@@ -24,5 +24,8 @@
 			"label": "No milestone",
 			"query": "repo:${owner}/${repository} state:open no:milestone no:parent-issue"
 		}
+	],
+	"errorLens.excludePatterns": [
+		"**/*.cigaleprotocol.{json,yaml}"
 	]
 }

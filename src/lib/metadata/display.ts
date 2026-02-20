@@ -1,30 +1,53 @@
 import { type } from 'arktype';
+import convert from 'convert';
 import * as dates from 'date-fns';
 
 import * as DB from '$lib/database';
 import type { RuntimeValue } from '$lib/schemas/metadata';
-import { round } from '$lib/utils';
+import { round, transformObject } from '$lib/utils';
 
 /**
  * Adds valueLabel to each metadata value object when the metadata is an enum.
- * @param values
- * @param metadataOptions
- * @returns
  */
-export function addValueLabels(
-	values: DB.MetadataValues,
-	metadataOptions: Record<string, Record<string, Pick<DB.MetadataEnumVariant, 'key' | 'label'>>>
-): Record<string, DB.MetadataValue & { valueLabel?: string }> {
-	return Object.fromEntries(
-		Object.entries(values).map(([key, value]) => {
-			const opts = metadataOptions[key];
-			if (!opts) return [key, value];
+export function addValueLabels<V extends DB.MetadataValue>(
+	metadataOptions: Record<string, Record<string, Pick<DB.MetadataEnumVariant, 'key' | 'label'>>>,
+	values: Record<string, V>
+): Record<string, V & { valueLabel?: string }> {
+	return transformObject(values, (key, value) => {
+		const opts = metadataOptions[key];
+		if (!opts) return [key, value];
 
-			const opt = opts[value.value.toString()];
+		const opt = opts[value.value.toString()];
 
-			return [key, { ...value, valueLabel: opt?.label }];
-		})
-	);
+		return [key, { ...value, valueLabel: opt?.label }];
+	});
+}
+
+/**
+ * Adds a valueBaseUnit to each numeric metadata value object when the metadata value's unit differs from the definition's unit
+ */
+export function addBaseUnitValues<V extends DB.MetadataValue>(
+	definitions: DB.Metadata[],
+	values: Record<string, V>
+): Record<string, V & { valueBaseUnit?: number }> {
+	return transformObject(values, (metadataId, val) => {
+		if (!val.unit) return [metadataId, val];
+		if (typeof val.value !== 'number') return [metadataId, val];
+
+		const def = definitions
+			.filter((d) => d.type === 'integer' || d.type === 'float')
+			.find((d) => d.id === metadataId);
+
+		if (!def?.unit) return [metadataId, val];
+
+		return [
+			metadataId,
+			{
+				...val,
+				valueBaseUnit: convert(val.value, val.unit).to(def.unit)
+			}
+		];
+	});
 }
 
 /**

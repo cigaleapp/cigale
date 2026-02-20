@@ -111,8 +111,8 @@
 						options={data.sessionMetadataOptions[def.id]}
 						definition={def}
 						{value}
-						onchange={async (v) => {
-							if (dequal(v, value?.value)) return;
+						onchange={async (v, unit) => {
+							if (dequal(v, value?.value) && unit === value?.unit) return;
 
 							if (v !== undefined) {
 								await storeMetadataValue({
@@ -120,7 +120,8 @@
 									manuallyModified: true,
 									subjectId: data.session.id,
 									metadataId: def.id,
-									value: v
+									value: v,
+									unit
 								});
 							} else {
 								await deleteMetadataValue({

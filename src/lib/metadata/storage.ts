@@ -13,6 +13,7 @@ import {
 } from '$lib/schemas/metadata.js';
 
 import { serializeMetadataValue } from './serializing.js';
+import type { NumericUnit } from '$lib/schemas/units.js';
 
 /**
  *
@@ -76,6 +77,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 	manuallyModified = false,
 	clearErrors = true,
 	isDefault = false,
+	unit = undefined,
 	cascadedFrom = [],
 	sessionId,
 	abortSignal
@@ -89,6 +91,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 	confirmed?: boolean;
 	clearErrors?: boolean;
 	isDefault?: boolean;
+	unit?: typeof NumericUnit.infer | undefined;
 	db: DatabaseHandle;
 	alternatives?:
 		| DB.MetadataValue['alternatives']
@@ -110,6 +113,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 	const newValue = {
 		value: serializeMetadataValue(value),
 		confidence,
+		unit,
 		confirmed,
 		manuallyModified,
 		isDefault,

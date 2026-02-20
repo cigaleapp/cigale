@@ -1,0 +1,269 @@
+# yaml-language-server: $schema=../static/protocol.schema.json
+id: fr.osug.terra-forma-web.entomoscope
+name: Entomoscope
+
+description: Protocole de collecte d'images d'insectes via l'Entomoscope
+
+authors:
+  - name: Jerome Briot
+  - { name: Gwenn Le Bihan, email: gwenn.lebihan7@gmail.com }
+  - name: Maxime Cauchoix
+
+imports:
+  - from: io.github.cigaleapp.arthropods.example
+    metadata:
+      - species
+      - genus
+      - family
+      - order
+      - class
+      - phylum
+      - kingdom
+      - identification_difficulty
+      - crop
+      - conservation_status
+
+crop:
+  metadata: crop
+
+sidecars:
+  filepath: ./{{ filepath | replace("_original.jpg", ".json") }}
+
+sessionMetadata:
+  monitoring_start:
+    type: date
+    label: Début du monitoring
+    description: Date de début du monitoring de l'entomoscope
+    mergeMethod: min
+    required: false
+    range: past
+
+  monitoring_end:
+    type: date
+    label: Fin du monitoring
+    description: Date de fin du monitoring de l'entomoscope
+    mergeMethod: max
+    required: false
+
+  microhabitat:
+    type: file
+    label: Microhabitat
+    description: Photo du microhabitat monitoré
+    mergeMethod: none
+    required: false
+    size:
+      maximum: 5 MB
+
+  landscape:
+    type: file
+    label: Paysage
+    description: Photo du paysage environnant l'entomoscope
+    mergeMethod: none
+    required: false
+    size:
+      maximum: 5 MB
+
+  inflorescence_count:
+    type: integer
+    label: Nombre d'inflorescences
+    description: Nombre d'inflorescences sur la plante monitorée hors cadre
+    mergeMethod: average
+    required: false
+    range: ≥ 0
+
+  samespecies_flowering_plants_count:
+    type: integer
+    label: Plantes en fleur de la même espèce
+    description: Nombre de plantes en fleur de la même espèce que celle monitorée dans un rayon d'1m
+    mergeMethod: average
+    required: false
+    range: ≥ 1
+
+  flowering_plant_coverage:
+    type: float
+    label: Recouvrement floral
+    description: Recouvrement en % de fleurs de toutes espèces confondues dans un rayon de 10m
+    mergeMethod: average
+    required: false
+    range: 0..100
+
+  target:
+    type: enum
+    label: Cible monitorée
+    description: ''
+    mergeMethod: none
+    required: false
+    options:
+      - key: ground
+        label: Sol
+      - key: natural_flower
+        label: Fleur naturelle
+      - key: artificial_flower
+        label: Fleur artificielle
+      - key: barber
+        label: Barber
+      - key: malaise_trap
+        label: Tente malaise
+        description: Aussi appelé "Piège Malaise"
+        learnMore: https://fr.wikipedia.org/wiki/Pi%C3%A8ge_Malaise
+
+  target_species:
+    type: string
+    label: Espèce cible
+    description: Espèce de la plante ou du microhabitat monitoré, si applicable
+    mergeMethod: none
+    required: false
+
+  plantnat_score:
+    type: float
+    label: Score plantn@t
+    description: ''
+    mergeMethod: average
+    required: false
+
+  grass_height:
+    type: float
+    label: Hauteur d'herbe
+    unit: cm
+    description: ''
+    mergeMethod: average
+    required: false
+    range: x > 0
+
+  recording_type:
+    type: enum
+    label: Enregistrement
+    description: ''
+    mergeMethod: none
+    required: false
+    options:
+      - key: timelapse
+        label: Photo time lapse
+      - key: ai
+        label: Photo IA
+      - key: acoustic
+        label: acoustique
+
+  fisheye:
+    type: boolean
+    label: Photo fisheye
+    description: Utilisé pour calculer l'ensoleillement
+    mergeMethod: average
+    required: true
+    default: false
+
+metadata:
+  shoot_location:
+    type: location
+    label: Lieu
+    description: Lieu de prise de vue
+    mergeMethod: average
+    required: false
+    # infer:
+    #   latitude: { sidecar: .EntomoscopeLatitude }
+    #   longitude: { sidecar: .EntomoscopeLongitude }
+  altitude:
+    type: float
+    label: Altitude
+    description: Altitude de l'entomoscope
+    unit: m
+    required: false
+    mergeMethod: average
+    # infer:
+    #   sidecar: .EntomoscopeAltitude
+  crop_inference_model:
+    type: string
+    label: Modèle utilisé pour la détection
+    description: Nom du modèle d'inférence utilisé par l'entomoscope pour générer les métadonnées de crop
+    mergeMethod: none
+    required: false
+    # infer:
+    #   sidecar: .EntomoscopeAiModel
+  camera_model:
+    type: enum
+    label: Modèle de caméra
+    description: Modèle de caméra de l'entomoscope
+    mergeMethod: none
+    required: false
+    options:
+      - { key: v1, label: V1, description: ... }
+      - { key: v2, label: V2, description: ... }
+      - { key: v3, label: V3, description: ... }
+    # infer:
+    #   sidecar: .EntomoscopeCameraModel
+  raspberry_model:
+    type: string
+    label: Modèle de Raspberry Pi
+    description: Modèle de Raspberry Pi utilisé dans l'entomoscope
+    mergeMethod: none
+    required: false
+    # infer:
+    #   sidecar: .EntomoscopeRaspberryPiModel
+  raspberry_serial_number:
+    type: string
+    label: Numéro de série du Raspberry Pi
+    description: Numéro de série du Raspberry Pi utilisé dans l'entomoscope
+    mergeMethod: none
+    required: false
+    # infer:
+    #   sidecar: .EntomoscopeRaspberryPiSerialNumber
+  shoot_date:
+    type: date
+    label: Date
+    description: Date de prise de vue
+    mergeMethod: average
+    required: false
+    # infer:
+    #   sidecar: .FrameWallClock * 1e-6
+  brightness:
+    type: float
+    label: Luminosité
+    description: Luminosité mesurée par l'entomoscope, en lux
+    mergeMethod: average
+    required: false
+    # unit: lx
+    # infer:
+    #   sidecar: .Lux
+  led_intensity:
+    type: integer
+    label: Intensité des LEDs
+    description: Intensité des LEDs de l'entomoscope, de 0 à 100
+    mergeMethod: average
+    range: 0..100
+    required: false
+    # infer:
+    #   sidecar: .EntomoscopeLedIntensity
+  site:
+    type: string
+    label: ID du site
+    description: ID du site d'installation de l'entomoscope
+    mergeMethod: none
+    required: true
+    # infer:
+    #   sidecar: .EntomoscopeSiteID
+  misc_config:
+    type: string
+    description: Tout les paramètres de configuration de l'entomoscope, encodés en JSON
+    label: ''
+    mergeMethod: none
+    required: false
+    # infer:
+    #   sidecar: . | tostring
+  crop:
+    type: boundingbox
+    description: Boîte englobante du crop d'insecte détecté par l'entomoscope
+    label: ''
+    mergeMethod: union
+    required: false
+    # infer:
+    #   sidecar: |
+    #     .EntomoscopeAiPredictionBoxes as $boxes |
+    #     .EntomoscopeAiPredictionConf as $scores |
+
+    #     range($boxes | length) | {
+    #       sx: $boxes[.][0],
+    #       sy: $boxes[.][1],
+    #       w: $boxes[.][2],
+    #       h: $boxes[.][3],
+    #       score: $scores[.]
+    #     }

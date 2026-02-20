@@ -12,6 +12,7 @@ import { addExifMetadata } from '$lib/exif';
 import type { DatabaseHandle } from '$lib/idb.svelte.js';
 import { cropImage, parseCropPadding } from '$lib/images.js';
 import {
+	addBaseUnitValues,
 	addValueLabels,
 	metadataPrettyKey,
 	metadataPrettyValue,
@@ -63,16 +64,21 @@ swarp.generateResultsExport(
 
 		const splitProgress = progressSplitter('prepare', 0.7, 'encode');
 
-		const { exportedObservations, exportedMetadataFiles, filepaths, cropMetadata } =
-			await prepare({
-				protocolUsed,
-				sessionId,
-				db,
-				abortSignal,
-				onProgress(p) {
-					notify({ event: 'progress', data: splitProgress('prepare', p) });
-				}
-			});
+		const {
+			exportedObservations,
+			exportedMetadataFiles,
+			filepaths,
+			cropMetadata,
+			sessionMetadata
+		} = await prepare({
+			protocolUsed,
+			sessionId,
+			db,
+			abortSignal,
+			onProgress(p) {
+				notify({ event: 'progress', data: splitProgress('prepare', p) });
+			}
+		});
 
 		const allMetadataKeys = [
 			...new Set(
@@ -213,9 +219,9 @@ swarp.generateResultsExport(
 				Analysis.assert({
 					session: {
 						...session,
-						metadata: toMetadataRecord(session.metadata),
+						metadata: toMetadataRecord(sessionMetadata),
 						protocolMetadata: toMetadataRecord(
-							protocolMetadataValues('session', protocolUsed, session.metadata)
+							protocolMetadataValues('session', protocolUsed, sessionMetadata)
 						)
 					},
 					files: Object.fromEntries(
@@ -223,7 +229,7 @@ swarp.generateResultsExport(
 					),
 					observations: exportedObservations
 				}),
-				['protocol', 'observations']
+				['protocol', 'files', 'observations']
 			)
 		};
 
@@ -610,13 +616,16 @@ async function prepare({
 	for (const obs of sessionObservations) {
 		observationNumber++;
 
-		const metadata = addValueLabels(
-			observationMetadata({
-				definitions: metadataDefinitions,
-				observation: obs,
-				images: sessionImages
-			}),
-			metadataOptions
+		const metadata = addBaseUnitValues(
+			metadataDefinitions,
+			addValueLabels(
+				metadataOptions,
+				observationMetadata({
+					definitions: metadataDefinitions,
+					observation: obs,
+					images: sessionImages
+				})
+			)
 		);
 		abortSignal?.throwIfAborted();
 
@@ -636,7 +645,10 @@ async function prepare({
 			const databaseImage = sessionImages.find((i) => i.id === imageId);
 			if (!databaseImage) continue;
 
-			const metadataValues = addValueLabels(databaseImage.metadata, metadataOptions);
+			const metadataValues = addBaseUnitValues(
+				metadataDefinitions,
+				addValueLabels(metadataOptions, databaseImage.metadata)
+			);
 
 			abortSignal?.throwIfAborted();
 
@@ -754,5 +766,14 @@ async function prepare({
 		})
 		.filter(nonnull);
 
-	return { exportedObservations, filepaths, cropMetadata, exportedMetadataFiles };
+	return {
+		exportedObservations,
+		filepaths,
+		cropMetadata,
+		exportedMetadataFiles,
+		sessionMetadata: addBaseUnitValues(
+			metadataDefinitions,
+			addValueLabels(metadataOptions, session.metadata)
+		)
+	};
 }
