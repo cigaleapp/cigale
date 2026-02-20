@@ -2,8 +2,8 @@
 	"$schema": "https://cigaleapp.github.io/cigale/protocol.schema.json",
 	"id": "io.github.cigaleapp.arthropods.example.light",
 	"name": "Example: arthropodes (lightweight)",
-	"learnMore": "https://github.com/cigaleapp/cigale/tree/2ece389ed6863bba02f1f3c0097e3bbdb4952352/scripts/README.md#protocoles-arthropodsexamplelight",
-	"version": 66,
+	"learnMore": "https://github.com/cigaleapp/cigale/tree/1fb3f89e5706155c3d3dc9e0a93553f962e68885/scripts/README.md#protocoles-arthropodsexamplelight",
+	"version": 67,
 	"updates": "automatic",
 	"source": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.light.cigaleprotocol.json",
 	"description": "Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification",
@@ -51,8 +51,7 @@
 		"io.github.cigaleapp.arthropods.example.light__class",
 		"io.github.cigaleapp.arthropods.example.light__phylum",
 		"io.github.cigaleapp.arthropods.example.light__kingdom",
-		"io.github.cigaleapp.arthropods.example.light__crop",
-		"io.github.cigaleapp.arthropods.example.light__crop_is_confirmed"
+		"io.github.cigaleapp.arthropods.example.light__crop"
 	],
 	"sessionMetadata": {
 		"io.github.cigaleapp.arthropods.example.light__prospection_duration": {
@@ -60,14 +59,16 @@
 			"label": "Durée de prospection",
 			"description": "Durée (en minutes) de la prospection sur le terrain",
 			"required": false,
-			"mergeMethod": "average"
+			"mergeMethod": "average",
+			"range": "> 0"
 		},
 		"io.github.cigaleapp.arthropods.example.light__prospection_distance": {
 			"type": "integer",
 			"label": "Distance de prospection",
 			"description": "Distance (en mètres) parcourue pendant la prospection",
 			"required": false,
-			"mergeMethod": "average"
+			"mergeMethod": "average",
+			"range": "> 0"
 		},
 		"io.github.cigaleapp.arthropods.example.light__homogenous_habitat": {
 			"type": "boolean",
@@ -127,7 +128,8 @@
 			"label": "Température",
 			"description": "Température approximative pendant la prospection (en °C)",
 			"required": false,
-			"mergeMethod": "average"
+			"mergeMethod": "average",
+			"range": ">= -273.15"
 		},
 		"io.github.cigaleapp.arthropods.example.light__cloud_coverage": {
 			"type": "enum",
@@ -163,7 +165,8 @@
 			"label": "Photos à l'ombre",
 			"description": "Part des photos prises à l'ombre (en pourcentage)",
 			"required": false,
-			"mergeMethod": "average"
+			"mergeMethod": "average",
+			"range": "0..100"
 		},
 		"io.github.cigaleapp.arthropods.example.light__camera_type": {
 			"type": "enum",
@@ -202,7 +205,8 @@
 			"label": "Date de la session",
 			"description": "Date à laquelle la session a été réalisée. On peut laisser vide si la date a été correctement réglée sur l’appareil photo",
 			"required": false,
-			"mergeMethod": "average"
+			"mergeMethod": "average",
+			"range": "past"
 		}
 	},
 	"metadata": {
@@ -962,13 +966,6 @@
 					}
 				]
 			}
-		},
-		"io.github.cigaleapp.arthropods.example.light__crop_is_confirmed": {
-			"type": "boolean",
-			"label": "",
-			"description": "",
-			"required": false,
-			"mergeMethod": "max"
 		},
 		"io.github.cigaleapp.arthropods.example.light__species": {
 			"type": "enum",
