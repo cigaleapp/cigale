@@ -45,6 +45,7 @@ let collembolaClassifierModel: PredownloadedModel | null = null;
 let arthropodaDetectionModel: PredownloadedModel | null = null;
 
 export type AppFixture = {
+	wait: (ms: number) => Promise<void>;
 	db: {
 		ready(): Promise<void>;
 		refresh(): Promise<void>;
@@ -140,6 +141,9 @@ export const test = base.extend<{ forEachTest: void; app: AppFixture }, { forEac
 		sidepanel.metadataSection = (label) => sidepanelMetadataSectionFor(page, label);
 
 		await use({
+			async wait(ms) {
+				await page.waitForTimeout(ms);
+			},
 			sidepanel,
 			db: {
 				async ready() {

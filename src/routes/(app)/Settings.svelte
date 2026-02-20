@@ -10,6 +10,7 @@
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
+	import InputRange from '$lib/InputRange.svelte';
 	import { askForNotificationPermission, hasNotificationsEnabled } from '$lib/notifications.js';
 	import { resolve } from '$lib/paths';
 	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
@@ -124,12 +125,12 @@
 		</div>
 		<div class="label">Taille des images</div>
 		<div class="setting">
-			<input
-				type="range"
-				min="0.5"
-				max="2"
-				step="0.01"
-				list="gridsize-marks"
+			<InputRange
+				min={0.5}
+				max={2}
+				granularity={0.01}
+				ticks={[1]}
+				onblur={async () => setSetting('gridSize', gridSize)}
 				bind:value={
 					() => gridSize,
 					(value) => {
@@ -138,11 +139,7 @@
 						settings[settings.findIndex((s) => s.id === 'user')].gridSize = value;
 					}
 				}
-				onblur={async () => setSetting('gridSize', gridSize)}
 			/>
-			<datalist id="gridsize-marks">
-				<option value="1"></option>
-			</datalist>
 		</div>
 		<div class="label">Langue</div>
 		<div class="setting">

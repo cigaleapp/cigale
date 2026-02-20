@@ -1,4 +1,6 @@
 <script lang="ts" generics="T extends MetadataType">
+	import { ArkErrors } from 'arktype';
+
 	import IconCheck from '~icons/ri/check-line';
 	import IconClear from '~icons/ri/close-line';
 	import IconTechnical from '~icons/ri/settings-line';
@@ -6,16 +8,21 @@
 
 	import ConfidencePercentage from './ConfidencePercentage.svelte';
 	import type { Metadata, MetadataEnumVariant } from './database.js';
+	import {
+		metadataValueValidatorDate,
+		metadataValueValidatorNumeric,
+		metadataValueValidatorString
+	} from './metadata/constraints.js';
 	import { hasRuntimeType, type TypedMetadataValue } from './metadata/index.js';
 	import MetadataInput from './MetadataInput.svelte';
 	import { splitMetadataId, type MetadataType, type RuntimeValue } from './schemas/metadata.js';
 	import { isDebugMode } from './settings.svelte.js';
 	import { tooltip } from './tooltips.js';
-	import { orEmpty, safeJSONParse } from './utils.js';
+	import { orEmpty, pick, safeJSONParse } from './utils.js';
 	import WorldMap from './WorldMap.svelte';
 
 	interface Props {
-		definition: Metadata & { type: T };
+		definition: Metadata;
 		options?: MetadataEnumVariant[];
 		value: undefined | TypedMetadataValue<NoInfer<T>>;
 		merged?: boolean;
@@ -24,6 +31,27 @@
 	}
 
 	let { value, merged, definition, options = [], onchange = () => {} }: Props = $props();
+
+	const valueValidator = $derived.by(() => {
+		switch (definition.type) {
+			case 'string':
+				return metadataValueValidatorString(definition);
+			case 'integer':
+				return metadataValueValidatorNumeric(definition);
+			case 'float':
+				return metadataValueValidatorNumeric(definition);
+			case 'date':
+				return metadataValueValidatorDate(definition);
+			default:
+				return undefined;
+		}
+	});
+
+	let validation: ArkErrors | unknown = $derived(
+		value?.value !== undefined ? valueValidator?.(value.value) : undefined
+	);
+
+	const validationErrors = $derived(validation instanceof ArkErrors ? validation : undefined);
 
 	const _id = $props.id();
 
@@ -129,9 +157,13 @@
 					type: definition.type,
 					...splitMetadataId(definition.id),
 					...(options.length <= 10 ? { options } : {}),
-					value
+					value,
+					validationErrors,
+					constraints: {
+						...pick(definition, 'pattern', 'regex', 'range', 'accept', 'size')
+					}
 				},
-				null,
+				(_k, v) => (v instanceof RegExp ? v.source : v),
 				2
 			)}</pre>
 	{/if}
@@ -149,6 +181,12 @@
 			{/if}
 		</section>
 	{/if}
+
+	{#if validationErrors}
+		<section class="validation">
+			{validationErrors.summary}
+		</section>
+	{/if}
 {/snippet}
 
 {#snippet input()}
@@ -157,7 +195,11 @@
 		{definition}
 		{options}
 		value={value?.value}
-		onblur={onchange}
+		{validationErrors}
+		onblur={(val) => {
+			onchange(val);
+			validation = val !== undefined ? valueValidator?.(val) : undefined;
+		}}
 		{isCompactEnum}
 		confidences={Object.fromEntries([
 			...Object.entries(value?.alternatives ?? {}).map(([key, value]) => [
@@ -185,7 +227,7 @@
 		class="clear"
 		use:tooltip={'Supprimer cette valeur'}
 		aria-label="Supprimer cette valeur"
-		disabled={!value}
+		disabled={!value || value.isDefault}
 		onclick={() => {
 			if (!value) return;
 			value = undefined;
@@ -282,5 +324,9 @@
 		border-radius: var(--corner-radius);
 		overflow: hidden;
 		margin: 1rem 0;
+	}
+
+	.validation {
+		color: var(--fg-error);
 	}
 </style>

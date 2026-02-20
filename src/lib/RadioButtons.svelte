@@ -1,22 +1,25 @@
-<script generics="OptionKey extends string|number, AdditionalItemData = {}">
-	/**
-	 * @template {string|number} Key
-	 * @typedef {{ key: Key; label: string; subtext?: string, disabled?: boolean } & AdditionalItemData} Item
-	 */
+<script lang="ts" generics="OptionKey extends string|number, AdditionalItemData = {}">
+	type Item<Key extends string | number> = {
+		key: Key;
+		label: string;
+		subtext?: string;
+		disabled?: boolean;
+	} & AdditionalItemData;
 
-	/**
-	 * @typedef {object} Props
-	 * @property {Array<Item<OptionKey>>} options possible options
-	 * @property {boolean} [vertical] force vertical display of radio buttons. if neither vertical nor horizontal is set, the buttons will be laid horizontally only if they all fit in a single row.
-	 * @property {boolean} [horizontal] display the radio buttons in a grid
-	 * @property {boolean} [cards] display the radio buttons as cards
-	 * @property {NoInfer<OptionKey> | undefined} [value] the value of the selected radio button
-	 * @property {(value: OptionKey|undefined) => void} [onchange] callback to call when the user selects a radio button
-	 * @property {import('svelte').Snippet<[Item<NoInfer<OptionKey>> & { value: typeof value, selected: boolean }]>} [children] content of the label
-	 * @property {string} [label] label for the radio group
-	 */
+	interface Props {
+		options: Array<Item<OptionKey>>;
+		vertical?: boolean;
+		horizontal?: boolean;
+		cards?: boolean;
+		value?: NoInfer<OptionKey> | undefined;
+		// eslint-disable-next-line no-unused-vars
+		onchange?: (value: OptionKey | undefined, fieldset: HTMLFieldSetElement) => void;
+		children?: import('svelte').Snippet<
+			[Item<NoInfer<OptionKey>> & { value: typeof value; selected: boolean }]
+		>;
+		label?: string;
+	}
 
-	/** @type {Props} */
 	let {
 		options,
 		value = $bindable(),
@@ -26,14 +29,18 @@
 		label,
 		horizontal,
 		vertical
-	} = $props();
+	}: Props = $props();
+
+	let fieldset: HTMLFieldSetElement | undefined = $state();
 
 	$effect(() => {
-		onchange(value);
+		if (!fieldset) return;
+		onchange(value, fieldset);
 	});
 </script>
 
-<div
+<fieldset
+	bind:this={fieldset}
 	class="radio-inputs"
 	class:horizontal
 	class:smart-horizontal={!horizontal && !vertical}
@@ -59,13 +66,15 @@
 			{/if}
 		</label>
 	{/each}
-</div>
+</fieldset>
 
 <style>
 	.radio-inputs {
 		display: flex;
 		flex-direction: column;
 		gap: 0.5em;
+		border: none;
+		padding: 0;
 	}
 
 	.radio-inputs.horizontal {

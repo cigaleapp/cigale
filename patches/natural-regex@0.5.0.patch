@@ -1,0 +1,44 @@
+diff --git a/node_modules/natural-regex/.bun-tag-4d61ccb1a34513f7 b/.bun-tag-4d61ccb1a34513f7
+new file mode 100644
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+diff --git a/node_modules/natural-regex/.bun-tag-cc74b0ee2e59fb b/.bun-tag-cc74b0ee2e59fb
+new file mode 100644
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+diff --git a/es/language.js b/es/language.js
+index 08a4d3a31de7cdc93ecec9bdbf41115d39f1f863..8daa2ec795ff68ab7e33e95276d73a8210b8b757 100644
+--- a/es/language.js
++++ b/es/language.js
+@@ -1427,7 +1427,4 @@ if (typeof require !== 'undefined' && typeof exports !== 'undefined') {
+     var source = require('fs').readFileSync(require('path').normalize(args[1]), "utf8");
+     return exports.parser.parse(source);
+   };
+-  if (typeof module !== 'undefined' && require.main === module) {
+-    exports.main(process.argv.slice(1));
+-  }
+ }
+diff --git a/lib/language.js b/lib/language.js
+index 08a4d3a31de7cdc93ecec9bdbf41115d39f1f863..b5b0be29415ca1f40879bdc8a5edf7946d113fb7 100644
+--- a/lib/language.js
++++ b/lib/language.js
+@@ -1427,7 +1427,4 @@ if (typeof require !== 'undefined' && typeof exports !== 'undefined') {
+     var source = require('fs').readFileSync(require('path').normalize(args[1]), "utf8");
+     return exports.parser.parse(source);
+   };
+-  if (typeof module !== 'undefined' && require.main === module) {
+-    exports.main(process.argv.slice(1));
+-  }
+ }
+\ No newline at end of file
+diff --git a/src/language.js b/src/language.js
+index 79b45d59ccf4723b80f361a481190dcd80dce56b..10c2711ca153e01cf8cde556fdad2230e2b3608a 100644
+--- a/src/language.js
++++ b/src/language.js
+@@ -1189,7 +1189,4 @@ exports.main = function commonjsMain(args) {
+     var source = require('fs').readFileSync(require('path').normalize(args[1]), "utf8");
+     return exports.parser.parse(source);
+ };
+-if (typeof module !== 'undefined' && require.main === module) {
+-  exports.main(process.argv.slice(1));
+-}
+ }
+\ No newline at end of file

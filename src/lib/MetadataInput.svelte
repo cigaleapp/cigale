@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Icon from '@iconify/svelte';
+	import { ArkErrors, type } from 'arktype';
 	import * as dates from 'date-fns';
 	import { fade } from 'svelte/transition';
 
@@ -13,6 +14,7 @@
 	import FilePreview from './FilePreview.svelte';
 	import { promptForFiles } from './files.js';
 	import { formatBytesSize } from './i18n.js';
+	import InputRange from './InputRange.svelte';
 	import LoadingText, { Loading } from './LoadingText.svelte';
 	import MetadataTypeswitch from './metadata/MetadataTypeswitch.svelte';
 	import MetadataCombobox from './MetadataCombobox.svelte';
@@ -32,6 +34,7 @@
 		value: undefined | RuntimeValue;
 		// eslint-disable-next-line no-unused-vars
 		onblur: (value: undefined | RuntimeValue) => void;
+		validationErrors: ArkErrors | undefined;
 		id: string;
 		disabled?: boolean;
 		options?: MetadataEnumVariant[];
@@ -42,6 +45,7 @@
 	const {
 		value,
 		confidences = {},
+		validationErrors,
 		id,
 		disabled,
 		definition,
@@ -52,7 +56,12 @@
 
 	let savingFile = $state(false);
 
-	const { type } = $derived(definition);
+	/**
+	 * Used to allow temporarily changing the value shown on the input
+	 * without triggering a database save
+	 * Used (for now) only for syncing the value of the range input with the text input, without saving on every change of the range input
+	 */
+	let temporaryValue: undefined | RuntimeValue = $derived(value);
 
 	let windowIsFocused = $state(true);
 	$effect(() => {
@@ -67,13 +76,14 @@
 
 <div
 	class="metadata-input"
-	data-type={type}
+	data-type={definition.type}
 	data-metadata-id={definition.id}
 	class:compact-enum={isCompactEnum}
+	class:has-validation-errors={Boolean(validationErrors)}
 >
 	<!-- XXX: Is not reactive without an explicit {#key}, idk why -->
 	{#key value}
-		<MetadataTypeswitch {type} {value}>
+		<MetadataTypeswitch {definition} {value}>
 			{#snippet enum_(value)}
 				{#if isCompactEnum}
 					<RadioButtons
@@ -117,18 +127,13 @@
 						type="single"
 						disabled={disabled ?? false}
 						value={safeJSONParse(value?.toString())?.toString() ?? value}
-						onValueChange={(val: string) => onblur(val)}
+						onValueChange={onblur}
 					/>
 				{/if}
 			{/snippet}
 			{#snippet boolean(value)}
 				<div class="boolean-switch">
-					<Switch
-						value={value ?? false}
-						onchange={(newValue) => {
-							onblur(newValue);
-						}}
-					/>
+					<Switch value={value ?? false} onchange={onblur} />
 					{#if value}
 						Oui
 					{:else if value === false}
@@ -145,54 +150,77 @@
 					onblur={(e) => onblur(e.currentTarget.value)}
 				/>
 			{/snippet}
-			{#snippet numeric(val)}
-				<input
-					{id}
-					{disabled}
-					type="text"
-					inputmode="numeric"
-					onblur={({ currentTarget }) => {
-						if (!(currentTarget instanceof HTMLInputElement)) return;
-						const newValue = currentTarget.value;
-						if (!newValue) {
-							onblur(undefined);
-							return;
-						}
+			{#snippet numeric(val, { range: interval })}
+				<div class="underscored">
+					<input
+						{id}
+						{disabled}
+						type="text"
+						inputmode="numeric"
+						{...interval}
+						onblur={({ currentTarget }) => {
+							if (!(currentTarget instanceof HTMLInputElement)) return;
+							const newValue = currentTarget.value;
+							if (!newValue) {
+								onblur(undefined);
+								return;
+							}
 
-						/** @type {number|undefined} */
-						let parsedValue =
-							type === 'integer'
-								? Number.parseInt(newValue, 10)
-								: Number.parseFloat(newValue);
+							let parsedValue: number | undefined =
+								definition.type === 'integer'
+									? Number.parseInt(newValue, 10)
+									: Number.parseFloat(newValue);
 
-						if (Number.isNaN(parsedValue)) {
-							parsedValue = undefined;
-						}
+							if (Number.isNaN(parsedValue)) {
+								parsedValue = undefined;
+							}
 
-						onblur(parsedValue);
-					}}
-					value={val?.toString() ?? ''}
-				/>
-				<button
-					class="decrement"
-					aria-label="Décrémenter"
-					onclick={() => {
-						if (typeof value !== 'number') return;
-						onblur(round((value ?? 0) - 1, 5));
-					}}
-				>
-					<IconDecrement />
-				</button>
-				<button
-					class="increment"
-					aria-label="Incrémenter"
-					onclick={() => {
-						if (typeof value !== 'number') return;
-						onblur(round((value ?? 0) + 1, 5));
-					}}
-				>
-					<IconIncrement />
-				</button>
+							onblur(parsedValue);
+						}}
+						value={temporaryValue ?? val?.toString() ?? ''}
+					/>
+				</div>
+
+				{#if interval?.min !== undefined && interval?.max !== undefined}
+					<div class="range-input">
+						<InputRange
+							min={interval.min}
+							max={interval.max}
+							granularity={definition.type === 'integer' ? 1 : 1e-6}
+							ticks={5}
+							value={val}
+							onvalue={(v) => {
+								temporaryValue = v;
+							}}
+							onblur={() => {
+								onblur(temporaryValue);
+							}}
+						/>
+					</div>
+				{/if}
+
+				<div class="increment-decrement-buttons">
+					<button
+						class="decrement"
+						aria-label="Décrémenter"
+						onclick={() => {
+							if (value !== undefined && typeof value !== 'number') return;
+							onblur(round((value ?? 0) - 1, 5));
+						}}
+					>
+						<IconDecrement />
+					</button>
+					<button
+						class="increment"
+						aria-label="Incrémenter"
+						onclick={() => {
+							if (value !== undefined && typeof value !== 'number') return;
+							onblur(round((value ?? 0) + 1, 5));
+						}}
+					>
+						<IconIncrement />
+					</button>
+				</div>
 			{/snippet}
 			{#snippet date(value)}
 				<!-- TODO use bits-ui datepicker -->
@@ -200,21 +228,19 @@
 					type="date"
 					{id}
 					{disabled}
-					onblur={() => onblur(value)}
-					bind:value={
-						() => {
-							if (value === undefined) return undefined;
-							return dates.format(value, 'yyyy-MM-dd');
-						},
-						(newValue) => {
-							if (newValue === undefined) {
-								onblur(undefined);
-								return undefined;
-							}
-							onblur(dates.parse(newValue, 'yyyy-MM-dd', new Date()));
-							return newValue;
+					value={value === undefined ? undefined : dates.format(value, 'yyyy-MM-dd')}
+					onblur={({ currentTarget }) => {
+						const newValue = currentTarget.value;
+
+						if (newValue === undefined) {
+							onblur(undefined);
+							return undefined;
 						}
-					}
+
+						const parsed = dates.parse(newValue, 'yyyy-MM-dd', new Date());
+						onblur(parsed);
+						return newValue;
+					}}
 				/>
 			{/snippet}
 			{#snippet location(value)}
@@ -262,6 +288,7 @@
 							{:else}
 								<code
 									class="size"
+									class:infinite={size.maximum === undefined}
 									use:tooltip={size.maximum
 										? `La taille maximale est de ${formatBytesSize(size.maximum)}`
 										: 'Aucune limite de taille'}
@@ -269,7 +296,7 @@
 									{#if size.maximum}
 										&lt;{formatBytesSize(size.maximum, 'narrow')}
 									{:else}
-										∞
+										<span>∞</span>
 									{/if}
 								</code>
 								<div class="name empty">Aucun fichier</div>
@@ -278,9 +305,7 @@
 							<div class="actions">
 								<ButtonInk
 									onclick={async () => {
-										const [file] = await promptForFiles({
-											accept
-										});
+										const [file] = await promptForFiles({ accept });
 
 										const savingStart = performance.now();
 										savingFile = true;
@@ -418,12 +443,63 @@
 	.metadata-input:not(
 		:is([data-type='boolean'], [data-type='file'], [data-type='boundingbox'], .compact-enum)
 	) {
-		border-bottom: 2px dashed var(--fg-neutral);
 		display: flex;
 		align-items: center;
 
-		&:focus-within {
+		&:not(:has(.underscored)) {
+			border-bottom: 2px dashed var(--fg-neutral);
+
+			&:focus-within {
+				border-bottom-style: solid;
+			}
+
+			&.has-validation-errors {
+				border-color: var(--fg-error);
+			}
+		}
+	}
+
+	.metadata-input:has(.range-input) {
+		.range-input {
+			width: 14ch;
+			margin-left: 1em;
+			display: flex;
+			align-items: center;
+		}
+
+		.underscored input {
+			width: 8ch;
+		}
+
+		/* .increment, .decrement {
+			display: none;
+		} */
+	}
+
+	.increment-decrement-buttons {
+		display: flex;
+		gap: 0.25em;
+		margin-left: 0.5em;
+		align-items: center;
+	}
+
+	.metadata-input:has(.underscored) {
+		.underscored {
+			display: flex;
+			align-items: center;
+			border-bottom: 2px dashed var(--fg-neutral);
+		}
+
+		&:focus-within .underscored {
 			border-bottom-style: solid;
+		}
+
+		&.has-validation-errors .underscored {
+			border-color: var(--fg-error);
+		}
+
+		&.has-validation-errors .range-input {
+			--track-fill: var(--fg-error);
 		}
 	}
 
@@ -461,6 +537,15 @@
 			font-size: 0.8em;
 			/* "000" + " " + "kB" */
 			width: calc(3ch + 1ch + 2ch);
+		}
+
+		.size.infinite {
+			text-align: center;
+
+			span {
+				font-weight: 100;
+				font-size: 2em;
+			}
 		}
 
 		.name.empty {

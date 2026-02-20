@@ -15,10 +15,12 @@ You can also provide a `numeric` snippet that will be used for both `integer` an
 	import { ArkErrors } from 'arktype';
 	import type { Snippet } from 'svelte';
 
-	import type { MetadataType } from '$lib/database';
+	import type { Metadata, MetadataType } from '$lib/database';
 	import { MetadataRuntimeValue, type RuntimeValue } from '$lib/schemas/metadata';
 
-	type Branch<T extends MetadataType> = Snippet<[undefined | RuntimeValue<T>]>;
+	type Branch<T extends MetadataType> = Snippet<
+		[undefined | RuntimeValue<T>, Extract<Metadata, { type: T }>]
+	>;
 
 	type Cases = {
 		[T in Exclude<MetadataType, 'enum'>]: Branch<T>;
@@ -34,7 +36,7 @@ You can also provide a `numeric` snippet that will be used for both `integer` an
 		  });
 
 	type Props = {
-		type: MetadataType;
+		definition: Metadata;
 		error: Snippet<[ArkErrors]>;
 		value: undefined | RuntimeValue;
 	} & (
@@ -42,7 +44,8 @@ You can also provide a `numeric` snippet that will be used for both `integer` an
 		| (Partial<Branches> & { fallback: Snippet<[RuntimeValue | undefined]> })
 	);
 
-	const { type: typ, value, error, fallback, ...branches }: Props = $props();
+	const { definition, value, error, fallback, ...branches }: Props = $props();
+	const typ = $derived(definition.type);
 
 	const branch = $derived.by(() => {
 		switch (typ) {
@@ -67,7 +70,7 @@ You can also provide a `numeric` snippet that will be used for both `integer` an
 {#if validated instanceof ArkErrors}
 	{@render error(validated)}
 {:else if branch}
-	{@render (branch as Branch<MetadataType>)(validated)}
+	{@render (branch as Branch<MetadataType>)(validated, definition)}
 {:else}
 	{@render fallback!(validated)}
 {/if}
