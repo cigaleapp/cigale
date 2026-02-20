@@ -364,7 +364,7 @@ export async function chooseInDropdown(page, trigger, ...option) {
 		await locateOption(options, ...option).click();
 	}
 
-	await page.keyboard.press('Escape'); // Close the dropdown(s)
+	await trigger.click();
 
 	/**
 	 * @param {Locator} options

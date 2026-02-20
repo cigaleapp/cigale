@@ -42,6 +42,7 @@ sessionMetadata:
     required: false
     type: float
     description: 'This metadata has no default value, so it will be undefined if not set'
+    unit: atm
 
   sessionwide_file:
     label: sessionwide file

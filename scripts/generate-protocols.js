@@ -221,7 +221,8 @@ const protocol = {
 			// TODO duration datatype ?
 			type: 'integer',
 			label: 'Durée de prospection',
-			description: 'Durée (en minutes) de la prospection sur le terrain',
+			description: 'Durée de la prospection sur le terrain',
+			unit: 'minutes',
 			required: false,
 			mergeMethod: 'average',
 			range: '> 0'
@@ -229,7 +230,8 @@ const protocol = {
 		[namespaced('prospection_distance')]: {
 			type: 'integer',
 			label: 'Distance de prospection',
-			description: 'Distance (en mètres) parcourue pendant la prospection',
+			description: 'Distance parcourue pendant la prospection',
+			unit: 'meters',
 			required: false,
 			mergeMethod: 'average',
 			range: '> 0'
@@ -271,7 +273,8 @@ const protocol = {
 		[namespaced('temperature')]: {
 			type: 'integer',
 			label: 'Température',
-			description: 'Température approximative pendant la prospection (en °C)',
+			description: 'Température approximative pendant la prospection',
+			unit: 'celsius',
 			required: false,
 			mergeMethod: 'average',
 			range: '>= -273.15'

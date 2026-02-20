@@ -23,6 +23,7 @@ import {
 	NeuralBoundingBoxInference,
 	NeuralEnumInference
 } from './neural.js';
+import { NumericUnit as NumberUnit, NumericUnit } from './units.js';
 
 /**
  * @param {string} metadataId
@@ -141,6 +142,10 @@ export const MetadataValue = type({
 		return out;
 	}, MetadataRuntimeValueAny),
 	confidence: Probability.default(1),
+	'unit?': type(
+		/** @type {type.cast<typeof NumericUnit.infer>} */
+		('string')
+	).describe('Unité dans laquelle la valeur est exprimée'),
 	confirmed: type('boolean')
 		.describe('Si la valeur a été manuellement confirmée comme correcte')
 		.default(false),
@@ -179,7 +184,10 @@ export const MetadataRecordValue = MetadataValue.omit('value').and({
 		'string',
 		'@',
 		"Label de la valeur de la métadonnée. Existe pour les métadonnées de type enum, contient dans ce cas le label associé à la clé de l'option de l'enum choisie"
-	]
+	],
+	'baseUnitValue?': type('number').describe(
+		"Si la métadonnée a une unité, c'est la valeur convertie dans l'unité de base définie pour cette métadonnée."
+	)
 });
 
 /**
@@ -425,14 +433,16 @@ export const MetadataInteger = MetadataBase.and({
 	type: '"integer"',
 	'range?': NumberRangeLiteral,
 	'default?': MetadataDefault('number.integer'),
-	'infer?': type.or(InferenceConfigs.exif, InferenceConfigs.sidecar(type('number.integer')))
+	'infer?': type.or(InferenceConfigs.exif, InferenceConfigs.sidecar(type('number.integer'))),
+	'unit?': NumberUnit
 }).pipe();
 
 export const MetadataFloat = MetadataBase.and({
 	type: '"float"',
 	'range?': NumberRangeLiteral,
 	'default?': MetadataDefault('number'),
-	'infer?': type.or(InferenceConfigs.exif, InferenceConfigs.sidecar(type('number')))
+	'infer?': type.or(InferenceConfigs.exif, InferenceConfigs.sidecar(type('number'))),
+	'unit?': NumberUnit
 });
 
 export const MetadataDate = MetadataBase.and({

@@ -76,7 +76,7 @@
 	</DropdownMenu.Trigger>
 
 	<DropdownMenu.Portal>
-		<DropdownMenu.Content data-testid={testids(testid).content}>
+		<DropdownMenu.Content data-testid={testids(testid).content} preventScroll={false}>
 			{#each groups as group (group.label)}
 				{#if group.items.length > 0}
 					<DropdownMenu.Group data-testid={group.testid}>
@@ -194,7 +194,8 @@
 		background-color: var(--bg-neutral);
 		border: 1px solid var(--fg-primary);
 		border-radius: 0.5rem;
-		overflow: hidden;
+		overflow: auto;
+		max-height: 60vh;
 		z-index: 100;
 	}
 
