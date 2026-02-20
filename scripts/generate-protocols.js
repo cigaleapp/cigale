@@ -208,7 +208,6 @@ const protocol = {
 		'phylum',
 		'kingdom',
 		'crop',
-		'crop_is_confirmed'
 	].map(namespaced),
 	sessionMetadata: {
 		[namespaced('prospection_duration')]: {
@@ -470,13 +469,6 @@ const protocol = {
 					}
 				]
 			}
-		},
-		[namespaced('crop_is_confirmed')]: {
-			type: 'boolean',
-			label: '',
-			description: '',
-			required: false,
-			mergeMethod: 'max'
 		},
 		[namespaced('species')]: {
 			type: 'enum',
