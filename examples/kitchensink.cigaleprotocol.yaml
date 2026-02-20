@@ -104,6 +104,7 @@ metadata:
     mergeMethod: average
     required: false
     type: integer
+    range: <= 100
 
   string:
     description: string metadata
@@ -111,6 +112,7 @@ metadata:
     mergeMethod: average
     required: false
     type: string
+    regex: ^ohio (understandment|respect).*$
 
   location:
     description: location metadata

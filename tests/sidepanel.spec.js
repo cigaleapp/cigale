@@ -1,3 +1,5 @@
+import { addDays, format as formatDate } from 'date-fns';
+
 import { issue } from './annotations.js';
 import { assert, expect, test } from './fixtures.js';
 import {
@@ -49,6 +51,7 @@ async function metadataValueInDatabase(
 	observation = 'leaf',
 	protocolId = 'io.github.cigaleapp.kitchensink'
 ) {
+	await app.wait(200);
 	return app.db.metadata.values({ observation, protocolId }).then((metadata) => metadata[key]);
 }
 
@@ -455,9 +458,19 @@ test('can update a date-type metadata', async ({ page, app }) => {
 	await assert(dateSection.getByRole('textbox')).toHaveValue('');
 
 	await dateSection.getByRole('textbox').fill('2025-05-01');
+	await dateSection.getByRole('textbox').blur();
 
-	await assert(dateSection.getByRole('textbox')).toHaveValue('2025-05-01');
-	assert(await metadataValueInDatabase(app, 'date')).toBe('2025-05-01T00:00:00');
+	await expect(dateSection.getByRole('textbox')).toHaveValue('2025-05-01');
+	expect(await metadataValueInDatabase(app, 'date')).toBe('2025-05-01T00:00:00');
+	await expect(dateSection).toHaveText(/must be .+ or later/);
+
+	const futureDate = formatDate(addDays(new Date(), 10), 'yyyy-MM-dd');
+	await dateSection.getByRole('textbox').fill(futureDate);
+	await dateSection.getByRole('textbox').blur();
+
+	await expect(dateSection.getByRole('textbox')).toHaveValue(futureDate);
+	expect(await metadataValueInDatabase(app, 'date')).toBe(`${futureDate}T00:00:00`);
+	await expect(dateSection).not.toHaveText(/must be .+ or later/);
 });
 
 test('can update a float-type metadata', async ({ page, app }) => {
@@ -480,23 +493,42 @@ test('can update a integer-type metadata', async ({ page, app }) => {
 	const integerSection = app.sidepanel.metadataSection('integer');
 	await assert(integerSection.getByRole('textbox')).toHaveValue('');
 
-	await integerSection.getByRole('textbox').fill('42');
+	await integerSection.getByRole('textbox').fill('142');
 	await integerSection.getByRole('textbox').blur();
 	await integerSection.getByRole('button', { name: 'Décrémenter' }).click();
 
-	await assert(integerSection.getByRole('textbox')).toHaveValue('41');
-	assert(await metadataValueInDatabase(app, 'integer')).toBe(41);
+	await expect(integerSection.getByRole('textbox')).toHaveValue('141');
+	expect(await metadataValueInDatabase(app, 'integer')).toBe(141);
+	await expect(integerSection).toHaveText(/must be less than 100/);
+
+	await integerSection.getByRole('textbox').fill('42');
+	await integerSection.getByRole('textbox').blur();
+
+	await expect(integerSection.getByRole('textbox')).toHaveValue('42');
+	expect(await metadataValueInDatabase(app, 'integer')).toBe(42);
+	await expect(integerSection).not.toHaveText('must be less than 100');
 });
 
 test('can update a string-type metadata', async ({ page, app }) => {
 	await initialize({ page, app, dump: 'db/kitchensink-protocol.devalue' });
 
-	const textbox = app.sidepanel.metadataSection('string').getByRole('textbox');
+	const section = app.sidepanel.metadataSection('string');
+	const textbox = section.getByRole('textbox');
 	await assert(textbox).toHaveValue('');
 
 	await textbox.fill('Hello world');
 	await textbox.blur();
 
-	await assert(textbox).toHaveValue('Hello world');
-	assert(await metadataValueInDatabase(app, 'string')).toBe('Hello world');
+	await expect(textbox).toHaveValue('Hello world');
+	expect(await metadataValueInDatabase(app, 'string')).toBe('Hello world');
+	// we're expecting a regex string in the UI, this is intentional
+	await expect(section).toHaveText(/\^ohio \(understandment\|respect\)\.\*\$/);
+
+	await textbox.fill('ohio understandment');
+	await textbox.blur();
+
+	await expect(textbox).toHaveValue('ohio understandment');
+	expect(await metadataValueInDatabase(app, 'string')).toBe('ohio understandment');
+	// we're expecting a regex string in the UI, this is intentional
+	await expect(section).not.toHaveText(/\^ohio \(understandment\|respect\)\.\*\$/);
 });

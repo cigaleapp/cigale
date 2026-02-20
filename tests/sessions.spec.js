@@ -500,6 +500,7 @@ test('session metadata form has default values', async ({ page, app }) => {
 	// Changing a value that another default value depends on
 
 	await page.getByRole('textbox', { name: 'Date du transect' }).fill('2024-01-01');
+	await page.getByRole('textbox', { name: 'Date du transect' }).blur();
 
 	await expect(page.getByRole('textbox', { name: 'Code du transect' })).toHaveValue(
 		'202401010000AB'
@@ -510,6 +511,7 @@ test('session metadata form has default values', async ({ page, app }) => {
 	await page.getByRole('textbox', { name: 'Code du transect' }).fill('custom code');
 
 	await page.getByRole('textbox', { name: 'Date du transect' }).fill('2024-02-01');
+	await page.getByRole('textbox', { name: 'Date du transect' }).blur();
 
 	await expect(page.getByRole('textbox', { name: 'Code du transect' })).toHaveValue(
 		'custom code'
