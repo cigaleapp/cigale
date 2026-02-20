@@ -207,7 +207,7 @@ const protocol = {
 		'class',
 		'phylum',
 		'kingdom',
-		'crop',
+		'crop'
 	].map(namespaced),
 	sessionMetadata: {
 		[namespaced('prospection_duration')]: {
@@ -289,7 +289,7 @@ const protocol = {
 			description: "Part des photos prises à l'ombre (en pourcentage)",
 			required: false,
 			mergeMethod: 'average',
-			range:  '0..100'
+			range: '0..100'
 		},
 		[namespaced('camera_type')]: {
 			type: 'enum',
