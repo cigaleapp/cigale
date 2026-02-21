@@ -16,6 +16,7 @@ import {
 } from './common.js';
 import { NaturalRegexExpression, NumberRangeLiteral, RegexExpression } from './constraints.js';
 import { NeuralBoundingBoxInference, NeuralEnumInference } from './neural.js';
+import { NumericUnit as NumberUnit, NumericUnit } from './units.js';
 
 /**
  * @param {string} metadataId
@@ -134,6 +135,9 @@ export const MetadataValue = type({
 		return out;
 	}, MetadataRuntimeValueAny),
 	confidence: Probability.default(1),
+	unit: NumericUnit.describe('Unité dans laquelle la valeur est exprimée')
+		.or('undefined')
+		.default(() => undefined),
 	confirmed: type('boolean')
 		.describe('Si la valeur a été manuellement confirmée comme correcte')
 		.default(false),
@@ -150,7 +154,8 @@ export const MetadataValue = type({
 
 export const MetadataValues = type.Record(NamespacedMetadataID, MetadataValue);
 
-export const MetadataRecordValue = MetadataValue.omit('value').and({
+export const MetadataRecordValue = MetadataValue.omit('value', 'unit').and({
+	'unit?': NumericUnit.describe('Unité dans laquelle la valeur est exprimée'),
 	value: [
 		type.or(
 			'null',
@@ -172,7 +177,10 @@ export const MetadataRecordValue = MetadataValue.omit('value').and({
 		'string',
 		'@',
 		"Label de la valeur de la métadonnée. Existe pour les métadonnées de type enum, contient dans ce cas le label associé à la clé de l'option de l'enum choisie"
-	]
+	],
+	'baseUnitValue?': type('number').describe(
+		"Si la métadonnée a une unité, c'est la valeur convertie dans l'unité de base définie pour cette métadonnée."
+	)
 });
 
 /**
@@ -349,14 +357,16 @@ export const MetadataInteger = MetadataBase.and({
 	type: '"integer"',
 	'range?': NumberRangeLiteral,
 	'default?': MetadataDefault('number.integer'),
-	'infer?': type.or({ exif: EXIFInference })
+	'infer?': type.or({ exif: EXIFInference }),
+	'unit?': NumberUnit
 }).pipe();
 
 export const MetadataFloat = MetadataBase.and({
 	type: '"float"',
 	'range?': NumberRangeLiteral,
 	'default?': MetadataDefault('number'),
-	'infer?': type.or({ exif: EXIFInference })
+	'infer?': type.or({ exif: EXIFInference }),
+	'unit?': NumberUnit
 });
 
 export const MetadataDate = MetadataBase.and({

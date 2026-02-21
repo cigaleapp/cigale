@@ -16,6 +16,7 @@
 	import { hasRuntimeType, type TypedMetadataValue } from './metadata/index.js';
 	import MetadataInput from './MetadataInput.svelte';
 	import { splitMetadataId, type MetadataType, type RuntimeValue } from './schemas/metadata.js';
+	import type { NumericUnit } from './schemas/units.js';
 	import { isDebugMode } from './settings.svelte.js';
 	import { tooltip } from './tooltips.js';
 	import { orEmpty, pick, safeJSONParse } from './utils.js';
@@ -26,8 +27,12 @@
 		options?: MetadataEnumVariant[];
 		value: undefined | TypedMetadataValue<NoInfer<T>>;
 		merged?: boolean;
-		// eslint-disable-next-line no-unused-vars
-		onchange?: (value: undefined | RuntimeValue<T>) => void;
+		onchange?: (
+			// eslint-disable-next-line no-unused-vars
+			value: undefined | RuntimeValue<T>,
+			// eslint-disable-next-line no-unused-vars
+			unit?: undefined | typeof NumericUnit.infer
+		) => void;
 	}
 
 	let { value, merged, definition, options = [], onchange = () => {} }: Props = $props();
@@ -37,9 +42,9 @@
 			case 'string':
 				return metadataValueValidatorString(definition);
 			case 'integer':
-				return metadataValueValidatorNumeric(definition);
 			case 'float':
-				return metadataValueValidatorNumeric(definition);
+				return metadataValueValidatorNumeric(definition, value?.unit);
+			// return
 			case 'date':
 				return metadataValueValidatorDate(definition);
 			default:
@@ -118,7 +123,7 @@
 									confidence,
 									alternatives: value?.alternatives ?? {}
 								};
-								onchange(value?.value);
+								onchange(value?.value, value?.unit);
 							}}
 						>
 							<IconCheck />
@@ -195,9 +200,14 @@
 		{definition}
 		{options}
 		value={value?.value}
+		unit={value?.unit}
 		{validationErrors}
-		onblur={(val) => {
-			onchange(val);
+		onblur={(val, unit) => {
+			// We eagerly update value.unit because otherwise it gets updated after the DB changes
+			// the validator would update separately to the unit+value change
+			// which causes a flickering false validation error
+			if (value) value.unit = unit;
+			onchange(val, unit);
 			validation = val !== undefined ? valueValidator?.(val) : undefined;
 		}}
 		{isCompactEnum}

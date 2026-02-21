@@ -42,7 +42,7 @@
 	 * @property {(() => void) | undefined} [onsplit] callback to call when the user wants to split the selected observation(s). If not set, the split button is not shown.
 	 * @property {(() => void) | undefined} [onimport] callback to call when the user wants to import additional images. If not set, the import button is not shown.
 	 * @property {boolean} [cansplit=false] whether the user is allowed to split the selected observation(s)
-	 * @property {(key: string, value: undefined | import('$lib/schemas/metadata').RuntimeValue) => void} onmetadatachange callback to call when a metadata's value is modified
+	 * @property {(key: string, value: undefined | import('$lib/schemas/metadata').RuntimeValue, unit: undefined | typeof import('$lib/schemas/units').NumericUnit.infer) => void} onmetadatachange callback to call when a metadata's value is modified
 	 * @property {boolean} [canmerge=false] whether the user is allowed to merge images or observations
 	 * @property {Record<string, import('$lib/database').MetadataValue & { merged: boolean } >} metadata values of the metadata we're viewing.
 	 */
@@ -216,9 +216,9 @@
 						{definition}
 						{value}
 						options={[...(options[definition.id] ?? new Map()).values()]}
-						onchange={async (v) => {
-							if (dequal(v, value?.value)) return;
-							onmetadatachange(definition.id, v);
+						onchange={async (v, unit) => {
+							if (dequal(v, value?.value) && unit === value?.unit) return;
+							onmetadatachange(definition.id, v, unit);
 						}}
 					/>
 				{/if}

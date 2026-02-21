@@ -1,4 +1,5 @@
 import { type } from 'arktype';
+import convert from 'convert';
 
 import { NaturalRegexExpression } from '$lib/schemas/constraints.js';
 import {
@@ -7,17 +8,22 @@ import {
 	MetadataInteger,
 	MetadataString
 } from '$lib/schemas/metadata.js';
+import type { NumericUnit } from '$lib/schemas/units.js';
 
 export function metadataValueValidatorNumeric(
-	metadata: typeof MetadataInteger.infer | typeof MetadataFloat.infer
+	metadata: typeof MetadataInteger.infer | typeof MetadataFloat.infer,
+	currentUnit?: typeof NumericUnit.infer
 ) {
 	let schema = type('number');
 
+	const fromBaseUnit = (x: number) =>
+		currentUnit && metadata.unit ? convert(x, metadata.unit).to(currentUnit) : x;
+
 	if (metadata.range) {
-		if ('gt' in metadata.range) schema = schema.moreThan(metadata.range.gt);
-		if ('gte' in metadata.range) schema = schema.atLeast(metadata.range.gte);
-		if ('lt' in metadata.range) schema = schema.lessThan(metadata.range.lt);
-		if ('lte' in metadata.range) schema = schema.atMost(metadata.range.lte);
+		if ('gt' in metadata.range) schema = schema.moreThan(fromBaseUnit(metadata.range.gt));
+		if ('gte' in metadata.range) schema = schema.atLeast(fromBaseUnit(metadata.range.gte));
+		if ('lt' in metadata.range) schema = schema.lessThan(fromBaseUnit(metadata.range.lt));
+		if ('lte' in metadata.range) schema = schema.atMost(fromBaseUnit(metadata.range.lte));
 	}
 
 	return schema;
