@@ -1,0 +1,442 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - dialog:
+      - banner:
+        - heading [level=1]: Raccourcis clavier
+        - button:
+          - img
+      - main:
+        - heading [level=2]: Général
+        - generic:
+          - term:
+            - generic:
+              - generic:
+                - generic: Ctrl
+                - generic: +
+                - generic: "!"
+          - definition: Signaler un bug
+          - term:
+            - generic:
+              - generic:
+                - generic: Ctrl
+                - generic: +
+                - generic: "*"
+          - definition: Proposer une fonctionnalité
+          - term:
+            - generic:
+              - generic:
+                - generic: Ctrl
+                - generic: +
+                - generic: Z
+          - definition: Annuler
+          - term:
+            - generic:
+              - generic:
+                - generic: Ctrl
+                - generic: +
+                - generic: Shift
+                - generic: +
+                - generic: Z
+          - definition: Rétablir
+          - term:
+            - generic:
+              - generic:
+                - generic: I
+                - generic: D
+                - generic: E
+                - generic: V
+          - definition: Activer/Désactiver le debug mode
+        - heading [level=2]: Navigation
+        - generic:
+          - term:
+            - generic:
+              - generic:
+                - generic: G
+                - generic: P
+          - definition: Choisir le protocole
+          - term:
+            - generic:
+              - generic:
+                - generic: G
+                - generic: I
+          - definition: Importer des images
+          - term:
+            - generic:
+              - generic:
+                - generic: G
+                - generic: R
+          - definition: Recadrer les images
+          - term:
+            - generic:
+              - generic:
+                - generic: G
+                - generic: "N"
+          - definition: Classifier les images
+          - term:
+            - generic:
+              - generic:
+                - generic: G
+                - generic: X
+          - definition: Exporter les résultats
+          - term:
+            - generic:
+              - generic:
+                - generic: G
+                - generic: M
+          - definition: Gérer les protocoles
+    - dialog:
+      - banner:
+        - heading [level=1]: Préparation hors-ligne
+        - button:
+          - img
+      - main:
+        - paragraph: Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne. Télécharge tout les modèles pour tout les protocoles actuellement installés.
+      - contentinfo:
+        - generic:
+          - button: Démarrer
+    - banner [ref=e3]:
+      - navigation [ref=e6]:
+        - button [ref=e8] [cursor=pointer]:
+          - img [ref=e10]
+        - generic [ref=e19]:
+          - link "New name" [ref=e20]:
+            - /url: "#/sessions/s1rqnxle"
+            - text: New name
+          - generic [ref=e22]:
+            - link "Importer" [ref=e23]:
+              - /url: "#/import"
+            - button [ref=e25] [cursor=pointer]:
+              - img [ref=e26]
+          - generic [ref=e28]:
+            - link "Recadrer" [disabled]:
+              - /url: "#/crop"
+            - button [ref=e30] [cursor=pointer]:
+              - img [ref=e31]
+          - generic [ref=e33]:
+            - link "Classifier" [disabled]:
+              - /url: "#/classify"
+            - button [ref=e35] [cursor=pointer]:
+              - img [ref=e36]
+          - link "Résultats" [ref=e38]:
+            - /url: "#/results"
+        - complementary [ref=e39]:
+          - generic [ref=e40]:
+            - button "Activer" [ref=e41] [cursor=pointer]:
+              - img [ref=e42]
+              - text: Activer
+            - button "Ne pas activer les notifications" [ref=e44] [cursor=pointer]:
+              - img [ref=e45]
+          - dialog:
+            - generic:
+              - heading [level=1]: Signaler un bug
+              - button:
+                - img
+            - main:
+              - generic:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - text: Description
+                        - paragraph: Expliquer comment reproduire votre bug, étape par étape, et ce à quoi vous vous attendiez
+                      - textbox
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic: Titre
+                      - textbox
+                - generic:
+                  - button: Envoyer
+          - button "Signaler un bug" [ref=e47] [cursor=pointer]:
+            - img [ref=e48]
+          - dialog:
+            - generic:
+              - heading [level=1]: Proposer une fonctionnalité
+              - button:
+                - img
+            - main:
+              - generic:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic: Description
+                      - textbox
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic: Titre
+                      - textbox
+                - generic:
+                  - button: Envoyer
+          - button "Proposer une fonctionnalité" [ref=e50] [cursor=pointer]:
+            - img [ref=e51]
+          - generic [ref=e54]:
+            - button "Réglages" [ref=e56] [cursor=pointer]:
+              - img [ref=e57]
+            - dialog:
+              - generic: Réglages
+              - generic:
+                - generic: Thème
+                - generic:
+                  - generic:
+                    - switch [checked]:
+                      - generic:
+                        - img
+                  - button "Synchroniser avec le thème du système" [disabled]:
+                    - img
+                - generic:
+                  - text: Notifications
+                  - paragraph: Quand un traitement est terminé
+                - generic:
+                  - generic:
+                    - switch:
+                      - generic:
+                        - img
+                - generic: Mode debug
+                - generic:
+                  - generic:
+                    - switch:
+                      - generic:
+                        - img
+                - generic: Taille des images
+                - generic:
+                  - slider: "1"
+                - generic: Langue
+                - generic:
+                  - radiogroup "Langue de l'interface":
+                    - radio "English"
+                    - radio "Français" [checked]
+                - generic:
+                  - text: Parallélisme
+                  - paragraph: Nombre de tâches en parallèle
+                - generic:
+                  - button "Réduire":
+                    - img
+                  - generic:
+                    - textbox "Nombre de tâches en parallèle":
+                      - /placeholder: ""
+                      - text: "2"
+                  - button "Augmenter":
+                    - img
+              - generic:
+                - button "Raccourcis clavier"
+                - button "Préparation hors-ligne"
+              - generic:
+                - text: CIGALE ver.
+                - link "a884e22":
+                  - /url: https://github.com/cigaleapp/cigale/tree/a884e227225bc5174e2ae8f78448a1f4f3644abd
+                - text: ·
+                - link "À propos":
+                  - /url: "#/about"
+    - main [ref=e60]:
+      - heading "New name Supprimer Ouvrir" [level=1] [ref=e61]:
+        - textbox "Nom de la session" [ref=e62]:
+          - /placeholder: ""
+          - text: New name
+        - generic [ref=e63]:
+          - dialog:
+            - generic:
+              - heading [level=1]: Êtes-vous sûr·e?
+              - button:
+                - img
+            - main:
+              - text: "La suppression entraînera:"
+              - list:
+                - listitem: La suppression de 0 images
+                - listitem: La suppression de 0 observations
+              - text: Il est impossible de revenir en arrière.
+              - generic:
+                - paragraph:
+                  - text: Afin de confirmer la suppression, veuillez taper
+                  - strong: New name
+                  - text: "ci-dessous:"
+                - textbox
+            - generic:
+              - generic:
+                - button: Annuler
+                - generic:
+                  - button [disabled]: Oui, supprimer
+          - button "Supprimer" [ref=e64] [cursor=pointer]
+          - button "Ouvrir" [ref=e65] [cursor=pointer]
+      - generic [ref=e66]:
+        - generic [ref=e69]:
+          - generic [ref=e70]: Description
+          - textbox "Description" [ref=e71]: A description
+        - generic [ref=e74]:
+          - generic [ref=e75]: Protocole
+          - 'button "Example: arthropodes (lightweight)" [ref=e76] [cursor=pointer]':
+            - text: "Example: arthropodes (lightweight)"
+            - img [ref=e77]
+      - heading "Métadonnées" [level=2] [ref=e79]
+      - generic [ref=e81]:
+        - generic [ref=e82]:
+          - generic [ref=e83]:
+            - generic [ref=e84]: Durée de prospection
+            - generic [ref=e85]:
+              - generic [ref=e86]:
+                - textbox "Durée de prospection" [ref=e87]
+                - button "Décrémenter" [ref=e88] [cursor=pointer]:
+                  - img [ref=e89]
+                - button "Incrémenter" [ref=e91] [cursor=pointer]:
+                  - img [ref=e92]
+              - button [disabled] [ref=e94] [cursor=pointer]:
+                - img [ref=e95]
+          - paragraph [ref=e98]: Durée (en minutes) de la prospection sur le terrain
+        - generic [ref=e99]:
+          - generic [ref=e100]:
+            - generic [ref=e101]: Distance de prospection
+            - generic [ref=e102]:
+              - generic [ref=e103]:
+                - textbox "Distance de prospection" [ref=e104]
+                - button "Décrémenter" [ref=e105] [cursor=pointer]:
+                  - img [ref=e106]
+                - button "Incrémenter" [ref=e108] [cursor=pointer]:
+                  - img [ref=e109]
+              - button [disabled] [ref=e111] [cursor=pointer]:
+                - img [ref=e112]
+          - paragraph [ref=e115]: Distance (en mètres) parcourue pendant la prospection
+        - generic [ref=e116]:
+          - generic [ref=e117]:
+            - generic [ref=e118]: Habitat homogène
+            - generic [ref=e119]:
+              - switch [ref=e123] [cursor=pointer]:
+                - img [ref=e125]
+              - button [disabled] [ref=e127] [cursor=pointer]:
+                - img [ref=e128]
+          - paragraph [ref=e131]: J'ai choisi un habitat homogène pour réaliser mon relevé (laisser vide si inconnu)
+        - generic [ref=e132]:
+          - generic [ref=e133]:
+            - generic [ref=e134]: Exhaustivité du relevé
+            - generic [ref=e135]:
+              - radiogroup [ref=e137]:
+                - generic [ref=e138]:
+                  - radio "Tous les individus rencontrés" [ref=e139]
+                  - generic [ref=e141]: Tous les individus rencontrés
+                - generic [ref=e142]:
+                  - radio "Au moins un individu de chaque espèce rencontrée" [ref=e143]
+                  - generic [ref=e145]: Au moins un individu de chaque espèce rencontrée
+                - generic [ref=e146]:
+                  - radio "Juste quelques individus quand j'en avais envie" [ref=e147]
+                  - generic [ref=e149]: Juste quelques individus quand j'en avais envie
+              - button [disabled] [ref=e150] [cursor=pointer]:
+                - img [ref=e151]
+          - paragraph [ref=e154]: J'ai photographié
+        - generic [ref=e155]:
+          - generic [ref=e156]:
+            - generic [ref=e157]: Vent
+            - generic [ref=e158]:
+              - radiogroup [ref=e160]:
+                - generic [ref=e161]:
+                  - radio "Pas du tout" [ref=e162]
+                  - generic [ref=e164]: Pas du tout
+                - generic [ref=e165]:
+                  - radio "Léger" [ref=e166]
+                  - generic [ref=e168]: Léger
+                - generic [ref=e169]:
+                  - radio "Modéré" [ref=e170]
+                  - generic [ref=e172]: Modéré
+                - generic [ref=e173]:
+                  - radio "Fort" [ref=e174]
+                  - generic [ref=e176]: Fort
+              - button [disabled] [ref=e177] [cursor=pointer]:
+                - img [ref=e178]
+          - paragraph [ref=e181]: Condition de vent pendant la prospection
+        - generic [ref=e182]:
+          - generic [ref=e183]:
+            - generic [ref=e184]: Température
+            - generic [ref=e185]:
+              - generic [ref=e186]:
+                - textbox "Température" [ref=e187]
+                - button "Décrémenter" [ref=e188] [cursor=pointer]:
+                  - img [ref=e189]
+                - button "Incrémenter" [ref=e191] [cursor=pointer]:
+                  - img [ref=e192]
+              - button [disabled] [ref=e194] [cursor=pointer]:
+                - img [ref=e195]
+          - paragraph [ref=e198]: Température approximative pendant la prospection (en °C)
+        - generic [ref=e199]:
+          - generic [ref=e200]:
+            - generic [ref=e201]: Couverture nuageuse
+            - generic [ref=e202]:
+              - radiogroup [ref=e204]:
+                - generic [ref=e205]:
+                  - radio "Dégagé" [ref=e206]
+                  - generic [ref=e208]: Dégagé
+                - generic [ref=e209]:
+                  - radio "10-30%" [ref=e210]
+                  - generic [ref=e212]: 10-30%
+                - generic [ref=e213]:
+                  - radio "50%" [ref=e214]
+                  - generic [ref=e216]: 50%
+                - generic [ref=e217]:
+                  - radio "Plus de 50%" [ref=e218]
+                  - generic [ref=e220]: Plus de 50%
+                - generic [ref=e221]:
+                  - radio "Tout couvert" [ref=e222]
+                  - generic [ref=e224]: Tout couvert
+              - button [disabled] [ref=e225] [cursor=pointer]:
+                - img [ref=e226]
+          - paragraph [ref=e229]: Condition de couverture nuageuse pendant la prospection
+        - generic [ref=e230]:
+          - generic [ref=e231]:
+            - generic [ref=e232]: Photos à l'ombre
+            - generic [ref=e233]:
+              - generic [ref=e234]:
+                - textbox "Photos à l'ombre" [ref=e235]
+                - button "Décrémenter" [ref=e236] [cursor=pointer]:
+                  - img [ref=e237]
+                - button "Incrémenter" [ref=e239] [cursor=pointer]:
+                  - img [ref=e240]
+              - button [disabled] [ref=e242] [cursor=pointer]:
+                - img [ref=e243]
+          - paragraph [ref=e246]: Part des photos prises à l'ombre (en pourcentage)
+        - generic [ref=e247]:
+          - generic [ref=e248]:
+            - generic [ref=e249]: Type d’appareil photo
+            - generic [ref=e250]:
+              - radiogroup [ref=e252]:
+                - generic [ref=e253]:
+                  - radio "Smartphone" [ref=e254]
+                  - generic [ref=e256]: Smartphone
+                - generic [ref=e257]:
+                  - radio "Appareil photo compact" [ref=e258]
+                  - generic [ref=e260]: Appareil photo compact
+                - generic [ref=e261]:
+                  - radio "Appareil photo reflex (DSLR)" [ref=e262]
+                  - generic [ref=e264]: Appareil photo reflex (DSLR)
+                - generic [ref=e265]:
+                  - radio "Appareil photo hybride" [ref=e266]
+                  - generic [ref=e268]: Appareil photo hybride
+              - button [disabled] [ref=e269] [cursor=pointer]:
+                - img [ref=e270]
+          - paragraph [ref=e273]: Type d'appareil photo utilisé pour prendre les photos
+        - generic [ref=e274]:
+          - generic [ref=e275]:
+            - generic [ref=e276]: Flash utilisé
+            - generic [ref=e277]:
+              - switch [ref=e281] [cursor=pointer]:
+                - img [ref=e283]
+              - button [disabled] [ref=e285] [cursor=pointer]:
+                - img [ref=e286]
+          - paragraph [ref=e289]: Le flash de l'appareil photo a-t-il été utilisé pour prendre des photos ?
+        - generic [ref=e290]:
+          - generic [ref=e291]:
+            - generic [ref=e292]: Date de la session
+            - generic [ref=e293]:
+              - textbox "Date de la session" [ref=e295]
+              - button [disabled] [ref=e296] [cursor=pointer]:
+                - img [ref=e297]
+          - paragraph [ref=e300]: Date à laquelle la session a été réalisée. On peut laisser vide si la date a été correctement réglée sur l’appareil photo
+      - button "Ouvrir la session" [ref=e302] [cursor=pointer]
+      - generic [ref=e305]:
+        - generic [ref=e306]: ID de la session
+        - code [ref=e307]: s1rqnxle
+    - generic [ref=e308]: Importer · Test!!
+  - tooltip "Nom de la session":
+    - generic: Nom de la session
+    - generic:
+      - img
+```

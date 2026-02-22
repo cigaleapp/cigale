@@ -1,0 +1,230 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - dialog:
+    - banner:
+      - heading [level=1]: Raccourcis clavier
+      - button:
+        - img
+    - main:
+      - heading [level=2]: Général
+      - generic:
+        - term:
+          - generic:
+            - generic:
+              - generic: Ctrl
+              - generic: +
+              - generic: "!"
+        - definition: Signaler un bug
+        - term:
+          - generic:
+            - generic:
+              - generic: Ctrl
+              - generic: +
+              - generic: "*"
+        - definition: Proposer une fonctionnalité
+        - term:
+          - generic:
+            - generic:
+              - generic: Ctrl
+              - generic: +
+              - generic: Z
+        - definition: Annuler
+        - term:
+          - generic:
+            - generic:
+              - generic: Ctrl
+              - generic: +
+              - generic: Shift
+              - generic: +
+              - generic: Z
+        - definition: Rétablir
+        - term:
+          - generic:
+            - generic:
+              - generic: I
+              - generic: D
+              - generic: E
+              - generic: V
+        - definition: Activer/Désactiver le debug mode
+      - heading [level=2]: Navigation
+      - generic:
+        - term:
+          - generic:
+            - generic:
+              - generic: G
+              - generic: P
+        - definition: Choisir le protocole
+        - term:
+          - generic:
+            - generic:
+              - generic: G
+              - generic: I
+        - definition: Importer des images
+        - term:
+          - generic:
+            - generic:
+              - generic: G
+              - generic: R
+        - definition: Recadrer les images
+        - term:
+          - generic:
+            - generic:
+              - generic: G
+              - generic: "N"
+        - definition: Classifier les images
+        - term:
+          - generic:
+            - generic:
+              - generic: G
+              - generic: X
+        - definition: Exporter les résultats
+        - term:
+          - generic:
+            - generic:
+              - generic: G
+              - generic: M
+        - definition: Gérer les protocoles
+  - dialog:
+    - banner:
+      - heading [level=1]: Préparation hors-ligne
+      - button:
+        - img
+    - main:
+      - paragraph: Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne. Télécharge tout les modèles pour tout les protocoles actuellement installés.
+    - contentinfo:
+      - generic:
+        - button: Démarrer
+  - banner [ref=e3]:
+    - navigation [ref=e6]:
+      - button [ref=e8] [cursor=pointer]:
+        - img [ref=e10]
+      - generic [ref=e19]:
+        - link "Sessions" [ref=e20] [cursor=pointer]:
+          - /url: "#/sessions"
+          - text: Sessions
+        - link "Protocoles" [ref=e22] [cursor=pointer]:
+          - /url: "#/protocols"
+      - complementary [ref=e23]:
+        - generic [ref=e24]:
+          - button "Activer" [ref=e25] [cursor=pointer]:
+            - img [ref=e26]
+            - text: Activer
+          - button "Ne pas activer les notifications" [ref=e28] [cursor=pointer]:
+            - img [ref=e29]
+        - dialog:
+          - generic:
+            - heading [level=1]: Signaler un bug
+            - button:
+              - img
+          - main:
+            - generic:
+              - generic:
+                - generic:
+                  - generic:
+                    - generic:
+                      - text: Description
+                      - paragraph: Expliquer comment reproduire votre bug, étape par étape, et ce à quoi vous vous attendiez
+                    - textbox
+              - generic:
+                - generic:
+                  - generic:
+                    - generic: Titre
+                    - textbox
+              - generic:
+                - button: Envoyer
+        - button "Signaler un bug" [ref=e31] [cursor=pointer]:
+          - img [ref=e32]
+        - dialog:
+          - generic:
+            - heading [level=1]: Proposer une fonctionnalité
+            - button:
+              - img
+          - main:
+            - generic:
+              - generic:
+                - generic:
+                  - generic:
+                    - generic: Description
+                    - textbox
+              - generic:
+                - generic:
+                  - generic:
+                    - generic: Titre
+                    - textbox
+              - generic:
+                - button: Envoyer
+        - button "Proposer une fonctionnalité" [ref=e34] [cursor=pointer]:
+          - img [ref=e35]
+        - generic [ref=e38]:
+          - button "Réglages" [ref=e40] [cursor=pointer]:
+            - img [ref=e41]
+          - dialog:
+            - generic: Réglages
+            - generic:
+              - generic: Thème
+              - generic:
+                - generic:
+                  - switch [checked]:
+                    - generic:
+                      - img
+                - button "Synchroniser avec le thème du système" [disabled]:
+                  - img
+              - generic:
+                - text: Notifications
+                - paragraph: Quand un traitement est terminé
+              - generic:
+                - generic:
+                  - switch:
+                    - generic:
+                      - img
+              - generic: Mode debug
+              - generic:
+                - generic:
+                  - switch:
+                    - generic:
+                      - img
+              - generic: Taille des images
+              - generic:
+                - slider: "1"
+              - generic: Langue
+              - generic:
+                - radiogroup "Langue de l'interface":
+                  - radio "English"
+                  - radio "Français" [checked]
+              - generic:
+                - text: Parallélisme
+                - paragraph: Nombre de tâches en parallèle
+              - generic:
+                - button "Réduire":
+                  - img
+                - generic:
+                  - textbox "Nombre de tâches en parallèle":
+                    - /placeholder: ""
+                    - text: "2"
+                - button "Augmenter":
+                  - img
+            - generic:
+              - button "Raccourcis clavier"
+              - button "Préparation hors-ligne"
+            - generic:
+              - text: CIGALE ver.
+              - link "a884e22":
+                - /url: https://github.com/cigaleapp/cigale/tree/a884e227225bc5174e2ae8f78448a1f4f3644abd
+              - text: ·
+              - link "À propos":
+                - /url: "#/about"
+  - main [ref=e44]:
+    - generic [ref=e45]:
+      - heading "Sessions" [level=1] [ref=e46]
+      - generic [ref=e47]:
+        - button "Importer un export .zip" [ref=e48] [cursor=pointer]:
+          - img [ref=e49]
+          - text: Importer un export .zip
+        - button "Nouvelle session" [ref=e51] [cursor=pointer]:
+          - img [ref=e52]
+          - text: Nouvelle session
+    - article [ref=e55] [cursor=pointer]:
+      - img [ref=e57]
+```

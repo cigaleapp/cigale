@@ -1,0 +1,10 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - img [ref=e3]
+  - paragraph [ref=e5]:
+    - text: Chargement…
+    - code [ref=e6]: Initialisation des réglages par défaut…
+  - code [ref=e7]: a884e227225bc5174e2ae8f78448a1f4f3644abd
+```
