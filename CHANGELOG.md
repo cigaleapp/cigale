@@ -6,10 +6,14 @@ All notable changes to this project will be documented in this file, on a monthl
 
 ### Improvements
 
+- Add a protocol registry notion
 - Add default values on metadata definitions for session metadata (Closes #1223)
 - Add map for displaying/inputting location metadata values
+- Enlarge ∞ character when no file size limit on file metadata input
 - Implement export-to-folder
 - Implement file metadata
+- Implement protocol metadata imports
+- Implement range & pattern/regex constraints on metadata
 - Improve clear button & confidence indicator on metadata inputs
 - Improve error message in crop step of loadTensor()
 - Include open session and metadata errors in bug report metadata, show metadata in modal
@@ -25,6 +29,7 @@ All notable changes to this project will be documented in this file, on a monthl
 - Fix confirmation overlay not showing up
 - Fix formatBytesSize()
 - Fix fullscreen classifier layout switching
+- Fix input type=range on Chrome
 - Fix layout switch in classifier not working immediately
 - Fix navbar not hiding when going to cropper from classifier
 - Fix session not switching when opening via Manage button on session card
@@ -35,7 +40,9 @@ All notable changes to this project will be documented in this file, on a monthl
 
 ### Data Updates
 
+- Add ranges on relevant metadata on example protocol
 - Regenerate example protocols
+- Remove now-unused confirmed_crop on example protocol
 
 ### Translation Updates
 
