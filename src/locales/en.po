@@ -82,7 +82,7 @@ msgstr "<0/> Retry"
 msgid "<0/> Supprimer"
 msgstr "<0/> Delete"
 
-#. placeholder {0}: images.length
+#. 0: images.length
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 msgid "<0/> Supprimer {0} images"
 msgstr "<0/> Delete {0} images"
@@ -152,13 +152,12 @@ msgstr "Cancel"
 msgid "Arbre taxonomique"
 msgstr "Taxonomic tree"
 
-#. placeholder {0}: file.name
+#. 0: file.name
 #: src/lib/results.svelte.js
 msgid "Aucun fichier d'analyse trouvé dans l'export {0}"
 msgstr "No analysis file found in export {0}"
 
-#. placeholder {0}: uiState.selectedClassificationModel
-#. placeholder {1}: uiState.currentProtocol.name
+#. 0: uiState.selectedClassificationModel; 1: uiState.currentProtocol.name
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
 msgid "Aucun paramètre d'inférence défini pour le modèle {0} sur le protocole {1}"
 msgstr "No inference parameters defined for model {0} on protocol {1}"
@@ -182,7 +181,7 @@ msgstr "No results :/"
 msgid "Aucune image"
 msgstr "No images"
 
-#. placeholder {0}: file.name
+#. 0: file.name
 #: src/lib/results.svelte.js
 msgid "Aucune image trouvée dans l'export {0}. L'export doit contenir les images originales, pas seulement les images recadrées"
 msgstr "No image found in export {0}. The export needs to include original images too, not just the cropped ones"
@@ -191,7 +190,7 @@ msgstr "No image found in export {0}. The export needs to include original image
 msgid "Auto"
 msgstr "Auto"
 
-#. placeholder {0}: user.login
+#. 0: user.login
 #: src/routes/(app)/DeploymentDetails.svelte
 msgid "Avatar de {0}"
 msgstr "{0}'s avatar"
@@ -204,7 +203,7 @@ msgstr "With data"
 msgid "Avec les modèles"
 msgstr "With models"
 
-#. placeholder {0}: i + 1
+#. 0: i + 1
 #: src/routes/(app)/(sidepanel)/crop/[image]/[[from]]/+page@(app).svelte
 msgid "Boîte #{0}"
 msgstr "Box #{0}"
@@ -274,7 +273,7 @@ msgstr "Loading built-in protocol"
 msgid "Chargement…"
 msgstr "Loading…"
 
-#. placeholder {0}: tool.name
+#. 0: tool.name
 #: src/routes/(app)/(sidepanel)/crop/[image]/[[from]]/+page@(app).svelte
 msgid "Choisir l'outil {0}"
 msgstr "Choose {0} tool"
@@ -326,7 +325,7 @@ msgstr "Confirmed"
 msgid "Continuer"
 msgstr "Continue"
 
-#. placeholder {0}: name
+#. 0: name
 #: src/routes/_colors/+page.svelte
 msgid "Copier var(--{0})"
 msgstr "Copy var(--{0})"
@@ -355,7 +354,7 @@ msgstr "Start"
 msgid "Déploiement de preview pour la <0>PR #{0}</0>"
 msgstr "Preview deployment for <0>PR #{0}</0>"
 
-#. placeholder {0}: previewingPrNumber
+#. 0: previewingPrNumber
 #: src/routes/(app)/DeploymentDetails.svelte
 msgid "Déploiement de preview pour la PR #{0}"
 msgstr "Preview deployment for PR #{0}"
@@ -402,19 +401,19 @@ msgstr "Error"
 msgid "Erreur inattendue"
 msgstr "Unexpected error"
 
-#. placeholder {0}: file.name
+#. 0: file.name
 #: src/lib/import.svelte.js
 msgid "Erreur lors de l'extraction des métadonnées EXIF pour {0}"
 msgstr "Error while extracting EXIF metadata for {0}"
 
-#. placeholder {0}: e
-#. placeholder {0}: error
+#. 0: e
+#. 0: error
 #: src/routes/(app)/protocols/import/[...url]/+page.svelte
 #: src/routes/(app)/protocols/import/[...url]/+page.svelte
 msgid "Erreur lors de l'import du protocole distant: {0}"
 msgstr "Error while importing remote protocol: {0}"
 
-#. placeholder {0}: error
+#. 0: error
 #: src/lib/MetadataCombobox.svelte
 msgid "Erreur lors de la récupération des étiquettes en cascade: {0}"
 msgstr "Error while getting cascaded labels: {0}"
@@ -437,8 +436,7 @@ msgstr "Export results"
 msgid "Fermer"
 msgstr "Close"
 
-#. placeholder {0}: file.name
-#. placeholder {1}: analysis.summary
+#. 0: file.name; 1: analysis.summary
 #: src/lib/results.svelte.js
 msgid "Fichier d'analyse de {0} invalide: {1}"
 msgstr "Invalid analysis file for {0}: {1}"
@@ -505,8 +503,7 @@ msgstr "Import images"
 msgid "Importer le protocole distant ?"
 msgstr "Import remote protocol ?"
 
-#. placeholder {0}: file.name
-#. placeholder {1}: e?.toString() ?? 'Erreur inattendue'
+#. 0: file.name; 1: e?.toString() ?? 'Erreur inattendue'
 #: src/lib/exif.js
 msgid "Impossible d'extraire les métadonnées EXIF de {0}: {1}"
 msgstr "Cannot extract EXIF metadata for {0}: {1}"
@@ -527,13 +524,12 @@ msgstr "Initializing default settings…"
 msgid "Irreprésentable"
 msgstr "Unrepresentable"
 
-#. placeholder {0}: imageLimits.maxResolutionInMP
-#. placeholder {1}: imageLimits.maxMemoryUsageInMB
+#. 0: imageLimits.maxResolutionInMP; 1: imageLimits.maxMemoryUsageInMB
 #: src/lib/images.js
 msgid "L'image est trop grande pour être traitée. Elle doit faire moins de {0} Megapixels et {1} Mo"
 msgstr "Image is too large to be processed. Images must be less than {0} Megapixels and {1} MB"
 
-#. placeholder {0}: imageId
+#. 0: imageId
 #: src/routes/(app)/(sidepanel)/crop/[image]/[[from]]/+page@(app).svelte
 msgid "L'image {0} n'a pas de recadrage alternatif, impossible de revenir au recadrage d'origine"
 msgstr "Image {0} has no alternative crop values, unable to revert to original crop"
@@ -546,7 +542,7 @@ msgstr "Language"
 msgid "Langue de l'interface"
 msgstr "Interface language"
 
-#. placeholder {0}: file.name
+#. 0: file.name
 #: src/lib/results.svelte.js
 msgid "Le fichier d'analyse de {0} n'est pas au format JSON ou est corrompu"
 msgstr "Analysis file of {0} is not valid JSON or is corrupted"
@@ -560,8 +556,8 @@ msgstr "Les carnets nature de Jessica"
 msgid "Marge autour des images recadrées"
 msgstr "Padding around cropped images"
 
-#. placeholder {0}: error
-#. placeholder {0}: error
+#. 0: error
+#. 0: error
 #: src/lib/Markdown.svelte
 #: src/routes/(app)/(sidepanel)/classify/[observation]/+page.svelte
 msgid "Markdown invalide: {0}"
@@ -629,7 +625,7 @@ msgstr "Parallelism"
 msgid "Pas besoin de Ctrl-S, vos changements sont sauvegardés automatiquement 😎"
 msgstr "No need for Control-S, your changes are saved automatically 😎"
 
-#. placeholder {0}: previewingPrNumber
+#. 0: previewingPrNumber
 #: src/routes/(app)/Navigation.svelte
 msgid "Preview #{0}"
 msgstr "Preview #{0}"
@@ -638,7 +634,7 @@ msgstr "Preview #{0}"
 msgid "Protocole supprimé"
 msgstr "Protocol deleted"
 
-#. placeholder {0}: ps[0].name
+#. 0: ps[0].name
 #: src/routes/(app)/protocols/+page.svelte
 msgid "Protocole “{0}” importé"
 msgstr "Imported protocol “{0}”"
@@ -673,7 +669,7 @@ msgstr "Crop <0/>"
 msgid "Recadrer les images"
 msgstr "Crop images"
 
-#. placeholder {0}: firstImage?.filename ?? '...'
+#. 0: firstImage?.filename ?? '...'
 #: src/routes/(app)/(sidepanel)/crop/[image]/[[from]]/+page@(app).svelte
 msgid "Recadrer {0}"
 msgstr "Crop {0}"
@@ -843,15 +839,14 @@ msgstr "of PR"
 msgid "sw&rpc"
 msgstr "sw&rpc"
 
-#. placeholder {0}: version
-#. placeholder {0}: version
+#. 0: version
+#. 0: version
 #: src/lib/ButtonUpdateProtocol.svelte
 #: src/lib/ButtonUpdateProtocol.svelte
 msgid "v{0}"
 msgstr "v{0}"
 
-#. placeholder {0}: version
-#. placeholder {1}: newVersion
+#. 0: version; 1: newVersion
 #: src/lib/ButtonUpdateProtocol.svelte
 msgctxt "Upgrading a protocol. The <0 /> is an icon arrow"
 msgid "v{0} <0/> v{1}"
@@ -897,12 +892,12 @@ msgstr "Spawn a loading image"
 msgid "File de traitement"
 msgstr "Processing queue"
 
-#. placeholder {0}: id
+#. 0: id
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
 msgid "L'observation {0} est vide"
 msgstr "Observation {0} is empty"
 
-#. placeholder {0}: id
+#. 0: id
 #: src/lib/images.js
 msgid "Identifiant d'image invalide (le format correct est aaaaaaaaaaaaaaaaaaaaaaaaaa_nnnnnn) : {0}"
 msgstr "Malformed image ID (correct format is aaaaaaaaaaaaaaaaaaaaaaaaaa_nnnnnn) : {0}"
@@ -945,7 +940,7 @@ msgstr ""
 "Select a box with 1 to 9 to edit with keyboard\n"
 "shortcuts"
 
-#. placeholder {0}: e
+#. 0: e
 #: src/lib/ButtonUpdateProtocol.svelte
 msgid "Impossible de vérifier les mises à jour: {0}"
 msgstr "Cannot check for updates: {0}"
@@ -958,7 +953,7 @@ msgstr "Open link"
 msgid "<0/> Accessible"
 msgstr "<0/> Available"
 
-#. placeholder {0}: response.status
+#. 0: response.status
 #: src/lib/FieldURL.svelte
 msgid "<0/> Inaccessible: HTTP {0} <1/>"
 msgstr "<0/> Unreachable: HTTP {0} <1/>"
@@ -967,7 +962,7 @@ msgstr "<0/> Unreachable: HTTP {0} <1/>"
 msgid "<0/> Vérification…"
 msgstr "<0/> Checking…"
 
-#. placeholder {0}: error
+#. 0: error
 #: src/lib/FieldURL.svelte
 msgid "<0/> Inaccessible: {0}"
 msgstr "<0/> Unreachable: {0}"
@@ -994,12 +989,12 @@ msgstr "<0/> already uses that ID"
 msgid "Créer"
 msgstr "Create"
 
-#. placeholder {0}: page.params.metadata
+#. 0: page.params.metadata
 #: src/routes/(app)/protocols/[id]/+error.svelte
 msgid "<0/> Métadonnée “{0}” introuvable"
 msgstr "<0/> Metadata “{0}” was not found"
 
-#. placeholder {0}: page.params.id
+#. 0: page.params.id
 #: src/routes/(app)/protocols/[id]/+layout.svelte
 msgid "Protocole {0}"
 msgstr "Protocol {0}"
@@ -1045,9 +1040,9 @@ msgstr "Create the metadata"
 msgid "Supprimer la métadonnée"
 msgstr "Delete the metadata"
 
-#. placeholder {0}: errorMessage(err)
-#. placeholder {0}: errorMessage(err)
-#. placeholder {0}: errorMessage(err)
+#. 0: errorMessage(err)
+#. 0: errorMessage(err)
+#. 0: errorMessage(err)
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/updater.svelte.js
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/updater.svelte.js
 #: src/routes/(app)/protocols/[id]/updater.svelte.js
@@ -1147,7 +1142,7 @@ msgstr "Model output layer <0>Repeats for each detected bounding box</0>"
 msgid "Boîte englobante"
 msgstr "Bounding box"
 
-#. placeholder {0}: page.params.id
+#. 0: page.params.id
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
 msgid "Protocole {0}: Export"
 msgstr "Protocol {0}: Export"
@@ -1164,7 +1159,7 @@ msgstr ""
 "For images (original and cropped), there are variables in the path, for example <0/>. A file per exported image will be created.\n"
 "You can also used several \"helper\" functions, that apply to an expression"
 
-#. placeholder {0}: '{{}}'
+#. 0: '{{}}'
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
 msgid "Ces expressions avec des {0} sont en vérité des <0>templates Handlebars</0>"
 msgstr "These expressions with {0} are <0>Handlebar templates</0>"
@@ -1173,12 +1168,8 @@ msgstr "These expressions with {0} are <0>Handlebar templates</0>"
 msgid "Variables et helpers disponibles"
 msgstr "Available variables and helpers"
 
-#. placeholder {0}: '{{ observation }}'
-#. placeholder {1}: '{{ observation.label }}'
-#. placeholder {2}: '{{ observation.protocolMetadata.species.confidence }}'
-#. placeholder {0}: '{{ image }}'
-#. placeholder {1}: '{{ image.filename }}'
-#. placeholder {2}: '{{ image.protocolMetadata.shoot_date.value }}'
+#. 0: '{{ observation }}'; 1: '{{ observation.label }}'; 2: '{{ observation.protocolMetadata.species.confidence }}'
+#. 0: '{{ image }}'; 1: '{{ image.filename }}'; 2: '{{ image.protocolMetadata.shoot_date.value }}'
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
 msgid "{0} <0/> {1} <1/> {2} <2/> etc."
@@ -1298,12 +1289,12 @@ msgstr "<0/> Up to date"
 msgid "<0/> Comparaison avec la version distante..."
 msgstr "<0/> Comparing with published version…"
 
-#. placeholder {0}: error.message
+#. 0: error.message
 #: src/routes/(app)/protocols/[id]/versioning/+page.svelte
 msgid "<0/> Erreur lors de la comparaison avec la version distante: {0}"
 msgstr "<0/> Error while comparing with published version: {0}"
 
-#. placeholder {0}: newVersion
+#. 0: newVersion
 #: src/routes/(app)/protocols/[id]/versioning/+page.svelte
 msgid "<0/> Une mise à jour à la v{0} est disponible <1/>"
 msgstr "<0/> Update to v{0} is available <1/>"
@@ -1334,7 +1325,7 @@ msgstr "See metadata"
 msgid "Voir l'option"
 msgstr "See option"
 
-#. placeholder {0}: piece + 1
+#. 0: piece + 1
 #: src/routes/(app)/protocols/[id]/versioning/ChangesWithRemote.svelte
 msgid "N°{0}"
 msgstr "#{0}"
@@ -1364,7 +1355,7 @@ msgstr "Model URL"
 msgid "Champ EXIF à utiliser"
 msgstr "EXIF field to use"
 
-#. placeholder {0}: newExif.summary
+#. 0: newExif.summary
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/inference/+page.svelte
 msgid "Champ EXIF invalide: {0}"
 msgstr "Invalid EXIF field: {0}"
@@ -1397,7 +1388,7 @@ msgstr ""
 "Merge method <0>How to merge values of this metadata when merging observations into\n"
 "a single observation</0>"
 
-#. placeholder {0}: page.params.option
+#. 0: page.params.option
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/+error.svelte
 msgid "<0/> Aucune option trouvée avec la clé {0}"
 msgstr "<0/> No option found with key {0}"
@@ -1426,7 +1417,7 @@ msgstr "New option…"
 msgid "Créer la nouvelle option"
 msgstr "Create new option"
 
-#. placeholder {0}: label || key
+#. 0: label || key
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/+layout.svelte
 msgid "Supprimer {0}"
 msgstr "Delete {0}"
@@ -1471,8 +1462,8 @@ msgstr ""
 msgid "Affecte <0>Change la valeur d'autres métadonnées quand {0} = {1}</0>"
 msgstr "Affects <0>Changes the value of other metadata when {0} = {1}</0>"
 
-#. placeholder {0}: option.label || option.key
-#. placeholder {0}: option.label || option.key
+#. 0: option.label || option.key
+#. 0: option.label || option.key
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
 msgid "Voir {0}"
@@ -1486,7 +1477,7 @@ msgstr "No cascades defined"
 msgid "Affectée par <0>Autres métadonnées qui change {0} à {1}</0>"
 msgstr "Affected by <0>Other metadata that change {0} to {1}</0>"
 
-#. placeholder {0}: metadata?.label || shortId
+#. 0: metadata?.label || shortId
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
 msgid "Si {0} = <0/>"
 msgstr "If {0} = <0/>"
@@ -1495,7 +1486,7 @@ msgstr "If {0} = <0/>"
 msgid "<0/> Supprimer cette option"
 msgstr "<0/> Delete this option"
 
-#. placeholder {0}: params.id
+#. 0: params.id
 #: src/routes/(app)/protocols/[id]/+layout.js
 msgid "Protocole {0} introuvable"
 msgstr "Protocol {0} not found"
@@ -1516,8 +1507,7 @@ msgstr "Cropped images"
 msgid "Images originales"
 msgstr "Original images"
 
-#. placeholder {0}: id
-#. placeholder {1}: protocol.id
+#. 0: id; 1: protocol.id
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/+layout.js
 msgid "Metadata {0} for protocol {1} not found"
 msgstr "Metadata {0} for protocol {1} not found"
@@ -1568,12 +1558,12 @@ msgstr[1] "# observations"
 msgid "<0>Remix Icon</0> par <1>Jimmy Cheung</1> et <2>Wendy Gao</2>"
 msgstr "<0>Remix Icon</0> by <1>Jimmy Cheung</1> and <2>Wendy Gao</2>"
 
-#. placeholder {0}: version
+#. 0: version
 #: src/lib/ButtonUpdateProtocol.svelte
 msgid "Protocole mis à jour vers la v{0}"
 msgstr "Updated protocol to v{0}"
 
-#. placeholder {0}: e
+#. 0: e
 #: src/lib/ButtonUpdateProtocol.svelte
 msgid "Impossible de mettre à jour le protocole: {0}"
 msgstr "Could not update protocol: {0}"
@@ -1703,22 +1693,24 @@ msgstr "File structure"
 msgid "Rétablir"
 msgstr "Redo"
 
-#. placeholder {0}: filename
+#. 0: filename
 #: src/routes/(app)/results/+page.svelte
 msgid "Impossible d'ajouter les métadonnées EXIF à l'image {0}"
 msgstr "Cannot add EXIF metadata to {0}"
 
-#. placeholder {0}: error
+#. 0: error
 #: src/routes/(app)/results/+page.svelte
 msgid "Erreur lors de l'exportation des résultats: {0}"
 msgstr "Could not export results: {0}"
 
-#. placeholder {0}: shortId
+#. 0: shortId
 #: src/routes/(app)/protocols/[id]/+layout.svelte
 msgid "Métadonnée {0} créée"
 msgstr "Metadata {0} created"
 
-#. placeholder {0}: err.summary
+#. 0: err.summary
+#. 0: err instanceof ArkErrors ? err.summary : errorMessage(err)
+#. 0: err.summary
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/updater.svelte.js
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/updater.svelte.js
 #: src/routes/(app)/protocols/[id]/updater.svelte.js
@@ -1749,12 +1741,12 @@ msgstr "Validation"
 msgid "Écriture du protocole"
 msgstr "Writing protocol"
 
-#. placeholder {0}: detail
+#. 0: detail
 #: src/routes/(app)/+layout.js
 msgid "Écriture de la métadonnée<br>{0}"
 msgstr "Writing metadata<br>{0}"
 
-#. placeholder {0}: detail
+#. 0: detail
 #: src/routes/(app)/+layout.js
 msgid "Écriture des options de la métadonnée<br>{0}"
 msgstr "Writing metadata's options<br>{0}"
@@ -1771,15 +1763,12 @@ msgstr "Cannot load the built-in protocol. Verify your Internet connection or tr
 msgid "Importation dans une nouvelle session"
 msgstr "Importing in a new session"
 
-#. placeholder {0}: file.name
-#. placeholder {1}: session.protocol
-#. placeholder {2}: uiState.currentSession.protocol
+#. 0: file.name; 1: session.protocol; 2: uiState.currentSession.protocol
 #: src/lib/results.svelte.js
 msgid "Le fichier d'analyse de {0} a été exporté avec le protocole {1}, mais le protocole de la session est {2}"
 msgstr "Analysis file of {0} was exported with protocol {1}, but the current session's protocol is {2}"
 
-#. placeholder {0}: title
-#. placeholder {1}: suffix
+#. 0: title; 1: suffix
 #: src/lib/seo.svelte.js
 msgid "{0} · {1}"
 msgstr "{0} · {1}"
@@ -1824,7 +1813,7 @@ msgid_plural "# images"
 msgstr[0] "# image"
 msgstr[1] "# images"
 
-#. placeholder {0}: plural(counts.images, ['# image', '# images'])
+#. 0: plural(counts.images, ['# image', '# images'])
 #: src/routes/(app)/sessions/+page.svelte
 msgid "{0} · créée <0/>"
 msgstr "{0} · created <0/>"
@@ -1870,7 +1859,7 @@ msgstr "Session not found"
 msgid "Afin de confirmer la suppression, veuillez taper <0/> ci-dessous:"
 msgstr "After confirming deletion, please type <0/> below:"
 
-#. placeholder {0}: typeToConfirm
+#. 0: typeToConfirm
 #: src/lib/ModalConfirmDeletion.svelte
 msgid "Taper “{0}”"
 msgstr "Type “{0}”"
@@ -1948,7 +1937,6 @@ msgstr "Send"
 
 #: src/routes/(app)/DeploymentDetails.svelte
 #: src/routes/(app)/DeploymentDetails.svelte
-#, fuzzy
 msgid "de"
 msgstr "of"
 
@@ -2017,7 +2005,7 @@ msgstr "Automatic updates"
 msgid "Mettre à jour automatiquement"
 msgstr "Auto-update"
 
-#. placeholder {0}: source
+#. 0: source
 #: src/routes/(app)/protocols/RowProtocol.svelte
 msgid "Via {0}"
 msgstr "Via {0}"
@@ -2026,7 +2014,7 @@ msgstr "Via {0}"
 msgid "<0/> Modifier <1>Beta</1>"
 msgstr "<0/> Edit <1>Beta</1>"
 
-#. placeholder {0}: updates[0].name
+#. 0: updates[0].name
 #: src/routes/(app)/+layout.js
 msgid "Le protocole \"{0}\" a été mis à jour"
 msgstr "Protocol \"{0}\" was updated"
@@ -2063,7 +2051,7 @@ msgstr "Crop settings"
 msgid "Réglages de classification"
 msgstr "Classification settings"
 
-#. placeholder {0}: i + 1
+#. 0: i + 1
 #: src/lib/Carousel.svelte
 msgid "Aller à l'image {0}"
 msgstr ""
@@ -2170,7 +2158,7 @@ msgstr ""
 msgid "Voir l'image entière/recadrée"
 msgstr ""
 
-#. placeholder {0}: imageId
+#. 0: imageId
 #: src/routes/(app)/(sidepanel)/crop/[image]/[[from]]/+page@(app).svelte
 msgid "Impossible de trouver l'image {0} pour la confirmer"
 msgstr ""
@@ -2195,7 +2183,7 @@ msgstr ""
 msgid "Image introuvable dans la session"
 msgstr ""
 
-#. placeholder {0}: directoryHandle.name
+#. 0: directoryHandle.name
 #: src/routes/(app)/results/+page.svelte
 msgid "Fichiers sauvegardés dans {0}"
 msgstr ""
@@ -2297,7 +2285,7 @@ msgstr ""
 msgid "Afficher en plein écran"
 msgstr ""
 
-#. placeholder {0}: error.message
+#. 0: error.message
 #: src/lib/FilePreview.svelte
 msgid "Error loading file preview: {0}"
 msgstr ""
@@ -2307,7 +2295,7 @@ msgstr ""
 msgid "Download"
 msgstr ""
 
-#. placeholder {0}: file.type
+#. 0: file.type
 #: src/lib/FilePreview.svelte
 msgid "Cannot preview this file type ({0})."
 msgstr ""
@@ -2336,12 +2324,12 @@ msgstr ""
 msgid "Classification terminée"
 msgstr ""
 
-#. placeholder {0}: file.name
+#. 0: file.name
 #: src/lib/results.svelte.js
 msgid "Import de {0}"
 msgstr ""
 
-#. placeholder {0}: file.name
+#. 0: file.name
 #: src/lib/results.svelte.js
 msgid "Importée depuis {0}"
 msgstr ""
