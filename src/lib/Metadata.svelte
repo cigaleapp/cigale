@@ -15,6 +15,7 @@
 	} from './metadata/constraints.js';
 	import { hasRuntimeType, type TypedMetadataValue } from './metadata/index.js';
 	import MetadataInput from './MetadataInput.svelte';
+	import OverflowableText from './OverflowableText.svelte';
 	import { splitMetadataId, type MetadataType, type RuntimeValue } from './schemas/metadata.js';
 	import { isDebugMode } from './settings.svelte.js';
 	import { tooltip } from './tooltips.js';
@@ -68,13 +69,13 @@
 	<section class="first-line">
 		<label for={_id}>
 			{#if definition.label}
-				{definition.label}
+				<OverflowableText text={definition.label} />
 			{:else}
 				<div class="technical-indicator" use:tooltip={'Métadonnée technique'}>
 					<IconTechnical />
 				</div>
 				<code>
-					{definition.id}
+					<OverflowableText text={definition.id} />
 				</code>
 			{/if}
 		</label>
