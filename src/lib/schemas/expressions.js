@@ -191,7 +191,7 @@ export const HELPERS = /** @type {const} */ ({
 		 * @param {number | string | undefined} indentation
 		 * @returns {string}
 		 */
-		implementation(value, indentation) {
+		implementationJsonata(value, indentation) {
 			return JSON.stringify(value, null, indentation);
 		}
 	},
@@ -199,18 +199,18 @@ export const HELPERS = /** @type {const} */ ({
 		documentation:
 			"Construire une date à partir de ses composantes. il est possible d'omettre les noms des composantes si on les donne dans l'ordre descendant (year, ..., minutes). toutes les composantes sont optionelles à partir des heures (et valent 0 par défaut). Les dates sont interprétées localement (dans le fuseau horaire local) ",
 		usage: [
-			['year=2024', 'month=12', 'day=31', 'hours=23', 'minutes=59', 'seconds=1.5'],
-			'2024-12-31T23:59:01.500+02:00'
+			['year=2024', 'month=12', 'day=31', 'hours=23', 'minutes=58', 'seconds=1.5'],
+			'2024-12-31T23:58:01.500Z'
 		],
-		/**
-		 * @param {number} year
-		 * @param {number} month
-		 * @param {number} day
-		 * @param {number | undefined} hours
-		 * @param {number | undefined} minutes
-		 * @param {{hash: { year?: number, month?: number, day?: number, hours?: number, minutes?: number, seconds?: number}}} options
-		 */
-		implementationHandlebars(year, month, day, hours, minutes, { hash }) {
+		implementationHandlebars(...args) {
+			/** @type {{hash: { year?: number, month?: number, day?: number, hours?: number, minutes?: number, seconds?: number}}} */
+			const { hash } = args.pop();
+
+			const year = hash.year ?? args.shift();
+			const month = hash.month ?? args.shift();
+			const day = hash.day ?? args.shift();
+			const hours = hash.hours ?? args.shift() ?? 0;
+			const minutes = hash.minutes ?? args.shift() ?? 0;
 			const seconds = hash.seconds ?? 0;
 
 			return new Date(
@@ -221,13 +221,16 @@ export const HELPERS = /** @type {const} */ ({
 				minutes ?? hash.minutes ?? 0,
 				Math.floor(seconds),
 				Math.round((seconds - Math.floor(seconds)) * 1000)
-			);
+			).toISOString();
 		}
 	},
 	object: {
 		documentation:
 			"Crée une représentation JSON d'un objet en prenant les paramètres comme paires clé-valeur",
-		usage: [["key1='value1'", "key2='value2'"], { key1: 'value1', key2: 'value2' }],
+		usage: [
+			["key1='value1'", "key2='value2'"],
+			JSON.stringify({ key2: 'value2', key1: 'value1' })
+		],
 		/**
 		 * @param {{hash: Record<string, unknown>}} options
 		 */
@@ -242,22 +245,18 @@ export const HELPERS = /** @type {const} */ ({
 			['"value1"', '"value2"'],
 			['value1', 'value2']
 		],
-		/**
-		 * @param {unknown} e0
-		 * @param {unknown} e1
-		 * @param {unknown} e2
-		 * @param {unknown} e3
-		 * @param {unknown} e4
-		 * @param {unknown} e5
-		 */
-		implementationHandlebars(e0, e1, e2, e3, e4, e5) {
-			return safeJSONStringify([e0, e1, e2, e3, e4, e5].filter((e) => e !== undefined));
+		implementationHandlebars(...args) {
+			args.pop(); // Remove hash argument added by Handlebars
+			return safeJSONStringify(args.filter((e) => e !== undefined));
 		}
 	},
 	gps: {
 		documentation:
 			'Crée une représetation JSON des coordonnées GPS données (latitude puis longitude)',
-		usage: [['42.957408', '1.0859884'], { latitude: 42.957408, longitude: 1.0859884 }],
+		usage: [
+			['42.957408', '1.0859884'],
+			JSON.stringify({ latitude: 42.957408, longitude: 1.0859884 })
+		],
 		/**
 		 * @param {number} latitude
 		 * @param {number} longitude
@@ -269,7 +268,7 @@ export const HELPERS = /** @type {const} */ ({
 	boundingBox: {
 		documentation:
 			'Crée une représentation JSON d’une bounding box à partir de ses coordonnées normalisées (x, y, w, h)',
-		usage: [['0.5', '0.5', '1', '1'], { x: 0.5, y: 0.5, w: 1, h: 1 }],
+		usage: [['0.5', '0.5', '1', '1'], JSON.stringify({ x: 0.5, y: 0.5, w: 1, h: 1 })],
 		/**
 		 * @param {number} x
 		 * @param {number} y
@@ -282,8 +281,6 @@ export const HELPERS = /** @type {const} */ ({
 	}
 });
 
-// TODO: inline tests generated from the usage examples in the documentation of each helper
-// test inside real handlebars/jsonata expression objects instead of testing the implementations directly
 
 export const HANDLEBARS_HELPERS = transformObject(
 	HELPERS,
@@ -299,12 +296,18 @@ export const HANDLEBARS_HELPERS = transformObject(
 			name,
 			{
 				...rest,
+				usageArgs,
+				usageResult,
 				implementation: impl,
 				usage: `{{ ${name} ${usageArgs.join(' ')} }} -> ${safeJSONStringify(usageResult)}`
 			}
 		];
 	}
 );
+
+for (const [name, { implementation }] of Object.entries(HANDLEBARS_HELPERS)) {
+	Handlebars.registerHelper(name, implementation);
+}
 
 const JSONATA_HELPERS = transformObject(
 	HELPERS,
@@ -318,6 +321,8 @@ const JSONATA_HELPERS = transformObject(
 			name,
 			{
 				...rest,
+				usageArgs,
+				usageResult,
 				usage: `$${name}(${usageArgs.join(', ')}) -> ${safeJSONStringify(usageResult)}`,
 				/**
 				 *
@@ -329,10 +334,6 @@ const JSONATA_HELPERS = transformObject(
 		];
 	}
 );
-
-for (const [name, { implementation }] of Object.entries(HANDLEBARS_HELPERS)) {
-	Handlebars.registerHelper(name, implementation);
-}
 
 /**
  * @template {import("arktype").Type} T
@@ -366,6 +367,34 @@ export const TemplatedString = (Input, postprocess) =>
 			throw new Error(`Invalid template ${safeJSONStringify(t)}`, { cause });
 		}
 	});
+
+if (import.meta.vitest) {
+	const { test, expect, describe } = import.meta.vitest;
+
+	describe('Handlebars helpers', () => {
+		for (const [name, { usageArgs, usageResult }] of Object.entries(HANDLEBARS_HELPERS)) {
+			// We should try mocking new Date() maybe?
+			if (name === 'now') continue;
+
+			const call = `${name} ${usageArgs.join(' ')}`;
+
+			test(call, () => {
+				const result = TemplatedString(type({}))
+					.assert(`{{ ${call} }}`)
+					.render({
+						obj: {},
+						session: {
+							protocolMetadata: { transect_code: { value: 'TR123' } },
+							metadata: {}
+						}
+					});
+				expect(result).toEqual(
+					typeof usageResult === 'string' ? usageResult : safeJSONStringify(usageResult)
+				);
+			});
+		}
+	});
+}
 
 /**
  * @template {import("arktype").Type} I
@@ -412,3 +441,28 @@ export const JsonataExpression = (Input, Output) =>
 			throw new Error(`Invalid Jsonata expression ${safeJSONStringify(t)}: ${cause.message}`, { cause });
 		}
 	});
+
+if (import.meta.vitest) {
+	const { test, expect, describe } = import.meta.vitest;
+
+	describe('Jsonata helpers', () => {
+		for (const [name, { usageArgs, usageResult }] of Object.entries(JSONATA_HELPERS)) {
+			// We should try mocking new Date() maybe?
+			if (name === 'now') continue;
+
+			const call = `$${name}(${usageArgs.join(', ')})`;
+
+			test(call, async () => {
+				const expr = JsonataExpression(type({}), type('unknown')).assert(call);
+				const result = await expr.evaluate({
+					obj: {},
+					session: {
+						protocolMetadata: { transect_code: { value: 'TR123' } },
+						metadata: {}
+					}
+				});
+				expect(result).toEqual(usageResult);
+			});
+		}
+	});
+}
