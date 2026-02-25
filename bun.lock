@@ -105,6 +105,7 @@
         "odt2html": "^1.0.1",
         "oxlint": "^1.47.0",
         "pdf-to-png-converter": "^3.11.0",
+        "playwright-performance-metrics": "^1.2.5",
         "postcss-preset-env": "^11.2.0",
         "prettier": "^3.8.1",
         "prettier-plugin-svelte": "^3.5.0",
@@ -2053,6 +2054,8 @@
     "playwright": ["playwright@1.58.2", "", { "dependencies": { "playwright-core": "1.58.2" }, "optionalDependencies": { "fsevents": "2.3.2" }, "bin": { "playwright": "cli.js" } }, "sha512-vA30H8Nvkq/cPBnNw4Q8TWz1EJyqgpuinBcHET0YVJVFldr8JDNiU9LaWAE1KqSkRYazuaBhTpB5ZzShOezQ6A=="],
 
     "playwright-core": ["playwright-core@1.58.2", "", { "bin": { "playwright-core": "cli.js" } }, "sha512-yZkEtftgwS8CsfYo7nm0KE8jsvm6i/PTgVtB8DL726wNf6H2IMsDuxCpJj59KDaxCtSnrWan2AeDqM7JBaultg=="],
+
+    "playwright-performance-metrics": ["playwright-performance-metrics@1.2.5", "", { "peerDependencies": { "@playwright/test": ">=1.40.0 <2.0.0" } }, "sha512-64tL3xm3TCn3J1yYhrW6pCYbx9uaJYWy4l3aD7hLK2BPLub7U1fYL0yVpI5ewLq4qMwsal8OkomShuMflbGUBA=="],
 
     "plist": ["plist@3.1.0", "", { "dependencies": { "@xmldom/xmldom": "^0.8.8", "base64-js": "^1.5.1", "xmlbuilder": "^15.1.1" } }, "sha512-uysumyrvkUX0rX/dEVqt8gC3sTBzd4zoWfLeS29nb53imdaXVvLINYXTI2GNqzaMuvacNx4uJQ8+b3zXR0pkgQ=="],
 

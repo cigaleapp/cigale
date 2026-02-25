@@ -380,8 +380,11 @@ export const test = base.extend<{ forEachTest: void; app: AppFixture }, { forEac
 				await setHardwareConcurrency(page, 1);
 			}
 
-			await page.goto('./');
-			await app.db.ready();
+			if (!tags.includes('@blank')) {
+				await page.goto('./');
+				await app.db.ready();
+			}
+
 			await use();
 		},
 		{ auto: true }
