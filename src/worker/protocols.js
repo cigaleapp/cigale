@@ -12,6 +12,7 @@ import { ExportedProtocol } from '$lib/schemas/protocols.js';
 import { entries, keys, omit, pick } from '$lib/utils.js';
 
 import { openDatabase, swarp } from './index.js';
+import JSONC from 'tiny-jsonc';
 
 swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 	// ri: icons to preload from Iconify API. See MetadataEnumVariant's "icon" field.
@@ -28,7 +29,7 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 
 	onLoadingState('parsing');
 	console.time('Parsing protocol');
-	let parsed = isJSON ? JSON.parse(contents) : YAML.parse(contents);
+	let parsed = isJSON ? JSONC.parse(contents) : YAML.parse(contents);
 	console.timeEnd('Parsing protocol');
 
 	console.info(`Importing protocol ${parsed.id}`);
