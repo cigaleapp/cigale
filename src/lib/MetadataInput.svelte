@@ -521,6 +521,11 @@
 		width: 100%;
 	}
 
+	.metadata-input:is([data-type='integer'], [data-type='float']) input {
+		text-align: right;
+		max-width: 10ch;
+	}
+
 	.file-input {
 		width: 100%;
 		display: flex;
