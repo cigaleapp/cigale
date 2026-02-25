@@ -207,7 +207,7 @@ export function modelUrl(model) {
  * @param {boolean} taskSettings.input.normalized
  * @param {object} taskSettings.output
  * @param {string} taskSettings.output.name
- * @param {import('./database.js').ModelDetectionOutputShape} taskSettings.output.shape
+ * @param {import('./database.js').ModelDetectionOutputShapes} taskSettings.output.shape
  * @param {AbortSignal} [taskSettings.abortSignal]
  * @param {ArrayBuffer[]} buffers
  * @param {import('onnxruntime-web').InferenceSession} session

@@ -16,7 +16,7 @@
 	import ShapeAtomDisplay from './ShapeAtomDisplay.svelte';
 
 	/**
-	 * @typedef {typeof import('$lib/schemas/neural.js').ModelDetectionOutputShape.infer[number]} Atom
+	 * @typedef {typeof import('$lib/schemas/neural.js').ModelDetectionOutputShape.infer} Atom
 	 */
 
 	/**

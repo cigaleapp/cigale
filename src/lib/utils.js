@@ -1501,3 +1501,39 @@ if (import.meta.vitest) {
 		expect(end - start).toBeGreaterThanOrEqual(99);
 	});
 }
+
+/**
+ * Syntactically clean filepaths:
+ * - replace (windows) backslashes with forward slashes
+ * - remove duplicate slashes
+ * - remove trailing slash (except if it's the root "/")
+ * - remove "." segments
+ * @param {string} filepath
+ * @returns {string}
+ */
+export function cleanFilepath(filepath) {
+	const segments = [];
+	for (const segment of filepath.replaceAll('\\', '/').split('/')) {
+		if (segment === '') continue;
+		if (segment === '.') continue;
+		if (segment === '..' && segments.length > 0) segments.pop();
+		else segments.push(segment);
+	}
+	return segments.join('/');
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('cleanFilepath', () => {
+		expect(cleanFilepath('foo/bar/baz')).toBe('foo/bar/baz');
+		expect(cleanFilepath('foo//bar///baz')).toBe('foo/bar/baz');
+		expect(cleanFilepath('/foo/bar/baz/')).toBe('foo/bar/baz');
+		expect(cleanFilepath('./foo/./bar/./baz/.')).toBe('foo/bar/baz');
+		expect(cleanFilepath('foo/../bar/baz')).toBe('bar/baz');
+		expect(cleanFilepath('../foo/bar/baz')).toBe('../foo/bar/baz');
+		expect(cleanFilepath('..')).toBe('..');
+		expect(cleanFilepath('.')).toBe('');
+		expect(cleanFilepath('/')).toBe('');
+		expect(cleanFilepath('C:\\foo\\bar\\baz')).toBe('C:/foo/bar/baz');
+	});
+}

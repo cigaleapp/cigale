@@ -221,6 +221,7 @@ class UIState {
 		const inference = this.cropMetadata?.infer;
 
 		if (!inference) return [];
+		if (!('neural' in inference)) return [];
 		return inference.neural;
 	});
 

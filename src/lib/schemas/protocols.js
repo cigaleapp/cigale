@@ -9,10 +9,10 @@ import {
 	NamespacedMetadataID,
 	ProtocolID,
 	SingleEntryRecord,
-	TemplatedString,
 	URLString
 } from './common.js';
-import { Metadata, namespacedMetadataId } from './metadata.js';
+import { Metadata, namespacedMetadataId, SidecarFilepathTemplate } from './metadata.js';
+import { TemplatedString } from './expressions.js';
 import { Image, Observation } from './observations.js';
 import { AnalyzedImage, AnalyzedObservation } from './results.js';
 
@@ -72,7 +72,7 @@ export const ProtocolImport = type({
 	sessionMetadata: ItemsImportSpec,
 	metadata: ItemsImportSpec
 }).narrow(({ sessionMetadata, metadata }, ctx) =>
-	sessionMetadata.length + metadata.length > 0
+	(sessionMetadata?.length ?? 0) + (metadata?.length ?? 0) > 0
 		? true
 		: ctx.reject('Un import ne peut pas être vide')
 );
@@ -146,6 +146,11 @@ export const Protocol = type({
 			)
 			.default('0px')
 	}).describe('Configuration de la partie recadrage'),
+	'sidecars?': type({
+		filepath: SidecarFilepathTemplate
+	}).describe(
+		'Définition par défaut des fichiers sidecar (fichiers annexes associés à chaque image par rapport à son nom de fichier)'
+	),
 	exports: type({
 		images: type({
 			cropped: ExportsFilepathTemplateObservation.describe('Chemins des images recadrées'),

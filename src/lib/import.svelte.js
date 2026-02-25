@@ -5,7 +5,7 @@ import * as dates from 'date-fns';
 
 import { toRelativeCoords } from '$lib/BoundingBoxes.svelte.js';
 import { processExifData } from '$lib/exif.js';
-import { tables } from '$lib/idb.svelte.js';
+import { databaseHandle, tables } from '$lib/idb.svelte.js';
 import {
 	errorMessageImageTooLarge,
 	imageId,
@@ -17,6 +17,7 @@ import { toasts } from '$lib/toasts.svelte.js';
 
 import { imageLimits } from './inference_utils.js';
 import { serializeMetadataValues } from './metadata/index.js';
+import { ACCEPTED_SIDECAR_TYPES, processSidecars } from './sidecars.js';
 
 export const ACCEPTED_IMPORT_TYPES = [
 	'image/jpeg',
@@ -28,14 +29,18 @@ export const ACCEPTED_IMPORT_TYPES = [
 	'.dng',
 	'.crw',
 	'.raw',
-	'.cr3'
+	'.cr3',
+	// Sidecar files
+	...ACCEPTED_SIDECAR_TYPES
 ];
 
 /**
- * @param {File} file
- * @param {string} id
+ * @param {object} param0
+ * @param {File} param0.file
+ * @param {string} param0.id
+ * @param {File[]} param0.sidecars
  */
-export async function processImageFile(file, id) {
+export async function processImageFile({ file, id, sidecars }) {
 	if (!uiState.currentProtocol) {
 		toasts.error('Aucun protocole sélectionné');
 		return;
@@ -73,6 +78,25 @@ export async function processImageFile(file, id) {
 
 	// We have to remove the file from the processing files list once the Image database object has been created
 	uiState.processing.removeFile(id);
+
+	if (!uiState.currentSessionId) {
+		toasts.error('Aucun session active');
+		return;
+	}
+
+	// Process sidecars first since they can create new images!
+	// If we do EXIF extraction first, images created via sidecars processing won't get their EXIF-infered metadata
+	await processSidecars({
+		db: databaseHandle(),
+		sessionId: uiState.currentSessionId,
+		cropMetadataId: uiState.cropMetadataId,
+		file,
+		imageFileId: id,
+		sidecars
+	}).catch((e) => {
+		console.error(e);
+		toasts.error(`Erreur lors du traitement du/des fichiers annexes associés à ${file.name}`);
+	});
 
 	await processExifData(uiState.currentSessionId, id, originalBytes, file).catch((error) => {
 		console.error(error);

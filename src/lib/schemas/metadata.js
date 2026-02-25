@@ -2,20 +2,27 @@ import { ArkErrors, scope, type } from 'arktype';
 
 import { parseISOSafe } from '../date.js';
 import { EXIF_FIELDS } from '../exiffields.js';
-import { keys, unique } from '../utils.js';
+import { boundingBoxResolver } from '../inference_utils.js';
+import { entries, keys, transformObject, unique } from '../utils.js';
 import {
 	ColorHex,
+	FilepathTemplate,
 	FileSize,
 	ID,
+	MIMEType,
 	NamespacedMetadataID,
 	Probability,
 	ProtocolID,
-	TemplatedString,
 	UniqueFileTypeSpecifier,
 	URLString
 } from './common.js';
 import { NaturalRegexExpression, NumberRangeLiteral, RegexExpression } from './constraints.js';
-import { NeuralBoundingBoxInference, NeuralEnumInference } from './neural.js';
+import { JsonataExpression, TemplatedString } from './expressions.js';
+import {
+	MODEL_DETECTION_OUTPUT_SHAPES,
+	NeuralBoundingBoxInference,
+	NeuralEnumInference
+} from './neural.js';
 
 /**
  * @param {string} metadataId
@@ -258,6 +265,67 @@ export const EXIFField = type.enumerated(...keys(EXIF_FIELDS));
 
 export const EXIFInference = EXIFField.describe('Inférer depuis un champ EXIF', 'self');
 
+export const SidecarFilepathTemplatePayload = type({
+	filepath: ['string', '@', "Chemin vers le fichier de l'image traitée"]
+	// TODO more stuff
+});
+
+export const SidecarFilepathTemplate = FilepathTemplate(SidecarFilepathTemplatePayload).describe(
+	"Un template pour construire le filepath du fichier sidecar à partir duquel inférer la valeur de la métadonnée. Les variables disponibles pour construire ce filepath sont à définir, mais devraient au minimum inclure le filepath de l'image, et potentiellement d'autres métadonnées de l'image ou de l'observation"
+);
+
+/**
+ * @template {import('arktype').Type} T
+ * @param {T} QueryOutput
+ */
+export const SidecarInference = (QueryOutput) =>
+	type.or(
+		type('string').pipe((query) => ({
+			query: JsonataExpression(type.unknown, QueryOutput).assert(query),
+			filepath: undefined
+		})),
+		{
+			filepath: SidecarFilepathTemplate.describe(
+				"Une template handlebars pour calculer le chemin vers le fichier Sidecar à partir du chemin de l'image (accessible avec la variable `filepath`). Il est possible égalemnt de préciser une simple expression JQ au lieu d'un objet filepath+query, si l'on utilise le fichier annexe par défault, définit par le protocole (voir sidecars.filepath)"
+			),
+			query: JsonataExpression(type.unknown, QueryOutput).describe(
+				'Un expression Jsonata (https://docs.jsonata.org/) pour extraire la valeur depuis le fichier sidecar'
+			)
+		}
+	);
+
+export const InferenceConfigs = /** @type {const} */ ({
+	exif: type({
+		exif: EXIFInference.describe("Inférer depuis les données EXIF de l'image"),
+		'+': 'reject'
+	}),
+
+	/**
+	 * @template {import('arktype').Type} T
+	 * @param {T} QueryOutput
+	 */
+	sidecar: (QueryOutput) =>
+		type({
+			sidecar: SidecarInference(QueryOutput).describe(
+				"Inférer depuis un fichier annexe associé à l'image, dont le nom dépend du nom de l'image associée. Le fichier doit être au format JSON ou XML. L'inférence se fait à l'aide d'une expression Jsonata (https://docs.jsonata.org/), qui permet d'extraire la valeur de la métadonnée depuis ce fichier"
+			),
+			'+': 'reject'
+		}),
+
+	neuralEnum: type({
+		neural: NeuralEnumInference.array().describe(
+			'Inférer depuis un ou plusieurs réseaux neuronaux de classification'
+		),
+		'+': 'reject'
+	}),
+	neuralBoundingBox: type({
+		neural: NeuralBoundingBoxInference.array().describe(
+			"Inférer depuis un ou plusieurs réseaux neuronaux de détection d'objets"
+		),
+		'+': 'reject'
+	})
+});
+
 export const MetadataDefaultDynamicPayload = type({
 	protocolMetadata: MetadataRecord(NamespacedMetadataID),
 	metadata: MetadataRecord(ID),
@@ -332,13 +400,13 @@ const MetadataBase = type({
 const MetadataBoolean = MetadataBase.and({
 	type: '"boolean"',
 	'default?': MetadataDefault('boolean'),
-	'infer?': type.or({ exif: EXIFInference })
+	'infer?': type.or(InferenceConfigs.exif, InferenceConfigs.sidecar(type('boolean')))
 });
 
 export const MetadataString = MetadataBase.and({
 	type: '"string"',
 	'default?': MetadataDefault('string'),
-	'infer?': type.or({ exif: EXIFInference }),
+	'infer?': type.or(InferenceConfigs.exif, InferenceConfigs.sidecar(type('string'))),
 	'regex?': RegexExpression.describe(
 		'Une expression régulière que la valeur de cette métadonnée doit respecter'
 	),
@@ -349,36 +417,47 @@ export const MetadataInteger = MetadataBase.and({
 	type: '"integer"',
 	'range?': NumberRangeLiteral,
 	'default?': MetadataDefault('number.integer'),
-	'infer?': type.or({ exif: EXIFInference })
+	'infer?': type.or(InferenceConfigs.exif, InferenceConfigs.sidecar(type('number.integer')))
 }).pipe();
 
 export const MetadataFloat = MetadataBase.and({
 	type: '"float"',
 	'range?': NumberRangeLiteral,
 	'default?': MetadataDefault('number'),
-	'infer?': type.or({ exif: EXIFInference })
+	'infer?': type.or(InferenceConfigs.exif, InferenceConfigs.sidecar(type('number')))
 });
 
 export const MetadataDate = MetadataBase.and({
 	type: '"date"',
 	'range?': '"future" | "past"',
 	'default?': MetadataDefault('string.date.iso'),
-	'infer?': type.or({ exif: EXIFInference })
+	'infer?': type.or(
+		InferenceConfigs.exif,
+		InferenceConfigs.sidecar(type('string.date.iso.parse'))
+	)
 });
 
 const MetadataLocation = MetadataBase.and({
 	type: '"location"',
 	'default?': MetadataDefault({ latitude: 'number', longitude: 'number' }),
-	'infer?': type({
-		latitude: type.or({ exif: EXIFInference }),
-		longitude: type.or({ exif: EXIFInference })
-	})
+	'infer?': type.or(
+		InferenceConfigs.sidecar(type({ latitude: 'number', longitude: 'number', '+': 'reject' })),
+		{
+			latitude: InferenceConfigs.exif,
+			longitude: InferenceConfigs.exif,
+			'+': 'reject'
+		}
+	)
 });
 
 const MetadataEnum = MetadataBase.and({
 	type: '"enum"',
 	'default?': MetadataDefault('string | number'),
-	'infer?': type.or({ exif: EXIFInference }, { neural: NeuralEnumInference.array() })
+	'infer?': type.or(
+		InferenceConfigs.exif,
+		InferenceConfigs.sidecar(type('string|number')),
+		InferenceConfigs.neuralEnum
+	)
 });
 
 const MetadataBoundingbox = MetadataBase.and({
@@ -389,15 +468,46 @@ const MetadataBoundingbox = MetadataBase.and({
 		w: '0 <= number <= 1',
 		h: '0 <= number <= 1'
 	}),
-	'infer?': type.or({
-		neural: NeuralBoundingBoxInference.array()
-	})
+	'infer?': type.or(
+		InferenceConfigs.neuralBoundingBox,
+		InferenceConfigs.sidecar(
+			type({
+				'+': 'reject',
+				...transformObject(
+					MODEL_DETECTION_OUTPUT_SHAPES,
+					(shape) =>
+						/** @type {const} */
+						([shape, type('0 <= number <= 1').optional()])
+				)
+			})
+				.array()
+				.pipe((boxes) =>
+					boxes.map((box) => {
+						const atoms = entries(box).filter(([_, value]) => value !== undefined);
+						const resolver = boundingBoxResolver(atoms.map(([shape]) => shape));
+						return resolver(
+							0,
+							atoms.map(([_, value]) => value ?? 0)
+						);
+					})
+				)
+		)
+	)
 });
 
 export const MetadataFile = MetadataBase.and({
 	type: '"file"',
 	'default?': 'null',
-	'infer?': 'null',
+	'infer?': type.or(
+		InferenceConfigs.sidecar(
+			type({
+				name: 'string',
+				'type?': MIMEType,
+				'lastModified?': 'number',
+				content: type.or('string', ['instanceof', Uint8Array])
+			}).pipe(({ name, content, ...attrs }) => new File([content], name, attrs))
+		)
+	),
 	size: type({ 'minimum?': FileSize, 'maximum?': FileSize })
 		.describe('Limites sur la taille du fichier')
 		.default(() => ({})),
@@ -443,14 +553,29 @@ export function ensureNamespacedMetadataId(metadataId, fallbackProtocolId) {
 }
 
 /**
- * Checks if a given metadata ID is namespaced to a given protocol ID
  * @template {string} ProtocolID
+ * @overload
  * @param {ProtocolID} protocolId
  * @param {string} metadataId
- * @returns {metadataId is `${ProtocolID}__${string}` }
+ * @returns {metadataId is NamespacedMetadataID<ProtocolID>}
+ */
+
+/**
+ * @overload
+ * @param {null} protocolId
+ * @param {string} metadataId
+ * @returns {metadataId is NamespacedMetadataID<string>}
+ */
+
+/**
+ * Checks if a given metadata ID is namespaced to a given protocol ID
+ * @param {null | string} protocolId
+ * @param {string} metadataId
  */
 export function isNamespacedToProtocol(protocolId, metadataId) {
-	return metadataId.startsWith(`${protocolId}__`);
+	if (protocolId) return metadataId.startsWith(`${protocolId}__`);
+
+	return metadataId.includes('__');
 }
 
 /**
@@ -461,6 +586,12 @@ export function isNamespacedToProtocol(protocolId, metadataId) {
 export function removeNamespaceFromMetadataId(metadataId) {
 	return metadataId.replace(/^.+__/, '');
 }
+
+/**
+ * @overload
+ * @param {undefined | NamespacedMetadataID} metadataId
+ * @returns {undefined|string}
+ */
 
 /**
  * @overload
@@ -476,10 +607,11 @@ export function removeNamespaceFromMetadataId(metadataId) {
 
 /**
  *
- * @param {string} metadataId
+ * @param {string|undefined} metadataId
  * @returns
  */
 export function namespaceOfMetadataId(metadataId) {
+	if (!metadataId) return undefined;
 	const parts = metadataId.split('__');
 	if (parts.length < 2) return undefined;
 	return parts.slice(0, -1).join('__');
