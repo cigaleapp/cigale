@@ -61,15 +61,17 @@ export default defineConfig({
 	/* Opt out of parallel tests. */
 	workers: 1,
 	/* Reporter to use. See https://playwright.dev/docs/test-reporters */
-	reporter: process.env.CI
-		? [
-				['json', { outputFile: 'test-results.json' }],
-				[process.env.SHARDING ? 'blob' : 'html'],
-				['github'],
-				['list'],
-				...pleyeReporter()
-			]
-		: [],
+	...(process.env.CI
+		? {
+				reporter: [
+					['json', { outputFile: 'test-results.json' }],
+					[process.env.SHARDING ? 'blob' : 'html'],
+					['github'],
+					['list'],
+					...pleyeReporter()
+				]
+			}
+		: {}),
 	/* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
 	use: {
 		/* Base URL to use in actions like `await page.goto('/')`. */
