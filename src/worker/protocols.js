@@ -3,6 +3,7 @@
 /// <reference lib="esnext" />
 /// <reference lib="webworker" />
 
+import JSONC from 'tiny-jsonc';
 import YAML from 'yaml';
 
 import { resolveProtocolImports } from '$lib/metadata/imports.js';
@@ -12,7 +13,6 @@ import { ExportedProtocol } from '$lib/schemas/protocols.js';
 import { entries, keys, omit, pick } from '$lib/utils.js';
 
 import { openDatabase, swarp } from './index.js';
-import JSONC from 'tiny-jsonc';
 
 swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 	// ri: icons to preload from Iconify API. See MetadataEnumVariant's "icon" field.
