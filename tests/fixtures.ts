@@ -349,6 +349,17 @@ export const test = base.extend<{ forEachTest: void; app: AppFixture }, { forEac
 	],
 	forEachTest: [
 		async ({ page, context, app }, use, { tags, annotations }) => {
+			let wwcount = 0;
+			page.on('worker', (worker) => {
+				console.log(`Created WebWorker n°${wwcount + 1} with ${worker.url()}`);
+				wwcount++;
+
+				worker.on('close', () => {
+					console.log(`Closing WebWorker n°${wwcount}`);
+					wwcount--;
+				});
+			});
+
 			await rm('./tests/results', { recursive: true, force: true });
 			await mkdir('./tests/results', { recursive: true });
 
