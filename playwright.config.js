@@ -29,6 +29,13 @@ const webkit = {
 	name: 'webkit',
 	use: {
 		...devices['Desktop Safari'],
+		launchOptions: {
+			args: dependsOnTarget({
+				dev: ['--max_old_space_size=4096'],
+				live: [],
+				built: []
+			})
+		},
 		contextOptions: {
 			// See https://github.com/microsoft/playwright/issues/1090
 			serviceWorkers: 'block'
