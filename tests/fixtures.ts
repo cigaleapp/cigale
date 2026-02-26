@@ -351,11 +351,11 @@ export const test = base.extend<{ forEachTest: void; app: AppFixture }, { forEac
 		async ({ page, context, app }, use, { tags, annotations }) => {
 			let wwcount = 0;
 			page.on('worker', (worker) => {
-				console.log(`Created WebWorker n°${wwcount + 1} with ${worker.url()}`);
+				console.debug(`Created WebWorker n°${wwcount + 1} with ${worker.url()}`);
 				wwcount++;
 
 				worker.on('close', () => {
-					console.log(`Closing WebWorker n°${wwcount}`);
+					console.debug(`Closing WebWorker n°${wwcount}`);
 					wwcount--;
 				});
 			});

@@ -58,11 +58,9 @@ export async function load() {
 	setLoadingMessage('Initialisation du worker…');
 
 	if (window && window.swarpc) {
-		console.log('Destroy existing swarpc instance');
 		window.swarpc.destroy();
 	}
 
-	console.log('create swarpc nodes');
 	const swarpc = Swarpc.Client(PROCEDURES, {
 		worker: WebWorker,
 		nodes: parallelism,
@@ -87,7 +85,6 @@ export async function load() {
 	});
 
 	if (window) {
-		console.log('Assign swarpc to window');
 		window.swarpc = swarpc;
 	}
 
