@@ -155,7 +155,9 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	let grouper = $state();
 
 	const groupingSettings = $derived(
-		uiState.currentSession?.group[zone] ?? uiState.currentSession?.group.global
+		uiState.currentSession?.group[zone] ??
+			uiState.currentSession?.group.global ??
+			/** @type {const} */ ({ field: 'none', tolerances: { dates: 'day', decimal: 'unit' } })
 	);
 
 	$effect(() => {
@@ -178,7 +180,9 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	let sorter = $state();
 
 	const sortingSettings = $derived(
-		uiState.currentSession?.sort[zone] ?? uiState.currentSession?.sort.global
+		uiState.currentSession?.sort[zone] ??
+			uiState.currentSession?.sort.global ??
+			/** @type {const} */ ({ field: 'id', direction: 'asc' })
 	);
 
 	$effect(() => {
