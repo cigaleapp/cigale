@@ -1,4 +1,4 @@
-import { minutesToMilliseconds } from 'date-fns';
+import { ms } from 'convert';
 import { PerformanceMetricsCollector } from 'playwright-performance-metrics';
 
 import { assert, expect, test } from './fixtures.js';
@@ -11,19 +11,19 @@ test('startup @blank', async ({ page, browserName, app }) => {
 
 	await page.goto('./');
 	await app.db.ready();
-	await assert(app.tabs.get('sessions')).toBeVisible({ timeout: minutesToMilliseconds(1) });
+	await assert(app.tabs.get('sessions')).toBeVisible({ timeout: ms('1min') });
 
 	const end = Date.now();
 
 	// TODO: lower this
 	console.info('Startup time:', end - start, 'ms');
-	expect(end - start).toBeLessThan(10_000);
+	expect(end - start).toBeLessThan(ms('10s'));
 
 	const metrics = await collector.collectMetrics(page, {
-		timeout: 10_000
+		timeout: ms('10s')
 	});
 
-	expect(metrics.largestContentfulPaint).toBeLessThan(5_000);
-	expect(metrics.paint?.firstContentfulPaint).toBeLessThan(250);
+	expect(metrics.largestContentfulPaint).toBeLessThan(ms('5s'));
+	expect(metrics.paint?.firstContentfulPaint).toBeLessThan(ms('250ms'));
 	console.info('Startup performance metrics:', metrics);
 });

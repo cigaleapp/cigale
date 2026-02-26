@@ -2,7 +2,8 @@
 import { tz } from '@date-fns/tz';
 import { defineConfig, devices } from '@playwright/test';
 import arkenv from 'arkenv';
-import { formatISO9075, minutesToMilliseconds } from 'date-fns';
+import { ms } from 'convert';
+import { formatISO9075 } from 'date-fns';
 
 /** @typedef {NonNullable<import('@playwright/test').PlaywrightTestConfig['projects']>[number]} Project */
 
@@ -40,11 +41,11 @@ const webkit = {
  */
 export default defineConfig({
 	/* Leave some time before github actions makes the job time out (1 hour), so the report can be deployed */
-	globalTimeout: minutesToMilliseconds(15),
+	globalTimeout: ms('15min'),
 	timeout: dependsOnTarget({
-		dev: minutesToMilliseconds(5),
-		live: minutesToMilliseconds(1.2),
-		built: minutesToMilliseconds(1.2)
+		dev: ms('5min'),
+		live: ms('1.2min'),
+		built: ms('1.2min')
 	}),
 	testDir: './tests',
 	metadata: {

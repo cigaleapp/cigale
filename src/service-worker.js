@@ -3,7 +3,7 @@
 /// <reference lib="esnext" />
 /// <reference lib="webworker" />
 
-import { hoursToMilliseconds } from 'date-fns';
+import { ms } from 'convert';
 
 import { build, files, version } from '$service-worker';
 
@@ -66,12 +66,12 @@ sw.addEventListener('fetch', (/** @type {FetchEvent} */ event) => {
 		}
 
 		if (url.hostname === 'nominatim.openstreetmap.org') {
-			// Cache Nominatim API responses for 31 days, since the underlying OSM data doesn't change super frequently but we still want to be nice to their servers
-			return tryCache(event.request, NOMINATIM_API_CACHE, hoursToMilliseconds(24 * 31));
+			// Cache Nominatim API responses for a month, since the underlying OSM data doesn't change super frequently but we still want to be nice to their servers
+			return tryCache(event.request, NOMINATIM_API_CACHE, ms('1 month'));
 		}
 
 		if (url.hostname.endsWith('.cartocdn.com')) {
-			return tryCache(event.request, MAP_TILES_CACHE, hoursToMilliseconds(24 * 365));
+			return tryCache(event.request, MAP_TILES_CACHE, ms('1 year'));
 		}
 
 		// for everything else, try the network first, but
