@@ -60,19 +60,21 @@ export async function load() {
 		worker: WebWorker,
 		nodes: parallelism,
 		hooks: {
-			success({ procedure, data }) {
-				if (procedure !== 'importProtocol') return;
+			success({ procedure, data, duration }) {
+				console.debug(`[timings/swarpc] ${procedure} took ${duration}ms`);
 
-				// We preload icons here instead of in the web worker
-				// so that the service worker can pick up on the fetch call and cache it
-				// > [...] when the **main app thread** makes a network request.
-				// https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerGlobalScope/fetch_event
-				loadIcons(data.iconsToPreload, (loaded, missing) => {
-					console.info(
-						`Preloaded ${loaded.length} icons, ${missing.length} missing:`,
-						missing
-					);
-				});
+				if (procedure === 'importProtocol') {
+					// We preload icons here instead of in the web worker
+					// so that the service worker can pick up on the fetch call and cache it
+					// > [...] when the **main app thread** makes a network request.
+					// https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerGlobalScope/fetch_event
+					loadIcons(data.iconsToPreload, (loaded, missing) => {
+						console.info(
+							`Preloaded ${loaded.length} icons, ${missing.length} missing:`,
+							missing
+						);
+					});
+				}
 			}
 		}
 	});
