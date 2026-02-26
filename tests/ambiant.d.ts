@@ -1,7 +1,7 @@
 import type { IDBPDatabase } from 'idb';
+import type { SwarpcClient } from 'swarpc';
 
 import type { IDBDatabaseType } from '$lib/idb.svelte';
-import type { SwarpcClient } from 'swarpc';
 import type { PROCEDURES } from '$worker/procedures.js';
 
 declare global {
