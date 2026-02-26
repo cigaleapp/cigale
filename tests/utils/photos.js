@@ -53,19 +53,29 @@ export async function importPhotos({ page, wait = true, additionalWaitTime = 0 }
 	 * @param {string | Array<string | string[]>} names
 	 */
 	async function waitUntilLastAppears(names) {
-		let lastItem = names;
+		// Don't wait for sidecar files to appear since they dont create cards by themselves
+		const candidates = (Array.isArray(names) ? names.flat() : [names])
+			.filter((name) => !name.endsWith('.json') && !name.endsWith('.xmp'))
+			.map((name) => path.basename(name));
 
-		while (Array.isArray(lastItem)) {
-			// @ts-expect-error
-			lastItem = lastItem.at(-1);
+		const lastItem = candidates.pop();
 
-			if (!lastItem) throw new Error('No last item to wait for');
+		if (!lastItem) {
+			throw new Error('Nothing to wait on');
 		}
 
 		const element = page
 			.getByText(lastItem, {
 				exact: true
 			})
+			.or(
+				page
+					.getByTestId('observations-area')
+					.locator('article')
+					.filter({
+						has: page.locator(`[data-tooltip-content='${lastItem}']`)
+					})
+			)
 			.last();
 
 		await expect(element).toBeVisible({

@@ -16,7 +16,7 @@ test.skip(
 
 test('basic', async ({ page }) => {
 	await goToProtocolManagement(page);
-	await importProtocol(page, 'arthropods.light.cigaleprotocol.json');
+	await importProtocol(page, 'examples/arthropods.light.cigaleprotocol.json');
 
 	await importResults(page, 'exports/correct.zip');
 	await dumpDatabase(page, 'db/basic.devalue');
@@ -24,7 +24,7 @@ test('basic', async ({ page }) => {
 
 test('kitchensink-protocol', async ({ page, app }) => {
 	await goToProtocolManagement(page);
-	await importProtocol(page, 'kitchensink.cigaleprotocol.yaml');
+	await importProtocol(page, 'examples/kitchensink.cigaleprotocol.yaml');
 	await page
 		.getByRole('listitem')
 		.filter({ hasText: exampleProtocol.id })

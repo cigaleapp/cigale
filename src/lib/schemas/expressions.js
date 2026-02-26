@@ -81,6 +81,21 @@ export const HELPERS = /** @type {const} */ ({
 			return Math.min(Math.max(value, min), max);
 		}
 	},
+	percentage: {
+		documentation:
+			'Display a percentage string, with a optional number of decimals (default: 0)',
+		usage: [['0.1236', '1'], '12.4%'],
+		implementationHandlebars(...args) {
+			args.pop(); // Remove Handlebars options argument
+
+			const [value, decimals = 0] = args;
+
+			return `${(value * 100).toFixed(decimals)}%`;
+		},
+		implementationJsonata(value, decimals = 0) {
+			return `${(value * 100).toFixed(decimals)}%`;
+		}
+	},
 	metadata: {
 		documentation:
 			"Récupère la valeur d'une métadonnée sur un subjet (une session, une observation ou une image) donnée. L'ID de la métadonnée peut ne pas comporter de namespace. Dans ce cas, le namespace correspondant au protocole courant est utilisé. Renvoie null si la métadonnée n'existe pas.",
@@ -280,7 +295,6 @@ export const HELPERS = /** @type {const} */ ({
 		}
 	}
 });
-
 
 export const HANDLEBARS_HELPERS = transformObject(
 	HELPERS,

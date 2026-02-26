@@ -20,7 +20,7 @@ export async function goToProtocolManagement(page) {
  */
 export async function goHome(page) {
 	await page.getByTestId('goto-home').click();
-	await waitForRoute(page, '/sessions');
+	await waitForRoute(page, '/(app)/sessions');
 }
 
 /**

@@ -49,7 +49,7 @@ async function namespacedDeclarations(
 		`export namespace ${namespace} {`,
 		`export const root = "${root.replaceAll('\\', '/')}";`,
 		`export type Any = ${Object.keys(decls).join(' | ')};`,
-		`export type Absolute<T extends Any = Any> = ${'`${typeof root}/${T}`'}`,
+		`export type Absolute<T extends Any = Any> = ${root ? '`${typeof root}/${T}`' : 'T'};`,
 		...(await filepathTypesDeclarations(
 			root,
 			Object.fromEntries(
@@ -74,6 +74,9 @@ Bun.file(path.join(projectRoot, 'tests', 'filepaths.ts')).write(
 		'',
 		...(await namespacedDeclarations('ExamplePaths', 'examples', {
 			Protocols: '*.{json,yaml}'
+		})),
+		...(await namespacedDeclarations('RealPaths', '', {
+			Protocols: 'protocols/*.{json,yaml}'
 		}))
 	].join('\n')
 );
