@@ -1,6 +1,9 @@
 name: Format code
 
 on:
+  pull_request:
+    paths:
+      - .prettierrc
   push:
     branches:
       - main
