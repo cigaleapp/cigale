@@ -48,8 +48,12 @@ async function namespacedDeclarations(
 	return [
 		`export namespace ${namespace} {`,
 		`export const root = "${root.replaceAll('\\', '/')}";`,
-		`export type Any = ${Object.keys(decls).join(' | ')};`,
-		`export type Absolute<T extends Any = Any> = ${root ? '`${typeof root}/${T}`' : 'T'};`,
+		Object.keys(decls).length > 0
+			? `export type Any = ${Object.keys(decls).join(' | ')};`
+			: '// export type Any = (no filepaths defined)',
+		Object.keys(decls).length > 0
+			? `export type Absolute<T extends Any = Any> = ${root ? '`${typeof root}/${T}`' : 'T'};`
+			: '// export type Absolute<T extends Any = Any> = (no filepaths defined);',
 		...(await filepathTypesDeclarations(
 			root,
 			Object.fromEntries(
@@ -71,7 +75,7 @@ Bun.file(path.join(projectRoot, 'tests', 'filepaths.ts')).write(
 			DatabaseDumps: 'db/*.devalue',
 			Photos: ['*.{jpeg,jpg,png,cr2}', 'real/entomoscope/*.{jpeg,jpg,json}']
 		})),
-		'',
+		...(await namespacedDeclarations('ResultsPaths', 'tests/results', {})),
 		...(await namespacedDeclarations('ExamplePaths', 'examples', {
 			Protocols: '*.{json,yaml}'
 		})),

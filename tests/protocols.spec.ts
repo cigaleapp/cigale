@@ -3,10 +3,12 @@ import type { Page } from '@playwright/test';
 import type { Analysis } from '$lib/schemas/exports.js';
 import type { ExportedProtocol } from '$lib/schemas/protocols.js';
 
+import { FixturePaths } from './filepaths.js';
 import { assert, expect, test, type AppFixture } from './fixtures.js';
 import {
 	expectZipFiles,
 	exportResults,
+	firstObservationCard,
 	goToProtocolManagement,
 	goToSessionPage,
 	importPhotos,
@@ -440,9 +442,7 @@ test('can use a protocol that imports metadata from another protocol', async ({
 		.getByRole('option', { name: 'Option 2067' })
 		.click();
 	// Cascade
-	await expect(
-		app.metadata.radio('Is imported', 'Yes')
-	).toBeChecked();
+	await expect(app.metadata.radio('Is imported', 'Yes')).toBeChecked();
 	await app.metadata.radio('Is imported', 'No').click();
 	await app.metadata.switch('Should come from parent2').click();
 	// Make it false
@@ -470,4 +470,142 @@ test('can use a protocol that imports metadata from another protocol', async ({
 			}
 		}
 	});
+});
+
+test('can infer metadata from a sidecar file', async ({ page, app, tempfiles }) => {
+	await goToProtocolManagement(page);
+
+	await app.settings.set({ showTechnicalMetadata: true });
+
+	tempfiles.at(FixturePaths.root);
+
+	const sidecars = {
+		xml: tempfiles.new(
+			'XXXX.xml',
+			`
+			<mv>
+				<value valid="yes" type="enum">Option 1</value>
+				<value valid="no" type="enum">Option unknown</value>
+			</mv>	
+		`
+		),
+		yaml: tempfiles.new(
+			'XXXX.yml',
+			`
+location:
+  coords: 38,12232; 67,676767
+`
+		),
+		json: tempfiles.new(
+			'XXXX.json',
+			JSON.stringify(
+				{
+					cropbox: [
+						{ cx: 0.6, cy: 0.2, w: 0.3, h: 0.4, score: 0.5 },
+						{ sx: 0.1, sy: 0.15, w: 0.25, h: 0.35, score: 0.25 }
+					],
+					boolean: true,
+					timestamp: new Date('2026-01-01T00:00:00Z').valueOf(),
+					number: 100.4,
+					text: 'some text right there  '
+				},
+				null,
+				2
+			)
+		)
+	};
+
+	await importProtocol(page, 'examples/kitchensink.cigaleprotocol.yaml', (p) => {
+		p.id = 'com.example.sidecars';
+		p.name = 'With sidecars';
+
+		p.sidecars = {
+			filepath: sidecars.json.filename
+		};
+
+		p.metadata.crop.infer = {
+			sidecar: 'cropbox'
+		};
+
+		p.metadata.bool.infer = {
+			sidecar: 'boolean'
+		};
+
+		p.metadata.date.infer = {
+			sidecar: 'timestamp ~> $fromMillis'
+		};
+
+		p.metadata.enum.infer = {
+			sidecar: {
+				filepath: sidecars.xml.filename,
+				query: 'mv.value[$."@valid" = "yes"][$."@type" = "enum"]."#text"'
+			}
+		};
+
+		p.metadata.float.infer = {
+			sidecar: 'number'
+		};
+
+		p.metadata.integer.infer = {
+			sidecar: '$floor(number)'
+		};
+
+		p.metadata.string.infer = {
+			sidecar: 'text'
+		};
+
+		p.metadata.location.infer = {
+			sidecar: {
+				filepath: sidecars.yaml.filename,
+				query: 'location.coords.$split("; ")#$i.$replace(",", ".").$number() { ($i = 0 ? "latitude" : "longitude"): $ }'
+			}
+		};
+
+		p.metadata.sidecar.infer = {
+			sidecar:
+				'{ "content": $ ~> $json, "name": $sidecarfile.name, "type": "application/json" }'
+		};
+	});
+
+	await newSession(page, {
+		protocol: 'With sidecars'
+	});
+
+	await importPhotos({ page }, ['cyan.jpeg', sidecars.xml, sidecars.json, sidecars.yaml]);
+
+	await firstObservationCard(page).click();
+
+	await expect(app.metadata.switch('bool')).toBeChecked();
+	await expect(app.metadata.textbox('date')).toHaveValue('2026-01-01');
+	await expect(app.metadata.radio('enum', 'Option 1')).toBeChecked();
+	await expect(app.metadata.textbox('float')).toHaveValue('100.4');
+	await expect(app.metadata.textbox('integer')).toHaveValue('100');
+	await expect(app.metadata.textbox('string')).toHaveValue('some text right there  ');
+	await expect(app.metadata.textbox('location')).toHaveValue('38.12232, 67.676767');
+	await expect(app.metadata.section('sidecar').locator('pre')).toHaveText(sidecars.json.content);
+
+	const { crop } = await app.db.metadata.of({
+		image: 'cyan.jpeg',
+		protocolId: 'com.example.sidecars'
+	});
+
+	expect(crop.parsedValue).toStrictEqual({ x: 0.6, y: 0.2, w: 0.3, h: 0.4 });
+	expect(crop.confidence).toEqual(0.5);
+	expect(crop.alternatives).toEqual({
+		[JSON.stringify({ x: 0.1, y: 0.15, w: 0.25, h: 0.35 })]: 0.25
+	});
+
+	const dbvalues = await app.db.metadata.values({
+		image: 'cyan.jpeg',
+		protocolId: 'com.example.sidecars'
+	});
+
+	expect(dbvalues.bool).toBe(true);
+	expect(dbvalues.date).toEqual(new Date('2026-01-01T00:00:00Z'));
+	expect(dbvalues.enum).toBe('Option 1');
+	expect(dbvalues.float).toBe(100.4);
+	expect(dbvalues.integer).toBe(100);
+	expect(dbvalues.string).toBe('some text right there  ');
+	expect(dbvalues.location).toEqual({ latitude: 38.12232, longitude: 67.676767 });
+	expect(dbvalues.sidecar).toEqual(JSON.parse(sidecars.json.content));
 });

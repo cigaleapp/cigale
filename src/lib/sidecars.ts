@@ -253,9 +253,11 @@ export async function processSidecars({
 					metadataId: item.metadataId,
 					error: e
 				});
+
+				return undefined;
 			});
 
-			if (!value) continue;
+			if (value === undefined) continue;
 
 			await storeMetadataValue({
 				db,

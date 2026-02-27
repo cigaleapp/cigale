@@ -10,12 +10,17 @@ import { loadingText } from './loading.js';
  */
 
 /**
+ * @template T
+ * @typedef {T | T[]} MaybeArray
+ */
+
+/**
  *
  * @param {object} ctx
  * @param {Page} ctx.page
  * @param {boolean} [ctx.wait=true] whether to wait for the loading message to disappear
  * @param {number} [ctx.additionalWaitTime] wait additional milliseconds between each import (when names.length > 1)
- * @param {...(FixturePaths.Photos|FixturePaths.Photos[])} names paths relative to ./tests/fixtures. If no extension is provided, .jpeg is used. Pass in arrays to import multiple files at once.
+ * @param {...MaybeArray<FixturePaths.Photos | {filename: string} | (string & {})>} names paths relative to ./tests/fixtures. If no extension is provided, .jpeg is used. Pass in arrays to import multiple files at once.
  */
 export async function importPhotos({ page, wait = true, additionalWaitTime = 0 }, ...names) {
 	if (!names) throw new Error('No file names provided');
@@ -30,7 +35,11 @@ export async function importPhotos({ page, wait = true, additionalWaitTime = 0 }
 
 	for (const name of names) {
 		i++;
-		const batch = Array.isArray(name) ? name : [name];
+		const batch = (Array.isArray(name) ? name : [name]).map((item) =>
+			typeof item === 'string' ? item : item.filename
+		);
+
+		console.debug(`Importing batch ${i + 1}:`, batch);
 
 		// Once we have at least a card, the file input from the dropzone disappears
 		if (i === 0) {
@@ -45,7 +54,7 @@ export async function importPhotos({ page, wait = true, additionalWaitTime = 0 }
 			);
 		}
 
-		if (wait) await waitUntilLastAppears(name);
+		if (wait) await waitUntilLastAppears(batch);
 	}
 
 	/**
@@ -55,7 +64,10 @@ export async function importPhotos({ page, wait = true, additionalWaitTime = 0 }
 	async function waitUntilLastAppears(names) {
 		// Don't wait for sidecar files to appear since they dont create cards by themselves
 		const candidates = (Array.isArray(names) ? names.flat() : [names])
-			.filter((name) => !name.endsWith('.json') && !name.endsWith('.xmp'))
+			.filter(
+				(name) =>
+					!['.json', '.xml', '.yaml', '.yml', '.xmp'].some((ext) => name.endsWith(ext))
+			)
 			.map((name) => path.basename(name));
 
 		const lastItem = candidates.pop();
