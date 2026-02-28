@@ -16,11 +16,14 @@ All notable changes to this project will be documented in this file, on a monthl
 - Implement range & pattern/regex constraints on metadata
 - Improve clear button & confidence indicator on metadata inputs
 - Improve error message in crop step of loadTensor()
+- Improve numeric metadata inputs
 - Include open session and metadata errors in bug report metadata, show metadata in modal
 - Make carousel scroll buttons much more responsive
 - Make classifier take observations instead of images
+- Properly handle overflow of metadata labels
 - Put full-screen-classifier open button disabled-help in tooltip
 - Store inference errors in exports
+- Support JSONC for protocol imports
 
 ### Bug Fixes
 
@@ -29,6 +32,7 @@ All notable changes to this project will be documented in this file, on a monthl
 - Fix confirmation overlay not showing up
 - Fix formatBytesSize()
 - Fix fullscreen classifier layout switching
+- Fix infinite "sorting..." state when importing invalid session zip
 - Fix input type=range on Chrome
 - Fix layout switch in classifier not working immediately
 - Fix navbar not hiding when going to cropper from classifier
