@@ -21,13 +21,13 @@ import {
 	getTab,
 	goToTab,
 	listTable,
+	metadataSections,
 	mockPredownloadedModels,
 	mockProtocolSourceURL,
 	modal,
 	openSettings,
 	setHardwareConcurrency,
 	setSettings,
-	sidepanelMetadataSectionFor,
 	toast,
 	waitForLoadingEnd,
 	waitForRoute,
@@ -46,6 +46,7 @@ let arthropodaDetectionModel: PredownloadedModel | null = null;
 
 export type AppFixture = {
 	wait: (ms: number) => Promise<void>;
+	metadata: ReturnType<typeof metadataSections>;
 	db: {
 		ready(): Promise<void>;
 		refresh(): Promise<void>;
@@ -130,21 +131,17 @@ export type AppFixture = {
 		wait(timeout?: number): Promise<void>;
 		waitIn(area: Locator, timeout?: number): Promise<void>;
 	};
-	sidepanel: Locator & {
-		metadataSection(label: string | RegExp): Locator;
-	};
+	sidepanel: Locator;
 };
 
 export const test = base.extend<{ forEachTest: void; app: AppFixture }, { forEachWorker: void }>({
 	app: async ({ page }, use) => {
-		const sidepanel = page.getByTestId('sidepanel') as AppFixture['sidepanel'];
-		sidepanel.metadataSection = (label) => sidepanelMetadataSectionFor(page, label);
-
 		await use({
 			async wait(ms) {
 				await page.waitForTimeout(ms);
 			},
-			sidepanel,
+			sidepanel: page.getByTestId('sidepanel'),
+			metadata: metadataSections(page),
 			db: {
 				async ready() {
 					await page.waitForFunction(() =>

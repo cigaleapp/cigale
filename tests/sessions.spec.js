@@ -12,7 +12,6 @@ import {
 	loadDatabaseDump,
 	newSession,
 	pickFiles,
-	sessionMetadataSectionFor,
 	setInferenceModels,
 	switchSession
 } from './utils/index.js';
@@ -279,18 +278,10 @@ test('import into new session', async ({ page, app }) => {
 	await page.getByTestId('goto-current-session').click();
 	await app.path.wait('/(app)/sessions/[id]');
 	// Check metadata set in the export
-	await assert(
-		sessionMetadataSectionFor(page, 'Durée de prospection').getByRole('textbox').first()
-	).toHaveValue('54');
-	await assert(
-		sessionMetadataSectionFor(page, 'Vent')
-			.getByRole('radiogroup')
-			.getByRole('radio', { name: 'Modéré' })
-	).toBeChecked();
+	await assert(app.metadata.textbox('Durée de prospection')).toHaveValue('54');
+	await assert(app.metadata.radio('Vent', 'Modéré')).toBeChecked();
 	// Check that other metadata are unset
-	await assert(
-		sessionMetadataSectionFor(page, 'Distance de prospection').getByRole('textbox').first()
-	).toBeEmpty();
+	await assert(app.metadata.textbox(/^Distance de prospection$/)).toBeEmpty();
 
 	await assert(page.getByRole('textbox', { name: 'Description' })).toHaveValue(
 		'Importée depuis correct.zip'
@@ -308,24 +299,14 @@ test('changing metadata values saves them in the database', async ({ page, app }
 
 	assert(await metadataValueFor('prospection_duration')).toBeUndefined();
 
-	await sessionMetadataSectionFor(page, 'Durée de prospection')
-		.getByRole('textbox')
-		.first()
-		.fill('120');
-
-	await sessionMetadataSectionFor(page, 'Durée de prospection')
-		.getByRole('textbox')
-		.first()
-		.blur();
+	await app.metadata.textbox('Durée de prospection').fill('120');
+	await app.metadata.textbox('Durée de prospection').blur();
 
 	assert(await metadataValueFor('prospection_duration')).toBe(120);
 
 	assert(await metadataValueFor('wind')).toBeUndefined();
 
-	await sessionMetadataSectionFor(page, 'Vent')
-		.getByRole('radiogroup')
-		.getByRole('radio', { name: 'Fort' })
-		.check();
+	await app.metadata.radio('Vent', 'Fort').check();
 
 	await page.waitForTimeout(500); // Wait for DB write
 
@@ -526,7 +507,7 @@ test('can set file-type metadata', async ({ page, app }) => {
 
 	const metadataKey = 'io.github.cigaleapp.kitchensink__sessionwide_file';
 
-	const fileMetadata = sessionMetadataSectionFor(page, 'Sessionwide file');
+	const fileMetadata = app.metadata.section('Sessionwide file');
 
 	// Make sure DB is clean
 	assert(await app.db.count('MetadataValueFile')).toBe(0);

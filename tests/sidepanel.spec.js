@@ -63,15 +63,15 @@ test('allows changing metadata values on import page', issue(440), async ({ page
 	await assert(page.getByTestId('sidepanel')).toBeVisible();
 
 	// Set to True on image itself
-	await assert(app.sidepanel.metadataSection('bool')).toMatchAriaSnapshot(`
+	await assert(app.metadata.section('bool')).toMatchAriaSnapshot(`
 	  - text: bool
 	  - switch "":
 	    - img
 	  - button [disabled]:
 	    - img
 	`);
-	await app.sidepanel.metadataSection('bool').getByRole('switch').click();
-	await assert(app.sidepanel.metadataSection('bool').getByRole('switch')).toMatchAriaSnapshot(`
+	await app.metadata.switch('bool').click();
+	await assert(app.metadata.switch('bool')).toMatchAriaSnapshot(`
 	  - switch "" [checked]:
 	    - img
 	`);
@@ -79,10 +79,10 @@ test('allows changing metadata values on import page', issue(440), async ({ page
 	// Set to False on observation
 	await app.tabs.go('classify');
 	await firstObservationCard(page).click();
-	await app.sidepanel.metadataSection('bool').getByRole('switch').click();
-	await app.sidepanel.metadataSection('bool').getByRole('switch').click();
-	await app.sidepanel.metadataSection('bool').getByRole('switch').click();
-	await assert(app.sidepanel.metadataSection('bool').getByRole('switch')).toMatchAriaSnapshot(`
+	await app.metadata.switch('bool').click();
+	await app.metadata.switch('bool').click();
+	await app.metadata.switch('bool').click();
+	await assert(app.metadata.switch('bool')).toMatchAriaSnapshot(`
 	  - switch "":
 	    - img
 	`);
@@ -90,7 +90,7 @@ test('allows changing metadata values on import page', issue(440), async ({ page
 	// Expect image to be still True
 	await app.tabs.go('import');
 	await firstObservationCard(page).click();
-	await assert(app.sidepanel.metadataSection('bool')).toMatchAriaSnapshot(`
+	await assert(app.metadata.section('bool')).toMatchAriaSnapshot(`
 	  - text: bool
 	  - switch "" [checked]:
 	    - img
@@ -248,7 +248,7 @@ test('can update a enum-type metadata with cascades', async ({ page, app }) => {
 		.getByTestId('metadata-combobox-viewport')
 		.getByText('Dicyrtomina saundersi 18%')
 		.click();
-	await expect(app.sidepanel.metadataSection('Espèce')).toMatchAriaSnapshot(`
+	await expect(app.metadata.section('Espèce')).toMatchAriaSnapshot(`
 		  - text: Espèce
 		  - combobox: Dicyrtomina saundersi
 		  - button:
@@ -284,7 +284,7 @@ test('can update a enum-type metadata with cascades', async ({ page, app }) => {
 	await groupHeader.getByRole('button', { name: 'Développer le groupe' }).click();
 	await page.getByText('lil-fella', { exact: true }).click();
 
-	await assert(app.sidepanel.metadataSection('Espèce')).toMatchAriaSnapshot(
+	await assert(app.metadata.section('Espèce')).toMatchAriaSnapshot(
 		`
 	  - text: Espèce
 	  - combobox: Dicyrtomina saundersi
@@ -423,7 +423,7 @@ test.describe('can search in a enum-type metadata combobox', () => {
 
 test('can update a boolean-type metadata', issue(216), async ({ page, app }) => {
 	await initialize({ page, app, dump: 'db/kitchensink-protocol.devalue' });
-	const switch_ = app.sidepanel.metadataSection('bool').getByRole('switch');
+	const switch_ = app.metadata.switch('bool');
 
 	await expect(switch_).toHaveAttribute('aria-checked', 'false');
 	expect(await metadataValueInDatabase(app, 'bool')).toBeUndefined();
@@ -442,7 +442,7 @@ test('can update a boolean-type metadata', issue(216), async ({ page, app }) => 
 test('shows crop-type metadata as non representable', async ({ page, app }) => {
 	await initialize({ page, app, dump: 'db/kitchensink-protocol.devalue' });
 
-	await assert(app.sidepanel.metadataSection('crop')).toMatchAriaSnapshot(`
+	await assert(app.metadata.section('crop')).toMatchAriaSnapshot(`
 	  - text: crop
 	  - img
 	  - paragraph: Irreprésentable
@@ -454,66 +454,62 @@ test('shows crop-type metadata as non representable', async ({ page, app }) => {
 test('can update a date-type metadata', async ({ page, app }) => {
 	await initialize({ page, app, dump: 'db/kitchensink-protocol.devalue' });
 
-	const dateSection = app.sidepanel.metadataSection('date');
-	await assert(dateSection.getByRole('textbox')).toHaveValue('');
+	await assert(app.metadata.textbox('date')).toHaveValue('');
 
-	await dateSection.getByRole('textbox').fill('2025-05-01');
-	await dateSection.getByRole('textbox').blur();
+	await app.metadata.textbox('date').fill('2025-05-01');
+	await app.metadata.textbox('date').blur();
 
-	await expect(dateSection.getByRole('textbox')).toHaveValue('2025-05-01');
+	await expect(app.metadata.textbox('date')).toHaveValue('2025-05-01');
 	expect(await metadataValueInDatabase(app, 'date')).toBe('2025-05-01T00:00:00');
-	await expect(dateSection).toHaveText(/must be .+ or later/);
+	await expect(app.metadata.section('date')).toHaveText(/must be .+ or later/);
 
 	const futureDate = formatDate(addDays(new Date(), 10), 'yyyy-MM-dd');
-	await dateSection.getByRole('textbox').fill(futureDate);
-	await dateSection.getByRole('textbox').blur();
+	await app.metadata.textbox('date').fill(futureDate);
+	await app.metadata.textbox('date').blur();
 
-	await expect(dateSection.getByRole('textbox')).toHaveValue(futureDate);
+	await expect(app.metadata.textbox('date')).toHaveValue(futureDate);
 	expect(await metadataValueInDatabase(app, 'date')).toBe(`${futureDate}T00:00:00`);
-	await expect(dateSection).not.toHaveText(/must be .+ or later/);
+	await expect(app.metadata.section('date')).not.toHaveText(/must be .+ or later/);
 });
 
 test('can update a float-type metadata', async ({ page, app }) => {
 	await initialize({ page, app, dump: 'db/kitchensink-protocol.devalue' });
 
-	const floatSection = app.sidepanel.metadataSection('float');
-	await assert(floatSection.getByRole('textbox')).toHaveValue('');
+	await assert(app.metadata.textbox('float')).toHaveValue('');
 
-	await floatSection.getByRole('textbox').fill('3.14');
-	await floatSection.getByRole('textbox').blur();
-	await floatSection.getByRole('button', { name: 'Incrémenter' }).click();
+	await app.metadata.textbox('float').fill('3.14');
+	await app.metadata.textbox('float').blur();
+	await app.metadata.section('float').getByRole('button', { name: 'Incrémenter' }).click();
 
-	await assert(floatSection.getByRole('textbox')).toHaveValue('4.14');
+	await assert(app.metadata.textbox('float')).toHaveValue('4.14');
 	assert(await metadataValueInDatabase(app, 'float')).toBe(4.14);
 });
 
 test('can update a integer-type metadata', async ({ page, app }) => {
 	await initialize({ page, app, dump: 'db/kitchensink-protocol.devalue' });
 
-	const integerSection = app.sidepanel.metadataSection('integer');
-	await assert(integerSection.getByRole('textbox')).toHaveValue('');
+	await assert(app.metadata.textbox('integer')).toHaveValue('');
 
-	await integerSection.getByRole('textbox').fill('142');
-	await integerSection.getByRole('textbox').blur();
-	await integerSection.getByRole('button', { name: 'Décrémenter' }).click();
+	await app.metadata.textbox('integer').fill('142');
+	await app.metadata.textbox('integer').blur();
+	await app.metadata.section('integer').getByRole('button', { name: 'Décrémenter' }).click();
 
-	await expect(integerSection.getByRole('textbox')).toHaveValue('141');
+	await expect(app.metadata.textbox('integer')).toHaveValue('141');
 	expect(await metadataValueInDatabase(app, 'integer')).toBe(141);
-	await expect(integerSection).toHaveText(/must be less than 100/);
+	await expect(app.metadata.section('integer')).toHaveText(/must be less than 100/);
 
-	await integerSection.getByRole('textbox').fill('42');
-	await integerSection.getByRole('textbox').blur();
+	await app.metadata.textbox('integer').fill('42');
+	await app.metadata.textbox('integer').blur();
 
-	await expect(integerSection.getByRole('textbox')).toHaveValue('42');
+	await expect(app.metadata.textbox('integer')).toHaveValue('42');
 	expect(await metadataValueInDatabase(app, 'integer')).toBe(42);
-	await expect(integerSection).not.toHaveText('must be less than 100');
+	await expect(app.metadata.section('integer')).not.toHaveText('must be less than 100');
 });
 
 test('can update a string-type metadata', async ({ page, app }) => {
 	await initialize({ page, app, dump: 'db/kitchensink-protocol.devalue' });
 
-	const section = app.sidepanel.metadataSection('string');
-	const textbox = section.getByRole('textbox');
+	const textbox = app.metadata.textbox('string');
 	await assert(textbox).toHaveValue('');
 
 	await textbox.fill('Hello world');
@@ -522,7 +518,9 @@ test('can update a string-type metadata', async ({ page, app }) => {
 	await expect(textbox).toHaveValue('Hello world');
 	expect(await metadataValueInDatabase(app, 'string')).toBe('Hello world');
 	// we're expecting a regex string in the UI, this is intentional
-	await expect(section).toHaveText(/\^ohio \(understandment\|respect\)\.\*\$/);
+	await expect(app.metadata.section('string')).toHaveText(
+		/\^ohio \(understandment\|respect\)\.\*\$/
+	);
 
 	await textbox.fill('ohio understandment');
 	await textbox.blur();
@@ -530,5 +528,7 @@ test('can update a string-type metadata', async ({ page, app }) => {
 	await expect(textbox).toHaveValue('ohio understandment');
 	expect(await metadataValueInDatabase(app, 'string')).toBe('ohio understandment');
 	// we're expecting a regex string in the UI, this is intentional
-	await expect(section).not.toHaveText(/\^ohio \(understandment\|respect\)\.\*\$/);
+	await expect(app.metadata.section('string')).not.toHaveText(
+		/\^ohio \(understandment\|respect\)\.\*\$/
+	);
 });

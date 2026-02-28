@@ -2,7 +2,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import JSZip from 'jszip';
 
 import { assert, test } from '../fixtures.js';
-import { importPhotos, newSession, sessionMetadataSectionFor } from '../utils/index.js';
+import { importPhotos, newSession } from '../utils/index.js';
 
 test.skip(
 	Boolean(process.env.CI),
@@ -19,18 +19,9 @@ async function prepare({ page, app }) {
 
 	await page.getByTestId('goto-current-session').click();
 	await app.path.wait('/(app)/sessions/[id]');
-	await sessionMetadataSectionFor(page, 'Durée de prospection')
-		.getByRole('textbox')
-		.first()
-		.fill('54');
-	await sessionMetadataSectionFor(page, 'Durée de prospection')
-		.getByRole('textbox')
-		.first()
-		.blur();
-	await sessionMetadataSectionFor(page, 'Vent')
-		.getByRole('radiogroup')
-		.getByRole('radio', { name: 'Modéré' })
-		.check();
+	await app.metadata.textbox('Durée de prospection').fill('54');
+	await app.metadata.textbox('Durée de prospection').blur();
+	await app.metadata.radio('Vent', 'Modéré').check();
 
 	await app.tabs.go('import');
 	await importPhotos({ page }, 'cyan.jpeg', 'leaf.jpeg', 'lil-fella.jpeg', 'with-exif-gps.jpeg');

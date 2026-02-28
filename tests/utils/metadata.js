@@ -50,7 +50,7 @@ export async function setImageMetadata({ page }, id, metadata, { refreshDB = tru
  * @param {Page} page
  * @param {string | RegExp} metadataLabel
  */
-export function sidepanelMetadataSectionFor(page, metadataLabel) {
+function sidepanelMetadataSectionFor(page, metadataLabel) {
 	return page
 		.getByTestId('sidepanel')
 		.locator('.metadata')
@@ -65,7 +65,7 @@ export function sidepanelMetadataSectionFor(page, metadataLabel) {
  * @param {Page} page
  * @param {string | RegExp} metadataLabel
  */
-export function sessionMetadataSectionFor(page, metadataLabel) {
+function sessionMetadataSectionFor(page, metadataLabel) {
 	return page
 		.getByTestId('session-metadata')
 		.locator('.metadata')
@@ -73,4 +73,35 @@ export function sessionMetadataSectionFor(page, metadataLabel) {
 			hasText: metadataLabel
 		})
 		.first();
+}
+
+/**
+ *
+ * @param {Page} page
+ */
+export function metadataSections(page) {
+	/** @param {string | RegExp} label */
+	const section = (label) =>
+		sidepanelMetadataSectionFor(page, label).or(sessionMetadataSectionFor(page, label));
+
+	return {
+		section,
+		/** @param {string | RegExp} label */
+		textbox: (label) => section(label).getByRole('textbox'),
+		/** @param {string | RegExp} label */
+		combobox: (label) => section(label).getByRole('combobox'),
+		/** @param {string | RegExp} label */
+		switch: (label) => section(label).getByRole('switch'),
+		/**
+		 * @param {string | RegExp} label
+		 * @param {string} option
+		 * @param {object} [params]
+		 * @param {boolean} [params.exact=true] whether to use exact matching for the option name
+		 */
+		radio(label, option, { exact = true } = { exact: true }) {
+			return section(label)
+				.getByRole('radiogroup')
+				.getByRole('radio', { name: option, exact });
+		}
+	};
 }

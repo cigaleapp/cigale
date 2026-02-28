@@ -388,8 +388,8 @@ test('can use a protocol that imports metadata from another protocol', async ({
 	    - img
 	`);
 
-	await app.sidepanel.metadataSection('From child').getByRole('switch').click();
-	await app.sidepanel.metadataSection('Imported enum').getByRole('combobox').fill('Option 20');
+	await app.metadata.combobox('From child').click();
+	await app.metadata.switch('Imported enum').fill('Option 20');
 	await expect(page.getByTestId('metadata-combobox-viewport')).toMatchAriaSnapshot(`
 	  - option /Option \\d+ --%/:
 	    - text: ""
@@ -434,25 +434,20 @@ test('can use a protocol that imports metadata from another protocol', async ({
 	  - paragraph:
 	    - emphasis: Métadonées mises à jour à la sélection de cette option
 	`);
-	await app.sidepanel.metadataSection('Imported enum').getByRole('combobox').fill('2067');
+	await app.metadata.combobox('Imported enum').fill('2067');
 	await page
 		.getByTestId('metadata-combobox-viewport')
 		.getByRole('option', { name: 'Option 2067' })
 		.click();
 	// Cascade
 	await expect(
-		app.sidepanel
-			.metadataSection('Is imported')
-			.getByRole('radio', { name: 'Yes', exact: true })
+		app.metadata.radio('Is imported', 'Yes')
 	).toBeChecked();
-	await app.sidepanel
-		.metadataSection('Is imported')
-		.getByRole('radio', { name: 'No', exact: true })
-		.click();
-	await app.sidepanel.metadataSection('Should come from parent2').getByRole('switch').click();
+	await app.metadata.radio('Is imported', 'No').click();
+	await app.metadata.switch('Should come from parent2').click();
 	// Make it false
-	await app.sidepanel.metadataSection('Remote metadata').getByRole('switch').click();
-	await app.sidepanel.metadataSection('Remote metadata').getByRole('switch').click();
+	await app.metadata.switch('Remote metadata').click();
+	await app.metadata.switch('Remote metadata').click();
 
 	await app.tabs.go('results');
 	const zip = await exportResults(page, { kind: 'metadata' });

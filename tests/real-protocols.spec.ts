@@ -41,23 +41,22 @@ test('Entomoscope @real-protocol', async ({ app, page }) => {
 
 	await firstObservationCard(page).click();
 
-	const textbox = (label: string) => app.sidepanel.metadataSection(label).getByRole('textbox');
-	const combobox = (label: string) => app.sidepanel.metadataSection(label).getByRole('combobox');
-	const radio = (label: string, name: string) =>
-		app.sidepanel.metadataSection(label).getByRole('radio', { name });
-
-	await expect(textbox('Altitude')).toHaveValue('0');
-	await expect(textbox('Luminosité')).toHaveValue(/^831\.9\d+/);
-	await expect(radio('Modèle de caméra', 'V3')).toBeChecked();
-	await expect(textbox('Modèle utilisé pour la détection')).toHaveValue(
+	await expect(app.metadata.textbox('Altitude')).toHaveValue('0');
+	await expect(app.metadata.textbox('Luminosité')).toHaveValue(/^831\.9\d+/);
+	await expect(app.metadata.radio('Modèle de caméra', 'V3')).toBeChecked();
+	await expect(app.metadata.textbox('Intensité des LEDs')).toHaveValue('61');
+	await expect(app.metadata.textbox('Date')).toHaveValue(/^2026-02-09T?/);
+	await expect(app.metadata.combobox('Lieu')).toHaveValue('0, 0');
+	await expect(app.metadata.textbox('ID du site')).toHaveValue('Col31');
+	await expect(app.metadata.textbox('Modèle utilisé pour la détection')).toHaveValue(
 		'yolo11n_ArthroNat+flatbug.pt'
 	);
-	await expect(textbox('Intensité des LEDs')).toHaveValue('61');
-	await expect(textbox('Modèle de Raspberry Pi')).toHaveValue('Raspberry Pi 4 Model B Rev 1.5');
-	await expect(textbox('Numéro de série du Raspberry Pi')).toHaveValue('10000000ede1b681');
-	await expect(textbox('Date')).toHaveValue(/^2026-02-09T?/);
-	await expect(combobox('Lieu')).toHaveValue('0, 0');
-	await expect(textbox('ID du site')).toHaveValue('Col31');
+	await expect(app.metadata.textbox('Modèle de Raspberry Pi')).toHaveValue(
+		'Raspberry Pi 4 Model B Rev 1.5'
+	);
+	await expect(app.metadata.textbox('Numéro de série du Raspberry Pi')).toHaveValue(
+		'10000000ede1b681'
+	);
 
 	await app.tabs.go('crop');
 	await firstObservationCard(page).click();
