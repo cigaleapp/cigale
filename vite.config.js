@@ -19,7 +19,12 @@ const env = arkenv(
 			.array()
 			.default(() => []),
 		VITEST: 'boolean = false',
-		DEBUG: 'boolean = false'
+		DEBUG: 'boolean = false',
+		BUILTIN_PROTOCOLS: type('string.url')
+			.array()
+			.default(() => [
+				'https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json'
+			])
 	},
 	{
 		arrayFormat: 'comma'
@@ -56,7 +61,8 @@ export default defineConfig({
 		'import.meta.env.buildCommit': JSON.stringify(
 			execSync('git rev-parse HEAD').toString().trim()
 		),
-		'import.meta.env.previewingPrNumber': prNumber ?? 'null'
+		'import.meta.env.previewingPrNumber': prNumber ?? 'null',
+		'import.meta.env.builtinProtocols': JSON.stringify(env.BUILTIN_PROTOCOLS)
 	},
 	worker: {
 		format: 'es',

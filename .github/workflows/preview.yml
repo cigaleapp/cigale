@@ -36,6 +36,8 @@ jobs:
       - name: Build
         if: github.event.action != 'closed'
         run: bun run build
+        env:
+          BUILTIN_PROTOCOLS: https://raw.githubusercontent.com/${{ github.repository }}/${{ github.head_ref }}/examples/arthropods.cigaleprotocol.json
 
       - name: Save preview
         uses: actions/upload-artifact@v7

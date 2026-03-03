@@ -143,52 +143,52 @@ async function loadDefaultProtocol(swarpc) {
 
 	const protocolsCount = await tables.Protocol.count();
 	if (protocolsCount === 0) {
-		try {
-			const contents = await fetch(
-				'https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json'
-			).then((res) => res.text());
-			await swarpc.importProtocol({ contents, isJSON: true }, ({ phase, detail }) => {
-				let secondLine = '';
-				switch (phase) {
-					case 'parsing':
-						secondLine = 'Analyse';
-						break;
+		for (const importUrl of import.meta.env.builtinProtocols) {
+			try {
+				const contents = await fetch(importUrl).then((res) => res.text());
+				await swarpc.importProtocol({ contents, isJSON: true }, ({ phase, detail }) => {
+					let secondLine = '';
+					switch (phase) {
+						case 'parsing':
+							secondLine = 'Analyse';
+							break;
 
-					case 'filtering-builtin-metadata':
-						secondLine = 'Filtrage des métadonnées intégrées';
-						break;
+						case 'filtering-builtin-metadata':
+							secondLine = 'Filtrage des métadonnées intégrées';
+							break;
 
-					case 'input-validation':
-						secondLine = 'Validation';
-						break;
+						case 'input-validation':
+							secondLine = 'Validation';
+							break;
 
-					case 'write-protocol':
-						secondLine = 'Écriture du protocole';
-						break;
+						case 'write-protocol':
+							secondLine = 'Écriture du protocole';
+							break;
 
-					case 'write-metadata':
-						secondLine = `Écriture de la métadonnée<br>${detail}`;
-						break;
+						case 'write-metadata':
+							secondLine = `Écriture de la métadonnée<br>${detail}`;
+							break;
 
-					case 'write-metadata-options':
-						secondLine = `Écriture des options de la métadonnée<br>${detail}`;
-						break;
+						case 'write-metadata-options':
+							secondLine = `Écriture des options de la métadonnée<br>${detail}`;
+							break;
 
-					case 'output-validation':
-						secondLine = 'Post-validation';
-						break;
+						case 'output-validation':
+							secondLine = 'Post-validation';
+							break;
 
-					default:
-						break;
-				}
+						default:
+							break;
+					}
 
-				setLoadingMessage(`${'Chargement du protocole intégré'}<br>${secondLine}`);
-			});
-		} catch (error) {
-			console.error(error);
-			toasts.error(
-				'Impossible de charger le protocole par défaut. Vérifiez votre connexion Internet ou essayez de recharger la page.'
-			);
+					setLoadingMessage(`${'Chargement du protocole intégré'}<br>${secondLine}`);
+				});
+			} catch (error) {
+				console.error(error);
+				toasts.error(
+					'Impossible de charger le protocole par défaut. Vérifiez votre connexion Internet ou essayez de recharger la page.'
+				);
+			}
 		}
 	}
 }
