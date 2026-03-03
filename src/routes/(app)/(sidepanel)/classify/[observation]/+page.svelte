@@ -343,7 +343,8 @@
 		}
 	}
 
-	.panel .synonyms, .panel .cascades {
+	.panel .synonyms,
+	.panel .cascades {
 		max-height: 15rem;
 
 		ul {
