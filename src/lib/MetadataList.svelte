@@ -1,16 +1,27 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 
+	import type * as DB from '$lib/database.js';
+
+	import { getSettings } from './settings.svelte.js';
+
 	interface Props {
-		children: Snippet;
+		children: Snippet<[DB.Metadata]>;
 		testid?: string;
+		definitions: DB.Metadata[];
 	}
 
-	let { children, testid }: Props = $props();
+	const { children, testid, definitions }: Props = $props();
+
+	const { showTechnicalMetadata } = $derived(getSettings());
 </script>
 
 <div class="liste" data-testid={testid}>
-	{@render children()}
+	{#each definitions as def (def.id)}
+		{#if def.label || showTechnicalMetadata}
+			{@render children(def)}
+		{/if}
+	{/each}
 </div>
 
 <style>
