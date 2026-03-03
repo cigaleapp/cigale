@@ -105,7 +105,7 @@
 		<h2>Métadonnées</h2>
 
 		<form class="metadata" data-testid="session-metadata">
-			<MetadataList definitions={sessionMetadata.map((s) => s.def)}>
+			<MetadataList definitions={sessionMetadata.map((s) => s.def)} groups={data.protocol.metadataGroups} ordering={data.protocol.metadataOrder}>
 				{#snippet children(def)}
 					{@const value = sessionMetadata.find((s) => s.def.id === def.id)?.value}
 					<Metadata

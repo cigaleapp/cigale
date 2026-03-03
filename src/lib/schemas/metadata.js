@@ -373,6 +373,9 @@ const MetadataBase = type({
 		"Si cette métadonnée est héritée d'un autre protocole, indique de quel protocole elle est héritée"
 	),
 	label: ['string', '@', 'Nom de la métadonnée'],
+	'group?': ID.brand('MetadataGroup').describe(
+		'Identifiant du groupe dans lequel mettre cette métadonnée. Voir le champ metadataGroups du protocole'
+	),
 	// TODO: move to type-specific branches (e.g. for boundingbox, it's union | none, for others there isnt union, ...)
 	// Get the allowed per-type methods from mergeBy<method> functions' declarations (add a satisfies to the implementations' type switches and export a const for each method)
 	mergeMethod: MetadataMergeMethod.configure(
@@ -528,6 +531,17 @@ export const Metadata = type.or(
 	MetadataBoundingbox,
 	MetadataFile
 );
+
+export const MetadataGroup = type({
+	id: ID.brand('MetadataGroup'),
+	name: 'string',
+	description: "string = ''",
+	collapsed: type(
+		'boolean',
+		'@',
+		"Si le groupe doit être replié par défaut dans l'interface utilisateur. Utile pour les groupes contenant beaucoup de métadonnées ou des métadonnées peu importantes"
+	).default(false)
+});
 
 /**
  * Ensures a metadata ID is namespaced to the given protocol ID

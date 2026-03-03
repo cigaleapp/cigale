@@ -70,7 +70,8 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 				...keys(p.metadata),
 				...keys(p.sessionMetadata)
 			],
-			sessionMetadata: keys(p.sessionMetadata)
+			sessionMetadata: keys(p.sessionMetadata),
+			metadataGroups: entries(p.metadataGroups ?? {}).map(([id, group]) => ({ id, ...group }))
 		});
 		console.timeEnd('Storing Protocol');
 

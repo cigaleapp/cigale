@@ -124,4 +124,29 @@
 		width: 100%;
 		max-width: 70rem;
 	}
+
+	:global(details) {
+		--transition-duration: 0.2s;
+
+		@supports (interpolate-size: allow-keywords) {
+			@media (prefers-reduced-motion: no-preference) {
+				interpolate-size: allow-keywords;
+			}
+
+			&::details-content {
+				opacity: 0;
+				block-size: 0;
+				overflow-y: clip;
+				transition:
+					content-visibility var(--transition-duration) allow-discrete,
+					opacity var(--transition-duration) ease,
+					block-size var(--transition-duration) ease;
+			}
+
+			&:open::details-content {
+				opacity: 1;
+				block-size: auto;
+			}
+		}
+	}
 </style>

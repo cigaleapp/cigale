@@ -204,7 +204,12 @@
 				{plural(selectionCounts.observation, ['1 observation', '# observations'])}
 			{/if}
 		</h2>
-		<MetadataList testid="sidepanel-metadata" {definitions}>
+		<MetadataList
+			testid="sidepanel-metadata"
+			{definitions}
+			groups={uiState.currentProtocol?.metadataGroups}
+			ordering={uiState.currentProtocol?.metadataOrder}
+		>
 			{#snippet children(definition)}
 				{@const value = metadata[definition.id]}
 				<Metadata
