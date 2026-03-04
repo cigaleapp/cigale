@@ -25,6 +25,7 @@
 		"scripts/issue-creator-discord-bot.ts",
 		// TODO add to a CI workflow
 		"scripts/generate-contributing-tables.js",
+		"scripts/to-gbif-classmapping.ts",
 		"src/electron/main.{d.ts,js}",
 		"src/electron/preload.js",
 		"forge.config.js",
