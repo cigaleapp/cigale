@@ -22,7 +22,7 @@ async function gbifIds(url) {
 
 /**
  * @param {"detector" | "classifier"} task
- * @param {"collembola" | "arthropoda"} [scope]
+ * @param {"collembola" | "arthropoda" | "andrena"} [scope]
  * @param {"model" | "classmapping"} [type]
  */
 function modelUrl(task, scope, type) {
@@ -46,6 +46,10 @@ const MODELS = {
 		collembola: {
 			model: modelUrl('classifier', 'collembola', 'model'),
 			classmapping: modelUrl('classifier', 'collembola', 'classmapping')
+		},
+		andrena: {
+			model: modelUrl('classifier', 'andrena', 'model'),
+			classmapping: modelUrl('classifier', 'andrena', 'classmapping')
 		}
 	}
 };
@@ -53,8 +57,9 @@ const MODELS = {
 const lightweightModelGbifIds = await gbifIds(MODELS.classifiers.collembola.classmapping);
 
 const allGbifIds = new Set([
+	...(await gbifIds(MODELS.classifiers.collembola.classmapping)),
 	...(await gbifIds(MODELS.classifiers.arthropoda.classmapping)),
-	...lightweightModelGbifIds
+	...(await gbifIds(MODELS.classifiers.andrena.classmapping))
 ]);
 
 /** @type { Record<string, { name: string; synonyms: string[] }>} */
@@ -502,6 +507,16 @@ const protocol = {
 						input: {
 							height: 224,
 							width: 224,
+							disposition: 'CHW',
+							normalized: true
+						}
+					},
+					{
+						name: 'Andrènes (50 classes)',
+						...MODELS.classifiers.andrena,
+						input: {
+							height: 384,
+							width: 384,
 							disposition: 'CHW',
 							normalized: true
 						}
