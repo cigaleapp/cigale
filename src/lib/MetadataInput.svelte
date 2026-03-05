@@ -228,6 +228,7 @@
 
 				{#if baseUnit}
 					<DropdownMenu
+						scrollable
 						items={[
 							{
 								label: 'Unité',
