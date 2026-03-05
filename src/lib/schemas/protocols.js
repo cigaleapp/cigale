@@ -11,8 +11,8 @@ import {
 	SingleEntryRecord,
 	URLString
 } from './common.js';
-import { Metadata, namespacedMetadataId, SidecarFilepathTemplate } from './metadata.js';
 import { TemplatedString } from './expressions.js';
+import { Metadata, namespacedMetadataId, SidecarFilepathTemplate } from './metadata.js';
 import { Image, Observation } from './observations.js';
 import { AnalyzedImage, AnalyzedObservation } from './results.js';
 

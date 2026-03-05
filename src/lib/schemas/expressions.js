@@ -452,7 +452,10 @@ export const JsonataExpression = (Input, Output) =>
 				}
 			};
 		} catch (cause) {
-			throw new Error(`Invalid Jsonata expression ${safeJSONStringify(t)}: ${cause.message}`, { cause });
+			throw new Error(
+				`Invalid Jsonata expression ${safeJSONStringify(t)}: ${cause.message}`,
+				{ cause }
+			);
 		}
 	});
 

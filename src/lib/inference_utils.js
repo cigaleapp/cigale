@@ -281,7 +281,7 @@ export function boundingBoxResolver(outputShape) {
 		.case({ sy: 'number', h: 'number' }, ({ sy, h }) => [sy + h / 2, h])
 		.default((atoms) => {
 			throw new Error(
-				`Could not get center point y coord and height. Check your output shape definition: ${outputShape}. Available atoms: ${JSON.stringify(atoms)}`, 
+				`Could not get center point y coord and height. Check your output shape definition: ${outputShape}. Available atoms: ${JSON.stringify(atoms)}`
 			);
 		});
 

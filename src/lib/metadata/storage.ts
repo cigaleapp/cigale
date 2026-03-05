@@ -105,7 +105,6 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 		throw new Error(`Le metadataId ${metadataId} n'est pas namespacé`);
 	}
 
-
 	if (confidence > 1) {
 		console.warn(`Confidence ${confidence} is greater than 1, capping to 1`);
 		confidence = 1;
