@@ -390,8 +390,8 @@ test('can use a protocol that imports metadata from another protocol', async ({
 	    - img
 	`);
 
-	await app.metadata.combobox('From child').click();
-	await app.metadata.switch('Imported enum').fill('Option 20');
+	await app.metadata.switch('From child').click();
+	await app.metadata.combobox('Imported enum').fill('Option 20');
 	await expect(page.getByTestId('metadata-combobox-viewport')).toMatchAriaSnapshot(`
 	  - option /Option \\d+ --%/:
 	    - text: ""
@@ -475,7 +475,7 @@ test('can use a protocol that imports metadata from another protocol', async ({
 test('can infer metadata from a sidecar file', async ({ page, app, tempfiles }) => {
 	await goToProtocolManagement(page);
 
-	await app.settings.set({ showTechnicalMetadata: true });
+	await app.settings.set({ showTechnicalMetadata: false });
 
 	tempfiles.at(FixturePaths.root);
 
@@ -484,8 +484,8 @@ test('can infer metadata from a sidecar file', async ({ page, app, tempfiles }) 
 			'XXXX.xml',
 			`
 			<mv>
-				<value valid="yes" type="enum">Option 1</value>
-				<value valid="no" type="enum">Option unknown</value>
+				<value valid="yes" type="enum">one</value>
+				<value valid="no" type="enum">unknown</value>
 			</mv>	
 		`
 		),
@@ -563,7 +563,7 @@ location:
 
 		p.metadata.sidecar.infer = {
 			sidecar:
-				'{ "content": $ ~> $json, "name": $sidecarfile.name, "type": "application/json" }'
+				'{ "content": $ ~> $json(2), "name": $sidecarfile.name, "type": "application/json" }'
 		};
 	});
 

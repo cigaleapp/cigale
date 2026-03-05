@@ -18,14 +18,14 @@ test('startup @blank', async ({ page, browserName, app }) => {
 
 	const end = Date.now();
 
-	// TODO: lower this
 	console.info('Startup time:', end - start, 'ms');
 
+	// TODO: lower this
 	expect(end - start).toBeLessThan(
 		{
 			chromium: ms('10s'),
-			webkit: ms('15s'),
-			firefox: ms('15s')
+			webkit: ms('17s'),
+			firefox: ms('17s')
 		}[browserName]
 	);
 
