@@ -425,9 +425,11 @@ export const test = base.extend<
 
 			await use();
 
-			info.attach('database snapshot', {
-				body: await dumpDatabase(page, null)
-			});
+			if (info.status !== info.expectedStatus) {
+				info.attach('database snapshot', {
+					body: await dumpDatabase(page, null)
+				});
+			}
 		},
 		{ auto: true }
 	]

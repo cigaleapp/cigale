@@ -333,7 +333,7 @@ function tupleSizeIs(tuple, ...sizes) {
  */
 export async function chooseInDropdown(page, trigger, ...option) {
 	if (!(await trigger.getAttribute('aria-controls'))) {
-		await trigger.click();
+		await trigger.click({ force: true });
 	}
 
 	await expect(trigger).toHaveAttribute('aria-controls');
@@ -364,7 +364,7 @@ export async function chooseInDropdown(page, trigger, ...option) {
 		await locateOption(options, ...option).click();
 	}
 
-	await trigger.click();
+	await page.keyboard.press('Escape'); // Close the dropdown after selection
 
 	/**
 	 * @param {Locator} options
