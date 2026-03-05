@@ -202,75 +202,94 @@ test('selecting multiple images', issue(1054), async ({ page, app }) => {
 	        - code: /\\d+%/
 	        - button:
 	          - img
-	    - text: Genre
-	    - combobox: Entomobrya
-	    - code: /\\d+%/
-	    - img
-	    - button "Supprimer cette valeur":
+	    - group:
 	      - img
-	    - text: Alternatives
-	    - list:
-	      - listitem:
-	        - text: Dicyrtomina
-	        - code: /\\d+%/
-	        - button:
-	          - img
-	      - listitem:
-	        - text: Tomocerus
-	        - code: /\\d+%/
-	        - button:
-	          - img
-	      - listitem:
-	        - text: Entomobrya
-	        - code: /\\d+%/
-	        - button:
-	          - img
-	    - text: Famille
-	    - combobox: Entomobryidae
-	    - code: /\\d+%/
-	    - img
-	    - button "Supprimer cette valeur":
+	      - text: Taxonomie
+	      - paragraph: Classification taxonomique de l'espèce
+	      - text: Genre
+	      - combobox: Entomobrya
+	      - code: /\\d+%/
 	      - img
-	    - text: Alternatives
-	    - list:
-	      - listitem:
-	        - text: Dicyrtomidae
-	        - code: /\\d+%/
-	        - button:
-	          - img
-	      - listitem:
-	        - text: Orchesellidae
-	        - code: /\\d+%/
-	        - button:
-	          - img
-	      - listitem:
-	        - text: Entomobryidae
-	        - code: /\\d+%/
-	        - button:
-	          - img
-	    - text: Ordre
-	    - combobox: Entomobryomorpha
-	    - code: /\\d+%/
-	    - img
-	    - button "Supprimer cette valeur":
+	      - button "Supprimer cette valeur":
+	        - img
+	      - text: Alternatives
+	      - list:
+	        - listitem:
+	          - text: Dicyrtomina
+	          - code: /\\d+%/
+	          - button:
+	            - img
+	        - listitem:
+	          - text: Tomocerus
+	          - code: /\\d+%/
+	          - button:
+	            - img
+	        - listitem:
+	          - text: Entomobrya
+	          - code: /\\d+%/
+	          - button:
+	            - img
+	      - text: Famille
+	      - combobox: Entomobryidae
+	      - code: /\\d+%/
 	      - img
-	    - text: Alternatives
-	    - list:
-	      - listitem:
-	        - text: Symphypleona
-	        - code: /\\d+%/
-	        - button:
-	          - img
-	      - listitem:
-	        - text: Entomobryomorpha
-	        - code: /\\d+%/
-	        - button:
-	          - img
-	      - listitem:
-	        - text: Poduromorpha
-	        - code: 5%
-	        - button:
-	          - img
+	      - button "Supprimer cette valeur":
+	        - img
+	      - text: Alternatives
+	      - list:
+	        - listitem:
+	          - text: Dicyrtomidae
+	          - code: /\\d+%/
+	          - button:
+	            - img
+	        - listitem:
+	          - text: Orchesellidae
+	          - code: /\\d+%/
+	          - button:
+	            - img
+	        - listitem:
+	          - text: Entomobryidae
+	          - code: /\\d+%/
+	          - button:
+	            - img
+	      - text: Ordre
+	      - combobox: Entomobryomorpha
+	      - code: /\\d+%/
+	      - img
+	      - button "Supprimer cette valeur":
+	        - img
+	      - text: Alternatives
+	      - list:
+	        - listitem:
+	          - text: Symphypleona
+	          - code: /\\d+%/
+	          - button:
+	            - img
+	        - listitem:
+	          - text: Entomobryomorpha
+	          - code: /\\d+%/
+	          - button:
+	            - img
+	        - listitem:
+	          - text: Poduromorpha
+	          - code: 5%
+	          - button:
+	            - img
+	      - text: Classe
+	      - combobox: Collembola
+	      - code: /\\d+%/
+	      - button "Supprimer cette valeur":
+	        - img
+	      - text: Phylum
+	      - combobox: Arthropoda
+	      - code: /\\d+%/
+	      - button "Supprimer cette valeur":
+	        - img
+	      - text: Règne
+	      - combobox: Animalia
+	      - code: /\\d+%/
+	      - button "Supprimer cette valeur":
+	        - img
 	    - text: Photo d'habitat
 	    - button "Supprimer cette valeur" [disabled]:
 	      - img
@@ -346,21 +365,6 @@ test('selecting multiple images', issue(1054), async ({ page, app }) => {
 	      - radio "LC Préoccupation mineure (“Least Concern”)"
 	      - text: LC
 	      - paragraph: Préoccupation mineure (“Least Concern”)
-	    - text: Classe
-	    - combobox: Collembola
-	    - code: /\\d+%/
-	    - button "Supprimer cette valeur":
-	      - img
-	    - text: Phylum
-	    - combobox: Arthropoda
-	    - code: /\\d+%/
-	    - button "Supprimer cette valeur":
-	      - img
-	    - text: Règne
-	    - combobox: Animalia
-	    - code: /\\d+%/
-	    - button "Supprimer cette valeur":
-	      - img
 	    - button "Regrouper Ctrl + G":
 	      - img
 	      - text: ""

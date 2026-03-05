@@ -271,13 +271,13 @@ test('can update a enum-type metadata with cascades', async ({ page, app }) => {
 	`);
 	// 4th combobox is the location input
 	await expect(nthCombobox(6)).toMatchAriaSnapshot(`
-	  - combobox: Collembola
-	`);
-	await expect(nthCombobox(7)).toMatchAriaSnapshot(`
 	  - combobox: Arthropoda
 	`);
-	await expect(nthCombobox(8)).toMatchAriaSnapshot(`
+	await expect(nthCombobox(7)).toMatchAriaSnapshot(`
 	  - combobox: Animalia
+	`);
+	await expect(nthCombobox(8)).toMatchAriaSnapshot(`
+	  - combobox
 	`);
 
 	// Unselect and reselect
@@ -619,6 +619,8 @@ test('displays metadata groups', async ({ page, app }) => {
 	});
 
 	await importPhotos({ page }, 'cyan.jpeg');
+
+	await page.waitForTimeout(500);
 
 	await firstObservationCard(page).click();
 

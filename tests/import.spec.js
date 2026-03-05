@@ -92,72 +92,91 @@ test.describe('correct results.zip', () => {
 		        - code: 4%
 		        - button:
 		          - img
-		    - text: Genre
-		    - combobox: Allacma
-		    - code: /\\d+%/
-		    - button "Supprimer cette valeur":
+		    - group:
 		      - img
-		    - text: Alternatives
-		    - list:
-		      - listitem:
-		        - text: Bourletiella
-		        - code: /\\d+%/
-		        - button:
-		          - img
-		      - listitem:
-		        - text: Sminthurus
-		        - code: /\\d+%/
-		        - button:
-		          - img
-		      - listitem:
-		        - text: Willowsia
-		        - code: 7%
-		        - button:
-		          - img
-		    - text: Famille
-		    - combobox: Sminthuridae
-		    - code: /\\d+%/
-		    - button "Supprimer cette valeur":
-		      - img
-		    - text: Alternatives
-		    - list:
-		      - listitem:
-		        - text: Entomobryidae
-		        - code: /\\d+%/
-		        - button:
-		          - img
-		      - listitem:
-		        - text: Bourletiellidae
-		        - code: /\\d+%/
-		        - button:
-		          - img
-		      - listitem:
-		        - text: Isotomidae
-		        - code: 6%
-		        - button:
-		          - img
-		    - text: Ordre
-		    - combobox: Symphypleona
-		    - code: /\\d+%/
-		    - button "Supprimer cette valeur":
-		      - img
-		    - text: Alternatives
-		    - list:
-		      - listitem:
-		        - text: Entomobryomorpha
-		        - code: /\\d+%/
-		        - button:
-		          - img
-		      - listitem:
-		        - text: Poduromorpha
-		        - code: 5%
-		        - button:
-		          - img
-		      - listitem:
-		        - text: Neelipleona
-		        - code: 0.8%
-		        - button:
-		          - img
+		      - text: Taxonomie
+		      - paragraph: Classification taxonomique de l'espèce
+		      - text: Genre
+		      - combobox: Allacma
+		      - code: /\\d+%/
+		      - button "Supprimer cette valeur":
+		        - img
+		      - text: Alternatives
+		      - list:
+		        - listitem:
+		          - text: Bourletiella
+		          - code: /\\d+%/
+		          - button:
+		            - img
+		        - listitem:
+		          - text: Sminthurus
+		          - code: /\\d+%/
+		          - button:
+		            - img
+		        - listitem:
+		          - text: Willowsia
+		          - code: 7%
+		          - button:
+		            - img
+		      - text: Famille
+		      - combobox: Sminthuridae
+		      - code: /\\d+%/
+		      - button "Supprimer cette valeur":
+		        - img
+		      - text: Alternatives
+		      - list:
+		        - listitem:
+		          - text: Entomobryidae
+		          - code: /\\d+%/
+		          - button:
+		            - img
+		        - listitem:
+		          - text: Bourletiellidae
+		          - code: /\\d+%/
+		          - button:
+		            - img
+		        - listitem:
+		          - text: Isotomidae
+		          - code: 6%
+		          - button:
+		            - img
+		      - text: Ordre
+		      - combobox: Symphypleona
+		      - code: /\\d+%/
+		      - button "Supprimer cette valeur":
+		        - img
+		      - text: Alternatives
+		      - list:
+		        - listitem:
+		          - text: Entomobryomorpha
+		          - code: /\\d+%/
+		          - button:
+		            - img
+		        - listitem:
+		          - text: Poduromorpha
+		          - code: 5%
+		          - button:
+		            - img
+		        - listitem:
+		          - text: Neelipleona
+		          - code: 0.8%
+		          - button:
+		            - img
+		      - text: Classe
+		      - combobox: Collembola
+		      - code: /\\d+%/
+		      - button "Supprimer cette valeur":
+		        - img
+		      - text: Phylum
+		      - combobox: Arthropoda
+		      - code: /\\d+%/
+		      - button "Supprimer cette valeur":
+		        - img
+		      - text: Règne
+		      - combobox: Animalia
+		      - code: /\\d+%/
+		      - button "Supprimer cette valeur":
+		        - img
 		    - text: Photo d'habitat
 		    - button "Supprimer cette valeur" [disabled]:
 		      - img
@@ -233,21 +252,6 @@ test.describe('correct results.zip', () => {
 		      - radio "LC Préoccupation mineure (“Least Concern”)"
 		      - text: LC
 		      - paragraph: Préoccupation mineure (“Least Concern”)
-		    - text: Classe
-		    - combobox: Collembola
-		    - code: /\\d+%/
-		    - button "Supprimer cette valeur":
-		      - img
-		    - text: Phylum
-		    - combobox: Arthropoda
-		    - code: /\\d+%/
-		    - button "Supprimer cette valeur":
-		      - img
-		    - text: Règne
-		    - combobox: Animalia
-		    - code: /\\d+%/
-		    - button "Supprimer cette valeur":
-		      - img
 		    - button "Regrouper Ctrl + G":
 		      - img
 		      - text: ""
