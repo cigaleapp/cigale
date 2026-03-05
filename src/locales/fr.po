@@ -203,6 +203,8 @@ msgid "Avec les modèles"
 msgstr "Avec les modèles"
 
 #. 0: i + 1
+#. 0: i + 1
+#: src/routes/(app)/(sidepanel)/crop/[image]/[[from]]/+page@(app).svelte
 #: src/routes/(app)/(sidepanel)/crop/[image]/[[from]]/+page@(app).svelte
 msgid "Boîte #{0}"
 msgstr "Boîte #{0}"
@@ -2312,6 +2314,15 @@ msgstr "Aucune session active. Impossible d'enregistrer le fichier."
 #: src/lib/MetadataInput.svelte
 msgid "Modifier"
 msgstr "Modifier"
+
+#: src/lib/import.svelte.js
+msgid "Aucun session active"
+msgstr "Aucun session active"
+
+#. 0: file.name
+#: src/lib/import.svelte.js
+msgid "Erreur lors du traitement du/des fichiers annexes associés à {0}"
+msgstr "Erreur lors du traitement du/des fichiers annexes associés à {0}"
 
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"
