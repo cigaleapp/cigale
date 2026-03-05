@@ -5,6 +5,7 @@ import type * as DB from '$lib/database.js';
 import type { DatabaseHandle, ReactiveTableNames } from '$lib/idb.svelte.js';
 import {
 	ensureNamespacedMetadataId,
+	isNamespacedToProtocol,
 	MetadataError,
 	MetadataValue,
 	namespacedMetadataId,
@@ -50,7 +51,7 @@ async function refreshTables(sessionId: string, ...tableNames: ReactiveTableName
 /**
  *
  * @param options
- * @param options.subjectId id de l'image, l'observation ou la session
+ * @param options.subjectId id de l'image, l'observation ou la session. Aussi possible de mettre un id de ImageFile, dans ce cas la métadonnée sera appliquée à toutes les images utilisant l'ImageFile en question
  * @param options.metadataId id de la métadonnée
  * @param options.type le type de données pour la métadonnée, sert à éviter des problèmes de typages
  * @param options.value la valeur de la métadonnée
@@ -76,11 +77,13 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 	manuallyModified = false,
 	clearErrors = true,
 	isDefault = false,
+	updateReactiveState = true,
 	cascadedFrom = [],
 	sessionId,
 	abortSignal
 }: {
 	subjectId: string;
+	// TODO switch to NamespacedMetadataId
 	metadataId: string;
 	type?: Type;
 	value: RuntimeValue<Type>;
@@ -96,10 +99,12 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 	cascadedFrom?: string[];
 	abortSignal?: AbortSignal | undefined;
 	sessionId?: string | undefined;
+	updateReactiveState?: boolean;
 }) {
-	if (!namespaceOfMetadataId(metadataId)) {
+	if (!isNamespacedToProtocol(null, metadataId)) {
 		throw new Error(`Le metadataId ${metadataId} n'est pas namespacé`);
 	}
+
 
 	if (confidence > 1) {
 		console.warn(`Confidence ${confidence} is greater than 1, capping to 1`);
@@ -235,7 +240,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 	}
 
 	// Only refresh table state once everything has been cascaded, meaning not inside recursive calls
-	if (cascadedFrom.length === 0 && sessionId) {
+	if (cascadedFrom.length === 0 && sessionId && updateReactiveState) {
 		await refreshTables(sessionId, session ? 'Session' : image ? 'Image' : 'Observation');
 	}
 }

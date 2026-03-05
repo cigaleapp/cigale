@@ -16,13 +16,13 @@ export const MODEL_DETECTION_OUTPUT_SHAPES = {
 	_: { help: 'Autre valeur (ignorée par CIGALE)' }
 };
 
-export const ModelDetectionOutputShape = type
-	.or(
-		...entries(MODEL_DETECTION_OUTPUT_SHAPES).map(([key, { help }]) =>
-			type(`"${key}"`).describe(help, 'self')
-		)
+export const ModelDetectionOutputShape = type.or(
+	...entries(MODEL_DETECTION_OUTPUT_SHAPES).map(([key, { help }]) =>
+		type(`"${key}"`).describe(help, 'self')
 	)
-	.array();
+);
+
+export const ModelDetectionOutputShapes = ModelDetectionOutputShape.array();
 
 export const ModelInput = type({
 	width: ['number < 1024', '@', "Largeur en pixels du tenseur d'entrée du modèle"],
@@ -52,7 +52,7 @@ export const ModelOutputBoundingBox = ModelOutputCommon.and({
 		'@',
 		"Si les coordonnées des boîtes englobantes sont normalisées par rapport aux dimensions de l'image"
 	],
-	shape: ModelDetectionOutputShape.describe(
+	shape: ModelDetectionOutputShapes.describe(
 		"Forme de sortie de chaque boîte englobante. Nécéssite obligatoirement d'avoir 'score'; 2 parmi 'cx', 'sx', 'ex', 'w'; et 2 parmi 'cy', 'sy', 'ey', 'h'. Si les boîtes contiennent d'autre valeurs, bien les mentionner avec '_', même quand c'est à la fin de la liste: cela permet de savoir quand on passe à la boîte suivante. Par exemple, [cx, cy, w, h, score, _] correspond à un modèle YOLO11 COCO"
 	)
 });

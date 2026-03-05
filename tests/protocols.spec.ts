@@ -3,10 +3,12 @@ import type { Page } from '@playwright/test';
 import type { Analysis } from '$lib/schemas/exports.js';
 import type { ExportedProtocol } from '$lib/schemas/protocols.js';
 
+import { FixturePaths } from './filepaths.js';
 import { assert, expect, test, type AppFixture } from './fixtures.js';
 import {
 	expectZipFiles,
 	exportResults,
+	firstObservationCard,
 	goToProtocolManagement,
 	goToSessionPage,
 	importPhotos,
@@ -388,8 +390,8 @@ test('can use a protocol that imports metadata from another protocol', async ({
 	    - img
 	`);
 
-	await app.sidepanel.metadataSection('From child').getByRole('switch').click();
-	await app.sidepanel.metadataSection('Imported enum').getByRole('combobox').fill('Option 20');
+	await app.metadata.switch('From child').click();
+	await app.metadata.combobox('Imported enum').fill('Option 20');
 	await expect(page.getByTestId('metadata-combobox-viewport')).toMatchAriaSnapshot(`
 	  - option /Option \\d+ --%/:
 	    - text: ""
@@ -434,25 +436,18 @@ test('can use a protocol that imports metadata from another protocol', async ({
 	  - paragraph:
 	    - emphasis: Métadonées mises à jour à la sélection de cette option
 	`);
-	await app.sidepanel.metadataSection('Imported enum').getByRole('combobox').fill('2067');
+	await app.metadata.combobox('Imported enum').fill('2067');
 	await page
 		.getByTestId('metadata-combobox-viewport')
 		.getByRole('option', { name: 'Option 2067' })
 		.click();
 	// Cascade
-	await expect(
-		app.sidepanel
-			.metadataSection('Is imported')
-			.getByRole('radio', { name: 'Yes', exact: true })
-	).toBeChecked();
-	await app.sidepanel
-		.metadataSection('Is imported')
-		.getByRole('radio', { name: 'No', exact: true })
-		.click();
-	await app.sidepanel.metadataSection('Should come from parent2').getByRole('switch').click();
+	await expect(app.metadata.radio('Is imported', 'Yes')).toBeChecked();
+	await app.metadata.radio('Is imported', 'No').click();
+	await app.metadata.switch('Should come from parent2').click();
 	// Make it false
-	await app.sidepanel.metadataSection('Remote metadata').getByRole('switch').click();
-	await app.sidepanel.metadataSection('Remote metadata').getByRole('switch').click();
+	await app.metadata.switch('Remote metadata').click();
+	await app.metadata.switch('Remote metadata').click();
 
 	await app.tabs.go('results');
 	const zip = await exportResults(page, { kind: 'metadata' });
@@ -475,4 +470,193 @@ test('can use a protocol that imports metadata from another protocol', async ({
 			}
 		}
 	});
+});
+
+test('can infer metadata from a sidecar file', async ({ page, context, app, tempfiles }) => {
+	await goToProtocolManagement(page);
+
+	await app.settings.set({ showTechnicalMetadata: false });
+
+	const locationDisplayName =
+		'Околтын, Akaltyn, Oltinsoy District, Province de Sourkhan-Daria, Ouzbékistan';
+
+	await mockUrl(
+		page,
+		context,
+		'https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=38.12232&lon=67.676767&addressdetails=0',
+		{
+			json: {
+				place_id: 194730330,
+				licence: 'Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright',
+				osm_type: 'way',
+				osm_id: 855726288,
+				lat: '38.1228066',
+				lon: '67.6767144',
+				category: 'highway',
+				type: 'living_street',
+				place_rank: 26,
+				importance: 0.05337333409628439,
+				addresstype: 'road',
+				name: '',
+				display_name: locationDisplayName,
+				boundingbox: ['38.1227130', '38.1229923', '67.6758481', '67.6785654']
+			}
+		}
+	);
+
+	tempfiles.at(FixturePaths.root);
+
+	const sidecars = {
+		xml: tempfiles.new(
+			'XXXX.xml',
+			`
+			<mv>
+				<value valid="yes" type="enum">one</value>
+				<value valid="no" type="enum">unknown</value>
+			</mv>	
+		`
+		),
+		yaml: tempfiles.new(
+			'XXXX.yml',
+			`
+location:
+  coords: 38,12232; 67,676767
+`
+		),
+		json: tempfiles.new(
+			'XXXX.json',
+			JSON.stringify(
+				{
+					cropbox: [
+						{ cx: 0.6, cy: 0.2, w: 0.3, h: 0.4, score: 0.5 },
+						{ sx: 0.1, sy: 0.15, w: 0.25, h: 0.35, score: 0.25 }
+					],
+					boolean: true,
+					timestamp: new Date('2026-01-01T00:00:00Z').valueOf(),
+					number: 100.4,
+					text: 'some text right there  '
+				},
+				null,
+				2
+			)
+		)
+	};
+
+	await importProtocol(page, 'examples/kitchensink.cigaleprotocol.yaml', (p) => {
+		p.id = 'com.example.sidecars';
+		p.name = 'With sidecars';
+
+		p.sidecars = {
+			filepath: sidecars.json.filename
+		};
+
+		p.metadata.crop.infer = {
+			sidecar: 'cropbox'
+		};
+
+		p.metadata.bool.infer = {
+			sidecar: 'boolean'
+		};
+
+		p.metadata.date.infer = {
+			sidecar: 'timestamp ~> $fromMillis'
+		};
+
+		p.metadata.enum.infer = {
+			sidecar: {
+				filepath: sidecars.xml.filename,
+				query: 'mv.value[$."@valid" = "yes"][$."@type" = "enum"]."#text"'
+			}
+		};
+
+		p.metadata.float.infer = {
+			sidecar: 'number'
+		};
+
+		p.metadata.integer.infer = {
+			sidecar: '$floor(number)'
+		};
+
+		p.metadata.string.infer = {
+			sidecar: 'text'
+		};
+
+		p.metadata.location.infer = {
+			sidecar: {
+				filepath: sidecars.yaml.filename,
+				query: 'location.coords.$split("; ")#$i.$replace(",", ".").$number() { ($i = 0 ? "latitude" : "longitude"): $ }'
+			}
+		};
+
+		p.metadata.sidecar.infer = {
+			sidecar:
+				'{ "content": $ ~> $json(2), "name": $sidecarfile.name, "type": "application/json" }'
+		};
+	});
+
+	await newSession(page, {
+		protocol: 'With sidecars'
+	});
+
+	await importPhotos({ page }, ['cyan.jpeg', sidecars.xml, sidecars.json, sidecars.yaml]);
+	await page.waitForTimeout(1_000);
+
+	await firstObservationCard(page).click();
+
+	await expect(app.metadata.switch('bool')).toBeChecked();
+	await expect(app.metadata.textbox('date')).toHaveValue('2026-01-01');
+	await expect(app.metadata.radio('enum', 'Option 1', { exact: false })).toBeChecked();
+	await expect(app.metadata.textbox('float')).toHaveValue('100.4');
+	await expect(app.metadata.textbox('integer')).toHaveValue('100');
+	await expect(app.metadata.textbox('string')).toHaveValue('some text right there  ');
+	await expect(app.metadata.combobox('location')).toHaveValue(locationDisplayName);
+	await expect(app.metadata.section('sidecar').locator('pre')).toHaveText(
+		// there's also a <pre> tag for the fullscreen <dialog>
+		[sidecars.json.content, sidecars.json.content]
+	);
+
+	const dbvalues = await app.db.metadata.values({
+		image: 'cyan.jpeg',
+		protocolId: 'com.example.sidecars'
+	});
+
+	expect(dbvalues.bool).toBe(true);
+	expect(dbvalues.date).toEqual('2026-01-01T00:00:00');
+	expect(dbvalues.enum).toBe('one');
+	expect(dbvalues.float).toBe(100.4);
+	expect(dbvalues.integer).toBe(100);
+	expect(dbvalues.string).toBe('some text right there  ');
+	expect(dbvalues.location).toEqual({ latitude: 38.12232, longitude: 67.676767 });
+	expect(
+		await page.evaluate(async (id) => {
+			const f = await window.DB.get('MetadataValueFile', id);
+			if (!f) throw new Error('MetadataValueFile not found');
+			return JSON.parse(new TextDecoder('utf-8').decode(f.bytes));
+		}, dbvalues.sidecar.toString())
+	).toEqual(JSON.parse(sidecars.json.content));
+
+	// Each box in a boundingbox-type sidecar inference result should create a separate Image for the ImageFile
+
+	const images = await app.db.image.list();
+	const crops = await Promise.all(
+		images.map(async (image) => {
+			const { crop } = await app.db.metadata.of({
+				imageId: image.id,
+				protocolId: 'com.example.sidecars'
+			});
+
+			return crop;
+		})
+	);
+
+	expect(crops).toMatchObject([
+		{
+			parsedValue: { x: 0.6, y: 0.2, w: 0.3, h: 0.4 },
+			confidence: 0.5
+		},
+		{
+			parsedValue: { x: 0.225, y: assert.closeTo(0.325, 5), w: 0.25, h: 0.35 },
+			confidence: 0.25
+		}
+	]);
 });

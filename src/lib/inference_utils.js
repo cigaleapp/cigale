@@ -186,7 +186,7 @@ async function normalizeTensor(tensor, mean, std, denormalize = false, abortSign
 
 /**
  *
- * @param {import('./database.js').ModelDetectionOutputShape} outputShape
+ * @param {import('./database.js').ModelDetectionOutputShapes} outputShape
  * @param {Float32Array} output
  * @param {number} numImages
  * @param {number} minConfidence
@@ -210,6 +210,9 @@ export function output2BB(outputShape, output, numImages, minConfidence, abortSi
             forme : [each img [each box score]]
     */
 
+	// TODO(perf): move this to only do it once per protocol instead of on every inference
+	const resolveBoundingBoxShape = boundingBoxResolver(outputShape);
+
 	/** @type {import('./inference.js').BB[][]}  */
 	let bestBoxes = [];
 	/** @type {number[][]}  */
@@ -231,69 +234,16 @@ export function output2BB(outputShape, output, numImages, minConfidence, abortSi
 
 		for (let i = 0; i < suboutput.length; i += suboutputSize) {
 			abortSignal?.throwIfAborted();
-			/**
-			 * Get a data point ("atom") for this bounding box for this model.
-			 * If the protocol's inference detection output shape does not include the atom, return undefined.
-			 * Otherwise, grab the data point from the suboutput using the index of the atom in the output shape.
-			 * For example, if the output shape is `['sx', '_', '_', 'sy']`, we can get the 'sy' atom using `suboutput[i + 3]`.
-			 * @param {import('./database').ModelDetectionOutputShape[number]} atom
-			 */
-			const atom = (atom) =>
-				outputShape.includes(atom) ? suboutput[i + outputShape.indexOf(atom)] : undefined;
 
-			// All possible data points ("atoms") for this bounding box
-			const atoms = {
-				sx: atom('sx'),
-				sy: atom('sy'),
-				ex: atom('ex'),
-				ey: atom('ey'),
-				cx: atom('cx'),
-				cy: atom('cy'),
-				w: atom('w'),
-				h: atom('h'),
-				score: atom('score')
-			};
-
-			// Get center point x coord and width
-			const [x, w] = match
-				.case({ cx: 'number', ex: 'number' }, ({ cx, ex }) => [cx, 2 * (ex - cx)])
-				.case({ cx: 'number', sx: 'number' }, ({ sx, cx }) => [cx, 2 * (cx - sx)])
-				.case({ cx: 'number', w: 'number' }, ({ cx, w }) => [cx, w])
-				.case({ ex: 'number', sx: 'number' }, ({ sx, ex }) => [(sx + ex) / 2, ex - sx])
-				.case({ ex: 'number', w: 'number' }, ({ ex, w }) => [ex - w / 2, w])
-				.case({ sx: 'number', w: 'number' }, ({ sx, w }) => [sx + w / 2, w])
-				.default(() => {
-					throw new Error(
-						`Could not get center point x coord and width. Check your protocol's inference.detection.output.shape. Available atoms: ${JSON.stringify(atoms)}`
-					);
-				})(atoms);
-
-			const [y, h] = match
-				.case({ cy: 'number', ey: 'number' }, ({ cy, ey }) => [cy, 2 * (ey - cy)])
-				.case({ cy: 'number', sy: 'number' }, ({ sy, cy }) => [cy, 2 * (cy - sy)])
-				.case({ cy: 'number', h: 'number' }, ({ cy, h }) => [cy, h])
-				.case({ ey: 'number', sy: 'number' }, ({ sy, ey }) => [(sy + ey) / 2, ey - sy])
-				.case({ ey: 'number', h: 'number' }, ({ ey, h }) => [ey - h / 2, h])
-				.case({ sy: 'number', h: 'number' }, ({ sy, h }) => [sy + h / 2, h])
-				.default(() => {
-					throw new Error(
-						`Could not get center point y coord and height. Check your protocol's inference.detection.output.shape. Available atoms: ${JSON.stringify(atoms)}`
-					);
-				})(atoms);
+			const { score, x, y, w, h } = resolveBoundingBoxShape(i, suboutput);
 
 			if (x == 0 && y == 0 && w == 0 && h == 0) {
 				break;
 			}
 
-			if (atoms.score === undefined) {
-				throw new Error(
-					"Could not get score. Check your protocol's inference.detection.output.shape."
-				);
-			}
-
-			if (atoms.score > minConfidence) {
+			if (score > minConfidence) {
 				bestPerImageBoxes.push([x, y, w, h]);
-				bbScores.push(atoms.score);
+				bbScores.push(score);
 			}
 		}
 
@@ -301,6 +251,79 @@ export function output2BB(outputShape, output, numImages, minConfidence, abortSi
 		bestScores.push(bbScores);
 	}
 	return [bestBoxes, bestScores];
+}
+
+/**
+ * Returns a function that computes the standard bounding box coordinates from a model's output tensor.
+ * @param {import('./database').ModelDetectionOutputShapes} outputShape shape description
+ */
+export function boundingBoxResolver(outputShape) {
+	// Get center point x coord and width
+	const horizontal = match
+		.case({ cx: 'number', ex: 'number' }, ({ cx, ex }) => [cx, 2 * (ex - cx)])
+		.case({ cx: 'number', sx: 'number' }, ({ sx, cx }) => [cx, 2 * (cx - sx)])
+		.case({ cx: 'number', w: 'number' }, ({ cx, w }) => [cx, w])
+		.case({ ex: 'number', sx: 'number' }, ({ sx, ex }) => [(sx + ex) / 2, ex - sx])
+		.case({ ex: 'number', w: 'number' }, ({ ex, w }) => [ex - w / 2, w])
+		.case({ sx: 'number', w: 'number' }, ({ sx, w }) => [sx + w / 2, w])
+		.default((atoms) => {
+			throw new Error(
+				`Could not get center point x coord and width. Check your output shape definition: ${outputShape}. Available atoms: ${JSON.stringify(atoms)}`
+			);
+		});
+
+	const vertical = match
+		.case({ cy: 'number', ey: 'number' }, ({ cy, ey }) => [cy, 2 * (ey - cy)])
+		.case({ cy: 'number', sy: 'number' }, ({ sy, cy }) => [cy, 2 * (cy - sy)])
+		.case({ cy: 'number', h: 'number' }, ({ cy, h }) => [cy, h])
+		.case({ ey: 'number', sy: 'number' }, ({ sy, ey }) => [(sy + ey) / 2, ey - sy])
+		.case({ ey: 'number', h: 'number' }, ({ ey, h }) => [ey - h / 2, h])
+		.case({ sy: 'number', h: 'number' }, ({ sy, h }) => [sy + h / 2, h])
+		.default((atoms) => {
+			throw new Error(
+				`Could not get center point y coord and height. Check your output shape definition: ${outputShape}. Available atoms: ${JSON.stringify(atoms)}`, 
+			);
+		});
+
+	/**
+	 * @param {number} start starting position in the output layer
+	 * @param {number[] | Float32Array} layer output layer values
+	 */
+	return (start, layer) => {
+		/**
+		 * Get a data point ("atom") for this bounding box for this model.
+		 * If the protocol's inference detection output shape does not include the atom, return undefined.
+		 * Otherwise, grab the data point from the suboutput using the index of the atom in the output shape.
+		 * For example, if the output shape is `['sx', '_', '_', 'sy']`, we can get the 'sy' atom using `suboutput[i + 3]`.
+		 * @param {import('./database').ModelDetectionOutputShapes[number]} atom
+		 */
+		const atom = (atom) =>
+			outputShape.includes(atom) ? layer[start + outputShape.indexOf(atom)] : undefined;
+
+		// All possible data points ("atoms") for this bounding box
+		const atoms = {
+			sx: atom('sx'),
+			sy: atom('sy'),
+			ex: atom('ex'),
+			ey: atom('ey'),
+			cx: atom('cx'),
+			cy: atom('cy'),
+			w: atom('w'),
+			h: atom('h'),
+			score: atom('score')
+		};
+
+		const [x, w] = horizontal(atoms);
+		const [y, h] = vertical(atoms);
+
+		if (atoms.score === undefined) {
+			throw new Error(
+				"Could not get score. Check your protocol's inference.detection.output.shape."
+			);
+		}
+
+		return { x, y, w, h, score: atoms.score };
+	};
 }
 
 /**

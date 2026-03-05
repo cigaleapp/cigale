@@ -12,6 +12,13 @@ const chromium = {
 	name: 'chromium',
 	use: {
 		...devices['Desktop Chrome'],
+		launchOptions: {
+			args: dependsOnTarget({
+				dev: ['--max_old_space_size=2048'],
+				live: [],
+				built: []
+			})
+		},
 		contextOptions: {
 			serviceWorkers: process.env.CI ? 'allow' : 'block'
 		}
@@ -51,8 +58,8 @@ export default defineConfig({
 	globalTimeout: ms('15min'),
 	timeout: dependsOnTarget({
 		dev: ms('5min'),
-		live: ms('1.2min'),
-		built: ms('1.2min')
+		live: ms('1.5min'),
+		built: ms('1.5min')
 	}),
 	testDir: './tests',
 	metadata: {

@@ -40,7 +40,7 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 				input: Schemas.ModelInput,
 				output: {
 					'name?': 'string',
-					shape: Schemas.ModelDetectionOutputShape
+					shape: Schemas.ModelDetectionOutputShapes
 				}
 			}
 		}),

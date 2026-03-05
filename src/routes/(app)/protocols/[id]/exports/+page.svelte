@@ -3,7 +3,7 @@
 
 	import { page } from '$app/state';
 	import { tables } from '$lib/idb.svelte.js';
-	import { HANDLEBARS_HELPERS } from '$lib/schemas/common.js';
+	import { HANDLEBARS_HELPERS } from '$lib/schemas/expressions.js';
 	import { seo } from '$lib/seo.svelte';
 	import { getSettings } from '$lib/settings.svelte';
 	import { toasts } from '$lib/toasts.svelte';

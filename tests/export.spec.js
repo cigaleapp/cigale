@@ -12,7 +12,6 @@ import {
 	loadDatabaseDump,
 	newSession,
 	pickFiles,
-	sessionMetadataSectionFor,
 	setInferenceModels,
 	toast
 } from './utils/index.js';
@@ -232,7 +231,7 @@ test('includes metadata files in export', async ({ page, app }) => {
 	await chooseFirstSession(page);
 	await goToSessionPage(page);
 
-	const sessionwideFile = sessionMetadataSectionFor(page, 'Sessionwide file');
+	const sessionwideFile = app.metadata.section('Sessionwide file');
 
 	await pickFiles(sessionwideFile.getByRole('button', { name: 'Ajouter' }), 'debugsquare.png');
 	await assert(sessionwideFile).toHaveText(/debugsquare\.png/);

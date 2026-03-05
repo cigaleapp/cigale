@@ -1,3 +1,4 @@
+import { ms } from 'convert';
 import { Schemas } from '../src/lib/database.js';
 import { issue } from './annotations.js';
 import { assert, exampleProtocol, expect, test } from './fixtures.js';
@@ -18,7 +19,7 @@ const CROP_METADATA_ID = `${exampleProtocol.id}__crop`;
 
 test.describe('Cropper view', () => {
 	test.beforeEach(async ({ page, app }, testInfo) => {
-		testInfo.setTimeout(40_000);
+		testInfo.setTimeout(ms('2min'));
 		await loadDatabaseDump(page);
 		await chooseFirstSession(page);
 		await app.tabs.go('import');

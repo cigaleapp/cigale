@@ -155,6 +155,7 @@
 		"handlebars": "^4.7.8",
 		"idb": "^8.0.3",
 		"jimp": "^1.6.0",
+		"jsonata": "^2.1.0",
 		"maplibre-gl": "^5.19.0",
 		"marked": "^17.0.3",
 		"microdiff": "^1.5.0",

@@ -160,9 +160,7 @@ test('selecting multiple images', issue(1054), async ({ page, app }) => {
 
 	// Set identification_difficulty on one of the observations
 	await page.getByRole('article', { name: 'cyan' }).click();
-	const medium = app.sidepanel
-		.metadataSection(/Difficulté d'identification/)
-		.getByRole('radio', { name: 'Moyenne' });
+	const medium = app.metadata.radio(/Difficulté d'identification/, 'Moyenne');
 	await medium.scrollIntoViewIfNeeded();
 	await medium.check();
 	await page.getByRole('article', { name: 'cyan' }).click();

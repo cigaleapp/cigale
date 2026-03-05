@@ -1067,6 +1067,7 @@
 					<li
 						class:unfocused={focusedImageId && focusedImageId !== image.id}
 						class:selected={selectedBox.imageId === image.id}
+						aria-label="Boîte #{i + 1}"
 					>
 						{#if image.fileId && firstImage}
 							<CroppedImg

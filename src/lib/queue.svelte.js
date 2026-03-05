@@ -4,6 +4,7 @@ import { imageFileId } from './images.js';
 import { inferBoundingBoxes, processImageFile } from './import.svelte.js';
 import { sendNotification } from './notifications.js';
 import { importResultsZip } from './results.svelte.js';
+import { isSidecar } from './sidecars.js';
 import { uiState } from './state.svelte.js';
 import { isZip, range } from './utils.js';
 
@@ -17,6 +18,7 @@ let processingQueue;
  * @property {object} [importing]
  * @property {File} importing.file
  * @property {string} importing.id
+ * @property {File[]} importing.sidecars sidecar files used to resolve sidecar metadata inferences on import
  * @property {object} [detection]
  * @property {string} detection.fileId
  * @property {object} [classification]
@@ -241,7 +243,7 @@ class ProcessingQueue {
 				if (isZip(file.type)) {
 					await importResultsZip(file, id);
 				} else {
-					await processImageFile(file, id);
+					await processImageFile(importing);
 				}
 			} else if (detection) {
 				await inferBoundingBoxes(this.swarpc, this.cancellers, detection.fileId);
@@ -264,7 +266,18 @@ class ProcessingQueue {
  */
 export function importMore(files) {
 	scheduleBatch(
-		files.map((file) => ({ importing: { file, id: imageFileId() } })),
+		files
+			// Don't try importing sidecar files themselves
+			.filter((file) => !isSidecar(file.name))
+			.map((file) => ({
+				importing: {
+					file,
+					id: imageFileId(),
+					// Attach all sidecar files to each task
+					// Should be OK since we only read their content when needed
+					sidecars: $state.snapshot(files.filter((f) => isSidecar(f.name)))
+				}
+			})),
 		{
 			title: 'Import des images terminé',
 			body: plural(files.length, ['1 image importée', `# images importées`]),

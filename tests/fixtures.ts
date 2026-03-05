@@ -1,7 +1,7 @@
 import { mkdir, rm } from 'node:fs/promises';
 import { test as base, expect as baseExpect, type Locator } from '@playwright/test';
 
-import type { Settings } from '$lib/database';
+import type { MetadataValue, Settings } from '$lib/database';
 import type { IDBDatabaseType } from '$lib/idb.svelte';
 import type { RuntimeValue } from '$lib/schemas/metadata';
 import type { ExportedProtocol } from '$lib/schemas/protocols';
@@ -11,6 +11,8 @@ import { safeJSONParse } from '$lib/utils';
 import _fullProtocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
 import lightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import type { FixturePaths } from './filepaths.js';
+import type { TempFilesFixture } from './fixtures/tempfiles.js';
+import { tempfiles } from './fixtures/tempfiles.js';
 import {
 	confirmDeletionModal,
 	expectTooltipContent,
@@ -21,13 +23,13 @@ import {
 	getTab,
 	goToTab,
 	listTable,
+	metadataSections,
 	mockPredownloadedModels,
 	mockProtocolSourceURL,
 	modal,
 	openSettings,
 	setHardwareConcurrency,
 	setSettings,
-	sidepanelMetadataSectionFor,
 	toast,
 	waitForLoadingEnd,
 	waitForRoute,
@@ -46,6 +48,7 @@ let arthropodaDetectionModel: PredownloadedModel | null = null;
 
 export type AppFixture = {
 	wait: (ms: number) => Promise<void>;
+	metadata: ReturnType<typeof metadataSections>;
 	db: {
 		ready(): Promise<void>;
 		refresh(): Promise<void>;
@@ -77,6 +80,23 @@ export type AppFixture = {
 		};
 		metadata: {
 			get(id: string): Promise<IDBDatabaseType['Metadata']['value'] | undefined>;
+			of(args: {
+				/** The image's filename */
+				image?: string;
+				/** The image's ID */
+				imageId?: string;
+				/** The observation's label */
+				observation?: string;
+				/** The session's name */
+				session?: string;
+				/** Remove namespace from metadata id (keys of returned object). By default, set to lightweight protocol's id */
+				protocolId?: string | null;
+			}): Promise<
+				Record<
+					string,
+					Omit<MetadataValue, 'value'> & { rawValue: string; parsedValue: RuntimeValue }
+				>
+			>;
 			values(args: {
 				/** The image's filename */
 				image?: string;
@@ -130,21 +150,21 @@ export type AppFixture = {
 		wait(timeout?: number): Promise<void>;
 		waitIn(area: Locator, timeout?: number): Promise<void>;
 	};
-	sidepanel: Locator & {
-		metadataSection(label: string | RegExp): Locator;
-	};
+	sidepanel: Locator;
 };
 
-export const test = base.extend<{ forEachTest: void; app: AppFixture }, { forEachWorker: void }>({
+export const test = base.extend<
+	{ forEachTest: void; app: AppFixture; tempfiles: TempFilesFixture },
+	{ forEachWorker: void }
+>({
+	tempfiles,
 	app: async ({ page }, use) => {
-		const sidepanel = page.getByTestId('sidepanel') as AppFixture['sidepanel'];
-		sidepanel.metadataSection = (label) => sidepanelMetadataSectionFor(page, label);
-
 		await use({
 			async wait(ms) {
 				await page.waitForTimeout(ms);
 			},
-			sidepanel,
+			sidepanel: page.getByTestId('sidepanel'),
+			metadata: metadataSections(page),
 			db: {
 				async ready() {
 					await page.waitForFunction(() =>
@@ -185,7 +205,7 @@ export const test = base.extend<{ forEachTest: void; app: AppFixture }, { forEac
 				},
 				metadata: {
 					get: async (id) => getDatabaseRowById(page, 'Metadata', id),
-					async values({
+					async of({
 						session,
 						image,
 						imageId,
@@ -228,10 +248,16 @@ export const test = base.extend<{ forEachTest: void; app: AppFixture }, { forEac
 								.filter(([id]) =>
 									protocolId ? id.startsWith(`${protocolId}__`) : true
 								)
-								.map(([id, { value }]) => [
+								.map(([id, { value, ...rest }]) => [
 									protocolId ? id.replace(`${protocolId}__`, '') : id,
-									safeJSONParse(value)
+									{ ...rest, rawValue: value, parsedValue: safeJSONParse(value) }
 								])
+						);
+					},
+					async values(params) {
+						const vals = await this.of(params);
+						return Object.fromEntries(
+							Object.entries(vals).map(([key, { parsedValue }]) => [key, parsedValue])
 						);
 					},
 					async set(imageId, key, value) {

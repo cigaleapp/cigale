@@ -20,7 +20,7 @@ import {
 	MetadataValue,
 	MetadataValues
 } from './schemas/metadata.js';
-import { ModelDetectionOutputShape, ModelInput } from './schemas/neural.js';
+import { ModelDetectionOutputShapes, ModelInput } from './schemas/neural.js';
 import { Image as ImageSchema, Observation as ObservationSchema } from './schemas/observations.js';
 import {
 	ExportsFilepathTemplateObservation,
@@ -188,7 +188,7 @@ export const Schemas = {
 	MetadataError,
 	Image,
 	ModelInput,
-	ModelDetectionOutputShape,
+	ModelDetectionOutputShapes,
 	Observation,
 	Session,
 	MetadataTypeSchema,
@@ -360,8 +360,8 @@ export const idComparator = (a, b) => {
  */
 
 /**
- * @typedef  ModelDetectionOutputShape
- * @type {typeof ModelDetectionOutputShape.infer}
+ * @typedef  ModelDetectionOutputShapes
+ * @type {typeof ModelDetectionOutputShapes.infer}
  */
 
 /**

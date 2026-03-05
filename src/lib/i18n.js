@@ -102,6 +102,10 @@ export function errorMessage(error, prefix = '') {
 		if ('cause' in error && error.cause) {
 			result = errorMessage(error.cause);
 		}
+	} else if (error && typeof error === 'object') {
+		if ('message' in error) {
+			result = error.message?.toString() || defaultMessage;
+		}
 	}
 
 	while (result.startsWith('Error: ')) {
@@ -121,9 +125,8 @@ if (import.meta.vitest) {
 		expect(errorMessage(undefined)).toBe('Erreur inattendue');
 		expect(errorMessage(new Error('test'), 'prefix')).toBe('prefix: test');
 
-		// The current implementation overwrites with toString(), so cause isn't used
-		const errorWithCause = new Error('main error');
-		errorWithCause.cause = new Error('cause error');
+		// TODO: Not sure if climbing up to the cause is a good idea
+		const errorWithCause = new Error('main error', { cause: new Error('cause error') });
 		expect(errorMessage(errorWithCause)).toBe('cause error');
 	});
 }
