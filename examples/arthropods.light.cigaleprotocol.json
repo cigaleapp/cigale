@@ -2,8 +2,8 @@
 	"$schema": "https://cigaleapp.github.io/cigale/protocol.schema.json",
 	"id": "io.github.cigaleapp.arthropods.example.light",
 	"name": "Example: arthropodes (lightweight)",
-	"learnMore": "https://github.com/cigaleapp/cigale/tree/dd87b6b89a8c3bdb32f744e025d977047283d54a/scripts/README.md#protocoles-arthropodsexamplelight",
-	"version": 71,
+	"learnMore": "https://github.com/cigaleapp/cigale/tree/608882e12d5fa25bac046b9c1ab3cb45a3fc7c9c/scripts/README.md#protocoles-arthropodsexamplelight",
+	"version": 72,
 	"updates": "automatic",
 	"source": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.light.cigaleprotocol.json",
 	"description": "Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification",
@@ -53,6 +53,12 @@
 		"io.github.cigaleapp.arthropods.example.light__kingdom",
 		"io.github.cigaleapp.arthropods.example.light__crop"
 	],
+	"metadataGroups": {
+		"taxonomy": {
+			"name": "Taxonomie",
+			"description": "Classification taxonomique de l'espèce"
+		}
+	},
 	"sessionMetadata": {
 		"io.github.cigaleapp.arthropods.example.light__prospection_duration": {
 			"type": "integer",
@@ -224,7 +230,8 @@
 			"required": false,
 			"description": "",
 			"mergeMethod": "max",
-			"groupable": true
+			"groupable": true,
+			"group": "taxonomy"
 		},
 		"io.github.cigaleapp.arthropods.example.light__phylum": {
 			"type": "enum",
@@ -243,7 +250,8 @@
 			"required": false,
 			"description": "",
 			"mergeMethod": "max",
-			"groupable": true
+			"groupable": true,
+			"group": "taxonomy"
 		},
 		"io.github.cigaleapp.arthropods.example.light__class": {
 			"type": "enum",
@@ -262,7 +270,8 @@
 			"required": false,
 			"description": "",
 			"mergeMethod": "max",
-			"groupable": true
+			"groupable": true,
+			"group": "taxonomy"
 		},
 		"io.github.cigaleapp.arthropods.example.light__order": {
 			"type": "enum",
@@ -308,7 +317,8 @@
 			"required": false,
 			"description": "",
 			"mergeMethod": "max",
-			"groupable": true
+			"groupable": true,
+			"group": "taxonomy"
 		},
 		"io.github.cigaleapp.arthropods.example.light__family": {
 			"type": "enum",
@@ -462,7 +472,8 @@
 			"required": false,
 			"description": "",
 			"mergeMethod": "max",
-			"groupable": true
+			"groupable": true,
+			"group": "taxonomy"
 		},
 		"io.github.cigaleapp.arthropods.example.light__genus": {
 			"type": "enum",
@@ -805,7 +816,8 @@
 			"required": false,
 			"description": "",
 			"mergeMethod": "max",
-			"groupable": true
+			"groupable": true,
+			"group": "taxonomy"
 		},
 		"io.github.cigaleapp.arthropods.example.light__habitat_photo": {
 			"type": "enum",
