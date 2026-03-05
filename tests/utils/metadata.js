@@ -55,9 +55,8 @@ function sidepanelMetadataSectionFor(page, metadataLabel) {
 		.getByTestId('sidepanel')
 		.locator('.metadata')
 		.filter({
-			hasText: metadataLabel
-		})
-		.first();
+			has: page.locator('label').filter({ hasText: metadataLabel })
+		});
 }
 
 /**
@@ -70,9 +69,8 @@ function sessionMetadataSectionFor(page, metadataLabel) {
 		.getByTestId('session-metadata')
 		.locator('.metadata')
 		.filter({
-			hasText: metadataLabel
-		})
-		.first();
+			has: page.locator('label').filter({ hasText: metadataLabel })
+		});
 }
 
 /**

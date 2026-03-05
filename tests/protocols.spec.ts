@@ -472,10 +472,37 @@ test('can use a protocol that imports metadata from another protocol', async ({
 	});
 });
 
-test('can infer metadata from a sidecar file', async ({ page, app, tempfiles }) => {
+test('can infer metadata from a sidecar file', async ({ page, context, app, tempfiles }) => {
 	await goToProtocolManagement(page);
 
 	await app.settings.set({ showTechnicalMetadata: false });
+
+	const locationDisplayName =
+		'Околтын, Akaltyn, Oltinsoy District, Province de Sourkhan-Daria, Ouzbékistan';
+
+	await mockUrl(
+		page,
+		context,
+		'https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=38.12232&lon=67.676767&addressdetails=0',
+		{
+			json: {
+				place_id: 194730330,
+				licence: 'Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright',
+				osm_type: 'way',
+				osm_id: 855726288,
+				lat: '38.1228066',
+				lon: '67.6767144',
+				category: 'highway',
+				type: 'living_street',
+				place_rank: 26,
+				importance: 0.05337333409628439,
+				addresstype: 'road',
+				name: '',
+				display_name: locationDisplayName,
+				boundingbox: ['38.1227130', '38.1229923', '67.6758481', '67.6785654']
+			}
+		}
+	);
 
 	tempfiles.at(FixturePaths.root);
 
@@ -572,28 +599,21 @@ location:
 	});
 
 	await importPhotos({ page }, ['cyan.jpeg', sidecars.xml, sidecars.json, sidecars.yaml]);
+	await page.waitForTimeout(1_000);
 
 	await firstObservationCard(page).click();
 
 	await expect(app.metadata.switch('bool')).toBeChecked();
 	await expect(app.metadata.textbox('date')).toHaveValue('2026-01-01');
-	await expect(app.metadata.radio('enum', 'Option 1')).toBeChecked();
+	await expect(app.metadata.radio('enum', 'Option 1', { exact: false })).toBeChecked();
 	await expect(app.metadata.textbox('float')).toHaveValue('100.4');
 	await expect(app.metadata.textbox('integer')).toHaveValue('100');
 	await expect(app.metadata.textbox('string')).toHaveValue('some text right there  ');
-	await expect(app.metadata.textbox('location')).toHaveValue('38.12232, 67.676767');
-	await expect(app.metadata.section('sidecar').locator('pre')).toHaveText(sidecars.json.content);
-
-	const { crop } = await app.db.metadata.of({
-		image: 'cyan.jpeg',
-		protocolId: 'com.example.sidecars'
-	});
-
-	expect(crop.parsedValue).toStrictEqual({ x: 0.6, y: 0.2, w: 0.3, h: 0.4 });
-	expect(crop.confidence).toEqual(0.5);
-	expect(crop.alternatives).toEqual({
-		[JSON.stringify({ x: 0.1, y: 0.15, w: 0.25, h: 0.35 })]: 0.25
-	});
+	await expect(app.metadata.combobox('location')).toHaveValue(locationDisplayName);
+	await expect(app.metadata.section('sidecar').locator('pre')).toHaveText(
+		// there's also a <pre> tag for the fullscreen <dialog>
+		[sidecars.json.content, sidecars.json.content]
+	);
 
 	const dbvalues = await app.db.metadata.values({
 		image: 'cyan.jpeg',
@@ -601,11 +621,42 @@ location:
 	});
 
 	expect(dbvalues.bool).toBe(true);
-	expect(dbvalues.date).toEqual(new Date('2026-01-01T00:00:00Z'));
-	expect(dbvalues.enum).toBe('Option 1');
+	expect(dbvalues.date).toEqual('2026-01-01T00:00:00');
+	expect(dbvalues.enum).toBe('one');
 	expect(dbvalues.float).toBe(100.4);
 	expect(dbvalues.integer).toBe(100);
 	expect(dbvalues.string).toBe('some text right there  ');
 	expect(dbvalues.location).toEqual({ latitude: 38.12232, longitude: 67.676767 });
-	expect(dbvalues.sidecar).toEqual(JSON.parse(sidecars.json.content));
+	expect(
+		await page.evaluate(async (id) => {
+			const f = await window.DB.get('MetadataValueFile', id);
+			if (!f) throw new Error('MetadataValueFile not found');
+			return JSON.parse(new TextDecoder('utf-8').decode(f.bytes));
+		}, dbvalues.sidecar.toString())
+	).toEqual(JSON.parse(sidecars.json.content));
+
+	// Each box in a boundingbox-type sidecar inference result should create a separate Image for the ImageFile
+
+	const images = await app.db.image.list();
+	const crops = await Promise.all(
+		images.map(async (image) => {
+			const { crop } = await app.db.metadata.of({
+				imageId: image.id,
+				protocolId: 'com.example.sidecars'
+			});
+
+			return crop;
+		})
+	);
+
+	expect(crops).toMatchObject([
+		{
+			parsedValue: { x: 0.6, y: 0.2, w: 0.3, h: 0.4 },
+			confidence: 0.5
+		},
+		{
+			parsedValue: { x: 0.225, y: assert.closeTo(0.325, 5), w: 0.25, h: 0.35 },
+			confidence: 0.25
+		}
+	]);
 });

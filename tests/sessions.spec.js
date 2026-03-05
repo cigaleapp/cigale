@@ -281,7 +281,7 @@ test('import into new session', async ({ page, app }) => {
 	await assert(app.metadata.textbox('Durée de prospection')).toHaveValue('54');
 	await assert(app.metadata.radio('Vent', 'Modéré')).toBeChecked();
 	// Check that other metadata are unset
-	await assert(app.metadata.textbox(/^Distance de prospection$/)).toBeEmpty();
+	await assert(app.metadata.textbox('Distance de prospection')).toBeEmpty();
 
 	await assert(page.getByRole('textbox', { name: 'Description' })).toHaveValue(
 		'Importée depuis correct.zip'
