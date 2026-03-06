@@ -6,7 +6,11 @@ import {
 	changeSessionProtocol,
 	chooseFirstSession,
 	firstObservationCard,
+	goToProtocolManagement,
+	importPhotos,
+	importProtocol,
 	loadDatabaseDump,
+	newSession,
 	setInferenceModels
 } from './utils/index.js';
 
@@ -267,13 +271,13 @@ test('can update a enum-type metadata with cascades', async ({ page, app }) => {
 	`);
 	// 4th combobox is the location input
 	await expect(nthCombobox(6)).toMatchAriaSnapshot(`
-	  - combobox: Collembola
-	`);
-	await expect(nthCombobox(7)).toMatchAriaSnapshot(`
 	  - combobox: Arthropoda
 	`);
-	await expect(nthCombobox(8)).toMatchAriaSnapshot(`
+	await expect(nthCombobox(7)).toMatchAriaSnapshot(`
 	  - combobox: Animalia
+	`);
+	await expect(nthCombobox(8)).toMatchAriaSnapshot(`
+	  - combobox
 	`);
 
 	// Unselect and reselect
@@ -530,5 +534,110 @@ test('can update a string-type metadata', async ({ page, app }) => {
 	// we're expecting a regex string in the UI, this is intentional
 	await expect(app.metadata.section('string')).not.toHaveText(
 		/\^ohio \(understandment\|respect\)\.\*\$/
+	);
+});
+
+test('displays metadata groups', async ({ page, app }) => {
+	await app.settings.set({ showTechnicalMetadata: false });
+	await goToProtocolManagement(page);
+	await importProtocol(page, {
+		id: 'com.example.metadatagroups',
+		name: 'Metadata groups example',
+		description: '',
+		authors: [],
+		metadataGroups: {
+			group1: {
+				name: 'Group 1',
+				collapsed: false
+			},
+			group2: {
+				name: 'Group 2',
+				collapsed: true
+			}
+		},
+		metadata: {
+			group1_key1: {
+				type: 'string',
+				group: 'group1',
+				label: 'Group 1 key 1',
+				mergeMethod: 'none',
+				required: false,
+				description: ''
+			},
+			group1_key2: {
+				type: 'string',
+				group: 'group1',
+				label: 'Group 1 key 2',
+				mergeMethod: 'none',
+				required: false,
+				description: ''
+			},
+			group2_key1: {
+				type: 'string',
+				group: 'group2',
+				label: 'Group 2 key 1',
+				mergeMethod: 'none',
+				required: false,
+				description: ''
+			},
+			ungrouped_key_1: {
+				type: 'string',
+				label: 'Ungrouped key 1',
+				mergeMethod: 'none',
+				required: false,
+				description: ''
+			},
+			ungrouped_key_2: {
+				type: 'string',
+				label: 'Ungrouped key 2',
+				mergeMethod: 'none',
+				required: false,
+				description: ''
+			},
+			ungrouped_key_3: {
+				type: 'string',
+				label: 'Ungrouped key 3',
+				mergeMethod: 'none',
+				required: false,
+				description: ''
+			}
+		},
+		metadataOrder: [
+			'ungrouped_key_2',
+			'group1_key2',
+			'group1_key1',
+			'ungrouped_key_3',
+			'group2_key1',
+			'ungrouped_key_1'
+		]
+	});
+
+	await app.tabs.go('sessions');
+	await newSession(page, {
+		name: 'Testing grouped metadata',
+		protocol: 'Metadata groups example'
+	});
+
+	await importPhotos({ page }, 'cyan.jpeg');
+
+	await page.waitForTimeout(500);
+
+	await firstObservationCard(page).click();
+
+	await expect(page.getByTestId('sidepanel').locator('.metadata')).toHaveText([
+		'Ungrouped key 2',
+		'Group 1 key 2',
+		'Group 1 key 1',
+		'Ungrouped key 3',
+		'Group 2 key 1',
+		'Ungrouped key 1'
+	]);
+	await expect(page.getByTestId('sidepanel').locator('summary')).toHaveText([
+		'Group 1',
+		'Group 2'
+	]);
+	await expect(page.getByTestId('sidepanel').locator('details').nth(0)).toHaveAttribute('open');
+	await expect(page.getByTestId('sidepanel').locator('details').nth(1)).not.toHaveAttribute(
+		'open'
 	);
 });

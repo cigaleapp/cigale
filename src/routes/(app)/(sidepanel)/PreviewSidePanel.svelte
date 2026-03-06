@@ -16,8 +16,8 @@
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import CroppedImg from '$lib/CroppedImg.svelte';
 	import { plural } from '$lib/i18n.js';
-	import { tables } from '$lib/idb.svelte.js';
 	import * as idb from '$lib/idb.svelte.js';
+	import { tables } from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import KeyboardHint from '$lib/KeyboardHint.svelte';
 	import Logo from '$lib/Logo.svelte';
@@ -27,7 +27,6 @@
 	import { goto } from '$lib/paths.js';
 	import { metadataDefinitionComparator } from '$lib/protocols.js';
 	import { splitMetadataId } from '$lib/schemas/metadata.js';
-	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte.js';
 
 	/**
@@ -121,8 +120,6 @@
 		});
 	});
 
-	const showTechnicalMetadata = $derived(getSettings().showTechnicalMetadata);
-
 	const singleObservationSelected = $derived(
 		uiState.selection.length === 1
 			? tables.Observation.state.find((obs) => obs.id === uiState.selection[0])
@@ -207,22 +204,25 @@
 				{plural(selectionCounts.observation, ['1 observation', '# observations'])}
 			{/if}
 		</h2>
-		<MetadataList testid="sidepanel-metadata">
-			{#each definitions as definition (definition.id)}
+		<MetadataList
+			testid="sidepanel-metadata"
+			{definitions}
+			groups={uiState.currentProtocol?.metadataGroups}
+			ordering={uiState.currentProtocol?.metadataOrder}
+		>
+			{#snippet children(definition)}
 				{@const value = metadata[definition.id]}
-				{#if definition.label || showTechnicalMetadata}
-					<Metadata
-						merged={value?.merged}
-						{definition}
-						{value}
-						options={[...(options[definition.id] ?? new Map()).values()]}
-						onchange={async (v) => {
-							if (dequal(v, value?.value)) return;
-							onmetadatachange(definition.id, v);
-						}}
-					/>
-				{/if}
-			{/each}
+				<Metadata
+					merged={value?.merged}
+					{definition}
+					{value}
+					options={[...(options[definition.id] ?? new Map()).values()]}
+					onchange={async (v) => {
+						if (dequal(v, value?.value)) return;
+						onmetadatachange(definition.id, v);
+					}}
+				/>
+			{/snippet}
 		</MetadataList>
 	{:else if loadingOptions}
 		<section class="empty-selection">

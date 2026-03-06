@@ -141,6 +141,7 @@ test('toExportedProtocol', async () => {
 	expect(exported).toEqual({
 		...pick(protocol, 'id', 'name', 'version', 'description', 'authors', 'crop', 'updates'),
 		importedMetadata: [],
+		metadataGroups: {},
 		sessionMetadata: {
 			protocol1__meta3: {
 				key: 'meta3',

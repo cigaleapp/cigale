@@ -146,6 +146,7 @@ describe('deleteSession', () => {
 			      "com.example.test.protocol__location",
 			      "com.example.test.protocol__no_exif",
 			    ],
+			    "metadataGroups": [],
 			    "name": "Test Protocol",
 			    "sessionMetadata": [],
 			    "updates": "manual",

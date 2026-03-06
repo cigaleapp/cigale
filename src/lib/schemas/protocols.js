@@ -12,7 +12,7 @@ import {
 	URLString
 } from './common.js';
 import { TemplatedString } from './expressions.js';
-import { Metadata, namespacedMetadataId, SidecarFilepathTemplate } from './metadata.js';
+import { Metadata, MetadataGroup, namespacedMetadataId, SidecarFilepathTemplate } from './metadata.js';
 import { Image, Observation } from './observations.js';
 import { AnalyzedImage, AnalyzedObservation } from './results.js';
 
@@ -105,6 +105,9 @@ export const Protocol = type({
 	sessionMetadata: NamespacedMetadataID.array()
 		.describe('Métadonnées associées à la session entière')
 		.default(() => []),
+	metadataGroups: MetadataGroup.array()
+		.describe("Permet de grouper les métadonnées dans l'interface utilisateur")
+		.default(() => []),
 	name: ['string', '@', 'Nom du protocole'],
 	description: ['string', '@', 'Description du protocole'],
 	'learnMore?': URLString.describe(
@@ -186,12 +189,19 @@ export const Protocol = type({
 export const ExportedProtocol = Protocol.omit(
 	'metadata',
 	'sessionMetadata',
+	'metadataGroups',
 	'metadataOrder',
 	'dirty',
 	'importedMetadata'
 )
 	.in.and({
 		imports: ProtocolImport.array().default(() => []),
+		'metadataGroups?': type.Record(
+			ID,
+			MetadataGroup.in
+				.omit('id')
+				.describe("Permet de grouper les métadonnées dans l'interface utilisateur")
+		),
 		'metadataOrder?': ID.array().describe(
 			"L'ordre dans lequel les métadonnées doivent être présentées dans l'interface utilisateur. Les métadonnées non listées ici seront affichées après toutes celles listées ici"
 		),
@@ -208,6 +218,9 @@ export const ExportedProtocol = Protocol.omit(
 		...omit(protocol, 'imports'),
 		...orEmptyObj2('metadataOrder', protocol.metadataOrder, (order) =>
 			order.map((key) => namespacedMetadataId(protocol.id, key))
+		),
+		metadataGroups: mapKeys(protocol.metadataGroups ?? {}, (key) =>
+			MetadataGroup.get('id').assert(key)
 		),
 		importedMetadata: protocol.imports.flatMap(({ from, metadata, sessionMetadata }) => [
 			...metadata.map(({ source, target }) => ({

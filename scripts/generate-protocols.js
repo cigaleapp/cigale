@@ -145,7 +145,8 @@ const cladeMetadata = (clade, label) => ({
 	required: false,
 	description: '',
 	mergeMethod: 'max',
-	groupable: true
+	groupable: true,
+	group: 'taxonomy'
 });
 
 /**
@@ -209,6 +210,12 @@ const protocol = {
 		'kingdom',
 		'crop'
 	].map(namespaced),
+	metadataGroups: {
+		taxonomy: {
+			name: 'Taxonomie',
+			description: "Classification taxonomique de l'espèce"
+		}
+	},
 	sessionMetadata: {
 		[namespaced('prospection_duration')]: {
 			// TODO duration datatype ?

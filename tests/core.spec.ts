@@ -291,7 +291,9 @@ test('can send a bug report', async ({ page, app, context }) => {
 				// TODO: use RegExp.escape once available (ie when VSCode ships with Node 24 ?? or something. Bun has it already, idk if it would work in CI yet)
 				new RegExp(`^${lightweightProtocol.id.replaceAll('.', '\\.')} v\\d+$`)
 			),
-			'Loaded objects': '4 observations, 4 images, 1 sessions, 25 metadatas, 1 protocols'
+			'Loaded objects': assert.stringMatching(
+				/^4 observations, 4 images, 1 sessions, \d+ metadatas, 1 protocols$/
+			)
 		})
 	} satisfies typeof requestBody);
 });

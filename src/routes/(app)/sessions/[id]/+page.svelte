@@ -105,8 +105,9 @@
 		<h2>Métadonnées</h2>
 
 		<form class="metadata" data-testid="session-metadata">
-			<MetadataList>
-				{#each sessionMetadata as { def, value } (def.id)}
+			<MetadataList definitions={sessionMetadata.map((s) => s.def)} groups={data.protocol.metadataGroups} ordering={data.protocol.metadataOrder}>
+				{#snippet children(def)}
+					{@const value = sessionMetadata.find((s) => s.def.id === def.id)?.value}
 					<Metadata
 						options={data.sessionMetadataOptions[def.id]}
 						definition={def}
@@ -133,7 +134,7 @@
 							invalidate(dependencyURI('Session', data.session.id));
 						}}
 					/>
-				{/each}
+				{/snippet}
 			</MetadataList>
 		</form>
 	{/if}
