@@ -2323,6 +2323,10 @@ msgstr ""
 msgid "Erreur lors du traitement du/des fichiers annexes associés à {0}"
 msgstr ""
 
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
+msgid "Aucune sélection"
+msgstr ""
+
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"
 msgstr ""
