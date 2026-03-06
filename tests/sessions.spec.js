@@ -3,6 +3,7 @@ import { differenceInMinutes, format as formatDate } from 'date-fns';
 
 import { assert, exampleProtocol, expect, test } from './fixtures.js';
 import {
+	chooseFirstSession,
 	chooseInDropdown,
 	deleteSession,
 	goToProtocolManagement,
@@ -583,4 +584,26 @@ test('can set file-type metadata', async ({ page, app }) => {
 	if (!session) throw new Error('Session not found');
 
 	expect(session.metadata).not.toHaveProperty([metadataKey]);
+});
+
+test('can convert between units', async ({ page, app }) => {
+	await app.settings.set({ showTechnicalMetadata: false });
+	await loadDatabaseDump(page, 'db/kitchensink-protocol.devalue');
+	await page.getByRole('button', { name: 'Gérer' }).click();
+	await app.path.wait('/(app)/sessions/[id]');
+	const section = app.metadata.section('Has no default');
+	const unitChanger = section.getByRole('button', { 
+		// XXX: When testing locally (headed or headless), it's "Utiliser une autre unité"
+		// when running in CI, it's atm/Pa
+		// go figure... 
+		name: /^(atm|Pa|Utiliser une autre unité)$/
+	 });
+
+	await expect(unitChanger).toHaveText('atm');
+	await section.getByRole('textbox').fill('1');
+	await section.getByRole('textbox').blur();
+	await page.waitForTimeout(500)
+	await chooseInDropdown(page, unitChanger, /^pascal$/);
+	await expect(section.getByRole('textbox')).toHaveValue('101325');
+	await expect(unitChanger).toHaveText('Pa');
 });
