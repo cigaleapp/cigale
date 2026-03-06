@@ -159,6 +159,7 @@ describe('deleteSession', () => {
 			    "description": "",
 			    "groupable": false,
 			    "id": "com.example.test.protocol__date",
+			    "images": [],
 			    "infer": {
 			      "exif": "DateTimeOriginal",
 			    },
@@ -173,6 +174,7 @@ describe('deleteSession', () => {
 			    "description": "",
 			    "groupable": false,
 			    "id": "com.example.test.protocol__location",
+			    "images": [],
 			    "infer": {
 			      "latitude": {
 			        "exif": "GPSLatitude",
@@ -192,6 +194,7 @@ describe('deleteSession', () => {
 			    "description": "",
 			    "groupable": false,
 			    "id": "com.example.test.protocol__no_exif",
+			    "images": [],
 			    "label": "",
 			    "learnMore": "https://example.com",
 			    "mergeMethod": "none",

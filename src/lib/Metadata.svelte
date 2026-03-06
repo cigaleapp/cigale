@@ -6,6 +6,7 @@
 	import IconTechnical from '~icons/ri/settings-line';
 	import IconMerged from '~icons/ri/stack-line';
 
+	import Carousel from './Carousel.svelte';
 	import ConfidencePercentage from './ConfidencePercentage.svelte';
 	import type { Metadata, MetadataEnumVariant } from './database.js';
 	import {
@@ -183,6 +184,16 @@
 		</section>
 	{/if}
 
+	{#if definition.images.length > 0}
+		<section class="images">
+			<Carousel items={definition.images} slideName={(_, i) => `Image ${i + 1}`}>
+				{#snippet item(src)}
+					<img {src} />
+				{/snippet}
+			</Carousel>
+		</section>
+	{/if}
+
 	{#if validationErrors}
 		<section class="validation">
 			{validationErrors.summary}
@@ -329,5 +340,16 @@
 
 	.validation {
 		color: var(--fg-error);
+	}
+
+	.images {
+		width: 100%;
+		height: 20rem;
+
+		img {
+			object-fit: contain;
+			width: 100%;
+			height: 100%;
+		}
 	}
 </style>
