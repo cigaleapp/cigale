@@ -157,12 +157,8 @@
 	}
 </script>
 
-<aside
-	data-testid="sidepanel"
-	class="sidepanel"
-	class:empty={images.length === 0 || loadingOptions}
->
-	{#if images.length > 0 && !loadingOptions}
+<aside data-testid="sidepanel" class="sidepanel" class:empty={loadingOptions}>
+	{#if !loadingOptions}
 		<div class="images">
 			{#each images as { src, box, dimensions }, i (i)}
 				{@const alt = singleObservationSelected
@@ -176,6 +172,8 @@
 						<img {src} {alt} />
 					{/if}
 				</div>
+			{:else}
+				<div class="image empty"></div>
 			{/each}
 		</div>
 		<h2>
@@ -202,28 +200,32 @@
 				{plural(selectionCounts.image, ['1 image', '# images'])}
 			{:else if selectionCounts.observation > 0}
 				{plural(selectionCounts.observation, ['1 observation', '# observations'])}
+			{:else}
+				Aucune sélection
 			{/if}
 		</h2>
-		<MetadataList
-			testid="sidepanel-metadata"
-			{definitions}
-			groups={uiState.currentProtocol?.metadataGroups}
-			ordering={uiState.currentProtocol?.metadataOrder}
-		>
-			{#snippet children(definition)}
-				{@const value = metadata[definition.id]}
-				<Metadata
-					merged={value?.merged}
-					{definition}
-					{value}
-					options={[...(options[definition.id] ?? new Map()).values()]}
-					onchange={async (v) => {
-						if (dequal(v, value?.value)) return;
-						onmetadatachange(definition.id, v);
-					}}
-				/>
-			{/snippet}
-		</MetadataList>
+		<div class="metadatas" class:empty={images.length === 0}>
+			<MetadataList
+				testid="sidepanel-metadata"
+				{definitions}
+				groups={uiState.currentProtocol?.metadataGroups}
+				ordering={uiState.currentProtocol?.metadataOrder}
+			>
+				{#snippet children(definition)}
+					{@const value = metadata[definition.id]}
+					<Metadata
+						merged={value?.merged}
+						{definition}
+						{value}
+						options={[...(options[definition.id] ?? new Map()).values()]}
+						onchange={async (v) => {
+							if (dequal(v, value?.value)) return;
+							onmetadatachange(definition.id, v);
+						}}
+					/>
+				{/snippet}
+			</MetadataList>
+		</div>
 	{:else if loadingOptions}
 		<section class="empty-selection">
 			<Logo variant="empty" />
@@ -317,6 +319,17 @@
 
 	.sidepanel.empty {
 		grid-template-rows: auto max-content;
+	}
+
+	.metadatas {
+		transition: opacity 0.3s ease;
+		display: flex;
+		flex-direction: column;
+		overflow-y: auto;
+
+		&.empty {
+			opacity: 0.25;
+		}
 	}
 
 	h2 {
