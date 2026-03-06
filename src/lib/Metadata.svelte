@@ -58,9 +58,7 @@
 	const _id = $props.id();
 
 	const isCompactEnum = $derived(
-		definition.type === 'enum' &&
-			options.length <= 10 &&
-			!options.some(opt => opt.learnMore)
+		definition.type === 'enum' && options.length <= 10 && !options.some((opt) => opt.learnMore)
 	);
 
 	const inputIsInline = $derived(!isCompactEnum && definition.type !== 'file');

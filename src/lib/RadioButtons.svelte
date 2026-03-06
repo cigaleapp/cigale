@@ -27,7 +27,7 @@
 		cards,
 		onchange = () => {},
 		label,
-		horizontal,
+		horizontal
 		// vertical
 	}: Props = $props();
 
