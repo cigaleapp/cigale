@@ -89,7 +89,8 @@
 					<RadioButtons
 						value={value?.toString()}
 						onchange={onblur}
-						cards={options.every((opt) => opt.icon || opt.color)}
+						// cards={options.every((opt) => opt.icon || opt.color)}
+						cards
 						options={options
 							.toSorted(compareBy(({ index }) => index))
 							.map((opt) =>

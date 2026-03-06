@@ -8,7 +8,7 @@
 
 	interface Props {
 		options: Array<Item<OptionKey>>;
-		vertical?: boolean;
+		// vertical?: boolean;
 		horizontal?: boolean;
 		cards?: boolean;
 		value?: NoInfer<OptionKey> | undefined;
@@ -28,7 +28,7 @@
 		onchange = () => {},
 		label,
 		horizontal,
-		vertical
+		// vertical
 	}: Props = $props();
 
 	let fieldset: HTMLFieldSetElement | undefined = $state();
@@ -43,7 +43,7 @@
 	bind:this={fieldset}
 	class="radio-inputs"
 	class:horizontal
-	class:smart-horizontal={!horizontal && !vertical}
+	// class:smart-horizontal={!horizontal && !vertical}
 	role="radiogroup"
 	aria-label={label}
 >
