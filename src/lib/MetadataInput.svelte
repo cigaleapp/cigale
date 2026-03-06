@@ -89,32 +89,38 @@
 					<RadioButtons
 						value={value?.toString()}
 						onchange={onblur}
-						cards={options.every((opt) => opt.icon || opt.color)}
+						// cards={options.every((opt) => opt.icon || opt.color)}
+						cards
 						options={options
 							.toSorted(compareBy(({ index }) => index))
 							.map((opt) =>
-								pick(opt, 'key', 'label', 'icon', 'color', 'description')
+								pick(opt, 'key', 'label', 'icon', 'color', 'description', 'images')
 							)}
 					>
-						{#snippet children({ label, icon, color, description })}
-							<div class="label">
-								<div class="first-line">
-									{#if icon || color}
-										<div
-											class="icon"
-											style:background-color={color}
-											style:color={color ? readableOn(color) : undefined}
-										>
-											{#if icon}
-												<Icon {icon} />
-											{/if}
-										</div>
-									{/if}
-									{label}
-								</div>
-								{#if description}
-									<p class="subtext">{description}</p>
+						{#snippet children({ label, icon, color, description, images })}
+							<div class="with-image">
+								{#if images && images.length > 0}
+									<img src={images[0]} alt="" />
 								{/if}
+								<div class="label">
+									<div class="first-line">
+										{#if icon || color}
+											<div
+												class="icon"
+												style:background-color={color}
+												style:color={color ? readableOn(color) : undefined}
+											>
+												{#if icon}
+													<Icon {icon} />
+												{/if}
+											</div>
+										{/if}
+										{label}
+									</div>
+									{#if description}
+										<p class="subtext">{description}</p>
+									{/if}
+								</div>
 							</div>
 						{/snippet}
 					</RadioButtons>
@@ -407,11 +413,17 @@
 		width: 100%;
 	}
 
-	.metadata-input.compact-enum .label {
-		gap: 0.75em;
-		margin-left: 0.25em;
+	.metadata-input.compact-enum .with-image {
+		display: flex;
+		gap: 1em;
+		align-items: center;
 
-		&:not(:has(.subtext)) {
+		.label {
+			gap: 0.75em;
+			margin-left: 0.25em;
+		}
+
+		.label:not(:has(.subtext)) {
 			display: inline-flex;
 			align-items: center;
 		}
@@ -437,6 +449,15 @@
 			margin-top: 0.25em;
 			font-size: 0.9em;
 			color: var(--gay);
+		}
+
+		img {
+			width: 4em;
+			height: 4em;
+			flex-shrink: 0;
+			object-fit: contain;
+			overflow: hidden;
+			border-radius: var(--corner-radius);
 		}
 	}
 

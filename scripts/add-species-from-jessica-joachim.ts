@@ -11,6 +11,7 @@ import Turndown from 'turndown';
 import _protocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
 import type { MetadataEnumVariant } from '../src/lib/schemas/metadata.js';
 import type { ExportedProtocol } from '../src/lib/schemas/protocols.js';
+import { align, chunkBySize, cyan, dim, percentage, yellow } from './utils.js';
 
 const protocol = _protocol as typeof ExportedProtocol.infer;
 
@@ -524,44 +525,6 @@ declare global {
 	interface RegExpConstructor {
 		escape(s: string): string;
 	}
-}
-
-// ANSI control sequences
-class CC {
-	static clearline = '\x1b[2K';
-	static red = '\x1b[31m';
-	static reset = '\x1b[0m';
-	static dim = '\x1b[2m';
-	static blue = '\x1b[34m';
-	static bold = '\x1b[1m';
-	static yellow = '\x1b[33m';
-	static cyan = '\x1b[36m';
-}
-
-function yellow(text: string): string {
-	return `${CC.yellow}${text}${CC.reset}`;
-}
-
-function cyan(text: string): string {
-	return `${CC.cyan}${text}${CC.reset}`;
-}
-
-function dim(text: string): string {
-	return `${CC.dim}${text}${CC.reset}`;
-}
-
-function percentage(part: number, total: number, precision = 0): string {
-	return ((part / total) * 100).toFixed(precision).padStart(3 + precision, ' ') + '%';
-}
-
-function align<T extends string | number>(num: T, total: T | T[]): string {
-	return num.toString().padStart(total.toString().length);
-}
-
-function chunkBySize<T>(by: number, items: T[]): T[][] {
-	return new Array(Math.ceil(items.length / by))
-		.fill([])
-		.map((_, i) => items.slice(i * by, (i + 1) * by));
 }
 
 async function fetchAndParseHtml(url: URL | string): Promise<JSDOM['window']['document']> {

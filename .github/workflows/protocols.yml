@@ -11,6 +11,7 @@ on:
       - scripts/add-species-from-jessica-joachim.ts
       - scripts/add-species-from-google-slides.js
       - scripts/add-taxonomic-parents-from-gbif.js
+      - scripts/add-metadata-from-xper3.ts
       - .github/workflows/protocols.yml
   push:
     branches:
@@ -73,6 +74,9 @@ jobs:
 
       - name: Initialize protocol
         run: bun run scripts/generate-protocols.js
+
+      - name: Add metadata from Xper3
+        run: bun run scripts/add-metadata-from-xper3.ts
 
       - name: Add species descriptions from JJ
         run: bun run scripts/add-species-from-jessica-joachim.ts species
