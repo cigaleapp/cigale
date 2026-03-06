@@ -12,7 +12,12 @@ import {
 	URLString
 } from './common.js';
 import { TemplatedString } from './expressions.js';
-import { Metadata, MetadataGroup, namespacedMetadataId, SidecarFilepathTemplate } from './metadata.js';
+import {
+	Metadata,
+	MetadataGroup,
+	namespacedMetadataId,
+	SidecarFilepathTemplate
+} from './metadata.js';
 import { Image, Observation } from './observations.js';
 import { AnalyzedImage, AnalyzedObservation } from './results.js';
 
