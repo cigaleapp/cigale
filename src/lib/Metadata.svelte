@@ -64,32 +64,45 @@
 	);
 
 	const inputIsInline = $derived(!isCompactEnum && definition.type !== 'file');
+
+	const displayImageOnTheSide = $derived(
+		definition.images.length === 1 && (inputIsInline || definition.type === 'enum')
+	);
 </script>
 
 <div class="metadata">
-	<section class="first-line">
-		<label for={_id}>
-			{#if definition.label}
-				<OverflowableText text={definition.label} />
-			{:else}
-				<div class="technical-indicator" use:tooltip={'Métadonnée technique'}>
-					<IconTechnical />
+	<div class="side-image-and-main-area">
+		{#if displayImageOnTheSide}
+			<div class="side-image"><img src={definition.images[0]} /></div>
+		{/if}
+		<div class="main-area">
+			<section class="first-line">
+				<label for={_id}>
+					{#if definition.label}
+						<OverflowableText text={definition.label} />
+					{:else}
+						<div class="technical-indicator" use:tooltip={'Métadonnée technique'}>
+							<IconTechnical />
+						</div>
+						<code>
+							<OverflowableText text={definition.id} />
+						</code>
+					{/if}
+				</label>
+				<div class="value">
+					{#if inputIsInline}
+						{@render input()}
+					{/if}
+					{@render extraInline()}
 				</div>
-				<code>
-					<OverflowableText text={definition.id} />
-				</code>
+			</section>
+			{#if !inputIsInline}
+				{@render description()}
 			{/if}
-		</label>
-		<div class="value">
-			{#if inputIsInline}
-				{@render input()}
-			{/if}
-			{@render extraInline()}
 		</div>
-	</section>
+	</div>
 
 	{#if !inputIsInline}
-		{@render description()}
 		<div class="input-line">
 			{@render input()}
 		</div>
@@ -184,7 +197,7 @@
 		</section>
 	{/if}
 
-	{#if definition.images.length > 0}
+	{#if definition.images.length > 0 && !displayImageOnTheSide}
 		<section class="images">
 			<Carousel items={definition.images} slideName={(_, i) => `Image ${i + 1}`}>
 				{#snippet item(src)}
@@ -251,11 +264,33 @@
 {/snippet}
 
 <style>
-	.metadata {
+	.metadata,
+	.main-area {
 		display: flex;
 		flex-direction: column;
 		gap: 0.5em;
 	}
+
+	.side-image-and-main-area:has(.side-image) {
+		display: grid;
+		--image-size: 8rem;
+		--gap: 1em;
+		grid-template-columns: var(--image-size) calc(100% - var(--image-size) - var(--gap));
+		gap: var(--gap);
+
+		.side-image {
+			width: var(--image-size);
+			height: var(--image-size);
+			flex-shrink: 0;
+
+			img {
+				object-fit: contain;
+				width: 100%;
+				height: 100%;
+			}
+		}
+	}
+
 	.first-line {
 		display: flex;
 		align-items: center;
@@ -279,6 +314,10 @@
 
 	button:disabled {
 		opacity: 0.25;
+	}
+
+	.learnmore p {
+		text-wrap: balance;
 	}
 
 	label {
