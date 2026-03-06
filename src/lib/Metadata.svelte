@@ -60,7 +60,7 @@
 	const isCompactEnum = $derived(
 		definition.type === 'enum' &&
 			options.length <= 10 &&
-			options.every((opt) => !opt.image && !opt.learnMore)
+			!options.some(opt => opt.learnMore)
 	);
 
 	const inputIsInline = $derived(!isCompactEnum && definition.type !== 'file');
