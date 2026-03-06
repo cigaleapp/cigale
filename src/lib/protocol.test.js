@@ -69,6 +69,7 @@ test('toExportedProtocol', async () => {
 					return [
 						{
 							id: 'protocol1__meta1',
+							images: [],
 							type: 'enum',
 							key: 'meta1',
 							description: 'Metadata 1 description',
@@ -80,6 +81,7 @@ test('toExportedProtocol', async () => {
 						},
 						{
 							id: 'protocol1__meta2',
+							images: [],
 							type: 'enum',
 							key: 'meta2',
 							label: 'Metadata 2',
@@ -91,6 +93,7 @@ test('toExportedProtocol', async () => {
 						},
 						{
 							id: 'protocol1__meta3',
+							images: [],
 							type: 'enum',
 							key: 'meta3',
 							label: 'Metadata 3',
@@ -152,7 +155,8 @@ test('toExportedProtocol', async () => {
 				required: false,
 				options: [],
 				sortable: false,
-				groupable: false
+				groupable: false,
+				images: []
 			}
 		},
 		metadata: {
@@ -163,6 +167,7 @@ test('toExportedProtocol', async () => {
 				description: 'Metadata 1 description',
 				mergeMethod: 'max',
 				required: false,
+				images: [],
 				sortable: false,
 				groupable: false,
 				options: [
@@ -186,6 +191,7 @@ test('toExportedProtocol', async () => {
 				description: 'Metadata 2 description',
 				mergeMethod: 'max',
 				required: false,
+				images: [],
 				type: 'enum',
 				sortable: false,
 				groupable: false,

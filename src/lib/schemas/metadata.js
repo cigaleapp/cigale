@@ -384,6 +384,11 @@ const MetadataBase = type({
 	),
 	required: ['boolean', '@', 'Si la métadonnée est obligatoire'],
 	description: ['string', '@', 'Description, pour aider à comprendre la métadonnée'],
+	images: URLString.array()
+		.describe(
+			"Liste d'images illustrant cette métadonnée. Utile pour aider les utilisateurs à comprendre ce que représente la métadonnée"
+		)
+		.default(() => []),
 	sortable: type('boolean')
 		.describe('Si la métadonnée peut être utilisée pour trier des images ou observations')
 		.default(false),

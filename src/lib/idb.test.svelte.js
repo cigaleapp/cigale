@@ -87,6 +87,7 @@ describe('operations', () => {
 				description: '',
 				label: 'Test',
 				mergeMethod: 'none',
+				images: [],
 				required: false,
 				sortable: false,
 				groupable: false,
