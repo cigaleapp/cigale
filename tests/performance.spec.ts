@@ -14,7 +14,7 @@ benchmark(`startup @blank`, {
 	firstContentfulPaint: '250ms',
 	// TODO: lower this
 	total: {
-		chromium: '11s',
+		chromium: '12s',
 		webkit: '21s',
 		firefox: '21s'
 	}

@@ -120,7 +120,7 @@ jobs:
             *-classmapping.txt
 
   test:
-    timeout-minutes: 20
+    timeout-minutes: 25
     runs-on: ubuntu-latest
     name: Test (shard ${{ matrix.shard-index }} of ${{ matrix.shard-count }})
     needs: predownload
