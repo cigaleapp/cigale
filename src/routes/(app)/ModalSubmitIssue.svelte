@@ -67,7 +67,7 @@
 		return {
 			Version: version,
 			'User Agent': navigator.userAgent,
-			Route: page.route.id,
+			Route: page.route.id ?? '',
 			OS: ua.os.toString(),
 			Browser: ua.browser.toString(),
 			Device: ua.device.toString(),
