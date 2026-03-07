@@ -34,28 +34,15 @@ jobs:
     name: Skip?
     runs-on: ubuntu-latest
     outputs:
-      skip: ${{ steps.check-commit.outputs.skip }}
+      skip: ${{ !steps.changes.outputs.any_changed }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-          fetch-depth: 2
-      - name: Check commit messages
-        id: check-commit
-        run: |
-          message=$(git log -1 --pretty=%B)
-          echo "Checking in $message"
-          skip="false"
-          if echo "$message" | grep -q 'Regenerate-Protocol: No'; then
-            skip="true"
-          fi
-          echo Skipping regenerate: $skip
-          echo "skip=$skip" > $GITHUB_OUTPUT
+          fetch-depth: 0
       - name: Compute changes with last push
-        if: steps.check-commit.outputs.skip != 'true'
         id: changes
-        uses: tj-actions/changed-files@v47.0.5 
+        uses: tj-actions/changed-files@v47.0.5
         with:
           since_last_remote_commit: true
           # XXX: Duplicated from on.pull_request.paths
@@ -66,12 +53,11 @@ jobs:
             scripts/add-taxonomic-parents-from-gbif.js
             scripts/add-metadata-from-xper3.ts
             .github/workflows/protocols.yml
-      - name: Set skip output if no relevant files changed
-        if: steps.changes.outputs.any_changed == false
+
+      - name: Log summary to list changed files
         run: |
-          echo "No relevant files changed, skipping regenerate"
-          # Replace skip result from commit
-          echo "skip=true" > $GITHUB_OUTPUT
+          echo "Changed files: ${{ steps.changes.outputs.all_changed_files }}" >> $GITHUB_STEP_SUMMARY
+          echo "Any changed: ${{ steps.changes.outputs.any_changed }}"  >> $GITHUB_STEP_SUMMARY
 
   regenerate:
     needs: check
@@ -153,8 +139,5 @@ jobs:
         if: steps.status.outputs.changed == 'true'
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
-          commit_message: |
-            🍱 Regenerate example protocols
-
-            Regenerate-Protocol: No
+          commit_message: 🍱 Regenerate example protocols
           file_pattern: examples/*.cigaleprotocol.json examples/*.cigaleprotocol.images/*
