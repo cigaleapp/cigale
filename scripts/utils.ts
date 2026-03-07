@@ -82,7 +82,7 @@ export function chunkBySize<T>(by: number, items: T[]): T[][] {
 let gh: undefined | Octokit;
 const checkruns = new Map<
 	string,
-	{ githubId: number; titlePrefix: string; progressPercent?: number }
+	{ githubId: number; step?: string; progressPercent?: number; name: string }
 >();
 
 export async function updateCheckrunProgress(
@@ -101,7 +101,7 @@ export async function updateCheckrunProgress(
 		? formatDistanceToNowStrict(arrivalDate, { addSuffix: true })
 		: 'No ETA';
 
-	await emitCheckrun(id, 'in_progress', null, `${perc}% | ${time}`);
+	await emitCheckrun(id, 'in_progress', null, `${time} | ${perc}%`);
 
 	checkruns.set(id, {
 		...checkruns.get(id)!,
@@ -113,7 +113,7 @@ export async function emitCheckrun(
 	id: 'protocols',
 	status: 'in_progress' | 'queued' | 'completed',
 	/** DONT set to null on the first emit */
-	title: string | null,
+	step: string | null,
 	details: string
 ) {
 	if (!process.env.GH_TOKEN && process.env.CI) {
@@ -126,7 +126,7 @@ export async function emitCheckrun(
 
 	let name = 'Status';
 
-	if (process.env.GH_CHECK_RUN_ID) {
+	if (process.env.GH_CHECK_RUN_ID && !checkruns.has(id)) {
 		const { data: checkrun } = await gh.request(
 			'GET /repos/{owner}/{repo}/check-runs/{check_run_id}',
 			{
@@ -143,23 +143,48 @@ export async function emitCheckrun(
 		});
 
 		name = `${job.workflow_name} / ${checkrun.name} (progress)`;
+
+		const {
+			data: { check_runs: currentCheckruns }
+		} = await gh.request('GET /repos/{owner}/{repo}/commits/{ref}/check-runs', {
+			owner,
+			repo,
+			ref: process.env.GITHUB_SHA!
+		});
+
+		const matchingCheckrun = currentCheckruns.find(
+			(c) => c.output.text === `custom-checkrun-${id}`
+		);
+		if (matchingCheckrun) {
+			checkruns.set(id, {
+				githubId: matchingCheckrun.id,
+				name
+			});
+		}
 	}
 
 	const existing = checkruns.get(id);
 
 	try {
 		if (existing) {
-			title ||= existing.titlePrefix;
+			step ||= existing.step ?? '';
 
 			await gh.request('PATCH /repos/{owner}/{repo}/check-runs/{check_run_id}', {
 				owner,
 				repo,
 				check_run_id: existing.githubId,
 				status,
-				output: { title: `${title}: ${details}`, summary: '', text: '' }
+				conclusion: status === 'completed' ? 'success' : undefined,
+				output: {
+					title: `${details} (${step})`,
+					summary: '',
+					text: `custom-checkrun-${id}`
+				}
 			});
+
+			checkruns.set(id, { ...existing, step });
 		} else {
-			console.debug(`Creating a checkrun with`, { name, title, details });
+			console.debug(`Creating a checkrun with`, { name, step, details });
 
 			const response = await gh.request('POST /repos/{owner}/{repo}/check-runs', {
 				head_sha: process.env.GITHUB_SHA!,
@@ -167,18 +192,23 @@ export async function emitCheckrun(
 				repo,
 				name,
 				status,
-				output: { title: `${title}: ${details}`, summary: '', text: '' }
+				output: {
+					title: `${details} (${step})`,
+					summary: '',
+					text: `custom-checkrun-${id}`
+				}
 			});
 
 			checkruns.set(id, {
 				githubId: response.data.id,
-				titlePrefix: title!
+				step: step!,
+				name
 			});
 		}
 	} catch (error) {
 		console.error(
 			`Couldn't emit a checkrun with`,
-			{ id, status, title, details, existing },
+			{ id, status, step, details, existing },
 			':',
 			error
 		);
