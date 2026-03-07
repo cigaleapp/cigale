@@ -14,7 +14,7 @@ import {
 	newSession,
 	pickFiles,
 	setInferenceModels,
-	switchSession,
+	switchSession
 } from './utils/index.js';
 
 test.describe('isolation', () => {
@@ -87,7 +87,7 @@ test('import into new session', async ({ page, app }) => {
 
 	await setInferenceModels(page, {
 		crop: 'Aucune inférence',
-		classify: 'Aucune inférence',
+		classify: 'Aucune inférence'
 	});
 
 	await app.tabs.go('crop');
@@ -334,18 +334,22 @@ test('changing session info saves in the database', async ({ page, app }) => {
 		openedAt: assert.stringMatching(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d+Z/),
 		description: '',
 		protocol: exampleProtocol.id,
-		metadata: {},
+		metadata: {}
 	});
 
 	const nameInput = page.getByRole('textbox', { name: 'Nom de la session' });
 	await nameInput.fill('New name');
 	await nameInput.blur();
 
+	await app.wait(200);
+
 	assert(await app.db.session.byId(id)).toHaveProperty('name', 'New name');
 
 	const descriptionInput = page.getByRole('textbox', { name: 'Description' });
 	await descriptionInput.fill('A description');
 	await descriptionInput.blur();
+
+	await app.wait(200);
 
 	assert(await app.db.session.byId(id)).toHaveProperty('description', 'A description');
 });
@@ -473,12 +477,12 @@ test('session metadata form has default values', async ({ page, app }) => {
 
 	await expect(page.getByRole('textbox', { name: 'Date du transect' })).toHaveValue(
 		formatDate(session.createdAt, 'yyyy-MM-dd', {
-			in: tz('Etc/UTC'),
+			in: tz('Etc/UTC')
 		})
 	);
 	await expect(page.getByRole('textbox', { name: 'Code du transect' })).toHaveValue(
 		formatDate(session.createdAt, "yyyyMMddHHmm'AB'", {
-			in: tz('Etc/UTC'),
+			in: tz('Etc/UTC')
 		})
 	);
 
@@ -554,7 +558,7 @@ test('can set file-type metadata', async ({ page, app }) => {
 	expect(await fileInDb()).toMatchObject({
 		filename: '20K-gray.jpeg',
 		contentType: 'image/jpeg',
-		size: 1_562_661,
+		size: 1_562_661
 	});
 
 	// A file -> another file
@@ -575,7 +579,7 @@ test('can set file-type metadata', async ({ page, app }) => {
 	await expect(fileInDb()).resolves.toMatchObject({
 		filename: 'large-image.jpeg',
 		contentType: 'image/jpeg',
-		size: 792_031,
+		size: 792_031
 	});
 
 	// A file -> empty
