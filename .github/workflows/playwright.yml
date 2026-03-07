@@ -18,6 +18,17 @@ on:
         type: string
         description: Name of artifact to download built app from.
         required: true
+      env:
+        type: string
+        description: |
+          Additional environments variables when runnning tests. 
+          Syntax is NAME1=value1 NAME2=value2 ...
+
+          Useful variables:
+          - DEBUG_WORKERS=true: show logs when web workers are created/closed
+        required: false
+        default: ""
+
 
 env:
   ELECTRON_SKIP_BINARY_DOWNLOAD: 'true'
@@ -142,7 +153,7 @@ jobs:
       - name: Remove task-type spec files for better sharding balance
         run: rm tests/tasks/*
       - name: Run Playwright tests
-        run: bunx playwright test --shard=${{ matrix.shard-index}}/${{ matrix.shard-count }}
+        run: ${{ inputs.env }} bunx playwright test --shard=${{ matrix.shard-index}}/${{ matrix.shard-count }}
         env:
           SHARDING: '1'
           JOB_ID: ${{ job.check_run_id }}

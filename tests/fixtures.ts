@@ -376,16 +376,18 @@ export const test = base.extend<
 	],
 	forEachTest: [
 		async ({ page, context, app }, use, info) => {
-			let wwcount = 0;
-			page.on('worker', (worker) => {
-				console.debug(`Created WebWorker n°${wwcount + 1} with ${worker.url()}`);
-				wwcount++;
+			if (process.env.DEBUG_WORKERS) {
+				let wwcount = 0;
+				page.on('worker', (worker) => {
+					console.debug(`Created WebWorker n°${wwcount + 1} with ${worker.url()}`);
+					wwcount++;
 
-				worker.on('close', () => {
-					console.debug(`Closing WebWorker n°${wwcount}`);
-					wwcount--;
+					worker.on('close', () => {
+						console.debug(`Closing WebWorker n°${wwcount}`);
+						wwcount--;
+					});
 				});
-			});
+			}
 
 			await rm('./tests/results', { recursive: true, force: true });
 			await mkdir('./tests/results', { recursive: true });
