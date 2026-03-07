@@ -2327,6 +2327,10 @@ msgstr ""
 msgid "Aucune sélection"
 msgstr ""
 
+#: src/lib/MetadataInput.svelte
+msgid "Utiliser une autre unité"
+msgstr ""
+
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"
 msgstr ""
