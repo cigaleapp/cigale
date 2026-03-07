@@ -1,0 +1,267 @@
+# yaml-language-server: $schema=https://cigaleapp.github.io/cigale/protocol.schema.json
+id: fr.osug.terra-forma-web.insecta
+name: INSECTA
+authors:
+  - name: Maxime Cauchoix
+
+description: |
+  Pour réaliser le protocole INSECTA, vous avez besoin d'un appareil photo, de curiosité et de patience. 
+
+  Choisissez un habitat qui vous semble homogène et imaginez une ligne d'environ 20 mètres que vous parcourrez à la vitesse d'un pas toutes les 30 secondes, pendant 20 minutes. 
+
+  À chaque pas, arrêtez-vous et observez les arthropodes qui vous entourent dans un rayon de 50 cm. Prenez en photo tous les individus que vous pouvez observer. 
+
+  Entre deux individus d'une même espèce, prenez une photo du ciel afin de pouvoir les traiter comme deux observations distinctes une fois rentré·e chez vous. 
+
+  Si, à l'un de vos pas, vous rencontrez un groupe d'individus qui semblent tous appartenir à la même espèce (ex. : pucerons, fourmis), une photo d'un individu par espèce présente est suffisante. 
+
+  Prenez les meilleures photos possibles, et, si possible, n'hésitez pas à en prendre deux ou trois sous différents angles pour un même individu afin de faciliter son identification.
+
+imports:
+  - from: io.github.cigaleapp.arthropods.example
+    metadata:
+      - species
+      - genus
+      - family
+      - order
+      - class
+      - phylum
+      - kingdom
+      - identification_difficulty
+      - conservation_status
+      - shoot_date
+      - shoot_location
+
+crop:
+  metadata: crop
+
+metadataGroups:
+  project:
+    name: Code projet
+    description: |
+      Choisir "entrainement" jusqu'à ce que vous vous sentiez à l'aise avec le protocole (3 à 5 sessions). Quand vous êtes suffisamment entrainé, choisissez "sciences participatives" ou un projet de recherche spécifique auquel vous êtes associé.
+
+sessionMetadata:
+  date:
+    type: date
+    label: Date de début
+    mergeMethod: none
+    required: false
+    description: ''
+    default: '{{ now "YYYY-mm-dd" }}'
+
+  is_training:
+    type: boolean
+    group: project
+    label: Entraînement
+    description: ''
+    mergeMethod: min
+    required: false
+
+  is_citizen_science:
+    type: boolean
+    group: project
+    label: Sciences participatives
+    description: ''
+    mergeMethod: min
+    required: false
+
+  is_psibiom:
+    type: boolean
+    group: project
+    label: Psi-Biom
+    learnMore: https://www.terroiko.fr/fr/recherche-et-developpement/psibiom
+    description: ''
+    mergeMethod: min
+    required: false
+
+  is_renat:
+    type: boolean
+    group: project
+    label: RENAT
+    learnMore: https://renat.wiki/
+    description: Parc Naturel Régional des Pyrénées Ariégeoises
+    mergeMethod: min
+    required: false
+
+  is_adept:
+    type: boolean
+    group: project
+    label: ADEPT
+    learnMore: https://fundatia-adept.org/projects/
+    description: ''
+    mergeMethod: min
+    required: false
+
+  is_wildnet:
+    type: boolean
+    group: project
+    label: WildNet
+    learnMore: https://wildnet.org/
+    description: ''
+    mergeMethod: min
+    required: false
+
+  site_code:
+    type: string
+    label: Code du site
+    description: Dépend du projet. Si vous ne faites pas le protocole dans le cadre d'un projet spécifique le nom de la commune ou de tout autre repère spatial est suffisant
+    mergeMethod: none
+    required: false
+
+  habitat_photo:
+    type: file
+    label: Photo du milieu
+    description: Prenez une photo qui représente bien l'endroit où vous allez effectuer l'inventaire photographique.
+    mergeMethod: none
+    required: false
+    accept:
+      - image/*
+    size:
+      maximum: 10 MB
+
+  soil_photo_start:
+    type: file
+    label: Sol au départ
+    description: Prenez une photo du sol au point de départ du transect. Le téléphone/appareil doit être parallèle au sol, à hauteur d'hanche (environ 1 m du sol) afin d'analyser la communauté de plante
+    mergeMethod: none
+    required: false
+    accept:
+      - image/*
+    size:
+      maximum: 10 MB
+
+  habitat_comment:
+    type: string
+    label: Commentaire sur le lieu
+    required: false
+    mergeMethod: none
+    description: ''
+
+  transect_code:
+    type: string
+    label: Code du transect
+    description: |
+      Le code du transect est composé de la date, de l'heure, et de vos initiales. Par exemple, un transect réalisé par Martin Galli le 07/12/2023 à 14h50 s'écrira : 202312071450MG
+    mergeMethod: none
+    required: true
+    pattern: year, month, day, hour, minute, uppercase letter minimum 2 times
+    default: |
+      {{ #with (metadata session "date") }}
+        {{ year . }}{{ month . }}{{ day . }}{{ hour . }}{{ hour . }}{{ minute . }}ABC
+      {{ /with }}
+
+  wind_speed:
+    type: float
+    # TODO: once https://github.com/jonahsnider/convert/issues/497 is resolved
+    # implement speed units and use them here
+    label: Vitesse du vent (km/h)
+    description: Si il y a du vent mais que sa vitesse est trop faible pour être détectée par votre anémomètre, indiquez 1 km/h
+    mergeMethod: average
+    required: false
+
+  shadow_temperature:
+    type: float
+    label: Température à l'ombre
+    unit: celsius
+    description: Il faut s'assurer que la température mesurée soit bien celle de l'air à l'ombre et qu'elle soit influencé le moins possible par le soleil, par le sol ou par votre température corporelle. Si vous n'avez pas de thermomètre utilisez la température prédite par la météo locale
+    mergeMethod: average
+    required: true
+
+  grass_height:
+    type: float
+    label: Hauteur de la strate herbacée
+    unit: cm
+    description: Estimez la hauteur de l'herbe sur votre transect. Si elle n'est pas constante estimez une moyenne sur les 20m du parcours prévu.
+    mergeMethod: average
+    required: true
+
+  incline:
+    type: float
+    label: Pente
+    unit: deg
+    description: Mesuré avec une application clinomètre, long côté du téléphone positionné parallèlement à la pente
+    mergeMethod: average
+    required: false
+
+  # TODO: verif si c bien ça la trad anglaise
+  incline_exposure:
+    type: float
+    label: Exposition de la pente
+    unit: def
+    description: Mesuré avec une application boussole, pointée vers le bas de la pente
+    mergeMethod: average
+    required: false
+
+  on_path:
+    type: boolean
+    label: Chemin
+    description: Le transect est-il réalisé depuis un chemin?
+    mergeMethod: average
+    required: false
+
+  start_at:
+    type: location
+    label: Point de départ
+    description: |
+      Dès que vous avez réussi à vous géolocaliser, c'est parti pour 20 minutes de safari macrophotographique! Laissez ou prenez un point de repère pour retrouver votre point de départ. Vous pouvez mettre le téléphone en veille et revenir sur ce questionnaire à la fin des 20min pour indiquer votre point d'arrivée et les 3 dernières questions. N'oubliez pas de lancer un chronomètre
+    mergeMethod: none
+    required: true
+    # TODO: shoot_location of argmin(photos shoot_date)
+    # default: 
+
+  end_at:
+    type: location
+    label: Point d'arrivée
+    description: Les 20min sont écoulées. Enregistrez la localisation de votre point d'arrivé.
+    mergeMethod: none
+    required: true
+    # TODO: shoot_location of argmax(photos shoot_date)
+    # default: 
+
+  soil_photo_end:
+    type: file
+    label: Sol à l'arrivée
+    description: La photo doit être parallèle au sol, à hauteur d'hanche (environ 1 m du sol) afin d'analyser la communauté de plante
+    required: false
+    mergeMethod: none
+    accept:
+      - image/*
+    size:
+      maximum: 10 MB
+
+  distance:
+    type: float
+    label: Distance parcourue
+    unit: m
+    required: true
+    mergeMethod: average
+    description: En revenant sur vos pas. Estimez en enjambées de 1 m la distance exact parcouru entre le point d'arrivée et le point de départ.
+
+  camera_type:
+    type: enum
+    label: Type d'appareil photo
+    description: ''
+    required: true
+    mergeMethod: none
+    options:
+      - key: smartphone
+        label: Smartphone
+      - key: with_macro
+        label: Reflex ou hybride avec objectif macro et flash
+      - key: compact
+        label: Compact
+      - key: without_macro
+        label: Reflex ou hybride sans objectif macro
+      - key: other
+        label: Autre
+
+  comment:
+    type: string
+    required: false
+    description: ''
+    label: Commentaire ou remarque
+    mergeMethod: none
+
+# All metadata are imported from the base arthropods protocol
+metadata: {}
