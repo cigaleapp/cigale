@@ -3,11 +3,9 @@ id: fr.osug.terra-forma-web.insecta
 name: INSECTA
 authors:
   - name: Maxime Cauchoix
-
 version: 3
 updates: automatic
 source: https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/insecta.cigaleprotocol.yaml
-
 description: |
   Pour réaliser le protocole INSECTA, vous avez besoin d'un appareil photo, de curiosité et de patience. 
 
@@ -20,7 +18,6 @@ description: |
   Si, à l'un de vos pas, vous rencontrez un groupe d'individus qui semblent tous appartenir à la même espèce (ex. : pucerons, fourmis), une photo d'un individu par espèce présente est suffisante. 
 
   Prenez les meilleures photos possibles, et, si possible, n'hésitez pas à en prendre deux ou trois sous différents angles pour un même individu afin de faciliter son identification.
-
 imports:
   - from: io.github.cigaleapp.arthropods.example
     metadataGroups:
@@ -33,16 +30,13 @@ imports:
       - shoot_date
       - shoot_location
       - crop
-
 crop:
   metadata: crop
-
 metadataGroups:
   project:
     name: Code projet
     description: |
       Choisir "entrainement" jusqu'à ce que vous vous sentiez à l'aise avec le protocole (3 à 5 sessions). Quand vous êtes suffisamment entrainé·e, choisissez "sciences participatives" ou un projet de recherche spécifique auquel vous êtes associé·e.
-
 metadataOrder:
   # Session
   - date
@@ -81,7 +75,6 @@ metadataOrder:
   - shoot_date
   - conservation_status
   - identification_difficulty
-
 sessionMetadata:
   date:
     type: date
@@ -236,6 +229,7 @@ sessionMetadata:
     range: 0..90
 
   # TODO: verif si c bien ça la trad anglaise
+
   incline_exposure:
     type: float
     label: Exposition (orientation) de la pente
