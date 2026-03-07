@@ -1,4 +1,7 @@
 import { type } from 'arktype';
+import { Estimation as ETA } from 'arrival-time';
+import { formatDistanceToNowStrict, isValid as isValidDate } from 'date-fns';
+import { Octokit } from 'octokit';
 
 /**
  * Semi-open range [start=0, end)
@@ -74,4 +77,110 @@ export function chunkBySize<T>(by: number, items: T[]): T[][] {
 	return new Array(Math.ceil(items.length / by))
 		.fill([])
 		.map((_, i) => items.slice(i * by, (i + 1) * by));
+}
+
+let gh: undefined | Octokit;
+const checkruns = new Map<
+	string,
+	{ githubId: number; titlePrefix: string; progressPercent?: number }
+>();
+
+export async function updateCheckrunProgress(
+	id: 'protocols',
+	done: number,
+	total: number,
+	eta: ETA
+) {
+	const percentage = Math.round((done / total) * 100);
+	const perc = percentage.toString().padStart(3);
+
+	if (checkruns.get(id)!.progressPercent == percentage) return;
+
+	const arrivalDate = new Date(Date.now() + eta.estimate());
+	const time = isValidDate(arrivalDate)
+		? formatDistanceToNowStrict(arrivalDate, { addSuffix: true })
+		: 'No ETA';
+
+	await emitCheckrun(id, 'in_progress', null, `${perc}% | ${time}`);
+
+	checkruns.set(id, {
+		...checkruns.get(id)!,
+		progressPercent: percentage
+	});
+}
+
+export async function emitCheckrun(
+	id: 'protocols',
+	status: 'in_progress' | 'queued' | 'completed',
+	/** DONT set to null on the first emit */
+	title: string | null,
+	details: string
+) {
+	if (!process.env.GH_TOKEN && process.env.CI) {
+		console.warn('GH_TOKEN env variable not set, cannot emit check runs');
+		return;
+	}
+
+	gh ??= new Octokit({ auth: process.env.GH_TOKEN });
+	const [owner, repo] = process.env.GITHUB_REPOSITORY!.split('/');
+
+	let name = 'Status';
+
+	if (process.env.GH_CHECK_RUN_ID) {
+		const { data: checkrun } = await gh.request(
+			'GET /repos/{owner}/{repo}/check-runs/{check_run_id}',
+			{
+				owner,
+				repo,
+				check_run_id: Number.parseInt(process.env.GH_CHECK_RUN_ID)
+			}
+		);
+
+		const { data: job } = await gh.request('GET /repos/{owner}/{repo}/actions/jobs/{job_id}', {
+			owner,
+			repo,
+			job_id: checkrun.id
+		});
+
+		name = `${job.workflow_name} / ${checkrun.name} (progress)`;
+	}
+
+	const existing = checkruns.get(id);
+
+	try {
+		if (existing) {
+			title ||= existing.titlePrefix;
+
+			await gh.request('PATCH /repos/{owner}/{repo}/check-runs/{check_run_id}', {
+				owner,
+				repo,
+				check_run_id: existing.githubId,
+				status,
+				output: { title: `${title}: ${details}`, summary: '', text: '' }
+			});
+		} else {
+			console.debug(`Creating a checkrun with`, { name, title, details });
+
+			const response = await gh.request('POST /repos/{owner}/{repo}/check-runs', {
+				head_sha: process.env.GITHUB_SHA!,
+				owner,
+				repo,
+				name,
+				status,
+				output: { title: `${title}: ${details}`, summary: '', text: '' }
+			});
+
+			checkruns.set(id, {
+				githubId: response.data.id,
+				titlePrefix: title!
+			});
+		}
+	} catch (error) {
+		console.error(
+			`Couldn't emit a checkrun with`,
+			{ id, status, title, details, existing },
+			':',
+			error
+		);
+	}
 }

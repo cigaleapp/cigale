@@ -200,7 +200,7 @@
 			onsplit={page.route.id?.endsWith('classify') ? splitSelection : undefined}
 			onimport={page.route.id?.endsWith('import') ? importImages : undefined}
 			ondelete={deleteSelection}
-			onmetadatachange={async (id, value) => {
+			onmetadatachange={async (id, value, unit) => {
 				if (!uiState.currentProtocol) return;
 				for (const subjectId of uiState.selection) {
 					if (value === undefined) {
@@ -219,7 +219,8 @@
 							metadataId: id,
 							confidence: 1,
 							manuallyModified: true,
-							value
+							value,
+							unit
 						});
 					}
 				}

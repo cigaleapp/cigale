@@ -15,6 +15,7 @@ import type { TempFilesFixture } from './fixtures/tempfiles.js';
 import { tempfiles } from './fixtures/tempfiles.js';
 import {
 	confirmDeletionModal,
+	dumpDatabase,
 	expectTooltipContent,
 	getDatabaseRowByField,
 	getDatabaseRowById,
@@ -374,22 +375,24 @@ export const test = base.extend<
 		{ scope: 'worker', auto: true }
 	],
 	forEachTest: [
-		async ({ page, context, app }, use, { tags, annotations }) => {
-			let wwcount = 0;
-			page.on('worker', (worker) => {
-				console.debug(`Created WebWorker n°${wwcount + 1} with ${worker.url()}`);
-				wwcount++;
+		async ({ page, context, app }, use, info) => {
+			if (process.env.DEBUG_WORKERS) {
+				let wwcount = 0;
+				page.on('worker', (worker) => {
+					console.debug(`Created WebWorker n°${wwcount + 1} with ${worker.url()}`);
+					wwcount++;
 
-				worker.on('close', () => {
-					console.debug(`Closing WebWorker n°${wwcount}`);
-					wwcount--;
+					worker.on('close', () => {
+						console.debug(`Closing WebWorker n°${wwcount}`);
+						wwcount--;
+					});
 				});
-			});
+			}
 
 			await rm('./tests/results', { recursive: true, force: true });
 			await mkdir('./tests/results', { recursive: true });
 
-			if (!tags.includes('@real-protocol')) {
+			if (!info.tags.includes('@real-protocol')) {
 				// @ts-expect-error we don't support non-string protocol source values for now
 				await mockProtocolSourceURL(page, context, fullProtocol.source, {
 					json: lightProtocol
@@ -405,24 +408,36 @@ export const test = base.extend<
 				species: [collembolaClassifierModel, arthropodaClassifierModel]
 			});
 
-			const concurrency = annotations.find((a) => a.type === 'concurrency')?.description;
+			const concurrency = info.annotations.find((a) => a.type === 'concurrency')?.description;
 			if (concurrency) {
 				await setHardwareConcurrency(page, Number.parseInt(concurrency));
 			}
 
 			if (
-				tags.includes('@webkit-no-parallelization') &&
+				info.tags.includes('@webkit-no-parallelization') &&
 				context.browser()?.browserType().name() === 'webkit'
 			) {
 				await setHardwareConcurrency(page, 1);
 			}
 
-			if (!tags.includes('@blank')) {
+			if (!info.tags.includes('@blank')) {
 				await page.goto('./');
 				await app.db.ready();
 			}
 
 			await use();
+
+			if (info.status !== info.expectedStatus) {
+				info.attach('database snapshot', {
+					body: await dumpDatabase(page, null)
+				});
+
+				info.attach('UI state', {
+					body: await page.evaluate(() =>
+						JSON.stringify(window.uiState?.snapshot() ?? null, null, 2)
+					)
+				});
+			}
 		},
 		{ auto: true }
 	]

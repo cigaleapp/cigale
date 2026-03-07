@@ -1,12 +1,14 @@
 import type { IDBPDatabase } from 'idb';
 import type { SwarpcClient } from 'swarpc';
 
-import type { IDBDatabaseType } from '$lib/idb.svelte';
+import type { IDBDatabaseType } from '$lib/idb.svelte.js';
+import type { UIState } from '$lib/state.svelte.js';
 import type { PROCEDURES } from '$worker/procedures.js';
 
 declare global {
 	interface Window {
 		DB: IDBPDatabase<IDBDatabaseType>;
+		uiState: undefined | UIState;
 		swarpc: undefined | SwarpcClient<typeof PROCEDURES>;
 		refreshDB: () => void;
 		devalue: {

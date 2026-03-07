@@ -11,7 +11,16 @@ import Turndown from 'turndown';
 import _protocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
 import type { MetadataEnumVariant } from '../src/lib/schemas/metadata.js';
 import type { ExportedProtocol } from '../src/lib/schemas/protocols.js';
-import { align, chunkBySize, cyan, dim, percentage, yellow } from './utils.js';
+import {
+	align,
+	chunkBySize,
+	cyan,
+	dim,
+	emitCheckrun,
+	percentage,
+	updateCheckrunProgress,
+	yellow
+} from './utils.js';
 
 const protocol = _protocol as typeof ExportedProtocol.infer;
 
@@ -97,7 +106,11 @@ if (import.meta.main) {
 async function main() {
 	const metadataKey = type('"genus" | "species"').assert(process.argv[2]);
 
+	await emitCheckrun('protocols', 'in_progress', `Jessica Joachim / ${metadataKey}`, 'Starting…');
+
 	const augmented = await augmentMetadata(protocol, metadataKey);
+
+	await emitCheckrun('protocols', 'in_progress', null, 'Finishing…');
 
 	await Bun.write(protocolPath, JSON.stringify(augmented, null, 2));
 
@@ -167,6 +180,8 @@ async function augmentMetadata(
 			processed++;
 
 			eta.update(done, total);
+
+			await updateCheckrunProgress('protocols', done, total, eta);
 
 			console.info(
 				`${align(processed, total)} ${percentage(done, total)} ${cyan(

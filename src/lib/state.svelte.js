@@ -4,6 +4,7 @@ import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 import { tables } from './idb.svelte.js';
 import { getMetadataValue } from './metadata/index.js';
 import { defaultClassificationMetadata, defaultCropMetadata } from './protocols.js';
+import { pick } from './utils.js';
 
 /**
  * @import * as DB from './database';
@@ -30,7 +31,52 @@ import { defaultClassificationMetadata, defaultCropMetadata } from './protocols.
  * @type {Record<string, Keybind<Groups>>}
  */
 
-class UIState {
+export class UIState {
+	constructor() {
+		// Can't use if(window) cuz variable might be undeclared
+		// Can't use if(browser) cuz $app/environment imports don't work when transforming worker code
+		try { 
+			window.uiState = this;
+		} catch {
+			// ok
+		}
+	}
+
+	/**
+	 * Returns a JSON-compatible object of the state.
+	 * Used for debugging purposes
+	 */
+	snapshot() {
+		return $state.snapshot({
+			processing: pick(this.processing, 'files', 'total', 'done', 'time', 'task'),
+			eta: this.eta,
+			selection: this.selection,
+			imageOpenedInCropper: this.imageOpenedInCropper,
+			imagePreviouslyOpenedInCropper: this.imagePreviouslyOpenedInCropper,
+			previewURLs: Object.fromEntries(this.previewURLs.entries()),
+			globalPreviewURLs: Object.fromEntries(this.globalPreviewURLs.entries()),
+			erroredImages: Object.fromEntries(this.erroredImages.entries()),
+			loadingImages: Array.from(this.loadingImages),
+			queuedImages: Array.from(this.queuedImages),
+			keybinds: this.keybinds,
+			currentSessionId: this.currentSessionId,
+			currentSession: this.currentSession
+				? pick(this.currentSession, 'id', 'protocol', 'inferenceModels')
+				: null,
+			currentProtocol: this.currentProtocol ? pick(this.currentProtocol, 'id', 'name') : null,
+			classificationMetadata: this.classificationMetadata
+				? pick(this.classificationMetadata, 'id', 'infer')
+				: null,
+			cropMetadata: this.cropMetadata ? pick(this.cropMetadata, 'id', 'infer') : null,
+			classificationModels: this.classificationModels,
+			cropModels: this.cropModels,
+			selectedCropModel: this.selectedCropModel,
+			selectedClassificationModel: this.selectedClassificationModel,
+			cropInferenceAvailable: this.cropInferenceAvailable,
+			classificationInferenceAvailable: this.classificationInferenceAvailable
+		});
+	}
+
 	processing = $state({
 		/** @type {Array<{name: string; id: string; addedAt: Date }>} */
 		files: [],
@@ -115,6 +161,7 @@ class UIState {
 		if (id === null) {
 			localStorage.removeItem('currentSessionId');
 		} else {
+			// eslint-disable-next-line svelte/prefer-svelte-reactivity
 			void tables.Session.update(id, 'openedAt', new Date().toISOString());
 			localStorage.setItem('currentSessionId', id);
 		}

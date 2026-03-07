@@ -8,7 +8,7 @@
 		granularity?: number | undefined;
 		/** Number of steps to use. If not set, uses as much steps as granularity allows */
 		stepcount?: number;
-		/** Array of numbers to specify every tick's value, a single number of specify a number of ticks to uniformly distribute on the slider */
+		/** Array of numbers to specify every tick's value, a single number of specify a number of ticks to uniformly distribute on the slider, excluding min & max (there are no ticks there if you specify a number) */
 		ticks?: number | number[];
 		value: number | undefined;
 		disabled?: boolean;
@@ -62,7 +62,7 @@
 			{/each}
 		{:else}
 			{#each range(ticks) as i (i)}
-				<option value={min + (i * (max - min)) / (ticks - 1)}></option>
+				<option value={min + ((i + 1) * (max - min)) / (ticks + 1)}></option>
 			{/each}
 		{/if}
 	</datalist>

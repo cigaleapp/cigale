@@ -59,12 +59,30 @@ export async function listTable(page, tableName) {
 }
 
 /**
+ * @overload
+ * @param {Page} page
+ * @param {null} filepath
+ * @returns {Promise<string>}
+ */
+
+
+/**
+ * @overload
+ * @param {Page} page
+ * @param {FixturePaths.DatabaseDumps} filepath
+ * @returns {Promise<undefined>}
+ */
+
+/**
  * Store a database dump in the fixtures/db directory
  * @param {import('@playwright/test').Page} page
- * @param {FixturePaths.DatabaseDumps} filepath relative to tests/fixtures/db
+ * @param {FixturePaths.DatabaseDumps | null} filepath relative to tests/fixtures/db. Null to skip saving the dump.
+ * @returns {Promise<string|undefined>} the encoded dump, if filepath is null
  */
 export async function dumpDatabase(page, filepath) {
-	const dest = path.join(import.meta.dirname, '../..', FixturePaths.root, filepath);
+	const dest = filepath
+		? path.join(import.meta.dirname, '../..', FixturePaths.root, filepath)
+		: null;
 
 	const encodedDump = await page.evaluate(async () => {
 		const tableNames = window.DB.objectStoreNames;
@@ -79,11 +97,15 @@ export async function dumpDatabase(page, filepath) {
 		return window.devalue.stringify(dump);
 	});
 
-	await mkdir(path.dirname(dest), {
-		recursive: true
-	});
+	if (dest) {
+		await mkdir(path.dirname(dest), {
+			recursive: true
+		});
 
-	await writeFile(dest, encodedDump, 'utf-8');
+		await writeFile(dest, encodedDump, 'utf-8');
+	} else {
+		return encodedDump;
+	}
 }
 
 /**

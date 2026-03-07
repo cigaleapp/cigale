@@ -2,8 +2,8 @@
 	"$schema": "https://cigaleapp.github.io/cigale/protocol.schema.json",
 	"id": "io.github.cigaleapp.arthropods.example.light",
 	"name": "Example: arthropodes (lightweight)",
-	"learnMore": "https://github.com/cigaleapp/cigale/tree/2d30318ba5570ead05a9b231ca04a72154e5957f/scripts/README.md#protocoles-arthropodsexamplelight",
-	"version": 73,
+	"learnMore": "https://github.com/cigaleapp/cigale/tree/7addd2a45b9eb2dcce25ec59796d687127e00b5d/scripts/README.md#protocoles-arthropodsexamplelight",
+	"version": 74,
 	"updates": "automatic",
 	"source": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.light.cigaleprotocol.json",
 	"description": "Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification",
@@ -63,7 +63,8 @@
 		"io.github.cigaleapp.arthropods.example.light__prospection_duration": {
 			"type": "integer",
 			"label": "Durée de prospection",
-			"description": "Durée (en minutes) de la prospection sur le terrain",
+			"description": "Durée de la prospection sur le terrain",
+			"unit": "minutes",
 			"required": false,
 			"mergeMethod": "average",
 			"range": "> 0"
@@ -71,7 +72,8 @@
 		"io.github.cigaleapp.arthropods.example.light__prospection_distance": {
 			"type": "integer",
 			"label": "Distance de prospection",
-			"description": "Distance (en mètres) parcourue pendant la prospection",
+			"description": "Distance parcourue pendant la prospection",
+			"unit": "meters",
 			"required": false,
 			"mergeMethod": "average",
 			"range": "> 0"
@@ -132,7 +134,8 @@
 		"io.github.cigaleapp.arthropods.example.light__temperature": {
 			"type": "integer",
 			"label": "Température",
-			"description": "Température approximative pendant la prospection (en °C)",
+			"description": "Température approximative pendant la prospection",
+			"unit": "celsius",
 			"required": false,
 			"mergeMethod": "average",
 			"range": ">= -273.15"

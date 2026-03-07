@@ -1460,6 +1460,23 @@ export function orEmptyObj2(key, subject, obj) {
 }
 
 /**
+ * { key: value } if value is not nullable, {} otherwise.
+ * Spread into an object literal to conditionally add something to it
+ * @template T
+ * @template {string} K
+ * @param {{ [key in K]: T }} obj { key: value }
+ * @returns { T extends null | undefined ? {} : { [key in K]: T } }
+ */
+export function orEmptyObj3(obj) {
+	const key = Object.keys(obj)[0];
+	if (key === undefined) return {};
+	if (obj[key] === null) return {};
+	if (obj[key] === undefined) return {};
+
+	return obj;
+}
+
+/**
  * @template {string} Prefix
  * @template T
  * @typedef {T extends `${Prefix}${infer P}` ? P : never} RemovePrefix

@@ -31,26 +31,33 @@ concurrency:
 
 jobs:
   check:
-    name: Check for Regenerate-Protocol commit trailer
+    name: Skip?
     runs-on: ubuntu-latest
     outputs:
-      skip: ${{ steps.check-commit.outputs.skip }}
+      skip: ${{ !steps.changes.outputs.any_changed }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-      - name: Check commit messages
-        id: check-commit
+          fetch-depth: 0
+      - name: Compute changes with last push
+        id: changes
+        uses: tj-actions/changed-files@v47.0.5
+        with:
+          since_last_remote_commit: true
+          # XXX: Duplicated from on.pull_request.paths
+          files: |
+            scripts/generate-protocols.js
+            scripts/add-species-from-jessica-joachim.ts
+            scripts/add-species-from-google-slides.js
+            scripts/add-taxonomic-parents-from-gbif.js
+            scripts/add-metadata-from-xper3.ts
+            .github/workflows/protocols.yml
+
+      - name: Log summary to list changed files
         run: |
-          message=$(git log -1 --pretty=%B)
-          echo "Checking in $message"
-          skip="false"
-          if echo "$message" | grep -q 'Regenerate-Protocol: No'; then
-            skip="true"
-          fi
-          echo Skipping regenerate: $skip
-          echo "skip=$skip" >> $GITHUB_OUTPUT
+          echo "Changed files: ${{ steps.changes.outputs.all_changed_files }}" >> $GITHUB_STEP_SUMMARY
+          echo "Any changed: ${{ steps.changes.outputs.any_changed }}"  >> $GITHUB_STEP_SUMMARY
 
   regenerate:
     needs: check
@@ -58,7 +65,15 @@ jobs:
     name: Regenerate
     runs-on: ubuntu-latest
 
+    env:
+      GH_TOKEN: ${{ github.token }}
+
     steps:
+      # For some reason, it's not available in job-level env ?
+      - name: Get checkrun id
+        run: |
+          echo "GH_CHECK_RUN_ID=${{ job.check_run_id }}" >> $GITHUB_ENV
+
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
@@ -113,6 +128,11 @@ jobs:
       - name: Format generated protocols
         run: bun x prettier --write examples/*.cigaleprotocol.json
 
+      - name: Mark custom checkrun as finished
+        run: bun --eval "
+          import { emitCheckrun } from './scripts/utils.js';
+          await emitCheckrun('protocols', 'completed', null, 'All done!')"
+
       - name: Setup diffing that ignores version and learnMore fields
         run: git config diff.example-protocols.textconv "$textconv"
         env:
@@ -132,8 +152,5 @@ jobs:
         if: steps.status.outputs.changed == 'true'
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
-          commit_message: |
-            🍱 Regenerate example protocols
-
-            Regenerate-Protocol: No
+          commit_message: 🍱 Regenerate example protocols
           file_pattern: examples/*.cigaleprotocol.json examples/*.cigaleprotocol.images/*

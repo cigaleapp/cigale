@@ -13,7 +13,9 @@ import { x } from 'tinyexec';
 import Turndown from 'turndown';
 
 import keys from '../google-drive-key.json' with { type: 'json' };
-import { range } from './utils.js';
+import { emitCheckrun, range, updateCheckrunProgress } from './utils.js';
+
+await emitCheckrun('protocols', 'in_progress', 'Google Slides', 'Starting…');
 
 await mkdir(path.join(import.meta.dirname, '../examples/arthropods.cigaleprotocol.images'), {
 	recursive: true
@@ -96,6 +98,7 @@ const longestNameLength = Math.max(...files.map((file) => file.name.length));
 
 for (const [i, { name, id }] of files.entries()) {
 	eta.update(i);
+	await updateCheckrunProgress('protocols', i, files.length, eta);
 
 	const log = (...items) => {
 		let remaining = new Date(Date.now() + eta.estimate());
@@ -368,11 +371,15 @@ for (const [i, { name, id }] of files.entries()) {
 	}
 }
 
+await emitCheckrun('protocols', 'in_progress', null, 'Finishing…');
+
 console.info(
 	`Formatting protocols ${cc.blue}${cc.dim}$${cc.reset} ${cc.blue}bun run format ${Object.keys(protocols).join(' ')}${cc.reset}`
 );
 
 await x('npm', ['run', 'format', ...Object.keys(protocols)]);
+
+await emitCheckrun('protocols', 'in_progress', null, `Described ${files.length} species`);
 
 /**
  *

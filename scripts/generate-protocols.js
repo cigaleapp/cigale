@@ -4,6 +4,8 @@ import path from 'node:path';
 import { type } from 'arktype';
 import { x } from 'tinyexec';
 
+import { emitCheckrun } from './utils.js';
+
 const BEAMUP_ORIGIN = 'https://beamup.cigale.gwen.works';
 
 const here = import.meta.dirname;
@@ -50,6 +52,8 @@ const MODELS = {
 	}
 };
 
+await emitCheckrun('protocols', 'in_progress', 'Initialization', 'Starting…');
+
 const lightweightModelGbifIds = await gbifIds(MODELS.classifiers.collembola.classmapping);
 
 const allGbifIds = new Set([
@@ -71,6 +75,8 @@ let gbifCache = await fetch(
 	);
 
 console.info(`Protocol has ${allGbifIds.size} species options`);
+
+await emitCheckrun('protocols', 'in_progress', 'Initialization', `with ${allGbifIds.size} species`);
 
 /**
  * @type {Array<typeof import('../src/lib/schemas/metadata').MetadataEnumVariant.infer>}
@@ -221,7 +227,8 @@ const protocol = {
 			// TODO duration datatype ?
 			type: 'integer',
 			label: 'Durée de prospection',
-			description: 'Durée (en minutes) de la prospection sur le terrain',
+			description: 'Durée de la prospection sur le terrain',
+			unit: 'minutes',
 			required: false,
 			mergeMethod: 'average',
 			range: '> 0'
@@ -229,7 +236,8 @@ const protocol = {
 		[namespaced('prospection_distance')]: {
 			type: 'integer',
 			label: 'Distance de prospection',
-			description: 'Distance (en mètres) parcourue pendant la prospection',
+			description: 'Distance parcourue pendant la prospection',
+			unit: 'meters',
 			required: false,
 			mergeMethod: 'average',
 			range: '> 0'
@@ -271,7 +279,8 @@ const protocol = {
 		[namespaced('temperature')]: {
 			type: 'integer',
 			label: 'Température',
-			description: 'Température approximative pendant la prospection (en °C)',
+			description: 'Température approximative pendant la prospection',
+			unit: 'celsius',
 			required: false,
 			mergeMethod: 'average',
 			range: '>= -273.15'
