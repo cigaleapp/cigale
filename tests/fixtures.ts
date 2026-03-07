@@ -431,6 +431,12 @@ export const test = base.extend<
 				info.attach('database snapshot', {
 					body: await dumpDatabase(page, null)
 				});
+
+				info.attach('UI state', {
+					body: await page.evaluate(() =>
+						JSON.stringify(window.uiState?.snapshot() ?? null, null, 2)
+					)
+				});
 			}
 		},
 		{ auto: true }
