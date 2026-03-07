@@ -31,7 +31,7 @@ concurrency:
 
 jobs:
   check:
-    name: Check for Regenerate-Protocol commit trailer
+    name: Skip?
     runs-on: ubuntu-latest
     outputs:
       skip: ${{ steps.check-commit.outputs.skip }}
@@ -40,6 +40,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 2
       - name: Check commit messages
         id: check-commit
         run: |
@@ -50,7 +51,27 @@ jobs:
             skip="true"
           fi
           echo Skipping regenerate: $skip
-          echo "skip=$skip" >> $GITHUB_OUTPUT
+          echo "skip=$skip" > $GITHUB_OUTPUT
+      - name: Compute changes with last push
+        if: steps.check-commit.outputs.skip != 'true'
+        id: changes
+        uses: tj-actions/changed-files@v47.0.5 
+        with:
+          since_last_remote_commit: true
+          # XXX: Duplicated from on.pull_request.paths
+          files: |
+            scripts/generate-protocols.js
+            scripts/add-species-from-jessica-joachim.ts
+            scripts/add-species-from-google-slides.js
+            scripts/add-taxonomic-parents-from-gbif.js
+            scripts/add-metadata-from-xper3.ts
+            .github/workflows/protocols.yml
+      - name: Set skip output if no relevant files changed
+        if: steps.changes.outputs.any_changed == false
+        run: |
+          echo "No relevant files changed, skipping regenerate"
+          # Replace skip result from commit
+          echo "skip=true" > $GITHUB_OUTPUT
 
   regenerate:
     needs: check
