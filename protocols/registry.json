@@ -1,9 +1,13 @@
 {
-	"$schema": "http://localhost:5173/registry.schema.json",
+	"$schema": "https://cigaleapp.github.io/cigale/registry.schema.json",
 	"protocols": [
 		{
 			"id": "io.github.cigaleapp.arthropods.example",
 			"url": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json"
+		},
+		{
+			"id": "fr.osug.terra-forma-web.insecta",
+			"url": "https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/insecta.cigaleprotocol.yaml"
 		}
 	]
 }

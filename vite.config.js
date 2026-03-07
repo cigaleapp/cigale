@@ -24,6 +24,7 @@ const env = arkenv(
 		BUILTIN_PROTOCOLS: type('string.url')
 			.array()
 			.default(() => [
+				'https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/insecta.cigaleprotocol.yaml',
 				'https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json',
 			]),
 	},
