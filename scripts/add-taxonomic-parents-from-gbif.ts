@@ -8,6 +8,7 @@ import _protocol from '../examples/arthropods.cigaleprotocol.json' with { type: 
 import _lightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import { MetadataEnumVariant } from '../src/lib/database.js';
 import { ExportedProtocol } from '../src/lib/schemas/protocols.js';
+import { emitCheckrun, updateCheckrunProgress } from './utils.js';
 
 const protocol = _protocol as typeof ExportedProtocol.infer;
 const lightProtocol = _lightProtocol as unknown as typeof ExportedProtocol.infer;
@@ -110,6 +111,8 @@ async function getSpecies(gbifId: string | number): Promise<GbifSpecies | undefi
 // 	}
 // }
 
+await emitCheckrun('protocols', 'in_progress', 'GBIF', 'Starting…');
+
 const newProtocol = { ...protocol };
 const newLightProtocol = { ...lightProtocol };
 
@@ -173,11 +176,14 @@ for (const [i, { key }] of options.entries()) {
 	await setICUNStatus(protocols, 'species', key);
 
 	eta.update(i + 1);
+	await updateCheckrunProgress('protocols', i + 1, options.length, eta);
 
 	process.stdout.write(
 		`\x1b[1K\r ${formatDistanceToNowStrict(new Date(Date.now() + eta.estimate()))} Processed ${i + 1}/${protocol.metadata['io.github.cigaleapp.arthropods.example__species'].options!.length} species: ${species.scientificName}`
 	);
 }
+
+await emitCheckrun('protocols', 'in_progress', null, 'Finishing…');
 
 const metadataToSort = ['species', 'genus', 'family', 'order', 'class', 'phylum', 'kingdom'];
 

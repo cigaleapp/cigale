@@ -6,7 +6,17 @@ import { formatDistanceToNowStrict } from 'date-fns';
 import _protocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
 import type { ExportedProtocol } from '../src/lib/schemas/protocols.js';
 import { slugify } from '../src/lib/utils.js';
-import { align, bold, cyan, dim, JSONPResponse, percentage, red } from './utils.js';
+import {
+	align,
+	bold,
+	cyan,
+	dim,
+	emitCheckrun,
+	JSONPResponse,
+	percentage,
+	red,
+	updateCheckrunProgress
+} from './utils.js';
 
 function slug(s: string): string {
 	return slugify(s).replaceAll('-', '_').toLowerCase();
@@ -236,6 +246,8 @@ async function requestItemDescriptors(item: typeof Xper3Item.infer) {
 }
 
 if (import.meta.main) {
+	await emitCheckrun('protocols', 'in_progress', 'Xper3', 'Starting…');
+
 	const { Descriptors, States, Items, Resources, NameDataset, Authors } =
 		await requestDescriptiveData();
 
@@ -386,6 +398,8 @@ if (import.meta.main) {
 				done++;
 				eta.update(done, total());
 
+				await updateCheckrunProgress('protocols', done, total(), eta);
+
 				console.info(
 					`${header} ${align(metadataKey, [...descriptorMetadatas.keys()])} = ${dim(state.name)}`
 				);
@@ -401,9 +415,18 @@ if (import.meta.main) {
 		}
 	}
 
+	await emitCheckrun('protocols', 'in_progress', null, 'Finishing…');
+
 	await Bun.file(protocolPath).write(JSON.stringify(protocol, null, 2));
 
 	await Bun.$`bun x prettier --write ${protocolPath}`;
+
+	await emitCheckrun(
+		'protocols',
+		'in_progress',
+		null,
+		`Updated ${done} out of ${total()} descriptions`
+	);
 
 	console.info(
 		cyan(

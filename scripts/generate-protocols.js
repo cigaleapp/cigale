@@ -4,6 +4,8 @@ import path from 'node:path';
 import { type } from 'arktype';
 import { x } from 'tinyexec';
 
+import { emitCheckrun } from './utils.js';
+
 const BEAMUP_ORIGIN = 'https://beamup.cigale.gwen.works';
 
 const here = import.meta.dirname;
@@ -50,6 +52,8 @@ const MODELS = {
 	}
 };
 
+await emitCheckrun('protocols', 'in_progress', 'Initialization', 'Starting…');
+
 const lightweightModelGbifIds = await gbifIds(MODELS.classifiers.collembola.classmapping);
 
 const allGbifIds = new Set([
@@ -71,6 +75,8 @@ let gbifCache = await fetch(
 	);
 
 console.info(`Protocol has ${allGbifIds.size} species options`);
+
+await emitCheckrun('protocols', 'in_progress', 'Initialization', `with ${allGbifIds.size} species`);
 
 /**
  * @type {Array<typeof import('../src/lib/schemas/metadata').MetadataEnumVariant.infer>}

@@ -65,38 +65,14 @@ jobs:
     name: Regenerate
     runs-on: ubuntu-latest
 
-    steps:
-      - name: Check runs titles
-        id: checkruns
-        env: 
-          runs: |
-            init          Initialize
-            xper3         Xper3
-            jj-species    JJ Species
-            google-slides Google Slides
-            gbif          GBIF
-            jj-genus      JJ Genus
-            finalize      Finalize
-          query: >
-            split("\n")
-            | map(select(length > 0))
-            | map(split(" ") | {
-              id: .[0], 
-              name: "Example protocols / Regenerate: " + (.[1:] | join(" ") | trim)
-            })
-        run: |
-          {
-            echo "runs<<EOF"
-            echo "$runs" | jq "$query" 
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
+    env:
+      GH_TOKEN: ${{ github.token }}
 
-      - name: Setup check runs
-        uses: dflydev/check-runs-action@v1
-        with:
-          token: ${{ github.token }}
-          status: queued
-          checks: ${{ steps.checkruns.outputs.runs }}
+    steps:
+      # For some reason, it's not available in job-level env ?
+      - name: Get checkrun id
+        run: |
+          echo "GH_CHECK_RUN_ID=${{ job.check_run_id }}" >> $GITHUB_ENV
 
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -111,60 +87,17 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
-      - uses: dflydev/check-runs-action@v1
-        with:
-          token: ${{ github.token }}
-          id: init
-          status: in_progress
-
       - name: Initialize protocol
         run: bun run scripts/generate-protocols.js
 
-      - uses: dflydev/check-runs-action@v1
-        with:
-          token: ${{ github.token }}
-          id: init
-          conclusion: success
-          
-      - uses: dflydev/check-runs-action@v1
-        with:
-          token: ${{ github.token }}
-          id: xper3
-          status: in_progress
-
       - name: Add metadata from Xper3
         run: bun run scripts/add-metadata-from-xper3.ts
-
-      - uses: dflydev/check-runs-action@v1
-        with:
-          token: ${{ github.token }}
-          id: xper3
-          conclusion: success
-
-      - uses: dflydev/check-runs-action@v1
-        with:
-          token: ${{ github.token }}
-          id: jj-species
-          status: in_progress
 
       - name: Add species descriptions from JJ
         run: bun run scripts/add-species-from-jessica-joachim.ts species
         env:
           WORDPRESS_USERNAME: ${{ secrets.WORDPRESS_USERNAME }}
           WORDPRESS_APP_PASSWORD: ${{ secrets.WORDPRESS_APP_PASSWORD }}
-
-
-      - uses: dflydev/check-runs-action@v1
-        with:
-          token: ${{ github.token }}
-          id: jj-species
-          conclusion: success
-          
-      - uses: dflydev/check-runs-action@v1
-        with:
-          token: ${{ github.token }}
-          id: google-slides
-          status: in_progress
 
       - name: Set google-drive-key.json
         uses: mobiledevops/secret-to-file-action@v1
@@ -180,33 +113,8 @@ jobs:
       - name: Unset google-drive-key.json
         run: rm google-drive-key.json
 
-      - uses: dflydev/check-runs-action@v1
-        with:
-          token: ${{ github.token }}
-          id: google-slides
-          conclusion: success
-          
-      - uses: dflydev/check-runs-action@v1
-        with:
-          token: ${{ github.token }}
-          id: gbif
-          status: in_progress
-
       - name: Add data from GBIF
         run: bun run scripts/add-taxonomic-parents-from-gbif.ts
-
-
-      - uses: dflydev/check-runs-action@v1
-        with:
-          token: ${{ github.token }}
-          id: gbif
-          conclusion: success
-          
-      - uses: dflydev/check-runs-action@v1
-        with:
-          token: ${{ github.token }}
-          id: jj-genus
-          status: in_progress
 
       - name: Add genus descriptions from JJ
         run: bun run scripts/add-species-from-jessica-joachim.ts genus
@@ -214,35 +122,16 @@ jobs:
           WORDPRESS_USERNAME: ${{ secrets.WORDPRESS_USERNAME }}
           WORDPRESS_APP_PASSWORD: ${{ secrets.WORDPRESS_APP_PASSWORD }}
 
-      - uses: dflydev/check-runs-action@v1
-        with:
-          token: ${{ github.token }}
-          id: jj-genus
-          conclusion: success
-          
-      - uses: dflydev/check-runs-action@v1
-        with:
-          token: ${{ github.token }}
-          id: finalize
-          status: in_progress
-
       - name: Clean old protocol
         run: rm examples/old-*.json
 
       - name: Format generated protocols
         run: bun x prettier --write examples/*.cigaleprotocol.json
 
-      - uses: dflydev/check-runs-action@v1
-        with:
-          token: ${{ github.token }}
-          id: finalize
-          conclusion: success
-          
-      - uses: dflydev/check-runs-action@v1
-        with:
-          token: ${{ github.token }}
-          id: xper3
-          status: in_progress
+      - name: Mark custom checkrun as finished
+        run: bun --eval "
+          import { emitCheckrun } from './scripts/utils.js';
+          await emitCheckrun('protocols', 'completed', null, 'All done!')"
 
       - name: Setup diffing that ignores version and learnMore fields
         run: git config diff.example-protocols.textconv "$textconv"
