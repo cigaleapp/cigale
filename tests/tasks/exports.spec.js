@@ -1,4 +1,5 @@
 import { readFile, writeFile } from 'node:fs/promises';
+
 import JSZip from 'jszip';
 
 import { assert, test } from '../fixtures.js';
@@ -26,7 +27,7 @@ async function prepare({ page, app }) {
 	await app.tabs.go('import');
 	await importPhotos({ page }, 'cyan.jpeg', 'leaf.jpeg', 'lil-fella.jpeg', 'with-exif-gps.jpeg');
 	await assert(page.getByText(/Analyse….|En attente/)).toHaveCount(0, {
-		timeout: 30_000
+		timeout: 30_000,
 	});
 
 	await app.tabs.go('crop');
@@ -38,7 +39,7 @@ async function prepare({ page, app }) {
 	await app.tabs.go('classify');
 	await page.waitForTimeout(1000);
 	await assert(page.getByText('Chargement du modèle de classification')).toHaveCount(0, {
-		timeout: 10_000
+		timeout: 10_000,
 	});
 	await page.waitForTimeout(5_000);
 	await assert(page.getByText(/Analyse…|En attente/)).toHaveCount(0, { timeout: 10_000 });

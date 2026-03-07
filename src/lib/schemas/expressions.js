@@ -10,7 +10,7 @@ import {
 	mapValues,
 	safeJSONStringify,
 	splitFilenameOnExtension,
-	transformObject
+	transformObject,
 } from '../utils.js';
 
 /**
@@ -36,7 +36,7 @@ export const HELPERS = /** @type {const} */ ({
 		implementation(subject, suffix) {
 			const [stem, ext] = splitFilenameOnExtension(subject);
 			return `${stem}${suffix}.${ext}`;
-		}
+		},
 	},
 	extension: {
 		documentation: 'Récupère l’extension d’un nom de fichier',
@@ -46,7 +46,7 @@ export const HELPERS = /** @type {const} */ ({
 		 */
 		implementation(subject) {
 			return splitFilenameOnExtension(subject)[1];
-		}
+		},
 	},
 	stem: {
 		documentation: 'Récupère le nom d’un fichier sans son extension',
@@ -56,7 +56,7 @@ export const HELPERS = /** @type {const} */ ({
 		 */
 		implementation(subject) {
 			return splitFilenameOnExtension(subject)[0];
-		}
+		},
 	},
 	fallback: {
 		documentation: 'Fournit une valeur de repli si la première est indéfinie',
@@ -67,7 +67,7 @@ export const HELPERS = /** @type {const} */ ({
 		 */
 		implementation(subject, fallback) {
 			return subject ?? fallback;
-		}
+		},
 	},
 	clamp: {
 		documentation: 'Contraindre un nombre à une plage donnée',
@@ -79,7 +79,7 @@ export const HELPERS = /** @type {const} */ ({
 		 */
 		implementation(value, min, max) {
 			return Math.min(Math.max(value, min), max);
-		}
+		},
 	},
 	percentage: {
 		documentation:
@@ -94,7 +94,7 @@ export const HELPERS = /** @type {const} */ ({
 		},
 		implementationJsonata(value, decimals = 0) {
 			return `${(value * 100).toFixed(decimals)}%`;
-		}
+		},
 	},
 	metadata: {
 		documentation:
@@ -122,7 +122,7 @@ export const HELPERS = /** @type {const} */ ({
 			}
 
 			throw new Error('Subject must have either metadata or metadataOverrides property');
-		}
+		},
 	},
 	now: {
 		documentation:
@@ -133,7 +133,7 @@ export const HELPERS = /** @type {const} */ ({
 		 */
 		implementation(format) {
 			return formatDate(Date.now(), format);
-		}
+		},
 	},
 	year: {
 		documentation: "Renvoie l’année d'une date sur 4 chiffres",
@@ -143,7 +143,7 @@ export const HELPERS = /** @type {const} */ ({
 		 */
 		implementation(date) {
 			return formatDate(new Date(date), 'yyyy');
-		}
+		},
 	},
 	month: {
 		documentation: "Renvoie le mois d'une date sur 2 chiffres",
@@ -153,7 +153,7 @@ export const HELPERS = /** @type {const} */ ({
 		 */
 		implementation(date) {
 			return formatDate(new Date(date), 'MM');
-		}
+		},
 	},
 	day: {
 		documentation: "Renvoie le jour d'une date sur 2 chiffres",
@@ -163,7 +163,7 @@ export const HELPERS = /** @type {const} */ ({
 		 */
 		implementation(date) {
 			return formatDate(new Date(date), 'dd');
-		}
+		},
 	},
 	hour: {
 		documentation: "Renvoie l'heure d'une date sur 2 chiffres",
@@ -173,7 +173,7 @@ export const HELPERS = /** @type {const} */ ({
 		 */
 		implementation(date) {
 			return formatDate(new Date(date), 'HH');
-		}
+		},
 	},
 	minute: {
 		documentation: "Renvoie les minutes d'une date sur 2 chiffres",
@@ -183,7 +183,7 @@ export const HELPERS = /** @type {const} */ ({
 		 */
 		implementation(date) {
 			return formatDate(new Date(date), 'mm');
-		}
+		},
 	},
 	second: {
 		documentation: "Renvoie les secondes d'une date sur 2 chiffres",
@@ -193,13 +193,13 @@ export const HELPERS = /** @type {const} */ ({
 		 */
 		implementation(date) {
 			return formatDate(new Date(date), 'ss');
-		}
+		},
 	},
 	json: {
 		documentation: 'Sérialise une valeur en JSON',
 		usage: [
 			['{ "key": { "nested1": "value1", "nested2": "value2" } }', '2'],
-			JSON.stringify({ key: { nested1: 'value1', nested2: 'value2' } }, null, 2)
+			JSON.stringify({ key: { nested1: 'value1', nested2: 'value2' } }, null, 2),
 		],
 		/**
 		 * @param {unknown} value
@@ -208,14 +208,14 @@ export const HELPERS = /** @type {const} */ ({
 		 */
 		implementationJsonata(value, indentation) {
 			return JSON.stringify(value, null, indentation);
-		}
+		},
 	},
 	date: {
 		documentation:
 			"Construire une date à partir de ses composantes. il est possible d'omettre les noms des composantes si on les donne dans l'ordre descendant (year, ..., minutes). toutes les composantes sont optionelles à partir des heures (et valent 0 par défaut). Les dates sont interprétées localement (dans le fuseau horaire local) ",
 		usage: [
 			['year=2024', 'month=12', 'day=31', 'hours=23', 'minutes=58', 'seconds=1.5'],
-			'2024-12-31T23:58:01.500Z'
+			'2024-12-31T23:58:01.500Z',
 		],
 		implementationHandlebars(...args) {
 			/** @type {{hash: { year?: number, month?: number, day?: number, hours?: number, minutes?: number, seconds?: number}}} */
@@ -237,40 +237,40 @@ export const HELPERS = /** @type {const} */ ({
 				Math.floor(seconds),
 				Math.round((seconds - Math.floor(seconds)) * 1000)
 			).toISOString();
-		}
+		},
 	},
 	object: {
 		documentation:
 			"Crée une représentation JSON d'un objet en prenant les paramètres comme paires clé-valeur",
 		usage: [
 			["key1='value1'", "key2='value2'"],
-			JSON.stringify({ key2: 'value2', key1: 'value1' })
+			JSON.stringify({ key2: 'value2', key1: 'value1' }),
 		],
 		/**
 		 * @param {{hash: Record<string, unknown>}} options
 		 */
 		implementationHandlebars({ hash }) {
 			return safeJSONStringify(hash);
-		}
+		},
 	},
 	array: {
 		documentation:
 			"Crée une représentation JSON d'un tableau en prenant les paramètres comme éléments du tableau",
 		usage: [
 			['"value1"', '"value2"'],
-			['value1', 'value2']
+			['value1', 'value2'],
 		],
 		implementationHandlebars(...args) {
 			args.pop(); // Remove hash argument added by Handlebars
 			return safeJSONStringify(args.filter((e) => e !== undefined));
-		}
+		},
 	},
 	gps: {
 		documentation:
 			'Crée une représetation JSON des coordonnées GPS données (latitude puis longitude)',
 		usage: [
 			['42.957408', '1.0859884'],
-			JSON.stringify({ latitude: 42.957408, longitude: 1.0859884 })
+			JSON.stringify({ latitude: 42.957408, longitude: 1.0859884 }),
 		],
 		/**
 		 * @param {number} latitude
@@ -278,7 +278,7 @@ export const HELPERS = /** @type {const} */ ({
 		 */
 		implementation(latitude, longitude) {
 			return safeJSONStringify({ latitude, longitude });
-		}
+		},
 	},
 	boundingBox: {
 		documentation:
@@ -292,8 +292,8 @@ export const HELPERS = /** @type {const} */ ({
 		 */
 		implementation(x, y, w, h) {
 			return safeJSONStringify({ x, y, w, h });
-		}
-	}
+		},
+	},
 });
 
 export const HANDLEBARS_HELPERS = transformObject(
@@ -313,8 +313,8 @@ export const HANDLEBARS_HELPERS = transformObject(
 				usageArgs,
 				usageResult,
 				implementation: impl,
-				usage: `{{ ${name} ${usageArgs.join(' ')} }} -> ${safeJSONStringify(usageResult)}`
-			}
+				usage: `{{ ${name} ${usageArgs.join(' ')} }} -> ${safeJSONStringify(usageResult)}`,
+			},
 		];
 	}
 );
@@ -343,8 +343,8 @@ const JSONATA_HELPERS = transformObject(
 				 * @param {import('jsonata').Focus} _this
 				 * @param  {...any} args
 				 */
-				implementation: impl
-			}
+				implementation: impl,
+			},
 		];
 	}
 );
@@ -362,7 +362,7 @@ export const TemplatedString = (Input, postprocess) =>
 				noEscape: true,
 				assumeObjects: true,
 				knownHelpersOnly: true,
-				knownHelpers: mapValues(HANDLEBARS_HELPERS, () => true)
+				knownHelpers: mapValues(HANDLEBARS_HELPERS, () => true),
 			});
 
 			return {
@@ -375,7 +375,7 @@ export const TemplatedString = (Input, postprocess) =>
 					const rendered = compiled(Input.assert(data));
 					// @ts-ignore
 					return postprocess ? postprocess(rendered) : rendered;
-				}
+				},
 			};
 		} catch (cause) {
 			throw new Error(`Invalid template ${safeJSONStringify(t)}`, { cause });
@@ -399,8 +399,8 @@ if (import.meta.vitest) {
 						obj: {},
 						session: {
 							protocolMetadata: { transect_code: { value: 'TR123' } },
-							metadata: {}
-						}
+							metadata: {},
+						},
 					});
 				expect(result).toEqual(
 					typeof usageResult === 'string' ? usageResult : safeJSONStringify(usageResult)
@@ -449,7 +449,7 @@ export const JsonataExpression = (Input, Output) =>
 					}
 
 					return out;
-				}
+				},
 			};
 		} catch (cause) {
 			throw new Error(
@@ -475,8 +475,8 @@ if (import.meta.vitest) {
 					obj: {},
 					session: {
 						protocolMetadata: { transect_code: { value: 'TR123' } },
-						metadata: {}
-					}
+						metadata: {},
+					},
 				});
 				expect(result).toEqual(usageResult);
 			});

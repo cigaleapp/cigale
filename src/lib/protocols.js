@@ -17,7 +17,7 @@ import {
 	omit,
 	pick,
 	range,
-	sum
+	sum,
 } from './utils.js';
 
 /**
@@ -61,8 +61,8 @@ export async function toExportedProtocol(db, protocol) {
 							.filter(({ id }) =>
 								metadataOptionsKeyRange(protocol.id, metadata.id).includes(id)
 							)
-							.map((option) => omit(option, 'id', 'metadataId'))
-					}
+							.map((option) => omit(option, 'id', 'metadataId')),
+					},
 				])
 		)
 	);
@@ -76,20 +76,20 @@ export async function toExportedProtocol(db, protocol) {
 						metadata: {
 							csv: protocol.exports.metadata.csv,
 							json: protocol.exports.metadata.json,
-							files: protocol.exports.metadata.files.toJSON()
+							files: protocol.exports.metadata.files.toJSON(),
 						},
 						images: {
 							cropped: protocol.exports.images.cropped.toJSON(),
-							original: protocol.exports.images.original.toJSON()
-						}
+							original: protocol.exports.images.original.toJSON(),
+						},
 					}
-				: {})
+				: {}),
 		},
 		metadata: pick(
 			allMetadataDefs,
 			...protocol.metadata.filter((id) => !protocol.sessionMetadata.includes(id))
 		),
-		sessionMetadata: pick(allMetadataDefs, ...protocol.sessionMetadata)
+		sessionMetadata: pick(allMetadataDefs, ...protocol.sessionMetadata),
 	});
 }
 
@@ -125,7 +125,7 @@ function downloadProtocol(base, format, exportedProtocol) {
 		'authors',
 		'exports',
 		'metadata',
-		'inference'
+		'inference',
 	]);
 
 	// application/yaml is finally a thing, see https://www.rfc-editor.org/rfc/rfc9512.html
@@ -146,11 +146,11 @@ function downloadProtocol(base, format, exportedProtocol) {
 export async function promptAndImportProtocol({
 	allowMultiple,
 	onInput = () => {},
-	importProtocol
+	importProtocol,
 }) {
 	const files = await promptForFiles({
 		multiple: allowMultiple,
-		accept: '.json,.yaml,application/json'
+		accept: '.json,.yaml,application/json',
 	});
 
 	onInput();
@@ -169,7 +169,7 @@ export async function promptAndImportProtocol({
 					try {
 						const result = await importProtocol({
 							contents: reader.result,
-							isJSON: file.name.endsWith('.json')
+							isJSON: file.name.endsWith('.json'),
 						});
 
 						const { tables } = await import('./idb.svelte.js');
@@ -205,15 +205,15 @@ export async function hasUpgradeAvailable({ version, source, id }) {
 			? source
 			: {
 					headers: {
-						Accept: 'application/json'
-					}
+						Accept: 'application/json',
+					},
 				}
 	)
 		.then((r) => r.json())
 		.then(
 			type({
 				'version?': 'number',
-				id: 'string'
+				id: 'string',
 			}).assert
 		);
 
@@ -222,13 +222,13 @@ export async function hasUpgradeAvailable({ version, source, id }) {
 	if (response.version > version) {
 		return {
 			upToDate: false,
-			newVersion: response.version
+			newVersion: response.version,
 		};
 	}
 
 	return {
 		upToDate: true,
-		newVersion: response.version
+		newVersion: response.version,
 	};
 }
 
@@ -250,8 +250,8 @@ export async function upgradeProtocol({ version, source, id, swarpc }) {
 
 	const contents = await fetch(cachebust(source), {
 		headers: {
-			Accept: 'application/json'
-		}
+			Accept: 'application/json',
+		},
 	}).then((r) => r.text());
 
 	const result = await swarpc.importProtocol({ contents });
@@ -286,7 +286,7 @@ export async function compareProtocolWithUpstream(db, protocolId, { onProgress }
 		fetchHttpRequest(databaseProtocol.source)
 			.then((r) => r.json())
 			.then((data) => ExportedProtocol(data)),
-		toExportedProtocol(db, databaseProtocol)
+		toExportedProtocol(db, databaseProtocol),
 	]);
 
 	if (remoteProtocol instanceof ArkErrors) {
@@ -297,7 +297,7 @@ export async function compareProtocolWithUpstream(db, protocolId, { onProgress }
 	// Sort options for each metadata by key
 	const metadataIds = new Set([
 		...keys(remoteProtocol.metadata),
-		...keys(localProtocol.metadata)
+		...keys(localProtocol.metadata),
 	]);
 
 	const optionsTotalCount = sum(
@@ -324,7 +324,7 @@ export async function compareProtocolWithUpstream(db, protocolId, { onProgress }
 		fetchAndConvert: 250 /* ×2ms */,
 		microdiff: 25 /* ×2ms */,
 		options: optionsTotalCount /* ×2ms */,
-		postProcess: 2 /* ×2ms */
+		postProcess: 2 /* ×2ms */,
 	};
 	const incrementProgress = async (amount = 1) => {
 		progressCompleted += amount;
@@ -337,7 +337,7 @@ export async function compareProtocolWithUpstream(db, protocolId, { onProgress }
 		description: '',
 		key: '',
 		label: '',
-		__deleted: true
+		__deleted: true,
 	};
 
 	for (const metadataId of metadataIds) {
@@ -350,7 +350,7 @@ export async function compareProtocolWithUpstream(db, protocolId, { onProgress }
 		const sortedLocalOptions = [];
 
 		const optionKeys = [
-			...new Set([...remoteOptions.map((o) => o.key), ...localOptions.map((o) => o.key)])
+			...new Set([...remoteOptions.map((o) => o.key), ...localOptions.map((o) => o.key)]),
 		].sort();
 
 		for (const key of optionKeys) {
@@ -367,7 +367,7 @@ export async function compareProtocolWithUpstream(db, protocolId, { onProgress }
 	}
 
 	const diffs = microdiff(remoteProtocol, localProtocol, {
-		cyclesFix: true
+		cyclesFix: true,
 	});
 
 	await incrementProgress(progressTotals.microdiff);
@@ -403,10 +403,10 @@ export async function compareProtocolWithUpstream(db, protocolId, { onProgress }
 								(d) =>
 									/** @type {const} */ ([
 										d.path.at(-1)?.toString() ?? '',
-										d.oldValue
+										d.oldValue,
 									])
 							)
-					)
+					),
 				});
 			} else if (type === 'REMOVE') {
 				// __deleted entry was _removed_ from localProtocol, so it's an option that didn't exist in remoteProtocol
@@ -425,10 +425,10 @@ export async function compareProtocolWithUpstream(db, protocolId, { onProgress }
 								(d) =>
 									/** @type {const} */ ([
 										d.path.at(-1)?.toString() ?? '',
-										d.value
+										d.value,
 									])
 							)
-					)
+					),
 				});
 			}
 		}

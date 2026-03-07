@@ -47,7 +47,7 @@ export function gatherToTree({
 	provenance,
 	isDirectory = false,
 	help = '',
-	contentType
+	contentType,
 }) {
 	for (const path of paths) {
 		const [current, ...deeper] = splitPath(path);
@@ -75,7 +75,7 @@ export function gatherToTree({
 			paths: [deeper.join('/')],
 			provenance,
 			help,
-			contentType
+			contentType,
 		});
 	}
 }
@@ -134,13 +134,13 @@ if (import.meta.vitest) {
 				'path',
 				'with',
 				'{braces}',
-				'file.txt'
+				'file.txt',
 			]);
 			expect(splitPath('/path/with/{{double-braces}}/file.txt')).toEqual([
 				'path',
 				'with',
 				'{{double-braces}}',
-				'file.txt'
+				'file.txt',
 			]);
 			expect(splitPath('/path/with/{braces}/and/some/{{ 2 / 0 }}/file.txt')).toEqual([
 				'path',
@@ -149,7 +149,7 @@ if (import.meta.vitest) {
 				'and',
 				'some',
 				'{{ 2 / 0 }}',
-				'file.txt'
+				'file.txt',
 			]);
 			expect(
 				splitPath('/path/with/{{double-braces}}/and/some/more/{{fallback file "/"}}.txt')
@@ -160,7 +160,7 @@ if (import.meta.vitest) {
 				'and',
 				'some',
 				'more',
-				'{{fallback file "/"}}.txt'
+				'{{fallback file "/"}}.txt',
 			]);
 		});
 	});
@@ -174,28 +174,28 @@ if (import.meta.vitest) {
 				paths: ['images/cropped/{observation.id}/{image.exportedAs.original}'],
 				provenance: 'images.cropped',
 				help: 'Cropped image',
-				contentType: () => 'image/jpeg'
+				contentType: () => 'image/jpeg',
 			});
 			gatherToTree({
 				tree,
 				paths: ['images/original/{observation.id}/{image.exportedAs.original}'],
 				provenance: 'images.original',
 				help: 'Original image',
-				contentType: () => 'image/jpeg'
+				contentType: () => 'image/jpeg',
 			});
 			gatherToTree({
 				tree,
 				paths: ['metadata.json'],
 				provenance: 'metadata.json',
 				help: 'Metadata in JSON format',
-				contentType: () => 'application/json'
+				contentType: () => 'application/json',
 			});
 			gatherToTree({
 				tree,
 				paths: ['metadata.csv'],
 				provenance: 'metadata.csv',
 				help: 'Metadata in CSV format',
-				contentType: () => 'text/csv'
+				contentType: () => 'text/csv',
 			});
 			expect(tree).toEqual([
 				{
@@ -211,11 +211,11 @@ if (import.meta.vitest) {
 											filename: '{image.exportedAs.original}',
 											help: 'Cropped image',
 											provenance: 'images.cropped',
-											contentType: 'image/jpeg'
-										}
-									]
-								}
-							]
+											contentType: 'image/jpeg',
+										},
+									],
+								},
+							],
 						},
 						{
 							folder: 'original',
@@ -227,26 +227,26 @@ if (import.meta.vitest) {
 											filename: '{image.exportedAs.original}',
 											help: 'Original image',
 											provenance: 'images.original',
-											contentType: 'image/jpeg'
-										}
-									]
-								}
-							]
-						}
-					]
+											contentType: 'image/jpeg',
+										},
+									],
+								},
+							],
+						},
+					],
 				},
 				{
 					filename: 'metadata.json',
 					help: 'Metadata in JSON format',
 					provenance: 'metadata.json',
-					contentType: 'application/json'
+					contentType: 'application/json',
 				},
 				{
 					filename: 'metadata.csv',
 					help: 'Metadata in CSV format',
 					provenance: 'metadata.csv',
-					contentType: 'text/csv'
-				}
+					contentType: 'text/csv',
+				},
 			]);
 		});
 	});

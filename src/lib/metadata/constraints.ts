@@ -1,3 +1,5 @@
+import type { NumericUnit } from '$lib/schemas/units.js';
+
 import { type } from 'arktype';
 import convert from 'convert';
 
@@ -6,9 +8,8 @@ import {
 	MetadataDate,
 	MetadataFloat,
 	MetadataInteger,
-	MetadataString
+	MetadataString,
 } from '$lib/schemas/metadata.js';
-import type { NumericUnit } from '$lib/schemas/units.js';
 
 export function metadataValueValidatorNumeric(
 	metadata: typeof MetadataInteger.infer | typeof MetadataFloat.infer,
@@ -57,7 +58,7 @@ if (import.meta.vitest) {
 		required: false,
 		description: 'test',
 		sortable: false,
-		groupable: false
+		groupable: false,
 	} as const;
 
 	describe('metadataValueValidatorNumeric', () => {
@@ -98,7 +99,7 @@ if (import.meta.vitest) {
 		test('enforces combined gte + lt', () => {
 			const schema = metadataValueValidatorNumeric({
 				...numeric,
-				range: { gte: 0, lt: 100 }
+				range: { gte: 0, lt: 100 },
 			});
 			expect(schema(0)).toBe(0);
 			expect(schema(50)).toBe(50);
@@ -132,7 +133,7 @@ if (import.meta.vitest) {
 		test('still returns a string schema when regex is provided', () => {
 			const schema = metadataValueValidatorString({
 				...string,
-				regex: /^[a-z]+$/
+				regex: /^[a-z]+$/,
 			});
 			expect(schema('abc')).toBe('abc');
 		});
@@ -140,7 +141,7 @@ if (import.meta.vitest) {
 		test('still returns a string schema when pattern is provided', () => {
 			const schema = metadataValueValidatorString({
 				...string,
-				pattern: NaturalRegexExpression.assert('digit for 3 times')
+				pattern: NaturalRegexExpression.assert('digit for 3 times'),
 			});
 			expect(schema('123')).toBe('123');
 		});

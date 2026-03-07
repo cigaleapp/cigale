@@ -1,6 +1,7 @@
+import type { MetadataEnumVariant } from '$lib/database.js';
+
 import { error } from '@sveltejs/kit';
 
-import type { MetadataEnumVariant } from '$lib/database.js';
 import { dependencyURI, list, tables } from '$lib/idb.svelte.js';
 import { metadataOptionsKeyRange } from '$lib/metadata/index.js';
 import { observationMetadata } from '$lib/observations.js';
@@ -12,7 +13,7 @@ import { compareBy } from '$lib/utils.js';
  */
 let optionsOfMetadata = {
 	metadataId: undefined as string | undefined,
-	options: [] as MetadataEnumVariant[]
+	options: [] as MetadataEnumVariant[],
 };
 
 export async function load({ params, depends, parent }) {
@@ -38,7 +39,7 @@ export async function load({ params, depends, parent }) {
 			options: await list(
 				'MetadataOption',
 				metadataOptionsKeyRange(uiState.currentProtocolId, focusedMetadata.id)
-			)
+			),
 		};
 	}
 
@@ -69,8 +70,8 @@ export async function load({ params, depends, parent }) {
 			observationMetadata({
 				definitions: metadataDefinitions,
 				observation: obs,
-				images: allImages
-			})[focusedMetadata?.id ?? '']
+				images: allImages,
+			})[focusedMetadata?.id ?? ''],
 		])
 	);
 
@@ -100,7 +101,7 @@ export async function load({ params, depends, parent }) {
 			totalObservations: allObservations.length,
 			classifiedObservationsCount,
 			confirmedClassificationsCount,
-			nextUnconfirmedObservation
-		}
+			nextUnconfirmedObservation,
+		},
 	};
 }

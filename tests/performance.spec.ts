@@ -1,8 +1,10 @@
+import type { AppFixture } from './fixtures.js';
 import type { Page, PlaywrightWorkerOptions } from '@playwright/test';
+
 import { ms } from 'convert';
 import { PerformanceMetricsCollector } from 'playwright-performance-metrics';
 
-import { assert, expect, test, type AppFixture } from './fixtures.js';
+import { assert, expect, test } from './fixtures.js';
 
 benchmark(`startup @blank`, {
 	async run({ page, app }) {
@@ -16,8 +18,8 @@ benchmark(`startup @blank`, {
 	total: {
 		chromium: '12s',
 		webkit: '21s',
-		firefox: '21s'
-	}
+		firefox: '21s',
+	},
 });
 
 benchmark('startup', {
@@ -33,8 +35,8 @@ benchmark('startup', {
 	total: {
 		chromium: '8s',
 		webkit: '12s',
-		firefox: '12s'
-	}
+		firefox: '12s',
+	},
 });
 
 function benchmark(
@@ -76,7 +78,7 @@ function benchmark(
 
 		if (collector) {
 			const metrics = await collector.collectMetrics(page, {
-				timeout: ms('10s')
+				timeout: ms('10s'),
 			});
 
 			if (limits.largestContentfulPaint) {

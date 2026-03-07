@@ -1,8 +1,8 @@
-import * as dates from 'date-fns';
-
 import type * as DB from '$lib/database.js';
 import type { RuntimeValue } from '$lib/schemas/metadata.js';
 import type { Comparator } from '$lib/utils.js';
+
+import * as dates from 'date-fns';
 
 import { switchOnMetadataType } from './index.js';
 
@@ -15,7 +15,7 @@ import { switchOnMetadataType } from './index.js';
  */
 function compareMetadataValues({
 	type,
-	options = []
+	options = [],
 }: {
 	type: DB.MetadataType;
 	options?: DB.MetadataEnumVariant[];
@@ -41,7 +41,7 @@ function compareMetadataValues({
 				} else {
 					return a.toString().localeCompare(b.toString());
 				}
-			}
+			},
 		});
 }
 
@@ -54,7 +54,7 @@ function compareMetadataValues({
  */
 export function compareByMetadataValue({
 	metadata,
-	options = []
+	options = [],
 }: {
 	metadata: Pick<DB.Metadata, 'id' | 'type'>;
 	options?: DB.MetadataEnumVariant[];
@@ -79,7 +79,7 @@ if (import.meta.vitest) {
 	describe('compareByMetadataValue', () => {
 		test('integer', () => {
 			const comparator = compareByMetadataValue({
-				metadata: metadatas.integer
+				metadata: metadatas.integer,
 			});
 
 			expect(items.toSorted(comparator).map((i) => i.id)).toMatchObject([
@@ -88,13 +88,13 @@ if (import.meta.vitest) {
 				'item2',
 				'item3',
 				'item4',
-				'item5'
+				'item5',
 			]);
 		});
 		test('enum', () => {
 			const comparator = compareByMetadataValue({
 				metadata: metadatas.enum,
-				options: metadatas.enum.options
+				options: metadatas.enum.options,
 			});
 
 			expect(items.toSorted(comparator).map((i) => i.id)).toMatchObject([
@@ -103,7 +103,7 @@ if (import.meta.vitest) {
 				'item3',
 				'item4',
 				'item5',
-				'item6'
+				'item6',
 			]);
 		});
 	});
@@ -119,7 +119,7 @@ if (import.meta.vitest) {
 			const comparator = compareMetadataValues({ type: 'float' });
 
 			expect([5.5, 2.2, 9.9, 1.1, 4.4].toSorted(comparator)).toMatchObject([
-				1.1, 2.2, 4.4, 5.5, 9.9
+				1.1, 2.2, 4.4, 5.5, 9.9,
 			]);
 		});
 
@@ -131,13 +131,13 @@ if (import.meta.vitest) {
 					new Date('2023-01-03'),
 					new Date('2022-12-31'),
 					new Date('2023-01-01'),
-					new Date('2023-01-02')
+					new Date('2023-01-02'),
 				].toSorted(comparator)
 			).toMatchObject([
 				new Date('2022-12-31'),
 				new Date('2023-01-01'),
 				new Date('2023-01-02'),
-				new Date('2023-01-03')
+				new Date('2023-01-03'),
 			]);
 		});
 
@@ -148,7 +148,7 @@ if (import.meta.vitest) {
 				'ananas',
 				'apple',
 				'banana',
-				'date'
+				'date',
 			]);
 		});
 
@@ -160,7 +160,7 @@ if (import.meta.vitest) {
 				false,
 				false,
 				true,
-				true
+				true,
 			]);
 		});
 
@@ -170,8 +170,8 @@ if (import.meta.vitest) {
 				options: [
 					{ key: 'A', label: 'Option A', index: 1, synonyms: [] },
 					{ key: 'B', label: 'Option B', index: 0, synonyms: [] },
-					{ key: 'C', label: 'Option C', index: 2, synonyms: [] }
-				]
+					{ key: 'C', label: 'Option C', index: 2, synonyms: [] },
+				],
 			});
 
 			expect(['B', 'C', 'A', 'B', 'C', 'A'].toSorted(comparator)).toMatchObject([
@@ -180,7 +180,7 @@ if (import.meta.vitest) {
 				'A',
 				'A',
 				'C',
-				'C'
+				'C',
 			]);
 		});
 
@@ -192,13 +192,13 @@ if (import.meta.vitest) {
 					{ latitude: 10, longitude: 20 },
 					{ latitude: 15, longitude: 25 },
 					{ latitude: 10, longitude: 15 },
-					{ latitude: 20, longitude: 30 }
+					{ latitude: 20, longitude: 30 },
 				].toSorted(comparator)
 			).toMatchObject([
 				{ latitude: 10, longitude: 15 },
 				{ latitude: 10, longitude: 20 },
 				{ latitude: 15, longitude: 25 },
-				{ latitude: 20, longitude: 30 }
+				{ latitude: 20, longitude: 30 },
 			]);
 		});
 
@@ -210,13 +210,13 @@ if (import.meta.vitest) {
 					{ x: 10, y: 10, w: 50, h: 50 },
 					{ x: 15, y: 15, w: 40, h: 40 },
 					{ x: 10, y: 5, w: 60, h: 60 },
-					{ x: 5, y: 20, w: 70, h: 70 }
+					{ x: 5, y: 20, w: 70, h: 70 },
 				].toSorted(comparator)
 			).toMatchObject([
 				{ h: 70, w: 70, x: 5, y: 20 },
 				{ h: 60, w: 60, x: 10, y: 5 },
 				{ h: 50, w: 50, x: 10, y: 10 },
-				{ h: 40, w: 40, x: 15, y: 15 }
+				{ h: 40, w: 40, x: 15, y: 15 },
 			]);
 		});
 	});

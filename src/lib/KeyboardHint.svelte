@@ -28,7 +28,7 @@
 					.split('+') // ["ctrl", "c"]
 					.flatMap((key) => [key, '+']) // ["ctrl", "+", "c", "+"]
 					.slice(0, -1), // Remove the last "+", as it's not needed
-				' '
+				' ',
 			])
 			.flat() // ["ctrl", "+", "c", " ", "arrowup", " "]
 			.slice(0, -1) // Remove the last space

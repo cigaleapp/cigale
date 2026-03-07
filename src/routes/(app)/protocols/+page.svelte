@@ -44,7 +44,7 @@
 					await promptAndImportProtocol({
 						allowMultiple: true,
 						onInput: signals.loadingStarted,
-						importProtocol: data.swarpc.importProtocol
+						importProtocol: data.swarpc.importProtocol,
 					})
 						.catch((e) => toasts.error(e))
 						.then((ps) => {
@@ -55,7 +55,7 @@
 								toasts.success(
 									plural(ps.length, [
 										'Protocole importé',
-										'# protocoles importés'
+										'# protocoles importés',
 									])
 								);
 						});

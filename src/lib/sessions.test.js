@@ -18,27 +18,27 @@ describe('deleteSession', () => {
 			mergeMethod: 'none',
 			required: false,
 			learnMore: 'https://example.com',
-			label: ''
+			label: '',
 		});
 
 		await db.tables.Metadata.set({
 			...metadataField,
 			id: namespacedMetadataId('com.example.test.protocol', 'date'),
 			type: 'date',
-			infer: { exif: 'DateTimeOriginal' }
+			infer: { exif: 'DateTimeOriginal' },
 		});
 
 		await db.tables.Metadata.set({
 			...metadataField,
 			id: namespacedMetadataId('com.example.test.protocol', 'location'),
 			type: 'location',
-			infer: { latitude: { exif: 'GPSLatitude' }, longitude: { exif: 'GPSLongitude' } }
+			infer: { latitude: { exif: 'GPSLatitude' }, longitude: { exif: 'GPSLongitude' } },
 		});
 
 		await db.tables.Metadata.set({
 			...metadataField,
 			id: namespacedMetadataId('com.example.test.protocol', 'no_exif'),
-			type: 'string'
+			type: 'string',
 		});
 
 		await db.tables.Protocol.set({
@@ -51,8 +51,8 @@ describe('deleteSession', () => {
 			description: 'Test Protocol',
 			learnMore: 'https://example.com',
 			crop: {
-				metadata: 'com.example.test.protocol.crop'
-			}
+				metadata: 'com.example.test.protocol.crop',
+			},
 		});
 
 		await db.tables.Session.set({
@@ -66,9 +66,9 @@ describe('deleteSession', () => {
 				[namespacedMetadataId('com.example.test.protocol', 'no_exif')]: {
 					alternatives: {},
 					value: '"oui"',
-					confidence: 1
-				}
-			}
+					confidence: 1,
+				},
+			},
 		});
 
 		await db.tables.Image.set({
@@ -79,7 +79,7 @@ describe('deleteSession', () => {
 			dimensions: { width: 100, height: 100 },
 			fileId: 'file_image1',
 			addedAt: new Date().toISOString(),
-			metadata: {}
+			metadata: {},
 		});
 
 		await db.tables.Image.set({
@@ -90,7 +90,7 @@ describe('deleteSession', () => {
 			dimensions: { width: 100, height: 100 },
 			fileId: 'file_image2',
 			addedAt: new Date().toISOString(),
-			metadata: {}
+			metadata: {},
 		});
 
 		// Image from other session
@@ -103,7 +103,7 @@ describe('deleteSession', () => {
 			dimensions: { width: 100, height: 100 },
 			fileId: 'file_image3',
 			addedAt: '2025-12-09T11:57:15.440Z',
-			metadata: {}
+			metadata: {},
 		});
 
 		await db.tables.Observation.set({
@@ -112,7 +112,7 @@ describe('deleteSession', () => {
 			label: 'Observation 1',
 			images: [imgid('image1')],
 			addedAt: '2025-12-09T11:57:15.440Z',
-			metadataOverrides: {}
+			metadataOverrides: {},
 		});
 
 		await db.tables.Observation.set({
@@ -121,7 +121,7 @@ describe('deleteSession', () => {
 			label: 'Observation 2',
 			images: [imgid('image3')],
 			addedAt: '2025-12-09T11:57:15.440Z',
-			metadataOverrides: {}
+			metadataOverrides: {},
 		});
 	});
 

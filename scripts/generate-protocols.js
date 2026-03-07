@@ -1,6 +1,7 @@
 import { writeFileSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
+
 import { type } from 'arktype';
 import { x } from 'tinyexec';
 
@@ -30,7 +31,7 @@ async function gbifIds(url) {
 function modelUrl(task, scope, type) {
 	const ending = {
 		model: '.onnx',
-		classmapping: '-classmapping.txt'
+		classmapping: '-classmapping.txt',
 	}[type];
 
 	return `https://huggingface.co/cigaleapp/built-in-protocols/resolve/main/${task}-${scope}${ending}?download=true`;
@@ -38,18 +39,18 @@ function modelUrl(task, scope, type) {
 
 const MODELS = {
 	detectors: {
-		arthropoda: modelUrl('detector', 'arthropoda', 'model')
+		arthropoda: modelUrl('detector', 'arthropoda', 'model'),
 	},
 	classifiers: {
 		arthropoda: {
 			model: modelUrl('classifier', 'arthropoda', 'model'),
-			classmapping: modelUrl('classifier', 'arthropoda', 'classmapping')
+			classmapping: modelUrl('classifier', 'arthropoda', 'classmapping'),
 		},
 		collembola: {
 			model: modelUrl('classifier', 'collembola', 'model'),
-			classmapping: modelUrl('classifier', 'collembola', 'classmapping')
-		}
-	}
+			classmapping: modelUrl('classifier', 'collembola', 'classmapping'),
+		},
+	},
 };
 
 await emitCheckrun('protocols', 'in_progress', 'Initialization', 'Starting…');
@@ -58,7 +59,7 @@ const lightweightModelGbifIds = await gbifIds(MODELS.classifiers.collembola.clas
 
 const allGbifIds = new Set([
 	...(await gbifIds(MODELS.classifiers.arthropoda.classmapping)),
-	...lightweightModelGbifIds
+	...lightweightModelGbifIds,
 ]);
 
 /** @type { Record<string, { name: string; synonyms: string[] }>} */
@@ -92,7 +93,7 @@ for (const gbifId of allGbifIds) {
 					name: await fetch(`https://api.gbif.org/v1/species/${gbifId}/name`)
 						.then((res) => res.json())
 						.then((data) => data.canonicalName),
-					synonyms: []
+					synonyms: [],
 				};
 			}
 
@@ -115,7 +116,7 @@ for (const gbifId of allGbifIds) {
 		// Remove mystery null values
 		synonyms: synonyms.filter(Boolean),
 		description: '',
-		learnMore: `https://gbif.org/species/${gbifId}`
+		learnMore: `https://gbif.org/species/${gbifId}`,
 	});
 }
 
@@ -152,7 +153,7 @@ const cladeMetadata = (clade, label) => ({
 	description: '',
 	mergeMethod: 'max',
 	groupable: true,
-	group: 'taxonomy'
+	group: 'taxonomy',
 });
 
 /**
@@ -171,22 +172,22 @@ const protocol = {
 	authors: [
 		{
 			name: 'GBIF Contributors',
-			email: 'info@gbif.org'
+			email: 'info@gbif.org',
 		},
 		{
 			name: 'Jessica Joachim',
-			email: 'tifaeriis@gmail.com'
+			email: 'tifaeriis@gmail.com',
 		},
 		{
 			name: 'Gwenn Le Bihan',
-			email: 'gwenn.lebihan7@gmail.com'
+			email: 'gwenn.lebihan7@gmail.com',
 		},
 		{
-			name: 'Maxime Cauchoix'
+			name: 'Maxime Cauchoix',
 		},
 		{
-			name: 'Léo Chekir'
-		}
+			name: 'Léo Chekir',
+		},
 	],
 	metadataOrder: [
 		// Session-wide
@@ -214,13 +215,13 @@ const protocol = {
 		'class',
 		'phylum',
 		'kingdom',
-		'crop'
+		'crop',
 	].map(namespaced),
 	metadataGroups: {
 		taxonomy: {
 			name: 'Taxonomie',
-			description: "Classification taxonomique de l'espèce"
-		}
+			description: "Classification taxonomique de l'espèce",
+		},
 	},
 	sessionMetadata: {
 		[namespaced('prospection_duration')]: {
@@ -231,7 +232,7 @@ const protocol = {
 			unit: 'minutes',
 			required: false,
 			mergeMethod: 'average',
-			range: '> 0'
+			range: '> 0',
 		},
 		[namespaced('prospection_distance')]: {
 			type: 'integer',
@@ -240,7 +241,7 @@ const protocol = {
 			unit: 'meters',
 			required: false,
 			mergeMethod: 'average',
-			range: '> 0'
+			range: '> 0',
 		},
 		// TODO trajectory
 		[namespaced('homogenous_habitat')]: {
@@ -249,7 +250,7 @@ const protocol = {
 			description:
 				"J'ai choisi un habitat homogène pour réaliser mon relevé (laisser vide si inconnu)",
 			required: false,
-			mergeMethod: 'none'
+			mergeMethod: 'none',
 		},
 		[namespaced('strictness')]: {
 			type: 'enum',
@@ -260,8 +261,8 @@ const protocol = {
 			options: [
 				{ key: 'all', label: 'Tous les individus rencontrés' },
 				{ key: 'inventory', label: 'Au moins un individu de chaque espèce rencontrée' },
-				{ key: 'at_will', label: "Juste quelques individus quand j'en avais envie" }
-			]
+				{ key: 'at_will', label: "Juste quelques individus quand j'en avais envie" },
+			],
 		},
 		[namespaced('wind')]: {
 			type: 'enum',
@@ -273,8 +274,8 @@ const protocol = {
 				{ key: 'none', label: 'Pas du tout' },
 				{ key: 'light', label: 'Léger' },
 				{ key: 'moderate', label: 'Modéré' },
-				{ key: 'strong', label: 'Fort' }
-			]
+				{ key: 'strong', label: 'Fort' },
+			],
 		},
 		[namespaced('temperature')]: {
 			type: 'integer',
@@ -283,7 +284,7 @@ const protocol = {
 			unit: 'celsius',
 			required: false,
 			mergeMethod: 'average',
-			range: '>= -273.15'
+			range: '>= -273.15',
 		},
 		[namespaced('cloud_coverage')]: {
 			type: 'enum',
@@ -296,8 +297,8 @@ const protocol = {
 				{ key: '10_30_percent', label: '10-30%' },
 				{ key: 'half', label: '50%' },
 				{ key: 'more_than_half', label: 'Plus de 50%' },
-				{ key: 'overcast', label: 'Tout couvert' }
-			]
+				{ key: 'overcast', label: 'Tout couvert' },
+			],
 		},
 		[namespaced('shadow')]: {
 			type: 'integer',
@@ -305,7 +306,7 @@ const protocol = {
 			description: "Part des photos prises à l'ombre (en pourcentage)",
 			required: false,
 			mergeMethod: 'average',
-			range: '0..100'
+			range: '0..100',
 		},
 		[namespaced('camera_type')]: {
 			type: 'enum',
@@ -317,8 +318,8 @@ const protocol = {
 				{ key: 'smartphone', label: 'Smartphone' },
 				{ key: 'compact', label: 'Appareil photo compact' },
 				{ key: 'dslr', label: 'Appareil photo reflex (DSLR)' },
-				{ key: 'mirrorless', label: 'Appareil photo hybride' }
-			]
+				{ key: 'mirrorless', label: 'Appareil photo hybride' },
+			],
 		},
 		[namespaced('has_flash')]: {
 			type: 'boolean',
@@ -326,7 +327,7 @@ const protocol = {
 			description:
 				"Le flash de l'appareil photo a-t-il été utilisé pour prendre des photos ?",
 			required: false,
-			mergeMethod: 'max'
+			mergeMethod: 'max',
 		},
 		[namespaced('session_date')]: {
 			type: 'date',
@@ -335,8 +336,8 @@ const protocol = {
 				'Date à laquelle la session a été réalisée. On peut laisser vide si la date a été correctement réglée sur l’appareil photo',
 			required: false,
 			mergeMethod: 'average',
-			range: 'past'
-		}
+			range: 'past',
+		},
 	},
 	metadata: {
 		[namespaced('kingdom')]: cladeMetadata('kingdom', 'Règne'),
@@ -355,8 +356,8 @@ const protocol = {
 			groupable: true,
 			options: [
 				{ key: 'current', label: "C'est une photo de l'habitat actuel" },
-				{ key: 'nearby', label: "C'est une photo de l'habitat à proximité" }
-			]
+				{ key: 'nearby', label: "C'est une photo de l'habitat à proximité" },
+			],
 		},
 		[namespaced('identification_difficulty')]: {
 			type: 'enum',
@@ -371,27 +372,27 @@ const protocol = {
 					key: 'easy',
 					label: 'Facile',
 					color: '#367517',
-					icon: 'ri:emotion-laugh-line'
+					icon: 'ri:emotion-laugh-line',
 				},
 				{
 					key: 'medium',
 					label: 'Moyenne',
 					color: '#e8e819',
-					icon: 'ri:emotion-happy-line'
+					icon: 'ri:emotion-happy-line',
 				},
 				{
 					key: 'hard',
 					label: 'Difficile',
 					color: '#dd8808',
-					icon: 'ri:emotion-normal-line'
+					icon: 'ri:emotion-normal-line',
 				},
 				{
 					key: 'very_hard',
 					label: 'Très difficile',
 					color: '#cd3c28',
-					icon: 'ri:emotion-unhappy-line'
-				}
-			]
+					icon: 'ri:emotion-unhappy-line',
+				},
+			],
 		},
 		[namespaced('conservation_status')]: {
 			type: 'enum',
@@ -406,45 +407,45 @@ const protocol = {
 					key: 'ex',
 					label: 'EX',
 					description: 'Éteint (“Extinct”)',
-					color: '#000000'
+					color: '#000000',
 				},
 				{
 					key: 'ew',
 					label: 'EW',
 					description: 'Éteint à l’état sauvage (“Extinct in the Wild”)',
-					color: '#3a3a3a'
+					color: '#3a3a3a',
 				},
 				{
 					key: 'cr',
 					label: 'CR',
 					description: 'En danger critique d’extinction (“Critically Endangered”)',
-					color: '#cd3030'
+					color: '#cd3030',
 				},
 				{
 					key: 'en',
 					label: 'EN',
 					description: 'En danger (“Endangered”)',
-					color: '#cd6630'
+					color: '#cd6630',
 				},
 				{
 					key: 'vu',
 					label: 'VU',
 					description: 'Vulnérable (“Vulnerable”)',
-					color: '#cd9a00'
+					color: '#cd9a00',
 				},
 				{
 					key: 'nt',
 					label: 'NT',
 					description: 'Quasi menacé (“Near Threatened”)',
-					color: '#006666'
+					color: '#006666',
 				},
 				{
 					key: 'lc',
 					label: 'LC',
 					description: 'Préoccupation mineure (“Least Concern”)',
-					color: '#16ca85'
-				}
-			]
+					color: '#16ca85',
+				},
+			],
 		},
 		[namespaced('shoot_date')]: {
 			type: 'date',
@@ -454,7 +455,7 @@ const protocol = {
 			mergeMethod: 'average',
 			sortable: true,
 			groupable: true,
-			infer: { exif: 'DateTimeOriginal' }
+			infer: { exif: 'DateTimeOriginal' },
 		},
 		[namespaced('shoot_location')]: {
 			type: 'location',
@@ -463,7 +464,7 @@ const protocol = {
 			required: false,
 			mergeMethod: 'average',
 			groupable: true,
-			infer: { latitude: { exif: 'GPSLatitude' }, longitude: { exif: 'GPSLongitude' } }
+			infer: { latitude: { exif: 'GPSLatitude' }, longitude: { exif: 'GPSLongitude' } },
 		},
 		[namespaced('crop')]: {
 			type: 'boundingbox',
@@ -481,15 +482,15 @@ const protocol = {
 							height: 640,
 							width: 640,
 							disposition: '1CHW',
-							normalized: true
+							normalized: true,
 						},
 						output: {
 							normalized: true,
-							shape: ['sx', 'sy', 'ex', 'ey', 'score', '_']
-						}
-					}
-				]
-			}
+							shape: ['sx', 'sy', 'ex', 'ey', 'score', '_'],
+						},
+					},
+				],
+			},
 		},
 		[namespaced('species')]: {
 			type: 'enum',
@@ -509,8 +510,8 @@ const protocol = {
 							height: 224,
 							width: 224,
 							disposition: 'CHW',
-							normalized: true
-						}
+							normalized: true,
+						},
 					},
 					{
 						name: 'Collemboles (~80 classes)',
@@ -519,12 +520,12 @@ const protocol = {
 							height: 224,
 							width: 224,
 							disposition: 'CHW',
-							normalized: true
-						}
-					}
-				]
-			}
-		}
+							normalized: true,
+						},
+					},
+				],
+			},
+		},
 	},
 	exports: {
 		images: {
@@ -532,16 +533,16 @@ const protocol = {
 			cropped:
 				'Cropped/{{ fallback image.protocolMetadata.species.valueLabel "(Unknown)" }}_obs{{ observation.number }}_{{ sequence }}.{{ extension image.filename }}',
 			original:
-				'Original/{{ fallback image.protocolMetadata.species.valueLabel "(Unknown)" }}_obs{{ observation.number }}_{{ sequence }}.{{ extension image.filename }}'
+				'Original/{{ fallback image.protocolMetadata.species.valueLabel "(Unknown)" }}_obs{{ observation.number }}_{{ sequence }}.{{ extension image.filename }}',
 		},
 		metadata: {
 			json: 'analysis.json',
-			csv: 'metadata.csv'
-		}
+			csv: 'metadata.csv',
+		},
 	},
 	beamup: {
-		origin: BEAMUP_ORIGIN
-	}
+		origin: BEAMUP_ORIGIN,
+	},
 };
 
 writeFileSync(
@@ -576,10 +577,10 @@ writeFileSync(
 					infer: {
 						neural: protocol.metadata[namespaced('species')].infer.neural.filter(
 							(model) => model.name === 'Collemboles (~80 classes)'
-						)
-					}
-				}
-			}
+						),
+					},
+				},
+			},
 		},
 		null,
 		2

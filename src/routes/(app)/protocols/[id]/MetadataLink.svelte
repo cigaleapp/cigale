@@ -7,7 +7,7 @@
 	import IconDatatype from '$lib/IconDatatype.svelte';
 	import {
 		ensureNamespacedMetadataId,
-		removeNamespaceFromMetadataId
+		removeNamespaceFromMetadataId,
 	} from '$lib/schemas/metadata';
 
 	import { updater } from './updater.svelte';
@@ -29,7 +29,7 @@
 		oncreate,
 		onupdate,
 		help,
-		'no-metadata': noMetadataHelp
+		'no-metadata': noMetadataHelp,
 	} = $props();
 
 	const shortKey = $derived(metadataKey ? removeNamespaceFromMetadataId(metadataKey) : undefined);
@@ -60,7 +60,7 @@
 				onclick={async () =>
 					goto('/(app)/protocols/[id]/metadata/[metadata]/infos', {
 						id: protocolId,
-						metadata: shortKey
+						metadata: shortKey,
 					})}
 			>
 				<IconGoto />
@@ -91,7 +91,7 @@
 
 						await goto('/(app)/protocols/[id]/metadata/[metadata]/infos', {
 							id: p.id,
-							metadata: shortKey
+							metadata: shortKey,
 						});
 					})}
 				>

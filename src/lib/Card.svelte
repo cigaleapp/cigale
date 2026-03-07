@@ -35,7 +35,7 @@ Available CSS variables:
 		tag = 'article',
 		tooltip: tooltipText,
 		testid,
-		loading: showLoading = false
+		loading: showLoading = false,
 	} = $props();
 
 	let loading = $state(false);

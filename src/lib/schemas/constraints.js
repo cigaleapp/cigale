@@ -13,7 +13,7 @@ export const NaturalRegexExpression = type('string')
 			return {
 				source,
 				regex,
-				display: describeNaturalRegex(source)
+				display: describeNaturalRegex(source),
 			};
 		} catch (e) {
 			if (e instanceof Function) {
@@ -31,18 +31,18 @@ export const NaturalRegexExpression = type('string')
 const comparatorsMore = /** @type {const} */ ({
 	'>': 'gt',
 	'>=': 'gte',
-	'≥': 'gte'
+	'≥': 'gte',
 });
 
 const comparatorsLess = /** @type {const} */ ({
 	'<': 'lt',
 	'<=': 'lte',
-	'≤': 'lte'
+	'≤': 'lte',
 });
 
 const comparators = /** @type {const} */ ({
 	...comparatorsLess,
-	...comparatorsMore
+	...comparatorsMore,
 });
 
 /**
@@ -78,7 +78,7 @@ function flipComparator(op) {
 const reg = /** @type {const} */ ({
 	float: '(-?\\d+(?:[.,]\\d+)?(?:[eE][+-]?\\d+)?)',
 	comp: '(' + Object.keys(comparators).join('|') + ')',
-	compLess: '(' + Object.keys(comparatorsLess).join('|') + ')'
+	compLess: '(' + Object.keys(comparatorsLess).join('|') + ')',
 });
 
 /**
@@ -117,7 +117,7 @@ function findFloat(s) {
 const numberRangePatterns = {
 	open: `((?:x\\s*)?${reg.comp}\\s*${reg.float})`,
 	closed: `(${reg.float}\\s*${reg.compLess}\\s*x\\s*${reg.compLess}\\s*${reg.float})`,
-	interval: `(${reg.float}\\s*[.][.]\\s*${reg.float})`
+	interval: `(${reg.float}\\s*[.][.]\\s*${reg.float})`,
 };
 
 export const NumberRangeLiteral = type(
@@ -151,7 +151,7 @@ export const NumberRangeLiteral = type(
 
 				return {
 					[lhsOp]: lhsNum,
-					[flipComparator(rhsOp)]: rhsNum
+					[flipComparator(rhsOp)]: rhsNum,
 				};
 			}
 
@@ -167,7 +167,7 @@ export const NumberRangeLiteral = type(
 
 				return {
 					gte: minNum,
-					lte: maxNum
+					lte: maxNum,
 				};
 			}
 

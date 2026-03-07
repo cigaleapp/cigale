@@ -3,20 +3,22 @@
 /// <reference lib="esnext" />
 /// <reference lib="webworker" />
 
+import type { DatabaseHandle } from '$lib/idb.svelte.js';
+import type { RuntimeValue } from '$lib/schemas/metadata';
+
 import { ArkErrors } from 'arktype';
 import { strToU8, zip } from 'fflate';
 
 import * as DB from '$lib/database.js';
 import { stringifyWithToplevelOrdering } from '$lib/download';
 import { addExifMetadata } from '$lib/exif';
-import type { DatabaseHandle } from '$lib/idb.svelte.js';
 import { cropImage, parseCropPadding } from '$lib/images.js';
 import {
 	addBaseUnitValues,
 	addValueLabels,
 	metadataPrettyKey,
 	metadataPrettyValue,
-	protocolMetadataValues
+	protocolMetadataValues,
 } from '$lib/metadata/index.js';
 import { observationMetadata } from '$lib/observations.js';
 import { defaultCropMetadata } from '$lib/protocols.js';
@@ -25,11 +27,10 @@ import {
 	MetadataRuntimeValue,
 	MetadataValues,
 	removeNamespaceFromMetadataId,
-	type RuntimeValue
 } from '$lib/schemas/metadata';
 import {
 	ExportsFilepathTemplateMetadataFile,
-	ExportsFilepathTemplateObservation
+	ExportsFilepathTemplateObservation,
 } from '$lib/schemas/protocols';
 import { AnalyzedImage, AnalyzedObservation, toMetadataRecord } from '$lib/schemas/results';
 import { compareBy, entries, mapValues, nonnull, progressSplitter, sum } from '$lib/utils';
@@ -69,7 +70,7 @@ swarp.generateResultsExport(
 			exportedMetadataFiles,
 			filepaths,
 			cropMetadata,
-			sessionMetadata
+			sessionMetadata,
 		} = await prepare({
 			protocolUsed,
 			sessionId,
@@ -77,13 +78,13 @@ swarp.generateResultsExport(
 			abortSignal,
 			onProgress(p) {
 				notify({ event: 'progress', data: splitProgress('prepare', p) });
-			}
+			},
 		});
 
 		const allMetadataKeys = [
 			...new Set(
 				observations.flatMap((o) => Object.keys(exportedObservations[o.id].metadata))
-			)
+			),
 		];
 
 		const buffersOfImages: Array<{
@@ -108,7 +109,7 @@ swarp.generateResultsExport(
 
 			files[path] = {
 				contents: new Uint8Array(file.bytes),
-				mtime: file.lastModifiedAt ? new Date(file.lastModifiedAt) : undefined
+				mtime: file.lastModifiedAt ? new Date(file.lastModifiedAt) : undefined,
 			};
 
 			if (format === 'folder') {
@@ -116,8 +117,8 @@ swarp.generateResultsExport(
 					event: 'writeFile',
 					data: {
 						filepath: path,
-						contents: files[path].contents
-					}
+						contents: files[path].contents,
+					},
 				});
 			}
 
@@ -135,7 +136,7 @@ swarp.generateResultsExport(
 
 				const metadata = MetadataValues.assert({
 					...image.metadata,
-					...observation.metadataOverrides
+					...observation.metadataOverrides,
 				});
 
 				abortSignal?.throwIfAborted();
@@ -189,7 +190,7 @@ swarp.generateResultsExport(
 					console.error(error);
 					notify({
 						event: 'warning',
-						data: ['exif-write-error', { filename: file.filename }]
+						data: ['exif-write-error', { filename: file.filename }],
 					});
 					originalBytes = new Uint8Array(original);
 					croppedBytes = new Uint8Array(cropped);
@@ -202,7 +203,7 @@ swarp.generateResultsExport(
 					croppedBytes,
 					originalBytes,
 					contentType,
-					filename
+					filename,
 				});
 
 				done++;
@@ -222,15 +223,15 @@ swarp.generateResultsExport(
 						metadata: toMetadataRecord(sessionMetadata),
 						protocolMetadata: toMetadataRecord(
 							protocolMetadataValues('session', protocolUsed, sessionMetadata)
-						)
+						),
 					},
 					files: Object.fromEntries(
 						exportedMetadataFiles.map(({ id, path }) => [id, path])
 					),
-					observations: exportedObservations
+					observations: exportedObservations,
 				}),
 				['protocol', 'files', 'observations']
-			)
+			),
 		};
 
 		if (format === 'folder') {
@@ -238,8 +239,8 @@ swarp.generateResultsExport(
 				event: 'writeFile',
 				data: {
 					filepath: filepaths.metadata.json,
-					contents: files[filepaths.metadata.json].contents
-				}
+					contents: files[filepaths.metadata.json].contents,
+				},
 			});
 		}
 
@@ -253,8 +254,8 @@ swarp.generateResultsExport(
 						.filter((k) => Boolean(metadataDefinitions[k]?.label))
 						.flatMap((k) => [
 							metadataPrettyKey(metadataDefinitions[k]),
-							`${metadataPrettyKey(metadataDefinitions[k])}: Confiance`
-						])
+							`${metadataPrettyKey(metadataDefinitions[k])}: Confiance`,
+						]),
 				],
 				observations.map((o) => ({
 					Identifiant: o.id,
@@ -268,18 +269,18 @@ swarp.generateResultsExport(
 										// Exports always have english value serializations for better interoperability
 										language: 'en',
 										type: metadataDefinitions[key].type,
-										valueLabel
-									})
+										valueLabel,
+									}),
 								],
 								[
 									`${metadataPrettyKey(metadataDefinitions[key])}: Confiance`,
-									confidence.toString()
-								]
+									confidence.toString(),
+								],
 							]
 						)
-					)
+					),
 				}))
-			)
+			),
 		};
 
 		if (format === 'folder') {
@@ -287,8 +288,8 @@ swarp.generateResultsExport(
 				event: 'writeFile',
 				data: {
 					filepath: filepaths.metadata.csv,
-					contents: files[filepaths.metadata.csv].contents
-				}
+					contents: files[filepaths.metadata.csv].contents,
+				},
 			});
 		}
 
@@ -308,7 +309,7 @@ swarp.generateResultsExport(
 
 				files[exportedAs.cropped] = {
 					mtime,
-					contents: buffers.croppedBytes
+					contents: buffers.croppedBytes,
 				};
 
 				if (format === 'folder') {
@@ -316,15 +317,15 @@ swarp.generateResultsExport(
 						event: 'writeFile',
 						data: {
 							filepath: exportedAs.cropped,
-							contents: buffers.croppedBytes
-						}
+							contents: buffers.croppedBytes,
+						},
 					});
 				}
 
 				if (include === 'full' && buffers.originalBytes) {
 					files[exportedAs.original] = {
 						mtime,
-						contents: buffers.originalBytes
+						contents: buffers.originalBytes,
 					};
 
 					if (format === 'folder') {
@@ -332,8 +333,8 @@ swarp.generateResultsExport(
 							event: 'writeFile',
 							data: {
 								filepath: exportedAs.original,
-								contents: buffers.originalBytes
-							}
+								contents: buffers.originalBytes,
+							},
 						});
 					}
 				}
@@ -357,7 +358,7 @@ swarp.generateResultsExport(
 								: [contents, { level: 0, ...options }]
 					),
 					{
-						comment: `Generated by C.i.g.a.l.e on ${new Date().toISOString()}`
+						comment: `Generated by C.i.g.a.l.e on ${new Date().toISOString()}`,
 					},
 					(err, data) => {
 						if (err) reject(err);
@@ -387,7 +388,7 @@ swarp.previewResultsZip(async ({ sessionId, include }, _, { abortSignal }) => {
 		protocolUsed,
 		sessionId,
 		db,
-		abortSignal
+		abortSignal,
 	});
 
 	return {
@@ -395,7 +396,7 @@ swarp.previewResultsZip(async ({ sessionId, include }, _, { abortSignal }) => {
 		'metadata.json': [{ path: filepaths.metadata.json, contentType: 'application/json' }],
 		'metadata.files': exportedMetadataFiles.map(({ path, file }) => ({
 			path,
-			contentType: file.type
+			contentType: file.type,
 		})),
 		'images.cropped':
 			include === 'metadataonly'
@@ -403,7 +404,7 @@ swarp.previewResultsZip(async ({ sessionId, include }, _, { abortSignal }) => {
 				: Object.values(exportedObservations).flatMap((o) =>
 						o.images.map((i) => ({
 							path: i.exportedAs.cropped,
-							contentType: i.contentType
+							contentType: i.contentType,
 						}))
 					),
 		'images.original':
@@ -412,9 +413,9 @@ swarp.previewResultsZip(async ({ sessionId, include }, _, { abortSignal }) => {
 				: Object.values(exportedObservations).flatMap((o) =>
 						o.images.map((i) => ({
 							path: i.exportedAs.original,
-							contentType: i.contentType
+							contentType: i.contentType,
 						}))
-					)
+					),
 	};
 });
 
@@ -451,8 +452,8 @@ swarp.estimateResultsZipSize(async ({ sessionId, include, cropPadding }, _, { ab
 					{
 						dimensions,
 						fullSize: bytes.byteLength,
-						bytePerPixel: bytes.byteLength / (dimensions.width * dimensions.height)
-					}
+						bytePerPixel: bytes.byteLength / (dimensions.width * dimensions.height),
+					},
 				])
 			)
 	);
@@ -503,7 +504,7 @@ swarp.estimateResultsZipSize(async ({ sessionId, include, cropPadding }, _, { ab
 				// This was determined over a sample of 50 images (we should probably do a bigger sample size, sth like 500 images)
 				return estimation * 6.37;
 			})
-		)
+		),
 	};
 
 	const compressionRates = {
@@ -511,13 +512,13 @@ swarp.estimateResultsZipSize(async ({ sessionId, include, cropPadding }, _, { ab
 		csv: 1 - 0.7,
 		cropped: 1,
 		full: 1,
-		files: 1
+		files: 1,
 	} satisfies Record<keyof typeof estimations, number>;
 
 	function computeEstimates(...things: (keyof typeof estimations)[]) {
 		return {
 			compressed: sum(things.map((thing) => compressionRates[thing] * estimations[thing])),
-			uncompressed: sum(things.map((thing) => estimations[thing]))
+			uncompressed: sum(things.map((thing) => estimations[thing])),
 		};
 	}
 
@@ -538,7 +539,7 @@ async function prepare({
 	sessionId,
 	db,
 	abortSignal,
-	onProgress
+	onProgress,
 }: {
 	protocolUsed: DB.Protocol;
 	sessionId: string;
@@ -553,15 +554,15 @@ async function prepare({
 			),
 			original: ExportsFilepathTemplateObservation.assert(
 				'original/{{sequence}}.{{extension image.filename}}'
-			)
+			),
 		},
 		metadata: {
 			json: 'analysis.json',
 			csv: 'metadata.csv',
 			files: ExportsFilepathTemplateMetadataFile.assert(
 				'files/{{metadataKey}}/{{stem filename}}-{{id}}.{{extension filename}}'
-			)
-		}
+			),
+		},
 	};
 
 	const metadataDefinitionsRaw = await db.getAll('Metadata');
@@ -623,7 +624,7 @@ async function prepare({
 				observationMetadata({
 					definitions: metadataDefinitions,
 					observation: obs,
-					images: sessionImages
+					images: sessionImages,
 				})
 			)
 		);
@@ -637,7 +638,7 @@ async function prepare({
 			protocolMetadata: toMetadataRecord(
 				protocolMetadataValues('observations+images', protocolUsed, metadata)
 			),
-			images: []
+			images: [],
 		};
 		abortSignal?.throwIfAborted();
 
@@ -661,7 +662,7 @@ async function prepare({
 				metadata: toMetadataRecord(metadataValues),
 				protocolMetadata: toMetadataRecord(
 					protocolMetadataValues('observations+images', protocolUsed, metadataValues)
-				)
+				),
 			};
 
 			abortSignal?.throwIfAborted();
@@ -670,7 +671,7 @@ async function prepare({
 				observation: exportedObservations[obs.id],
 				image,
 				sequence,
-				numberInObservation
+				numberInObservation,
 			};
 
 			exportedObservations[obs.id].images.push({
@@ -679,8 +680,8 @@ async function prepare({
 				numberInObservation,
 				exportedAs: {
 					original: filepaths.images.original.render(filepathsData),
-					cropped: filepaths.images.cropped.render(filepathsData)
-				}
+					cropped: filepaths.images.cropped.render(filepathsData),
+				},
 			});
 
 			abortSignal?.throwIfAborted();
@@ -717,7 +718,7 @@ async function prepare({
 				.map(([metadataId, { value }]) => ({
 					kind: 'session' as const,
 					metadataId,
-					value
+					value,
 				}))
 				.find(matches);
 
@@ -727,7 +728,7 @@ async function prepare({
 						kind: 'observation' as const,
 						metadataId,
 						value,
-						observation: o
+						observation: o,
 					}))
 				)
 				.find(matches);
@@ -740,7 +741,7 @@ async function prepare({
 						metadataId,
 						value,
 						image: i,
-						observation: o
+						observation: o,
 					}))
 				)
 				.find(matches);
@@ -759,7 +760,7 @@ async function prepare({
 				image: source.image,
 				filename: file.filename,
 				size: file.size,
-				contentType: file.contentType
+				contentType: file.contentType,
 			});
 
 			return { id, path, file };
@@ -774,6 +775,6 @@ async function prepare({
 		sessionMetadata: addBaseUnitValues(
 			metadataDefinitions,
 			addValueLabels(metadataOptions, session.metadata)
-		)
+		),
 	};
 }

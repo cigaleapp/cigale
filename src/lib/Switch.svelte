@@ -29,7 +29,7 @@
 	let icons = $derived(
 		iconsOverride ?? {
 			on: Check,
-			off: Cross
+			off: Cross,
 		}
 	);
 </script>

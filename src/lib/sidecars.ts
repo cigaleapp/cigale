@@ -1,9 +1,10 @@
+import type { DatabaseHandle } from './idb.svelte.js';
+
 import JSONC from 'tiny-jsonc';
 import * as YAML from 'yaml';
 
 import * as DB from './database.js';
 import { errorMessage } from './i18n.js';
-import type { DatabaseHandle } from './idb.svelte.js';
 import { imageId } from './images.js';
 import { storeMetadataValue } from './metadata/storage.js';
 import { MetadataType, namespaceOfMetadataId } from './schemas/metadata.js';
@@ -21,7 +22,7 @@ export async function processSidecars({
 	cropMetadataId,
 	imageFileId,
 	file,
-	sidecars
+	sidecars,
 }: {
 	db: DatabaseHandle;
 	sessionId: string;
@@ -102,7 +103,7 @@ export async function processSidecars({
 			metadataId: m.id,
 			filepath: resolvedFilepath,
 			type: m.type,
-			query: m.infer.sidecar.query
+			query: m.infer.sidecar.query,
 		});
 	}
 
@@ -130,8 +131,8 @@ export async function processSidecars({
 		const context = {
 			sidecarfile: {
 				name: sidecar.name,
-				lastModified: sidecar.lastModified
-			}
+				lastModified: sidecar.lastModified,
+			},
 		};
 
 		console.debug(`Sidecar: ${item.metadataId} <- ${item.query.toJSON()} <- ${sidecar.name}`);
@@ -167,7 +168,7 @@ export async function processSidecars({
 				size: file.size,
 				lastModifiedAt: new Date(file.lastModified).toISOString(),
 				sessionId: session.id,
-				bytes: await file.arrayBuffer()
+				bytes: await file.arrayBuffer(),
 			});
 
 			await storeMetadataValue({
@@ -177,7 +178,7 @@ export async function processSidecars({
 				sessionId: session.id,
 				type: item.type,
 				subjectId: imageFileId,
-				value: ref
+				value: ref,
 			});
 		} else if (item.type === 'boundingbox') {
 			const boxes = await item.query.evaluate(json, context).catch((e) => {
@@ -212,7 +213,7 @@ export async function processSidecars({
 						sessionId: session.id,
 						boundingBoxesAnalyzed: true,
 						metadataErrors: {},
-						metadata: {}
+						metadata: {},
 					});
 
 					await storeMetadataValue({
@@ -223,7 +224,7 @@ export async function processSidecars({
 						subjectId: newImageId,
 						value: box,
 						confidence: score,
-						updateReactiveState: isLast && isLastBox
+						updateReactiveState: isLast && isLastBox,
 					});
 				}
 			} else {
@@ -240,8 +241,8 @@ export async function processSidecars({
 					confidence: score,
 					alternatives: alternatives.map(({ score, ...coords }) => ({
 						value: coords,
-						confidence: score
-					}))
+						confidence: score,
+					})),
 				});
 			}
 		} else {
@@ -251,7 +252,7 @@ export async function processSidecars({
 					data: json,
 					context,
 					metadataId: item.metadataId,
-					error: e
+					error: e,
 				});
 
 				return undefined;
@@ -266,7 +267,7 @@ export async function processSidecars({
 				sessionId: session.id,
 				type: item.type,
 				subjectId: imageFileId,
-				value
+				value,
 			});
 		}
 	}
@@ -320,7 +321,7 @@ function xmlToJson(
 	xml: string,
 	config: { textProperty: string; attributePrefix: string } = {
 		textProperty: '#text',
-		attributePrefix: '@'
+		attributePrefix: '@',
 	}
 ): unknown {
 	const parser = new DOMParser();
@@ -331,7 +332,7 @@ function xmlToJson(
 
 		if (root) {
 			return {
-				[node.tagName]: nodeToObject(node, false)
+				[node.tagName]: nodeToObject(node, false),
 			};
 		}
 
@@ -406,20 +407,20 @@ if (import.meta.vitest) {
 					bar: [
 						{
 							'@spam': 'eggs',
-							'#text': 'baz'
+							'#text': 'baz',
 						},
 						{
 							'@spam': 'eggs2',
-							bacon: ['quux', 'quux2']
+							bacon: ['quux', 'quux2'],
 						},
 						{
 							'@spam': 'eggs3',
 							'#text': 'buzz',
 							bacon: 'quux',
-							other: 'quux2'
-						}
-					]
-				}
+							other: 'quux2',
+						},
+					],
+				},
 			});
 
 			expect(
@@ -429,20 +430,20 @@ if (import.meta.vitest) {
 					bar: [
 						{
 							$spam: 'eggs',
-							__value__: 'baz'
+							__value__: 'baz',
 						},
 						{
 							$spam: 'eggs2',
-							bacon: ['quux', 'quux2']
+							bacon: ['quux', 'quux2'],
 						},
 						{
 							$spam: 'eggs3',
 							__value__: 'buzz',
 							bacon: 'quux',
-							other: 'quux2'
-						}
-					]
-				}
+							other: 'quux2',
+						},
+					],
+				},
 			});
 		});
 

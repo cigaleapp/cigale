@@ -63,7 +63,7 @@
 		},
 		async restore({ currentSessionId }) {
 			await switchSession(currentSessionId);
-		}
+		},
 	};
 
 	const imageFileIds = $derived(tables.Image.state.map((image) => image.fileId).filter(nonnull));
@@ -89,14 +89,14 @@
 			do: () =>
 				toasts.info(
 					'Pas besoin de Ctrl-S, vos changements sont sauvegardés automatiquement 😎'
-				)
+				),
 		},
 		'i d e v': {
 			help: 'Activer/Désactiver le debug mode',
 			do: async () => {
 				await setSetting('showTechnicalMetadata', isDebugMode() ? false : true);
-			}
-		}
+			},
+		},
 	});
 
 	defineKeyboardShortcuts(
@@ -108,7 +108,7 @@
 					error: () => toasts.error(/* @wc-ignore */ 'Example error toast'),
 					info: () => toasts.info(/* @wc-ignore */ 'Example info toast'),
 					debug: () => toasts.add('debug', /* @wc-ignore */ 'Example debug toast'),
-					success: () => toasts.success(/* @wc-ignore */ 'Example success toast')
+					success: () => toasts.success(/* @wc-ignore */ 'Example success toast'),
 				};
 				return [
 					`t t ${type.charAt(0)}`,
@@ -117,8 +117,8 @@
 						debug: true,
 						allowInModals: true,
 						when: isDebugMode,
-						do: toastFns[type]
-					}
+						do: toastFns[type],
+					},
 				];
 			})
 		)
@@ -143,11 +143,11 @@
 				toasts.info('Une mise à jour est disponible.', {
 					lifetime: Infinity,
 					labels: {
-						action: 'Recharger'
+						action: 'Recharger',
 					},
 					action() {
 						location.reload();
-					}
+					},
 				});
 			});
 		});

@@ -23,7 +23,7 @@ export function toCSV(header, rows, separator = ';') {
 
 	return [
 		header.map(quote).join(separator),
-		...rows.map((row) => header.map((key) => quote(row[key])).join(separator))
+		...rows.map((row) => header.map((key) => quote(row[key])).join(separator)),
 	].join('\n');
 }
 
@@ -39,7 +39,7 @@ export async function importResultsZip(file, id) {
 	const results = unzipSync(contents, {
 		filter: ({ name }) => {
 			return name === ANALYSIS_JSON_ZIP_FILEPATH;
-		}
+		},
 	});
 
 	if (Object.keys(results).length === 0) {
@@ -85,8 +85,8 @@ export async function importResultsZip(file, id) {
 			openedAt: new Date().toISOString(),
 			metadata: mapValues(session.metadata ?? {}, ({ value, ...rest }) => ({
 				...rest,
-				value: serializeMetadataValue(value)
-			}))
+				value: serializeMetadataValue(value),
+			})),
 		});
 
 		await switchSession(newSession.id);
@@ -109,7 +109,7 @@ export async function importResultsZip(file, id) {
 	uiState.processing.files.push(...files);
 
 	const extractedImages = unzipSync(contents, {
-		filter: ({ name }) => files.some((f) => f.name === name)
+		filter: ({ name }) => files.some((f) => f.name === name),
 	});
 
 	if (Object.keys(extractedImages).length === 0) {
@@ -153,14 +153,14 @@ export async function importResultsZip(file, id) {
 				value: serializeMetadataValue(v.value),
 				confidence: v.confidence,
 				manuallyModified: v.manuallyModified,
-				alternatives: v.alternatives
-			}))
+				alternatives: v.alternatives,
+			})),
 		});
 
 		const originalBytes = uint8ArrayToArrayBuffer(bytes);
 
 		const [[width, height], resizedBytes] = await resizeToMaxSize({
-			source: new File([originalBytes], image.filename, { type: image.contentType })
+			source: new File([originalBytes], image.filename, { type: image.contentType }),
 		});
 
 		await storeImageBytes({
@@ -171,7 +171,7 @@ export async function importResultsZip(file, id) {
 			contentType: image.contentType,
 			filename: image.filename,
 			width,
-			height
+			height,
 		});
 
 		await db.tables.Image.set({
@@ -186,8 +186,8 @@ export async function importResultsZip(file, id) {
 				value: serializeMetadataValue(v.value),
 				confidence: v.confidence,
 				manuallyModified: v.manuallyModified,
-				alternatives: v.alternatives
-			}))
+				alternatives: v.alternatives,
+			})),
 		});
 
 		uiState.processing.removeFile(image.id);

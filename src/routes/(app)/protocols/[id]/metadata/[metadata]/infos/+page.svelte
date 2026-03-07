@@ -16,7 +16,7 @@
 	import {
 		METADATA_MERGE_METHODS,
 		METADATA_TYPES,
-		removeNamespaceFromMetadataId
+		removeNamespaceFromMetadataId,
 	} from '$lib/schemas/metadata';
 	import Switch from '$lib/Switch.svelte';
 	import { entries } from '$lib/utils';
@@ -37,7 +37,7 @@
 			median: IconMergeMedian,
 			average: IconMergeAverage,
 			union: IconMergeUnion,
-			none: IconMergeNone
+			none: IconMergeNone,
 		})[mergeMethod] ?? IconMergeNone;
 </script>
 
@@ -99,7 +99,7 @@
 			options={entries(METADATA_TYPES).map(([key, { label, help }]) => ({
 				key,
 				label: uppercaseFirst(label),
-				subtext: uppercaseFirst(help)
+				subtext: uppercaseFirst(help),
 			}))}
 			value={type}
 			onchange={updater((m, value) => {
@@ -148,7 +148,7 @@
 				disabled:
 					!MERGEABLE_METADATA_TYPES.has(type) ||
 					(key === 'union' && type !== 'boundingbox'),
-				subtext: help
+				subtext: help,
 			}))}
 			onchange={updater((m, value) => {
 				if (!value) return;

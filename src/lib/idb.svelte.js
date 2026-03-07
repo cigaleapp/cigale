@@ -7,7 +7,7 @@ import {
 	idComparator,
 	isReactiveTable,
 	isSessionDependentReactiveTable,
-	Tables
+	Tables,
 } from './database.js';
 import { nonnull, safeJSONStringify } from './utils.js';
 
@@ -37,7 +37,7 @@ export const _tablesState = $state({
 	Observation: [],
 	Protocol: [],
 	Settings: [],
-	Session: []
+	Session: [],
 });
 
 /**
@@ -59,7 +59,7 @@ export const tables = {
 			if (!isReactiveTable(name)) continue;
 			await tables[name].refresh(sessionId);
 		}
-	}
+	},
 };
 
 /**
@@ -226,8 +226,8 @@ function wrangler(table) {
 			async list() {
 				const db = await openDatabase();
 				return await db.getAll(table);
-			}
-		}
+			},
+		},
 	};
 }
 
@@ -489,13 +489,13 @@ export async function openDatabase() {
 			for (const [tableName, schema] of tablesByName) {
 				createTable(tableName, schema);
 			}
-		}
+		},
 	});
 
 	// Needed for E2E tests, to send non-[Serializable] values between browser and test runner
 	window.devalue = {
 		stringify: devalue.stringify,
-		parse: devalue.parse
+		parse: devalue.parse,
 	};
 	window.DB = _database;
 	window.refreshDB = () => {

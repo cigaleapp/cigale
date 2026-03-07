@@ -1,5 +1,6 @@
 import type { DatabaseHandle } from '$lib/idb.svelte.js';
 import type { NamespacedMetadataID } from '$lib/schemas/common.js';
+
 import { namespaceOfMetadataId } from '$lib/schemas/metadata.js';
 import { ExportedProtocol, ProtocolRegistry } from '$lib/schemas/protocols.js';
 
@@ -70,7 +71,7 @@ if (import.meta.vitest) {
 	/** Helper to create a mock DatabaseHandle with a configurable `get` */
 	function mockDb(existing: Record<string, Record<string, unknown>> = {}) {
 		return {
-			get: vi.fn(async (store: string, key: string) => existing[store]?.[key] ?? undefined)
+			get: vi.fn(async (store: string, key: string) => existing[store]?.[key] ?? undefined),
 		} as unknown as DatabaseHandle;
 	}
 
@@ -96,8 +97,8 @@ if (import.meta.vitest) {
 			imports: imports.map(({ from, metadata, sessionMetadata }) => ({
 				from,
 				metadata: metadata,
-				sessionMetadata: sessionMetadata ?? []
-			}))
+				sessionMetadata: sessionMetadata ?? [],
+			})),
 		};
 	}
 
@@ -125,18 +126,18 @@ if (import.meta.vitest) {
 								protocols: [
 									{
 										id: 'parent-protocol',
-										url: 'https://example.com/parent.json'
-									}
-								]
+										url: 'https://example.com/parent.json',
+									},
+								],
 							};
 						}
 						return parentInput;
-					}
+					},
 				}))
 			);
 
 			const result = await resolveProtocolImports(mockDb(), 'my-protocol', [
-				imp('parent-protocol__field1', 'my-protocol__field1')
+				imp('parent-protocol__field1', 'my-protocol__field1'),
 			]);
 
 			expect(result).toHaveLength(1);
@@ -145,7 +146,7 @@ if (import.meta.vitest) {
 
 		test('skips protocols already resolved', async () => {
 			const alreadyResolved = new Map([
-				['parent-protocol', { id: 'parent-protocol' } as typeof ExportedProtocol.infer]
+				['parent-protocol', { id: 'parent-protocol' } as typeof ExportedProtocol.infer],
 			]);
 
 			vi.stubGlobal(
@@ -153,9 +154,9 @@ if (import.meta.vitest) {
 				vi.fn(async () => ({
 					json: async () => ({
 						protocols: [
-							{ id: 'parent-protocol', url: 'https://example.com/parent.json' }
-						]
-					})
+							{ id: 'parent-protocol', url: 'https://example.com/parent.json' },
+						],
+					}),
 				}))
 			);
 
@@ -178,16 +179,16 @@ if (import.meta.vitest) {
 				vi.fn(async () => ({
 					json: async () => ({
 						protocols: [
-							{ id: 'parent-protocol', url: 'https://example.com/parent.json' }
-						]
-					})
+							{ id: 'parent-protocol', url: 'https://example.com/parent.json' },
+						],
+					}),
 				}))
 			);
 
 			const db = mockDb({ Protocol: { 'parent-protocol': { id: 'parent-protocol' } } });
 
 			const result = await resolveProtocolImports(db, 'my-protocol', [
-				imp('parent-protocol__field1', 'my-protocol__field1')
+				imp('parent-protocol__field1', 'my-protocol__field1'),
 			]);
 
 			expect(result).toEqual([]);
@@ -198,13 +199,13 @@ if (import.meta.vitest) {
 			vi.stubGlobal(
 				'fetch',
 				vi.fn(async () => ({
-					json: async () => ({ protocols: [] }) // empty registry
+					json: async () => ({ protocols: [] }), // empty registry
 				}))
 			);
 
 			await expect(
 				resolveProtocolImports(mockDb(), 'my-protocol', [
-					imp('unknown-protocol__field1', 'my-protocol__field1')
+					imp('unknown-protocol__field1', 'my-protocol__field1'),
 				])
 			).rejects.toThrow('inherits from unknown protocol unknown-protocol');
 		});
@@ -221,19 +222,19 @@ if (import.meta.vitest) {
 								protocols: [
 									{
 										id: 'parent-protocol',
-										url: 'https://example.com/parent.json'
-									}
-								]
+										url: 'https://example.com/parent.json',
+									},
+								],
 							};
 						}
 						return parentInput;
-					}
+					},
 				}))
 			);
 
 			const result = await resolveProtocolImports(mockDb(), 'my-protocol', [
 				imp('parent-protocol__field1', 'my-protocol__field1'),
-				imp('parent-protocol__field2', 'my-protocol__field2')
+				imp('parent-protocol__field2', 'my-protocol__field2'),
 			]);
 
 			expect(result).toHaveLength(1);
@@ -244,7 +245,7 @@ if (import.meta.vitest) {
 		test('resolves recursive imports', async () => {
 			const grandparentInput = fakeExportedProtocol('grandparent');
 			const parentInput = fakeExportedProtocol('parent', [
-				{ from: 'grandparent', metadata: ['field'] }
+				{ from: 'grandparent', metadata: ['field'] },
 			]);
 
 			vi.stubGlobal(
@@ -257,20 +258,20 @@ if (import.meta.vitest) {
 									{ id: 'parent', url: 'https://example.com/proto-parent.json' },
 									{
 										id: 'grandparent',
-										url: 'https://example.com/proto-grandparent.json'
-									}
-								]
+										url: 'https://example.com/proto-grandparent.json',
+									},
+								],
 							};
 						}
 						if (url.includes('proto-grandparent.json')) return grandparentInput;
 						if (url.includes('proto-parent.json')) return parentInput;
 						throw new Error(`Unexpected fetch: ${url}`);
-					}
+					},
 				}))
 			);
 
 			const result = await resolveProtocolImports(mockDb(), 'child', [
-				imp('parent__field', 'child__field')
+				imp('parent__field', 'child__field'),
 			]);
 
 			expect(result).toHaveLength(2);

@@ -18,8 +18,9 @@
 
 <script lang="ts" generics="T">
 	import type { EmblaCarouselType } from 'embla-carousel';
-	import embla from 'embla-carousel-svelte';
 	import type { Snippet } from 'svelte';
+
+	import embla from 'embla-carousel-svelte';
 
 	import IconPrev from '~icons/ri/arrow-left-s-line';
 	import IconNext from '~icons/ri/arrow-right-s-line';
@@ -33,7 +34,7 @@
 		scrollers = $bindable(),
 		currentItem = $bindable(),
 		'keyboard-next': keyboardNext,
-		'keyboard-prev': keyboardPrev
+		'keyboard-prev': keyboardPrev,
 	}: Props<T> = $props();
 
 	let canScrollNext = $state(true);
@@ -49,7 +50,7 @@
 		if (!carousel) return;
 		scrollers = {
 			next: () => carousel?.scrollNext(),
-			prev: () => carousel?.scrollPrev()
+			prev: () => carousel?.scrollPrev(),
 		};
 	});
 
@@ -115,7 +116,7 @@
 		<div
 			class="embla__viewport"
 			use:embla={{
-				options: { duration: 12 }
+				options: { duration: 12 },
 			}}
 			onemblaInit={(event: CustomEvent) => {
 				carousel = event.detail;

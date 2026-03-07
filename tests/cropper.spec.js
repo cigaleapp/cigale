@@ -9,7 +9,7 @@ import {
 	getDatabaseRowById,
 	imagesByName,
 	loadDatabaseDump,
-	setImageMetadata
+	setImageMetadata,
 } from './utils/index.js';
 
 /**
@@ -47,7 +47,7 @@ test.describe('Cropper view', () => {
 
 			test(`navigate with arrow keys (autoskip ${enabled ? 'on' : 'off'})`, async ({
 				page,
-				app
+				app,
 			}) => {
 				const images = await imagesByName(app);
 				await page.getByText('leaf.jpeg', { exact: true }).click();
@@ -65,7 +65,7 @@ test.describe('Cropper view', () => {
 
 			test(`go back to import view with escape key (autoskip ${enabled ? 'on' : 'off'})`, async ({
 				page,
-				app
+				app,
 			}) => {
 				const { leaf: image } = await imagesByName(app);
 				await page.getByText('leaf.jpeg', { exact: true }).click();
@@ -210,7 +210,7 @@ test.describe('Cropper view', () => {
 
 		test('should delete the image on ctrl-delete and go to the next image', async ({
 			page,
-			app
+			app,
 		}) => {
 			await navigateThenAssert(page, app, async (page) =>
 				page.keyboard.press('Control+Delete')
@@ -219,7 +219,7 @@ test.describe('Cropper view', () => {
 
 		test('should delete the image via delete button and go to the next image', async ({
 			page,
-			app
+			app,
 		}) => {
 			await navigateThenAssert(page, app, async (page) => {
 				await page.getByRole('button', { name: 'Supprimer', exact: true }).click();
@@ -311,7 +311,7 @@ test.describe('Cropper view', () => {
 
 			test('should mark the image as confirmed if image was untouched', async ({
 				page,
-				app
+				app,
 			}) => {
 				await expectAllImagesConfirmedInDatabase(page, app, false);
 				await makeBox(page, 10, 10, 50, 50);
@@ -370,10 +370,10 @@ test.describe('Cropper view', () => {
 			async function makeBox(page, x1, y1, x2, y2) {
 				await page.waitForTimeout(500);
 				await page.locator('.change-area').click({
-					position: { x: x1, y: y1 }
+					position: { x: x1, y: y1 },
 				});
 				await page.locator('.change-area').click({
-					position: { x: x2, y: y2 }
+					position: { x: x2, y: y2 },
 				});
 			}
 
@@ -390,7 +390,7 @@ test.describe('Cropper view', () => {
 
 			test('should mark the image as confirmed if image was untouched', async ({
 				page,
-				app
+				app,
 			}) => {
 				await expectAllImagesConfirmedInDatabase(page, app, false);
 				await makeBox(page, 10, 10, 50, 50);
@@ -451,7 +451,7 @@ test.describe('Cropper view', () => {
 
 			test('should mark the image as confirmed if image was untouched', async ({
 				page,
-				app
+				app,
 			}) => {
 				await expectAllImagesConfirmedInDatabase(page, app, false);
 				await makeBox(page, 10, 10, 50, 50, 50, 100, 10, 100);
@@ -715,11 +715,11 @@ async function setImageConfirmedStatusInDB(page, ids, confirmed = true) {
 			{
 				[CROP_METADATA_ID]: {
 					...image?.metadata[CROP_METADATA_ID],
-					confirmed
-				}
+					confirmed,
+				},
 			},
 			{
-				refreshDB: i === ids.length - 1 // Only refresh the DB after the last image to avoid unnecessary refreshes
+				refreshDB: i === ids.length - 1, // Only refresh the DB after the last image to avoid unnecessary refreshes
 			}
 		);
 	}

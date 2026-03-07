@@ -14,7 +14,7 @@ export const Image = type({
 	fileId: ID.or('null').describe("ID vers l'objet ImageFile associé"),
 	sessionId: ID.describe('ID de la session à laquelle cette image appartient'),
 	/** Si les boîtes englobantes ont été analysées. Pratique en particulier pour savoir s'il faut calculer les boîtes englobantes pour une image qui n'a aucune observation associée (chaque bounding box crée une image) */
-	boundingBoxesAnalyzed: 'boolean = false'
+	boundingBoxesAnalyzed: 'boolean = false',
 });
 
 export const Observation = type({
@@ -24,5 +24,5 @@ export const Observation = type({
 	addedAt: 'string.date.iso.parse',
 	metadataOverrides: MetadataValues,
 	metadataErrors: MetadataErrors.default(() => ({})),
-	images: References
+	images: References,
 });

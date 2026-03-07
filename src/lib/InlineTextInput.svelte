@@ -28,7 +28,7 @@
 		onerror,
 		placeholder: _placeholder = '',
 		type: inputType = 'text',
-		Type = type.string
+		Type = type.string,
 	} = $props();
 
 	const placeholder = $derived(

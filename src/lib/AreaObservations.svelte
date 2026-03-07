@@ -86,7 +86,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 
 		dragselect?.destroy();
 		dragselect = new DragSelect(imagesContainer, uiState.selection, {
-			ondeadclick: onemptyclick
+			ondeadclick: onemptyclick,
 		});
 		dragselect.setSelection(uiState.selection);
 		uiState.setSelection = (newSelection) => {
@@ -114,7 +114,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 			when: ({ target }) => !(target instanceof HTMLInputElement),
 			do: () => {
 				dragselect?.setSelection(items.map((img) => img.id));
-			}
+			},
 		},
 		// And Ctrl-D to deselect all
 		'$mod+d': {
@@ -123,8 +123,8 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 			do: () => {
 				uiState.selection = [];
 				dragselect?.setSelection([]);
-			}
-		}
+			},
+		},
 	});
 
 	/**
@@ -145,7 +145,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		scrollTo.scrollIntoView({
 			behavior: 'instant',
 			block: 'start',
-			inline: 'nearest'
+			inline: 'nearest',
 		});
 	});
 
@@ -227,7 +227,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 
 	function roundUnrolledCorners() {
 		const items = [
-			...(imagesContainer?.querySelectorAll('.item-unroll-container.unrolled') ?? [])
+			...(imagesContainer?.querySelectorAll('.item-unroll-container.unrolled') ?? []),
 		];
 
 		const itemCoords = [...items].map((el) => el.getBoundingClientRect());
@@ -254,7 +254,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	use:resizeobserver={{
 		onresize() {
 			roundUnrolledCorners();
-		}
+		},
 	}}
 	use:mutationobserver={{
 		childList: true,
@@ -264,7 +264,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 			dragselect?.refreshSelectables();
 			dragselect?.setSelection(uiState.selection);
 			roundUnrolledCorners();
-		}
+		},
 	}}
 >
 	{#if groups}
@@ -314,7 +314,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 												'Image',
 												'Observation',
 												'ImageFile',
-												'ImagePreviewFile'
+												'ImagePreviewFile',
 											],
 											{},
 											async (tx) => {
@@ -322,7 +322,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 													cancelTask(id, 'Cancelled by user');
 													await deleteObservation(id, {
 														notFoundOk: true,
-														recursive: true
+														recursive: true,
 													});
 													await deleteImageFile(id, tx, true);
 												}

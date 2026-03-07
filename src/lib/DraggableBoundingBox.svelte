@@ -49,7 +49,7 @@
 		movable,
 		createMode,
 		zoom,
-		imageFileID
+		imageFileID,
 	} = $props();
 
 	// Using a writable $derived here causes the state to not update until onmouseup, idk why
@@ -104,7 +104,7 @@
 		resizeObserver.observe(imageElement);
 		mutationObserver.observe(imageElement, {
 			attributes: true,
-			attributeFilter: ['src']
+			attributeFilter: ['src'],
 		});
 
 		return () => {
@@ -123,14 +123,14 @@
 	const toPixel = $derived(
 		coordsScaler({
 			x: imageRect.width,
-			y: imageRect.height
+			y: imageRect.height,
 		})
 	);
 
 	const fromPixel = $derived(
 		coordsScaler({
 			x: 1 / imageRect.width,
-			y: 1 / imageRect.height
+			y: 1 / imageRect.height,
 		})
 	);
 
@@ -139,7 +139,7 @@
 	let creatingBoundingBox = $state(false);
 	let newBoundingBox = $derived(
 		new NewBoundingBox({
-			limits: { x: 0, y: 0, width: imageRect.width, height: imageRect.height }
+			limits: { x: 0, y: 0, width: imageRect.width, height: imageRect.height },
 		})
 	);
 	$effect(() => newBoundingBox.setCreateMode(createMode));
@@ -193,7 +193,7 @@
 				this.bottomleft === value &&
 				this.bottomright === value
 			);
-		}
+		},
 	});
 </script>
 

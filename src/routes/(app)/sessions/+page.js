@@ -7,7 +7,7 @@ export async function load({ depends }) {
 	depends(dependencyURI('Session', ''));
 
 	return {
-		sessions: await sortedSessions()
+		sessions: await sortedSessions(),
 	};
 }
 
@@ -18,7 +18,7 @@ async function loadSessionThumbnails(sessionId) {
 	const images = await listByIndex('Image', 'sessionId', sessionId);
 
 	const firstUniqueFileIds = [
-		...new Set(images.map((image) => image.fileId).filter(nonnull))
+		...new Set(images.map((image) => image.fileId).filter(nonnull)),
 	].slice(0, 4);
 
 	await Promise.all(
@@ -44,7 +44,7 @@ async function sortedSessions() {
 		session.protocol = await tables.Protocol.get(session.protocol);
 		session.thumbs = await loadSessionThumbnails(session.id);
 		session.counts = {
-			images: await listByIndex('Image', 'sessionId', session.id).then((imgs) => imgs.length)
+			images: await listByIndex('Image', 'sessionId', session.id).then((imgs) => imgs.length),
 		};
 	}
 

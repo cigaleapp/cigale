@@ -13,7 +13,7 @@ import {
 	newSession,
 	pickFiles,
 	setInferenceModels,
-	toast
+	toast,
 } from './utils/index.js';
 
 test('correctly applies crop padding', issue(463), async ({ page, app }) => {
@@ -22,8 +22,8 @@ test('correctly applies crop padding', issue(463), async ({ page, app }) => {
 	await newSession(page, {
 		models: {
 			crop: 'Aucune inférence',
-			classify: 'Aucune inférence'
-		}
+			classify: 'Aucune inférence',
+		},
 	});
 
 	await app.tabs.go('import');
@@ -44,8 +44,8 @@ test('correctly applies crop padding', issue(463), async ({ page, app }) => {
 	const zip = await exportResults(page, { cropPadding: '40px' });
 	await expectZipFiles(zip, ['analysis.json', 'metadata.csv', 'Cropped/(Unknown)_obs1_1.png'], {
 		'Cropped/(Unknown)_obs1_1.png': {
-			buffer: async (buf) => assert(buf).toMatchSnapshot()
-		}
+			buffer: async (buf) => assert(buf).toMatchSnapshot(),
+		},
 	});
 });
 
@@ -82,7 +82,7 @@ test('correctly shows .zip preview', async ({ page, app }) => {
 		await page.waitForTimeout(200);
 
 		await assert(preview).not.toHaveText('Chargement', {
-			timeout: 5_000
+			timeout: 5_000,
 		});
 	}
 
@@ -194,7 +194,7 @@ test('export to a folder', async ({ page, app, browserName }) => {
 	await chooseFirstSession(page);
 	await setInferenceModels(page, {
 		crop: 'Aucune inférence',
-		classify: 'Aucune inférence'
+		classify: 'Aucune inférence',
 	});
 
 	await app.tabs.go('results');
@@ -222,7 +222,7 @@ test('export to a folder', async ({ page, app, browserName }) => {
 		'Cigale Export Test/Cropped/Allacma fusca_obs1_1.jpeg': assert.any(Uint8Array),
 		'Cigale Export Test/Cropped/Orchesella cincta_obs2_2.jpeg': assert.any(Uint8Array),
 		'Cigale Export Test/Cropped/Entomobrya muscorum_obs3_3.jpeg': assert.any(Uint8Array),
-		'Cigale Export Test/Cropped/(Unknown)_obs4_4.jpeg': assert.any(Uint8Array)
+		'Cigale Export Test/Cropped/(Unknown)_obs4_4.jpeg': assert.any(Uint8Array),
 	});
 });
 
@@ -266,12 +266,12 @@ test('includes metadata files in export', async ({ page, app }) => {
 			'metadata.csv',
 			'image-1.cropped.jpeg',
 			'image-2.cropped.jpeg',
-			'file-sessionwide_file-debugsquare.png'
+			'file-sessionwide_file-debugsquare.png',
 		],
 		{
 			'file-sessionwide_file-debugsquare.png': {
-				buffer: async (buf) => expect(buf).toMatchSnapshot()
-			}
+				buffer: async (buf) => expect(buf).toMatchSnapshot(),
+			},
 		}
 	);
 });

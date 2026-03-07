@@ -10,7 +10,7 @@ import {
 	errorMessageImageTooLarge,
 	imageId,
 	resizeToMaxSize,
-	storeImageBytes
+	storeImageBytes,
 } from '$lib/images.js';
 import { uiState } from '$lib/state.svelte.js';
 import { toasts } from '$lib/toasts.svelte.js';
@@ -31,7 +31,7 @@ export const ACCEPTED_IMPORT_TYPES = [
 	'.raw',
 	'.cr3',
 	// Sidecar files
-	...ACCEPTED_SIDECAR_TYPES
+	...ACCEPTED_SIDECAR_TYPES,
 ];
 
 /**
@@ -62,7 +62,7 @@ export async function processImageFile({ file, id, sidecars }) {
 		contentType: file.type,
 		filename: file.name,
 		width,
-		height
+		height,
 	});
 
 	await tables.Image.set({
@@ -73,7 +73,7 @@ export async function processImageFile({ file, id, sidecars }) {
 		contentType: file.type,
 		dimensions: { width, height },
 		fileId: id,
-		metadata: {}
+		metadata: {},
 	});
 
 	// We have to remove the file from the processing files list once the Image database object has been created
@@ -92,7 +92,7 @@ export async function processImageFile({ file, id, sidecars }) {
 		cropMetadataId: uiState.cropMetadataId,
 		file,
 		imageFileId: id,
-		sidecars
+		sidecars,
 	}).catch((e) => {
 		console.error(e);
 		toasts.error(`Erreur lors du traitement du/des fichiers annexes associés à ${file.name}`);
@@ -132,7 +132,7 @@ export async function inferBoundingBoxes(swarpc, cancellers, fileId) {
 
 	const inference = swarpc.inferBoundingBoxes.cancelable({
 		fileId: image.fileId,
-		taskSettings: inferenceSettings
+		taskSettings: inferenceSettings,
 	});
 
 	cancellers?.set(image.fileId, inference.cancel);
@@ -170,9 +170,9 @@ export async function inferBoundingBoxes(swarpc, cancellers, fileId) {
 					value: JSON.stringify(toCropBox(boxes[i])),
 					confidence: scores[i],
 					alternatives: {},
-					manuallyModified: false
-				}
-			}
+					manuallyModified: false,
+				},
+			},
 		});
 	}
 }

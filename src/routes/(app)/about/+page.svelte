@@ -25,7 +25,7 @@
 			electronVersions = {
 				node: window.versions.node(),
 				chrome: window.versions.chrome(),
-				electron: window.versions.electron()
+				electron: window.versions.electron(),
 			};
 
 			void window.versions.os().then((os) => {
@@ -53,14 +53,14 @@
 		{ name: 'Gaetan Laumonier', gitlab: 'laumong' },
 		{ name: 'Gwenn Le Bihan', gitlab: 'gwennlbh', url: 'https://gwen.works' },
 		{ name: 'Ines Charles', gitlab: 'charlei' },
-		{ name: 'Olivier Lamothe', gitlab: 'lamotho' }
+		{ name: 'Olivier Lamothe', gitlab: 'lamotho' },
 	].map(({ gitlab, ...rest }) => ({ url: `https://git.inpt.fr/${gitlab}`, ...rest }));
 
 	const supervisors = [
 		{ name: 'Axel Carlier', url: 'https://github.com/axelcarlier' },
 		{ name: 'Maxime Cauchois', url: 'https://github.com/mcauchoix' },
 		{ name: 'Edgar Remy', url: 'https://github.com/edgaremy' },
-		{ name: 'Thomas Forgione', url: 'https://github.com/tforgione' }
+		{ name: 'Thomas Forgione', url: 'https://github.com/tforgione' },
 	];
 
 	/**
@@ -72,7 +72,7 @@
 		// Get list of package names
 		const pkgs = [
 			...Object.keys(workspaces[''].dependencies),
-			...Object.keys(workspaces[''].devDependencies)
+			...Object.keys(workspaces[''].devDependencies),
 		];
 
 		// Get resolved versions for each package

@@ -14,16 +14,16 @@ export async function load({ parent }) {
 
 	const {
 		images: { cropped, original },
-		metadata: { csv, json }
+		metadata: { csv, json },
 	} = protocol.exports ?? {
 		images: {
 			cropped: { toJSON: () => 'cropped/{{ sequence }}.{{ extension image.filename }}' },
-			original: { toJSON: () => 'original/{{ sequence }}.{{ extension image.filename }}' }
+			original: { toJSON: () => 'original/{{ sequence }}.{{ extension image.filename }}' },
 		},
 		metadata: {
 			csv: 'metadata.csv',
-			json: 'metadata.json'
-		}
+			json: 'metadata.json',
+		},
 	};
 
 	gatherToTree({
@@ -31,7 +31,7 @@ export async function load({ parent }) {
 		provenance: 'metadata.csv',
 		paths: [csv],
 		help: 'Métadonnées des images exportées',
-		contentType: () => 'text/csv'
+		contentType: () => 'text/csv',
 	});
 
 	gatherToTree({
@@ -39,7 +39,7 @@ export async function load({ parent }) {
 		provenance: 'metadata.json',
 		paths: [json],
 		help: "Export JSON complet de l'analyse",
-		contentType: () => 'application/json'
+		contentType: () => 'application/json',
 	});
 
 	gatherToTree({
@@ -47,7 +47,7 @@ export async function load({ parent }) {
 		provenance: 'images.cropped',
 		paths: [cropped.toJSON()],
 		help: 'Images recadrées',
-		contentType: () => 'image/x-unknown'
+		contentType: () => 'image/x-unknown',
 	});
 
 	gatherToTree({
@@ -55,7 +55,7 @@ export async function load({ parent }) {
 		provenance: 'images.original',
 		paths: [original.toJSON()],
 		help: 'Images originales',
-		contentType: () => 'image/x-unknown'
+		contentType: () => 'image/x-unknown',
 	});
 
 	return { protocol, initialTree: nodes };

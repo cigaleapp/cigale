@@ -49,7 +49,7 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 		onopen = undefined,
 		footer = undefined,
 		toasts: toastsPool = undefined,
-		children
+		children,
 	} = $props();
 
 	// Initialize and update close/update functions when stateKey changes

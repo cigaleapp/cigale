@@ -16,7 +16,7 @@
 		value,
 		children,
 		tooltip: help = (percentage) => `Confiance: ${percentage}`,
-		'no-fallback': noFallback = false
+		'no-fallback': noFallback = false,
 	} = $props();
 
 	const color = $derived(

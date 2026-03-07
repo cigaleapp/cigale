@@ -18,14 +18,14 @@ const env = arkenv({
 		(repoAndOwner) => {
 			const [owner, repo] = repoAndOwner.split('/', 2);
 			return { owner, repo };
-		}
-	]
+		},
+	],
 });
 
 const reporter = new App({
 	appId: env.GITHUB_APP_ID,
 	privateKey: await Bun.file(env.GITHUB_APP_KEY_FILE).text(),
-	log: console
+	log: console,
 });
 
 const gh = await reporter.getInstallationOctokit(env.GITHUB_APP_INSTALLATION_ID);
@@ -36,7 +36,7 @@ const { data: repository } = await gh.rest.repos.get({ owner, repo });
 console.info(`Acting on ${repository.full_name}`);
 
 const client = new DiscordJS.Client({
-	intents: ['Guilds', 'GuildMessages']
+	intents: ['Guilds', 'GuildMessages'],
 });
 
 client.on('clientReady', async () => {
@@ -56,17 +56,17 @@ client.on('clientReady', async () => {
 
 	await commands.create({
 		name: 'To Github Bug',
-		type: 3
+		type: 3,
 	});
 
 	await commands.create({
 		name: 'To Github Feature Request',
-		type: 3
+		type: 3,
 	});
 
 	await commands.create({
 		name: 'To Github Task',
-		type: 3
+		type: 3,
 	});
 });
 
@@ -101,7 +101,7 @@ client.on('interactionCreate', async (interaction) => {
 				labels,
 				issueTypes,
 				milestones,
-				collaborators
+				collaborators,
 			});
 			interaction.showModal(modal);
 		}
@@ -122,7 +122,7 @@ client.on('interactionCreate', async (interaction) => {
 			{
 				Task: 'Task',
 				Bug: 'Bug',
-				'Feature Request': 'Feature'
+				'Feature Request': 'Feature',
 				// "Dependencies",
 			}[customId.replace('create github issue ', '')] ?? null;
 
@@ -132,7 +132,7 @@ client.on('interactionCreate', async (interaction) => {
 			labels,
 			milestone,
 			assignee,
-			type
+			type,
 		});
 
 		const { data: issue } = await gh.rest.issues.create({
@@ -143,7 +143,7 @@ client.on('interactionCreate', async (interaction) => {
 			milestone,
 			assignee,
 			labels: [...labels],
-			type
+			type,
 		});
 
 		await interaction.reply(`[Created #${issue.number}](${issue.html_url})`);
@@ -158,7 +158,7 @@ export const getModal = ({
 	message,
 	labels,
 	milestones,
-	collaborators
+	collaborators,
 }: {
 	id: string;
 	user: DiscordJS.User;
@@ -180,8 +180,8 @@ export const getModal = ({
 				...message.content.split('\n').map((line) => `> ${line}`),
 				'',
 				`— ${message.author.displayName} (${message.author.tag})`,
-				''
-			].join('\n')
+				'',
+			].join('\n'),
 		}),
 		Labels: selectMultipleMenu('labels', labels),
 		Milestone: selectOneMenu('milestone', milestones),
@@ -189,9 +189,9 @@ export const getModal = ({
 			'assignee',
 			collaborators.map(({ login, name }) => ({
 				name: login,
-				description: name ?? null
+				description: name ?? null,
 			}))
-		)
+		),
 	});
 };
 

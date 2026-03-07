@@ -27,8 +27,7 @@ on:
           Useful variables:
           - DEBUG_WORKERS=true: show logs when web workers are created/closed
         required: false
-        default: ""
-
+        default: ''
 
 env:
   ELECTRON_SKIP_BINARY_DOWNLOAD: 'true'

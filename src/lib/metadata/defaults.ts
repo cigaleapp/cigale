@@ -1,11 +1,13 @@
+import type { DatabaseHandle } from '$lib/idb.svelte.js';
+
 import { ArkErrors } from 'arktype';
 
 import { Tables } from '$lib/database.js';
-import { tables, type DatabaseHandle } from '$lib/idb.svelte.js';
+import { tables } from '$lib/idb.svelte.js';
 import {
 	isNamespacedToProtocol,
 	MetadataDefaultDynamicPayload,
-	removeNamespaceFromMetadataId
+	removeNamespaceFromMetadataId,
 } from '$lib/schemas/metadata.js';
 import { toMetadataRecord } from '$lib/schemas/results.js';
 import { toasts } from '$lib/toasts.svelte.js';
@@ -19,7 +21,7 @@ export async function resolveDefaults({
 	db,
 	sessionId,
 	metadataToConsider,
-	iterations = metadataToConsider.length
+	iterations = metadataToConsider.length,
 }: {
 	db: DatabaseHandle;
 	sessionId: string;
@@ -52,8 +54,8 @@ export async function resolveDefaults({
 				if (!isNamespacedToProtocol(session.protocol, key)) return;
 
 				return [removeNamespaceFromMetadataId(key), value];
-			})
-		}
+			}),
+		},
 	};
 
 	const metadataToIterateFurtherOn = new Set<string>();
@@ -84,8 +86,8 @@ export async function resolveDefaults({
 			currentValue,
 			serializeds: {
 				new: serializeMetadataValue(value),
-				current: serializeMetadataValue(currentValue?.value)
-			}
+				current: serializeMetadataValue(currentValue?.value),
+			},
 		});
 
 		if (serializeMetadataValue(value) === serializeMetadataValue(currentValue?.value)) continue;
@@ -97,7 +99,7 @@ export async function resolveDefaults({
 			subjectId: sessionId,
 			type,
 			isDefault: true,
-			value
+			value,
 		});
 
 		metadataToIterateFurtherOn.add(id);
@@ -107,7 +109,7 @@ export async function resolveDefaults({
 		db,
 		sessionId,
 		metadataToConsider: [...metadataToIterateFurtherOn],
-		iterations: iterations - 1
+		iterations: iterations - 1,
 	});
 }
 
@@ -115,19 +117,19 @@ if (import.meta.vitest) {
 	const { describe, it, expect, vi, beforeEach } = import.meta.vitest;
 
 	vi.mock('$lib/database.js', () => ({
-		Tables: { Session: { assert: vi.fn((v: unknown) => v) } }
+		Tables: { Session: { assert: vi.fn((v: unknown) => v) } },
 	}));
 
 	vi.mock('$lib/idb.svelte.js', () => ({
-		tables: { Metadata: { getMany: vi.fn(async () => []) } }
+		tables: { Metadata: { getMany: vi.fn(async () => []) } },
 	}));
 
 	vi.mock('$lib/toasts.svelte.js', () => ({
-		toasts: { warn: vi.fn() }
+		toasts: { warn: vi.fn() },
 	}));
 
 	vi.mock('./storage.js', () => ({
-		storeMetadataValue: vi.fn(async () => {})
+		storeMetadataValue: vi.fn(async () => {}),
 	}));
 
 	// Module-level imports are now the mocks — cast for mock method access
@@ -158,7 +160,7 @@ if (import.meta.vitest) {
 				db,
 				sessionId: 'sess1',
 				metadataToConsider: [],
-				iterations: 0
+				iterations: 0,
 			});
 			expect(db.get).not.toHaveBeenCalled();
 		});
@@ -176,7 +178,7 @@ if (import.meta.vitest) {
 			await resolveDefaults({
 				db,
 				sessionId: 'sess1',
-				metadataToConsider: ['proto__field1']
+				metadataToConsider: ['proto__field1'],
 			});
 
 			expect(_store).not.toHaveBeenCalled();
@@ -185,13 +187,13 @@ if (import.meta.vitest) {
 		it('stores a static default when no current value exists', async () => {
 			const db = mockDb(makeSession());
 			_tables.Metadata.getMany.mockResolvedValue([
-				{ id: 'proto__field1', type: 'string', default: 'hello' }
+				{ id: 'proto__field1', type: 'string', default: 'hello' },
 			]);
 
 			await resolveDefaults({
 				db,
 				sessionId: 'sess1',
-				metadataToConsider: ['proto__field1']
+				metadataToConsider: ['proto__field1'],
 			});
 
 			expect(_store).toHaveBeenCalledWith(
@@ -202,7 +204,7 @@ if (import.meta.vitest) {
 					subjectId: 'sess1',
 					type: 'string',
 					isDefault: true,
-					value: 'hello'
+					value: 'hello',
 				})
 			);
 		});
@@ -216,18 +218,18 @@ if (import.meta.vitest) {
 						confirmed: false,
 						manuallyModified: false,
 						isDefault: false,
-						alternatives: {}
-					}
+						alternatives: {},
+					},
 				})
 			);
 			_tables.Metadata.getMany.mockResolvedValue([
-				{ id: 'proto__field1', type: 'string', default: 'hello' }
+				{ id: 'proto__field1', type: 'string', default: 'hello' },
 			]);
 
 			await resolveDefaults({
 				db,
 				sessionId: 'sess1',
-				metadataToConsider: ['proto__field1']
+				metadataToConsider: ['proto__field1'],
 			});
 
 			expect(_store).not.toHaveBeenCalled();
@@ -242,18 +244,18 @@ if (import.meta.vitest) {
 						confirmed: false,
 						manuallyModified: false,
 						isDefault: true,
-						alternatives: {}
-					}
+						alternatives: {},
+					},
 				})
 			);
 			_tables.Metadata.getMany.mockResolvedValue([
-				{ id: 'proto__field1', type: 'string', default: 'new' }
+				{ id: 'proto__field1', type: 'string', default: 'new' },
 			]);
 
 			await resolveDefaults({
 				db,
 				sessionId: 'sess1',
-				metadataToConsider: ['proto__field1']
+				metadataToConsider: ['proto__field1'],
 			});
 
 			expect(_store).toHaveBeenCalledWith(
@@ -270,18 +272,18 @@ if (import.meta.vitest) {
 						confirmed: false,
 						manuallyModified: false,
 						isDefault: true,
-						alternatives: {}
-					}
+						alternatives: {},
+					},
 				})
 			);
 			_tables.Metadata.getMany.mockResolvedValue([
-				{ id: 'proto__field1', type: 'string', default: 'hello' }
+				{ id: 'proto__field1', type: 'string', default: 'hello' },
 			]);
 
 			await resolveDefaults({
 				db,
 				sessionId: 'sess1',
-				metadataToConsider: ['proto__field1']
+				metadataToConsider: ['proto__field1'],
 			});
 
 			expect(_store).not.toHaveBeenCalled();
@@ -291,20 +293,20 @@ if (import.meta.vitest) {
 			const db = mockDb(makeSession());
 			const renderFn = vi.fn(() => 'computed');
 			_tables.Metadata.getMany.mockResolvedValue([
-				{ id: 'proto__field1', type: 'string', default: { render: renderFn } }
+				{ id: 'proto__field1', type: 'string', default: { render: renderFn } },
 			]);
 
 			await resolveDefaults({
 				db,
 				sessionId: 'sess1',
-				metadataToConsider: ['proto__field1']
+				metadataToConsider: ['proto__field1'],
 			});
 
 			expect(renderFn).toHaveBeenCalledWith(
 				expect.objectContaining({
 					session: expect.objectContaining({
-						createdAt: '2024-01-01T00:00:00.000Z'
-					})
+						createdAt: '2024-01-01T00:00:00.000Z',
+					}),
 				})
 			);
 			expect(_store).toHaveBeenCalledWith(
@@ -318,13 +320,13 @@ if (import.meta.vitest) {
 
 			const db = mockDb(makeSession());
 			_tables.Metadata.getMany.mockResolvedValue([
-				{ id: 'proto__field1', type: 'string', default: { render: () => errors } }
+				{ id: 'proto__field1', type: 'string', default: { render: () => errors } },
 			]);
 
 			await resolveDefaults({
 				db,
 				sessionId: 'sess1',
-				metadataToConsider: ['proto__field1']
+				metadataToConsider: ['proto__field1'],
 			});
 
 			expect(_toasts.warn).toHaveBeenCalled();
@@ -341,7 +343,7 @@ if (import.meta.vitest) {
 				db,
 				sessionId: 'sess1',
 				metadataToConsider: ['proto__field1'],
-				iterations: 2 // allow one level of recursion
+				iterations: 2, // allow one level of recursion
 			});
 
 			// db.get called twice: initial + one recursive call
@@ -356,14 +358,14 @@ if (import.meta.vitest) {
 			_tables.Metadata.getMany
 				.mockResolvedValueOnce([
 					{ id: 'proto__a', type: 'string', default: 'val-a' },
-					{ id: 'proto__b', type: 'integer', default: 42 }
+					{ id: 'proto__b', type: 'integer', default: 42 },
 				])
 				.mockResolvedValueOnce([]); // recursive call finds nothing new
 
 			await resolveDefaults({
 				db,
 				sessionId: 'sess1',
-				metadataToConsider: ['proto__a', 'proto__b']
+				metadataToConsider: ['proto__a', 'proto__b'],
 			});
 
 			expect(_store).toHaveBeenCalledWith(
@@ -384,8 +386,8 @@ if (import.meta.vitest) {
 							confirmed: false,
 							manuallyModified: false,
 							isDefault: false,
-							alternatives: {}
-						}
+							alternatives: {},
+						},
 					},
 					'proto'
 				)
@@ -395,13 +397,13 @@ if (import.meta.vitest) {
 				(_payload: typeof MetadataDefaultDynamicPayload.inferIn) => 'derived'
 			);
 			_tables.Metadata.getMany.mockResolvedValue([
-				{ id: 'proto__label', type: 'string', default: { render: renderFn } }
+				{ id: 'proto__label', type: 'string', default: { render: renderFn } },
 			]);
 
 			await resolveDefaults({
 				db,
 				sessionId: 'sess1',
-				metadataToConsider: ['proto__label']
+				metadataToConsider: ['proto__label'],
 			});
 
 			const payload = renderFn.mock.calls[0][0];

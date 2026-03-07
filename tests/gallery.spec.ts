@@ -1,22 +1,20 @@
+import type { GROUP_FIELDS, SORT_FIELDS } from '../src/lib/schemas/sessions.js';
+import type { FixturePaths } from './filepaths.js';
+import type { AppFixture } from './fixtures.js';
+import type { Tuple } from './utils/index.js';
 import type { Locator } from '@playwright/test';
+
 import { addDays } from 'date-fns';
 
 import lightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
-import type { GROUP_FIELDS, SORT_FIELDS } from '../src/lib/schemas/sessions.js';
-import type { FixturePaths } from './filepaths.js';
-import { assert, test, type AppFixture } from './fixtures.js';
-import {
-	chooseFirstSession,
-	chooseInDropdown,
-	loadDatabaseDump,
-	type Tuple
-} from './utils/index.js';
+import { assert, test } from './fixtures.js';
+import { chooseFirstSession, chooseInDropdown, loadDatabaseDump } from './utils/index.js';
 
 const photos = [
 	'lil-fella.jpeg',
 	'cyan.jpeg',
 	'leaf.jpeg',
-	'with-exif-gps.jpeg'
+	'with-exif-gps.jpeg',
 ] as const satisfies FixturePaths.Photos[];
 
 const orders =
@@ -31,7 +29,7 @@ test.beforeEach(async ({ page, app }) => {
 		await Promise.all(
 			photos.map(async (filename) => [
 				filename,
-				await app.db.image.byFilename(filename).then((i) => i!.id)
+				await app.db.image.byFilename(filename).then((i) => i!.id),
 			])
 		)
 	) as Record<(typeof photos)[number], string>;
@@ -44,7 +42,7 @@ test.beforeEach(async ({ page, app }) => {
 			await app.db.metadata.set(ids[filename], 'shoot_date', days(index));
 			await app.db.metadata.set(ids[filename], 'conservation_status', {
 				value: 'ex',
-				confidence: 1 - index / 4
+				confidence: 1 - index / 4,
 			});
 
 			if (index === 0) {
@@ -53,7 +51,7 @@ test.beforeEach(async ({ page, app }) => {
 			} else {
 				await app.db.metadata.set(ids[filename], 'order', {
 					value: orders[index % 2].key,
-					confidence: index / 4
+					confidence: index / 4,
 				});
 			}
 		})
@@ -67,21 +65,21 @@ test.describe('sorting', () => {
 		'cyan.jpeg',
 		'leaf.jpeg',
 		'lil-fella.jpeg',
-		'with-exif-gps.jpeg'
+		'with-exif-gps.jpeg',
 	]);
 
 	testCardsOrder('Métadonnée…', 'shoot_date', [
 		'lil-fella.jpeg',
 		'cyan.jpeg',
 		'leaf.jpeg',
-		'with-exif-gps.jpeg'
+		'with-exif-gps.jpeg',
 	]);
 
 	testCardsOrder('Confiance en…', 'conservation_status', [
 		'with-exif-gps.jpeg',
 		'leaf.jpeg',
 		'cyan.jpeg',
-		'lil-fella.jpeg'
+		'lil-fella.jpeg',
 	]);
 });
 
@@ -89,19 +87,19 @@ test.describe('grouping', () => {
 	testCardsGroups('Métadonnée…', 'order', {
 		'Ordre = Symphypleona': ['leaf.jpeg'],
 		'Ordre = Poduromorpha': ['cyan.jpeg', 'with-exif-gps.jpeg'],
-		'Sans Ordre': ['lil-fella.jpeg']
+		'Sans Ordre': ['lil-fella.jpeg'],
 	});
 
 	testCardsGroups('Présence de…', 'order', {
 		'Avec Ordre': ['cyan.jpeg', 'leaf.jpeg', 'with-exif-gps.jpeg'],
-		'Sans Ordre': ['lil-fella.jpeg']
+		'Sans Ordre': ['lil-fella.jpeg'],
 	});
 
 	testCardsGroups('Confiance en…', 'order', {
 		'Ordre: confiance à 75%-100%': ['with-exif-gps.jpeg'],
 		'Ordre: confiance à 50%-75%': ['leaf.jpeg'],
 		'Ordre: confiance à 25%-50%': ['cyan.jpeg'],
-		'Sans Ordre': ['lil-fella.jpeg']
+		'Sans Ordre': ['lil-fella.jpeg'],
 	});
 
 	test('collapse and expand groups', async ({ page }) => {

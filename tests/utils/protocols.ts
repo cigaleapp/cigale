@@ -1,8 +1,9 @@
 import { readFileSync } from 'node:fs';
+import type { ExportedProtocol } from '../../src/lib/schemas/protocols.js';
 import type { Page } from '@playwright/test';
+
 import YAML from 'yaml';
 
-import type { ExportedProtocol } from '../../src/lib/schemas/protocols.js';
 import { ExamplePaths, RealPaths } from '../filepaths.js';
 
 /**
@@ -22,7 +23,7 @@ export async function importProtocol(
 
 	await page
 		.getByRole('button', {
-			name: 'Importer'
+			name: 'Importer',
 		})
 		.click();
 
@@ -42,7 +43,7 @@ export async function importProtocol(
 			chooser.setFiles({
 				name,
 				mimeType: mime,
-				buffer: Buffer.from(utf8.encode(content))
+				buffer: Buffer.from(utf8.encode(content)),
 			})
 		);
 	}

@@ -17,7 +17,7 @@
 		onunacceptable,
 		filetypes,
 		children,
-		clickable
+		clickable,
 	} = $props();
 
 	/** @param {DragEvent} event */

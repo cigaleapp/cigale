@@ -58,7 +58,7 @@
 					help: 'Recherche de mise à jour…',
 					state: 'checking',
 					current: version,
-					newest: undefined
+					newest: undefined,
 				})}
 			{:else}
 				<Btn help="Recherche de mise à jour…" disabled onclick={() => {}}>
@@ -98,7 +98,7 @@
 					help,
 					state: 'uptodate',
 					current: version,
-					newest: newVersion
+					newest: newVersion,
 				})}
 			{:else if upToDate}
 				<Btn {help} {onclick}>
@@ -120,7 +120,7 @@
 					help,
 					state: upgrading ? 'upgrading' : 'available',
 					current: version,
-					newest: newVersion
+					newest: newVersion,
 				})}
 			{:else}
 				<Btn {onclick} {help}>
@@ -152,7 +152,7 @@
 					help: `Impossible de vérifier les mises à jour: ${e}`,
 					state: 'error',
 					current: version,
-					newest: undefined
+					newest: undefined,
 				})}
 			{:else}
 				<Btn {onclick} help="Impossible de vérifier les mises à jour: {e}">
@@ -172,7 +172,7 @@
 		help: 'Ce protocole ne supporte pas la vérification des mises à jour',
 		state: 'error',
 		current: version,
-		newest: undefined
+		newest: undefined,
 	})}
 {:else if version}
 	<Btn onclick={() => {}} help="Ce protocole ne supporte pas la vérification des mises à jour">
@@ -189,7 +189,7 @@
 		help: "Ce protocole n'est pas versionné, pour le mettre à jour, supprimer le et importez la nouvelle version",
 		state: 'error',
 		current: undefined,
-		newest: undefined
+		newest: undefined,
 	})}
 {:else}
 	<Btn

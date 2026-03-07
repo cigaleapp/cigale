@@ -7,7 +7,7 @@ import { dependencyURI, get, set } from '$lib/idb.svelte';
 import {
 	ensureNamespacedMetadataId,
 	metadataOptionId,
-	namespacedMetadataId
+	namespacedMetadataId,
 } from '$lib/schemas/metadata';
 import { toasts } from '$lib/toasts.svelte';
 

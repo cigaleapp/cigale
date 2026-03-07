@@ -1,4 +1,11 @@
 <script lang="ts">
+	import type { MaybeLoading } from './LoadingText.svelte';
+	import type {
+		NodeProvenance,
+		TreeLeaf,
+		TreeNode,
+		TreeNodeMaybeLoading,
+	} from '$lib/file-tree.js';
 	import type { Component, Snippet } from 'svelte';
 
 	import IconCroppedImage from '~icons/ri/crop-line';
@@ -14,24 +21,13 @@
 	import IconFolder from '~icons/ri/folder-2-line';
 	import IconFolderNew from '~icons/ri/folder-add-line';
 	import IconFullImage from '~icons/ri/image-2-line';
-	import type {
-		NodeProvenance,
-		TreeLeaf,
-		TreeNode,
-		TreeNodeMaybeLoading
-	} from '$lib/file-tree.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import { toasts } from '$lib/toasts.svelte.js';
 	import Tooltip from '$lib/Tooltip.svelte';
 
 	import Badge from './Badge.svelte';
 	import { plural } from './i18n.js';
-	import {
-		loaded,
-		Loading,
-		default as LoadingText,
-		type MaybeLoading
-	} from './LoadingText.svelte';
+	import { loaded, Loading, default as LoadingText } from './LoadingText.svelte';
 	import { scrollfader } from './scrollfader.js';
 
 	interface Props {
@@ -170,7 +166,7 @@
 									value={Loading}
 									mask={plural(child.children.length, [
 										'# élément',
-										'# éléments'
+										'# éléments',
 									])}
 								/>
 							{/if}

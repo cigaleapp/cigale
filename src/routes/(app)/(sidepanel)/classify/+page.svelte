@@ -13,7 +13,7 @@
 		imageBufferWasSaved,
 		imageIdToFileId,
 		imageIsClassified,
-		isValidImageId
+		isValidImageId,
 	} from '$lib/images';
 	import { loadModel } from '$lib/inference.js';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
@@ -50,14 +50,14 @@
 			metadata: observationMetadata({
 				definitions: tables.Metadata.state,
 				images: obs.images.map((id) => tables.Image.getFromState(id)).filter(nonnull),
-				observation: obs
+				observation: obs,
 			}),
 			virtual: false,
 			data: {
 				image: undefined,
 				observation: obs,
-				images: obs.images.map((id) => tables.Image.getFromState(id)).filter(nonnull)
-			}
+				images: obs.images.map((id) => tables.Image.getFromState(id)).filter(nonnull),
+			},
 		}))
 	);
 
@@ -78,9 +78,9 @@
 				data: {
 					image: img,
 					observation: undefined,
-					images: [img]
-				}
-			})) ?? []
+					images: [img],
+				},
+			})) ?? [],
 	]);
 
 	/**
@@ -118,11 +118,11 @@
 			protocolId: uiState.currentProtocol.id,
 			requests: {
 				model: settings.model,
-				classmapping: settings.classmapping
+				classmapping: settings.classmapping,
 			},
 			onProgress(p) {
 				modelLoadingProgress = p;
-			}
+			},
 		});
 	}
 
@@ -178,8 +178,8 @@
 				if (!id) return;
 
 				await goto('/(app)/(sidepanel)/classify/[observation]', { observation: id });
-			}
-		}
+			},
+		},
 	});
 </script>
 
@@ -218,7 +218,7 @@
 						}}
 						ondoubleclick={() => {
 							goto('/(app)/(sidepanel)/classify/[observation]', {
-								observation: observation.id
+								observation: observation.id,
 							});
 						}}
 						onretry={() => {

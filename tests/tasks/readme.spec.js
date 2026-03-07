@@ -14,7 +14,7 @@ test.describe('screenshots', { tag: '@real-protocol' }, () => {
 			 */
 			async function waitForAnalysis(page) {
 				await assert(firstObservationCard(page)).not.toHaveText(new RegExp('Analyse…'), {
-					timeout: 20_000
+					timeout: 20_000,
 				});
 			}
 
@@ -23,7 +23,7 @@ test.describe('screenshots', { tag: '@real-protocol' }, () => {
 
 				const languageNames = {
 					en: 'English',
-					fr: 'Français'
+					fr: 'Français',
 				};
 
 				await page.setViewportSize({ width: (16 / 9) * 720, height: 720 });

@@ -101,13 +101,13 @@
 			{
 				key: 'CHW',
 				label: 'Hauteur-largeur sans batch',
-				subtext: 'CHW'
+				subtext: 'CHW',
 			},
 			{
 				key: '1CHW',
 				label: 'Hauteur-largeur avec batch*',
-				subtext: 'BCHW'
-			}
+				subtext: 'BCHW',
+			},
 		]}
 	>
 		{#snippet children({ key, label, subtext })}
@@ -209,19 +209,19 @@
 			{
 				key: 'raw',
 				label: 'Brutes',
-				subtext: /* @wc-include */ 'entre 0 et 255'
+				subtext: /* @wc-include */ 'entre 0 et 255',
 			},
 			{
 				key: 'normalized',
 				label: 'Normalisées',
-				subtext: /* @wc-include */ 'entre 0 et 1'
-			}
+				subtext: /* @wc-include */ 'entre 0 et 1',
+			},
 		]}
 	>
 		{#snippet children({ key, label, subtext })}
 			{@const colors = [
 				[44, 19, 116],
-				[148, 0, 0]
+				[148, 0, 0],
 			]}
 			<div class="color-values radio-card-text">
 				<span class="text">{label}</span>

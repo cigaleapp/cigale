@@ -30,7 +30,7 @@ export async function setSettings({ page }, newSettings) {
 		await window.DB.put('Settings', {
 			...settings,
 			id: 'user',
-			...newSettings
+			...newSettings,
 		});
 
 		window.refreshDB();

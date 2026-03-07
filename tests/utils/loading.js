@@ -22,26 +22,26 @@ export async function waitForLoadingEnd(area, timeout = 30_000) {
 		typeof timeout === 'number'
 			? {
 					begin: timeout,
-					finish: timeout
+					finish: timeout,
 				}
 			: {
 					begin: 30_000,
 					finish: 120_000,
-					...timeout
+					...timeout,
 				};
 
 	await expect(area.getByText(loadingText).first()).toBeVisible({
-		timeout: timeouts.begin
+		timeout: timeouts.begin,
 	});
 
 	if (concurrency > 1) {
 		// Ensure we have multiple (concurrency amount) loading items occurring at once (really loading, not just queued)
 		await expect(area.getByText(loadingNotQueuedText)).toHaveCount(concurrency, {
-			timeout: timeouts.begin
+			timeout: timeouts.begin,
 		});
 	}
 
 	await expect(area.getByText(loadingText)).toHaveCount(0, {
-		timeout: timeouts.finish
+		timeout: timeouts.finish,
 	});
 }

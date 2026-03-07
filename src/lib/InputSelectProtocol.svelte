@@ -33,8 +33,8 @@
 				async onclick() {
 					value = p.id;
 					await onchange?.(value);
-				}
-			}))
+				},
+			})),
 		},
 		{
 			items: [
@@ -44,10 +44,10 @@
 					label: 'Gérer les protocoles',
 					async onclick() {
 						await goto('/protocols');
-					}
-				}
-			]
-		}
+					},
+				},
+			],
+		},
 	]}
 >
 	{#snippet trigger(props)}

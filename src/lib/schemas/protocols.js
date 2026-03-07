@@ -9,14 +9,14 @@ import {
 	NamespacedMetadataID,
 	ProtocolID,
 	SingleEntryRecord,
-	URLString
+	URLString,
 } from './common.js';
 import { TemplatedString } from './expressions.js';
 import {
 	Metadata,
 	MetadataGroup,
 	namespacedMetadataId,
-	SidecarFilepathTemplate
+	SidecarFilepathTemplate,
 } from './metadata.js';
 import { Image, Observation } from './observations.js';
 import { AnalyzedImage, AnalyzedObservation } from './results.js';
@@ -24,7 +24,7 @@ import { AnalyzedImage, AnalyzedObservation } from './results.js';
 export const ExportsFilepathTemplateObservation = FilepathTemplate(
 	type({
 		observation: AnalyzedObservation.omit('images'),
-		image: AnalyzedImage.omit('exportedAs')
+		image: AnalyzedImage.omit('exportedAs'),
 		// TODO deprecate these, put them in the image object only
 	}).and(AnalyzedImage.pick('sequence', 'numberInObservation'))
 );
@@ -42,8 +42,8 @@ export const ExportsFilepathTemplateMetadataFile = FilepathTemplate(
 		id: [
 			'string',
 			'@',
-			'Référence du fichier, correspondant à la valeur de la métadonnée de type "file"'
-		]
+			'Référence du fichier, correspondant à la valeur de la métadonnée de type "file"',
+		],
 	})
 );
 
@@ -52,8 +52,8 @@ export const ANALYSIS_JSON_ZIP_FILEPATH = 'analysis.json';
 export const ProtocolRegistry = type({
 	protocols: type({
 		id: ProtocolID,
-		url: URLString.describe('URL où télécharger le protocole')
-	}).array()
+		url: URLString.describe('URL où télécharger le protocole'),
+	}).array(),
 });
 
 const ItemsImportSpec = type
@@ -75,7 +75,7 @@ const ItemsImportSpec = type
 export const ProtocolImport = type({
 	from: ProtocolID.describe('ID du protocole duquel importer'),
 	sessionMetadata: ItemsImportSpec,
-	metadata: ItemsImportSpec
+	metadata: ItemsImportSpec,
 }).narrow(({ sessionMetadata, metadata }, ctx) =>
 	(sessionMetadata?.length ?? 0) + (metadata?.length ?? 0) > 0
 		? true
@@ -91,14 +91,14 @@ export const Protocol = type({
 		sessionwide: [
 			'boolean',
 			'@',
-			"True si la métadonnée s'importe en tant que sessionMetadata plutôt que metadata classique"
+			"True si la métadonnée s'importe en tant que sessionMetadata plutôt que metadata classique",
 		],
 		source: NamespacedMetadataID.describe(
 			"ID de la métadonnée dans le protocole d'où elle est importée, avec namespace"
 		),
 		target: NamespacedMetadataID.describe(
 			'ID de la métadonnée dans le protocole courant, avec namespace'
-		)
+		),
 	})
 		.array()
 
@@ -130,7 +130,7 @@ export const Protocol = type({
 	),
 	authors: type({
 		'email?': ['string.email', '@', 'Adresse email'],
-		name: ['string', '@', 'Prénom Nom']
+		name: ['string', '@', 'Prénom Nom'],
 	})
 		.array()
 		.describe("Les auteurices ayant participé à l'élaboration du protocole"),
@@ -141,21 +141,21 @@ export const Protocol = type({
 		'defaultLabel?': TemplatedString(
 			type({
 				images: Image.array(),
-				observation: Observation
+				observation: Observation,
 			})
 		).describe(
 			"Label par défaut pour les observations. Template Handlebars, recevant une liste des images de l'observation à crééer (clé images) et l'observation elle-même (clé observation)"
-		)
+		),
 	},
 	'crop?': type({
 		padding: type(/^\d+(%|px)$/)
 			.describe(
 				"Pixels de marge à rajouter autour de la boîte englobante au moment d'exporter les images recadrées. Nombre suivi de 'px' pour un nombre de pixels fixe, ou de '%' pour un pourcentage des dimensions de chaque image."
 			)
-			.default('0px')
+			.default('0px'),
 	}).describe('Configuration de la partie recadrage'),
 	'sidecars?': type({
-		filepath: SidecarFilepathTemplate
+		filepath: SidecarFilepathTemplate,
 	}).describe(
 		'Définition par défaut des fichiers sidecar (fichiers annexes associés à chaque image par rapport à son nom de fichier)'
 	),
@@ -166,8 +166,8 @@ export const Protocol = type({
 			'mtime?': [
 				'string',
 				'@',
-				'Métadonnée à utiliser pour la date de modification des fichiers exportés'
-			]
+				'Métadonnée à utiliser pour la date de modification des fichiers exportés',
+			],
 		}).describe(
 			`Chemins où sauvegarder les images. Vous pouvez utiliser {{observation.metadata.identifiant.value}} pour insérer la valeur d'une métadonnée, {{image.filename}} pour le nom de fichier, {{observation.label}} pour le label (nom) de l'observation, et {{sequence}} pour un numéro d'image, commençant à 1. {{observation.metadata.identifiant.valueLabel}} peut être pratique pour obtenir le label associé au choix d'une métadonnée de type 'enum'. Enfin, il est possible de faire {{suffix image.filename "_exemple"}} pour ajouter "_exemple" à la fin d'un nom de fichier, mais avant son extension (par exemple: {{suffix image.filename "_cropped"}} donnera "IMG_1245_cropped.JPEG" si l'image avait pour nom de fichier "IMG_12345.JPEG"); Vous pouvez faire {{extension image.filename}} pour avoir l'extension d'un fichier, et {{fallback image.metadata.exemple "(Inconnnu)"}} pour utiliser "(Inconnu)" si image.metadata.example n'existe pas. Ce sont enfait des templates Handlebars, en savoir plus: https://handlebarsjs.com/guide/`
 		),
@@ -184,11 +184,11 @@ export const Protocol = type({
 				'Chemins où sauvegarder les fichiers pour les métadonnées de type "file". Même syntaxe que pour les images, mais avec en plus {{metadata}} pour accéder à la métadonnée elle-même, {{metadataKey}} pour accéder à la clé de la métadonnée (sans namespace), {{filename}} pour le nom du fichier, {{contentType}} pour son type MIME, {{id}} pour sa référence (cette référence est ce qui est stocké dans la valeur de la métadonnée de type "file", et peut être utilisée pour faire le lien entre les fichiers et les métadonnées), et {{size}} pour sa taille en octets.'
 			).default(
 				'{{ metadataKey }}-files/{{ stem filename }}-{{ id }}.{{ extension filename }}'
-			)
-		}
+			),
+		},
 	})
 		.describe("La structure du fichier .zip d'export pour ce protocole.")
-		.optional()
+		.optional(),
 });
 
 export const ExportedProtocol = Protocol.omit(
@@ -217,7 +217,7 @@ export const ExportedProtocol = Protocol.omit(
 		'sessionMetadata?': type.Record(
 			ID,
 			Metadata.in.omit('id').describe('Métadonnées associées à la session entière')
-		)
+		),
 	})
 	.pipe((protocol) => ({
 		...omit(protocol, 'imports'),
@@ -231,18 +231,18 @@ export const ExportedProtocol = Protocol.omit(
 			...metadata.map(({ source, target }) => ({
 				sessionwide: false,
 				source: namespacedMetadataId(from, source),
-				target: namespacedMetadataId(protocol.id, target)
+				target: namespacedMetadataId(protocol.id, target),
 			})),
 			...sessionMetadata.map(({ source, target }) => ({
 				sessionwide: true,
 				source: namespacedMetadataId(from, source),
-				target: namespacedMetadataId(protocol.id, target)
-			}))
+				target: namespacedMetadataId(protocol.id, target),
+			})),
 		]),
 		metadata: mapKeys(protocol.metadata, (key) => namespacedMetadataId(protocol.id, key)),
 		sessionMetadata: mapKeys(protocol.sessionMetadata ?? {}, (key) =>
 			namespacedMetadataId(protocol.id, key)
-		)
+		),
 	}));
 
 /**
@@ -259,7 +259,7 @@ export const ExportedProtocol = Protocol.omit(
 export function isMetadataInProtocol(protocol, metadataId) {
 	return [
 		...protocol.metadata,
-		...protocol.importedMetadata.flatMap(({ source, target }) => [source, target])
+		...protocol.importedMetadata.flatMap(({ source, target }) => [source, target]),
 	].includes(metadataId);
 }
 
@@ -271,8 +271,8 @@ if (import.meta.vitest) {
 		const protocol = {
 			metadata: ['proto__color', 'proto__size'],
 			importedMetadata: [
-				{ sessionwide: false, source: 'other__shape', target: 'proto__shape' }
-			]
+				{ sessionwide: false, source: 'other__shape', target: 'proto__shape' },
+			],
 		};
 
 		test('returns true for a direct metadata', () => {

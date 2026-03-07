@@ -20,15 +20,15 @@ const filepathMockData = {
 		metadataErrors: {},
 		contentType: 'image/jpeg',
 		id: 'i12345',
-		fileId: 'f12345'
+		fileId: 'f12345',
 	},
 	observation: {
 		label: 'Test Observation',
 		number: 1,
 		metadata: {},
 		metadataErrors: {},
-		protocolMetadata: {}
-	}
+		protocolMetadata: {},
+	},
 };
 
 describe('generateId', () => {
@@ -95,7 +95,7 @@ describe('filepath templates', () => {
 		expect(
 			JSON.stringify({
 				path: template,
-				type: 'filepath-template'
+				type: 'filepath-template',
 			})
 		).toBe('{"path":"{{id}}.jpg","type":"filepath-template"}');
 	});
@@ -137,7 +137,7 @@ describe('MetadataValue', () => {
 			Schemas.MetadataValue.assert({
 				value: val,
 				confidence: 0.5,
-				alternatives: {}
+				alternatives: {},
 			});
 
 		test('invalid', () => {

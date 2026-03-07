@@ -36,7 +36,7 @@
 			requests: { model: cropModel, classmapping: undefined },
 			onProgress(p) {
 				modelLoadingProgress = p;
-			}
+			},
 		});
 	}
 

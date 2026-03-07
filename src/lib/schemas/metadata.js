@@ -14,14 +14,14 @@ import {
 	Probability,
 	ProtocolID,
 	UniqueFileTypeSpecifier,
-	URLString
+	URLString,
 } from './common.js';
 import { NaturalRegexExpression, NumberRangeLiteral, RegexExpression } from './constraints.js';
 import { JsonataExpression, TemplatedString } from './expressions.js';
 import {
 	MODEL_DETECTION_OUTPUT_SHAPES,
 	NeuralBoundingBoxInference,
-	NeuralEnumInference
+	NeuralEnumInference,
 } from './neural.js';
 import { NumericUnit as NumberUnit, NumericUnit } from './units.js';
 
@@ -56,16 +56,16 @@ export const METADATA_TYPES = /** @type {const} */ ({
 	date: { label: 'date', help: 'une date' },
 	location: {
 		label: 'localisation',
-		help: 'un objet avec deux nombres, `latitude` et `longitude`'
+		help: 'un objet avec deux nombres, `latitude` et `longitude`',
 	},
 	boundingbox: {
 		label: "région d'image",
-		help: 'un objet représentant une région rectangulaire au format YOLO'
+		help: 'un objet représentant une région rectangulaire au format YOLO',
 	},
 	file: {
 		label: 'fichier',
-		help: 'un fichier, représenté par une référence à un MetadataFile, qui est exporté séparément'
-	}
+		help: 'un fichier, représenté par une référence à un MetadataFile, qui est exporté séparément',
+	},
 });
 
 export const MetadataType = type.or(
@@ -96,7 +96,7 @@ export const MetadataRuntimeValue = /** @type {const} */ ({
 	date: type('Date'),
 	location: type({ latitude: 'number', longitude: 'number' }),
 	boundingbox: type({ x: 'number', y: 'number', w: 'number', h: 'number' }),
-	file: type(ID)
+	file: type(ID),
 });
 
 export const MetadataRuntimeValueAny = type.or(
@@ -123,7 +123,7 @@ export const MetadataError = type({
 			'@',
 			"Erreur survenue lors de l'inférence de la valeur de cette métadonnée"
 		)
-	)
+	),
 });
 
 export const MetadataErrors = type.Record(NamespacedMetadataID, MetadataError.array());
@@ -156,8 +156,8 @@ export const MetadataValue = type({
 		.describe('Si la valeur est la valeur par défaut définie dans le protocole')
 		.default(false),
 	alternatives: {
-		'[string.json]': Probability
-	}
+		'[string.json]': Probability,
+	},
 });
 
 export const MetadataValues = type.Record(NamespacedMetadataID, MetadataValue);
@@ -178,16 +178,16 @@ export const MetadataRecordValue = MetadataValue.omit('value').and({
 			MetadataRuntimeValue.file
 		),
 		'@',
-		'Valeur de la métadonnée'
+		'Valeur de la métadonnée',
 	],
 	'valueLabel?': [
 		'string',
 		'@',
-		"Label de la valeur de la métadonnée. Existe pour les métadonnées de type enum, contient dans ce cas le label associé à la clé de l'option de l'enum choisie"
+		"Label de la valeur de la métadonnée. Existe pour les métadonnées de type enum, contient dans ce cas le label associé à la clé de l'option de l'enum choisie",
 	],
 	'baseUnitValue?': type('number').describe(
 		"Si la métadonnée a une unité, c'est la valeur convertie dans l'unité de base définie pour cette métadonnée."
-	)
+	),
 });
 
 /**
@@ -202,28 +202,28 @@ export const MetadataRecord = (keySchema) => type.Record(keySchema, MetadataReco
 export const METADATA_MERGE_METHODS = /** @type {const} */ ({
 	min: {
 		label: 'Minimum',
-		help: "Choisir la valeur avec la meilleure confiance, et prendre la plus petite valeur en cas d'ambuiguité"
+		help: "Choisir la valeur avec la meilleure confiance, et prendre la plus petite valeur en cas d'ambuiguité",
 	},
 	max: {
 		label: 'Maximum',
-		help: "Choisir la valeur avec la meilleure confiance, et prendre la plus grande valeur en cas d'ambuiguité"
+		help: "Choisir la valeur avec la meilleure confiance, et prendre la plus grande valeur en cas d'ambuiguité",
 	},
 	average: {
 		label: 'Moyenne',
-		help: 'Prend la moyenne des valeurs'
+		help: 'Prend la moyenne des valeurs',
 	},
 	median: {
 		label: 'Médiane',
-		help: 'Prend la médiane des valeurs'
+		help: 'Prend la médiane des valeurs',
 	},
 	union: {
 		label: 'Union',
-		help: 'Spécifique aux boîtes de recadrage: fusionne les boîtes de recadrage en la plus petite boîte englobant toutes les boîtes'
+		help: 'Spécifique aux boîtes de recadrage: fusionne les boîtes de recadrage en la plus petite boîte englobant toutes les boîtes',
 	},
 	none: {
 		label: 'Aucune',
-		help: 'Ne pas fusionner'
-	}
+		help: 'Ne pas fusionner',
+	},
 });
 
 export const MetadataMergeMethod = type.or(
@@ -248,7 +248,7 @@ export const MetadataEnumVariant = type({
 	'image?': URLString.configure({
 		deprecated: true,
 		description:
-			"Image illustrant cette option de l'énumération. Utiliser plutôt `images` avec un seul élément."
+			"Image illustrant cette option de l'énumération. Utiliser plutôt `images` avec un seul élément.",
 	}),
 	'images?': URLString.array().describe(
 		"Liste d'images illustrant cette option de l'énumération. Permet d'en spécifier plusieurs"
@@ -266,7 +266,7 @@ export const MetadataEnumVariant = type({
 		.Record(ID, ID)
 		.describe(
 			'Objet contenant pour clés des identifiants d\'autres métadonnées, et pour valeurs la valeur à assigner à cette métadonnée si cette option est choisie. Le processus est récursif: Imaginons une métadonnée species ayant une option avec `{ key: "1", cascade: { genus: "2" } }`, une métadonnée genus ayant une option `{ key: "2", cascade: { family: "3" } }`. Si l\'option "1" de la métadonnée species est choisie, la métadonnée genus sera définie sur l\'option "2" et la métadonnée family sera à son tour définie sur l\'option "3".'
-		)
+		),
 });
 
 export const EXIFField = type.enumerated(...keys(EXIF_FIELDS));
@@ -274,7 +274,7 @@ export const EXIFField = type.enumerated(...keys(EXIF_FIELDS));
 export const EXIFInference = EXIFField.describe('Inférer depuis un champ EXIF', 'self');
 
 export const SidecarFilepathTemplatePayload = type({
-	filepath: ['string', '@', "Chemin vers le fichier de l'image traitée"]
+	filepath: ['string', '@', "Chemin vers le fichier de l'image traitée"],
 	// TODO more stuff
 });
 
@@ -290,7 +290,7 @@ export const SidecarInference = (QueryOutput) =>
 	type.or(
 		type('string').pipe((query) => ({
 			query: JsonataExpression(type.unknown, QueryOutput).assert(query),
-			filepath: undefined
+			filepath: undefined,
 		})),
 		{
 			filepath: SidecarFilepathTemplate.describe(
@@ -298,14 +298,14 @@ export const SidecarInference = (QueryOutput) =>
 			),
 			query: JsonataExpression(type.unknown, QueryOutput).describe(
 				'Un expression Jsonata (https://docs.jsonata.org/) pour extraire la valeur depuis le fichier sidecar'
-			)
+			),
 		}
 	);
 
 export const InferenceConfigs = /** @type {const} */ ({
 	exif: type({
 		exif: EXIFInference.describe("Inférer depuis les données EXIF de l'image"),
-		'+': 'reject'
+		'+': 'reject',
 	}),
 
 	/**
@@ -317,21 +317,21 @@ export const InferenceConfigs = /** @type {const} */ ({
 			sidecar: SidecarInference(QueryOutput).describe(
 				"Inférer depuis un fichier annexe associé à l'image, dont le nom dépend du nom de l'image associée. Le fichier doit être au format JSON ou XML. L'inférence se fait à l'aide d'une expression Jsonata (https://docs.jsonata.org/), qui permet d'extraire la valeur de la métadonnée depuis ce fichier"
 			),
-			'+': 'reject'
+			'+': 'reject',
 		}),
 
 	neuralEnum: type({
 		neural: NeuralEnumInference.array().describe(
 			'Inférer depuis un ou plusieurs réseaux neuronaux de classification'
 		),
-		'+': 'reject'
+		'+': 'reject',
 	}),
 	neuralBoundingBox: type({
 		neural: NeuralBoundingBoxInference.array().describe(
 			"Inférer depuis un ou plusieurs réseaux neuronaux de détection d'objets"
 		),
-		'+': 'reject'
-	})
+		'+': 'reject',
+	}),
 });
 
 export const MetadataDefaultDynamicPayload = type({
@@ -340,8 +340,8 @@ export const MetadataDefaultDynamicPayload = type({
 	session: {
 		protocolMetadata: MetadataRecord(NamespacedMetadataID),
 		metadata: MetadataRecord(ID),
-		createdAt: 'string.date.iso'
-	}
+		createdAt: 'string.date.iso',
+	},
 });
 
 export const MetadataDefault = scope({ MetadataRuntimeValueAny }).type(
@@ -350,7 +350,7 @@ export const MetadataDefault = scope({ MetadataRuntimeValueAny }).type(
 		[
 			'Exclude<static, string>',
 			'@',
-			"Une valeur par défaut pour une métadonnée. Pour l'instant, uniquement supportée sur les métadonnées de session"
+			"Une valeur par défaut pour une métadonnée. Pour l'instant, uniquement supportée sur les métadonnées de session",
 		],
 		'|',
 		TemplatedString(MetadataDefaultDynamicPayload, (serialized) => {
@@ -363,7 +363,7 @@ export const MetadataDefault = scope({ MetadataRuntimeValueAny }).type(
 			return parsed;
 		}).describe(
 			"Une valeur par défaut dynamique. Pour l'instant, uniquement supportée sur les métadonnées de session. C'est une templates Handlebars, avec pour variables `protocolMetadata` (contenant les métadonnées du protocole courant) et `metadata` (contenant les métadonnées de _toutes_ les métadonnées). La valeur par défaut sera évaluée en considérant que le texte final (après éxécution de la template Handlebars) est une représentation JSON (sauf pour les métadonnées de type texte ou enum, où le text final est pris tel-quel). Les helpers gps, boundingBox, date, object et array sont disponibles pour facilement construire des représentations JSON de valeurs complexes"
-		)
+		),
 	]
 );
 
@@ -410,13 +410,13 @@ const MetadataBase = type({
 		.describe('Les options valides. Uniquement utile pour une métadonnée de type "enum"'),
 	learnMore: URLString.describe(
 		'Un lien pour en apprendre plus sur ce que cette métadonnée décrit'
-	).optional()
+	).optional(),
 });
 
 const MetadataBoolean = MetadataBase.and({
 	type: '"boolean"',
 	'default?': MetadataDefault('boolean'),
-	'infer?': type.or(InferenceConfigs.exif, InferenceConfigs.sidecar(type('boolean')))
+	'infer?': type.or(InferenceConfigs.exif, InferenceConfigs.sidecar(type('boolean'))),
 });
 
 export const MetadataString = MetadataBase.and({
@@ -426,7 +426,7 @@ export const MetadataString = MetadataBase.and({
 	'regex?': RegexExpression.describe(
 		'Une expression régulière que la valeur de cette métadonnée doit respecter'
 	),
-	'pattern?': NaturalRegexExpression
+	'pattern?': NaturalRegexExpression,
 });
 
 export const MetadataInteger = MetadataBase.and({
@@ -434,7 +434,7 @@ export const MetadataInteger = MetadataBase.and({
 	'range?': NumberRangeLiteral,
 	'default?': MetadataDefault('number.integer'),
 	'infer?': type.or(InferenceConfigs.exif, InferenceConfigs.sidecar(type('number.integer'))),
-	'unit?': NumberUnit
+	'unit?': NumberUnit,
 }).pipe();
 
 export const MetadataFloat = MetadataBase.and({
@@ -442,7 +442,7 @@ export const MetadataFloat = MetadataBase.and({
 	'range?': NumberRangeLiteral,
 	'default?': MetadataDefault('number'),
 	'infer?': type.or(InferenceConfigs.exif, InferenceConfigs.sidecar(type('number'))),
-	'unit?': NumberUnit
+	'unit?': NumberUnit,
 });
 
 export const MetadataDate = MetadataBase.and({
@@ -452,7 +452,7 @@ export const MetadataDate = MetadataBase.and({
 	'infer?': type.or(
 		InferenceConfigs.exif,
 		InferenceConfigs.sidecar(type('string.date.iso.parse'))
-	)
+	),
 });
 
 const MetadataLocation = MetadataBase.and({
@@ -463,9 +463,9 @@ const MetadataLocation = MetadataBase.and({
 		{
 			latitude: InferenceConfigs.exif,
 			longitude: InferenceConfigs.exif,
-			'+': 'reject'
+			'+': 'reject',
 		}
-	)
+	),
 });
 
 const MetadataEnum = MetadataBase.and({
@@ -475,7 +475,7 @@ const MetadataEnum = MetadataBase.and({
 		InferenceConfigs.exif,
 		InferenceConfigs.sidecar(type('string|number')),
 		InferenceConfigs.neuralEnum
-	)
+	),
 });
 
 const MetadataBoundingbox = MetadataBase.and({
@@ -484,7 +484,7 @@ const MetadataBoundingbox = MetadataBase.and({
 		x: '0 <= number <= 1',
 		y: '0 <= number <= 1',
 		w: '0 <= number <= 1',
-		h: '0 <= number <= 1'
+		h: '0 <= number <= 1',
 	}),
 	'infer?': type.or(
 		InferenceConfigs.neuralBoundingBox,
@@ -496,7 +496,7 @@ const MetadataBoundingbox = MetadataBase.and({
 					(shape) =>
 						/** @type {const} */
 						([shape, type('0 <= number <= 1').optional()])
-				)
+				),
 			})
 				.array()
 				.pipe((boxes) =>
@@ -510,7 +510,7 @@ const MetadataBoundingbox = MetadataBase.and({
 					})
 				)
 		)
-	)
+	),
 });
 
 export const MetadataFile = MetadataBase.and({
@@ -522,7 +522,7 @@ export const MetadataFile = MetadataBase.and({
 				name: 'string',
 				'type?': MIMEType,
 				'lastModified?': 'number',
-				content: type.or('string', ['instanceof', Uint8Array])
+				content: type.or('string', ['instanceof', Uint8Array]),
 			}).pipe(({ name, content, ...attrs }) => new File([content], name, attrs))
 		)
 	),
@@ -532,7 +532,7 @@ export const MetadataFile = MetadataBase.and({
 	accept: UniqueFileTypeSpecifier.array()
 		.pipe((specs) => specs.join(', '))
 		.describe('Fichiers acceptés pour cette métadonnée')
-		.default(() => [])
+		.default(() => []),
 });
 
 export const Metadata = type.or(
@@ -555,7 +555,7 @@ export const MetadataGroup = type({
 		'boolean',
 		'@',
 		"Si le groupe doit être replié par défaut dans l'interface utilisateur. Utile pour les groupes contenant beaucoup de métadonnées ou des métadonnées peu importantes"
-	).default(false)
+	).default(false),
 });
 
 /**
@@ -665,6 +665,6 @@ export function namespaceOfMetadataId(metadataId) {
 export function splitMetadataId(metadataId) {
 	return {
 		namespace: namespaceOfMetadataId(metadataId),
-		id: removeNamespaceFromMetadataId(metadataId)
+		id: removeNamespaceFromMetadataId(metadataId),
 	};
 }

@@ -15,8 +15,8 @@ export function pr(number) {
 		tag: `@pr`,
 		annotation: {
 			type: 'pullrequest',
-			description: `https://github.com/cigaleapp/cigale/pull/${number}`
-		}
+			description: `https://github.com/cigaleapp/cigale/pull/${number}`,
+		},
 	};
 }
 
@@ -29,8 +29,8 @@ export function issue(...numbers) {
 		tag: '@issue',
 		annotation: numbers.map((n) => ({
 			type: 'issue',
-			description: `https://github.com/cigaleapp/cigale/issues/${n}`
-		}))
+			description: `https://github.com/cigaleapp/cigale/issues/${n}`,
+		})),
 	};
 }
 
@@ -45,7 +45,7 @@ export function withParallelism(value) {
 	return {
 		annotation: {
 			type: 'concurrency',
-			description: (value * 3).toString()
-		}
+			description: (value * 3).toString(),
+		},
 	};
 }

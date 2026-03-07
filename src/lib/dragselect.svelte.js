@@ -81,11 +81,11 @@ export class DragSelect {
 			// file://./dragselect.css
 			selectionAreaClass: 'viselect-selection-area',
 			behaviour: {
-				overlap: 'keep'
+				overlap: 'keep',
 			},
 			features: {
-				deselectOnBlur: true
-			}
+				deselectOnBlur: true,
+			},
 		});
 
 		// Clear selection if no modifier key is pressed

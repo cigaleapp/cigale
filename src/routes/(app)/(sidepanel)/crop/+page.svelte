@@ -32,10 +32,10 @@
 					{
 						definitions: idb.tables.Metadata.state,
 						// TODO
-						options: {}
+						options: {},
 					}
 				),
-				data: images
+				data: images,
 			})
 		)
 	);
