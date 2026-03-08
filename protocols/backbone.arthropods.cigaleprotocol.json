@@ -1,0 +1,501 @@
+{
+  "id": "io.github.cigaleapp.backbone.arthropods",
+  "name": "Arthropodes",
+  "version": 0,
+  "updates": "automatic",
+  "source": "https://example.com",
+  "description": "Protocole de base pour l'identification des arthropodes.",
+  "authors": [
+    {
+      "name": "GBIF Contributors",
+      "email": "info@gbif.org"
+    },
+    {
+      "name": "Jessica Joachim",
+      "email": "tifaeriis@gmail.com"
+    },
+    {
+      "name": "Gwenn Le Bihan",
+      "email": "gwenn.lebihan7@gmail.com"
+    },
+    {
+      "name": "Maxime Cauchoix"
+    },
+    {
+      "name": "Léo Chekir"
+    },
+    {
+      "name": "Lighten #1"
+    },
+    {
+      "name": "Lighten #10"
+    },
+    {
+      "name": "Lighten #2"
+    },
+    {
+      "name": "Lighten #3"
+    },
+    {
+      "name": "Lighten #4"
+    },
+    {
+      "name": "Lighten #5"
+    }
+  ],
+  "metadataOrder": [
+    "prospection_duration",
+    "prospection_distance",
+    "homogenous_habitat",
+    "strictness",
+    "wind",
+    "temperature",
+    "cloud_coverage",
+    "shadow",
+    "camera_type",
+    "has_flash",
+    "session_date",
+    "species",
+    "genus",
+    "family",
+    "order",
+    "habitat_photo",
+    "shoot_date",
+    "shoot_location",
+    "identification_difficulty",
+    "conservation_status",
+    "class",
+    "phylum",
+    "kingdom",
+    "crop"
+  ],
+  "metadataGroups": {
+    "taxonomy": {
+      "name": "Taxonomie",
+      "description": "Classification taxonomique de l'espèce"
+    }
+  },
+  "sessionMetadata": {
+    "prospection_duration": {
+      "type": "integer",
+      "label": "Durée de prospection",
+      "description": "Durée de la prospection sur le terrain",
+      "unit": "minutes",
+      "required": false,
+      "mergeMethod": "average",
+      "range": "> 0",
+      "images": [],
+      "groupable": false,
+      "sortable": false
+    },
+    "prospection_distance": {
+      "type": "integer",
+      "label": "Distance de prospection",
+      "description": "Distance parcourue pendant la prospection",
+      "unit": "meters",
+      "required": false,
+      "mergeMethod": "average",
+      "range": "> 0",
+      "images": [],
+      "groupable": false,
+      "sortable": false
+    },
+    "homogenous_habitat": {
+      "type": "boolean",
+      "label": "Habitat homogène",
+      "description": "Jai choisi un habitat homogène pour réaliser mon relevé (laisser vide si inconnu)",
+      "required": false,
+      "mergeMethod": "none"
+    },
+    "strictness": {
+      "type": "enum",
+      "label": "Exhaustivité du relevé",
+      "description": "Jai photographié",
+      "required": true,
+      "mergeMethod": "min",
+      "options": [
+        {
+          "key": "all",
+          "label": "Tous les individus rencontrés"
+        },
+        {
+          "key": "inventory",
+          "label": "Au moins un individu de chaque espèce rencontrée"
+        },
+        {
+          "key": "at_will",
+          "label": "Juste quelques individus quand j'en avais envie"
+        }
+      ],
+      "images": [],
+      "groupable": false,
+      "sortable": false
+    },
+    "wind": {
+      "type": "enum",
+      "label": "Vent",
+      "description": "Condition de vent pendant la prospection",
+      "required": false,
+      "mergeMethod": "max",
+      "options": [
+        {
+          "key": "none",
+          "label": "Pas du tout"
+        },
+        {
+          "key": "light",
+          "label": "Léger"
+        },
+        {
+          "key": "moderate",
+          "label": "Modéré"
+        },
+        {
+          "key": "strong",
+          "label": "Fort"
+        }
+      ],
+      "images": [],
+      "groupable": false,
+      "sortable": false
+    },
+    "temperature": {
+      "type": "integer",
+      "label": "Température",
+      "description": "Température approximative pendant la prospection",
+      "unit": "celsius",
+      "required": false,
+      "mergeMethod": "average",
+      "range": ">= -273.15",
+      "images": [],
+      "groupable": false,
+      "sortable": false
+    },
+    "cloud_coverage": {
+      "type": "enum",
+      "label": "Couverture nuageuse",
+      "description": "Condition de couverture nuageuse pendant la prospection",
+      "required": false,
+      "mergeMethod": "max",
+      "options": [
+        {
+          "key": "clear",
+          "label": "Dégagé"
+        },
+        {
+          "key": "10_30_percent",
+          "label": "10-30%"
+        },
+        {
+          "key": "half",
+          "label": "50%"
+        },
+        {
+          "key": "more_than_half",
+          "label": "Plus de 50%"
+        },
+        {
+          "key": "overcast",
+          "label": "Tout couvert"
+        }
+      ],
+      "images": [],
+      "groupable": false,
+      "sortable": false
+    },
+    "shadow": {
+      "type": "integer",
+      "label": "Photos à lombre",
+      "description": "Part des photos prises à lombre (en pourcentage)",
+      "required": false,
+      "mergeMethod": "average",
+      "range": "0..100",
+      "images": [],
+      "groupable": false,
+      "sortable": false
+    },
+    "camera_type": {
+      "type": "enum",
+      "label": "Type d’appareil photo",
+      "description": "Type dappareil photo utilisé pour prendre les photos",
+      "required": false,
+      "mergeMethod": "none",
+      "options": [
+        {
+          "key": "smartphone",
+          "label": "Smartphone"
+        },
+        {
+          "key": "compact",
+          "label": "Appareil photo compact"
+        },
+        {
+          "key": "dslr",
+          "label": "Appareil photo reflex (DSLR)"
+        },
+        {
+          "key": "mirrorless",
+          "label": "Appareil photo hybride"
+        }
+      ],
+      "images": [],
+      "groupable": false,
+      "sortable": false
+    },
+    "has_flash": {
+      "type": "boolean",
+      "label": "Flash utilisé",
+      "description": "Le flash de lappareil photo a-t-il été utilisé pour prendre des photos ?",
+      "required": false,
+      "mergeMethod": "max"
+    },
+    "session_date": {
+      "type": "date",
+      "label": "Date de la session",
+      "description": "Date à laquelle la session a été réalisée. On peut laisser vide si la date a été correctement réglée sur l’appareil photo",
+      "required": false,
+      "mergeMethod": "average",
+      "range": "past",
+      "images": [],
+      "groupable": false,
+      "sortable": false
+    }
+  },
+  "metadata": {
+    "kingdom": {
+      "type": "enum",
+      "group": "taxonomy",
+      "label": "Règne",
+      "required": true,
+      "description": "",
+      "mergeMethod": "max",
+      "groupable": true,
+      "options": [],
+      "images": [],
+      "sortable": false
+    },
+    "phylum": {
+      "type": "enum",
+      "group": "taxonomy",
+      "label": "Phylum",
+      "required": true,
+      "description": "",
+      "mergeMethod": "max",
+      "groupable": true,
+      "options": [],
+      "images": [],
+      "sortable": false
+    },
+    "class": {
+      "type": "enum",
+      "group": "taxonomy",
+      "label": "Classe",
+      "required": true,
+      "description": "",
+      "mergeMethod": "max",
+      "groupable": true,
+      "options": [],
+      "images": [],
+      "sortable": false
+    },
+    "order": {
+      "type": "enum",
+      "group": "taxonomy",
+      "label": "Ordre",
+      "required": true,
+      "description": "",
+      "mergeMethod": "max",
+      "groupable": true,
+      "options": [],
+      "images": [],
+      "sortable": false
+    },
+    "family": {
+      "type": "enum",
+      "group": "taxonomy",
+      "label": "Famille",
+      "required": true,
+      "description": "",
+      "mergeMethod": "max",
+      "groupable": true,
+      "options": [],
+      "images": [],
+      "sortable": false
+    },
+    "genus": {
+      "type": "enum",
+      "group": "taxonomy",
+      "label": "Genre",
+      "required": true,
+      "description": "",
+      "mergeMethod": "max",
+      "groupable": true,
+      "options": [],
+      "images": [],
+      "sortable": false
+    },
+    "species": {
+      "type": "enum",
+      "group": "taxonomy",
+      "label": "Espèce",
+      "required": true,
+      "description": "",
+      "mergeMethod": "max",
+      "groupable": true,
+      "options": [],
+      "infer": {
+        "neural": []
+      },
+      "images": [],
+      "sortable": false
+    },
+    "identification_difficulty": {
+      "type": "enum",
+      "label": "Difficulté didentification",
+      "description": "Niveau de difficulté pour identifier lespèce sur la photo",
+      "required": false,
+      "mergeMethod": "average",
+      "groupable": true,
+      "sortable": true,
+      "options": [
+        {
+          "key": "easy",
+          "label": "Facile",
+          "color": "#367517",
+          "icon": "ri:emotion-laugh-line"
+        },
+        {
+          "key": "medium",
+          "label": "Moyenne",
+          "color": "#e8e819",
+          "icon": "ri:emotion-happy-line"
+        },
+        {
+          "key": "hard",
+          "label": "Difficile",
+          "color": "#dd8808",
+          "icon": "ri:emotion-normal-line"
+        },
+        {
+          "key": "very_hard",
+          "label": "Très difficile",
+          "color": "#cd3c28",
+          "icon": "ri:emotion-unhappy-line"
+        }
+      ],
+      "images": []
+    },
+    "conservation_status": {
+      "type": "enum",
+      "label": "Statut de conservation",
+      "description": "Statut de conservation IUCN de lespèce",
+      "required": false,
+      "mergeMethod": "average",
+      "groupable": true,
+      "sortable": true,
+      "options": [
+        {
+          "key": "ex",
+          "label": "EX",
+          "description": "Éteint (“Extinct”)",
+          "color": "#000000"
+        },
+        {
+          "key": "ew",
+          "label": "EW",
+          "description": "Éteint à l’état sauvage (“Extinct in the Wild”)",
+          "color": "#3a3a3a"
+        },
+        {
+          "key": "cr",
+          "label": "CR",
+          "description": "En danger critique d’extinction (“Critically Endangered”)",
+          "color": "#cd3030"
+        },
+        {
+          "key": "en",
+          "label": "EN",
+          "description": "En danger (“Endangered”)",
+          "color": "#cd6630"
+        },
+        {
+          "key": "vu",
+          "label": "VU",
+          "description": "Vulnérable (“Vulnerable”)",
+          "color": "#cd9a00"
+        },
+        {
+          "key": "nt",
+          "label": "NT",
+          "description": "Quasi menacé (“Near Threatened”)",
+          "color": "#006666"
+        },
+        {
+          "key": "lc",
+          "label": "LC",
+          "description": "Préoccupation mineure (“Least Concern”)",
+          "color": "#16ca85"
+        }
+      ],
+      "images": []
+    },
+    "shoot_date": {
+      "type": "date",
+      "label": "Date",
+      "description": "Moment où la photo a été prise",
+      "required": false,
+      "mergeMethod": "average",
+      "sortable": true,
+      "groupable": true,
+      "infer": {
+        "exif": "DateTimeOriginal"
+      },
+      "images": []
+    },
+    "shoot_location": {
+      "type": "location",
+      "label": "Localisation",
+      "description": "Endroit où la photo a été prise",
+      "required": false,
+      "mergeMethod": "average",
+      "groupable": true,
+      "infer": {
+        "latitude": {
+          "exif": "GPSLatitude"
+        },
+        "longitude": {
+          "exif": "GPSLongitude"
+        }
+      },
+      "images": [],
+      "sortable": false
+    },
+    "crop": {
+      "type": "boundingbox",
+      "label": "",
+      "description": "",
+      "required": true,
+      "mergeMethod": "union",
+      "groupable": true,
+      "infer": {
+        "neural": []
+      },
+      "images": [],
+      "sortable": false
+    }
+  },
+  "exports": {
+    "metadata": {
+      "csv": "metadata.csv",
+      "json": "analysis.json"
+    },
+    "images": {
+      "mtime": "shoot_date",
+      "cropped": "Cropped/{{ fallback image.protocolMetadata.species.valueLabel \"(Unknown)\" }}_obs{{ observation.number }}_{{ sequence }}.{{ extension image.filename }}",
+      "original": "Original/{{ fallback image.protocolMetadata.species.valueLabel \"(Unknown)\" }}_obs{{ observation.number }}_{{ sequence }}.{{ extension image.filename }}"
+    }
+  },
+  "beamup": {
+    "origin": "https://beamup.gwen.works"
+  }
+}
