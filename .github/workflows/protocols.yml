@@ -12,6 +12,7 @@ on:
       - scripts/add-species-from-google-slides.js
       - scripts/add-taxonomic-parents-from-gbif.js
       - scripts/add-metadata-from-xper3.ts
+      - scripts/utils.ts
       - .github/workflows/protocols.yml
   push:
     branches:
@@ -40,20 +41,36 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: .bun-version
+
+      - name: Get paths to check changes for
+        id: paths
+        env:
+          workflow_ref: ${{ github.workflow_ref }}
+        run: |
+          # We sadly don't have yq, so a JS script will have to do
+
+          bun - <<'EOS' >> $GITHUB_OUTPUT
+            const path = process.env.workflow_ref
+              .split('@').at(0)
+              .split('/').slice(2).join('/')
+
+            const workflow = await import(`./${path}`)
+
+            console.log('files<<EOF')
+            console.log(workflow.on.pull_request.paths.join('\n'))
+            console.log('EOF')
+          EOS
       - name: Compute changes with last push
         id: changes
         uses: tj-actions/changed-files@v47.0.5
         with:
           since_last_remote_commit: true
-          # XXX: Duplicated from on.pull_request.paths
-          files: |
-            scripts/generate-protocols.js
-            scripts/add-species-from-jessica-joachim.ts
-            scripts/add-species-from-google-slides.js
-            scripts/add-taxonomic-parents-from-gbif.js
-            scripts/add-metadata-from-xper3.ts
-            .github/workflows/protocols.yml
-
+          files: ${{ steps.paths.outputs.files }}
       - name: Log summary to list changed files
         run: |
           echo "Changed files: ${{ steps.changes.outputs.all_changed_files }}" >> $GITHUB_STEP_SUMMARY
@@ -131,7 +148,7 @@ jobs:
       - name: Mark custom checkrun as finished
         run: bun --eval "
           import { emitCheckrun } from './scripts/utils.js';
-          await emitCheckrun('protocols', 'completed', null, 'All done!')"
+          await emitCheckrun('protocols', 'completed', 'Finishing', 'All done!');"
 
       - name: Setup diffing that ignores version and learnMore fields
         run: git config diff.example-protocols.textconv "$textconv"
