@@ -178,7 +178,7 @@
 										{
 											id: page.params.id ?? '',
 											metadata: shortId,
-											option: option.key
+											option: option.key,
 										}
 									)}
 							>
@@ -218,7 +218,7 @@
 										{
 											id: page.params.id ?? '',
 											metadata: shortId,
-											option: option.key
+											option: option.key,
 										}
 									)}
 							>

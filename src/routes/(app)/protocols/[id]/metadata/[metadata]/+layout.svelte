@@ -64,7 +64,7 @@
 			)}
 				{@const path = resolve(`/(app)/protocols/[id]/metadata/[metadata]/${route}`, {
 					id: data.protocol.id,
-					metadata: removeNamespaceFromMetadataId(id)
+					metadata: removeNamespaceFromMetadataId(id),
 				})}
 				<a
 					href={path}
@@ -86,7 +86,7 @@
 			{/if}
 			{@render navlink('inference', 'Inférence', IconInference)}
 			{@render navlink('cascades', 'Cascades', IconCascades, {
-				help: "Changer les valeurs d'autres métadonnées en fonction de celle-ci"
+				help: "Changer les valeurs d'autres métadonnées en fonction de celle-ci",
 			})}
 		</nav>
 	</header>

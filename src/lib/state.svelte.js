@@ -35,7 +35,7 @@ export class UIState {
 	constructor() {
 		// Can't use if(window) cuz variable might be undeclared
 		// Can't use if(browser) cuz $app/environment imports don't work when transforming worker code
-		try { 
+		try {
 			window.uiState = this;
 		} catch {
 			// ok
@@ -73,7 +73,7 @@ export class UIState {
 			selectedCropModel: this.selectedCropModel,
 			selectedClassificationModel: this.selectedClassificationModel,
 			cropInferenceAvailable: this.cropInferenceAvailable,
-			classificationInferenceAvailable: this.classificationInferenceAvailable
+			classificationInferenceAvailable: this.classificationInferenceAvailable,
 		});
 	}
 
@@ -104,7 +104,7 @@ export class UIState {
 			this.done = 0;
 			this.time = 0;
 			this.task = '';
-		}
+		},
 	});
 
 	#eta = new ETA({ total: 0 });
@@ -306,7 +306,7 @@ export class UIState {
 
 		const metadataIds = {
 			classification: this.classificationMetadataId,
-			crop: this.cropMetadataId
+			crop: this.cropMetadataId,
 		};
 
 		if (!metadataIds.classification || !metadataIds.crop) return;
@@ -328,7 +328,7 @@ export class UIState {
 
 		await tables.Session.update(this.currentSession.id, 'inferenceModels', {
 			...current,
-			...changes
+			...changes,
 		});
 	}
 }

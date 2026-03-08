@@ -32,13 +32,13 @@ export async function load({ parent }) {
 	if (sortSettings && groupSettings) {
 		const imagesSorter = await galleryEffectiveSorter({
 			sortSettings,
-			groupSettings
+			groupSettings,
 		});
 
 		const toGalleryItem = ({ id, filename, metadata }: (typeof images)[number]) => ({
 			id,
 			metadata,
-			name: filename
+			name: filename,
 		});
 
 		images.sort((a, b) => imagesSorter(toGalleryItem(a), toGalleryItem(b)));
@@ -47,6 +47,6 @@ export async function load({ parent }) {
 	}
 
 	return {
-		sortedFileIds: images.map((image) => image.fileId ?? imageIdToFileId(image.id))
+		sortedFileIds: images.map((image) => image.fileId ?? imageIdToFileId(image.id)),
 	};
 }

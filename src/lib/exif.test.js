@@ -1,6 +1,7 @@
 import 'fake-indexeddb/auto';
 
 import { readFileSync } from 'node:fs';
+
 import exif from 'exif-parser';
 import { beforeEach, describe, expect, test } from 'vitest';
 
@@ -9,7 +10,7 @@ import {
 	coerceExifValue,
 	extractMetadata,
 	processExifData,
-	serializeExifValue
+	serializeExifValue,
 } from './exif.js';
 import * as db from './idb.svelte.js';
 import { imageId } from './images.js';
@@ -33,27 +34,27 @@ describe('processExifData', () => {
 			mergeMethod: 'none',
 			required: false,
 			learnMore: 'https://example.com',
-			label: ''
+			label: '',
 		});
 
 		await db.tables.Metadata.set({
 			...metadataField,
 			id: namespacedMetadataId('com.example.test.protocol', 'date'),
 			type: 'date',
-			infer: { exif: 'DateTimeOriginal' }
+			infer: { exif: 'DateTimeOriginal' },
 		});
 
 		await db.tables.Metadata.set({
 			...metadataField,
 			id: namespacedMetadataId('com.example.test.protocol', 'location'),
 			type: 'location',
-			infer: { latitude: { exif: 'GPSLatitude' }, longitude: { exif: 'GPSLongitude' } }
+			infer: { latitude: { exif: 'GPSLatitude' }, longitude: { exif: 'GPSLongitude' } },
 		});
 
 		await db.tables.Metadata.set({
 			...metadataField,
 			id: namespacedMetadataId('com.example.test.protocol', 'no_exif'),
-			type: 'string'
+			type: 'string',
 		});
 
 		await db.tables.Protocol.set({
@@ -66,8 +67,8 @@ describe('processExifData', () => {
 			description: 'Test Protocol',
 			learnMore: 'https://example.com',
 			crop: {
-				metadata: 'com.example.test.protocol.crop'
-			}
+				metadata: 'com.example.test.protocol.crop',
+			},
 		});
 
 		await db.tables.Image.set({
@@ -78,7 +79,7 @@ describe('processExifData', () => {
 			dimensions: { width: 100, height: 100 },
 			contentType: 'image/jpeg',
 			filename: 'test.jpg',
-			metadata: {}
+			metadata: {},
 		});
 
 		await db.tables.Session.set({
@@ -88,7 +89,7 @@ describe('processExifData', () => {
 			openedAt: '2023-10-01T00:00:00Z',
 			description: '',
 			metadata: {},
-			name: 'Testing Session'
+			name: 'Testing Session',
 		});
 	});
 
@@ -97,7 +98,7 @@ describe('processExifData', () => {
 
 		await processExifData('testing', 'quoicoubaka', imageBytes, {
 			type: 'image/jpeg',
-			name: 'test.jpg'
+			name: 'test.jpg',
 		});
 
 		const image = await db.tables.Image.get(imageId(0, 0));
@@ -108,8 +109,8 @@ describe('processExifData', () => {
 				confirmed: false,
 				isDefault: false,
 				confidence: 1,
-				alternatives: {}
-			}
+				alternatives: {},
+			},
 		});
 	});
 
@@ -118,7 +119,7 @@ describe('processExifData', () => {
 
 		await processExifData('testing', 'quoicoubaka', imageBytes, {
 			type: 'image/jpeg',
-			name: 'test.jpg'
+			name: 'test.jpg',
 		});
 
 		const image = await db.tables.Image.get(imageId(0, 0));
@@ -129,19 +130,19 @@ describe('processExifData', () => {
 				confidence: 1,
 				confirmed: false,
 				isDefault: false,
-				alternatives: {}
+				alternatives: {},
 			},
 			[namespacedMetadataId('com.example.test.protocol', 'location')]: {
 				value: {
 					latitude: 43.46715666666389,
-					longitude: 11.885394999997223
+					longitude: 11.885394999997223,
 				},
 				manuallyModified: false,
 				confidence: 1,
 				confirmed: false,
 				isDefault: false,
-				alternatives: {}
-			}
+				alternatives: {},
+			},
 		});
 	});
 });
@@ -151,26 +152,26 @@ describe('extractMetadata', () => {
 		{
 			key: 'date',
 			infer: { exif: 'DateTimeOriginal' },
-			type: 'date'
+			type: 'date',
 		},
 		{
 			key: 'location',
 			infer: {
 				latitude: { exif: 'GPSLatitude' },
-				longitude: { exif: 'GPSLongitude' }
+				longitude: { exif: 'GPSLongitude' },
 			},
-			type: 'location'
+			type: 'location',
 		},
 		{
 			key: 'make',
 			infer: { exif: 'Make' },
-			type: 'string'
+			type: 'string',
 		},
 		{
 			key: 'model',
 			infer: { exif: 'Model' },
-			type: 'string'
-		}
+			type: 'string',
+		},
 	]);
 
 	test('extracts from image without GPS', async () => {
@@ -181,18 +182,18 @@ describe('extractMetadata', () => {
 			date: {
 				value: new Date('2025-04-25T12:38:36.000Z'),
 				alternatives: {},
-				confidence: 1
+				confidence: 1,
 			},
 			make: {
 				alternatives: {},
 				confidence: 1,
-				value: 'Canon'
+				value: 'Canon',
 			},
 			model: {
 				alternatives: {},
 				confidence: 1,
-				value: 'Canon EOS RP'
-			}
+				value: 'Canon EOS RP',
+			},
 		});
 	});
 
@@ -204,26 +205,26 @@ describe('extractMetadata', () => {
 			date: {
 				confidence: 1,
 				alternatives: {},
-				value: new Date('2008-10-22T16:29:49.000Z')
+				value: new Date('2008-10-22T16:29:49.000Z'),
 			},
 			location: {
 				confidence: 1,
 				alternatives: {},
 				value: {
 					latitude: 43.46715666666389,
-					longitude: 11.885394999997223
-				}
+					longitude: 11.885394999997223,
+				},
 			},
 			make: {
 				confidence: 1,
 				alternatives: {},
-				value: 'NIKON'
+				value: 'NIKON',
 			},
 			model: {
 				confidence: 1,
 				alternatives: {},
-				value: 'COOLPIX P6000'
-			}
+				value: 'COOLPIX P6000',
+			},
 		});
 	});
 
@@ -233,16 +234,16 @@ describe('extractMetadata', () => {
 			{
 				key: 'date',
 				infer: { exif: 'DateTimeOriginal' },
-				type: 'date'
-			}
+				type: 'date',
+			},
 		]);
 
 		expect(extraction).toEqual({
 			date: {
 				confidence: 1,
 				alternatives: {},
-				value: new Date('2008-10-22T16:29:49.000Z')
-			}
+				value: new Date('2008-10-22T16:29:49.000Z'),
+			},
 		});
 	});
 });
@@ -347,8 +348,8 @@ describe('addExifMetadata', () => {
 			groupable: false,
 			infer: /** @type {const} */ ({
 				latitude: { exif: 'GPSLatitude' },
-				longitude: { exif: 'GPSLongitude' }
-			})
+				longitude: { exif: 'GPSLongitude' },
+			}),
 		},
 		{
 			id: 'proto__date',
@@ -360,8 +361,8 @@ describe('addExifMetadata', () => {
 			sortable: false,
 			groupable: false,
 			infer: /** @type {const} */ ({
-				exif: 'DateTimeOriginal'
-			})
+				exif: 'DateTimeOriginal',
+			}),
 		},
 		{
 			id: 'proto__non_exif',
@@ -371,31 +372,31 @@ describe('addExifMetadata', () => {
 			mergeMethod: /** @type {const} */ ('none'),
 			required: false,
 			sortable: false,
-			groupable: false
-		}
+			groupable: false,
+		},
 	];
 	const metadataValues = {
 		proto__gps: {
 			value: {
 				latitude: 43.46715666666389,
-				longitude: 11.885394999997223
+				longitude: 11.885394999997223,
 			},
 			manuallyModified: false,
 			confidence: 1,
-			alternatives: {}
+			alternatives: {},
 		},
 		proto__date: {
 			value: new Date('2023-10-01T12:00:00Z'),
 			manuallyModified: false,
 			confidence: 1,
-			alternatives: {}
+			alternatives: {},
 		},
 		proto__non_exif: {
 			value: 'test',
 			manuallyModified: false,
 			confidence: 1,
-			alternatives: {}
-		}
+			alternatives: {},
+		},
 	};
 
 	// FIXME kinda slow, idk why
@@ -411,7 +412,7 @@ describe('addExifMetadata', () => {
 			GPSLatitudeRef: 'N',
 			GPSLongitude: 11.885394444444444,
 			GPSLongitudeRef: 'E',
-			DateTimeOriginal: 1696161600
+			DateTimeOriginal: 1696161600,
 		});
 	});
 
@@ -426,7 +427,7 @@ describe('addExifMetadata', () => {
 			GPSLatitudeRef: 'N',
 			GPSLongitude: 11.885394444444444,
 			GPSLongitudeRef: 'E',
-			DateTimeOriginal: 1696161600
+			DateTimeOriginal: 1696161600,
 		});
 	});
 });

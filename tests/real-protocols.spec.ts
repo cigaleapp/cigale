@@ -18,22 +18,22 @@ test('Entomoscope @real-protocol', async ({ app, page }) => {
 			images: {
 				cropped:
 					'cropped/{{ percentage image.protocolMetadata.crop.confidence 1 }}.{{ extension image.filename }}',
-				original: 'original/{{ sequence }}.{{ extension image.filename }}'
+				original: 'original/{{ sequence }}.{{ extension image.filename }}',
 			},
 			metadata: {
 				csv: 'metadata.csv',
-				files: 'files/{{ metadataKey }}/{{ filename }}'
-			}
+				files: 'files/{{ metadataKey }}/{{ filename }}',
+			},
 		};
 	});
 	await newSession(page, {
 		name: 'Entomoscope test',
-		protocol: 'Entomoscope'
+		protocol: 'Entomoscope',
 	});
 
 	await importPhotos({ page }, [
 		'real/entomoscope/20260209141830.jpg',
-		'real/entomoscope/20260209141830.json'
+		'real/entomoscope/20260209141830.json',
 	]);
 
 	// FIXME: loading ends a bit early on the card
@@ -96,23 +96,23 @@ test('Entomoscope @real-protocol', async ({ app, page }) => {
 			'cropped/71.8%.jpg',
 			'cropped/70.5%.jpg',
 			'cropped/57.0%.jpg',
-			'cropped/55.9%.jpg'
+			'cropped/55.9%.jpg',
 		],
 		{
 			'files/misc_config/20260209141830.json': {
 				async json(json: unknown) {
 					expect(json).toMatchObject(sidecarExample);
-				}
+				},
 			},
 			'cropped/89.8%.jpg': {
 				async buffer(buffer) {
 					expect(buffer).toMatchSnapshot('entomoscope-box-best.jpg');
-				}
+				},
 			},
 			'cropped/55.9%.jpg': {
 				async buffer(buffer) {
 					expect(buffer).toMatchSnapshot('entomoscope-box-worst.jpg');
-				}
+				},
 			},
 			'analysis.json': {
 				async json(json) {
@@ -123,14 +123,16 @@ test('Entomoscope @real-protocol', async ({ app, page }) => {
 					expect(obs).toHaveLength(14);
 
 					expect([
-						...new Set(obs.map((o) => o.protocolMetadata.raspberry_serial_number.value))
+						...new Set(
+							obs.map((o) => o.protocolMetadata.raspberry_serial_number.value)
+						),
 					]).toMatchObject(['10000000ede1b681']);
 
 					expect(obs.map((o) => o.protocolMetadata.species.value)).not.toContainEqual(
 						null
 					);
-				}
-			}
+				},
+			},
 		}
 	);
 });

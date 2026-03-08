@@ -45,12 +45,12 @@
 				consequences={[
 					plural(data.counts.images, [
 						'La suppression de 1 image',
-						'La suppression de # images'
+						'La suppression de # images',
 					]),
 					plural(data.counts.observations, [
 						'La suppression de 1 observation',
-						'La suppression de # observations'
-					])
+						'La suppression de # observations',
+					]),
 				]}
 				onconfirm={async () => {
 					await deleteSession(data.session.id);
@@ -126,13 +126,13 @@
 									subjectId: data.session.id,
 									metadataId: def.id,
 									value: v,
-									unit
+									unit,
 								});
 							} else {
 								await deleteMetadataValue({
 									db: databaseHandle(),
 									subjectId: data.session.id,
-									metadataId: def.id
+									metadataId: def.id,
 								});
 							}
 

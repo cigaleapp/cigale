@@ -46,7 +46,7 @@ export async function processExifData(sessionId, imageFileId, imageBytes, file) 
 						[
 							{ exif: 'string' },
 							'|',
-							{ latitude: { exif: 'string' }, longitude: { exif: 'string' } }
+							{ latitude: { exif: 'string' }, longitude: { exif: 'string' } },
 						],
 						(infer) => /** @type {ExifExtractionPlanItem} */ ({ key: id, infer, type })
 					)
@@ -75,7 +75,7 @@ export async function processExifData(sessionId, imageFileId, imageBytes, file) 
 				sessionId: session.id,
 				metadataId: ensureNamespacedMetadataId(key, protocol.id),
 				value,
-				confidence
+				confidence,
 			});
 		}
 	}
@@ -105,8 +105,8 @@ export async function extractMetadata(buffer, extractionPlan) {
 				type: '"location"',
 				infer: {
 					latitude: { exif: 'string' },
-					longitude: { exif: 'string' }
-				}
+					longitude: { exif: 'string' },
+				},
 			},
 			({ infer }) => {
 				if (!(infer.longitude.exif in exif.tags)) return undefined;
@@ -117,15 +117,15 @@ export async function extractMetadata(buffer, extractionPlan) {
 					alternatives: {},
 					value: {
 						longitude: coerceExifValue(exif.tags[infer.longitude.exif], 'float'),
-						latitude: coerceExifValue(exif.tags[infer.latitude.exif], 'float')
-					}
+						latitude: coerceExifValue(exif.tags[infer.latitude.exif], 'float'),
+					},
 				};
 			}
 		)
 		.case(
 			{
 				type: Schemas.MetadataTypeSchema,
-				infer: { exif: 'string' }
+				infer: { exif: 'string' },
 			},
 			({ infer, type }) => {
 				if (!(infer.exif in exif.tags)) return undefined;
@@ -133,7 +133,7 @@ export async function extractMetadata(buffer, extractionPlan) {
 				return {
 					confidence: 1,
 					alternatives: {},
-					value: coerceExifValue(exif.tags[infer.exif], type)
+					value: coerceExifValue(exif.tags[infer.exif], type),
 				};
 			}
 		)
@@ -222,8 +222,8 @@ export function addExifMetadata(bytes, metadataDefs, metadataValues) {
 		infer: [
 			{ exif: 'string' },
 			'|',
-			{ latitude: { exif: 'string' }, longitude: { exif: 'string' } }
-		]
+			{ latitude: { exif: 'string' }, longitude: { exif: 'string' } },
+		],
 	});
 
 	const exifDict = { GPS: {}, Exif: {} };

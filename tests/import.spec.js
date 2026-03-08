@@ -14,7 +14,7 @@ import {
 	mockUrl,
 	newSession,
 	observationCard,
-	setInferenceModels
+	setInferenceModels,
 } from './utils/index.js';
 
 test.describe('correct results.zip', () => {
@@ -56,11 +56,11 @@ test.describe('correct results.zip', () => {
 
 	test('does not re-analyze when going to classify tab @webkit-no-parallelization', async ({
 		page,
-		app
+		app,
 	}) => {
 		await app.tabs.go('classify');
 		await page.getByText('cyan', { exact: true }).click({
-			timeout: 5_000
+			timeout: 5_000,
 		});
 		await assert(page.getByTestId('sidepanel')).toMatchAriaSnapshot(`
 		  - complementary:
@@ -280,7 +280,7 @@ test.describe('correct results.zip', () => {
 			/^Cropped\/Entomobrya muscorum_obs\d_3\.jpeg$/,
 			/^Original\/Entomobrya muscorum_obs\d_3\.jpeg$/,
 			/^Cropped\/\(Unknown\)_obs\d_4\.jpeg$/,
-			/^Original\/\(Unknown\)_obs\d_4\.jpeg$/
+			/^Original\/\(Unknown\)_obs\d_4\.jpeg$/,
 		]);
 	});
 });
@@ -330,7 +330,7 @@ test('fails when importing a .CR2 image', issue(413), async ({ page, app }) => {
 	await app.tabs.go('import');
 	await importPhotos({ page }, 'sample.cr2');
 	await assert(page.getByText(/Analyse…|En attente/)).toHaveCount(0, {
-		timeout: 5_000
+		timeout: 5_000,
 	});
 	await assert(firstObservationCard(page)).toHaveTooltip(
 		/Les fichiers .+? ne sont pas (encore )?supportés/
@@ -342,11 +342,11 @@ test('can import a large image', issue(412, 415), async ({ page, app }) => {
 	await app.tabs.go('import');
 	await importPhotos({ page }, 'large-image.jpeg');
 	await assert(page.getByText('large-image.jpeg')).toBeVisible({
-		timeout: 10_000
+		timeout: 10_000,
 	});
 	await app.tabs.go('classify');
 	await assert(page.getByText('large-image')).toBeVisible({
-		timeout: 10_000
+		timeout: 10_000,
 	});
 });
 
@@ -367,17 +367,17 @@ test.fixme('can cancel import', issue(430), async ({ page, app }) => {
 		'lil-fella.jpeg',
 		'cyan.jpeg',
 		'leaf.jpeg',
-		'with-exif-gps.jpeg'
+		'with-exif-gps.jpeg',
 	]);
 	await assert(firstObservationCard(page)).toHaveText(loadingText, {
-		timeout: 10_000
+		timeout: 10_000,
 	});
 	await page
 		.locator('article', { hasText: 'lil-fella.jpeg' })
 		.getByRole('button', { name: 'Supprimer' })
 		.click();
 	await assert(page.getByText('lil-fella.jpeg').first()).not.toBeVisible({
-		timeout: 500
+		timeout: 500,
 	});
 });
 
@@ -390,7 +390,7 @@ test('can import in multiple batches', async ({ page, app }) => {
 		['with-exif-gps.jpeg', '20K-gray.jpeg', 'debugsquare.png']
 	);
 	await assert(page.locator('main').getByText(/Analyse…|En attente/)).toHaveCount(0, {
-		timeout: 60_000
+		timeout: 60_000,
 	});
 	await assert(page.locator('main').getByText('lil-fella.jpeg')).toBeVisible();
 	await assert(page.locator('main').getByText('leaf.jpeg')).toBeVisible();
@@ -449,7 +449,7 @@ test('can extract EXIF date from an image', async ({ page, app }) => {
 
 	assert(metadataValues).toMatchObject({
 		...metadataValues,
-		shoot_date: '2025-04-25T12:38:36'
+		shoot_date: '2025-04-25T12:38:36',
 	});
 });
 
@@ -473,8 +473,8 @@ test('can extract EXIF GPS data from an image', async ({ page, context, app }) =
 				addresstype: 'tourism',
 				name: '',
 				display_name: 'Via Madonna Laura, Arezzo, Toscane, 52100, Italie',
-				boundingbox: ['43.4674027', '43.4675027', '11.8850287', '11.8851287']
-			}
+				boundingbox: ['43.4674027', '43.4675027', '11.8850287', '11.8851287'],
+			},
 		}
 	);
 
@@ -495,7 +495,7 @@ test('can extract EXIF GPS data from an image', async ({ page, context, app }) =
 		shoot_date: '2008-10-22T16:29:49',
 		shoot_location: {
 			latitude: 43.46715666666389,
-			longitude: 11.885394999997223
-		}
+			longitude: 11.885394999997223,
+		},
 	});
 });

@@ -20,7 +20,7 @@ export async function setInferenceModels(page, models) {
 		if (!model) continue;
 
 		const trigger = page.getByRole('button', {
-			name: { crop: 'Réglages de recadrage', classify: 'Réglages de classification' }[tab]
+			name: { crop: 'Réglages de recadrage', classify: 'Réglages de classification' }[tab],
 		});
 
 		await chooseInDropdown(page, trigger, "Modèle d'inférence", model);
@@ -60,7 +60,7 @@ export async function getPredownloadedModel(filename, classmappingFilename) {
 		? {
 				model,
 				classmapping,
-				filename
+				filename,
 			}
 		: null;
 }
@@ -98,7 +98,7 @@ async function mockPredownloadedModel(
 		throw new Error(`Model URL for metadata ${metadataId} is not a string`);
 
 	await mockUrl(page, context, inference.model, {
-		body: model
+		body: model,
 	});
 
 	if (classmapping && 'classmapping' in inference) {
@@ -106,7 +106,7 @@ async function mockPredownloadedModel(
 			throw new Error(`Classmapping URL for metadata ${metadataId} is not a string`);
 
 		await mockUrl(page, context, inference.classmapping, {
-			body: classmapping
+			body: classmapping,
 		});
 	}
 }

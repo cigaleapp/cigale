@@ -1,4 +1,5 @@
 import path from 'node:path';
+
 import { expect } from '@playwright/test';
 
 import { FixturePaths } from '../filepaths.js';
@@ -48,7 +49,7 @@ export async function importPhotos({ page, wait = true, additionalWaitTime = 0 }
 		} else {
 			await pickFiles(
 				page.getByRole('button', {
-					name: "Importer d'autres images"
+					name: "Importer d'autres images",
 				}),
 				...batch
 			);
@@ -78,24 +79,24 @@ export async function importPhotos({ page, wait = true, additionalWaitTime = 0 }
 
 		const element = page
 			.getByText(lastItem, {
-				exact: true
+				exact: true,
 			})
 			.or(
 				page
 					.getByTestId('observations-area')
 					.locator('article')
 					.filter({
-						has: page.locator(`[data-tooltip-content='${lastItem}']`)
+						has: page.locator(`[data-tooltip-content='${lastItem}']`),
 					})
 			)
 			.last();
 
 		await expect(element).toBeVisible({
-			timeout: 20_000
+			timeout: 20_000,
 		});
 
 		await expect(element).not.toHaveText(loadingText, {
-			timeout: 20_000
+			timeout: 20_000,
 		});
 
 		if (additionalWaitTime) {

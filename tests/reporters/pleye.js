@@ -90,7 +90,7 @@ export default class Pleye {
 			traceViewerUrl,
 			commitSha,
 			githubJobId,
-			pullRequestNumber
+			pullRequestNumber,
 		} = params;
 
 		this.#apiKey = apiKey;
@@ -121,7 +121,7 @@ export default class Pleye {
 			commitDate,
 			authorName,
 			authorEmail,
-			commitDescription
+			commitDescription,
 		});
 
 		const githubRunId = Number(process.env.GITHUB_RUN_ID);
@@ -198,7 +198,7 @@ export default class Pleye {
 			committedAt: new Date(commitDate),
 			branch,
 			pullRequestNumber,
-			pullRequestTitle
+			pullRequestTitle,
 		};
 
 		this.#debug('Will start run with data', this.#runData);
@@ -216,14 +216,14 @@ export default class Pleye {
 			run: {
 				...this.#runData,
 				baseDirectory: this.#baseDirectory,
-				testrunsCount: this.#expectedTestsCount
+				testrunsCount: this.#expectedTestsCount,
 			},
 			projects: config.projects.map((project) => ({
 				name: project.name,
 				match: toArray(project.testMatch).map(String),
 				ignore: toArray(project.testIgnore).map(String),
-				timeoutMs: project.timeout
-			}))
+				timeoutMs: project.timeout,
+			})),
 		});
 	}
 
@@ -234,7 +234,7 @@ export default class Pleye {
 	onError(error) {
 		void this.#sendPayload('error', {
 			githubJobId: this.#runData.githubJobId,
-			error: this.#toError(error)
+			error: this.#toError(error),
 		});
 	}
 
@@ -246,7 +246,7 @@ export default class Pleye {
 			status: 'completed',
 			completedAt: new Date(),
 			result: result.status,
-			githubJobId: this.#runData.githubJobId
+			githubJobId: this.#runData.githubJobId,
 		});
 	}
 
@@ -304,10 +304,10 @@ export default class Pleye {
 					filePath: step.location ? this.#relativeFilepath(step.location.file) : null,
 					locationInFile: step.location
 						? [step.location.line, step.location.column]
-						: null
+						: null,
 					// TODO: step.parent
 					// parentStepId: step.parent
-				}
+				},
 			});
 
 			// Small delay to ensure step-begin is processed before step-end
@@ -317,7 +317,7 @@ export default class Pleye {
 				githubJobId: this.#runData.githubJobId,
 				step: stepIdentifier,
 				duration: toISOInterval(step.duration),
-				error: step.error ? this.#toError(step.error) : undefined
+				error: step.error ? this.#toError(step.error) : undefined,
 			});
 		})();
 	}
@@ -348,15 +348,15 @@ export default class Pleye {
 				tags: test.tags,
 				filePath: this.#relativeFilepath(test.location.file),
 				locationInFile: [test.location.line, test.location.column],
-				annotations: test.annotations
+				annotations: test.annotations,
 			},
 			testrun: {
 				timeoutMs: test.timeout,
 				expectedStatus: test.expectedStatus,
 				retriesLimit: test.retries,
 				retries: result.retry,
-				startedAt: result.startTime
-			}
+				startedAt: result.startTime,
+			},
 		});
 	}
 
@@ -368,7 +368,7 @@ export default class Pleye {
 	onTestEnd(test, result) {
 		this.#debug('onTestEnd', {
 			attachments: result.attachments,
-			traceViewerURLs: result.attachments.map((a) => this.#attachmentTraceViewerURL(a))
+			traceViewerURLs: result.attachments.map((a) => this.#attachmentTraceViewerURL(a)),
 		});
 
 		void this.#sendPayload('test-end', {
@@ -388,8 +388,8 @@ export default class Pleye {
 				traceViewerUrl:
 					result.attachments
 						.map((attachment) => this.#attachmentTraceViewerURL(attachment))
-						.find((url) => url !== null) ?? null
-			}
+						.find((url) => url !== null) ?? null,
+			},
 		});
 	}
 
@@ -404,9 +404,9 @@ export default class Pleye {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				Authorization: `Bearer ${this.#apiKey}`
+				Authorization: `Bearer ${this.#apiKey}`,
 			},
-			body: JSON.stringify(payload)
+			body: JSON.stringify(payload),
 		}).then(async (res) => {
 			if (!this.#debugging) return;
 			if (res.ok) return;
@@ -454,7 +454,7 @@ export default class Pleye {
 	#testIdentifierParams(test) {
 		return {
 			filePath: this.#relativeFilepath(test.location.file),
-			...splitTitlePath(test.titlePath())
+			...splitTitlePath(test.titlePath()),
 		};
 	}
 
@@ -470,7 +470,7 @@ export default class Pleye {
 			stack,
 			snippet,
 			filePath: location?.file ? this.#relativeFilepath(location.file) : null,
-			locationInFile: location ? [location.line, location.column] : null
+			locationInFile: location ? [location.line, location.column] : null,
 		};
 	}
 
@@ -620,7 +620,7 @@ function splitTitlePath(titlePath) {
 	const [_root, _project, _file, ...fullpath] = titlePath;
 	return {
 		title: fullpath.at(-1) ?? '',
-		path: fullpath.slice(0, -1)
+		path: fullpath.slice(0, -1),
 	};
 }
 

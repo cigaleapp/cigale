@@ -16,19 +16,19 @@ const chromium = {
 			args: dependsOnTarget({
 				dev: ['--max_old_space_size=2048'],
 				live: [],
-				built: []
-			})
+				built: [],
+			}),
 		},
 		contextOptions: {
-			serviceWorkers: process.env.CI ? 'allow' : 'block'
-		}
-	}
+			serviceWorkers: process.env.CI ? 'allow' : 'block',
+		},
+	},
 };
 
 /** @type {Project} */
 const firefox = {
 	name: 'firefox',
-	use: { ...devices['Desktop Firefox'] }
+	use: { ...devices['Desktop Firefox'] },
 };
 
 /** @type {Project} */
@@ -40,14 +40,14 @@ const webkit = {
 			args: dependsOnTarget({
 				dev: ['--max_old_space_size=4096'],
 				live: [],
-				built: []
-			})
+				built: [],
+			}),
 		},
 		contextOptions: {
 			// See https://github.com/microsoft/playwright/issues/1090
-			serviceWorkers: 'block'
-		}
-	}
+			serviceWorkers: 'block',
+		},
+	},
 };
 
 /**
@@ -59,13 +59,13 @@ export default defineConfig({
 	timeout: dependsOnTarget({
 		dev: ms('5min'),
 		live: ms('1.5min'),
-		built: ms('1.5min')
+		built: ms('1.5min'),
 	}),
 	testDir: './tests',
 	metadata: {
 		generated: formatISO9075(new Date(), {
-			in: tz('Europe/Paris')
-		})
+			in: tz('Europe/Paris'),
+		}),
 	},
 	/* Run tests in files in parallel */
 	fullyParallel: true,
@@ -83,8 +83,8 @@ export default defineConfig({
 					[process.env.SHARDING ? 'blob' : 'html'],
 					['github'],
 					['list'],
-					...pleyeReporter()
-				]
+					...pleyeReporter(),
+				],
 			}
 		: {}),
 	/* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
@@ -93,14 +93,14 @@ export default defineConfig({
 		baseURL: dependsOnTarget({
 			live: process.env.BASE_URL,
 			dev: 'http://localhost:5173',
-			built: 'http://localhost:4173'
+			built: 'http://localhost:4173',
 		}),
 
 		// See https://github.com/microsoft/playwright/issues/16357
 		bypassCSP: dependsOnTarget({
 			live: true,
 			dev: false,
-			built: false
+			built: false,
 		}),
 
 		/* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
@@ -110,14 +110,14 @@ export default defineConfig({
 		locale: 'fr-FR',
 
 		// Ensure no TZ issues for assertions that depend on time
-		timezoneId: 'Etc/UTC'
+		timezoneId: 'Etc/UTC',
 	},
 
 	/* Configure projects for major browsers */
 	projects: dependsOnTarget({
 		live: [chromium],
 		dev: [chromium, firefox, webkit],
-		built: [chromium, webkit]
+		built: [chromium, webkit],
 	}),
 
 	/* Run your local dev server before starting the tests */
@@ -126,14 +126,14 @@ export default defineConfig({
 		dev: {
 			command: 'bun run dev',
 			port: 5173,
-			reuseExistingServer: true
+			reuseExistingServer: true,
 		},
 		built: {
 			command: 'bun run preview',
 			port: 4173,
-			reuseExistingServer: false
-		}
-	})
+			reuseExistingServer: false,
+		},
+	}),
 });
 
 /**
@@ -158,8 +158,9 @@ function pleyeReporter() {
 			TRACE_VIEWER_BASE_URL: [
 				'string.url',
 				':',
-				(url, ctx) => !url.endsWith('/') || ctx.reject('base url must not end with a slash')
-			]
+				(url, ctx) =>
+					!url.endsWith('/') || ctx.reject('base url must not end with a slash'),
+			],
 		});
 
 		/**
@@ -173,11 +174,11 @@ function pleyeReporter() {
 			commitSha: env.COMMIT_SHA,
 			traceViewerUrl: (sha1, extension) =>
 				urlWithBase(env.TRACE_VIEWER_BASE_URL, '/trace/index.html', {
-					trace: urlWithBase(env.TRACE_VIEWER_BASE_URL, `/data/${sha1 + extension}`)
+					trace: urlWithBase(env.TRACE_VIEWER_BASE_URL, `/data/${sha1 + extension}`),
 				}),
 			pullRequestNumber: process.env.PR_NUMBER
 				? parseInt(process.env.PR_NUMBER, 10)
-				: undefined
+				: undefined,
 		};
 
 		return [['./tests/reporters/pleye.js', config]];

@@ -6,21 +6,21 @@ export const centeredBoundingBox = type({
 	x: 'number',
 	y: 'number',
 	w: 'number',
-	h: 'number'
+	h: 'number',
 });
 
 const topLeftBoundingBox = type({
 	x: 'number',
 	y: 'number',
 	width: 'number',
-	height: 'number'
+	height: 'number',
 });
 
 const _rect = type({
 	x: 'number > 0',
 	y: 'number > 0',
 	width: 'number > 0',
-	height: 'number > 0'
+	height: 'number > 0',
 });
 
 const _anyBoundingBox = type.or(centeredBoundingBox, topLeftBoundingBox);
@@ -67,7 +67,7 @@ if (import.meta.vitest) {
 			x: 2,
 			y: 6,
 			width: 8,
-			height: 15
+			height: 15,
 		});
 	});
 }
@@ -77,7 +77,7 @@ export const toRelativeCoords = (input) => {
 	if (!input) throw new Error('No input settings were provided');
 	return coordsScaler({
 		x: 1 / (input.width ?? TARGETWIDTH),
-		y: 1 / (input.height ?? TARGETHEIGHT)
+		y: 1 / (input.height ?? TARGETHEIGHT),
 	});
 };
 
@@ -93,7 +93,7 @@ export function toCenteredCoords({ x, y, width, height }) {
 		x: x + width / 2,
 		y: y + height / 2,
 		w: width,
-		h: height
+		h: height,
 	};
 }
 
@@ -104,7 +104,7 @@ if (import.meta.vitest) {
 			x: 5,
 			y: 10,
 			w: 10,
-			h: 20
+			h: 20,
 		});
 	});
 }
@@ -121,7 +121,7 @@ export function toTopLeftCoords({ x, y, w, h }) {
 		x: Math.max(x - w / 2, 0),
 		y: Math.max(y - h / 2, 0),
 		width: w,
-		height: h
+		height: h,
 	};
 }
 
@@ -132,7 +132,7 @@ if (import.meta.vitest) {
 			x: 0,
 			y: 0,
 			width: 10,
-			height: 20
+			height: 20,
 		});
 	});
 }
@@ -140,17 +140,17 @@ if (import.meta.vitest) {
 export function boundingBoxIsNonZero(boundingBox) {
 	return type({
 		x: 'number > 0',
-		y: 'number > 0'
+		y: 'number > 0',
 	})
 		.and(
 			type.or(
 				{
 					width: 'number > 0',
-					height: 'number > 0'
+					height: 'number > 0',
 				},
 				{
 					w: 'number > 0',
-					h: 'number > 0'
+					h: 'number > 0',
 				}
 			)
 		)
@@ -282,7 +282,7 @@ export function toCorners(boundingBox) {
 		topleft: [boundingBox.x, boundingBox.y],
 		topright: [boundingBox.x + boundingBox.width, boundingBox.y],
 		bottomleft: [boundingBox.x, boundingBox.y + boundingBox.height],
-		bottomright: [boundingBox.x + boundingBox.width, boundingBox.y + boundingBox.height]
+		bottomright: [boundingBox.x + boundingBox.width, boundingBox.y + boundingBox.height],
 	};
 }
 
@@ -293,13 +293,13 @@ if (import.meta.vitest) {
 			topleft: [1, 1],
 			topright: [11, 1],
 			bottomleft: [1, 21],
-			bottomright: [11, 21]
+			bottomright: [11, 21],
 		});
 		expect(toCorners({ x: 5, y: 10, w: 10, h: 20 })).toEqual({
 			topleft: [0, 0],
 			topright: [10, 0],
 			bottomleft: [0, 20],
-			bottomright: [10, 20]
+			bottomright: [10, 20],
 		});
 	});
 }

@@ -4,7 +4,7 @@ contextBridge.exposeInMainWorld('versions', {
 	node: () => process.versions.node,
 	chrome: () => process.versions.chrome,
 	electron: () => process.versions.electron,
-	os: async () => ipcRenderer.invoke('osinfo')
+	os: async () => ipcRenderer.invoke('osinfo'),
 });
 
 contextBridge.exposeInMainWorld('nativeWindow', {
@@ -15,5 +15,5 @@ contextBridge.exposeInMainWorld('nativeWindow', {
 	/** @param {string} color */
 	setControlsColor: (color) => ipcRenderer.send('nativeWindow:setControlsColor', color),
 	/** @param {number} height */
-	setControlsHeight: (height) => ipcRenderer.send('nativeWindow:setControlsHeight', height)
+	setControlsHeight: (height) => ipcRenderer.send('nativeWindow:setControlsHeight', height),
 });

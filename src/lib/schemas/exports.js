@@ -13,7 +13,7 @@ export const Analysis = type({
 		.and({
 			metadata: MetadataRecord(NamespacedMetadataID),
 			// TODO(2026-02-17): remove the default in a little while
-			protocolMetadata: MetadataRecord(ID).default(() => ({}))
+			protocolMetadata: MetadataRecord(ID).default(() => ({})),
 		})
 		.describe("La session d'analyse"),
 	files: type
@@ -21,5 +21,5 @@ export const Analysis = type({
 		.describe(
 			"Associe une référence de fichier à son chemin dans le .zip d'exportation. Les références de fichiers sont les valeurs des métadonnées de type 'file'"
 		)
-		.default(() => ({}))
+		.default(() => ({})),
 });

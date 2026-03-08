@@ -1,9 +1,10 @@
+import type { RuntimeValue } from '$lib/schemas/metadata';
+
 import { type } from 'arktype';
 import convert from 'convert';
 import * as dates from 'date-fns';
 
 import * as DB from '$lib/database';
-import type { RuntimeValue } from '$lib/schemas/metadata';
 import { round, transformObject } from '$lib/utils';
 
 /**
@@ -44,8 +45,8 @@ export function addBaseUnitValues<V extends DB.MetadataValue>(
 			metadataId,
 			{
 				...val,
-				valueBaseUnit: convert(val.value, val.unit).to(def.unit)
-			}
+				valueBaseUnit: convert(val.value, val.unit).to(def.unit),
+			},
 		];
 	});
 }
@@ -65,7 +66,7 @@ export function metadataPrettyValue<Type extends DB.MetadataType>(
 		language,
 		type: metadataType,
 		valueLabel,
-		boundingBoxPrecision = 2
+		boundingBoxPrecision = 2,
 	}: {
 		language: import('$lib/i18n.js').Language;
 		type: Type;
@@ -93,7 +94,7 @@ export function metadataPrettyValue<Type extends DB.MetadataType>(
 		case 'location': {
 			const { latitude, longitude } = type({
 				latitude: 'number',
-				longitude: 'number'
+				longitude: 'number',
 			}).assert(value);
 
 			return `${latitude}, ${longitude}`;
@@ -104,7 +105,7 @@ export function metadataPrettyValue<Type extends DB.MetadataType>(
 				x: 'number',
 				y: 'number',
 				h: 'number',
-				w: 'number'
+				w: 'number',
 			}).assert(value);
 
 			const coord = (v: number) =>
@@ -153,7 +154,7 @@ if (import.meta.vitest) {
 				expect(
 					metadataPrettyValue(new Date('2023-02-01T15:04:05Z'), {
 						type: 'date',
-						language: 'fr'
+						language: 'fr',
 					})
 				).toBe('01/02/2023, 15:04:05');
 			});
@@ -178,7 +179,7 @@ if (import.meta.vitest) {
 						metadataPrettyValue(box, {
 							type: 'boundingbox',
 							language: 'fr',
-							boundingBoxPrecision: 'unbounded'
+							boundingBoxPrecision: 'unbounded',
 						})
 					).toBe('Boîte de (1, 2.005) à (4, 6.005)');
 				});
@@ -206,7 +207,7 @@ if (import.meta.vitest) {
 				expect(
 					metadataPrettyValue(new Date('2023-02-01T15:04:05Z'), {
 						type: 'date',
-						language: 'en'
+						language: 'en',
 					})
 				).toBe('02/01/2023, 3:04:05 PM');
 			});
@@ -225,7 +226,7 @@ if (import.meta.vitest) {
 						metadataPrettyValue(box, {
 							type: 'boundingbox',
 							language: 'en',
-							boundingBoxPrecision: 'unbounded'
+							boundingBoxPrecision: 'unbounded',
 						})
 					).toBe('Box from (1, 2.005) to (4, 6.005)');
 				});
@@ -264,14 +265,14 @@ if (import.meta.vitest) {
 				metadataPrettyValue('value1', {
 					language: 'en',
 					type: 'enum',
-					valueLabel: 'Label 1'
+					valueLabel: 'Label 1',
 				})
 			).toBe('Label 1');
 			expect(
 				metadataPrettyValue('value1', {
 					language: 'fr',
 					type: 'enum',
-					valueLabel: 'Label 1'
+					valueLabel: 'Label 1',
 				})
 			).toBe('Label 1');
 			expect(metadataPrettyValue('value2', { language: 'en', type: 'enum' })).toBe('value2');

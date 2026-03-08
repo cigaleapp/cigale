@@ -27,7 +27,7 @@ export async function prepareForOfflineUse(protocolIds, onProgress) {
 
 					return infer.neural.map(({ model }) => model);
 				})
-		)
+		),
 	];
 
 	const results = await Promise.allSettled(
@@ -39,9 +39,9 @@ export async function prepareForOfflineUse(protocolIds, onProgress) {
 						done: transferred,
 						total,
 						modelNo: i,
-						modelURL: modelUrl(model)
+						modelURL: modelUrl(model),
 					});
-				}
+				},
 			})
 		)
 	);

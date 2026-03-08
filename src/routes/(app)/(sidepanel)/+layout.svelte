@@ -12,7 +12,7 @@
 	import {
 		deleteMetadataValue,
 		mergeMetadataFromImagesAndObservations,
-		storeMetadataValue
+		storeMetadataValue,
 	} from '$lib/metadata/index.js';
 	import { deleteObservation, mergeToObservation, newObservation } from '$lib/observations';
 	import { cancelTask, importMore } from '$lib/queue.svelte.js';
@@ -88,7 +88,7 @@
 				for (const id of uiState.selection) {
 					if (!uiState.erroredImages.has(id)) uiState.erroredImages.set(id, 'Errored!');
 				}
-			}
+			},
 		},
 		'x u': {
 			help: 'Enlever les erreurs de la sélection',
@@ -97,7 +97,7 @@
 				for (const id of uiState.selection) {
 					uiState.erroredImages.delete(id);
 				}
-			}
+			},
 		},
 		'x f': {
 			help: 'Créer une image en chargement',
@@ -106,22 +106,22 @@
 				uiState.processing.files.push({
 					id: imageFileId(),
 					name: 'Debug image.jpeg',
-					addedAt: new Date()
+					addedAt: new Date(),
 				});
-			}
+			},
 		},
 		'$mod+g': {
 			help: 'Fusionner des observations ou images',
-			do: mergeSelection
+			do: mergeSelection,
 		},
 		'$mod+Shift+g': {
 			help: 'Séparer toutes les observations sélectionnées en images seules',
-			do: splitSelection
+			do: splitSelection,
 		},
 		Delete: {
 			help: 'Supprimer les images et observations sélectionnées',
-			do: deleteSelection
-		}
+			do: deleteSelection,
+		},
 	});
 
 	let showSidePanel = $derived(
@@ -163,7 +163,7 @@
 					src,
 					id: image.id,
 					dimensions: image.dimensions,
-					box: box ? toTopLeftCoords(box) : undefined
+					box: box ? toTopLeftCoords(box) : undefined,
 				};
 			})
 			.filter((i) => i !== undefined)
@@ -176,7 +176,7 @@
 			return mergeMetadataFromImagesAndObservations({
 				definitions: tables.Metadata.state,
 				images: selectedImages,
-				observations: selectedObservations
+				observations: selectedObservations,
 			});
 		} catch (e) {
 			console.error(e);
@@ -209,7 +209,7 @@
 							sessionId: uiState.currentSession?.id,
 							subjectId,
 							metadataId: id,
-							recursive: true
+							recursive: true,
 						});
 					} else {
 						await storeMetadataValue({
@@ -220,7 +220,7 @@
 							confidence: 1,
 							manuallyModified: true,
 							value,
-							unit
+							unit,
 						});
 					}
 				}

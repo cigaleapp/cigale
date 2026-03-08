@@ -51,8 +51,8 @@
 			fullscreenClassifier: {
 				layout: 'top-bottom',
 				...orEmptyObj(classificationMetadata !== undefined, {
-					focusedMetadata: classificationMetadata?.id ?? ''
-				})
+					focusedMetadata: classificationMetadata?.id ?? '',
+				}),
 			},
 			group: {
 				global: { field: 'none' },
@@ -61,13 +61,13 @@
 					: { field: 'none' },
 				classify: classificationMetadata
 					? { field: 'metadataConfidence', metadata: classificationMetadata.id }
-					: { field: 'none' }
+					: { field: 'none' },
 			},
 			sort: {
 				global: mtimeMetadata
 					? { field: 'metadataValue', direction: 'asc', metadata: mtimeMetadata }
-					: { field: 'name', direction: 'asc' }
-			}
+					: { field: 'name', direction: 'asc' },
+			},
 		});
 
 		await switchSession(id);
@@ -83,7 +83,7 @@
 				onclick={async () => {
 					const zipfile = await promptForFiles({
 						accept: 'application/zip',
-						multiple: false
+						multiple: false,
 					});
 
 					await switchSession(null);

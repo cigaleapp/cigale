@@ -1,5 +1,6 @@
 import os from 'node:os';
 import path from 'node:path';
+
 import { app, BrowserWindow, ipcMain, session } from 'electron';
 import serve from 'electron-serve';
 import started from 'electron-squirrel-startup';
@@ -33,8 +34,8 @@ const createWindow = () => {
 		// Make title bar overlay background transparent
 		titleBarOverlay: process.platform !== 'darwin' ? { color: '#0000' } : undefined,
 		webPreferences: {
-			preload: path.join(import.meta.dirname, 'preload.js')
-		}
+			preload: path.join(import.meta.dirname, 'preload.js'),
+		},
 	});
 
 	ipcMain.on('progressBar:set', (_event, /** @type {number} */ value) => {
@@ -67,7 +68,7 @@ const createWindow = () => {
 	const usualArchs = {
 		win32: ['x64'],
 		darwin: ['arm64', 'x64'],
-		linux: ['x64']
+		linux: ['x64'],
 	};
 
 	ipcMain.handle('osinfo', () => ({
@@ -77,7 +78,7 @@ const createWindow = () => {
 		archIsUnusual: !usualArchs[os.platform()]?.includes(os.arch()),
 		serviceWorkers: Object.values(session.defaultSession.serviceWorkers.getAllRunning()).map(
 			(sw) => sw.scriptUrl
-		)
+		),
 	}));
 
 	// and load the index.html of the app.

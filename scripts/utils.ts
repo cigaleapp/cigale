@@ -17,10 +17,10 @@ export const JSONPResponse = type('<T>', [
 	[
 		'string',
 		'=>',
-		(response) => JSON.parse(response.replace(new RegExp(`^[\\w_]+\\((.*)\\)$`), '$1'))
+		(response) => JSON.parse(response.replace(new RegExp(`^[\\w_]+\\((.*)\\)$`), '$1')),
 	],
 	'|>',
-	'T'
+	'T',
 ]);
 
 // ANSI control sequences
@@ -105,7 +105,7 @@ export async function updateCheckrunProgress(
 
 	checkruns.set(id, {
 		...checkruns.get(id)!,
-		progressPercent: percentage
+		progressPercent: percentage,
 	});
 }
 
@@ -132,14 +132,14 @@ export async function emitCheckrun(
 			{
 				owner,
 				repo,
-				check_run_id: Number.parseInt(process.env.GH_CHECK_RUN_ID)
+				check_run_id: Number.parseInt(process.env.GH_CHECK_RUN_ID),
 			}
 		);
 
 		const { data: job } = await gh.request('GET /repos/{owner}/{repo}/actions/jobs/{job_id}', {
 			owner,
 			repo,
-			job_id: checkrun.id
+			job_id: checkrun.id,
 		});
 
 		name = `${job.workflow_name} / ${checkrun.name} (progress)`;

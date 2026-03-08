@@ -5,7 +5,7 @@ import {
 	compareProtocolWithUpstream,
 	hasUpgradeAvailable,
 	jsonSchemaURL,
-	toExportedProtocol
+	toExportedProtocol,
 } from '$lib/protocols.js';
 import { Protocol } from '$lib/schemas/protocols.js';
 import { pick } from '$lib/utils.js';
@@ -17,7 +17,7 @@ test('jsonSchemaURL', () => {
 	const originalLocation = window.location;
 	Object.defineProperty(window, 'location', {
 		value: { origin: 'https://example.com' },
-		writable: true
+		writable: true,
 	});
 
 	expect(jsonSchemaURL('')).toBe('https://example.com/protocol.schema.json');
@@ -27,7 +27,7 @@ test('jsonSchemaURL', () => {
 	// Restore original location
 	Object.defineProperty(window, 'location', {
 		value: originalLocation,
-		writable: true
+		writable: true,
 	});
 });
 
@@ -46,7 +46,7 @@ test('toExportedProtocol', async () => {
 							key: 'opt1',
 							label: 'Option 1',
 							description: 'Desc 1',
-							synonyms: []
+							synonyms: [],
 						},
 						{
 							id: 'protocol1__meta1:opt2',
@@ -54,7 +54,7 @@ test('toExportedProtocol', async () => {
 							key: 'opt2',
 							label: 'Option 2',
 							description: 'Desc 2',
-							synonyms: []
+							synonyms: [],
 						},
 						{
 							id: 'protocol1__meta2:opt1',
@@ -62,8 +62,8 @@ test('toExportedProtocol', async () => {
 							key: 'opt1',
 							label: 'Option A',
 							description: 'Desc A',
-							synonyms: []
-						}
+							synonyms: [],
+						},
 					];
 				} else if (table === 'Metadata') {
 					return [
@@ -77,7 +77,7 @@ test('toExportedProtocol', async () => {
 							mergeMethod: 'max',
 							required: false,
 							sortable: false,
-							groupable: false
+							groupable: false,
 						},
 						{
 							id: 'protocol1__meta2',
@@ -89,7 +89,7 @@ test('toExportedProtocol', async () => {
 							mergeMethod: 'max',
 							required: false,
 							sortable: false,
-							groupable: false
+							groupable: false,
 						},
 						{
 							id: 'protocol1__meta3',
@@ -101,13 +101,13 @@ test('toExportedProtocol', async () => {
 							mergeMethod: 'max',
 							required: false,
 							sortable: false,
-							groupable: false
-						}
+							groupable: false,
+						},
 					];
 				}
 				return [];
 			}
-		)
+		),
 	};
 	const protocol = Protocol.assert({
 		id: 'protocol1',
@@ -119,19 +119,19 @@ test('toExportedProtocol', async () => {
 		authors: [],
 		description: 'A test protocol',
 		crop: {
-			metadata: 'meta1'
+			metadata: 'meta1',
 		},
 		exports: {
 			metadata: {
 				json: 'analysis.json',
 				csv: 'metadata.csv',
-				files: 'files/{{metadataKey}}/{{id}}.{{extension filename}}'
+				files: 'files/{{metadataKey}}/{{id}}.{{extension filename}}',
 			},
 			images: {
 				cropped: 'cropped/{{sequence}}.{{extension image.filename}}',
-				original: 'original/{{sequence}}.{{extension image.filename}}'
-			}
-		}
+				original: 'original/{{sequence}}.{{extension image.filename}}',
+			},
+		},
 	});
 	const exported = await toExportedProtocol(db, protocol);
 
@@ -156,8 +156,8 @@ test('toExportedProtocol', async () => {
 				options: [],
 				sortable: false,
 				groupable: false,
-				images: []
-			}
+				images: [],
+			},
 		},
 		metadata: {
 			protocol1__meta1: {
@@ -175,15 +175,15 @@ test('toExportedProtocol', async () => {
 						key: 'opt1',
 						label: 'Option 1',
 						description: 'Desc 1',
-						synonyms: []
+						synonyms: [],
 					},
 					{
 						key: 'opt2',
 						label: 'Option 2',
 						description: 'Desc 2',
-						synonyms: []
-					}
-				]
+						synonyms: [],
+					},
+				],
 			},
 			protocol1__meta2: {
 				key: 'meta2',
@@ -200,22 +200,22 @@ test('toExportedProtocol', async () => {
 						key: 'opt1',
 						label: 'Option A',
 						description: 'Desc A',
-						synonyms: []
-					}
-				]
-			}
+						synonyms: [],
+					},
+				],
+			},
 		},
 		exports: {
 			metadata: {
 				json: 'analysis.json',
 				csv: 'metadata.csv',
-				files: 'files/{{metadataKey}}/{{id}}.{{extension filename}}'
+				files: 'files/{{metadataKey}}/{{id}}.{{extension filename}}',
 			},
 			images: {
 				cropped: 'cropped/{{sequence}}.{{extension image.filename}}',
-				original: 'original/{{sequence}}.{{extension image.filename}}'
-			}
-		}
+				original: 'original/{{sequence}}.{{extension image.filename}}',
+			},
+		},
 	});
 });
 
@@ -235,26 +235,26 @@ describe('compareProtocolWithUpstream', () => {
 				description: 'A test protocol',
 				// no source:
 				crop: {
-					padding: '0px'
+					padding: '0px',
 				},
 				exports: {
 					metadata: {
 						json: 'analysis.json',
 						csv: 'metadata.csv',
-						files: 'files/{{metadataKey}}/{{id}}.{{extension filename}}'
+						files: 'files/{{metadataKey}}/{{id}}.{{extension filename}}',
 					},
 					images: {
 						cropped: 'cropped/{{sequence}}.{{extension image.filename}}',
-						original: 'original/{{sequence}}.{{extension image.filename}}'
-					}
-				}
+						original: 'original/{{sequence}}.{{extension image.filename}}',
+					},
+				},
 			}),
 
-			count: async () => 0
+			count: async () => 0,
 		};
 
 		const diffs = await compareProtocolWithUpstream(db, 'protocol1', {
-			onProgress: () => {}
+			onProgress: () => {},
 		});
 
 		expect(diffs).toEqual([]);
@@ -276,23 +276,23 @@ describe('compareProtocolWithUpstream', () => {
 				description: 'A test protocol',
 				source: 'https://example.com/protocol.json',
 				crop: {
-					padding: '0px'
+					padding: '0px',
 				},
 				exports: {
 					metadata: {
 						json: 'analysis.json',
 						csv: 'metadata.csv',
-						files: 'files/{{metadataKey}}/{{id}}.{{extension filename}}'
+						files: 'files/{{metadataKey}}/{{id}}.{{extension filename}}',
 					},
 					images: {
 						cropped: 'cropped/{{sequence}}.{{extension image.filename}}',
-						original: 'original/{{sequence}}.{{extension image.filename}}'
-					}
-				}
+						original: 'original/{{sequence}}.{{extension image.filename}}',
+					},
+				},
 			}),
 
 			count: async () => 0,
-			getAll: async () => []
+			getAll: async () => [],
 		};
 
 		const fetch = vi.fn(async () => ({
@@ -306,30 +306,30 @@ describe('compareProtocolWithUpstream', () => {
 				description: 'A test protocol',
 				source: 'https://example.com/protocol.json',
 				crop: {
-					padding: '0px'
+					padding: '0px',
 				},
 				exports: {
 					metadata: {
 						json: 'analysis.json',
 						csv: 'metadata.csv',
-						files: 'files/{{metadataKey}}/{{id}}.{{extension filename}}'
+						files: 'files/{{metadataKey}}/{{id}}.{{extension filename}}',
 					},
 					images: {
 						cropped: 'cropped/{{sequence}}.{{extension image.filename}}',
-						original: 'original/{{sequence}}.{{extension image.filename}}'
-					}
-				}
-			})
+						original: 'original/{{sequence}}.{{extension image.filename}}',
+					},
+				},
+			}),
 		}));
 
 		vi.stubGlobal('fetch', fetch);
 
 		const diffs = await compareProtocolWithUpstream(db, 'protocol1', {
-			onProgress: () => {}
+			onProgress: () => {},
 		});
 
 		expect(fetch).toHaveBeenCalledWith(new URL('https://example.com/protocol.json'), {
-			headers: {}
+			headers: {},
 		});
 
 		expect(diffs).toEqual([]);
@@ -350,19 +350,19 @@ describe('compareProtocolWithUpstream', () => {
 				description: 'A test protocol',
 				source: 'https://example.com/protocol.json',
 				crop: {
-					padding: '0px'
+					padding: '0px',
 				},
 				exports: {
 					metadata: {
 						json: 'analysis.json',
 						csv: 'metadata.csv',
-						files: 'files/{{metadataKey}}/{{id}}.{{extension filename}}'
+						files: 'files/{{metadataKey}}/{{id}}.{{extension filename}}',
 					},
 					images: {
 						cropped: 'cropped/{{sequence}}.{{extension image.filename}}',
-						original: 'original/{{sequence}}.{{extension image.filename}}'
-					}
-				}
+						original: 'original/{{sequence}}.{{extension image.filename}}',
+					},
+				},
 			}),
 
 			count: async () => 2,
@@ -379,7 +379,7 @@ describe('compareProtocolWithUpstream', () => {
 							key: 'opt1',
 							label: 'Option 1',
 							description: 'Desc 1',
-							synonyms: []
+							synonyms: [],
 						},
 						{
 							id: 'protocol1__meta1:opt2',
@@ -387,7 +387,7 @@ describe('compareProtocolWithUpstream', () => {
 							key: 'opt2',
 							label: 'Option 2',
 							description: 'Desc 2',
-							synonyms: []
+							synonyms: [],
 						},
 						{
 							id: 'protocol1__meta2:opt1',
@@ -395,8 +395,8 @@ describe('compareProtocolWithUpstream', () => {
 							key: 'opt1',
 							label: 'Option A',
 							description: 'Desc A',
-							synonyms: []
-						}
+							synonyms: [],
+						},
 					];
 				} else if (table === 'Metadata') {
 					return [
@@ -408,7 +408,7 @@ describe('compareProtocolWithUpstream', () => {
 							mergeMethod: 'max',
 							required: false,
 							sortable: false,
-							groupable: false
+							groupable: false,
 						},
 						{
 							id: 'protocol1__meta2',
@@ -418,7 +418,7 @@ describe('compareProtocolWithUpstream', () => {
 							mergeMethod: 'max',
 							required: false,
 							sortable: false,
-							groupable: false
+							groupable: false,
 						},
 						{
 							id: 'protocol1__meta4',
@@ -428,12 +428,12 @@ describe('compareProtocolWithUpstream', () => {
 							mergeMethod: 'max',
 							required: false,
 							sortable: false,
-							groupable: false
-						}
+							groupable: false,
+						},
 					];
 				}
 				return [];
-			}
+			},
 		};
 
 		const fetch = vi.fn(async () => ({
@@ -446,7 +446,7 @@ describe('compareProtocolWithUpstream', () => {
 				version: 2,
 				updates: 'automatic',
 				crop: {
-					padding: '0px'
+					padding: '0px',
 				},
 				metadata: {
 					protocol1__meta1: {
@@ -460,8 +460,8 @@ describe('compareProtocolWithUpstream', () => {
 						options: [
 							{ key: 'opt1', label: 'Option 1', description: 'Desc 1', synonyms: [] },
 							// opt2 removed
-							{ key: 'opt3', label: 'Option 3', description: 'Desc 3', synonyms: [] } // new option
-						]
+							{ key: 'opt3', label: 'Option 3', description: 'Desc 3', synonyms: [] }, // new option
+						],
 					},
 					protocol1__meta2: {
 						label: 'Metadata 2',
@@ -473,8 +473,8 @@ describe('compareProtocolWithUpstream', () => {
 						type: 'enum',
 						options: [
 							{ key: 'opt1', label: 'Option A', description: 'Desc A', synonyms: [] },
-							{ key: 'opt2', label: 'Option B', description: 'Desc B', synonyms: [] } // new option
-						]
+							{ key: 'opt2', label: 'Option B', description: 'Desc B', synonyms: [] }, // new option
+						],
 					},
 					// meta4 removed
 					protocol1__meta3: {
@@ -487,9 +487,9 @@ describe('compareProtocolWithUpstream', () => {
 						sortable: false,
 						type: 'enum',
 						options: [
-							{ key: 'opt1', label: 'Option X', description: 'Desc X', synonyms: [] }
-						]
-					}
+							{ key: 'opt1', label: 'Option X', description: 'Desc X', synonyms: [] },
+						],
+					},
 				},
 				authors: [],
 				description: 'A test protocol updated',
@@ -497,14 +497,14 @@ describe('compareProtocolWithUpstream', () => {
 					metadata: {
 						json: 'analysis.json',
 						csv: 'metadata_v2.csv', // changed
-						files: 'files/{{metadataKey}}/{{id}}.{{extension filename}}'
+						files: 'files/{{metadataKey}}/{{id}}.{{extension filename}}',
 					},
 					images: {
 						cropped: 'cropped/{{sequence}}.{{extension image.filename}}',
-						original: 'original/{{sequence}}.{{extension image.filename}}'
-					}
-				}
-			})
+						original: 'original/{{sequence}}.{{extension image.filename}}',
+					},
+				},
+			}),
 		}));
 
 		vi.stubGlobal('fetch', fetch);
@@ -514,7 +514,7 @@ describe('compareProtocolWithUpstream', () => {
 		const diffs = await compareProtocolWithUpstream(db, 'protocol1', { onProgress });
 
 		expect(fetch).toHaveBeenCalledWith(new URL('https://example.com/protocol.json'), {
-			headers: {}
+			headers: {},
 		});
 
 		// Each option counts as 1 step, so we should have 4 (options) + 250 (fetchAndConvert) + 25 (microdiff) + 2 (postProcess)
@@ -562,19 +562,19 @@ describe('compareProtocolWithUpstream', () => {
 				oldValue: 'A test protocol updated',
 				path: ['description'],
 				type: 'CHANGE',
-				value: 'A test protocol'
+				value: 'A test protocol',
 			},
 			{
 				oldValue: 'metadata_v2.csv',
 				path: ['exports', 'metadata', 'csv'],
 				type: 'CHANGE',
-				value: 'metadata.csv'
+				value: 'metadata.csv',
 			},
 			{
 				oldValue: 'Metadata 1 description updated',
 				path: ['metadata', 'protocol1__meta1', 'description'],
 				type: 'CHANGE',
-				value: 'Metadata 1 description'
+				value: 'Metadata 1 description',
 			},
 			{
 				path: ['metadata', 'protocol1__meta1', 'options', 1],
@@ -582,26 +582,26 @@ describe('compareProtocolWithUpstream', () => {
 				value: {
 					description: 'Desc 2',
 					key: 'opt2',
-					label: 'Option 2'
-				}
+					label: 'Option 2',
+				},
 			},
 			{
 				oldValue: {
 					description: 'Desc 3',
 					key: 'opt3',
-					label: 'Option 3'
+					label: 'Option 3',
 				},
 				path: ['metadata', 'protocol1__meta1', 'options', 2],
-				type: 'REMOVE'
+				type: 'REMOVE',
 			},
 			{
 				oldValue: {
 					description: 'Desc B',
 					key: 'opt2',
-					label: 'Option B'
+					label: 'Option B',
 				},
 				path: ['metadata', 'protocol1__meta2', 'options', 1],
-				type: 'REMOVE'
+				type: 'REMOVE',
 			},
 			{
 				oldValue: {
@@ -612,26 +612,26 @@ describe('compareProtocolWithUpstream', () => {
 						{
 							description: 'Desc X',
 							key: 'opt1',
-							label: 'Option X'
-						}
+							label: 'Option X',
+						},
 					],
 					required: false,
-					type: 'enum'
+					type: 'enum',
 				},
 				path: ['metadata', 'protocol1__meta3'],
-				type: 'REMOVE'
+				type: 'REMOVE',
 			},
 			{
 				oldValue: 'Test Protocol Updated',
 				path: ['name'],
 				type: 'CHANGE',
-				value: 'Test Protocol'
+				value: 'Test Protocol',
 			},
 			{
 				path: ['source'],
 				type: 'CREATE',
-				value: 'https://example.com/protocol.json'
-			}
+				value: 'https://example.com/protocol.json',
+			},
 		]);
 	});
 });
@@ -641,8 +641,8 @@ describe('hasUpgradeAvailable', () => {
 		const fetch = vi.fn(async () => ({
 			json: async () => ({
 				version: 2,
-				id: 'mon-protocole'
-			})
+				id: 'mon-protocole',
+			}),
 		}));
 
 		vi.stubGlobal('fetch', fetch);
@@ -650,15 +650,15 @@ describe('hasUpgradeAvailable', () => {
 		const result = await hasUpgradeAvailable({
 			version: 1,
 			source: 'https://example.com/protocol.json',
-			id: 'mon-protocole'
+			id: 'mon-protocole',
 		});
 
 		expect(fetch).toHaveBeenCalledWith(
 			expect.stringContaining('https://example.com/protocol.json?v='),
 			{
 				headers: {
-					Accept: 'application/json'
-				}
+					Accept: 'application/json',
+				},
 			}
 		);
 		expect(result).toEqual({ upToDate: false, newVersion: 2 });
@@ -668,8 +668,8 @@ describe('hasUpgradeAvailable', () => {
 		const fetch = vi.fn(async () => ({
 			json: async () => ({
 				version: 1,
-				id: 'mon-protocole'
-			})
+				id: 'mon-protocole',
+			}),
 		}));
 
 		vi.stubGlobal('fetch', fetch);
@@ -677,15 +677,15 @@ describe('hasUpgradeAvailable', () => {
 		const result = await hasUpgradeAvailable({
 			version: 1,
 			source: 'https://example.com/protocol.json',
-			id: 'mon-protocole'
+			id: 'mon-protocole',
 		});
 
 		expect(fetch).toHaveBeenCalledWith(
 			expect.stringContaining('https://example.com/protocol.json?v='),
 			{
 				headers: {
-					Accept: 'application/json'
-				}
+					Accept: 'application/json',
+				},
 			}
 		);
 		expect(result).toEqual({ upToDate: true, newVersion: 1 });
@@ -695,8 +695,8 @@ describe('hasUpgradeAvailable', () => {
 		const fetch = vi.fn(async () => ({
 			json: async () => ({
 				version: 2,
-				id: 'autre-protocole'
-			})
+				id: 'autre-protocole',
+			}),
 		}));
 
 		vi.stubGlobal('fetch', fetch);
@@ -705,7 +705,7 @@ describe('hasUpgradeAvailable', () => {
 			hasUpgradeAvailable({
 				version: 1,
 				source: 'https://example.com/protocol.json',
-				id: 'mon-protocole'
+				id: 'mon-protocole',
 			})
 		).rejects.toThrowErrorMatchingInlineSnapshot(
 			`[Error: Le protocole a changé d'identifiant]`
@@ -715,8 +715,8 @@ describe('hasUpgradeAvailable', () => {
 	test('should throw an error if the remote protocol has no version', async () => {
 		const fetch = vi.fn(async () => ({
 			json: async () => ({
-				id: 'mon-protocole'
-			})
+				id: 'mon-protocole',
+			}),
 		}));
 
 		vi.stubGlobal('fetch', fetch);
@@ -725,7 +725,7 @@ describe('hasUpgradeAvailable', () => {
 			hasUpgradeAvailable({
 				version: 1,
 				source: 'https://example.com/protocol.json',
-				id: 'mon-protocole'
+				id: 'mon-protocole',
 			})
 		).rejects.toThrowErrorMatchingInlineSnapshot(`[Error: Le protocole n'a plus de version]`);
 	});
@@ -736,7 +736,7 @@ describe('hasUpgradeAvailable', () => {
 			hasUpgradeAvailable({
 				version: 1,
 				source: undefined,
-				id: 'mon-protocole'
+				id: 'mon-protocole',
 			})
 		).rejects.toThrowErrorMatchingInlineSnapshot(`[Error: Le protocole n'a pas de source]`);
 	});
@@ -747,7 +747,7 @@ describe('hasUpgradeAvailable', () => {
 			hasUpgradeAvailable({
 				version: undefined,
 				source: 'https://example.com/protocol.json',
-				id: 'mon-protocole'
+				id: 'mon-protocole',
 			})
 		).rejects.toThrowErrorMatchingInlineSnapshot(`[Error: Le protocole n'a pas de version]`);
 	});
@@ -757,7 +757,7 @@ describe('hasUpgradeAvailable', () => {
 			// @ts-expect-error
 			hasUpgradeAvailable({
 				version: 1,
-				source: 'https://example.com/protocol.json'
+				source: 'https://example.com/protocol.json',
 			})
 		).rejects.toThrowErrorMatchingInlineSnapshot(`[Error: Le protocole n'a pas d'identifiant]`);
 	});

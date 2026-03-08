@@ -5,7 +5,7 @@ import { tables } from './idb.svelte.js';
 import { deleteImageFile, imageFileIds } from './images.js';
 import {
 	mergeMetadataFromImagesAndObservations,
-	serializeMetadataFullValue
+	serializeMetadataFullValue,
 } from './metadata/index.js';
 import { uiState } from './state.svelte.js';
 import { compareBy, mapValues, nonnull } from './utils.js';
@@ -48,10 +48,10 @@ export async function mergeToObservation(parts) {
 			mergeMetadataFromImagesAndObservations({
 				definitions: tables.Metadata.state,
 				images: [],
-				observations
+				observations,
 			}),
 			serializeMetadataFullValue
-		)
+		),
 	};
 
 	observation.label = defaultObservationLabel({ protocol, images, observation });
@@ -147,12 +147,12 @@ export function newObservation(image, protocol, session) {
 		images: [image.id],
 		addedAt: new Date().toISOString(),
 		label: fallbackObservationLabel([image]),
-		metadataOverrides: {}
+		metadataOverrides: {},
 	};
 
 	return {
 		...newObs,
-		label: defaultObservationLabel({ images: [image], observation: newObs, protocol })
+		label: defaultObservationLabel({ images: [image], observation: newObs, protocol }),
 	};
 }
 
@@ -200,12 +200,12 @@ export function observationMetadata({ definitions, observation, images }) {
 		observations: [],
 		images: images
 			.filter(({ id }) => observation.images.includes(id))
-			.toSorted(compareBy(({ id }) => observation.images.indexOf(id)))
+			.toSorted(compareBy(({ id }) => observation.images.indexOf(id))),
 	});
 
 	return {
 		...metadataFromImages,
-		...observation.metadataOverrides
+		...observation.metadataOverrides,
 	};
 }
 
@@ -225,7 +225,7 @@ if (import.meta.vitest) {
 		boundingBoxesAnalyzed: true,
 		contentType: 'image/jpeg',
 		dimensions: { width: 100, height: 100, aspectRatio: 1 },
-		fileId: 'file_' + id
+		fileId: 'file_' + id,
 	}));
 
 	describe('observationMetadata', () => {
@@ -235,16 +235,16 @@ if (import.meta.vitest) {
 				metadataOverrides: {
 					[metadatas.enum.id]: {
 						...items[0].metadata.enum,
-						value: 'A'
-					}
-				}
+						value: 'A',
+					},
+				},
 			};
 
 			expect(
 				observationMetadata({
 					definitions: Object.values(metadatas),
 					observation,
-					images
+					images,
 				})
 			).toMatchInlineSnapshot(`
 				{

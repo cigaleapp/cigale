@@ -6,7 +6,7 @@ import {
 	importPhotos,
 	importProtocol,
 	importResults,
-	newSession
+	newSession,
 } from '../utils/index.js';
 
 test.skip(

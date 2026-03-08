@@ -4,7 +4,7 @@ import {
 	chooseFirstSession,
 	loadDatabaseDump,
 	observationCard,
-	setInferenceModels
+	setInferenceModels,
 } from './utils/index.js';
 
 test.beforeEach(async ({ page, app }) => {
@@ -18,7 +18,7 @@ test.beforeEach(async ({ page, app }) => {
 test('allows merging and unrolling two observations', async ({ page, app }) => {
 	const src = {
 		lilfella: await observationImage(page, 'lil-fella').getAttribute('src'),
-		cyan: await observationImage(page, 'cyan').getAttribute('src')
+		cyan: await observationImage(page, 'cyan').getAttribute('src'),
 	};
 	if (!src.lilfella) throw new Error('Could not get lil-fella image src');
 	if (!src.cyan) throw new Error('Could not get cyan image src');
@@ -31,7 +31,7 @@ test('allows merging and unrolling two observations', async ({ page, app }) => {
 
 	const imageIds = {
 		lilfella: await app.db.image.byFilename('lil-fella.jpeg'),
-		cyan: await app.db.image.byFilename('cyan.jpeg')
+		cyan: await app.db.image.byFilename('cyan.jpeg'),
 	};
 
 	if (!imageIds.lilfella) throw new Error('Could not get lil-fella image ID');
@@ -39,7 +39,7 @@ test('allows merging and unrolling two observations', async ({ page, app }) => {
 
 	assert(await app.db.observation.byLabel('lil-fella')).toHaveProperty('images', [
 		imageIds.lilfella.id,
-		imageIds.cyan.id
+		imageIds.cyan.id,
 	]);
 
 	await assert(page.getByTestId('observations-area').locator('article')).toHaveCount(3);
@@ -82,7 +82,7 @@ test('allows merging three observations', async ({ page, app }) => {
 	const imageIds = {
 		lilfella: await app.db.image.byFilename('lil-fella.jpeg'),
 		cyan: await app.db.image.byFilename('cyan.jpeg'),
-		leaf: await app.db.image.byFilename('leaf.jpeg')
+		leaf: await app.db.image.byFilename('leaf.jpeg'),
 	};
 
 	if (!imageIds.lilfella) throw new Error('Could not get lil-fella image ID');
@@ -92,7 +92,7 @@ test('allows merging three observations', async ({ page, app }) => {
 	assert(await app.db.observation.byLabel('leaf')).toHaveProperty('images', [
 		imageIds.leaf.id,
 		imageIds.lilfella.id,
-		imageIds.cyan.id
+		imageIds.cyan.id,
 	]);
 
 	await assert(page.getByTestId('observations-area').locator('article')).toHaveCount(2);
@@ -123,7 +123,7 @@ test('allows merging a second time into the same observation', async ({ page, ap
 	const imageIds = {
 		lilfella: await app.db.image.byFilename('lil-fella.jpeg'),
 		cyan: await app.db.image.byFilename('cyan.jpeg'),
-		leaf: await app.db.image.byFilename('leaf.jpeg')
+		leaf: await app.db.image.byFilename('leaf.jpeg'),
 	};
 
 	if (!imageIds.lilfella) throw new Error('Could not get lil-fella image ID');
@@ -133,7 +133,7 @@ test('allows merging a second time into the same observation', async ({ page, ap
 	assert(await app.db.observation.byLabel('lil-fella')).toHaveProperty('images', [
 		imageIds.lilfella.id,
 		imageIds.cyan.id,
-		imageIds.leaf.id
+		imageIds.leaf.id,
 	]);
 });
 
@@ -154,7 +154,7 @@ test('selecting multiple images', issue(1054), async ({ page, app }) => {
 	await loadDatabaseDump(page, 'db/basic.devalue');
 	await chooseFirstSession(page);
 	await setInferenceModels(page, {
-		classify: 'Aucune inférence'
+		classify: 'Aucune inférence',
 	});
 	await app.tabs.go('classify');
 

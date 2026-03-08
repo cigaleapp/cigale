@@ -1,11 +1,12 @@
 <script lang="ts">
+	import type * as DB from '$lib/database';
+
 	import IconConfirmed from '~icons/ri/check-double-line';
 	import IconCrop from '~icons/ri/crop-line';
 	import IconUnconfirmed from '~icons/ri/error-warning-line';
 	import IconGallery from '~icons/ri/function-line';
 	import { invalidate } from '$app/navigation';
 	import ButtonInk from '$lib/ButtonInk.svelte';
-	import type * as DB from '$lib/database';
 	import { dependencyURI, tables } from '$lib/idb.svelte';
 	import { imageIdToFileId } from '$lib/images';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
@@ -24,7 +25,7 @@
 
 	const cropUrlParams = $derived({
 		image: imageIdToFileId(currentImage.id),
-		from: observation.id
+		from: observation.id,
 	});
 
 	defineKeyboardShortcuts('classification', {
@@ -32,7 +33,7 @@
 			help: 'Retour à la galerie',
 			async do() {
 				await goto('/(app)/(sidepanel)/classify');
-			}
+			},
 		},
 		B: {
 			help: "Recadrer l'image",
@@ -40,8 +41,8 @@
 			async do() {
 				if (!cropUrlParams) return;
 				await goto('/(app)/(sidepanel)/crop/[image]/[[from]]', cropUrlParams);
-			}
-		}
+			},
+		},
 	});
 </script>
 

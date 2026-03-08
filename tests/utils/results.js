@@ -1,4 +1,5 @@
 import path from 'node:path';
+
 import { expect } from '@playwright/test';
 import { nanoid } from 'nanoid';
 import * as yauzl from 'yauzl-promise';
@@ -19,10 +20,10 @@ import { goToTab, newSession, setSettings, waitForLoadingEnd } from './index.js'
 export async function importResults(page, filepath, { waitForLoading = true } = {}) {
 	await setSettings(
 		{
-			page
+			page,
 		},
 		{
-			showTechnicalMetadata: false
+			showTechnicalMetadata: false,
 		}
 	);
 
@@ -60,7 +61,7 @@ export async function exportResults(page, { cropPadding = '0px', kind = 'cropped
 			{
 				metadata: 'Métadonnées seulement',
 				cropped: 'Métadonnées et images recadrées',
-				full: 'Métadonnées, images recadrées et images originales'
+				full: 'Métadonnées, images recadrées et images originales',
 			}[kind]
 		)
 		.click();

@@ -37,16 +37,16 @@ import { entries, mapValues } from './utils.js';
 const TOAST_POOLS = /** @type {const} @satisfies {Record<string, Omit<ToastPool, 'items'>>} */ ({
 	default: {
 		lifetime: 3_000,
-		capacity: 3
+		capacity: 3,
 	},
 	exporter: {
 		lifetime: Infinity,
-		capacity: Infinity
+		capacity: Infinity,
 	},
 	protocolcreator: {
 		lifetime: Infinity,
-		capacity: Infinity
-	}
+		capacity: Infinity,
+	},
 });
 
 /**
@@ -148,7 +148,7 @@ class Toasts {
 			callbacks,
 			data: data ?? null,
 			lifetime: lifetime === 'inferred' ? this.#inferLifetime(message) : lifetime,
-			...rest
+			...rest,
 		};
 
 		if (Number.isFinite(newToast.lifetime)) {
@@ -157,7 +157,7 @@ class Toasts {
 
 		this.pools[this.currentPoolName].items = [
 			...this.items().slice(0, this.pool.capacity - 1),
-			newToast
+			newToast,
 		];
 		return id;
 	}
@@ -186,8 +186,8 @@ class Toasts {
 				toasts.remove(t.id, toasts.currentPoolName, { silent: true });
 			},
 			labels: {
-				action: 'Annuler'
-			}
+				action: 'Annuler',
+			},
 		});
 	}
 
@@ -223,7 +223,7 @@ class Toasts {
 	error(message, options) {
 		return this.add('error', message?.toString() ?? 'Erreur inattendue', {
 			...options,
-			lifetime: options?.lifetime ?? 'inferred'
+			lifetime: options?.lifetime ?? 'inferred',
 		});
 	}
 

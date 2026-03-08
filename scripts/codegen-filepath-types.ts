@@ -1,4 +1,5 @@
 import path from 'node:path';
+
 import { Glob } from 'bun';
 
 const projectRoot = path.join(import.meta.dir, '..');
@@ -59,11 +60,11 @@ async function namespacedDeclarations(
 			Object.fromEntries(
 				Object.entries(decls).map(([typeName, globOrGlobs]) => [
 					typeName,
-					Array.isArray(globOrGlobs) ? globOrGlobs : [globOrGlobs]
+					Array.isArray(globOrGlobs) ? globOrGlobs : [globOrGlobs],
 				])
 			)
 		)),
-		'};'
+		'};',
 	];
 }
 
@@ -73,14 +74,14 @@ Bun.file(path.join(projectRoot, 'tests', 'filepaths.ts')).write(
 		...(await namespacedDeclarations('FixturePaths', 'tests/fixtures', {
 			Exports: 'exports/*.zip',
 			DatabaseDumps: 'db/*.devalue',
-			Photos: ['*.{jpeg,jpg,png,cr2}', 'real/entomoscope/*.{jpeg,jpg,json}']
+			Photos: ['*.{jpeg,jpg,png,cr2}', 'real/entomoscope/*.{jpeg,jpg,json}'],
 		})),
 		...(await namespacedDeclarations('ResultsPaths', 'tests/results', {})),
 		...(await namespacedDeclarations('ExamplePaths', 'examples', {
-			Protocols: '*.{json,yaml}'
+			Protocols: '*.{json,yaml}',
 		})),
 		...(await namespacedDeclarations('RealPaths', '', {
-			Protocols: 'protocols/*.{json,yaml}'
-		}))
+			Protocols: 'protocols/*.{json,yaml}',
+		})),
 	].join('\n')
 );

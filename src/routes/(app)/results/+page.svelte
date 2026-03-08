@@ -1,4 +1,6 @@
 <script lang="ts">
+	import type { TreeNode, TreeNodeMaybeLoading } from '$lib/file-tree.js';
+
 	import { watch } from 'runed';
 	import { tick } from 'svelte';
 
@@ -8,7 +10,7 @@
 	import { page } from '$app/state';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import { downloadAsFile } from '$lib/download.js';
-	import { gatherToTree, type TreeNode, type TreeNodeMaybeLoading } from '$lib/file-tree.js';
+	import { gatherToTree } from '$lib/file-tree.js';
 	import { writeToFilesystem } from '$lib/filesystem.js';
 	import { formatBytesSize } from '$lib/i18n';
 	import { parseCropPadding } from '$lib/images';
@@ -94,7 +96,7 @@
 					jsonSchemaURL: new URL(
 						asset('/results.schema.json'),
 						page.url.origin
-					).toString()
+					).toString(),
 				},
 				async ({ event, data }) => {
 					switch (event) {
@@ -147,7 +149,7 @@
 
 		const preview = await swarpc.previewResultsZip.once({
 			include,
-			sessionId: uiState.currentSessionId
+			sessionId: uiState.currentSessionId,
 		});
 
 		const tree: TreeNode = [];
@@ -157,7 +159,7 @@
 				paths: files.map((f) => f.path),
 				provenance,
 				contentType: (path) =>
-					files.find((f) => f.path === path)?.contentType ?? 'application/octet-stream'
+					files.find((f) => f.path === path)?.contentType ?? 'application/octet-stream',
 			});
 		}
 		return tree;
@@ -181,14 +183,14 @@
 			sizeEstimates = await swarpc.estimateResultsZipSize.once({
 				include,
 				sessionId: uiState.currentSessionId,
-				cropPadding: cropPadding.withUnit
+				cropPadding: cropPadding.withUnit,
 			});
 		})();
 	});
 
 	const loadingFolder: TreeNodeMaybeLoading[number] = {
 		folder: Loading,
-		children: Array(10).fill(Loading)
+		children: Array(10).fill(Loading),
 	};
 
 	let supportsWritingFolder = $state(false);
@@ -232,7 +234,7 @@
 					const directory = await (window as any).showDirectoryPicker({
 						mode: 'readwrite',
 						startIn: 'documents',
-						id: 'results-export'
+						id: 'results-export',
 					});
 					await downloadExport(directory);
 				}}
@@ -269,8 +271,8 @@
 						{
 							key: 'full',
 							label: 'Métadonnées, images recadrées et images originales',
-							subtext: 'Permet de ré-importer les résultats ultérieurement'
-						}
+							subtext: 'Permet de ré-importer les résultats ultérieurement',
+						},
 					]}
 				/>
 			</div>
@@ -326,8 +328,8 @@
 						...{
 							metadataonly: [],
 							croppedonly: [loadingFolder],
-							full: [loadingFolder, loadingFolder]
-						}[include]
+							full: [loadingFolder, loadingFolder],
+						}[include],
 					]}
 				>
 					{#snippet rootHelp()}

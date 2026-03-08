@@ -20,7 +20,7 @@ const MAP_TILES_CACHE = `cache-map-tiles`;
 
 const ASSETS = [
 	...build, // the app itself
-	...files // everything in `static`
+	...files, // everything in `static`
 ].filter((u) =>
 	// Prevent trying to cache app://-/ URLs when running with Electron
 	/^https?:\/\//.test(u)

@@ -180,8 +180,8 @@ export function formatBytesSize(bytes, unitDisplay = 'short') {
 			3: 'kilobyte',
 			6: 'megabyte',
 			9: 'gigabyte',
-			12: 'terabyte'
-		}[power]
+			12: 'terabyte',
+		}[power],
 	});
 
 	const value = bytes / 10 ** power;

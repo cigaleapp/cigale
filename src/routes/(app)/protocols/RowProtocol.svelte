@@ -1,4 +1,6 @@
 <script lang="ts">
+	import type { Protocol } from '$lib/database';
+
 	import IconUpgrade from '~icons/ri/arrow-up-circle-line';
 	import IconDelete from '~icons/ri/delete-bin-line';
 	import IconEdit from '~icons/ri/pencil-line';
@@ -7,7 +9,6 @@
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import ButtonUpdateProtocol from '$lib/ButtonUpdateProtocol.svelte';
-	import type { Protocol } from '$lib/database';
 	import { databaseHandle } from '$lib/idb.svelte';
 	import OverflowableText from '$lib/OverflowableText.svelte';
 	import { goto, resolve } from '$lib/paths';
@@ -35,7 +36,7 @@
 		version,
 		ondelete,
 		updates,
-		expanded = $bindable(false)
+		expanded = $bindable(false),
 	}: Props = $props();
 
 	const autoUpdatesEnabled = $derived.by(() => {
@@ -92,7 +93,7 @@
 						const currently = getSettings().autoUpdateProtocols;
 						await setSetting('autoUpdateProtocols', {
 							...currently,
-							[id]: enabled
+							[id]: enabled,
 						});
 					}}
 				/>

@@ -13,14 +13,14 @@ export const SORT_FIELDS = /** @type {const} */ ({
 	metadataValue: { label: 'Métadonnée…', needsMetadata: true },
 	metadataConfidence: { label: 'Confiance en…', needsMetadata: true },
 	id: { label: 'ID', needsMetadata: false },
-	name: { label: 'Nom', needsMetadata: false }
+	name: { label: 'Nom', needsMetadata: false },
 });
 
 export const GROUP_FIELDS = /** @type {const} */ ({
 	metadataValue: { label: 'Métadonnée…', needsMetadata: true, needsTolerance: true },
 	metadataPresence: { label: 'Présence de…', needsMetadata: true, needsTolerance: false },
 	metadataConfidence: { label: 'Confiance en…', needsMetadata: true, needsTolerance: false },
-	none: { label: 'Aucun regroupement', needsMetadata: false, needsTolerance: false }
+	none: { label: 'Aucun regroupement', needsMetadata: false, needsTolerance: false },
 });
 
 export const GROUPING_TOLERANCES = /** @type {const} */ ({
@@ -33,8 +33,8 @@ export const GROUPING_TOLERANCES = /** @type {const} */ ({
 			month: { scientific: '', casual: 'Par mois' },
 			day: { scientific: '', casual: 'Par jour' },
 			hour: { scientific: '', casual: 'Par heure' },
-			minute: { scientific: '', casual: 'Par minute' }
-		}
+			minute: { scientific: '', casual: 'Par minute' },
+		},
 	},
 	decimal: {
 		label: 'Nombres',
@@ -43,7 +43,7 @@ export const GROUPING_TOLERANCES = /** @type {const} */ ({
 			'integer',
 			'float',
 			'boundingbox',
-			'location'
+			'location',
 		]),
 		options: {
 			giga: { scientific: 'G', casual: 'Au milliard' },
@@ -56,9 +56,9 @@ export const GROUPING_TOLERANCES = /** @type {const} */ ({
 			centi: { scientific: '0.01', casual: 'Au centième' },
 			milli: { scientific: 'm', casual: 'Au millième' },
 			micro: { scientific: 'µ', casual: 'Au millionième' },
-			nano: { scientific: 'n', casual: 'Au milliardième' }
-		}
-	}
+			nano: { scientific: 'n', casual: 'Au milliardième' },
+		},
+	},
 });
 
 export const FULLSCREEN_CLASSIFY_LAYOUTS = /** @type {const} */ (['top-bottom', 'left-right']);
@@ -79,7 +79,7 @@ export function sortOrGroupFieldNeedsMetadata(...[task, field]) {
 export const SortSettings = type({
 	field: type.enumerated(...keys(SORT_FIELDS)),
 	'metadata?': ID,
-	direction: type.enumerated('asc', 'desc')
+	direction: type.enumerated('asc', 'desc'),
 });
 
 export const GroupSettings = type({
@@ -87,11 +87,11 @@ export const GroupSettings = type({
 	'metadata?': ID,
 	tolerances: type({
 		dates: type.enumerated(...keys(GROUPING_TOLERANCES.dates.options)),
-		decimal: type.enumerated(...keys(GROUPING_TOLERANCES.decimal.options))
+		decimal: type.enumerated(...keys(GROUPING_TOLERANCES.decimal.options)),
 	}).default(() => ({
 		dates: 'day',
-		decimal: 'unit'
-	}))
+		decimal: 'unit',
+	})),
 });
 
 export const Session = type({
@@ -105,33 +105,33 @@ export const Session = type({
 	metadata: MetadataValues,
 	fullscreenClassifier: type({
 		layout: type.enumerated(...FULLSCREEN_CLASSIFY_LAYOUTS),
-		'focusedMetadata?': ID
+		'focusedMetadata?': ID,
 	}).default(() => ({
-		layout: 'top-bottom'
+		layout: 'top-bottom',
 	})),
 	sort: type({
 		global: SortSettings,
 		// Per-tab
 		'import?': SortSettings,
 		'crop?': SortSettings,
-		'classify?': SortSettings
+		'classify?': SortSettings,
 	}).default(() => ({
-		global: { field: 'id', direction: 'asc' }
+		global: { field: 'id', direction: 'asc' },
 	})),
 	group: type({
 		global: GroupSettings,
 		// Per-tab
 		'import?': GroupSettings,
 		'crop?': GroupSettings,
-		'classify?': GroupSettings
+		'classify?': GroupSettings,
 	}).default(() => ({
-		global: { field: 'none' }
+		global: { field: 'none' },
 	})),
 	inferenceModels: scope({ ID })
 		.type({
 			// -1 is for none selected
-			'[ID]': 'number.integer >= -1'
+			'[ID]': 'number.integer >= -1',
 		})
 		.describe('Maps metadata IDs to selected model indices')
-		.default(() => ({}))
+		.default(() => ({})),
 });

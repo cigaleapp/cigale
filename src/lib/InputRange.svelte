@@ -26,7 +26,7 @@
 		value = $bindable(),
 		disabled,
 		onblur,
-		onvalue
+		onvalue,
 	}: Props = $props();
 
 	const componentId = $props.id();

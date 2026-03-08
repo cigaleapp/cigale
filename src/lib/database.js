@@ -8,7 +8,7 @@ import {
 	MIMEType,
 	NamespacedMetadataID,
 	Probability,
-	References
+	References,
 } from './schemas/common.js';
 import {
 	EXIFField,
@@ -18,13 +18,13 @@ import {
 	Metadata as MetadataSchema,
 	MetadataType as MetadataTypeSchema,
 	MetadataValue,
-	MetadataValues
+	MetadataValues,
 } from './schemas/metadata.js';
 import { ModelDetectionOutputShapes, ModelInput } from './schemas/neural.js';
 import { Image as ImageSchema, Observation as ObservationSchema } from './schemas/observations.js';
 import {
 	ExportsFilepathTemplateObservation,
-	Protocol as ProtocolSchema
+	Protocol as ProtocolSchema,
 } from './schemas/protocols.js';
 import { Session as SessionSchema } from './schemas/sessions.js';
 import { clamp } from './utils.js';
@@ -70,7 +70,7 @@ const ImageFile = table(
 		filename: 'string',
 		contentType: MIMEType,
 		dimensions: Dimensions,
-		sessionId: ID
+		sessionId: ID,
 	})
 );
 
@@ -83,7 +83,7 @@ const ImagePreviewFile = table(
 		filename: 'string',
 		contentType: MIMEType,
 		dimensions: Dimensions,
-		sessionId: ID
+		sessionId: ID,
 	})
 );
 
@@ -100,7 +100,7 @@ const MetadataValueFile = table(
 		filename: 'string',
 		contentType: MIMEType,
 		size: ['number', '@', 'in bytes'],
-		lastModifiedAt: 'string.date.iso'
+		lastModifiedAt: 'string.date.iso',
 	})
 );
 
@@ -115,7 +115,7 @@ const MetadataOption = table(
 	['id'],
 	MetadataEnumVariant.and({
 		id: [/\w+__\w+:\w+/, '@', 'ID of the form namespaced_metadata_id:key'],
-		metadataId: NamespacedMetadataID
+		metadataId: NamespacedMetadataID,
 	})
 );
 const Protocol = table('id', ProtocolSchema);
@@ -168,14 +168,14 @@ const Settings = table(
 		}),
 		gallerySort: type({
 			direction: type.enumerated('asc', 'desc'),
-			key: type.enumerated('filename', 'date')
+			key: type.enumerated('filename', 'date'),
 		})
 			.configure({ deprecated: true })
 			.default(() => ({
 				direction: 'asc',
-				key: 'date'
+				key: 'date',
 			})),
-		autoUpdateProtocols: type('Record<string, boolean>').default(() => ({}))
+		autoUpdateProtocols: type('Record<string, boolean>').default(() => ({})),
 	})
 );
 
@@ -198,7 +198,7 @@ export const Schemas = {
 	Protocol,
 	Settings,
 	EXIFField,
-	HTTPRequest
+	HTTPRequest,
 };
 
 /**
@@ -208,7 +208,7 @@ export const NO_REACTIVE_STATE_TABLES = /** @type {const} */ ([
 	'ImageFile',
 	'ImagePreviewFile',
 	'MetadataOption',
-	'MetadataValueFile'
+	'MetadataValueFile',
 ]);
 
 /**
@@ -245,7 +245,7 @@ export const Tables = {
 	Metadata,
 	MetadataOption,
 	Protocol,
-	Settings
+	Settings,
 };
 
 /**

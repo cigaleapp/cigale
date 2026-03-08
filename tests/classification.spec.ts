@@ -1,8 +1,9 @@
+import type { AppFixture } from './fixtures.js';
 import type { Page } from '@playwright/test';
 
 import lightweightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import { issue, pr } from './annotations.js';
-import { assert, expect, test, type AppFixture } from './fixtures.js';
+import { assert, expect, test } from './fixtures.js';
 import {
 	chooseFirstSession,
 	firstObservationCard,
@@ -11,7 +12,7 @@ import {
 	loadDatabaseDump,
 	newSession,
 	observationsByLabel,
-	setInferenceModels
+	setInferenceModels,
 } from './utils/index.js';
 
 test('allows cancelling classification of an observation', issue(430), async ({ page, app }) => {
@@ -19,18 +20,18 @@ test('allows cancelling classification of an observation', issue(430), async ({ 
 	await app.tabs.go('import');
 	await importPhotos({ page }, 'lil-fella.jpeg');
 	await assert(firstObservationCard(page)).not.toHaveText(/Analyse…|En attente/, {
-		timeout: 10_000
+		timeout: 10_000,
 	});
 	await app.tabs.go('crop');
 	await app.loading.wait();
 	await app.tabs.go('classify');
 	await assert(firstObservationCard(page)).toHaveText(/Analyse…|En attente/, {
-		timeout: 10_000
+		timeout: 10_000,
 	});
 	await page.waitForTimeout(1_000);
 	await firstObservationCard(page).getByRole('button', { name: 'Supprimer' }).click();
 	await assert(firstObservationCard(page)).not.toBeVisible({
-		timeout: 5_000
+		timeout: 5_000,
 	});
 	assert(await app.db.observation.byLabel('lil-fella')).toBeUndefined();
 });
@@ -55,7 +56,7 @@ test.describe('full-screen classification view', pr(1071), () => {
 				window.DB.put('MetadataOption', {
 					...option!,
 					description:
-						"A test description to test stuff out woooo here's some **markdown**. I hope you get rendered into a <strong> HTML tag buddy! See you soon in a expect() call down there :p"
+						"A test description to test stuff out woooo here's some **markdown**. I hope you get rendered into a <strong> HTML tag buddy! See you soon in a expect() call down there :p",
 				});
 			},
 			[speciesOfLilFella.key]
@@ -64,7 +65,7 @@ test.describe('full-screen classification view', pr(1071), () => {
 		await chooseFirstSession(page);
 		await setInferenceModels(page, {
 			classify: 'Aucune inférence',
-			crop: 'Aucune inférence'
+			crop: 'Aucune inférence',
 		});
 
 		await app.tabs.go('classify');
@@ -181,7 +182,7 @@ test.describe('full-screen classification view', pr(1071), () => {
 				) {
 					const { species } = await app.db.metadata.values({
 						protocolId: lightweightProtocol.id,
-						observation: 'lil-fella'
+						observation: 'lil-fella',
 					});
 
 					const expectedOption = lightweightProtocol.metadata[

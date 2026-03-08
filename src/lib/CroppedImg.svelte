@@ -1,7 +1,9 @@
 <!-- @component A wrapped <img> tag that displays an image cropped to a given bounding box. -->
 
 <script lang="ts">
-	import { toCorners, type Rect } from './BoundingBoxes.svelte';
+	import type { Rect } from './BoundingBoxes.svelte';
+
+	import { toCorners } from './BoundingBoxes.svelte';
 
 	interface Props {
 		src: string | undefined;
@@ -47,7 +49,7 @@
 
 		const [w, h] = [
 			(1 / box.width) * Math.min(aspectRatio, 1),
-			(1 / box.height) * Math.min(1 / aspectRatio, 1)
+			(1 / box.height) * Math.min(1 / aspectRatio, 1),
 		];
 
 		if (areaAspectRatio > aspectRatio) {
@@ -100,7 +102,7 @@
 			corners.topleft,
 			corners.topright,
 			corners.bottomright,
-			corners.bottomleft
+			corners.bottomleft,
 		]
 			.map(percents)
 			.join(', ')})"

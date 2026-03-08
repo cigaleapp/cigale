@@ -45,7 +45,7 @@ export const scrollfader: Attachment<HTMLElement> = (element) => {
 		attributes: true,
 		childList: true,
 		subtree: true,
-		characterData: true
+		characterData: true,
 	});
 
 	element.addEventListener('scroll', onscroll);

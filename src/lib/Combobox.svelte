@@ -27,10 +27,12 @@
 </script>
 
 <script lang="ts" generics="I extends Item, V extends string">
-	import VirtualList from '@sveltejs/svelte-virtual-list';
-	import { Combobox, mergeProps, type WithoutChildrenOrChild } from 'bits-ui';
-	import { Debounced } from 'runed';
+	import type { WithoutChildrenOrChild } from 'bits-ui';
 	import type { Snippet } from 'svelte';
+
+	import VirtualList from '@sveltejs/svelte-virtual-list';
+	import { Combobox, mergeProps } from 'bits-ui';
+	import { Debounced } from 'runed';
 
 	import Logo from './Logo.svelte';
 	import { scrollfader } from './scrollfader.js';
@@ -82,14 +84,14 @@
 		if (searchValue === '') {
 			return [...items.toSorted(sorter)].map((item) => ({
 				...item,
-				matchedFrom: item.label
+				matchedFrom: item.label,
 			}));
 		}
 
 		return items
 			.map((item) => ({
 				...item,
-				matchedFrom: searcher(searchValue, item)
+				matchedFrom: searcher(searchValue, item),
 			}))
 			.filter((item) => item.matchedFrom !== undefined)
 			.toSorted(compareBy(({ label, matchedFrom }) => (label === matchedFrom ? 0 : 1)));
@@ -108,7 +110,7 @@
 		mergeProps(inputProps, {
 			oninput: handleInput,
 			onfocus: () => (open = true),
-			defaultValue: label
+			defaultValue: label,
 		})
 	);
 
@@ -170,7 +172,7 @@
 								{@render listItem({
 									...item,
 									selected,
-									highlighted: highlightedItem?.key === item.key
+									highlighted: highlightedItem?.key === item.key,
 								})}
 							{/snippet}
 						</Combobox.Item>

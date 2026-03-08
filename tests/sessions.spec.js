@@ -14,7 +14,7 @@ import {
 	newSession,
 	pickFiles,
 	setInferenceModels,
-	switchSession
+	switchSession,
 } from './utils/index.js';
 
 test.describe('isolation', () => {
@@ -87,7 +87,7 @@ test('import into new session', async ({ page, app }) => {
 
 	await setInferenceModels(page, {
 		crop: 'Aucune inférence',
-		classify: 'Aucune inférence'
+		classify: 'Aucune inférence',
 	});
 
 	await app.tabs.go('crop');
@@ -334,7 +334,7 @@ test('changing session info saves in the database', async ({ page, app }) => {
 		openedAt: assert.stringMatching(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d+Z/),
 		description: '',
 		protocol: exampleProtocol.id,
-		metadata: {}
+		metadata: {},
 	});
 
 	const nameInput = page.getByRole('textbox', { name: 'Nom de la session' });
@@ -477,12 +477,12 @@ test('session metadata form has default values', async ({ page, app }) => {
 
 	await expect(page.getByRole('textbox', { name: 'Date du transect' })).toHaveValue(
 		formatDate(session.createdAt, 'yyyy-MM-dd', {
-			in: tz('Etc/UTC')
+			in: tz('Etc/UTC'),
 		})
 	);
 	await expect(page.getByRole('textbox', { name: 'Code du transect' })).toHaveValue(
 		formatDate(session.createdAt, "yyyyMMddHHmm'AB'", {
-			in: tz('Etc/UTC')
+			in: tz('Etc/UTC'),
 		})
 	);
 
@@ -550,7 +550,7 @@ test('can set file-type metadata', async ({ page, app }) => {
 		// TODO: don't use 20K-gray, it takes a while to decode on webkit
 		// (is webkit dumb enough to decode at fullres even though layouted size is way smaller? maybe)
 		timeout: ms('1min'),
-		maxDiffPixelRatio: 0.01
+		maxDiffPixelRatio: 0.01,
 	});
 
 	await page.waitForTimeout(500); // XXX: Wait for DB write
@@ -558,7 +558,7 @@ test('can set file-type metadata', async ({ page, app }) => {
 	expect(await fileInDb()).toMatchObject({
 		filename: '20K-gray.jpeg',
 		contentType: 'image/jpeg',
-		size: 1_562_661
+		size: 1_562_661,
 	});
 
 	// A file -> another file
@@ -568,7 +568,7 @@ test('can set file-type metadata', async ({ page, app }) => {
 	await expect(fileMetadata).toHaveText(/792\sko/);
 	await expect(fileMetadata).toHaveText(/large-image\.jpeg/);
 	await expect(fileMetadata.getByRole('img', { name: 'large-image.jpeg' })).toHaveScreenshot({
-		maxDiffPixelRatio: 0.01
+		maxDiffPixelRatio: 0.01,
 	});
 
 	await page.waitForTimeout(500); // XXX: Wait for DB write
@@ -579,7 +579,7 @@ test('can set file-type metadata', async ({ page, app }) => {
 	await expect(fileInDb()).resolves.toMatchObject({
 		filename: 'large-image.jpeg',
 		contentType: 'image/jpeg',
-		size: 792_031
+		size: 792_031,
 	});
 
 	// A file -> empty
@@ -610,7 +610,7 @@ test('can convert between units', async ({ page, app }) => {
 		// XXX: When testing locally (headed or headless), it's "Utiliser une autre unité"
 		// when running in CI, it's atm/Pa
 		// go figure...
-		name: /^(atm|Pa|Utiliser une autre unité)$/
+		name: /^(atm|Pa|Utiliser une autre unité)$/,
 	});
 
 	await expect(unitChanger).toHaveText('atm');

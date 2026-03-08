@@ -1,17 +1,20 @@
 import { mkdir, rm } from 'node:fs/promises';
-import { test as base, expect as baseExpect, type Locator } from '@playwright/test';
-
+import type { FixturePaths } from './filepaths.js';
+import type { TempFilesFixture } from './fixtures/tempfiles.js';
+import type { NavigationTab, PredownloadedModel } from './utils/index.js';
+import type { Locator } from '@playwright/test';
 import type { MetadataValue, Settings } from '$lib/database';
 import type { IDBDatabaseType } from '$lib/idb.svelte';
 import type { RuntimeValue } from '$lib/schemas/metadata';
 import type { ExportedProtocol } from '$lib/schemas/protocols';
 import type { Toast } from '$lib/toasts.svelte.js';
+
+import { test as base, expect as baseExpect } from '@playwright/test';
+
 import { safeJSONParse } from '$lib/utils';
 
 import _fullProtocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
 import lightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
-import type { FixturePaths } from './filepaths.js';
-import type { TempFilesFixture } from './fixtures/tempfiles.js';
 import { tempfiles } from './fixtures/tempfiles.js';
 import {
 	confirmDeletionModal,
@@ -34,8 +37,6 @@ import {
 	toast,
 	waitForLoadingEnd,
 	waitForRoute,
-	type NavigationTab,
-	type PredownloadedModel
 } from './utils/index.js';
 
 const fullProtocol = _fullProtocol as ExportedProtocol;
@@ -185,24 +186,24 @@ export const test = base.extend<
 				},
 				protocol: {
 					byId: async (id) => getDatabaseRowById(page, 'Protocol', id),
-					byName: async (name) => getDatabaseRowByField(page, 'Protocol', 'name', name)
+					byName: async (name) => getDatabaseRowByField(page, 'Protocol', 'name', name),
 				},
 				observation: {
 					list: async () => listTable(page, 'Observation'),
 					byId: async (id) => getDatabaseRowById(page, 'Observation', id),
 					byLabel: async (label) =>
-						getDatabaseRowByField(page, 'Observation', 'label', label)
+						getDatabaseRowByField(page, 'Observation', 'label', label),
 				},
 				image: {
 					list: async () => listTable(page, 'Image'),
 					byId: async (id) => getDatabaseRowById(page, 'Image', id),
 					byFilename: async (fname) =>
-						getDatabaseRowByField(page, 'Image', 'filename', fname)
+						getDatabaseRowByField(page, 'Image', 'filename', fname),
 				},
 				session: {
 					list: async () => listTable(page, 'Session'),
 					byId: async (id) => getDatabaseRowById(page, 'Session', id),
-					byName: async (name) => getDatabaseRowByField(page, 'Session', 'name', name)
+					byName: async (name) => getDatabaseRowByField(page, 'Session', 'name', name),
 				},
 				metadata: {
 					get: async (id) => getDatabaseRowById(page, 'Metadata', id),
@@ -211,7 +212,7 @@ export const test = base.extend<
 						image,
 						imageId,
 						observation: obs,
-						protocolId = lightProtocol.id
+						protocolId = lightProtocol.id,
 					}) {
 						let object:
 							| undefined
@@ -251,7 +252,7 @@ export const test = base.extend<
 								)
 								.map(([id, { value, ...rest }]) => [
 									protocolId ? id.replace(`${protocolId}__`, '') : id,
-									{ ...rest, rawValue: value, parsedValue: safeJSONParse(value) }
+									{ ...rest, rawValue: value, parsedValue: safeJSONParse(value) },
 								])
 						);
 					},
@@ -292,12 +293,12 @@ export const test = base.extend<
 							typeof value === 'object' && 'value' in value
 								? {
 										confidence: value.confidence,
-										value: JSON.stringify(value.value)
+										value: JSON.stringify(value.value),
 									}
 								: typeof value === 'object' && 'confidence' in value
 									? {
 											confidence: value.confidence,
-											value: original.metadata[key]?.value
+											value: original.metadata[key]?.value,
 										}
 									: { value: JSON.stringify(value) };
 
@@ -308,9 +309,9 @@ export const test = base.extend<
 								[key]: {
 									alternatives: {},
 									confidence: 1,
-									...newValue
-								}
-							}
+									...newValue,
+								},
+							},
 						};
 
 						await page.evaluate(
@@ -319,18 +320,18 @@ export const test = base.extend<
 							},
 							[updated]
 						);
-					}
-				}
+					},
+				},
 			},
 			modals: {
 				byKey: (key) => modal(page, { key }),
 				byTitle: (message) => modal(page, { title: message }),
 				confirmDeletion: async (key, type) =>
-					confirmDeletionModal(page, { type, modalKey: key })
+					confirmDeletionModal(page, { type, modalKey: key }),
 			},
 			toasts: {
 				byMessage: (type, message) => toast(page, message, { type: type ?? undefined }),
-				byType: (type) => toast(page, null, { type })
+				byType: (type) => toast(page, null, { type }),
 			},
 			settings: {
 				set: async (values) => setSettings({ page }, values),
@@ -339,23 +340,23 @@ export const test = base.extend<
 					const key = maybeKey[0];
 					return key ? settings[key] : settings;
 				},
-				open: async (options) => openSettings(page, options)
+				open: async (options) => openSettings(page, options),
 			},
 			tabs: {
 				go: async (tab) => goToTab(page, tab),
-				get: (tab) => getTab(page, tab)
+				get: (tab) => getTab(page, tab),
 			},
 			path: {
 				wait: async (route) => waitForRoute(page, route),
 				async go(path) {
 					const fullPath = (process.env.BASE_PATH || '') + path;
 					await page.goto(fullPath);
-				}
+				},
 			},
 			loading: {
 				wait: async (timeout) => waitForLoadingEnd(page, timeout),
-				waitIn: async (area, timeout) => waitForLoadingEnd(area, timeout)
-			}
+				waitIn: async (area, timeout) => waitForLoadingEnd(area, timeout),
+			},
 		});
 	},
 	forEachWorker: [
@@ -372,7 +373,7 @@ export const test = base.extend<
 			arthropodaDetectionModel = await getPredownloadedModel('detector-arthropoda.onnx');
 			await use();
 		},
-		{ scope: 'worker', auto: true }
+		{ scope: 'worker', auto: true },
 	],
 	forEachTest: [
 		async ({ page, context, app }, use, info) => {
@@ -395,17 +396,17 @@ export const test = base.extend<
 			if (!info.tags.includes('@real-protocol')) {
 				// @ts-expect-error we don't support non-string protocol source values for now
 				await mockProtocolSourceURL(page, context, fullProtocol.source, {
-					json: lightProtocol
+					json: lightProtocol,
 				});
 
 				await mockProtocolSourceURL(page, context, lightProtocol.source, {
-					json: lightProtocol
+					json: lightProtocol,
 				});
 			}
 
 			await mockPredownloadedModels(page, context, fullProtocol, {
 				crop: [arthropodaDetectionModel],
-				species: [collembolaClassifierModel, arthropodaClassifierModel]
+				species: [collembolaClassifierModel, arthropodaClassifierModel],
 			});
 
 			const concurrency = info.annotations.find((a) => a.type === 'concurrency')?.description;
@@ -429,18 +430,18 @@ export const test = base.extend<
 
 			if (info.status !== info.expectedStatus) {
 				info.attach('database snapshot', {
-					body: await dumpDatabase(page, null)
+					body: await dumpDatabase(page, null),
 				});
 
 				info.attach('UI state', {
 					body: await page.evaluate(() =>
 						JSON.stringify(window.uiState?.snapshot() ?? null, null, 2)
-					)
+					),
 				});
 			}
 		},
-		{ auto: true }
-	]
+		{ auto: true },
+	],
 });
 
 export const assert = baseExpect.extend({
@@ -467,7 +468,7 @@ export const assert = baseExpect.extend({
 
 		const message = () =>
 			this.utils.matcherHint(assertionName, undefined, undefined, {
-				isNot: this.isNot
+				isNot: this.isNot,
 			}) +
 			'\n\n' +
 			`Locator: ${locator}\n` +
@@ -479,7 +480,7 @@ export const assert = baseExpect.extend({
 			pass,
 			name: assertionName,
 			expected,
-			actual: matcherResult?.actual
+			actual: matcherResult?.actual,
 		};
 	},
 
@@ -504,7 +505,7 @@ export const assert = baseExpect.extend({
 
 		const message = () =>
 			this.utils.matcherHint(assertionName, undefined, undefined, {
-				isNot: this.isNot
+				isNot: this.isNot,
 			}) +
 			'\n\n' +
 			`Locator: ${locator}\n` +
@@ -518,9 +519,9 @@ export const assert = baseExpect.extend({
 			pass,
 			name: assertionName,
 			expected: slideName,
-			actual: matcherResult?.actual
+			actual: matcherResult?.actual,
 		};
-	}
+	},
 });
 
 // Encourage using soft expects in tests, and only use hard expects (assert in our case) when it's necessary for the rest of the test to continue

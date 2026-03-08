@@ -4,7 +4,7 @@ import {
 	goHome,
 	goToTab,
 	setInferenceModels,
-	waitForRoute
+	waitForRoute,
 } from './index.js';
 
 /**
@@ -39,7 +39,7 @@ export async function newSession(page, { name, protocol, models } = {}) {
 
 	if (name) {
 		const textbox = page.getByRole('textbox', {
-			name: 'Nom de la session'
+			name: 'Nom de la session',
 		});
 
 		await textbox.fill(name);
@@ -52,7 +52,7 @@ export async function newSession(page, { name, protocol, models } = {}) {
 		await page
 			.getByRole('button', {
 				name: 'Ouvrir',
-				exact: true
+				exact: true,
 			})
 			.click();
 
@@ -79,7 +79,7 @@ export async function switchSession(page, name) {
 
 	await page
 		.getByRole('heading', {
-			name
+			name,
 		})
 		.click();
 
@@ -99,26 +99,26 @@ export async function deleteSession(page, name) {
 
 	const sessionCard = page.getByRole('article').filter({
 		has: page.getByRole('heading', {
-			name
-		})
+			name,
+		}),
 	});
 
 	await sessionCard
 		.getByRole('button', {
-			name: 'Gérer'
+			name: 'Gérer',
 		})
 		.click();
 
 	await page
 		.getByRole('button', {
 			name: 'Supprimer',
-			exact: true
+			exact: true,
 		})
 		.click();
 
 	await confirmDeletionModal(page, {
 		type: name,
-		modalKey: 'modal_delete_session'
+		modalKey: 'modal_delete_session',
 	});
 
 	await waitForRoute(page, '/sessions');

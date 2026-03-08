@@ -9,7 +9,7 @@ import { coordsScaler, toTopLeftCoords } from './BoundingBoxes.svelte.js';
  */
 export const imageLimits = /** @type {const} */ ({
 	maxMemoryUsageInMB: 1024,
-	maxResolutionInMP: 100
+	maxResolutionInMP: 100,
 });
 
 /**
@@ -96,7 +96,7 @@ export async function loadToTensor(
 		let buffer = buffers[f];
 
 		const imageTensor = await Jimp.fromBuffer(buffer, {
-			'image/jpeg': imageLimits
+			'image/jpeg': imageLimits,
 		});
 
 		if (crop) {
@@ -143,7 +143,7 @@ export async function loadToTensor(
 		buffers.length,
 		3,
 		targetHeight,
-		targetWidth
+		targetWidth,
 	]);
 
 	return tensor;
@@ -310,7 +310,7 @@ export function boundingBoxResolver(outputShape) {
 			cy: atom('cy'),
 			w: atom('w'),
 			h: atom('h'),
-			score: atom('score')
+			score: atom('score'),
 		};
 
 		const [x, w] = horizontal(atoms);

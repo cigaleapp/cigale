@@ -22,7 +22,7 @@ export function toast(page, message, { type = undefined } = {}) {
 
 	if (message) {
 		loc = loc.filter({
-			hasText: message
+			hasText: message,
 		});
 	}
 
@@ -41,7 +41,7 @@ export const browserConsole = {
 			(args) => console.log(...args),
 			args.map((arg) => (typeof arg === 'object' ? JSON.stringify(arg, null, 2) : arg))
 		);
-	}
+	},
 };
 
 /**
@@ -54,7 +54,7 @@ async function tooltipOf(page, locator, { timeout } = {}) {
 	await browserConsole.log(page, `Looking for tooltip of locator:`, await locator.innerHTML());
 
 	await expect(locator).toHaveAttribute('aria-describedby', /tippy-\d+/, {
-		timeout: timeout ?? 1_000
+		timeout: timeout ?? 1_000,
 	});
 
 	const tippyId = await locator.getAttribute('aria-describedby', timeout ? { timeout } : {});
@@ -73,7 +73,7 @@ async function tooltipOf(page, locator, { timeout } = {}) {
  */
 export async function expectTooltipContent(page, locator, content, { timeout } = {}) {
 	await locator.hover({
-		force: true
+		force: true,
 	});
 
 	try {
@@ -140,7 +140,7 @@ export async function mockProtocolSourceURL(page, context, source, mockedResult)
 export function modal(page, query) {
 	if (typeof query === 'string') {
 		return modal(page, {
-			title: query
+			title: query,
 		});
 	}
 
@@ -153,8 +153,8 @@ export function modal(page, query) {
 
 		has: page.getByRole('banner').getByRole('heading', {
 			name: query.title,
-			exact: true
-		})
+			exact: true,
+		}),
 	});
 }
 
@@ -174,10 +174,10 @@ export async function confirmDeletionModal(
 		page,
 		modalKey
 			? {
-					key: modalKey
+					key: modalKey,
 				}
 			: {
-					title
+					title,
 				}
 	);
 
@@ -190,7 +190,7 @@ export async function confirmDeletionModal(
 
 	await deletionModal
 		.getByRole('button', {
-			name: 'Oui, supprimer'
+			name: 'Oui, supprimer',
 		})
 		.click();
 }
@@ -225,7 +225,7 @@ export async function setHardwareConcurrency(page, value) {
 
 		Object.defineProperty(proto, 'hardwareConcurrency', {
 			value,
-			writable: false
+			writable: false,
 		});
 	}, value);
 }
@@ -383,7 +383,7 @@ export async function chooseInDropdown(page, trigger, ...option) {
 		}
 
 		return options.getByRole('menuitemcheckbox', {
-			name: locator
+			name: locator,
 		});
 	}
 }

@@ -31,7 +31,7 @@ let inferenceSessions = new Map();
 
 swarp.loadModel(async ({ task, model, classmapping, inferenceSessionId: id, webgpu }) => {
 	const onnx = await ort.InferenceSession.create(model, {
-		executionProviders: webgpu ? ['webgpu'] : []
+		executionProviders: webgpu ? ['webgpu'] : [],
 	});
 
 	if (!onnx) throw new Error('Impossible de charger le modèle ONNX');
@@ -66,7 +66,7 @@ swarp.inferBoundingBoxes(async ({ fileId, taskSettings }, _, tools) => {
 	const [[boxes], [scores]] = await infer(
 		{
 			...taskSettings,
-			abortSignal: tools.abortSignal
+			abortSignal: tools.abortSignal,
 		},
 		[file.bytes],
 		session
@@ -106,7 +106,7 @@ swarp.classify(async ({ imageId, metadataIds, taskSettings }, _, tools) => {
 		...taskSettings.input,
 		normalized: true,
 		crop: cropbox,
-		abortSignal: tools.abortSignal
+		abortSignal: tools.abortSignal,
 	});
 
 	const scores = await classify(taskSettings, img, onnx, tools.abortSignal);
@@ -115,7 +115,7 @@ swarp.classify(async ({ imageId, metadataIds, taskSettings }, _, tools) => {
 	const results = scores
 		?.map((score, i) => ({
 			confidence: score,
-			value: classmapping[i]
+			value: classmapping[i],
 		}))
 		.sort((a, b) => b.confidence - a.confidence)
 		.slice(0, 100);
@@ -134,7 +134,7 @@ swarp.classify(async ({ imageId, metadataIds, taskSettings }, _, tools) => {
 		metadataId: metadataIds.target,
 		subjectId: imageId,
 		alternatives,
-		...firstChoice
+		...firstChoice,
 	});
 
 	return { scores };

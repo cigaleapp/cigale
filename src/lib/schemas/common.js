@@ -45,7 +45,7 @@ export const HTTPRequest = URLString.configure(
 		),
 		'method?': type
 			.enumerated('GET', 'POST', 'PUT', 'DELETE')
-			.describe('La méthode de la requête (GET par défaut)')
+			.describe('La méthode de la requête (GET par défaut)'),
 	})
 	.configure(
 		'Le requête HTTP pour obtenir le fichier, avec des en-têtes et une méthode personnalisable',
@@ -54,11 +54,11 @@ export const HTTPRequest = URLString.configure(
 
 export const Dimensions = type({
 	width: 'number > 0',
-	height: 'number > 0'
+	height: 'number > 0',
 }).pipe(({ width, height }) => ({
 	width,
 	height,
-	aspectRatio: width / height
+	aspectRatio: width / height,
 }));
 
 /**
@@ -111,7 +111,7 @@ export const FileSize = type('number')
 					M: 6,
 					G: 9,
 					T: 12,
-					P: 15
+					P: 15,
 				}[prefix.toUpperCase()];
 
 				const base = binary ? 2 : 10;

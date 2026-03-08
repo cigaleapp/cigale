@@ -1,8 +1,10 @@
+import type { RuntimeValuesPerType } from './types.js';
 import type * as DB from '$lib/database';
+
 import { type RuntimeValue } from '$lib/schemas/metadata.js';
 import { avg, mapValues, nonnull } from '$lib/utils.js';
 
-import { switchOnMetadataType, type RuntimeValuesPerType } from './types.js';
+import { switchOnMetadataType } from './types.js';
 
 export const MERGEABLE_METADATA_TYPES: Set<DB.MetadataType> = new Set([
 	'boolean',
@@ -11,7 +13,7 @@ export const MERGEABLE_METADATA_TYPES: Set<DB.MetadataType> = new Set([
 	'date',
 	'location',
 	'boundingbox',
-	'enum'
+	'enum',
 ]);
 
 /**
@@ -20,7 +22,7 @@ export const MERGEABLE_METADATA_TYPES: Set<DB.MetadataType> = new Set([
 export function mergeMetadataFromImagesAndObservations({
 	definitions,
 	images,
-	observations
+	observations,
 }: {
 	definitions: DB.Metadata[];
 	images: DB.Image[];
@@ -70,7 +72,7 @@ export function mergeMetadataValues(
 	values: Array<DB.MetadataValues>,
 	{
 		definitions,
-		options = {}
+		options = {},
 	}: {
 		definitions: DB.Metadata[];
 		/** Key is id of the metadata */
@@ -103,7 +105,7 @@ export function mergeMetadataValues(
 		if (merged !== null && merged !== undefined)
 			output[key] = {
 				...merged,
-				merged: new Set(valuesOfKey.map((v) => JSON.stringify(v.value))).size > 1
+				merged: new Set(valuesOfKey.map((v) => JSON.stringify(v.value))).size > 1,
 			};
 	}
 
@@ -126,13 +128,13 @@ function mergeMetadata(
 					valueAsString,
 					merger(
 						values.flatMap((v) => v.alternatives[valueAsString] ?? null).filter(Boolean)
-					)
+					),
 				])
 		);
 
 	const mergeFullValue = ({
 		value,
-		confidences
+		confidences,
 	}: {
 		value: RuntimeValue;
 		confidences: (probabilities: number[]) => number;
@@ -141,7 +143,7 @@ function mergeMetadata(
 		manuallyModified: values.some((v) => v.manuallyModified),
 		confidence: confidences(values.map((v) => v.confidence)),
 		confirmed: values.every((v) => v.confirmed),
-		alternatives: mergeAlternatives(confidences, values)
+		alternatives: mergeAlternatives(confidences, values),
 	});
 
 	switch (definition.mergeMethod) {
@@ -152,8 +154,8 @@ function mergeMetadata(
 					aggregate: avg,
 					type: definition.type,
 					values: values.map((v) => v.value),
-					options
-				})
+					options,
+				}),
 			});
 		case 'max':
 		case 'min':
@@ -163,7 +165,7 @@ function mergeMetadata(
 					definition.type,
 					values,
 					definition.mergeMethod === 'max' ? max : min
-				)
+				),
 			});
 		case 'median':
 			return mergeFullValue({
@@ -172,8 +174,8 @@ function mergeMetadata(
 					aggregate: median,
 					type: definition.type,
 					values: values.map((v) => v.value),
-					options
-				})
+					options,
+				}),
 			});
 		case 'union':
 			return mergeFullValue({
@@ -181,7 +183,7 @@ function mergeMetadata(
 				value: mergeByUnion(
 					definition.type,
 					values.map((v) => v.value)
-				)
+				),
 			});
 		case 'none':
 			return null;
@@ -213,7 +215,7 @@ function mergeByAggregate<Type extends DB.MetadataType, Value extends RuntimeVal
 	type,
 	values,
 	options,
-	aggregate
+	aggregate,
 }: {
 	type: Type;
 	values: Value[];
@@ -231,7 +233,7 @@ function mergeByAggregate<Type extends DB.MetadataType, Value extends RuntimeVal
 			date: (...vals) => new Date(aggregate(toNumber('date', vals))),
 			location: (...vals) => ({
 				latitude: aggregate(vals.map((v) => v.latitude)),
-				longitude: aggregate(vals.map((v) => v.longitude))
+				longitude: aggregate(vals.map((v) => v.longitude)),
 			}),
 			enum: (...vals) => {
 				// Get average index of values, and return closest option
@@ -243,7 +245,7 @@ function mergeByAggregate<Type extends DB.MetadataType, Value extends RuntimeVal
 				);
 
 				return options.find((opt) => opt.index === targetIndex)?.key ?? vals[0];
-			}
+			},
 		},
 		() => {
 			throw new Error(`Impossible de fusionner des valeurs de type ${type}`);
@@ -269,9 +271,9 @@ function mergeByUnion(type: DB.MetadataType, values: Array<RuntimeValue>) {
 					x: xStart,
 					y: yStart,
 					w: xEnd - xStart,
-					h: yEnd - yStart
+					h: yEnd - yStart,
 				};
-			}
+			},
 		},
 		() => {
 			throw new Error(`Impossible de fusionner des valeurs de type ${type} par union`);
@@ -294,7 +296,7 @@ function toNumber(
 				integer: (v) => v,
 				float: (v) => v,
 				boolean: (v) => (v ? 1 : 0),
-				date: (v) => new Date(v).getTime()
+				date: (v) => new Date(v).getTime(),
 			},
 			() => {
 				throw new Error(`Impossible de convertir des valeurs de type ${type} en nombre`);

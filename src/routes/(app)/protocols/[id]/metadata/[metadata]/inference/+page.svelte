@@ -17,7 +17,7 @@
 	const inferenceTypes = /** @type {const} */ ([
 		{ key: 'none', label: "Pas d'inférence" },
 		{ key: 'neural', label: 'Réseau neuronal' },
-		{ key: 'exif', label: 'EXIF' }
+		{ key: 'exif', label: 'EXIF' },
 	]);
 
 	const modelUrl = $derived.by(() => {
@@ -33,8 +33,8 @@
 		input: {
 			width: 224,
 			height: 224,
-			normalized: true
-		}
+			normalized: true,
+		},
 	};
 
 	const currentInferenceType = $derived(
@@ -74,8 +74,8 @@
 							neural: {
 								...placeholderNeuralSettings,
 								...currentNeuralSettings,
-								model: newModel
-							}
+								model: newModel,
+							},
 						});
 						await invalidateAll();
 					}}

@@ -61,7 +61,7 @@ test('nukeDatabase', async () => {
 		bytes: new ArrayBuffer(),
 		filename: 'ha',
 		contentType: 'image/png',
-		dimensions: { width: 1, height: 1 }
+		dimensions: { width: 1, height: 1 },
 	});
 	const items = await db.getAll('ImageFile');
 	expect(items).toHaveLength(1);
@@ -79,7 +79,7 @@ describe('operations', () => {
 				label: 'Test',
 				mergeMethod: 'none',
 				required: false,
-				type: 'string'
+				type: 'string',
 			});
 			const object = await idb.get('Metadata', 'proto__test');
 			expect(object).toEqual({
@@ -91,7 +91,7 @@ describe('operations', () => {
 				required: false,
 				sortable: false,
 				groupable: false,
-				type: 'string'
+				type: 'string',
 			});
 		});
 		test('with transformations (tables that have fields with defaults or pipes)', async () => {
@@ -109,10 +109,10 @@ describe('operations', () => {
 					proto__water: {
 						value: '"bucket"',
 						alternatives: {
-							'"release!!!!"': 0.3
-						}
-					}
-				}
+							'"release!!!!"': 0.3,
+						},
+					},
+				},
 			});
 
 			const serialized = await db.get('Image', imageId('0', 0));
@@ -128,10 +128,10 @@ describe('operations', () => {
 					proto__water: {
 						value: '"bucket"',
 						alternatives: {
-							'"release!!!!"': 0.3
-						}
-					}
-				}
+							'"release!!!!"': 0.3,
+						},
+					},
+				},
 			});
 
 			const deserialized = await idb.get('Image', imageId('0', 0));
@@ -153,10 +153,10 @@ describe('operations', () => {
 						manuallyModified: false,
 						isDefault: false,
 						alternatives: {
-							'"release!!!!"': 0.3
-						}
-					}
-				}
+							'"release!!!!"': 0.3,
+						},
+					},
+				},
 			});
 		});
 	});
@@ -170,7 +170,7 @@ describe('operations', () => {
 				images: [],
 				label: 'Test',
 				metadataOverrides: {},
-				metadataErrors: {}
+				metadataErrors: {},
 			});
 		}
 		for (const i of [0, 1, 2]) {
@@ -180,7 +180,7 @@ describe('operations', () => {
 				bytes: new ArrayBuffer(0),
 				filename: 'ha',
 				contentType: 'image/png',
-				dimensions: { width: 1, height: 1 }
+				dimensions: { width: 1, height: 1 },
 			});
 		}
 
@@ -205,10 +205,10 @@ describe('operations', () => {
 				proto__water: {
 					value: '"bucket"',
 					alternatives: {
-						'"release!!!!"': 0.3
-					}
-				}
-			}
+						'"release!!!!"': 0.3,
+					},
+				},
+			},
 		});
 		await db.put('Image', {
 			id: imageId('0', 1),
@@ -223,10 +223,10 @@ describe('operations', () => {
 				proto__water: {
 					value: '"ogjroe"',
 					alternatives: {
-						'"release!!!!"': 0.3
-					}
-				}
-			}
+						'"release!!!!"': 0.3,
+					},
+				},
+			},
 		});
 		expect(await idb.get('Image', imageId('0', 0))).toEqual({
 			id: imageId('0', 0),
@@ -246,10 +246,10 @@ describe('operations', () => {
 					manuallyModified: false,
 					isDefault: false,
 					alternatives: {
-						'"release!!!!"': 0.3
-					}
-				}
-			}
+						'"release!!!!"': 0.3,
+					},
+				},
+			},
 		});
 	});
 	test('list', async () => {
@@ -263,7 +263,7 @@ describe('operations', () => {
 				images: [],
 				label: 'Test',
 				metadataErrors: {},
-				metadataOverrides: {}
+				metadataOverrides: {},
 			});
 		}
 		const items = await idb.list('Observation');
@@ -281,7 +281,7 @@ describe('operations', () => {
 				images: [],
 				label: 'Test',
 				metadataErrors: {},
-				metadataOverrides: {}
+				metadataOverrides: {},
 			});
 		}
 		await idb.drop('Observation', 'test1');
@@ -299,7 +299,7 @@ describe('operations', () => {
 			images: [],
 			label: 'Test',
 			metadataErrors: {},
-			metadataOverrides: {}
+			metadataOverrides: {},
 		});
 
 		for (const i of [0, 1, 2]) {
@@ -309,23 +309,23 @@ describe('operations', () => {
 		const iterator = idb.iterator('Observation');
 		expect(await iterator.next()).toEqual({
 			done: false,
-			value: { ...observation(0), addedAt }
+			value: { ...observation(0), addedAt },
 		});
 		expect(await iterator.next()).toEqual({
 			done: false,
-			value: { ...observation(1), addedAt }
+			value: { ...observation(1), addedAt },
 		});
 		expect(await iterator.next()).toEqual({
 			done: false,
-			value: { ...observation(2), addedAt }
+			value: { ...observation(2), addedAt },
 		});
 		expect(await iterator.next()).toEqual({
 			done: true,
-			value: undefined
+			value: undefined,
 		});
 		expect(await iterator.next()).toEqual({
 			done: true,
-			value: undefined
+			value: undefined,
 		});
 	});
 });
@@ -339,7 +339,7 @@ describe('wrangler', () => {
 		images: [],
 		label: 'Test',
 		metadataErrors: {},
-		metadataOverrides: {}
+		metadataOverrides: {},
 	});
 
 	const image = (/** @type {number} */ i) => ({
@@ -355,10 +355,10 @@ describe('wrangler', () => {
 			proto__water: {
 				value: '"bucket"',
 				alternatives: {
-					'"release!!!!"': 0.3
-				}
-			}
-		}
+					'"release!!!!"': 0.3,
+				},
+			},
+		},
 	});
 
 	test('initialize', async () => {
@@ -368,14 +368,14 @@ describe('wrangler', () => {
 			Observation: [
 				{
 					...observation(0),
-					addedAt
-				}
+					addedAt,
+				},
 			],
 			Image: [],
 			Session: [],
 			Metadata: [],
 			Protocol: [],
-			Settings: []
+			Settings: [],
 		});
 	});
 	describe('refresh', () => {
@@ -407,7 +407,7 @@ describe('wrangler', () => {
 				description: '',
 				mergeMethod: 'none',
 				required: false,
-				type: 'string'
+				type: 'string',
 			});
 
 			await idb.set('Observation', observation(0));
@@ -434,7 +434,7 @@ describe('wrangler', () => {
 			await idb.set('Observation', observation(0));
 			expect(await tables.Observation.get('test0')).toEqual({
 				...observation(0),
-				addedAt
+				addedAt,
 			});
 		});
 
@@ -444,13 +444,13 @@ describe('wrangler', () => {
 			expect(tables.Observation.state).toEqual([
 				{
 					...observation(0),
-					addedAt
-				}
+					addedAt,
+				},
 			]);
 
 			expect(await idb.get('Observation', 'test0')).toEqual({
 				...observation(0),
-				addedAt
+				addedAt,
 			});
 
 			await tables.Observation.set(observation(1));
@@ -458,21 +458,21 @@ describe('wrangler', () => {
 			expect(tables.Observation.state).toEqual([
 				{
 					...observation(0),
-					addedAt
+					addedAt,
 				},
 				{
 					...observation(1),
-					addedAt
-				}
+					addedAt,
+				},
 			]);
 
 			expect(await idb.get('Observation', 'test1')).toEqual({
 				...observation(1),
-				addedAt
+				addedAt,
 			});
 			expect(await idb.get('Observation', 'test0')).toEqual({
 				...observation(0),
-				addedAt
+				addedAt,
 			});
 		});
 
@@ -481,21 +481,21 @@ describe('wrangler', () => {
 			expect(tables.Observation.state).toEqual([
 				{
 					...observation(0),
-					addedAt
-				}
+					addedAt,
+				},
 			]);
 			await tables.Observation.update('test0', 'label', 'Updated');
 			expect(tables.Observation.state).toEqual([
 				{
 					...observation(0),
 					addedAt,
-					label: 'Updated'
-				}
+					label: 'Updated',
+				},
 			]);
 			expect(await idb.get('Observation', 'test0')).toEqual({
 				...observation(0),
 				addedAt,
-				label: 'Updated'
+				label: 'Updated',
 			});
 		});
 
@@ -506,7 +506,7 @@ describe('wrangler', () => {
 				images: [],
 				label: 'Test',
 				metadataErrors: {},
-				metadataOverrides: {}
+				metadataOverrides: {},
 			};
 			const { id } = await tables.Observation.add(observation);
 
@@ -514,14 +514,14 @@ describe('wrangler', () => {
 				{
 					...observation,
 					addedAt,
-					id
-				}
+					id,
+				},
 			]);
 
 			expect(await idb.get('Observation', id)).toEqual({
 				...observation,
 				addedAt,
-				id
+				id,
 			});
 		});
 
@@ -548,31 +548,31 @@ describe('wrangler', () => {
 			expect(tables.Observation.state).toEqual([
 				{
 					...observation(1),
-					addedAt
-				}
+					addedAt,
+				},
 			]);
 			expect(await idb.list('Image')).toEqual([
 				expect.objectContaining({
-					id: imageId('0', 0)
+					id: imageId('0', 0),
 				}),
 				expect.objectContaining({
-					id: imageId('0', 1)
-				})
+					id: imageId('0', 1),
+				}),
 			]);
 			expect(await idb.list('Observation')).toEqual([
 				{
 					...observation(1),
-					addedAt
-				}
+					addedAt,
+				},
 			]);
 			expect(await idb.get('Observation', 'test0')).toBeUndefined();
 			expect(await idb.list('Image')).toEqual([
 				expect.objectContaining({
-					id: imageId('0', 0)
+					id: imageId('0', 0),
 				}),
 				expect.objectContaining({
-					id: imageId('0', 1)
-				})
+					id: imageId('0', 1),
+				}),
 			]);
 		});
 
@@ -589,7 +589,7 @@ describe('wrangler', () => {
 
 			expect(items).toEqual([
 				{ ...observation(0), addedAt },
-				{ ...observation(1), addedAt }
+				{ ...observation(1), addedAt },
 			]);
 		});
 
@@ -603,11 +603,11 @@ describe('wrangler', () => {
 
 			expect(await items.next()).toEqual({
 				done: false,
-				value: { ...observation(0), addedAt }
+				value: { ...observation(0), addedAt },
 			});
 			expect(await items.next()).toEqual({
 				done: false,
-				value: { ...observation(1), addedAt }
+				value: { ...observation(1), addedAt },
 			});
 			expect(await items.next()).toEqual({ done: true, value: undefined });
 			expect(await items.next()).toEqual({ done: true, value: undefined });
@@ -621,10 +621,10 @@ describe('wrangler', () => {
 						proto__water: {
 							value: '"bucket"',
 							alternatives: {
-								'"release!!!!"': 0.3
-							}
-						}
-					}
+								'"release!!!!"': 0.3,
+							},
+						},
+					},
 				});
 				expect(tables.Image.state).toHaveLength(0);
 				await tables.Image.refresh('testing');
@@ -642,10 +642,10 @@ describe('wrangler', () => {
 								manuallyModified: false,
 								isDefault: false,
 								alternatives: {
-									'"release!!!!"': 0.3
-								}
-							}
-						}
+									'"release!!!!"': 0.3,
+								},
+							},
+						},
 					},
 					{
 						...image(1),
@@ -660,11 +660,11 @@ describe('wrangler', () => {
 								manuallyModified: false,
 								isDefault: false,
 								alternatives: {
-									'"release!!!!"': 0.3
-								}
-							}
-						}
-					}
+									'"release!!!!"': 0.3,
+								},
+							},
+						},
+					},
 				]);
 			});
 
@@ -684,10 +684,10 @@ describe('wrangler', () => {
 							manuallyModified: false,
 							isDefault: false,
 							alternatives: {
-								'"release!!!!"': 0.3
-							}
-						}
-					}
+								'"release!!!!"': 0.3,
+							},
+						},
+					},
 				});
 				expect(await tables.Image.raw.get(imageId('0', 1))).toEqual({
 					...image(1),
@@ -696,10 +696,10 @@ describe('wrangler', () => {
 						proto__water: {
 							value: '"bucket"',
 							alternatives: {
-								'"release!!!!"': 0.3
-							}
-						}
-					}
+								'"release!!!!"': 0.3,
+							},
+						},
+					},
 				});
 			});
 		});

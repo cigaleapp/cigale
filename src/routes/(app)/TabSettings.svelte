@@ -1,4 +1,6 @@
 <script lang="ts">
+	import type { NeuralInference } from '$lib/schemas/neural';
+
 	import IconSelect from '~icons/ri/arrow-down-s-line';
 	import IconSubmenu from '~icons/ri/arrow-right-s-line';
 	import IconCheck from '~icons/ri/check-line';
@@ -10,14 +12,13 @@
 	import { tables } from '$lib/idb.svelte';
 	import { metadataDefinitionComparator } from '$lib/protocols';
 	import { namespaceOfMetadataId, removeNamespaceFromMetadataId } from '$lib/schemas/metadata';
-	import type { NeuralInference } from '$lib/schemas/neural';
 	import {
 		GROUP_FIELDS,
 		GROUPING_TOLERANCES,
 		GroupSettings,
 		SORT_FIELDS,
 		sortOrGroupFieldNeedsMetadata,
-		SortSettings
+		SortSettings,
 	} from '$lib/schemas/sessions';
 	import { uiState } from '$lib/state.svelte';
 	import { entries, orEmpty } from '$lib/utils';
@@ -57,7 +58,7 @@
 				if (isOnTabItself && currentModelIndex !== i) {
 					window.location.reload();
 				}
-			}
+			},
 		};
 	}
 
@@ -78,7 +79,7 @@
 		uiState.currentSession
 			? {
 					sort: uiState.currentSession.sort[tab] ?? uiState.currentSession.sort.global,
-					group: uiState.currentSession.group[tab] ?? uiState.currentSession.group.global
+					group: uiState.currentSession.group[tab] ?? uiState.currentSession.group.global,
 				}
 			: undefined
 	);
@@ -94,7 +95,7 @@
 
 		const updated = {
 			...currentSettings[task],
-			...settings
+			...settings,
 		};
 
 		if (sortOrGroupFieldNeedsMetadata(task, updated.field) && !updated.metadata) {
@@ -105,14 +106,14 @@
 		if (task === 'sort') {
 			const value = $state.snapshot({
 				...uiState.currentSession.sort,
-				[tab]: { direction: 'asc', ...updated }
+				[tab]: { direction: 'asc', ...updated },
 			});
 
 			await tables.Session.update(uiState.currentSession.id, 'sort', value);
 		} else {
 			const value = $state.snapshot({
 				...uiState.currentSession.group,
-				[tab]: { ...updated }
+				[tab]: { ...updated },
 			});
 
 			await tables.Session.update(uiState.currentSession.id, 'group', value);
@@ -154,17 +155,17 @@
 									async onclick() {
 										if (selected && metadata === m.id) {
 											await setSettings('sort', {
-												direction: direction === 'asc' ? 'desc' : 'asc'
+												direction: direction === 'asc' ? 'desc' : 'asc',
 											});
 										} else {
 											await setSettings('sort', {
 												metadata: m.id,
-												field: key
+												field: key,
 											});
 										}
-									}
-								}))
-							}
+									},
+								})),
+							},
 						};
 					}
 
@@ -179,14 +180,14 @@
 							if (selected) {
 								// Toggle direction
 								await setSettings('sort', {
-									direction: direction === 'asc' ? 'desc' : 'asc'
+									direction: direction === 'asc' ? 'desc' : 'asc',
 								});
 							} else {
 								await setSettings('sort', { field: key });
 							}
-						}
+						},
 					};
-				})
+				}),
 			},
 			{
 				label: 'Regrouper par…',
@@ -216,17 +217,17 @@
 									async onclick() {
 										if (selected && metadata === m.id) {
 											await setSettings('group', {
-												field: 'none'
+												field: 'none',
 											});
 										} else {
 											await setSettings('group', {
 												metadata: m.id,
-												field: key
+												field: key,
 											});
 										}
-									}
-								}))
-							}
+									},
+								})),
+							},
 						};
 					}
 
@@ -239,9 +240,9 @@
 						closeOnSelect: false,
 						async onclick() {
 							await setSettings('group', { field: key });
-						}
+						},
 					};
-				})
+				}),
 			},
 			...orEmpty(GROUP_FIELDS[currentSettings?.group.field ?? 'none'].needsTolerance, {
 				label: 'Précision des groupes',
@@ -273,22 +274,24 @@
 									await setSettings('group', {
 										tolerances: {
 											...currentSettings.group.tolerances,
-											[field]: key
-										}
+											[field]: key,
+										},
 									});
-								}
-							}))
-						}
-					}))
+								},
+							})),
+						},
+					})),
 			}),
 			...orEmpty(uiState.currentProtocol && models.length > 0, {
 				label: "Modèle d'inférence",
 				testid: `${tab}-settings-inference-model`,
 				items: [
 					selectableModel(-1, 'Aucune inférence'),
-					...models.map((model, i) => selectableModel(i, model.name ?? `Modèle ${i + 1}`))
-				]
-			})
+					...models.map((model, i) =>
+						selectableModel(i, model.name ?? `Modèle ${i + 1}`)
+					),
+				],
+			}),
 		]}
 	>
 		{#snippet trigger(props)}

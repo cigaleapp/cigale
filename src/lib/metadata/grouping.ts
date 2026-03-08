@@ -1,6 +1,7 @@
+import type * as DB from '$lib/database.js';
+
 import * as dates from 'date-fns';
 
-import type * as DB from '$lib/database.js';
 import { type Language } from '$lib/i18n';
 import { type RuntimeValue } from '$lib/schemas/metadata.js';
 import { GROUPING_TOLERANCES, GroupSettings } from '$lib/schemas/sessions.js';
@@ -24,7 +25,7 @@ export function metadataValueGrouper<Type extends DB.MetadataType>({
 	language,
 	type,
 	options = [],
-	tolerances
+	tolerances,
 }: {
 	type: Type;
 	language: Language;
@@ -43,7 +44,7 @@ export function metadataValueGrouper<Type extends DB.MetadataType>({
 				centi: 2,
 				milli: 3,
 				micro: 6,
-				nano: 9
+				nano: 9,
 			}[tolerances.decimal]
 		: undefined;
 
@@ -54,7 +55,7 @@ export function metadataValueGrouper<Type extends DB.MetadataType>({
 			type,
 			language,
 			valueLabel: options.find((o) => o.key === value?.toString())?.label,
-			boundingBoxPrecision: decimalTolerance
+			boundingBoxPrecision: decimalTolerance,
 		});
 
 	return (value: RuntimeValue) =>
@@ -74,14 +75,14 @@ export function metadataValueGrouper<Type extends DB.MetadataType>({
 						return dates.format(v, 'MMMM yyyy');
 					case 'day':
 						return new Intl.DateTimeFormat(language, {
-							dateStyle: 'long'
+							dateStyle: 'long',
 						}).format(v);
 					case 'hour':
 						return new Intl.DateTimeFormat(language, {
 							year: 'numeric',
 							month: 'long',
 							day: 'numeric',
-							hour: 'numeric'
+							hour: 'numeric',
 						}).format(v);
 					case 'minute':
 						return new Intl.DateTimeFormat(language, {
@@ -89,14 +90,14 @@ export function metadataValueGrouper<Type extends DB.MetadataType>({
 							month: 'long',
 							day: 'numeric',
 							hour: 'numeric',
-							minute: 'numeric'
+							minute: 'numeric',
 						}).format(v);
 					default:
 						throw new Error(
 							`Invalid date tolerance: ${tolerances?.dates} (expected ${keys(GROUPING_TOLERANCES.dates).join(', ')})`
 						);
 				}
-			}
+			},
 		});
 }
 
@@ -110,7 +111,7 @@ if (import.meta.vitest) {
 	) {
 		const grouper = metadataValueGrouper({
 			language: 'fr',
-			...settings
+			...settings,
 		});
 
 		return mapValues(
@@ -125,13 +126,13 @@ if (import.meta.vitest) {
 				expect(
 					groupMetadataValues(values.integer, {
 						type: metadatas.integer.type,
-						tolerances: { decimal: 'unit', dates: 'minute' }
+						tolerances: { decimal: 'unit', dates: 'minute' },
 					})
 				).toMatchObject({
 					'10': ['item1', 'item2'],
 					'15': ['item3'],
 					'20': ['item4'],
-					'30': ['item5']
+					'30': ['item5'],
 				});
 			});
 
@@ -139,12 +140,12 @@ if (import.meta.vitest) {
 				expect(
 					groupMetadataValues(values.integer, {
 						type: metadatas.integer.type,
-						tolerances: { decimal: 'deca', dates: 'minute' }
+						tolerances: { decimal: 'deca', dates: 'minute' },
 					})
 				).toMatchObject({
 					'10': ['item1', 'item2'],
 					'20': ['item3', 'item4'],
-					'30': ['item5']
+					'30': ['item5'],
 				});
 			});
 		});
@@ -154,13 +155,13 @@ if (import.meta.vitest) {
 				expect(
 					groupMetadataValues(values.float, {
 						type: metadatas.float.type,
-						tolerances: { decimal: 'deci', dates: 'minute' }
+						tolerances: { decimal: 'deci', dates: 'minute' },
 					})
 				).toMatchObject({
 					'10,1': ['item1', 'item2'],
 					'15,6': ['item3'],
 					'20': ['item4', 'item5'],
-					'25': ['item6']
+					'25': ['item6'],
 				});
 			});
 
@@ -168,14 +169,14 @@ if (import.meta.vitest) {
 				expect(
 					groupMetadataValues(values.float, {
 						type: metadatas.float.type,
-						tolerances: { decimal: 'centi', dates: 'minute' }
+						tolerances: { decimal: 'centi', dates: 'minute' },
 					})
 				).toMatchObject({
 					'10,12': ['item1'],
 					'10,13': ['item2'],
 					'15,57': ['item3'],
 					'20': ['item4', 'item5'],
-					'25': ['item6']
+					'25': ['item6'],
 				});
 			});
 
@@ -183,10 +184,10 @@ if (import.meta.vitest) {
 				expect(
 					groupMetadataValues(values.float, {
 						type: metadatas.float.type,
-						tolerances: { decimal: 'kilo', dates: 'minute' }
+						tolerances: { decimal: 'kilo', dates: 'minute' },
 					})
 				).toMatchObject({
-					'0': ['item1', 'item2', 'item3', 'item4', 'item5', 'item6']
+					'0': ['item1', 'item2', 'item3', 'item4', 'item5', 'item6'],
 				});
 			});
 		});
@@ -196,13 +197,13 @@ if (import.meta.vitest) {
 				expect(
 					groupMetadataValues(values.date, {
 						type: metadatas.date.type,
-						tolerances: { decimal: 'unit', dates: 'day' }
+						tolerances: { decimal: 'unit', dates: 'day' },
 					})
 				).toMatchObject({
 					'1 janvier 2023': ['item1', 'item2'],
 					'2 janvier 2023': ['item3'],
 					'3 janvier 2023': ['item4', 'item5'],
-					'4 janvier 2023': ['item6']
+					'4 janvier 2023': ['item6'],
 				});
 			});
 
@@ -210,14 +211,14 @@ if (import.meta.vitest) {
 				expect(
 					groupMetadataValues(values.date, {
 						type: metadatas.date.type,
-						tolerances: { decimal: 'unit', dates: 'minute' }
+						tolerances: { decimal: 'unit', dates: 'minute' },
 					})
 				).toMatchObject({
 					'1 janvier 2023 à 12:00': ['item1', 'item2'],
 					'2 janvier 2023 à 12:00': ['item3'],
 					'3 janvier 2023 à 12:00': ['item4'],
 					'3 janvier 2023 à 12:05': ['item5'],
-					'4 janvier 2023 à 12:00': ['item6']
+					'4 janvier 2023 à 12:00': ['item6'],
 				});
 			});
 		});
@@ -225,24 +226,24 @@ if (import.meta.vitest) {
 		test('strings', () => {
 			expect(
 				groupMetadataValues(values.string, {
-					type: metadatas.string.type
+					type: metadatas.string.type,
 				})
 			).toMatchObject({
 				apple: ['item1', 'item3'],
 				banana: ['item2', 'item5'],
 				grape: ['item6'],
-				orange: ['item4']
+				orange: ['item4'],
 			});
 		});
 
 		test('booleans', () => {
 			expect(
 				groupMetadataValues(values.boolean, {
-					type: metadatas.boolean.type
+					type: metadatas.boolean.type,
 				})
 			).toMatchObject({
 				Non: ['item2', 'item4', 'item5'],
-				Oui: ['item1', 'item3', 'item6']
+				Oui: ['item1', 'item3', 'item6'],
 			});
 		});
 
@@ -251,12 +252,12 @@ if (import.meta.vitest) {
 				expect(
 					groupMetadataValues(values.location, {
 						type: metadatas.location.type,
-						tolerances: { decimal: 'deci', dates: 'minute' }
+						tolerances: { decimal: 'deci', dates: 'minute' },
 					})
 				).toMatchObject({
 					'10.1, 20.1': ['item1', 'item2', 'item4', 'item5'],
 					'15.6, 25.6': ['item3'],
-					'30, 40': ['item6']
+					'30, 40': ['item6'],
 				});
 			});
 
@@ -264,12 +265,12 @@ if (import.meta.vitest) {
 				expect(
 					groupMetadataValues(values.location, {
 						type: metadatas.location.type,
-						tolerances: { decimal: 'unit', dates: 'minute' }
+						tolerances: { decimal: 'unit', dates: 'minute' },
 					})
 				).toMatchObject({
 					'10, 20': ['item1', 'item2', 'item4', 'item5'],
 					'16, 26': ['item3'],
-					'30, 40': ['item6']
+					'30, 40': ['item6'],
 				});
 			});
 
@@ -277,12 +278,12 @@ if (import.meta.vitest) {
 				expect(
 					groupMetadataValues(values.location, {
 						type: metadatas.location.type,
-						tolerances: { decimal: 'deca', dates: 'minute' }
+						tolerances: { decimal: 'deca', dates: 'minute' },
 					})
 				).toMatchObject({
 					'10, 20': ['item1', 'item2', 'item4', 'item5'],
 					'20, 30': ['item3'],
-					'30, 40': ['item6']
+					'30, 40': ['item6'],
 				});
 			});
 		});
@@ -290,12 +291,12 @@ if (import.meta.vitest) {
 		test('enums', () => {
 			expect(
 				groupMetadataValues(values.enum, {
-					type: metadatas.enum.type
+					type: metadatas.enum.type,
 				})
 			).toMatchObject({
 				A: ['item1', 'item3', 'item6'],
 				B: ['item2', 'item5'],
-				C: ['item4']
+				C: ['item4'],
 			});
 		});
 
@@ -304,13 +305,13 @@ if (import.meta.vitest) {
 				expect(
 					groupMetadataValues(values.boundingbox, {
 						type: metadatas.boundingbox.type,
-						tolerances: { decimal: 'deci', dates: 'minute' }
+						tolerances: { decimal: 'deci', dates: 'minute' },
 					})
 				).toMatchObject({
 					'Boîte de (10, 10) à (60, 60)': ['item1'],
 					'Boîte de (11, 11.5) à (61, 61.5)': ['item4', 'item5'],
 					'Boîte de (12, 12) à (62, 62)': ['item2'],
-					'Boîte de (15, 15) à (65, 65)': ['item6']
+					'Boîte de (15, 15) à (65, 65)': ['item6'],
 				});
 			});
 
@@ -318,13 +319,13 @@ if (import.meta.vitest) {
 				expect(
 					groupMetadataValues(values.boundingbox, {
 						type: metadatas.boundingbox.type,
-						tolerances: { decimal: 'unit', dates: 'minute' }
+						tolerances: { decimal: 'unit', dates: 'minute' },
 					})
 				).toMatchObject({
 					'Boîte de (10, 10) à (60, 60)': ['item1'],
 					'Boîte de (11, 12) à (61, 62)': ['item4', 'item5'],
 					'Boîte de (12, 12) à (62, 62)': ['item2'],
-					'Boîte de (15, 15) à (65, 65)': ['item6']
+					'Boîte de (15, 15) à (65, 65)': ['item6'],
 				});
 			});
 
@@ -332,11 +333,11 @@ if (import.meta.vitest) {
 				expect(
 					groupMetadataValues(values.boundingbox, {
 						type: metadatas.boundingbox.type,
-						tolerances: { decimal: 'deca', dates: 'minute' }
+						tolerances: { decimal: 'deca', dates: 'minute' },
 					})
 				).toMatchObject({
 					'Boîte de (10, 10) à (60, 60)': ['item1', 'item2', 'item4', 'item5'],
-					'Boîte de (20, 20) à (70, 70)': ['item6']
+					'Boîte de (20, 20) à (70, 70)': ['item6'],
 				});
 			});
 		});

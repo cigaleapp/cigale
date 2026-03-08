@@ -21,7 +21,7 @@
 
 	let newProtocol = $state({
 		name: '',
-		id: ''
+		id: '',
 	});
 </script>
 
@@ -79,7 +79,7 @@
 						label: '',
 						mergeMethod: 'union',
 						type: 'boundingbox',
-						required: false
+						required: false,
 					});
 					await tables.Protocol.set({
 						id: newProtocol.id,
@@ -88,8 +88,8 @@
 						description: '',
 						authors: [],
 						crop: {
-							metadata: namespace('crop')
-						}
+							metadata: namespace('crop'),
+						},
 					});
 					await goto('/(app)/protocols/[id]/infos', { id: newProtocol.id });
 				} catch (error) {

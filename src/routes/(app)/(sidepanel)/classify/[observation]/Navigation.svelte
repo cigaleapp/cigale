@@ -1,4 +1,6 @@
 <script lang="ts">
+	import type { Metadata, Observation } from '$lib/database';
+
 	import IconPrev from '~icons/ri/arrow-left-s-line';
 	import IconNext from '~icons/ri/arrow-right-s-line';
 	import IconConfirmedClassification from '~icons/ri/check-double-line';
@@ -8,7 +10,6 @@
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import ConfirmedOverlay from '$lib/ConfirmedOverlay.svelte';
-	import type { Metadata, Observation } from '$lib/database';
 	import { percent } from '$lib/i18n';
 	import { databaseHandle, dependencyURI } from '$lib/idb.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
@@ -38,14 +39,14 @@
 		classifiedObservationsCount,
 		confirmedClassificationsCount,
 		nextUnconfirmedObservation,
-		focusedMetadata
+		focusedMetadata,
 	}: Props = $props();
 
 	let showOverlay = $state(async () => {});
 
 	function observationRoute(observation: { id: string }) {
 		return resolve('/(app)/(sidepanel)/classify/[observation]', {
-			observation: observation.id
+			observation: observation.id,
 		});
 	}
 
@@ -66,7 +67,7 @@
 				sessionId: uiState.currentSessionId,
 				subjectId: currentObservation.id,
 				...currently,
-				confirmed
+				confirmed,
 			});
 
 			if (!currently.confirmed && confirmed) await showOverlay();
@@ -87,20 +88,20 @@
 	defineKeyboardShortcuts('classification', {
 		'$mod+ArrowRight': {
 			help: 'Observation suivante',
-			do: async () => nextObservation && goto(observationRoute(nextObservation))
+			do: async () => nextObservation && goto(observationRoute(nextObservation)),
 		},
 		Space: {
 			help: 'Marquer la classification comme confirmée et passer à la prochaine observation non confirmée',
-			do: async () => confirmAndContinue()
+			do: async () => confirmAndContinue(),
 		},
 		'$mod+ArrowLeft': {
 			help: 'Observation précédente',
-			do: async () => prevObservation && goto(observationRoute(prevObservation))
+			do: async () => prevObservation && goto(observationRoute(prevObservation)),
 		},
 		'Shift+Space': {
 			help: 'Observation précédente',
-			do: async () => prevObservation && goto(observationRoute(prevObservation))
-		}
+			do: async () => prevObservation && goto(observationRoute(prevObservation)),
+		},
 	});
 </script>
 

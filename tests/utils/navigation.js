@@ -39,33 +39,33 @@ const appNavTabs = (lang = 'fr') =>
 	/** @type {const}, @satisfies {Record<string, { name: string; route: import('$app/types').ResolvedPathname }>} */ ({
 		import: {
 			name: lang === 'fr' ? 'Importer' : 'Import',
-			route: '/import'
+			route: '/import',
 		},
 
 		crop: {
 			name: lang === 'fr' ? 'Recadrer' : 'Crop',
-			route: '/crop'
+			route: '/crop',
 		},
 
 		classify: {
 			name: lang === 'fr' ? 'Classifier' : 'Classify',
-			route: '/classify'
+			route: '/classify',
 		},
 
 		results: {
 			name: lang === 'fr' ? 'Résultats' : 'Results',
-			route: '/results'
+			route: '/results',
 		},
 
 		sessions: {
 			name: lang === 'fr' ? 'Sessions' : 'Sessions',
-			route: '/sessions'
+			route: '/sessions',
 		},
 
 		protocols: {
 			name: lang === 'fr' ? 'Protocoles' : 'Protocols',
-			route: '/protocols'
-		}
+			route: '/protocols',
+		},
 	});
 
 /**
@@ -93,7 +93,7 @@ export async function goToTab(page, tabName, { waitForModel = true, language = '
 					: 'Chargement du modèle de classification'
 			),
 			{
-				timeout: 20_000
+				timeout: 20_000,
 			}
 		);
 	}
@@ -111,7 +111,7 @@ export function getTab(page, tabName, language = 'fr') {
 	if (!tab) throw new Error(`Unknown tab: ${tabName}`);
 
 	return page.getByTestId('app-nav').getByRole('link', {
-		name: tab.name
+		name: tab.name,
 	});
 }
 

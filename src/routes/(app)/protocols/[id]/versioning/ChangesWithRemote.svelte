@@ -28,8 +28,8 @@
 
 	const HasCurrentOption = type({
 		value: {
-			key: 'string | number'
-		}
+			key: 'string | number',
+		},
 	});
 </script>
 
@@ -110,7 +110,7 @@
 					title="Voir la métadonnée"
 					href={resolve('/(app)/protocols/[id]/metadata/[metadata]', {
 						id: metadataId.namespace ?? page.params.id ?? '',
-						metadata: metadataId.id
+						metadata: metadataId.id,
 					})}
 				>
 					{metadata.label || metadataId.id}
@@ -125,7 +125,7 @@
 								{
 									id: metadataId.namespace ?? page.params.id ?? '',
 									metadata: metadataId.id,
-									option: option.key
+									option: option.key,
 								}
 							)}
 						>

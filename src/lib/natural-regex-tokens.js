@@ -114,7 +114,7 @@ const TOKEN_LABELS = {
 
 	// Divers
 	CONTROL_CHARACTER: 'caractère de contrôle',
-	CHARACTER: 'caractère'
+	CHARACTER: 'caractère',
 };
 
 /**
@@ -128,7 +128,7 @@ const COMPOUND_LABELS = {
 	LOWERCASE: { LETTER: 'lettre minuscule' },
 	NEGATIVE: { TYPE_NUMBER: 'nombre négatif', NUMBER: 'nombre négatif' },
 	POSITIVE: { TYPE_NUMBER: 'nombre positif', NUMBER: 'nombre positif' },
-	DECIMAL: { TYPE_NUMBER: 'nombre décimal', NUMBER: 'nombre décimal' }
+	DECIMAL: { TYPE_NUMBER: 'nombre décimal', NUMBER: 'nombre décimal' },
 };
 
 /**
@@ -163,14 +163,14 @@ function tokenize(input) {
 			tokens.push({
 				type: `${raw[i].type}+${raw[i + 1].type}`,
 				text: `${raw[i].text} ${raw[i + 1].text}`,
-				label: compoundLabel
+				label: compoundLabel,
 			});
 			i++;
 		} else {
 			tokens.push({
 				type: raw[i].type,
 				text: raw[i].text,
-				label: TOKEN_LABELS[raw[i].type] ?? raw[i].text
+				label: TOKEN_LABELS[raw[i].type] ?? raw[i].text,
 			});
 		}
 	}

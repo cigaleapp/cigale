@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { mkdir } from 'node:fs/promises';
 import path from 'node:path';
+
 import { Estimation as ETA } from 'arrival-time';
 import { formatDistanceToNowStrict, isValid as isValidDate } from 'date-fns';
 import { JWT } from 'google-auth-library';
@@ -18,7 +19,7 @@ import { emitCheckrun, range, updateCheckrunProgress } from './utils.js';
 await emitCheckrun('protocols', 'in_progress', 'Google Slides', 'Starting…');
 
 await mkdir(path.join(import.meta.dirname, '../examples/arthropods.cigaleprotocol.images'), {
-	recursive: true
+	recursive: true,
 });
 
 const _tdown = new Turndown();
@@ -37,11 +38,11 @@ const cc = {
 	blue: '\x1b[34m',
 	bold: '\x1b[1m',
 	yellow: '\x1b[33m',
-	cyan: '\x1b[36m'
+	cyan: '\x1b[36m',
 };
 
 const ADD_TO_PROTOCOLS = [
-	path.join(import.meta.dirname, '../examples/arthropods.cigaleprotocol.json')
+	path.join(import.meta.dirname, '../examples/arthropods.cigaleprotocol.json'),
 ];
 
 const GOOGLE_DRIVE_FOLDER_URL = folderIdFromUrl(
@@ -58,8 +59,8 @@ const protocols = Object.fromEntries(
 		file,
 		{
 			fresh: JSON.parse(readFileSync(file, 'utf8')),
-			old: JSON.parse(readFileSync(file.replace('arthropods', 'old-arthropods'), 'utf8'))
-		}
+			old: JSON.parse(readFileSync(file.replace('arthropods', 'old-arthropods'), 'utf8')),
+		},
 	])
 );
 
@@ -73,8 +74,8 @@ google.options({
 	auth: new JWT({
 		email: keys.client_email,
 		key: keys.private_key,
-		scopes: ['https://www.googleapis.com/auth/drive.readonly']
-	})
+		scopes: ['https://www.googleapis.com/auth/drive.readonly'],
+	}),
 });
 
 console.info(`Logged in to Google Drive as ${cc.blue}${keys.client_email}${cc.reset}...`);
@@ -85,7 +86,7 @@ const drive = google.drive('v3');
 console.info(`Listing slides in folder ${cc.blue}${GOOGLE_DRIVE_FOLDER_URL}${cc.reset}...`);
 
 const response = await drive.files.list({
-	q: `'${GOOGLE_DRIVE_FOLDER_URL}' in parents and mimeType = 'application/vnd.google-apps.presentation'`
+	q: `'${GOOGLE_DRIVE_FOLDER_URL}' in parents and mimeType = 'application/vnd.google-apps.presentation'`,
 });
 
 const files = response.data.files.sort((a, b) => a.name.localeCompare(b.name));
@@ -132,10 +133,10 @@ for (const [i, { name, id }] of files.entries()) {
 		const odp = await drive.files.export(
 			{
 				fileId: id,
-				mimeType: 'application/vnd.oasis.opendocument.presentation'
+				mimeType: 'application/vnd.oasis.opendocument.presentation',
 			},
 			{
-				responseType: 'arraybuffer'
+				responseType: 'arraybuffer',
 			}
 		);
 
@@ -147,19 +148,19 @@ for (const [i, { name, id }] of files.entries()) {
 					// Remove comments (see #308). For some reason, returning null doesnt work, so we turn it into a <slides-comment> tag and let Turndown remove it
 					'officeooo:annotation': ({ name }) => ({
 						xml: name,
-						html: 'slides-comment'
+						html: 'slides-comment',
 					}),
 					'draw:page': ({ attributes, name }) => ({
 						xml: name,
 						html: 'section',
-						attrs: [{ name: 'data-page', value: attributes['draw:name'] }]
+						attrs: [{ name: 'data-page', value: attributes['draw:name'] }],
 					}),
 					'text:s': ({ name }) => ({
 						xml: name,
 						html: 'span',
-						attrs: [{ name: 'data-is-whitespace', value: 'true' }]
-					})
-				}
+						attrs: [{ name: 'data-is-whitespace', value: 'true' }],
+					}),
+				},
 			})
 			.then((html) => {
 				const doc = new JSDOM(html).window.document;
@@ -194,17 +195,17 @@ for (const [i, { name, id }] of files.entries()) {
 		const pdf = await drive.files.export(
 			{
 				fileId: id,
-				mimeType: 'application/pdf'
+				mimeType: 'application/pdf',
 			},
 			{
-				responseType: 'arraybuffer'
+				responseType: 'arraybuffer',
 			}
 		);
 
 		log(`Converting slides ${[...imagePageNumbers].join(', ')} to images`);
 		const images = await pdfToPng(pdf.data, {
 			pagesToProcess: [...imagePageNumbers],
-			viewportScale: 4
+			viewportScale: 4,
 		})
 			.then((results) =>
 				Promise.all(results.map(async ({ content }) => Jimp.fromBuffer(content)))
@@ -214,7 +215,7 @@ for (const [i, { name, id }] of files.entries()) {
 					const { width, height } = image.bitmap;
 					let cropbox = {
 						start: { x: 0, y: 0, found: false },
-						end: { x: width, y: height, found: false }
+						end: { x: width, y: height, found: false },
 					};
 
 					const isBackground = (x, y) => image.getPixelColor(x, y) === 0xffffffff;
@@ -268,7 +269,7 @@ for (const [i, { name, id }] of files.entries()) {
 						x: cropbox.start.x,
 						y: cropbox.start.y,
 						w: cropbox.end.x - cropbox.start.x,
-						h: cropbox.end.y - cropbox.start.y
+						h: cropbox.end.y - cropbox.start.y,
 					});
 				})
 			);
@@ -350,7 +351,7 @@ for (const [i, { name, id }] of files.entries()) {
 					images: imageUrls.map((u) => u.toString()),
 					description,
 					links,
-					learnMore
+					learnMore,
 				});
 			}
 

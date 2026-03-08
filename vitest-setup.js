@@ -6,6 +6,6 @@ beforeEach(() => {
 	dates.setDefaultOptions({ locale: fr });
 	vi.stubGlobal('console', {
 		...console,
-		debug: () => {}
+		debug: () => {},
 	});
 });

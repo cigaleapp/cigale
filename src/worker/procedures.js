@@ -11,10 +11,10 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 	init: {
 		input: type({
 			databaseName: 'string',
-			databaseRevision: 'number.integer >= 1'
+			databaseRevision: 'number.integer >= 1',
 		}),
 		progress: type('undefined'),
-		success: type('undefined')
+		success: type('undefined'),
 	},
 	loadModel: {
 		input: type({
@@ -22,15 +22,15 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 			'classmapping?': 'string | undefined',
 			task: '"classification" | "detection"',
 			'webgpu?': 'boolean',
-			inferenceSessionId: 'string > 1'
+			inferenceSessionId: 'string > 1',
 		}),
 		progress: type('undefined'),
-		success: type('true')
+		success: type('true'),
 	},
 	inferenceSessionId: {
 		input: type('"classification" | "detection"'),
 		progress: type('undefined'),
-		success: type('string | null')
+		success: type('string | null'),
 	},
 	inferBoundingBoxes: {
 		input: type({
@@ -40,15 +40,15 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 				input: Schemas.ModelInput,
 				output: {
 					'name?': 'string',
-					shape: Schemas.ModelDetectionOutputShapes
-				}
-			}
+					shape: Schemas.ModelDetectionOutputShapes,
+				},
+			},
 		}),
 		progress: type({}),
 		success: type({
 			boxes: type(['number', 'number', 'number', 'number']).array(),
-			scores: 'number[]'
-		})
+			scores: 'number[]',
+		}),
 	},
 	classify: {
 		input: type({
@@ -56,22 +56,22 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 			'webgpu?': 'boolean',
 			metadataIds: {
 				cropbox: 'string',
-				target: 'string'
+				target: 'string',
 			},
 			taskSettings: {
 				input: Schemas.ModelInput,
-				'output?': { name: 'string' }
-			}
+				'output?': { name: 'string' },
+			},
 		}),
 		progress: type({}),
 		success: type({
-			scores: 'number[]'
-		})
+			scores: 'number[]',
+		}),
 	},
 	importProtocol: {
 		input: type({
 			contents: 'string',
-			isJSON: 'boolean = false'
+			isJSON: 'boolean = false',
 		}),
 		progress: type({
 			phase: type.enumerated(
@@ -83,14 +83,14 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 				'write-metadata-options',
 				'output-validation'
 			),
-			'detail?': 'string'
+			'detail?': 'string',
 		}),
 		success: type({
 			id: 'string',
 			name: 'string',
 			'version?': 'number | undefined',
-			iconsToPreload: 'string[]'
-		})
+			iconsToPreload: 'string[]',
+		}),
 	},
 	/**
 	 * Returns ZIP bytes (if format is zip)
@@ -103,7 +103,7 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 			include: type.enumerated('croppedonly', 'full', 'metadataonly'),
 			cropPadding: /^\d+(px|%)$/,
 			jsonSchemaURL: 'string.url.parse',
-			format: '"zip" | "folder"'
+			format: '"zip" | "folder"',
 		}),
 		progress: type.or(
 			{ event: '"progress"', data: 'number' },
@@ -112,33 +112,33 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 				event: '"writeFile"',
 				data: {
 					filepath: 'string',
-					contents: type.or('string', ['instanceof', Uint8Array])
-				}
+					contents: type.or('string', ['instanceof', Uint8Array]),
+				},
 			}
 		),
-		success: type('ArrayBuffer')
+		success: type('ArrayBuffer'),
 	},
 	previewResultsZip: {
 		input: type({
 			sessionId: 'string',
-			include: type.enumerated('croppedonly', 'full', 'metadataonly')
+			include: type.enumerated('croppedonly', 'full', 'metadataonly'),
 		}),
 		progress: type('undefined'),
 		success: type.scope({ NodeProvenance }).type({
-			'[NodeProvenance]': [{ path: 'string', contentType: 'string' }, '[]']
-		})
+			'[NodeProvenance]': [{ path: 'string', contentType: 'string' }, '[]'],
+		}),
 	},
 	estimateResultsZipSize: {
 		input: type({
 			sessionId: 'string',
 			include: type.enumerated('croppedonly', 'full', 'metadataonly'),
-			cropPadding: /^\d+(px|%)$/
+			cropPadding: /^\d+(px|%)$/,
 		}),
 		progress: type('undefined'),
 		success: type({
 			uncompressed: ['number.integer >= 0', '@', 'bytes'],
-			compressed: ['number.integer >= 0', '@', 'bytes, estimated']
-		})
+			compressed: ['number.integer >= 0', '@', 'bytes, estimated'],
+		}),
 	},
 	diffProtocolWithRemote: {
 		input: type({ protocolId: 'string' }),
@@ -152,11 +152,11 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 						path: '(number|string)[]',
 						type: '"CHANGE"',
 						oldValue: 'unknown',
-						value: 'unknown'
+						value: 'unknown',
 					},
 					{ path: '(number|string)[]', type: '"REMOVE"', oldValue: 'unknown' }
 				)
-				.array()
-		})
-	}
+				.array(),
+		}),
+	},
 });

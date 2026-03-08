@@ -76,7 +76,7 @@
 				description: '',
 				type: 'string',
 				mergeMethod: 'none',
-				required: false
+				required: false,
 			});
 
 			await tables.Protocol.update(id, 'metadata', [newId, ...metadata]);
@@ -95,7 +95,7 @@
 			toasts.success(`Métadonnée ${shortId} créée`);
 			await goto('/(app)/protocols/[id]/metadata/[metadata]/infos', {
 				id,
-				metadata: shortId
+				metadata: shortId,
 			});
 		} catch (error) {
 			toasts.error(errorMessage(error, 'Impossible de créer la métadonnée'));
@@ -123,7 +123,7 @@
 
 		toasts.withUndo('success', `Métadonnée ${shortId} supprimée`, {
 			undo: async () => updateProtocol('undo'),
-			commit: async () => tables.Metadata.remove(def.id)
+			commit: async () => tables.Metadata.remove(def.id),
 		});
 	}
 
@@ -145,7 +145,7 @@
 		// @ts-expect-error
 		await goto(page.route.id, {
 			...page.params,
-			id: newid
+			id: newid,
 		});
 	}
 </script>
@@ -254,7 +254,7 @@
 						discreet
 						placeholder={{
 							idle: 'Nouvelle métadonnée…',
-							focused: 'Nom de la métadonnée'
+							focused: 'Nom de la métadonnée',
 						}}
 						onblur={() => {}}
 					/>
@@ -275,7 +275,7 @@
 						{
 							...page.params,
 							id,
-							metadata: shortId
+							metadata: shortId,
 						}
 					)}
 
@@ -352,7 +352,7 @@
 		use:tooltip={collapsedSidebar
 			? {
 					text: name,
-					placement: 'right'
+					placement: 'right',
 				}
 			: undefined}
 	>

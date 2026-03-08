@@ -12,11 +12,13 @@ You can also provide a `numeric` snippet that will be used for both `integer` an
 -->
 
 <script lang="ts">
-	import { ArkErrors } from 'arktype';
+	import type { Metadata, MetadataType } from '$lib/database';
+	import type { RuntimeValue } from '$lib/schemas/metadata';
 	import type { Snippet } from 'svelte';
 
-	import type { Metadata, MetadataType } from '$lib/database';
-	import { MetadataRuntimeValue, type RuntimeValue } from '$lib/schemas/metadata';
+	import { ArkErrors } from 'arktype';
+
+	import { MetadataRuntimeValue } from '$lib/schemas/metadata';
 
 	type Branch<T extends MetadataType> = Snippet<
 		[undefined | RuntimeValue<T>, Extract<Metadata, { type: T }>]

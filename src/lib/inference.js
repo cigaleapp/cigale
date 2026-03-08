@@ -56,7 +56,7 @@ ort.env.wasm.numThreads = 1;
 
 ort.env.wasm.wasmPaths = {
 	// @ts-ignore
-	'ort-wasm-simd-threaded.wasm': '/ort-wasm-simd-threaded.wasm'
+	'ort-wasm-simd-threaded.wasm': '/ort-wasm-simd-threaded.wasm',
 };
 
 export const TARGETWIDTH = 640; // taille de l'image d'entrée du modèle de détection
@@ -105,7 +105,7 @@ export async function loadModel(
 		cacheAs: 'model',
 		onProgress({ transferred, total }) {
 			onProgress(splitProgress('model', transferred / total));
-		}
+		},
 	})
 		.then((response) => response.arrayBuffer())
 		.then((buffer) => new Uint8Array(buffer));
@@ -118,7 +118,7 @@ export async function loadModel(
 			cacheAs: 'model',
 			onProgress({ transferred, total }) {
 				onProgress(splitProgress('classmapping', transferred / total));
-			}
+			},
 		}).then((res) => res.text());
 	}
 
@@ -127,7 +127,7 @@ export async function loadModel(
 		model,
 		classmapping,
 		webgpu,
-		inferenceSessionId: id
+		inferenceSessionId: id,
 	});
 
 	if (!loaded.every(Boolean)) {
@@ -157,7 +157,7 @@ function inferenceModelId(protocolId, request) {
 			request.url,
 			...Object.entries(request.headers ?? {})
 				.sort(([a], [b]) => a.localeCompare(b))
-				.map(([k, v]) => `${k}:${v}`)
+				.map(([k, v]) => `${k}:${v}`),
 		];
 	}
 
@@ -172,12 +172,12 @@ if (import.meta.vitest) {
 		const id2 = inferenceModelId('protocol1', {
 			url: 'http://example.com/model.onnx',
 			method: 'GET',
-			headers: { Authorization: 'Bearer token' }
+			headers: { Authorization: 'Bearer token' },
 		});
 		const id3 = inferenceModelId('protocol1', {
 			url: 'http://example.com/model.onnx',
 			method: 'GET',
-			headers: { 'X-Custom-Header': 'value', Authorization: 'Bearer token' }
+			headers: { 'X-Custom-Header': 'value', Authorization: 'Bearer token' },
 		});
 
 		expect(id1).toBe('protocol1|GET|http://example.com/model.onnx');
@@ -265,12 +265,12 @@ export async function infer(
 			height: TARGETHEIGHT,
 			name: session.inputNames[0],
 			normalized: true,
-			...taskSettings?.input
+			...taskSettings?.input,
 		},
 		output: {
 			name: 'output0',
-			...taskSettings?.output
-		}
+			...taskSettings?.output,
+		},
 	};
 	let inputTensor;
 

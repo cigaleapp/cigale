@@ -9,7 +9,7 @@ const GROUPS = {
 	navigation: 'Navigation',
 	cropping: 'Recadrage',
 	debugmode: 'Debug mode',
-	classification: 'Classification'
+	classification: 'Classification',
 };
 
 /**
@@ -32,7 +32,7 @@ export function defineKeyboardShortcuts(group, shortcuts) {
 
 			uiState.keybinds[key] = {
 				group: GROUPS[definition.debug ? 'debugmode' : group],
-				...definition
+				...definition,
 			};
 		}
 	});

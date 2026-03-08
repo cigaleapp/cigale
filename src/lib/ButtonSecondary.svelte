@@ -91,7 +91,7 @@ Available CSS variables:
 					},
 					loadingEnded: () => {
 						isLoading = false;
-					}
+					},
 				});
 			} finally {
 				if (loading) isLoading = false;

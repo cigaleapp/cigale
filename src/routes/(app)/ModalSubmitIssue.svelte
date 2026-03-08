@@ -1,4 +1,7 @@
 <script lang="ts">
+	import type { MetadataError } from '$lib/database';
+	import type { IssueCreatorRequest } from '$lib/schemas/issue-creator';
+
 	import { UAParser } from 'ua-parser-js';
 	import xss from 'xss';
 
@@ -8,14 +11,12 @@
 	import { page } from '$app/state';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
-	import type { MetadataError } from '$lib/database';
 	import Field from '$lib/Field.svelte';
 	import { databaseHandle, tables } from '$lib/idb.svelte';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import Markdown from '$lib/Markdown.svelte';
 	import Modal from '$lib/Modal.svelte';
-	import type { IssueCreatorRequest } from '$lib/schemas/issue-creator';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 
@@ -36,8 +37,8 @@
 	defineKeyboardShortcuts('general', {
 		[type === 'bug' ? '$mod+!' : '$mod+*']: {
 			help: type === 'bug' ? 'Signaler un bug' : 'Proposer une fonctionnalité',
-			do: () => open?.()
-		}
+			do: () => open?.(),
+		},
 	});
 
 	const collectedMetadata = $derived.by(() => {
@@ -61,7 +62,7 @@
 			...tables.Observation.state.flatMap((obs) =>
 				formatErrors(obs.label, obs.metadataErrors)
 			),
-			...tables.Image.state.flatMap((img) => formatErrors(img.filename, img.metadataErrors))
+			...tables.Image.state.flatMap((img) => formatErrors(img.filename, img.metadataErrors)),
 		];
 
 		return {
@@ -79,7 +80,7 @@
 				.map((table) => `${tables[table].state.length} ${table.toLowerCase()}s`)
 				.join(', '),
 			'Metadata Errors': `${errors.length}\n` + '<dl>' + errors.join('') + '</dl>\n',
-			'Open session': jsonText(uiState.currentSession)
+			'Open session': jsonText(uiState.currentSession),
 		};
 	});
 </script>
@@ -97,14 +98,14 @@
 			const response = await fetch('https://mkissue.cigale.gwen.works/submit', {
 				method: 'POST',
 				headers: {
-					'Content-Type': 'application/json'
+					'Content-Type': 'application/json',
 				},
 				body: JSON.stringify({
 					type,
 					title,
 					body,
-					metadata: collectedMetadata
-				} satisfies (typeof IssueCreatorRequest)['infer'])
+					metadata: collectedMetadata,
+				} satisfies (typeof IssueCreatorRequest)['infer']),
 			});
 			submitting = false;
 			close?.();
@@ -115,8 +116,8 @@
 					lifetime: Infinity,
 					action: new URL(data.url),
 					labels: {
-						action: 'Voir'
-					}
+						action: 'Voir',
+					},
 				});
 			} else {
 				console.error(

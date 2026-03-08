@@ -1,14 +1,14 @@
 import { readFile } from 'node:fs/promises';
 import * as path from 'node:path';
-import { ArkErrors } from 'arktype';
-
+import type { FixturePaths } from './filepaths.js';
 import type * as SvelteTypes from '$app/types';
+
+import { ArkErrors } from 'arktype';
 
 import lightweightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import { Analysis } from '../src/lib/schemas/exports.js';
 import { IssueCreatorRequest } from '../src/lib/schemas/issue-creator.js';
 import { withParallelism } from './annotations.js';
-import type { FixturePaths } from './filepaths.js';
 import { assert, expect, test } from './fixtures.js';
 import {
 	browserConsole,
@@ -22,7 +22,7 @@ import {
 	mockUrl,
 	newSession,
 	setInferenceModels,
-	waitForLoadingEnd
+	waitForLoadingEnd,
 } from './utils/index.js';
 
 for (const offline of [false, true]) {
@@ -45,7 +45,7 @@ for (const offline of [false, true]) {
 					.click();
 
 				await assert(app.modals.byTitle('Préparation hors-ligne')).toHaveText(/OK!/, {
-					timeout: 10_000
+					timeout: 10_000,
 				});
 
 				await app.modals
@@ -120,13 +120,13 @@ for (const offline of [false, true]) {
 					'analysis.json',
 					'metadata.csv',
 					'Cropped/Entomobrya muscorum_obs1_1.jpeg',
-					'Original/Entomobrya muscorum_obs1_1.jpeg'
+					'Original/Entomobrya muscorum_obs1_1.jpeg',
 				],
 				{
 					'analysis.json': {
 						json(data) {
 							expect(Analysis.allows(data)).toBe(true);
-						}
+						},
 					},
 					'metadata.csv': {
 						text(txt) {
@@ -137,7 +137,7 @@ for (const offline of [false, true]) {
 								.toBe(
 									'"Identifiant";"Observation";"Date";"Date: Confiance";"Espèce";"Espèce: Confiance";"Genre";"Genre: Confiance";"Famille";"Famille: Confiance";"Ordre";"Ordre: Confiance";"Classe";"Classe: Confiance";"Phylum";"Phylum: Confiance";"Règne";"Règne: Confiance"'
 								);
-						}
+						},
 					},
 					'Cropped/Entomobrya muscorum_obs1_1.jpeg': {
 						buffer(buf) {
@@ -147,8 +147,8 @@ for (const offline of [false, true]) {
 							assert
 								.soft(entry.getLastMod().toISOString())
 								.toEqual('2025-04-25T12:38:36.000Z');
-						}
-					}
+						},
+					},
 				}
 			);
 		}
@@ -167,7 +167,7 @@ test('can handle a bunch of images at once', withParallelism(4), async ({ page, 
 	test.setTimeout(3 * timeouts.finish);
 
 	await app.settings.set({
-		showTechnicalMetadata: false
+		showTechnicalMetadata: false,
 	});
 	await newSession(page);
 	await app.tabs.go('import');
@@ -178,7 +178,7 @@ test('can handle a bunch of images at once', withParallelism(4), async ({ page, 
 		'cyan.jpeg',
 		'lil-fella.jpeg',
 		'leaf.jpeg',
-		'large-image.jpeg'
+		'large-image.jpeg',
 	];
 	const randomImage = () => images[Math.floor(Math.random() * images.length)];
 	await importPhotos({ page, wait: false }, Array.from({ length: imagesCount }, randomImage));
@@ -208,14 +208,14 @@ test('can import a protocol via /protocols/import/url', async ({ page, app, cont
 		body: await readFile(
 			path.join(import.meta.dirname, '..', 'examples', 'kitchensink.cigaleprotocol.yaml'),
 			'utf8'
-		)
+		),
 	});
 
 	await app.path.wait('/sessions');
 
 	await app.path.go(`/protocols/import/${protocolUrl}`);
 	await assert(app.modals.byTitle('Importer le protocole distant ?')).toBeVisible({
-		timeout: 30_000
+		timeout: 30_000,
 	});
 	await assert(
 		app.modals.byTitle('Importer le protocole distant ?').getByRole('link')
@@ -253,8 +253,8 @@ test('can send a bug report', async ({ page, app, context }) => {
 			await browserConsole.log(page, 'mocking route, body is', requestBody);
 			return {
 				json: {
-					url: 'https://example.com/issue/123'
-				}
+					url: 'https://example.com/issue/123',
+				},
 			};
 		}
 	);
@@ -275,7 +275,7 @@ test('can send a bug report', async ({ page, app, context }) => {
 
 	await assert(
 		app.toasts.byMessage('success', 'Merci pour votre contribution!').getByRole('button', {
-			name: 'Voir'
+			name: 'Voir',
 		})
 	).toHaveAttribute('href', 'https://example.com/issue/123');
 
@@ -293,7 +293,7 @@ test('can send a bug report', async ({ page, app, context }) => {
 			),
 			'Loaded objects': assert.stringMatching(
 				/^4 observations, 4 images, 1 sessions, \d+ metadatas, 1 protocols$/
-			)
-		})
+			),
+		}),
 	} satisfies typeof requestBody);
 });

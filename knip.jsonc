@@ -12,13 +12,13 @@
 		"src/lib/UnsavedChangesIndicator.svelte",
 		"src/locales/**/*.js",
 		"tests/reporters/pleye.js",
-		"src/**/\\(todo\\)/*"
+		"src/**/\\(todo\\)/*",
 	],
 	"ignoreDependencies": [
 		"@iconify-json/.+",
 		"bun",
 		"@sveltejs/vite-plugin-svelte-inspector",
-		"svelte-mathml"
+		"svelte-mathml",
 	],
 	"entry": [
 		"scripts/issue-creator-server.ts",
@@ -32,7 +32,7 @@
 		"vite.electron*.config.js",
 		"wuchale.config.js",
 		"tests/*.spec.js",
-		"tests/tasks/*.spec.js"
+		"tests/tasks/*.spec.js",
 	],
 	"paths": {
 		"~icons/*": ["node_modules/unplugin-icons/types/svelte5.d.ts"],
@@ -41,7 +41,7 @@
 		"$worker/*": ["src/worker/*"],
 		"$routes/*": ["src/routes/*"],
 		"$service-worker": ["node_modules/@sveltejs/kit/types/index.d.ts"],
-		"$app/types": [".svelte-kit/non-ambient.d.ts"]
+		"$app/types": [".svelte-kit/non-ambient.d.ts"],
 	},
 	"svelte": {
 		"entry": [
@@ -51,7 +51,7 @@
 			"src/hooks.{server,client}.{js,ts}",
 			"src/params/*.{js,ts}",
 			"src/service-worker.{js,ts}",
-			"src/hooks.{js,ts}"
-		]
-	}
+			"src/hooks.{js,ts}",
+		],
+	},
 }

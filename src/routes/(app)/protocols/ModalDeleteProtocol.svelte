@@ -30,8 +30,8 @@
 	consequences={[
 		plural(sessionsUsingProtocol.length, [
 			"L'impossibilité d'utiliser 1 session",
-			"L'impossibilité d'utiliser # sessions"
-		])
+			"L'impossibilité d'utiliser # sessions",
+		]),
 	]}
 	onconfirm={async () => {
 		await openTransaction(['Protocol', 'Metadata', 'MetadataOption'], {}, async (tx) => {

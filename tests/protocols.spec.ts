@@ -1,10 +1,10 @@
+import type { AppFixture } from './fixtures.js';
 import type { Page } from '@playwright/test';
-
 import type { Analysis } from '$lib/schemas/exports.js';
 import type { ExportedProtocol } from '$lib/schemas/protocols.js';
 
 import { FixturePaths } from './filepaths.js';
-import { assert, expect, test, type AppFixture } from './fixtures.js';
+import { assert, expect, test } from './fixtures.js';
 import {
 	expectZipFiles,
 	exportResults,
@@ -14,7 +14,7 @@ import {
 	importPhotos,
 	importProtocol,
 	mockUrl,
-	newSession
+	newSession,
 } from './utils/index.js';
 
 async function setup(
@@ -40,7 +40,7 @@ async function setup(
 
 	const versions = {
 		oldVersion: protocol.version! - 2,
-		newVersion: protocol.version!
+		newVersion: protocol.version!,
 	};
 
 	await page.evaluate(
@@ -49,7 +49,7 @@ async function setup(
 			if (!current) throw new Error('Protocol not found in DB');
 			await window.DB.put('Protocol', {
 				...current,
-				version: versions.oldVersion
+				version: versions.oldVersion,
 			});
 		},
 		[protocol.id, versions] as const
@@ -70,7 +70,7 @@ test('can auto-update a protocol', async ({ page, app }) => {
 			'Le protocole "Example: arthropodes (lightweight)" a été mis à jour'
 		)
 	).toBeVisible({
-		timeout: 10_000
+		timeout: 10_000,
 	});
 
 	const protocol = await app.db.protocol.byName('Example: arthropodes (lightweight)');
@@ -83,7 +83,7 @@ test('does not auto-update when disabled', async ({ page, app }) => {
 	await assert(
 		app.toasts.byMessage('info', 'Le protocole "Example: arthropodes" a été mis à jour')
 	).not.toBeVisible({
-		timeout: 3000
+		timeout: 3000,
 	});
 
 	const protocol = await app.db.protocol.byName('Example: arthropodes (lightweight)');
@@ -93,7 +93,7 @@ test('does not auto-update when disabled', async ({ page, app }) => {
 test('can use a protocol that imports metadata from another protocol', async ({
 	page,
 	context,
-	app
+	app,
 }) => {
 	// await loadDatabaseDump(page, "db/kitchensink-protocol.devalue")
 	await goToProtocolManagement(page);
@@ -117,8 +117,8 @@ test('can use a protocol that imports metadata from another protocol', async ({
 						description: '',
 						label: 'Remote session metadata',
 						required: false,
-						mergeMethod: 'none'
-					}
+						mergeMethod: 'none',
+					},
 				},
 				metadata: {
 					remote_metadata: {
@@ -126,10 +126,10 @@ test('can use a protocol that imports metadata from another protocol', async ({
 						description: '',
 						label: 'Remote metadata',
 						required: false,
-						mergeMethod: 'none'
-					}
-				}
-			} satisfies typeof ExportedProtocol.inferIn
+						mergeMethod: 'none',
+					},
+				},
+			} satisfies typeof ExportedProtocol.inferIn,
 		}
 	);
 
@@ -142,10 +142,10 @@ test('can use a protocol that imports metadata from another protocol', async ({
 				protocols: [
 					{
 						id: 'com.example.remote',
-						url: 'https://example.com/protocols/com.example.remote.cigaleprotocol.json'
-					}
-				]
-			}
+						url: 'https://example.com/protocols/com.example.remote.cigaleprotocol.json',
+					},
+				],
+			},
 		}
 	);
 
@@ -159,14 +159,14 @@ test('can use a protocol that imports metadata from another protocol', async ({
 		imports: [
 			{
 				from: 'com.example.unknown',
-				metadata: ['feur']
+				metadata: ['feur'],
 			},
 			{
 				from: 'com.example.remote',
-				metadata: ['remote_metadata', 'remote_session_metadata']
-			}
+				metadata: ['remote_metadata', 'remote_session_metadata'],
+			},
 		],
-		metadata: {}
+		metadata: {},
 	});
 
 	await expect(
@@ -187,8 +187,8 @@ test('can use a protocol that imports metadata from another protocol', async ({
 				description: '',
 				label: 'Imported session metadata',
 				required: false,
-				mergeMethod: 'none'
-			}
+				mergeMethod: 'none',
+			},
 		},
 		metadata: {
 			is_imported: {
@@ -200,22 +200,22 @@ test('can use a protocol that imports metadata from another protocol', async ({
 				options: [
 					{ key: 'yes', label: 'Yes' },
 					{ key: 'no', label: 'No' },
-					{ key: 'ionknow', label: 'Ionknow' }
-				]
+					{ key: 'ionknow', label: 'Ionknow' },
+				],
 			},
 			not_imported: {
 				type: 'boolean',
 				description: '',
 				label: 'Not imported',
 				required: false,
-				mergeMethod: 'none'
+				mergeMethod: 'none',
 			},
 			should_come_from_parent2: {
 				type: 'boolean',
 				description: '',
 				label: 'WRONG!!!',
 				required: false,
-				mergeMethod: 'none'
+				mergeMethod: 'none',
 			},
 			imported_enum: {
 				type: 'enum',
@@ -227,10 +227,10 @@ test('can use a protocol that imports metadata from another protocol', async ({
 					key: `option_${i}`,
 					label: `Option ${i}`,
 					cascade: { is_imported: i % 10 === 0 ? 'ionknow' : 'yes' },
-					description: `This is the option №${i} 🤓`
-				}))
-			}
-		}
+					description: `This is the option №${i} 🤓`,
+				})),
+			},
+		},
 	});
 
 	await importProtocol(page, {
@@ -244,8 +244,8 @@ test('can use a protocol that imports metadata from another protocol', async ({
 				description: '',
 				label: 'Unrelated session metadata',
 				required: false,
-				mergeMethod: 'none'
-			}
+				mergeMethod: 'none',
+			},
 		},
 		metadata: {
 			should_come_from_parent2: {
@@ -253,7 +253,7 @@ test('can use a protocol that imports metadata from another protocol', async ({
 				description: 'SMILE :D (porter robinson reference)',
 				label: 'Should come from parent2',
 				required: false,
-				mergeMethod: 'none'
+				mergeMethod: 'none',
 			},
 
 			crop: {
@@ -261,9 +261,9 @@ test('can use a protocol that imports metadata from another protocol', async ({
 				description: '',
 				label: '',
 				required: false,
-				mergeMethod: 'none'
-			}
-		}
+				mergeMethod: 'none',
+			},
+		},
 	});
 
 	await importProtocol(page, {
@@ -277,8 +277,8 @@ test('can use a protocol that imports metadata from another protocol', async ({
 				description: '',
 				label: 'Unrelated session metadata',
 				required: false,
-				mergeMethod: 'none'
-			}
+				mergeMethod: 'none',
+			},
 		},
 		metadata: {
 			unrelated_metadata: {
@@ -286,9 +286,9 @@ test('can use a protocol that imports metadata from another protocol', async ({
 				description: '',
 				label: 'Unrelated metadata',
 				required: false,
-				mergeMethod: 'none'
-			}
-		}
+				mergeMethod: 'none',
+			},
+		},
 	});
 
 	await importProtocol(page, {
@@ -300,17 +300,17 @@ test('can use a protocol that imports metadata from another protocol', async ({
 			{
 				from: 'com.example.parent',
 				metadata: ['is_imported', 'imported_enum'],
-				sessionMetadata: ['imported_session_metadata']
+				sessionMetadata: ['imported_session_metadata'],
 			},
 			{
 				from: 'com.example.parent2',
-				metadata: ['should_come_from_parent2', 'crop']
+				metadata: ['should_come_from_parent2', 'crop'],
 			},
 			{
 				from: 'com.example.remote',
 				metadata: ['remote_metadata'],
-				sessionMetadata: ['remote_session_metadata']
-			}
+				sessionMetadata: ['remote_session_metadata'],
+			},
 		],
 		metadata: {
 			from_child: {
@@ -318,9 +318,9 @@ test('can use a protocol that imports metadata from another protocol', async ({
 				description: '',
 				label: 'From child',
 				required: false,
-				mergeMethod: 'none'
-			}
-		}
+				mergeMethod: 'none',
+			},
+		},
 	});
 
 	expect(await app.db.count('MetadataOption')).toBe(3000 + 3);
@@ -328,7 +328,7 @@ test('can use a protocol that imports metadata from another protocol', async ({
 	await app.tabs.go('sessions');
 	await newSession(page, {
 		name: 'Test session',
-		protocol: 'Child Protocol'
+		protocol: 'Child Protocol',
 	});
 
 	await goToSessionPage(page);
@@ -460,15 +460,15 @@ test('can use a protocol that imports metadata from another protocol', async ({
 					should_come_from_parent2: assert.objectContaining({ value: true }),
 					remote_metadata: assert.objectContaining({ value: false }),
 					imported_enum: assert.objectContaining({ value: 'option_2067' }),
-					crop: assert.objectContaining({ value: null })
+					crop: assert.objectContaining({ value: null }),
 				});
 
 				expect(data.session.protocolMetadata).toEqual({
 					remote_session_metadata: assert.objectContaining({ value: 'Feur' }),
-					imported_session_metadata: assert.objectContaining({ value: null })
+					imported_session_metadata: assert.objectContaining({ value: null }),
 				});
-			}
-		}
+			},
+		},
 	});
 });
 
@@ -499,8 +499,8 @@ test('can infer metadata from a sidecar file', async ({ page, context, app, temp
 				addresstype: 'road',
 				name: '',
 				display_name: locationDisplayName,
-				boundingbox: ['38.1227130', '38.1229923', '67.6758481', '67.6785654']
-			}
+				boundingbox: ['38.1227130', '38.1229923', '67.6758481', '67.6785654'],
+			},
 		}
 	);
 
@@ -529,17 +529,17 @@ location:
 				{
 					cropbox: [
 						{ cx: 0.6, cy: 0.2, w: 0.3, h: 0.4, score: 0.5 },
-						{ sx: 0.1, sy: 0.15, w: 0.25, h: 0.35, score: 0.25 }
+						{ sx: 0.1, sy: 0.15, w: 0.25, h: 0.35, score: 0.25 },
 					],
 					boolean: true,
 					timestamp: new Date('2026-01-01T00:00:00Z').valueOf(),
 					number: 100.4,
-					text: 'some text right there  '
+					text: 'some text right there  ',
 				},
 				null,
 				2
 			)
-		)
+		),
 	};
 
 	await importProtocol(page, 'examples/kitchensink.cigaleprotocol.yaml', (p) => {
@@ -547,55 +547,55 @@ location:
 		p.name = 'With sidecars';
 
 		p.sidecars = {
-			filepath: sidecars.json.filename
+			filepath: sidecars.json.filename,
 		};
 
 		p.metadata.crop.infer = {
-			sidecar: 'cropbox'
+			sidecar: 'cropbox',
 		};
 
 		p.metadata.bool.infer = {
-			sidecar: 'boolean'
+			sidecar: 'boolean',
 		};
 
 		p.metadata.date.infer = {
-			sidecar: 'timestamp ~> $fromMillis'
+			sidecar: 'timestamp ~> $fromMillis',
 		};
 
 		p.metadata.enum.infer = {
 			sidecar: {
 				filepath: sidecars.xml.filename,
-				query: 'mv.value[$."@valid" = "yes"][$."@type" = "enum"]."#text"'
-			}
+				query: 'mv.value[$."@valid" = "yes"][$."@type" = "enum"]."#text"',
+			},
 		};
 
 		p.metadata.float.infer = {
-			sidecar: 'number'
+			sidecar: 'number',
 		};
 
 		p.metadata.integer.infer = {
-			sidecar: '$floor(number)'
+			sidecar: '$floor(number)',
 		};
 
 		p.metadata.string.infer = {
-			sidecar: 'text'
+			sidecar: 'text',
 		};
 
 		p.metadata.location.infer = {
 			sidecar: {
 				filepath: sidecars.yaml.filename,
-				query: 'location.coords.$split("; ")#$i.$replace(",", ".").$number() { ($i = 0 ? "latitude" : "longitude"): $ }'
-			}
+				query: 'location.coords.$split("; ")#$i.$replace(",", ".").$number() { ($i = 0 ? "latitude" : "longitude"): $ }',
+			},
 		};
 
 		p.metadata.sidecar.infer = {
 			sidecar:
-				'{ "content": $ ~> $json(2), "name": $sidecarfile.name, "type": "application/json" }'
+				'{ "content": $ ~> $json(2), "name": $sidecarfile.name, "type": "application/json" }',
 		};
 	});
 
 	await newSession(page, {
-		protocol: 'With sidecars'
+		protocol: 'With sidecars',
 	});
 
 	await importPhotos({ page }, ['cyan.jpeg', sidecars.xml, sidecars.json, sidecars.yaml]);
@@ -617,7 +617,7 @@ location:
 
 	const dbvalues = await app.db.metadata.values({
 		image: 'cyan.jpeg',
-		protocolId: 'com.example.sidecars'
+		protocolId: 'com.example.sidecars',
 	});
 
 	expect(dbvalues.bool).toBe(true);
@@ -642,7 +642,7 @@ location:
 		images.map(async (image) => {
 			const { crop } = await app.db.metadata.of({
 				imageId: image.id,
-				protocolId: 'com.example.sidecars'
+				protocolId: 'com.example.sidecars',
 			});
 
 			return crop;
@@ -652,11 +652,11 @@ location:
 	expect(crops).toMatchObject([
 		{
 			parsedValue: { x: 0.6, y: 0.2, w: 0.3, h: 0.4 },
-			confidence: 0.5
+			confidence: 0.5,
 		},
 		{
 			parsedValue: { x: 0.225, y: assert.closeTo(0.325, 5), w: 0.25, h: 0.35 },
-			confidence: 0.25
-		}
+			confidence: 0.25,
+		},
 	]);
 });

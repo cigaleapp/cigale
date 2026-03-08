@@ -17,7 +17,7 @@ const mockMetadata = (id, type = 'enum') => ({
 	label: '',
 	mergeMethod: 'none',
 	required: false,
-	type
+	type,
 });
 
 /**
@@ -30,7 +30,7 @@ const mockOption = (metadataId, i) => ({
 	description: '',
 	key: i.toString(),
 	label: `Option ${i}`,
-	synonyms: []
+	synonyms: [],
 });
 
 beforeEach(async () => {
@@ -46,7 +46,7 @@ describe('complex case with multiple metadata in the cascades', () => {
 		const [species, genus, difficulty] = [
 			await db.add('Metadata', mockMetadata('species')),
 			await db.add('Metadata', mockMetadata('genus')),
-			await db.add('Metadata', mockMetadata('difficulty'))
+			await db.add('Metadata', mockMetadata('difficulty')),
 		];
 
 		const options = [species, genus, difficulty].flatMap((mid) =>
@@ -65,29 +65,29 @@ describe('complex case with multiple metadata in the cascades', () => {
 			difficulty1,
 			difficulty2,
 			difficulty3,
-			___
+			___,
 		] = options;
 
 		species40.cascade = {
-			[genus]: genus1.key
+			[genus]: genus1.key,
 		};
 
 		species41.cascade = {
-			[genus]: genus1.key
+			[genus]: genus1.key,
 		};
 
 		species42.cascade = {
 			[genus]: genus2.key,
-			[difficulty]: difficulty3.key
+			[difficulty]: difficulty3.key,
 		};
 
 		species44.cascade = {
 			[genus]: genus3.key,
-			[difficulty]: difficulty1.key
+			[difficulty]: difficulty1.key,
 		};
 
 		genus1.cascade = {
-			[difficulty]: difficulty2.key
+			[difficulty]: difficulty2.key,
 		};
 
 		await Promise.all(options.map(async (opt) => db.add('MetadataOption', opt)));
@@ -104,7 +104,7 @@ describe('complex case with multiple metadata in the cascades', () => {
 			difficulty1,
 			difficulty2,
 			difficulty3,
-			___
+			___,
 		};
 	}
 
@@ -120,8 +120,8 @@ describe('complex case with multiple metadata in the cascades', () => {
 			alternatives: [
 				{ value: species41.key, confidence: 0.3 },
 				{ value: species42.key, confidence: 0.2 },
-				{ value: species44.key, confidence: 0.1 }
-			]
+				{ value: species44.key, confidence: 0.1 },
+			],
 		});
 
 		expect(result).toMatchObject([
@@ -132,13 +132,13 @@ describe('complex case with multiple metadata in the cascades', () => {
 				alternatives: [
 					{
 						confidence: 0.2,
-						value: '2'
+						value: '2',
 					},
 					{
 						confidence: 0.1,
-						value: '3'
-					}
-				]
+						value: '3',
+					},
+				],
 			},
 			{
 				metadataId: 'mockproto__difficulty',
@@ -147,10 +147,10 @@ describe('complex case with multiple metadata in the cascades', () => {
 				alternatives: [
 					{
 						confidence: 0.1,
-						value: '1'
-					}
-				]
-			}
+						value: '1',
+					},
+				],
+			},
 		]);
 	});
 
@@ -162,7 +162,7 @@ describe('complex case with multiple metadata in the cascades', () => {
 			db,
 			protocolId: 'mockproto',
 			cache: {},
-			option: species40
+			option: species40,
 		});
 
 		expect(result).toMatchObject({
@@ -171,15 +171,15 @@ describe('complex case with multiple metadata in the cascades', () => {
 				depth: 1,
 				icon: undefined,
 				metadata: '',
-				value: 'Option 2'
+				value: 'Option 2',
 			},
 			mockproto__genus: {
 				color: undefined,
 				depth: 0,
 				icon: undefined,
 				metadata: '',
-				value: 'Option 1'
-			}
+				value: 'Option 1',
+			},
 		});
 	});
 });
@@ -191,7 +191,7 @@ describe('without any cascades', () => {
 		const [species, genus, difficulty] = [
 			await db.add('Metadata', mockMetadata('species')),
 			await db.add('Metadata', mockMetadata('genus')),
-			await db.add('Metadata', mockMetadata('difficulty'))
+			await db.add('Metadata', mockMetadata('difficulty')),
 		];
 
 		const options = [species, genus, difficulty].flatMap((mid) =>
@@ -215,8 +215,8 @@ describe('without any cascades', () => {
 			alternatives: [
 				{ value: 2, confidence: 0.3 },
 				{ value: 3, confidence: 0.2 },
-				{ value: 4, confidence: 0.1 }
-			]
+				{ value: 4, confidence: 0.1 },
+			],
 		});
 
 		expect(result).toMatchObject([]);
@@ -225,14 +225,14 @@ describe('without any cascades', () => {
 	test('cascadeLabels', async () => {
 		const db = await openDatabase();
 		const {
-			options: [species41]
+			options: [species41],
 		} = await setup();
 
 		const result = await cascadeLabels({
 			db,
 			protocolId: 'mockproto',
 			cache: {},
-			option: species41
+			option: species41,
 		});
 
 		expect(result).toMatchObject({});

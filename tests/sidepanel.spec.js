@@ -11,7 +11,7 @@ import {
 	importProtocol,
 	loadDatabaseDump,
 	newSession,
-	setInferenceModels
+	setInferenceModels,
 } from './utils/index.js';
 
 /**
@@ -309,7 +309,7 @@ test('can update a enum-type metadata with cascades', async ({ page, app }) => {
 		shoot_date: '2025-04-25T12:38:36.000Z',
 		class: '10713444',
 		phylum: '54',
-		kingdom: '1'
+		kingdom: '1',
 	});
 });
 
@@ -548,12 +548,12 @@ test('displays metadata groups', async ({ page, app }) => {
 		metadataGroups: {
 			group1: {
 				name: 'Group 1',
-				collapsed: false
+				collapsed: false,
 			},
 			group2: {
 				name: 'Group 2',
-				collapsed: true
-			}
+				collapsed: true,
+			},
 		},
 		metadata: {
 			group1_key1: {
@@ -562,7 +562,7 @@ test('displays metadata groups', async ({ page, app }) => {
 				label: 'Group 1 key 1',
 				mergeMethod: 'none',
 				required: false,
-				description: ''
+				description: '',
 			},
 			group1_key2: {
 				type: 'string',
@@ -570,7 +570,7 @@ test('displays metadata groups', async ({ page, app }) => {
 				label: 'Group 1 key 2',
 				mergeMethod: 'none',
 				required: false,
-				description: ''
+				description: '',
 			},
 			group2_key1: {
 				type: 'string',
@@ -578,29 +578,29 @@ test('displays metadata groups', async ({ page, app }) => {
 				label: 'Group 2 key 1',
 				mergeMethod: 'none',
 				required: false,
-				description: ''
+				description: '',
 			},
 			ungrouped_key_1: {
 				type: 'string',
 				label: 'Ungrouped key 1',
 				mergeMethod: 'none',
 				required: false,
-				description: ''
+				description: '',
 			},
 			ungrouped_key_2: {
 				type: 'string',
 				label: 'Ungrouped key 2',
 				mergeMethod: 'none',
 				required: false,
-				description: ''
+				description: '',
 			},
 			ungrouped_key_3: {
 				type: 'string',
 				label: 'Ungrouped key 3',
 				mergeMethod: 'none',
 				required: false,
-				description: ''
-			}
+				description: '',
+			},
 		},
 		metadataOrder: [
 			'ungrouped_key_2',
@@ -608,14 +608,14 @@ test('displays metadata groups', async ({ page, app }) => {
 			'group1_key1',
 			'ungrouped_key_3',
 			'group2_key1',
-			'ungrouped_key_1'
-		]
+			'ungrouped_key_1',
+		],
 	});
 
 	await app.tabs.go('sessions');
 	await newSession(page, {
 		name: 'Testing grouped metadata',
-		protocol: 'Metadata groups example'
+		protocol: 'Metadata groups example',
 	});
 
 	await importPhotos({ page }, 'cyan.jpeg');
@@ -630,11 +630,11 @@ test('displays metadata groups', async ({ page, app }) => {
 		'Group 1 key 1',
 		'Ungrouped key 3',
 		'Group 2 key 1',
-		'Ungrouped key 1'
+		'Ungrouped key 1',
 	]);
 	await expect(page.getByTestId('sidepanel').locator('summary')).toHaveText([
 		'Group 1',
-		'Group 2'
+		'Group 2',
 	]);
 	await expect(page.getByTestId('sidepanel').locator('details').nth(0)).toHaveAttribute('open');
 	await expect(page.getByTestId('sidepanel').locator('details').nth(1)).not.toHaveAttribute(

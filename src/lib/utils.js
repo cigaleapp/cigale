@@ -36,7 +36,7 @@ export function mapKeys(subject, mapper) {
 	return Object.fromEntries(
 		Object.entries(subject).map(([key, value]) => [
 			mapper(/** @type {KIn} */ (key), value),
-			value
+			value,
 		])
 	);
 }
@@ -92,7 +92,7 @@ if (import.meta.vitest) {
 		});
 		test('with nullables', () => {
 			expect(mapValuesNoNullables({ a: 1, b: null }, (v) => (v ? v + 1 : v))).toEqual({
-				a: 2
+				a: 2,
 			});
 		});
 		test('with only nullables', () => {
@@ -138,7 +138,7 @@ if (import.meta.vitest) {
 		expect(
 			fromEntries([
 				['a', 1],
-				['b', 2]
+				['b', 2],
 			])
 		).toEqual({ a: 1, b: 2 });
 		expect(fromEntries([])).toEqual({});
@@ -161,7 +161,7 @@ if (import.meta.vitest) {
 	test('entries', () => {
 		expect(entries({ a: 1, b: 2 })).toEqual([
 			['a', 1],
-			['b', 2]
+			['b', 2],
 		]);
 		expect(entries({})).toEqual([]);
 	});
@@ -478,19 +478,19 @@ if (import.meta.vitest) {
 		test('works with 2 iterators', () => {
 			expect([...zip([1, 2], ['a', 'b'])]).toEqual([
 				[1, 'a'],
-				[2, 'b']
+				[2, 'b'],
 			]);
 		});
 		test('works with 3 iterators', () => {
 			expect([...zip([1, 2], ['a', 'b'], [true, false])]).toEqual([
 				[1, 'a', true],
-				[2, 'b', false]
+				[2, 'b', false],
 			]);
 		});
 		test('works with asymmetrically-sized iterators', () => {
 			expect([...zip([1, 2, 3], [[], []])]).toEqual([
 				[1, []],
-				[2, []]
+				[2, []],
 			]);
 		});
 	});
@@ -521,11 +521,11 @@ if (import.meta.vitest) {
 		expect(unique([])).toEqual([]);
 		expect(unique([{ id: 1 }, { id: 2 }, { id: 1 }], (o) => o.id)).toEqual([
 			{ id: 1 },
-			{ id: 2 }
+			{ id: 2 },
 		]);
 		expect(unique([{ id: 1 }, { id: 2 }, { id: 1 }], (o) => o.id.toString())).toEqual([
 			{ id: 1 },
-			{ id: 2 }
+			{ id: 2 },
 		]);
 	});
 }
@@ -620,19 +620,19 @@ if (import.meta.vitest) {
 			const items = [
 				{ id: 2, name: 'b' },
 				{ id: 1, name: 'a' },
-				{ id: 3, name: 'c' }
+				{ id: 3, name: 'c' },
 			];
 
 			expect([...items].sort(compareBy((i) => i.id))).toEqual([
 				{ id: 1, name: 'a' },
 				{ id: 2, name: 'b' },
-				{ id: 3, name: 'c' }
+				{ id: 3, name: 'c' },
 			]);
 
 			expect([...items].sort(compareBy((i) => i.name))).toEqual([
 				{ id: 1, name: 'a' },
 				{ id: 2, name: 'b' },
-				{ id: 3, name: 'c' }
+				{ id: 3, name: 'c' },
 			]);
 		});
 
@@ -640,7 +640,7 @@ if (import.meta.vitest) {
 			const items = [
 				{ id: 2, name: 'b' },
 				{ id: 1, name: 'a' },
-				{ id: 3, name: 'c' }
+				{ id: 3, name: 'c' },
 			];
 
 			expect(compareBy((i) => i.id)(items[0], items[1])).toBe(1);
@@ -656,7 +656,7 @@ if (import.meta.vitest) {
 			const items = [
 				{ id: 2, name: 'b' },
 				{ id: 1, name: 'a' },
-				{ id: 3, name: 'c' }
+				{ id: 3, name: 'c' },
 			];
 
 			expect(compareBy('id')(items[0], items[1])).toBe(1);
@@ -704,7 +704,7 @@ if (import.meta.vitest) {
 			const cachebustedUrl = cachebust(url);
 			expect(URL.canParse(cachebustedUrl)).toBeTruthy();
 			expect([...new URL(cachebustedUrl).searchParams.entries()]).toEqual([
-				['v', expect.stringMatching(/^\d+$/)]
+				['v', expect.stringMatching(/^\d+$/)],
 			]);
 		});
 		test('with existing query params', () => {
@@ -782,7 +782,7 @@ if (import.meta.vitest) {
 				Promise.resolve(
 					new Response(JSON.stringify({ success: true }), {
 						status: 200,
-						headers: { 'Content-Type': 'application/json' }
+						headers: { 'Content-Type': 'application/json' },
 					})
 				)
 			);
@@ -791,7 +791,7 @@ if (import.meta.vitest) {
 			const response = await fetchHttpRequest(
 				'https://example.com/api?q=test&another=param',
 				{
-					cacheAs: 'model'
+					cacheAs: 'model',
 				}
 			);
 			expect(fetchMock).toHaveBeenCalledTimes(1);
@@ -810,7 +810,7 @@ if (import.meta.vitest) {
 				Promise.resolve(
 					new Response(JSON.stringify({ success: true }), {
 						status: 200,
-						headers: { 'Content-Type': 'application/json' }
+						headers: { 'Content-Type': 'application/json' },
 					})
 				)
 			);
@@ -820,9 +820,9 @@ if (import.meta.vitest) {
 				url: 'https://example.com/api',
 				method: 'POST',
 				headers: {
-					'Content-Type': 'application/json'
+					'Content-Type': 'application/json',
 				},
-				body: JSON.stringify({ key: 'value' })
+				body: JSON.stringify({ key: 'value' }),
 			});
 
 			const response = await fetchHttpRequest(request, { cacheAs: 'model' });
@@ -1054,7 +1054,7 @@ if (import.meta.vitest) {
 			['decompression', 1, 0.9],
 			['parsing', 0, 0.9],
 			['parsing', 0.5, 0.95],
-			['parsing', 1, 1]
+			['parsing', 1, 1],
 		]);
 
 		for (const [phase, input, expected] of expectations) {
@@ -1147,7 +1147,7 @@ if (import.meta.vitest) {
 		expect(groupBy([1, 2, 3, 4, 5], (n) => (n % 2 === 0 ? 'even' : 'odd'))).toEqual(
 			new Map([
 				['odd', [1, 3, 5]],
-				['even', [2, 4]]
+				['even', [2, 4]],
 			])
 		);
 
@@ -1157,7 +1157,7 @@ if (import.meta.vitest) {
 					{ id: 1, name: 'Alice' },
 					{ id: 2, name: 'Bob' },
 					{ id: 3, name: 'Charlie' },
-					{ id: 4, name: 'David' }
+					{ id: 4, name: 'David' },
 				],
 				(user) => (user.id % 2 === 0 ? 'even' : 'odd'),
 				(user) => user.name
@@ -1165,7 +1165,7 @@ if (import.meta.vitest) {
 		).toEqual(
 			new Map([
 				['odd', ['Alice', 'Charlie']],
-				['even', ['Bob', 'David']]
+				['even', ['Bob', 'David']],
 			])
 		);
 	});
@@ -1214,7 +1214,7 @@ if (import.meta.vitest) {
 				[0.7, 'blue', '70%', 'red'],
 				[0.75, 'blue', '75%', 'red'],
 				[0.8, 'blue', '80%', 'red'],
-				[0.9, 'blue', '90%', 'red']
+				[0.9, 'blue', '90%', 'red'],
 			]);
 
 			for (const [input, color, percent, otherColor] of expectations) {
@@ -1239,7 +1239,7 @@ if (import.meta.vitest) {
 				[0.7, 'blue', '40%', 'yellow'],
 				[0.75, 'blue', '50%', 'yellow'],
 				[0.8, 'blue', '60%', 'yellow'],
-				[0.9, 'blue', '80%', 'yellow']
+				[0.9, 'blue', '80%', 'yellow'],
 			]);
 
 			for (const [input, color, percent, otherColor] of expectations) {
@@ -1264,7 +1264,7 @@ if (import.meta.vitest) {
 				[0.7, 'blue', '10%', 'green'],
 				[0.75, 'blue', '25%', 'green'],
 				[0.8, 'blue', '40%', 'green'],
-				[0.9, 'blue', '70%', 'green']
+				[0.9, 'blue', '70%', 'green'],
 			]);
 
 			for (const [input, color, percent, otherColor] of expectations) {
@@ -1352,7 +1352,7 @@ export async function unlessAborted(signal, promise) {
 			signal?.addEventListener('abort', () => {
 				reject(signal.reason);
 			});
-		})
+		}),
 	]);
 }
 

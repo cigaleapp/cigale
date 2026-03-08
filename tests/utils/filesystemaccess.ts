@@ -30,7 +30,7 @@ export async function mockFilesystemAccessAPI(
 			((window as any).___playwright_fsa_files ??= {})[handleId] = FILES;
 
 			(window as any).showDirectoryPicker = async function showDirectoryPicker({
-				mode = 'read'
+				mode = 'read',
 			}: { mode?: 'read' | 'readwrite' } = {}) {
 				return makeDirectoryHandle(rootDir, rootDir, mode === 'readwrite', true);
 			};
@@ -64,9 +64,9 @@ export async function mockFilesystemAccessAPI(
 							},
 							async close() {
 								this.___playwright_closed = true;
-							}
+							},
 						};
-					}
+					},
 				};
 			}
 
@@ -95,7 +95,7 @@ export async function mockFilesystemAccessAPI(
 							writable,
 							created && options?.create
 						);
-					}
+					},
 				};
 			}
 		},

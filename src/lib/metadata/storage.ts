@@ -1,8 +1,11 @@
+import type * as DB from '$lib/database.js';
+import type { DatabaseHandle, ReactiveTableNames } from '$lib/idb.svelte.js';
+import type { RuntimeValue } from '$lib/schemas/metadata.js';
+import type { NumericUnit } from '$lib/schemas/units.js';
+
 import { ArkErrors } from 'arktype';
 
 import { computeCascades } from '$lib/cascades.js';
-import type * as DB from '$lib/database.js';
-import type { DatabaseHandle, ReactiveTableNames } from '$lib/idb.svelte.js';
 import {
 	ensureNamespacedMetadataId,
 	isNamespacedToProtocol,
@@ -10,9 +13,7 @@ import {
 	MetadataValue,
 	namespacedMetadataId,
 	namespaceOfMetadataId,
-	type RuntimeValue
 } from '$lib/schemas/metadata.js';
-import type { NumericUnit } from '$lib/schemas/units.js';
 import { orEmptyObj3 } from '$lib/utils.js';
 
 import { serializeMetadataValue } from './serializing.js';
@@ -83,7 +84,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 	unit = undefined,
 	cascadedFrom = [],
 	sessionId,
-	abortSignal
+	abortSignal,
 }: {
 	subjectId: string;
 	// TODO switch to NamespacedMetadataId
@@ -135,7 +136,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 
 						return [serializeMetadataValue(value), confidence];
 					})
-				)
+				),
 	};
 
 	// Make sure the alternatives does not contain the value itself
@@ -191,7 +192,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 				confirmed,
 				manuallyModified,
 				clearErrors,
-				abortSignal
+				abortSignal,
 			});
 		}
 	} else {
@@ -205,7 +206,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 		metadataId,
 		value,
 		confidence,
-		alternatives
+		alternatives,
 	});
 
 	for (const cascade of cascades) {
@@ -239,7 +240,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 			cascadedFrom: [...cascadedFrom, metadataId],
 			abortSignal,
 			clearErrors,
-			...cascade
+			...cascade,
 		});
 	}
 
@@ -254,7 +255,7 @@ export async function storeMetadataErrors(
 		db,
 		subjectId,
 		sessionId,
-		metadataId
+		metadataId,
 	}: {
 		db: DatabaseHandle;
 		subjectId: string;
@@ -298,7 +299,7 @@ export async function storeMetadataErrors(
 					db,
 					sessionId,
 					subjectId: id,
-					metadataId
+					metadataId,
 				},
 				...errors
 			);
@@ -323,7 +324,7 @@ export async function deleteMetadataValue({
 	metadataId,
 	recursive = false,
 	reactive = true,
-	sessionId
+	sessionId,
 }: {
 	subjectId: string;
 	metadataId: string;
@@ -366,7 +367,7 @@ export async function deleteMetadataValue({
 					recursive: false,
 					metadataId,
 					// Don't refresh table state on recursive calls, we just have to do it once
-					reactive: false
+					reactive: false,
 				});
 			}
 		}
@@ -378,7 +379,7 @@ export async function deleteMetadataValue({
 				subjectId: id,
 				recursive: false,
 				metadataId,
-				reactive: false
+				reactive: false,
 			});
 		}
 	}

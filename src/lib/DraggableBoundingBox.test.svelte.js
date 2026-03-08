@@ -11,7 +11,7 @@ describe('fittedImageRect', () => {
 				clientWidth: 100,
 				clientHeight: 200,
 				clientTop: 0,
-				clientLeft: 0
+				clientLeft: 0,
 			},
 			undefined
 		);
@@ -19,7 +19,7 @@ describe('fittedImageRect', () => {
 			width: 100,
 			height: 200,
 			x: 0,
-			y: 0
+			y: 0,
 		});
 	});
 
@@ -31,7 +31,7 @@ describe('fittedImageRect', () => {
 				clientWidth: 200,
 				clientHeight: 100,
 				clientTop: 0,
-				clientLeft: 0
+				clientLeft: 0,
 			},
 			undefined
 		);
@@ -39,7 +39,7 @@ describe('fittedImageRect', () => {
 			width: 200,
 			height: 100,
 			x: 0,
-			y: 0
+			y: 0,
 		});
 	});
 
@@ -51,7 +51,7 @@ describe('fittedImageRect', () => {
 				clientWidth: 200,
 				clientHeight: 100,
 				clientTop: 0,
-				clientLeft: 0
+				clientLeft: 0,
 			},
 			undefined
 		);
@@ -73,7 +73,7 @@ describe('fittedImageRect', () => {
 				clientWidth: 100,
 				clientHeight: 200,
 				clientTop: 0,
-				clientLeft: 0
+				clientLeft: 0,
 			},
 			undefined
 		);
@@ -95,13 +95,13 @@ describe('fittedImageRect', () => {
 				clientWidth: 200,
 				clientHeight: 100,
 				clientTop: 0,
-				clientLeft: 0
+				clientLeft: 0,
 			},
 			{
 				origin: { x: 0, y: 0 },
 				scale: 2,
 				panning: false,
-				panStart: { x: 0, y: 0, zoomOrigin: { x: 0, y: 0 } }
+				panStart: { x: 0, y: 0, zoomOrigin: { x: 0, y: 0 } },
 			}
 		);
 		expect(rect).toMatchInlineSnapshot(`
@@ -122,13 +122,13 @@ describe('fittedImageRect', () => {
 				clientWidth: 100,
 				clientHeight: 200,
 				clientTop: 0,
-				clientLeft: 0
+				clientLeft: 0,
 			},
 			{
 				origin: { x: 0, y: 0 },
 				scale: 2,
 				panning: false,
-				panStart: { x: 0, y: 0, zoomOrigin: { x: 0, y: 0 } }
+				panStart: { x: 0, y: 0, zoomOrigin: { x: 0, y: 0 } },
 			}
 		);
 		expect(rect).toMatchInlineSnapshot(`
@@ -149,13 +149,13 @@ describe('fittedImageRect', () => {
 				clientWidth: 100,
 				clientHeight: 200,
 				clientTop: 10,
-				clientLeft: 20
+				clientLeft: 20,
 			},
 			{
 				origin: { x: 0, y: 0 },
 				scale: 2,
 				panning: false,
-				panStart: { x: 0, y: 0, zoomOrigin: { x: 0, y: 0 } }
+				panStart: { x: 0, y: 0, zoomOrigin: { x: 0, y: 0 } },
 			}
 		);
 		expect(rect).toMatchInlineSnapshot(`
@@ -184,17 +184,17 @@ describe('NewBoundingBox', () => {
 			x: 1,
 			y: 2,
 			width: 3,
-			height: 4
+			height: 4,
 		};
 		const boundingBox = new NewBoundingBox({
-			limits
+			limits,
 		});
 		expect(boundingBox.clickanddrag).toEqual({
 			x: 0,
 			y: 0,
 			width: 0,
 			height: 0,
-			dragDirection: { x: 0, y: 0 }
+			dragDirection: { x: 0, y: 0 },
 		});
 		expect(boundingBox.points).toEqual([]);
 		expect(boundingBox.limits).toEqual(limits);
@@ -223,7 +223,7 @@ describe('NewBoundingBox', () => {
 					y: 0,
 					width: 0,
 					height: 0,
-					dragDirection: { x: 0, y: 0 }
+					dragDirection: { x: 0, y: 0 },
 				});
 			});
 
@@ -235,7 +235,7 @@ describe('NewBoundingBox', () => {
 						y: 2,
 						width: 3,
 						height: 4,
-						dragDirection: { x: 1, y: 1 }
+						dragDirection: { x: 1, y: 1 },
 					});
 				});
 				test('enlarges', () => {
@@ -246,7 +246,7 @@ describe('NewBoundingBox', () => {
 						y: 2,
 						width: 8,
 						height: 10,
-						dragDirection: { x: 1, y: 1 }
+						dragDirection: { x: 1, y: 1 },
 					});
 				});
 				test('shrinks', () => {
@@ -257,7 +257,7 @@ describe('NewBoundingBox', () => {
 						y: 2,
 						width: 2,
 						height: 2,
-						dragDirection: { x: 1, y: 1 }
+						dragDirection: { x: 1, y: 1 },
 					});
 				});
 				describe('changes direction', () => {
@@ -270,7 +270,7 @@ describe('NewBoundingBox', () => {
 							y: -8,
 							width: 9,
 							height: 11,
-							dragDirection: { x: -1, y: -1 }
+							dragDirection: { x: -1, y: -1 },
 						});
 					});
 					it('to ←↑', () => {
@@ -282,7 +282,7 @@ describe('NewBoundingBox', () => {
 							y: 2,
 							width: 9,
 							height: 11,
-							dragDirection: { x: -1, y: 1 }
+							dragDirection: { x: -1, y: 1 },
 						});
 					});
 					it('to →↑', () => {
@@ -294,7 +294,7 @@ describe('NewBoundingBox', () => {
 							y: -12,
 							width: 2,
 							height: 18,
-							dragDirection: { x: 1, y: -1 }
+							dragDirection: { x: 1, y: -1 },
 						});
 					});
 				});
@@ -578,7 +578,7 @@ describe('NewBoundingBox', () => {
 				x: 1,
 				y: 2,
 				width: 3,
-				height: 4
+				height: 4,
 			});
 		});
 		test('clickanddrag, outside limits', () => {
@@ -589,7 +589,7 @@ describe('NewBoundingBox', () => {
 				x: 1,
 				y: 2,
 				width: 99,
-				height: 4
+				height: 4,
 			});
 		});
 		test('2-points', () => {
@@ -600,7 +600,7 @@ describe('NewBoundingBox', () => {
 				x: 1,
 				y: 2,
 				width: 2,
-				height: 2
+				height: 2,
 			});
 		});
 		test('4-points', () => {
@@ -613,7 +613,7 @@ describe('NewBoundingBox', () => {
 				x: 1,
 				y: 2,
 				width: 6,
-				height: 6
+				height: 6,
 			});
 		});
 		test('createMode off', () => {
@@ -624,7 +624,7 @@ describe('NewBoundingBox', () => {
 				x: 0,
 				y: 0,
 				width: 0,
-				height: 0
+				height: 0,
 			});
 		});
 	});
@@ -637,7 +637,7 @@ describe('NewBoundingBox', () => {
 			y: 2,
 			width: 3,
 			height: 4,
-			dragDirection: { x: 1, y: 1 }
+			dragDirection: { x: 1, y: 1 },
 		});
 		bb.reset();
 		expect(bb.clickanddrag).toEqual({
@@ -645,7 +645,7 @@ describe('NewBoundingBox', () => {
 			y: 0,
 			width: 0,
 			height: 0,
-			dragDirection: { x: 0, y: 0 }
+			dragDirection: { x: 0, y: 0 },
 		});
 		expect(bb.points).toEqual([]);
 		expect(bb.limits).toEqual({ x: 0, y: 0, width: 100, height: 100 });

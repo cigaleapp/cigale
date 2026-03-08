@@ -24,7 +24,7 @@
 				metadata,
 				name: filename,
 				virtual: false,
-				data: tables.Image.getFromState(id)
+				data: tables.Image.getFromState(id),
 			})),
 			// Since id can (and mostly is) fileId, we have to uniquify
 			// by the id because multiple Images can reference the same ImageFile
@@ -37,8 +37,8 @@
 			name,
 			metadata: {},
 			virtual: true,
-			data: null
-		}))
+			data: null,
+		})),
 	]);
 
 	const empty = $derived(allImages.length === 0);

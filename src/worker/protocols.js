@@ -68,16 +68,19 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 			metadata: [
 				...p.importedMetadata.map((imported) => imported.target),
 				...keys(p.metadata),
-				...keys(p.sessionMetadata)
+				...keys(p.sessionMetadata),
 			],
 			sessionMetadata: keys(p.sessionMetadata),
-			metadataGroups: entries(p.metadataGroups ?? {}).map(([id, group]) => ({ id, ...group }))
+			metadataGroups: entries(p.metadataGroups ?? {}).map(([id, group]) => ({
+				id,
+				...group,
+			})),
 		});
 		console.timeEnd('Storing Protocol');
 
 		for (const [id, metadata] of entries({
 			...p.metadata,
-			...p.sessionMetadata
+			...p.sessionMetadata,
 		})) {
 			if (typeof metadata === 'string') continue;
 
@@ -101,7 +104,7 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 					id: metadataOptionId(namespacedMetadataId(p.id, id), option.key),
 					metadataId: namespacedMetadataId(p.id, id),
 					index: i,
-					...option
+					...option,
 				});
 
 				if (option.icon) {
@@ -114,7 +117,7 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 		if (p.id === protocol.id) {
 			return {
 				...pick(p, 'id', 'name', 'version'),
-				iconsToPreload: [...iconsToPreload]
+				iconsToPreload: [...iconsToPreload],
 			};
 		}
 	}

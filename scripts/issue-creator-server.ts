@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+
 import arkenv from 'arkenv';
 import { ArkErrors } from 'arktype';
 import { App } from 'octokit';
@@ -9,12 +10,12 @@ const env = arkenv({
 	GITHUB_APP_ID: 'string > 0',
 	GITHUB_APP_INSTALLATION_ID: 'string.integer.parse',
 	GITHUB_APP_KEY_FILE: 'string > 0',
-	PORT: 'number.port'
+	PORT: 'number.port',
 });
 
 const reporter = new App({
 	appId: env.GITHUB_APP_ID,
-	privateKey: readFileSync(env.GITHUB_APP_KEY_FILE, 'utf8')
+	privateKey: readFileSync(env.GITHUB_APP_KEY_FILE, 'utf8'),
 });
 
 const github = await reporter.getInstallationOctokit(env.GITHUB_APP_INSTALLATION_ID);
@@ -26,13 +27,13 @@ Bun.serve({
 			const user = await github.rest.users.getAuthenticated();
 			return Response.json({
 				'Connected as': user.data.login,
-				'POST /submit': IssueCreatorRequest.toJsonSchema()
+				'POST /submit': IssueCreatorRequest.toJsonSchema(),
 			});
 		},
 		'/submit': {
 			async OPTIONS() {
 				return new Response(null, {
-					status: 204
+					status: 204,
 				});
 			},
 			async POST(request) {
@@ -41,11 +42,11 @@ Bun.serve({
 					return Response.json(
 						{
 							summary: data.summary,
-							errors: data
+							errors: data,
 						},
 						{
 							status: 400,
-							headers: { 'Content-Type': 'application/json' }
+							headers: { 'Content-Type': 'application/json' },
 						}
 					);
 				}
@@ -60,7 +61,7 @@ Bun.serve({
 						type: type === 'bug' ? 'Bug' : 'Feature',
 						body: `${body}\n\n---\n\n${Object.entries(metadata)
 							.map(([k, v]) => `- **${k}**: ${v}`)
-							.join('\n')}`
+							.join('\n')}`,
 					});
 
 					return Response.json({ url: issue.data.html_url });
@@ -71,12 +72,12 @@ Bun.serve({
 						{ status: 500, headers: { 'Content-Type': 'application/json' } }
 					);
 				}
-			}
-		}
+			},
+		},
 	},
 	fetch() {
 		return new Response('Not found', { status: 404 });
-	}
+	},
 });
 
 console.info(`Listening on :${env.PORT}`);
