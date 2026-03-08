@@ -1,5 +1,8 @@
 import { exists, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import type { MetadataEnumVariant } from '../src/lib/schemas/metadata.js';
+import type { ExportedProtocol } from '../src/lib/schemas/protocols.js';
+
 import arkenv from 'arkenv';
 import { ArkErrors, type } from 'arktype';
 import { Estimation as ETA } from 'arrival-time';
@@ -9,8 +12,6 @@ import { JSDOM } from 'jsdom';
 import Turndown from 'turndown';
 
 import _protocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
-import type { MetadataEnumVariant } from '../src/lib/schemas/metadata.js';
-import type { ExportedProtocol } from '../src/lib/schemas/protocols.js';
 import {
 	align,
 	chunkBySize,
@@ -19,7 +20,7 @@ import {
 	emitCheckrun,
 	percentage,
 	updateCheckrunProgress,
-	yellow
+	yellow,
 } from './utils.js';
 
 const protocol = _protocol as typeof ExportedProtocol.infer;
@@ -27,7 +28,7 @@ const protocol = _protocol as typeof ExportedProtocol.infer;
 const env = arkenv({
 	WORDPRESS_USERNAME: 'string > 0',
 	WORDPRESS_APP_PASSWORD: /(\w{4} ?){6}/,
-	LIMIT: ['number >= 0', '=', Infinity]
+	LIMIT: ['number >= 0', '=', Infinity],
 });
 
 // Suppress annoying virtual console error we can't do anything about and don't care about
@@ -39,17 +40,17 @@ virtualConsole.on('error', (e) => {
 
 const RichContent = type({ rendered: 'string', raw: 'string' }).pipe((content) => ({
 	raw: new JSDOM(content.raw, {
-		virtualConsole
+		virtualConsole,
 	}),
 	rendered: new JSDOM(content.rendered, {
-		virtualConsole
-	})
+		virtualConsole,
+	}),
 }));
 
 const OGImage = type({
 	url: 'string.url.parse',
 	width: 'string.integer.parse | number | ""',
-	height: 'string.integer.parse | number | ""'
+	height: 'string.integer.parse | number | ""',
 });
 
 const WordpressPage = type({
@@ -66,8 +67,8 @@ const WordpressPage = type({
 	yoast_head_json: {
 		canonical: 'string.url.parse',
 		og_description: 'string = ""',
-		og_image: OGImage.array().default(() => [])
-	}
+		og_image: OGImage.array().default(() => []),
+	},
 });
 
 const WordpressPagesResponse = WordpressPage.array().atLeastLength(1);
@@ -80,7 +81,7 @@ const LINKS_TO_AVOID = [
 	// FIXME 404 not found
 	'https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/curculionidae/aulacobaris-sp/',
 	// FIXME redirects to an image file
-	'https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/chrysomelidae/timarcha-sp/'
+	'https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/chrysomelidae/timarcha-sp/',
 ];
 
 const cleanedTextContent = (node: Element) =>
@@ -260,7 +261,7 @@ async function searchFor(metadataKey: string) {
 	const nameToGbifID = new Map<string, string>(
 		protocol.metadata[`${protocol.id}__${metadataKey}`].options!.flatMap((o) => [
 			[o.label, o.key] as const,
-			...(o.synonyms ?? []).map((syn) => [syn, o.key] as const)
+			...(o.synonyms ?? []).map((syn) => [syn, o.key] as const),
 		])
 	);
 
@@ -359,7 +360,7 @@ async function augmentMetadataOption(
 		easy: 'facile',
 		medium: 'moyenne',
 		hard: 'difficile',
-		very_hard: 'tres-difficile'
+		very_hard: 'tres-difficile',
 	})) {
 		if (hasImageWithFilename(`Id-${niveau}.jpg`)) {
 			cascade.identification_difficulty = key;
@@ -422,7 +423,7 @@ async function augmentMetadataOption(
 		learnMore: page.yoast_head_json.canonical.toString(),
 		description: htmlToMarkdown(content.innerHTML).trim(),
 		images: images.map((u) => u.toString()),
-		cascade
+		cascade,
 	};
 }
 
@@ -445,8 +446,8 @@ async function fetchPagesViaWordpressAPI(
 	const response = await fetch(`https://jessica-joachim.com/wp-json/wp/v2/pages?${query}`, {
 		headers: {
 			Authorization:
-				'Basic ' + btoa(`${env.WORDPRESS_USERNAME}:${env.WORDPRESS_APP_PASSWORD}`)
-		}
+				'Basic ' + btoa(`${env.WORDPRESS_USERNAME}:${env.WORDPRESS_APP_PASSWORD}`),
+		},
 	});
 
 	// Handle rate limiting
@@ -470,7 +471,7 @@ async function fetchPagesViaWordpressAPI(
 		await new Promise((resolve) => setTimeout(resolve, secondsToMilliseconds(waitTime)));
 
 		return fetchPagesViaWordpressAPI(lookups, {
-			rateLimitWaitSeconds: rateLimitWaitSeconds * Math.E
+			rateLimitWaitSeconds: rateLimitWaitSeconds * Math.E,
 		});
 	}
 
@@ -521,7 +522,7 @@ function extractPageParams(page: URL) {
 
 	return {
 		id: undefined,
-		slug: lastPathSegment(page) || undefined
+		slug: lastPathSegment(page) || undefined,
 	};
 }
 

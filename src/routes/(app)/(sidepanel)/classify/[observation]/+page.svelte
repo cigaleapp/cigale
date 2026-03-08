@@ -3,14 +3,16 @@
 </script>
 
 <script lang="ts">
-	import { marked } from 'marked';
+	import type { CascadeLabelsCache } from '$lib/cascades';
 	import type { Attachment } from 'svelte/attachments';
+
+	import { marked } from 'marked';
 	import { fade } from 'svelte/transition';
 
 	import IconDescription from '~icons/ri/align-left';
 	import IconCascades from '~icons/ri/corner-right-down-fill';
 	import IconSynonyms from '~icons/ri/links-line';
-	import { cascadeLabels, type CascadeLabelsCache } from '$lib/cascades';
+	import { cascadeLabels } from '$lib/cascades';
 	import Field from '$lib/Field.svelte';
 	import { openDatabase } from '$lib/idb.svelte.js';
 	import LearnMoreLink from '$lib/LearnMoreLink.svelte';
@@ -37,7 +39,7 @@
 		navigation,
 		focusedMetadata,
 		metadataDefinitions,
-		allOptions: options
+		allOptions: options,
 	} = $derived(data);
 
 	const cascadeLabelsCache: CascadeLabelsCache = $state({});
@@ -51,7 +53,7 @@
 		const metadata = observationMetadata({
 			definitions: metadataDefinitions,
 			observation,
-			images
+			images,
 		});
 		return getMetadataValue({ metadata }, 'enum', focusedMetadata.id);
 	});

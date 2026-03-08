@@ -15,6 +15,7 @@
 	import '$lib/skeleton-font.css';
 
 	import type { Snippet } from 'svelte';
+
 	import { fade } from 'svelte/transition';
 
 	interface Props {

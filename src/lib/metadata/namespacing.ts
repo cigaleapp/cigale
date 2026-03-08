@@ -1,5 +1,6 @@
 import type * as DB from '$lib/database.js';
 import type { NamespacedMetadataID } from '$lib/schemas/common.js';
+
 import { removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';
 import { fromEntries } from '$lib/utils.js';
 

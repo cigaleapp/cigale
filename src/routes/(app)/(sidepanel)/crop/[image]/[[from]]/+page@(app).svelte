@@ -30,7 +30,7 @@
 		coordsScaler,
 		FULL_IMAGE_CROPBOX,
 		toCenteredCoords,
-		toTopLeftCoords
+		toTopLeftCoords,
 	} from '$lib/BoundingBoxes.svelte';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonInk from '$lib/ButtonInk.svelte';
@@ -47,7 +47,7 @@
 		imageIdToFileId,
 		imagesOfImageFile,
 		imageId as makeImageId,
-		parseImageId
+		parseImageId,
 	} from '$lib/images.js';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
 	import KeyboardHint from '$lib/KeyboardHint.svelte';
@@ -56,7 +56,7 @@
 		assertIs,
 		deleteMetadataValue,
 		hasRuntimeType,
-		storeMetadataValue
+		storeMetadataValue,
 	} from '$lib/metadata/index.js';
 	import OverflowableText from '$lib/OverflowableText.svelte';
 	import { goto } from '$lib/paths.js';
@@ -78,7 +78,7 @@
 		pick,
 		range,
 		sign,
-		throwError
+		throwError,
 	} from '$lib/utils';
 
 	/**
@@ -125,7 +125,7 @@
 			transformable: true,
 			createMode: 'clickanddrag',
 			movable: true,
-			cursor: 'crosshair'
+			cursor: 'crosshair',
 		},
 		{
 			name: '2 points',
@@ -135,7 +135,7 @@
 			transformable: false,
 			createMode: '2point',
 			movable: false,
-			cursor: 'crosshair'
+			cursor: 'crosshair',
 		},
 		{
 			name: '4 points',
@@ -145,7 +145,7 @@
 			transformable: false,
 			createMode: '4point',
 			movable: false,
-			cursor: 'crosshair'
+			cursor: 'crosshair',
 		},
 		{
 			name: 'Déplacer',
@@ -155,7 +155,7 @@
 			transformable: false,
 			createMode: 'off',
 			movable: true,
-			cursor: 'pointer'
+			cursor: 'pointer',
 		},
 		{
 			name: 'Main',
@@ -165,8 +165,8 @@
 			transformable: false,
 			createMode: 'off',
 			movable: false,
-			cursor: 'grab'
-		}
+			cursor: 'grab',
+		},
 	]);
 
 	const creationTools = $derived(tools.filter(({ createMode }) => createMode !== 'off'));
@@ -236,8 +236,8 @@
 						image.id,
 						{
 							value: JSON.parse(stringValue),
-							confidence
-						}
+							confidence,
+						},
 					];
 				}
 
@@ -293,7 +293,7 @@
 				manuallyModified: true,
 				value: FULL_IMAGE_CROPBOX,
 				alternatives: {},
-				confirmed: true
+				confirmed: true,
 			};
 		}
 
@@ -304,7 +304,7 @@
 			subjectId: image.id,
 			type: 'boundingbox',
 			...value,
-			confirmed
+			confirmed,
 		});
 	}
 
@@ -339,7 +339,7 @@
 			metadataId: uiState.cropMetadataId,
 			type: 'boundingbox',
 			manuallyModified: false,
-			...initialCrop
+			...initialCrop,
 		});
 
 		if (uiState.classificationMetadataId) {
@@ -347,7 +347,7 @@
 				db: idb.databaseHandle(),
 				sessionId: uiState.currentSessionId,
 				metadataId: uiState.classificationMetadataId,
-				subjectId: imageId
+				subjectId: imageId,
 			});
 		}
 	}
@@ -361,7 +361,7 @@
 					image.id,
 					initial &&
 						hasRuntimeType('boundingbox', current) &&
-						!coordsAreEqual(initial, current)
+						!coordsAreEqual(initial, current),
 				];
 			})
 		)
@@ -410,7 +410,7 @@
 		if (!skipUndo) {
 			undo.push('crop/box/delete', {
 				imageId,
-				box: boundingBoxes[imageId]
+				box: boundingBoxes[imageId],
 			});
 		}
 
@@ -419,7 +419,7 @@
 				db: idb.databaseHandle(),
 				sessionId: uiState.currentSession?.id,
 				metadataId: uiState.cropMetadataId,
-				subjectId: imageId
+				subjectId: imageId,
 			});
 		} else {
 			await idb.tables.Image.remove(imageId);
@@ -479,7 +479,7 @@
 					db: idb.databaseHandle(),
 					sessionId: uiState.currentSessionId,
 					metadataId: uiState.classificationMetadataId,
-					subjectId: image.id
+					subjectId: image.id,
 				});
 			}
 		}
@@ -491,7 +491,7 @@
 				undo.push('crop/box/edit', {
 					imageId,
 					before: boundingBoxes[imageId],
-					after: toCenteredCoords(newBoundingBox)
+					after: toCenteredCoords(newBoundingBox),
 				});
 			}
 
@@ -506,7 +506,7 @@
 				confidence: 1,
 				// Put the neural-network-inferred (initial) value in the alternatives as a backup
 				alternatives: initialCrops[imageId] ? [initialCrops[imageId]] : [],
-				manuallyModified: true
+				manuallyModified: true,
 			});
 		} else if (
 			images.length === 1 &&
@@ -519,7 +519,7 @@
 			if (pushToUndoStack) {
 				undo.push('crop/box/create', {
 					imageId: newImageId,
-					box: toCenteredCoords(newBoundingBox)
+					box: toCenteredCoords(newBoundingBox),
 				});
 			}
 
@@ -532,7 +532,7 @@
 				value: toCenteredCoords(newBoundingBox),
 				confidence: 1,
 				manuallyModified: true,
-				alternatives: []
+				alternatives: [],
 			});
 		} else {
 			// We're creating a >1st cropbox
@@ -544,7 +544,7 @@
 			if (pushToUndoStack) {
 				undo.push('crop/box/create', {
 					imageId: newImageId,
-					box: toCenteredCoords(newBoundingBox)
+					box: toCenteredCoords(newBoundingBox),
 				});
 			}
 
@@ -562,9 +562,9 @@
 						confidence: 1,
 						manuallyModified: true,
 						confirmed: true,
-						alternatives: {}
-					}
-				}
+						alternatives: {},
+					},
+				},
 			});
 		}
 
@@ -629,7 +629,7 @@
 		if (!firstImage) return [0, 0];
 		const scaler = coordsScaler({
 			x: firstImage.dimensions.width,
-			y: firstImage.dimensions.height
+			y: firstImage.dimensions.height,
 		});
 
 		const { w, h } = mapValues(scaler(box), Math.round);
@@ -659,40 +659,40 @@
 	 */
 	let selectedBox = $state({
 		imageId: null,
-		manual: false
+		manual: false,
 	});
 
 	defineKeyboardShortcuts('cropping', {
 		ArrowLeft: {
 			help: 'Image précédente',
 			when: () => Boolean(prevFileId),
-			do: () => goto('/(app)/(sidepanel)/crop/[image]', { image: prevFileId })
+			do: () => goto('/(app)/(sidepanel)/crop/[image]', { image: prevFileId }),
 		},
 		'Shift+Space': {
 			help: 'Image précédente',
 			when: () => Boolean(prevFileId),
-			do: () => goto('/(app)/(sidepanel)/crop/[image]', { image: prevFileId })
+			do: () => goto('/(app)/(sidepanel)/crop/[image]', { image: prevFileId }),
 		},
 		ArrowRight: {
 			help: 'Image suivante',
 			when: () => Boolean(nextFileId),
-			do: () => goto('/(app)/(sidepanel)/crop/[image]', { image: nextFileId })
+			do: () => goto('/(app)/(sidepanel)/crop/[image]', { image: nextFileId }),
 		},
 		Space: {
 			help: 'Continuer',
-			do: moveToNextUnconfirmed
+			do: moveToNextUnconfirmed,
 		},
 		'$mod+Delete': {
 			help: 'Supprimer l’image',
-			do: deleteImageFileAndGotoNext
+			do: deleteImageFileAndGotoNext,
 		},
 		Escape: {
 			help: 'Quitter le mode recadrage',
-			do: exit
+			do: exit,
 		},
 		a: {
 			help: 'Activer/désactiver la continuation automatique',
-			do: async () => toggleSetting('cropAutoNext')
+			do: async () => toggleSetting('cropAutoNext'),
 		},
 		Delete: {
 			help: 'Supprimer la boîte sélectionnée',
@@ -708,7 +708,7 @@
 					selectedBox.imageId =
 						images.toReversed().find((image) => image.id in boundingBoxes)?.id ?? null;
 				}
-			}
+			},
 		},
 		f: {
 			help: 'Cacher les boîtes non sélectionnées',
@@ -720,7 +720,7 @@
 				} else if (selectedBox.imageId) {
 					focusedImageId = selectedBox.imageId;
 				}
-			}
+			},
 		},
 		u: {
 			help: "Revenir au recadrage d'origine",
@@ -728,41 +728,41 @@
 			do: () => {
 				if (!revertableCrops[fileId]) return;
 				revertToInferredCrop(fileId);
-			}
+			},
 		},
 		'$mod+u': {
 			help: "Revenir au recadrage d'origine pour toutes les boîtes",
 			when: () => Object.keys(boundingBoxes).length > 0,
-			do: revertAll
+			do: revertAll,
 		},
 		ArrowUp: {
 			help: 'Marquer le recadrage comme confirmé',
 			when: () => !hasConfirmedCrop(fileId),
-			do: () => changeAllConfirmedStatuses(true)
+			do: () => changeAllConfirmedStatuses(true),
 		},
 		ArrowDown: {
 			help: 'Marquer le recadrage comme non confirmé',
 			when: () => hasConfirmedCrop(fileId),
-			do: () => changeAllConfirmedStatuses(false)
+			do: () => changeAllConfirmedStatuses(false),
 		},
 		'+': {
 			help: 'Zoomer',
 			do: () => {
 				zoom.scale = clamp(1, zoom.scale + 4 * zoomSpeed, 10);
-			}
+			},
 		},
 		'-': {
 			help: 'Dézoomer',
 			do: () => {
 				zoom.scale = clamp(1, zoom.scale - 4 * zoomSpeed, 10);
-			}
+			},
 		},
 		Digit0: {
 			help: 'Réinitialiser le zoom',
 			do: () => {
 				zoom.origin = { x: 0, y: 0 };
 				zoom.scale = 1;
-			}
+			},
 		},
 		...fromEntries(
 			tools.map((tool) => [
@@ -771,8 +771,8 @@
 					help: `Choisir l'outil ${tool.name}`,
 					do: () => {
 						activeToolName = tool.name;
-					}
-				}
+					},
+				},
 			])
 		),
 		',': {
@@ -782,7 +782,7 @@
 				const currentIndex = imageIds.indexOf(selectedBox.imageId ?? '');
 				const prevIndex = (currentIndex - 1 + imageIds.length) % imageIds.length;
 				selectedBox.imageId = imageIds[prevIndex];
-			}
+			},
 		},
 		';': {
 			help: 'Sélectionner la boîte suivante',
@@ -791,7 +791,7 @@
 				const currentIndex = imageIds.indexOf(selectedBox.imageId ?? '');
 				const nextIndex = (currentIndex + 1) % imageIds.length;
 				selectedBox.imageId = imageIds[nextIndex];
-			}
+			},
 		},
 		...fromEntries(
 			range(1, 10).map((i) => [
@@ -808,8 +808,8 @@
 							selectedBox.imageId = imageId;
 							selectedBox.manual = true;
 						}
-					}
-				}
+					},
+				},
 			])
 		),
 		'd e v +': {
@@ -823,8 +823,8 @@
 					.map(Number.parseFloat);
 
 				await onCropChange(null, toTopLeftCoords({ x, y, w, h }));
-			}
-		}
+			},
+		},
 	});
 
 	// Scroll to selected box
@@ -833,7 +833,7 @@
 		document.querySelector(`.boxes li.selected`)?.scrollIntoView({
 			behavior: 'smooth',
 			block: 'nearest',
-			inline: 'nearest'
+			inline: 'nearest',
 		});
 	});
 
@@ -875,7 +875,7 @@
 			zoom.panStart = {
 				x: e.clientX,
 				y: e.clientY,
-				zoomOrigin: $state.snapshot(zoom.origin)
+				zoomOrigin: $state.snapshot(zoom.origin),
 			};
 		}}
 		onmouseup={async ({ button }) => {
@@ -958,7 +958,7 @@
 				use:tooltip={{
 					text: `${tool.name}: ${tool.help}`,
 					keyboard: tool.shortcut,
-					placement: 'right'
+					placement: 'right',
 				}}
 				onclick={() => {
 					activeToolName = tool.name;
@@ -1007,7 +1007,7 @@
 					onclick={deleteImageFileAndGotoNext}
 					help={{
 						text: 'Supprimer cette image et passer à la suivante',
-						keyboard: '$mod+Delete'
+						keyboard: '$mod+Delete',
 					}}
 				>
 					<IconDelete />
@@ -1207,7 +1207,7 @@
 					class="auto"
 					use:tooltip={{
 						text: "Passer automatiquement à l'image suivante quand celle-ci est recadrée",
-						keyboard: 'A'
+						keyboard: 'A',
 					}}
 				>
 					<Switch

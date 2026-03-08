@@ -1,5 +1,6 @@
 import { writeFile } from 'node:fs/promises';
 import path from 'node:path';
+
 import { type } from 'arktype';
 
 import { Analysis } from '../src/lib/schemas/exports.js';
@@ -17,7 +18,7 @@ async function exportJsonSchema(name, schema) {
 	console.info(`Exporting JSON Schema for ${name}…`);
 	let schemaObject = {
 		$schema: 'https://json-schema.org/draft-07/schema',
-		...schema.in.toJsonSchema()
+		...schema.in.toJsonSchema(),
 	};
 
 	// Remove any key that as a value matching a $ark.object
@@ -57,7 +58,7 @@ if (import.meta.vitest) {
 				a: 1,
 				b: { $ark: { object1: true } },
 				c: 3,
-				d: { $ark: { object2: true } }
+				d: { $ark: { object2: true } },
 			};
 			const result = deleteKeys(
 				input,

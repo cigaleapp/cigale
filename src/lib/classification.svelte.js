@@ -36,8 +36,8 @@ export async function classifyImage(swarpc, id, cancellers) {
 		taskSettings,
 		metadataIds: {
 			cropbox: uiState.cropMetadataId,
-			target: uiState.classificationMetadataId
-		}
+			target: uiState.classificationMetadataId,
+		},
 	});
 
 	cancellers?.set(id, cancel);
@@ -53,7 +53,7 @@ export async function classifyImage(swarpc, id, cancellers) {
 				db: databaseHandle(),
 				subjectId: id,
 				sessionId: uiState.currentSessionId,
-				metadataId: uiState.classificationMetadataId
+				metadataId: uiState.classificationMetadataId,
 			},
 			{
 				kind: 'inference',
@@ -63,8 +63,8 @@ export async function classifyImage(swarpc, id, cancellers) {
 				details: {
 					taskSettings,
 					image: await tables.Image.get(id),
-					fullError: safeJSONStringify(error)
-				}
+					fullError: safeJSONStringify(error),
+				},
 			}
 		);
 	}

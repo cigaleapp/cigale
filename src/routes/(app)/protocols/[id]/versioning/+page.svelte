@@ -39,7 +39,7 @@
 		progress: 0,
 		get loading() {
 			return this.progress > 0.02 && this.progress < 1;
-		}
+		},
 	});
 
 	async function computeChangesWithUpstream() {
@@ -67,7 +67,7 @@
 		upgrading: 'Mise à jour...',
 		uptodate: '',
 		available: 'Mise à jour disponible',
-		error: 'Erreur lors de la mise à jour'
+		error: 'Erreur lors de la mise à jour',
 	};
 </script>
 

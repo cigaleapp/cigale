@@ -17,7 +17,7 @@
 		if (wasOnOptionPage) {
 			await goto('/(app)/protocols/[id]/metadata/[metadata]/options', {
 				id: page.params.id ?? '',
-				metadata: page.params.metadata ?? ''
+				metadata: page.params.metadata ?? '',
 			});
 		}
 
@@ -35,10 +35,10 @@
 					await goto('/(app)/protocols/[id]/metadata/[metadata]/options/[option]', {
 						id: page.params.id ?? '',
 						metadata: page.params.metadata ?? '',
-						option: key
+						option: key,
 					});
 				}
-			}
+			},
 		});
 	}
 </script>
@@ -98,7 +98,7 @@
 				metadataId: data.metadata.id,
 				key,
 				label: nameInput.value,
-				description: ''
+				description: '',
 			});
 
 			nameInput.value = '';
@@ -107,7 +107,7 @@
 			await goto('/(app)/protocols/[id]/metadata/[metadata]/options/[option]', {
 				id: data.protocol.id,
 				metadata: removeNamespaceFromMetadataId(data.metadata.id),
-				option: key
+				option: key,
 			});
 		} catch (error) {
 			toasts.error(errorMessage(error, "Impossible de créer l'option"));
@@ -153,7 +153,7 @@
 							{
 								id: data.protocol.id,
 								metadata: removeNamespaceFromMetadataId(data.metadata.id),
-								option: key
+								option: key,
 							}
 						)}
 					>

@@ -2,7 +2,7 @@ import { Schemas } from './database.js';
 import {
 	metadataOptionId,
 	namespacedMetadataId,
-	parseMetadataOptionId
+	parseMetadataOptionId,
 } from './schemas/metadata.js';
 import { entries, groupBy, nonnull, pick, sum } from './utils.js';
 
@@ -65,12 +65,12 @@ export async function computeCascades({
 	metadataId,
 	confidence,
 	value,
-	alternatives: _alternatives
+	alternatives: _alternatives,
 }) {
 	const alternatives = !Array.isArray(_alternatives)
 		? Object.entries(_alternatives).map(([value, confidence]) => ({
 				value: /** @type {RuntimeValue} */ (JSON.parse(value)),
-				confidence
+				confidence,
 			}))
 		: _alternatives;
 
@@ -91,7 +91,7 @@ export async function computeCascades({
 			options.filter(nonnull).flatMap(({ cascade, confidence }) => {
 				return entries(cascade).map(([metadataId, value]) => ({
 					optionId: metadataOptionId(metadataId, value),
-					confidence
+					confidence,
 				}));
 			}),
 			(c) => c.optionId,
@@ -107,7 +107,7 @@ export async function computeCascades({
 			([optionId, confidences]) =>
 				/** @type {const} */ ({
 					value: parseMetadataOptionId(optionId).key,
-					confidence: sum(confidences)
+					confidence: sum(confidences),
 				})
 		);
 
@@ -121,7 +121,7 @@ export async function computeCascades({
 				metadataId,
 				value,
 				confidence,
-				alternatives
+				alternatives,
 			};
 		});
 	});
@@ -181,7 +181,7 @@ export async function cascadeLabels({ cache, protocolId, option, db }) {
 					value: option.label,
 					metadata: metadata.label,
 					depth,
-					...pick(option, 'color', 'icon')
+					...pick(option, 'color', 'icon'),
 				};
 
 				if (Object.keys(option.cascade ?? {}).length > 0) {
@@ -196,7 +196,7 @@ export async function cascadeLabels({ cache, protocolId, option, db }) {
 				labels[metadata.id] = {
 					value: value,
 					metadata: metadata.label,
-					depth
+					depth,
 				};
 			}
 		}

@@ -21,7 +21,7 @@ export async function load({ params: { id }, depends }) {
 			protocol: null,
 			sessionMetadata: [],
 			sessionMetadataOptions: {},
-			counts: { observations: 0, images: 0 }
+			counts: { observations: 0, images: 0 },
 		};
 	}
 
@@ -30,7 +30,7 @@ export async function load({ params: { id }, depends }) {
 	// ).then((defs) => defs.filter(nonnull));
 	const sessionMetadataDefs = await tables.Metadata.getMany([
 		...protocol.sessionMetadata,
-		...protocol.importedMetadata.filter((imp) => imp.sessionwide).map((imp) => imp.source)
+		...protocol.importedMetadata.filter((imp) => imp.sessionwide).map((imp) => imp.source),
 	]);
 
 	sessionMetadataDefs.forEach(({ id }) => depends(idb.dependencyURI('Metadata', id)));
@@ -42,7 +42,7 @@ export async function load({ params: { id }, depends }) {
 			def.id,
 			def.type === 'enum'
 				? await idb.list('MetadataOption', metadataOptionsKeyRange(protocol.id, def.id))
-				: []
+				: [],
 		])
 	).then((options) => Object.fromEntries(options));
 
@@ -50,13 +50,13 @@ export async function load({ params: { id }, depends }) {
 		observations: await idb
 			.listByIndex('Observation', 'sessionId', session.id)
 			.then((obs) => obs.length),
-		images: await idb.listByIndex('Image', 'sessionId', session.id).then((imgs) => imgs.length)
+		images: await idb.listByIndex('Image', 'sessionId', session.id).then((imgs) => imgs.length),
 	};
 
 	await resolveDefaults({
 		db: idb.databaseHandle(),
 		sessionId: session.id,
-		metadataToConsider: sessionMetadataDefs.map(({ id }) => id)
+		metadataToConsider: sessionMetadataDefs.map(({ id }) => id),
 	});
 
 	session = await tables.Session.get(id);
@@ -64,7 +64,7 @@ export async function load({ params: { id }, depends }) {
 
 	const sessionMetadata = sessionMetadataDefs.map((def) => ({
 		def,
-		value: session.metadata?.[def.id]
+		value: session.metadata?.[def.id],
 	}));
 
 	return { session, protocol, sessionMetadata, sessionMetadataOptions, counts };

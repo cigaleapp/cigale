@@ -23,8 +23,8 @@ export function observationCard(page, label) {
 		.getByRole('article')
 		.filter({
 			has: page.getByRole('heading', {
-				name: label
-			})
+				name: label,
+			}),
 		})
 		.first();
 }
@@ -43,7 +43,7 @@ export async function imagesByName(app) {
 			(await app.db.image.byFilename('cyan.jpeg')) ?? throwError('Image cyan.jpeg not found'),
 		withExifGps:
 			(await app.db.image.byFilename('with-exif-gps.jpeg')) ??
-			throwError('Image with-exif-gps.jpeg not found')
+			throwError('Image with-exif-gps.jpeg not found'),
 	};
 }
 
@@ -61,6 +61,6 @@ export async function observationsByLabel(app) {
 			(await app.db.observation.byLabel('cyan')) ?? throwError('Observation cyan not found'),
 		withExifGps:
 			(await app.db.observation.byLabel('with-exif-gps')) ??
-			throwError('Observation with-exif-gps not found')
+			throwError('Observation with-exif-gps not found'),
 	};
 }

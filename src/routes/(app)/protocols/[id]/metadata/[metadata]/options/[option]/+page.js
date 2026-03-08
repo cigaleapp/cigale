@@ -33,7 +33,7 @@ export async function load({ parent, params }) {
 				metadataId: fullMetadataId,
 				metadata,
 				option,
-				value
+				value,
 			};
 		})
 	);
@@ -51,7 +51,7 @@ export async function load({ parent, params }) {
 					value: o.key,
 					metadataId: metadata.id,
 					metadata,
-					option: o
+					option: o,
 				}));
 		})
 	).then((results) => results.flat());
@@ -61,6 +61,6 @@ export async function load({ parent, params }) {
 		metadata,
 		option,
 		cascades,
-		reverseCascades
+		reverseCascades,
 	};
 }

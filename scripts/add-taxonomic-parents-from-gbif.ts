@@ -1,5 +1,6 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+
 import { warning } from '@actions/core';
 import { Estimation as ETA } from 'arrival-time';
 import { formatDistanceToNowStrict, millisecondsToHours } from 'date-fns';
@@ -26,7 +27,7 @@ const IUCN_GBIF_TO_TWO_LETTER_CODE = {
 	LEAST_CONCERN: 'lc',
 	DATA_DEFICIENT: 'dd',
 	NOT_APPLICABLE: 'na',
-	NOT_EVALUATED: 'ne'
+	NOT_EVALUATED: 'ne',
 } as const satisfies Record<GbifIucnRedListCategory['category'], string>;
 
 const onlineCacheUrl = 'https://github.com/cigaleapp/models/raw/refs/heads/main/gbif.json';
@@ -139,7 +140,7 @@ for (const [i, { key }] of options.entries()) {
 		order: species.orderKey?.toString(),
 		class: species.classKey?.toString(),
 		phylum: species.phylumKey?.toString(),
-		kingdom: species.kingdomKey?.toString()
+		kingdom: species.kingdomKey?.toString(),
 	};
 
 	if (!Object.values(keys).every(Boolean)) {
@@ -219,7 +220,7 @@ async function setICUNStatus(
 	}
 
 	const { category } = (await fetchWithCache(`${Number(key)}/iucnRedListCategory`)) ?? {
-		category: 'NOT_EVALUATED'
+		category: 'NOT_EVALUATED',
 	};
 
 	const code = IUCN_GBIF_TO_TWO_LETTER_CODE[category] ?? 'ne';
@@ -295,7 +296,7 @@ async function addToOptions(
 		key,
 		label,
 		description,
-		learnMore: `https://gbif.org/species/${key}`
+		learnMore: `https://gbif.org/species/${key}`,
 	} as MetadataEnumVariant);
 
 	if (rest.length > 0) {

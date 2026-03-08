@@ -1,12 +1,14 @@
 <script lang="ts">
-	import { page } from '$app/state';
-	import Carousel, { type Props as CarouselProps } from '$lib/Carousel.svelte';
+	import type { Expandable } from './+page.svelte';
+	import type { Props as CarouselProps } from '$lib/Carousel.svelte';
 	import type { MetadataEnumVariant } from '$lib/database';
+
+	import { page } from '$app/state';
+	import Carousel from '$lib/Carousel.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import Logo from '$lib/Logo.svelte';
 	import { uiState } from '$lib/state.svelte';
 
-	import type { Expandable } from './+page.svelte';
 	import WithExpandButton from './WithExpandButton.svelte';
 
 	interface Props {
@@ -24,18 +26,18 @@
 	defineKeyboardShortcuts('classification', {
 		'Shift+L': {
 			help: 'Image de référence suivante',
-			do: () => carouselScrollers?.next()
+			do: () => carouselScrollers?.next(),
 		},
 		'Shift+J': {
 			help: 'Image de référence précédente',
-			do: () => carouselScrollers?.prev()
+			do: () => carouselScrollers?.prev(),
 		},
 		E: {
 			help: 'Agrandir/Réduire les images de référence',
 			do: () => {
 				expand = expand === 'references' ? 'none' : 'references';
-			}
-		}
+			},
+		},
 	});
 </script>
 

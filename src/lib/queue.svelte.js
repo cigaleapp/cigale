@@ -182,7 +182,7 @@ class ProcessingQueue {
 			uiState.processing.files.push({
 				name: task.importing.file.name,
 				id: task.importing.id,
-				addedAt: new Date()
+				addedAt: new Date(),
 			});
 	}
 
@@ -275,13 +275,13 @@ export function importMore(files) {
 					id: imageFileId(),
 					// Attach all sidecar files to each task
 					// Should be OK since we only read their content when needed
-					sidecars: $state.snapshot(files.filter((f) => isSidecar(f.name)))
-				}
+					sidecars: $state.snapshot(files.filter((f) => isSidecar(f.name))),
+				},
 			})),
 		{
 			title: 'Import des images terminé',
 			body: plural(files.length, ['1 image importée', `# images importées`]),
-			tag: 'import-complete'
+			tag: 'import-complete',
 		}
 	);
 }
@@ -296,7 +296,7 @@ export function detectMore(fileIds) {
 		{
 			title: 'Détection terminée',
 			body: plural(fileIds.length, ['1 image traitée', `# images traitées`]),
-			tag: 'detection-complete'
+			tag: 'detection-complete',
 		}
 	);
 }
@@ -311,7 +311,7 @@ export function classifyMore(imageIds) {
 		{
 			title: 'Classification terminée',
 			body: plural(imageIds.length, ['1 image classée', `# images classées`]),
-			tag: 'classification-complete'
+			tag: 'classification-complete',
 		}
 	);
 }
@@ -337,7 +337,7 @@ function scheduleBatch(tasks, { title, ...options }) {
 		sendNotification(title, {
 			icon: '/icon.png',
 			badge: '/badge.png',
-			...options
+			...options,
 		});
 	});
 }
@@ -362,7 +362,7 @@ function assertQueueInitialized(queue) {
 export function initializeProcessingQueue(arg0) {
 	processingQueue ??= new ProcessingQueue({
 		parallelism: Math.ceil(navigator.hardwareConcurrency / 2),
-		...arg0
+		...arg0,
 	});
 }
 

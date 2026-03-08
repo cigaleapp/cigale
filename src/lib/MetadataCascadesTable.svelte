@@ -1,7 +1,8 @@
 <script lang="ts">
+	import type { cascadeLabels } from './cascades.js';
+
 	import Icon from '@iconify/svelte';
 
-	import type { cascadeLabels } from './cascades.js';
 	import OverflowableText from './OverflowableText.svelte';
 	import { readableOn } from './utils.js';
 

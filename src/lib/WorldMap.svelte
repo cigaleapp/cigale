@@ -1,12 +1,8 @@
 <script lang="ts">
 	import type { LngLatLike, MapMouseEvent } from 'maplibre-gl';
-	import {
-		DefaultMarker,
-		MapEvents,
-		MapLibre,
-		Popup,
-		type MarkerClickInfo
-	} from 'svelte-maplibre';
+	import type { MarkerClickInfo } from 'svelte-maplibre';
+
+	import { DefaultMarker, MapEvents, MapLibre, Popup } from 'svelte-maplibre';
 
 	import { getTheme } from '$routes/+layout.svelte';
 

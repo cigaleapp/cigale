@@ -1,4 +1,5 @@
 import { fileURLToPath } from 'node:url';
+
 import { includeIgnoreFile } from '@eslint/compat';
 import js from '@eslint/js';
 import prettier from 'eslint-config-prettier';
@@ -20,7 +21,7 @@ export default [
 	js.configs.recommended,
 	...ts.configs.recommended.map((cfg) => ({
 		files: ['**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts'],
-		...cfg
+		...cfg,
 	})),
 	...svelte.configs['flat/recommended'],
 	prettier,
@@ -30,8 +31,8 @@ export default [
 			globals: {
 				...globals.browser,
 				...globals.node,
-				Bun: false
-			}
+				Bun: false,
+			},
 		},
 		rules: {
 			'svelte/no-at-html-tags': 'off',
@@ -42,17 +43,17 @@ export default [
 				{
 					argsIgnorePattern: '^_',
 					varsIgnorePattern: '^_',
-					caughtErrorsIgnorePattern: '^_'
-				}
-			]
-		}
+					caughtErrorsIgnorePattern: '^_',
+				},
+			],
+		},
 	},
 	{
 		files: ['**/*.svelte'],
 		rules: {
 			// False positives since v10.0.1 upgrade on e.g. = $bindable()
-			'no-useless-assignment': 'off'
-		}
+			'no-useless-assignment': 'off',
+		},
 	},
 	{
 		files: ['**/*.svelte', '**/*.svelte.ts', '**/*.svelte.js'],
@@ -61,13 +62,13 @@ export default [
 				projectService: true,
 				extraFileExtensions: ['.svelte'],
 				parser: ts.parser,
-				svelteConfig
-			}
+				svelteConfig,
+			},
 		},
 		rules: {
-			'svelte/no-inspect': 'error'
-		}
+			'svelte/no-inspect': 'error',
+		},
 	},
 	// oxlint should be the last one
-	...oxlint.buildFromOxlintConfigFile('./.oxlintrc.json')
+	...oxlint.buildFromOxlintConfigFile('./.oxlintrc.json'),
 ];

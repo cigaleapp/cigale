@@ -1,8 +1,8 @@
 <script lang="ts">
+	import type * as DB from '$lib/database.js';
 	import type { Snippet } from 'svelte';
 
 	import IconExpand from '~icons/ri/arrow-down-s-line';
-	import type * as DB from '$lib/database.js';
 
 	import { metadataDefinitionComparator } from './protocols.js';
 	import { getSettings } from './settings.svelte.js';
@@ -29,15 +29,15 @@
 				group,
 				definitions: definitions
 					.filter((d) => d.group === group?.id)
-					.toSorted(compareDefinitions)
+					.toSorted(compareDefinitions),
 			})),
 			...definitions
 				.filter((def) => !def.group)
 				.map((def) => ({
 					iterationKey: `definition-${def.id}`,
 					group: null,
-					definitions: [def]
-				}))
+					definitions: [def],
+				})),
 		]
 			.filter(({ definitions }) => definitions.length > 0)
 			.toSorted((a, b) => {

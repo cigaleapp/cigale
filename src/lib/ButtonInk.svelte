@@ -23,7 +23,7 @@
 		dangerous,
 		disabled = false,
 		inline = false,
-		fills = false
+		fills = false,
 	} = $props();
 
 	const hrefIsExternal = $derived(

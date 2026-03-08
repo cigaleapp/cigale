@@ -31,7 +31,7 @@ export async function load({ parent }) {
 		console.time('sort: make sorter');
 		const imagesSorter = await galleryEffectiveSorter({
 			sortSettings,
-			groupSettings
+			groupSettings,
 		});
 		console.timeEnd('sort: make sorter');
 
@@ -47,8 +47,8 @@ export async function load({ parent }) {
 			metadata: observationMetadata({
 				definitions: metadataDefinitions,
 				observation,
-				images: imagesOfAllObservations
-			})
+				images: imagesOfAllObservations,
+			}),
 		});
 
 		console.time('sort: sort array');
@@ -65,6 +65,6 @@ export async function load({ parent }) {
 	return {
 		currentSession,
 		metadataDefinitions,
-		observationsOrder: new Map(allObservations.map(({ id }, i) => [id, i]))
+		observationsOrder: new Map(allObservations.map(({ id }, i) => [id, i])),
 	};
 }

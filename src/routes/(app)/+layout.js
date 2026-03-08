@@ -15,7 +15,7 @@ import {
 	databaseName,
 	databaseRevision,
 	openTransaction,
-	tables
+	tables,
 } from '$lib/idb.svelte.js';
 import { autoUpdateProtocols } from '$lib/protocols';
 import { getSetting } from '$lib/settings.svelte';
@@ -29,7 +29,7 @@ export const trailingSlash = 'always';
 
 export async function load() {
 	const locale = await getSetting('language', {
-		fallback: localeFromNavigator()
+		fallback: localeFromNavigator(),
 	});
 
 	document.documentElement.lang = locale;
@@ -45,14 +45,14 @@ export async function load() {
 		locale: {
 			fr: dateFnsLocales.fr,
 			en: dateFnsLocales.enUS,
-			ja: dateFnsLocales.ja
-		}[locale]
+			ja: dateFnsLocales.ja,
+		}[locale],
 	});
 
 	await initializeSettings();
 
 	const parallelism = await getSetting('parallelism', {
-		fallback: 1
+		fallback: 1,
 	});
 
 	setLoadingMessage('Initialisation du worker…');
@@ -80,8 +80,8 @@ export async function load() {
 						);
 					});
 				}
-			}
-		}
+			},
+		},
 	});
 
 	if (window) {
@@ -101,7 +101,7 @@ export async function load() {
 	} catch (e) {
 		console.error(e);
 		error(400, {
-			message: e?.toString() ?? 'Erreur inattendue'
+			message: e?.toString() ?? 'Erreur inattendue',
 		});
 	}
 
@@ -129,7 +129,7 @@ async function initializeSettings() {
 			showInputHints: true,
 			showTechnicalMetadata: dev,
 			cropAutoNext: false,
-			gallerySort: { key: 'date', direction: 'asc' }
+			gallerySort: { key: 'date', direction: 'asc' },
 		});
 	});
 }

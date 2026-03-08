@@ -26,7 +26,7 @@ export const INITIAL_ZOOM_STATE = {
 	origin: { x: 0, y: 0 },
 	scale: 1,
 	panning: false,
-	panStart: { x: 0, y: 0, zoomOrigin: { x: 0, y: 0 } }
+	panStart: { x: 0, y: 0, zoomOrigin: { x: 0, y: 0 } },
 };
 
 /**
@@ -56,7 +56,7 @@ export function fittedImageRect(
 		width,
 		height,
 		x: (zoomState?.origin.x ?? 0) + clientLeft + (clientWidth - width) / 2,
-		y: (zoomState?.origin.y ?? 0) + clientTop + (clientHeight - height) / 2
+		y: (zoomState?.origin.y ?? 0) + clientTop + (clientHeight - height) / 2,
 	};
 }
 
@@ -69,7 +69,7 @@ export class NewBoundingBox {
 		x: 0,
 		y: 0,
 		width: 0,
-		height: 0
+		height: 0,
 	};
 
 	/** @type {'clickanddrag' | '2point' | '4point'|'off'} */
@@ -89,8 +89,8 @@ export class NewBoundingBox {
 		// -1 or 1
 		dragDirection: {
 			x: 0,
-			y: 0
-		}
+			y: 0,
+		},
 	});
 
 	/** @type {Array<{x: number; y: number}>}  */
@@ -105,7 +105,7 @@ export class NewBoundingBox {
 				x: 'number > 0',
 				y: 'number > 0',
 				width: 'number > 0',
-				height: 'number > 0'
+				height: 'number > 0',
 			}).allows(this.clickanddrag);
 		}
 
@@ -130,7 +130,7 @@ export class NewBoundingBox {
 			x: clamp(rect.x, this.limits.x, this.limits.width),
 			y: clamp(rect.y, this.limits.y, this.limits.height),
 			width: clamp(rect.width, 0, this.limits.width - rect.x),
-			height: clamp(rect.height, 0, this.limits.height - rect.y)
+			height: clamp(rect.height, 0, this.limits.height - rect.y),
 		};
 	}
 
@@ -191,7 +191,7 @@ export class NewBoundingBox {
 		if (width <= 0 || height <= 0) {
 			this.clickanddrag.dragDirection = {
 				x: sign(dx),
-				y: sign(dy)
+				y: sign(dy),
 			};
 		}
 
@@ -228,7 +228,7 @@ export class NewBoundingBox {
 			x: this.x,
 			y: this.y,
 			width: this.width,
-			height: this.height
+			height: this.height,
 		});
 	}
 
@@ -240,8 +240,8 @@ export class NewBoundingBox {
 			height: 0,
 			dragDirection: {
 				x: 0,
-				y: 0
-			}
+				y: 0,
+			},
 		};
 		this.points = [];
 	}
@@ -260,8 +260,8 @@ export class NewBoundingBox {
 			height: 0,
 			dragDirection: {
 				x: 0,
-				y: 0
-			}
+				y: 0,
+			},
 		};
 		this.points = [];
 	}

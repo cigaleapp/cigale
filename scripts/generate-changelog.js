@@ -1,4 +1,5 @@
 import { writeFile } from 'node:fs/promises';
+
 import * as date from 'date-fns';
 import { x } from 'tinyexec';
 
@@ -11,7 +12,7 @@ console.info(
 const gitlog = await x('git', [
 	'log',
 	`--since=${upTo}`,
-	`--until=${date.format(Date.now(), 'yyyy-MM-dd')}`
+	`--until=${date.format(Date.now(), 'yyyy-MM-dd')}`,
 ]).then((result) => result.stdout);
 
 const commits = gitlog
@@ -39,7 +40,7 @@ const commits = gitlog
 	.filter(({ committedAt }) =>
 		date.isWithinInterval(committedAt, {
 			start: date.parse(upTo, 'yyyy-MM-dd', new Date()),
-			end: new Date()
+			end: new Date(),
 		})
 	);
 
@@ -50,7 +51,7 @@ const SECTIONS = /** @type {const} */ ([
 	'Bug Fixes',
 	'Data Updates',
 	'Translation Updates',
-	'Legal Changes'
+	'Legal Changes',
 ]);
 
 /**
@@ -71,7 +72,7 @@ const EMOJI_TO_SECTION = {
 	':bento:': 'Data Updates',
 	'🌐': 'Translation Updates',
 	'📄': 'Legal Changes',
-	'♿️': 'Accessibility Improvements'
+	'♿️': 'Accessibility Improvements',
 };
 
 /** @type {Record<string, Record<typeof SECTIONS[number], typeof commits>>} **/
@@ -87,8 +88,8 @@ const months = commits.reduce((current, commit) => {
 			...current[month],
 			[section]: [...(current[month]?.[section] ?? []), commit].toSorted((a, b) =>
 				date.compareDesc(a.committedAt, b.committedAt)
-			)
-		}
+			),
+		},
 	};
 }, {});
 
@@ -99,9 +100,9 @@ console.dir(
 			Object.fromEntries(
 				Object.entries(sections).map(([section, commits]) => [
 					section,
-					commits.map((commit) => commit.title)
+					commits.map((commit) => commit.title),
 				])
-			)
+			),
 		])
 	),
 	{ depth: null }

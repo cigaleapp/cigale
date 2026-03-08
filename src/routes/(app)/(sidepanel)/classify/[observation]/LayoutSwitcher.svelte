@@ -24,7 +24,7 @@
 
 		await tables.Session.update(uiState.currentSessionId, 'fullscreenClassifier', {
 			...uiState.currentSession?.fullscreenClassifier,
-			layout: LAYOUTS[(LAYOUTS.indexOf(layout) + 1) % LAYOUTS.length]
+			layout: LAYOUTS[(LAYOUTS.indexOf(layout) + 1) % LAYOUTS.length],
 		});
 
 		await sleep(50);
@@ -34,8 +34,8 @@
 	defineKeyboardShortcuts('classification', {
 		'Alt+L': {
 			help: 'Changer de disposition',
-			do: () => cycleLayout()
-		}
+			do: () => cycleLayout(),
+		},
 	});
 </script>
 
@@ -44,7 +44,7 @@
 	onclick={() => cycleLayout()}
 	use:tooltip={{
 		text: 'Changer de disposition',
-		keyboard: 'Alt+L'
+		keyboard: 'Alt+L',
 	}}
 >
 	{#each LAYOUTS as l (l)}

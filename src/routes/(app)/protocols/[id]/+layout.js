@@ -20,6 +20,6 @@ export async function load({ params, depends }) {
 			protocol.metadata
 				.toSorted(metadataDefinitionComparator({ metadataOrder }))
 				.map(async (id) => tables.Metadata.get(id))
-		).then((defs) => defs.filter(nonnull))
+		).then((defs) => defs.filter(nonnull)),
 	};
 }

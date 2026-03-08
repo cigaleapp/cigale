@@ -7,6 +7,6 @@ export const IssueCreatorRequest = type({
 	metadata: [
 		'Record<string, string>',
 		'@',
-		'Additional metadata to include at the end of the issue body'
-	]
+		'Additional metadata to include at the end of the issue body',
+	],
 });

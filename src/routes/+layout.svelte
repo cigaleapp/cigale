@@ -20,7 +20,7 @@
 
 	$effect(() =>
 		fadeOutElement('#loading', 250, {
-			firstTimeDuration: 1_000
+			firstTimeDuration: 1_000,
 		})
 	);
 </script>

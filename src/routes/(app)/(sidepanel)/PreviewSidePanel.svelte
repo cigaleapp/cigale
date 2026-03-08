@@ -56,7 +56,7 @@
 		cansplit,
 		onmetadatachange,
 		canmerge,
-		metadata
+		metadata,
 	} = $props();
 
 	const definitions = $derived.by(() => {
@@ -68,7 +68,7 @@
 				.map((imp) => tables.Metadata.getFromState(imp.source)),
 			...protocol.metadata
 				.filter((id) => !protocol.sessionMetadata.includes(id))
-				.map((id) => tables.Metadata.getFromState(id))
+				.map((id) => tables.Metadata.getFromState(id)),
 		]
 			.filter((m) => m !== undefined)
 			.toSorted(metadataDefinitionComparator(protocol));
@@ -100,7 +100,7 @@
 				.map(({ source }) => {
 					const { namespace, id } = splitMetadataId(source);
 					return metadataOptionsKeyRange(namespace, id);
-				})
+				}),
 		];
 
 		Promise.all(keyranges.map((range) => idb.list('MetadataOption', range))).then((results) => {
@@ -141,7 +141,7 @@
 		).length,
 		get all() {
 			return this.image + this.observation;
-		}
+		},
 	});
 
 	/**
@@ -274,7 +274,7 @@
 				onclick={async () => {
 					if (!singleObservationSelected) return;
 					await goto('/(app)/(sidepanel)/classify/[observation]', {
-						observation: singleObservationSelected.id
+						observation: singleObservationSelected.id,
 					});
 				}}
 			>

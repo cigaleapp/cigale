@@ -3,14 +3,14 @@ import { ArkErrors, type } from 'arktype';
 const NominatimResponseSchemas = {
 	Reverse: type({
 		name: 'string',
-		display_name: 'string'
+		display_name: 'string',
 	}),
 	Forward: type({
 		name: 'string',
 		display_name: 'string',
 		lat: 'string.numeric.parse',
-		lon: 'string.numeric.parse'
-	}).array()
+		lon: 'string.numeric.parse',
+	}).array(),
 };
 
 /**
@@ -19,7 +19,7 @@ const NominatimResponseSchemas = {
  */
 export async function coordinatesToAddress({
 	latitude,
-	longitude
+	longitude,
 }: {
 	latitude: number;
 	longitude: number;
@@ -29,7 +29,7 @@ export async function coordinatesToAddress({
 			format: 'jsonv2',
 			lat: latitude.toString(),
 			lon: longitude.toString(),
-			addressdetails: '0'
+			addressdetails: '0',
 		})}`
 	);
 
@@ -66,10 +66,10 @@ export async function suggestCoordinates(query: string): Promise<
 		`https://nominatim.openstreetmap.org/search?${new URLSearchParams({
 			format: 'jsonv2',
 			q: query,
-			limit: '5'
+			limit: '5',
 		})}`,
 		{
-			signal: coordinatesSuggestionAbortController.signal
+			signal: coordinatesSuggestionAbortController.signal,
 		}
 	);
 
@@ -83,6 +83,6 @@ export async function suggestCoordinates(query: string): Promise<
 		key: `${lon};${lat}`,
 		label: display_name,
 		latitude: lat,
-		longitude: lon
+		longitude: lon,
 	}));
 }

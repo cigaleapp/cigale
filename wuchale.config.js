@@ -45,10 +45,10 @@ export default defineConfig({
 						'seo',
 						'$derived.by',
 						'$derived',
-						'$effect'
+						'$effect',
 					].includes(call);
 				}
-			}
+			},
 		}),
 		js: js({
 			sourceLocale: 'fr',
@@ -56,7 +56,7 @@ export default defineConfig({
 			files: [
 				'src/**/+{page,layout}.{js,ts}',
 				'src/**/+{page,layout}.server.{js,ts}',
-				'src/lib/**.js'
+				'src/lib/**.js',
 			],
 			heuristic({ msgStr: [msg], details: { file, funcName, call } }) {
 				// Strings in test files
@@ -81,7 +81,7 @@ export default defineConfig({
 
 				// Table names
 				if (Object.keys(Tables).includes(msg)) return false;
-			}
-		})
-	}
+			},
+		}),
+	},
 });

@@ -28,7 +28,7 @@
 		composite,
 		icon,
 		Icon,
-		'indent-icon': indentIcon = true
+		'indent-icon': indentIcon = true,
 	} = $props();
 </script>
 

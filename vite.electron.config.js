@@ -7,7 +7,7 @@ export default defineConfig({
 		lib: {
 			formats: ['es'],
 			entry: 'src/electron/main.js',
-			fileName: 'main'
-		}
-	}
+			fileName: 'main',
+		},
+	},
 });

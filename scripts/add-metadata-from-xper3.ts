@@ -1,10 +1,11 @@
 import path from 'node:path';
+import type { ExportedProtocol } from '../src/lib/schemas/protocols.js';
+
 import { ArkErrors, type } from 'arktype';
 import { Estimation as ETA } from 'arrival-time';
 import { formatDistanceToNowStrict } from 'date-fns';
 
 import _protocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
-import type { ExportedProtocol } from '../src/lib/schemas/protocols.js';
 import { slugify } from '../src/lib/utils.js';
 import {
 	align,
@@ -15,7 +16,7 @@ import {
 	JSONPResponse,
 	percentage,
 	red,
-	updateCheckrunProgress
+	updateCheckrunProgress,
 } from './utils.js';
 
 function slug(s: string): string {
@@ -69,7 +70,7 @@ const Xper3Descriptor = type({
 	feedback: 'number[]',
 	calculatedType: 'boolean',
 	quantitativeType: 'boolean',
-	categoricalType: 'boolean'
+	categoricalType: 'boolean',
 });
 
 const Xper3Item = type({
@@ -85,16 +86,16 @@ const Xper3Item = type({
 				species: `${genus} ${final}`,
 				toString() {
 					return name;
-				}
+				},
 			};
-		}
+		},
 	],
 	alternativeName: 'null | string',
 	detail: UnderscoreableString,
 	uniqueid: 'string',
 	resourceIds: 'number[]',
 	taxaConfusion: 'number[]',
-	id: 'number'
+	id: 'number',
 });
 
 const Xper3State = type('null', '|', {
@@ -105,7 +106,7 @@ const Xper3State = type('null', '|', {
 	/** Key */
 	uniqueid: 'string',
 	'resourceIds?': 'number[]',
-	id: 'number'
+	id: 'number',
 }).pipe((s) => {
 	if (s === null) return null;
 	// TODO: figure out if we can process the object post-pipes
@@ -116,7 +117,7 @@ const Xper3State = type('null', '|', {
 	// Split name into name+detail
 	const compoundPatterns = [
 		/^(?<name>.+?)\s+:\s+(?<detail>.+)$/,
-		/^(?<name>.+?)\s+\(\s*=\s*(?<detail>.+)\)$/
+		/^(?<name>.+?)\s+\(\s*=\s*(?<detail>.+)\)$/,
 	];
 
 	const pattern = compoundPatterns.find((p) => p.test(s.name));
@@ -137,7 +138,7 @@ const Xper3Resource = type('null', '|', {
 	/** Alt */
 	legend: ['null | string', '=>', (d: string | null) => d || ''],
 	url: ['string.url', '=>', (u: string) => googledriveThumbnailUrl(u) ?? new URL(u)],
-	keywords: 'null'
+	keywords: 'null',
 });
 
 async function findGbifId(item: typeof Xper3Item.infer) {
@@ -157,7 +158,7 @@ async function findGbifId(item: typeof Xper3Item.infer) {
 			new URLSearchParams({
 				scientificName: item.name.species,
 				genus: item.name.genus,
-				subgenus: item.name.subgenus
+				subgenus: item.name.subgenus,
 			})
 	)
 		.then((res) => res.json())
@@ -165,7 +166,7 @@ async function findGbifId(item: typeof Xper3Item.infer) {
 			type({
 				rank: "'GENUS' | 'SPECIES'",
 				matchType: "'EXACT'",
-				usageKey: 'number'
+				usageKey: 'number',
 			})(m)
 		);
 
@@ -175,7 +176,7 @@ async function findGbifId(item: typeof Xper3Item.infer) {
 	return {
 		via: 'gbif',
 		key: response.usageKey.toString(),
-		inProtocol: species.options?.find((option) => option.key === response.usageKey.toString())
+		inProtocol: species.options?.find((option) => option.key === response.usageKey.toString()),
 	};
 }
 
@@ -189,7 +190,7 @@ async function requestDescriptiveData() {
 				callback: 'cb',
 				sddURL: SDD_URL,
 				withGlobalWeigth: 'true',
-				_: UNDERSCORE_NUMBER.toString()
+				_: UNDERSCORE_NUMBER.toString(),
 			})
 	)
 		.then((response) => response.text())
@@ -204,7 +205,7 @@ async function requestDescriptiveData() {
 				InvertedDependancyTable: { '[string.integer]': 'number' },
 				NameDataset: 'string',
 				Authors: 'never[]',
-				descriptorsScoreMap: { '[string.integer]': 'number' }
+				descriptorsScoreMap: { '[string.integer]': 'number' },
 			}).assert(text)
 		);
 }
@@ -217,7 +218,7 @@ async function requestItemDescriptors(item: typeof Xper3Item.infer) {
 				callback: 'cb',
 				sddURL: SDD_URL,
 				itemName: item.name.toString(),
-				_: UNDERSCORE_NUMBER.toString()
+				_: UNDERSCORE_NUMBER.toString(),
 			})
 	)
 		.then((response) => response.text())
@@ -237,10 +238,10 @@ async function requestItemDescriptors(item: typeof Xper3Item.infer) {
 						// TODO
 						// calculatedStateEvaluations: 'object',
 						unknown: 'boolean',
-						contextualWeight: 'number'
+						contextualWeight: 'number',
 					},
-					'[]'
-				]
+					'[]',
+				],
 			}).assert(text)
 		);
 }
@@ -256,7 +257,7 @@ if (import.meta.main) {
 		...(Authors.length === 0
 			? // TODO: ask them to provide authors
 				[{ name: 'IDmyBee.com' }]
-			: Authors.map((a) => ({ name: `${a}` })))
+			: Authors.map((a) => ({ name: `${a}` }))),
 	];
 
 	protocol.description += `\n\nClés d'identification d'abeilles fournies par IDmyBee.com, extraites depuis [${NameDataset} sur Xper3](${APP_URL}).`;
@@ -265,7 +266,7 @@ if (import.meta.main) {
 	protocol.metadataGroups.andrena = {
 		name: 'Andrènes',
 		description: "Caractéristiques d'identification spécifiques aux abeilles du genre Andrena",
-		collapsed: true
+		collapsed: true,
 	};
 
 	const descriptorMetadatas = new Map<
@@ -301,9 +302,9 @@ if (import.meta.main) {
 					label: name,
 					description: detail,
 					key: slug(uniqueid),
-					images: resource?.url ? [resource.url.toString()] : []
+					images: resource?.url ? [resource.url.toString()] : [],
 				};
-			})
+			}),
 		});
 
 		protocol.metadataOrder?.push(id);
@@ -344,7 +345,7 @@ if (import.meta.main) {
 			},
 			toString() {
 				return this.text();
-			}
+			},
 		};
 
 		const specie = await findGbifId(item);
@@ -386,13 +387,13 @@ if (import.meta.main) {
 						protocol.metadata[`${protocol.id}__species`].options!.push({
 							key: specie.key,
 							label: item.name.species,
-							synonyms: [item.name.toString()]
+							synonyms: [item.name.toString()],
 						}) - 1;
 				}
 
 				protocol.metadata[`${protocol.id}__species`].options![optionIndex].cascade = {
 					...species.options![optionIndex]?.cascade,
-					[metadataKey]: slug(state.uniqueid)
+					[metadataKey]: slug(state.uniqueid),
 				};
 
 				done++;

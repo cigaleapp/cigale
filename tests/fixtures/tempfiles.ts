@@ -1,5 +1,6 @@
 import { unlinkSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+
 import { nanoid } from 'nanoid';
 
 import { ResultsPaths } from '../filepaths.js';
@@ -38,7 +39,7 @@ export class TempFilesFixture {
 			},
 			cleanup() {
 				unlinkSync(path.join(inside, filename));
-			}
+			},
 		};
 		this.files.push(file);
 		return file;

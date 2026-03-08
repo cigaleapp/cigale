@@ -1,5 +1,6 @@
 /// <reference types="vitest" />
 import { execSync } from 'node:child_process';
+
 import { sveltekit } from '@sveltejs/kit/vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { wuchale } from '@wuchale/vite-plugin';
@@ -23,11 +24,11 @@ const env = arkenv(
 		BUILTIN_PROTOCOLS: type('string.url')
 			.array()
 			.default(() => [
-				'https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json'
-			])
+				'https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json',
+			]),
 	},
 	{
-		arrayFormat: 'comma'
+		arrayFormat: 'comma',
 	}
 );
 
@@ -40,7 +41,7 @@ export default defineConfig({
 		includeSource: [
 			'src/lib/**/*{.svelte,}.{js,ts}',
 			'scripts/generate-json-schemas.js',
-			'src/routes/**/utils.js'
+			'src/routes/**/utils.js',
 		],
 		reporters: env.GITHUB_ACTIONS ? ['dot', 'github-actions', 'html'] : ['default'],
 		globalSetup: './vitest-timezone.js',
@@ -48,13 +49,13 @@ export default defineConfig({
 		coverage: {
 			reporter: ['json-summary', 'json', 'html'],
 			reportOnFailure: true,
-			include: ['src/lib/**/*{.svelte,}.{js,ts}', 'src/routes/**/utils.js']
-		}
+			include: ['src/lib/**/*{.svelte,}.{js,ts}', 'src/routes/**/utils.js'],
+		},
 	},
 	server: {
 		fs: {
-			allow: ['./bun.lock']
-		}
+			allow: ['./bun.lock'],
+		},
 	},
 	define: {
 		'import.meta.vitest': 'undefined',
@@ -62,40 +63,40 @@ export default defineConfig({
 			execSync('git rev-parse HEAD').toString().trim()
 		),
 		'import.meta.env.previewingPrNumber': prNumber ?? 'null',
-		'import.meta.env.builtinProtocols': JSON.stringify(env.BUILTIN_PROTOCOLS)
+		'import.meta.env.builtinProtocols': JSON.stringify(env.BUILTIN_PROTOCOLS),
 	},
 	worker: {
 		format: 'es',
-		plugins: () => [svelte()]
+		plugins: () => [svelte()],
 	},
 	resolve: env.VITEST ? { conditions: ['browser'] } : {},
 	assetsInclude: ['**/*.wasm'],
 	optimizeDeps: {
-		exclude: ['onnxruntime-web', 'turbo_exif', 'fetch-progress']
+		exclude: ['onnxruntime-web', 'turbo_exif', 'fetch-progress'],
 	},
 	build: {
 		minify: !env.DEBUG,
-		sourcemap: env.DEBUG ? 'inline' : false
+		sourcemap: env.DEBUG ? 'inline' : false,
 	},
 	css: {
 		postcss: {
-			plugins: [postcssPresetEnv({ browsers: 'baseline widely available, >1%' })]
-		}
+			plugins: [postcssPresetEnv({ browsers: 'baseline widely available, >1%' })],
+		},
 	},
 	plugins: [
 		...env.BUNDLE_ANALYZER.map((mode) =>
 			analyzer({
 				analyzerMode: mode,
-				openAnalyzer: false
+				openAnalyzer: false,
 			})
 		),
 		icons({
 			compiler: 'svelte',
-			defaultClass: 'icon'
+			defaultClass: 'icon',
 		}),
 		// FIXME Wuchale doesnt play well with Vitest for now
 		env.VITEST ? undefined : wuchale(),
 		sveltekit(),
-		crossOriginIsolation()
-	]
+		crossOriginIsolation(),
+	],
 });

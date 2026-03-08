@@ -44,7 +44,7 @@
 		openPrepareForOfflineUse,
 		progress = 0,
 		eta = Infinity,
-		progressbarOnly = false
+		progressbarOnly = false,
 	} = $props();
 
 	// @ts-expect-error
@@ -119,33 +119,33 @@
 		// Choose [P]rotocol
 		'g p': {
 			do: () => goto('/'),
-			help: 'Choisir le protocole'
+			help: 'Choisir le protocole',
 		},
 		// [I]mport images
 		'g i': {
 			do: () => goto('/import'),
-			help: 'Importer des images'
+			help: 'Importer des images',
 		},
 		// Adjust C[r]ops
 		'g r': {
 			do: () => goto('/crop'),
-			help: 'Recadrer les images'
+			help: 'Recadrer les images',
 		},
 		// A[n]notate images
 		'g n': {
 			do: () => goto('/classify'),
-			help: 'Classifier les images'
+			help: 'Classifier les images',
 		},
 		// E[x]port results
 		'g x': {
 			do: () => goto('/results'),
-			help: 'Exporter les résultats'
+			help: 'Exporter les résultats',
 		},
 		// [M]anage protocols
 		'g m': {
 			do: () => goto('/protocols'),
-			help: 'Gérer les protocoles'
-		}
+			help: 'Gérer les protocoles',
+		},
 	});
 </script>
 
@@ -230,7 +230,7 @@
 							href={page.route.id !== '/(app)/(sidepanel)/crop/[image]' &&
 							uiState.imageOpenedInCropper
 								? resolve('/(app)/(sidepanel)/crop/[image]', {
-										image: uiState.imageOpenedInCropper
+										image: uiState.imageOpenedInCropper,
 									})
 								: resolve('/crop')}
 							data-testid="goto-crop"

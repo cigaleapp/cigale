@@ -7,23 +7,23 @@ import { defineKeyboardShortcuts } from './keyboard.svelte.js';
 const OPERATIONS = {
 	'crop/box/create': type({
 		imageId: 'string',
-		box: centeredBoundingBox
+		box: centeredBoundingBox,
 	}),
 	'crop/box/delete': type({
 		imageId: 'string',
-		box: centeredBoundingBox
+		box: centeredBoundingBox,
 	}),
 	'crop/box/edit': type({
 		imageId: 'string',
 		before: centeredBoundingBox,
-		after: centeredBoundingBox
+		after: centeredBoundingBox,
 	}),
 	'classify/enum/edit': type({
 		observationId: 'string',
 		metadataId: 'string',
 		before: { key: 'string' },
-		after: { key: 'string' }
-	})
+		after: { key: 'string' },
+	}),
 };
 
 /**
@@ -34,12 +34,12 @@ const OPERATION_REWINDERS = {
 	'crop/box/delete': (data) => ({ op: 'crop/box/create', data }),
 	'crop/box/edit': ({ imageId, before, after }) => ({
 		op: 'crop/box/edit',
-		data: { imageId, before: after, after: before }
+		data: { imageId, before: after, after: before },
 	}),
 	'classify/enum/edit': ({ observationId, metadataId, before, after }) => ({
 		op: 'classify/enum/edit',
-		data: { observationId, metadataId, before: after, after: before }
-	})
+		data: { observationId, metadataId, before: after, after: before },
+	}),
 };
 
 /**
@@ -178,12 +178,12 @@ class UndoStack {
 			defineKeyboardShortcuts('general', {
 				'$mod+z': {
 					help: 'Annuler',
-					do: async () => undo.pop()
+					do: async () => undo.pop(),
 				},
 				'$mod+Shift+z': {
 					help: 'Rétablir',
-					do: async () => undo.rewind()
-				}
+					do: async () => undo.rewind(),
+				},
 			});
 		}
 	}
@@ -203,7 +203,7 @@ if (import.meta.vitest) {
 				undo.handlers['crop/box/create'] = handler;
 				undo.push('crop/box/create', {
 					imageId: 'img1',
-					box: { x: 0, y: 0, w: 100, h: 100 }
+					box: { x: 0, y: 0, w: 100, h: 100 },
 				});
 
 				undo.pop();
@@ -212,7 +212,7 @@ if (import.meta.vitest) {
 			expect(handler).toHaveBeenCalledOnce();
 			expect(handler).toHaveBeenCalledWith({
 				imageId: 'img1',
-				box: { x: 0, y: 0, w: 100, h: 100 }
+				box: { x: 0, y: 0, w: 100, h: 100 },
 			});
 		});
 
@@ -227,7 +227,7 @@ if (import.meta.vitest) {
 
 				undo.push('crop/box/create', {
 					imageId: 'img2',
-					box: { x: 10, y: 10, w: 50, h: 50 }
+					box: { x: 10, y: 10, w: 50, h: 50 },
 				});
 
 				undo.pop(); // Undo create
@@ -237,13 +237,13 @@ if (import.meta.vitest) {
 			expect(createHandler).toHaveBeenCalledOnce();
 			expect(createHandler).toHaveBeenCalledWith({
 				imageId: 'img2',
-				box: { x: 10, y: 10, w: 50, h: 50 }
+				box: { x: 10, y: 10, w: 50, h: 50 },
 			});
 
 			expect(deleteHandler).toHaveBeenCalledOnce();
 			expect(deleteHandler).toHaveBeenCalledWith({
 				imageId: 'img2',
-				box: { x: 10, y: 10, w: 50, h: 50 }
+				box: { x: 10, y: 10, w: 50, h: 50 },
 			});
 		});
 
@@ -272,22 +272,22 @@ if (import.meta.vitest) {
 			expect(handle).toHaveBeenNthCalledWith(1, {
 				imageId: 'img3',
 				before: box80,
-				after: box60
+				after: box60,
 			});
 			expect(handle).toHaveBeenNthCalledWith(2, {
 				imageId: 'img3',
 				before: box90,
-				after: box80
+				after: box80,
 			});
 			expect(handle).toHaveBeenNthCalledWith(3, {
 				imageId: 'img3',
 				before: box80,
-				after: box90
+				after: box90,
 			});
 			expect(handle).toHaveBeenNthCalledWith(4, {
 				imageId: 'img3',
 				before: box60,
-				after: box80
+				after: box80,
 			});
 		});
 
@@ -300,15 +300,15 @@ if (import.meta.vitest) {
 
 				undo.push('crop/box/create', {
 					imageId: 'img4',
-					box: { x: 0, y: 0, w: 10, h: 10 }
+					box: { x: 0, y: 0, w: 10, h: 10 },
 				});
 				undo.push('crop/box/create', {
 					imageId: 'img4',
-					box: { x: 0, y: 0, w: 20, h: 20 }
+					box: { x: 0, y: 0, w: 20, h: 20 },
 				});
 				undo.push('crop/box/create', {
 					imageId: 'img4',
-					box: { x: 0, y: 0, w: 30, h: 30 }
+					box: { x: 0, y: 0, w: 30, h: 30 },
 				});
 
 				// First operation should have been discarded
@@ -320,11 +320,11 @@ if (import.meta.vitest) {
 			expect(handler).toHaveBeenCalledTimes(2);
 			expect(handler).toHaveBeenNthCalledWith(1, {
 				imageId: 'img4',
-				box: { x: 0, y: 0, w: 30, h: 30 }
+				box: { x: 0, y: 0, w: 30, h: 30 },
 			});
 			expect(handler).toHaveBeenNthCalledWith(2, {
 				imageId: 'img4',
-				box: { x: 0, y: 0, w: 20, h: 20 }
+				box: { x: 0, y: 0, w: 20, h: 20 },
 			});
 		});
 
@@ -349,7 +349,7 @@ if (import.meta.vitest) {
 				undo.push('crop/box/create', {
 					imageId: 'img5',
 					// @ts-expect-error Testing invalid data
-					box: { x: 'invalid', y: 0, w: 100, h: 100 }
+					box: { x: 'invalid', y: 0, w: 100, h: 100 },
 				});
 
 				undo.pop();
@@ -365,7 +365,7 @@ if (import.meta.vitest) {
 				undo.initialize(100);
 				undo.push('crop/box/create', {
 					imageId: 'img6',
-					box: { x: 0, y: 0, w: 100, h: 100 }
+					box: { x: 0, y: 0, w: 100, h: 100 },
 				});
 				// No handler registered for 'crop/box/create'
 				expect(() => undo.pop()).toThrowError(
@@ -382,7 +382,7 @@ if (import.meta.vitest) {
 				undo.handlers['crop/box/create'] = handler;
 				undo.push('crop/box/create', {
 					imageId: 'img9',
-					box: { x: 0, y: 0, w: 100, h: 100 }
+					box: { x: 0, y: 0, w: 100, h: 100 },
 				});
 
 				undo.clear();
@@ -409,7 +409,7 @@ if (import.meta.vitest) {
 				undo.push('crop/box/edit', {
 					imageId: 'img7',
 					before: boxBefore,
-					after: boxAfter
+					after: boxAfter,
 				});
 
 				// Simulate applying the edit
@@ -438,7 +438,7 @@ if (import.meta.vitest) {
 				// Create box
 				undo.push('crop/box/create', {
 					imageId: 'img8',
-					box
+					box,
 				});
 
 				// Simulate creating the box
@@ -452,7 +452,7 @@ if (import.meta.vitest) {
 				undo.rewind(); // Redo create
 				expect(boxes).toEqual({
 					testBox: { ...box },
-					otherBox: { ...box }
+					otherBox: { ...box },
 				});
 			})();
 		});

@@ -1,14 +1,16 @@
 import type { MetadataValues } from './database.js';
+import type { GroupSettings, SortSettings } from './schemas/sessions.js';
+import type { Comparator } from './utils.js';
+
 import { list, tables } from './idb.svelte.js';
 import {
 	compareByMetadataValue,
 	metadataOptionsKeyRange,
-	metadataValueGrouper
+	metadataValueGrouper,
 } from './metadata/index.js';
 import { removeNamespaceFromMetadataId, splitMetadataId } from './schemas/metadata.js';
-import type { GroupSettings, SortSettings } from './schemas/sessions.js';
 import { getSettings } from './settings.svelte.js';
-import { applySortDirection, compareBy, type Comparator } from './utils.js';
+import { applySortDirection, compareBy } from './utils.js';
 
 export type GalleryItem<AdditionalData = never> = {
 	sessionId: string;
@@ -63,7 +65,7 @@ export async function galleryItemsSorter(
 					options: await list(
 						'MetadataOption',
 						metadataOptionsKeyRange(metadataId.namespace, metadataId.id)
-					)
+					),
 				})
 			);
 		}
@@ -129,7 +131,7 @@ export async function galleryItemsGrouper(
 				type: metadata.type,
 				language: getSettings().language,
 				tolerances: settings.tolerances,
-				options
+				options,
 			});
 
 			return (item) => {
@@ -138,7 +140,7 @@ export async function galleryItemsGrouper(
 				const group = grouper(value);
 				return [
 					options.find((opt) => opt.key === value.toString())?.index ?? group,
-					`${label} = ${group}`
+					`${label} = ${group}`,
 				];
 			};
 		}
@@ -154,7 +156,7 @@ export async function galleryItemsGrouper(
  */
 export async function galleryEffectiveSorter({
 	sortSettings,
-	groupSettings
+	groupSettings,
 }: {
 	sortSettings: typeof SortSettings.infer;
 	groupSettings: typeof GroupSettings.infer;

@@ -1,9 +1,8 @@
-import type { IDBPDatabase } from 'idb';
-import type { SwarpcClient } from 'swarpc';
-
 import type { IDBDatabaseType } from '$lib/idb.svelte.js';
 import type { UIState } from '$lib/state.svelte.js';
 import type { PROCEDURES } from '$worker/procedures.js';
+import type { IDBPDatabase } from 'idb';
+import type { SwarpcClient } from 'swarpc';
 
 declare global {
 	interface Window {

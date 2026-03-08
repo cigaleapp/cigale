@@ -1,4 +1,9 @@
 <script lang="ts" generics="T extends MetadataType">
+	import type { Metadata, MetadataEnumVariant } from './database.js';
+	import type { TypedMetadataValue } from './metadata/index.js';
+	import type { MetadataType, RuntimeValue } from './schemas/metadata.js';
+	import type { NumericUnit } from './schemas/units.js';
+
 	import { ArkErrors } from 'arktype';
 
 	import IconCheck from '~icons/ri/check-line';
@@ -8,17 +13,15 @@
 
 	import Carousel from './Carousel.svelte';
 	import ConfidencePercentage from './ConfidencePercentage.svelte';
-	import type { Metadata, MetadataEnumVariant } from './database.js';
 	import {
 		metadataValueValidatorDate,
 		metadataValueValidatorNumeric,
-		metadataValueValidatorString
+		metadataValueValidatorString,
 	} from './metadata/constraints.js';
-	import { hasRuntimeType, type TypedMetadataValue } from './metadata/index.js';
+	import { hasRuntimeType } from './metadata/index.js';
 	import MetadataInput from './MetadataInput.svelte';
 	import OverflowableText from './OverflowableText.svelte';
-	import { splitMetadataId, type MetadataType, type RuntimeValue } from './schemas/metadata.js';
-	import type { NumericUnit } from './schemas/units.js';
+	import { splitMetadataId } from './schemas/metadata.js';
 	import { isDebugMode } from './settings.svelte.js';
 	import { tooltip } from './tooltips.js';
 	import { orEmpty, pick, safeJSONParse } from './utils.js';
@@ -134,7 +137,7 @@
 								value = {
 									value: JSON.parse(jsonValue),
 									confidence,
-									alternatives: value?.alternatives ?? {}
+									alternatives: value?.alternatives ?? {},
 								};
 								onchange(value?.value, value?.unit);
 							}}
@@ -164,7 +167,7 @@
 					id: '_',
 					onMove({ lngLat: [longitude, latitude] }) {
 						onchange?.({ latitude, longitude });
-					}
+					},
 				})}
 			/>
 		</section>
@@ -178,8 +181,8 @@
 					value,
 					validationErrors,
 					constraints: {
-						...pick(definition, 'pattern', 'regex', 'range', 'accept', 'size')
-					}
+						...pick(definition, 'pattern', 'regex', 'range', 'accept', 'size'),
+					},
 				},
 				(_k, v) => (v instanceof RegExp ? v.source : v),
 				2
@@ -237,9 +240,9 @@
 		confidences={Object.fromEntries([
 			...Object.entries(value?.alternatives ?? {}).map(([key, value]) => [
 				safeJSONParse(key)?.toString(),
-				value
+				value,
 			]),
-			[safeJSONParse(value?.value)?.toString(), value?.confidence]
+			[safeJSONParse(value?.value)?.toString(), value?.confidence],
 		])}
 	/>
 {/snippet}

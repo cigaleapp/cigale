@@ -50,7 +50,7 @@
 							return /** @type {const} */ ([
 								[pattern, bind],
 								[number, bind],
-								[`Shift+${number}`, bind]
+								[`Shift+${number}`, bind],
 							]);
 						}
 
@@ -78,7 +78,7 @@
 							// before calling the handler function if "preventDefault" is true
 							if (preventDefault) e.preventDefault();
 							await bind.do(e);
-						}
+						},
 					])
 			)
 		)

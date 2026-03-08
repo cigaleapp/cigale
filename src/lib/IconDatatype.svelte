@@ -27,7 +27,7 @@
 			float: IconFloat,
 			enum: IconEnum,
 			boundingbox: IconBoundingbox,
-			raw: IconRaw
+			raw: IconRaw,
 		}[kind] ?? IconCube
 	);
 
@@ -40,7 +40,7 @@
 		float: 'Un nombre à virgule',
 		enum: "Un choix parmi une liste d'options",
 		boundingbox: "Une région d'image",
-		raw: 'Données brutes'
+		raw: 'Données brutes',
 	};
 </script>
 

@@ -30,8 +30,8 @@ function props(parameters) {
 			content:
 				xss(parameters.text, {
 					allowList: {
-						kbd: ['class']
-					}
+						kbd: ['class'],
+					},
 				}) +
 				// XXX: needs :global styling from KeyboardHint.svelte
 				(parameters.keyboard
@@ -46,7 +46,7 @@ function props(parameters) {
 							.toArray()
 							.join('') +
 						'</kbd>'
-					: '')
+					: ''),
 		};
 	}
 
@@ -69,7 +69,7 @@ export function tooltip(node, parameters) {
 			},
 			destroy() {
 				node.removeAttribute('title');
-			}
+			},
 		};
 	}
 
@@ -93,7 +93,7 @@ export function tooltip(node, parameters) {
 		destroy() {
 			delete node.dataset.tooltipContent;
 			node._tippy?.destroy();
-		}
+		},
 	};
 }
 

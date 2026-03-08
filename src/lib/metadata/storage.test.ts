@@ -1,4 +1,6 @@
-import { openDatabase, type DatabaseHandle } from '$lib/idb.svelte.js';
+import type { DatabaseHandle } from '$lib/idb.svelte.js';
+
+import { openDatabase } from '$lib/idb.svelte.js';
 import { metadataOptionId, MetadataType, namespacedMetadataId } from '$lib/schemas/metadata.js';
 
 import 'fake-indexeddb/auto';
@@ -21,7 +23,7 @@ function mockMetadata(id: string, metadataType: MetadataType = 'enum') {
 		description: '',
 		mergeMethod: 'none',
 		required: false,
-		type: metadataType
+		type: metadataType,
 	} as const;
 }
 
@@ -36,7 +38,7 @@ function mockImage(id: string, sessionId = SESSION_ID, fileId = 'file001') {
 		contentType: 'image/jpeg',
 		fileId,
 		sessionId,
-		boundingBoxesAnalyzed: false
+		boundingBoxesAnalyzed: false,
 	};
 }
 
@@ -48,7 +50,7 @@ function mockObservation(id: string, imageIds: string[], sessionId = SESSION_ID)
 		addedAt: new Date().toISOString(),
 		metadataOverrides: {},
 		metadataErrors: {},
-		images: imageIds
+		images: imageIds,
 	};
 }
 
@@ -60,7 +62,7 @@ function mockSession(id = SESSION_ID) {
 		openedAt: new Date().toISOString(),
 		description: '',
 		protocol: PROTOCOL_ID,
-		metadata: {}
+		metadata: {},
 	};
 }
 
@@ -89,7 +91,7 @@ describe('storeMetadataValue', () => {
 			metadataId,
 			type: 'string',
 			value: 'Rosalia alpina',
-			sessionId: SESSION_ID
+			sessionId: SESSION_ID,
 		});
 
 		const img = await db.get('Image', '1');
@@ -97,7 +99,7 @@ describe('storeMetadataValue', () => {
 			value: '"Rosalia alpina"',
 			confidence: 1,
 			confirmed: false,
-			manuallyModified: false
+			manuallyModified: false,
 		});
 	});
 
@@ -113,13 +115,13 @@ describe('storeMetadataValue', () => {
 			type: 'enum',
 			value: 'option1',
 			confidence: 0.8,
-			sessionId: SESSION_ID
+			sessionId: SESSION_ID,
 		});
 
 		const img = await db.get('Image', '1');
 		expect(img?.metadata[metadataId]).toMatchObject({
 			value: '"option1"',
-			confidence: 0.8
+			confidence: 0.8,
 		});
 	});
 
@@ -133,12 +135,12 @@ describe('storeMetadataValue', () => {
 			subjectId: 'o1',
 			metadataId,
 			value: 'Lamia textor',
-			sessionId: SESSION_ID
+			sessionId: SESSION_ID,
 		});
 
 		const obs = await db.get('Observation', 'o1');
 		expect(obs?.metadataOverrides[metadataId]).toMatchObject({
-			value: '"Lamia textor"'
+			value: '"Lamia textor"',
 		});
 	});
 
@@ -152,12 +154,12 @@ describe('storeMetadataValue', () => {
 			subjectId: SESSION_ID,
 			metadataId,
 			value: 'Forest',
-			sessionId: SESSION_ID
+			sessionId: SESSION_ID,
 		});
 
 		const session = await db.get('Session', SESSION_ID);
 		expect(session?.metadata[metadataId]).toMatchObject({
-			value: '"Forest"'
+			value: '"Forest"',
 		});
 	});
 
@@ -175,9 +177,9 @@ describe('storeMetadataValue', () => {
 			alternatives: [
 				{ value: 'a', confidence: 0.6 },
 				{ value: 'b', confidence: 0.3 },
-				{ value: 'c', confidence: 0.1 }
+				{ value: 'c', confidence: 0.1 },
 			],
-			sessionId: SESSION_ID
+			sessionId: SESSION_ID,
 		});
 
 		const img = await db.get('Image', '1');
@@ -199,7 +201,7 @@ describe('storeMetadataValue', () => {
 			metadataId,
 			value: 'test',
 			confidence: 5,
-			sessionId: SESSION_ID
+			sessionId: SESSION_ID,
 		});
 
 		const img = await db.get('Image', '1');
@@ -217,7 +219,7 @@ describe('storeMetadataValue', () => {
 			metadataId,
 			value: 'a',
 			alternatives: [{ value: 'b', confidence: 2.5 }],
-			sessionId: SESSION_ID
+			sessionId: SESSION_ID,
 		});
 
 		const img = await db.get('Image', '1');
@@ -234,7 +236,7 @@ describe('storeMetadataValue', () => {
 				subjectId: '1',
 				metadataId: 'species', // not namespaced
 				value: 'test',
-				sessionId: SESSION_ID
+				sessionId: SESSION_ID,
 			})
 		).rejects.toThrow("n'est pas namespacé");
 	});
@@ -248,7 +250,7 @@ describe('storeMetadataValue', () => {
 				subjectId: '1',
 				metadataId: nsId('nonexistent'),
 				value: 'test',
-				sessionId: SESSION_ID
+				sessionId: SESSION_ID,
 			})
 		).rejects.toThrow('inconnue');
 	});
@@ -265,7 +267,7 @@ describe('storeMetadataValue', () => {
 				metadataId,
 				type: 'integer',
 				value: 42,
-				sessionId: SESSION_ID
+				sessionId: SESSION_ID,
 			})
 		).rejects.toThrow('incorrect');
 	});
@@ -283,10 +285,10 @@ describe('storeMetadataValue', () => {
 						stack: '',
 						ignored: false,
 						happenedAt: new Date().toISOString(),
-						kind: 'inference'
-					}
-				]
-			}
+						kind: 'inference',
+					},
+				],
+			},
 		});
 
 		await storeMetadataValue({
@@ -294,7 +296,7 @@ describe('storeMetadataValue', () => {
 			subjectId: '1',
 			metadataId,
 			value: 'fixed',
-			sessionId: SESSION_ID
+			sessionId: SESSION_ID,
 		});
 
 		const img = await db.get('Image', '1');
@@ -314,10 +316,10 @@ describe('storeMetadataValue', () => {
 						stack: '',
 						ignored: false,
 						happenedAt: new Date().toISOString(),
-						kind: 'inference'
-					}
-				]
-			}
+						kind: 'inference',
+					},
+				],
+			},
 		});
 
 		await storeMetadataValue({
@@ -326,7 +328,7 @@ describe('storeMetadataValue', () => {
 			metadataId,
 			value: 'updated',
 			clearErrors: false,
-			sessionId: SESSION_ID
+			sessionId: SESSION_ID,
 		});
 
 		const img = await db.get('Image', '1');
@@ -345,13 +347,13 @@ describe('storeMetadataValue', () => {
 			value: 'manual',
 			manuallyModified: true,
 			confirmed: true,
-			sessionId: SESSION_ID
+			sessionId: SESSION_ID,
 		});
 
 		const img = await db.get('Image', '1');
 		expect(img?.metadata[metadataId]).toMatchObject({
 			manuallyModified: true,
-			confirmed: true
+			confirmed: true,
 		});
 	});
 
@@ -364,7 +366,7 @@ describe('storeMetadataValue', () => {
 				subjectId: 'nonexistent',
 				metadataId: nsId('species'),
 				value: 'test',
-				sessionId: SESSION_ID
+				sessionId: SESSION_ID,
 			})
 		).rejects.toThrowErrorMatchingInlineSnapshot(
 			`[Error: Aucune image ou observation avec l'ID nonexistent]`
@@ -386,7 +388,7 @@ describe('storeMetadataValue', () => {
 				metadataId,
 				value: 'nope',
 				abortSignal: controller.signal,
-				sessionId: SESSION_ID
+				sessionId: SESSION_ID,
 			})
 		).rejects.toThrowErrorMatchingInlineSnapshot(`[AbortError: This operation was aborted]`);
 	});
@@ -405,7 +407,7 @@ describe('storeMetadataValue', () => {
 			subjectId: 'sharedFile',
 			metadataId,
 			value: 'shared value',
-			sessionId: SESSION_ID
+			sessionId: SESSION_ID,
 		});
 
 		const img1 = await db.get('Image', '1');
@@ -432,14 +434,14 @@ describe('storeMetadataValue', () => {
 			key: '1',
 			label: 'Species 1',
 			synonyms: [],
-			cascade: { [genusId]: '2' }
+			cascade: { [genusId]: '2' },
 		});
 		await db.add('MetadataOption', {
 			metadataId: genusId,
 			id: metadataOptionId(genusId, '2'),
 			key: '2',
 			label: 'Genus 2',
-			synonyms: []
+			synonyms: [],
 		});
 
 		await storeMetadataValue({
@@ -448,7 +450,7 @@ describe('storeMetadataValue', () => {
 			metadataId: speciesId,
 			value: '1',
 			confidence: 0.9,
-			sessionId: SESSION_ID
+			sessionId: SESSION_ID,
 		});
 
 		const img = await db.get('Image', '1');
@@ -467,7 +469,7 @@ describe('storeMetadataValue', () => {
 			subjectId: '1',
 			metadataId,
 			value: 'first',
-			sessionId: SESSION_ID
+			sessionId: SESSION_ID,
 		});
 
 		await storeMetadataValue({
@@ -476,7 +478,7 @@ describe('storeMetadataValue', () => {
 			metadataId,
 			value: 'second',
 			confidence: 0.5,
-			sessionId: SESSION_ID
+			sessionId: SESSION_ID,
 		});
 
 		const img = await db.get('Image', '1');
@@ -497,7 +499,7 @@ describe('storeMetadataErrors', () => {
 			{
 				message: 'Inference failed',
 				details: { reason: 'timeout' },
-				kind: 'inference'
+				kind: 'inference',
 			}
 		);
 
@@ -505,7 +507,7 @@ describe('storeMetadataErrors', () => {
 		expect(img?.metadataErrors?.[metadataId]).toHaveLength(1);
 		expect(img?.metadataErrors?.[metadataId]?.[0]).toMatchObject({
 			message: 'Inference failed',
-			kind: 'inference'
+			kind: 'inference',
 		});
 	});
 
@@ -518,14 +520,14 @@ describe('storeMetadataErrors', () => {
 			{
 				message: 'Bad value',
 				details: null,
-				kind: 'inference'
+				kind: 'inference',
 			}
 		);
 
 		const obs = await db.get('Observation', 'o1');
 		expect(obs?.metadataErrors?.[metadataId]).toHaveLength(1);
 		expect(obs?.metadataErrors?.[metadataId]?.[0]).toMatchObject({
-			message: 'Bad value'
+			message: 'Bad value',
 		});
 	});
 
@@ -606,16 +608,16 @@ describe('deleteMetadataValue', () => {
 					confidence: 1,
 					confirmed: false,
 					manuallyModified: false,
-					alternatives: {}
-				}
-			}
+					alternatives: {},
+				},
+			},
 		});
 
 		await deleteMetadataValue({
 			db,
 			subjectId: '1',
 			metadataId,
-			sessionId: SESSION_ID
+			sessionId: SESSION_ID,
 		});
 
 		const img = await db.get('Image', '1');
@@ -632,16 +634,16 @@ describe('deleteMetadataValue', () => {
 					confidence: 1,
 					confirmed: false,
 					manuallyModified: false,
-					alternatives: {}
-				}
-			}
+					alternatives: {},
+				},
+			},
 		});
 
 		await deleteMetadataValue({
 			db,
 			subjectId: SESSION_ID,
 			metadataId,
-			sessionId: SESSION_ID
+			sessionId: SESSION_ID,
 		});
 
 		const session = await db.get('Session', SESSION_ID);
@@ -658,16 +660,16 @@ describe('deleteMetadataValue', () => {
 					confidence: 1,
 					confirmed: false,
 					manuallyModified: false,
-					alternatives: {}
-				}
-			}
+					alternatives: {},
+				},
+			},
 		});
 
 		await deleteMetadataValue({
 			db,
 			subjectId: 'o1',
 			metadataId,
-			sessionId: SESSION_ID
+			sessionId: SESSION_ID,
 		});
 
 		const obs = await db.get('Observation', 'o1');
@@ -681,20 +683,20 @@ describe('deleteMetadataValue', () => {
 			confidence: 1,
 			confirmed: false,
 			manuallyModified: false,
-			alternatives: {}
+			alternatives: {},
 		};
 
 		await db.add('Image', {
 			...mockImage('1'),
-			metadata: { [metadataId]: metaValue }
+			metadata: { [metadataId]: metaValue },
 		});
 		await db.add('Image', {
 			...mockImage('2'),
-			metadata: { [metadataId]: metaValue }
+			metadata: { [metadataId]: metaValue },
 		});
 		await db.add('Observation', {
 			...mockObservation('o1', ['1', '2']),
-			metadataOverrides: { [metadataId]: metaValue }
+			metadataOverrides: { [metadataId]: metaValue },
 		});
 
 		await deleteMetadataValue({
@@ -702,7 +704,7 @@ describe('deleteMetadataValue', () => {
 			subjectId: 'o1',
 			metadataId,
 			recursive: true,
-			sessionId: SESSION_ID
+			sessionId: SESSION_ID,
 		});
 
 		const obs = await db.get('Observation', 'o1');
@@ -721,23 +723,23 @@ describe('deleteMetadataValue', () => {
 			confidence: 1,
 			confirmed: false,
 			manuallyModified: false,
-			alternatives: {}
+			alternatives: {},
 		};
 
 		await db.add('Image', {
 			...mockImage('1', SESSION_ID, 'sharedFile'),
-			metadata: { [metadataId]: metaValue }
+			metadata: { [metadataId]: metaValue },
 		});
 		await db.add('Image', {
 			...mockImage('2', SESSION_ID, 'sharedFile'),
-			metadata: { [metadataId]: metaValue }
+			metadata: { [metadataId]: metaValue },
 		});
 
 		await deleteMetadataValue({
 			db,
 			subjectId: 'sharedFile',
 			metadataId,
-			sessionId: SESSION_ID
+			sessionId: SESSION_ID,
 		});
 
 		const img1 = await db.get('Image', '1');
@@ -752,7 +754,7 @@ describe('deleteMetadataValue', () => {
 				db,
 				subjectId: 'nonexistent',
 				metadataId: nsId('species'),
-				sessionId: SESSION_ID
+				sessionId: SESSION_ID,
 			})
 		).rejects.toThrowErrorMatchingInlineSnapshot(
 			`[Error: Aucune image, observation ou session avec l'ID nonexistent]`
@@ -767,22 +769,22 @@ describe('deleteMetadataValue', () => {
 			confidence: 1,
 			confirmed: false,
 			manuallyModified: false,
-			alternatives: {}
+			alternatives: {},
 		};
 
 		await db.add('Image', {
 			...mockImage('1'),
 			metadata: {
 				[speciesId]: metaValue,
-				[genusId]: metaValue
-			}
+				[genusId]: metaValue,
+			},
 		});
 
 		await deleteMetadataValue({
 			db,
 			subjectId: '1',
 			metadataId: speciesId,
-			sessionId: SESSION_ID
+			sessionId: SESSION_ID,
 		});
 
 		const img = await db.get('Image', '1');

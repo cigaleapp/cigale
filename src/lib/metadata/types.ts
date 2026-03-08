@@ -1,7 +1,9 @@
+import type * as DB from '$lib/database';
+import type { RuntimeValue } from '$lib/schemas/metadata';
+
 import { ArkErrors } from 'arktype';
 
-import type * as DB from '$lib/database';
-import { MetadataRuntimeValue, type RuntimeValue } from '$lib/schemas/metadata';
+import { MetadataRuntimeValue } from '$lib/schemas/metadata';
 
 export type TypedMetadataValue<Type extends DB.MetadataType = DB.MetadataType> = Omit<
 	DB.MetadataValue,
@@ -27,11 +29,11 @@ type TypeswitchValues = RuntimeValue | [RuntimeValue, RuntimeValue] | RuntimeVal
  */
 export function switchOnMetadataType<
 	R,
-	RT extends TypeswitchReturnTypes<R> = TypeswitchReturnTypes<R>
+	RT extends TypeswitchReturnTypes<R> = TypeswitchReturnTypes<R>,
 >(type: DB.MetadataType, value: TypeswitchValues, cases: TypeswitchCases<RT>): RT[DB.MetadataType];
 export function switchOnMetadataType<
 	R,
-	RT extends TypeswitchReturnTypes<R> = TypeswitchReturnTypes<R>
+	RT extends TypeswitchReturnTypes<R> = TypeswitchReturnTypes<R>,
 >(
 	type: DB.MetadataType,
 	value: TypeswitchValues,
@@ -41,7 +43,7 @@ export function switchOnMetadataType<
 ): RT[DB.MetadataType];
 export function switchOnMetadataType<
 	R,
-	RT extends TypeswitchReturnTypes<R> = TypeswitchReturnTypes<R>
+	RT extends TypeswitchReturnTypes<R> = TypeswitchReturnTypes<R>,
 >(
 	type: DB.MetadataType,
 	value: TypeswitchValues,
@@ -51,7 +53,7 @@ export function switchOnMetadataType<
 ): RT[DB.MetadataType];
 export function switchOnMetadataType<
 	R,
-	RT extends TypeswitchReturnTypes<R> = TypeswitchReturnTypes<R>
+	RT extends TypeswitchReturnTypes<R> = TypeswitchReturnTypes<R>,
 >(
 	type: DB.MetadataType,
 	value: TypeswitchValues,
@@ -109,6 +111,6 @@ export function getMetadataValue<Type extends DB.MetadataType>(
 
 	return {
 		...value,
-		value: assertIs(type, value.value)
+		value: assertIs(type, value.value),
 	};
 }

@@ -1,4 +1,7 @@
 <script lang="ts">
+	import type { Metadata, MetadataEnumVariant } from './database.js';
+	import type { MetadataFile, RuntimeValue } from './schemas/metadata.js';
+
 	import Icon from '@iconify/svelte';
 	import { ArkErrors, type } from 'arktype';
 	import { convert } from 'convert';
@@ -13,7 +16,7 @@
 
 	import ButtonIcon from './ButtonIcon.svelte';
 	import ButtonInk from './ButtonInk.svelte';
-	import { generateId, type Metadata, type MetadataEnumVariant } from './database.js';
+	import { generateId } from './database.js';
 	import DropdownMenu from './DropdownMenu.svelte';
 	import FilePreview from './FilePreview.svelte';
 	import { promptForFiles } from './files.js';
@@ -25,7 +28,6 @@
 	import { sendNotification } from './notifications.js';
 	import OverflowableText from './OverflowableText.svelte';
 	import RadioButtons from './RadioButtons.svelte';
-	import type { MetadataFile, RuntimeValue } from './schemas/metadata.js';
 	import { availableUnitsFor, findUnit, NumericUnit } from './schemas/units.js';
 	import { uiState } from './state.svelte.js';
 	import Switch from './Switch.svelte';
@@ -38,7 +40,7 @@
 		pick,
 		readableOn,
 		round,
-		safeJSONParse
+		safeJSONParse,
 	} from './utils.js';
 	import WorldLocationCombobox from './WorldLocationCombobox.svelte';
 
@@ -70,7 +72,7 @@
 		definition,
 		options = [],
 		isCompactEnum = false,
-		onblur
+		onblur,
 	}: Props = $props();
 
 	let savingFile = $state(false);
@@ -101,7 +103,7 @@
 
 		return {
 			names: u.names,
-			symbols: 'symbols' in u ? u.symbols : []
+			symbols: 'symbols' in u ? u.symbols : [],
 		};
 	});
 </script>
@@ -120,7 +122,7 @@
 				{#if isCompactEnum}
 					<RadioButtons
 						value={value?.toString()}
-						onchange={(value) =>onblur(value)}
+						onchange={(value) => onblur(value)}
 						// cards={options.every((opt) => opt.icon || opt.color)}
 						cards
 						options={options
@@ -165,13 +167,13 @@
 						type="single"
 						disabled={disabled ?? false}
 						value={safeJSONParse(value?.toString())?.toString() ?? value}
-						onValueChange={value => onblur(value)}
+						onValueChange={(value) => onblur(value)}
 					/>
 				{/if}
 			{/snippet}
 			{#snippet boolean(value)}
 				<div class="boolean-switch">
-					<Switch value={value ?? false} onchange={value => onblur(value)} />
+					<Switch value={value ?? false} onchange={(value) => onblur(value)} />
 					{#if value}
 						Oui
 					{:else if value === false}
@@ -255,10 +257,10 @@
 											).to(unitName);
 											onblur(converted, unitName);
 											valueUnit = unitName;
-										}
+										},
 									};
-								})
-							}
+								}),
+							},
 						]}
 					>
 						{#snippet trigger(props)}
@@ -344,7 +346,10 @@
 				/>
 			{/snippet}
 			{#snippet location(value)}
-				<WorldLocationCombobox value={value as RuntimeValue<'location'>} onblur={value => onblur(value)} />
+				<WorldLocationCombobox
+					value={value as RuntimeValue<'location'>}
+					onblur={(value) => onblur(value)}
+				/>
 			{/snippet}
 			{#snippet file(currentFileId)}
 				{@const { accept, size } = definition as typeof MetadataFile.infer}
@@ -437,7 +442,7 @@
 											bytes: await file.arrayBuffer(),
 											lastModifiedAt: new Date(
 												file.lastModified || Date.now()
-											).toISOString()
+											).toISOString(),
 										});
 
 										const timeElapsed = performance.now() - savingStart;
@@ -447,7 +452,7 @@
 											timeElapsed > 5_000
 										) {
 											sendNotification(`${file.name} enregistré`, {
-												body: 'Le fichier a été enregistré avec succès'
+												body: 'Le fichier a été enregistré avec succès',
 											});
 										}
 
@@ -468,7 +473,7 @@
 						{#if fileObject}
 							{@const file = new File([fileObject.bytes], fileObject.filename, {
 								type: fileObject.contentType,
-								lastModified: new Date(fileObject.lastModifiedAt).getTime()
+								lastModified: new Date(fileObject.lastModifiedAt).getTime(),
 							})}
 							<div class="preview" in:fade>
 								<FilePreview {file} />

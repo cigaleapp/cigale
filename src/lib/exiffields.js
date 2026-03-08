@@ -427,7 +427,7 @@ export const EXIF_REGULAR_FIELDS = /** @type {const} */ ({
 	//  'Saturation': 0xfe55,
 	//  'Sharpness': 0xfe56,
 	Smoothness: 0xfe57,
-	MoireFilter: 0xfe58
+	MoireFilter: 0xfe58,
 	// gps
 });
 
@@ -463,7 +463,7 @@ export const EXIF_GPS_FIELDS = /** @type {const} */ ({
 	GPSAreaInformation: 0x001c,
 	GPSDateStamp: 0x001d,
 	GPSDifferential: 0x001e,
-	GPSHPositioningError: 0x001f
+	GPSHPositioningError: 0x001f,
 });
 
 /**
@@ -471,5 +471,5 @@ export const EXIF_GPS_FIELDS = /** @type {const} */ ({
  */
 export const EXIF_FIELDS = /** @type {const} */ ({
 	...EXIF_REGULAR_FIELDS,
-	...EXIF_GPS_FIELDS
+	...EXIF_GPS_FIELDS,
 });

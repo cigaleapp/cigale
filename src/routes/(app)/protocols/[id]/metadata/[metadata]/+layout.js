@@ -21,6 +21,6 @@ export async function load({ params, parent, depends }) {
 	return {
 		protocol,
 		metadata,
-		optionsCount
+		optionsCount,
 	};
 }

@@ -29,7 +29,7 @@ const sampleImage = (id, fileId) => ({
 	filename: 'gurt: syubau.jpeg',
 	boundingBoxesAnalyzed: false,
 	contentType: 'image/jpeg',
-	metadata: {}
+	metadata: {},
 });
 
 /**
@@ -183,7 +183,7 @@ export async function deleteImageFile(id, tx, notFoundOk = true) {
 						} else if (remainingImages.length < observation.images.length) {
 							tx.objectStore('Observation').put({
 								...observation,
-								images: remainingImages
+								images: remainingImages,
 							});
 						}
 					}
@@ -230,7 +230,7 @@ export async function storeImageBytes({
 	filename,
 	width,
 	height,
-	tx
+	tx,
 }) {
 	await db.openTransaction(['ImageFile', 'ImagePreviewFile'], { tx }, async (tx) => {
 		tx.objectStore('ImageFile').put({
@@ -239,7 +239,7 @@ export async function storeImageBytes({
 			contentType,
 			filename,
 			dimensions: { width, height },
-			sessionId: sessionId ?? uiState.currentSessionId
+			sessionId: sessionId ?? uiState.currentSessionId,
 		});
 		tx.objectStore('ImagePreviewFile').put({
 			id,
@@ -247,7 +247,7 @@ export async function storeImageBytes({
 			contentType,
 			filename,
 			dimensions: { width, height },
-			sessionId: sessionId ?? uiState.currentSessionId
+			sessionId: sessionId ?? uiState.currentSessionId,
 		});
 		const preview = new Blob([resizedBytes], { type: contentType });
 		uiState.setPreviewURL(id, URL.createObjectURL(preview));
@@ -293,7 +293,7 @@ const RAW_IMAGE_MEDIA_TYPES = [
 	'image/x-panasonic-raw',
 	'image/x-sony-sr2',
 	'image/x-sony-srf',
-	'image/x-sigma-x3f'
+	'image/x-sigma-x3f',
 ];
 
 const ALWAYS_SUPPORTED_TYPES = ['image/jpeg', 'image/png'];
@@ -338,7 +338,7 @@ export async function resizeToMaxSize({ source }) {
 	resize(originalCanvas, resizedCanvas, {
 		targetWidth: MAXWIDTH,
 		targetHeight: MAXHEIGHT(originalImage),
-		filter: 'mks2013'
+		filter: 'mks2013',
 	});
 	return new Promise((resolve) => {
 		resizedCanvas.toBlob((blob) => {
@@ -406,7 +406,7 @@ export function parseImageId(imageId) {
 	const subindexNumber = Number.parseInt(subindex, 10);
 	return {
 		fileId,
-		subindex: Number.isNaN(subindexNumber) ? null : subindexNumber
+		subindex: Number.isNaN(subindexNumber) ? null : subindexNumber,
 	};
 }
 
@@ -432,7 +432,7 @@ if (import.meta.vitest) {
 			const id = imageFileId();
 			expect(parseImageId(imageId(id, 1234567))).toStrictEqual({
 				fileId: id,
-				subindex: 1234567
+				subindex: 1234567,
 			});
 		});
 	});
@@ -457,7 +457,7 @@ export async function cropImage(bytes, contentType, centeredBoundingBox, padding
 		canvas.getContext('2d')?.drawImage(croppedBitmap, 0, 0);
 		const croppedBytes = await canvas
 			.convertToBlob({
-				type: ['image/png', 'image/jpeg'].includes(contentType) ? contentType : 'image/png'
+				type: ['image/png', 'image/jpeg'].includes(contentType) ? contentType : 'image/png',
 			})
 			.then((blob) => blob.arrayBuffer());
 
@@ -467,7 +467,7 @@ export async function cropImage(bytes, contentType, centeredBoundingBox, padding
 		throw new Error(
 			`Couldn't crop with ${JSON.stringify({ centeredBoundingBox, padding })}: ${error}`,
 			{
-				cause: error
+				cause: error,
 			}
 		);
 	} finally {
@@ -496,8 +496,8 @@ export function parseCropPadding(padding) {
 				x: clamp(x * width - this.inPixels(width), 0, width),
 				y: clamp(y * height - this.inPixels(height), 0, height),
 				width: clamp(w * width + this.inPixels(width) * 2, 1, width),
-				height: clamp(h * height + this.inPixels(height) * 2, 1, height)
+				height: clamp(h * height + this.inPixels(height) * 2, 1, height),
 			};
-		}
+		},
 	};
 }

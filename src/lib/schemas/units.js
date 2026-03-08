@@ -50,7 +50,7 @@ export function availableUnitsFor(unit) {
 		(u) =>
 			/** @type {const} */ ({
 				names: u.names,
-				symbols: 'symbols' in u ? u.symbols : []
+				symbols: 'symbols' in u ? u.symbols : [],
 			})
 	);
 }

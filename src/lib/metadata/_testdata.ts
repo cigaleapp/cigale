@@ -1,4 +1,5 @@
 import type * as DB from '$lib/database.js';
+
 import { METADATA_TYPES } from '$lib/schemas/metadata';
 import { mapEntries } from '$lib/utils';
 
@@ -13,7 +14,7 @@ export const metadatas = {
 		id: 'metadata_boundingbox ',
 		type: 'boundingbox',
 		mergeMethod: 'union',
-		options: []
+		options: [],
 	},
 	enum: {
 		id: 'metadata_enum ',
@@ -22,9 +23,9 @@ export const metadatas = {
 		options: [
 			{ key: 'A', label: 'Option A', index: 1, synonyms: ['Option α'] },
 			{ key: 'B', label: 'Option B', index: 0, synonyms: ['Option β'] },
-			{ key: 'C', label: 'Option C', index: 2, synonyms: ['Option γ'] }
-		]
-	}
+			{ key: 'C', label: 'Option C', index: 2, synonyms: ['Option γ'] },
+		],
+	},
 } as const satisfies {
 	[K in DB.MetadataType]: Pick<DB.Metadata, 'id' | 'type' | 'mergeMethod'> & {
 		options: DB.MetadataEnumVariant[];
@@ -42,8 +43,8 @@ export const items: Array<{ id: string; metadata: DB.MetadataValues }> = [
 			metadata_boolean: true,
 			metadata_location: { latitude: 10.12345, longitude: 20.12345 },
 			metadata_enum: 'A',
-			metadata_boundingbox: { x: 10, y: 10, w: 50, h: 50 }
-		}
+			metadata_boundingbox: { x: 10, y: 10, w: 50, h: 50 },
+		},
 	},
 	{
 		id: 'item2',
@@ -55,8 +56,8 @@ export const items: Array<{ id: string; metadata: DB.MetadataValues }> = [
 			metadata_boolean: false,
 			metadata_location: { latitude: 10.12355, longitude: 20.12355 },
 			metadata_enum: 'B',
-			metadata_boundingbox: { x: 12, y: 12, w: 50, h: 50 }
-		}
+			metadata_boundingbox: { x: 12, y: 12, w: 50, h: 50 },
+		},
 	},
 	{
 		id: 'item3',
@@ -67,9 +68,9 @@ export const items: Array<{ id: string; metadata: DB.MetadataValues }> = [
 			metadata_string: 'apple',
 			metadata_boolean: true,
 			metadata_location: { latitude: 15.56789, longitude: 25.56789 },
-			metadata_enum: 'A'
+			metadata_enum: 'A',
 			// No bounding box value here
-		}
+		},
 	},
 	{
 		id: 'item4',
@@ -81,8 +82,8 @@ export const items: Array<{ id: string; metadata: DB.MetadataValues }> = [
 			metadata_boolean: false,
 			metadata_location: { latitude: 10.124, longitude: 20.124 },
 			metadata_enum: 'C',
-			metadata_boundingbox: { x: 11, y: 11.5, w: 50, h: 50 }
-		}
+			metadata_boundingbox: { x: 11, y: 11.5, w: 50, h: 50 },
+		},
 	},
 	{
 		id: 'item5',
@@ -94,8 +95,8 @@ export const items: Array<{ id: string; metadata: DB.MetadataValues }> = [
 			metadata_boolean: false,
 			metadata_location: { latitude: 10.124, longitude: 20.124 },
 			metadata_enum: 'B',
-			metadata_boundingbox: { x: 11, y: 11.5, w: 50, h: 50 }
-		}
+			metadata_boundingbox: { x: 11, y: 11.5, w: 50, h: 50 },
+		},
 	},
 	{
 		id: 'item6',
@@ -107,9 +108,9 @@ export const items: Array<{ id: string; metadata: DB.MetadataValues }> = [
 			metadata_boolean: true,
 			metadata_location: { latitude: 30.0, longitude: 40.0 },
 			metadata_enum: 'A',
-			metadata_boundingbox: { x: 15, y: 15, w: 50, h: 50 }
-		}
-	}
+			metadata_boundingbox: { x: 15, y: 15, w: 50, h: 50 },
+		},
+	},
 ].map((item) => ({
 	...item,
 	metadata: Object.fromEntries(
@@ -120,15 +121,15 @@ export const items: Array<{ id: string; metadata: DB.MetadataValues }> = [
 				manuallyModified: false,
 				confirmed: false,
 				confidence: 1,
-				alternatives: {}
-			} satisfies DB.MetadataValue
+				alternatives: {},
+			} satisfies DB.MetadataValue,
 		])
-	)
+	),
 }));
 
 export const values = mapEntries(METADATA_TYPES, (typ) => [
 	typ,
 	items
 		.filter((item) => item.metadata[`metadata_${typ}`] !== undefined)
-		.map((item) => [item.id, item.metadata[`metadata_${typ}`]!.value] as const)
+		.map((item) => [item.id, item.metadata[`metadata_${typ}`]!.value] as const),
 ]);

@@ -1,4 +1,6 @@
 <script lang="ts">
+	import type { NodeProvenance } from '../../../../../lib/file-tree.js';
+
 	import { fade } from 'svelte/transition';
 
 	import { page } from '$app/state';
@@ -10,7 +12,6 @@
 	import { entries } from '$lib/utils.js';
 	import ZipContentsTree from '$lib/ZipContentsTree.svelte';
 
-	import type { NodeProvenance } from '../../../../../lib/file-tree.js';
 	import MetadataLink from '../MetadataLink.svelte';
 
 	seo({ title: `Protocole ${page.params.id}: Export` });
@@ -29,12 +30,12 @@
 		const newExports = {
 			images: {
 				cropped: exports.images.cropped.toJSON(),
-				original: exports.images.original.toJSON()
+				original: exports.images.original.toJSON(),
 			},
 			metadata: {
 				csv: exports.metadata.csv,
-				json: exports.metadata.json
-			}
+				json: exports.metadata.json,
+			},
 		};
 
 		// @ts-expect-error

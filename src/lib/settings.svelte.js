@@ -46,7 +46,7 @@ export async function setSetting(key, value) {
 	return tables.Settings.set({
 		...current,
 		id: 'user',
-		[key]: value
+		[key]: value,
 	});
 }
 
@@ -83,7 +83,7 @@ export async function toggleSetting(key) {
 	return tables.Settings.set({
 		...current,
 		id: 'user',
-		[key]: !current[key]
+		[key]: !current[key],
 	});
 }
 

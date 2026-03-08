@@ -1,4 +1,8 @@
 <script lang="ts">
+	import type { Metadata, MetadataEnumVariant, Observation } from '$lib/database.js';
+	import type { TypedMetadataValue } from '$lib/metadata/index.js';
+	import type { Props as ComboboxProps } from '$lib/MetadataCombobox.svelte';
+
 	import IconUnconfirmed from '~icons/ri/arrow-go-back-line';
 	import IconPrevious from '~icons/ri/arrow-left-line';
 	import IconNext from '~icons/ri/arrow-right-line';
@@ -7,11 +11,10 @@
 	import { invalidate } from '$app/navigation';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import ConfidencePercentage from '$lib/ConfidencePercentage.svelte';
-	import type { Metadata, MetadataEnumVariant, Observation } from '$lib/database.js';
 	import { dependencyURI, openDatabase } from '$lib/idb.svelte.js';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
-	import { storeMetadataValue, type TypedMetadataValue } from '$lib/metadata/index.js';
-	import MetadataCombobox, { type Props as ComboboxProps } from '$lib/MetadataCombobox.svelte';
+	import { storeMetadataValue } from '$lib/metadata/index.js';
+	import MetadataCombobox from '$lib/MetadataCombobox.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { undo } from '$lib/undo.svelte.js';
 	import { compareBy, entries, mapKeys, nonnull } from '$lib/utils.js';
@@ -27,7 +30,7 @@
 		observation,
 		focusedMetadata,
 		options,
-		currentMetadataValue: current
+		currentMetadataValue: current,
 	}: Props = $props();
 
 	const layout = $derived(uiState.currentSession?.fullscreenClassifier.layout ?? 'top-bottom');
@@ -41,7 +44,7 @@
 		if (!option) return {};
 		return {
 			...mapKeys(current.alternatives, (k) => JSON.parse(k).toString() as string),
-			[option.key]: current.confidence
+			[option.key]: current.confidence,
 		};
 	});
 
@@ -83,9 +86,9 @@
 				...(newAlternative ? [newAlternative] : []),
 				...entries(confidences).map(([value, confidence]) => ({
 					value,
-					confidence
-				}))
-			]
+					confidence,
+				})),
+			],
 		});
 
 		if (pushToUndoStack && current) {
@@ -93,7 +96,7 @@
 				observationId: observation.id,
 				metadataId: focusedMetadata.id,
 				before: { key: current.value.toString() },
-				after: { key: option.key }
+				after: { key: option.key },
 			});
 		}
 
@@ -112,43 +115,43 @@
 			async do() {
 				if (!nextOption) return;
 				await setOption(nextOption, confidences);
-			}
+			},
 		},
 		J: {
 			help: 'Option précédente',
 			async do() {
 				if (!prevOption) return;
 				await setOption(prevOption, confidences);
-			}
+			},
 		},
 		'$mod+F': {
 			help: 'Ouvrir/Fermer la liste des options',
 			do: (e) => {
 				e.preventDefault();
 				focusOptionCombobox?.('toggle');
-			}
+			},
 		},
 		M: {
 			help: 'Ouvrir le lien "En savoir plus" dans un nouvel onglet',
 			when: () => Boolean(option?.learnMore),
 			do() {
 				window.open(option!.learnMore, '_blank');
-			}
+			},
 		},
 		ArrowUp: {
 			help: 'Marquer la classification comme confirmée',
 			async do() {
 				if (!option) return;
 				await setOption(option!, confidences, { confirmed: true, pushToUndoStack: false });
-			}
+			},
 		},
 		ArrowDown: {
 			help: 'Marquer la classification comme non confirmée',
 			async do() {
 				if (!option) return;
 				await setOption(option!, confidences, { confirmed: false, pushToUndoStack: false });
-			}
-		}
+			},
+		},
 	});
 </script>
 
@@ -160,7 +163,7 @@
 			onclick={async () => setOption(prevOption!, confidences)}
 			help={{
 				text: prevOption?.label ?? '',
-				keyboard: 'J'
+				keyboard: 'J',
 			}}
 		>
 			<div class="button-contents prev">
@@ -181,7 +184,7 @@
 			onclick={() => focusOptionCombobox('focus')}
 			help={{
 				text: 'Voir toutes les options',
-				keyboard: '$mod+F'
+				keyboard: '$mod+F',
 			}}
 		>
 			<MetadataCombobox
@@ -208,7 +211,7 @@
 			onclick={async () => setOption(nextOption!, confidences)}
 			help={{
 				text: nextOption?.label ?? '',
-				keyboard: 'L'
+				keyboard: 'L',
 			}}
 		>
 			<div class="button-contents">
@@ -231,14 +234,14 @@
 					if (!option) return;
 					await setOption(option, confidences, {
 						confirmed: !current?.confirmed,
-						pushToUndoStack: false
+						pushToUndoStack: false,
 					});
 				}}
 				help={{
 					text: current?.confirmed
 						? 'Marquer comme non confirmée '
 						: 'Confirmer la classification ',
-					keyboard: current?.confirmed ? 'ArrowDown' : 'ArrowUp'
+					keyboard: current?.confirmed ? 'ArrowDown' : 'ArrowUp',
 				}}
 			>
 				<div class="button-contents">

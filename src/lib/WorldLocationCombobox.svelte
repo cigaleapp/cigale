@@ -1,10 +1,11 @@
 <script lang="ts">
+	import type { RuntimeValue } from './schemas/metadata.js';
+
 	import { ArkErrors, type } from 'arktype';
 	import { SvelteMap } from 'svelte/reactivity';
 
 	import Combobox from './Combobox.svelte';
 	import { coordinatesToAddress, suggestCoordinates } from './nominatim.js';
-	import type { RuntimeValue } from './schemas/metadata.js';
 	import { orEmpty2 } from './utils.js';
 	import WorldMap from './WorldMap.svelte';
 
@@ -75,8 +76,8 @@
 			{
 				...coords,
 				key: coordsToKey(coords),
-				label: `Utiliser des coordonnées`
-			}
+				label: `Utiliser des coordonnées`,
+			},
 		];
 	}}
 	items={orEmpty2(value, ({ latitude, longitude }) => {
@@ -86,7 +87,7 @@
 			key,
 			latitude,
 			longitude,
-			label: reverseGeocodings.get(key) || `${latitude}, ${longitude}`
+			label: reverseGeocodings.get(key) || `${latitude}, ${longitude}`,
 		};
 	})}
 >

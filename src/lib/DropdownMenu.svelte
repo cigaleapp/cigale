@@ -41,8 +41,9 @@
 </script>
 
 <script lang="ts" generics="D = never, SD = never">
-	import { DropdownMenu } from 'bits-ui';
 	import type { Snippet } from 'svelte';
+
+	import { DropdownMenu } from 'bits-ui';
 
 	interface Props {
 		items: ItemsGroup<D, SD>[];
@@ -57,7 +58,7 @@
 	function testids(testid: string | undefined) {
 		return {
 			trigger: testid ? `${testid}-open` : undefined,
-			content: testid ? `${testid}-options` : undefined
+			content: testid ? `${testid}-options` : undefined,
 		};
 	}
 
@@ -71,7 +72,7 @@
 				...props,
 				onclick: () => {
 					open = !open;
-				}
+				},
 			})}
 		{/snippet}
 	</DropdownMenu.Trigger>
@@ -146,7 +147,7 @@
 														{#if item}
 															{@render item(j.data, {
 																...j,
-																selected: false
+																selected: false,
 															})}
 														{:else}
 															{j.label}

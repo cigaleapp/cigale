@@ -65,7 +65,6 @@ export async function listTable(page, tableName) {
  * @returns {Promise<string>}
  */
 
-
 /**
  * @overload
  * @param {Page} page
@@ -99,7 +98,7 @@ export async function dumpDatabase(page, filepath) {
 
 	if (dest) {
 		await mkdir(path.dirname(dest), {
-			recursive: true
+			recursive: true,
 		});
 
 		await writeFile(dest, encodedDump, 'utf-8');

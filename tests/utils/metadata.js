@@ -29,16 +29,16 @@ export async function setImageMetadata({ page }, id, metadata, { refreshDB = tru
 						key,
 						{
 							...rest,
-							value: JSON.stringify(value)
-						}
+							value: JSON.stringify(value),
+						},
 					])
-				)
-			}
+				),
+			},
 		});
 		if (refreshDB) {
 			console.info('Image updated, refreshing DB', {
 				id,
-				metadata
+				metadata,
 			});
 
 			window.refreshDB();
@@ -55,7 +55,7 @@ function sidepanelMetadataSectionFor(page, metadataLabel) {
 		.getByTestId('sidepanel')
 		.locator('.metadata')
 		.filter({
-			has: page.locator('label').filter({ hasText: metadataLabel })
+			has: page.locator('label').filter({ hasText: metadataLabel }),
 		});
 }
 
@@ -69,7 +69,7 @@ function sessionMetadataSectionFor(page, metadataLabel) {
 		.getByTestId('session-metadata')
 		.locator('.metadata')
 		.filter({
-			has: page.locator('label').filter({ hasText: metadataLabel })
+			has: page.locator('label').filter({ hasText: metadataLabel }),
 		});
 }
 
@@ -100,6 +100,6 @@ export function metadataSections(page) {
 			return section(label)
 				.getByRole('radiogroup')
 				.getByRole('radio', { name: option, exact });
-		}
+		},
 	};
 }
