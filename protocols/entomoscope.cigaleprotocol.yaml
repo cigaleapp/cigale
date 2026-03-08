@@ -10,7 +10,7 @@ authors:
   - name: Maxime Cauchoix
 
 imports:
-  - from: io.github.cigaleapp.arthropods.example
+  - from: io.github.cigaleapp.backbone.arthropods
     metadata:
       - species
       - genus
