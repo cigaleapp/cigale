@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file, on a monthly basis, with a consistent, simple format: month/year heading > type of change heading > list of changes.
 
+## March 2026
+
+### Improvements
+
+- Add metadata groups
+- Add metadata images (#1310)
+- Display images in compact enums
+- Put metadata images at the left side when possible
+
+### Bug Fixes
+
+- Fix description hidden by very long cascades in vertical fullscreen classifier
+
+### Data Updates
+
+- Add metadata from Xper3 descriptors
+- Regenerate example protocols
+
+### Translation Updates
+
+- Refresh translation files
+
 ## February 2026
 
 ### Improvements
@@ -12,8 +34,10 @@ All notable changes to this project will be documented in this file, on a monthl
 - Enlarge ∞ character when no file size limit on file metadata input
 - Implement export-to-folder
 - Implement file metadata
+- Implement metadata units & conversions
 - Implement protocol metadata imports
 - Implement range & pattern/regex constraints on metadata
+- Implement sidecar metadata inference
 - Improve clear button & confidence indicator on metadata inputs
 - Improve error message in crop step of loadTensor()
 - Improve numeric metadata inputs
