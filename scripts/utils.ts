@@ -145,11 +145,11 @@ export async function emitCheckrun(
 		name = `${job.workflow_name} / ${checkrun.name} (progress)`;
 
 		const {
-			data: { check_runs: currentCheckruns }
+			data: { check_runs: currentCheckruns },
 		} = await gh.request('GET /repos/{owner}/{repo}/commits/{ref}/check-runs', {
 			owner,
 			repo,
-			ref: process.env.GITHUB_SHA!
+			ref: process.env.GITHUB_SHA!,
 		});
 
 		const matchingCheckrun = currentCheckruns.find(
@@ -158,7 +158,7 @@ export async function emitCheckrun(
 		if (matchingCheckrun) {
 			checkruns.set(id, {
 				githubId: matchingCheckrun.id,
-				name
+				name,
 			});
 		}
 	}
@@ -178,8 +178,8 @@ export async function emitCheckrun(
 				output: {
 					title: `${details} (${step})`,
 					summary: '',
-					text: `custom-checkrun-${id}`
-				}
+					text: `custom-checkrun-${id}`,
+				},
 			});
 
 			checkruns.set(id, { ...existing, step });
@@ -195,14 +195,14 @@ export async function emitCheckrun(
 				output: {
 					title: `${details} (${step})`,
 					summary: '',
-					text: `custom-checkrun-${id}`
-				}
+					text: `custom-checkrun-${id}`,
+				},
 			});
 
 			checkruns.set(id, {
 				githubId: response.data.id,
 				step: step!,
-				name
+				name,
 			});
 		}
 	} catch (error) {
