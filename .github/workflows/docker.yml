@@ -43,7 +43,7 @@ jobs:
         name: Build
         run: bun run build
       - name: Build docker image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           file: ./Dockerfile
           context: .
