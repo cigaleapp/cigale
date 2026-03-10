@@ -22,11 +22,10 @@
 	import KeyboardHint from '$lib/KeyboardHint.svelte';
 	import Logo from '$lib/Logo.svelte';
 	import Metadata from '$lib/Metadata.svelte';
-	import { metadataOptionsKeyRange } from '$lib/metadata/index.js';
+	import { metadataOptionsOf } from '$lib/metadata/index.js';
 	import MetadataList from '$lib/MetadataList.svelte';
 	import { goto } from '$lib/paths.js';
 	import { metadataDefinitionComparator } from '$lib/protocols.js';
-	import { splitMetadataId } from '$lib/schemas/metadata.js';
 	import { uiState } from '$lib/state.svelte.js';
 
 	/**
@@ -93,31 +92,22 @@
 			return;
 		}
 
-		const keyranges = [
-			metadataOptionsKeyRange(uiState.currentProtocol.id, null),
-			...uiState.currentProtocol.importedMetadata
-				.filter(({ sessionwide }) => !sessionwide)
-				.map(({ source }) => {
-					const { namespace, id } = splitMetadataId(source);
-					return metadataOptionsKeyRange(namespace, id);
-				}),
-		];
+		void (async () => {
+			const results = await metadataOptionsOf(
+				idb.databaseHandle(),
+				uiState.currentProtocolId,
+				null
+			);
 
-		Promise.all(keyranges.map((range) => idb.list('MetadataOption', range))).then((results) => {
-			// Prevent double-load even if both promises resolved at the same time
-			if (Object.keys(options).length > 0) {
-				loadingOptions = false;
-				return;
-			}
-
-			for (const { metadataId, key, ...rest } of results.flat()) {
+			for (const [metadataId, opts] of results.byMetadata) {
 				options[metadataId] ??= new Map();
-				const k = key.toString();
-				options[metadataId].set(k, { key: k, ...rest });
+				for (const opt of opts) {
+					options[metadataId].set(opt.key, opt);
+				}
 			}
 
 			loadingOptions = false;
-		});
+		})();
 	});
 
 	const singleObservationSelected = $derived(

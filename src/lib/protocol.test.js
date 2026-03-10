@@ -1,4 +1,4 @@
-import { describe, expect, it, test, vi } from 'vitest';
+import { beforeEach, describe, expect, it, test, vi } from 'vitest';
 
 import { metadataOptionsKeyRange } from '$lib/metadata/index.js';
 import {
@@ -11,6 +11,15 @@ import { Protocol } from '$lib/schemas/protocols.js';
 import { pick } from '$lib/utils.js';
 
 import 'fake-indexeddb/auto';
+
+import { openDatabase } from './idb.svelte.js';
+
+beforeEach(async () => {
+	const db = await openDatabase();
+	await db.clear('Protocol');
+	await db.clear('Metadata');
+	await db.clear('MetadataOption');
+});
 
 test('jsonSchemaURL', () => {
 	// Mock window.location.origin
@@ -32,84 +41,9 @@ test('jsonSchemaURL', () => {
 });
 
 test('toExportedProtocol', async () => {
-	const db = {
-		getAll: vi.fn(
-			/**
-			 * @returns {Promise<Array<import('$lib/database').Metadata | import('$lib/database').MetadataEnumVariant & {metadataId: string}>>}
-			 */
-			async (table, _range) => {
-				if (table === 'MetadataOption') {
-					return [
-						{
-							id: 'protocol1__meta1:opt1',
-							metadataId: 'protocol1__meta1',
-							key: 'opt1',
-							label: 'Option 1',
-							description: 'Desc 1',
-							synonyms: [],
-						},
-						{
-							id: 'protocol1__meta1:opt2',
-							metadataId: 'protocol1__meta1',
-							key: 'opt2',
-							label: 'Option 2',
-							description: 'Desc 2',
-							synonyms: [],
-						},
-						{
-							id: 'protocol1__meta2:opt1',
-							metadataId: 'protocol1__meta2',
-							key: 'opt1',
-							label: 'Option A',
-							description: 'Desc A',
-							synonyms: [],
-						},
-					];
-				} else if (table === 'Metadata') {
-					return [
-						{
-							id: 'protocol1__meta1',
-							images: [],
-							type: 'enum',
-							key: 'meta1',
-							description: 'Metadata 1 description',
-							label: 'Metadata 1',
-							mergeMethod: 'max',
-							required: false,
-							sortable: false,
-							groupable: false,
-						},
-						{
-							id: 'protocol1__meta2',
-							images: [],
-							type: 'enum',
-							key: 'meta2',
-							label: 'Metadata 2',
-							description: 'Metadata 2 description',
-							mergeMethod: 'max',
-							required: false,
-							sortable: false,
-							groupable: false,
-						},
-						{
-							id: 'protocol1__meta3',
-							images: [],
-							type: 'enum',
-							key: 'meta3',
-							label: 'Metadata 3',
-							description: 'Metadata 3 description',
-							mergeMethod: 'max',
-							required: false,
-							sortable: false,
-							groupable: false,
-						},
-					];
-				}
-				return [];
-			}
-		),
-	};
-	const protocol = Protocol.assert({
+	const db = await openDatabase();
+
+	await db.add('Protocol', {
 		id: 'protocol1',
 		name: 'Test Protocol',
 		version: 1,
@@ -118,9 +52,6 @@ test('toExportedProtocol', async () => {
 		sessionMetadata: ['protocol1__meta3'],
 		authors: [],
 		description: 'A test protocol',
-		crop: {
-			metadata: 'meta1',
-		},
 		exports: {
 			metadata: {
 				json: 'analysis.json',
@@ -133,13 +64,76 @@ test('toExportedProtocol', async () => {
 			},
 		},
 	});
-	const exported = await toExportedProtocol(db, protocol);
 
-	expect.soft(db.getAll).toHaveBeenCalledTimes(2);
-	expect
-		.soft(db.getAll)
-		.toHaveBeenCalledWith('MetadataOption', metadataOptionsKeyRange('protocol1', null));
-	expect.soft(db.getAll).toHaveBeenCalledWith('Metadata');
+	await db.add('MetadataOption', {
+		id: 'protocol1__meta1:opt1',
+		metadataId: 'protocol1__meta1',
+		key: 'opt1',
+		label: 'Option 1',
+		description: 'Desc 1',
+		synonyms: [],
+	});
+
+	await db.add('MetadataOption', {
+		id: 'protocol1__meta1:opt2',
+		metadataId: 'protocol1__meta1',
+		key: 'opt2',
+		label: 'Option 2',
+		description: 'Desc 2',
+		synonyms: [],
+	});
+
+	await db.add('MetadataOption', {
+		id: 'protocol1__meta2:opt1',
+		metadataId: 'protocol1__meta2',
+		key: 'opt1',
+		label: 'Option A',
+		description: 'Desc A',
+		synonyms: [],
+	});
+
+	await db.add('Metadata', {
+		id: 'protocol1__meta1',
+		images: [],
+		type: 'enum',
+		// key: 'meta1',
+		description: 'Metadata 1 description',
+		label: 'Metadata 1',
+		mergeMethod: 'max',
+		required: false,
+		sortable: false,
+		groupable: false,
+	});
+
+	await db.add('Metadata', {
+		id: 'protocol1__meta2',
+		images: [],
+		type: 'enum',
+		// key: 'meta2',
+		label: 'Metadata 2',
+		description: 'Metadata 2 description',
+		mergeMethod: 'max',
+		required: false,
+		sortable: false,
+		groupable: false,
+	});
+
+	await db.add('Metadata', {
+		id: 'protocol1__meta3',
+		images: [],
+		type: 'enum',
+		// key: 'meta3',
+		label: 'Metadata 3',
+		description: 'Metadata 3 description',
+		mergeMethod: 'max',
+		required: false,
+		sortable: false,
+		groupable: false,
+	});
+
+	const protocol = Protocol.assert(await db.get('Protocol', 'protocol1'));
+
+	const exported = await toExportedProtocol(db, protocol);
 
 	expect(exported).toEqual({
 		...pick(protocol, 'id', 'name', 'version', 'description', 'authors', 'crop', 'updates'),
@@ -147,7 +141,6 @@ test('toExportedProtocol', async () => {
 		metadataGroups: {},
 		sessionMetadata: {
 			protocol1__meta3: {
-				key: 'meta3',
 				label: 'Metadata 3',
 				type: 'enum',
 				description: 'Metadata 3 description',
@@ -161,7 +154,6 @@ test('toExportedProtocol', async () => {
 		},
 		metadata: {
 			protocol1__meta1: {
-				key: 'meta1',
 				label: 'Metadata 1',
 				type: 'enum',
 				description: 'Metadata 1 description',
@@ -186,7 +178,6 @@ test('toExportedProtocol', async () => {
 				],
 			},
 			protocol1__meta2: {
-				key: 'meta2',
 				label: 'Metadata 2',
 				description: 'Metadata 2 description',
 				mergeMethod: 'max',
