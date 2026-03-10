@@ -1,7 +1,7 @@
 import { error } from '@sveltejs/kit';
 
-import { get, list, tables } from '$lib/idb.svelte.js';
-import { metadataOptionsKeyRange } from '$lib/metadata/index.js';
+import { get, tables, databaseHandle } from '$lib/idb.svelte.js';
+import { metadataOptionsKeyRange, metadataOptionsOf } from '$lib/metadata/index.js';
 import { metadataOptionId, namespacedMetadataId } from '$lib/schemas/metadata.js';
 import { entries } from '$lib/utils.js';
 
@@ -38,14 +38,16 @@ export async function load({ parent, params }) {
 		})
 	);
 
+	const options = await metadataOptionsOf(databaseHandle(), params.id);
+
 	const reverseCascades = await Promise.all(
 		protocol.metadata.flatMap(async (mid) => {
 			const metadata = await tables.Metadata.get(namespacedMetadataId(params.id, mid));
 			if (!metadata) return [];
 			if (metadata.type !== 'enum') return [];
 
-			const options = await list('MetadataOption', metadataOptionsKeyRange(params.id, mid));
 			return options
+				.filter((o) => metadataOptionsKeyRange)
 				.filter((o) => o.cascade?.[params.metadata] === option.key)
 				.map((o) => ({
 					value: o.key,

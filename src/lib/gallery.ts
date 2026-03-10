@@ -2,10 +2,10 @@ import type { MetadataValues } from './database.js';
 import type { GroupSettings, SortSettings } from './schemas/sessions.js';
 import type { Comparator } from './utils.js';
 
-import { list, tables } from './idb.svelte.js';
+import { databaseHandle, tables } from './idb.svelte.js';
 import {
 	compareByMetadataValue,
-	metadataOptionsKeyRange,
+	metadataOptionsOf,
 	metadataValueGrouper,
 } from './metadata/index.js';
 import { removeNamespaceFromMetadataId, splitMetadataId } from './schemas/metadata.js';
@@ -62,9 +62,10 @@ export async function galleryItemsSorter(
 			return dir(
 				compareByMetadataValue({
 					metadata: await tables.Metadata.getOrThrow(settings.metadata),
-					options: await list(
-						'MetadataOption',
-						metadataOptionsKeyRange(metadataId.namespace, metadataId.id)
+					options: await metadataOptionsOf(
+						databaseHandle(),
+						metadataId.namespace,
+						metadataId.id
 					),
 				})
 			);
@@ -122,9 +123,10 @@ export async function galleryItemsGrouper(
 				);
 			}
 
-			const options = await list(
-				'MetadataOption',
-				metadataOptionsKeyRange(metadataId.namespace, metadataId.id)
+			const options = await metadataOptionsOf(
+				databaseHandle(),
+				metadataId.namespace,
+				metadataId.id
 			);
 
 			const grouper = metadataValueGrouper({

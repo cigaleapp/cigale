@@ -3,7 +3,7 @@ import { error } from '@sveltejs/kit';
 import * as idb from '$lib/idb.svelte.js';
 import { tables } from '$lib/idb.svelte.js';
 import { resolveDefaults } from '$lib/metadata/defaults.js';
-import { metadataOptionsKeyRange } from '$lib/metadata/index.js';
+import { metadataOptionsOf } from '$lib/metadata/index.js';
 import { compareBy } from '$lib/utils.js';
 
 export async function load({ params: { id }, depends }) {
@@ -37,14 +37,11 @@ export async function load({ params: { id }, depends }) {
 
 	sessionMetadataDefs.sort(compareBy(({ id }) => protocol.metadataOrder?.indexOf(id) ?? -1));
 
-	const sessionMetadataOptions = await Promise.all(
-		sessionMetadataDefs.map(async (def) => [
-			def.id,
-			def.type === 'enum'
-				? await idb.list('MetadataOption', metadataOptionsKeyRange(protocol.id, def.id))
-				: [],
-		])
-	).then((options) => Object.fromEntries(options));
+	const sessionMetadataOptions = await metadataOptionsOf(
+		idb.databaseHandle(),
+		protocol.id,
+		sessionMetadataDefs.map((def) => def.id)
+	).then((options) => Object.fromEntries(Array.from(options.byMetadata)));
 
 	const counts = {
 		observations: await idb

@@ -1,3 +1,4 @@
+import type * as DB from '$lib/database.js';
 import type { DatabaseHandle } from '$lib/idb.svelte.js';
 import type { NamespacedMetadataID } from '$lib/schemas/common.js';
 
@@ -5,6 +6,19 @@ import { namespaceOfMetadataId } from '$lib/schemas/metadata.js';
 import { ExportedProtocol, ProtocolRegistry } from '$lib/schemas/protocols.js';
 
 let PROTOCOLS_REGISTRY: typeof ProtocolRegistry.infer | null = null;
+
+/**
+ * Resolve a metadata ID to its source metadata id in case it is imported
+ * @param protocol
+ * @param id
+ * @returns
+ */
+export function resolveMetadataImport(
+	protocol: Partial<Pick<DB.Protocol, 'importedMetadata'>>,
+	id: NamespacedMetadataID
+) {
+	return protocol.importedMetadata?.find((imp) => imp.target === id)?.source ?? id;
+}
 
 /**
  * Downloads (recursively) all the protocols needed to import the given protocol
