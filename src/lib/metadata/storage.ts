@@ -1,5 +1,6 @@
 import type * as DB from '$lib/database.js';
 import type { DatabaseHandle, ReactiveTableNames } from '$lib/idb.svelte.js';
+import type { NamespacedMetadataID } from '$lib/schemas/common.js';
 import type { RuntimeValue } from '$lib/schemas/metadata.js';
 import type { NumericUnit } from '$lib/schemas/units.js';
 
@@ -16,6 +17,7 @@ import {
 } from '$lib/schemas/metadata.js';
 import { orEmptyObj3 } from '$lib/utils.js';
 
+import { resolveMetadataImport } from './imports.js';
 import { serializeMetadataValue } from './serializing.js';
 
 /**
@@ -36,6 +38,89 @@ export function metadataOptionsKeyRange(
 			namespacedMetadataId('\uffff', protocolId)
 		);
 	}
+}
+
+const METADATA_OPTIONS_CACHE = new Map<NamespacedMetadataID, DB.MetadataEnumVariant[]>();
+
+export function clearMetadataOptionsCache() {
+	METADATA_OPTIONS_CACHE.clear();
+}
+
+/**
+ * Options are cached. Use clearMetadataOptionsCache to clear that cache.
+ * @param protocolId ID of the protocol
+ * @param metadataId ID(s) of the metadata. Null to get all metadata from the protocol
+ */
+export async function metadataOptionsOf(
+	db: DatabaseHandle,
+	protocolId: string,
+	metadataId: string | string[] | null
+) {
+	function arrayAndMap<Prop extends string, K extends string, V>(prop: Prop, map: Map<K, V[]>) {
+		// @ts-expect-error does not include [prop] yet
+		const out: Array<V> & { [k in Prop]: Map<K, V[]> } = Array.from(map.values()).flat();
+		// @ts-expect-error TS doesnt understand that Prop is a single fixed string
+		out[prop] = map;
+
+		return out;
+	}
+
+	console.log('metadata options cache is', METADATA_OPTIONS_CACHE);
+	const options = new Map<NamespacedMetadataID, DB.MetadataEnumVariant[]>();
+
+	const protocol = await db.get('Protocol', protocolId);
+	if (!protocol) return arrayAndMap('byMetadata', options);
+
+	let metadatas = Array.isArray(metadataId)
+		? metadataId.map((id) => ensureNamespacedMetadataId(id, protocolId))
+		: typeof metadataId === 'string'
+			? [ensureNamespacedMetadataId(metadataId, protocolId)]
+			: protocol.metadata;
+
+	metadatas = metadatas.map((id) => resolveMetadataImport(protocol, id));
+
+	for (const m of metadatas) {
+		const cached = METADATA_OPTIONS_CACHE.get(m);
+
+		if (cached) {
+			options.set(m, cached);
+		}
+	}
+
+	metadatas = metadatas.filter((id) => !options.has(id));
+
+	if (metadatas.length === 0) return arrayAndMap('byMetadata', options);
+
+	const results = await Promise.all(
+		Array.from(Map.groupBy(metadatas, (id) => namespaceOfMetadataId(id)).entries()).map(
+			async ([protocolId, metadatas]) =>
+				db.getAll(
+					'MetadataOption',
+					metadataOptionsKeyRange(
+						protocolId,
+						metadatas.length === 1 ? metadatas[0] : null
+					)
+				)
+		)
+	);
+
+	const byMetadata = new Map(
+		metadatas.map((id) => [
+			id,
+			results
+				.flat()
+				.filter((o) =>
+					metadataOptionsKeyRange(namespaceOfMetadataId(id), id).includes(o.id)
+				),
+		])
+	);
+
+	for (const [id, result] of byMetadata) {
+		METADATA_OPTIONS_CACHE.set(id, result);
+		options.set(id, result);
+	}
+
+	return arrayAndMap('byMetadata', options);
 }
 
 /**

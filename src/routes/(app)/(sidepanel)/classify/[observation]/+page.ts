@@ -2,8 +2,8 @@ import type { MetadataEnumVariant } from '$lib/database.js';
 
 import { error } from '@sveltejs/kit';
 
-import { dependencyURI, list, tables } from '$lib/idb.svelte.js';
-import { metadataOptionsKeyRange } from '$lib/metadata/index.js';
+import { databaseHandle, dependencyURI, tables } from '$lib/idb.svelte.js';
+import { metadataOptionsOf } from '$lib/metadata/index.js';
 import { observationMetadata } from '$lib/observations.js';
 import { uiState } from '$lib/state.svelte.js';
 import { compareBy } from '$lib/utils.js';
@@ -36,9 +36,10 @@ export async function load({ params, depends, parent }) {
 	) {
 		optionsOfMetadata = {
 			metadataId: focusedMetadata.id,
-			options: await list(
-				'MetadataOption',
-				metadataOptionsKeyRange(uiState.currentProtocolId, focusedMetadata.id)
+			options: await metadataOptionsOf(
+				databaseHandle(),
+				uiState.currentProtocolId,
+				focusedMetadata.id
 			),
 		};
 	}
@@ -65,14 +66,16 @@ export async function load({ params, depends, parent }) {
 
 	const allImages = await tables.Image.getMany(allObservations.flatMap(({ images }) => images));
 	const focusedValues = new Map(
-		allObservations.map((obs) => [
-			obs.id,
-			observationMetadata({
-				definitions: metadataDefinitions,
-				observation: obs,
-				images: allImages,
-			})[focusedMetadata?.id ?? ''],
-		])
+		focusedMetadata
+			? allObservations.map((obs) => [
+					obs.id,
+					observationMetadata({
+						definitions: metadataDefinitions,
+						observation: obs,
+						images: allImages,
+					})[focusedMetadata.id],
+				])
+			: []
 	);
 
 	// Counts

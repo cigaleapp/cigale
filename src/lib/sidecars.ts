@@ -6,6 +6,7 @@ import * as YAML from 'yaml';
 import * as DB from './database.js';
 import { errorMessage } from './i18n.js';
 import { imageId } from './images.js';
+import { resolveMetadataImport } from './metadata/imports.js';
 import { storeMetadataValue } from './metadata/storage.js';
 import { MetadataType, namespaceOfMetadataId } from './schemas/metadata.js';
 import { compareBy } from './utils.js';
@@ -56,13 +57,7 @@ export async function processSidecars({
 	const extractionPlan: Array<{ [T in MetadataType]: ExtractionPlanItem<T> }[MetadataType]> = [];
 
 	const metadataOfProtocol = await Promise.all(
-		protocol.metadata.map(async (id) =>
-			db.get(
-				'Metadata',
-				// Resolve imports
-				protocol.importedMetadata.find((imp) => imp.target === id)?.source || id
-			)
-		)
+		protocol.metadata.map(async (id) => db.get('Metadata', resolveMetadataImport(protocol, id)))
 	).then((ms) => ms.map((m) => DB.Schemas.Metadata.assert(m)));
 
 	for (const m of metadataOfProtocol) {
@@ -72,9 +67,13 @@ export async function processSidecars({
 		const config = m.infer.sidecar;
 
 		// resolve improts, used to get the proper default sidecar filepath
-		const importedFrom = namespaceOfMetadataId(
-			protocol.importedMetadata.find((imp) => imp.target === m.id)?.source
+		let importedFrom: string | undefined = namespaceOfMetadataId(
+			resolveMetadataImport(protocol, m.id)
 		);
+
+		if (importedFrom === protocol.id) {
+			importedFrom = undefined;
+		}
 
 		if (importedFrom && !protocols.has(importedFrom)) {
 			const parentProtocol = await db.get('Protocol', importedFrom);

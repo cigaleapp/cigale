@@ -616,11 +616,6 @@ export function removeNamespaceFromMetadataId(metadataId) {
 	return metadataId.replace(/^.+__/, '');
 }
 
-/**
- * @overload
- * @param {undefined | NamespacedMetadataID} metadataId
- * @returns {undefined|string}
- */
 
 /**
  * @overload
@@ -632,6 +627,12 @@ export function removeNamespaceFromMetadataId(metadataId) {
  * @overload
  * @param {string} metadataId
  * @returns {string	| undefined}
+ */
+
+/**
+ * @overload
+ * @param {undefined | NamespacedMetadataID} metadataId
+ * @returns {undefined|string}
  */
 
 /**
