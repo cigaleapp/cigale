@@ -41,7 +41,7 @@ export async function load({ params: { id }, depends }) {
 		idb.databaseHandle(),
 		protocol.id,
 		sessionMetadataDefs.map((def) => def.id)
-	).then((options) => Object.fromEntries(Array.from(options.byMetadata)));
+	)
 
 	const counts = {
 		observations: await idb

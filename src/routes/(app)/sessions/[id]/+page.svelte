@@ -3,6 +3,7 @@
 	import { fade } from 'svelte/transition';
 
 	import { invalidate } from '$app/navigation';
+	import SessionMetadataForm from '$lib/SessionMetadataForm.svelte'
 	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import Field from '$lib/Field.svelte';
@@ -104,44 +105,7 @@
 	{:else if sessionMetadata.length > 0}
 		<h2>Métadonnées</h2>
 
-		<form class="metadata" data-testid="session-metadata">
-			<MetadataList
-				definitions={sessionMetadata.map((s) => s.def)}
-				groups={data.protocol.metadataGroups}
-				ordering={data.protocol.metadataOrder}
-			>
-				{#snippet children(def)}
-					{@const value = sessionMetadata.find((s) => s.def.id === def.id)?.value}
-					<Metadata
-						options={data.sessionMetadataOptions[def.id]}
-						definition={def}
-						{value}
-						onchange={async (v, unit) => {
-							if (dequal(v, value?.value) && unit === value?.unit) return;
-
-							if (v !== undefined) {
-								await storeMetadataValue({
-									db: databaseHandle(),
-									manuallyModified: true,
-									subjectId: data.session.id,
-									metadataId: def.id,
-									value: v,
-									unit,
-								});
-							} else {
-								await deleteMetadataValue({
-									db: databaseHandle(),
-									subjectId: data.session.id,
-									metadataId: def.id,
-								});
-							}
-
-							invalidate(dependencyURI('Session', data.session.id));
-						}}
-					/>
-				{/snippet}
-			</MetadataList>
-		</form>
+		<SessionMetadataForm session={data.session} metadataOptions={data.sessionMetadataOptions.byMetadata}  />	
 	{/if}
 
 	<ButtonPrimary
