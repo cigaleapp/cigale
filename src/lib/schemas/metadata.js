@@ -3,7 +3,7 @@ import { ArkErrors, scope, type } from 'arktype';
 import { parseISOSafe } from '../date.js';
 import { EXIF_FIELDS } from '../exiffields.js';
 import { boundingBoxResolver } from '../inference_utils.js';
-import { entries, keys, transformObject, unique } from '../utils.js';
+import { entries, keys, pick, transformObject, unique } from '../utils.js';
 import {
 	ColorHex,
 	FilepathTemplate,
@@ -94,8 +94,8 @@ export const MetadataRuntimeValue = /** @type {const} */ ({
 	float: type('number'),
 	enum: type('string | number'),
 	date: type('Date'),
-	location: type({ latitude: 'number', longitude: 'number' }),
-	boundingbox: type({ x: 'number', y: 'number', w: 'number', h: 'number' }),
+	location: type({ latitude: 'number', longitude: 'number', '+': 'reject' }),
+	boundingbox: type({ x: 'number', y: 'number', w: 'number', h: 'number', '+': 'reject' }),
 	file: type(ID),
 });
 
@@ -335,17 +335,22 @@ export const InferenceConfigs = /** @type {const} */ ({
 });
 
 export const MetadataDefaultDynamicPayload = type({
-	protocolMetadata: MetadataRecord(NamespacedMetadataID),
-	metadata: MetadataRecord(ID),
+	protocolMetadata: MetadataRecord(ID),
+	metadata: MetadataRecord(NamespacedMetadataID),
+	// TODO: add full Observation/Image type without creating a circular import
+	observations: type({ id: ID, protocolMetadataOverrides: MetadataRecord(ID) }).array(),
+	images: type({ id: ID, protocolMetadata: MetadataRecord(ID) }).array(),
 	session: {
-		protocolMetadata: MetadataRecord(NamespacedMetadataID),
-		metadata: MetadataRecord(ID),
+		id: ID,
+		protocolMetadata: MetadataRecord(ID),
+		metadata: MetadataRecord(NamespacedMetadataID),
 		createdAt: 'string.date.iso',
 	},
 });
 
-export const MetadataDefault = scope({ MetadataRuntimeValueAny }).type(
-	'<static extends MetadataRuntimeValueAny>',
+export const MetadataDefault = scope({
+	MetadataRuntimeValueAny: MetadataRuntimeValueAny.exclude('Date'),
+}).type('<static extends MetadataRuntimeValueAny>', [
 	[
 		[
 			'Exclude<static, string>',
@@ -364,8 +369,16 @@ export const MetadataDefault = scope({ MetadataRuntimeValueAny }).type(
 		}).describe(
 			"Une valeur par défaut dynamique. Pour l'instant, uniquement supportée sur les métadonnées de session. C'est une templates Handlebars, avec pour variables `protocolMetadata` (contenant les métadonnées du protocole courant) et `metadata` (contenant les métadonnées de _toutes_ les métadonnées). La valeur par défaut sera évaluée en considérant que le texte final (après éxécution de la template Handlebars) est une représentation JSON (sauf pour les métadonnées de type texte ou enum, où le text final est pris tel-quel). Les helpers gps, boundingBox, date, object et array sont disponibles pour facilement construire des représentations JSON de valeurs complexes"
 		),
-	]
-);
+	],
+	'|',
+	{
+		jsonata: JsonataExpression(
+			MetadataDefaultDynamicPayload,
+			MetadataRuntimeValueAny.or('null | undefined')
+		),
+		'+': 'reject',
+	},
+]);
 
 export const MetadataPatternConstraint = type.or();
 
@@ -457,7 +470,7 @@ export const MetadataDate = MetadataBase.and({
 
 const MetadataLocation = MetadataBase.and({
 	type: '"location"',
-	'default?': MetadataDefault({ latitude: 'number', longitude: 'number' }),
+	'default?': MetadataDefault({ latitude: 'number', longitude: 'number', '+': 'reject' }),
 	'infer?': type.or(
 		InferenceConfigs.sidecar(type({ latitude: 'number', longitude: 'number', '+': 'reject' })),
 		{
@@ -485,6 +498,7 @@ const MetadataBoundingbox = MetadataBase.and({
 		y: '0 <= number <= 1',
 		w: '0 <= number <= 1',
 		h: '0 <= number <= 1',
+		'+': 'reject',
 	}),
 	'infer?': type.or(
 		InferenceConfigs.neuralBoundingBox,

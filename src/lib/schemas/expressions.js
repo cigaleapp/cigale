@@ -7,6 +7,7 @@ import Handlebars from 'handlebars';
 import jsonata from 'jsonata';
 
 import {
+	compareBy,
 	mapValues,
 	safeJSONStringify,
 	splitFilenameOnExtension,
@@ -189,6 +190,74 @@ export const HELPERS = /** @type {const} */ ({
 		 */
 		implementation(date) {
 			return formatDate(new Date(date), 'ss');
+		},
+	},
+	min: {
+		documentation:
+			'Renvoie le plus petit élément (texte comparé lexicographiquement et nombres comparés par valeur)',
+		usage: [['[2, 3, 5, 1, 4]'], 1],
+		/**
+		 * @param {Array<string|number>} values
+		 */
+		implementationJsonata(values) {
+			return values
+				.toSorted((a, b) => {
+					if (typeof a === 'number' && typeof b === 'number') return a - b;
+					return a.toString().localeCompare(b.toString());
+				})
+				.at(0);
+		},
+	},
+	max: {
+		documentation:
+			'Renvoie le plus grand élément (texte comparé lexicographiquement et nombres comparés par valeur)',
+		usage: [['[2, 3, 5, 1, 4]'], 5],
+		/**
+		 * @param {Array<string|number>} values
+		 */
+		implementationJsonata(values) {
+			return values
+				.toSorted((a, b) => {
+					if (typeof a === 'number' && typeof b === 'number') return a - b;
+					return a.toString().localeCompare(b.toString());
+				})
+				.at(-1);
+		},
+	},
+	argmin: {
+		documentation:
+			"Renvoie l'index du plus petit élément (texte comparé lexicographiquement et nombres comparés par valeur)",
+		usage: [['[2, 3, 5, 1, 4]'], 4],
+		/**
+		 * @param {Array<string|number>} values
+		 */
+		implementationJsonata(values) {
+			const value = values
+				.toSorted((a, b) => {
+					if (typeof a === 'number' && typeof b === 'number') return a - b;
+					return a.toString().localeCompare(b.toString());
+				})
+				.at(0);
+
+			return values.findIndex((v) => v === value);
+		},
+	},
+	argmax: {
+		documentation:
+			"Renvoie l'index du plus grand élément (texte comparé lexicographiquement et nombres comparés par valeur)",
+		usage: [['[2, 3, 5, 1, 4]'], 3],
+		/**
+		 * @param {Array<string|number>} values
+		 */
+		implementationJsonata(values) {
+			const value = values
+				.toSorted((a, b) => {
+					if (typeof a === 'number' && typeof b === 'number') return a - b;
+					return a.toString().localeCompare(b.toString());
+				})
+				.at(-1);
+
+			return values.findIndex((v) => v === value);
 		},
 	},
 	json: {

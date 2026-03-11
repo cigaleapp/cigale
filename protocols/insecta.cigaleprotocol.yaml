@@ -52,7 +52,8 @@ sessionMetadata:
     mergeMethod: none
     required: false
     description: ''
-    default: '{{ now }}'
+    default: 
+      jsonata: $min(images.protoclMetadata.shoot_date.value.$fromTimestamp($))
 
   is_training:
     type: boolean
@@ -216,8 +217,9 @@ sessionMetadata:
       Dès que vous avez réussi à vous géolocaliser, c'est parti pour 20 minutes de safari macrophotographique! Laissez ou prenez un point de repère pour retrouver votre point de départ. Vous pouvez mettre le téléphone en veille et revenir sur ce questionnaire à la fin des 20min pour indiquer votre point d'arrivée et les 3 dernières questions. N'oubliez pas de lancer un chronomètre
     mergeMethod: none
     required: true
-    # TODO: shoot_location of argmin(photos shoot_date)
-    # default:
+    default:
+      jsonata: |
+        images[ $argmin(%.images.protocolMetadata.shoot_date.value) ].protocolMetadata.shoot_location.value
 
   end_at:
     type: location
@@ -225,8 +227,9 @@ sessionMetadata:
     description: Les 20min sont écoulées. Enregistrez la localisation de votre point d'arrivé.
     mergeMethod: none
     required: true
-    # TODO: shoot_location of argmax(photos shoot_date)
-    # default:
+    default:
+      jsonata: |
+        images[ $argmax(%.images.protocolMetadata.shoot_date.value) ].protocolMetadata.shoot_location.value
 
   soil_photo_end:
     type: file

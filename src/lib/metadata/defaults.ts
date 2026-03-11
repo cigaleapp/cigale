@@ -13,6 +13,7 @@ import { toMetadataRecord } from '$lib/schemas/results.js';
 import { toasts } from '$lib/toasts.svelte.js';
 import { transformObject } from '$lib/utils.js';
 
+import { protocolMetadataValues } from './namespacing.js';
 import { serializeMetadataValue } from './serializing.js';
 import { storeMetadataValue } from './storage.js';
 import { getMetadataValue } from './types.js';
@@ -36,6 +37,10 @@ export async function resolveDefaults({
 		.get('Session', sessionId)
 		.then((session) => Tables.Session.assert(session));
 
+	const protocol = await db
+		.get('Protocol', session.protocol)
+		.then((protocol) => Tables.Protocol.assert(protocol));
+
 	const defs = await tables.Metadata.getMany(metadataToConsider).then((defs) =>
 		defs.filter((def) => def.default !== undefined)
 	);
@@ -47,14 +52,37 @@ export async function resolveDefaults({
 	const payload: typeof MetadataDefaultDynamicPayload.inferIn = {
 		protocolMetadata: {},
 		metadata: {},
+		observations: await db
+			.getAllFromIndex('Observation', 'sessionId', session.id)
+			.then((observations) => observations.map((o) => Tables.Observation.assert(o)))
+			.then((observations) =>
+				observations.map((observation) => ({
+					...observation,
+					protocolMetadataOverrides: protocolMetadataValues(
+						'observations+images',
+						protocol,
+						observation.metadataOverrides
+					),
+				}))
+			),
+		images: await db
+			.getAllFromIndex('Image', 'sessionId', session.id)
+			.then((images) => images.map((i) => Tables.Image.assert(i)))
+			.then((images) =>
+				images.map((image) => ({
+					...image,
+					protocolMetadata: protocolMetadataValues(
+						'observations+images',
+						protocol,
+						image.metadata
+					),
+				}))
+			),
 		session: {
+			id: session.id,
 			createdAt: session.createdAt,
 			metadata: sessionMetadata,
-			protocolMetadata: transformObject(sessionMetadata, (key, value) => {
-				if (!isNamespacedToProtocol(session.protocol, key)) return;
-
-				return [removeNamespaceFromMetadataId(key), value];
-			}),
+			protocolMetadata: protocolMetadataValues('session', protocol, sessionMetadata),
 		},
 	};
 
@@ -71,7 +99,9 @@ export async function resolveDefaults({
 		const value =
 			typeof defaultSpec === 'object' && 'render' in defaultSpec
 				? defaultSpec.render(payload)
-				: defaultSpec;
+				: typeof defaultSpec === 'object' && 'jsonata' in defaultSpec
+					? await defaultSpec.jsonata.evaluate(payload)
+					: defaultSpec;
 
 		if (value instanceof ArkErrors) {
 			toasts.warn(
@@ -79,6 +109,9 @@ export async function resolveDefaults({
 			);
 			continue;
 		}
+
+		if (value === null) continue;
+		if (value === undefined) continue;
 
 		console.debug('resolved default for', id, {
 			defaultSpec,
