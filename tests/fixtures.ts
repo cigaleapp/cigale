@@ -30,6 +30,7 @@ import {
 	metadataSections,
 	mockPredownloadedModels,
 	mockProtocolSourceURL,
+	mockUrl,
 	modal,
 	openSettings,
 	setHardwareConcurrency,
@@ -392,6 +393,31 @@ export const test = base.extend<
 
 			await rm('./tests/results', { recursive: true, force: true });
 			await mkdir('./tests/results', { recursive: true });
+
+			// XXX: 404 all other protocols so that no other built-in protocols appears before the Example: one in the protocols list
+			// TODO: modify newSession/etc in the tests to target lightProtocol by default instead, test failures happened on main and I was doing sth else
+			const ALLOWED_PROTOCOLS = [fullProtocol.source, lightProtocol.source];
+			await mockUrl(
+				page,
+				context,
+				(u) =>
+					Boolean(
+						u.pathname
+							.split('/')
+							.at(-1)
+							?.match(/\.cigaleprotocol\.\w+$/) &&
+						!ALLOWED_PROTOCOLS.some((source) => {
+							if (typeof source !== 'string') return false;
+							const url = new URL(source);
+							// Handles requests that contain a ?v= cachebuster in the URL
+							return url.pathname === u.pathname && url.host === u.host;
+						})
+					),
+				{
+					status: 404,
+					body: '',
+				}
+			);
 
 			if (!info.tags.includes('@real-protocol')) {
 				// @ts-expect-error we don't support non-string protocol source values for now

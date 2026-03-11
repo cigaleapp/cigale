@@ -99,7 +99,7 @@ export async function expectTooltipContent(page, locator, content, { timeout } =
  * @param {import('@playwright/test').Page} page
  * @param {import('@playwright/test').BrowserContext} context
  * @param {string | RegExp | ((u: URL) => boolean)} url
- * @param {MaybeAsyncFunction<import('@playwright/test').Route, {json:object}|{body:string|Buffer}>} result
+ * @param {MaybeAsyncFunction<import('@playwright/test').Route, {json:object}|{status?: number; body:string|Buffer}>} result
  */
 export async function mockUrl(page, context, url, result) {
 	await Promise.all(
