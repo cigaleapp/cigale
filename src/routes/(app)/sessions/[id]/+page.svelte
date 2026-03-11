@@ -1,5 +1,4 @@
 <script>
-	import { dequal } from 'dequal';
 	import { fade } from 'svelte/transition';
 
 	import { invalidate } from '$app/navigation';
@@ -7,12 +6,9 @@
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import Field from '$lib/Field.svelte';
 	import { plural } from '$lib/i18n.js';
-	import { databaseHandle, dependencyURI, tables } from '$lib/idb.svelte.js';
+	import { dependencyURI, tables } from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import InputSelectProtocol from '$lib/InputSelectProtocol.svelte';
-	import Metadata from '$lib/Metadata.svelte';
-	import { deleteMetadataValue, storeMetadataValue } from '$lib/metadata/index.js';
-	import MetadataList from '$lib/MetadataList.svelte';
 	import ModalConfirmDeletion from '$lib/ModalConfirmDeletion.svelte';
 	import { goto } from '$lib/paths.js';
 	import SessionMetadataForm from '$lib/SessionMetadataForm.svelte';

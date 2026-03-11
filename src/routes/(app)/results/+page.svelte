@@ -6,29 +6,43 @@
 
 	import IconDownloadAsZip from '~icons/ri/file-zip-line';
 	import IconDownloadAsFolder from '~icons/ri/folder-download-line';
+	import IconExpand from '~icons/ri/skip-left-line';
+	import IconCollapse from '~icons/ri/skip-right-line';
 	import { asset } from '$app/paths';
 	import { page } from '$app/state';
+	import { FULL_IMAGE_CROPBOX, toRelativeCoords } from '$lib/BoundingBoxes.svelte.js';
+	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
+	import CroppedImg from '$lib/CroppedImg.svelte';
 	import { downloadAsFile } from '$lib/download.js';
+	import Field from '$lib/Field.svelte';
 	import { gatherToTree } from '$lib/file-tree.js';
 	import { writeToFilesystem } from '$lib/filesystem.js';
 	import { formatBytesSize } from '$lib/i18n';
+	import { tables } from '$lib/idb.svelte.js';
 	import { parseCropPadding } from '$lib/images';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 	import LoadingText, { Loading } from '$lib/LoadingText.svelte';
 	import { ensureNoLoneImages } from '$lib/observations.js';
 	import RadioButtons from '$lib/RadioButtons.svelte';
+	import { scrollfader } from '$lib/scrollfader.js';
 	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
 	import SessionMetadataForm from '$lib/SessionMetadataForm.svelte';
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte.js';
+	import Tooltip from '$lib/Tooltip.svelte';
 	import { tooltip } from '$lib/tooltips.js';
 	import { entries } from '$lib/utils.js';
 	import ZipContentsTree from '$lib/ZipContentsTree.svelte';
 
 	const { data } = $props();
 	const swarpc = $derived(data.swarpc);
+
+	let windowWidth: number | undefined = $state();
+	let collapsedExportPanel = $derived((windowWidth ?? 0) <= 1400);
+
+	$inspect({ windowWidth, collapsedExportPanel });
 
 	/** We are currently generating an export (of the specified format) */
 	let exporting: 'zip' | 'folder' | false = $state(false);
@@ -168,7 +182,7 @@
 
 	let preview: TreeNode | undefined = $state();
 
-	watch([() => include], () => {
+	watch([() => uiState.currentSession?.metadata, () => include], () => {
 		preview = undefined;
 		(async () => {
 			preview = await previewZipContents();
@@ -177,7 +191,7 @@
 
 	let sizeEstimates: { compressed?: number; uncompressed?: number } = $state({});
 
-	watch([() => include, () => cropPadding], () => {
+	watch([() => uiState.currentSession?.metadata, () => include, () => cropPadding], () => {
 		sizeEstimates = {};
 		(async () => {
 			if (!uiState.currentSessionId) return;
@@ -202,15 +216,180 @@
 	});
 </script>
 
+<svelte:window bind:innerWidth={windowWidth} />
+
 <main>
-	<header>
-		<h2>Session</h2>
-	</header>
+	<section class="session">
+		<header>
+			<h2>Vérifie ta session</h2>
+		</header>
 
-	<SessionMetadataForm session={uiState.currentSession} metadataOptions={new Map()} />
+		<div class="side-by-side">
+			<section class="metadata">
+				{#if uiState.currentSession}
+					<SessionMetadataForm
+						session={uiState.currentSession}
+						metadataOptions={new Map()}
+					/>
+				{/if}
+			</section>
+		</div>
+	</section>
 
-	<header>
-		<h2>Résultats</h2>
+	<section class="export" data-testid="zip-preview" class:collapsed={collapsedExportPanel}>
+		<header>
+			<div class="actions">
+				<ButtonIcon
+					help={collapsedExportPanel
+						? "Montrer le panneau d'export"
+						: "Cacher le panneau d'export"}
+					onclick={() => {
+						collapsedExportPanel = !collapsedExportPanel;
+					}}
+				>
+					{#if collapsedExportPanel}
+						<IconExpand />
+					{:else}
+						<IconCollapse />
+					{/if}
+				</ButtonIcon>
+			</div>
+			<h2>Exporter</h2>
+		</header>
+
+		<div class="scrollable">
+			<div class="settings-and-gallery">
+				<div class="settings">
+					<div class="include">
+						<Field label="Inclure">
+							<RadioButtons
+								bind:value={include}
+								options={[
+									{ key: 'metadataonly', label: 'Métadonnées seulement' },
+									{
+										key: 'croppedonly',
+										label: 'Métadonnées et images recadrées',
+									},
+									{
+										key: 'full',
+										label: 'Tout',
+										subtext:
+											'Permet de ré-importer les résultats ultérieurement',
+									},
+								]}
+							/>
+						</Field>
+					</div>
+					<div class="crop-padding" class:irrelevant={include === 'metadataonly'}>
+						<Field>
+							{#snippet label()}
+								Marge de recadrage
+								<p class="fineprint"></p>
+							{/snippet}
+							<RadioButtons
+								options={[
+									{ key: 'none', label: 'Aucune' },
+									{ key: 'small', label: '5%' },
+									{ key: 'medium', label: '10%' },
+									{ key: 'customPercent', label: '?%' },
+									{ key: 'customPixels', label: '?px' },
+								]}
+								// labels={{ none: 'Aucune', small: '5%', medium: '10%' }}
+								bind:value={cropPaddingPreset}
+							>
+								{#snippet children({ key: option, label })}
+									{#if option.startsWith('custom')}
+										{@const unit = option === 'customPercent' ? '%' : 'px'}
+										<div
+											class="numeric"
+											style:--width={unit === '%' ? '3ch' : '4ch'}
+										>
+											<InlineTextInput
+												label={option === 'customPercent'
+													? "en pourcentage des dimensions de l'image"
+													: 'en pixels'}
+												value={cropPadding.unitless === 0
+													? '0'
+													: cropPadding.unit === unit
+														? cropPadding.unitless.toString()
+														: '?'}
+												onblur={async (newValue) => {
+													// otherwise, the input value updates to a '?' too quickly when changing value but not unit
+													await tick();
+													const parsed = Number.parseInt(newValue, 10);
+													if (!isNaN(parsed) && parsed > 0) {
+														cropPadding = parseCropPadding(
+															parsed + unit
+														);
+														cropPaddingPreset = option;
+													}
+												}}
+											/>
+											{unit}
+										</div>
+									{:else if label.includes('%')}
+										<Tooltip
+											text="Relativement aux dimensions de chacune des images"
+										>
+											{label}
+										</Tooltip>
+									{:else}
+										{label}
+									{/if}
+								{/snippet}
+							</RadioButtons>
+						</Field>
+					</div>
+				</div>
+
+				<div class="gallery">
+					{#each tables.Image.state.slice(0, 100) as image (image.id)}
+						{@const box = cropPadding.apply(
+							image.dimensions,
+							uiState.cropMetadataValueOf(image)?.value ?? FULL_IMAGE_CROPBOX
+						)}
+						<div
+							class="thumbnail"
+							data-box={JSON.stringify(uiState.cropMetadataValueOf(image))}
+						>
+							<CroppedImg
+								transitions
+								blurfill
+								src={uiState.getPreviewURL(image.fileId)}
+								box={toRelativeCoords(image.dimensions)(box)}
+								dimensions={image.dimensions}
+							/>
+						</div>
+					{/each}
+				</div>
+			</div>
+
+			<div class="tree loading">
+				<ZipContentsTree
+					tree={preview ?? [
+						Loading,
+						Loading,
+						...{
+							metadataonly: [],
+							croppedonly: [loadingFolder],
+							full: [loadingFolder, loadingFolder],
+						}[include],
+					]}
+				>
+					{#snippet rootHelp()}
+						<LoadingText
+							value={sizeEstimates.uncompressed}
+							mask="~{formatBytesSize(1e6, 'narrow')}"
+						>
+							{#snippet loaded(size)}
+								~{formatBytesSize(size, 'narrow')}
+							{/snippet}
+						</LoadingText>
+						une fois dézippé
+					{/snippet}
+				</ZipContentsTree>
+			</div>
+		</div>
 
 		<div class="actions">
 			<ButtonSecondary onclick={async () => await downloadExport(undefined)}>
@@ -266,99 +445,12 @@
 				{/if}
 			</ButtonSecondary>
 		</div>
-	</header>
-	<div class="side-by-side">
-		<section class="settings">
-			<div class="include">
-				<RadioButtons
-					bind:value={include}
-					options={[
-						{ key: 'metadataonly', label: 'Métadonnées seulement' },
-						{ key: 'croppedonly', label: 'Métadonnées et images recadrées' },
-						{
-							key: 'full',
-							label: 'Métadonnées, images recadrées et images originales',
-							subtext: 'Permet de ré-importer les résultats ultérieurement',
-						},
-					]}
-				/>
-			</div>
-			<div class="crop-padding" class:irrelevant={include === 'metadataonly'}>
-				<div class="label">Marge autour des images recadrées</div>
-				<SegmentedGroup
-					aria-label="Marge autour des images recadrées"
-					options={['none', 'small', 'medium', 'customPercent', 'customPixels']}
-					labels={{ none: 'Aucune', small: '5%', medium: '10%' }}
-					bind:value={cropPaddingPreset}
-				>
-					{#snippet customOption(option)}
-						{@const unit = option === 'customPercent' ? '%' : 'px'}
-						<div class="numeric" style:--width={unit === '%' ? '3ch' : '4ch'}>
-							<InlineTextInput
-								label={option === 'customPercent'
-									? "en pourcentage des dimensions de l'image"
-									: 'en pixels'}
-								value={cropPadding.unitless === 0
-									? '0'
-									: cropPadding.unit === unit
-										? cropPadding.unitless.toString()
-										: '?'}
-								onblur={async (newValue) => {
-									// otherwise, the input value updates to a '?' too quickly when changing value but not unit
-									await tick();
-									const parsed = Number.parseInt(newValue, 10);
-									if (!isNaN(parsed) && parsed > 0) {
-										cropPadding = parseCropPadding(parsed + unit);
-										cropPaddingPreset = option;
-									}
-								}}
-							/>
-							{unit}
-						</div>
-					{/snippet}
-				</SegmentedGroup>
-				<p class="fineprint">
-					Une valeur en % signifie que la marge est relative aux dimensions de chacune des
-					images
-				</p>
-			</div>
-		</section>
-
-		<section class="preview" data-testid="zip-preview">
-			<h3>Contenu de l'export .zip</h3>
-
-			<div class="tree loading">
-				<ZipContentsTree
-					tree={preview ?? [
-						Loading,
-						Loading,
-						...{
-							metadataonly: [],
-							croppedonly: [loadingFolder],
-							full: [loadingFolder, loadingFolder],
-						}[include],
-					]}
-				>
-					{#snippet rootHelp()}
-						<LoadingText
-							value={sizeEstimates.uncompressed}
-							mask="~{formatBytesSize(1e6, 'narrow')}"
-						>
-							{#snippet loaded(size)}
-								~{formatBytesSize(size, 'narrow')}
-							{/snippet}
-						</LoadingText>
-						une fois dézippé
-					{/snippet}
-				</ZipContentsTree>
-			</div>
-		</section>
-	</div>
+	</section>
 </main>
 
 <style>
 	main {
-		max-width: 1200px;
+		max-width: 1400px;
 		width: 100%;
 		margin: 0 auto;
 		display: flex;
@@ -368,20 +460,103 @@
 
 	header {
 		display: flex;
-		justify-content: space-between;
 		align-items: center;
 		gap: 1em;
 	}
 
-	header .actions {
-		display: flex;
-		gap: 1em;
+	.session header {
+		justify-content: space-between;
 	}
 
-	.side-by-side {
-		display: grid;
-		grid-template-columns: 3fr 2fr;
+	.session {
+		display: flex;
+		flex-direction: column;
 		gap: 2em;
+		padding: 2rem;
+	}
+
+	.session .side-by-side {
+		display: grid;
+		gap: 2em;
+		grid-template-columns: 1fr 1fr;
+	}
+
+	.session .metadata {
+		display: flex;
+		flex-direction: column;
+		max-width: 50rem;
+		gap: 2em;
+	}
+
+	.gallery {
+		--thumb-size: 70px;
+		width: 100%;
+		display: grid;
+		grid-auto-flow: columns;
+		grid-template-columns: repeat(auto-fill, var(--thumb-size));
+		gap: 1em;
+		max-height: calc(4 * (var(--thumb-size) + 1em));
+		overflow: hidden;
+
+		.thumbnail {
+			width: var(--thumb-size);
+			height: var(--thumb-size);
+			position: relative;
+
+			:global(picture) {
+				position: absolute;
+				inset: 0;
+			}
+		}
+	}
+
+	.export {
+		position: fixed;
+		top: calc(var(--navbar-height));
+		bottom: 3rem;
+		right: 3rem;
+		max-width: 50rem;
+		border-radius: var(--corner-radius);
+		border: 1px solid var(--gray);
+		background-color: var(--bg-neutral);
+		display: flex;
+		flex-direction: column;
+		/* z-index: 200; */
+
+		transition: right 80ms ease;
+
+		&.collapsed {
+			right: -40rem;
+		}
+	}
+
+	.export > * {
+		/* So that the .scrollable's scrollbar kisses the actual card's borders */
+		padding: 1rem 2rem;
+
+		&:first-child {
+			padding-top: 2rem;
+		}
+
+		&:last-child {
+			padding-bottom: 2rem;
+		}
+	}
+
+	.export .scrollable {
+		display: flex;
+		flex-direction: column;
+		gap: 3em;
+		overflow-y: auto;
+		height: 100%;
+		scrollbar-gutter: stable;
+	}
+
+	.settings-and-gallery {
+		display: grid;
+		align-items: space-between;
+		grid-template-columns: 1.5fr 1fr;
+		gap: 3em;
 	}
 
 	.settings {
@@ -397,21 +572,13 @@
 		accent-color: var(--fg-primary);
 	}
 
-	.crop-padding {
-		margin-top: 1.5em;
-	}
-
 	.crop-padding.irrelevant {
 		opacity: 0.5;
 		pointer-events: none;
 	}
 
-	.crop-padding .label {
-		margin-bottom: 0.5em;
-	}
-
 	.crop-padding .numeric {
-		display: flex;
+		display: inline-flex;
 		align-items: center;
 		gap: 0.5em;
 		overflow: hidden;
@@ -421,14 +588,15 @@
 		width: var(--width, 3ch);
 	}
 
-	.crop-padding .fineprint {
-		font-size: 0.9em;
-		color: var(--gy);
-		margin-top: 0.75em;
-	}
-
 	code.size {
 		font-size: 0.85em;
 		min-width: 6ch;
+	}
+
+	.actions {
+		display: flex;
+		gap: 1em;
+		align-items: center;
+		justify-content: center;
 	}
 </style>
