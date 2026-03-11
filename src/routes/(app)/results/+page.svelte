@@ -26,8 +26,6 @@
 	import LoadingText, { Loading } from '$lib/LoadingText.svelte';
 	import { ensureNoLoneImages } from '$lib/observations.js';
 	import RadioButtons from '$lib/RadioButtons.svelte';
-	import { scrollfader } from '$lib/scrollfader.js';
-	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
 	import SessionMetadataForm from '$lib/SessionMetadataForm.svelte';
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte.js';
@@ -41,8 +39,6 @@
 
 	let windowWidth: number | undefined = $state();
 	let collapsedExportPanel = $derived((windowWidth ?? 0) <= 1400);
-
-	$inspect({ windowWidth, collapsedExportPanel });
 
 	/** We are currently generating an export (of the specified format) */
 	let exporting: 'zip' | 'folder' | false = $state(false);
@@ -221,22 +217,17 @@
 <main>
 	<section class="session">
 		<header>
-			<h2>Vérifie ta session</h2>
+			<h2>Vérifier les métadonnées</h2>
 		</header>
 
-		<div class="side-by-side">
-			<section class="metadata">
-				{#if uiState.currentSession}
-					<SessionMetadataForm
-						session={uiState.currentSession}
-						metadataOptions={new Map()}
-					/>
-				{/if}
-			</section>
-		</div>
+		<section class="metadata">
+			{#if uiState.currentSession}
+				<SessionMetadataForm session={uiState.currentSession} metadataOptions={new Map()} />
+			{/if}
+		</section>
 	</section>
 
-	<section class="export" data-testid="zip-preview" class:collapsed={collapsedExportPanel}>
+	<section class="export" data-testid="export-results" class:collapsed={collapsedExportPanel}>
 		<header>
 			<div class="actions">
 				<ButtonIcon
@@ -273,8 +264,7 @@
 									{
 										key: 'full',
 										label: 'Tout',
-										subtext:
-											'Permet de ré-importer les résultats ultérieurement',
+										subtext: 'Permet de ré-importer ultérieurement',
 									},
 								]}
 							/>
@@ -329,7 +319,7 @@
 										</div>
 									{:else if label.includes('%')}
 										<Tooltip
-											text="Relativement aux dimensions de chacune des images"
+											text="Pour chaque image, relativement à ses dimensions"
 										>
 											{label}
 										</Tooltip>
@@ -364,30 +354,32 @@
 				</div>
 			</div>
 
-			<div class="tree loading">
-				<ZipContentsTree
-					tree={preview ?? [
-						Loading,
-						Loading,
-						...{
-							metadataonly: [],
-							croppedonly: [loadingFolder],
-							full: [loadingFolder, loadingFolder],
-						}[include],
-					]}
-				>
-					{#snippet rootHelp()}
-						<LoadingText
-							value={sizeEstimates.uncompressed}
-							mask="~{formatBytesSize(1e6, 'narrow')}"
-						>
-							{#snippet loaded(size)}
-								~{formatBytesSize(size, 'narrow')}
-							{/snippet}
-						</LoadingText>
-						une fois dézippé
-					{/snippet}
-				</ZipContentsTree>
+			<div class="tree loading" data-testid="zip-preview">
+				<Field label="Contenu de l'export">
+					<ZipContentsTree
+						tree={preview ?? [
+							Loading,
+							Loading,
+							...{
+								metadataonly: [],
+								croppedonly: [loadingFolder],
+								full: [loadingFolder, loadingFolder],
+							}[include],
+						]}
+					>
+						{#snippet rootHelp()}
+							<LoadingText
+								value={sizeEstimates.uncompressed}
+								mask="~{formatBytesSize(1e6, 'narrow')}"
+							>
+								{#snippet loaded(size)}
+									~{formatBytesSize(size, 'narrow')}
+								{/snippet}
+							</LoadingText>
+							une fois dézippé
+						{/snippet}
+					</ZipContentsTree>
+				</Field>
 			</div>
 		</div>
 
@@ -475,39 +467,11 @@
 		padding: 2rem;
 	}
 
-	.session .side-by-side {
-		display: grid;
-		gap: 2em;
-		grid-template-columns: 1fr 1fr;
-	}
-
 	.session .metadata {
 		display: flex;
 		flex-direction: column;
 		max-width: 50rem;
 		gap: 2em;
-	}
-
-	.gallery {
-		--thumb-size: 70px;
-		width: 100%;
-		display: grid;
-		grid-auto-flow: columns;
-		grid-template-columns: repeat(auto-fill, var(--thumb-size));
-		gap: 1em;
-		max-height: calc(4 * (var(--thumb-size) + 1em));
-		overflow: hidden;
-
-		.thumbnail {
-			width: var(--thumb-size);
-			height: var(--thumb-size);
-			position: relative;
-
-			:global(picture) {
-				position: absolute;
-				inset: 0;
-			}
-		}
 	}
 
 	.export {
@@ -526,7 +490,7 @@
 		transition: right 80ms ease;
 
 		&.collapsed {
-			right: -40rem;
+			right: -35rem;
 		}
 	}
 
@@ -546,17 +510,40 @@
 	.export .scrollable {
 		display: flex;
 		flex-direction: column;
-		gap: 3em;
+		gap: 1em;
 		overflow-y: auto;
 		height: 100%;
 		scrollbar-gutter: stable;
 	}
 
 	.settings-and-gallery {
+		--gallery-thumb: 80px;
+		--gallery-gap: 1em;
 		display: grid;
-		align-items: space-between;
-		grid-template-columns: 1.5fr 1fr;
+		grid-template-columns: auto calc(3 * (var(--gallery-thumb) + var(--gallery-gap)));
 		gap: 3em;
+	}
+
+	.gallery {
+		align-self: flex-start;
+		width: 100%;
+		display: grid;
+		grid-auto-flow: columns;
+		grid-template-columns: repeat(auto-fill, var(--gallery-thumb));
+		gap: 1em;
+		max-height: calc(4 * (var(--gallery-thumb) + var(--gallery-gap)));
+		overflow: hidden;
+
+		.thumbnail {
+			width: var(--gallery-thumb);
+			height: var(--gallery-thumb);
+			position: relative;
+
+			:global(picture) {
+				position: absolute;
+				inset: 0;
+			}
+		}
 	}
 
 	.settings {
@@ -598,5 +585,26 @@
 		gap: 1em;
 		align-items: center;
 		justify-content: center;
+	}
+
+	@media (max-width: 1300px) {
+		main {
+			margin: 0 auto;
+			align-items: center;
+		}
+
+		.export {
+			position: static;
+			border: none;
+			width: 100%;
+			header .actions {
+				display: none;
+			}
+
+			&,
+			> * {
+				padding-inline: 0;
+			}
+		}
 	}
 </style>

@@ -47,26 +47,30 @@ export async function importResults(page, filepath, { waitForLoading = true } = 
 export async function exportResults(page, { cropPadding = '0px', kind = 'cropped' } = {}) {
 	const saveAs = `tests/results/${nanoid()}.zip`;
 
-	if (cropPadding.endsWith('px')) {
-		await page
+	const area = page.getByTestId('export-results');
+
+	if (cropPadding === '0px') {
+		await area.getByRole('radio', { name: 'Aucune' }).check();
+	} else if (cropPadding.endsWith('px')) {
+		await area
 			.getByRole('radio', { name: '0 px' })
 			.getByRole('textbox')
 			.fill(cropPadding.replace(/px$/, ''));
 	} else {
-		await page.getByRole('radio', { name: cropPadding }).check();
+		await area.getByRole('radio', { name: cropPadding }).check();
 	}
 
-	await page
+	await area
 		.getByText(
 			{
 				metadata: 'Métadonnées seulement',
 				cropped: 'Métadonnées et images recadrées',
-				full: 'Métadonnées, images recadrées et images originales',
+				full: 'Tout',
 			}[kind]
 		)
 		.click();
 
-	await page.getByRole('button', { name: 'Archive ZIP' }).click();
+	await area.getByRole('button', { name: 'Archive ZIP' }).click();
 	const download = await page.waitForEvent('download');
 	expect(download.suggestedFilename()).toBe('results.zip');
 	await download.saveAs(saveAs);

@@ -65,7 +65,6 @@ export async function metadataOptionsOf(
 		return out;
 	}
 
-	console.log('metadata options cache is', METADATA_OPTIONS_CACHE);
 	const options = new Map<NamespacedMetadataID, DB.MetadataEnumVariant[]>();
 
 	const protocol = await db.get('Protocol', protocolId);
