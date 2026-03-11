@@ -203,7 +203,7 @@ test('can handle a bunch of images at once', withParallelism(4), async ({ page, 
 
 test('can import a protocol via /protocols/import/url', async ({ page, app, context }) => {
 	await app.settings.set({ showTechnicalMetadata: false });
-	const protocolUrl = 'https://example.com/kitchensink.cigaleprotocol.yaml';
+	const protocolUrl = 'https://example.com/kitchensink.yaml';
 	await mockProtocolSourceURL(page, context, protocolUrl, {
 		body: await readFile(
 			path.join(import.meta.dirname, '..', 'examples', 'kitchensink.cigaleprotocol.yaml'),
