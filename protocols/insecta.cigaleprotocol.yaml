@@ -4,6 +4,10 @@ name: INSECTA
 authors:
   - name: Maxime Cauchoix
 
+version: 1
+updates: automatic
+source: https://raw.githubusercontent.com/cigaleapp/cigale/protocols/insecta.cigaleprotocol.yaml
+
 description: |
   Pour réaliser le protocole INSECTA, vous avez besoin d'un appareil photo, de curiosité et de patience. 
 
