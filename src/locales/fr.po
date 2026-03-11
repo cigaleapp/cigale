@@ -2327,6 +2327,16 @@ msgstr "Aucune sélection"
 msgid "Utiliser une autre unité"
 msgstr "Utiliser une autre unité"
 
+#. 0: filename
+#: src/routes/(app)/+layout.js
+msgid "Chargement du protocole {0}"
+msgstr "Chargement du protocole {0}"
+
+#. 0: filename
+#: src/routes/(app)/+layout.js
+msgid "Impossible de charger le protocole {0}. Vérifiez votre connexion Internet ou essayez de recharger la page."
+msgstr "Impossible de charger le protocole {0}. Vérifiez votre connexion Internet ou essayez de recharger la page."
+
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"
 msgstr "Import des images terminé"
@@ -2348,13 +2358,3 @@ msgstr "Import de {0}"
 #: src/lib/results.svelte.js
 msgid "Importée depuis {0}"
 msgstr "Importée depuis {0}"
-
-#. 0: filename
-#: src/routes/(app)/+layout.js
-msgid "Chargement du protocole {0}"
-msgstr "Chargement du protocole {0}"
-
-#. 0: filename
-#: src/routes/(app)/+layout.js
-msgid "Impossible de charger le protocole {0}. Vérifiez votre connexion Internet ou essayez de recharger la page."
-msgstr "Impossible de charger le protocole {0}. Vérifiez votre connexion Internet ou essayez de recharger la page."
