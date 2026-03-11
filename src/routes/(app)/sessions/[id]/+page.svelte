@@ -1,26 +1,21 @@
 <script>
-	import { dequal } from 'dequal';
 	import { fade } from 'svelte/transition';
 
 	import { invalidate } from '$app/navigation';
-	import SessionMetadataForm from '$lib/SessionMetadataForm.svelte'
 	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import Field from '$lib/Field.svelte';
 	import { plural } from '$lib/i18n.js';
-	import { databaseHandle, dependencyURI, tables } from '$lib/idb.svelte.js';
+	import { dependencyURI, tables } from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import InputSelectProtocol from '$lib/InputSelectProtocol.svelte';
-	import Metadata from '$lib/Metadata.svelte';
-	import { deleteMetadataValue, storeMetadataValue } from '$lib/metadata/index.js';
-	import MetadataList from '$lib/MetadataList.svelte';
 	import ModalConfirmDeletion from '$lib/ModalConfirmDeletion.svelte';
 	import { goto } from '$lib/paths.js';
+	import SessionMetadataForm from '$lib/SessionMetadataForm.svelte';
 	import { deleteSession, switchSession } from '$lib/sessions.js';
 	import { toasts } from '$lib/toasts.svelte.js';
 
 	const { data } = $props();
-	let sessionMetadata = $derived(data.sessionMetadata);
 	let { protocol: protocolId, name } = $derived(data.session);
 </script>
 
@@ -102,10 +97,12 @@
 		<section class="error">
 			Protocole <code>{data.session.protocol}</code> introuvable.
 		</section>
-	{:else if sessionMetadata.length > 0}
+	{:else}
 		<h2>Métadonnées</h2>
 
-		<SessionMetadataForm session={data.session} metadataOptions={data.sessionMetadataOptions.byMetadata}  />	
+		<SessionMetadataForm session={data.session} metadataOptions={new Map()} onmetadatachange={() => {
+			invalidate(dependencyURI('Session', data.session.id))
+		}} />
 	{/if}
 
 	<ButtonPrimary

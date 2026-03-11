@@ -4,16 +4,16 @@
 
 	import Icon from '@iconify/svelte';
 	import { ArkErrors, type } from 'arktype';
-	import { convert, MeasureKind } from 'convert';
+	import { convert, MeasureKind, ms } from 'convert';
 	import * as dates from 'date-fns';
 	import { useDebounce } from 'runed';
 	import { fade } from 'svelte/transition';
 
-	import * as idb from '$lib/idb.svelte.js';
 	import IconIncrement from '~icons/ri/add-line';
 	import IconCheck from '~icons/ri/check-line';
 	import IconError from '~icons/ri/error-warning-fill';
 	import IconDecrement from '~icons/ri/subtract-line';
+	import * as idb from '$lib/idb.svelte.js';
 
 	import ButtonIcon from './ButtonIcon.svelte';
 	import ButtonInk from './ButtonInk.svelte';
@@ -29,7 +29,7 @@
 	import { sendNotification } from './notifications.js';
 	import OverflowableText from './OverflowableText.svelte';
 	import RadioButtons from './RadioButtons.svelte';
-	import { availableUnitsFor, displayUnit, unitKind, NumericUnit } from './schemas/units.js';
+	import { availableUnitsFor, displayUnit, NumericUnit, unitKind } from './schemas/units.js';
 	import { uiState } from './state.svelte.js';
 	import Switch from './Switch.svelte';
 	import { toasts } from './toasts.svelte.js';
@@ -454,10 +454,7 @@
 
 										const timeElapsed = performance.now() - savingStart;
 
-										if (
-											(!windowIsFocused && timeElapsed > 2_000) ||
-											timeElapsed > 5_000
-										) {
+										if (!windowIsFocused || timeElapsed > ms('5s')) {
 											sendNotification(`${file.name} enregistré`, {
 												body: 'Le fichier a été enregistré avec succès',
 											});

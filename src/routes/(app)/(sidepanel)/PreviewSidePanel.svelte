@@ -95,7 +95,7 @@
 		void (async () => {
 			const results = await metadataOptionsOf(
 				idb.databaseHandle(),
-				uiState.currentProtocolId,
+				uiState.currentProtocol.id,
 				null
 			);
 

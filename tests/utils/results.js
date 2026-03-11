@@ -47,27 +47,33 @@ export async function importResults(page, filepath, { waitForLoading = true } = 
 export async function exportResults(page, { cropPadding = '0px', kind = 'cropped' } = {}) {
 	const saveAs = `tests/results/${nanoid()}.zip`;
 
-	if (cropPadding.endsWith('px')) {
-		await page
-			.getByRole('radio', { name: '0 px' })
-			.getByRole('textbox')
-			.fill(cropPadding.replace(/px$/, ''));
+	const area = page.getByTestId('export-results');
+
+	if (cropPadding === '0px') {
+		await area.getByRole('radio', { name: 'Aucune' }).check();
+	} else if (cropPadding.endsWith('px')) {
+		await area.getByRole('textbox', { name: 'en pixels' }).fill(cropPadding.replace(/px$/, ''));
+	} else if (['5%', '10%'].includes(cropPadding)) {
+		await area.getByRole('radio', { name: cropPadding }).check();
 	} else {
-		await page.getByRole('radio', { name: cropPadding }).check();
+		await area
+			.getByRole('textbox', { name: "en pourcentage des dimensions de l'image" })
+			.fill(cropPadding.replace(/%$/, ''));
 	}
 
-	await page
+	await area
 		.getByText(
 			{
 				metadata: 'Métadonnées seulement',
 				cropped: 'Métadonnées et images recadrées',
-				full: 'Métadonnées, images recadrées et images originales',
+				full: 'Tout',
 			}[kind]
 		)
 		.click();
 
-	await page.getByRole('button', { name: 'Archive ZIP' }).click();
-	const download = await page.waitForEvent('download');
+	const event = page.waitForEvent('download');
+	await area.getByRole('button', { name: 'Archive ZIP' }).click();
+	const download = await event;
 	expect(download.suggestedFilename()).toBe('results.zip');
 	await download.saveAs(saveAs);
 

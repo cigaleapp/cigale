@@ -463,12 +463,13 @@ test('can change protocol of session', async ({ page, app }) => {
 	`);
 });
 
-test('session metadata form has default values', async ({ page, app }) => {
+test('session metadata form has default values', async ({ page, app, browserName }) => {
+	// test.skip(browserName === 'webkit', 'Does not work on Webkit for some reason');
+
 	await loadDatabaseDump(page, 'db/kitchensink-protocol.devalue');
 	await app.settings.set({ showTechnicalMetadata: false });
 	await newSession(page, { name: 'Test' });
-	await page.getByTestId('app-nav').getByRole('link', { name: 'Test' }).click();
-	await app.path.wait('/(app)/sessions/[id]');
+	await goToSessionPage(page);
 
 	const session = await app.db.session.byName('Test');
 	if (!session) throw new Error('Session not found');
