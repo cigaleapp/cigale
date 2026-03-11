@@ -74,6 +74,10 @@ export default defineConfig({
 					if (call === '[MemberExpression].logWarning') return false;
 				}
 
+				// Headers.get
+				// TODO: figure out if using a condition based on funcName/call etc is possible?
+				if (msg === 'Content-Type') return false;
+
 				// EXIF fields in exif.js
 				if (file === 'src/lib/exif.js' && funcName === 'addExifMetadata') {
 					return false;

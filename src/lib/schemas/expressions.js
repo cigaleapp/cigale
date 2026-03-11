@@ -2,7 +2,7 @@
  * Computed expression templates: Handlebars and Jsonata
  */
 import { ArkErrors, type } from 'arktype';
-import { format as formatDate } from 'date-fns';
+import { format as formatDate, formatISO } from 'date-fns';
 import Handlebars from 'handlebars';
 import jsonata from 'jsonata';
 
@@ -125,14 +125,10 @@ export const HELPERS = /** @type {const} */ ({
 		},
 	},
 	now: {
-		documentation:
-			'Renvoie la date actuelle dans le format précisé. Voir https://date-fns.org/v4.1.0/docs/format pour une description complète du format',
-		usage: [['"dd/MM/yyyy \'à\' HH:mm"'], '31/12/2026 à 23:59'],
-		/**
-		 * @param {string} format
-		 */
-		implementation(format) {
-			return formatDate(Date.now(), format);
+		documentation: 'Renvoie la date actuelle au format ISO',
+		usage: [[], '2026-12-31T23:59:00Z'],
+		implementation() {
+			return formatISO(new Date());
 		},
 	},
 	year: {

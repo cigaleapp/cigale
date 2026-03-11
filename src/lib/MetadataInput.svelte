@@ -4,8 +4,9 @@
 
 	import Icon from '@iconify/svelte';
 	import { ArkErrors, type } from 'arktype';
-	import { convert } from 'convert';
+	import { convert, MeasureKind } from 'convert';
 	import * as dates from 'date-fns';
+	import { useDebounce } from 'runed';
 	import { fade } from 'svelte/transition';
 
 	import IconIncrement from '~icons/ri/add-line';
@@ -28,7 +29,7 @@
 	import { sendNotification } from './notifications.js';
 	import OverflowableText from './OverflowableText.svelte';
 	import RadioButtons from './RadioButtons.svelte';
-	import { availableUnitsFor, findUnit, NumericUnit } from './schemas/units.js';
+	import { availableUnitsFor, findUnit, NumericUnit, unitKind } from './schemas/units.js';
 	import { uiState } from './state.svelte.js';
 	import Switch from './Switch.svelte';
 	import { toasts } from './toasts.svelte.js';
@@ -93,6 +94,10 @@
 			windowIsFocused = false;
 		};
 	});
+
+	const debouncedOnblur = useDebounce(() => {
+		onblur(temporaryValue, selectedUnit);
+	}, 500);
 
 	const selectedUnit = $derived.by(() => {
 		if (!('unit' in definition)) return;
@@ -289,7 +294,12 @@
 							min={interval.min}
 							max={interval.max}
 							granularity={definition.type === 'integer' ? 1 : 1e-6}
-							ticks={1}
+							ticks={selectedUnit && unitKind(selectedUnit) === MeasureKind.Angle
+								? // Every 45deg from -360 to 360
+									Array.from({ length: (360 * 2) / 45 }).map(
+										(_, i) => i * 45 - 360
+									)
+								: 1}
 							value={val}
 							onvalue={(v) => {
 								temporaryValue = v;
@@ -307,7 +317,10 @@
 						aria-label="Décrémenter"
 						onclick={() => {
 							if (value !== undefined && typeof value !== 'number') return;
-							onblur(round((value ?? 0) - 1, 5), valueUnit);
+							if (temporaryValue !== undefined && typeof temporaryValue !== 'number')
+								return;
+							temporaryValue = round((temporaryValue ?? value ?? 0) - 1, 5);
+							debouncedOnblur();
 						}}
 					>
 						<IconDecrement />
@@ -317,7 +330,10 @@
 						aria-label="Incrémenter"
 						onclick={() => {
 							if (value !== undefined && typeof value !== 'number') return;
-							onblur(round((value ?? 0) + 1, 5), valueUnit);
+							if (temporaryValue !== undefined && typeof temporaryValue !== 'number')
+								return;
+							temporaryValue = round((temporaryValue ?? value ?? 0) + 1, 5);
+							debouncedOnblur();
 						}}
 					>
 						<IconIncrement />

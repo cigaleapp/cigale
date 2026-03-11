@@ -54,3 +54,17 @@ export function availableUnitsFor(unit) {
 			})
 	);
 }
+
+/**
+ *
+ * @param {import('convert').Unit} unit
+ */
+export function unitKind(unit) {
+	const found = [...conversions.entries()].find(([, { units }]) =>
+		units.some((u) => [...u.names, ...u.symbols].includes(unit))
+	);
+
+	if (!found) return;
+
+	return found[0];
+}
