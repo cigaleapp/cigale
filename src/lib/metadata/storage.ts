@@ -15,7 +15,7 @@ import {
 	namespacedMetadataId,
 	namespaceOfMetadataId,
 } from '$lib/schemas/metadata.js';
-import { orEmptyObj3 } from '$lib/utils.js';
+import { groupBy, orEmptyObj3 } from '$lib/utils.js';
 
 import { resolveMetadataImport } from './imports.js';
 import { serializeMetadataValue } from './serializing.js';
@@ -65,7 +65,6 @@ export async function metadataOptionsOf(
 		return out;
 	}
 
-	console.log('metadata options cache is', METADATA_OPTIONS_CACHE);
 	const options = new Map<NamespacedMetadataID, DB.MetadataEnumVariant[]>();
 
 	const protocol = await db.get('Protocol', protocolId);
@@ -92,7 +91,7 @@ export async function metadataOptionsOf(
 	if (metadatas.length === 0) return arrayAndMap('byMetadata', options);
 
 	const results = await Promise.all(
-		Array.from(Map.groupBy(metadatas, (id) => namespaceOfMetadataId(id)).entries()).map(
+		Array.from(groupBy(metadatas, (id) => namespaceOfMetadataId(id)).entries()).map(
 			async ([protocolId, metadatas]) =>
 				db.getAll(
 					'MetadataOption',

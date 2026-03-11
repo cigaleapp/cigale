@@ -104,7 +104,7 @@ test('can use a protocol that imports metadata from another protocol', async ({
 	await mockUrl(
 		page,
 		context,
-		'https://example.com/protocols/com.example.remote.cigaleprotocol.json',
+		'https://example.com/protocols/com.example.remote.json',
 		{
 			json: {
 				id: 'com.example.remote',
@@ -142,7 +142,7 @@ test('can use a protocol that imports metadata from another protocol', async ({
 				protocols: [
 					{
 						id: 'com.example.remote',
-						url: 'https://example.com/protocols/com.example.remote.cigaleprotocol.json',
+						url: 'https://example.com/protocols/com.example.remote.json',
 					},
 				],
 			},

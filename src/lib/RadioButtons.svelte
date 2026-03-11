@@ -83,20 +83,6 @@
 		gap: 1em;
 	}
 
-	.radio-inputs.smart-horizontal {
-		display: flex;
-		flex-flow: row wrap;
-		gap: 0.5em 2em;
-
-		& > * {
-			flex: 0 0 auto;
-		}
-
-		&:has(> :nth-child(n + 2):not(:first-child):not(:last-child)) {
-			flex-direction: column;
-		}
-	}
-
 	label.card {
 		border: 1px solid var(--bg-neutral);
 		border-radius: 0.5em;
