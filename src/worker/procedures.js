@@ -71,6 +71,7 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 	importProtocol: {
 		input: type({
 			contents: 'string',
+			/** Optimize parsing by ensuring content is JSONC and not just YAML */
 			isJSON: 'boolean = false',
 		}),
 		progress: type({

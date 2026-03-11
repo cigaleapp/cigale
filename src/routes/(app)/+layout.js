@@ -146,9 +146,11 @@ async function loadDefaultProtocol(swarpc) {
 		console.debug(`Importing built-in protocols`, import.meta.env.builtinProtocols);
 		for (const importUrl of import.meta.env.builtinProtocols) {
 			const filename = new URL(importUrl).pathname.split('/').at(-1);
+			console.debug(`Importing ${filename}`);
 			try {
 				const contents = await fetch(importUrl).then((res) => res.text());
-				await swarpc.importProtocol({ contents, isJSON: true }, ({ phase, detail }) => {
+				const isJSON = Boolean(filename?.endsWith('.json'));
+				await swarpc.importProtocol({ contents, isJSON }, ({ phase, detail }) => {
 					let secondLine = '';
 					switch (phase) {
 						case 'parsing':
