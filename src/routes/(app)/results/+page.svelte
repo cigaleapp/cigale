@@ -20,6 +20,7 @@
 	import { ensureNoLoneImages } from '$lib/observations.js';
 	import RadioButtons from '$lib/RadioButtons.svelte';
 	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
+	import SessionMetadataForm from '$lib/SessionMetadataForm.svelte';
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte.js';
 	import { tooltip } from '$lib/tooltips.js';
@@ -203,7 +204,13 @@
 
 <main>
 	<header>
-		<h1>Résultats</h1>
+		<h2>Session</h2>
+	</header>
+
+	<SessionMetadataForm session={uiState.currentSession} metadataOptions={new Map()} />
+
+	<header>
+		<h2>Résultats</h2>
 
 		<div class="actions">
 			<ButtonSecondary onclick={async () => await downloadExport(undefined)}>
@@ -318,7 +325,7 @@
 		</section>
 
 		<section class="preview" data-testid="zip-preview">
-			<h2>Contenu de l'export .zip</h2>
+			<h3>Contenu de l'export .zip</h3>
 
 			<div class="tree loading">
 				<ZipContentsTree

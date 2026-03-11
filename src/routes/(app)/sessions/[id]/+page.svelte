@@ -3,7 +3,6 @@
 	import { fade } from 'svelte/transition';
 
 	import { invalidate } from '$app/navigation';
-	import SessionMetadataForm from '$lib/SessionMetadataForm.svelte'
 	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import Field from '$lib/Field.svelte';
@@ -16,6 +15,7 @@
 	import MetadataList from '$lib/MetadataList.svelte';
 	import ModalConfirmDeletion from '$lib/ModalConfirmDeletion.svelte';
 	import { goto } from '$lib/paths.js';
+	import SessionMetadataForm from '$lib/SessionMetadataForm.svelte';
 	import { deleteSession, switchSession } from '$lib/sessions.js';
 	import { toasts } from '$lib/toasts.svelte.js';
 
@@ -105,7 +105,14 @@
 	{:else if sessionMetadata.length > 0}
 		<h2>Métadonnées</h2>
 
-		<SessionMetadataForm session={data.session} metadataOptions={data.sessionMetadataOptions.byMetadata}  />	
+		<SessionMetadataForm
+			session={data.session}
+			metadataOptions={data.sessionMetadataOptions.byMetadata}
+			onmetadatachange={() => {
+				// XXX: is this really necessary? not sure since defaults are also resolved within the component
+				invalidate(dependencyURI('Session', data.session.id));
+			}}
+		/>
 	{/if}
 
 	<ButtonPrimary
