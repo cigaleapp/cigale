@@ -213,7 +213,7 @@ sessionMetadata:
     mergeMethod: none
     required: true
     # TODO: shoot_location of argmin(photos shoot_date)
-    # default: 
+    # default:
 
   end_at:
     type: location
@@ -222,7 +222,7 @@ sessionMetadata:
     mergeMethod: none
     required: true
     # TODO: shoot_location of argmax(photos shoot_date)
-    # default: 
+    # default:
 
   soil_photo_end:
     type: file

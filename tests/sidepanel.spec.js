@@ -500,7 +500,7 @@ test('can update a integer-type metadata', async ({ page, app }) => {
 	await app.metadata.textbox('integer').blur();
 	await app.metadata.section('integer').getByRole('button', { name: 'Décrémenter' }).click();
 
-	await app.wait(500) // wait for debounce on {de,in}crement buttons
+	await app.wait(500); // wait for debounce on {de,in}crement buttons
 	await expect(app.metadata.textbox('integer')).toHaveValue('141');
 	expect(await metadataValueInDatabase(app, 'integer')).toBe(141);
 	await expect(app.metadata.section('integer')).toHaveText(/must be less than 100/);
