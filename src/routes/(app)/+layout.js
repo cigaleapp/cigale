@@ -141,8 +141,15 @@ async function initializeSettings() {
 async function loadDefaultProtocol(swarpc) {
 	setLoadingMessage('Chargement du protocole intégré');
 
-	const protocolsCount = await tables.Protocol.count();
-	if (protocolsCount === 0) {
+	// const protocolsCount = await tables.Protocol.count();
+	const protocols = await tables.Protocol.list();
+	const ids = protocols.map((p) => p.id);
+
+	if (
+		ids.length === 0 ||
+		// TODO(2026-03-11): remove at some point
+		(ids.length === 1 && ids.at(0) === 'io.github.cigaleapp.arthropods.example')
+	) {
 		console.debug(`Importing built-in protocols`, import.meta.env.builtinProtocols);
 		for (const importUrl of import.meta.env.builtinProtocols) {
 			const filename = new URL(importUrl).pathname.split('/').at(-1);
