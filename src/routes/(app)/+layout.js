@@ -143,7 +143,9 @@ async function loadDefaultProtocol(swarpc) {
 
 	const protocolsCount = await tables.Protocol.count();
 	if (protocolsCount === 0) {
+		console.debug(`Importing built-in protocols`, import.meta.env.builtinProtocols);
 		for (const importUrl of import.meta.env.builtinProtocols) {
+			const filename = new URL(importUrl).pathname.split('/').at(-1);
 			try {
 				const contents = await fetch(importUrl).then((res) => res.text());
 				await swarpc.importProtocol({ contents, isJSON: true }, ({ phase, detail }) => {
@@ -181,12 +183,12 @@ async function loadDefaultProtocol(swarpc) {
 							break;
 					}
 
-					setLoadingMessage(`${'Chargement du protocole intégré'}<br>${secondLine}`);
+					setLoadingMessage(`${`Chargement du protocole ${filename}`}<br>${secondLine}`);
 				});
 			} catch (error) {
 				console.error(error);
 				toasts.error(
-					'Impossible de charger le protocole par défaut. Vérifiez votre connexion Internet ou essayez de recharger la page.'
+					`Impossible de charger le protocole ${filename}. Vérifiez votre connexion Internet ou essayez de recharger la page.`
 				);
 			}
 		}
