@@ -263,7 +263,6 @@ msgid "Chargement du modèle de recadrage…"
 msgstr "Chargement du modèle de recadrage…"
 
 #: src/routes/(app)/+layout.js
-#: src/routes/(app)/+layout.js
 msgid "Chargement du protocole intégré"
 msgstr "Chargement du protocole intégré"
 
@@ -1758,10 +1757,6 @@ msgstr "Écriture des options de la métadonnée<br>{0}"
 msgid "Post-validation"
 msgstr "Post-validation"
 
-#: src/routes/(app)/+layout.js
-msgid "Impossible de charger le protocole par défaut. Vérifiez votre connexion Internet ou essayez de recharger la page."
-msgstr "Impossible de charger le protocole par défaut. Vérifiez votre connexion Internet ou essayez de recharger la page."
-
 #: src/lib/results.svelte.js
 msgid "Importation dans une nouvelle session"
 msgstr "Importation dans une nouvelle session"
@@ -2353,3 +2348,13 @@ msgstr "Import de {0}"
 #: src/lib/results.svelte.js
 msgid "Importée depuis {0}"
 msgstr "Importée depuis {0}"
+
+#. 0: filename
+#: src/routes/(app)/+layout.js
+msgid "Chargement du protocole {0}"
+msgstr "Chargement du protocole {0}"
+
+#. 0: filename
+#: src/routes/(app)/+layout.js
+msgid "Impossible de charger le protocole {0}. Vérifiez votre connexion Internet ou essayez de recharger la page."
+msgstr "Impossible de charger le protocole {0}. Vérifiez votre connexion Internet ou essayez de recharger la page."

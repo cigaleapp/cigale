@@ -264,7 +264,6 @@ msgid "Chargement du modèle de recadrage…"
 msgstr "Loading cropping model…"
 
 #: src/routes/(app)/+layout.js
-#: src/routes/(app)/+layout.js
 msgid "Chargement du protocole intégré"
 msgstr "Loading built-in protocol"
 
@@ -1757,10 +1756,6 @@ msgstr "Writing metadata's options<br>{0}"
 msgid "Post-validation"
 msgstr "Post-validation"
 
-#: src/routes/(app)/+layout.js
-msgid "Impossible de charger le protocole par défaut. Vérifiez votre connexion Internet ou essayez de recharger la page."
-msgstr "Cannot load the built-in protocol. Verify your Internet connection or try reloading the page."
-
 #: src/lib/results.svelte.js
 msgid "Importation dans une nouvelle session"
 msgstr "Importing in a new session"
@@ -2351,4 +2346,14 @@ msgstr ""
 #. 0: file.name
 #: src/lib/results.svelte.js
 msgid "Importée depuis {0}"
+msgstr ""
+
+#. 0: filename
+#: src/routes/(app)/+layout.js
+msgid "Chargement du protocole {0}"
+msgstr ""
+
+#. 0: filename
+#: src/routes/(app)/+layout.js
+msgid "Impossible de charger le protocole {0}. Vérifiez votre connexion Internet ou essayez de recharger la page."
 msgstr ""
