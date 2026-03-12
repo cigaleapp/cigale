@@ -27,7 +27,7 @@ export const ssr = false;
 
 export const trailingSlash = 'always';
 
-export async function load() {
+export async function load({ url }) {
 	const locale = await getSetting('language', {
 		fallback: localeFromNavigator(),
 	});
@@ -51,9 +51,13 @@ export async function load() {
 
 	await initializeSettings();
 
-	const parallelism = await getSetting('parallelism', {
+	let parallelism = await getSetting('parallelism', {
 		fallback: 1,
 	});
+
+	if (url.searchParams.has('nodes')) {
+		parallelism = Number.parseInt(url.searchParams.get('nodes') ?? '1');
+	}
 
 	setLoadingMessage('Initialisation du worker…');
 
