@@ -22,7 +22,8 @@ jobs:
       BASE_PATH: /${{ github.event.repository.name }}
       SVELTEKIT_FALLBACK_PAGE: 404.html
       SVELTE_FALLBACK_PAGE: 404.html
-      BUILTIN_PROTOCOLS: https://raw.githubusercontent.com/${{ github.repository }}/main/examples/arthropods.cigaleprotocol.json
+      BUILTIN_PROTOCOLS: https://raw.githubusercontent.com/${{ github.repository }}/main/examples/arthropods.cigaleprotocol.json,https://raw.githubusercontent.com/${{ github.repository }}/main/protocols/insecta.cigaleprotocol.yaml
+
 
     steps:
       - name: Checkout repository
