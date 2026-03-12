@@ -160,7 +160,9 @@ const Settings = table(
 		cropAutoNext: 'boolean = false',
 		parallelism: type('number').default(() => {
 			try {
-				return Math.ceil(navigator.hardwareConcurrency / 3);
+				// Seems like >4 nodes consumes too much RAM (we might wanna check for navigator.deviceMemory buts it's Chromium-only...)
+				// See https://github.com/cigaleapp/cigale/issues/1333
+				return Math.min(4, Math.ceil(navigator.hardwareConcurrency / 3));
 			} catch (e) {
 				console.warn("Couldn't get navigator.hardwareConcurrency, defaulting to 1", e);
 				return 1;
