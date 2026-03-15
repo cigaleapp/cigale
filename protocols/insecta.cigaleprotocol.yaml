@@ -4,9 +4,9 @@ name: INSECTA
 authors:
   - name: Maxime Cauchoix
 
-version: 1
+version: 2
 updates: automatic
-source: https://raw.githubusercontent.com/cigaleapp/cigale/protocols/insecta.cigaleprotocol.yaml
+source: https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/insecta.cigaleprotocol.yaml
 
 description: |
   Pour réaliser le protocole INSECTA, vous avez besoin d'un appareil photo, de curiosité et de patience. 
@@ -35,6 +35,7 @@ imports:
       - conservation_status
       - shoot_date
       - shoot_location
+      - crop
 
 crop:
   metadata: crop
@@ -44,6 +45,48 @@ metadataGroups:
     name: Code projet
     description: |
       Choisir "entrainement" jusqu'à ce que vous vous sentiez à l'aise avec le protocole (3 à 5 sessions). Quand vous êtes suffisamment entrainé·e, choisissez "sciences participatives" ou un projet de recherche spécifique auquel vous êtes associé·e.
+  taxonomy:
+    name: Taxonomie
+
+metadataOrder:
+  # Session
+  - date
+  - is_training
+  - is_citizen_science
+  - is_psibiom
+  - is_renat
+  - is_adept
+  - is_wildnet
+  - site_code
+  - habitat_photo
+  - soil_photo_start
+  - habitat_comment
+  - transect_code
+  - wind_speed
+  - shadow_temperature
+  - grass_height
+  - incline
+  - incline_exposure
+  - on_path
+  - start_at
+  - end_at
+  - soil_photo_end
+  - distance
+  - camera_type
+  - comment
+  # Observations
+  - species
+  - genus
+  - family
+  - order
+  - class
+  - phylum
+  - kingdom
+  - shoot_location
+  - shoot_date
+  - conservation_status
+  - identification_difficulty
+
 
 sessionMetadata:
   date:
