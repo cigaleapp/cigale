@@ -87,7 +87,6 @@ metadataOrder:
   - conservation_status
   - identification_difficulty
 
-
 sessionMetadata:
   date:
     type: date
