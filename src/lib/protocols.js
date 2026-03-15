@@ -5,7 +5,7 @@ import { idComparator, Schemas } from './database.js';
 import { downloadAsFile, stringifyWithToplevelOrdering } from './download.js';
 import { promptForFiles } from './files.js';
 import { errorMessage } from './i18n.js';
-import { metadataOptionsKeyRange } from './metadata/index.js';
+import { metadataOptionsKeyRange, metadataOptionsOf } from './metadata/index.js';
 import { removeNamespaceFromMetadataId } from './schemas/metadata.js';
 import { ExportedProtocol, isMetadataInProtocol, Protocol } from './schemas/protocols.js';
 import {
@@ -40,10 +40,7 @@ export function jsonSchemaURL(base) {
  * @param {typeof Tables.Protocol.infer} protocol
  */
 export async function toExportedProtocol(db, protocol) {
-	const allMetadataOptions = await db.getAll(
-		'MetadataOption',
-		metadataOptionsKeyRange(protocol.id, null)
-	);
+	const metadataOptions = await metadataOptionsOf(db, protocol.id, null);
 
 	const allMetadataDefs = Object.fromEntries(
 		await db.getAll('Metadata').then((defs) =>
@@ -57,11 +54,9 @@ export async function toExportedProtocol(db, protocol) {
 					metadata.id,
 					{
 						...omit(metadata, 'id'),
-						options: allMetadataOptions
-							.filter(({ id }) =>
-								metadataOptionsKeyRange(protocol.id, metadata.id).includes(id)
-							)
-							.map((option) => omit(option, 'id', 'metadataId')),
+						options: (metadataOptions.byMetadata.get(metadata.id) ?? []).map((option) =>
+							omit(option, 'id', 'metadataId')
+						),
 					},
 				])
 		)

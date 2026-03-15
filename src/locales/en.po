@@ -66,10 +66,6 @@ msgstr "<0/> Reset"
 msgid "<0/> Réinitialiser la base de données"
 msgstr "<0/> Reset database"
 
-#: src/routes/(app)/results/+page.svelte
-msgid "Résultats"
-msgstr "Results"
-
 #: src/lib/CardMedia.svelte
 msgid "<0/> Rééssayer"
 msgstr "<0/> Retry"
@@ -425,6 +421,7 @@ msgid "Erreur lors du chargement du modèle de classification"
 msgstr "Error while loading classification model"
 
 #: src/routes/(app)/protocols/RowProtocol.svelte
+#: src/routes/(app)/results/+page.svelte
 msgid "Exporter"
 msgstr "Export"
 
@@ -551,11 +548,6 @@ msgstr "Analysis file of {0} is not valid JSON or is corrupted"
 #: src/routes/(app)/about/+page.svelte
 msgid "Les carnets nature de Jessica"
 msgstr "Les carnets nature de Jessica"
-
-#: src/routes/(app)/results/+page.svelte
-#: src/routes/(app)/results/+page.svelte
-msgid "Marge autour des images recadrées"
-msgstr "Padding around cropped images"
 
 #. 0: error
 #. 0: error
@@ -1957,18 +1949,6 @@ msgstr "No active session to export."
 msgid "Aucune session active à prévisualiser."
 msgstr "No session to preview."
 
-#: src/routes/(app)/results/+page.svelte
-msgid ""
-"Une valeur en % signifie que la marge est relative aux dimensions de chacune des\n"
-"images"
-msgstr ""
-"A % value means that the padding is relative to\n"
-"the dimensions of each image"
-
-#: src/routes/(app)/results/+page.svelte
-msgid "Contenu de l'export .zip"
-msgstr "Exported .zip contents"
-
 #: src/routes/(app)/ModalSubmitIssue.svelte
 msgid ""
 "Expliquer comment reproduire votre bug, étape par étape, et ce à quoi vous\n"
@@ -2334,6 +2314,26 @@ msgstr ""
 #. 0: filename
 #: src/routes/(app)/+layout.js
 msgid "Impossible de charger le protocole {0}. Vérifiez votre connexion Internet ou essayez de recharger la page."
+msgstr ""
+
+#: src/routes/(app)/results/+page.svelte
+msgid "Vérifier les métadonnées"
+msgstr ""
+
+#: src/routes/(app)/results/+page.svelte
+msgid "Inclure"
+msgstr ""
+
+#: src/routes/(app)/results/+page.svelte
+msgid "Marge de recadrage <0/>"
+msgstr ""
+
+#: src/routes/(app)/results/+page.svelte
+msgid "Pour chaque image, relativement à ses dimensions"
+msgstr ""
+
+#: src/routes/(app)/results/+page.svelte
+msgid "Contenu de l'export"
 msgstr ""
 
 #: src/lib/queue.svelte.js

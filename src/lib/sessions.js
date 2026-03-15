@@ -1,6 +1,7 @@
 import * as idb from '$lib/idb.svelte.js';
 
 import { imageIdToFileId } from './images.js';
+import { clearMetadataOptionsCache } from './metadata/storage.js';
 import { withQueue } from './queue.svelte.js';
 import { uiState } from './state.svelte.js';
 import { undo } from './undo.svelte.js';
@@ -37,9 +38,13 @@ export async function deleteSession(sessionId) {
  * @param {string | null} id id of the session to switch to, or null to close it
  */
 export async function switchSession(id) {
-	uiState.setCurrentSession(id);
+	const previousProtocolId = uiState.currentProtocolId
+	await uiState.setCurrentSession(id);
 	uiState.clearPreviewURLs();
 	undo.clear();
 	withQueue((q) => q.cancelAll('La session a été fermée'));
 	await idb.tables.initialize(id);
+	if (uiState.currentProtocolId !== previousProtocolId) {
+		clearMetadataOptionsCache()
+	}
 }

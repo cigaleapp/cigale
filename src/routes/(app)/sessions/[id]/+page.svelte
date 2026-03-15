@@ -1,5 +1,4 @@
 <script>
-	import { dequal } from 'dequal';
 	import { fade } from 'svelte/transition';
 
 	import { invalidate } from '$app/navigation';
@@ -7,19 +6,16 @@
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import Field from '$lib/Field.svelte';
 	import { plural } from '$lib/i18n.js';
-	import { databaseHandle, dependencyURI, tables } from '$lib/idb.svelte.js';
+	import { dependencyURI, tables } from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import InputSelectProtocol from '$lib/InputSelectProtocol.svelte';
-	import Metadata from '$lib/Metadata.svelte';
-	import { deleteMetadataValue, storeMetadataValue } from '$lib/metadata/index.js';
-	import MetadataList from '$lib/MetadataList.svelte';
 	import ModalConfirmDeletion from '$lib/ModalConfirmDeletion.svelte';
 	import { goto } from '$lib/paths.js';
+	import SessionMetadataForm from '$lib/SessionMetadataForm.svelte';
 	import { deleteSession, switchSession } from '$lib/sessions.js';
 	import { toasts } from '$lib/toasts.svelte.js';
 
 	const { data } = $props();
-	let sessionMetadata = $derived(data.sessionMetadata);
 	let { protocol: protocolId, name } = $derived(data.session);
 </script>
 
@@ -101,47 +97,17 @@
 		<section class="error">
 			Protocole <code>{data.session.protocol}</code> introuvable.
 		</section>
-	{:else if sessionMetadata.length > 0}
+	{:else}
 		<h2>Métadonnées</h2>
 
-		<form class="metadata" data-testid="session-metadata">
-			<MetadataList
-				definitions={sessionMetadata.map((s) => s.def)}
-				groups={data.protocol.metadataGroups}
-				ordering={data.protocol.metadataOrder}
-			>
-				{#snippet children(def)}
-					{@const value = sessionMetadata.find((s) => s.def.id === def.id)?.value}
-					<Metadata
-						options={data.sessionMetadataOptions[def.id]}
-						definition={def}
-						{value}
-						onchange={async (v, unit) => {
-							if (dequal(v, value?.value) && unit === value?.unit) return;
-
-							if (v !== undefined) {
-								await storeMetadataValue({
-									db: databaseHandle(),
-									manuallyModified: true,
-									subjectId: data.session.id,
-									metadataId: def.id,
-									value: v,
-									unit,
-								});
-							} else {
-								await deleteMetadataValue({
-									db: databaseHandle(),
-									subjectId: data.session.id,
-									metadataId: def.id,
-								});
-							}
-
-							invalidate(dependencyURI('Session', data.session.id));
-						}}
-					/>
-				{/snippet}
-			</MetadataList>
-		</form>
+		<SessionMetadataForm
+			session={data.session}
+			metadataOptions={new Map()}
+			onmetadatachange={() => {
+				// XXX: is this really necessary? not sure since defaults are also resolved within the component
+				invalidate(dependencyURI('Session', data.session.id));
+			}}
+		/>
 	{/if}
 
 	<ButtonPrimary

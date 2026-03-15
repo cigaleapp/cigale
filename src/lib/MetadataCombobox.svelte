@@ -70,7 +70,7 @@
 	 * @param {DB.MetadataEnumVariant} item
 	 */
 	function nameMatches(search, item) {
-		return [item.label, ...item.synonyms].find((val) =>
+		return [item.label, ...(item.synonyms ?? [])].find((val) =>
 			val.toLowerCase().includes(search.toLowerCase())
 		);
 	}
