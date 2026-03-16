@@ -9,15 +9,19 @@ All notable changes to this project will be documented in this file, on a monthl
 - Add metadata groups
 - Add metadata images (#1310)
 - Display images in compact enums
+- Improve metadata inputs
 - Put metadata images at the left side when possible
 
 ### Bug Fixes
 
 - Fix description hidden by very long cascades in vertical fullscreen classifier
+- Support YAML builtin protocols
 
 ### Data Updates
 
+- Add INSECTA protocol
 - Add metadata from Xper3 descriptors
+- Fix INSECTA protocol
 - Regenerate example protocols
 
 ### Translation Updates
