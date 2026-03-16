@@ -1,0 +1,1 @@
+const e=/("(?:\\?[^])*?")|(\/\/.*)|(\/\*[^]*?\*\/)/g,n=/("(?:\\?[^])*?")|(,\s*)(?=]|})/g,s={parse:r=>{r=String(r);try{return JSON.parse(r)}catch{return JSON.parse(r.replace(e,"$1").replace(n,"$1"))}}};export{s as J};
