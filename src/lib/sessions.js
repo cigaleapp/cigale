@@ -38,13 +38,13 @@ export async function deleteSession(sessionId) {
  * @param {string | null} id id of the session to switch to, or null to close it
  */
 export async function switchSession(id) {
-	const previousProtocolId = uiState.currentProtocolId
+	const previousProtocolId = uiState.currentProtocolId;
 	await uiState.setCurrentSession(id);
 	uiState.clearPreviewURLs();
 	undo.clear();
 	withQueue((q) => q.cancelAll('La session a été fermée'));
 	await idb.tables.initialize(id);
 	if (uiState.currentProtocolId !== previousProtocolId) {
-		clearMetadataOptionsCache()
+		clearMetadataOptionsCache();
 	}
 }

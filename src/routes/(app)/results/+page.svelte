@@ -178,7 +178,7 @@
 
 	let preview: TreeNode | undefined = $state();
 
-	let reloadPreviews = $state(0)
+	let reloadPreviews = $state(0);
 
 	watch([() => reloadPreviews, () => include], () => {
 		preview = undefined;
@@ -224,9 +224,13 @@
 
 		<section class="metadata">
 			{#if uiState.currentSession}
-				<SessionMetadataForm session={uiState.currentSession} metadataOptions={new Map()} onmetadatachange={() => {
-					reloadPreviews ++
-				}} />
+				<SessionMetadataForm
+					session={uiState.currentSession}
+					metadataOptions={new Map()}
+					onmetadatachange={() => {
+						reloadPreviews++;
+					}}
+				/>
 			{/if}
 		</section>
 	</section>

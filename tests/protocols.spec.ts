@@ -101,37 +101,32 @@ test('can use a protocol that imports metadata from another protocol', async ({
 	await page.getByRole('button', { name: 'Supprimer' }).click();
 	await app.modals.confirmDeletion('modal_delete_protocol', 'Example: arthropodes (lightweight)');
 
-	await mockUrl(
-		page,
-		context,
-		'https://example.com/protocols/com.example.remote.json',
-		{
-			json: {
-				id: 'com.example.remote',
-				name: 'Remote Protocol',
-				description: 'This protocol is hosted remotely',
-				authors: [],
-				sessionMetadata: {
-					remote_session_metadata: {
-						type: 'string',
-						description: '',
-						label: 'Remote session metadata',
-						required: false,
-						mergeMethod: 'none',
-					},
+	await mockUrl(page, context, 'https://example.com/protocols/com.example.remote.json', {
+		json: {
+			id: 'com.example.remote',
+			name: 'Remote Protocol',
+			description: 'This protocol is hosted remotely',
+			authors: [],
+			sessionMetadata: {
+				remote_session_metadata: {
+					type: 'string',
+					description: '',
+					label: 'Remote session metadata',
+					required: false,
+					mergeMethod: 'none',
 				},
-				metadata: {
-					remote_metadata: {
-						type: 'boolean',
-						description: '',
-						label: 'Remote metadata',
-						required: false,
-						mergeMethod: 'none',
-					},
+			},
+			metadata: {
+				remote_metadata: {
+					type: 'boolean',
+					description: '',
+					label: 'Remote metadata',
+					required: false,
+					mergeMethod: 'none',
 				},
-			} satisfies typeof ExportedProtocol.inferIn,
-		}
-	);
+			},
+		} satisfies typeof ExportedProtocol.inferIn,
+	});
 
 	await mockUrl(
 		page,

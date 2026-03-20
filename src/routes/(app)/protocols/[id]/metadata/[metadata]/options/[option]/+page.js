@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
 
-import { get, tables, databaseHandle } from '$lib/idb.svelte.js';
+import { databaseHandle, get, tables } from '$lib/idb.svelte.js';
 import { metadataOptionsKeyRange, metadataOptionsOf } from '$lib/metadata/index.js';
 import { metadataOptionId, namespacedMetadataId } from '$lib/schemas/metadata.js';
 import { entries } from '$lib/utils.js';

@@ -100,9 +100,13 @@
 	{:else}
 		<h2>Métadonnées</h2>
 
-		<SessionMetadataForm session={data.session} metadataOptions={new Map()} onmetadatachange={() => {
-			invalidate(dependencyURI('Session', data.session.id))
-		}} />
+		<SessionMetadataForm
+			session={data.session}
+			metadataOptions={new Map()}
+			onmetadatachange={() => {
+				invalidate(dependencyURI('Session', data.session.id));
+			}}
+		/>
 	{/if}
 
 	<ButtonPrimary
