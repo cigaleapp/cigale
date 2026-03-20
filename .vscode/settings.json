@@ -18,6 +18,14 @@
 			"query": "repo:${owner}/${repository} milestone:\"Terraforma: Échéance 1\" state:open"
 		},
 		{
+			"label": "Kobotoolbox",
+			"query": "repo:${owner}/${repository} parent-issue:${owner}/${repository}#1217"
+		},
+		{
+			"label": "Xper3",
+			"query": "repo:${owner}/${repository} parent-issue:${owner}/${repository}#1294"
+		},
+		{
 			"label": "All Issues",
 			"query": "repo:${owner}/${repository} state:open sort:created-desc"
 		},
