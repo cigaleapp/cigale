@@ -1,6 +1,6 @@
-import naturalregex from 'natural-regex';
+import NaturalRegex from 'natural-regex';
 
-const parser = naturalregex.default.parser;
+const parser = NaturalRegex.parser;
 
 /**
  * French labels for natural-regex tokens. Keys are token type names from the Jison parser's `terminals_` table.

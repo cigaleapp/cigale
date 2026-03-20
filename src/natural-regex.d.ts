@@ -1,18 +1,11 @@
 declare module 'natural-regex' {
-	export default {
-		default: class NaturalRegex {
-			static parser: Parser;
+	export default class NaturalRegex {
+		static parser: Parser;
 
-			static parse(code: string): string;
-			static from(code: string, flags?: string): RegExp;
-			static replace(
-				string?: string,
-				match?: string,
-				replace?: string,
-				flags?: string
-			): string;
-		},
-	};
+		static parse(code: string): string;
+		static from(code: string, flags?: string): RegExp;
+		static replace(string?: string, match?: string, replace?: string, flags?: string): string;
+	}
 
 	class Parser {
 		yy: Record<string, unknown>;
