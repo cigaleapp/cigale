@@ -35,6 +35,11 @@
 		merged?: boolean;
 		/** Display requiredness indicators */
 		requiredness: 'all' | 'required' | 'none';
+		onvalidation?: (
+			/** Empty if okay */
+			// eslint-disable-next-line no-unused-vars
+			messages: string[]
+		) => void;
 		onchange?: (
 			// eslint-disable-next-line no-unused-vars
 			value: undefined | RuntimeValue<T>,
@@ -50,6 +55,7 @@
 		requiredness,
 		options = [],
 		onchange = () => {},
+		onvalidation = () => {},
 	}: Props = $props();
 
 	const valueValidator = $derived.by(() => {
@@ -72,6 +78,13 @@
 	);
 
 	const validationErrors = $derived(validation instanceof ArkErrors ? validation : undefined);
+
+	$effect(() => {
+		onvalidation([
+			...(validationErrors?.map((error) => error.message) ?? []),
+			...orEmpty(definition.required && value === undefined, 'Obligatoire'),
+		]);
+	});
 
 	const _id = $props.id();
 
@@ -213,10 +226,10 @@
 		<section class="learnmore">
 			{#if definition.description || optional}
 				<p>
-					{definition.description}
 					{#if optional}
 						<em class="optional">(Optionnel)</em>
 					{/if}
+					{definition.description}
 				</p>
 			{/if}
 			{#if definition.learnMore}
@@ -303,6 +316,7 @@
 		display: flex;
 		flex-direction: column;
 		gap: 0.5em;
+		scroll-padding-top: 20px;
 	}
 
 	.side-image-and-main-area:has(.side-image) {
@@ -371,6 +385,7 @@
 		align-items: center;
 		justify-content: center;
 		color: var(--fg-error);
+		font-size: 0.75em;
 	}
 
 	.alternatives {

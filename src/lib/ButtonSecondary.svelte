@@ -139,14 +139,15 @@ Available CSS variables:
 	}
 
 	button.danger:not(:disabled) {
-		color: var(--fg, var(--fg-error));
-		border-color: var(--fg, var(--fg-error));
+		color: var(--fg-error);
+		border-color: var(--fg-error);
+		background-color: var(--bg-neutral);
 	}
 
 	button.danger:not(:disabled):is(:hover, :focus-visible) {
-		background-color: var(--bg-hover, var(--bg-error));
-		color: var(--fg-hover, var(--fg-error));
-		border-color: var(--fg-hover, var(--fg-error));
+		background-color: var(--bg-error);
+		color: var(--fg-error);
+		border-color: var(--fg-error);
 	}
 
 	button.tight {
