@@ -204,6 +204,7 @@
 				{#snippet children(definition)}
 					{@const value = metadata[definition.id]}
 					<Metadata
+					requiredness="required"
 						merged={value?.merged}
 						{definition}
 						{value}

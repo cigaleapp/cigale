@@ -74,6 +74,7 @@
 			{#snippet children(def)}
 				{@const value = session.metadata[def.id]}
 				<Metadata
+				requiredness="all"
 					options={metadataOptions.get(def.id) ?? []}
 					definition={def}
 					{value}
