@@ -468,47 +468,45 @@ test('session metadata form has default values', async ({ page, app, browserName
 
 	await loadDatabaseDump(page, 'db/kitchensink-protocol.devalue');
 	await app.settings.set({ showTechnicalMetadata: false });
-	await newSession(page, { name: 'Test' });
-	await goToSessionPage(page);
+	await newSession(page, { name: 'Test', goto: '' });
 
 	const session = await app.db.session.byName('Test');
 	if (!session) throw new Error('Session not found');
 
 	expect(differenceInMinutes(new Date(), new Date(session.createdAt))).toBeLessThan(5);
 
-	await expect(page.getByRole('textbox', { name: 'Date du transect' })).toHaveValue(
+	await expect(app.metadata.textbox('Date du transect')).toHaveValue(
 		formatDate(session.createdAt, 'yyyy-MM-dd', {
 			in: tz('Etc/UTC'),
 		})
 	);
-	await expect(page.getByRole('textbox', { name: 'Code du transect' })).toHaveValue(
+	await expect(app.metadata.textbox('Code du transect')).toHaveValue(
 		formatDate(session.createdAt, "yyyyMMddHHmm'AB'", {
 			in: tz('Etc/UTC'),
 		})
 	);
 
-	await expect(page.getByRole('textbox', { name: 'ohio respect' })).toHaveValue('6.7');
-	await expect(page.getByRole('textbox', { name: 'has no default' })).toHaveValue('');
+	await expect(app.metadata.textbox('ohio respect')).toHaveValue('6.7');
+	await expect(app.metadata.textbox('has no default')).toHaveValue('');
 
 	// Changing a value that another default value depends on
 
-	await page.getByRole('textbox', { name: 'Date du transect' }).fill('2024-01-01');
-	await page.getByRole('textbox', { name: 'Date du transect' }).blur();
+	await app.metadata.textbox('Date du transect').fill('2024-01-01');
+	await app.metadata.textbox('Date du transect').blur();
 
-	await expect(page.getByRole('textbox', { name: 'Code du transect' })).toHaveValue(
-		'202401010000AB'
-	);
+	await app.wait('500ms');
+
+	await expect(app.metadata.textbox('Code du transect')).toHaveValue('202401010000AB');
 
 	// Value should not change even if resolved default value changes if its value has been modified by the user
 
-	await page.getByRole('textbox', { name: 'Code du transect' }).fill('custom code');
+	await app.metadata.textbox('Code du transect').fill('custom code');
+	await app.metadata.textbox('Date du transect').fill('2024-02-01');
+	await app.metadata.textbox('Date du transect').blur();
 
-	await page.getByRole('textbox', { name: 'Date du transect' }).fill('2024-02-01');
-	await page.getByRole('textbox', { name: 'Date du transect' }).blur();
+	await app.wait('500ms');
 
-	await expect(page.getByRole('textbox', { name: 'Code du transect' })).toHaveValue(
-		'custom code'
-	);
+	await expect(app.metadata.textbox('Code du transect')).toHaveValue('custom code');
 });
 
 test('can set file-type metadata', async ({ page, app }) => {
@@ -554,7 +552,7 @@ test('can set file-type metadata', async ({ page, app }) => {
 		maxDiffPixelRatio: 0.01,
 	});
 
-	await page.waitForTimeout(500); // XXX: Wait for DB write
+	await app.wait('500ms'); // XXX: Wait for DB write
 
 	expect(await fileInDb()).toMatchObject({
 		filename: '20K-gray.jpeg',
@@ -572,7 +570,7 @@ test('can set file-type metadata', async ({ page, app }) => {
 		maxDiffPixelRatio: 0.01,
 	});
 
-	await page.waitForTimeout(500); // XXX: Wait for DB write
+	await app.wait('500ms'); // XXX: Wait for DB write
 
 	// Old file should be deleted
 	expect(await app.db.count('MetadataValueFile')).toBe(1);
@@ -590,7 +588,7 @@ test('can set file-type metadata', async ({ page, app }) => {
 	await expect(fileMetadata).toHaveText(/Aucun fichier/);
 	await expect(fileMetadata).not.toHaveText(/large-image\.jpeg/);
 
-	await page.waitForTimeout(500); // XXX: Wait for DB write
+	await app.wait('500ms'); // XXX: Wait for DB write
 
 	// File should be deleted
 	expect(await app.db.count('MetadataValueFile')).toBe(0);

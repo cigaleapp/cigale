@@ -294,6 +294,9 @@ for (const width of [undefined, 1400, 1600]) {
 
 			// Make sure that going to the metadata form on results page does not remove metadata set in the session edit page
 			await goToSessionPage(page);
+
+			await app.wait(500); // wait for defaults to resolve
+
 			await app.metadata.textbox('Date du transect').fill('2020-02-20');
 			await app.metadata
 				.section('has no default')
