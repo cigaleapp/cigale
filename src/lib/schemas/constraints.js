@@ -1,7 +1,9 @@
 import { type } from 'arktype';
-import NaturalRegex from 'natural-regex';
+import naturalregex from 'natural-regex';
 
 import { describeNaturalRegex } from '../natural-regex-tokens.js';
+
+const NaturalRegex = naturalregex.default;
 
 export const RegexExpression = type('string').pipe.try((source) => new RegExp(source));
 
