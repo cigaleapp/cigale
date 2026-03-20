@@ -72,7 +72,7 @@ if (import.meta.vitest) {
 	});
 }
 
-/** @param {undefined | typeof import('./schemas/neural.js').ModelInput.infer} input  */
+/** @param {undefined | {width: number, height: number}} input  */
 export const toRelativeCoords = (input) => {
 	if (!input) throw new Error('No input settings were provided');
 	return coordsScaler({

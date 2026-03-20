@@ -65,10 +65,6 @@ msgstr "<0/> Réinit."
 msgid "<0/> Réinitialiser la base de données"
 msgstr "<0/> Réinitialiser la base de données"
 
-#: src/routes/(app)/results/+page.svelte
-msgid "Résultats"
-msgstr "Résultats"
-
 #: src/lib/CardMedia.svelte
 msgid "<0/> Rééssayer"
 msgstr "<0/> Rééssayer"
@@ -424,6 +420,7 @@ msgid "Erreur lors du chargement du modèle de classification"
 msgstr "Erreur lors du chargement du modèle de classification"
 
 #: src/routes/(app)/protocols/RowProtocol.svelte
+#: src/routes/(app)/results/+page.svelte
 msgid "Exporter"
 msgstr "Exporter"
 
@@ -550,11 +547,6 @@ msgstr "Le fichier d'analyse de {0} n'est pas au format JSON ou est corrompu"
 #: src/routes/(app)/about/+page.svelte
 msgid "Les carnets nature de Jessica"
 msgstr "Les carnets nature de Jessica"
-
-#: src/routes/(app)/results/+page.svelte
-#: src/routes/(app)/results/+page.svelte
-msgid "Marge autour des images recadrées"
-msgstr "Marge autour des images recadrées"
 
 #. 0: error
 #. 0: error
@@ -1958,18 +1950,6 @@ msgstr "Aucune session active à exporter."
 msgid "Aucune session active à prévisualiser."
 msgstr "Aucune session active à prévisualiser."
 
-#: src/routes/(app)/results/+page.svelte
-msgid ""
-"Une valeur en % signifie que la marge est relative aux dimensions de chacune des\n"
-"images"
-msgstr ""
-"Une valeur en % signifie que la marge est relative aux dimensions de chacune des\n"
-"images"
-
-#: src/routes/(app)/results/+page.svelte
-msgid "Contenu de l'export .zip"
-msgstr "Contenu de l'export .zip"
-
 #: src/routes/(app)/ModalSubmitIssue.svelte
 msgid ""
 "Expliquer comment reproduire votre bug, étape par étape, et ce à quoi vous\n"
@@ -2336,6 +2316,26 @@ msgstr "Chargement du protocole {0}"
 #: src/routes/(app)/+layout.js
 msgid "Impossible de charger le protocole {0}. Vérifiez votre connexion Internet ou essayez de recharger la page."
 msgstr "Impossible de charger le protocole {0}. Vérifiez votre connexion Internet ou essayez de recharger la page."
+
+#: src/routes/(app)/results/+page.svelte
+msgid "Vérifier les métadonnées"
+msgstr "Vérifier les métadonnées"
+
+#: src/routes/(app)/results/+page.svelte
+msgid "Inclure"
+msgstr "Inclure"
+
+#: src/routes/(app)/results/+page.svelte
+msgid "Marge de recadrage <0/>"
+msgstr "Marge de recadrage <0/>"
+
+#: src/routes/(app)/results/+page.svelte
+msgid "Pour chaque image, relativement à ses dimensions"
+msgstr "Pour chaque image, relativement à ses dimensions"
+
+#: src/routes/(app)/results/+page.svelte
+msgid "Contenu de l'export"
+msgstr "Contenu de l'export"
 
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"

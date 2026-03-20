@@ -10,6 +10,7 @@ import type { ExportedProtocol } from '$lib/schemas/protocols';
 import type { Toast } from '$lib/toasts.svelte.js';
 
 import { test as base, expect as baseExpect } from '@playwright/test';
+import { ms } from 'convert';
 
 import { safeJSONParse } from '$lib/utils';
 
@@ -50,7 +51,7 @@ let collembolaClassifierModel: PredownloadedModel | null = null;
 let arthropodaDetectionModel: PredownloadedModel | null = null;
 
 export type AppFixture = {
-	wait: (ms: number) => Promise<void>;
+	wait: (ms: number | `${number}${'ms' | 's'}`) => Promise<void>;
 	metadata: ReturnType<typeof metadataSections>;
 	db: {
 		ready(): Promise<void>;
@@ -163,8 +164,8 @@ export const test = base.extend<
 	tempfiles,
 	app: async ({ page }, use) => {
 		await use({
-			async wait(ms) {
-				await page.waitForTimeout(ms);
+			async wait(duration) {
+				await page.waitForTimeout(typeof duration === 'number' ? duration : ms(duration));
 			},
 			sidepanel: page.getByTestId('sidepanel'),
 			metadata: metadataSections(page),

@@ -4,7 +4,7 @@
 
 	import Icon from '@iconify/svelte';
 	import { ArkErrors, type } from 'arktype';
-	import { convert, MeasureKind } from 'convert';
+	import { convert, MeasureKind, ms } from 'convert';
 	import * as dates from 'date-fns';
 	import { useDebounce } from 'runed';
 	import { fade } from 'svelte/transition';
@@ -29,7 +29,7 @@
 	import { sendNotification } from './notifications.js';
 	import OverflowableText from './OverflowableText.svelte';
 	import RadioButtons from './RadioButtons.svelte';
-	import { availableUnitsFor, findUnit, NumericUnit, unitKind } from './schemas/units.js';
+	import { availableUnitsFor, displayUnit, NumericUnit, unitKind } from './schemas/units.js';
 	import { uiState } from './state.svelte.js';
 	import Switch from './Switch.svelte';
 	import { toasts } from './toasts.svelte.js';
@@ -103,13 +103,7 @@
 		if (!('unit' in definition)) return;
 		if (!definition.unit) return;
 
-		const u = findUnit(valueUnit ?? definition.unit);
-		if (!u) return;
-
-		return {
-			names: u.names,
-			symbols: 'symbols' in u ? u.symbols : [],
-		};
+		return valueUnit ?? definition.unit;
 	});
 </script>
 
@@ -198,7 +192,7 @@
 			{#snippet numeric(val, { range: intervalInBaseUnit, unit: baseUnit })}
 				{@const interval = intervalInBaseUnit
 					? mapValues(pick(intervalInBaseUnit, 'min', 'max'), (v) =>
-							valueUnit && v !== undefined
+							valueUnit && baseUnit && v !== undefined
 								? Number(convert(v, baseUnit).to(valueUnit))
 								: v
 						)
@@ -227,7 +221,7 @@
 								parsedValue = undefined;
 							}
 
-							onblur(parsedValue, selectedUnit?.names[0]);
+							onblur(parsedValue, selectedUnit);
 						}}
 						value={temporaryValue ?? val?.toString() ?? ''}
 					/>
@@ -240,28 +234,22 @@
 							{
 								label: 'Unité',
 								items: availableUnitsFor(baseUnit).map((u) => {
-									const unitNames = (uu: typeof u) =>
-										new Set([...uu.names, ...uu.symbols]);
-
-									const unitName = u.names[0] || u.symbols[0];
+									const { symbol, name } = displayUnit(u);
 
 									return {
-										data: u,
-										key: u.symbols[0] || u.names[0],
+										data: { symbol, name },
+										key: symbol || name,
 										type: 'selectable',
-										label: unitName,
-										selected: Boolean(
-											selectedUnit &&
-											!unitNames(u).isDisjointFrom(unitNames(selectedUnit))
-										),
+										label: name || symbol,
+										selected: u === selectedUnit,
 										onclick() {
 											if (val === undefined) return;
 											const converted = convert(
 												val,
 												valueUnit ?? baseUnit
-											).to(unitName);
-											onblur(converted, unitName);
-											valueUnit = unitName;
+											).to(u);
+											onblur(converted, u);
+											valueUnit = u;
 										},
 									};
 								}),
@@ -269,15 +257,18 @@
 						]}
 					>
 						{#snippet trigger(props)}
-							<ButtonIcon help="Utiliser une autre unité" {...props}>
-								{selectedUnit?.symbols[0] ?? selectedUnit?.names[0] ?? ''}
-							</ButtonIcon>
+							{#if selectedUnit}
+								{@const { symbol, name } = displayUnit(selectedUnit)}
+								<ButtonIcon help="Utiliser une autre unité" {...props}>
+									{symbol || name}
+								</ButtonIcon>
+							{/if}
 						{/snippet}
 
-						{#snippet item({ names, symbols }, { selected })}
+						{#snippet item({ name, symbol }, { selected })}
 							<div class="unit">
-								<span class="symbol">{symbols.at(0) ?? ''}</span>
-								<span class="name">{names[0]}</span>
+								<span class="symbol">{symbol}</span>
+								<span class="name">{name}</span>
 								<div class="icon">
 									{#if selected}
 										<IconCheck />
@@ -463,10 +454,7 @@
 
 										const timeElapsed = performance.now() - savingStart;
 
-										if (
-											(!windowIsFocused && timeElapsed > 2_000) ||
-											timeElapsed > 5_000
-										) {
+										if (!windowIsFocused || timeElapsed > ms('5s')) {
 											sendNotification(`${file.name} enregistré`, {
 												body: 'Le fichier a été enregistré avec succès',
 											});

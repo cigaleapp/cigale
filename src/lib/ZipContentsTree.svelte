@@ -79,7 +79,7 @@
 	}
 </script>
 
-<ul class="tree">
+<ul class="tree root">
 	<li>
 		<IconZipFile />
 		<div class="text">
@@ -237,6 +237,10 @@
 			/* Vertical line */
 			border-left: 2px solid var(--fg-neutral);
 		}
+	}
+
+	ul.root {
+		padding: 0;
 	}
 
 	ul.leaves-only {

@@ -18,8 +18,10 @@ import {
  * @param {string} [options.protocol] name of protocol to use
  * @param {Parameters<typeof setInferenceModels>[1]} [options.models]
  * @param {string} [options.name] name of the session
+ * @param {import('./navigation.js').NavigationTab | ""} [options.goto] goto page after session was created. Empty string to stay here
  */
-export async function newSession(page, { name, protocol, models } = {}) {
+// TODO change goto default to ""
+export async function newSession(page, { name, protocol, models, goto = 'import' } = {}) {
 	await goHome(page);
 	await goToTab(page, 'sessions');
 
@@ -46,23 +48,27 @@ export async function newSession(page, { name, protocol, models } = {}) {
 		await textbox.blur();
 	}
 
-	// XXX: Sometimes clicking the open button does nothing for some reason
-	// Can't reproduce outside of the testing environment though
-	while (page.url().includes('/sessions/')) {
-		await page
-			.getByRole('button', {
-				name: 'Ouvrir',
-				exact: true,
-			})
-			.click();
-
-		await new Promise((r) => setTimeout(r, 500));
-	}
-
-	await waitForRoute(page, '/import');
-
 	if (models) {
 		await setInferenceModels(page, models);
+	}
+
+	if (goto !== '') {
+		// XXX: Sometimes clicking the open button does nothing for some reason
+		// Can't reproduce outside of the testing environment though
+		while (page.url().includes('/sessions/')) {
+			await page
+				.getByRole('button', {
+					name: 'Ouvrir',
+					exact: true,
+				})
+				.click();
+
+			await new Promise((r) => setTimeout(r, 500));
+		}
+
+		await waitForRoute(page, '/(app)/(sidepanel)/import');
+
+		if (goto !== 'import') await goToTab(page, goto);
 	}
 }
 

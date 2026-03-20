@@ -32,6 +32,7 @@ export function findUnit(nameOrSymbol) {
 /**
  *
  * @param {import('convert').Unit} unit
+ * @returns {import('convert').Unit[]}
  */
 export function availableUnitsFor(unit) {
 	// TODO turn [...x] into just x once Vite build supports Iterator#flatMap
@@ -44,15 +45,30 @@ export function availableUnitsFor(unit) {
 		)
 	);
 
-	if (!kind) return [];
+	return kind?.units.map(({ names }) => names[0]) ?? [];
+}
 
-	return kind.units.map(
-		(u) =>
-			/** @type {const} */ ({
-				names: u.names,
-				symbols: 'symbols' in u ? u.symbols : [],
-			})
-	);
+/**
+ *
+ * @param {import('convert').Unit} unit
+ * @returns {{symbol: string, name: string }}
+ */
+export function displayUnit(unit) {
+	const u = [...conversions.values()]
+		.flatMap((kind) => kind.units)
+		.find((u) => [...u.names, ...u.symbols].includes(unit));
+
+	if (!u) return { symbol: '', name: '' };
+
+	const { names, symbols } = u;
+	const name = names.find(Boolean) ?? '';
+	let symbol = symbols.find(Boolean) ?? '';
+
+	if (symbol === 'C' || symbol === 'F') {
+		symbol = `°${symbol}`;
+	}
+
+	return { name, symbol };
 }
 
 /**

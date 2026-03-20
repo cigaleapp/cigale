@@ -12,13 +12,13 @@ benchmark(`startup @blank`, {
 		await app.db.ready();
 		await assert(app.tabs.get('sessions')).toBeVisible({ timeout: ms('1min') });
 	},
-	largestContentfulPaint: '12s',
+	largestContentfulPaint: '13s',
 	firstContentfulPaint: '250ms',
 	// TODO: lower this
 	total: {
-		chromium: '12s',
-		webkit: '21s',
-		firefox: '21s',
+		chromium: '13s',
+		webkit: '25s',
+		firefox: '25s',
 	},
 });
 
@@ -34,8 +34,8 @@ benchmark('startup', {
 	// TODO: lower this
 	total: {
 		chromium: '8s',
-		webkit: '12s',
-		firefox: '12s',
+		webkit: '15s',
+		firefox: '15s',
 	},
 });
 

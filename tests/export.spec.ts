@@ -1,3 +1,7 @@
+import type { Analysis } from '$lib/schemas/exports.js';
+
+import { ms } from 'convert';
+
 import { issue } from './annotations.js';
 import { assert, expect, test } from './fixtures.js';
 import { mockFilesystemAccessAPI, writtenFilesOfHandle } from './utils/filesystemaccess.js';
@@ -58,23 +62,25 @@ test('correctly shows .zip preview', async ({ page, app }) => {
 
 	const preview = page.getByRole('main').getByTestId('zip-preview');
 	const downloadButton = page.getByRole('main').getByRole('button', { name: 'Archive ZIP' });
+	const settings = page.locator('section').filter({ hasText: 'Marge de recadrage' });
 
-	/**
-	 *
-	 * @param {object} opts
-	 * @param {string} [opts.include]
-	 * @param {{px: number}|{'%': number}} [opts.cropPadding]
-	 */
-	async function changeExportSettings({ include, cropPadding }) {
+	async function changeExportSettings({
+		include,
+		cropPadding,
+	}: {
+		include?: string;
+		cropPadding?: { px: number } | { '%': number };
+	}) {
 		if (include) {
-			await page.getByRole('radio', { name: include }).click();
+			await settings.getByRole('radio', { name: include }).click();
 		}
 
 		if (cropPadding) {
-			// @ts-ignore
-			const [[unit, value]] = entries(cropPadding);
+			const [[unit, value]] = entries(cropPadding as { px: number; '%': number });
 
-			const input = page.getByRole('radio', { name: unit }).getByRole('textbox');
+			const input = settings.getByRole('textbox', {
+				name: { px: 'en pixels', '%': "en pourcentage des dimensions de l'image" }[unit],
+			});
 			await input.fill(value.toString());
 			await input.blur();
 		}
@@ -89,7 +95,6 @@ test('correctly shows .zip preview', async ({ page, app }) => {
 	await changeExportSettings({ include: 'Métadonnées seulement' });
 	await expect(downloadButton).toHaveText('Archive ZIP ~16ko');
 	await expect(preview).toMatchAriaSnapshot(`
-	  - heading "Contenu de l'export .zip" [level=2]
 	  - list:
 	    - listitem:
 	      - img
@@ -106,7 +111,6 @@ test('correctly shows .zip preview', async ({ page, app }) => {
 	await changeExportSettings({ include: 'Métadonnées et images recadrées' });
 	await expect(downloadButton).toHaveText('Archive ZIP ~4,4Mo');
 	await expect(preview).toMatchAriaSnapshot(`
-	  - heading "Contenu de l'export .zip" [level=2]
 	  - list:
 	    - listitem:
 	      - img
@@ -136,10 +140,9 @@ test('correctly shows .zip preview', async ({ page, app }) => {
 	          - text: (Unknown)_obs4_4.jpeg
 	`);
 
-	await changeExportSettings({ include: 'Métadonnées, images recadrées et images originales' });
+	await changeExportSettings({ include: 'Tout' });
 	await expect(downloadButton).toHaveText('Archive ZIP ~10Mo');
 	await expect(preview).toMatchAriaSnapshot(`
-	  - heading "Contenu de l'export .zip" [level=2]
 	  - list:
 	    - listitem:
 	      - img
@@ -238,7 +241,6 @@ test('includes metadata files in export', async ({ page, app }) => {
 
 	await app.tabs.go('results');
 	await expect(page.getByTestId('zip-preview')).toMatchAriaSnapshot(`
-	  - heading "Contenu de l'export .zip" [level=2]
 	  - list:
 	    - listitem:
 	      - img
@@ -275,3 +277,75 @@ test('includes metadata files in export', async ({ page, app }) => {
 		}
 	);
 });
+
+for (const width of [undefined, 1400, 1600]) {
+	test.describe(`with a ${width ?? 'default'}px-wide window`, () => {
+		test.beforeEach(async ({ page }) => {
+			if (!width) return;
+			await page.setViewportSize({
+				width: width,
+				height: Math.floor((9 / 16) * width),
+			});
+		});
+
+		test('can change session metadata in results page', async ({ page, app }) => {
+			await loadDatabaseDump(page, 'db/kitchensink-protocol.devalue');
+			await chooseFirstSession(page);
+
+			// Make sure that going to the metadata form on results page does not remove metadata set in the session edit page
+			await goToSessionPage(page);
+
+			await app.wait(500); // wait for defaults to resolve
+
+			await app.metadata.textbox('Date du transect').fill('2020-02-20');
+			await app.metadata
+				.section('has no default')
+				.getByRole('button', { name: 'Incrémenter' })
+				.click();
+
+			await app.wait(500); // wait for debounce on increment button
+
+			await app.tabs.go('results');
+
+			await app.metadata.textbox('Code du transect').fill('QUOICOUBEH');
+			await app.metadata.textbox('ohio respect').fill('67');
+			await app.metadata
+				.section('has no default')
+				.getByRole('button', { name: 'Incrémenter' })
+				.click();
+
+			await app.wait(500); // wait for debounce on increment button
+
+			const expand = page.getByRole('button', {
+				name: "Montrer le panneau d'export",
+				exact: true,
+			});
+
+			if (await expand.isVisible({ timeout: ms('2s') })) {
+				await expand.click();
+			}
+
+			const zip = await exportResults(page, { kind: 'metadata' });
+			await expectZipFiles(zip, ['analysis.json', 'metadata.csv'], {
+				'analysis.json': {
+					json({ session }: (typeof Analysis)['infer']) {
+						expect(session.protocolMetadata).toMatchObject({
+							transect_date: {
+								value: '2020-02-20T00:00:00.000Z',
+							},
+							transect_code: {
+								value: 'QUOICOUBEH',
+							},
+							ohio_respect: {
+								value: 67,
+							},
+							has_no_default: {
+								value: 2,
+							},
+						});
+					},
+				},
+			});
+		});
+	});
+}
