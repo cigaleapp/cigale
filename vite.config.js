@@ -37,7 +37,7 @@ const prNumber = process.env.PR_NUMBER ? parseInt(process.env.PR_NUMBER, 10) : u
 
 export default defineConfig({
 	legacy: {
-		inconsistentCjsInterop: true
+		inconsistentCjsInterop: true,
 	},
 	test: {
 		environment: 'jsdom',
