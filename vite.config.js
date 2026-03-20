@@ -36,6 +36,9 @@ const env = arkenv(
 const prNumber = process.env.PR_NUMBER ? parseInt(process.env.PR_NUMBER, 10) : undefined;
 
 export default defineConfig({
+	legacy: {
+		inconsistentCjsInterop: true
+	},
 	test: {
 		environment: 'jsdom',
 		include: ['src/lib/**/*.test{.svelte,}.{js,ts}', 'src/routes/**/utils.js'],
