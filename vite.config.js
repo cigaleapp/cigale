@@ -37,6 +37,7 @@ const prNumber = process.env.PR_NUMBER ? parseInt(process.env.PR_NUMBER, 10) : u
 
 export default defineConfig({
 	legacy: {
+		// FIXME: Needed for natural-regex
 		inconsistentCjsInterop: true,
 	},
 	test: {
