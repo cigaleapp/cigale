@@ -258,6 +258,7 @@ const protocol = {
 			description: "J'ai photographié",
 			required: true,
 			mergeMethod: 'min',
+			default: 'at_will',
 			options: [
 				{ key: 'all', label: 'Tous les individus rencontrés' },
 				{ key: 'inventory', label: 'Au moins un individu de chaque espèce rencontrée' },
