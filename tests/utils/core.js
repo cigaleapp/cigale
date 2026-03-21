@@ -401,3 +401,13 @@ export async function pickFiles(trigger, ...files) {
 		picker.setFiles(files.map((f) => `${FixturePaths.root}/${f}`))
 	);
 }
+
+/**
+ * @param {Page} page
+ * @param {() => Promise<void>} trigger
+ */
+export async function waitForDownload(page, trigger) {
+	const event = page.waitForEvent('download');
+	await trigger();
+	return await event;
+}
