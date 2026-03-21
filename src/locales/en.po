@@ -2336,6 +2336,26 @@ msgstr ""
 msgid "Contenu de l'export"
 msgstr ""
 
+#: src/lib/Metadata.svelte
+msgid "(Optionnel)"
+msgstr ""
+
+#: src/routes/(app)/results/+page.svelte
+msgid "Métadonnées incorrectes"
+msgstr ""
+
+#: src/routes/(app)/results/+page.svelte
+msgid "Exporter quand même"
+msgstr ""
+
+#: src/routes/(app)/results/+page.svelte
+msgid "Corriger"
+msgstr ""
+
+#: src/routes/(app)/results/+page.svelte
+msgid "Certaines métadonnées sont incorrectes <0/>"
+msgstr ""
+
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"
 msgstr ""
