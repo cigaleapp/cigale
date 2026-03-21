@@ -365,8 +365,8 @@ for (const width of [undefined, 1400, 1600]) {
 
 			await app.tabs.go('results');
 
-			await app.metadata.textbox('Code du transect').fill('QUOICOUBEH');
-			await app.metadata.textbox('ohio respect').fill('67');
+			await app.metadata.textbox('Code du transect').fill('111111111111QUOICOUBEH');
+			await app.metadata.textbox('ohio respect').fill('6.7');
 			await app.metadata
 				.section('has no default')
 				.getByRole('button', { name: 'Incrémenter' })
@@ -392,10 +392,10 @@ for (const width of [undefined, 1400, 1600]) {
 								value: '2020-02-20T00:00:00.000Z',
 							},
 							transect_code: {
-								value: 'QUOICOUBEH',
+								value: '111111111111QUOICOUBEH',
 							},
 							ohio_respect: {
-								value: 67,
+								value: 6.7,
 							},
 							has_no_default: {
 								value: 2,
