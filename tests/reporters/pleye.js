@@ -252,75 +252,7 @@ export default class Pleye {
 
 	// TODO: onError, onExit
 
-	/**
-	 *
-	 * @param {PW.TestCase} test
-	 * @param {PW.TestResult} result
-	 * @param {PW.TestStep} step
-	 * @returns
-	 */
-	onStepBegin(test, result, step) {
-		// For now, we send both step-begin and step-end at the end of the step to filter out steps that are <1second long, otherwise theres too many requests
-	}
-
-	/**
-	 *
-	 * @param {PW.TestCase} test
-	 * @param {PW.TestResult} result
-	 * @param {PW.TestStep} step
-	 */
-	onStepEnd(test, result, step) {
-		const stepIdentifier = this.#stepIdentifierParams(test, result);
-		if (!stepIdentifier) return;
-
-		if (step.steps.length > 0) {
-			// We only care about "true" steps
-			return;
-		}
-
-		const testKey = this.#stepIndicesKey(test);
-		const index = (this.#stepIndices.get(testKey) ?? -1) + 1;
-		this.#stepIndices.set(testKey, index);
-
-		if (step.duration < 1_000) {
-			// Ignore steps that are less than 1 second long
-			// Index is still incremented above, so that the UI knows that a step happened here
-			return;
-		}
-
-		void (async () => {
-			await this.#sendPayload('step-begin', {
-				githubJobId: this.#runData.githubJobId,
-				test: this.#testIdentifierParams(test),
-				step: {
-					index,
-					retry: result.retry,
-					title: step.titlePath().at(-1) ?? '',
-					path: step.titlePath().slice(0, -1),
-
-					startedAt: step.startTime,
-					annotations: step.annotations,
-					category: toStepCategory(step.category),
-					filePath: step.location ? this.#relativeFilepath(step.location.file) : null,
-					locationInFile: step.location
-						? [step.location.line, step.location.column]
-						: null,
-					// TODO: step.parent
-					// parentStepId: step.parent
-				},
-			});
-
-			// Small delay to ensure step-begin is processed before step-end
-			await new Promise((resolve) => setTimeout(resolve, 100));
-
-			await this.#sendPayload('step-end', {
-				githubJobId: this.#runData.githubJobId,
-				step: stepIdentifier,
-				duration: toISOInterval(step.duration),
-				error: step.error ? this.#toError(step.error) : undefined,
-			});
-		})();
-	}
+	// TODO(maybe?): bring back onStep{Begin,End}
 
 	/**
 	 *
