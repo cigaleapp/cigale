@@ -107,7 +107,7 @@
 		"fake-indexeddb": "^6.2.5",
 		"gitmoji-cli": "^9.7.0",
 		"globals": "^17.4.0",
-		"google-auth-library": "^10.6.1",
+		"google-auth-library": "^10.6.2",
 		"google-fonts-helper": "^3.7.3",
 		"googleapis": "^171.4.0",
 		"jsdom": "^29.0.1",
