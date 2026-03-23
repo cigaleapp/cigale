@@ -140,7 +140,7 @@ jobs:
 
           cat $GITHUB_OUTPUT
       - name: Add sticky comment with coverage difference
-        uses: marocchino/sticky-pull-request-comment@v2
+        uses: marocchino/sticky-pull-request-comment@v3
         if: steps.diff.outputs.trend != 'neutral'
         with:
           header: 📊 Coverage difference
