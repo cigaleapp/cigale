@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file, on a monthl
 
 - Add metadata groups
 - Add metadata images (#1310)
+- Add session metadata form to results page
 - Display images in compact enums
 - Improve metadata inputs
 - Put metadata images at the left side when possible
