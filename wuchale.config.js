@@ -13,6 +13,7 @@ export default defineConfig({
 		main: svelte({
 			sourceLocale: 'fr',
 			loader: 'sveltekit',
+			files: ['src/**/*.svelte'],
 			heuristic({ msgStr: [msg], details: { file, scope, call } }) {
 				if (file.includes('/_playground/')) return false;
 
@@ -56,7 +57,7 @@ export default defineConfig({
 			files: [
 				'src/**/+{page,layout}.{js,ts}',
 				'src/**/+{page,layout}.server.{js,ts}',
-				'src/lib/**.js',
+				'src/lib/**.{js,ts}',
 			],
 			heuristic({ msgStr: [msg], details: { file, funcName, call } }) {
 				// Strings in test files
