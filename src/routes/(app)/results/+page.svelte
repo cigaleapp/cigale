@@ -1,8 +1,10 @@
 <script lang="ts">
 	import type { TreeNode, TreeNodeMaybeLoading } from '$lib/file-tree.js';
+	import type { NamespacedMetadataID } from '$lib/schemas/common.js';
 
 	import { watch } from 'runed';
 	import { tick } from 'svelte';
+	import { SvelteMap } from 'svelte/reactivity';
 
 	import IconDownloadAsZip from '~icons/ri/file-zip-line';
 	import IconDownloadAsFolder from '~icons/ri/folder-download-line';
@@ -24,6 +26,7 @@
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 	import LoadingText, { Loading } from '$lib/LoadingText.svelte';
+	import ModalConfirm from '$lib/ModalConfirm.svelte';
 	import { ensureNoLoneImages } from '$lib/observations.js';
 	import RadioButtons from '$lib/RadioButtons.svelte';
 	import SessionMetadataForm from '$lib/SessionMetadataForm.svelte';
@@ -81,6 +84,12 @@
 	});
 
 	async function downloadExport(directoryHandle: FileSystemDirectoryHandle | undefined) {
+		if (metadataErrors.values().some((errs) => errs.length > 0)) {
+			if (!(await confirmExportWithMetadataErrors())) {
+				return;
+			}
+		}
+
 		await toasts.clear('exporter');
 		uiState.processing.reset();
 		const exportFormat = directoryHandle ? 'folder' : 'zip';
@@ -206,6 +215,9 @@
 		children: Array(10).fill(Loading),
 	};
 
+	let confirmExportWithMetadataErrors: () => Promise<boolean> = $state();
+	const metadataErrors: Map<NamespacedMetadataID, string[]> = new SvelteMap();
+
 	let supportsWritingFolder = $state(false);
 	$effect(() => {
 		if ('showDirectoryPicker' in window) {
@@ -213,6 +225,29 @@
 		}
 	});
 </script>
+
+<ModalConfirm
+	dangerous
+	key="modal_export_with_metadata_errors"
+	title="Métadonnées incorrectes"
+	bind:show={confirmExportWithMetadataErrors}
+	confirm="Exporter quand même"
+	cancel="Corriger"
+>
+	Certaines métadonnées sont incorrectes
+
+	<section class="problems">
+		{#each metadataErrors as [id, errors] (id)}
+			<Field label={tables.Metadata.getFromState(id)?.label ?? id}>
+				<ul>
+					{#each errors as error (error)}
+						<li>{error}</li>
+					{/each}
+				</ul>
+			</Field>
+		{/each}
+	</section>
+</ModalConfirm>
 
 <svelte:window bind:innerWidth={windowWidth} />
 
@@ -227,6 +262,7 @@
 				<SessionMetadataForm
 					session={uiState.currentSession}
 					metadataOptions={new Map()}
+					errors={metadataErrors}
 					onmetadatachange={() => {
 						reloadPreviews++;
 					}}
@@ -462,6 +498,13 @@
 		display: flex;
 		align-items: center;
 		gap: 1em;
+	}
+
+	.problems {
+		display: flex;
+		flex-direction: column;
+		gap: 1em;
+		margin-top: 1em;
 	}
 
 	.session header {

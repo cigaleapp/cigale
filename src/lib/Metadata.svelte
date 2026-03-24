@@ -6,6 +6,7 @@
 
 	import { ArkErrors } from 'arktype';
 
+	import IconRequired from '~icons/ri/asterisk';
 	import IconCheck from '~icons/ri/check-line';
 	import IconClear from '~icons/ri/close-line';
 	import IconTechnical from '~icons/ri/settings-line';
@@ -32,6 +33,13 @@
 		options?: MetadataEnumVariant[];
 		value: undefined | TypedMetadataValue<NoInfer<T>>;
 		merged?: boolean;
+		/** Display requiredness indicators */
+		requiredness: 'all' | 'required' | 'none';
+		onvalidation?: (
+			/** Empty if okay */
+			// eslint-disable-next-line no-unused-vars
+			messages: string[]
+		) => void;
 		onchange?: (
 			// eslint-disable-next-line no-unused-vars
 			value: undefined | RuntimeValue<T>,
@@ -40,7 +48,15 @@
 		) => void;
 	}
 
-	let { value, merged, definition, options = [], onchange = () => {} }: Props = $props();
+	let {
+		value,
+		merged,
+		definition,
+		requiredness,
+		options = [],
+		onchange = () => {},
+		onvalidation = () => {},
+	}: Props = $props();
 
 	const valueValidator = $derived.by(() => {
 		switch (definition.type) {
@@ -63,6 +79,13 @@
 
 	const validationErrors = $derived(validation instanceof ArkErrors ? validation : undefined);
 
+	$effect(() => {
+		onvalidation([
+			...(validationErrors?.map((error) => error.message) ?? []),
+			...orEmpty(definition.required && value === undefined, 'Obligatoire'),
+		]);
+	});
+
 	const _id = $props.id();
 
 	const isCompactEnum = $derived(
@@ -74,6 +97,9 @@
 	const displayImageOnTheSide = $derived(
 		definition.images.length === 1 && (inputIsInline || definition.type === 'enum')
 	);
+
+	const optional = $derived(requiredness === 'all' && !definition.required);
+	const required = $derived(requiredness !== 'none' && definition.required);
 </script>
 
 <div class="metadata">
@@ -84,6 +110,11 @@
 		<div class="main-area">
 			<section class="first-line">
 				<label for={_id}>
+					{#if required}
+						<div class="required-indicator" use:tooltip={'Métadonnée obligatoire'}>
+							<IconRequired />
+						</div>
+					{/if}
 					{#if definition.label}
 						<OverflowableText text={definition.label} />
 					{:else}
@@ -191,10 +222,15 @@
 </div>
 
 {#snippet description()}
-	{#if definition.description || definition.learnMore}
+	{#if definition.description || definition.learnMore || optional}
 		<section class="learnmore">
-			{#if definition.description}
-				<p>{definition.description}</p>
+			{#if definition.description || optional}
+				<p>
+					{#if optional}
+						<em class="optional">(Optionnel)</em>
+					{/if}
+					{definition.description}
+				</p>
 			{/if}
 			{#if definition.learnMore}
 				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
@@ -280,6 +316,7 @@
 		display: flex;
 		flex-direction: column;
 		gap: 0.5em;
+		scroll-padding-top: 20px;
 	}
 
 	.side-image-and-main-area:has(.side-image) {
@@ -343,6 +380,14 @@
 		gap: 0.5em;
 	}
 
+	.required-indicator {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: var(--fg-error);
+		font-size: 0.75em;
+	}
+
 	.alternatives {
 		display: flex;
 		justify-content: space-between;
@@ -401,5 +446,9 @@
 			width: 100%;
 			height: 100%;
 		}
+	}
+
+	.optional {
+		color: var(--gay);
 	}
 </style>

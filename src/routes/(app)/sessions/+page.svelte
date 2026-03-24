@@ -9,7 +9,7 @@
 	import Datetime from '$lib/Datetime.svelte';
 	import { promptForFiles } from '$lib/files';
 	import { plural } from '$lib/i18n.js';
-	import { tables } from '$lib/idb.svelte.js';
+	import { databaseHandle, tables } from '$lib/idb.svelte.js';
 	import { goto } from '$lib/paths.js';
 	import { defaultClassificationMetadata, defaultCropMetadata } from '$lib/protocols.js';
 	import { importMore } from '$lib/queue.svelte';
@@ -18,6 +18,7 @@
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte.js';
 	import { orEmptyObj } from '$lib/utils.js';
+	import { resolveDefaults } from '$lib/metadata/defaults.js';
 
 	seo({ title: 'Sessions' });
 
@@ -56,19 +57,25 @@
 			},
 			group: {
 				global: { field: 'none' },
-				crop: cropMetadata
+				crop: cropMetadata?.groupable
 					? { field: 'metadataPresence', metadata: cropMetadata.id }
 					: { field: 'none' },
-				classify: classificationMetadata
+				classify: classificationMetadata?.groupable
 					? { field: 'metadataConfidence', metadata: classificationMetadata.id }
 					: { field: 'none' },
 			},
 			sort: {
-				global: mtimeMetadata
+				global: mtimeMetadata&& tables.Metadata.getFromState(mtimeMetadata)?.sortable
 					? { field: 'metadataValue', direction: 'asc', metadata: mtimeMetadata }
 					: { field: 'name', direction: 'asc' },
 			},
 		});
+
+		await resolveDefaults({
+			db: databaseHandle(),
+			sessionId: id,
+			metadataToConsider: defaultProtocol.metadata,
+		})
 
 		await switchSession(id);
 		await goto('/(app)/sessions/[id]', { id });

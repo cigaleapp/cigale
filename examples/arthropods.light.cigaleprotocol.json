@@ -91,6 +91,7 @@
 			"description": "J'ai photographié",
 			"required": true,
 			"mergeMethod": "min",
+			"default": "at_will",
 			"options": [
 				{
 					"key": "all",

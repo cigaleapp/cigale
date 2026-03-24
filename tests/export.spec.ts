@@ -18,6 +18,7 @@ import {
 	pickFiles,
 	setInferenceModels,
 	toast,
+	waitForDownload,
 } from './utils/index.js';
 
 test('correctly applies crop padding', issue(463), async ({ page, app }) => {
@@ -278,6 +279,63 @@ test('includes metadata files in export', async ({ page, app }) => {
 	);
 });
 
+test('shows warning dialog when exporting with metadata problems', async ({ page, app }) => {
+	await loadDatabaseDump(page, 'db/kitchensink-protocol.devalue');
+	await chooseFirstSession(page);
+	await app.tabs.go('results');
+
+	await app.metadata.textbox('ohio respect').fill('16');
+	await app.metadata.textbox('ohio respect').blur();
+	await app.wait('200ms');
+
+	await page.getByRole('button', { name: 'Archive ZIP' }).click();
+	const modal = app.modals.byTitle('Métadonnées incorrectes');
+	await assert(modal).toBeVisible();
+	await expect(modal).toMatchAriaSnapshot(`
+	  - dialog:
+	    - banner:
+	      - heading "Métadonnées incorrectes" [level=1]
+	      - button "Fermer":
+	        - img
+	    - main:
+	      - text: Certaines métadonnées sont incorrectes ohio respect
+	      - list:
+	        - listitem: /must be at most \\d+ \\(was \\d+\\)/
+	    - contentinfo:
+	      - button "Corriger"
+	      - button "Exporter quand même"
+	`);
+
+	let download = await waitForDownload(page, async () =>
+		modal.getByRole('button', { name: 'Exporter quand même' }).click()
+	);
+
+	expect(download.suggestedFilename()).toBe('results.zip');
+
+	const downloadShouldNotOccur = () =>
+		expect(true, { message: 'Download should not have occured' }).toBe(false);
+
+	page.on('download', downloadShouldNotOccur);
+
+	await page.getByRole('button', { name: 'Archive ZIP' }).click();
+	await modal.getByRole('button', { name: 'Corriger' }).click();
+
+	// Correct the problem
+	await app.metadata.textbox('ohio respect').fill('3');
+	await app.metadata.textbox('ohio respect').blur();
+	await app.wait('200ms');
+
+	page.off('download', downloadShouldNotOccur);
+
+	download = await waitForDownload(page, async () => {
+		await page.getByRole('button', { name: 'Archive ZIP' }).click();
+		await app.wait('50ms');
+		await expect(modal).not.toBeVisible();
+	});
+
+	expect(download.suggestedFilename()).toBe('results.zip');
+});
+
 for (const width of [undefined, 1400, 1600]) {
 	test.describe(`with a ${width ?? 'default'}px-wide window`, () => {
 		test.beforeEach(async ({ page }) => {
@@ -307,8 +365,8 @@ for (const width of [undefined, 1400, 1600]) {
 
 			await app.tabs.go('results');
 
-			await app.metadata.textbox('Code du transect').fill('QUOICOUBEH');
-			await app.metadata.textbox('ohio respect').fill('67');
+			await app.metadata.textbox('Code du transect').fill('111111111111QUOICOUBEH');
+			await app.metadata.textbox('ohio respect').fill('6.7');
 			await app.metadata
 				.section('has no default')
 				.getByRole('button', { name: 'Incrémenter' })
@@ -334,10 +392,10 @@ for (const width of [undefined, 1400, 1600]) {
 								value: '2020-02-20T00:00:00.000Z',
 							},
 							transect_code: {
-								value: 'QUOICOUBEH',
+								value: '111111111111QUOICOUBEH',
 							},
 							ohio_respect: {
-								value: 67,
+								value: 6.7,
 							},
 							has_no_default: {
 								value: 2,

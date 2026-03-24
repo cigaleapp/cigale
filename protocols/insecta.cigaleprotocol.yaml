@@ -4,7 +4,7 @@ name: INSECTA
 authors:
   - name: Maxime Cauchoix
 
-version: 2
+version: 3
 updates: automatic
 source: https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/insecta.cigaleprotocol.yaml
 
@@ -92,7 +92,7 @@ sessionMetadata:
     type: date
     label: Date de début
     mergeMethod: none
-    required: false
+    required: true
     description: ''
     default: '{{ now }}'
 
@@ -102,7 +102,8 @@ sessionMetadata:
     label: Entraînement
     description: ''
     mergeMethod: min
-    required: false
+    required: true
+    default: false
 
   is_citizen_science:
     type: boolean
@@ -110,7 +111,8 @@ sessionMetadata:
     label: Sciences participatives
     description: ''
     mergeMethod: min
-    required: false
+    required: true
+    default: false
 
   is_psibiom:
     type: boolean
@@ -119,7 +121,8 @@ sessionMetadata:
     learnMore: https://www.terroiko.fr/fr/recherche-et-developpement/psibiom
     description: ''
     mergeMethod: min
-    required: false
+    required: true
+    default: false
 
   is_renat:
     type: boolean
@@ -128,7 +131,8 @@ sessionMetadata:
     learnMore: https://renat.wiki/
     description: Parc Naturel Régional des Pyrénées Ariégeoises
     mergeMethod: min
-    required: false
+    required: true
+    default: false
 
   is_adept:
     type: boolean
@@ -137,7 +141,8 @@ sessionMetadata:
     learnMore: https://fundatia-adept.org/projects/
     description: ''
     mergeMethod: min
-    required: false
+    required: true
+    default: false
 
   is_wildnet:
     type: boolean
@@ -146,7 +151,8 @@ sessionMetadata:
     learnMore: https://wildnet.org/
     description: ''
     mergeMethod: min
-    required: false
+    required: true
+    default: false
 
   site_code:
     type: string
@@ -205,7 +211,7 @@ sessionMetadata:
     description: Si il y a du vent mais que sa vitesse est trop faible pour être détectée par votre anémomètre, indiquez 1 km/h
     mergeMethod: average
     required: false
-    range: 0..30
+    range: 1..30
 
   shadow_temperature:
     type: float

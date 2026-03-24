@@ -4,6 +4,7 @@
 
 	import { dequal } from 'dequal';
 	import { watch } from 'runed';
+	import { SvelteMap } from 'svelte/reactivity';
 
 	import { databaseHandle, openDatabase, tables } from './idb.svelte.js';
 	import Metadata from './Metadata.svelte';
@@ -19,11 +20,18 @@
 		session: DB.Session;
 		metadataOptions?: Map<NamespacedMetadataID, DB.MetadataEnumVariant[]>;
 		onmetadatachange?: () => Promise<void> | void;
+		/** Bind to this prop to check if all metadata values are valid (required metadata are filled, nothing breaks constraints, etc). Maps metadata IDs to error messages for that metadata */
+		errors?: Map<NamespacedMetadataID, string[]>;
 	}
 
 	let refreshDefaults = $state(0);
 
-	let { session, metadataOptions = new Map(), onmetadatachange }: Props = $props();
+	let {
+		session,
+		errors = new SvelteMap(),
+		metadataOptions = new Map(),
+		onmetadatachange,
+	}: Props = $props();
 	const protocol = $derived(tables.Protocol.getFromState(session.protocol));
 
 	const metadataDefs = $derived(
@@ -74,9 +82,17 @@
 			{#snippet children(def)}
 				{@const value = session.metadata[def.id]}
 				<Metadata
+					requiredness="all"
 					options={metadataOptions.get(def.id) ?? []}
 					definition={def}
 					{value}
+					onvalidation={(messages) => {
+						if (messages.length > 0) {
+							errors.set(def.id, messages);
+						} else {
+							errors.delete(def.id);
+						}
+					}}
 					onchange={async (v, unit) => {
 						if (dequal(v, value?.value) && unit === value?.unit) return;
 
