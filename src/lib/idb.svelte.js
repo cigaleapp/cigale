@@ -88,10 +88,7 @@ function wrangler(table) {
 			}
 		},
 		/** @param {string[]} keys */
-		getMany: async (keys) =>
-			Promise.all(keys.map((key) => get(table, key))).then((results) =>
-				results.filter(nonnull)
-			),
+		getMany: async (keys) => getMany(table, keys),
 		/** @param {string} key  */
 		get: async (key) => get(table, key),
 		/** @param {string} key */
@@ -271,6 +268,29 @@ export async function get(tableName, key) {
 		const out = value ? validator.assert(value) : undefined;
 		return out;
 	});
+}
+
+/**
+ *
+ * @param {TableName} tableName
+ * @param {string[]} keys
+ * @returns {Promise<Array<typeof Tables[TableName]['infer']>>}
+ * @template {keyof typeof Tables} TableName
+ */
+export async function getMany(tableName, keys) {
+	/** @type {Array<typeof Tables[TableName]['infer']>} */
+	const results = [];
+	const validator = Tables[tableName];
+
+	await openTransaction([tableName], {}, async (tx) => {
+		for (const key of keys) {
+			const found = await tx.objectStore(tableName).get(key)
+			if (!found) continue
+			results.push(validator.assert(found));
+		}
+	});
+
+	return results;
 }
 
 /**
