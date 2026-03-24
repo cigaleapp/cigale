@@ -195,7 +195,7 @@
 				{/if}
 			</div>
 
-			{#if uiState.currentSession && page.route.id !== '/(app)/sessions' && page.route.id !== '/(app)/protocols'}
+			{#if uiState.currentSession && page.route.id !== '/(app)/sessions' && page.route.id !== '/(app)/protocols' && page.route.id !== '(app)/accounts'}
 				<div class="steps" in:fade={{ duration: 100 }}>
 					<a
 						class="session-link"

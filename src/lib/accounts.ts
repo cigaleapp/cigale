@@ -79,7 +79,7 @@ export class KoboToolbox implements Account {
 
 		const me = await this.fetch('GET', 'v2', '/me/', KoboToolbox.MeResponse);
 
-		return /** @type {const} */ {
+		return {
 			username: me.username,
 			displayName:
 				(me.first_name || me.last_name
@@ -87,7 +87,7 @@ export class KoboToolbox implements Account {
 					: me.extra_details.name) || me.username,
 			avatarURL: me.gravatar,
 			profileURL: me.projects_url,
-			type: 'kobocollect',
+			type: 'kobocollect' as const,
 			token: this.#token,
 		};
 	}
@@ -314,7 +314,7 @@ export class KoboToolbox implements Account {
 		init?: RequestInit
 	) {
 		const response = await fetch(
-			new URL(path, version === 'v1' ? this.v1domain : this.v2domain),
+			new URL(path, `https://${version === 'v1' ? this.v1domain : this.v2domain}`),
 			{
 				method,
 				headers: {
