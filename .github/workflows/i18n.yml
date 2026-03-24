@@ -3,6 +3,8 @@ name: Translations
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [renovate/wuchale-*]
 
 env:
   ELECTRON_SKIP_BINARY_DOWNLOAD: 'true'
