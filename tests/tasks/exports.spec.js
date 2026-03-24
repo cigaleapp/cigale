@@ -52,7 +52,7 @@ async function prepare({ page, app }) {
 test('correct', async ({ page, app }) => {
 	await prepare({ page, app });
 	await app.tabs.go('results');
-	await page.getByRole('radio', {name: "Tout Permet de ré-importer ultérieurement"}).click();
+	await page.getByRole('radio', { name: 'Tout Permet de ré-importer ultérieurement' }).click();
 	await page.getByRole('button', { name: 'Archive ZIP' }).click();
 	const download = await page.waitForEvent('download');
 	await download.saveAs('./tests/fixtures/exports/correct.zip');
@@ -70,7 +70,7 @@ test('no-originals', async ({ page, app }) => {
 test('no-analysis', async ({ page, app }) => {
 	await prepare({ page, app });
 	await app.tabs.go('results');
-	await page.getByRole('radio', {name: "Tout Permet de ré-importer ultérieurement"}).click();
+	await page.getByRole('radio', { name: 'Tout Permet de ré-importer ultérieurement' }).click();
 	await page.getByRole('button', { name: 'Archive ZIP' }).click();
 	const download = await page.waitForEvent('download');
 	const zipPath = './tests/fixtures/exports/no-analysis.zip';
@@ -87,7 +87,7 @@ test('no-analysis', async ({ page, app }) => {
 test('invalid-json-analysis', async ({ page, app }) => {
 	await prepare({ page, app });
 	await app.tabs.go('results');
-	await page.getByRole('radio', {name: "Tout Permet de ré-importer ultérieurement"}).click();
+	await page.getByRole('radio', { name: 'Tout Permet de ré-importer ultérieurement' }).click();
 	await page.getByRole('button', { name: 'Archive ZIP' }).click();
 	const download = await page.waitForEvent('download');
 	const zipPath = './tests/fixtures/exports/invalid-json-analysis.zip';
@@ -108,7 +108,7 @@ test('invalid-json-analysis', async ({ page, app }) => {
 test('wrong-protocol', async ({ page, app }) => {
 	await prepare({ page, app });
 	await app.tabs.go('results');
-	await page.getByRole('radio', {name: "Tout Permet de ré-importer ultérieurement"}).click();
+	await page.getByRole('radio', { name: 'Tout Permet de ré-importer ultérieurement' }).click();
 	await page.getByRole('button', { name: 'Archive ZIP' }).click();
 	const download = await page.waitForEvent('download');
 	await download.saveAs('./tests/fixtures/exports/wrong-protocol.zip');

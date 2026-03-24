@@ -47,7 +47,7 @@
 	let reverseGeocodings = new SvelteMap<CoordsKey, string>();
 	$effect(() => {
 		if (!value) return;
-		if (reverseGeocodings.has(coordsToKey(value))) return
+		if (reverseGeocodings.has(coordsToKey(value))) return;
 
 		void coordinatesToAddress(value)
 			.then((result) => {
@@ -56,7 +56,7 @@
 			})
 			.catch((error) => {
 				console.error('Failed to reverse geocode coordinates', value, error);
-				reverseGeocodings.set(coordsToKey(value), "Unknown");
+				reverseGeocodings.set(coordsToKey(value), 'Unknown');
 			});
 	});
 </script>
