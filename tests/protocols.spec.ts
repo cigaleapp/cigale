@@ -111,15 +111,24 @@ test('can use a protocol that imports metadata from another protocol', async ({
 				remote_session_metadata: {
 					type: 'string',
 					description: '',
+					group: 'all',
 					label: 'Remote session metadata',
 					required: false,
 					mergeMethod: 'none',
+				},
+			},
+			metadataGroups: {
+				all: {
+					name: 'All',
+					description: 'Everything',
+					collapsed: false,
 				},
 			},
 			metadata: {
 				remote_metadata: {
 					type: 'boolean',
 					description: '',
+					group: 'all',
 					label: 'Remote metadata',
 					required: false,
 					mergeMethod: 'none',
@@ -158,7 +167,7 @@ test('can use a protocol that imports metadata from another protocol', async ({
 			},
 			{
 				from: 'com.example.remote',
-				metadata: ['remote_metadata', 'remote_session_metadata'],
+				metadataGroups: ['all'],
 			},
 		],
 		metadata: {},
@@ -303,8 +312,7 @@ test('can use a protocol that imports metadata from another protocol', async ({
 			},
 			{
 				from: 'com.example.remote',
-				metadata: ['remote_metadata'],
-				sessionMetadata: ['remote_session_metadata'],
+				metadataGroups: ['all'],
 			},
 		],
 		metadata: {
@@ -335,10 +343,18 @@ test('can use a protocol that imports metadata from another protocol', async ({
 	  - textbox "Imported session metadata"
 	  - button "Supprimer cette valeur" [disabled]:
 	    - img
-	  - text: Remote session metadata
-	  - textbox "Remote session metadata"
-	  - button "Supprimer cette valeur" [disabled]:
+	  - paragraph:
+	    - emphasis: (Optionnel)
+	  - group:
 	    - img
+	    - text: All
+	    - paragraph: Everything
+	    - text: Remote session metadata
+	    - textbox "Remote session metadata"
+	    - button "Supprimer cette valeur" [disabled]:
+	      - img
+	    - paragraph:
+	      - emphasis: (Optionnel)
 	`);
 
 	await page
@@ -378,11 +394,19 @@ test('can use a protocol that imports metadata from another protocol', async ({
 	  - button "Supprimer cette valeur" [disabled]:
 	    - img
 	  - paragraph: SMILE :D (porter robinson reference)
-	  - text: Remote metadata
-	  - switch:
+	  - group:
 	    - img
-	  - button "Supprimer cette valeur" [disabled]:
-	    - img
+	    - text: All
+	    - paragraph: Everything
+	    - text: Remote metadata
+	    - switch:
+	      - img
+	    - button "Supprimer cette valeur" [disabled]:
+	      - img
+	    - text: Remote session metadata
+	    - textbox "Remote session metadata"
+	    - button "Supprimer cette valeur" [disabled]:
+	      - img
 	`);
 
 	await app.metadata.switch('From child').click();

@@ -136,8 +136,9 @@ test('toExportedProtocol', async () => {
 	const exported = await toExportedProtocol(db, protocol);
 
 	expect(exported).toEqual({
-		...pick(protocol, 'id', 'name', 'version', 'description', 'authors', 'crop', 'updates'),
+		...pick(protocol, 'id', 'name', 'version', 'description', 'authors', 'updates'),
 		importedMetadata: [],
+		importedMetadataGroups: [],
 		metadataGroups: {},
 		sessionMetadata: {
 			protocol1__meta3: {

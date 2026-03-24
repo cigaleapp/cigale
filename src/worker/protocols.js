@@ -10,7 +10,7 @@ import { resolveProtocolImports } from '$lib/metadata/imports.js';
 import { compareProtocolWithUpstream } from '$lib/protocols.js';
 import { metadataOptionId, namespacedMetadataId } from '$lib/schemas/metadata.js';
 import { ExportedProtocol } from '$lib/schemas/protocols.js';
-import { entries, keys, omit, pick } from '$lib/utils.js';
+import { entries, keys, omit, pick, prefixIDBKeyRange } from '$lib/utils.js';
 
 import { openDatabase, swarp } from './index.js';
 
@@ -43,11 +43,7 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 	const db = await openDatabase();
 
 	console.time('Resolve imports');
-	const importedProtocols = await resolveProtocolImports(
-		db,
-		protocol.id,
-		protocol.importedMetadata
-	);
+	const importedProtocols = await resolveProtocolImports(db, protocol);
 	console.timeEnd('Resolve imports');
 
 	const tx = db.transaction(['Protocol', 'Metadata', 'MetadataOption'], 'readwrite');
@@ -61,20 +57,67 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 			continue;
 		}
 
+		const importedGroups = await Promise.all(
+			p.importedMetadataGroups.map(async ({ from, id }) => {
+				const protocol = await tx.objectStore('Protocol').get(from);
+				if (!protocol) return undefined;
+				const group = protocol.metadataGroups?.find((group) => group.id === id);
+				if (!group) return undefined;
+				const metadata = await tx
+					.objectStore('Metadata')
+					.getAll(prefixIDBKeyRange(namespacedMetadataId(from, "")));
+				return {
+					id,
+					group,
+					metadata: metadata.filter((m) => m.group === id).map((m) => m.id),
+					sessionMetadata: metadata
+						.filter((m) => m.group === id && protocol.sessionMetadata?.includes(m.id))
+						.map((m) => m.id),
+				};
+			})
+		).then((groups) => groups.filter((group) => group !== undefined));
+
+
 		onLoadingState('write-protocol', p.id);
 		console.time('Storing Protocol');
 		tx.objectStore('Protocol').put({
 			...p,
+			importedMetadata: [
+				...(p.importedMetadata ?? []),
+				...importedGroups.flatMap(({ metadata, sessionMetadata }) => [
+					...metadata.map((id) => ({
+						source: id,
+						target: namespacedMetadataId(p.id, id),
+						sessionwide: false,
+					})),
+					...sessionMetadata.map((id) => ({
+						source: id,
+						target: namespacedMetadataId(p.id, id),
+						sessionwide: true,
+					})),
+				]),
+			],
 			metadata: [
 				...p.importedMetadata.map((imported) => imported.target),
+				...importedGroups.flatMap(({ metadata }) =>
+					metadata.map((m) => namespacedMetadataId(p.id, m))
+				),
 				...keys(p.metadata),
 				...keys(p.sessionMetadata),
 			],
-			sessionMetadata: keys(p.sessionMetadata),
-			metadataGroups: entries(p.metadataGroups ?? {}).map(([id, group]) => ({
-				id,
-				...group,
-			})),
+			sessionMetadata: [
+				...keys(p.sessionMetadata),
+				...importedGroups.flatMap(({ sessionMetadata }) =>
+					sessionMetadata.map((m) => namespacedMetadataId(p.id, m))
+				),
+			],
+			metadataGroups: [
+				...importedGroups.map(({ id, group }) => ({ id, ...group })),
+				...entries(p.metadataGroups ?? {}).map(([id, group]) => ({
+					id,
+					...group,
+				})),
+			],
 		});
 		console.timeEnd('Storing Protocol');
 

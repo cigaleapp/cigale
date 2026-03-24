@@ -491,11 +491,15 @@ export function metadataDefinitionComparator(protocol) {
 
 		if (protocol.metadataOrder) {
 			// return protocol.metadataOrder.indexOf(a) - protocol.metadataOrder.indexOf(b);
-			return compareBy((key) =>
-				protocol.metadataOrder
+			return compareBy((key) => {
+				const index = protocol.metadataOrder
 					?.map(removeNamespaceFromMetadataId)
-					.indexOf(removeNamespaceFromMetadataId(key))
-			)(a, b);
+					.indexOf(removeNamespaceFromMetadataId(key));
+
+				if (index === -1) return Number.POSITIVE_INFINITY;
+
+				return index;
+			})(a, b);
 		}
 		return idComparator(a, b);
 	};

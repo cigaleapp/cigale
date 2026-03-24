@@ -76,8 +76,11 @@ export const ProtocolImport = type({
 	from: ProtocolID.describe('ID du protocole duquel importer'),
 	sessionMetadata: ItemsImportSpec,
 	metadata: ItemsImportSpec,
-}).narrow(({ sessionMetadata, metadata }, ctx) =>
-	(sessionMetadata?.length ?? 0) + (metadata?.length ?? 0) > 0
+	metadataGroups: ID.brand('MetadataGroup')
+		.array()
+		.default(() => []),
+}).narrow(({ sessionMetadata = [], metadata = [], metadataGroups = [] }, ctx) =>
+	[...sessionMetadata, ...metadata, ...metadataGroups].length > 0
 		? true
 		: ctx.reject('Un import ne peut pas être vide')
 );
@@ -226,6 +229,9 @@ export const ExportedProtocol = Protocol.omit(
 		),
 		metadataGroups: mapKeys(protocol.metadataGroups ?? {}, (key) =>
 			MetadataGroup.get('id').assert(key)
+		),
+		importedMetadataGroups: protocol.imports.flatMap(({ from, metadataGroups }) =>
+			metadataGroups.map((id) => ({ from, id }))
 		),
 		importedMetadata: protocol.imports.flatMap(({ from, metadata, sessionMetadata }) => [
 			...metadata.map(({ source, target }) => ({

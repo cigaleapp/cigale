@@ -106,6 +106,7 @@
 				}
 			}
 
+
 			loadingOptions = false;
 		})();
 	});
@@ -204,8 +205,8 @@
 				{#snippet children(definition)}
 					{@const value = metadata[definition.id]}
 					<Metadata
-					// TODO: actually support checking required metadata on observations. right now it's only for session metadata since thats way more important
-					requiredness="none"
+						// TODO: actually support checking required metadata on observations. right now it's only for session metadata since thats way more important
+						requiredness="none"
 						merged={value?.merged}
 						{definition}
 						{value}

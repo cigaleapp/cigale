@@ -11,14 +11,10 @@ authors:
 
 imports:
   - from: io.github.cigaleapp.arthropods.example
+    metadataGroups:
+      - taxonomy
     metadata:
       - species
-      - genus
-      - family
-      - order
-      - class
-      - phylum
-      - kingdom
       - identification_difficulty
       - conservation_status
 

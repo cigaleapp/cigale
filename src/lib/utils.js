@@ -1554,3 +1554,12 @@ if (import.meta.vitest) {
 		expect(cleanFilepath('C:\\foo\\bar\\baz')).toBe('C:/foo/bar/baz');
 	});
 }
+
+/**
+ * Return a IDBKeyRange that matches all strings starting with `prefix`
+ * @param {string} prefix
+ * @returns
+ */
+export function prefixIDBKeyRange(prefix) {
+	return IDBKeyRange.bound(prefix, prefix + '\uffff');
+}

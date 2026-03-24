@@ -23,14 +23,11 @@ description: |
 
 imports:
   - from: io.github.cigaleapp.arthropods.example
+    metadataGroups:
+      - taxonomy
+      - andrena
     metadata:
       - species
-      - genus
-      - family
-      - order
-      - class
-      - phylum
-      - kingdom
       - identification_difficulty
       - conservation_status
       - shoot_date
@@ -45,8 +42,6 @@ metadataGroups:
     name: Code projet
     description: |
       Choisir "entrainement" jusqu'à ce que vous vous sentiez à l'aise avec le protocole (3 à 5 sessions). Quand vous êtes suffisamment entrainé·e, choisissez "sciences participatives" ou un projet de recherche spécifique auquel vous êtes associé·e.
-  taxonomy:
-    name: Taxonomie
 
 metadataOrder:
   # Session
