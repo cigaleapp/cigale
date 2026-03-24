@@ -1,17 +1,15 @@
 import type * as DB from '$lib/database.js';
 
 import { Type, type } from 'arktype';
-import { nanoid } from 'nanoid';
 
 import { resolveMetadataImport } from './metadata/imports.js';
 import { switchOnMetadataType } from './metadata/types.js';
-import { NamespacedMetadataID, URLString } from './schemas/common.js';
+import { NamespacedMetadataID } from './schemas/common.js';
 import { removeNamespaceFromMetadataId } from './schemas/metadata.js';
-import { entries } from './utils.js';
 
 interface Account {
 	logoURL: URL;
-	login(): Promise<{ username: string; displayName: string; avatarURL: URL; profileURL: URL }>;
+	login(): Promise<Omit<DB.Account, 'id'>>;
 	logout(): Promise<void>;
 	loggedIn: boolean;
 	upload(session: DB.Session): Promise<URL | undefined>;
@@ -81,7 +79,7 @@ export class KoboToolbox implements Account {
 
 		const me = await this.fetch('GET', 'v2', '/me/', KoboToolbox.MeResponse);
 
-		return {
+		return /** @type {const} */ {
 			username: me.username,
 			displayName:
 				(me.first_name || me.last_name
@@ -89,6 +87,8 @@ export class KoboToolbox implements Account {
 					: me.extra_details.name) || me.username,
 			avatarURL: me.gravatar,
 			profileURL: me.projects_url,
+			type: 'kobocollect',
+			token: this.#token,
 		};
 	}
 

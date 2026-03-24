@@ -181,6 +181,22 @@ const Settings = table(
 	})
 );
 
+const Account = table(
+	'id',
+	type({
+		id: "string",
+		username: 'string',
+		displayName: 'string',
+		avatarURL: 'string.url.parse',
+		profileURL: 'string.url.parse',
+	}).and(
+		type.or({
+			type: '"kobocollect"',
+			token: 'string',
+		})
+	)
+);
+
 export const Schemas = {
 	ID,
 	ExportsFilepathTemplateObservation,
@@ -201,6 +217,7 @@ export const Schemas = {
 	Settings,
 	EXIFField,
 	HTTPRequest,
+	Account,
 };
 
 /**
@@ -248,6 +265,7 @@ export const Tables = {
 	MetadataOption,
 	Protocol,
 	Settings,
+	Account,
 };
 
 /**
@@ -397,4 +415,9 @@ export const idComparator = (a, b) => {
 /**
  * @typedef MetadataValueFile
  * @type {typeof MetadataValueFile.infer}
+ */
+
+/**
+ * @typedef Account
+ * @type {typeof Account.infer}
  */

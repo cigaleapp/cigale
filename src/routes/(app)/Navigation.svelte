@@ -309,6 +309,12 @@
 							<div class="line"></div>
 						{/if}
 					</a>
+					<a href={resolve('/accounts')} data-testid="goto-accounts">
+						Comptes
+						{#if path.startsWith('/accounts')}
+							<div class="line"></div>
+						{/if}
+					</a>
 				</div>
 			{/if}
 
