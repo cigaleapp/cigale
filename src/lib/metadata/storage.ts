@@ -15,7 +15,7 @@ import {
 	namespacedMetadataId,
 	namespaceOfMetadataId,
 } from '$lib/schemas/metadata.js';
-import { groupBy, orEmptyObj3 } from '$lib/utils.js';
+import { groupBy, orEmptyObj3, prefixIDBKeyRange } from '$lib/utils.js';
 
 import { resolveMetadataImport } from './imports.js';
 import { serializeMetadataValue } from './serializing.js';
@@ -29,15 +29,11 @@ export function metadataOptionsKeyRange(
 	protocolId: string,
 	metadataId: string | null
 ): IDBKeyRange {
-	if (metadataId) {
-		const fullMetadataId = ensureNamespacedMetadataId(metadataId, protocolId);
-		return IDBKeyRange.bound(fullMetadataId + ':', fullMetadataId + ':\uffff');
-	} else {
-		return IDBKeyRange.bound(
-			namespacedMetadataId('', protocolId),
-			namespacedMetadataId('\uffff', protocolId)
-		);
-	}
+	return prefixIDBKeyRange(
+		metadataId
+			? ensureNamespacedMetadataId(metadataId, protocolId) + ':'
+			: namespacedMetadataId(protocolId, '')
+	);
 }
 
 const METADATA_OPTIONS_CACHE = new Map<NamespacedMetadataID, DB.MetadataEnumVariant[]>();
@@ -77,6 +73,7 @@ export async function metadataOptionsOf(
 			: protocol.metadata;
 
 	metadatas = metadatas.map((id) => resolveMetadataImport(protocol, id));
+
 
 	for (const m of metadatas) {
 		const cached = METADATA_OPTIONS_CACHE.get(m);

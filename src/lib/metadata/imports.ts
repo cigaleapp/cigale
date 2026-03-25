@@ -25,24 +25,29 @@ export function resolveMetadataImport(
  */
 export async function resolveProtocolImports(
 	db: DatabaseHandle,
-	protocolId: string,
-	imports: (typeof ExportedProtocol.inferOut)['importedMetadata'],
+	{
+		id: protocolId,
+		importedMetadata,
+		importedMetadataGroups,
+	}: Pick<typeof ExportedProtocol.inferOut, 'importedMetadata' | 'id' | 'importedMetadataGroups'>,
 	/** Resolved imports  */
 	resolved = new Map<string, typeof ExportedProtocol.infer>()
 ): Promise<(typeof ExportedProtocol.infer)[]> {
-	if (imports.length === 0) {
+	if (importedMetadata.length === 0 && importedMetadataGroups.length === 0) {
 		return [];
 	}
 
-	if (!PROTOCOLS_REGISTRY) {
-		PROTOCOLS_REGISTRY = await fetch(
-			'https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/registry.json'
-		)
-			.then((res) => res.json())
-			.then((data) => ProtocolRegistry.assert(data));
-	}
+	PROTOCOLS_REGISTRY ??= await fetch(
+		'https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/registry.json'
+	)
+		.then((res) => res.json())
+		.then((data) => ProtocolRegistry.assert(data));
 
-	const importedProtocolIds = new Set(imports.map((imp) => namespaceOfMetadataId(imp.source)));
+	const importedProtocolIds = new Set([
+		...importedMetadata.map((imp) => namespaceOfMetadataId(imp.source)),
+		...importedMetadataGroups.map((imp) => imp.from),
+	]);
+
 
 	for (const from of importedProtocolIds) {
 		if (resolved.has(from)) {
@@ -68,12 +73,7 @@ export async function resolveProtocolImports(
 
 		resolved.set(from, parentProtocol);
 
-		await resolveProtocolImports(
-			db,
-			parentProtocol.id,
-			parentProtocol.importedMetadata,
-			resolved
-		);
+		await resolveProtocolImports(db, parentProtocol, resolved);
 	}
 
 	return [...resolved.values()];
@@ -124,7 +124,11 @@ if (import.meta.vitest) {
 		});
 
 		test('returns empty array when imports is empty', async () => {
-			const result = await resolveProtocolImports(mockDb(), 'my-protocol', []);
+			const result = await resolveProtocolImports(mockDb(), {
+				id: 'my-protocol',
+				importedMetadata: [],
+				importedMetadataGroups: [],
+			});
 			expect(result).toEqual([]);
 		});
 
@@ -150,9 +154,11 @@ if (import.meta.vitest) {
 				}))
 			);
 
-			const result = await resolveProtocolImports(mockDb(), 'my-protocol', [
-				imp('parent-protocol__field1', 'my-protocol__field1'),
-			]);
+			const result = await resolveProtocolImports(mockDb(), {
+				id: 'my-protocol',
+				importedMetadata: [imp('parent-protocol__field1', 'my-protocol__field1')],
+				importedMetadataGroups: [],
+			});
 
 			expect(result).toHaveLength(1);
 			expect(result[0].id).toBe('parent-protocol');
@@ -176,8 +182,11 @@ if (import.meta.vitest) {
 
 			const result = await resolveProtocolImports(
 				mockDb(),
-				'my-protocol',
-				[imp('parent-protocol__field1', 'my-protocol__field1')],
+				{
+					id: 'my-protocol',
+					importedMetadata: [imp('parent-protocol__field1', 'my-protocol__field1')],
+					importedMetadataGroups: [],
+				},
 				alreadyResolved
 			);
 
@@ -201,9 +210,11 @@ if (import.meta.vitest) {
 
 			const db = mockDb({ Protocol: { 'parent-protocol': { id: 'parent-protocol' } } });
 
-			const result = await resolveProtocolImports(db, 'my-protocol', [
-				imp('parent-protocol__field1', 'my-protocol__field1'),
-			]);
+			const result = await resolveProtocolImports(db, {
+				id: 'my-protocol',
+				importedMetadata: [imp('parent-protocol__field1', 'my-protocol__field1')],
+				importedMetadataGroups: [],
+			});
 
 			expect(result).toEqual([]);
 			expect(db.get).toHaveBeenCalledWith('Protocol', 'parent-protocol');
@@ -218,9 +229,11 @@ if (import.meta.vitest) {
 			);
 
 			await expect(
-				resolveProtocolImports(mockDb(), 'my-protocol', [
-					imp('unknown-protocol__field1', 'my-protocol__field1'),
-				])
+				resolveProtocolImports(mockDb(), {
+					id: 'my-protocol',
+					importedMetadata: [imp('unknown-protocol__field1', 'my-protocol__field1')],
+					importedMetadataGroups: [],
+				})
 			).rejects.toThrow('inherits from unknown protocol unknown-protocol');
 		});
 
@@ -246,10 +259,14 @@ if (import.meta.vitest) {
 				}))
 			);
 
-			const result = await resolveProtocolImports(mockDb(), 'my-protocol', [
-				imp('parent-protocol__field1', 'my-protocol__field1'),
-				imp('parent-protocol__field2', 'my-protocol__field2'),
-			]);
+			const result = await resolveProtocolImports(mockDb(), {
+				id: 'my-protocol',
+				importedMetadata: [
+					imp('parent-protocol__field1', 'my-protocol__field1'),
+					imp('parent-protocol__field2', 'my-protocol__field2'),
+				],
+				importedMetadataGroups: [],
+			});
 
 			expect(result).toHaveLength(1);
 			// registry fetch + one protocol fetch = 2 calls total
@@ -284,9 +301,11 @@ if (import.meta.vitest) {
 				}))
 			);
 
-			const result = await resolveProtocolImports(mockDb(), 'child', [
-				imp('parent__field', 'child__field'),
-			]);
+			const result = await resolveProtocolImports(mockDb(), {
+				id: 'child',
+				importedMetadata: [imp('parent__field', 'child__field')],
+				importedMetadataGroups: [],
+			});
 
 			expect(result).toHaveLength(2);
 			const ids = result.map((p) => p.id);
