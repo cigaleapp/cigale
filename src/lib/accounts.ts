@@ -9,7 +9,7 @@ import { removeNamespaceFromMetadataId } from './schemas/metadata.js';
 
 interface Account {
 	logoURL: URL;
-	login(): Promise<Omit<DB.Account, 'id'>>;
+	login(): Promise<Omit<(typeof DB.Schemas.Account)['inferIn'], 'id'>>;
 	logout(): Promise<void>;
 	loggedIn: boolean;
 	upload(session: DB.Session): Promise<URL | undefined>;
@@ -85,8 +85,8 @@ export class KoboToolbox implements Account {
 				(me.first_name || me.last_name
 					? `${me.first_name} ${me.last_name}`
 					: me.extra_details.name) || me.username,
-			avatarURL: me.gravatar,
-			profileURL: me.projects_url,
+			avatarURL: me.gravatar.href,
+			profileURL: me.projects_url.href,
 			type: 'kobocollect' as const,
 			token: this.#token,
 		};
@@ -314,7 +314,7 @@ export class KoboToolbox implements Account {
 		init?: RequestInit
 	) {
 		const response = await fetch(
-			new URL(path, `https://${version === 'v1' ? this.v1domain : this.v2domain}`),
+			`https://cors.gwen.works/${new URL(path, `https://${version === 'v1' ? this.v1domain : this.v2domain}`)}`,
 			{
 				method,
 				headers: {
