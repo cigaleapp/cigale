@@ -74,7 +74,6 @@ export async function metadataOptionsOf(
 
 	metadatas = metadatas.map((id) => resolveMetadataImport(protocol, id));
 
-
 	for (const m of metadatas) {
 		const cached = METADATA_OPTIONS_CACHE.get(m);
 

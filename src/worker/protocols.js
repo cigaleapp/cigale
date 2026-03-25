@@ -65,7 +65,7 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 				if (!group) return undefined;
 				const metadata = await tx
 					.objectStore('Metadata')
-					.getAll(prefixIDBKeyRange(namespacedMetadataId(from, "")));
+					.getAll(prefixIDBKeyRange(namespacedMetadataId(from, '')));
 				return {
 					id,
 					group,
@@ -76,7 +76,6 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 				};
 			})
 		).then((groups) => groups.filter((group) => group !== undefined));
-
 
 		onLoadingState('write-protocol', p.id);
 		console.time('Storing Protocol');

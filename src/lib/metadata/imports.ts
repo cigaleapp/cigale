@@ -48,7 +48,6 @@ export async function resolveProtocolImports(
 		...importedMetadataGroups.map((imp) => imp.from),
 	]);
 
-
 	for (const from of importedProtocolIds) {
 		if (resolved.has(from)) {
 			continue;
