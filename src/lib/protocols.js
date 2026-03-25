@@ -1,11 +1,13 @@
 import { ArkErrors, type } from 'arktype';
 import microdiff from 'microdiff';
+import JSONC from 'tiny-jsonc';
+import YAML from 'yaml';
 
 import { idComparator, Schemas } from './database.js';
 import { downloadAsFile, stringifyWithToplevelOrdering } from './download.js';
 import { promptForFiles } from './files.js';
 import { errorMessage } from './i18n.js';
-import { metadataOptionsKeyRange, metadataOptionsOf } from './metadata/index.js';
+import { metadataOptionsOf } from './metadata/index.js';
 import { removeNamespaceFromMetadataId } from './schemas/metadata.js';
 import { ExportedProtocol, isMetadataInProtocol, Protocol } from './schemas/protocols.js';
 import {
@@ -15,6 +17,7 @@ import {
 	fromEntries,
 	keys,
 	omit,
+	parseYAMLorJSON,
 	pick,
 	range,
 	sum,
@@ -194,36 +197,29 @@ export async function hasUpgradeAvailable({ version, source, id }) {
 	if (!version) throw new Error("Le protocole n'a pas de version");
 	if (!id) throw new Error("Le protocole n'a pas d'identifiant");
 
-	const response = await fetch(
-		cachebust(typeof source === 'string' ? source : source.url),
-		typeof source !== 'string'
-			? source
-			: {
-					headers: {
-						Accept: 'application/json',
-					},
-				}
-	)
-		.then((r) => r.json())
-		.then(
-			type({
-				'version?': 'number',
-				id: 'string',
-			}).assert
-		);
+	const response = await fetchHttpRequest(source, {
+		cachebust: true,
+		headers: {
+			Accept: 'application/json, application/yaml',
+		},
+	});
 
-	if (!response.version) throw new Error("Le protocole n'a plus de version");
-	if (response.id !== id) throw new Error("Le protocole a changé d'identifiant");
-	if (response.version > version) {
+	const protocol = ExportedProtocol.in
+		.pick('id', 'version')
+		.assert(await parseYAMLorJSON(response));
+
+	if (!protocol.version) throw new Error("Le protocole n'a plus de version");
+	if (protocol.id !== id) throw new Error("Le protocole a changé d'identifiant");
+	if (protocol.version > version) {
 		return {
 			upToDate: false,
-			newVersion: response.version,
+			newVersion: protocol.version,
 		};
 	}
 
 	return {
 		upToDate: true,
-		newVersion: response.version,
+		newVersion: protocol.version,
 	};
 }
 
@@ -238,18 +234,21 @@ export async function upgradeProtocol({ version, source, id, swarpc }) {
 	if (!source) throw new Error("Le protocole n'a pas de source");
 	if (!version) throw new Error("Le protocole n'a pas de version");
 	if (!id) throw new Error("Le protocole n'a pas d'identifiant");
-	if (typeof source !== 'string')
-		throw new Error('Les requêtes HTTP ne sont pas encore supportées, utilisez une URL');
 
 	const { tables } = await import('./idb.svelte.js');
 
-	const contents = await fetch(cachebust(source), {
+	const response = await fetchHttpRequest(source, {
+		cachebust: true,
 		headers: {
-			Accept: 'application/json',
+			Accept: 'application/json, application/yaml',
 		},
-	}).then((r) => r.text());
+	});
 
-	const result = await swarpc.importProtocol({ contents });
+	const result = await swarpc.importProtocol({
+		contents: await response.text(),
+		isJSON: new URL(response.url).pathname.endsWith('.json'),
+	});
+
 	tables.Protocol.refresh(null);
 	tables.Metadata.refresh(null);
 

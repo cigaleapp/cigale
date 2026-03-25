@@ -1,6 +1,8 @@
 // @wc-ignore-file
 
 import fetchProgress from 'fetch-progress';
+import JSONC from 'tiny-jsonc';
+import YAML from 'yaml';
 
 /**
  * @template {string} K
@@ -754,9 +756,16 @@ if (import.meta.vitest) {
  * @param {''|'model'} [options.cacheAs=""]
  * @param {import('fetch-progress').FetchProgressInitOptions['onProgress']} [options.onProgress]
  * @param {AbortSignal} [options.signal]
+ * @param {Record<string, string>} [options.headers] default headers, to be merged with the request's headers
+ * @param {boolean} [options.cachebust] add a cachebuster URL query parameter
  */
-export async function fetchHttpRequest(request, { cacheAs = '', onProgress, signal } = {}) {
+export async function fetchHttpRequest(
+	request,
+	{ cacheAs = '', onProgress, signal, headers = {}, cachebust: enableCachebusting = false } = {}
+) {
 	let url = new URL(typeof request === 'string' ? request : request.url);
+
+	if (enableCachebusting) url = cachebust(url);
 
 	/** @type {RequestInit} */
 	const options = typeof request === 'string' ? { headers: {} } : request;
@@ -767,6 +776,10 @@ export async function fetchHttpRequest(request, { cacheAs = '', onProgress, sign
 
 	if (signal) {
 		options.signal = signal;
+	}
+
+	if (headers) {
+		options.headers = { ...headers, ...options.headers };
 	}
 
 	if (onProgress) return fetch(url, options).then(fetchProgress({ onProgress }));
@@ -838,6 +851,20 @@ if (import.meta.vitest) {
 			vi.unstubAllGlobals();
 		});
 	});
+}
+
+/**
+ * Parse a given Response into a JS value, assuming the response is either:
+ * - JSONC (if the url pathname ends with .json)
+ * - YAML (otherwise)
+ * @param {Response} response
+ */
+export async function parseYAMLorJSON(response) {
+	if (new URL(response.url).pathname.endsWith('.json')) {
+		return JSONC.parse(await response.text());
+	}
+
+	return YAML.parse(await response.text());
 }
 
 /** @param {Iterable<number>} values */
