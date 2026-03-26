@@ -655,7 +655,7 @@ describe('hasUpgradeAvailable', () => {
 			expect.stringContaining('https://example.com/protocol.json?v='),
 			{
 				headers: {
-					Accept: 'application/json',
+					Accept: 'application/json, application/yaml',
 				},
 			}
 		);
@@ -683,7 +683,7 @@ describe('hasUpgradeAvailable', () => {
 			expect.stringContaining('https://example.com/protocol.json?v='),
 			{
 				headers: {
-					Accept: 'application/json',
+					Accept: 'application/json, application/yaml',
 				},
 			}
 		);
