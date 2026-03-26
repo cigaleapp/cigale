@@ -1111,6 +1111,8 @@ msgid "Forme de la sortie"
 msgstr "Forme de la sortie"
 
 #: src/lib/MetadataInput.svelte
+#: src/routes/(app)/accounts/+page.svelte
+#: src/routes/(app)/accounts/+page.svelte
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelOutputShapeDiagram.svelte
 msgid "Ajouter"
 msgstr "Ajouter"
@@ -2356,6 +2358,75 @@ msgstr "Corriger"
 #: src/routes/(app)/results/+page.svelte
 msgid "Certaines métadonnées sont incorrectes <0/>"
 msgstr "Certaines métadonnées sont incorrectes <0/>"
+
+#: src/routes/(app)/Navigation.svelte
+msgid "Comptes <0/>"
+msgstr "Comptes <0/>"
+
+#. 0: adding?.displayName
+#: src/routes/(app)/accounts/+page.svelte
+msgid "Ajouter un compte {0}"
+msgstr "Ajouter un compte {0}"
+
+#: src/routes/(app)/accounts/+page.svelte
+msgid "Se connecter"
+msgstr "Se connecter"
+
+#: src/routes/(app)/accounts/+page.svelte
+msgid "Serveur"
+msgstr "Serveur"
+
+#: src/routes/(app)/accounts/+page.svelte
+msgid "Connecte-toi sur <0/>, puis copier-colle <1>ton token</1>"
+msgstr "Connecte-toi sur <0/>, puis copier-colle <1>ton token</1>"
+
+#: src/routes/(app)/accounts/+page.svelte
+msgid "Token <0/>"
+msgstr "Token <0/>"
+
+#: src/routes/(app)/accounts/+page.svelte
+msgid "Token"
+msgstr "Token"
+
+#: src/routes/(app)/accounts/+page.svelte
+msgid "Comptes"
+msgstr "Comptes"
+
+#: src/routes/(app)/accounts/+page.svelte
+msgid ""
+"Permet d'ouvrir des sessions distantes ou de publier des sessions vers des services\n"
+"tierces"
+msgstr ""
+"Permet d'ouvrir des sessions distantes ou de publier des sessions vers des services\n"
+"tierces"
+
+#. 0: provider.displayName
+#. 0: provider.displayName
+#: src/routes/(app)/accounts/+page.svelte
+#: src/routes/(app)/accounts/+page.svelte
+msgid "Logo de {0}"
+msgstr "Logo de {0}"
+
+#: src/routes/(app)/accounts/+page.svelte
+msgid "Connectés"
+msgstr "Connectés"
+
+#. 0: account.username
+#: src/routes/(app)/accounts/+page.svelte
+msgid "Photo de {0}"
+msgstr "Photo de {0}"
+
+#: src/routes/(app)/accounts/+page.svelte
+msgid "Type de compte inconnu"
+msgstr "Type de compte inconnu"
+
+#: src/routes/(app)/accounts/+page.svelte
+msgid "Déconnecter"
+msgstr "Déconnecter"
+
+#: src/routes/(app)/accounts/+page.svelte
+msgid "Aucun compte"
+msgstr "Aucun compte"
 
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"

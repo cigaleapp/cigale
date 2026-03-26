@@ -86,7 +86,7 @@ export interface AccountConstructor<
 	Auth extends AuthenticationMethod = AuthenticationMethod,
 	Server extends string = string,
 > {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any allows anything in the constructor
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any 
 	new (...args: any[]): Account;
 
 	id: string

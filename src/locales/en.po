@@ -1112,6 +1112,8 @@ msgid "Forme de la sortie"
 msgstr "Output shape"
 
 #: src/lib/MetadataInput.svelte
+#: src/routes/(app)/accounts/+page.svelte
+#: src/routes/(app)/accounts/+page.svelte
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelOutputShapeDiagram.svelte
 msgid "Ajouter"
 msgstr "Add"
@@ -2354,6 +2356,73 @@ msgstr ""
 
 #: src/routes/(app)/results/+page.svelte
 msgid "Certaines métadonnées sont incorrectes <0/>"
+msgstr ""
+
+#: src/routes/(app)/Navigation.svelte
+msgid "Comptes <0/>"
+msgstr ""
+
+#. 0: adding?.displayName
+#: src/routes/(app)/accounts/+page.svelte
+msgid "Ajouter un compte {0}"
+msgstr ""
+
+#: src/routes/(app)/accounts/+page.svelte
+msgid "Se connecter"
+msgstr ""
+
+#: src/routes/(app)/accounts/+page.svelte
+msgid "Serveur"
+msgstr ""
+
+#: src/routes/(app)/accounts/+page.svelte
+msgid "Connecte-toi sur <0/>, puis copier-colle <1>ton token</1>"
+msgstr ""
+
+#: src/routes/(app)/accounts/+page.svelte
+msgid "Token <0/>"
+msgstr ""
+
+#: src/routes/(app)/accounts/+page.svelte
+msgid "Token"
+msgstr ""
+
+#: src/routes/(app)/accounts/+page.svelte
+msgid "Comptes"
+msgstr ""
+
+#: src/routes/(app)/accounts/+page.svelte
+msgid ""
+"Permet d'ouvrir des sessions distantes ou de publier des sessions vers des services\n"
+"tierces"
+msgstr ""
+
+#. 0: provider.displayName
+#. 0: provider.displayName
+#: src/routes/(app)/accounts/+page.svelte
+#: src/routes/(app)/accounts/+page.svelte
+msgid "Logo de {0}"
+msgstr ""
+
+#: src/routes/(app)/accounts/+page.svelte
+msgid "Connectés"
+msgstr ""
+
+#. 0: account.username
+#: src/routes/(app)/accounts/+page.svelte
+msgid "Photo de {0}"
+msgstr ""
+
+#: src/routes/(app)/accounts/+page.svelte
+msgid "Type de compte inconnu"
+msgstr ""
+
+#: src/routes/(app)/accounts/+page.svelte
+msgid "Déconnecter"
+msgstr ""
+
+#: src/routes/(app)/accounts/+page.svelte
+msgid "Aucun compte"
 msgstr ""
 
 #: src/lib/queue.svelte.js

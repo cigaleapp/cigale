@@ -12,16 +12,17 @@
 	 * @type {object}
 	 * @property {string} text
 	 * @property {string} [tag] span by default
+	 * @property {boolean} [no-tooltip] disable tooltip
 	 */
 
 	/** @type {Props} */
-	const { text, tag = 'span' } = $props();
+	const { text, tag = 'span', 'no-tooltip': noTooltip } = $props();
 
 	/** @type {HTMLElement | undefined} */
 	let element = $state();
 	let offsetWidth = $state(0);
 
-	const tooltipText = $derived(element && offsetWidth < element.scrollWidth ? text : '');
+	const tooltipText = $derived(!noTooltip && element && offsetWidth < element.scrollWidth ? text : '');
 </script>
 
 <svelte:element

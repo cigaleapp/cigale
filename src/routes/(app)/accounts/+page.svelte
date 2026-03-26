@@ -1,13 +1,12 @@
 <script lang="ts">
-	import type { Snapshot } from './$types.js';
-	import type { Account, AccountConstructor, LoginData } from '$lib/accounts/types.js';
+	import type { AccountConstructor, LoginData } from '$lib/accounts/types.js';
+	import OverflowableText from '$lib/OverflowableText.svelte';
 
 	import { format as formatDate, formatDistanceToNow } from 'date-fns';
 
 	import KoboToolbox from '$lib/accounts/kobotoolbox.js';
 	import { providers } from '$lib/accounts/registry.js';
 	import ButtonInk from '$lib/ButtonInk.svelte';
-	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import Field from '$lib/Field.svelte';
 	import { databaseHandle, tables } from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
@@ -19,7 +18,6 @@
 	let adding: undefined | AccountConstructor = $state();
 	let login: undefined | (() => Promise<boolean>) = $state();
 	let loginData: undefined | LoginData = $state();
-	let loginError = $state('');
 
 	const db = $derived(databaseHandle());
 </script>
@@ -155,7 +153,7 @@
 									class="added-at"
 									use:tooltip={`Ajouté le ${formatDate(account.addedAt, 'PPPpp')}`}
 								>
-									{formatDistanceToNow(account.addedAt, { addSuffix: true })}
+									<OverflowableText no-tooltip text={formatDistanceToNow(account.addedAt, { addSuffix: true })} />
 								</span>
 							</span>
 						{:else}

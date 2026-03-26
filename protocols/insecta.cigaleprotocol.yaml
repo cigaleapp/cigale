@@ -103,10 +103,8 @@ sessionMetadata:
     group: project
     label: Entraînement
     kobocollect:
-      # select_from_list_name
       list: Code projet
-      # defaults to matching by label
-      # choice: entrainement
+      choice: entrainement
     description: ''
     mergeMethod: min
     required: true
@@ -118,6 +116,7 @@ sessionMetadata:
     label: Sciences participatives
     kobocollect:
       list: Code projet
+      choice: sciences_participatives
     description: ''
     mergeMethod: min
     required: true
@@ -129,7 +128,7 @@ sessionMetadata:
     label: Psi-Biom
     kobocollect:
       list: Code projet
-      choice: PSIBIOM
+      choice: psibiom
     learnMore: https://www.terroiko.fr/fr/recherche-et-developpement/psibiom
     description: ''
     mergeMethod: min
@@ -142,6 +141,7 @@ sessionMetadata:
     label: RENAT
     kobocollect:
       list: Code projet
+      choice: renat
     learnMore: https://renat.wiki/
     description: Parc Naturel Régional des Pyrénées Ariégeoises
     mergeMethod: min
@@ -154,6 +154,7 @@ sessionMetadata:
     label: ADEPT
     kobocollect:
       list: Code projet
+      choice: adept
     learnMore: https://fundatia-adept.org/projects/
     description: ''
     mergeMethod: min
@@ -165,8 +166,8 @@ sessionMetadata:
     group: project
     label: WildNet
     kobocollect:
-      list: ju1pp37
-      # choice: WILDNET # label matching is case-insensitive
+      list: Code projet
+      choice: wildnet
     learnMore: https://wildnet.org/
     description: ''
     mergeMethod: min
