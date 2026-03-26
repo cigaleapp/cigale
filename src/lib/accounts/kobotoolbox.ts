@@ -16,9 +16,11 @@ import { SessionRemoteID } from '$lib/schemas/sessions.js';
 import { ensureArray, mapValues } from '$lib/utils.js';
 
 export default class Provider implements Account {
+	static id = 'kobotoolbox' as const;
 	static servers = ['kf.kobotoolbox.org', 'eu.kobotoolbox.org'] as const;
 	static auth = 'token' as const satisfies AuthenticationMethod;
 	static capabilities = ['sessions'] as const;
+	static displayName = 'KoboToolbox';
 	static logoURL = new URL('https://avatars.githubusercontent.com/u/5543677?s=280&v=4');
 
 	#token: string;
@@ -39,8 +41,19 @@ export default class Provider implements Account {
 		}
 	}
 
-	get tokenURL(): URL {
-		return new URL('/token/', 'https://' + this.domain);
+	static tokenPageURL(server: string): URL {
+		return new URL('/token/', 'https://' + server);
+	}
+
+	static domainOfProfileURL(profileURL: string | URL): (typeof Provider.servers)[number] {
+		switch (new URL(profileURL).hostname) {
+			case 'kc.kobotoolbox.org':
+				return 'kf.kobotoolbox.org';
+			case 'kc-eu.kobotoolbox.org':
+				return 'eu.kobotoolbox.org';
+			default:
+				throw new Error(`Profile is on a unknown KoboToolbox server: ${profileURL}`);
+		}
 	}
 
 	#cache: Map<SessionRemoteID, (typeof Provider.ProjectDataResponse)['infer']> = new Map();
@@ -67,28 +80,34 @@ export default class Provider implements Account {
 		db: DatabaseHandle,
 		account: Pick<DB.Account, 'token' | 'profileURL' | 'username' | 'type'>
 	) {
-		if (account.type !== 'kobocollect') throw new Error('Invalid account type');
+		if (account.type !== 'kobotoolbox') throw new Error('Invalid account type');
 
 		return new Provider(db, {
 			token: account.token,
-			domain: type.enumerated(...Provider.servers).assert(account.profileURL.hostname),
+			domain: Provider.domainOfProfileURL(account.profileURL),
 			username: account.username,
 		});
 	}
 
 	static async login(
 		db: DatabaseHandle,
-		data: LoginData<typeof Provider.auth, (typeof Provider.servers)[number]>
+		{ token, server }: LoginData<(typeof Provider.servers)[number]>
 	) {
+		if (!token) throw new Error('No login data provided');
+
 		const account = new Provider(db, {
-			token: data.token,
-			domain: data.server,
+			domain: server,
 			username: '',
+			token,
 		});
 
 		const me = await account.json('GET', 'v2', '/me/', Provider.MeResponse);
 
+		me.gravatar.searchParams.set('s', '200')
+
 		return {
+			type: 'kobotoolbox' as const,
+			token,
 			username: me.username,
 			displayName:
 				(me.first_name || me.last_name
@@ -96,8 +115,6 @@ export default class Provider implements Account {
 					: me.extra_details.name) || me.username,
 			avatarURL: me.gravatar.href,
 			profileURL: me.projects_url.href,
-			type: 'kobocollect' as const,
-			token: data.token,
 		};
 	}
 

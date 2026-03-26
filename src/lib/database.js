@@ -189,9 +189,10 @@ const Account = table(
 		displayName: 'string',
 		avatarURL: 'string.url.parse',
 		profileURL: 'string.url.parse',
+		addedAt: ['string.date.iso.parse', '=', () => new Date().toISOString()],
 	}).and(
 		type.or({
-			type: '"kobocollect"',
+			type: '"kobotoolbox"',
 			token: 'string',
 		})
 	)

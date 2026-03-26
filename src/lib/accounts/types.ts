@@ -4,11 +4,12 @@ import type { SessionRemoteID } from '$lib/schemas/sessions.js';
 
 export type AuthenticationMethod = 'oauth' | 'token' | 'password';
 
-export type LoginData<A extends AuthenticationMethod, S extends string> = {
-	token: { server: S; token: string };
-	password: { server: S; username: string; password: string };
-	oauth: { server: S; authorize: URL; identity: URL; token: URL };
-}[A];
+export type LoginData<S extends string = string> = {
+	server: S;
+	token?: string;
+	password?: { username: string; password: string };
+	oauth?: { authorize: URL; identity: URL; token: URL };
+};
 
 export interface Account {
 	logout(): Promise<void>;
@@ -40,7 +41,7 @@ export interface Account {
 		id: SessionRemoteID;
 		name: string;
 		submittedAt: Date;
-		thumbnail: URL|undefined;
+		thumbnail: URL | undefined;
 		/** Cursor to pass to the method to get the next results. Must be undefined once we have finished listing all sessions. Must be the same on all items */
 		nextCursor: string | undefined;
 	}>;
@@ -82,12 +83,15 @@ export interface Account {
 }
 
 export interface AccountConstructor<
-	Auth extends AuthenticationMethod,
+	Auth extends AuthenticationMethod = AuthenticationMethod,
 	Server extends string = string,
 > {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any allows anything in the constructor
 	new (...args: any[]): Account;
 
+	id: string
 	logoURL: URL;
+	displayName: string;
 	capabilities: readonly ('sessions' | 'upload')[];
 	auth: Auth;
 	servers: readonly Server[];
@@ -95,6 +99,6 @@ export interface AccountConstructor<
 	fromDatabase(db: DatabaseHandle, account: DB.Account): Account;
 	login(
 		db: DatabaseHandle,
-		data: LoginData<Auth, Server>
+		data: LoginData<Server>
 	): Promise<Omit<(typeof DB.Schemas.Account)['inferIn'], 'id'>>;
 }
