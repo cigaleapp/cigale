@@ -33,6 +33,23 @@ export class Provider implements Account {
 	domain: ServerDomain;
 	db: DatabaseHandle;
 
+	get v2domain(): string {
+		return this.domain;
+	}
+
+	get v1domain(): string {
+		switch (this.domain) {
+			case 'eu.kobotoolbox.org':
+				return 'kc-eu.kobotoolbox.org';
+			case 'kf.kobotoolbox.org':
+				return 'kc.kobotoolbox.org';
+		}
+	}
+
+	get tokenURL(): URL {
+		return new URL('/token/', 'https://' + this.domain);
+	}
+
 	#cache: Map<SessionRemoteID, (typeof Provider.ProjectDataResponse)['infer']> = new Map();
 
 	constructor(
@@ -66,36 +83,6 @@ export class Provider implements Account {
 		});
 	}
 
-	get v2domain(): string {
-		return this.domain;
-	}
-
-	get v1domain(): string {
-		switch (this.domain) {
-			case 'eu.kobotoolbox.org':
-				return 'kc-eu.kobotoolbox.org';
-			case 'kf.kobotoolbox.org':
-				return 'kc.kobotoolbox.org';
-		}
-	}
-
-	projectAssetUid(href: string): string {
-		const url = new URL(href);
-		if (!url.hash.startsWith('#/forms/'))
-			throw new Error(`Invalid form URL '${url}': must contain #/forms/...`);
-
-		const id = url.hash.split('/').at(2);
-
-		if (!id)
-			throw new Error(`Invalid form URL '${url}': must be of the form #/forms/ID HERE/(...)`);
-
-		return id;
-	}
-
-	get tokenURL(): URL {
-		return new URL('/token/', 'https://' + this.domain);
-	}
-
 	static async login(db: DatabaseHandle, data: LoginData) {
 		const account = new Provider(db, {
 			token: data.token,
@@ -118,13 +105,8 @@ export class Provider implements Account {
 		};
 	}
 
-	#SessionRemoteID(assetUid: string, dataId: string | number) {
-		return SessionRemoteID.assert(`/api/v2/assets/${assetUid}/data/${dataId}`);
-	}
-
-	#parseSessionRemoteID(id: SessionRemoteID): { assetUid: string; dataId: string } {
-		const [_, _api, _v2, _assets, assetUid, _data, dataId] = id.split('/');
-		return { assetUid, dataId };
+	get loggedIn() {
+		return Boolean(this.#token);
 	}
 
 	async logout() {}
@@ -132,7 +114,7 @@ export class Provider implements Account {
 	async *sessions(protocol: DB.Protocol, { cursor, limit } = { cursor: undefined, limit: 10 }) {
 		if (!protocol.remote?.kobocollect) return { ...[], nextCursor: undefined };
 
-		const assetUid = this.projectAssetUid(protocol.remote.kobocollect.form);
+		const assetUid = this.#projectAssetUid(protocol.remote.kobocollect.form);
 
 		const response = await this.json(
 			'GET',
@@ -288,6 +270,10 @@ export class Provider implements Account {
 		}
 	}
 
+	async upload(): Promise<{ remoteID?: SessionRemoteID; page?: URL }> {
+		throw new Error('Not implemented');
+	}
+
 	async #fetchProject(id: SessionRemoteID) {
 		// TODO cache this too
 		return this.json(
@@ -400,8 +386,26 @@ export class Provider implements Account {
 		}
 	}
 
-	async upload(session: DB.Session) {
-		throw new Error('Not implemented');
+	#SessionRemoteID(assetUid: string, dataId: string | number) {
+		return SessionRemoteID.assert(`/api/v2/assets/${assetUid}/data/${dataId}`);
+	}
+
+	#parseSessionRemoteID(id: SessionRemoteID): { assetUid: string; dataId: string } {
+		const [_, _api, _v2, _assets, assetUid, _data, dataId] = id.split('/');
+		return { assetUid, dataId };
+	}
+
+	#projectAssetUid(href: string): string {
+		const url = new URL(href);
+		if (!url.hash.startsWith('#/forms/'))
+			throw new Error(`Invalid form URL '${url}': must contain #/forms/...`);
+
+		const id = url.hash.split('/').at(2);
+
+		if (!id)
+			throw new Error(`Invalid form URL '${url}': must be of the form #/forms/ID HERE/(...)`);
+
+		return id;
 	}
 
 	async json<Response extends Type>(
@@ -435,10 +439,6 @@ export class Provider implements Account {
 		};
 
 		return fetch(`https://cors.gwen.works/${url.toString()}`, init);
-	}
-
-	get loggedIn() {
-		return Boolean(this.#token);
 	}
 
 	static PaginatedResponse = type('<T>', {
