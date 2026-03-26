@@ -1590,3 +1590,11 @@ if (import.meta.vitest) {
 export function prefixIDBKeyRange(prefix) {
 	return IDBKeyRange.bound(prefix, prefix + '\uffff');
 }
+/**
+ * @template T
+ * @param {T|T[]} subject
+ * @returns {T[]}
+ */
+export function ensureArray(subject) {
+	return Array.isArray(subject) ? subject : [subject]
+}

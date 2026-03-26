@@ -40,7 +40,7 @@ crop:
 remote:
   kobocollect:
     form: https://kf.kobotoolbox.org/#/forms/aTocGmTVNFFtuTAbtcgsEK/
-    title: Transect n°{{ Transect_code }}
+    title: Transect du {{ default metadata.date survey._submission_time | formatDate "PPP" }} (n°{{ metadata.transect_code.value }})
 
 metadataGroups:
   project:
@@ -91,7 +91,7 @@ sessionMetadata:
   date:
     type: date
     label: Date de début
-    kobocollect: ur65y40
+    kobocollect: [ur65y40, Date du transect]
     mergeMethod: none
     required: true
     description: ''

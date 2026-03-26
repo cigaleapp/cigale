@@ -238,7 +238,11 @@ export const MetadataMergeMethod = type.or(
 export const MetadataEnumVariant = type({
 	key: [ID, '@', 'Identifiant unique pour cette option'],
 	label: ['string', '@', "Nom de l'option, affichable dans une interface utilisateur"],
-	'kobocollect?': ['string', '@', 'Valeur (nom technique, sans espaces) de la métadonnée'],
+	'kobocollect?': [
+		'string | string[]',
+		'@',
+		'Valeur(s) (nom technique, sans espaces) de la métadonnée',
+	],
 	synonyms: type('string[]')
 		.describe('Synonymes (labels alternatifs) pour cette option')
 		.default(() => []),
@@ -383,9 +387,9 @@ const MetadataBase = type({
 	),
 	label: ['string', '@', 'Nom de la métadonnée'],
 	'kobocollect?': [
-		'string',
+		'string | string[]',
 		'@',
-		'Label ou nom de colonne de la question Kobocollect associée à cette métadonnée. Non sensible à la casse',
+		'Label(s) ou nom(s) de colonne de la question Kobocollect associée à cette métadonnée. Non sensible à la casse',
 	],
 	'group?': ID.brand('MetadataGroup').describe(
 		'Identifiant du groupe dans lequel mettre cette métadonnée. Voir le champ metadataGroups du protocole'
@@ -426,31 +430,31 @@ const MetadataBoolean = MetadataBase.omit('kobocollect').and({
 	'kobocollect?': type.or(
 		{
 			'list?': [
-				'string',
+				'string | string[]',
 				'@',
-				'Label ou nom de colonne de la question Kobocollect associée (question à choix)',
+				'Label(s) ou nom(s) de colonne de la question Kobocollect associée (question à choix)',
 			],
 			true: [
-				'string',
+				'string | string[]',
 				'@',
-				'Label ou nom technique du choix associé à Vrai. Mettre OK pour une question de type "Acknowledge"',
+				'Label(s) ou nom(s) technique du choix associé à Vrai. Mettre OK pour une question de type "Acknowledge"',
 			],
 			false: [
-				'string',
+				'string | string[]',
 				'@',
-				'Label ou nom technique du choix associé à Faux. Mettre "" pour une question de type "Acknowledge"',
+				'Label(s) ou nom(s) technique du choix associé à Faux. Mettre "" pour une question de type "Acknowledge"',
 			],
 		},
 		{
 			'list?': [
-				'string',
+				'string | string[]',
 				'@',
-				'Label ou nom de colonne de la question Kobocollect associée (question à choix multiples)',
+				'Label(s) ou nom(s) de colonne de la question Kobocollect associée (question à choix multiples)',
 			],
 			choice: [
-				'string',
+				'string | string[]',
 				'@',
-				'Label ou nom technique du choix à cocher si cette métadonnée est vraie',
+				'Label(s) ou nom(s) technique du choix à cocher si cette métadonnée est vraie',
 			],
 		}
 	),

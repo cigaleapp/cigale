@@ -13,7 +13,7 @@ import { metadataOptionsKeyRange } from '$lib/metadata/storage.js';
 import { MIMEType, NamespacedMetadataID } from '$lib/schemas/common.js';
 import { removeNamespaceFromMetadataId, splitMetadataId } from '$lib/schemas/metadata.js';
 import { SessionRemoteID } from '$lib/schemas/sessions.js';
-import { mapValues } from '$lib/utils.js';
+import { ensureArray, mapValues } from '$lib/utils.js';
 
 export default class Provider implements Account {
 	static servers = ['kf.kobotoolbox.org', 'eu.kobotoolbox.org'] as const;
@@ -108,6 +108,13 @@ export default class Provider implements Account {
 
 		const assetUid = this.#projectAssetUid(protocol.remote.kobocollect.form);
 
+		const project = await this.json(
+			'GET',
+			'v2',
+			`/api/v2/assets/${assetUid}`,
+			Provider.ProjectResponse
+		);
+
 		const response = await this.json(
 			'GET',
 			'v2',
@@ -124,7 +131,10 @@ export default class Provider implements Account {
 
 			yield {
 				id: gid,
-				name: protocol.remote.kobocollect.title.render(result as Record<string, string>),
+				name: protocol.remote.kobocollect.title.render({
+					survey: result,
+					metadata: await this.#rowToMetadata(protocol, project, result),
+				}),
 				submittedAt: result._submission_time,
 				thumbnails: [],
 				nextCursor: response.next ?? undefined,
@@ -151,62 +161,16 @@ export default class Provider implements Account {
 			type({ url: 'string.url' })
 		);
 
-		const metadataValues: Record<NamespacedMetadataID, RuntimeValue> = {};
-
-		for (const id of protocol.sessionMetadata) {
-			const def = await this.db
-				.get('Metadata', resolveMetadataImport(protocol, id))
-				.then((raw) => (raw ? Schemas.Metadata.assert(raw) : undefined));
-
-			if (!def) continue;
-
-			const column = this.#columnOfMetadata(project, def);
-			if (!column) continue;
-
-			const value = column.$xpath in row ? row[column.$xpath]?.toString() : undefined;
-
-			if (!value) continue;
-
-			switch (def.type) {
-				case 'enum': {
-					const option = await this.#parseEnumCell(def, value);
-					if (!option) continue;
-
-					metadataValues[def.id] = option.key;
-					break;
-				}
-				case 'file': {
-					const file = this.#findAttachment({
-						column,
-						attachments: row._attachments,
-					});
-
-					if (!file) continue;
-
-					metadataValues[def.id] = file.uid;
-					break;
-				}
-				default: {
-					const parsed = this.#parseKobocollectCell(def, value);
-					if (parsed === undefined) continue;
-
-					metadataValues[def.id] = parsed;
-					break;
-				}
-			}
-		}
+		const metadata = await this.#rowToMetadata(protocol, project, row);
 
 		return {
 			remoteId: id,
 			protocol: protocol.id,
 			createdAt: row._submission_time.toISOString(),
 			description: `Créée sur KoboCollect. Voir ${submissionUrl}`,
-			name: protocol.remote.kobocollect.title.render(row),
+			name: protocol.remote.kobocollect.title.render({ survey: row, metadata }),
 			openedAt: new Date().toISOString(),
-			metadata: mapValues(metadataValues, (value) => ({
-				value: serializeMetadataValue(value),
-				alternatives: {},
-			})),
+			metadata,
 			inferenceModels: {},
 			group: {
 				global: { field: 'none', tolerances: { dates: 'day', decimal: 'unit' } } as const,
@@ -266,6 +230,62 @@ export default class Provider implements Account {
 		throw new Error('Not implemented');
 	}
 
+	async #rowToMetadata(
+		protocol: DB.Protocol,
+		project: (typeof Provider.ProjectResponse)['infer'],
+		row: (typeof Provider.ProjectDataResponse)['infer']
+	) {
+		const metadataValues: Record<NamespacedMetadataID, RuntimeValue> = {};
+
+		for (const id of protocol.sessionMetadata) {
+			const def = await this.db
+				.get('Metadata', resolveMetadataImport(protocol, id))
+				.then((raw) => (raw ? Schemas.Metadata.assert(raw) : undefined));
+
+			if (!def) continue;
+
+			const column = this.#columnOfMetadata(project, def);
+			if (!column) continue;
+
+			const value = column.$xpath in row ? row[column.$xpath]?.toString() : undefined;
+
+			if (!value) continue;
+
+			switch (def.type) {
+				case 'enum': {
+					const option = await this.#parseEnumCell(def, value);
+					if (!option) continue;
+
+					metadataValues[def.id] = option.key;
+					break;
+				}
+				case 'file': {
+					const file = this.#findAttachment({
+						column,
+						attachments: row._attachments,
+					});
+
+					if (!file) continue;
+
+					metadataValues[def.id] = file.uid;
+					break;
+				}
+				default: {
+					const parsed = this.#parseKobocollectCell(def, value);
+					if (parsed === undefined) continue;
+
+					metadataValues[def.id] = parsed;
+					break;
+				}
+			}
+		}
+
+		return mapValues(metadataValues, (value) => ({
+			value: serializeMetadataValue(value),
+			alternatives: {},
+		}));
+	}
+
 	async #fetchProject(id: SessionRemoteID) {
 		// TODO cache this too
 		return this.json(
@@ -309,9 +329,13 @@ export default class Provider implements Account {
 		return project.content.survey.find((field) => {
 			// We can have an explicit empty string, which can be used to explicitly exclude a metadata from kobocollect equivalence
 			const explicit = metadata.kobocollect
-				? typeof metadata.kobocollect === 'string'
+				? Array.isArray(metadata.kobocollect)
 					? metadata.kobocollect
-					: metadata.kobocollect.list
+					: typeof metadata.kobocollect === 'string'
+						? [metadata.kobocollect]
+						: Array.isArray(metadata.kobocollect.list)
+							? metadata.kobocollect.list
+							: [metadata.kobocollect.list]
 				: undefined;
 
 			return (
@@ -337,14 +361,18 @@ export default class Provider implements Account {
 			}
 
 			case 'boolean': {
-				if (!metadata.kobocollect || typeof metadata.kobocollect === 'string')
-					return serializedValue === 'OK';
+				const isOK = serializedValue === 'OK';
+
+				if (!metadata.kobocollect) return isOK;
+				if (typeof metadata.kobocollect === 'string') return isOK;
+				if (Array.isArray(metadata.kobocollect)) return isOK;
 
 				if ('choice' in metadata.kobocollect) {
-					return serializedValue.split(' ').includes(metadata.kobocollect.choice);
+					const choices = ensureArray(metadata.kobocollect.choice);
+					return serializedValue.split(' ').some((value) => choices.includes(value));
 				}
 
-				return serializedValue === metadata.kobocollect.true;
+				return ensureArray(metadata.kobocollect.true).includes(serializedValue);
 			}
 
 			case 'location': {
@@ -557,16 +585,21 @@ export default class Provider implements Account {
 
 function matchesName(
 	subject: { $autovalue: string; name?: string } | { $autoname: string; name?: string },
-	name: string
+	name: string | Array<string | undefined>
 ) {
 	const subj = subject.name || ('$autovalue' in subject ? subject.$autovalue : subject.$autoname);
-	return subj.trim().toLowerCase() === name.trim().toLowerCase();
+	const candidates = ensureArray(name).map((c) => c?.trim().toLowerCase());
+	return candidates.includes(subj.trim().toLowerCase());
 }
 
-function matchesLabel(subject: { label?: string | string[] }, label: string) {
+function matchesLabel(
+	subject: { label?: string | string[] },
+	label: string | Array<string | undefined>
+) {
 	if (!subject.label) return false;
 
-	const subj = Array.isArray(subject.label) ? subject.label[0] : subject.label;
+	const subj = ensureArray(subject.label)[0];
+	const candidates = ensureArray(label).map((c) => c?.trim().toLowerCase());
 
-	return subj.trim().toLowerCase() === label.trim().toLowerCase();
+	return candidates.includes(subj.trim().toLowerCase());
 }

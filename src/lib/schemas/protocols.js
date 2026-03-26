@@ -15,6 +15,8 @@ import { TemplatedString } from './expressions.js';
 import {
 	Metadata,
 	MetadataGroup,
+	MetadataRecord,
+	MetadataRecordValue,
 	namespacedMetadataId,
 	SidecarFilepathTemplate,
 } from './metadata.js';
@@ -85,6 +87,7 @@ export const ProtocolImport = type({
 		: ctx.reject('Un import ne peut pas être vide')
 );
 
+
 export const Protocol = type({
 	id: ProtocolID,
 	dirty: type('boolean')
@@ -93,8 +96,10 @@ export const Protocol = type({
 	'remote?': {
 		'kobocollect?': {
 			form: URLString,
-			title: TemplatedString(type.unknown).describe(
-				'Template Handlebars pour construire le titre de la session à partir des colonnes de la soumissions Kobocollect. Par exemple, si il y a une colonne Transect_code: `Transect #{{ Transect_code }}`'
+			title: TemplatedString(
+				type({ survey: 'unknown', metadata: MetadataRecord(ID) })
+			).describe(
+				'Template Handlebars pour construire le titre de la session à partir des colonnes de la soumissions Kobocollect (dans `survey`) et des valeur des métadonnées de la session (sans préfixe de protocole, dans `metadata`). Par exemple, si il y a une colonne Transect_code et une metadata start: `Transect #{{ survey.Transect_code }} du {{ metadata.start.value | formatDate "dd/MM/yyyy" }}`'
 			),
 		},
 	},

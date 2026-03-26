@@ -235,6 +235,17 @@ export const HELPERS = /** @type {const} */ ({
 			).toISOString();
 		},
 	},
+	formatDate: {
+		documentation: "Formatte une date à partir d'une date au format ISO",
+		usage: [["'2024-01-10T02:03:04Z'", "'dd/MM/yyyy'"], '10/01/2024'],
+		/**
+		 * @param {string} datestring
+		 * @param {string} format
+		 */
+		implementation(datestring, format) {
+			return formatDate(new Date(datestring), format);
+		},
+	},
 	object: {
 		documentation:
 			"Crée une représentation JSON d'un objet en prenant les paramètres comme paires clé-valeur",
