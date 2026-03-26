@@ -289,7 +289,7 @@ describe('compareProtocolWithUpstream', () => {
 
 		const fetch = vi.fn(async (url) => ({
 			url,
-			json: async () => ({
+			text: async () => JSON.stringify({
 				id: 'protocol1',
 				name: 'Test Protocol',
 				version: 1,
@@ -431,10 +431,13 @@ describe('compareProtocolWithUpstream', () => {
 
 		const fetch = vi.fn(async (url) => ({
 			url,
-			/**
-			 * @returns {Promise<typeof import('$lib/schemas/protocols').ExportedProtocol.inferIn>}
+			
+			text: async () => JSON.stringify(
+				/**
+			 * @satisfies {typeof import('$lib/schemas/protocols').ExportedProtocol.inferIn}
 			 */
-			json: async () => ({
+				
+				{
 				id: 'protocol1',
 				name: 'Test Protocol Updated',
 				version: 2,
@@ -634,7 +637,7 @@ describe('hasUpgradeAvailable', () => {
 	test('should return upToDate: false if the version is lower', async () => {
 		const fetch = vi.fn(async (url) => ({
 			url,
-			json: async () => ({
+			text: async () => JSON.stringify({
 				version: 2,
 				id: 'mon-protocole',
 			}),
@@ -662,7 +665,7 @@ describe('hasUpgradeAvailable', () => {
 	test('should return upToDate: true if the version is the same', async () => {
 		const fetch = vi.fn(async (url) => ({
 			url,
-			json: async () => ({
+			text: async () => JSON.stringify({
 				version: 1,
 				id: 'mon-protocole',
 			}),
@@ -690,7 +693,7 @@ describe('hasUpgradeAvailable', () => {
 	test('should throw an error if the protocol ID is different', async () => {
 		const fetch = vi.fn(async (url) => ({
 			url,
-			json: async () => ({
+			text: async () => JSON.stringify({
 				version: 2,
 				id: 'autre-protocole',
 			}),
@@ -712,7 +715,7 @@ describe('hasUpgradeAvailable', () => {
 	test('should throw an error if the remote protocol has no version', async () => {
 		const fetch = vi.fn(async (url) => ({
 			url,
-			json: async () => ({
+			text: async () => JSON.stringify({
 				id: 'mon-protocole',
 			}),
 		}));
