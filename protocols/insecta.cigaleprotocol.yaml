@@ -39,9 +39,10 @@ crop:
 
 remote:
   kobocollect:
-    form: https://kf.kobotoolbox.org/#/forms/aTocGmTVNFFtuTAbtcgsEK/
-    title: Transect du {{ default metadata.date survey._submission_time | formatDate "PPP" }} (n°{{ metadata.transect_code.value }})
-    thumbnail: Prendre_une_photo_du_milieu
+    # form: https://kf.kobotoolbox.org/#/forms/aTocGmTVNFFtuTAbtcgsEK/
+    form: https://kf.kobotoolbox.org/#/forms/a3kVqAFEJwnHFcFc7PpWj4/
+    title: "{{ titlecase survey.Code_projet }}, n°{{ metadata session 'transect_code' }}"
+    thumbnail: Prenez_une_photo_du_milieu
 
 metadataGroups:
   project:
@@ -92,7 +93,7 @@ sessionMetadata:
   date:
     type: date
     label: Date de début
-    kobocollect: [ur65y40, Date du transect]
+    kobocollect: [Bonjour_Pour_r_aliser_le_pro, Date du transect]
     mergeMethod: none
     required: true
     description: ''
@@ -360,3 +361,12 @@ sessionMetadata:
 
 # All metadata are imported from the base arthropods protocol
 metadata: {}
+
+exports:
+  images:
+    mtime: shoot_date
+    cropped: Cropped/{{ fallback image.protocolMetadata.species.valueLabel "(Unknown)" }}_obs{{ observation.number }}_{{ sequence }}.{{ extension image.filename }}
+    original: Original/{{ fallback image.protocolMetadata.species.valueLabel "(Unknown)" }}_obs{{ observation.number }}_{{ sequence }}.{{ extension image.filename }}
+  metadata:
+    csv: metadata.csv
+    files: Files/{{ sequence }}-{{ metadataKey }}.{{ extension filename }}

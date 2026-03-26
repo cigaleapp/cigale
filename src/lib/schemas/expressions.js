@@ -26,6 +26,20 @@ import {
  * @satisfies {Record<string, Helper>}
  */
 export const HELPERS = /** @type {const} */ ({
+	titlecase: {
+		documentation:
+			'Met la première lettre de chaque mot en majuscule et les autres en minuscules',
+		usage: [["'some Test HERE!!'"], 'Some Test Here!!!'],
+		/**
+		 * @param {string} subject
+		 */
+		implementation(subject) {
+			return subject
+				.split(/\s/)
+				.map((word) => word.at(0)?.toUpperCase() + word.slice(1).toLowerCase())
+				.join(' ');
+		},
+	},
 	suffix: {
 		documentation: "Ajoute un suffixe à un nom de fichier, avant l'extension",
 		usage: [["'filename.jpeg'", "'_example'"], 'filename_example.jpeg'],
@@ -106,19 +120,15 @@ export const HELPERS = /** @type {const} */ ({
 		 */
 		implementation(subject, metadataId) {
 			if ('metadata' in subject) {
-				return (
-					subject.protocolMetadata[metadataId]?.value ??
-					subject.metadata[metadataId]?.value ??
-					null
-				);
+				const record = subject.protocolMetadata ?? subject.metadata;
+				if (metadataId in record) return record[metadataId]?.value;
+				return null;
 			}
 
 			if ('metadataOverrides' in subject) {
-				return (
-					subject.protocolMetadataOverrides[metadataId]?.value ??
-					subject.metadataOverrides[metadataId]?.value ??
-					null
-				);
+				const record = subject.protocolMetadataOverrides ?? subject.metadataOverrides;
+				if (metadataId in record) return record[metadataId]?.value;
+				return null;
 			}
 
 			throw new Error('Subject must have either metadata or metadataOverrides property');

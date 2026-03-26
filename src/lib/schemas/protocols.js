@@ -39,6 +39,7 @@ export const ExportsFilepathTemplateMetadataFile = FilepathTemplate(
 		metadata: Metadata,
 		metadataKey: ['string', '@', 'ID de la métadonnée, sans namespace'],
 		size: ['number', '@', 'Taille du fichier en octets'],
+		sequence: ['number', '@', "Entier s'incrémentant et commençant à 1"],
 		filename: 'string',
 		contentType: MIMEType,
 		id: [
@@ -101,7 +102,13 @@ export const Protocol = type({
 				"Nom ou label d'une colonne de type image à utiliser comme miniature pour lister les sessions",
 			],
 			title: TemplatedString(
-				type({ survey: 'unknown', metadata: MetadataRecord(ID) })
+				type({
+					survey: 'unknown',
+					session: {
+						metadata: MetadataRecord(NamespacedMetadataID),
+						protocolMetadata: MetadataRecord(ID),
+					},
+				})
 			).describe(
 				'Template Handlebars pour construire le titre de la session à partir des colonnes de la soumissions Kobocollect (dans `survey`) et des valeur des métadonnées de la session (sans préfixe de protocole, dans `metadata`). Par exemple, si il y a une colonne Transect_code et une metadata start: `Transect #{{ survey.Transect_code }} du {{ metadata.start.value | formatDate "dd/MM/yyyy" }}`'
 			),

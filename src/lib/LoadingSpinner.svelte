@@ -1,7 +1,9 @@
 <!-- 
  
 @component
-CSS Variables: `--size` (default: `1em`)
+CSS Variables: 
+- `--size` (default: `1em`)
+- `--stroke` (default: `6`) stroke width
 
 
 -->
@@ -78,6 +80,7 @@ CSS Variables: `--size` (default: `1em`)
 	.loader-path {
 		stroke-dasharray: 300;
 		stroke-linecap: round;
+		stroke-width: var(--stroke, 6);
 	}
 
 	.infinite .loader-path {

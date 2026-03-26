@@ -693,7 +693,7 @@ async function prepare({
 	}
 
 	const exportedMetadataFiles = metadataValueFiles
-		.map(({ id, ...file }) => {
+		.map(({ id, ...file }, i) => {
 			// Find metadata value associated with this file
 			let source:
 				| undefined
@@ -753,6 +753,7 @@ async function prepare({
 
 			const path = filepaths.metadata.files.render({
 				id,
+				sequence: i+1,
 				metadataKey: removeNamespaceFromMetadataId(source.metadataId),
 				metadata: metadataDefinitionsRaw.find((m) => m.id === source.metadataId)!,
 				session: source.kind === 'session' ? { id: sessionId } : undefined,

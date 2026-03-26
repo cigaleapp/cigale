@@ -33,17 +33,22 @@ export interface Account {
 	 * @param options
 	 * @param options.cursor see nextCursor in the response
 	 * @param options.limit change the number of sessions returned in each call. Default is implementation-specific
+	 * @param options.mine only return sessions created by the account's user
 	 */
 	sessions(
-		protocol: DB.Protocol,
-		options?: { cursor?: string | undefined; limit?: number }
-	): AsyncIterator<{
+		options?: { cursor?: string | undefined; limit?: number, mine? :boolean }
+	): AsyncIterable<{
 		id: SessionRemoteID;
+		protocol: string,
+		page: URL|undefined;
 		name: string;
 		submittedAt: Date;
+		submittedBy?: string;
 		thumbnail: URL | undefined;
 		/** Cursor to pass to the method to get the next results. Must be undefined once we have finished listing all sessions. Must be the same on all items */
 		nextCursor: string | undefined;
+		filesCount: number;
+		imagesCount: number;
 	}>;
 	/**
 	 * Get the remote session
@@ -75,7 +80,7 @@ export interface Account {
 	files(
 		protocol: DB.Protocol,
 		session: SessionRemoteID
-	): AsyncIterator<Omit<(typeof DB.Tables.MetadataValueFile)['inferIn'], 'sessionId'>>;
+	): AsyncIterable<Omit<(typeof DB.Tables.MetadataValueFile)['inferIn'], 'sessionId'>>;
 	/**
 	 * Get a URL to a page on the remote website for a session
 	 */
@@ -92,7 +97,7 @@ export interface AccountConstructor<
 	id: string
 	logoURL: URL;
 	displayName: string;
-	capabilities: readonly ('sessions' | 'upload')[];
+	capabilities: readonly ('sessions' | 'images' | 'upload')[];
 	auth: Auth;
 	servers: readonly Server[];
 

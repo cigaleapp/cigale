@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { AccountConstructor, LoginData } from '$lib/accounts/types.js';
-	import OverflowableText from '$lib/OverflowableText.svelte';
 
 	import { format as formatDate, formatDistanceToNow } from 'date-fns';
 
@@ -11,7 +10,9 @@
 	import { databaseHandle, tables } from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import ModalConfirm from '$lib/ModalConfirm.svelte';
+	import OverflowableText from '$lib/OverflowableText.svelte';
 	import RadioButtons from '$lib/RadioButtons.svelte';
+	import RowAccount from '$lib/RowAccount.svelte';
 	import { tooltip } from '$lib/tooltips.js';
 	import { safeJSONParse } from '$lib/utils.js';
 
@@ -31,7 +32,7 @@
 		if (!adding) return;
 		if (!loginData) return;
 		const account = await adding.login(db, loginData);
-		await tables.Account.add(account);
+		await tables.Account.add({ ...account, addedAt: new Date().toISOString() });
 	}}
 >
 	{#if adding}
@@ -132,46 +133,22 @@
 		<h2>Connectés</h2>
 		<ul>
 			{#each tables.Account.state as account (account.id)}
-				{@const provider = providers.get(account.type)}
-				<li>
-					<img
-						class="avatar"
-						src="https://cors.gwen.works/{account.avatarURL.href}"
-						alt="Photo de {account.username}"
-					/>
-					<p>
-						<strong>{account.displayName}</strong>
-						{#if provider}
-							<span class="with-provider-logo">
-								<img
-									src={provider.logoURL.href}
-									alt="Logo de {provider.displayName}"
-								/>
-								<span>{provider.displayName}</span>
-								&nbsp;&middot;&nbsp;
-								<span
-									class="added-at"
-									use:tooltip={`Ajouté le ${formatDate(account.addedAt, 'PPPpp')}`}
-								>
-									<OverflowableText no-tooltip text={formatDistanceToNow(account.addedAt, { addSuffix: true })} />
-								</span>
-							</span>
-						{:else}
-							<strong class="error">Type de compte inconnu</strong>
-						{/if}
-					</p>
-					<ButtonInk
-						dangerous
-						onclick={async () => {
-							if (!provider) return;
-							const acct = provider.fromDatabase(db, account);
-							await acct.logout();
-							await tables.Account.remove(account.id);
-						}}
-					>
-						Déconnecter
-					</ButtonInk>
-				</li>
+				<RowAccount {account} >
+				{#snippet action()}
+<ButtonInk
+		dangerous
+		onclick={async () => {
+			const provider = providers.get(account.type)
+			if (!provider) return;
+			const acct = provider.fromDatabase(db, account);
+			await acct.logout();
+			await tables.Account.remove(account.id);
+		}}
+	>
+		Déconnecter
+	</ButtonInk>
+				{/snippet}
+				</RowAccount>
 			{:else}
 				<li class="empty">Aucun compte</li>
 			{/each}
@@ -197,7 +174,7 @@
 	ul {
 		display: flex;
 		flex-direction: column;
-		gap: 1rem;
+		gap: 1.7rem;
 	}
 
 	li {
@@ -215,25 +192,16 @@
 		gap: 0.25em;
 	}
 
+	
+
 	li img {
 		height: 4rem;
 		width: 4rem;
 		border-radius: var(--corner-radius);
-		&.avatar {
-			border-radius: 50%;
-		}
+	
 	}
 
-	li .with-provider-logo {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.2em;
-
-		img {
-			height: 1.4em;
-			width: 1.4em;
-		}
-	}
+	
 
 	li.empty {
 		color: var(--gay);

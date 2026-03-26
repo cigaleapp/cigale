@@ -125,6 +125,7 @@ const Settings = table(
 	type({
 		id: '"defaults" | "user"',
 		protocols: References,
+		sessionFolder: type.or('"local"', { remote: ID, mine: 'boolean = true' }).default('local'),
 		theme: type.enumerated('dark', 'light', 'auto'),
 		// TODO(2025-09-05): remove n===10 after a while
 		gridSize: type.number.pipe((n) => (n === 10 ? 1 : clamp(n, 0.5, 2))),

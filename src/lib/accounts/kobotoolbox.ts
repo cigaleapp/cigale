@@ -1,13 +1,14 @@
 import type { DatabaseHandle } from '../idb.svelte.js';
 import type { Account, AuthenticationMethod, LoginData } from '$lib/accounts/types.js';
 import type * as DB from '$lib/database.js';
-import type { RuntimeValue } from '$lib/schemas/metadata.js';
+import type { MetadataRecordValue, RuntimeValue } from '$lib/schemas/metadata.js';
 
 import { Type, type } from 'arktype';
 import * as date from 'date-fns';
 
 import { Schemas } from '$lib/database.js';
 import { resolveMetadataImport } from '$lib/metadata/imports.js';
+import { protocolMetadataValues } from '$lib/metadata/namespacing.js';
 import { serializeMetadataValue } from '$lib/metadata/serializing.js';
 import { metadataOptionsKeyRange } from '$lib/metadata/storage.js';
 import { MIMEType, NamespacedMetadataID } from '$lib/schemas/common.js';
@@ -103,7 +104,7 @@ export default class Provider implements Account {
 
 		const me = await account.json('GET', 'v2', '/me/', Provider.MeResponse);
 
-		me.gravatar.searchParams.set('s', '200')
+		me.gravatar.searchParams.set('s', '200');
 
 		return {
 			type: 'kobotoolbox' as const,
@@ -120,57 +121,88 @@ export default class Provider implements Account {
 
 	async logout() {}
 
-	async *sessions(protocol: DB.Protocol, { cursor, limit } = { cursor: undefined, limit: 10 }) {
-		if (!protocol.remote?.kobocollect) return { ...[], nextCursor: undefined };
+	async *sessions({ cursor = undefined, limit = 10, mine = false } = {}) {
+		for (const p of await this.db.getAll('Protocol')) {
+			const protocol = Schemas.Protocol.assert(p);
+			console.log({ p, protocol });
+			if (!protocol.remote?.kobocollect) continue;
 
-		const assetUid = this.#projectAssetUid(protocol.remote.kobocollect.form);
+			const assetUid = this.#projectAssetUid(protocol.remote.kobocollect.form);
 
-		const project = await this.json(
-			'GET',
-			'v2',
-			`/api/v2/assets/${assetUid}`,
-			Provider.ProjectResponse
-		);
-
-		const response = await this.json(
-			'GET',
-			'v2',
-			`/api/v2/assets/${assetUid}/data?${new URLSearchParams({
-				limit: limit.toString(),
-				offset: cursor ? (new URL(cursor).searchParams.get('offset') ?? '0') : '0',
-			})}`,
-			Provider.PaginatedResponse(Provider.ProjectDataResponse)
-		);
-
-		for (const result of response.results) {
-			const gid = this.#SessionRemoteID(assetUid, result._id);
-			this.#cache.set(gid, result);
-
-			const thumbField = this.#columnByNameOrLabel(project, {
-				both: protocol.remote?.kobocollect?.thumbnail,
-			});
-
-			const thumb = result._attachments.find(
-				(a) =>
-					a.mimetype.startsWith('image/') &&
-					a.question_xpath === thumbField?.$xpath &&
-					!a.is_deleted
+			const project = await this.json(
+				'GET',
+				'v2',
+				`/api/v2/assets/${assetUid}`,
+				Provider.ProjectResponse
 			);
 
-			yield {
-				id: gid,
-				submittedAt: result._submission_time,
-				nextCursor: response.next ?? undefined,
-				thumbnail: thumb?.download_small_url
-					? await this.fetch(thumb.download_small_url)
-							.then((response) => response.blob())
-							.then((blob) => new URL(URL.createObjectURL(blob)))
-					: undefined,
-				name: protocol.remote.kobocollect.title.render({
-					survey: result,
-					metadata: await this.#rowToMetadata(protocol, project, result),
-				}),
-			};
+			const response = await this.json(
+				'GET',
+				'v2',
+				`/api/v2/assets/${assetUid}/data?${new URLSearchParams({
+					limit: limit.toString(),
+					offset: cursor ? (new URL(cursor).searchParams.get('offset') ?? '0') : '0',
+					query: JSON.stringify({
+						_submitted_by: mine ? this.username : undefined,
+					}),
+					sort: JSON.stringify({
+						_submission_time: -1,
+					}),
+				})}`,
+				Provider.PaginatedResponse(Provider.ProjectDataResponse)
+			);
+
+			for (const result of response.results) {
+				const gid = this.#SessionRemoteID(assetUid, result._id);
+				this.#cache.set(gid, result);
+
+				const thumbField = this.#columnByNameOrLabel(project, {
+					both: protocol.remote?.kobocollect?.thumbnail,
+				});
+
+				const thumb = result._attachments.find(
+					(a) =>
+						a.mimetype.startsWith('image/') &&
+						a.question_xpath === thumbField?.$xpath &&
+						!a.is_deleted
+				);
+				console.log({ thumbField, thumb, a: result._attachments });
+
+				const metadata = await this.#rowToMetadata(protocol, project, result);
+
+				let name = 'Sans nom';
+
+				try {
+					name = protocol.remote.kobocollect.title.render({
+						survey: result,
+						session: {
+							metadata,
+							protocolMetadata: protocolMetadataValues('session', protocol, metadata),
+						},
+					});
+				} catch (error) {
+					console.error(error);
+				}
+
+				yield {
+					id: gid,
+					name,
+					page: new URL(
+						`https://${this.v2domain}/api/v2/assets/${assetUid}/data/${result._id}/enketo/redirect/view`
+					),
+					protocol: protocol.id,
+					submittedAt: result._submission_time,
+					submittedBy: result._submitted_by,
+					nextCursor: response.next ?? undefined,
+					filesCount: result._attachments.length,
+					imagesCount: 0,
+					thumbnail: thumb?.download_small_url
+						? await this.fetch(thumb.download_small_url)
+								.then((response) => response.blob())
+								.then((blob) => new URL(URL.createObjectURL(blob)))
+						: undefined,
+				};
+			}
 		}
 	}
 
@@ -194,15 +226,33 @@ export default class Provider implements Account {
 		);
 
 		const metadata = await this.#rowToMetadata(protocol, project, row);
+		let name = 'Sans nom';
+
+		console.log({ metadata });
+
+		try {
+			name = protocol.remote.kobocollect.title.render({
+				survey: row,
+				session: {
+					metadata,
+					protocolMetadata: protocolMetadataValues('session', protocol, metadata),
+				},
+			});
+		} catch (error) {
+			console.error(error);
+		}
 
 		return {
 			remoteId: id,
 			protocol: protocol.id,
+			name,
 			createdAt: row._submission_time.toISOString(),
 			description: `Créée sur KoboCollect. Voir ${submissionUrl}`,
-			name: protocol.remote.kobocollect.title.render({ survey: row, metadata }),
 			openedAt: new Date().toISOString(),
-			metadata,
+			metadata: mapValues(metadata, ({ value, ...rest }) => ({
+				...rest,
+				value: serializeMetadataValue(value),
+			})),
 			inferenceModels: {},
 			group: {
 				global: { field: 'none', tolerances: { dates: 'day', decimal: 'unit' } } as const,
@@ -247,7 +297,7 @@ export default class Provider implements Account {
 
 			yield {
 				// TODO: support attaching download_url here
-				id: `${this.domain}__${project.uid}__${row._id}__${attachment.uid}`,
+				id: this.#compositeFileId(project, row, attachment),
 				bytes,
 				contentType: attachment.mimetype,
 				filename: attachment.media_file_basename,
@@ -262,12 +312,23 @@ export default class Provider implements Account {
 		throw new Error('Not implemented');
 	}
 
+	#compositeFileId(
+		project: (typeof Provider.ProjectResponse)['infer'],
+		row: (typeof Provider.ProjectDataResponse)['infer'],
+		attachment: (typeof Provider.ProjectDataResponse)['infer']['_attachments'][number]
+	) {
+		return `${this.domain}__${project.uid}__${row._id}__${attachment.uid}`;
+	}
+
 	async #rowToMetadata(
 		protocol: DB.Protocol,
 		project: (typeof Provider.ProjectResponse)['infer'],
 		row: (typeof Provider.ProjectDataResponse)['infer']
 	) {
-		const metadataValues: Record<NamespacedMetadataID, RuntimeValue> = {};
+		const metadataValues: Record<
+			NamespacedMetadataID,
+			(typeof MetadataRecordValue)['inferIn']
+		> = {};
 
 		for (const id of protocol.sessionMetadata) {
 			const def = await this.db
@@ -288,7 +349,7 @@ export default class Provider implements Account {
 					const option = await this.#parseEnumCell(def, value);
 					if (!option) continue;
 
-					metadataValues[def.id] = option.key;
+					metadataValues[def.id] = { value: option.key, alternatives: {} };
 					break;
 				}
 				case 'file': {
@@ -299,23 +360,26 @@ export default class Provider implements Account {
 
 					if (!file) continue;
 
-					metadataValues[def.id] = file.uid;
+					metadataValues[def.id] = {
+						value: this.#compositeFileId(project, row, file),
+						alternatives: {},
+					};
 					break;
 				}
 				default: {
 					const parsed = this.#parseKobocollectCell(def, value);
 					if (parsed === undefined) continue;
 
-					metadataValues[def.id] = parsed;
+					metadataValues[def.id] = {
+						value: parsed instanceof Date ? parsed.toISOString() : parsed,
+						alternatives: {},
+					};
 					break;
 				}
 			}
 		}
 
-		return mapValues(metadataValues, (value) => ({
-			value: serializeMetadataValue(value),
-			alternatives: {},
-		}));
+		return metadataValues;
 	}
 
 	async #fetchProject(id: SessionRemoteID) {
@@ -385,6 +449,7 @@ export default class Provider implements Account {
 			both?: undefined | string | Array<string | undefined>;
 		}
 	) {
+		console.log({ fields: project.content.survey, name, both, label });
 		return project.content.survey.find(
 			(field) =>
 				matchesName(field, both ?? name ?? []) || matchesLabel(field, both ?? label ?? [])
@@ -568,7 +633,7 @@ export default class Provider implements Account {
 					| 'username'
 					| (string & {})
 				>(),
-				required: 'boolean',
+				'required?': 'boolean',
 				$xpath: 'string',
 				$kuid: 'string',
 				'label?': 'string[]',

@@ -105,7 +105,7 @@ export const Session = type({
 	/** When the session is hosted on a remote server. On the root of the object for indexing purposes. Empty if session is local-only  */
 	remoteId: SessionRemoteID.default(''),
 	/** When the session is hosted on a remote server */
-	account: ID,
+	'account?': ID,
 	name: 'string',
 	// Date is not compatible with JSON Schemas, use a datestring instead
 	createdAt: 'string.date.iso',
