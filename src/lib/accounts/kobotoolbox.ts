@@ -8,6 +8,7 @@ import * as date from 'date-fns';
 
 import { Schemas } from '$lib/database.js';
 import { resolveMetadataImport } from '$lib/metadata/imports.js';
+import { serializeMetadataValue } from '$lib/metadata/serializing.js';
 import { metadataOptionsKeyRange } from '$lib/metadata/storage.js';
 import { switchOnMetadataType } from '$lib/metadata/types.js';
 import { MIMEType, NamespacedMetadataID } from '$lib/schemas/common.js';
@@ -24,6 +25,9 @@ export type LoginData = {
 };
 
 export class Provider implements Account {
+	static capabilities = ['sessions'] as const;
+	static logoURL = new URL('https://avatars.githubusercontent.com/u/5543677?s=280&v=4');
+
 	#token: string;
 	username: string;
 	domain: ServerDomain;
@@ -37,7 +41,6 @@ export class Provider implements Account {
 			token,
 			username,
 			domain,
-			db,
 		}: {
 			token: string;
 			username: string;
@@ -49,8 +52,6 @@ export class Provider implements Account {
 		this.domain = domain;
 		this.db = db;
 	}
-
-	static logoURL = new URL('https://avatars.githubusercontent.com/u/5543677?s=280&v=4');
 
 	static fromDatabase(
 		db: DatabaseHandle,
@@ -117,8 +118,8 @@ export class Provider implements Account {
 		};
 	}
 
-	#SessionRemoteID(assetUid: string, dataId: string) {
-		return SessionRemoteID.assert(`/api/v2/assets/${assetUid}/data/${result.id}`);
+	#SessionRemoteID(assetUid: string, dataId: string | number) {
+		return SessionRemoteID.assert(`/api/v2/assets/${assetUid}/data/${dataId}`);
 	}
 
 	#parseSessionRemoteID(id: SessionRemoteID): { assetUid: string; dataId: string } {
@@ -162,10 +163,7 @@ export class Provider implements Account {
 		return undefined;
 	}
 
-	async session(
-		protocol: DB.Protocol,
-		id: SessionRemoteID
-	): Promise<Omit<DB.Session, 'id' | 'account'>> {
+	async session(protocol: DB.Protocol, id: SessionRemoteID) {
 		if (!protocol.remote?.kobocollect)
 			throw new Error("This protocol doesn't support KoboToolbox remote sessions");
 
@@ -191,11 +189,7 @@ export class Provider implements Account {
 			const column = this.#columnOfMetadata(project, def);
 			if (!column) continue;
 
-			const value =
-				column.$xpath in row
-					? // @ts-expect-error can't figure out how to type additional properties with ArkType
-						row[column.$xpath]?.toString()
-					: undefined;
+			const value = column.$xpath in row ? row[column.$xpath]?.toString() : undefined;
 
 			if (!value) continue;
 
@@ -230,27 +224,24 @@ export class Provider implements Account {
 
 		return {
 			remoteId: id,
+			protocol: protocol.id,
 			createdAt: row._submission_time.toISOString(),
 			description: `Créée sur KoboCollect. Voir ${submissionUrl}`,
 			name: protocol.remote.kobocollect.title.render(row),
 			openedAt: new Date().toISOString(),
 			metadata: mapValues(metadataValues, (value) => ({
-				value,
-				confidence: 1,
+				value: serializeMetadataValue(value),
 				alternatives: {},
-				confirmed: true,
-				manuallyModified: true,
-				isDefault: false,
 			})),
 			inferenceModels: {},
 			group: {
-				global: { field: 'none', tolerances: { dates: 'day', decimal: 'unit' } },
+				global: { field: 'none', tolerances: { dates: 'day', decimal: 'unit' } } as const,
 			},
 			sort: {
-				global: { field: 'name', direction: 'asc' },
+				global: { field: 'name', direction: 'asc' } as const,
 			},
 			fullscreenClassifier: {
-				layout: 'top-bottom',
+				layout: 'top-bottom' as const,
 			},
 		};
 	}
@@ -409,215 +400,8 @@ export class Provider implements Account {
 		}
 	}
 
-	// TODO: do we keep this?
 	async upload(session: DB.Session) {
-		const { tables, ...idb } = await import('../idb.svelte.js');
-		const instanceId = crypto.randomUUID();
-
-		const filepartBoundaryName = (fileid: string) => `file-part-${fileid}`;
-
-		const files: Record<NamespacedMetadataID, DB.MetadataValueFile | undefined> = {};
-
-		const selectedOptions: Record<NamespacedMetadataID, DB.MetadataEnumVariant | undefined> =
-			{};
-
-		const project = await this.json(
-			'GET',
-			'v2',
-			`/api/v2/assets/${this.projectAssetUid}/`,
-			Provider.ProjectResponse
-		);
-
-		const uuid = project.deployment__uuid;
-
-		let xmlFields = '';
-
-		const metadatas = await tables.Metadata.getMany(Object.keys(session.metadata));
-		const protocol = await tables.Protocol.get(session.protocol);
-		if (!protocol) throw new Error(`Protocole ${session.protocol} introuvable`);
-
-		for (const field of project.content.survey) {
-			// We can have multiple matches if we have a single kobocollect select_many that maps from multiple boolean values with the same .kobocollect.list
-			const candidates = metadatas.filter((metadata) => {
-				const matchables = {
-					label: (override?: string) => matchesLabel(field, override ?? metadata.label),
-					name: (override?: string) =>
-						matchesName(field, override ?? removeNamespaceFromMetadataId(metadata.id)),
-				};
-
-				if (metadata.kobocollect && typeof metadata.kobocollect === 'string') {
-					return (
-						matchables.label(metadata.kobocollect) ||
-						matchables.name(metadata.kobocollect)
-					);
-				}
-
-				if (metadata.kobocollect && typeof metadata.kobocollect !== 'string') {
-					return (
-						matchables.label(metadata.kobocollect.list) ||
-						matchables.name(metadata.kobocollect.list)
-					);
-				}
-
-				return matchables.label() || matchables.name();
-			});
-
-			if (candidates.length === 0) {
-				xmlFields += `<${field.$xpath}/>\n`;
-				console.warn(
-					`${field.label} (${field.$xpath}) has no associated metadata, searched in`,
-					metadatas
-				);
-				continue;
-			}
-
-			// So that we can get the metadata of a value by its index, useful within switchOnMetadataType(...) cuz it can only take an array of RuntimeValue's
-			const metadatasOfValues = candidates.filter(
-				({ id }) => session.metadata[id]?.value !== undefined
-			);
-			const values = metadatasOfValues.map(({ id }) => session.metadata[id]!.value!);
-
-			if (values.length === 0) {
-				xmlFields += `<${field.$xpath}/>\n`;
-				continue;
-			}
-
-			for (const [i, { id, type }] of metadatasOfValues.entries()) {
-				if (type === 'enum') {
-					if (!values[i]) {
-						selectedOptions[id] = undefined;
-						continue;
-					}
-
-					selectedOptions[id] = await idb.get(
-						'MetadataOption',
-						`${resolveMetadataImport(protocol, id)}:${values[i]}`
-					);
-				}
-				if (type === 'file') {
-					if (!values[i]) {
-						files[id] = undefined;
-						continue;
-					}
-
-					files[id] = await idb.get('MetadataValueFile', values[i].toString());
-				}
-			}
-
-			const serialized = switchOnMetadataType<string | undefined>(
-				candidates[0].type,
-				values,
-				{
-					boolean(...values) {
-						const serialized = values.map((value, i) => {
-							const { kobocollect } = metadatasOfValues[i];
-							if (!kobocollect || typeof kobocollect === 'string') {
-								return value ? 'OK' : undefined;
-							}
-
-							if ('true' in kobocollect) {
-								return value ? kobocollect.true : kobocollect.false;
-							}
-
-							return project.content.choices.find((choice) => {
-								choice.list_name === field.select_from_list_name! &&
-									(matchesName(choice, kobocollect.choice) ||
-										matchesLabel(choice, kobocollect.choice));
-							});
-						});
-
-						if (serialized.every((s) => s === undefined)) return undefined;
-
-						return serialized.join(' ');
-					},
-					enum() {
-						// Only boolean can have multiple metadata values for a single kobo field
-						const metadata = metadatasOfValues[0];
-						if (!metadata) return undefined;
-						const option = selectedOptions[metadata.id];
-						if (!option) return undefined;
-
-						const choice = project.content.choices.find((choice) => {
-							choice.list_name === field.select_from_list_name! &&
-								(matchesName(choice, option.kobocollect ?? option.key) ||
-									matchesLabel(choice, option.kobocollect ?? option.label));
-						});
-
-						return choice?.name || choice?.$autovalue;
-					},
-					date(value) {
-						const iso = value.toISOString();
-						if (field.type === 'date') return iso.split('T').at(0)!;
-						return iso;
-					},
-					location({ latitude, longitude }) {
-						return `${latitude} ${longitude} 0 0`;
-					},
-					string: (value) => value,
-					float: (value) => value.toString(),
-					integer: (value) => value.toString(),
-					boundingbox: (value) => JSON.stringify(value),
-					file: (value) => filepartBoundaryName(value),
-				}
-			);
-
-			if (serialized === undefined) xmlFields += `<${field.$xpath}/>`;
-			else xmlFields += `<${field.$xpath}>${serialized}</${field.$xpath}>`;
-		}
-
-		// Many thanks to https://github.com/DRC-UA/kobo-sdk/blob/main/src/v1/KoboClientV1Submission.ts
-
-		const xml = `<${project.uid} id=${project.uid} version="1 (2021-03-25 18:06:48)">
-			<formhub><uuid>${uuid}</uuid></formhub>
-			<__version__>${project.version_id}</__version>
-			<meta>
-				<instanceID>uuid:${instanceId}</instanceID>
-			</meta>
-			${xmlFields}
-		</${project.uid}>`;
-
-		const formdata = new FormData();
-
-		formdata.append(
-			'xml_submission_file',
-			new File([xml], uuid, {
-				type: 'application/xml',
-			})
-		);
-
-		for (const file of Object.values(files)) {
-			if (!file) continue;
-			formdata.append(
-				filepartBoundaryName(file.id),
-				new File([file.bytes], file.filename, {
-					type: file.contentType,
-				})
-			);
-		}
-
-		const response = await this.json(
-			'POST',
-			'v1',
-			'/v1/submissions',
-			type({
-				'message?': 'string',
-				'formid?': 'string',
-				'encrypted?': 'boolean',
-				'instanceID?': 'string',
-				'submissionDate?': 'string',
-				'markedAsCompleteDate?': 'string',
-				'error?': 'string',
-			}),
-			{
-				body: formdata,
-			}
-		);
-
-		if (response.error) throw new Error(response.error);
-
-		return {
-			remoteID: SessionRemoteID.assert(response.instanceID),
-		};
+		throw new Error('Not implemented');
 	}
 
 	async json<Response extends Type>(
@@ -664,6 +448,7 @@ export class Provider implements Account {
 	});
 
 	static ProjectDataResponse = type({
+		'[string]': 'unknown',
 		_id: 'number.integer',
 		__version__: 'string',
 		_xform_id_string: 'string',

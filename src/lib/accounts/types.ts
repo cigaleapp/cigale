@@ -67,7 +67,7 @@ export interface Account {
 	files(
 		protocol: DB.Protocol,
 		session: SessionRemoteID
-	): AsyncIterator<Omit<(typeof DB.Tables.MetadataValueFile)['inferIn']>, 'sessionId'>;
+	): AsyncIterator<Omit<(typeof DB.Tables.MetadataValueFile)['inferIn'], 'sessionId'>>;
 	/**
 	 * Get a URL to a page on the remote website for a session
 	 */
@@ -78,6 +78,7 @@ export interface AccountConstructor<LoginData> {
 	new (db: DatabaseHandle, data: LoginData): Account;
 
 	logoURL: URL;
+	capabilities: readonly ("sessions" | "upload")[]
 
 	fromDatabase(db: DatabaseHandle, account: DB.Account): Account;
 	login(
