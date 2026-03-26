@@ -129,15 +129,30 @@ export default class Provider implements Account {
 			const gid = this.#SessionRemoteID(assetUid, result._id);
 			this.#cache.set(gid, result);
 
+			const thumbField = this.#columnByNameOrLabel(project, {
+				both: protocol.remote?.kobocollect?.thumbnail,
+			});
+
+			const thumb = result._attachments.find(
+				(a) =>
+					a.mimetype.startsWith('image/') &&
+					a.question_xpath === thumbField?.$xpath &&
+					!a.is_deleted
+			);
+
 			yield {
 				id: gid,
+				submittedAt: result._submission_time,
+				nextCursor: response.next ?? undefined,
+				thumbnail: thumb?.download_small_url
+					? await this.fetch(thumb.download_small_url)
+							.then((response) => response.blob())
+							.then((blob) => new URL(URL.createObjectURL(blob)))
+					: undefined,
 				name: protocol.remote.kobocollect.title.render({
 					survey: result,
 					metadata: await this.#rowToMetadata(protocol, project, result),
 				}),
-				submittedAt: result._submission_time,
-				thumbnails: [],
-				nextCursor: response.next ?? undefined,
 			};
 		}
 	}
@@ -326,9 +341,10 @@ export default class Provider implements Account {
 	}
 
 	#columnOfMetadata(project: (typeof Provider.ProjectResponse)['infer'], metadata: DB.Metadata) {
-		return project.content.survey.find((field) => {
-			// We can have an explicit empty string, which can be used to explicitly exclude a metadata from kobocollect equivalence
-			const explicit = metadata.kobocollect
+		return this.#columnByNameOrLabel(project, {
+			name: removeNamespaceFromMetadataId(metadata.id),
+			label: metadata.label,
+			both: metadata.kobocollect
 				? Array.isArray(metadata.kobocollect)
 					? metadata.kobocollect
 					: typeof metadata.kobocollect === 'string'
@@ -336,13 +352,26 @@ export default class Provider implements Account {
 						: Array.isArray(metadata.kobocollect.list)
 							? metadata.kobocollect.list
 							: [metadata.kobocollect.list]
-				: undefined;
-
-			return (
-				matchesName(field, explicit ?? removeNamespaceFromMetadataId(metadata.id)) ||
-				matchesLabel(field, explicit ?? metadata.label)
-			);
+				: undefined,
 		});
+	}
+
+	#columnByNameOrLabel(
+		project: (typeof Provider.ProjectResponse)['infer'],
+		{
+			name,
+			label,
+			both,
+		}: {
+			name?: undefined | string | Array<string | undefined>;
+			label?: undefined | string | Array<string | undefined>;
+			both?: undefined | string | Array<string | undefined>;
+		}
+	) {
+		return project.content.survey.find(
+			(field) =>
+				matchesName(field, both ?? name ?? []) || matchesLabel(field, both ?? label ?? [])
+		);
 	}
 
 	#parseKobocollectCell<T extends DB.MetadataType>(
@@ -480,6 +509,9 @@ export default class Provider implements Account {
 		'meta/instanceID': 'string',
 		_attachments: type({
 			download_url: 'string.url',
+			download_large_url: 'string.url',
+			download_medium_url: 'string.url',
+			download_small_url: 'string.url',
 			mimetype: MIMEType,
 			filename: 'string',
 			media_file_basename: 'string',

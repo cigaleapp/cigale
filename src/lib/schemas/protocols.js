@@ -87,7 +87,6 @@ export const ProtocolImport = type({
 		: ctx.reject('Un import ne peut pas être vide')
 );
 
-
 export const Protocol = type({
 	id: ProtocolID,
 	dirty: type('boolean')
@@ -96,6 +95,11 @@ export const Protocol = type({
 	'remote?': {
 		'kobocollect?': {
 			form: URLString,
+			'thumbnail?': [
+				'string|string[]',
+				'@',
+				"Nom ou label d'une colonne de type image à utiliser comme miniature pour lister les sessions",
+			],
 			title: TemplatedString(
 				type({ survey: 'unknown', metadata: MetadataRecord(ID) })
 			).describe(

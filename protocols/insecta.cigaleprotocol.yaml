@@ -41,6 +41,7 @@ remote:
   kobocollect:
     form: https://kf.kobotoolbox.org/#/forms/aTocGmTVNFFtuTAbtcgsEK/
     title: Transect du {{ default metadata.date survey._submission_time | formatDate "PPP" }} (n°{{ metadata.transect_code.value }})
+    thumbnail: Prendre_une_photo_du_milieu
 
 metadataGroups:
   project:

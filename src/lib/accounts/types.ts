@@ -40,7 +40,7 @@ export interface Account {
 		id: SessionRemoteID;
 		name: string;
 		submittedAt: Date;
-		thumbnails: URL[];
+		thumbnail: URL|undefined;
 		/** Cursor to pass to the method to get the next results. Must be undefined once we have finished listing all sessions. Must be the same on all items */
 		nextCursor: string | undefined;
 	}>;
