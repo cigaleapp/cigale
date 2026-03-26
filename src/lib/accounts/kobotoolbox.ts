@@ -1,5 +1,5 @@
 import type { DatabaseHandle } from '../idb.svelte.js';
-import type { Account } from '$lib/accounts/types.js';
+import type { Account, AuthenticationMethod, LoginData } from '$lib/accounts/types.js';
 import type * as DB from '$lib/database.js';
 import type { RuntimeValue } from '$lib/schemas/metadata.js';
 
@@ -10,27 +10,20 @@ import { Schemas } from '$lib/database.js';
 import { resolveMetadataImport } from '$lib/metadata/imports.js';
 import { serializeMetadataValue } from '$lib/metadata/serializing.js';
 import { metadataOptionsKeyRange } from '$lib/metadata/storage.js';
-import { switchOnMetadataType } from '$lib/metadata/types.js';
 import { MIMEType, NamespacedMetadataID } from '$lib/schemas/common.js';
 import { removeNamespaceFromMetadataId, splitMetadataId } from '$lib/schemas/metadata.js';
 import { SessionRemoteID } from '$lib/schemas/sessions.js';
 import { mapValues } from '$lib/utils.js';
 
-const ServerDomain = type.enumerated('kf.kobotoolbox.org', 'eu.kobotoolbox.org');
-type ServerDomain = (typeof ServerDomain)['infer'];
-
-export type LoginData = {
-	token: string;
-	server: ServerDomain;
-};
-
-export class Provider implements Account {
+export default class Provider implements Account {
+	static servers = ['kf.kobotoolbox.org', 'eu.kobotoolbox.org'] as const;
+	static auth = 'token' as const satisfies AuthenticationMethod;
 	static capabilities = ['sessions'] as const;
 	static logoURL = new URL('https://avatars.githubusercontent.com/u/5543677?s=280&v=4');
 
 	#token: string;
 	username: string;
-	domain: ServerDomain;
+	domain: (typeof Provider.servers)[number];
 	db: DatabaseHandle;
 
 	get v2domain(): string {
@@ -61,7 +54,7 @@ export class Provider implements Account {
 		}: {
 			token: string;
 			username: string;
-			domain: ServerDomain;
+			domain: (typeof Provider.servers)[number];
 		}
 	) {
 		this.#token = token;
@@ -78,12 +71,15 @@ export class Provider implements Account {
 
 		return new Provider(db, {
 			token: account.token,
-			domain: ServerDomain.assert(account.profileURL.hostname),
+			domain: type.enumerated(...Provider.servers).assert(account.profileURL.hostname),
 			username: account.username,
 		});
 	}
 
-	static async login(db: DatabaseHandle, data: LoginData) {
+	static async login(
+		db: DatabaseHandle,
+		data: LoginData<typeof Provider.auth, (typeof Provider.servers)[number]>
+	) {
 		const account = new Provider(db, {
 			token: data.token,
 			domain: data.server,
@@ -103,10 +99,6 @@ export class Provider implements Account {
 			type: 'kobocollect' as const,
 			token: data.token,
 		};
-	}
-
-	get loggedIn() {
-		return Boolean(this.#token);
 	}
 
 	async logout() {}
@@ -184,7 +176,7 @@ export class Provider implements Account {
 					break;
 				}
 				case 'file': {
-					const file = await this.#findAttachment({
+					const file = this.#findAttachment({
 						column,
 						attachments: row._attachments,
 					});

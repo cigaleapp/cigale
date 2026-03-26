@@ -1,12 +1,12 @@
-import type { AccountConstructor } from './types.js';
+import type { AccountConstructor, AuthenticationMethod } from './types.js';
 
-import * as KoboToolbox from '$lib/accounts/kobotoolbox.js';
+import KoboToolbox from '$lib/accounts/kobotoolbox.js';
 
 type AccountProviders = {
-	kobotoolbox: AccountConstructor<KoboToolbox.LoginData>;
+	kobotoolbox: AccountConstructor<typeof KoboToolbox.auth, (typeof KoboToolbox.servers)[number]>;
 };
 
-class AccountRegistry<Providers extends Record<string, AccountConstructor<any>>> {
+class AccountRegistry<Providers extends Record<string, AccountConstructor<AuthenticationMethod>>> {
 	constructor(private providers: Providers) {}
 
 	get<K extends keyof Providers>(key: K): Providers[K] {
@@ -15,5 +15,5 @@ class AccountRegistry<Providers extends Record<string, AccountConstructor<any>>>
 }
 
 export const accounts = new AccountRegistry<AccountProviders>({
-	kobotoolbox: KoboToolbox.Provider,
+	kobotoolbox: KoboToolbox,
 });

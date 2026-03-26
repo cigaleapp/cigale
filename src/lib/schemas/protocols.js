@@ -92,7 +92,7 @@ export const Protocol = type({
 		.default(false),
 	'remote?': {
 		'kobocollect?': {
-			form: 'string.url',
+			form: URLString,
 			title: TemplatedString(type.unknown).describe(
 				'Template Handlebars pour construire le titre de la session à partir des colonnes de la soumissions Kobocollect. Par exemple, si il y a une colonne Transect_code: `Transect #{{ Transect_code }}`'
 			),

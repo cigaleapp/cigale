@@ -2,9 +2,16 @@ import type * as DB from '$lib/database.js';
 import type { DatabaseHandle } from '$lib/idb.svelte.js';
 import type { SessionRemoteID } from '$lib/schemas/sessions.js';
 
+export type AuthenticationMethod = 'oauth' | 'token' | 'password';
+
+export type LoginData<A extends AuthenticationMethod, S extends string> = {
+	token: { server: S; token: string };
+	password: { server: S; username: string; password: string };
+	oauth: { server: S; authorize: URL; identity: URL; token: URL };
+}[A];
+
 export interface Account {
 	logout(): Promise<void>;
-	loggedIn: boolean;
 
 	/**
 	 * Upload a session to the account
@@ -74,15 +81,20 @@ export interface Account {
 	sessionRemotePage(id: SessionRemoteID): URL | undefined;
 }
 
-export interface AccountConstructor<LoginData> {
-	new (db: DatabaseHandle, data: LoginData): Account;
+export interface AccountConstructor<
+	Auth extends AuthenticationMethod,
+	Server extends string = string,
+> {
+	new (...args: any[]): Account;
 
 	logoURL: URL;
-	capabilities: readonly ("sessions" | "upload")[]
+	capabilities: readonly ('sessions' | 'upload')[];
+	auth: Auth;
+	servers: readonly Server[];
 
 	fromDatabase(db: DatabaseHandle, account: DB.Account): Account;
 	login(
 		db: DatabaseHandle,
-		data: LoginData
+		data: LoginData<Auth, Server>
 	): Promise<Omit<(typeof DB.Schemas.Account)['inferIn'], 'id'>>;
 }
