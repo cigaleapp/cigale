@@ -37,6 +37,11 @@ imports:
 crop:
   metadata: crop
 
+remote:
+  kobocollect:
+    form: https://kf.kobotoolbox.org/#/forms/aTocGmTVNFFtuTAbtcgsEK/
+    title: Transect n°{{ Transect_code }}
+
 metadataGroups:
   project:
     name: Code projet
@@ -105,7 +110,6 @@ sessionMetadata:
     mergeMethod: min
     required: true
     default: false
-
 
   is_citizen_science:
     type: boolean
@@ -334,14 +338,16 @@ sessionMetadata:
       - key: smartphone
         label: Smartphone
       - key: with_macro
+        kobocollect: reflex_ou_hybride_avec_objectif_macro_et
         label: Reflex ou hybride avec objectif macro et flash
       - key: compact
         label: Compact
       - key: without_macro
+        kobocollect: reflex_ou_hybride_sans_objectif_macro
         label: Reflex ou hybride sans objectif macro
       - key: other
+        kobocollect: autres
         label: Autre
-        kobocollect: Autres
 
   comment:
     type: string

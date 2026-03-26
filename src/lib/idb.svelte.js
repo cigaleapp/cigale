@@ -507,6 +507,10 @@ export async function openDatabase() {
 				rebuildIndexes('ImagePreviewFile');
 			}
 
+			if (oldVersion === 6) {
+				rebuildIndexes('Session')
+			}
+
 			for (const [tableName, schema] of tablesByName) {
 				createTable(tableName, schema);
 			}

@@ -90,6 +90,14 @@ export const Protocol = type({
 	dirty: type('boolean')
 		.describe('Si le protocole a été modifié depuis sa dernière exportation')
 		.default(false),
+	'remote?': {
+		'kobocollect?': {
+			form: 'string.url',
+			title: TemplatedString(type.unknown).describe(
+				'Template Handlebars pour construire le titre de la session à partir des colonnes de la soumissions Kobocollect. Par exemple, si il y a une colonne Transect_code: `Transect #{{ Transect_code }}`'
+			),
+		},
+	},
 	importedMetadata: type({
 		sessionwide: [
 			'boolean',

@@ -238,11 +238,7 @@ export const MetadataMergeMethod = type.or(
 export const MetadataEnumVariant = type({
 	key: [ID, '@', 'Identifiant unique pour cette option'],
 	label: ['string', '@', "Nom de l'option, affichable dans une interface utilisateur"],
-	'kobocollect?': [
-		'string',
-		'@',
-		'Label ou nom technique du choix de la question Kobocollect associée',
-	],
+	'kobocollect?': ['string', '@', 'Valeur (nom technique, sans espaces) de la métadonnée'],
 	synonyms: type('string[]')
 		.describe('Synonymes (labels alternatifs) pour cette option')
 		.default(() => []),

@@ -108,11 +108,11 @@ const Image = table(['id', 'addedAt', 'sessionId'], ImageSchema);
 
 const Observation = table(['id', 'addedAt', 'sessionId'], ObservationSchema);
 
-const Session = table(['id'], SessionSchema);
+const Session = table(['id', 'remoteId'], SessionSchema);
 
 const Metadata = table('id', MetadataSchema.omit('options'));
 const MetadataOption = table(
-	['id'],
+	['id', 'kobocollectId'],
 	MetadataEnumVariant.and({
 		id: [/\w+__\w+:\w+/, '@', 'ID of the form namespaced_metadata_id:key'],
 		metadataId: NamespacedMetadataID,
@@ -184,7 +184,7 @@ const Settings = table(
 const Account = table(
 	'id',
 	type({
-		id: "string",
+		id: 'string',
 		username: 'string',
 		displayName: 'string',
 		avatarURL: 'string.url.parse',
