@@ -22,6 +22,17 @@ export default [
 	...ts.configs.recommended.map((cfg) => ({
 		files: ['**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts'],
 		...cfg,
+		rules: {
+			...cfg.rules,
+			'@typescript-eslint/no-unused-vars': [
+				'error',
+				{
+					argsIgnorePattern: '^_',
+					varsIgnorePattern: '^_',
+					caughtErrorsIgnorePattern: '^_',
+				},
+			],
+		},
 	})),
 	...svelte.configs['flat/recommended'],
 	prettier,
