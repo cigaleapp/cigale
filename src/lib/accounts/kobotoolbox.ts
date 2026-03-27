@@ -26,8 +26,12 @@ export default class Provider implements Account {
 
 	#token: string;
 	username: string;
+	displayName: string;
+	avatarURL: URL | undefined;
 	domain: (typeof Provider.servers)[number];
 	db: DatabaseHandle;
+	/** Database ID of the account */
+	id: string | undefined;
 
 	get v2domain(): string {
 		return this.domain;
@@ -64,22 +68,34 @@ export default class Provider implements Account {
 		{
 			token,
 			username,
+			displayName,
+			avatarURL,
 			domain,
+			id,
 		}: {
 			token: string;
-			username: string;
 			domain: (typeof Provider.servers)[number];
+			username?: string;
+			displayName?: string;
+			avatarURL?: URL | undefined;
+			id?: string | undefined;
 		}
 	) {
 		this.#token = token;
-		this.username = username;
+		this.username = username ?? '';
 		this.domain = domain;
+		this.displayName = displayName ?? '';
+		this.avatarURL = avatarURL;
 		this.db = db;
+		this.id = id;
 	}
 
 	static fromDatabase(
 		db: DatabaseHandle,
-		account: Pick<DB.Account, 'token' | 'profileURL' | 'username' | 'type'>
+		account: Pick<
+			DB.Account,
+			'token' | 'profileURL' | 'username' | 'type' | 'displayName' | 'avatarURL'
+		>
 	) {
 		if (account.type !== 'kobotoolbox') throw new Error('Invalid account type');
 
@@ -87,6 +103,9 @@ export default class Provider implements Account {
 			token: account.token,
 			domain: Provider.domainOfProfileURL(account.profileURL),
 			username: account.username,
+			displayName: account.displayName,
+			avatarURL: account.avatarURL,
+			id: account.id,
 		});
 	}
 
@@ -96,14 +115,14 @@ export default class Provider implements Account {
 	) {
 		if (!token) throw new Error('No login data provided');
 
-		const account = new Provider(db, {
-			domain: server,
-			username: '',
-			token,
-		});
+		const me = await new Provider(db, { domain: server, token }).json(
+			'GET',
+			'v2',
+			'/me/',
+			Provider.MeResponse
+		);
 
-		const me = await account.json('GET', 'v2', '/me/', Provider.MeResponse);
-
+		// Enforce a 200px thumbnail
 		me.gravatar.searchParams.set('s', '200');
 
 		return {
@@ -122,9 +141,10 @@ export default class Provider implements Account {
 	async logout() {}
 
 	async *sessions({ cursor = undefined, limit = 10, mine = false } = {}) {
+		let total = 0;
+		let yielded = new Set<string>()
 		for (const p of await this.db.getAll('Protocol')) {
 			const protocol = Schemas.Protocol.assert(p);
-			console.log({ p, protocol });
 			if (!protocol.remote?.kobocollect) continue;
 
 			const assetUid = this.#projectAssetUid(protocol.remote.kobocollect.form);
@@ -152,21 +172,26 @@ export default class Provider implements Account {
 				Provider.PaginatedResponse(Provider.ProjectDataResponse)
 			);
 
+			total += response.results.length;
+			yield { total };
+
 			for (const result of response.results) {
 				const gid = this.#SessionRemoteID(assetUid, result._id);
 				this.#cache.set(gid, result);
 
-				const thumbField = this.#columnByNameOrLabel(project, {
-					both: protocol.remote?.kobocollect?.thumbnail,
-				});
+				const thumbFields = ensureArray(protocol.remote?.kobocollect?.thumbnails ?? []).map(
+					(field) =>
+						this.#columnByNameOrLabel(project, {
+							both: field,
+						})
+				);
 
-				const thumb = result._attachments.find(
+				const thumbs = result._attachments.filter(
 					(a) =>
 						a.mimetype.startsWith('image/') &&
-						a.question_xpath === thumbField?.$xpath &&
+						thumbFields.some((field) => field?.$xpath === a.question_xpath) &&
 						!a.is_deleted
 				);
-				console.log({ thumbField, thumb, a: result._attachments });
 
 				const metadata = await this.#rowToMetadata(protocol, project, result);
 
@@ -184,6 +209,9 @@ export default class Provider implements Account {
 					console.error(error);
 				}
 
+				if (yielded.has(gid)) continue
+
+				yielded.add(gid)
 				yield {
 					id: gid,
 					name,
@@ -196,14 +224,16 @@ export default class Provider implements Account {
 					nextCursor: response.next ?? undefined,
 					filesCount: result._attachments.length,
 					imagesCount: 0,
-					thumbnail: thumb?.download_small_url
-						? await this.fetch(thumb.download_small_url)
-								.then((response) => response.blob())
-								.then((blob) => new URL(URL.createObjectURL(blob)))
-						: undefined,
+					thumbnails: thumbs.map(thumb => thumb.download_small_url),
 				};
 			}
 		}
+	}
+
+	async thumbnail(url: URL) {
+		return this.fetch(url)
+			.then((response) => response.blob())
+			.then((blob) => new URL(URL.createObjectURL(blob)));
 	}
 
 	sessionRemotePage(_id: SessionRemoteID) {
@@ -227,8 +257,6 @@ export default class Provider implements Account {
 
 		const metadata = await this.#rowToMetadata(protocol, project, row);
 		let name = 'Sans nom';
-
-		console.log({ metadata });
 
 		try {
 			name = protocol.remote.kobocollect.title.render({
@@ -449,7 +477,6 @@ export default class Provider implements Account {
 			both?: undefined | string | Array<string | undefined>;
 		}
 	) {
-		console.log({ fields: project.content.survey, name, both, label });
 		return project.content.survey.find(
 			(field) =>
 				matchesName(field, both ?? name ?? []) || matchesLabel(field, both ?? label ?? [])

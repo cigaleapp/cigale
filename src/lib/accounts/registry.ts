@@ -1,4 +1,6 @@
 import type { AccountConstructor } from './types.js';
+import type * as DB from '$lib/database.js';
+import type {DatabaseHandle} from '$lib/idb.svelte.js'
 
 import KoboToolbox from '$lib/accounts/kobotoolbox.js';
 
@@ -15,6 +17,10 @@ class AccountRegistry<Providers extends Record<string, AccountConstructor>> {
 
 	list() {
 		return Object.values(this.providers);
+	}
+
+	fromDatabase(db: DatabaseHandle, account: DB.Account) {
+		return this.providers[account.type].fromDatabase(db, account);
 	}
 }
 

@@ -96,7 +96,7 @@ export const Protocol = type({
 	'remote?': {
 		'kobocollect?': {
 			form: URLString,
-			'thumbnail?': [
+			'thumbnails?': [
 				'string|string[]',
 				'@',
 				"Nom ou label d'une colonne de type image à utiliser comme miniature pour lister les sessions",

@@ -11,18 +11,20 @@ Available CSS variables:
  
 -->
 
-<script lang="ts">
-	import LoadingSpinner from './LoadingSpinner.svelte';
-	import { tooltip } from './tooltips.js';
-
+<script lang="ts" module>
 	/**
 	 * Allows updating some data of the component while loading
 	 * Useful for long-running onclick callbacks
 	 */
-	type Mutator = (data: {
+	export type Mutator = (data: {
 		/** Update the loading state or text */
 		loading?: boolean | string;
 	}) => void;
+</script>
+
+<script lang="ts">
+	import LoadingSpinner from './LoadingSpinner.svelte';
+	import { tooltip } from './tooltips.js';
 
 	interface Props {
 		children?: import('svelte').Snippet;
@@ -32,7 +34,7 @@ Available CSS variables:
 		tooltip?: string;
 		testid?: string;
 		loading?: boolean | string;
-		alwaysLoading? : boolean
+		alwaysLoading?: boolean;
 	}
 
 	const {
@@ -43,7 +45,7 @@ Available CSS variables:
 		tooltip: tooltipText,
 		testid,
 		loading: showLoading = false,
-		alwaysLoading
+		alwaysLoading,
 	}: Props = $props();
 
 	let _showLoading = $derived(showLoading);

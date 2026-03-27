@@ -12,6 +12,12 @@ export type LoginData<S extends string = string> = {
 };
 
 export interface Account {
+	username: string;
+	displayName: string;
+	avatarURL: URL | undefined;
+	/** Database ID of the account. */
+	id: string | undefined;
+
 	logout(): Promise<void>;
 
 	/**
@@ -35,21 +41,29 @@ export interface Account {
 	 * @param options.limit change the number of sessions returned in each call. Default is implementation-specific
 	 * @param options.mine only return sessions created by the account's user
 	 */
-	sessions(
-		options?: { cursor?: string | undefined; limit?: number, mine? :boolean }
-	): AsyncIterable<{
-		id: SessionRemoteID;
-		protocol: string,
-		page: URL|undefined;
-		name: string;
-		submittedAt: Date;
-		submittedBy?: string;
-		thumbnail: URL | undefined;
-		/** Cursor to pass to the method to get the next results. Must be undefined once we have finished listing all sessions. Must be the same on all items */
-		nextCursor: string | undefined;
-		filesCount: number;
-		imagesCount: number;
-	}>;
+	sessions(options?: {
+		cursor?: string | undefined;
+		limit?: number;
+		mine?: boolean;
+	}): AsyncIterable<
+		| {
+				/** Signals the total number of sessions */
+				total: number;
+		  }
+		| {
+				id: SessionRemoteID;
+				protocol: string;
+				page: URL | undefined;
+				name: string;
+				submittedAt: Date;
+				submittedBy?: string;
+				thumbnails: URL[];
+				/** Cursor to pass to the method to get the next results. Must be undefined once we have finished listing all sessions. Must be the same on all items */
+				nextCursor: string | undefined;
+				filesCount: number;
+				imagesCount: number;
+		  }
+	>;
 	/**
 	 * Get the remote session
 	 * @param protocol protocol of the session
@@ -59,6 +73,14 @@ export interface Account {
 		protocol: DB.Protocol,
 		id: SessionRemoteID
 	): Promise<Omit<(typeof DB.Schemas.Session)['inferIn'], 'id' | 'account'>>;
+	/**
+	 * Fetch the thumbnail for a session, 
+	 * returning a blob:// URL ready for use 
+	 */
+	async thumbnail(
+		url: URL
+	): Promise<URL>;
+
 	/**
 	 * Get all observations/images/image files of the remote session
 	 * @param protocol protocol of the session
@@ -91,10 +113,10 @@ export interface AccountConstructor<
 	Auth extends AuthenticationMethod = AuthenticationMethod,
 	Server extends string = string,
 > {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any 
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	new (...args: any[]): Account;
 
-	id: string
+	id: string;
 	logoURL: URL;
 	displayName: string;
 	capabilities: readonly ('sessions' | 'images' | 'upload')[];

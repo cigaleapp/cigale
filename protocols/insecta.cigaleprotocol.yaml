@@ -42,7 +42,11 @@ remote:
     # form: https://kf.kobotoolbox.org/#/forms/aTocGmTVNFFtuTAbtcgsEK/
     form: https://kf.kobotoolbox.org/#/forms/a3kVqAFEJwnHFcFc7PpWj4/
     title: "{{ titlecase survey.Code_projet }}, n°{{ metadata session 'transect_code' }}"
-    thumbnail: Prenez_une_photo_du_milieu
+    thumbnails:
+      - Prendre_une_photo_du_milieu
+      - Prenez_une_photo_du_milieu
+      - Prenez_une_photo_du_arriv_e_du_transect
+      - Prenez_une_photo_du_e_d_part_du_transect
 
 metadataGroups:
   project:

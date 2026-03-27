@@ -125,7 +125,27 @@ const Settings = table(
 	type({
 		id: '"defaults" | "user"',
 		protocols: References,
-		sessionFolder: type.or('"local"', { remote: ID, mine: 'boolean = true' }).default('local'),
+		sessionsDirectory: type({
+			platform: type.enumerated('local', 'kobotoolbox'),
+			account: 'string | undefined',
+			protocol: 'string | undefined',
+			filters: {
+				search: 'string',
+				by: type.enumerated('me', 'everyone'),
+				'at?': {
+					start: 'string.date.iso.parse',
+					end: 'string.date.iso.parse',
+				},
+			},
+		}).default(() => ({
+			platform: 'local',
+			account: undefined,
+			protocol: undefined,
+			filters: {
+				search: '',
+				by: 'me',
+			},
+		})),
 		theme: type.enumerated('dark', 'light', 'auto'),
 		// TODO(2025-09-05): remove n===10 after a while
 		gridSize: type.number.pipe((n) => (n === 10 ? 1 : clamp(n, 0.5, 2))),

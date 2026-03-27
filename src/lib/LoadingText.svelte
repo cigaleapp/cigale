@@ -9,6 +9,7 @@
 
 <!-- Credits: https://github.com/nolimits4web/skeleton-elements -->
 <script lang="ts" generics="T extends string | number = string | number">
+	import LoadingText from './LoadingText.svelte';
 	import { tooltip } from './tooltips.js';
 	import { LOREM_IPSUM } from './utils.js';
 
@@ -20,15 +21,15 @@
 
 	interface Props {
 		/** HTML tag to use for the text element */
-		tag?: string;
+		tag?: string | undefined;
 		/** Value to display when loaded */
-		value: MaybeLoading<T> | null | undefined;
+		value: MaybeLoading<T> | null | undefined | (() => Promise<T>);
 		/** Help text to show as a tooltip */
-		help?: string;
+		help?: string | undefined;
 		/** Text to use for determining the length of the skeleton text. Use lines or words to specify a length and get text from lorem ipsum */
-		mask?: string | { lines: number } | { words: number };
+		mask?: string | { lines: number } | { words: number } | undefined;
 		/** Content to show when the value is loaded */
-		loaded?: Snippet<[T]>;
+		loaded?: Snippet<[T]> | undefined;
 	}
 
 	const { tag = 'span', value, help, mask, loaded: loadedContent }: Props = $props();
@@ -53,7 +54,13 @@
 	});
 </script>
 
-{#if !loaded(value) || value === null || value === undefined}
+{#if typeof value === 'function'}
+	{#await value()}
+		<LoadingText {tag} {help} {mask} loaded={loadedContent} value={Loading} />
+	{:then loadedValue}
+		<LoadingText {tag} {help} {mask} loaded={loadedContent} value={loadedValue} />
+	{/await}
+{:else if !loaded(value) || value === null || value === undefined}
 	<svelte:element
 		this={tag === 'code' ? 'span' : tag}
 		use:tooltip={help}
