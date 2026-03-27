@@ -23,6 +23,7 @@ msgid "<0/> Autres photos <1/>"
 msgstr "<0/> Other photos <1/>"
 
 #: src/routes/(app)/PrepareForOffline.svelte
+#: src/routes/(app)/sessions/+page.svelte
 msgid "<0/> Chargement…"
 msgstr "<0/> Loading…"
 
@@ -267,6 +268,7 @@ msgstr "Loading built-in protocol"
 #: src/lib/MetadataInput.svelte
 #: src/routes/(app)/+layout.js
 #: src/routes/(app)/DeploymentDetails.svelte
+#: src/routes/(app)/sessions/+page.svelte
 msgid "Chargement…"
 msgstr "Loading…"
 
@@ -1795,20 +1797,18 @@ msgid "Ouvrir la session"
 msgstr "Open the session"
 
 #: src/routes/(app)/sessions/+page.svelte
+#: src/routes/(app)/sessions/+page.svelte
 msgid "Protocole indisponible"
 msgstr "Protocol unavailable"
 
+#: src/routes/(app)/sessions/+page.svelte
 #: src/routes/(app)/sessions/+page.svelte
 msgid "# image"
 msgid_plural "# images"
 msgstr[0] "# image"
 msgstr[1] "# images"
 
-#. 0: plural(counts.images, ['# image', '# images'])
 #: src/routes/(app)/sessions/+page.svelte
-msgid "{0} · créée <0/>"
-msgstr "{0} · created <0/>"
-
 #: src/routes/(app)/sessions/+page.svelte
 msgid "Gérer"
 msgstr "Manage"
@@ -1825,6 +1825,7 @@ msgstr "Session name"
 msgid "Session supprimée."
 msgstr "Session was deleted."
 
+#: src/routes/(app)/sessions/+page.svelte
 #: src/routes/(app)/sessions/[id]/+page.svelte
 msgid "Ouvrir"
 msgstr "Open"
@@ -2398,8 +2399,6 @@ msgid ""
 msgstr ""
 
 #. 0: provider.displayName
-#. 0: provider.displayName
-#: src/routes/(app)/accounts/+page.svelte
 #: src/routes/(app)/accounts/+page.svelte
 msgid "Logo de {0}"
 msgstr ""
@@ -2408,21 +2407,47 @@ msgstr ""
 msgid "Connectés"
 msgstr ""
 
-#. 0: account.username
-#: src/routes/(app)/accounts/+page.svelte
-msgid "Photo de {0}"
-msgstr ""
-
-#: src/routes/(app)/accounts/+page.svelte
-msgid "Type de compte inconnu"
-msgstr ""
-
 #: src/routes/(app)/accounts/+page.svelte
 msgid "Déconnecter"
 msgstr ""
 
 #: src/routes/(app)/accounts/+page.svelte
+#: src/routes/(app)/sessions/+page.svelte
 msgid "Aucun compte"
+msgstr ""
+
+#: src/routes/(app)/sessions/+page.svelte
+msgid "<0/> Local"
+msgstr ""
+
+#: src/routes/(app)/sessions/+page.svelte
+msgid "<0/> Autres comptes"
+msgstr ""
+
+#: src/routes/(app)/sessions/+page.svelte
+msgid "<0/> En ligne"
+msgstr ""
+
+#: src/routes/(app)/sessions/+page.svelte
+msgid "Télécharger la session"
+msgstr ""
+
+#: src/routes/(app)/sessions/+page.svelte
+msgid "Téléchargement…"
+msgstr ""
+
+#. 0: session.submittedBy
+#: src/routes/(app)/sessions/+page.svelte
+msgid "· par {0}"
+msgstr ""
+
+#. 0: provider.displayName
+#: src/routes/(app)/sessions/+page.svelte
+msgid "Voir sur {0}"
+msgstr ""
+
+#: src/routes/(app)/sessions/+page.svelte
+msgid "<0/> Aucune session"
 msgstr ""
 
 #: src/lib/queue.svelte.js

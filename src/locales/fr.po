@@ -22,6 +22,7 @@ msgid "<0/> Autres photos <1/>"
 msgstr "<0/> Autres photos <1/>"
 
 #: src/routes/(app)/PrepareForOffline.svelte
+#: src/routes/(app)/sessions/+page.svelte
 msgid "<0/> Chargement…"
 msgstr "<0/> Chargement…"
 
@@ -266,6 +267,7 @@ msgstr "Chargement du protocole intégré"
 #: src/lib/MetadataInput.svelte
 #: src/routes/(app)/+layout.js
 #: src/routes/(app)/DeploymentDetails.svelte
+#: src/routes/(app)/sessions/+page.svelte
 msgid "Chargement…"
 msgstr "Chargement…"
 
@@ -1796,20 +1798,18 @@ msgid "Ouvrir la session"
 msgstr "Ouvrir la session"
 
 #: src/routes/(app)/sessions/+page.svelte
+#: src/routes/(app)/sessions/+page.svelte
 msgid "Protocole indisponible"
 msgstr "Protocole indisponible"
 
+#: src/routes/(app)/sessions/+page.svelte
 #: src/routes/(app)/sessions/+page.svelte
 msgid "# image"
 msgid_plural "# images"
 msgstr[0] "# image"
 msgstr[1] "# images"
 
-#. 0: plural(counts.images, ['# image', '# images'])
 #: src/routes/(app)/sessions/+page.svelte
-msgid "{0} · créée <0/>"
-msgstr "{0} · créée <0/>"
-
 #: src/routes/(app)/sessions/+page.svelte
 msgid "Gérer"
 msgstr "Gérer"
@@ -1826,6 +1826,7 @@ msgstr "Nom de la session"
 msgid "Session supprimée."
 msgstr "Session supprimée."
 
+#: src/routes/(app)/sessions/+page.svelte
 #: src/routes/(app)/sessions/[id]/+page.svelte
 msgid "Ouvrir"
 msgstr "Ouvrir"
@@ -2401,8 +2402,6 @@ msgstr ""
 "tierces"
 
 #. 0: provider.displayName
-#. 0: provider.displayName
-#: src/routes/(app)/accounts/+page.svelte
 #: src/routes/(app)/accounts/+page.svelte
 msgid "Logo de {0}"
 msgstr "Logo de {0}"
@@ -2411,22 +2410,48 @@ msgstr "Logo de {0}"
 msgid "Connectés"
 msgstr "Connectés"
 
-#. 0: account.username
-#: src/routes/(app)/accounts/+page.svelte
-msgid "Photo de {0}"
-msgstr "Photo de {0}"
-
-#: src/routes/(app)/accounts/+page.svelte
-msgid "Type de compte inconnu"
-msgstr "Type de compte inconnu"
-
 #: src/routes/(app)/accounts/+page.svelte
 msgid "Déconnecter"
 msgstr "Déconnecter"
 
 #: src/routes/(app)/accounts/+page.svelte
+#: src/routes/(app)/sessions/+page.svelte
 msgid "Aucun compte"
 msgstr "Aucun compte"
+
+#: src/routes/(app)/sessions/+page.svelte
+msgid "<0/> Local"
+msgstr "<0/> Local"
+
+#: src/routes/(app)/sessions/+page.svelte
+msgid "<0/> Autres comptes"
+msgstr "<0/> Autres comptes"
+
+#: src/routes/(app)/sessions/+page.svelte
+msgid "<0/> En ligne"
+msgstr "<0/> En ligne"
+
+#: src/routes/(app)/sessions/+page.svelte
+msgid "Télécharger la session"
+msgstr "Télécharger la session"
+
+#: src/routes/(app)/sessions/+page.svelte
+msgid "Téléchargement…"
+msgstr "Téléchargement…"
+
+#. 0: session.submittedBy
+#: src/routes/(app)/sessions/+page.svelte
+msgid "· par {0}"
+msgstr "· par {0}"
+
+#. 0: provider.displayName
+#: src/routes/(app)/sessions/+page.svelte
+msgid "Voir sur {0}"
+msgstr "Voir sur {0}"
+
+#: src/routes/(app)/sessions/+page.svelte
+msgid "<0/> Aucune session"
+msgstr "<0/> Aucune session"
 
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"
