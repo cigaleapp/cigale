@@ -6,28 +6,36 @@ All notable changes to this project will be documented in this file, on a monthl
 
 ### Improvements
 
+- Add indicators for requiredness of metadata
 - Add metadata groups
 - Add metadata images (#1310)
 - Add session metadata form to results page
+- Add warning modal when trying to export with metadata problems
+- Allow importing whole metadata groups in protocols (#1371)
 - Display images in compact enums
 - Improve metadata inputs
 - Put metadata images at the left side when possible
+- Resolve defaults on session create, and don't set group/sort options if metadata don't support it
 
 ### Bug Fixes
 
 - Fix description hidden by very long cascades in vertical fullscreen classifier
+- Resolve defaults on results tab load
 - Support YAML builtin protocols
 
 ### Data Updates
 
 - Add INSECTA protocol
 - Add metadata from Xper3 descriptors
+- Adjust required, default and temperature range for INSECTA
 - Fix INSECTA protocol
 - Regenerate example protocols
+- Set default for strictness metadata in default protocol
 
 ### Translation Updates
 
 - Refresh translation files
+- Update po files
 
 ## February 2026
 
