@@ -31,6 +31,7 @@ If you have a changing items iterator, please use a {#key} block around to ensur
 
 	import { type } from 'arktype';
 	import { onDestroy } from 'svelte';
+	import { SvelteSet } from 'svelte/reactivity';
 
 	import { clamp } from './utils.js';
 
@@ -63,6 +64,7 @@ If you have a changing items iterator, please use a {#key} block around to ensur
 	let total = $state(0);
 	let loading = $state(true);
 	let loaded: T[] = $state([]);
+	const loadedKeys = new SvelteSet<string | number>();
 	let error: unknown = $state();
 
 	const ghostsCount = $derived.by(() => {
@@ -86,6 +88,7 @@ If you have a changing items iterator, please use a {#key} block around to ensur
 				if (cache && cache.entries.has(cache.key)) {
 					loaded = cache.entries.get(cache.key)!;
 				} else {
+					let i = 0;
 					for await (const item of items()) {
 						if (abortion.signal.aborted) {
 							break;
@@ -93,9 +96,12 @@ If you have a changing items iterator, please use a {#key} block around to ensur
 
 						if (IterationTotalSignal.allows(item)) {
 							total = item.total;
-						} else {
+						} else if (!loadedKeys.has(key(item, i))) {
 							loaded.push(item);
+							loadedKeys.add(key(item, i));
 						}
+
+						i++
 					}
 
 					if (cache) {

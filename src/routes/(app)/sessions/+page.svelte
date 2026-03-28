@@ -303,9 +303,14 @@
 							console.log(`fetching thumbs for ${session.name}`)
 							if (!session.thumbnails.length) return;
 
-							for (const thumb of session.thumbnails.slice(0, 4)) {
+							const yielded= new Set<string>()
+
+							for (const thumb of session.thumbnails) {
 								const url =  await account.thumbnail(thumb);
-								yield url.href
+								if (!yielded.has(thumb.href)) yield url.href
+								yielded.add(thumb.href)
+								console.log(session.id, thumb, yielded)
+								if (yielded.size >= 4) break
 							}
 						}}
 						card={(session) => ({
@@ -321,6 +326,7 @@
 										mutator,
 									});
 								}
+								if (!id) return
 								await switchSession(id);
 								await goto('/(app)/(sidepanel)/import');
 							},
@@ -345,7 +351,7 @@
 										e.stopPropagation();
 										if (local) {
 											await switchSession(local.id);
-											await goto('/(app)/sessions/[id]', local.id);
+											await goto('/(app)/sessions/[id]', local);
 										} else {
 											window.open(page, '_blank');
 										}

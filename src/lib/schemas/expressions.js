@@ -2,7 +2,7 @@
  * Computed expression templates: Handlebars and Jsonata
  */
 import { ArkErrors, type } from 'arktype';
-import { format as formatDate, formatISO } from 'date-fns';
+import { format as formatDate, formatISO, parse as parseDate } from 'date-fns';
 import Handlebars from 'handlebars';
 import jsonata from 'jsonata';
 
@@ -29,7 +29,7 @@ export const HELPERS = /** @type {const} */ ({
 	titlecase: {
 		documentation:
 			'Met la première lettre de chaque mot en majuscule et les autres en minuscules',
-		usage: [["'some Test HERE!!'"], 'Some Test Here!!!'],
+		usage: [["'some Test HERE!!'"], 'Some Test Here!!'],
 		/**
 		 * @param {string} subject
 		 */
@@ -214,6 +214,29 @@ export const HELPERS = /** @type {const} */ ({
 		 */
 		implementationJsonata(value, indentation) {
 			return JSON.stringify(value, null, indentation);
+		},
+	},
+	slice: {
+		documentation: "Prendre une partie d'une liste ou d'un texte",
+		usage: [['"abcDEFgh"', '3', '6'], 'DEF'],
+		/**
+		 * @param {string | unknown[]} subject
+		 * @param {number} start
+		 * @param {number} stop
+		 */
+		implementation(subject, start, stop) {
+			return subject.slice(start, stop);
+		},
+	},
+	parseDate: {
+		documentation: "Construire une date à partir d'un texte et d'un format",
+		usage: [['"202508311121"', '"yyyyMMddHHmm"'], '2025-08-31T11:21:00.000Z'],
+		/**
+		 * @param {string} datestring
+		 * @param {string} format
+		 */
+		implementation(datestring, format) {
+			return parseDate(datestring, format, new Date()).toISOString();
 		},
 	},
 	date: {

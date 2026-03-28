@@ -41,7 +41,18 @@ remote:
   kobocollect:
     # form: https://kf.kobotoolbox.org/#/forms/aTocGmTVNFFtuTAbtcgsEK/
     form: https://kf.kobotoolbox.org/#/forms/a3kVqAFEJwnHFcFc7PpWj4/
-    title: "{{ titlecase survey.Code_projet }}, n°{{ metadata session 'transect_code' }}"
+    title: |
+      {{ titlecase survey.Code_projet }} de {{ 
+        slice (metadata session 'transect_code') 12 999 
+      }} à {{ 
+        formatDate
+          (
+            parseDate
+              (slice (metadata session 'transect_code') 0 12)
+              "yyyyMMddHHmm"
+          )
+          "HH:mm"
+      }} 
     thumbnails:
       - Prendre_une_photo_du_milieu
       - Prenez_une_photo_du_milieu

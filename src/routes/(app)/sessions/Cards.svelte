@@ -4,11 +4,12 @@
 >
 	import type { Snippet } from 'svelte';
 
+	import { onDestroy } from 'svelte';
 	import { SvelteMap } from 'svelte/reactivity';
 	import { fade } from 'svelte/transition';
 
 	import IconAdd from '~icons/ri/add-line';
-	import IconDownloaded from '~icons/ri/check-fill';
+	import IconDownloaded from '~icons/ri/hard-drive-2-line';
 	import AsyncEach from '$lib/AsyncEach.svelte';
 	import Card from '$lib/Card.svelte';
 	import { errorMessage } from '$lib/i18n.js';
@@ -36,6 +37,12 @@
 	const { thumbnails, sessions, subtitle, actions, card, cache }: Props = $props();
 
 	const thumbnailsCache = new SvelteMap<string, string[]>();
+
+	onDestroy(() => {
+		thumbnailsCache.clear();
+	});
+
+	$inspect({ thumbnailsCache });
 </script>
 
 <AsyncEach {cache} items={sessions} key={(s, i) => s.id + i}>
@@ -60,7 +67,7 @@
 								items={() => thumbnails(session)}
 								key={(src, i) => src + i}
 								onloaded={(sources) => {
-									thumbnailsCache.set(session.id, sources);
+									thumbnailsCache.set(session.id, $state.snapshot(sources));
 								}}
 							>
 								{#snippet children(src)}
@@ -156,13 +163,10 @@
 
 	.indicator-downloaded {
 		position: absolute;
-		top: 1em;
-		right: 1em;
-		padding: 0.25em;
-		font-size: 1.2em;
-		border-radius: 50%;
-		background-color: var(--bg-success);
-		color: var(--fg-success);
+		top: 1.1em;
+		right: 1.1em;
+		font-size: 1.05em;
+		color: var(--gay);
 		display: flex;
 		justify-content: center;
 		align-items: center;
