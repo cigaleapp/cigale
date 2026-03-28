@@ -1,8 +1,6 @@
 <script lang="ts">
 	import type { AccountConstructor, LoginData } from '$lib/accounts/types.js';
 
-	import { format as formatDate, formatDistanceToNow } from 'date-fns';
-
 	import KoboToolbox from '$lib/accounts/kobotoolbox.js';
 	import { providers } from '$lib/accounts/registry.js';
 	import ButtonInk from '$lib/ButtonInk.svelte';
@@ -10,11 +8,10 @@
 	import { databaseHandle, tables } from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import ModalConfirm from '$lib/ModalConfirm.svelte';
-	import OverflowableText from '$lib/OverflowableText.svelte';
 	import RadioButtons from '$lib/RadioButtons.svelte';
-	import RowAccount from '$lib/RowAccount.svelte';
-	import { tooltip } from '$lib/tooltips.js';
 	import { safeJSONParse } from '$lib/utils.js';
+
+	import RowAccount from './RowAccount.svelte';
 
 	let adding: undefined | AccountConstructor = $state();
 	let login: undefined | (() => Promise<boolean>) = $state();
@@ -133,21 +130,21 @@
 		<h2>Connectés</h2>
 		<ul>
 			{#each tables.Account.state as account (account.id)}
-				<RowAccount {account} >
-				{#snippet action()}
-<ButtonInk
-		dangerous
-		onclick={async () => {
-			const provider = providers.get(account.type)
-			if (!provider) return;
-			const acct = provider.fromDatabase(db, account);
-			await acct.logout();
-			await tables.Account.remove(account.id);
-		}}
-	>
-		Déconnecter
-	</ButtonInk>
-				{/snippet}
+				<RowAccount {account}>
+					{#snippet action()}
+						<ButtonInk
+							dangerous
+							onclick={async () => {
+								const provider = providers.get(account.type);
+								if (!provider) return;
+								const acct = provider.fromDatabase(db, account);
+								await acct.logout();
+								await tables.Account.remove(account.id);
+							}}
+						>
+							Déconnecter
+						</ButtonInk>
+					{/snippet}
 				</RowAccount>
 			{:else}
 				<li class="empty">Aucun compte</li>
@@ -192,16 +189,11 @@
 		gap: 0.25em;
 	}
 
-	
-
 	li img {
 		height: 4rem;
 		width: 4rem;
 		border-radius: var(--corner-radius);
-	
 	}
-
-	
 
 	li.empty {
 		color: var(--gay);

@@ -1,38 +1,22 @@
 <script lang="ts">
-	import type { AccountConstructor, LoginData } from '$lib/accounts/types.js';
-	import type {Snippet} from 'svelte'
 	import type * as DB from '$lib/database.js';
+	import type { Snippet } from 'svelte';
 
 	import { format as formatDate, formatDistanceToNow } from 'date-fns';
 
-	import KoboToolbox from '$lib/accounts/kobotoolbox.js';
 	import { providers } from '$lib/accounts/registry.js';
-	import ButtonInk from '$lib/ButtonInk.svelte';
-	import Field from '$lib/Field.svelte';
-	import { databaseHandle, tables } from '$lib/idb.svelte.js';
-	import InlineTextInput from '$lib/InlineTextInput.svelte';
-	import ModalConfirm from '$lib/ModalConfirm.svelte';
 	import OverflowableText from '$lib/OverflowableText.svelte';
-	import RadioButtons from '$lib/RadioButtons.svelte';
 	import { tooltip } from '$lib/tooltips.js';
-	import { safeJSONParse } from '$lib/utils.js';
-
-	let adding: undefined | AccountConstructor = $state();
-	let login: undefined | (() => Promise<boolean>) = $state();
-	let loginData: undefined | LoginData = $state();
-
-	const db = $derived(databaseHandle());
 
 	interface Props {
 		tag?: string;
 		account: DB.Account;
-		action: Snippet; 
+		action: Snippet;
 	}
 
 	const { tag = 'li', account, action }: Props = $props();
 
-
-				const provider = $derived(providers.get(account.type))
+	const provider = $derived(providers.get(account.type));
 </script>
 
 <svelte:element this={tag}>
@@ -63,11 +47,10 @@
 		{/if}
 	</p>
 	<div class="action">{@render action()}</div>
-	
 </svelte:element>
 
 <style>
-li {
+	li {
 		list-style: none;
 		display: flex;
 		align-items: center;
@@ -105,6 +88,4 @@ li {
 			width: 1.4em;
 		}
 	}
-
-	
 </style>

@@ -16,6 +16,7 @@ Available CSS variables:
 	 * Allows updating some data of the component while loading
 	 * Useful for long-running onclick callbacks
 	 */
+	// eslint-disable-next-line no-unused-vars
 	export type Mutator = (data: {
 		/** Update the loading state or text */
 		loading?: boolean | string;
@@ -28,6 +29,7 @@ Available CSS variables:
 
 	interface Props {
 		children?: import('svelte').Snippet;
+		// eslint-disable-next-line no-unused-vars
 		onclick?: (e: MouseEvent, mutator: Mutator) => void | Promise<void>;
 		ondoubleclick?: () => void;
 		tag?: 'article' | 'li' | 'div';

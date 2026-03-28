@@ -347,7 +347,7 @@
 							{/if}
 						{/snippet}
 
-						{#snippet actions({ page, id, local })}
+						{#snippet actions({ page, local })}
 							{#if page || local}
 								<ButtonInk
 									fills

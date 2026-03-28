@@ -141,8 +141,9 @@ export default class Provider implements Account {
 	async logout() {}
 
 	async *sessions({ cursor = undefined, limit = 40, mine = false } = {}) {
+		const yielded = new Set<string>();
 		let total = 0;
-		let yielded = new Set<string>();
+
 		for (const p of await this.db.getAll('Protocol')) {
 			const protocol = Schemas.Protocol.assert(p);
 			if (!protocol.remote?.kobocollect) continue;

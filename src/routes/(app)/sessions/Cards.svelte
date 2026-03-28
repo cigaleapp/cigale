@@ -1,6 +1,6 @@
 <script
 	lang="ts"
-	generics="Session extends {id: string, protocol: string, name: string, downloaded?: boolean }"
+	generics="Session extends { id: string, protocol: string, name: string, downloaded?: boolean }"
 >
 	import type { Snippet } from 'svelte';
 
@@ -22,14 +22,17 @@
 
 	interface Props {
 		cache?: { key: string; entries: Map<string, NoInfer<Session>[]> };
+		// eslint-disable-next-line no-unused-vars
 		thumbnails: (session: Session) => AsyncIterable<string>;
 		sessions: () => AsyncIterable<Session | { total: number }>;
 		subtitle: Snippet<[Session]>;
 		actions: Snippet<[Session]>;
 		create?: undefined | (() => Promise<void>);
+		// eslint-disable-next-line no-unused-vars
 		card: (session: Session) => {
 			loading: string;
 			tooltip: string;
+			// eslint-disable-next-line no-unused-vars
 			onclick: (e: MouseEvent, mutator: import('$lib/Card.svelte').Mutator) => Promise<void>;
 			highlighted: boolean;
 		};
@@ -42,8 +45,6 @@
 	onDestroy(() => {
 		thumbnailsCache.clear();
 	});
-
-	$inspect({ thumbnailsCache });
 </script>
 
 <AsyncEach {cache} items={sessions} key={(s, i) => s.id + i}>
@@ -97,10 +98,6 @@
 			</div>
 		</Card>
 	{/snippet}
-	<!-- // XXX: DONT MERGE -->
-	<!-- {#snippet empty()}
-	{/snippet} -->
-
 	{#snippet ghost()}
 		<Card>
 			<div class="content">

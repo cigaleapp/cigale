@@ -38,6 +38,7 @@ If you have a changing items iterator, please use a {#key} block around to ensur
 	interface Props {
 		/** Yield a {total: number} object to signal the number of total items. This causes AsyncEach to add (total - loaded.length) ghost items (if the ghost snippet is defined) at the end of the DOM */
 		items: () => AsyncIterable<T | (typeof IterationTotalSignal)['infer']>;
+		// eslint-disable-next-line no-unused-vars
 		key: (item: T, index: number) => string | number;
 		/**
 		 * Cache the results if the AsyncEach component ever gets recreated with the same key
@@ -54,6 +55,7 @@ If you have a changing items iterator, please use a {#key} block around to ensur
 		/** When an error occurs */
 		error?: Snippet<[unknown]>;
 		/** Callback when the iteration finished */
+		// eslint-disable-next-line no-unused-vars
 		onloaded?: (items: T[]) => Promise<void> | void;
 	}
 
@@ -101,7 +103,7 @@ If you have a changing items iterator, please use a {#key} block around to ensur
 							loadedKeys.add(key(item, i));
 						}
 
-						i++
+						i++;
 					}
 
 					if (cache) {
@@ -135,7 +137,7 @@ If you have a changing items iterator, please use a {#key} block around to ensur
 		{/if}
 	{/each}
 	{#if ghostsCount > 0}
-		{#each Array.from({ length: ghostsCount }) as _}
+		{#each Array.from({ length: ghostsCount }) as _, i (i)}
 			{@render snippets.ghost?.()}
 		{/each}
 	{/if}
