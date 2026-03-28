@@ -23,6 +23,7 @@ test('openDatabase', async () => {
 		FakeDOMStringList {
 		  "0": "Account",
 		  "1": "Image",
+		  "10": "Settings",
 		  "2": "ImageFile",
 		  "3": "ImagePreviewFile",
 		  "4": "Metadata",
@@ -31,9 +32,8 @@ test('openDatabase', async () => {
 		  "7": "Observation",
 		  "8": "Protocol",
 		  "9": "Session",
-		  "10": "Settings",
 		  "_values": [
-			"Account",
+		    "Account",
 		    "Image",
 		    "ImageFile",
 		    "ImagePreviewFile",
@@ -105,7 +105,7 @@ describe('operations', () => {
 				addedAt: addedAt.toISOString(),
 				fileId: 'quoicoubaka',
 				dimensions: { width: 100, height: 100 },
-				contentType: 'what/ever',
+				contentType: 'image/jpeg',
 				filename: 'THE NETHER',
 				metadata: {
 					proto__water: {
@@ -124,7 +124,7 @@ describe('operations', () => {
 				addedAt: addedAt.toISOString(),
 				fileId: 'quoicoubaka',
 				dimensions: { width: 100, height: 100 },
-				contentType: 'what/ever',
+				contentType: 'image/jpeg',
 				filename: 'THE NETHER',
 				metadata: {
 					proto__water: {
@@ -144,7 +144,7 @@ describe('operations', () => {
 				fileId: 'quoicoubaka',
 				boundingBoxesAnalyzed: false,
 				dimensions: { width: 100, height: 100, aspectRatio: 1 },
-				contentType: 'what/ever',
+				contentType: 'image/jpeg',
 				filename: 'THE NETHER',
 				metadataErrors: {},
 				metadata: {
@@ -200,7 +200,7 @@ describe('operations', () => {
 			addedAt: addedAt.toISOString(),
 			fileId: 'quoicoubaka',
 			dimensions: { width: 100, height: 100 },
-			contentType: 'what/ever',
+			contentType: 'image/jpeg',
 			filename: 'THE NETHER',
 			metadataErrors: {},
 			metadata: {
@@ -395,7 +395,7 @@ describe('wrangler', () => {
 		addedAt: addedAt.toISOString(),
 		fileId: 'quoicoubaka',
 		dimensions: { width: 100, height: 100 },
-		contentType: 'what/ever',
+		contentType: 'image/jpeg',
 		filename: 'THE NETHER',
 		metadataErrors: {},
 		metadata: {
