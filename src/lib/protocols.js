@@ -278,7 +278,7 @@ export async function compareProtocolWithUpstream(db, protocolId, { onProgress }
 
 	const [remoteProtocol, localProtocol] = await Promise.all([
 		fetchHttpRequest(databaseProtocol.source)
-			.then(async (r) => parseYAMLorJSON(await r.text()))
+			.then(parseYAMLorJSON)
 			.then((data) => ExportedProtocol(data)),
 		toExportedProtocol(db, databaseProtocol),
 	]);
