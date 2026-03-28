@@ -287,31 +287,33 @@ describe('compareProtocolWithUpstream', () => {
 			getAll: async () => [],
 		};
 
-		const fetch = vi.fn(async () => ({
-			json: async () => ({
-				id: 'protocol1',
-				name: 'Test Protocol',
-				version: 1,
-				updates: 'automatic',
-				metadata: {},
-				authors: [],
-				description: 'A test protocol',
-				source: 'https://example.com/protocol.json',
-				crop: {
-					padding: '0px',
-				},
-				exports: {
-					metadata: {
-						json: 'analysis.json',
-						csv: 'metadata.csv',
-						files: 'files/{{metadataKey}}/{{id}}.{{extension filename}}',
+		const fetch = vi.fn(async (url) => ({
+			url,
+			text: async () =>
+				JSON.stringify({
+					id: 'protocol1',
+					name: 'Test Protocol',
+					version: 1,
+					updates: 'automatic',
+					metadata: {},
+					authors: [],
+					description: 'A test protocol',
+					source: 'https://example.com/protocol.json',
+					crop: {
+						padding: '0px',
 					},
-					images: {
-						cropped: 'cropped/{{sequence}}.{{extension image.filename}}',
-						original: 'original/{{sequence}}.{{extension image.filename}}',
+					exports: {
+						metadata: {
+							json: 'analysis.json',
+							csv: 'metadata.csv',
+							files: 'files/{{metadataKey}}/{{id}}.{{extension filename}}',
+						},
+						images: {
+							cropped: 'cropped/{{sequence}}.{{extension image.filename}}',
+							original: 'original/{{sequence}}.{{extension image.filename}}',
+						},
 					},
-				},
-			}),
+				}),
 		}));
 
 		vi.stubGlobal('fetch', fetch);
@@ -428,75 +430,106 @@ describe('compareProtocolWithUpstream', () => {
 			},
 		};
 
-		const fetch = vi.fn(async () => ({
-			/**
-			 * @returns {Promise<typeof import('$lib/schemas/protocols').ExportedProtocol.inferIn>}
-			 */
-			json: async () => ({
-				id: 'protocol1',
-				name: 'Test Protocol Updated',
-				version: 2,
-				updates: 'automatic',
-				crop: {
-					padding: '0px',
-				},
-				metadata: {
-					protocol1__meta1: {
-						label: 'Metadata 1',
-						type: 'enum',
-						description: 'Metadata 1 description updated',
-						mergeMethod: 'max',
-						required: false,
-						groupable: false,
-						sortable: false,
-						options: [
-							{ key: 'opt1', label: 'Option 1', description: 'Desc 1', synonyms: [] },
-							// opt2 removed
-							{ key: 'opt3', label: 'Option 3', description: 'Desc 3', synonyms: [] }, // new option
-						],
-					},
-					protocol1__meta2: {
-						label: 'Metadata 2',
-						description: 'Metadata 2 description',
-						mergeMethod: 'max',
-						required: false,
-						groupable: false,
-						sortable: false,
-						type: 'enum',
-						options: [
-							{ key: 'opt1', label: 'Option A', description: 'Desc A', synonyms: [] },
-							{ key: 'opt2', label: 'Option B', description: 'Desc B', synonyms: [] }, // new option
-						],
-					},
-					// meta4 removed
-					protocol1__meta3: {
-						// new metadata
-						label: 'Metadata 3',
-						description: 'Metadata 3 description',
-						mergeMethod: 'max',
-						required: false,
-						groupable: false,
-						sortable: false,
-						type: 'enum',
-						options: [
-							{ key: 'opt1', label: 'Option X', description: 'Desc X', synonyms: [] },
-						],
-					},
-				},
-				authors: [],
-				description: 'A test protocol updated',
-				exports: {
-					metadata: {
-						json: 'analysis.json',
-						csv: 'metadata_v2.csv', // changed
-						files: 'files/{{metadataKey}}/{{id}}.{{extension filename}}',
-					},
-					images: {
-						cropped: 'cropped/{{sequence}}.{{extension image.filename}}',
-						original: 'original/{{sequence}}.{{extension image.filename}}',
-					},
-				},
-			}),
+		const fetch = vi.fn(async (url) => ({
+			url,
+
+			text: async () =>
+				JSON.stringify(
+					/**
+					 * @satisfies {typeof import('$lib/schemas/protocols').ExportedProtocol.inferIn}
+					 */
+
+					{
+						id: 'protocol1',
+						name: 'Test Protocol Updated',
+						version: 2,
+						updates: 'automatic',
+						crop: {
+							padding: '0px',
+						},
+						metadata: {
+							protocol1__meta1: {
+								label: 'Metadata 1',
+								type: 'enum',
+								description: 'Metadata 1 description updated',
+								mergeMethod: 'max',
+								required: false,
+								groupable: false,
+								sortable: false,
+								options: [
+									{
+										key: 'opt1',
+										label: 'Option 1',
+										description: 'Desc 1',
+										synonyms: [],
+									},
+									// opt2 removed
+									{
+										key: 'opt3',
+										label: 'Option 3',
+										description: 'Desc 3',
+										synonyms: [],
+									}, // new option
+								],
+							},
+							protocol1__meta2: {
+								label: 'Metadata 2',
+								description: 'Metadata 2 description',
+								mergeMethod: 'max',
+								required: false,
+								groupable: false,
+								sortable: false,
+								type: 'enum',
+								options: [
+									{
+										key: 'opt1',
+										label: 'Option A',
+										description: 'Desc A',
+										synonyms: [],
+									},
+									{
+										key: 'opt2',
+										label: 'Option B',
+										description: 'Desc B',
+										synonyms: [],
+									}, // new option
+								],
+							},
+							// meta4 removed
+							protocol1__meta3: {
+								// new metadata
+								label: 'Metadata 3',
+								description: 'Metadata 3 description',
+								mergeMethod: 'max',
+								required: false,
+								groupable: false,
+								sortable: false,
+								type: 'enum',
+								options: [
+									{
+										key: 'opt1',
+										label: 'Option X',
+										description: 'Desc X',
+										synonyms: [],
+									},
+								],
+							},
+						},
+						authors: [],
+						description: 'A test protocol updated',
+						exports: {
+							metadata: {
+								json: 'analysis.json',
+								csv: 'metadata_v2.csv', // changed
+								files: 'files/{{metadataKey}}/{{id}}.{{extension filename}}',
+							},
+							images: {
+								cropped: 'cropped/{{sequence}}.{{extension image.filename}}',
+								original: 'original/{{sequence}}.{{extension image.filename}}',
+							},
+						},
+					}
+				),
 		}));
 
 		vi.stubGlobal('fetch', fetch);
@@ -630,11 +663,13 @@ describe('compareProtocolWithUpstream', () => {
 
 describe('hasUpgradeAvailable', () => {
 	test('should return upToDate: false if the version is lower', async () => {
-		const fetch = vi.fn(async () => ({
-			json: async () => ({
-				version: 2,
-				id: 'mon-protocole',
-			}),
+		const fetch = vi.fn(async (url) => ({
+			url,
+			text: async () =>
+				JSON.stringify({
+					version: 2,
+					id: 'mon-protocole',
+				}),
 		}));
 
 		vi.stubGlobal('fetch', fetch);
@@ -645,23 +680,25 @@ describe('hasUpgradeAvailable', () => {
 			id: 'mon-protocole',
 		});
 
-		expect(fetch).toHaveBeenCalledWith(
-			expect.stringContaining('https://example.com/protocol.json?v='),
-			{
-				headers: {
-					Accept: 'application/json',
-				},
-			}
+		expect(fetch).toHaveBeenCalledWith(expect.any(URL), {
+			headers: {
+				Accept: 'application/json, application/yaml',
+			},
+		});
+		expect(fetch.mock.calls[0][0].toString()).toMatch(
+			/^https:\/\/example\.com\/protocol\.json\?v=.+$/
 		);
 		expect(result).toEqual({ upToDate: false, newVersion: 2 });
 	});
 
 	test('should return upToDate: true if the version is the same', async () => {
-		const fetch = vi.fn(async () => ({
-			json: async () => ({
-				version: 1,
-				id: 'mon-protocole',
-			}),
+		const fetch = vi.fn(async (url) => ({
+			url,
+			text: async () =>
+				JSON.stringify({
+					version: 1,
+					id: 'mon-protocole',
+				}),
 		}));
 
 		vi.stubGlobal('fetch', fetch);
@@ -672,23 +709,25 @@ describe('hasUpgradeAvailable', () => {
 			id: 'mon-protocole',
 		});
 
-		expect(fetch).toHaveBeenCalledWith(
-			expect.stringContaining('https://example.com/protocol.json?v='),
-			{
-				headers: {
-					Accept: 'application/json',
-				},
-			}
+		expect(fetch).toHaveBeenCalledWith(expect.any(URL), {
+			headers: {
+				Accept: 'application/json, application/yaml',
+			},
+		});
+		expect(fetch.mock.calls[0][0].toString()).toMatch(
+			/^https:\/\/example\.com\/protocol\.json\?v=.+$/
 		);
 		expect(result).toEqual({ upToDate: true, newVersion: 1 });
 	});
 
 	test('should throw an error if the protocol ID is different', async () => {
-		const fetch = vi.fn(async () => ({
-			json: async () => ({
-				version: 2,
-				id: 'autre-protocole',
-			}),
+		const fetch = vi.fn(async (url) => ({
+			url,
+			text: async () =>
+				JSON.stringify({
+					version: 2,
+					id: 'autre-protocole',
+				}),
 		}));
 
 		vi.stubGlobal('fetch', fetch);
@@ -705,10 +744,12 @@ describe('hasUpgradeAvailable', () => {
 	});
 
 	test('should throw an error if the remote protocol has no version', async () => {
-		const fetch = vi.fn(async () => ({
-			json: async () => ({
-				id: 'mon-protocole',
-			}),
+		const fetch = vi.fn(async (url) => ({
+			url,
+			text: async () =>
+				JSON.stringify({
+					id: 'mon-protocole',
+				}),
 		}));
 
 		vi.stubGlobal('fetch', fetch);
