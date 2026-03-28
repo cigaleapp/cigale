@@ -37,7 +37,7 @@ If you have a changing items iterator, please use a {#key} block around to ensur
 	interface Props {
 		/** Yield a {total: number} object to signal the number of total items. This causes AsyncEach to add (total - loaded.length) ghost items (if the ghost snippet is defined) at the end of the DOM */
 		items: () => AsyncIterable<T | (typeof IterationTotalSignal)['infer']>;
-		key: (item: T) => string | number;
+		key: (item: T, index: number) => string | number;
 		/**
 		 * Cache the results if the AsyncEach component ever gets recreated with the same key
 		 * The cache only gets filled when the iteration finishes
@@ -70,7 +70,6 @@ If you have a changing items iterator, please use a {#key} block around to ensur
 		return 0;
 	});
 
-	$inspect({ghostsCount})
 
 	// When component is removed, cancel all
 	onDestroy(() => {
@@ -118,7 +117,7 @@ If you have a changing items iterator, please use a {#key} block around to ensur
 {#if error}
 	{@render snippets.error?.(error)}
 {:else}
-	{#each loaded as item, i (key(item))}
+	{#each loaded as item, i (key(item, i))}
 		{@render children(item, i)}
 	{:else}
 		{#if loading && !ghostsCount}

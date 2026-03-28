@@ -94,7 +94,7 @@ export default class Provider implements Account {
 		db: DatabaseHandle,
 		account: Pick<
 			DB.Account,
-			'token' | 'profileURL' | 'username' | 'type' | 'displayName' | 'avatarURL'
+			'token' | 'profileURL' | 'username' | 'type' | 'displayName' | 'avatarURL' | 'id'
 		>
 	) {
 		if (account.type !== 'kobotoolbox') throw new Error('Invalid account type');
@@ -140,9 +140,9 @@ export default class Provider implements Account {
 
 	async logout() {}
 
-	async *sessions({ cursor = undefined, limit = 10, mine = false } = {}) {
+	async *sessions({ cursor = undefined, limit = 40, mine = false } = {}) {
 		let total = 0;
-		let yielded = new Set<string>()
+		let yielded = new Set<string>();
 		for (const p of await this.db.getAll('Protocol')) {
 			const protocol = Schemas.Protocol.assert(p);
 			if (!protocol.remote?.kobocollect) continue;
@@ -209,9 +209,9 @@ export default class Provider implements Account {
 					console.error(error);
 				}
 
-				if (yielded.has(gid)) continue
+				if (yielded.has(gid)) continue;
 
-				yielded.add(gid)
+				yielded.add(gid);
 				yield {
 					id: gid,
 					name,
@@ -224,7 +224,7 @@ export default class Provider implements Account {
 					nextCursor: response.next ?? undefined,
 					filesCount: result._attachments.length,
 					imagesCount: 0,
-					thumbnails: thumbs.map(thumb => thumb.download_small_url),
+					thumbnails: thumbs.map((thumb) => thumb.download_small_url),
 				};
 			}
 		}
@@ -614,7 +614,7 @@ export default class Provider implements Account {
 		_status: type('string').as<'submitted_via_web' | (string & {})>(),
 		_geolocation: ['number|null', 'number|null'],
 		_submission_time: 'string.date.iso.parse',
-		_submitted_by: 'string',
+		_submitted_by: 'string|null',
 		'meta/instanceID': 'string',
 		_attachments: type({
 			download_url: 'string.url',

@@ -300,10 +300,12 @@
 							}
 						}}
 						thumbnails={async function* (session) {
+							console.log(`fetching thumbs for ${session.name}`)
 							if (!session.thumbnails.length) return;
 
 							for (const thumb of session.thumbnails.slice(0, 4)) {
-								yield await account.thumbnail(thumb);
+								const url =  await account.thumbnail(thumb);
+								yield url.href
 							}
 						}}
 						card={(session) => ({

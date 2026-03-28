@@ -1,25 +1,27 @@
-<script lang="ts" generics="Session extends {id: string, protocol: string, name: string, downloaded: boolean }">
+<script
+	lang="ts"
+	generics="Session extends {id: string, protocol: string, name: string, downloaded: boolean }"
+>
 	import type { Snippet } from 'svelte';
 
 	import { fade } from 'svelte/transition';
 
 	import IconAdd from '~icons/ri/add-line';
+	import IconDownloaded from '~icons/ri/check-fill';
 	import AsyncEach from '$lib/AsyncEach.svelte';
 	import Card from '$lib/Card.svelte';
-	import IconDownloaded from '~icons/ri/check-fill';
 	import { errorMessage } from '$lib/i18n.js';
 	import { tables } from '$lib/idb.svelte.js';
+	import IfInViewport from '$lib/IfInViewport.svelte';
 	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 	import LoadingText, { Loading } from '$lib/LoadingText.svelte';
 	import Logo from '$lib/Logo.svelte';
-	import {tooltip} from '$lib/tooltips.js'
-
-	import { createSession } from './create.js';
+	import { tooltip } from '$lib/tooltips.js';
 
 	interface Props {
 		cache?: { key: string; entries: Map<string, NoInfer<Session>[]> };
 		thumbnails: (session: Session) => AsyncIterable<string>;
-		sessions: () => AsyncIterable<Session>;
+		sessions: () => AsyncIterable<Session | { total: number }>;
 		subtitle: Snippet<[Session]>;
 		actions: Snippet<[Session]>;
 		card: (session: Session) => {
@@ -33,23 +35,25 @@
 	const { thumbnails, sessions, subtitle, actions, card, cache }: Props = $props();
 </script>
 
-<AsyncEach {cache} items={sessions} key={(s) => s.id}>
+<AsyncEach {cache} items={sessions} key={(s, i) => s.id + i}>
 	{#snippet children(session)}
 		{@const protocol = tables.Protocol.getFromState(session.protocol)}
 		{@const props = card(session)}
-		<Card {...props} --card-border={props.highlighted ? 'var(--bg-primary)' : ''} >
+		<Card {...props} --card-border={props.highlighted ? 'var(--bg-primary)' : ''}>
 			<div class="content">
-			{#if session.downloaded}
-			<div class="indicator-downloaded" use:tooltip={"Disponible sur l'appareil"}>
-			<IconDownloaded />
-			</div>
-			{/if}
+				{#if session.downloaded}
+					<div class="indicator-downloaded" use:tooltip={"Disponible sur l'appareil"}>
+						<IconDownloaded />
+					</div>
+				{/if}
 				<div class="gallery">
-					<AsyncEach items={() => thumbnails(session)} key={(src) => src}>
-						{#snippet children(src)}
-							<img {src} in:fade={{duration: 200}} />
-						{/snippet}
-					</AsyncEach>
+					<IfInViewport >
+						<AsyncEach items={() => thumbnails(session)} key={(src) => src}>
+							{#snippet children(src)}
+								<img {src} in:fade={{ duration: 200 }} />
+							{/snippet}
+						</AsyncEach>
+					</IfInViewport>
 				</div>
 				<header>
 					<p class="protocol">
