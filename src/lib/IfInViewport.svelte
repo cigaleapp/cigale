@@ -12,39 +12,14 @@
 	interface Props {
 		children: Snippet;
 		/** Only run once, afterwards the content stays rendered even if the component leaves the viewport */
-		once: boolean;
+		once?: boolean;
 	}
 
-	const { children, once }: Props = $props();
+	const { children, once = false }: Props = $props();
 
 	let node = $state<HTMLElement>();
 
-	/** Closest parent of `node` up the DOM tree that is scrollable */
-	const scrollableParent = $derived.by(() => {
-		let parent = node;
-		if (!parent) return;
-		while (parent.scrollHeight <= parent.clientHeight) {
-			if (!parent.parentElement) return parent;
-			parent = parent.parentElement;
-		}
-		return parent;
-	});
-
-	const inViewport = $derived(
-		new IsInViewport(() => node, { once, root: scrollableParent})
-	);
-
-	$inspect({node, scrollableParent, inViewport})
-
-	$effect(() => {
-		console.log(
-			'IfInViewport',
-			node?.parentElement?.parentElement?.parentElement,
-			inViewport.current ? 'visible' : 'hidden',
-			'in',
-			scrollableParent
-		);
-	});
+	const inViewport = $derived(new IsInViewport(() => node?.parentElement, { once }));
 </script>
 
 <div class="if-in-viewport" bind:this={node}>

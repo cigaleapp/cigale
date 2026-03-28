@@ -4,6 +4,7 @@
 >
 	import type { Snippet } from 'svelte';
 
+	import { SvelteMap } from 'svelte/reactivity';
 	import { fade } from 'svelte/transition';
 
 	import IconAdd from '~icons/ri/add-line';
@@ -33,6 +34,8 @@
 	}
 
 	const { thumbnails, sessions, subtitle, actions, card, cache }: Props = $props();
+
+	const thumbnailsCache = new SvelteMap<string, string[]>();
 </script>
 
 <AsyncEach {cache} items={sessions} key={(s, i) => s.id + i}>
@@ -47,12 +50,24 @@
 					</div>
 				{/if}
 				<div class="gallery">
-					<IfInViewport >
-						<AsyncEach items={() => thumbnails(session)} key={(src) => src}>
-							{#snippet children(src)}
+					<IfInViewport>
+						{#if thumbnailsCache.has(session.id)}
+							{#each thumbnailsCache.get(session.id)! as src, i (src + i)}
 								<img {src} in:fade={{ duration: 200 }} />
-							{/snippet}
-						</AsyncEach>
+							{/each}
+						{:else}
+							<AsyncEach
+								items={() => thumbnails(session)}
+								key={(src, i) => src + i}
+								onloaded={(sources) => {
+									thumbnailsCache.set(session.id, sources);
+								}}
+							>
+								{#snippet children(src)}
+									<img {src} in:fade={{ duration: 200 }} />
+								{/snippet}
+							</AsyncEach>
+						{/if}
 					</IfInViewport>
 				</div>
 				<header>

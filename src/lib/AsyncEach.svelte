@@ -52,9 +52,11 @@ If you have a changing items iterator, please use a {#key} block around to ensur
 		empty?: Snippet;
 		/** When an error occurs */
 		error?: Snippet<[unknown]>;
+		/** Callback when the iteration finished */
+		onloaded?: (items: T[]) => Promise<void> | void;
 	}
 
-	const { items, key, children, cache, ...snippets }: Props = $props();
+	const { items, key, children, cache, onloaded, ...snippets }: Props = $props();
 
 	const abortion = new AbortController();
 
@@ -69,7 +71,6 @@ If you have a changing items iterator, please use a {#key} block around to ensur
 		if (loaded.length > 0) return 1;
 		return 0;
 	});
-
 
 	// When component is removed, cancel all
 	onDestroy(() => {
@@ -104,6 +105,8 @@ If you have a changing items iterator, please use a {#key} block around to ensur
 				}
 
 				error = undefined;
+
+				await onloaded?.(loaded);
 			} catch (err) {
 				// TODO detect when it's a abortsignal error
 				error = err;
