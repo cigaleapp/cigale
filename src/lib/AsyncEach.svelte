@@ -106,7 +106,6 @@ If you have a changing items iterator, please use a {#key} block around to ensur
 
 					if (cache) {
 						cache.entries.set(cache.key, loaded);
-						console.log(cache.key, 'updated cache:', cache.entries);
 					}
 				}
 

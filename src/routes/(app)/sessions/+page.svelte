@@ -62,158 +62,156 @@
 
 <main in:fade={{ duration: 100 }}>
 	<header>
-		<div class="line">
-			<section class="filters">
-				<DropdownMenu
-					items={[
-						{
-							items: [
-								{
-									type: 'selectable',
-									label: "Sur l'appareil",
-									key: 'local',
-									selected: directory.platform === 'local',
-									data: {
-										special: 'local' as undefined | 'local' | 'manage',
-										provider: undefined as undefined | AccountConstructor,
-										account: undefined as undefined | Account,
-									},
-									onclick() {
-										setSetting('sessionsDirectory', {
-											...$state.snapshot(directory),
-											platform: 'local',
-											account: undefined,
-											protocol: undefined,
-										});
-									},
+		<section class="filters">
+			<DropdownMenu
+				items={[
+					{
+						items: [
+							{
+								type: 'selectable',
+								label: "Sur l'appareil",
+								key: 'local',
+								selected: directory.platform === 'local',
+								data: {
+									special: 'local' as undefined | 'local' | 'manage',
+									provider: undefined as undefined | AccountConstructor,
+									account: undefined as undefined | Account,
 								},
-							],
-						},
-						...providers.list().map((provider) => ({
-							label: provider.displayName,
-							items: tables.Account.state
-								.filter((account) => account.type === provider.id)
-								.map((account) => ({
-									type: 'selectable' as const,
-									label: account.displayName,
-									key: account.id,
-									selected: directory.account === account.id,
-									data: {
-										special: undefined,
-										provider,
-										account: providers.fromDatabase(db, account),
-									},
-									onclick() {
-										setSetting('sessionsDirectory', {
-											...$state.snapshot(directory),
-											platform: account.type,
-											account: account.id,
-											protocol: undefined,
-										});
-									},
-								})),
-						})),
-						{
-							label: 'Ajouter & supprimer',
-							items: [
-								{
-									type: 'clickable',
-									key: 'manage',
-									label: 'Gérer les comptes',
-									data: {
-										special: 'manage',
-										provider: undefined,
+								onclick() {
+									setSetting('sessionsDirectory', {
+										...$state.snapshot(directory),
+										platform: 'local',
 										account: undefined,
-									},
-									async onclick() {
-										await goto('/(app)/accounts');
-									},
+										protocol: undefined,
+									});
 								},
-							],
-						},
-					]}
-				>
-					{#snippet trigger(props)}
-						<ButtonSecondary {...props}>
-							<div class="account-selection-item">
-								{#if directory.platform === 'local'}
-									<div class="icon">
-										<IconLocal />
-									</div>
-									<span class="label">Sur l'appareil</span>
-								{:else if account}
-									{@const provider = providers.get(directory.platform)!}
-									<div class="icon">
-										<CompositeAvatar
-											avatar={account.avatarURL}
-											sublogo={provider.logoURL}
-											tooltip="{account.username} sur {provider.displayName}"
-										/>
-									</div>
-									<span class="label">
-										<OverflowableText text={account.displayName} />
-									</span>
-								{/if}
-								<div class="dropdown-arrow icon">
-									<IconDropdown />
+							},
+						],
+					},
+					...providers.list().map((provider) => ({
+						label: provider.displayName,
+						items: tables.Account.state
+							.filter((account) => account.type === provider.id)
+							.map((account) => ({
+								type: 'selectable' as const,
+								label: account.displayName,
+								key: account.id,
+								selected: directory.account === account.id,
+								data: {
+									special: undefined,
+									provider,
+									account: providers.fromDatabase(db, account),
+								},
+								onclick() {
+									setSetting('sessionsDirectory', {
+										...$state.snapshot(directory),
+										platform: account.type,
+										account: account.id,
+										protocol: undefined,
+									});
+								},
+							})),
+					})),
+					{
+						label: 'Ajouter & supprimer',
+						items: [
+							{
+								type: 'clickable',
+								label: 'Gérer les comptes',
+								data: {
+									special: 'manage',
+									provider: undefined,
+									account: undefined,
+								},
+								async onclick() {
+									await goto('/(app)/accounts');
+								},
+							},
+						],
+					},
+				]}
+			>
+				{#snippet trigger(props)}
+					<ButtonSecondary {...props}>
+						<div class="account-selection-item">
+							{#if directory.platform === 'local'}
+								<div class="icon">
+									<IconLocal />
 								</div>
-							</div>
-						</ButtonSecondary>
-					{/snippet}
-
-					{#snippet item({ provider, account, special }, { label })}
-						<div class="account-selection-item taller">
-							<div class="icon">
-								{#if provider && account}
+								<span class="label">Sur l'appareil</span>
+							{:else if account}
+								{@const provider = providers.get(directory.platform)!}
+								<div class="icon">
 									<CompositeAvatar
 										avatar={account.avatarURL}
 										sublogo={provider.logoURL}
+										tooltip="{account.username} sur {provider.displayName}"
 									/>
-								{:else if special === 'local'}
-									<IconLocal />
-								{:else if special === 'manage'}
-									<IconManage />
-								{/if}
+								</div>
+								<span class="label">
+									<OverflowableText text={account.displayName} />
+								</span>
+							{/if}
+							<div class="dropdown-arrow icon">
+								<IconDropdown />
 							</div>
-							<span class="label">
-								<OverflowableText text={label} />
-							</span>
 						</div>
-					{/snippet}
-				</DropdownMenu>
-			</section>
-			<section class="actions">
-				<ButtonSecondary
-					onclick={async () => {
-						const zipfile = await promptForFiles({
-							accept: 'application/zip',
-							multiple: false,
-						});
-						await switchSession(null);
-						importMore(zipfile);
-						await goto('/(app)/(sidepanel)/import');
-					}}
-				>
-					<IconImport />
-					Importer un export .zip
-				</ButtonSecondary>
-				<ButtonSecondary
-					testid="new-session"
-					onclick={async () => {
-						await createSession();
-					}}
-				>
-					<IconAdd />
-					Nouvelle session
-				</ButtonSecondary>
-			</section>
-		</div>
+					</ButtonSecondary>
+				{/snippet}
+
+				{#snippet item({ provider, account, special }, { label })}
+					<div class="account-selection-item taller">
+						<div class="icon">
+							{#if provider && account}
+								<CompositeAvatar
+									avatar={account.avatarURL}
+									sublogo={provider.logoURL}
+								/>
+							{:else if special === 'local'}
+								<IconLocal />
+							{:else if special === 'manage'}
+								<IconManage />
+							{/if}
+						</div>
+						<span class="label">
+							<OverflowableText text={label} />
+						</span>
+					</div>
+				{/snippet}
+			</DropdownMenu>
+		</section>
+		<section class="actions">
+			<ButtonSecondary
+				onclick={async () => {
+					const zipfile = await promptForFiles({
+						accept: 'application/zip',
+						multiple: false,
+					});
+					await switchSession(null);
+					importMore(zipfile);
+					await goto('/(app)/(sidepanel)/import');
+				}}
+			>
+				<IconImport />
+				Importer un export .zip
+			</ButtonSecondary>
+			<ButtonSecondary
+				testid="new-session"
+				onclick={async () => {
+					await createSession();
+				}}
+			>
+				<IconAdd />
+				Nouvelle session
+			</ButtonSecondary>
+		</section>
 	</header>
 
 	<section class="sessions">
 		{#if directory.platform === 'local'}
 			<div class="cards" in:fade={{ duration: 200 }}>
 				<Cards
+					create={createSession}
 					sessions={async function* () {
 						for (const session of tables.Session.state) {
 							yield session;
@@ -290,31 +288,37 @@
 									continue;
 								}
 
-								const local = tables.Session.state.find(s => s.remoteId === session.id)
+								const local = tables.Session.state.find(
+									(s) => s.remoteId === session.id
+								);
 
 								yield {
 									...session,
 									local,
-									downloaded: Boolean(local), 
+									downloaded: Boolean(local),
 								};
 							}
 						}}
 						thumbnails={async function* (session) {
-							console.log(`fetching thumbs for ${session.name}`)
+							console.log(`fetching thumbs for ${session.name}`);
 							if (!session.thumbnails.length) return;
 
-							const yielded= new Set<string>()
+							const yielded = new Set<string>();
 
 							for (const thumb of session.thumbnails) {
-								const url =  await account.thumbnail(thumb);
-								if (!yielded.has(thumb.href)) yield url.href
-								yielded.add(thumb.href)
-								console.log(session.id, thumb, yielded)
-								if (yielded.size >= 4) break
+								const url = await account.thumbnail(thumb);
+								if (!yielded.has(thumb.href)) yield url.href;
+								yielded.add(thumb.href);
+								console.log(session.id, thumb, yielded);
+								if (yielded.size >= 4) break;
 							}
 						}}
 						card={(session) => ({
-							tooltip: isDebugMode() ? `id: ${session.id}; local: ${session.local?.id}` :  session.local ? 'Ouvrir' : 'Télécharger',
+							tooltip: isDebugMode()
+								? `id: ${session.id}; local: ${session.local?.id}`
+								: session.local
+									? 'Ouvrir'
+									: 'Télécharger',
 							loading: session.local ? 'Ouverture…' : 'Téléchargement…',
 							highlighted: false,
 							async onclick(_, mutator) {
@@ -326,7 +330,7 @@
 										mutator,
 									});
 								}
-								if (!id) return
+								if (!id) return;
 								await switchSession(id);
 								await goto('/(app)/(sidepanel)/import');
 							},
@@ -381,18 +385,11 @@
 
 	main > header {
 		display: flex;
-		flex-direction: column;
+		align-items: center;
+		justify-content: space-between;
 		margin-bottom: 2rem;
 
-		.line {
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			margin-bottom: 0.5rem;
-		}
-
-		.actions,
-		.places {
+		.actions {
 			display: flex;
 			align-items: center;
 			gap: 1rem;
@@ -410,48 +407,6 @@
 		--card-height: 250px;
 		--card-width: 350px;
 		--card-padding: 0;
-	}
-
-	.accounts {
-		padding: 0;
-		margin: 7rem auto 0;
-		display: flex;
-		flex-direction: column;
-		gap: 1.5rem;
-
-		li {
-			list-style: none;
-		}
-
-		:global li {
-			margin: 0 auto;
-		}
-
-		li.manage {
-			margin-top: 1.5rem;
-		}
-	}
-
-	.breadcrumbs {
-		display: flex;
-		align-items: center;
-		gap: 1em;
-
-		> * {
-			display: flex;
-			align-items: center;
-			gap: 0.5em;
-		}
-	}
-
-	.error-screen {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		gap: 2rem;
-		text-align: center;
-		min-height: 50vh;
 	}
 
 	.account-selection-item {

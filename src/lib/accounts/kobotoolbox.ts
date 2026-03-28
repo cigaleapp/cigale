@@ -236,11 +236,6 @@ export default class Provider implements Account {
 			.then((blob) => new URL(URL.createObjectURL(blob)));
 	}
 
-	sessionRemotePage(_id: SessionRemoteID) {
-		// TODO
-		return undefined;
-	}
-
 	async session(protocol: DB.Protocol, id: SessionRemoteID) {
 		if (!protocol.remote?.kobocollect)
 			throw new Error("This protocol doesn't support KoboToolbox remote sessions");

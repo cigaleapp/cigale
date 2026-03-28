@@ -1,7 +1,5 @@
-import { ArkErrors, type } from 'arktype';
+import { ArkErrors } from 'arktype';
 import microdiff from 'microdiff';
-import JSONC from 'tiny-jsonc';
-import YAML from 'yaml';
 
 import { idComparator, Schemas } from './database.js';
 import { downloadAsFile, stringifyWithToplevelOrdering } from './download.js';
@@ -11,7 +9,6 @@ import { metadataOptionsOf } from './metadata/index.js';
 import { removeNamespaceFromMetadataId } from './schemas/metadata.js';
 import { ExportedProtocol, isMetadataInProtocol, Protocol } from './schemas/protocols.js';
 import {
-	cachebust,
 	compareBy,
 	fetchHttpRequest,
 	fromEntries,

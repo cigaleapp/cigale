@@ -64,6 +64,7 @@ export interface Account {
 				imagesCount: number;
 		  }
 	>;
+
 	/**
 	 * Get the remote session
 	 * @param protocol protocol of the session
@@ -73,13 +74,12 @@ export interface Account {
 		protocol: DB.Protocol,
 		id: SessionRemoteID
 	): Promise<Omit<(typeof DB.Schemas.Session)['inferIn'], 'id' | 'account'>>;
+
 	/**
-	 * Fetch the thumbnail for a session, 
-	 * returning a blob:// URL ready for use 
+	 * Fetch the thumbnail for a session,
+	 * returning a blob:// URL ready for use
 	 */
-	async thumbnail(
-		url: URL
-	): Promise<URL>;
+	thumbnail(url: URL): Promise<URL>;
 
 	/**
 	 * Get all observations/images/image files of the remote session
@@ -94,6 +94,7 @@ export interface Account {
 		images: Array<(typeof DB.Schemas.Image)['inferIn']>;
 		files: Array<(typeof DB.Tables.ImageFile)['inferIn']>;
 	}>;
+
 	/**
 	 * Get files from file-type session metadata values
 	 * @param protocol protocol of the session
@@ -103,10 +104,6 @@ export interface Account {
 		protocol: DB.Protocol,
 		session: SessionRemoteID
 	): AsyncIterable<Omit<(typeof DB.Tables.MetadataValueFile)['inferIn'], 'sessionId'>>;
-	/**
-	 * Get a URL to a page on the remote website for a session
-	 */
-	sessionRemotePage(id: SessionRemoteID): URL | undefined;
 }
 
 export interface AccountConstructor<

@@ -1,6 +1,6 @@
 <script
 	lang="ts"
-	generics="Session extends {id: string, protocol: string, name: string, downloaded: boolean }"
+	generics="Session extends {id: string, protocol: string, name: string, downloaded?: boolean }"
 >
 	import type { Snippet } from 'svelte';
 
@@ -26,6 +26,7 @@
 		sessions: () => AsyncIterable<Session | { total: number }>;
 		subtitle: Snippet<[Session]>;
 		actions: Snippet<[Session]>;
+		create?: undefined | (() => Promise<void>);
 		card: (session: Session) => {
 			loading: string;
 			tooltip: string;
@@ -34,7 +35,7 @@
 		};
 	}
 
-	const { thumbnails, sessions, subtitle, actions, card, cache }: Props = $props();
+	const { thumbnails, sessions, subtitle, actions, card, cache, create }: Props = $props();
 
 	const thumbnailsCache = new SvelteMap<string, string[]>();
 
@@ -98,17 +99,6 @@
 	{/snippet}
 	<!-- // XXX: DONT MERGE -->
 	<!-- {#snippet empty()}
-		<Card
-			testid="new-session-card"
-			tooltip="Créer une nouvelle session"
-			onclick={async () => {
-				await createSession();
-			}}
-		>
-			<div class="content new">
-				<IconAdd />
-			</div>
-		</Card>
 	{/snippet} -->
 
 	{#snippet ghost()}
@@ -137,10 +127,24 @@
 		</div>
 	{/snippet}
 	{#snippet empty()}
-		<div class="error-screen" in:fade={{ duration: 300 }}>
-			<Logo --size="5rem" variant="empty" />
-			Aucune session
-		</div>
+		{#if create}
+			<Card
+				testid="new-session-card"
+				tooltip="Créer une nouvelle session"
+				onclick={async () => {
+					await create();
+				}}
+			>
+				<div class="content new">
+					<IconAdd />
+				</div>
+			</Card>
+		{:else}
+			<div class="error-screen" in:fade={{ duration: 300 }}>
+				<Logo --size="5rem" variant="empty" />
+				Aucune session
+			</div>
+		{/if}
 	{/snippet}
 	{#snippet error(e)}
 		<div class="error-screen" in:fade={{ duration: 300 }}>
