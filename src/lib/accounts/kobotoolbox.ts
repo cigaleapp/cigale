@@ -18,7 +18,10 @@ import { ensureArray, mapValues } from '$lib/utils.js';
 
 export default class Provider implements Account {
 	static id = 'kobotoolbox' as const;
-	static servers = ['kf.kobotoolbox.org', 'eu.kobotoolbox.org'] as const;
+	static servers = [
+		{ domain: 'kf.kobotoolbox.org', name: 'Global' },
+		{ domain: 'eu.kobotoolbox.org', name: 'Europe' },
+	] as const;
 	static auth = 'token' as const satisfies AuthenticationMethod;
 	static capabilities = ['sessions'] as const;
 	static displayName = 'KoboToolbox';
@@ -28,7 +31,7 @@ export default class Provider implements Account {
 	username: string;
 	displayName: string;
 	avatarURL: URL | undefined;
-	domain: (typeof Provider.servers)[number];
+	domain: (typeof Provider.servers)[number]['domain'];
 	db: DatabaseHandle;
 	/** Database ID of the account */
 	id: string | undefined;
@@ -50,7 +53,9 @@ export default class Provider implements Account {
 		return new URL('/token/', 'https://' + server);
 	}
 
-	static domainOfProfileURL(profileURL: string | URL): (typeof Provider.servers)[number] {
+	static domainOfProfileURL(
+		profileURL: string | URL
+	): (typeof Provider.servers)[number]['domain'] {
 		switch (new URL(profileURL).hostname) {
 			case 'kc.kobotoolbox.org':
 				return 'kf.kobotoolbox.org';
@@ -74,7 +79,7 @@ export default class Provider implements Account {
 			id,
 		}: {
 			token: string;
-			domain: (typeof Provider.servers)[number];
+			domain: (typeof Provider.servers)[number]['domain'];
 			username?: string;
 			displayName?: string;
 			avatarURL?: URL | undefined;
@@ -88,6 +93,21 @@ export default class Provider implements Account {
 		this.avatarURL = avatarURL;
 		this.db = db;
 		this.id = id;
+	}
+
+	static async checkAuth({
+		server,
+		token,
+	}: LoginData<(typeof Provider.servers)[number]['domain']>) {
+		if (!token) return "Token vide";
+
+		const response = await new Provider(undefined!, { token, domain: server }).fetch(
+			`https://${server}/me/`
+		);
+
+		if (response.ok) return undefined;
+
+		return response.text();
 	}
 
 	static fromDatabase(
@@ -111,7 +131,7 @@ export default class Provider implements Account {
 
 	static async login(
 		db: DatabaseHandle,
-		{ token, server }: LoginData<(typeof Provider.servers)[number]>
+		{ token, server }: LoginData<(typeof Provider.servers)[number]['domain']>
 	) {
 		if (!token) throw new Error('No login data provided');
 
@@ -736,7 +756,7 @@ function matchesLabel(
 	if (!subject.label) return false;
 
 	const subj = ensureArray(subject.label)[0];
-	const candidates = ensureArray(label).map((c) => c?.trim().toLowerCase());
+	const candidates = ensureArray(label).map((c) => name?.trim().toLowerCase());
 
 	return candidates.includes(subj.trim().toLowerCase());
 }

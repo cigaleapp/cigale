@@ -118,7 +118,10 @@ export interface AccountConstructor<
 	displayName: string;
 	capabilities: readonly ('sessions' | 'images' | 'upload')[];
 	auth: Auth;
-	servers: readonly Server[];
+	servers: readonly { domain: Server; name?: string }[];
+
+	/** Returns the error message, or undefined if everything is a-ok */
+	checkAuth(data: LoginData<Server>): Promise<undefined|string>;
 
 	fromDatabase(db: DatabaseHandle, account: DB.Account): Account;
 	login(
