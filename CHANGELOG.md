@@ -19,6 +19,7 @@ All notable changes to this project will be documented in this file, on a monthl
 
 ### Bug Fixes
 
+- Dont assume json when checking for protocol updates (#1374)
 - Fix description hidden by very long cascades in vertical fullscreen classifier
 - Resolve defaults on results tab load
 - Support YAML builtin protocols
