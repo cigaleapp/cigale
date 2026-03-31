@@ -12,8 +12,6 @@ export async function downloadRemoteSession({
 	account: Account;
 	mutator: import('$lib/Card.svelte').Mutator;
 }) {
-	console.log('Download remote session', { session, account });
-
 	if (!account.id) return;
 
 	const protocol = await tables.Protocol.get(session.protocol);

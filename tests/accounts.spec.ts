@@ -168,6 +168,14 @@ test('can download a session from a kobotoolbox account', async ({ page, context
 				required: true,
 				pattern: 'year, month, day, hours, minutes, uppercase letter minimum 2 times',
 			},
+			file: {
+				type: 'file',
+				label: 'File',
+				description: '',
+				mergeMethod: 'none',
+				required: false,
+				kobocollect: 'Prenez une photo du milieu',
+			},
 		},
 		metadata: {},
 	});
@@ -219,20 +227,31 @@ test('can download a session from a kobotoolbox account', async ({ page, context
 	await card.click();
 	await expect(card).toHaveText(/Téléchargement…/);
 	await expect(card).toHaveText(/Sauvegarde…/);
-	await expect(card).toHaveText(/Fichier \(1\/3\)…/);
-	await expect(card).toHaveText(/Fichier \(2\/3\)…/);
-	await expect(card).toHaveText(/Fichier \(3\/3\)…/);
+	await expect(card).toHaveText(/Fichier \(1\/1\)…/);
 	await app.path.wait('/(app)/(sidepanel)/import');
 	await goToSessionPage(page);
-	await expect(main).toHaveText(/Créée sur KoboToolbox/);
+	await expect(page.getByRole('textbox', { name: 'Description' })).toHaveValue(
+		/Créée sur KoboToolbox/
+	);
 	expect(
 		await app.db.metadata.of({
 			session: 'Session #202603131502GLB',
 			protocolId: 'com.example.testing',
 		})
 	).toMatchObject({
-		not_inferred: { value: 'wasnt inferred from kobo' },
-		transect_code: { value: '202603131502GLB' },
+		not_inferred: { parsedValue: 'wasnt inferred from kobo' },
+		transect_code: { parsedValue: '202603131502GLB' },
+	});
+
+	const { file: fileId } = await app.db.metadata.values({
+		session: 'Session #202603131502GLB',
+		protocolId: 'com.example.testing',
+	});
+
+	expect(fileId).not.toBeUndefined();
+	expect(await app.db.get('MetadataValueFile', fileId.toString())).toMatchObject({
+		filename: '1773410434869.jpg',
+		contentType: 'image/jpeg',
 	});
 
 	await goHome(page);

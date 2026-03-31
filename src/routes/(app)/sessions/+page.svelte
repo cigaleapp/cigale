@@ -300,7 +300,6 @@
 							}
 						}}
 						thumbnails={async function* (session) {
-							console.log(`fetching thumbs for ${session.name}`);
 							if (!session.thumbnails.length) return;
 
 							const yielded = new Set<string>();
@@ -309,7 +308,6 @@
 								const url = await account.thumbnail(thumb);
 								if (!yielded.has(thumb.href)) yield url.href;
 								yielded.add(thumb.href);
-								console.log(session.id, thumb, yielded);
 								if (yielded.size >= 4) break;
 							}
 						}}
@@ -322,9 +320,7 @@
 							loading: session.local ? 'Ouverture…' : 'Téléchargement…',
 							highlighted: false,
 							async onclick(_, mutator) {
-								console.log('OGJRGOJREGJOERGERJOGREOJGREOJGREJOGERJOGREOJGRJOEOERGOERJOGERJGOJREOGJREOGJLSJGLJIKDBNVORJPZESJKVNIRHIRJTOZJPFAPNQNPFVESNGPGEJGROJGEORJHTOHNPNBRTOHJREOGJEROPGNEOGNBEORGJEROGPEJGPRDRJGMSEJGPZJPGEJSGLJDGLJL')
 								let id = session.local?.id;
-								console.log({id})
 								if (!session.local) {
 									id = await downloadRemoteSession({
 										account,
