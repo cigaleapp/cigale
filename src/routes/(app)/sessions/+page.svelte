@@ -322,7 +322,9 @@
 							loading: session.local ? 'Ouverture…' : 'Téléchargement…',
 							highlighted: false,
 							async onclick(_, mutator) {
+								console.log('OGJRGOJREGJOERGERJOGREOJGREOJGREJOGERJOGREOJGRJOEOERGOERJOGERJGOJREOGJREOGJLSJGLJIKDBNVORJPZESJKVNIRHIRJTOZJPFAPNQNPFVESNGPGEJGROJGEORJHTOHNPNBRTOHJREOGJEROPGNEOGNBEORGJEROGPEJGPRDRJGMSEJGPZJPGEJSGLJDGLJL')
 								let id = session.local?.id;
+								console.log({id})
 								if (!session.local) {
 									id = await downloadRemoteSession({
 										account,

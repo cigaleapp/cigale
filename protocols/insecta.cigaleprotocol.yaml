@@ -108,7 +108,7 @@ sessionMetadata:
   date:
     type: date
     label: Date de début
-    kobocollect: [Bonjour_Pour_r_aliser_le_pro, Date du transect]
+    kobocollect: [Bonjour_Pour_r_aliser_le_pro, Bonjour_Pour_r_ali_tualiser_votre_relev, Date du transect]
     mergeMethod: none
     required: true
     description: ''

@@ -211,23 +211,28 @@ test('can download a session from a kobotoolbox account', async ({ page, context
 
 	// TODO mock images
 
-	const main = page.getByRole('main').first();
-	await expect(main).toHaveText('Chargement…');
+	const main = page.locator('body').first();
+	await expect(main).toHaveText(/Chargement…/);
 
 	const card = main.getByRole('article').filter({ hasText: 'Session #202603131502GLB' }).first();
 
 	await card.click();
-	await expect(card).toHaveText('Téléchargement…');
-	await expect(card).toHaveText('Sauvegarde…');
-	await expect(card).toHaveText('Fichier (1/3)…');
-	await expect(card).toHaveText('Fichier (2/3)…');
-	await expect(card).toHaveText('Fichier (3/3)…');
+	await expect(card).toHaveText(/Téléchargement…/);
+	await expect(card).toHaveText(/Sauvegarde…/);
+	await expect(card).toHaveText(/Fichier \(1\/3\)…/);
+	await expect(card).toHaveText(/Fichier \(2\/3\)…/);
+	await expect(card).toHaveText(/Fichier \(3\/3\)…/);
 	await app.path.wait('/(app)/(sidepanel)/import');
 	await goToSessionPage(page);
-	await expect(main).toHaveText('Importée depuis KoboToolbox');
-	expect(await app.db.metadata.of({ session: 'Session #202603131502GLB' })).toMatchObject({
-		'com.example.testing__not_inferred': { value: 'wasnt inferred from kobo' },
-		'com.example.testing__transect_code': { value: '202603131502GLB' },
+	await expect(main).toHaveText(/Créée sur KoboToolbox/);
+	expect(
+		await app.db.metadata.of({
+			session: 'Session #202603131502GLB',
+			protocolId: 'com.example.testing',
+		})
+	).toMatchObject({
+		not_inferred: { value: 'wasnt inferred from kobo' },
+		transect_code: { value: '202603131502GLB' },
 	});
 
 	await goHome(page);

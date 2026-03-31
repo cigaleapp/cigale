@@ -761,7 +761,7 @@ function matchesLabel(
 	if (!subject.label) return false;
 
 	const subj = ensureArray(subject.label)[0];
-	const candidates = ensureArray(label).map((c) => name?.trim().toLowerCase());
+	const candidates = ensureArray(label).map((c) => c?.trim().toLowerCase());
 
 	return candidates.includes(subj.trim().toLowerCase());
 }
