@@ -99,7 +99,7 @@ export default class Provider implements Account {
 		server,
 		token,
 	}: LoginData<(typeof Provider.servers)[number]['domain']>) {
-		if (!token) return "Token vide";
+		if (!token) return 'Token vide';
 
 		const response = await new Provider(undefined!, { token, domain: server }).fetch(
 			`https://${server}/me/`
@@ -273,6 +273,11 @@ export default class Provider implements Account {
 
 		const metadata = await this.#rowToMetadata(protocol, project, row);
 		let name = 'Sans nom';
+
+		console.info(
+			'Metadata computed from KoboToolbox fields:',
+			mapValues(metadata, ({ value }) => value)
+		);
 
 		try {
 			name = protocol.remote.kobocollect.title.render({

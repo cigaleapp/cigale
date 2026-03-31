@@ -48,6 +48,7 @@
 	interface Props {
 		items: ItemsGroup<D, SD>[];
 		item?: Snippet<[AnyItem<D, SD>['data'], AnyItem<D, SD> & { selected: boolean }]>;
+		/** IMPORTANT: Don't put just onclick on the button, spread the entire object */
 		trigger: Snippet<[{ onclick: () => void } & Record<string, unknown>,]>;
 		testid?: string | undefined;
 		scrollable?: boolean;

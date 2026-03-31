@@ -156,6 +156,7 @@ test('can download a session from a kobotoolbox account', async ({ page, context
 				mergeMethod: 'none',
 				required: false,
 				description: 'Not inferred',
+				default: 'wasnt inferred from kobo',
 				kobocollect: '', // force non-inference
 			},
 			// TODO also test kobotoolbox: list+true+false, kobotoolbox: list+choice and options: kobotoolbox
@@ -197,7 +198,7 @@ test('can download a session from a kobotoolbox account', async ({ page, context
 		return { json: mockKobotoolboxAssetData };
 	});
 
-	await mockKobotoolboxApi(`/api/v2/assets/${mockFormId}/data/enketo/view/`, {
+	await mockKobotoolboxApi(`/api/v2/assets/*/data/*/enketo/view{/}?`, {
 		json: {
 			url: 'https://ee.kobotoolbox.org/view/eb62b72b5c0aa392278dbe3a25f9bb89?instance_id=c2983a5e-fd4c-4032-9b07-50d3e0b8db5f&return_url=false',
 			version_uid: 'vomChPkx3JLXdErzdUjMYd',
@@ -213,37 +214,31 @@ test('can download a session from a kobotoolbox account', async ({ page, context
 	const main = page.getByRole('main').first();
 	await expect(main).toHaveText('Chargement…');
 
-	await main.getByRole('article').filter({ hasText: 'Session #202603281502GLB' }).click();
-	await expect(main).toHaveText('Téléchargement…');
-	await expect(main).toHaveText('Sauvegarde…');
-	await expect(main).toHaveText('Fichier (1/3)…');
-	await expect(main).toHaveText('Fichier (2/3)…');
-	await expect(main).toHaveText('Fichier (3/3)…');
+	const card = main.getByRole('article').filter({ hasText: 'Session #202603131502GLB' }).first();
+
+	await card.click();
+	await expect(card).toHaveText('Téléchargement…');
+	await expect(card).toHaveText('Sauvegarde…');
+	await expect(card).toHaveText('Fichier (1/3)…');
+	await expect(card).toHaveText('Fichier (2/3)…');
+	await expect(card).toHaveText('Fichier (3/3)…');
 	await app.path.wait('/(app)/(sidepanel)/import');
 	await goToSessionPage(page);
 	await expect(main).toHaveText('Importée depuis KoboToolbox');
-	// TODO check DB
+	expect(await app.db.metadata.of({ session: 'Session #202603131502GLB' })).toMatchObject({
+		'com.example.testing__not_inferred': { value: 'wasnt inferred from kobo' },
+		'com.example.testing__transect_code': { value: '202603131502GLB' },
+	});
 
 	await goHome(page);
 	// TODO add testid for the indicator
-	await expect(
-		page
-			.locator('article')
-			.filter({ hasText: '202603281502GLB' })
-			.first()
-			.locator('.indicator-downloaded')
-	).toHaveTooltip("Disponible sur l'appareil");
+	await expect(card.locator('.indicator-downloaded')).toHaveTooltip("Disponible sur l'appareil");
 	await chooseInDropdown(
 		page,
 		page.getByRole('button', { name: 'Gwenn Le Bihan' }),
 		"Sur l'appareil"
 	);
-	await page
-		.locator('article')
-		.filter({ hasText: '202603281502GLB' })
-		.first()
-		.getByRole('button', { name: 'Gérer' })
-		.click();
+	card.getByRole('button', { name: 'Gérer' }).click();
 	await app.path.wait('/(app)/sessions/[id]');
 	// Get session id from the URL (kinda jank???)
 	const id = new URL(page.url()).pathname.split('/').at(2);
