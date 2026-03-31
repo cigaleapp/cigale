@@ -9,7 +9,6 @@
 <script lang="ts" generics="Step extends `step${string}`">
 	import type { Snippet } from 'svelte';
 
-
 	type Props = {
 		steps: Array<{ name: Step; title: string }>;
 	} & Record<Step, Snippet<[{ done: () => void }]>>;

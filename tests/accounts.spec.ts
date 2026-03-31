@@ -264,10 +264,14 @@ test('can download a session from a kobotoolbox account', async ({ page, context
 	card.getByRole('button', { name: 'Gérer' }).click();
 	await app.path.wait('/(app)/sessions/[id]');
 	// Get session id from the URL (kinda jank???)
-	// const id = new URL(page.url()).pathname.split('/').at(2);
-	// XXX: DONT MERGE
-	// TODO check db
-	
+	const id = new URL(page.url()).pathname.split('/').at(2);
+	expect(await app.db.get('Session', id!)).toMatchObject({
+		name: 'Session #202603131502GLB',
+		metadata: {
+			'com.example.testing__not_inferred': { value: 'wasnt inferred from kobo' },
+			'com.example.testing__transect_code': { value: '202603131502GLB' },
+		},
+	});
 });
 
 async function registerKobotoolboxAccount({

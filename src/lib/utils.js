@@ -1598,3 +1598,12 @@ export function prefixIDBKeyRange(prefix) {
 export function ensureArray(subject) {
 	return Array.isArray(subject) ? subject : [subject]
 }
+
+if (import.meta.vitest) {
+	const {test, expect} = await import('vitest')
+	test("ensureArray", () => {
+		expect(ensureArray(1)).toEqual([1])
+		expect(ensureArray([1])).toEqual([1])
+		expect(ensureArray([[3]])).toEqual([[3]])
+	})
+}
