@@ -66,6 +66,11 @@ const appNavTabs = (lang = 'fr') =>
 			name: lang === 'fr' ? 'Protocoles' : 'Protocols',
 			route: '/protocols',
 		},
+
+		accounts: {
+			name: lang === 'fr' ? 'Comptes' : 'Accounts',
+			route: '/accounts',
+		},
 	});
 
 /**

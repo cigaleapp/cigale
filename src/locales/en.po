@@ -23,7 +23,7 @@ msgid "<0/> Autres photos <1/>"
 msgstr "<0/> Other photos <1/>"
 
 #: src/routes/(app)/PrepareForOffline.svelte
-#: src/routes/(app)/sessions/+page.svelte
+#: src/routes/(app)/sessions/Cards.svelte
 msgid "<0/> Chargement…"
 msgstr "<0/> Loading…"
 
@@ -268,7 +268,6 @@ msgstr "Loading built-in protocol"
 #: src/lib/MetadataInput.svelte
 #: src/routes/(app)/+layout.js
 #: src/routes/(app)/DeploymentDetails.svelte
-#: src/routes/(app)/sessions/+page.svelte
 msgid "Chargement…"
 msgstr "Loading…"
 
@@ -954,6 +953,7 @@ msgid "<0/> Inaccessible: HTTP {0} <1/>"
 msgstr "<0/> Unreachable: HTTP {0} <1/>"
 
 #: src/lib/FieldURL.svelte
+#: src/routes/(app)/accounts/+page.svelte
 msgid "<0/> Vérification…"
 msgstr "<0/> Checking…"
 
@@ -1775,13 +1775,8 @@ msgid "Protocoles <0/>"
 msgstr "Protocols <0/>"
 
 #: src/routes/(app)/sessions/+page.svelte
-#: src/routes/(app)/sessions/+page.svelte
 msgid "Sessions"
 msgstr "Sessions"
-
-#: src/routes/(app)/sessions/+page.svelte
-msgid "Aucun protocole installé, impossible de créer une session."
-msgstr "No protocol is installed, cannot create a session."
 
 #: src/routes/(app)/sessions/+page.svelte
 msgid "<0/> Importer un export .zip"
@@ -1791,13 +1786,11 @@ msgstr "<0/> Import a .zip export"
 msgid "<0/> Nouvelle session"
 msgstr "<0/> New session"
 
-#: src/routes/(app)/sessions/+page.svelte
 #: src/routes/(app)/sessions/[id]/+page.svelte
 msgid "Ouvrir la session"
 msgstr "Open the session"
 
-#: src/routes/(app)/sessions/+page.svelte
-#: src/routes/(app)/sessions/+page.svelte
+#: src/routes/(app)/sessions/Cards.svelte
 msgid "Protocole indisponible"
 msgstr "Protocol unavailable"
 
@@ -1813,7 +1806,7 @@ msgstr[1] "# images"
 msgid "Gérer"
 msgstr "Manage"
 
-#: src/routes/(app)/sessions/+page.svelte
+#: src/routes/(app)/sessions/Cards.svelte
 msgid "Créer une nouvelle session"
 msgstr "Create a new session"
 
@@ -1825,7 +1818,6 @@ msgstr "Session name"
 msgid "Session supprimée."
 msgstr "Session was deleted."
 
-#: src/routes/(app)/sessions/+page.svelte
 #: src/routes/(app)/sessions/[id]/+page.svelte
 msgid "Ouvrir"
 msgstr "Open"
@@ -1972,10 +1964,6 @@ msgstr ""
 #: src/lib/inference.js
 msgid "X-Custom-Header"
 msgstr ""
-
-#: src/routes/(app)/sessions/+page.svelte
-msgid "Ouverture…"
-msgstr "Opening…"
 
 #: src/routes/(app)/protocols/RowProtocol.svelte
 msgid "Mises à jour automatiques"
@@ -2373,29 +2361,11 @@ msgid "Se connecter"
 msgstr ""
 
 #: src/routes/(app)/accounts/+page.svelte
-msgid "Serveur"
-msgstr ""
-
-#: src/routes/(app)/accounts/+page.svelte
-msgid "Connecte-toi sur <0/>, puis copier-colle <1>ton token</1>"
-msgstr ""
-
-#: src/routes/(app)/accounts/+page.svelte
-msgid "Token <0/>"
-msgstr ""
-
-#: src/routes/(app)/accounts/+page.svelte
 msgid "Token"
 msgstr ""
 
 #: src/routes/(app)/accounts/+page.svelte
 msgid "Comptes"
-msgstr ""
-
-#: src/routes/(app)/accounts/+page.svelte
-msgid ""
-"Permet d'ouvrir des sessions distantes ou de publier des sessions vers des services\n"
-"tierces"
 msgstr ""
 
 #. 0: provider.displayName
@@ -2412,42 +2382,50 @@ msgid "Déconnecter"
 msgstr ""
 
 #: src/routes/(app)/accounts/+page.svelte
-#: src/routes/(app)/sessions/+page.svelte
 msgid "Aucun compte"
 msgstr ""
 
-#: src/routes/(app)/sessions/+page.svelte
-msgid "<0/> Local"
-msgstr ""
-
-#: src/routes/(app)/sessions/+page.svelte
-msgid "<0/> Autres comptes"
-msgstr ""
-
-#: src/routes/(app)/sessions/+page.svelte
-msgid "<0/> En ligne"
-msgstr ""
-
-#: src/routes/(app)/sessions/+page.svelte
-msgid "Télécharger la session"
-msgstr ""
-
-#: src/routes/(app)/sessions/+page.svelte
-msgid "Téléchargement…"
-msgstr ""
-
-#. 0: session.submittedBy
+#. 0: submittedBy
 #: src/routes/(app)/sessions/+page.svelte
 msgid "· par {0}"
 msgstr ""
 
-#. 0: provider.displayName
+#. 0: providers.get(directory.platform)!.displayName
 #: src/routes/(app)/sessions/+page.svelte
 msgid "Voir sur {0}"
 msgstr ""
 
-#: src/routes/(app)/sessions/+page.svelte
+#: src/routes/(app)/sessions/Cards.svelte
 msgid "<0/> Aucune session"
+msgstr ""
+
+#: src/routes/(app)/accounts/+page.svelte
+msgid "Connecte-toi sur <0/>"
+msgstr ""
+
+#. 0: '{}'
+#: src/routes/(app)/accounts/+page.svelte
+msgid "Copie-colle <0>ton token</0> (c'est la partie entre les {0})"
+msgstr ""
+
+#: src/routes/(app)/accounts/+page.svelte
+msgid "<0/> Token valide"
+msgstr ""
+
+#: src/routes/(app)/accounts/+page.svelte
+msgid "<0/> Token invalide"
+msgstr ""
+
+#: src/routes/(app)/accounts/+page.svelte
+msgid "Pour ouvrir ou publier des sessions en ligne"
+msgstr ""
+
+#: src/routes/(app)/sessions/+page.svelte
+msgid "Supprimer toutes les sessions"
+msgstr ""
+
+#: src/routes/(app)/sessions/+page.svelte
+msgid "Sur l'appareil"
 msgstr ""
 
 #: src/lib/queue.svelte.js

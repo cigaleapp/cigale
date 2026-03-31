@@ -56,6 +56,7 @@ export type AppFixture = {
 	db: {
 		ready(): Promise<void>;
 		refresh(): Promise<void>;
+		list<T extends keyof IDBDatabaseType>(name: T): Promise<IDBDatabaseType[T]['value'][]>;
 		get<T extends keyof IDBDatabaseType>(
 			name: T,
 			key: string
@@ -179,6 +180,9 @@ export const test = base.extend<
 					await page.evaluate(async () => {
 						window.refreshDB();
 					});
+				},
+				async list<T extends keyof IDBDatabaseType>(name: T) {
+					return page.evaluate(async (name) => window.DB.getAll(name), name);
 				},
 				async get<T extends keyof IDBDatabaseType>(name: T, key: string) {
 					return getDatabaseRowById(page, name, key);
@@ -403,10 +407,7 @@ export const test = base.extend<
 				context,
 				(u) =>
 					Boolean(
-						u.pathname
-							.split('/')
-							.at(-1)
-							?.match(/\.cigaleprotocol\.\w+$/) &&
+						new URLPattern("https://*/**/*.cigaleprotocol.*").test(u) && 
 						!ALLOWED_PROTOCOLS.some((source) => {
 							if (typeof source !== 'string') return false;
 							const url = new URL(source);

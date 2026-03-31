@@ -247,7 +247,7 @@ test('can send a bug report', async ({ page, app, context }) => {
 	await mockUrl(
 		page,
 		context,
-		(u) => u.hostname === 'mkissue.cigale.gwen.works',
+		"https://mkissue.cigale.gwen.works/**",
 		async (route) => {
 			requestBody = route.request().postDataJSON();
 			await browserConsole.log(page, 'mocking route, body is', requestBody);

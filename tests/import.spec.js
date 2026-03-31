@@ -457,7 +457,7 @@ test('can extract EXIF GPS data from an image', async ({ page, context, app }) =
 	await mockUrl(
 		page,
 		context,
-		'https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=43.46715666666389&lon=11.885394999997223&addressdetails=0',
+		'https://nominatim.openstreetmap.org/reverse\\?format=jsonv2&lat=43.46715666666389&lon=11.885394999997223&addressdetails=0',
 		{
 			json: {
 				place_id: 73806197,
