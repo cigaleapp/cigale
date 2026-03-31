@@ -296,7 +296,7 @@ export default class Provider implements Account {
 			protocol: protocol.id,
 			name,
 			createdAt: row._submission_time.toISOString(),
-			description: `Créée sur KoboCollect. Voir ${submissionUrl}`,
+			description: `Créée sur KoboToolbox. Voir ${submissionUrl}`,
 			openedAt: new Date().toISOString(),
 			metadata: mapValues(metadata, ({ value, ...rest }) => ({
 				...rest,

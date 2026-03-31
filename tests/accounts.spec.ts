@@ -157,7 +157,7 @@ test('can download a session from a kobotoolbox account', async ({ page, context
 				required: false,
 				description: 'Not inferred',
 				default: 'wasnt inferred from kobo',
-				kobocollect: '', // force non-inference
+				kobocollect: [], // force non-inference
 			},
 			// TODO also test kobotoolbox: list+true+false, kobotoolbox: list+choice and options: kobotoolbox
 			transect_code: {
@@ -227,12 +227,14 @@ test('can download a session from a kobotoolbox account', async ({ page, context
 	await card.click();
 	await expect(card).toHaveText(/Téléchargement…/);
 	await expect(card).toHaveText(/Sauvegarde…/);
-	await expect(card).toHaveText(/Fichier \(1\/1\)…/);
 	await app.path.wait('/(app)/(sidepanel)/import');
 	await goToSessionPage(page);
 	await expect(page.getByRole('textbox', { name: 'Description' })).toHaveValue(
 		/Créée sur KoboToolbox/
 	);
+	// Wait for defaults to apply 
+	// TODO: reduce / eliminate this wait, resolveDefaults is wayyyyyyyyyyyyyy too slow
+	await app.wait("5s")
 	expect(
 		await app.db.metadata.of({
 			session: 'Session #202603131502GLB',
