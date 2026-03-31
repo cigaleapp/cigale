@@ -9,7 +9,6 @@
 <script lang="ts" generics="Step extends `step${string}`">
 	import type { Snippet } from 'svelte';
 
-	import { SvelteSet } from 'svelte/reactivity';
 
 	type Props = {
 		steps: Array<{ name: Step; title: string }>;
@@ -17,15 +16,12 @@
 
 	const { steps, ...snippets }: Props = $props();
 
-	const done = new SvelteSet<Step>();
 	let current = $derived(steps[0]);
 	const future = $derived(steps.slice(nextIndex(current)));
 
 	function nextIndex(step: { name: Step }) {
 		return steps.findIndex((s) => s.name === step.name) + 1;
 	}
-
-	$inspect({ done, current, future });
 </script>
 
 <ol>

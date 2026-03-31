@@ -1,8 +1,5 @@
-import { readFile } from 'node:fs';
 import type { AppFixture } from './fixtures.js';
 import type { Locator, Page } from '@playwright/test';
-
-import { logexpr } from '$lib/utils.js';
 
 import { expect, test } from './fixtures.js';
 import mockKobotoolboxAssetData from './fixtures/http/kobotoolbox/asset-data.json' with { type: 'json' };
@@ -232,9 +229,9 @@ test('can download a session from a kobotoolbox account', async ({ page, context
 	await expect(page.getByRole('textbox', { name: 'Description' })).toHaveValue(
 		/Créée sur KoboToolbox/
 	);
-	// Wait for defaults to apply 
+	// Wait for defaults to apply
 	// TODO: reduce / eliminate this wait, resolveDefaults is wayyyyyyyyyyyyyy too slow
-	await app.wait("5s")
+	await app.wait('5s');
 	expect(
 		await app.db.metadata.of({
 			session: 'Session #202603131502GLB',
@@ -267,8 +264,10 @@ test('can download a session from a kobotoolbox account', async ({ page, context
 	card.getByRole('button', { name: 'Gérer' }).click();
 	await app.path.wait('/(app)/sessions/[id]');
 	// Get session id from the URL (kinda jank???)
-	const id = new URL(page.url()).pathname.split('/').at(2);
-	// TODO: check db
+	// const id = new URL(page.url()).pathname.split('/').at(2);
+	// XXX: DONT MERGE
+	// TODO check db
+	
 });
 
 async function registerKobotoolboxAccount({

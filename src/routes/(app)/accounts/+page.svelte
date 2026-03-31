@@ -94,7 +94,7 @@
 							<a
 								href="https://{loginData.server}"
 								target="_blank"
-								onclick={(e) => {
+								onclick={() => {
 									done();
 								}}
 							>
