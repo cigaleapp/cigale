@@ -1,0 +1,33 @@
+{
+	"username": "gwennlbh",
+	"first_name": "",
+	"last_name": "",
+	"email": "gwenn.lebihan7@gmail.com",
+	"server_time": "2026-04-01T09:50:22Z",
+	"date_joined": "2026-02-06T10:12:39Z",
+	"projects_url": "https://kc.kobotoolbox.org/gwennlbh",
+	"gravatar": "https://www.gravatar.com/avatar/ef0da0f0f03e400ffd7ce59603db2e62?s=40",
+	"last_login": "2026-03-29T18:05:17.097174Z",
+	"extra_details": {
+		"name": "Gwenn Le Bihan",
+		"sector": "Environment",
+		"country": "FRA",
+		"organization": "CNRS",
+		"last_ui_language": "en",
+		"organization_type": "government",
+		"organization_website": "https://sete-moulis-cnrs.fr/en/",
+		"newsletter_subscription": false,
+		"done_storage_limits_check": true,
+		"require_auth": true
+	},
+	"git_rev": false,
+	"social_accounts": [],
+	"validated_password": true,
+	"accepted_tos": true,
+	"organization": {
+		"url": "https://kf.kobotoolbox.org/api/v2/organizations/orgsn5GLZHW4mDekLY7XPr2H/",
+		"name": "CNRS",
+		"uid": "orgsn5GLZHW4mDekLY7XPr2H"
+	},
+	"extra_details__uid": "uidWFneivxquTAy8DLAe37"
+}

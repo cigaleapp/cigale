@@ -88,11 +88,22 @@ export default class Provider implements Account {
 	) {
 		this.#token = token;
 		this.username = username ?? '';
-		this.domain = domain;
+		this.domain = type.enumerated(...Provider.servers.map((s) => s.domain)).assert(domain);
 		this.displayName = displayName ?? '';
 		this.avatarURL = avatarURL;
 		this.db = db;
 		this.id = id;
+	}
+
+	toJSON() {
+		return {
+			token: this.#token,
+			username: this.username,
+			domain: this.domain,
+			displayName: this.displayName,
+			db: this.db,
+			id: this.id,
+		};
 	}
 
 	static async checkAuth({
