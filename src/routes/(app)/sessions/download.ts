@@ -26,6 +26,10 @@ export async function downloadRemoteSession({
 	});
 
 	let i = 0;
+	mutator({
+		loading: `Fichiers (${i}/${session.filesCount})…`
+	})
+	
 	for await (const file of account.files(protocol, session.id)) {
 		i++;
 

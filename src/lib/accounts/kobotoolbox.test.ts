@@ -1,19 +1,26 @@
 import 'urlpattern-polyfill';
 import 'fake-indexeddb/auto';
 
-import type * as DB from '$lib/database.js';
-
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import data5 from '$e2e/fixtures/http/kobotoolbox/asset-data-limit-5.json' with { type: 'json' };
+import dataOne from '$e2e/fixtures/http/kobotoolbox/asset-data-single.json' with { type: 'json' };
 import data40 from '$e2e/fixtures/http/kobotoolbox/asset-data.json' with { type: 'json' };
 import asset from '$e2e/fixtures/http/kobotoolbox/asset.json' with { type: 'json' };
 import me from '$e2e/fixtures/http/kobotoolbox/me.json' with { type: 'json' };
+import * as DB from '$lib/database.js';
 import { openDatabase } from '$lib/idb.svelte.js';
+import { SessionRemoteID } from '$lib/schemas/sessions.js';
 
 import Provider from './kobotoolbox.js';
 
 const MOCK_TOKEN = 'da98ec4ef4ea681cfaef1cae68c4fae64cfae64f6ae4cfe6a1fc6e';
+const MOCK_SESSION_REMOTEID = SessionRemoteID.assert(
+	`/api/v2/assets/a3kVqAFEJwnHFcFc7PpWj4/data/709547383/`
+);
+const MOCK_SESSION_REMOTEID_NOTFOUND = SessionRemoteID.assert(
+	`/api/v2/assets/a3kVqAFEJwnHFcFc7PpWj4/data/42066667/`
+);
 
 beforeEach(() => {
 	const _originalFetch = global.fetch;
@@ -61,6 +68,17 @@ beforeEach(() => {
 			respond({
 				route: 'https://:server.kobotoolbox.org/api/v2/assets/:id/data',
 				response: (_, url) => (url.searchParams.get('limit') === '5' ? data5 : data40),
+			}) ??
+			respond({
+				route: 'https://:server.kobotoolbox.org/api/v2/assets/:id/data/:dataid{/}?',
+				response: dataOne,
+			}) ??
+			respond({
+				route: 'https://:server.kobotoolbox.org/api/v2/assets/:id/data/:dataid/enketo/view',
+				response: {
+					url: 'https://ee.kobotoolbox.org/view/103e4931120464df0cebb60b35df43b6?instance_id=c2983a5e-fd4c-4032-9b07-50d3e0b8db5f&return_url=false',
+					version_uid: 'vomChPkx3JLXdErzdUjMYd',
+				},
 			}) ??
 			respond({
 				route: 'https://:server.kobotoolbox.org/me/',
@@ -195,8 +213,10 @@ describe('.login', () => {
 	});
 });
 
-describe('.sessions', () => {
-	async function setupProtocols(...protocols: Array<Pick<DB.Protocol, 'id' | 'remote'>>) {
+describe('db-dependent', () => {
+	async function setupProtocols(
+		...protocols: Array<Pick<(typeof DB.Schemas.Protocol)['inferIn'], 'id' | 'remote'>>
+	) {
 		const db = await openDatabase();
 		for (const p of protocols) {
 			await db.add('Protocol', {
@@ -209,6 +229,12 @@ describe('.sessions', () => {
 		}
 
 		return db;
+	}
+
+	async function getAccount(id = '_default') {
+		const db = await openDatabase();
+		const acc = DB.Schemas.Account.assert(await db.get('Account', id));
+		return Provider.fromDatabase(db, acc);
 	}
 
 	beforeEach(async () => {
@@ -228,32 +254,34 @@ describe('.sessions', () => {
 		});
 	});
 
-	test('with no kobo protocols', async () => {
-		const db = await setupProtocols({ id: 'without.kobo' });
-		const account = Provider.fromDatabase(db, await db.get('Account', '_default')!);
+	describe('.sessions', () => {
+		test('with no kobo protocols', async () => {
+			await setupProtocols({ id: 'without.kobo' });
+			const account = await getAccount();
 
-		const iterations = await Array.fromAsync(account.sessions());
-		expect(iterations).toMatchObject([]);
-	});
+			const iterations = await Array.fromAsync(account.sessions());
+			expect(iterations).toMatchObject([]);
+		});
 
-	test('with static titles', async () => {
-		const db = await setupProtocols(
-			{ id: 'without.kobo' },
-			{
-				id: 'with.kobo',
-				remote: {
-					kobocollect: {
-						form: 'https://kf.kobotoolbox.org/#/forms/a3kVqAFEJwnHFcFc7PpWj4/summary',
-						title: 'Static title',
+		test('with static titles', async () => {
+			await setupProtocols(
+				{ id: 'without.kobo' },
+				{
+					id: 'with.kobo',
+					remote: {
+						kobocollect: {
+							form: 'https://kf.kobotoolbox.org/#/forms/a3kVqAFEJwnHFcFc7PpWj4/summary',
+							title: 'Static title',
+							thumbnails: [''],
+						},
 					},
-				},
-			}
-		);
+				}
+			);
 
-		const account = Provider.fromDatabase(db, await db.get('Account', '_default')!);
+			const account = await getAccount();
 
-		const iterations = await Array.fromAsync(account.sessions({ limit: 5 }));
-		expect(iterations).toMatchInlineSnapshot(`
+			const iterations = await Array.fromAsync(account.sessions({ limit: 5 }));
+			expect(iterations).toMatchInlineSnapshot(`
 			[
 			  {
 			    "total": 5,
@@ -320,5 +348,65 @@ describe('.sessions', () => {
 			  },
 			]
 		`);
+		});
+	});
+
+	describe('.session', () => {
+		test('non-kobo protocol', async () => {
+			const db = await setupProtocols({ id: 'not.kobo' });
+			const acc = await getAccount();
+			const prot = DB.Schemas.Protocol.assert(await db.get('Protocol', 'not.kobo'));
+			expect(
+				acc.session(prot, MOCK_SESSION_REMOTEID)
+			).rejects.toThrowErrorMatchingInlineSnapshot(
+				`[Error: This protocol doesn't support KoboToolbox remote sessions]`
+			);
+		});
+
+		test('not found data id', async () => {
+			const db = await setupProtocols(
+				{ id: 'not.kobo' },
+
+				{
+					id: 'with.kobo',
+					remote: {
+						kobocollect: {
+							form: 'https://kf.kobotoolbox.org/#/forms/a3kVqAFEJwnHFcFc7PpWj4/summary',
+							title: 'Static title',
+							thumbnails: [''],
+						},
+					},
+				}
+			);
+			const acc = await getAccount();
+			const prot = DB.Schemas.Protocol.assert(await db.get('Protocol', 'with.kobo'));
+
+			expect(
+				acc.session(prot, MOCK_SESSION_REMOTEID_NOTFOUND)
+			).rejects.toThrowErrorMatchingInlineSnapshot(
+				`[Error: Impossible de se connecter à KoboToolbox: {"detail":"Invalid token."}]`
+			);
+		});
+
+		test('valid id', async () => {
+			const db = await setupProtocols(
+				{ id: 'not.kobo' },
+
+				{
+					id: 'with.kobo',
+					remote: {
+						kobocollect: {
+							form: 'https://kf.kobotoolbox.org/#/forms/a3kVqAFEJwnHFcFc7PpWj4/summary',
+							title: 'Static title',
+							thumbnails: [''],
+						},
+					},
+				}
+			);
+			const acc = await getAccount();
+			const prot = DB.Schemas.Protocol.assert(await db.get('Protocol', 'with.kobo'));
+
+			expect(acc.session(prot, MOCK_SESSION_REMOTEID)).resolves.toMatchInlineSnapshot();
+		});
 	});
 });
