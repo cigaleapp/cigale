@@ -75,7 +75,7 @@
 		"@electron-forge/publisher-github": "^7.11.1",
 		"@electron-forge/shared-types": "^7.11.1",
 		"@electron/fuses": "^1.8.0",
-		"@eslint/compat": "^2.0.3",
+		"@eslint/compat": "^2.0.4",
 		"@eslint/js": "^10.0.1",
 		"@ianvs/prettier-plugin-sort-imports": "^4.7.1",
 		"@iconify-json/ri": "^1.2.10",
