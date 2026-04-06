@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file, on a monthly basis, with a consistent, simple format: month/year heading > type of change heading > list of changes.
 
+## April 2026
+
+### Data Updates
+
+- Regenerate example protocols
+
 ## March 2026
 
 ### Improvements
