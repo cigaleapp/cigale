@@ -99,7 +99,7 @@
 		"discord.js": "^14.25.1",
 		"electron": "^41.1.1",
 		"embla-carousel": "^8.6.0",
-		"eslint": "^10.1.0",
+		"eslint": "^10.2.0",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-depend": "^1.5.0",
 		"eslint-plugin-oxlint": "^1.57.0",
