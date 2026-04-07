@@ -188,6 +188,7 @@ metadata:
       - { key: v1, label: V1, description: ... }
       - { key: v2, label: V2, description: ... }
       - { key: v3, label: V3, description: ... }
+      - { key: hq, label: HQ, description: ... }
     infer:
       sidecar: EntomoscopeCameraModel
   raspberry_model:
