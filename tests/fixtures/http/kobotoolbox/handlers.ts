@@ -6,7 +6,6 @@ import type { HttpRequestResolverExtras, RequestHandlerOptions, ResponseResolver
 import { http, HttpResponse } from 'msw';
 
 import { FixturePaths } from '$e2e/filepaths.js';
-import { logexpr } from '$lib/utils.js';
 
 import data5 from './asset-data-limit-5.json' with { type: 'json' };
 import dataOne from './asset-data-single.json' with { type: 'json' };
@@ -53,19 +52,16 @@ export const handlers = [
 		})
 	),
 	get<{ size: string }>('/api/v2/assets/*/data/*/attachments/*/:size/', () =>
-		logexpr(
-			'attachment mock',
-			HttpResponse.arrayBuffer(
-				readFileSync(path.join(FixturePaths.root, 'cyan.jpeg' as FixturePaths.Any)).buffer,
-				{
-					headers: { 'Content-Type': 'image/jpeg' },
-				}
-			)
+		HttpResponse.arrayBuffer(
+			readFileSync(path.join(FixturePaths.root, 'cyan.jpeg' as FixturePaths.Any)).buffer,
+			{
+				headers: { 'Content-Type': 'image/jpeg' },
+			}
 		)
 	),
 ];
 
-function get<ExtraParams extends Record<string, any> = BaseParams>(
+function get<ExtraParams extends Record<string, unknown> = BaseParams>(
 	...[route, resolver, options]: CorsedHandlerArgs<ExtraParams>
 ) {
 	return http.get<BaseParams & ExtraParams>(
@@ -75,7 +71,7 @@ function get<ExtraParams extends Record<string, any> = BaseParams>(
 	);
 }
 
-function post<P extends Record<string, any> = BaseParams>(
+function post<P extends Record<string, unknown> = BaseParams>(
 	...[route, resolver, options]: CorsedHandlerArgs<P>
 ) {
 	return http.post<BaseParams & P>(
@@ -87,6 +83,7 @@ function post<P extends Record<string, any> = BaseParams>(
 
 type BaseParams = { id: string; server: string };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type CorsedHandlerArgs<P extends Record<string, any> = BaseParams> = [
 	route: string,
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
