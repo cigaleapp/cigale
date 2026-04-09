@@ -8,6 +8,8 @@ import { chooseInDropdown } from './utils/core.js';
 import { goHome, goToSessionPage } from './utils/navigation.js';
 import { importProtocol } from './utils/protocols.js';
 
+// TODO: test for graceful handling of external API being down
+
 test.beforeEach(({ network }) => {
 	network.use(...kobotoolbox.handlers);
 });

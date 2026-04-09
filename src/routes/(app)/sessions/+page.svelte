@@ -210,6 +210,7 @@
 	<section class="sessions">
 		{#if directory.platform === 'local'}
 			<div class="cards" in:fade={{ duration: 200 }}>
+			{#key tables.Session.state}
 				<Cards
 					create={createSession}
 					sessions={async function* () {
@@ -272,6 +273,7 @@
 						</ButtonInk>
 					{/snippet}
 				</Cards>
+				{/key}
 			</div>
 		{:else if account}
 			{#key directory}
