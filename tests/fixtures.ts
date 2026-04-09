@@ -1,14 +1,15 @@
-import { mkdir, rm } from 'node:fs/promises';
-import type { FixturePaths } from './filepaths.js';
-import type { TempFilesFixture } from './fixtures/tempfiles.js';
-import type { NavigationTab, PredownloadedModel } from './utils/index.js';
-import type { Locator } from '@playwright/test';
 import type { MetadataValue, Settings } from '$lib/database';
 import type { IDBDatabaseType } from '$lib/idb.svelte';
 import type { RuntimeValue } from '$lib/schemas/metadata';
 import type { ExportedProtocol } from '$lib/schemas/protocols';
 import type { Toast } from '$lib/toasts.svelte.js';
+import type { Locator } from '@playwright/test';
+import { mkdir, rm } from 'node:fs/promises';
+import type { FixturePaths } from './filepaths.js';
+import type { TempFilesFixture } from './fixtures/tempfiles.js';
+import type { NavigationTab, PredownloadedModel } from './utils/index.js';
 
+import { defineNetworkFixture } from '@msw/playwright';
 import { test as base, expect as baseExpect } from '@playwright/test';
 import { ms } from 'convert';
 
@@ -159,10 +160,26 @@ export type AppFixture = {
 };
 
 export const test = base.extend<
-	{ forEachTest: void; app: AppFixture; tempfiles: TempFilesFixture },
+	{
+		forEachTest: void;
+		app: AppFixture;
+		tempfiles: TempFilesFixture;
+		handlers: Array<import('msw').AnyHandler>;
+		network: import('@msw/playwright').NetworkFixture;
+	},
 	{ forEachWorker: void }
 >({
 	tempfiles,
+	handlers: [],
+	network: [
+		async ({ context, handlers }, use) => {
+			const network = defineNetworkFixture({ context, handlers });
+			await network.enable();
+			await use(network);
+			await network.disable();
+		},
+		{ auto: true },
+	],
 	app: async ({ page }, use) => {
 		await use({
 			async wait(duration) {
@@ -407,7 +424,7 @@ export const test = base.extend<
 				context,
 				(u) =>
 					Boolean(
-						new URLPattern("https://*/**/*.cigaleprotocol.*").test(u) && 
+						new URLPattern('https://*/**/*.cigaleprotocol.*').test(u) &&
 						!ALLOWED_PROTOCOLS.some((source) => {
 							if (typeof source !== 'string') return false;
 							const url = new URL(source);

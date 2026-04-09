@@ -2,50 +2,15 @@ import type { AppFixture } from './fixtures.js';
 import type { Locator, Page } from '@playwright/test';
 
 import { expect, test } from './fixtures.js';
-import mockKobotoolboxAssetData from './fixtures/http/kobotoolbox/asset-data.json' with { type: 'json' };
-import mockKobotoolboxAsset from './fixtures/http/kobotoolbox/asset.json' with { type: 'json' };
-import { chooseInDropdown, mockUrl } from './utils/core.js';
+import { MOCK_TOKEN } from './fixtures/http/kobotoolbox/handlers.js';
+import * as kobotoolbox from './fixtures/http/kobotoolbox/handlers.js';
+import { chooseInDropdown } from './utils/core.js';
 import { goHome, goToSessionPage } from './utils/navigation.js';
 import { importProtocol } from './utils/protocols.js';
 
-const mocks = {
-	kobotoolbox: {
-		token: 'a5e16a5e1f6a1fa61bc651bd16',
-		account: {
-			username: 'gwennlbh',
-			first_name: '',
-			last_name: '',
-			email: 'gwenn.lebihan7@gmail.com',
-			server_time: '2026-03-29T17:50:19Z',
-			date_joined: '2026-02-06T10:12:39Z',
-			projects_url: 'https://kc.kobotoolbox.org/gwennlbh',
-			gravatar: 'https://www.gravatar.com/avatar/ef0da0f0f03e400ffd7ce59603db2e62?s=40',
-			last_login: '2026-03-26T15:45:57.421836Z',
-			extra_details: {
-				name: 'Gwenn Le Bihan',
-				sector: 'Environment',
-				country: 'FRA',
-				organization: 'CNRS',
-				last_ui_language: 'fr',
-				organization_type: 'government',
-				organization_website: 'https://sete-moulis-cnrs.fr/en/',
-				newsletter_subscription: false,
-				done_storage_limits_check: true,
-				require_auth: true,
-			},
-			git_rev: false,
-			social_accounts: [],
-			validated_password: true,
-			accepted_tos: true,
-			organization: {
-				url: 'https://kf.kobotoolbox.org/api/v2/organizations/orgsn5GLZHW4mDekLY7XPr2H/',
-				name: 'CNRS',
-				uid: 'orgsn5GLZHW4mDekLY7XPr2H',
-			},
-			extra_details__uid: 'uidWFneivxquTAy8DLAe37',
-		},
-	},
-};
+test.beforeEach(({ network }) => {
+	network.use(...kobotoolbox.handlers);
+});
 
 test.describe('adding a kobotoolbox account', () => {
 	test.beforeEach(async ({ app }) => {
@@ -63,7 +28,7 @@ For a general introduction to the KoboToolbox API, please visit the KoboToolbox 
 You can also check the official API documentation for a detailed documentation of all available endpoints.
 
 {
-  "token": "${mocks.kobotoolbox.token}"
+  "token": "${MOCK_TOKEN}"
 }
 `,
 		});
@@ -80,7 +45,7 @@ You can also check the official API documentation for a detailed documentation o
 			page,
 			app,
 			context,
-			token: `{ \n"token": "${mocks.kobotoolbox.token}"\n }`,
+			token: `{ \n"token": "${MOCK_TOKEN}"\n }`,
 		});
 	});
 
@@ -89,7 +54,7 @@ You can also check the official API documentation for a detailed documentation o
 			page,
 			app,
 			context,
-			token: ` "token": "${mocks.kobotoolbox.token}" `,
+			token: ` "token": "${MOCK_TOKEN}" `,
 		});
 	});
 
@@ -98,7 +63,7 @@ You can also check the official API documentation for a detailed documentation o
 			page,
 			app,
 			context,
-			token: ` ${mocks.kobotoolbox.token} `,
+			token: ` ${MOCK_TOKEN} `,
 		});
 	});
 
@@ -185,35 +150,6 @@ test('can download a session from a kobotoolbox account', async ({ page, context
 		'Gwenn Le Bihan'
 	);
 
-	const mockKobotoolboxApi = async (path: string, result: Parameters<typeof mockUrl>[3]) =>
-		mockUrl(
-			page,
-			context,
-			`https://cors.gwen.works/https\\://kf.kobotoolbox.org${path}`,
-			result
-		);
-
-	await mockKobotoolboxApi(`/api/v2/assets/${mockFormId}`, async () => {
-		await app.wait('2s');
-		return { json: mockKobotoolboxAsset };
-	});
-
-	await mockKobotoolboxApi(`/api/v2/assets/${mockFormId}/data`, async () => {
-		await app.wait('2s');
-		return { json: mockKobotoolboxAssetData };
-	});
-
-	await mockKobotoolboxApi(`/api/v2/assets/*/data/*/enketo/view{/}?`, {
-		json: {
-			url: 'https://ee.kobotoolbox.org/view/eb62b72b5c0aa392278dbe3a25f9bb89?instance_id=c2983a5e-fd4c-4032-9b07-50d3e0b8db5f&return_url=false',
-			version_uid: 'vomChPkx3JLXdErzdUjMYd',
-		},
-	});
-
-	await mockKobotoolboxApi(`/api/v2/assets/*/data/*/attachments/*/:size/`, {
-		file: 'cyan.jpeg',
-	});
-
 	// TODO mock images
 
 	const main = page.locator('body').first();
@@ -278,7 +214,7 @@ async function registerKobotoolboxAccount({
 	page,
 	app,
 	context,
-	token = mocks.kobotoolbox.token,
+	token = MOCK_TOKEN,
 	afterTokenFill,
 }: {
 	page: Page;
@@ -288,27 +224,6 @@ async function registerKobotoolboxAccount({
 	/** What to do after the token has been filled in. By default, checks for successful validation and click login button then wait for the modal to close */
 	afterTokenFill?: (modal: Locator) => Promise<void>;
 }) {
-	await mockUrl(
-		page,
-		context,
-		'https://cors.gwen.works/https\\://kf.kobotoolbox.org/:action(me|login){/}?',
-		async (req) => {
-			const auth = await req.request().headerValue('Authorization');
-			if (auth !== `Token ${mocks.kobotoolbox.token}`) {
-				return {
-					status: 401,
-					json: {
-						detail: "Informations d'authentification non fournies.",
-					},
-				};
-			}
-
-			return {
-				json: mocks.kobotoolbox.account,
-			};
-		}
-	);
-
 	const main = page.locator('main');
 	const modal = app.modals.byTitle('Ajouter un compte KoboToolbox');
 

@@ -1,96 +1,36 @@
-import 'urlpattern-polyfill';
 import 'fake-indexeddb/auto';
+import 'urlpattern-polyfill';
 
-import { beforeEach, describe, expect, test, vi } from 'vitest';
+import { setupServer } from 'msw/node';
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
 
-import data5 from '$e2e/fixtures/http/kobotoolbox/asset-data-limit-5.json' with { type: 'json' };
-import dataOne from '$e2e/fixtures/http/kobotoolbox/asset-data-single.json' with { type: 'json' };
-import data40 from '$e2e/fixtures/http/kobotoolbox/asset-data.json' with { type: 'json' };
-import asset from '$e2e/fixtures/http/kobotoolbox/asset.json' with { type: 'json' };
-import me from '$e2e/fixtures/http/kobotoolbox/me.json' with { type: 'json' };
+import {
+	handlers as kobotoolboxApiMockHandlers,
+	MOCK_SESSION_REMOTEID,
+	MOCK_SESSION_REMOTEID_NOTFOUND_DATA_ID,
+	MOCK_TOKEN,
+} from '$e2e/fixtures/http/kobotoolbox/handlers.js';
 import * as DB from '$lib/database.js';
 import { openDatabase } from '$lib/idb.svelte.js';
-import { SessionRemoteID } from '$lib/schemas/sessions.js';
 
 import Provider from './kobotoolbox.js';
 
-const MOCK_TOKEN = 'da98ec4ef4ea681cfaef1cae68c4fae64cfae64f6ae4cfe6a1fc6e';
-const MOCK_SESSION_REMOTEID = (dataid = '709547383') =>
-	SessionRemoteID.assert(`/api/v2/assets/a3kVqAFEJwnHFcFc7PpWj4/data/${dataid}/`);
-const MOCK_SESSION_REMOTEID_NOTFOUND_DATA_ID = '42066667';
+const kobotoolboxApiMock = setupServer(...kobotoolboxApiMockHandlers);
+
+beforeAll(() => {
+	kobotoolboxApiMock.listen();
+});
 
 beforeEach(() => {
 	vi.setSystemTime('2026-04-09T09:09:17.500Z');
+});
 
-	const _originalFetch = global.fetch;
-	global.fetch = vi.fn((corsedUrl: string | URL | RequestInfo, init?: RequestInit) => {
-		const url = corsedUrl.toString().replace(/^https:\/\/cors\.gwen\.works\//, '');
+afterEach(() => {
+	kobotoolboxApiMock.resetHandlers();
+});
 
-		const respond = ({
-			route,
-			response,
-		}: {
-			route: string;
-			response: object | ((match: URLPatternResult, url: URL) => object | Response);
-		}) => {
-			const match = new URLPattern(route).exec(url);
-
-			if (!match) return undefined;
-
-			if (
-				new Headers(init?.headers ?? {}).get('Authorization') !== `Token ${MOCK_TOKEN}` ||
-				match.hostname.groups.server !== 'kf'
-			) {
-				return Promise.resolve(
-					new Response(JSON.stringify({ detail: 'Jeton invalide.' }), {
-						headers: { 'Content-Type': 'application/json' },
-						status: 401,
-					})
-				);
-			}
-
-			const resp = typeof response === 'function' ? response(match, new URL(url)) : response;
-
-			return Promise.resolve(
-				resp instanceof Response
-					? resp
-					: new Response(JSON.stringify(resp), {
-							status: 200,
-							headers: { 'Content-Type': 'application/json' },
-						})
-			);
-		};
-
-		return (
-			respond({
-				route: 'https://:server.kobotoolbox.org/api/v2/assets/:id',
-				response: asset,
-			}) ??
-			respond({
-				route: 'https://:server.kobotoolbox.org/api/v2/assets/:id/data',
-				response: (_, url) => (url.searchParams.get('limit') === '5' ? data5 : data40),
-			}) ??
-			respond({
-				route: 'https://:server.kobotoolbox.org/api/v2/assets/:id/data/:dataid{/}?',
-				response: ({ pathname: { groups } }) =>
-					groups.dataid === MOCK_SESSION_REMOTEID_NOTFOUND_DATA_ID
-						? new Response('Not found', { status: 404 })
-						: dataOne,
-			}) ??
-			respond({
-				route: 'https://:server.kobotoolbox.org/api/v2/assets/:id/data/:dataid/enketo/view',
-				response: {
-					url: 'https://ee.kobotoolbox.org/view/103e4931120464df0cebb60b35df43b6?instance_id=c2983a5e-fd4c-4032-9b07-50d3e0b8db5f&return_url=false',
-					version_uid: 'vomChPkx3JLXdErzdUjMYd',
-				},
-			}) ??
-			respond({
-				route: 'https://:server.kobotoolbox.org/me/',
-				response: me,
-			}) ??
-			_originalFetch(corsedUrl, init)
-		);
-	});
+afterAll(() => {
+	kobotoolboxApiMock.close();
 });
 
 test('.tokenPageURL', () => {
@@ -389,7 +329,7 @@ describe('db-dependent', () => {
 			await expect(
 				acc.session(prot, MOCK_SESSION_REMOTEID(MOCK_SESSION_REMOTEID_NOTFOUND_DATA_ID))
 			).rejects.toThrowErrorMatchingInlineSnapshot(
-				`[Error: Impossible de se connecter à KoboToolbox: Not found]`
+				`[Error: Impossible de se connecter à KoboToolbox: {"detail":"Not found."}]`
 			);
 		});
 
