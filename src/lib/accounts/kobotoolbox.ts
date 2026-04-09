@@ -278,7 +278,7 @@ export default class Provider implements Account {
 		const { url: submissionUrl } = await this.json(
 			'GET',
 			'v2',
-			`${id}/enketo/view`,
+			`${id.replace(/\/$/, '')}/enketo/view`,
 			type({ url: 'string.url' })
 		);
 

@@ -15,14 +15,13 @@ import { SessionRemoteID } from '$lib/schemas/sessions.js';
 import Provider from './kobotoolbox.js';
 
 const MOCK_TOKEN = 'da98ec4ef4ea681cfaef1cae68c4fae64cfae64f6ae4cfe6a1fc6e';
-const MOCK_SESSION_REMOTEID = SessionRemoteID.assert(
-	`/api/v2/assets/a3kVqAFEJwnHFcFc7PpWj4/data/709547383/`
-);
-const MOCK_SESSION_REMOTEID_NOTFOUND = SessionRemoteID.assert(
-	`/api/v2/assets/a3kVqAFEJwnHFcFc7PpWj4/data/42066667/`
-);
+const MOCK_SESSION_REMOTEID = (dataid = '709547383') =>
+	SessionRemoteID.assert(`/api/v2/assets/a3kVqAFEJwnHFcFc7PpWj4/data/${dataid}/`);
+const MOCK_SESSION_REMOTEID_NOTFOUND_DATA_ID = '42066667';
 
 beforeEach(() => {
+	vi.setSystemTime('2026-04-09T09:09:17.500Z');
+
 	const _originalFetch = global.fetch;
 	global.fetch = vi.fn((corsedUrl: string | URL | RequestInfo, init?: RequestInit) => {
 		const url = corsedUrl.toString().replace(/^https:\/\/cors\.gwen\.works\//, '');
@@ -32,7 +31,7 @@ beforeEach(() => {
 			response,
 		}: {
 			route: string;
-			response: object | ((match: URLPatternResult, url: URL) => object);
+			response: object | ((match: URLPatternResult, url: URL) => object | Response);
 		}) => {
 			const match = new URLPattern(route).exec(url);
 
@@ -53,10 +52,12 @@ beforeEach(() => {
 			const resp = typeof response === 'function' ? response(match, new URL(url)) : response;
 
 			return Promise.resolve(
-				new Response(JSON.stringify(resp), {
-					status: 200,
-					headers: { 'Content-Type': 'application/json' },
-				})
+				resp instanceof Response
+					? resp
+					: new Response(JSON.stringify(resp), {
+							status: 200,
+							headers: { 'Content-Type': 'application/json' },
+						})
 			);
 		};
 
@@ -71,7 +72,10 @@ beforeEach(() => {
 			}) ??
 			respond({
 				route: 'https://:server.kobotoolbox.org/api/v2/assets/:id/data/:dataid{/}?',
-				response: dataOne,
+				response: ({ pathname: { groups } }) =>
+					groups.dataid === MOCK_SESSION_REMOTEID_NOTFOUND_DATA_ID
+						? new Response('Not found', { status: 404 })
+						: dataOne,
 			}) ??
 			respond({
 				route: 'https://:server.kobotoolbox.org/api/v2/assets/:id/data/:dataid/enketo/view',
@@ -156,6 +160,7 @@ describe('.fromDatabase', () => {
 	test('invalid type', () => {
 		expect(() =>
 			Provider.fromDatabase(undefined!, {
+				// @ts-expect-error type is purposely wrong
 				type: 'inaturalist',
 				token: MOCK_TOKEN,
 				username: 'big_yahu',
@@ -190,7 +195,7 @@ describe('.login', () => {
 
 	test('invalid token', async () => {
 		const db = await openDatabase();
-		expect(
+		await expect(
 			Provider.login(db, {
 				token: MOCK_TOKEN + 'Dérisoire',
 				server: 'kf.kobotoolbox.org',
@@ -202,7 +207,7 @@ describe('.login', () => {
 
 	test('wrong server', async () => {
 		const db = await openDatabase();
-		expect(
+		await expect(
 			Provider.login(db, {
 				token: MOCK_TOKEN,
 				server: 'eu.kobotoolbox.org',
@@ -356,8 +361,8 @@ describe('db-dependent', () => {
 			const db = await setupProtocols({ id: 'not.kobo' });
 			const acc = await getAccount();
 			const prot = DB.Schemas.Protocol.assert(await db.get('Protocol', 'not.kobo'));
-			expect(
-				acc.session(prot, MOCK_SESSION_REMOTEID)
+			await expect(
+				acc.session(prot, MOCK_SESSION_REMOTEID())
 			).rejects.toThrowErrorMatchingInlineSnapshot(
 				`[Error: This protocol doesn't support KoboToolbox remote sessions]`
 			);
@@ -381,17 +386,16 @@ describe('db-dependent', () => {
 			const acc = await getAccount();
 			const prot = DB.Schemas.Protocol.assert(await db.get('Protocol', 'with.kobo'));
 
-			expect(
-				acc.session(prot, MOCK_SESSION_REMOTEID_NOTFOUND)
+			await expect(
+				acc.session(prot, MOCK_SESSION_REMOTEID(MOCK_SESSION_REMOTEID_NOTFOUND_DATA_ID))
 			).rejects.toThrowErrorMatchingInlineSnapshot(
-				`[Error: Impossible de se connecter à KoboToolbox: {"detail":"Invalid token."}]`
+				`[Error: Impossible de se connecter à KoboToolbox: Not found]`
 			);
 		});
 
 		test('valid id', async () => {
 			const db = await setupProtocols(
 				{ id: 'not.kobo' },
-
 				{
 					id: 'with.kobo',
 					remote: {
@@ -406,7 +410,37 @@ describe('db-dependent', () => {
 			const acc = await getAccount();
 			const prot = DB.Schemas.Protocol.assert(await db.get('Protocol', 'with.kobo'));
 
-			expect(acc.session(prot, MOCK_SESSION_REMOTEID)).resolves.toMatchInlineSnapshot();
+			await expect(acc.session(prot, MOCK_SESSION_REMOTEID())).resolves
+				.toMatchInlineSnapshot(`
+				{
+				  "createdAt": "2026-03-28T13:55:19.000Z",
+				  "description": "Créée sur KoboToolbox. Voir https://ee.kobotoolbox.org/view/103e4931120464df0cebb60b35df43b6?instance_id=c2983a5e-fd4c-4032-9b07-50d3e0b8db5f&return_url=false",
+				  "fullscreenClassifier": {
+				    "layout": "top-bottom",
+				  },
+				  "group": {
+				    "global": {
+				      "field": "none",
+				      "tolerances": {
+				        "dates": "day",
+				        "decimal": "unit",
+				      },
+				    },
+				  },
+				  "inferenceModels": {},
+				  "metadata": {},
+				  "name": "Static title",
+				  "openedAt": "2026-04-09T09:09:17.500Z",
+				  "protocol": "with.kobo",
+				  "remoteId": "/api/v2/assets/a3kVqAFEJwnHFcFc7PpWj4/data/709547383/",
+				  "sort": {
+				    "global": {
+				      "direction": "asc",
+				      "field": "name",
+				    },
+				  },
+				}
+			`);
 		});
 	});
 });
