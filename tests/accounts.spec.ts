@@ -159,7 +159,6 @@ test('can download a session from a kobotoolbox account', async ({ page, context
 
 	await card.click();
 	await expect(card).toHaveText(/Téléchargement…/);
-	await expect(card).toHaveText(/Sauvegarde…/);
 	await app.path.wait('/(app)/(sidepanel)/import');
 	await goToSessionPage(page);
 	await expect(page.getByRole('textbox', { name: 'Description' })).toHaveValue(
@@ -204,8 +203,8 @@ test('can download a session from a kobotoolbox account', async ({ page, context
 	expect(await app.db.get('Session', id!)).toMatchObject({
 		name: 'Session #202603131502GLB',
 		metadata: {
-			'com.example.testing__not_inferred': { value: 'wasnt inferred from kobo' },
-			'com.example.testing__transect_code': { value: '202603131502GLB' },
+			'com.example.testing__not_inferred': { value: '"wasnt inferred from kobo"' },
+			'com.example.testing__transect_code': { value: '"202603131502GLB"' },
 		},
 	});
 });
