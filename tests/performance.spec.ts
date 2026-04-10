@@ -59,13 +59,21 @@ function benchmark(
 		run(arg: { page: Page; app: AppFixture }): Promise<void>;
 	}
 ) {
-	test(testLabel, async ({ page, browserName, app }) => {
+	test(testLabel, async ({ page, browserName, app }, testInfo) => {
 		await prepare?.({ page, app });
 
 		let collector: PerformanceMetricsCollector | undefined;
 		if (browserName === 'chromium') {
 			// playwright-performance-metrics only supports Chromium-based browsers
 			collector = new PerformanceMetricsCollector();
+
+			await page.evaluate(() => {
+				const samplesPerMs = 10;
+				window.profiler = new Profiler({
+					sampleInterval: samplesPerMs,
+					maxBufferSize: ms(limits.total.chromium) * samplesPerMs,
+				});
+			});
 		}
 
 		const start = Date.now();
@@ -96,6 +104,15 @@ function benchmark(
 			}
 
 			console.info('Startup performance metrics:', metrics);
+		}
+
+		const trace = await page.evaluate(async () => window.profiler?.stop());
+
+		if (trace) {
+			testInfo.attach('Trace', {
+				body: JSON.stringify(trace),
+				contentType: 'application/json',
+			});
 		}
 	});
 }
