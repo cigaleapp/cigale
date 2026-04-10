@@ -288,9 +288,9 @@ test('import into new session', async ({ page, app }) => {
 	// Check that other metadata are unset
 	await assert(app.metadata.textbox('Distance de prospection')).toBeEmpty();
 
-	await assert(page.getByRole('textbox', { name: 'Description' })).toHaveValue(
-		'Importée depuis correct.zip'
-	);
+	await assert(
+		page.getByRole('main').getByRole('textbox', { name: 'Description', exact: true })
+	).toHaveValue('Importée depuis correct.zip');
 });
 
 test('changing metadata values saves them in the database', async ({ page, app }) => {
@@ -345,7 +345,7 @@ test('changing session info saves in the database', async ({ page, app }) => {
 
 	assert(await app.db.session.byId(id)).toHaveProperty('name', 'New name');
 
-	const descriptionInput = page.getByRole('textbox', { name: 'Description' });
+	const descriptionInput = page.getByRole('main').getByRole('textbox', { name: 'Description', exact: true });
 	await descriptionInput.fill('A description');
 	await descriptionInput.blur();
 

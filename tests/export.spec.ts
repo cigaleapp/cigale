@@ -297,10 +297,9 @@ test('shows warning dialog when exporting with metadata problems', async ({ page
 	      - heading "Métadonnées incorrectes" [level=1]
 	      - button "Fermer":
 	        - img
-	    - main:
-	      - text: Certaines métadonnées sont incorrectes ohio respect
-	      - list:
-	        - listitem: /must be at most \\d+ \\(was \\d+\\)/
+	    - text: Certaines métadonnées sont incorrectes ohio respect
+	    - list:
+	      - listitem: /must be at most \\d+ \\(was \\d+\\)/
 	    - contentinfo:
 	      - button "Corriger"
 	      - button "Exporter quand même"

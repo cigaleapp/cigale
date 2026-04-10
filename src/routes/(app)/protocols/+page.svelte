@@ -73,7 +73,7 @@
 		</section>
 	</header>
 
-	<ul class="protocols">
+	<ul class="protocols" data-testid="protocols-list">
 		{#each tables.Protocol.state as p (p.id)}
 			<RowProtocol
 				{...p}

@@ -163,7 +163,7 @@ test('can download a session from a kobotoolbox account', async ({ page, context
 	await expect(card).toHaveText(/Téléchargement…/);
 	await app.path.wait('/(app)/(sidepanel)/import');
 	await goToSessionPage(page);
-	await expect(page.getByRole('textbox', { name: 'Description' })).toHaveValue(
+	await expect(page.getByRole('main').getByRole('textbox', { name: 'Description', exact: true })).toHaveValue(
 		/Créée sur KoboToolbox/
 	);
 	// Wait for defaults to apply

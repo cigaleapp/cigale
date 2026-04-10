@@ -138,9 +138,9 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 			<IconClose />
 		</ButtonIcon>
 	</header>
-	<main>
+	<div class="contents">
 		{@render children({ close })}
-	</main>
+	</div>
 
 	{#if toastsPool}
 		<section class="toasts">
@@ -202,7 +202,7 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 		justify-content: space-between;
 	}
 
-	main {
+	.contents {
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
