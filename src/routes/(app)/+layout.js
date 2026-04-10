@@ -45,7 +45,6 @@ export async function load({ url }) {
 		locale: {
 			fr: dateFnsLocales.fr,
 			en: dateFnsLocales.enUS,
-			ja: dateFnsLocales.ja,
 		}[locale],
 	});
 
