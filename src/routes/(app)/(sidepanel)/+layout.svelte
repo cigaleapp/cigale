@@ -187,7 +187,7 @@
 </script>
 
 <div class="main-and-sidepanel" class:has-sidepanel={showSidePanel} in:fade={{ duration: 100 }}>
-	<main data-testid="app-main">{@render children?.()}</main>
+	<div class="main" data-testid="app-main">{@render children?.()}</div>
 	{#if showSidePanel}
 		<PreviewSidePanel
 			images={selectedHrefsWithCropboxes}
@@ -236,11 +236,11 @@
 		overflow: hidden;
 	}
 
-	.main-and-sidepanel:not(.has-sidepanel) main {
+	.main-and-sidepanel:not(.has-sidepanel) .main {
 		width: 100%;
 	}
 
-	main {
+	.main {
 		display: flex;
 		flex-direction: column;
 		gap: 1em;
