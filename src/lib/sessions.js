@@ -44,6 +44,7 @@ export async function switchSession(id) {
 	undo.clear();
 	withQueue((q) => q.cancelAll('La session a été fermée'));
 	await idb.tables.initialize(id, { sessionOnly: true });
+	if (id) void idb.tables.Session.update(id, 'openedAt', new Date().toISOString());
 	if (uiState.currentProtocolId !== previousProtocolId) {
 		clearMetadataOptionsCache();
 	}
