@@ -18,6 +18,11 @@ export const LOCAL_STORAGE = type({
  */
 
 export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
+	wakeup: {
+		input: type('undefined'),
+		progress: type('undefined'),
+		success: type('true'),
+	},
 	loadModel: {
 		input: type({
 			model: 'TypedArray.Uint8',

@@ -140,6 +140,9 @@ export async function load({ url }) {
 		);
 	});
 
+	// Start workers in the background so that we can have the UI shown etc but warm them up so that they're ready when needed
+	void swarpc.wakeup(undefined);
+
 	return { swarpc, parallelism };
 }
 

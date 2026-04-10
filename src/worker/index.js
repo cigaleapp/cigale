@@ -29,6 +29,8 @@ export async function openDatabase() {
 
 export const swarp = Swarp.Server(PROCEDURES);
 
+swarp.wakeup(async () => true);
+
 /**
  * @template {keyof import('./procedures.js').LocalStorage} K
  * @param {K} key
