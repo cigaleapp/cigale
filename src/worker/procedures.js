@@ -7,15 +7,17 @@ import { type } from 'arktype';
 import { Schemas } from '$lib/database.js';
 import { NodeProvenance } from '$lib/file-tree.js';
 
+
+export const LOCAL_STORAGE = type({
+	databaseName: "string",
+	databaseRevision: "string.integer.parse",
+})
+
+/**
+ * @typedef {typeof LOCAL_STORAGE['infer']} LocalStorage
+ */
+
 export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
-	init: {
-		input: type({
-			databaseName: 'string',
-			databaseRevision: 'number.integer >= 1',
-		}),
-		progress: type('undefined'),
-		success: type('undefined'),
-	},
 	loadModel: {
 		input: type({
 			model: 'TypedArray.Uint8',

@@ -68,6 +68,10 @@ export async function load({ url }) {
 	const swarpc = Swarpc.Client(PROCEDURES, {
 		worker: WebWorker,
 		nodes: parallelism,
+		localStorage: /** @satisfies {import('$worker/procedures').LocalStorage} */ ({
+			databaseName,
+			databaseRevision,
+		}),
 		hooks: {
 			success({ procedure, data, duration }) {
 				console.debug(`[timings/swarpc] ${procedure} took ${duration}ms`);
@@ -96,7 +100,6 @@ export async function load({ url }) {
 		const sessionId = localStorage.getItem('currentSessionId');
 
 		setLoadingMessage('Initialisation de la base de données…');
-		await swarpc.init.broadcast.orThrow({ databaseName, databaseRevision });
 		await tables.initialize(sessionId);
 
 		setLoadingMessage('Chargement des données intégrées…');
