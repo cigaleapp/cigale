@@ -61,7 +61,7 @@
 	);
 </script>
 
-<section class="observations" in:fade={{ duration: 100 }}>
+<main class="observations" in:fade={{ duration: 100 }}>
 	<AreaObservations {items} zone="crop">
 		{#snippet item(images, { id: fileId })}
 			<CardImageFile
@@ -94,7 +94,7 @@
 			<ButtonSecondary onclick={() => goto('/import')}>Importer</ButtonSecondary>
 		</div>
 	{/if}
-</section>
+</main>
 
 <style>
 	.observations {

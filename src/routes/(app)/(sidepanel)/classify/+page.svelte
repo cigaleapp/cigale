@@ -195,16 +195,16 @@
 {/snippet}
 
 {#if !classifmodelLoaded}
-	<section class="loading" in:fade={{ duration: 100 }}>
+	<main class="loading" in:fade={{ duration: 100 }}>
 		<Logo loading />
 		<p>Chargement du modèle de classification</p>
 		<p class="source">{@render modelsource()}</p>
 		<div class="progressbar">
 			<ProgressBar percentage alwaysActive progress={modelLoadingProgress} />
 		</div>
-	</section>
+	</main>
 {:else}
-	<section class="observations" class:empty={!items.length} in:fade={{ duration: 100 }}>
+	<main class="observations" class:empty={!items.length} in:fade={{ duration: 100 }}>
 		<AreaObservations {items} {unroll} zone="classify">
 			{#snippet item({ observation, image, images }, { id })}
 				{#if observation}
@@ -250,7 +250,7 @@
 				<ButtonSecondary onclick={() => goto('/import')}>Importer</ButtonSecondary>
 			</div>
 		{/if}
-	</section>
+	</main>
 {/if}
 
 <style>
