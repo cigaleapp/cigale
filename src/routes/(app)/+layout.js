@@ -20,6 +20,7 @@ import {
 import { autoUpdateProtocols } from '$lib/protocols';
 import { getSetting } from '$lib/settings.svelte';
 import { toasts } from '$lib/toasts.svelte';
+import { profiler } from '$lib/utils.js';
 import { PROCEDURES } from '$worker/procedures.js';
 import WebWorker from '$worker/start.js?worker';
 
@@ -27,10 +28,14 @@ export const ssr = false;
 
 export const trailingSlash = 'always';
 
+const profile = profiler('App');
+
 export async function load({ url }) {
-	const locale = await getSetting('language', {
-		fallback: localeFromNavigator(),
-	});
+	const locale = await profile('Startup', 'Get language setting', async () =>
+		getSetting('language', {
+			fallback: localeFromNavigator(),
+		})
+	);
 
 	document.documentElement.lang = locale;
 	setLoadingMessage(
@@ -39,7 +44,7 @@ export async function load({ url }) {
 		{ fr: 'Chargement des traductions…', en: 'Loading translations…' }[locale]
 	);
 
-	await loadLocale(locale);
+	await profile('Startup', 'Load locale', async () => loadLocale(locale));
 
 	dates.setDefaultOptions({
 		locale: {
@@ -48,7 +53,7 @@ export async function load({ url }) {
 		}[locale],
 	});
 
-	await initializeSettings();
+	await profile('Startup', 'Initialize settings', initializeSettings);
 
 	let parallelism = await getSetting('parallelism', {
 		fallback: 1,
@@ -58,11 +63,12 @@ export async function load({ url }) {
 		parallelism = Number.parseInt(url.searchParams.get('nodes') ?? '1');
 	}
 
-	setLoadingMessage('Initialisation du worker…');
-
+	setLoadingMessage('Initialisation des workers…');
 	if (window && window.swarpc) {
 		window.swarpc.destroy();
 	}
+
+	const isDev = await getSetting('showTechnicalMetadata', { fallback: dev });
 
 	const swarpc = Swarpc.Client(PROCEDURES, {
 		worker: WebWorker,
@@ -73,7 +79,16 @@ export async function load({ url }) {
 		}),
 		hooks: {
 			success({ procedure, data, duration }) {
-				console.debug(`[timings/swarpc] ${procedure} took ${duration}ms`);
+				performance.measure(procedure, {
+					start: performance.now() - duration,
+					detail: {
+						devtools: {
+							dataType: 'track-entry',
+							track: 'Workers',
+							trackGroup: 'App',
+						},
+					},
+				});
 
 				if (procedure === 'importProtocol') {
 					// We preload icons here instead of in the web worker
@@ -99,11 +114,16 @@ export async function load({ url }) {
 		const sessionId = localStorage.getItem('currentSessionId');
 
 		setLoadingMessage('Initialisation de la base de données…');
-		await tables.initialize(sessionId);
+
+		await profile('Startup', 'Initialize database', async () => {
+			await tables.initialize(sessionId);
+		});
 
 		setLoadingMessage('Chargement des données intégrées…');
-		await loadDefaultProtocol(swarpc);
-		await tables.initialize(sessionId);
+		await profile('Startup', 'Load built-in protocols', async () => {
+			await loadDefaultProtocol(swarpc);
+			await tables.initialize(sessionId);
+		});
 	} catch (e) {
 		console.error(e);
 		error(400, {
