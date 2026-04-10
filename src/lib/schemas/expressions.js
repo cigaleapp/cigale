@@ -2,7 +2,7 @@
  * Computed expression templates: Handlebars and Jsonata
  */
 import { ArkErrors, type } from 'arktype';
-import { format as formatDate, formatISO } from 'date-fns';
+import { format as formatDate, formatISO, parse as parseDate } from 'date-fns';
 import Handlebars from 'handlebars';
 import jsonata from 'jsonata';
 
@@ -26,6 +26,20 @@ import {
  * @satisfies {Record<string, Helper>}
  */
 export const HELPERS = /** @type {const} */ ({
+	titlecase: {
+		documentation:
+			'Met la première lettre de chaque mot en majuscule et les autres en minuscules',
+		usage: [["'some Test HERE!!'"], 'Some Test Here!!'],
+		/**
+		 * @param {string} subject
+		 */
+		implementation(subject) {
+			return subject
+				.split(/\s/)
+				.map((word) => word.at(0)?.toUpperCase() + word.slice(1).toLowerCase())
+				.join(' ');
+		},
+	},
 	suffix: {
 		documentation: "Ajoute un suffixe à un nom de fichier, avant l'extension",
 		usage: [["'filename.jpeg'", "'_example'"], 'filename_example.jpeg'],
@@ -106,19 +120,15 @@ export const HELPERS = /** @type {const} */ ({
 		 */
 		implementation(subject, metadataId) {
 			if ('metadata' in subject) {
-				return (
-					subject.protocolMetadata[metadataId]?.value ??
-					subject.metadata[metadataId]?.value ??
-					null
-				);
+				const record = subject.protocolMetadata ?? subject.metadata;
+				if (metadataId in record) return record[metadataId]?.value;
+				return null;
 			}
 
 			if ('metadataOverrides' in subject) {
-				return (
-					subject.protocolMetadataOverrides[metadataId]?.value ??
-					subject.metadataOverrides[metadataId]?.value ??
-					null
-				);
+				const record = subject.protocolMetadataOverrides ?? subject.metadataOverrides;
+				if (metadataId in record) return record[metadataId]?.value;
+				return null;
 			}
 
 			throw new Error('Subject must have either metadata or metadataOverrides property');
@@ -206,6 +216,29 @@ export const HELPERS = /** @type {const} */ ({
 			return JSON.stringify(value, null, indentation);
 		},
 	},
+	slice: {
+		documentation: "Prendre une partie d'une liste ou d'un texte",
+		usage: [['"abcDEFgh"', '3', '6'], 'DEF'],
+		/**
+		 * @param {string | unknown[]} subject
+		 * @param {number} start
+		 * @param {number} stop
+		 */
+		implementation(subject, start, stop) {
+			return subject.slice(start, stop);
+		},
+	},
+	parseDate: {
+		documentation: "Construire une date à partir d'un texte et d'un format",
+		usage: [['"202508311121"', '"yyyyMMddHHmm"'], '2025-08-31T11:21:00.000Z'],
+		/**
+		 * @param {string} datestring
+		 * @param {string} format
+		 */
+		implementation(datestring, format) {
+			return parseDate(datestring, format, new Date()).toISOString();
+		},
+	},
 	date: {
 		documentation:
 			"Construire une date à partir de ses composantes. il est possible d'omettre les noms des composantes si on les donne dans l'ordre descendant (year, ..., minutes). toutes les composantes sont optionelles à partir des heures (et valent 0 par défaut). Les dates sont interprétées localement (dans le fuseau horaire local) ",
@@ -233,6 +266,17 @@ export const HELPERS = /** @type {const} */ ({
 				Math.floor(seconds),
 				Math.round((seconds - Math.floor(seconds)) * 1000)
 			).toISOString();
+		},
+	},
+	formatDate: {
+		documentation: "Formatte une date à partir d'une date au format ISO",
+		usage: [["'2024-01-10T02:03:04Z'", "'dd/MM/yyyy'"], '10/01/2024'],
+		/**
+		 * @param {string} datestring
+		 * @param {string} format
+		 */
+		implementation(datestring, format) {
+			return formatDate(new Date(datestring), format);
 		},
 	},
 	object: {

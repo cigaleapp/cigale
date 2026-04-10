@@ -94,8 +94,18 @@ export const GroupSettings = type({
 	})),
 });
 
+export const SessionRemoteID = type('string#Session.remote');
+
+/**
+ * @typedef {typeof SessionRemoteID['infer']} SessionRemoteID
+ */
+
 export const Session = type({
 	id: ID,
+	/** When the session is hosted on a remote server. On the root of the object for indexing purposes. Empty if session is local-only  */
+	remoteId: SessionRemoteID.default(''),
+	/** When the session is hosted on a remote server */
+	'account?': ID,
 	name: 'string',
 	// Date is not compatible with JSON Schemas, use a datestring instead
 	createdAt: 'string.date.iso',

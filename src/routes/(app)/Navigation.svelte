@@ -195,7 +195,7 @@
 				{/if}
 			</div>
 
-			{#if uiState.currentSession && page.route.id !== '/(app)/sessions' && page.route.id !== '/(app)/protocols'}
+			{#if uiState.currentSession && page.route.id !== '/(app)/sessions' && page.route.id !== '/(app)/protocols' && page.route.id !== '(app)/accounts'}
 				<div class="steps" in:fade={{ duration: 100 }}>
 					<a
 						class="session-link"
@@ -306,6 +306,12 @@
 					<a href={resolve('/protocols')} data-testid="goto-protocols">
 						Protocoles
 						{#if path.startsWith('/protocols')}
+							<div class="line"></div>
+						{/if}
+					</a>
+					<a href={resolve('/accounts')} data-testid="goto-accounts">
+						Comptes
+						{#if path.startsWith('/accounts')}
 							<div class="line"></div>
 						{/if}
 					</a>

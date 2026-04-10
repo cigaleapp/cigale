@@ -228,7 +228,7 @@ test('can import a protocol via /protocols/import/url', async ({ page, app, cont
 
 	await app.path.wait('/protocols');
 
-	await assert(page.getByRole('listitem')).toHaveCount(2);
+	await assert(page.getByTestId('protocols-list').getByRole('listitem')).toHaveCount(2);
 	await assert(
 		page
 			.getByRole('listitem')
@@ -244,20 +244,15 @@ test('can import a protocol via /protocols/import/url', async ({ page, app, cont
 test('can send a bug report', async ({ page, app, context }) => {
 	let requestBody: undefined | typeof IssueCreatorRequest.inferIn;
 
-	await mockUrl(
-		page,
-		context,
-		(u) => u.hostname === 'mkissue.cigale.gwen.works',
-		async (route) => {
-			requestBody = route.request().postDataJSON();
-			await browserConsole.log(page, 'mocking route, body is', requestBody);
-			return {
-				json: {
-					url: 'https://example.com/issue/123',
-				},
-			};
-		}
-	);
+	await mockUrl(page, context, 'https://mkissue.cigale.gwen.works/**', async (route) => {
+		requestBody = route.request().postDataJSON();
+		await browserConsole.log(page, 'mocking route, body is', requestBody);
+		return {
+			json: {
+				url: 'https://example.com/issue/123',
+			},
+		};
+	});
 
 	await loadDatabaseDump(page, 'db/basic.devalue');
 	await chooseFirstSession(page);

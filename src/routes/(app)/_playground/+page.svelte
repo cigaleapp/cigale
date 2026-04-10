@@ -1,12 +1,23 @@
 <svelte:options runes={true} />
 
 <script>
-	import CardObservation from '$lib/CardObservation.svelte';
+	import DropdownMenu from '$lib/DropdownMenu.svelte';
 </script>
 
-<CardObservation
-	title="Test title"
-	image="https://picsum.photos/200/300"
-	selected={false}
-	loading={0.5}
-/>
+<DropdownMenu
+	items={[
+		{
+			label: 'Feur',
+			items: [
+				{
+					key: 'item',
+					label: 'Item',
+				},
+			],
+		},
+	]}
+>
+	{#snippet trigger(props)}
+		<button {...props}> feur </button>
+	{/snippet}
+</DropdownMenu>

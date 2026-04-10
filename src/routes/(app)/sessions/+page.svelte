@@ -1,91 +1,185 @@
-<script>
+<script lang="ts">
+	import type { Account, AccountConstructor } from '$lib/accounts/types.js';
+
+	import { SvelteMap } from 'svelte/reactivity';
 	import { fade } from 'svelte/transition';
 
 	import IconAdd from '~icons/ri/add-line';
+	import IconDropdown from '~icons/ri/arrow-down-s-fill';
+	import IconLocal from '~icons/ri/hard-drive-2-line';
 	import IconImport from '~icons/ri/import-line';
+	import IconManage from '~icons/ri/settings-3-line';
+	import { providers } from '$lib/accounts/registry.js';
 	import ButtonInk from '$lib/ButtonInk.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import Card from '$lib/Card.svelte';
+	import CompositeAvatar from '$lib/CompositeAvatar.svelte';
 	import Datetime from '$lib/Datetime.svelte';
+	import DropdownMenu from '$lib/DropdownMenu.svelte';
 	import { promptForFiles } from '$lib/files';
 	import { plural } from '$lib/i18n.js';
-	import { databaseHandle, tables } from '$lib/idb.svelte.js';
-	import { resolveDefaults } from '$lib/metadata/defaults.js';
+	import { databaseHandle, listByIndex, tables } from '$lib/idb.svelte.js';
+	import { loadPreviewImage } from '$lib/images.js';
+	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
+	import LoadingText from '$lib/LoadingText.svelte';
+	import OverflowableText from '$lib/OverflowableText.svelte';
 	import { goto } from '$lib/paths.js';
-	import { defaultClassificationMetadata, defaultCropMetadata } from '$lib/protocols.js';
 	import { importMore } from '$lib/queue.svelte';
 	import { seo } from '$lib/seo.svelte';
 	import { switchSession } from '$lib/sessions.js';
+	import { getSettings, isDebugMode, setSetting } from '$lib/settings.svelte.js';
 	import { uiState } from '$lib/state.svelte.js';
-	import { toasts } from '$lib/toasts.svelte.js';
-	import { orEmptyObj } from '$lib/utils.js';
+	import { nonnull } from '$lib/utils.js';
+
+	import Cards from './Cards.svelte';
+	import { createSession } from './create.js';
+	import { downloadRemoteSession } from './download.js';
 
 	seo({ title: 'Sessions' });
 
-	const { data } = $props();
-	const sessions = $derived(data.sessions);
+	const db = $derived(databaseHandle());
+	const directory = $derived(getSettings().sessionsDirectory);
+	const account = $derived.by(() => {
+		if (!directory.account) return undefined;
+		const databaseAccount = tables.Account.getFromState(directory.account);
+		if (!databaseAccount) return undefined;
+		return providers.fromDatabase(db, databaseAccount);
+	});
 
-	const defaultProtocol = $derived(tables.Protocol.state[0]);
+	const sessionsCache = new SvelteMap<string, any[]>();
 
-	async function createSession() {
-		if (!defaultProtocol) {
-			toasts.error('Aucun protocole installé, impossible de créer une session.');
-			return;
-		}
-
-		const classificationMetadata = defaultClassificationMetadata(
-			defaultProtocol,
-			tables.Metadata.state
-		);
-
-		const cropMetadata = defaultCropMetadata(defaultProtocol, tables.Metadata.state);
-
-		const mtimeMetadata = defaultProtocol.exports?.images.mtime;
-
-		const { id } = await tables.Session.add({
-			name: `Session du ${Intl.DateTimeFormat().format(new Date())}`,
-			description: '',
-			protocol: defaultProtocol.id,
-			createdAt: new Date().toISOString(),
-			openedAt: new Date().toISOString(),
-			metadata: {},
-			fullscreenClassifier: {
-				layout: 'top-bottom',
-				...orEmptyObj(classificationMetadata !== undefined, {
-					focusedMetadata: classificationMetadata?.id ?? '',
-				}),
+	defineKeyboardShortcuts('debugmode', {
+		's d a y': {
+			help: 'Supprimer toutes les sessions',
+			debug: true,
+			allowInModals: false,
+			when: isDebugMode,
+			async do() {
+				await tables.Session.clear();
 			},
-			group: {
-				global: { field: 'none' },
-				crop: cropMetadata?.groupable
-					? { field: 'metadataPresence', metadata: cropMetadata.id }
-					: { field: 'none' },
-				classify: classificationMetadata?.groupable
-					? { field: 'metadataConfidence', metadata: classificationMetadata.id }
-					: { field: 'none' },
-			},
-			sort: {
-				global:
-					mtimeMetadata && tables.Metadata.getFromState(mtimeMetadata)?.sortable
-						? { field: 'metadataValue', direction: 'asc', metadata: mtimeMetadata }
-						: { field: 'name', direction: 'asc' },
-			},
-		});
-
-		await resolveDefaults({
-			db: databaseHandle(),
-			sessionId: id,
-			metadataToConsider: defaultProtocol.metadata,
-		});
-
-		await switchSession(id);
-		await goto('/(app)/sessions/[id]', { id });
-	}
+		},
+	});
 </script>
 
 <main in:fade={{ duration: 100 }}>
 	<header>
-		<h1>Sessions</h1>
+		<section class="filters">
+			<DropdownMenu
+				items={[
+					{
+						items: [
+							{
+								type: 'selectable',
+								label: "Sur l'appareil",
+								key: 'local',
+								selected: directory.platform === 'local',
+								data: {
+									special: 'local' as undefined | 'local' | 'manage',
+									provider: undefined as undefined | AccountConstructor,
+									account: undefined as undefined | Account,
+								},
+								onclick() {
+									setSetting('sessionsDirectory', {
+										...$state.snapshot(directory),
+										platform: 'local',
+										account: undefined,
+										protocol: undefined,
+									});
+								},
+							},
+						],
+					},
+					...providers.list().map((provider) => ({
+						label: provider.displayName,
+						items: tables.Account.state
+							.filter((account) => account.type === provider.id)
+							.map((account) => ({
+								type: 'selectable' as const,
+								label: account.displayName,
+								key: account.id,
+								selected: directory.account === account.id,
+								data: {
+									special: undefined,
+									provider,
+									account: providers.fromDatabase(db, account),
+								},
+								onclick() {
+									setSetting('sessionsDirectory', {
+										...$state.snapshot(directory),
+										platform: account.type,
+										account: account.id,
+										protocol: undefined,
+									});
+								},
+							})),
+					})),
+					{
+						label: 'Ajouter & supprimer',
+						items: [
+							{
+								type: 'clickable',
+								label: 'Gérer les comptes',
+								data: {
+									special: 'manage',
+									provider: undefined,
+									account: undefined,
+								},
+								async onclick() {
+									await goto('/(app)/accounts');
+								},
+							},
+						],
+					},
+				]}
+			>
+				{#snippet trigger(props)}
+					<ButtonSecondary {...props}>
+						<div class="account-selection-item">
+							{#if directory.platform === 'local'}
+								<div class="icon">
+									<IconLocal />
+								</div>
+								<span class="label">Sur l'appareil</span>
+							{:else if account}
+								{@const provider = providers.get(directory.platform)!}
+								<div class="icon">
+									<CompositeAvatar
+										avatar={account.avatarURL}
+										sublogo={provider.logoURL}
+										tooltip="{account.username} sur {provider.displayName}"
+									/>
+								</div>
+								<span class="label">
+									<OverflowableText text={account.displayName} />
+								</span>
+							{/if}
+							<div class="dropdown-arrow icon">
+								<IconDropdown />
+							</div>
+						</div>
+					</ButtonSecondary>
+				{/snippet}
+
+				{#snippet item({ provider, account, special }, { label })}
+					<div class="account-selection-item taller">
+						<div class="icon">
+							{#if provider && account}
+								<CompositeAvatar
+									avatar={account.avatarURL}
+									sublogo={provider.logoURL}
+								/>
+							{:else if special === 'local'}
+								<IconLocal />
+							{:else if special === 'manage'}
+								<IconManage />
+							{/if}
+						</div>
+						<span class="label">
+							<OverflowableText text={label} />
+						</span>
+					</div>
+				{/snippet}
+			</DropdownMenu>
+		</section>
 		<section class="actions">
 			<ButtonSecondary
 				onclick={async () => {
@@ -93,10 +187,9 @@
 						accept: 'application/zip',
 						multiple: false,
 					});
-
 					await switchSession(null);
 					importMore(zipfile);
-					await goto('/import');
+					await goto('/(app)/(sidepanel)/import');
 				}}
 			>
 				<IconImport />
@@ -115,38 +208,59 @@
 	</header>
 
 	<section class="sessions">
-		{#each sessions as { createdAt, id, name, protocol, counts, thumbs } (id)}
-			<Card
-				--card-border={uiState.currentSessionId === id ? 'var(--bg-primary)' : ''}
-				tooltip="Ouvrir la session"
-				loading="Ouverture…"
-				onclick={async () => {
-					await switchSession(id);
-					// TODO remember last viewed page in session
-					await goto('/import');
-				}}
-			>
-				<div class="content">
-					<div class="gallery">
-						{#each thumbs as src (src)}
-							<img {src} />
-						{/each}
-					</div>
-					<header>
-						<p class="protocol">
-							{#if protocol}
-								{protocol.name}
-							{:else}
-								<em class="unavailable">Protocole indisponible</em>
-							{/if}
-						</p>
-						<h2>{name}</h2>
-						<p class="date">
-							{plural(counts.images, ['# image', '# images'])}
-							· créée <Datetime show="relative" value={createdAt} />
-						</p>
-					</header>
-					<footer>
+		{#if directory.platform === 'local'}
+			<div class="cards" in:fade={{ duration: 200 }}>
+			{#key tables.Session.state}
+				<Cards
+					create={createSession}
+					sessions={async function* () {
+						for (const session of tables.Session.state) {
+							yield session;
+						}
+					}}
+					card={(session) => ({
+						highlighted: uiState.currentSessionId === session.id,
+						tooltip: 'Ouvrir la session',
+						loading: 'Ouverture…',
+						async onclick() {
+							await switchSession(session.id);
+							await goto('/(app)/(sidepanel)/import');
+						},
+					})}
+					thumbnails={async function* ({ id }) {
+						const images = await listByIndex('Image', 'sessionId', id);
+
+						const firstUniqueFileIds = [
+							...new Set(images.map((image) => image.fileId).filter(nonnull)),
+						].slice(0, 4);
+
+						for (const fileId of firstUniqueFileIds) {
+							if (uiState.hasPreviewURL(fileId)) {
+								yield uiState.getPreviewURL(fileId)!;
+								continue;
+							}
+
+							await loadPreviewImage(fileId, 'global');
+							yield uiState.getPreviewURL(fileId)!;
+						}
+					}}
+				>
+					{#snippet subtitle({ id, createdAt })}
+						<LoadingText
+							mask="# images"
+							value={async () =>
+								listByIndex('Image', 'sessionId', id).then(
+									(images) => images.length
+								)}
+						>
+							{#snippet loaded(count)}
+								{plural(count, ['# image', '# images'])}
+							{/snippet}
+						</LoadingText>
+						· <Datetime parts="date" show="absolute" value={createdAt} />
+					{/snippet}
+
+					{#snippet actions({ id })}
 						<ButtonInk
 							fills
 							onclick={async (e) => {
@@ -157,22 +271,108 @@
 						>
 							Gérer
 						</ButtonInk>
-					</footer>
+					{/snippet}
+				</Cards>
+				{/key}
+			</div>
+		{:else if account}
+			{#key directory}
+				<div class="cards" in:fade={{ duration: 200 }}>
+					<Cards
+						cache={{
+							key: `${directory.platform}:${directory.account}`,
+							entries: sessionsCache,
+						}}
+						sessions={async function* () {
+							for await (const session of account.sessions()) {
+								if ('total' in session) {
+									yield session;
+									continue;
+								}
+
+								const local = tables.Session.state.find(
+									(s) => s.remoteId === session.id
+								);
+
+								yield {
+									...session,
+									local,
+									downloaded: Boolean(local),
+								};
+							}
+						}}
+						thumbnails={async function* (session) {
+							if (!session.thumbnails.length) return;
+
+							const yielded = new Set<string>();
+
+							for (const thumb of session.thumbnails) {
+								const url = await account.thumbnail(thumb);
+								if (!yielded.has(thumb.href)) yield url.href;
+								yielded.add(thumb.href);
+								if (yielded.size >= 4) break;
+							}
+						}}
+						card={(session) => ({
+							tooltip: isDebugMode()
+								? `id: ${session.id}; local: ${session.local?.id}`
+								: session.local
+									? 'Ouvrir'
+									: 'Télécharger',
+							loading: session.local ? 'Ouverture…' : 'Téléchargement…',
+							highlighted: false,
+							async onclick(_, mutator) {
+								let id = session.local?.id;
+								if (!session.local) {
+									id = await downloadRemoteSession({
+										account,
+										session,
+										mutator,
+									});
+								}
+								if (!id) return;
+								await switchSession(id);
+								await goto('/(app)/(sidepanel)/import');
+							},
+						})}
+					>
+						{#snippet subtitle({ submittedAt, imagesCount, submittedBy })}
+							{#if providers.get(directory.platform)?.capabilities.includes('images')}
+								{plural(imagesCount, ['# image', '# images'])}
+								·
+							{/if}
+							<Datetime parts="date" show="absolute" value={submittedAt} />
+							{#if submittedBy}
+								· par {submittedBy}
+							{/if}
+						{/snippet}
+
+						{#snippet actions({ page, local })}
+							{#if page || local}
+								<ButtonInk
+									fills
+									onclick={async (e) => {
+										e.stopPropagation();
+										if (local) {
+											await switchSession(local.id);
+											await goto('/(app)/sessions/[id]', local);
+										} else {
+											window.open(page, '_blank');
+										}
+									}}
+								>
+									{#if local}
+										Gérer
+									{:else}
+										Voir sur {providers.get(directory.platform)!.displayName}
+									{/if}
+								</ButtonInk>
+							{/if}
+						{/snippet}
+					</Cards>
 				</div>
-			</Card>
-		{:else}
-			<Card
-				testid="new-session-card"
-				tooltip="Créer une nouvelle session"
-				onclick={async () => {
-					await createSession();
-				}}
-			>
-				<div class="content new">
-					<IconAdd />
-				</div>
-			</Card>
-		{/each}
+			{/key}
+		{/if}
 	</section>
 </main>
 
@@ -196,7 +396,7 @@
 		}
 	}
 
-	section.sessions {
+	section.sessions .cards {
 		display: grid;
 		/* flex-wrap: wrap; */
 		grid-template-columns: repeat(auto-fit, var(--card-width));
@@ -209,53 +409,25 @@
 		--card-padding: 0;
 	}
 
-	.content {
-		display: grid;
-		grid-template-rows: 3fr max-content 50px;
-		grid-template-columns: 100%;
-		gap: 1rem;
-		width: 100%;
-		height: 100%;
-		position: relative;
-	}
-
-	.content.new {
-		place-items: center;
-		grid-template-rows: 1fr;
-		font-size: 3rem;
-	}
-
-	.content .gallery {
+	.account-selection-item {
 		display: flex;
-		gap: 0.5rem;
-		padding: 1rem 1rem 0;
-		height: 100%;
-		overflow: hidden;
+		align-items: center;
+		gap: 1em;
 
-		img {
-			border-radius: var(--corner-radius);
-		}
-	}
-
-	.content header {
-		padding: 0 1rem;
-		display: flex;
-		flex-direction: column;
-		gap: 0.5em;
-
-		h2 {
-			line-height: 1;
+		&.taller {
+			height: 2.3em;
 		}
 
-		.protocol,
-		.date {
-			color: var(--gay);
+		.icon {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			width: 1.5em;
+			height: 1.5em;
 		}
-	}
 
-	.content footer {
-		display: flex;
-		justify-content: center;
-		flex-grow: 0;
+		.label {
+			max-width: 20ch;
+		}
 	}
 </style>

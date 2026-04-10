@@ -16,7 +16,7 @@ export const previewingPrNumber =
 	import.meta.env.previewingPrNumber === 'null' ? null : import.meta.env.previewingPrNumber;
 
 export const databaseName = previewingPrNumber ? `previews/pr-${previewingPrNumber}` : 'database';
-export const databaseRevision = 6;
+export const databaseRevision = 7;
 
 /**
  * @typedef {typeof import('./database.js').NO_REACTIVE_STATE_TABLES[number]} NonReactiveTableNames
@@ -38,6 +38,7 @@ export const _tablesState = $state({
 	Protocol: [],
 	Settings: [],
 	Session: [],
+	Account: []
 });
 
 /**
@@ -88,10 +89,7 @@ function wrangler(table) {
 			}
 		},
 		/** @param {string[]} keys */
-		getMany: async (keys) =>
-			Promise.all(keys.map((key) => get(table, key))).then((results) =>
-				results.filter(nonnull)
-			),
+		getMany: async (keys) => getMany(table, keys),
 		/** @param {string} key  */
 		get: async (key) => get(table, key),
 		/** @param {string} key */
@@ -271,6 +269,29 @@ export async function get(tableName, key) {
 		const out = value ? validator.assert(value) : undefined;
 		return out;
 	});
+}
+
+/**
+ *
+ * @param {TableName} tableName
+ * @param {string[]} keys
+ * @returns {Promise<Array<typeof Tables[TableName]['infer']>>}
+ * @template {keyof typeof Tables} TableName
+ */
+export async function getMany(tableName, keys) {
+	/** @type {Array<typeof Tables[TableName]['infer']>} */
+	const results = [];
+	const validator = Tables[tableName];
+
+	await openTransaction([tableName], {}, async (tx) => {
+		for (const key of keys) {
+			const found = await tx.objectStore(tableName).get(key)
+			if (!found) continue
+			results.push(validator.assert(found));
+		}
+	});
+
+	return results;
 }
 
 /**
@@ -484,6 +505,10 @@ export async function openDatabase() {
 			if (oldVersion === 4) {
 				rebuildIndexes('ImageFile');
 				rebuildIndexes('ImagePreviewFile');
+			}
+
+			if (oldVersion === 6) {
+				rebuildIndexes('Session')
 			}
 
 			for (const [tableName, schema] of tablesByName) {

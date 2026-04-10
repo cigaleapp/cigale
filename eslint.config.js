@@ -64,6 +64,20 @@ export default [
 		rules: {
 			// False positives since v10.0.1 upgrade on e.g. = $bindable()
 			'no-useless-assignment': 'off',
+			'svelte/no-restricted-html-elements': [
+				'error',
+				{
+					elements: ['main'],
+					message:
+						'The <main> element is reserved for pages (+page.svelte, +error.svelte), so that we can ensure a single <main> element at all times throughout the DOM tree.',
+				},
+			],
+		},
+	},
+	{
+		files: ['src/routes/**/+page*.svelte', 'src/routes/**/+error*.svelte'],
+		rules: {
+			'svelte/no-restricted-html-elements': 'off',
 		},
 	},
 	{

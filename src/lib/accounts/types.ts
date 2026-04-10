@@ -1,0 +1,131 @@
+import type * as DB from '$lib/database.js';
+import type { DatabaseHandle } from '$lib/idb.svelte.js';
+import type { SessionRemoteID } from '$lib/schemas/sessions.js';
+
+export type AuthenticationMethod = 'oauth' | 'token' | 'password';
+
+export type LoginData<S extends string = string> = {
+	server: S;
+	token?: string;
+	password?: { username: string; password: string };
+	oauth?: { authorize: URL; identity: URL; token: URL };
+};
+
+export interface Account {
+	username: string;
+	displayName: string;
+	avatarURL: URL | undefined;
+	/** Database ID of the account. */
+	id: string | undefined;
+
+	logout(): Promise<void>;
+
+	/**
+	 * Upload a session to the account
+	 * @param session session object from the database
+	 */
+	upload(session: DB.Session): Promise<{
+		/** If the session has a remote ID that can be used to import it back later into CIGALE. Useful if the Account is ALSO a {@link AccountRemoteSessions} */
+		remoteID?: SessionRemoteID;
+		/**
+		 * URL to where the session can be visited on the account
+		 */
+		page?: URL;
+	}>;
+
+	/**
+	 * List available remote sessions on the account
+	 * @param protocol chosen protocol
+	 * @param options
+	 * @param options.cursor see nextCursor in the response
+	 * @param options.limit change the number of sessions returned in each call. Default is implementation-specific
+	 * @param options.mine only return sessions created by the account's user
+	 */
+	sessions(options?: {
+		cursor?: string | undefined;
+		limit?: number;
+		mine?: boolean;
+	}): AsyncIterable<
+		| {
+				/** Signals the total number of sessions */
+				total: number;
+		  }
+		| {
+				id: SessionRemoteID;
+				protocol: string;
+				page: URL | undefined;
+				name: string;
+				submittedAt: Date;
+				submittedBy?: string;
+				thumbnails: URL[];
+				/** Cursor to pass to the method to get the next results. Must be undefined once we have finished listing all sessions. Must be the same on all items */
+				nextCursor: string | undefined;
+				filesCount: number;
+				imagesCount: number;
+		  }
+	>;
+
+	/**
+	 * Get the remote session
+	 * @param protocol protocol of the session
+	 * @param id remote ID of the session
+	 */
+	session(
+		protocol: DB.Protocol,
+		id: SessionRemoteID
+	): Promise<Omit<(typeof DB.Schemas.Session)['inferIn'], 'id' | 'account'>>;
+
+	/**
+	 * Fetch the thumbnail for a session,
+	 * returning a blob:// URL ready for use
+	 */
+	thumbnail(url: URL): Promise<URL>;
+
+	/**
+	 * Get all observations/images/image files of the remote session
+	 * @param protocol protocol of the session
+	 * @param session remote ID of the session (in Session.remote.id in the database)
+	 */
+	items(
+		protocol: DB.Protocol,
+		session: SessionRemoteID
+	): Promise<{
+		observations: Array<(typeof DB.Schemas.Observation)['inferIn']>;
+		images: Array<(typeof DB.Schemas.Image)['inferIn']>;
+		files: Array<(typeof DB.Tables.ImageFile)['inferIn']>;
+	}>;
+
+	/**
+	 * Get files from file-type session metadata values
+	 * @param protocol protocol of the session
+	 * @param session remote ID of the session
+	 */
+	files(
+		protocol: DB.Protocol,
+		session: SessionRemoteID
+	): AsyncIterable<Omit<(typeof DB.Tables.MetadataValueFile)['inferIn'], 'sessionId'>>;
+}
+
+export interface AccountConstructor<
+	Auth extends AuthenticationMethod = AuthenticationMethod,
+	Server extends string = string,
+> {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	new (...args: any[]): Account;
+
+	id: string;
+	logoURL: URL;
+	displayName: string;
+	capabilities: readonly ('sessions' | 'images' | 'upload')[];
+	auth: Auth;
+	servers: readonly { domain: Server; name?: string }[];
+
+	/** Returns the error message, or undefined if everything is a-ok */
+	checkAuth(data: LoginData<Server>): Promise<undefined|string>;
+
+	fromDatabase(db: DatabaseHandle, account: DB.Account): Account;
+	login(
+		db: DatabaseHandle,
+		data: LoginData<Server>
+	): Promise<Omit<(typeof DB.Schemas.Account)['inferIn'], 'id'>>;
+}

@@ -108,11 +108,11 @@ const Image = table(['id', 'addedAt', 'sessionId'], ImageSchema);
 
 const Observation = table(['id', 'addedAt', 'sessionId'], ObservationSchema);
 
-const Session = table(['id'], SessionSchema);
+const Session = table(['id', 'remoteId'], SessionSchema);
 
 const Metadata = table('id', MetadataSchema.omit('options'));
 const MetadataOption = table(
-	['id'],
+	['id', 'kobocollectId'],
 	MetadataEnumVariant.and({
 		id: [/\w+__\w+:\w+/, '@', 'ID of the form namespaced_metadata_id:key'],
 		metadataId: NamespacedMetadataID,
@@ -125,6 +125,27 @@ const Settings = table(
 	type({
 		id: '"defaults" | "user"',
 		protocols: References,
+		sessionsDirectory: type({
+			platform: type.enumerated('local', 'kobotoolbox'),
+			account: 'string | undefined',
+			protocol: 'string | undefined',
+			filters: {
+				search: 'string',
+				by: type.enumerated('me', 'everyone'),
+				'at?': {
+					start: 'string.date.iso.parse',
+					end: 'string.date.iso.parse',
+				},
+			},
+		}).default(() => ({
+			platform: 'local',
+			account: undefined,
+			protocol: undefined,
+			filters: {
+				search: '',
+				by: 'me',
+			},
+		})),
 		theme: type.enumerated('dark', 'light', 'auto'),
 		// TODO(2025-09-05): remove n===10 after a while
 		gridSize: type.number.pipe((n) => (n === 10 ? 1 : clamp(n, 0.5, 2))),
@@ -181,6 +202,23 @@ const Settings = table(
 	})
 );
 
+const Account = table(
+	'id',
+	type({
+		id: 'string',
+		username: 'string',
+		displayName: 'string',
+		avatarURL: 'string.url.parse',
+		profileURL: 'string.url.parse',
+		addedAt: ['string.date.iso.parse', '=', () => new Date().toISOString()],
+	}).and(
+		type.or({
+			type: '"kobotoolbox"',
+			token: 'string',
+		})
+	)
+);
+
 export const Schemas = {
 	ID,
 	ExportsFilepathTemplateObservation,
@@ -201,6 +239,7 @@ export const Schemas = {
 	Settings,
 	EXIFField,
 	HTTPRequest,
+	Account,
 };
 
 /**
@@ -248,6 +287,7 @@ export const Tables = {
 	MetadataOption,
 	Protocol,
 	Settings,
+	Account,
 };
 
 /**
@@ -397,4 +437,9 @@ export const idComparator = (a, b) => {
 /**
  * @typedef MetadataValueFile
  * @type {typeof MetadataValueFile.infer}
+ */
+
+/**
+ * @typedef Account
+ * @type {typeof Account.infer}
  */

@@ -11,23 +11,34 @@ Available CSS variables:
  
 -->
 
-<script>
+<script lang="ts" module>
+	/**
+	 * Allows updating some data of the component while loading
+	 * Useful for long-running onclick callbacks
+	 */
+	// eslint-disable-next-line no-unused-vars
+	export type Mutator = (data: {
+		/** Update the loading state or text */
+		loading?: boolean | string;
+	}) => void;
+</script>
+
+<script lang="ts">
 	import LoadingSpinner from './LoadingSpinner.svelte';
 	import { tooltip } from './tooltips.js';
 
-	/**
-	 * @typedef Props
-	 * @type {object}
-	 * @property {import('svelte').Snippet} [children]
-	 * @property {(e: MouseEvent) => void} [onclick]
-	 * @property {() => void} [ondoubleclick]
-	 * @property {'article' | 'li' | 'div'} [tag=article] - HTML tag to use for the card container
-	 * @property {string} [tooltip] - Tooltip text to show on hover (only if clickable)
-	 * @property {string} [testid]
-	 * @property {boolean | string} [loading=false] - Whether to show a loading state while onclick is being processed, if string, show it instead of the default loading text
-	 */
+	interface Props {
+		children?: import('svelte').Snippet;
+		// eslint-disable-next-line no-unused-vars
+		onclick?: (e: MouseEvent, mutator: Mutator) => void | Promise<void>;
+		ondoubleclick?: () => void;
+		tag?: 'article' | 'li' | 'div';
+		tooltip?: string;
+		testid?: string;
+		loading?: boolean | string;
+		alwaysLoading?: boolean;
+	}
 
-	/** @type {Props}*/
 	const {
 		children = undefined,
 		onclick,
@@ -36,9 +47,12 @@ Available CSS variables:
 		tooltip: tooltipText,
 		testid,
 		loading: showLoading = false,
-	} = $props();
+		alwaysLoading,
+	}: Props = $props();
 
-	let loading = $state(false);
+	let _showLoading = $derived(showLoading);
+
+	let loading = $derived(alwaysLoading || false);
 	const clickable = $derived(Boolean(onclick));
 </script>
 
@@ -50,10 +64,12 @@ Available CSS variables:
 	use:tooltip={clickable && tooltipText ? tooltipText : undefined}
 	class="card"
 	ondblclick={ondoubleclick}
-	onclick={async (e) => {
+	onclick={async (e: MouseEvent) => {
 		try {
 			loading = true;
-			await onclick?.(e);
+			await onclick?.(e, (changes) => {
+				if ('loading' in changes) _showLoading = changes.loading;
+			});
 		} finally {
 			loading = false;
 		}
@@ -61,10 +77,10 @@ Available CSS variables:
 	aria-busy={loading}
 	tabindex={clickable ? 0 : undefined}
 >
-	{#if showLoading && loading}
+	{#if _showLoading && loading}
 		<div class="loading-overlay">
 			<LoadingSpinner />
-			{typeof showLoading == 'string' ? showLoading : 'Chargement…'}
+			{typeof _showLoading == 'string' ? _showLoading : 'Chargement…'}
 		</div>
 	{/if}
 	{@render children?.()}

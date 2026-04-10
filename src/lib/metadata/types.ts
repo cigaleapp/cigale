@@ -5,6 +5,8 @@ import { ArkErrors } from 'arktype';
 
 import { MetadataRuntimeValue } from '$lib/schemas/metadata';
 
+import { ensureArray } from '../utils.js';
+
 export type TypedMetadataValue<Type extends DB.MetadataType = DB.MetadataType> = Omit<
 	DB.MetadataValue,
 	'value'
@@ -61,8 +63,7 @@ export function switchOnMetadataType<
 	fallback?: (...values: RuntimeValue[]) => RT[DB.MetadataType],
 	error?: (...values: ArkErrors[]) => RT[DB.MetadataType]
 ): RT[DB.MetadataType] {
-	const values = Array.isArray(value) ? value : [value];
-	const typeds = values.map((v) => MetadataRuntimeValue[type](v));
+	const typeds = ensureArray(value).map((v) => MetadataRuntimeValue[type](v));
 
 	if (typeds.some((v) => v instanceof ArkErrors)) {
 		if (error) return error(...(typeds.filter((v) => v instanceof ArkErrors) as ArkErrors[]));

@@ -238,6 +238,11 @@ export const MetadataMergeMethod = type.or(
 export const MetadataEnumVariant = type({
 	key: [ID, '@', 'Identifiant unique pour cette option'],
 	label: ['string', '@', "Nom de l'option, affichable dans une interface utilisateur"],
+	'kobocollect?': [
+		'string | string[]',
+		'@',
+		'Valeur(s) (nom technique, sans espaces) de la métadonnée',
+	],
 	synonyms: type('string[]')
 		.describe('Synonymes (labels alternatifs) pour cette option')
 		.default(() => []),
@@ -381,6 +386,11 @@ const MetadataBase = type({
 		"Si cette métadonnée est héritée d'un autre protocole, indique de quel protocole elle est héritée"
 	),
 	label: ['string', '@', 'Nom de la métadonnée'],
+	'kobocollect?': [
+		'string | string[]',
+		'@',
+		'Label(s) ou nom(s) de colonne de la question Kobocollect associée à cette métadonnée. Non sensible à la casse',
+	],
 	'group?': ID.brand('MetadataGroup').describe(
 		'Identifiant du groupe dans lequel mettre cette métadonnée. Voir le champ metadataGroups du protocole'
 	),
@@ -413,10 +423,41 @@ const MetadataBase = type({
 	).optional(),
 });
 
-const MetadataBoolean = MetadataBase.and({
+const MetadataBoolean = MetadataBase.omit('kobocollect').and({
 	type: '"boolean"',
 	'default?': MetadataDefault('boolean'),
 	'infer?': type.or(InferenceConfigs.exif, InferenceConfigs.sidecar(type('boolean'))),
+	'kobocollect?': type.or(
+		{
+			'list?': [
+				'string | string[]',
+				'@',
+				'Label(s) ou nom(s) de colonne de la question Kobocollect associée (question à choix)',
+			],
+			true: [
+				'string | string[]',
+				'@',
+				'Label(s) ou nom(s) technique du choix associé à Vrai. Mettre OK pour une question de type "Acknowledge"',
+			],
+			false: [
+				'string | string[]',
+				'@',
+				'Label(s) ou nom(s) technique du choix associé à Faux. Mettre "" pour une question de type "Acknowledge"',
+			],
+		},
+		{
+			'list?': [
+				'string | string[]',
+				'@',
+				'Label(s) ou nom(s) de colonne de la question Kobocollect associée (question à choix multiples)',
+			],
+			choice: [
+				'string | string[]',
+				'@',
+				'Label(s) ou nom(s) technique du choix à cocher si cette métadonnée est vraie',
+			],
+		}
+	),
 });
 
 export const MetadataString = MetadataBase.and({

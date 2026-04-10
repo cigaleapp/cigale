@@ -332,9 +332,9 @@
 			</ButtonIcon>
 		</div>
 	</aside>
-	<main class:padded={!page.route.id?.startsWith('/(app)/protocols/[id]/metadata/')}>
+	<div class="main" class:padded={!page.route.id?.startsWith('/(app)/protocols/[id]/metadata/')}>
 		{@render children()}
-	</main>
+	</div>
 </div>
 
 {#snippet navlink(
@@ -372,7 +372,7 @@
 		height: 100%;
 	}
 
-	main {
+	.main {
 		overflow-y: auto;
 		width: 100%;
 		&.padded {
@@ -386,7 +386,7 @@
 		}
 	}
 
-	aside.collapsed + main.padded > :global(*) {
+	aside.collapsed + .main.padded > :global(*) {
 		max-width: 60rem;
 	}
 

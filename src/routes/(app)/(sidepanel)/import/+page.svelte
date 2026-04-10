@@ -49,7 +49,7 @@
 	clickable={allImages.length === 0}
 	onfiles={({ files }) => importMore(files)}
 >
-	<section class="observations" class:empty in:fade={{ duration: 100 }}>
+	<main class="observations" class:empty in:fade={{ duration: 100 }}>
 		<AreaObservations
 			items={allImages}
 			zone="import"
@@ -95,7 +95,7 @@
 				<p>Cliquer ou déposer des images, ou un export de résultats (.zip)</p>
 			</div>
 		{/if}
-	</section>
+	</main>
 </Dropzone>
 
 <style>

@@ -28,7 +28,7 @@ export const References = ID.array().pipe((ids) => [...new Set(ids)]);
 export const Probability = type('0 <= number <= 1.0001').pipe((n) => clamp(n, 0, 1));
 
 /**
- * Can't use string.url.parse because it prevents us from generating JSON schemas
+ * Can't use string.url.parse or string.url because it prevents us from generating JSON schemas
  */
 export const URLString = type(/https?:\/\/.+/);
 

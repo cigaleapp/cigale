@@ -37,6 +37,28 @@ imports:
 crop:
   metadata: crop
 
+remote:
+  kobocollect:
+    # form: https://kf.kobotoolbox.org/#/forms/aTocGmTVNFFtuTAbtcgsEK/
+    form: https://kf.kobotoolbox.org/#/forms/a3kVqAFEJwnHFcFc7PpWj4/
+    title: |
+      {{ titlecase survey.Code_projet }} de {{ 
+        slice (metadata session 'transect_code') 12 999 
+      }} à {{ 
+        formatDate
+          (
+            parseDate
+              (slice (metadata session 'transect_code') 0 12)
+              "yyyyMMddHHmm"
+          )
+          "HH:mm"
+      }} 
+    thumbnails:
+      - Prendre_une_photo_du_milieu
+      - Prenez_une_photo_du_milieu
+      - Prenez_une_photo_du_arriv_e_du_transect
+      - Prenez_une_photo_du_e_d_part_du_transect
+
 metadataGroups:
   project:
     name: Code projet
@@ -86,6 +108,7 @@ sessionMetadata:
   date:
     type: date
     label: Date de début
+    kobocollect: [Bonjour_Pour_r_aliser_le_pro, Bonjour_Pour_r_ali_tualiser_votre_relev, Date du transect]
     mergeMethod: none
     required: true
     description: ''
@@ -95,6 +118,9 @@ sessionMetadata:
     type: boolean
     group: project
     label: Entraînement
+    kobocollect:
+      list: Code projet
+      choice: entrainement
     description: ''
     mergeMethod: min
     required: true
@@ -104,6 +130,9 @@ sessionMetadata:
     type: boolean
     group: project
     label: Sciences participatives
+    kobocollect:
+      list: Code projet
+      choice: sciences_participatives
     description: ''
     mergeMethod: min
     required: true
@@ -113,6 +142,9 @@ sessionMetadata:
     type: boolean
     group: project
     label: Psi-Biom
+    kobocollect:
+      list: Code projet
+      choice: psibiom
     learnMore: https://www.terroiko.fr/fr/recherche-et-developpement/psibiom
     description: ''
     mergeMethod: min
@@ -123,6 +155,9 @@ sessionMetadata:
     type: boolean
     group: project
     label: RENAT
+    kobocollect:
+      list: Code projet
+      choice: renat
     learnMore: https://renat.wiki/
     description: Parc Naturel Régional des Pyrénées Ariégeoises
     mergeMethod: min
@@ -133,6 +168,9 @@ sessionMetadata:
     type: boolean
     group: project
     label: ADEPT
+    kobocollect:
+      list: Code projet
+      choice: adept
     learnMore: https://fundatia-adept.org/projects/
     description: ''
     mergeMethod: min
@@ -143,6 +181,9 @@ sessionMetadata:
     type: boolean
     group: project
     label: WildNet
+    kobocollect:
+      list: Code projet
+      choice: wildnet
     learnMore: https://wildnet.org/
     description: ''
     mergeMethod: min
@@ -155,10 +196,12 @@ sessionMetadata:
     description: Dépend du projet. Si vous ne faites pas le protocole dans le cadre d'un projet spécifique le nom de la commune ou de tout autre repère spatial est suffisant
     mergeMethod: none
     required: false
+    # kobocollect: Code du site # defaults to matching by label
 
   habitat_photo:
     type: file
     label: Photo du milieu
+    kobocollect: Prenez une photo du milieu
     description: Prenez une photo qui représente bien l'endroit où vous allez effectuer l'inventaire photographique.
     mergeMethod: none
     required: false
@@ -170,6 +213,7 @@ sessionMetadata:
   soil_photo_start:
     type: file
     label: Sol au départ
+    kobocollect: Prenez une photo du sol au point de départ du transect
     description: Prenez une photo du sol au point de départ du transect. Le téléphone/appareil doit être parallèle au sol, à hauteur d'hanche (environ 1 m du sol) afin d'analyser la communauté de plante
     mergeMethod: none
     required: false
@@ -181,6 +225,7 @@ sessionMetadata:
   habitat_comment:
     type: string
     label: Commentaire sur le lieu
+    kobocollect: Commentaire ou remarque sur le milieu
     required: false
     mergeMethod: none
     description: ''
@@ -211,6 +256,7 @@ sessionMetadata:
   shadow_temperature:
     type: float
     label: Température à l'ombre
+    kobocollect: Température à l'ombre (°C)
     unit: celsius
     description: Il faut s'assurer que la température mesurée soit bien celle de l'air à l'ombre et qu'elle soit influencé le moins possible par le soleil, par le sol ou par votre température corporelle. Si vous n'avez pas de thermomètre utilisez la température prédite par la météo locale
     mergeMethod: average
@@ -220,6 +266,7 @@ sessionMetadata:
   grass_height:
     type: float
     label: Hauteur de la strate herbacée
+    kobocollect: Hauteur de la strate herbacée (cm)
     unit: cm
     description: Estimez la hauteur de l'herbe sur votre transect. Si elle n'est pas constante estimez une moyenne sur les 20m du parcours prévu.
     mergeMethod: average
@@ -239,6 +286,7 @@ sessionMetadata:
   incline_exposure:
     type: float
     label: Exposition (orientation) de la pente
+    kobocollect: Exposition
     unit: deg
     description: Mesuré avec une application boussole, pointée vers le bas de la pente
     mergeMethod: average
@@ -249,6 +297,10 @@ sessionMetadata:
     type: boolean
     label: Chemin
     description: Le transect est-il réalisé depuis un chemin?
+    kobocollect:
+      list: Le transect est-il réalisé depuis un chemin ?
+      true: oui
+      false: non
     mergeMethod: average
     required: false
 
@@ -274,6 +326,7 @@ sessionMetadata:
   soil_photo_end:
     type: file
     label: Sol à l'arrivée
+    kobocollect: Prenez une photo du sol au point d'arrivée du transect
     description: La photo doit être parallèle au sol, à hauteur d'hanche (environ 1 m du sol) afin d'analyser la communauté de plante
     required: false
     mergeMethod: none
@@ -285,6 +338,7 @@ sessionMetadata:
   distance:
     type: float
     label: Distance parcourue
+    kobocollect: Distance totale parcourue (m)
     unit: m
     required: true
     mergeMethod: average
@@ -294,6 +348,7 @@ sessionMetadata:
   camera_type:
     type: enum
     label: Type d'appareil photo
+    kobocollect: Quel type d'appareil photo avez vous utilisez?
     description: ''
     required: true
     mergeMethod: none
@@ -301,20 +356,32 @@ sessionMetadata:
       - key: smartphone
         label: Smartphone
       - key: with_macro
+        kobocollect: reflex_ou_hybride_avec_objectif_macro_et
         label: Reflex ou hybride avec objectif macro et flash
       - key: compact
         label: Compact
       - key: without_macro
+        kobocollect: reflex_ou_hybride_sans_objectif_macro
         label: Reflex ou hybride sans objectif macro
       - key: other
+        kobocollect: autres
         label: Autre
 
   comment:
     type: string
     required: false
     description: ''
-    label: Commentaire ou remarque
+    label: Remarque ou commentaire
     mergeMethod: none
 
 # All metadata are imported from the base arthropods protocol
 metadata: {}
+
+exports:
+  images:
+    mtime: shoot_date
+    cropped: Cropped/{{ fallback image.protocolMetadata.species.valueLabel "(Unknown)" }}_obs{{ observation.number }}_{{ sequence }}.{{ extension image.filename }}
+    original: Original/{{ fallback image.protocolMetadata.species.valueLabel "(Unknown)" }}_obs{{ observation.number }}_{{ sequence }}.{{ extension image.filename }}
+  metadata:
+    csv: metadata.csv
+    files: Files/{{ sequence }}-{{ metadataKey }}.{{ extension filename }}

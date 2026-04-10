@@ -48,7 +48,8 @@
 	interface Props {
 		items: ItemsGroup<D, SD>[];
 		item?: Snippet<[AnyItem<D, SD>['data'], AnyItem<D, SD> & { selected: boolean }]>;
-		trigger: Snippet<[{ onclick: () => void } & Record<string, unknown>]>;
+		/** IMPORTANT: Don't put just onclick on the button, spread the entire object */
+		trigger: Snippet<[{ onclick: () => void } & Record<string, unknown>,]>;
 		testid?: string | undefined;
 		scrollable?: boolean;
 	}
@@ -65,6 +66,7 @@
 	let open = $state(false);
 </script>
 
+
 <DropdownMenu.Root {open}>
 	<DropdownMenu.Trigger {...rest} data-testid={testids(testid).trigger}>
 		{#snippet child({ props })}
@@ -73,6 +75,7 @@
 				onclick: () => {
 					open = !open;
 				},
+			}, {
 			})}
 		{/snippet}
 	</DropdownMenu.Trigger>

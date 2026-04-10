@@ -98,7 +98,7 @@ test('can use a protocol that imports metadata from another protocol', async ({
 	// await loadDatabaseDump(page, "db/kitchensink-protocol.devalue")
 	await goToProtocolManagement(page);
 	await page.getByText('Example: arthropodes (lightweight)').click();
-	await page.getByRole('button', { name: 'Supprimer' }).click();
+	await page.getByRole('button', { name: 'Supprimer', exact: true }).click();
 	await app.modals.confirmDeletion('modal_delete_protocol', 'Example: arthropodes (lightweight)');
 
 	await mockUrl(page, context, 'https://example.com/protocols/com.example.remote.json', {
@@ -502,7 +502,7 @@ test('can infer metadata from a sidecar file', async ({ page, context, app, temp
 	await mockUrl(
 		page,
 		context,
-		'https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=38.12232&lon=67.676767&addressdetails=0',
+		'https://nominatim.openstreetmap.org/reverse\\?format=jsonv2&lat=38.12232&lon=67.676767&addressdetails=0',
 		{
 			json: {
 				place_id: 194730330,

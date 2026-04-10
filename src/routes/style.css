@@ -14,8 +14,8 @@ dialog {
 	--bg-error: light-dark(#ffddd7, #250505);
 	--fg-error: light-dark(#940000, #ff7b7b);
 
-	--bg-success: light-dark(#adffad, #042904);
-	--fg-success: light-dark(#1d7a1d, #50ee50);
+	--bg-success: light-dark(#ccffcc, #042904);
+	--fg-success: light-dark(#107510, #50ee50);
 
 	--bg-neutral: light-dark(#ffffff, #030308);
 	--bg2-neutral: light-dark(#f3f3f3, #0c1527);

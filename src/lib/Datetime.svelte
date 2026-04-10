@@ -11,15 +11,18 @@
 	 * @typedef {object} Props
 	 * @property {string | Date} value
 	 * @property {"absolute" | "relative" | "both"} [show="absolute"] what to display
+	 * @property {"date" | "time" | "both"} [parts="both"] what parts of the datetime to display. only relevant if show=absolute
 	 */
 
 	/** @type {Props & Record<string, unknown>} */
-	const { value, show = 'absolute', ...rest } = $props();
+	const { value, show = 'absolute', parts = 'both', ...rest } = $props();
 
 	const parsedDate = $derived(typeof value === 'string' ? new Date(value) : value);
 
-	const absolute = $derived(dates.format(parsedDate, 'PPpp'));
 	const relative = $derived(dates.formatDistanceToNow(parsedDate, { addSuffix: true }));
+	const absolute = $derived(
+		dates.format(parsedDate, { both: 'PPpp', date: 'PP', time: 'pp' }[parts])
+	);
 </script>
 
 <time

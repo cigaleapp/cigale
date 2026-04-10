@@ -18,20 +18,22 @@ test('openDatabase', async () => {
 	expect(window).toHaveProperty('DB');
 	expect(window).toHaveProperty('refreshDB');
 	expect(db.name).toMatchInlineSnapshot(`"database"`);
-	expect(db.version).toMatchInlineSnapshot(`6`);
+	expect(db.version).toMatchInlineSnapshot(`7`);
 	expect(db.objectStoreNames).toMatchInlineSnapshot(`
 		FakeDOMStringList {
-		  "0": "Image",
-		  "1": "ImageFile",
-		  "2": "ImagePreviewFile",
-		  "3": "Metadata",
-		  "4": "MetadataOption",
-		  "5": "MetadataValueFile",
-		  "6": "Observation",
-		  "7": "Protocol",
-		  "8": "Session",
-		  "9": "Settings",
+		  "0": "Account",
+		  "1": "Image",
+		  "10": "Settings",
+		  "2": "ImageFile",
+		  "3": "ImagePreviewFile",
+		  "4": "Metadata",
+		  "5": "MetadataOption",
+		  "6": "MetadataValueFile",
+		  "7": "Observation",
+		  "8": "Protocol",
+		  "9": "Session",
 		  "_values": [
+		    "Account",
 		    "Image",
 		    "ImageFile",
 		    "ImagePreviewFile",
@@ -103,7 +105,7 @@ describe('operations', () => {
 				addedAt: addedAt.toISOString(),
 				fileId: 'quoicoubaka',
 				dimensions: { width: 100, height: 100 },
-				contentType: 'what/ever',
+				contentType: 'image/jpeg',
 				filename: 'THE NETHER',
 				metadata: {
 					proto__water: {
@@ -122,7 +124,7 @@ describe('operations', () => {
 				addedAt: addedAt.toISOString(),
 				fileId: 'quoicoubaka',
 				dimensions: { width: 100, height: 100 },
-				contentType: 'what/ever',
+				contentType: 'image/jpeg',
 				filename: 'THE NETHER',
 				metadata: {
 					proto__water: {
@@ -142,7 +144,7 @@ describe('operations', () => {
 				fileId: 'quoicoubaka',
 				boundingBoxesAnalyzed: false,
 				dimensions: { width: 100, height: 100, aspectRatio: 1 },
-				contentType: 'what/ever',
+				contentType: 'image/jpeg',
 				filename: 'THE NETHER',
 				metadataErrors: {},
 				metadata: {
@@ -198,7 +200,7 @@ describe('operations', () => {
 			addedAt: addedAt.toISOString(),
 			fileId: 'quoicoubaka',
 			dimensions: { width: 100, height: 100 },
-			contentType: 'what/ever',
+			contentType: 'image/jpeg',
 			filename: 'THE NETHER',
 			metadataErrors: {},
 			metadata: {
@@ -216,7 +218,7 @@ describe('operations', () => {
 			addedAt: addedAt.toISOString(),
 			fileId: 'quoicoubaka',
 			dimensions: { width: 100, height: 100 },
-			contentType: 'the ehehhe',
+			contentType: 'image/jpeg',
 			filename: 'ogrjoigrejo',
 			metadataErrors: {},
 			metadata: {
@@ -235,7 +237,7 @@ describe('operations', () => {
 			fileId: 'quoicoubaka',
 			boundingBoxesAnalyzed: false,
 			dimensions: { width: 100, height: 100, aspectRatio: 1 },
-			contentType: 'what/ever',
+			contentType: 'image/jpeg',
 			filename: 'THE NETHER',
 			metadataErrors: {},
 			metadata: {
@@ -251,6 +253,51 @@ describe('operations', () => {
 				},
 			},
 		});
+	});
+	test('getMany', async () => {
+		const db = await openDatabase();
+		const addedAt = new Date();
+		await db.put('Image', {
+			id: imageId('0', 0),
+			sessionId: 'testing',
+			addedAt: addedAt.toISOString(),
+			fileId: 'quoicoubaka',
+			dimensions: { width: 100, height: 100 },
+			contentType: 'image/jpeg',
+			filename: 'THE NETHER',
+			metadataErrors: {},
+			metadata: {
+				proto__water: {
+					value: '"bucket"',
+					alternatives: {
+						'"release!!!!"': 0.3,
+					},
+				},
+			},
+		});
+		await db.put('Image', {
+			id: imageId('0', 1),
+			sessionId: 'testing',
+			addedAt: addedAt.toISOString(),
+			fileId: 'quoicoubaka',
+			dimensions: { width: 100, height: 100 },
+			contentType: 'image/jpeg',
+			filename: 'ogrjoigrejo',
+			metadataErrors: {},
+			metadata: {
+				proto__water: {
+					value: '"ogjroe"',
+					alternatives: {
+						'"release!!!!"': 0.3,
+					},
+				},
+			},
+		});
+
+		expect(await idb.getMany('Image', [imageId('0', 0), imageId('0', 1)])).toMatchObject([
+			{ id: imageId('0', 0) },
+			{ id: imageId('0', 1) },
+		]);
 	});
 	test('list', async () => {
 		const db = await openDatabase();
@@ -348,7 +395,7 @@ describe('wrangler', () => {
 		addedAt: addedAt.toISOString(),
 		fileId: 'quoicoubaka',
 		dimensions: { width: 100, height: 100 },
-		contentType: 'what/ever',
+		contentType: 'image/jpeg',
 		filename: 'THE NETHER',
 		metadataErrors: {},
 		metadata: {
@@ -371,6 +418,7 @@ describe('wrangler', () => {
 					addedAt,
 				},
 			],
+			Account: [],
 			Image: [],
 			Session: [],
 			Metadata: [],

@@ -1,5 +1,11 @@
 import { expect } from '@playwright/test';
 
+// TODO: remove once we get on Node >=25
+import 'urlpattern-polyfill';
+
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+
 import { FixturePaths } from '../filepaths.js';
 
 /**
@@ -89,25 +95,41 @@ export async function expectTooltipContent(page, locator, content, { timeout } =
 }
 
 /**
- * @template Args
+ * @template {any[]} Args
  * @template T
- * @typedef {T | ((args: Args) => T) | ((args: Args) => Promise<T>)} MaybeAsyncFunction
+ * @typedef {T | ((...args: Args) => T) | ((...args: Args) => Promise<T>)} MaybeAsyncFunction
  */
 
 /**
  * @param {import('@playwright/test').Page} page
  * @param {import('@playwright/test').Page} page
  * @param {import('@playwright/test').BrowserContext} context
- * @param {string | RegExp | ((u: URL) => boolean)} url
- * @param {MaybeAsyncFunction<import('@playwright/test').Route, {json:object}|{status?: number; body:string|Buffer}>} result
+ * @param {string | URLPattern | ((u: URL) => boolean)} url  string form is passed to new URLPattern(...)
+ * @param {MaybeAsyncFunction<[import('@playwright/test').Route, URLPatternResult|undefined], {json:object}|{status?: number; body:string|Buffer}|{file: import('../filepaths.js').FixturePaths.Any }>} result
  */
 export async function mockUrl(page, context, url, result) {
+	if (typeof url === 'string') {
+		return mockUrl(page, context, new URLPattern(url), result);
+	}
+
 	await Promise.all(
 		// Context: service workers. Page: regular fetch() requests (for browsers that don't support service worker instrumentation)
 		[context, page].map(async (target) =>
-			target.route(url, async (route) =>
-				route.fulfill(typeof result === 'function' ? await result(route) : result)
-			)
+			target.route(url instanceof URLPattern ? (u) => url.test(u) : url, async (route) => {
+				let match = url instanceof URLPattern ? url.exec(route.request().url()) : undefined;
+
+				const response =
+					typeof result === 'function' ? await result(route, match ?? undefined) : result;
+
+				if ('file' in response) {
+					return route.fulfill({
+						...response,
+						body: readFileSync(path.join(FixturePaths.root, response.file)),
+					});
+				}
+
+				route.fulfill(response);
+			})
 		)
 	);
 }
@@ -186,6 +208,7 @@ export async function confirmDeletionModal(
 	if (type) {
 		const textbox = deletionModal.getByRole('textbox');
 		await textbox.fill(type);
+		await textbox.blur()
 	}
 
 	await deletionModal

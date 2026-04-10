@@ -528,7 +528,7 @@
 	.export {
 		position: fixed;
 		z-index: 10;
-		top: calc(var(--navbar-height));
+		top: calc(var(--navbar-height, 20px));
 		bottom: 3rem;
 		right: 3rem;
 		max-width: 50rem;
