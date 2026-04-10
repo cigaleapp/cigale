@@ -14,7 +14,7 @@ const config = {
 			$worker: 'src/worker',
 			$locales: 'src/locales',
 			$routes: 'src/routes',
-			$e2e: 'tests'
+			$e2e: 'tests',
 		},
 		paths: {
 			base:

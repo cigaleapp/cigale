@@ -47,7 +47,7 @@
 	confirm="Se connecter"
 	bind:open={login}
 	oncancel={() => {
-		loginData = undefined
+		loginData = undefined;
 	}}
 	onconfirm={async () => {
 		if (!adding) return;

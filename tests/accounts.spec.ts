@@ -163,9 +163,9 @@ test('can download a session from a kobotoolbox account', async ({ page, context
 	await expect(card).toHaveText(/Téléchargement…/);
 	await app.path.wait('/(app)/(sidepanel)/import');
 	await goToSessionPage(page);
-	await expect(page.getByRole('main').getByRole('textbox', { name: 'Description', exact: true })).toHaveValue(
-		/Créée sur KoboToolbox/
-	);
+	await expect(
+		page.getByRole('main').getByRole('textbox', { name: 'Description', exact: true })
+	).toHaveValue(/Créée sur KoboToolbox/);
 	// Wait for defaults to apply
 	// TODO: reduce / eliminate this wait, resolveDefaults is wayyyyyyyyyyyyyy too slow
 	await app.wait('5s');

@@ -121,7 +121,7 @@ export interface AccountConstructor<
 	servers: readonly { domain: Server; name?: string }[];
 
 	/** Returns the error message, or undefined if everything is a-ok */
-	checkAuth(data: LoginData<Server>): Promise<undefined|string>;
+	checkAuth(data: LoginData<Server>): Promise<undefined | string>;
 
 	fromDatabase(db: DatabaseHandle, account: DB.Account): Account;
 	login(

@@ -22,7 +22,9 @@
 	let element = $state();
 	let offsetWidth = $state(0);
 
-	const tooltipText = $derived(!noTooltip && element && offsetWidth < element.scrollWidth ? text : '');
+	const tooltipText = $derived(
+		!noTooltip && element && offsetWidth < element.scrollWidth ? text : ''
+	);
 </script>
 
 <svelte:element

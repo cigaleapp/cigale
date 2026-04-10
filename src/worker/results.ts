@@ -753,7 +753,7 @@ async function prepare({
 
 			const path = filepaths.metadata.files.render({
 				id,
-				sequence: i+1,
+				sequence: i + 1,
 				metadataKey: removeNamespaceFromMetadataId(source.metadataId),
 				metadata: metadataDefinitionsRaw.find((m) => m.id === source.metadataId)!,
 				session: source.kind === 'session' ? { id: sessionId } : undefined,

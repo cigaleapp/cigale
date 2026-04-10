@@ -38,7 +38,7 @@ export const _tablesState = $state({
 	Protocol: [],
 	Settings: [],
 	Session: [],
-	Account: []
+	Account: [],
 });
 
 /**
@@ -285,8 +285,8 @@ export async function getMany(tableName, keys) {
 
 	await openTransaction([tableName], {}, async (tx) => {
 		for (const key of keys) {
-			const found = await tx.objectStore(tableName).get(key)
-			if (!found) continue
+			const found = await tx.objectStore(tableName).get(key);
+			if (!found) continue;
 			results.push(validator.assert(found));
 		}
 	});
@@ -508,7 +508,7 @@ export async function openDatabase() {
 			}
 
 			if (oldVersion === 6) {
-				rebuildIndexes('Session')
+				rebuildIndexes('Session');
 			}
 
 			for (const [tableName, schema] of tablesByName) {

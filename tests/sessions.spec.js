@@ -345,7 +345,9 @@ test('changing session info saves in the database', async ({ page, app }) => {
 
 	assert(await app.db.session.byId(id)).toHaveProperty('name', 'New name');
 
-	const descriptionInput = page.getByRole('main').getByRole('textbox', { name: 'Description', exact: true });
+	const descriptionInput = page
+		.getByRole('main')
+		.getByRole('textbox', { name: 'Description', exact: true });
 	await descriptionInput.fill('A description');
 	await descriptionInput.blur();
 

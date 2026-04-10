@@ -1,13 +1,13 @@
+import { mkdir, rm } from 'node:fs/promises';
+import type { FixturePaths } from './filepaths.js';
+import type { TempFilesFixture } from './fixtures/tempfiles.js';
+import type { NavigationTab, PredownloadedModel } from './utils/index.js';
+import type { Locator } from '@playwright/test';
 import type { MetadataValue, Settings } from '$lib/database';
 import type { IDBDatabaseType } from '$lib/idb.svelte';
 import type { RuntimeValue } from '$lib/schemas/metadata';
 import type { ExportedProtocol } from '$lib/schemas/protocols';
 import type { Toast } from '$lib/toasts.svelte.js';
-import type { Locator } from '@playwright/test';
-import { mkdir, rm } from 'node:fs/promises';
-import type { FixturePaths } from './filepaths.js';
-import type { TempFilesFixture } from './fixtures/tempfiles.js';
-import type { NavigationTab, PredownloadedModel } from './utils/index.js';
 
 import { defineNetworkFixture } from '@msw/playwright';
 import { test as base, expect as baseExpect } from '@playwright/test';
