@@ -19,7 +19,7 @@ import {
 
 test.describe('isolation', () => {
 	test.beforeEach(() => {
-		test.setTimeout(40_000);
+		test.setTimeout(ms('1min'));
 	});
 	test('no images from one session shows up in another', async ({ page, app }) => {
 		await newSession(page, { name: 'Session α' });

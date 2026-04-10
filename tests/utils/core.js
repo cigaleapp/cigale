@@ -208,6 +208,7 @@ export async function confirmDeletionModal(
 	if (type) {
 		const textbox = deletionModal.getByRole('textbox');
 		await textbox.fill(type);
+		await textbox.blur()
 	}
 
 	await deletionModal

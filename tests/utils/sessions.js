@@ -127,7 +127,7 @@ export async function deleteSession(page, name) {
 		modalKey: 'modal_delete_session',
 	});
 
-	await waitForRoute(page, '/sessions');
+	await waitForRoute(page, '/(app)/sessions');
 }
 
 /**

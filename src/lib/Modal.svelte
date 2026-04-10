@@ -29,6 +29,8 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 </script>
 
 <script>
+	import { ms } from 'convert';
+
 	import IconClose from '~icons/ri/close-line';
 	import { pushState } from '$app/navigation';
 	import { page } from '$app/state';
@@ -52,17 +54,26 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 		children,
 	} = $props();
 
+	// Track if the modal is still opening (animation) to prevent click-outside from closing it immediately
+	let opening = $state(false);
+	/** milliseconds it takes for the modal to open */
+	const openingDuration = ms('200ms');
+
 	// Initialize and update close/update functions when stateKey changes
 	$effect(() => {
 		console.debug(`Binding functions to ${stateKey} `);
 
 		open = () => {
+			opening = true;
 			onopen?.();
 			if (toastsPool) {
 				toasts.setCurrentPool(toastsPool);
 				toasts.clear();
 			}
 			pushState('', { [stateKey]: true });
+			setTimeout(() => {
+				opening = false;
+			}, openingDuration);
 		};
 		close = () => {
 			onclose?.();
@@ -79,14 +90,22 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 	$effect(() => {
 		if (!modalElement) return;
 
-		if (page.state[stateKey]) modalElement.showModal();
-		else modalElement.close();
+		// Somehow page.state[stateKey] can be undefined sometimes when running under Playwright
+		switch (page.state[stateKey]) {
+			case true:
+				modalElement.showModal();
+				break;
+			case false:
+				modalElement.close();
+				break;
+		}
 	});
 </script>
 
 <dialog
 	data-key={stateKey}
-	aria-hidden={!page.state[stateKey]}
+	// Somehow page.state[stateKey] can be undefined sometimes
+	aria-hidden={page.state[stateKey] === false}
 	style:color-scheme={getColorScheme()}
 	bind:this={modalElement}
 	onclose={() => {
@@ -105,7 +124,7 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 			return;
 		}
 		// Close on backdrop click
-		if (target === currentTarget) close?.();
+		if (target === currentTarget && !opening) close?.();
 	}}
 >
 	<header>
