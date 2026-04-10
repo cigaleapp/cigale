@@ -1607,3 +1607,95 @@ if (import.meta.vitest) {
 		expect(ensureArray([[3]])).toEqual([[3]]);
 	});
 }
+
+/**
+ * @param {string} group
+ */
+export function profiler(group) {
+	/**
+	 * @template T
+	 * @overload
+	 * @param {string} track
+	 * @param {string} label
+	 * @param {Record<string, string|number|boolean>} dataOrFn
+	 * @param {() => Promise<T> | T} fnIfHasData
+	 * @returns {Promise<T>}
+	 */
+
+	/**
+	 * @template T
+	 * @overload
+	 * @param {string} track
+	 * @param {string} label
+	 * @param {() => Promise<T> | T} dataOrFn
+	 * @returns {Promise<T>}
+	 */
+
+	/**
+	 * @template T
+	 * @param {string} track
+	 * @param {string} label
+	 * @param {Record<string, string|number|boolean> | (() => Promise<T> | T)} dataOrFn
+	 * @param {() => Promise<T> | T} [fnIfHasData]
+	 * @returns {Promise<T>}
+	 */
+	async function profile(track, label, dataOrFn, fnIfHasData) {
+		const fn = fnIfHasData ?? dataOrFn;
+		const start = performance.now();
+		const result = await fn();
+		// console.timeStamp(label, start, end, track, group, );
+		performance.measure(label, {
+			start,
+			detail: {
+				devtools: {
+					dataType: 'track-entry',
+					track,
+					trackGroup: group,
+					properties:
+						typeof dataOrFn === 'function'
+							? undefined
+							: Object.entries(dataOrFn).map(([key, value]) => [
+									key,
+									value.toString(),
+								]),
+				},
+			},
+		});
+		return result;
+	}
+
+	return profile;
+}
+
+/**
+ *
+ * @param {string | undefined | IDBKeyRange} keyRange
+ * @returns
+ */
+export function displayKeyRange(keyRange) {
+	if (!keyRange) return 'none';
+	if (typeof keyRange === 'string') return `{${keyRange}}`;
+
+	/** @type {string} */
+	let lowerBound;
+	/** @type {string} */
+	let upperBound;
+
+	if (keyRange.lower === undefined) {
+		lowerBound = '(-∞';
+	} else if (keyRange.lowerOpen) {
+		lowerBound = `(${keyRange.lower}`;
+	} else {
+		lowerBound = `[${keyRange.lower}`;
+	}
+
+	if (keyRange.upper === undefined) {
+		upperBound = '∞)';
+	} else if (keyRange.upperOpen) {
+		upperBound = `${keyRange.upper})`;
+	} else {
+		upperBound = `${keyRange.upper}]`;
+	}
+
+	return `${lowerBound}, ${upperBound}`;
+}
