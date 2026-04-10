@@ -24,7 +24,7 @@
 		cache?: { key: string; entries: Map<string, NoInfer<Session>[]> };
 		// eslint-disable-next-line no-unused-vars
 		thumbnails: (session: Session) => AsyncIterable<string>;
-		sessions: () => AsyncIterable<Session | { total: number }>;
+		sessions: Array<Session> | (() => AsyncIterable<Session | { total: number }>);
 		subtitle: Snippet<[Session]>;
 		actions: Snippet<[Session]>;
 		create?: undefined | (() => Promise<void>);

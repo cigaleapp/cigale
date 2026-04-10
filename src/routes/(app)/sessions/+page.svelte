@@ -210,70 +210,64 @@
 	<section class="sessions">
 		{#if directory.platform === 'local'}
 			<div class="cards" in:fade={{ duration: 200 }}>
-				{#key tables.Session.state}
-					<Cards
-						create={createSession}
-						sessions={async function* () {
-							for (const session of tables.Session.state) {
-								yield session;
-							}
-						}}
-						card={(session) => ({
-							highlighted: uiState.currentSessionId === session.id,
-							tooltip: 'Ouvrir la session',
-							loading: 'Ouverture…',
-							async onclick() {
-								await switchSession(session.id);
-								await goto('/(app)/(sidepanel)/import');
-							},
-						})}
-						thumbnails={async function* ({ id }) {
-							const images = await listByIndex('Image', 'sessionId', id);
+				<Cards
+					create={createSession}
+					sessions={tables.Session.state}
+					card={(session) => ({
+						highlighted: uiState.currentSessionId === session.id,
+						tooltip: 'Ouvrir la session',
+						loading: 'Ouverture…',
+						async onclick() {
+							await switchSession(session.id);
+							await goto('/(app)/(sidepanel)/import');
+						},
+					})}
+					thumbnails={async function* ({ id }) {
+						const images = await listByIndex('Image', 'sessionId', id);
 
-							const firstUniqueFileIds = [
-								...new Set(images.map((image) => image.fileId).filter(nonnull)),
-							].slice(0, 4);
+						const firstUniqueFileIds = [
+							...new Set(images.map((image) => image.fileId).filter(nonnull)),
+						].slice(0, 4);
 
-							for (const fileId of firstUniqueFileIds) {
-								if (uiState.hasPreviewURL(fileId)) {
-									yield uiState.getPreviewURL(fileId)!;
-									continue;
-								}
-
-								await loadPreviewImage(fileId, 'global');
+						for (const fileId of firstUniqueFileIds) {
+							if (uiState.hasPreviewURL(fileId)) {
 								yield uiState.getPreviewURL(fileId)!;
+								continue;
 							}
-						}}
-					>
-						{#snippet subtitle({ id, createdAt })}
-							<LoadingText
-								mask="# images"
-								value={async () =>
-									listByIndex('Image', 'sessionId', id).then(
-										(images) => images.length
-									)}
-							>
-								{#snippet loaded(count)}
-									{plural(count, ['# image', '# images'])}
-								{/snippet}
-							</LoadingText>
-							· <Datetime parts="date" show="absolute" value={createdAt} />
-						{/snippet}
 
-						{#snippet actions({ id })}
-							<ButtonInk
-								fills
-								onclick={async (e) => {
-									e.stopPropagation();
-									await switchSession(id);
-									await goto('/(app)/sessions/[id]', { id });
-								}}
-							>
-								Gérer
-							</ButtonInk>
-						{/snippet}
-					</Cards>
-				{/key}
+							await loadPreviewImage(fileId, 'global');
+							yield uiState.getPreviewURL(fileId)!;
+						}
+					}}
+				>
+					{#snippet subtitle({ id, createdAt })}
+						<LoadingText
+							mask="# images"
+							value={async () =>
+								listByIndex('Image', 'sessionId', id).then(
+									(images) => images.length
+								)}
+						>
+							{#snippet loaded(count)}
+								{plural(count, ['# image', '# images'])}
+							{/snippet}
+						</LoadingText>
+						· <Datetime parts="date" show="absolute" value={createdAt} />
+					{/snippet}
+
+					{#snippet actions({ id })}
+						<ButtonInk
+							fills
+							onclick={async (e) => {
+								e.stopPropagation();
+								await switchSession(id);
+								await goto('/(app)/sessions/[id]', { id });
+							}}
+						>
+							Gérer
+						</ButtonInk>
+					{/snippet}
+				</Cards>
 			</div>
 		{:else if account}
 			{#key directory}
