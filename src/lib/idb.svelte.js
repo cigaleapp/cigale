@@ -48,7 +48,7 @@ export const _tablesState = $state({
  * @type {{
  *  [Name in ReactiveTableNames]: ReturnType<typeof wrangler<Name>>
  * } & {
- * 	initialize: (sessionId: string|null) => Promise<void>
+ * 	initialize: (...args: Parameters<ReturnType<typeof wrangler>['refresh']>) => Promise<void>
  * }}
  */
 // @ts-ignore
@@ -57,11 +57,11 @@ export const tables = {
 	/**
 	 * Initialize reactive tables for the current session
 	 */
-	async initialize(sessionId) {
+	async initialize(...args) {
 		for (const name of tableNames) {
 			if (!isReactiveTable(name)) continue;
-			await tables[name].refresh(sessionId);
 			await profile(name, 'Initialize reactive table', async () => {
+				await tables[name].refresh(...args);
 			});
 		}
 	},
@@ -77,8 +77,12 @@ function wrangler(table) {
 		get state() {
 			return _tablesState[table];
 		},
-		/** @param {string|null} sessionId */
-		async refresh(sessionId) {
+		/**
+		 * @param {string|null} sessionId
+		 * @param {object} options
+		 * @param {boolean} options.sessionOnly if true, only refresh session-dependent tables
+		 */
+		async refresh(sessionId, { sessionOnly = false } = {}) {
 			if (!sessionId && isSessionDependentReactiveTable(table)) {
 				console.debug(`refresh ${table} without session: clearing state`);
 				_tablesState[table] = [];
@@ -86,7 +90,7 @@ function wrangler(table) {
 				console.debug(`refresh ${table} for session ${sessionId}`);
 				// @ts-ignore
 				_tablesState[table] = await this.list('sessionId', sessionId);
-			} else {
+			} else if (!sessionOnly) {
 				console.debug(`refresh ${table}`);
 				// @ts-ignore
 				_tablesState[table] = await this.list();

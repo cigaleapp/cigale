@@ -43,7 +43,7 @@ export async function switchSession(id) {
 	uiState.clearPreviewURLs();
 	undo.clear();
 	withQueue((q) => q.cancelAll('La session a été fermée'));
-	await idb.tables.initialize(id);
+	await idb.tables.initialize(id, { sessionOnly: true });
 	if (uiState.currentProtocolId !== previousProtocolId) {
 		clearMetadataOptionsCache();
 	}
