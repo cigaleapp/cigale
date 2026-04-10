@@ -9,7 +9,7 @@ import {
 	isSessionDependentReactiveTable,
 	Tables,
 } from './database.js';
-import { nonnull, safeJSONStringify } from './utils.js';
+import { displayKeyRange, profiler, safeJSONStringify } from './utils.js';
 
 /** @type {number | null} */
 export const previewingPrNumber =
@@ -17,6 +17,8 @@ export const previewingPrNumber =
 
 export const databaseName = previewingPrNumber ? `previews/pr-${previewingPrNumber}` : 'database';
 export const databaseRevision = 7;
+
+const profile = profiler('Database');
 
 /**
  * @typedef {typeof import('./database.js').NO_REACTIVE_STATE_TABLES[number]} NonReactiveTableNames
@@ -59,6 +61,8 @@ export const tables = {
 		for (const name of tableNames) {
 			if (!isReactiveTable(name)) continue;
 			await tables[name].refresh(sessionId);
+			await profile(name, 'Initialize reactive table', async () => {
+			});
 		}
 	},
 };
@@ -279,19 +283,21 @@ export async function get(tableName, key) {
  * @template {keyof typeof Tables} TableName
  */
 export async function getMany(tableName, keys) {
-	/** @type {Array<typeof Tables[TableName]['infer']>} */
-	const results = [];
-	const validator = Tables[tableName];
+	return profile(tableName, 'getMany', { Keys: keys.length }, async () => {
+		/** @type {Array<typeof Tables[TableName]['infer']>} */
+		const results = [];
+		const validator = Tables[tableName];
 
-	await openTransaction([tableName], {}, async (tx) => {
-		for (const key of keys) {
-			const found = await tx.objectStore(tableName).get(key);
-			if (!found) continue;
-			results.push(validator.assert(found));
-		}
+		await openTransaction([tableName], {}, async (tx) => {
+			for (const key of keys) {
+				const found = await tx.objectStore(tableName).get(key);
+				if (!found) continue;
+				results.push(validator.assert(found));
+			}
+		});
+
+		return results;
 	});
-
-	return results;
 }
 
 /**
@@ -302,15 +308,17 @@ export async function getMany(tableName, keys) {
  * @template {keyof typeof Tables} TableName
  */
 export async function list(tableName, keyRange = undefined) {
-	const db = await openDatabase();
-	const validator = Tables[tableName];
-	// @ts-ignore
-	return await db
-		.getAll(tableName, keyRange)
-		.then((values) => values.map((v) => validator.assert(v)).sort(idComparator))
-		.then((result) => {
-			return result;
-		});
+	return profile(tableName, 'list', { 'Key range': displayKeyRange(keyRange) }, async () => {
+		const db = await openDatabase();
+		const validator = Tables[tableName];
+		// @ts-ignore
+		return await db
+			.getAll(tableName, keyRange)
+			.then((values) => values.map((v) => validator.assert(v)).sort(idComparator))
+			.then((result) => {
+				return result;
+			});
+	});
 }
 
 /**
@@ -321,19 +329,26 @@ export async function list(tableName, keyRange = undefined) {
  * @returns {Promise<Array<typeof Tables[TableName]['infer']>>}
  */
 export async function listByIndex(tableName, indexName, keyRange = undefined) {
-	const db = await openDatabase();
-	const validator = Tables[tableName];
-	// @ts-ignore
-	return await db
-		.getAllFromIndex(
-			tableName,
-			indexName,
-			typeof keyRange === 'string' ? IDBKeyRange.only(keyRange) : keyRange
-		)
-		.then((values) => values.map((v) => validator.assert(v)).sort(idComparator))
-		.then((result) => {
-			return result;
-		});
+	return profile(
+		tableName,
+		'listByIndex',
+		{ Index: indexName, 'Key range': displayKeyRange(keyRange) },
+		async () => {
+			const db = await openDatabase();
+			const validator = Tables[tableName];
+			// @ts-ignore
+			return await db
+				.getAllFromIndex(
+					tableName,
+					indexName,
+					typeof keyRange === 'string' ? IDBKeyRange.only(keyRange) : keyRange
+				)
+				.then((values) => values.map((v) => validator.assert(v)).sort(idComparator))
+				.then((result) => {
+					return result;
+				});
+		}
+	);
 }
 
 /**
