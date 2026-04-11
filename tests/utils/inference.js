@@ -39,18 +39,22 @@ export async function setInferenceModels(page, models) {
  */
 export async function getPredownloadedModel(filename, classmappingFilename) {
 	const model = await readFile(filename).catch(() => {
-		console.warn(
-			`Warning: cannot find '${filename}' model file. Tests will use the network to fetch it.`
-		);
+		if (process.env.CI) {
+			console.warn(
+				`Warning: cannot find '${filename}' model file. Tests will use the network to fetch it.`
+			);
+		}
 
 		return null;
 	});
 
 	const classmapping = classmappingFilename
 		? await readFile(classmappingFilename).catch(() => {
-				console.warn(
-					`Warning: cannot find '${classmappingFilename}' classmapping file. Tests will use the network to fetch the '${filename}' model.`
-				);
+				if (process.env.CI) {
+					console.warn(
+						`Warning: cannot find '${classmappingFilename}' classmapping file. Tests will use the network to fetch the '${filename}' model.`
+					);
+				}
 
 				return undefined;
 			})
