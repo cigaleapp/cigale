@@ -73,10 +73,11 @@ export async function load({ url }) {
 	const swarpc = Swarpc.Client(PROCEDURES, {
 		worker: WebWorker,
 		nodes: parallelism,
-		localStorage: /** @satisfies {import('$worker/procedures').LocalStorage} */ ({
-			databaseName,
-			databaseRevision,
-		}),
+		localStorage:
+			/** @satisfies {typeof import('$worker/procedures').LOCAL_STORAGE['inferIn']} */ ({
+				databaseName,
+				databaseRevision: databaseRevision.toString(),
+			}),
 		hooks: {
 			success({ procedure, data, duration }) {
 				performance.measure(procedure, {
