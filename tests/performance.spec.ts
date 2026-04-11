@@ -9,8 +9,12 @@ import { assert, expect, test } from './fixtures.js';
 test.use({ storageState: { cookies: [], origins: [] } });
 
 benchmark(`startup @blank`, {
-	async run({ page, app }) {
-		await page.goto('./');
+	async prepare({ page }) {
+		await page.goto('./', {
+			waitUntil: 'commit',
+		});
+	},
+	async run({ app }) {
 		await app.db.ready();
 		await assert(app.tabs.get('sessions')).toBeVisible({ timeout: ms('1min') });
 	},
@@ -67,13 +71,15 @@ function benchmark(
 			// playwright-performance-metrics only supports Chromium-based browsers
 			collector = new PerformanceMetricsCollector();
 
-			await page.evaluate(() => {
-				const samplesPerMs = 10;
-				window.profiler = new Profiler({
-					sampleInterval: samplesPerMs,
-					maxBufferSize: ms(limits.total.chromium) * samplesPerMs,
-				});
-			});
+			const sampleInterval = 10;
+			const maxBufferSize = ms(limits.total.chromium) * sampleInterval;
+
+			await page.evaluate(
+				(params) => {
+					window.profiler = new Profiler(params);
+				},
+				{ sampleInterval, maxBufferSize }
+			);
 		}
 
 		const start = Date.now();
