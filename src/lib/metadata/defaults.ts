@@ -11,7 +11,7 @@ import {
 } from '$lib/schemas/metadata.js';
 import { toMetadataRecord } from '$lib/schemas/results.js';
 import { toasts } from '$lib/toasts.svelte.js';
-import { transformObject } from '$lib/utils.js';
+import { profiler, transformObject } from '$lib/utils.js';
 
 import { serializeMetadataValue } from './serializing.js';
 import { storeMetadataValue } from './storage.js';
@@ -32,85 +32,98 @@ export async function resolveDefaults({
 
 	if (iterations <= 0) return;
 
-	const session = await db
-		.get('Session', sessionId)
-		.then((session) => Tables.Session.assert(session));
-
-	const defs = await tables.Metadata.getMany(metadataToConsider).then((defs) =>
-		defs.filter((def) => def.default !== undefined)
-	);
-
-	// TODO for now it only works on session metadata
-
-	const sessionMetadata = toMetadataRecord(session.metadata);
-
-	const payload: typeof MetadataDefaultDynamicPayload.inferIn = {
-		protocolMetadata: {},
-		metadata: {},
-		session: {
-			createdAt: session.createdAt,
-			metadata: sessionMetadata,
-			protocolMetadata: transformObject(sessionMetadata, (key, value) => {
-				if (!isNamespacedToProtocol(session.protocol, key)) return;
-
-				return [removeNamespaceFromMetadataId(key), value];
-			}),
+	return await profiler('App')(
+		'Metadata',
+		'resolveDefaults',
+		{
+			'Remaining iterations': iterations,
+			'Considered metadata': JSON.stringify(metadataToConsider),
+			Session: sessionId,
 		},
-	};
+		async () => {
+			const session = await db
+				.get('Session', sessionId)
+				.then((session) => Tables.Session.assert(session));
 
-	const metadataToIterateFurtherOn = new Set<string>();
-
-	for (const { default: defaultSpec, id, type } of defs) {
-		if (defaultSpec === undefined) continue;
-		if (defaultSpec === null) continue;
-
-		const currentValue = getMetadataValue(session, type, id);
-
-		if (currentValue && !currentValue.isDefault) continue;
-
-		const value =
-			typeof defaultSpec === 'object' && 'render' in defaultSpec
-				? defaultSpec.render(payload)
-				: defaultSpec;
-
-		if (value instanceof ArkErrors) {
-			toasts.warn(
-				`La valeur par défaut de la métadonnée ${id} est invalide : ${value.toString()}`
+			const defs = await tables.Metadata.getMany(metadataToConsider).then((defs) =>
+				defs.filter((def) => def.default !== undefined)
 			);
-			continue;
+
+			// TODO for now it only works on session metadata
+
+			const sessionMetadata = toMetadataRecord(session.metadata);
+
+			const payload: typeof MetadataDefaultDynamicPayload.inferIn = {
+				protocolMetadata: {},
+				metadata: {},
+				session: {
+					createdAt: session.createdAt,
+					metadata: sessionMetadata,
+					protocolMetadata: transformObject(sessionMetadata, (key, value) => {
+						if (!isNamespacedToProtocol(session.protocol, key)) return;
+
+						return [removeNamespaceFromMetadataId(key), value];
+					}),
+				},
+			};
+
+			const metadataToIterateFurtherOn = new Set<string>();
+
+			for (const { default: defaultSpec, id, type } of defs) {
+				if (defaultSpec === undefined) continue;
+				if (defaultSpec === null) continue;
+
+				const currentValue = getMetadataValue(session, type, id);
+
+				if (currentValue && !currentValue.isDefault) continue;
+
+				const value =
+					typeof defaultSpec === 'object' && 'render' in defaultSpec
+						? defaultSpec.render(payload)
+						: defaultSpec;
+
+				if (value instanceof ArkErrors) {
+					toasts.warn(
+						`La valeur par défaut de la métadonnée ${id} est invalide : ${value.toString()}`
+					);
+					continue;
+				}
+
+				console.debug('resolved default for', id, {
+					defaultSpec: JSON.stringify(defaultSpec),
+					value,
+					currentValue,
+					serializeds: {
+						new: serializeMetadataValue(value),
+						current: serializeMetadataValue(currentValue?.value),
+					},
+				});
+
+				if (serializeMetadataValue(value) === serializeMetadataValue(currentValue?.value))
+					continue;
+
+				await storeMetadataValue({
+					db,
+					sessionId,
+					metadataId: id,
+					subjectId: sessionId,
+					type,
+					isDefault: true,
+					value,
+				});
+
+				metadataToIterateFurtherOn.add(id);
+			}
+
+
+			await resolveDefaults({
+				db,
+				sessionId,
+				metadataToConsider: [...metadataToIterateFurtherOn],
+				iterations: iterations - 1,
+			});
 		}
-
-		console.debug('resolved default for', id, {
-			defaultSpec,
-			value,
-			currentValue,
-			serializeds: {
-				new: serializeMetadataValue(value),
-				current: serializeMetadataValue(currentValue?.value),
-			},
-		});
-
-		if (serializeMetadataValue(value) === serializeMetadataValue(currentValue?.value)) continue;
-
-		await storeMetadataValue({
-			db,
-			sessionId,
-			metadataId: id,
-			subjectId: sessionId,
-			type,
-			isDefault: true,
-			value,
-		});
-
-		metadataToIterateFurtherOn.add(id);
-	}
-
-	await resolveDefaults({
-		db,
-		sessionId,
-		metadataToConsider: [...metadataToIterateFurtherOn],
-		iterations: iterations - 1,
-	});
+	);
 }
 
 if (import.meta.vitest) {
