@@ -4,8 +4,13 @@ All notable changes to this project will be documented in this file, on a monthl
 
 ## April 2026
 
+### Improvements
+
+- Allow pulling remote sessions with metadata from KoboToolbox (#1373)
+
 ### Data Updates
 
+- Add HQ to camera_model in entomoscope protocol
 - Regenerate example protocols
 
 ## March 2026
