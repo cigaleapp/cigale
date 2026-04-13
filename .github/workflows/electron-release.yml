@@ -75,7 +75,7 @@ jobs:
           echo year=$(Get-Date -Format "yyyy") >> $GITHUB_OUTPUT
 
       - name: Set release notes on release draft
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           body: ${{ steps.release_notes.outputs.release_notes }}
           tag_name: ${{ github.event.inputs.tag || github.ref_name }}
