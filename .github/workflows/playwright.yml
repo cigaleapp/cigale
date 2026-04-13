@@ -124,7 +124,7 @@ jobs:
     name: Test (shard ${{ matrix.shard-index }} of ${{ matrix.shard-count }})
     needs: predownload
     container:
-      image: ghcr.io/gwennlbh/playwright-bun:v1.58.2
+      image: ghcr.io/gwennlbh/playwright-bun:v1.59.1
       options: --user 1001
     strategy:
       fail-fast: false
