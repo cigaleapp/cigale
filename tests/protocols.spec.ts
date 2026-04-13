@@ -73,7 +73,7 @@ test('can auto-update a protocol', async ({ page, app }) => {
 
 	await assert(
 		app.toasts.byMessage('info', 'Protocole "Example: arthropodes (lightweight)" mis à jour')
-	).toBeVisible({ timeout: ms('30s') });
+	).toBeVisible({ timeout: ms('15s') });
 
 	const protocol = await app.db.protocol.byName('Example: arthropodes (lightweight)');
 	assert(protocol).toHaveProperty('version', newVersion);

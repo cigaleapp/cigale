@@ -2,6 +2,8 @@ import { readFileSync } from 'node:fs';
 import type { ExportedProtocol } from '../../src/lib/schemas/protocols.js';
 import type { Page } from '@playwright/test';
 
+import { expect } from '@playwright/test';
+import { ms } from 'convert';
 import YAML from 'yaml';
 
 import { ExamplePaths, RealPaths } from '../filepaths.js';
@@ -59,4 +61,14 @@ export async function importProtocol(
 			JSON.stringify(protocolData)
 		);
 	}
+
+	await expect
+		.soft(
+			page
+				.getByRole('main')
+				.getByRole('listitem')
+				.getByRole('code')
+				.getByText(protocolData.id)
+		)
+		.toBeVisible({ timeout: ms('10s') });
 }

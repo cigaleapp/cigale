@@ -34,7 +34,7 @@
 
 <ModalCreateProtocol bind:open={openProtocolCreation} />
 
-<div class="page" in:fade={{ duration: 100 }}>
+<main class="page" in:fade={{ duration: 100 }}>
 	<header>
 		<h1>Protocoles</h1>
 		<section class="actions">
@@ -91,7 +91,7 @@
 			/>
 		{/each}
 	</ul>
-</div>
+</main>
 
 <style>
 	h1 {
