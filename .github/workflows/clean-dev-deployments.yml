@@ -67,7 +67,7 @@ jobs:
             number=$(basename "$directory" | cut -d'-' -f2)
             if ! echo "$open_prs" | grep -q "$number"; then
               echo "💢 $REPO_PR_URL/$number: $directory removed, as $number does not match any open PR"
-              ssh dev-deployments "rm -rf www/pr-$number"
+              ssh dev-deployments "rm -rf $directory"
             else
               echo "⏭️ $REPO_PR_URL/$number: $directory kept as $number is still open"
             fi
