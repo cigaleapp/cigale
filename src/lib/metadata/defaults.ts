@@ -115,6 +115,17 @@ export async function resolveDefaults({
 				metadataToIterateFurtherOn.add(id);
 			}
 
+			if (metadataToConsider.length === metadataToIterateFurtherOn.size) {
+				console.debug(
+					"Next iteration has the same metadata to consider, some defaults might not converge (such as '{{ now }}' for example), stopping iterations",
+					{
+						metadataToConsider,
+						metadataToIterateFurtherOn,
+						sessionId,
+					}
+				);
+				return;
+			}
 
 			await resolveDefaults({
 				db,
@@ -359,9 +370,9 @@ if (import.meta.vitest) {
 				iterations: 2, // allow one level of recursion
 			});
 
-			// db.get called twice: initial + one recursive call
-			expect(db.get).toHaveBeenCalledTimes(2);
-			expect(_tables.Metadata.getMany).toHaveBeenCalledTimes(2);
+			// db.get called once: initial
+			expect(db.get).toHaveBeenCalledTimes(1);
+			expect(_tables.Metadata.getMany).toHaveBeenCalledTimes(1);
 			// Second call should be with the IDs that were stored
 			expect(_tables.Metadata.getMany).toHaveBeenLastCalledWith(['proto__field1']);
 		});
@@ -408,9 +419,14 @@ if (import.meta.vitest) {
 			const renderFn = vi.fn(
 				(_payload: typeof MetadataDefaultDynamicPayload.inferIn) => 'derived'
 			);
+
 			_tables.Metadata.getMany.mockResolvedValue([
 				{ id: 'proto__label', type: 'string', default: { render: renderFn } },
 			]);
+
+			// Son 😭😭😭  w/o this call the mock resolves to a [] within the func call 
+			// im crine
+			await _tables.Metadata.getMany()
 
 			await resolveDefaults({
 				db,
