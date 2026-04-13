@@ -156,23 +156,28 @@ test('can use a protocol that imports metadata from another protocol', async ({
 
 	// Trying to import from an unknown protocol should not work
 
-	await importProtocol(page, {
-		id: 'com.example.child',
-		authors: [],
-		description: 'Child protocol',
-		name: 'Child Protocol',
-		imports: [
-			{
-				from: 'com.example.unknown',
-				metadata: ['feur'],
-			},
-			{
-				from: 'com.example.remote',
-				metadataGroups: ['all'],
-			},
-		],
-		metadata: {},
-	});
+	await importProtocol(
+		page,
+		{
+			id: 'com.example.child',
+			authors: [],
+			description: 'Child protocol',
+			name: 'Child Protocol',
+			imports: [
+				{
+					from: 'com.example.unknown',
+					metadata: ['feur'],
+				},
+				{
+					from: 'com.example.remote',
+					metadataGroups: ['all'],
+				},
+			],
+			metadata: {},
+		},
+		undefined,
+		{ wait: false }
+	);
 
 	await expect(
 		app.toasts.byMessage(

@@ -11,6 +11,8 @@ import { ExamplePaths, RealPaths } from '../filepaths.js';
 /**
  * Must already be on the /protocols management page
  * @param tweaks modify (in-place) the protocol before importing
+ * @param options
+ * @param options.wait wait for the protocol to appear in the list after importing (default: true)
  */
 export async function importProtocol(
 	page: Page,
@@ -18,7 +20,8 @@ export async function importProtocol(
 		| ExamplePaths.Absolute<ExamplePaths.Protocols>
 		| RealPaths.Absolute<RealPaths.Protocols>
 		| typeof ExportedProtocol.inferIn,
-	tweaks?: (protocol: typeof ExportedProtocol.inferIn) => void
+	tweaks?: (protocol: typeof ExportedProtocol.inferIn) => void,
+	options: { wait?: boolean } = { wait: true }
 ) {
 	const utf8 = new TextEncoder();
 	const fileChooser = page.waitForEvent('filechooser');
@@ -62,13 +65,15 @@ export async function importProtocol(
 		);
 	}
 
-	await expect
-		.soft(
-			page
-				.getByRole('main')
-				.getByRole('listitem')
-				.getByRole('code')
-				.getByText(protocolData.id)
-		)
-		.toBeVisible({ timeout: ms('10s') });
+	if (options.wait) {
+		await expect
+			.soft(
+				page
+					.getByRole('main')
+					.getByRole('listitem')
+					.getByRole('code')
+					.getByText(protocolData.id)
+			)
+			.toBeVisible({ timeout: ms('10s') });
+	}
 }

@@ -1442,10 +1442,6 @@ msgstr "Amount of parallel tasks"
 msgid "Augmenter"
 msgstr "Increase"
 
-#: src/routes/(app)/+layout.js
-msgid "Initialisation du worker…"
-msgstr "Initializing worker…"
-
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 msgid "1 élément"
 msgid_plural "# éléments"
@@ -2434,4 +2430,53 @@ msgstr ""
 #. 0: updates[0].name
 #: src/routes/(app)/+layout.js
 msgid "Protocole \"{0}\" mis à jour"
+msgstr ""
+
+#: src/lib/idb.svelte.js
+msgid "Initialize reactive table"
+msgstr ""
+
+#: src/lib/idb.svelte.js
+#: src/lib/idb.svelte.js
+msgid "Key range"
+msgstr ""
+
+#: src/routes/(app)/+layout.js
+#: src/routes/(app)/+layout.js
+#: src/routes/(app)/+layout.js
+#: src/routes/(app)/+layout.js
+#: src/routes/(app)/+layout.js
+msgid "Startup"
+msgstr ""
+
+#: src/routes/(app)/+layout.js
+msgid "Get language setting"
+msgstr ""
+
+#: src/routes/(app)/+layout.js
+msgid "Load locale"
+msgstr ""
+
+#: src/routes/(app)/+layout.js
+msgid "Initialize settings"
+msgstr ""
+
+#: src/routes/(app)/+layout.js
+msgid "Initialisation des workers…"
+msgstr ""
+
+#: src/routes/(app)/+layout.js
+msgid "Workers"
+msgstr ""
+
+#: src/routes/(app)/+layout.js
+msgid "App"
+msgstr ""
+
+#: src/routes/(app)/+layout.js
+msgid "Initialize database"
+msgstr ""
+
+#: src/routes/(app)/+layout.js
+msgid "Load built-in protocols"
 msgstr ""
