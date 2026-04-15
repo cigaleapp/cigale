@@ -1,18 +1,11 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: \n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2026-01-24 11:04+0000\n"
-"Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"Source-Language: fr\n"
 "Language: en\n"
-"Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
+"MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=n != 1;\n"
-"MIME-Version: 1.0\n"
-"X-Generator: Weblate 5.12.2\n"
-"Source-Language: fr\n"
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/[[from]]/+page@(app).svelte
 msgid "<0/> Auto"
@@ -219,14 +212,6 @@ msgstr "CIGALE ver. <0/> · <1>About</1>"
 msgid "Cacher les boîtes non sélectionnées"
 msgstr "Hide unselected boxes"
 
-#: src/routes/(app)/protocols/import/[...url]/+page.svelte
-msgid ""
-"Ce lien pointe vers un protocole distant. Voulez-vous l'importer? Il se trouve à l'adresse\n"
-"suivante: <0/> <1>Importation en cours...</1>"
-msgstr ""
-"This links points to a remote protocol. Do you want to import it? It's located at the following\n"
-"address: <0/> <1>Importing...</1>"
-
 #: src/lib/ButtonUpdateProtocol.svelte
 msgid "Ce protocole n'est pas versionné, pour le mettre à jour, supprimer le et importez la nouvelle version"
 msgstr "This protocol is not versioned. To update it, delete it and import the new version"
@@ -393,6 +378,8 @@ msgid "Erreur"
 msgstr "Error"
 
 #: src/lib/exif.js
+#: src/lib/i18n.js
+#: src/lib/i18n.js
 #: src/lib/i18n.js
 #: src/lib/toasts.svelte.js
 #: src/routes/(app)/+layout.js
@@ -780,13 +767,6 @@ msgid "Tout sélectionner"
 msgstr "Select all"
 
 #: src/routes/(app)/PrepareForOffline.svelte
-msgid ""
-"Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne.\n"
-"Télécharge tout les modèles pour tout les protocoles actuellement installés."
-msgstr ""
-"Download all needed resources for offline usage.\n"
-"Downloads all neural network models for all installed protocols."
-
 #: src/routes/(app)/Settings.svelte
 msgid "Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne. Télécharge tout les modèles pour tout les protocoles actuellement installés."
 msgstr "Download everything needed to use the application offline. Downloads all models for all currently installed protocols."
@@ -926,14 +906,6 @@ msgstr "https://ibrahimkactioglu.com/"
 msgid "https://elementtype.co/"
 msgstr "https://elementtype.co/"
 
-#: src/routes/(app)/(sidepanel)/crop/[image]/[[from]]/+page@(app).svelte
-msgid ""
-"Sélectionnez une boîte avec 1 à 9 pour la modifier avec des raccourcis\n"
-"clavier"
-msgstr ""
-"Select a box with 1 to 9 to edit with keyboard\n"
-"shortcuts"
-
 #. 0: e
 #: src/lib/ButtonUpdateProtocol.svelte
 msgid "Impossible de vérifier les mises à jour: {0}"
@@ -966,14 +938,6 @@ msgstr "<0/> Unreachable: {0}"
 #: src/routes/(app)/protocols/[id]/+layout.svelte
 msgid "Nom du protocole"
 msgstr "Protocol name"
-
-#: src/routes/(app)/protocols/ModalCreateProtocol.svelte
-msgid ""
-"Identifiant du protocole <0>Doit être unique. Il est conseillé de le baser sur un nom de domaine web que vous\n"
-"contrôlez; celui d'un site web permettant de télécharger le protocole, par exemple</0>"
-msgstr ""
-"Protocol ID <0>Must be unique. Including a domain name of a website you\n"
-"control is recommended; the site where the protocol can be downloaded from, for example</0>"
 
 #: src/routes/(app)/protocols/ModalCreateProtocol.svelte
 msgid "<0/> utilise déjà cet identifiant"
@@ -1035,15 +999,6 @@ msgstr "Create the metadata"
 msgid "Supprimer la métadonnée"
 msgstr "Delete the metadata"
 
-#. 0: errorMessage(err)
-#. 0: errorMessage(err)
-#. 0: errorMessage(err)
-#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/updater.svelte.js
-#: src/routes/(app)/protocols/[id]/metadata/[metadata]/updater.svelte.js
-#: src/routes/(app)/protocols/[id]/updater.svelte.js
-msgid "Impossible de sauvegarder : {0}"
-msgstr "Cannot save: {0}"
-
 #: src/routes/(app)/protocols/[id]/MetadataLink.svelte
 msgid "<0/> Voir"
 msgstr "<0/> See"
@@ -1086,16 +1041,6 @@ msgstr "Pixel layout"
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelConfig.svelte
 msgid "Représente"
 msgstr "Interpreted as"
-
-#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelConfig.svelte
-msgid ""
-"*Pour l'instant, CIGALE ne prend pas avantage des réseaux capables de traiter des\n"
-"images par batch, donc il n'enverra toujours qu'une image à la fois au modèle. <0/> Cela pourrait changer dans le futur, donc il est toujours utile de configurer correctement\n"
-"la disposition des pixels."
-msgstr ""
-"*CIGALE cannot make use of neural networks with batching capabilities yet.\n"
-"Only one image will be sent at a time to the model.<0/> This could change in the future, so it's still useful to\n"
-"configure the pixel layout correctly."
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelConfig.svelte
 msgid "Valeur des pixels"
@@ -1148,14 +1093,6 @@ msgstr "Protocol {0}: Export"
 msgid "Aucune configuration d'exports trouvée pour ce protocole."
 msgstr "No export configuration found for this protocol."
 
-#: src/routes/(app)/protocols/[id]/exports/+page.svelte
-msgid ""
-"Pour les images recadrées et originales, il y a des variables dans le chemin, par exemple <0/>. Un fichier sera créé par image exportée.\n"
-"On peut aussi utiliser quelques fonctions \"helper\", qui s'appliquent à une expression"
-msgstr ""
-"For images (original and cropped), there are variables in the path, for example <0/>. A file per exported image will be created.\n"
-"You can also used several \"helper\" functions, that apply to an expression"
-
 #. 0: '{{}}'
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
 msgid "Ces expressions avec des {0} sont en vérité des <0>templates Handlebars</0>"
@@ -1179,14 +1116,6 @@ msgstr "Image's observation"
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
 msgid "Image en cours d'exportation"
 msgstr "Image currently being exported"
-
-#: src/routes/(app)/protocols/[id]/exports/+page.svelte
-msgid ""
-"Un numéro de séquence, dont l'unicité est guarantie à travers toutes les images de\n"
-"l'export"
-msgstr ""
-"A sequence number. Guaranteed to be unique\n"
-"for the whole export"
 
 #: src/lib/ZipContentsTree.svelte
 msgid "Nouveau dossier"
@@ -1377,14 +1306,6 @@ msgstr "Hide this metadata in the UI. Useful for automatically managed metadata,
 msgid "Type de métadonnée"
 msgstr "Metadata type"
 
-#: src/routes/(app)/protocols/[id]/metadata/[metadata]/infos/+page.svelte
-msgid ""
-"Méthode de fusion <0>Comment fusionner les valeurs de cette métadonnée lors du regroupement de plusieurs\n"
-"observations en une seule</0>"
-msgstr ""
-"Merge method <0>How to merge values of this metadata when merging observations into\n"
-"a single observation</0>"
-
 #. 0: page.params.option
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/+error.svelte
 msgid "<0/> Aucune option trouvée avec la clé {0}"
@@ -1446,14 +1367,6 @@ msgstr "Image URL"
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
 msgid "Cascades"
 msgstr "Cascades"
-
-#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
-msgid ""
-"Permet de changer la valeur d'autres métadonnées quand cette option est choisie. Peut être\n"
-"pratique pour représenter des taxonomies, ajouter des attributs à une métadonnée, etc."
-msgstr ""
-"Allows changing the value of other metadata when this option is selected. May be\n"
-"useful to represent taxonomies, add attributes to a metadata option, etc."
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
 msgid "Affecte <0>Change la valeur d'autres métadonnées quand {0} = {1}</0>"
@@ -1631,12 +1544,6 @@ msgid "Synonymes"
 msgstr "Synonyms"
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
-msgid ""
-"Autres noms possibles pour cette option. Permet de trouver l'option en cherchant avec un\n"
-"synonyme."
-msgstr "Other possible names for this option. Allows finding the option by searching for a synonym."
-
-#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
 msgid "Synonyme"
 msgstr "Synonym"
@@ -1704,15 +1611,6 @@ msgstr "Could not export results: {0}"
 #: src/routes/(app)/protocols/[id]/+layout.svelte
 msgid "Métadonnée {0} créée"
 msgstr "Metadata {0} created"
-
-#. 0: err.summary
-#. 0: err instanceof ArkErrors ? err.summary : errorMessage(err)
-#. 0: err.summary
-#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/updater.svelte.js
-#: src/routes/(app)/protocols/[id]/metadata/[metadata]/updater.svelte.js
-#: src/routes/(app)/protocols/[id]/updater.svelte.js
-msgid "Valeur invalide : {0}"
-msgstr "Invalide value : {0}"
 
 #: src/routes/(app)/+layout.js
 msgid "Initialisation de la base de données…"
@@ -1943,14 +1841,6 @@ msgstr "No active session to export."
 #: src/routes/(app)/results/+page.svelte
 msgid "Aucune session active à prévisualiser."
 msgstr "No session to preview."
-
-#: src/routes/(app)/ModalSubmitIssue.svelte
-msgid ""
-"Expliquer comment reproduire votre bug, étape par étape, et ce à quoi vous\n"
-"vous attendiez"
-msgstr ""
-"Explain how to reproduce the bug you found, step-by-step, and what\n"
-"you were expecting"
 
 #: src/routes/(app)/results/+page.svelte
 msgid "<0/> une fois dézippé"
@@ -2448,4 +2338,100 @@ msgstr ""
 #. 0: file.name
 #: src/lib/results.svelte.js
 msgid "Importée depuis {0}"
+msgstr ""
+
+#: src/lib/file-tree.js
+#: src/lib/file-tree.js
+msgid "Cropped image"
+msgstr ""
+
+#: src/lib/file-tree.js
+#: src/lib/file-tree.js
+msgid "Original image"
+msgstr ""
+
+#: src/lib/file-tree.js
+#: src/lib/file-tree.js
+msgid "Metadata in JSON format"
+msgstr ""
+
+#: src/lib/file-tree.js
+#: src/lib/file-tree.js
+msgid "Metadata in CSV format"
+msgstr ""
+
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid "Expliquer comment reproduire votre bug, étape par étape, et ce à quoi vous vous attendiez"
+msgstr ""
+
+#. 0: label
+#: src/lib/gallery.ts
+msgid "Avec {0}"
+msgstr ""
+
+#. 0: label
+#. 0: label
+#. 0: label
+#: src/lib/gallery.ts
+#: src/lib/gallery.ts
+#: src/lib/gallery.ts
+msgid "Sans {0}"
+msgstr ""
+
+#: src/lib/i18n.js
+#: src/lib/i18n.js
+#: src/lib/i18n.js
+msgid "Hello"
+msgstr ""
+
+#: src/lib/i18n.js
+msgid "école"
+msgstr ""
+
+#: src/lib/i18n.js
+msgid "École"
+msgstr ""
+
+#: src/lib/undo.svelte.js
+msgid "No handler for undo operation crop/box/create"
+msgstr ""
+
+#: src/routes/(app)/protocols/ModalCreateProtocol.svelte
+msgid "Identifiant du protocole <0>Doit être unique. Il est conseillé de le baser sur un nom de domaine web que vous contrôlez; celui d'un site web permettant de télécharger le protocole, par exemple</0>"
+msgstr ""
+
+#: src/routes/(app)/protocols/import/[...url]/+page.svelte
+msgid "Ce lien permet d'importer un protocole venant d'Internet, à l'adresse suivante:"
+msgstr ""
+
+#: src/routes/(app)/protocols/import/[...url]/+page.svelte
+msgid "Importation en cours..."
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/exports/+page.svelte
+msgid "Pour les images recadrées et originales, il y a des variables dans le chemin, par exemple <0/>. Un fichier sera créé par image exportée. On peut aussi utiliser quelques fonctions \"helper\", qui s'appliquent à une expression"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/exports/+page.svelte
+msgid "Un numéro de séquence, dont l'unicité est guarantie à travers toutes les images de l'export"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/crop/[image]/[[from]]/+page@(app).svelte
+msgid "Sélectionnez une boîte avec 1 à 9 pour la modifier avec des raccourcis clavier"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelConfig.svelte
+msgid "*Pour l'instant, CIGALE ne prend pas avantage des réseaux capables de traiter des images par batch, donc il n'enverra toujours qu'une image à la fois au modèle. <0/> Cela pourrait changer dans le futur, donc il est toujours utile de configurer correctement la disposition des pixels."
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/infos/+page.svelte
+msgid "Méthode de fusion <0>Comment fusionner les valeurs de cette métadonnée lors du regroupement de plusieurs observations en une seule</0>"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
+msgid "Autres noms possibles pour cette option. Permet de trouver l'option en cherchant avec un synonyme."
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
+msgid "Permet de changer la valeur d'autres métadonnées quand cette option est choisie. Peut être pratique pour représenter des taxonomies, ajouter des attributs à une métadonnée, etc."
 msgstr ""
