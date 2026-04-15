@@ -3,7 +3,6 @@ import { execSync } from 'node:child_process';
 
 import { sveltekit } from '@sveltejs/kit/vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
-import { wuchale } from 'wuchale/vite';
 import arkenv from 'arkenv';
 import { type } from 'arktype';
 import postcssPresetEnv from 'postcss-preset-env';
@@ -11,6 +10,7 @@ import icons from 'unplugin-icons/vite';
 import { analyzer } from 'vite-bundle-analyzer';
 import crossOriginIsolation from 'vite-plugin-cross-origin-isolation';
 import { defineConfig } from 'vitest/config';
+import { wuchale } from 'wuchale/vite';
 
 const env = arkenv(
 	{
