@@ -63,8 +63,7 @@
 		}
 	}}
 >
-	Ce lien pointe vers un protocole distant. Voulez-vous l'importer? Il se trouve à l'adresse
-	suivante:
+	<p>Ce lien permet d'importer un protocole venant d'Internet, à l'adresse suivante:</p>
 
 	{#if toImport}
 		<HighlightHostname linkify url={toImport} />
