@@ -14,6 +14,7 @@ import {
 	observationsByLabel,
 	setInferenceModels,
 } from './utils/index.js';
+import { controlOrMeta } from './utils/keyboard.js';
 
 test('allows cancelling classification of an observation', issue(430), async ({ page, app }) => {
 	await newSession(page);
@@ -284,7 +285,7 @@ test.describe('full-screen classification view', pr(1071), () => {
 
 				// XXX: fore some reason, in E2E browsers only, this specific click goes two images forward
 				// await navigation.getByRole('button', { name: 'Image suivante' }).click();
-				await page.keyboard.press('Control+ArrowRight');
+				await page.keyboard.press(controlOrMeta(page, 'ArrowRight'));
 				await expect(title).toHaveAccessibleName('leaf');
 				await expect(selectedOption).toHaveText('21%');
 				await expect(selectedOption.getByRole('combobox')).toHaveValue('Orchesella cincta');
@@ -356,7 +357,7 @@ test.describe('full-screen classification view', pr(1071), () => {
 
 		// Confirming cyan
 
-		await page.keyboard.press('Control+ArrowRight');
+		await page.keyboard.press(controlOrMeta(page, 'ArrowRight'));
 		await app.path.wait(`/classify/${cyan.id}`);
 
 		await page.keyboard.press('ArrowUp');
@@ -368,7 +369,7 @@ test.describe('full-screen classification view', pr(1071), () => {
 
 		// Confirming with-exif-gps does nothing since theres no classification
 
-		await page.keyboard.press('Control+ArrowRight');
+		await page.keyboard.press(controlOrMeta(page, 'ArrowRight'));
 
 		await app.path.wait(`/classify/${withExifGps.id}`);
 		await page.keyboard.press('ArrowUp');

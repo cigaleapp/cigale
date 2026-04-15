@@ -252,16 +252,16 @@ test.describe('correct results.zip', () => {
 		      - radio "LC Préoccupation mineure (“Least Concern”)"
 		      - text: LC
 		      - paragraph: Préoccupation mineure (“Least Concern”)
-		    - button "Regrouper Ctrl + G":
+		    - button /^Regrouper /:
 		      - img
 		      - text: ""
-		    - button "Séparer Ctrl + Shift + G":
+		    - button /^Séparer /:
 		      - img
 		      - text: ""
-		    - button "Ouvrir en plein écran Ctrl + ⏎":
+		    - button /^Ouvrir en plein écran /:
 		      - img
 		      - text: ""
-		    - button "Supprimer 1 images Suppr":
+		    - button /^Supprimer 1 images /:
 		      - img
 		      - text: ""
 		`);
@@ -411,7 +411,7 @@ test(
 		await observationCard(page, 'cyan.jpeg').click();
 		await page
 			.getByTestId('sidepanel')
-			.getByRole('button', { name: 'Supprimer 1 images Suppr' })
+			.getByRole('button', { name: /^Supprimer 1 images? / })
 			.click();
 		await app.tabs.go('classify');
 		await assert(observationCard(page, 'cyan')).not.toBeVisible();
