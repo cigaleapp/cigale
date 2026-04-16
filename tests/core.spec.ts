@@ -24,6 +24,7 @@ import {
 	setInferenceModels,
 	waitForLoadingEnd,
 } from './utils/index.js';
+import { controlOrMeta } from './utils/keyboard.js';
 
 for (const offline of [false, true]) {
 	test(
@@ -193,7 +194,7 @@ test('can handle a bunch of images at once', withParallelism(4), async ({ page, 
 	// await app.tabs.go('classify')
 	// await waitForLoadingEnd(observations, timeouts);
 
-	await page.keyboard.press('Control+A');
+	await page.keyboard.press(controlOrMeta(page, 'A'));
 	// await expect(page.getByTestId('sidepanel')).toMatchAriaSnapshot();
 	await assert(page.getByTestId('sidepanel').getByRole('heading', { level: 2 })).toHaveText(
 		`${imagesCount} images`

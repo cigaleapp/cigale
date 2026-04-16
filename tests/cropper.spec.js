@@ -11,6 +11,7 @@ import {
 	loadDatabaseDump,
 	setImageMetadata,
 } from './utils/index.js';
+import { controlOrMeta } from './utils/keyboard.js';
 
 /**
  * @import { AppFixture } from './fixtures.js';
@@ -213,7 +214,7 @@ test.describe('Cropper view', () => {
 			app,
 		}) => {
 			await navigateThenAssert(page, app, async (page) =>
-				page.keyboard.press('Control+Delete')
+				page.keyboard.press(controlOrMeta(page, 'Delete'))
 			);
 		});
 
@@ -324,11 +325,11 @@ test.describe('Cropper view', () => {
 				await expectBoxInList(page, 2, 245, 245);
 
 				// Undo box creation
-				await page.keyboard.press('Control+z');
+				await page.keyboard.press(controlOrMeta(page, 'z'));
 				await assert(boxesInBoxesList(page)).toHaveCount(1);
 
 				// Redo box creation
-				await page.keyboard.press('Control+Shift+z');
+				await page.keyboard.press(controlOrMeta(page, 'Shift+z'));
 				await expectBoxInList(page, 2, 245, 245);
 				await assert(boxesInBoxesList(page)).toHaveCount(2);
 			});
@@ -403,11 +404,11 @@ test.describe('Cropper view', () => {
 				await expectBoxInList(page, 2, 327, 327);
 
 				// Undo box creation
-				await page.keyboard.press('Control+z');
+				await page.keyboard.press(controlOrMeta(page, 'z'));
 				await assert(boxesInBoxesList(page)).toHaveCount(1);
 
 				// Redo box creation
-				await page.keyboard.press('Control+Shift+z');
+				await page.keyboard.press(controlOrMeta(page, 'Shift+z'));
 				await expectBoxInList(page, 2, 327, 327);
 				await assert(boxesInBoxesList(page)).toHaveCount(2);
 			});

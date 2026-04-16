@@ -365,16 +365,16 @@ test('selecting multiple images', issue(1054), async ({ page, app }) => {
 	      - radio "LC Préoccupation mineure (“Least Concern”)"
 	      - text: LC
 	      - paragraph: Préoccupation mineure (“Least Concern”)
-	    - button "Regrouper Ctrl + G":
+	    - button /^Regrouper /:
 	      - img
 	      - text: ""
-	    - button "Séparer Ctrl + Shift + G":
+	    - button /^Séparer /:
 	      - img
 	      - text: ""
-	    - button "Ouvrir en plein écran Ctrl + ⏎" [disabled]:
+	    - button /^Ouvrir en plein écran / [disabled]:
 	      - img
 	      - text: ""
-	    - button "Supprimer 3 images Suppr":
+	    - button /^Supprimer 3 images /:
 	      - img
 	      - text: ""
 	`);
