@@ -45,7 +45,7 @@ test.describe('isolation', () => {
 		await assert(page.getByText('debugsquare.png')).not.toBeVisible();
 	});
 
-	test.only('deleting a session only deletes its images', async ({ page, app }) => {
+	test('deleting a session only deletes its images', async ({ page, app }) => {
 		await newSession(page, { name: 'Session α' });
 		await app.tabs.go('import');
 		await importPhotos({ page, additionalWaitTime: ms('2s') }, 'lil-fella.jpeg');
