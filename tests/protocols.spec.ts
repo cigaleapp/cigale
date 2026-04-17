@@ -46,7 +46,7 @@ async function setup(
 		newVersion: protocol.version!,
 	};
 
-	test.step('Downgrade protocol version in DB', async () => {
+	await test.step('Downgrade protocol version in DB', async () => {
 		await page.evaluate(
 			async ({ id, versions }) => {
 				const current = await window.DB.get('Protocol', id);

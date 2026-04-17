@@ -345,7 +345,7 @@ for (const width of [undefined, 1400, 1600]) {
 			});
 		});
 
-		test('can change session metadata in results page', async ({ page, app }) => {
+		test('can change session metadata in results page @no-builtins', async ({ page, app }) => {
 			await loadDatabaseDump(page, 'db/kitchensink-protocol.devalue');
 			await chooseFirstSession(page);
 

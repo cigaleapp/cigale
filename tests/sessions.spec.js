@@ -463,7 +463,7 @@ test('can change protocol of session', async ({ page, app }) => {
 	`);
 });
 
-test('session metadata form has default values', async ({ page, app, browserName }) => {
+test('session metadata form has default values @no-builtins', async ({ page, app }) => {
 	// test.skip(browserName === 'webkit', 'Does not work on Webkit for some reason');
 
 	await loadDatabaseDump(page, 'db/kitchensink-protocol.devalue');
@@ -509,7 +509,7 @@ test('session metadata form has default values', async ({ page, app, browserName
 	await expect(app.metadata.textbox('Code du transect')).toHaveValue('custom code');
 });
 
-test('can set file-type metadata', async ({ page, app }) => {
+test('can set file-type metadata @no-builtins', async ({ page, app }) => {
 	await loadDatabaseDump(page, 'db/kitchensink-protocol.devalue');
 	await app.settings.set({ showTechnicalMetadata: false });
 	await newSession(page, { name: 'Test' });

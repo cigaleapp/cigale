@@ -41,6 +41,7 @@ import {
 	waitForLoadingEnd,
 	waitForRoute,
 } from './utils/index.js';
+import { dependsOnTags } from './utils/annotations.js';
 
 const fullProtocol = _fullProtocol as ExportedProtocol;
 
@@ -475,11 +476,13 @@ export const test = base.extend<
 						localStorage: [
 							{
 								name: 'builtinProtocols',
-								value: JSON.stringify([
-									info.tags.includes('@real-protocol')
-										? fullProtocol.source
-										: lightProtocol.source,
-								]),
+								value: JSON.stringify(
+									dependsOnTags(info, {
+										'@no-builtins': [],
+										'@real-protocol': [fullProtocol.source],
+										'': [lightProtocol.source],
+									})
+								),
 							},
 						],
 					},
