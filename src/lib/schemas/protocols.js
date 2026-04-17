@@ -95,7 +95,7 @@ export const Protocol = type({
 		.default(false),
 	'remote?': {
 		'kobocollect?': {
-			form: URLString,
+			form: /^https:\/\/(kf|eu)\.kobotoolbox\.org\/#\/forms\/[a-zA-Z0-9]+\//,
 			'thumbnails?': [
 				'string|string[]',
 				'@',
