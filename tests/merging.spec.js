@@ -169,7 +169,10 @@ test('selecting multiple images', issue(1054), async ({ page, app }) => {
 	for (const observation of ['cyan', 'leaf', 'lil-fella']) {
 		await selectObservation(page, observation);
 		await page.waitForTimeout(500);
-		await assert(app.toasts.byType('error')).not.toBeVisible();
+		// TODO: reintroduce when we don't have the ugly workaround that creates "cannot load protocol" error toasts at startup
+		// see https://github.com/cigaleapp/cigale/blob/8d458fdd9b3743bcc5e3fbc9fb3ee279aa9826f4/tests/fixtures.ts#L419
+		// await assert(app.toasts.byType('error')).not.toBeVisible();
+
 	}
 
 	// Assert sidepanel content
