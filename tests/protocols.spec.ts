@@ -5,7 +5,6 @@ import type { ExportedProtocol } from '$lib/schemas/protocols.js';
 
 import { ms } from 'convert';
 
-import lightweightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import { FixturePaths } from './filepaths.js';
 import { assert, expect, test } from './fixtures.js';
 import {
