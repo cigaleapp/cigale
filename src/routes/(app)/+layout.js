@@ -114,7 +114,7 @@ export async function load({ url }) {
 		toasts.info(
 			updates.length === 1
 				? `Protocole "${updates[0].name}" mis à jour`
-				: `${updates.length} protocoles ont été mis à jour: ${updates.map((u) => `"${u.name}"`).join(', ')}`,
+				: `${updates.length} protocoles ont été mis à jour: ${updates.map((u) => `"${u.name}"`).join(', ')}`
 		);
 	});
 

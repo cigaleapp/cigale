@@ -1,5 +1,5 @@
 /**
- * Keys must include the @ prefix 
+ * Keys must include the @ prefix
  * Use a '' key for the fallback
  */
 export function dependsOnTags<T>(info: { tags: string[] }, mapping: Record<string, T>): T {

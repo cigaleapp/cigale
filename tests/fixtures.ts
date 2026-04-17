@@ -18,6 +18,7 @@ import { safeJSONParse } from '$lib/utils';
 import _fullProtocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
 import lightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import { tempfiles } from './fixtures/tempfiles.js';
+import { dependsOnTags } from './utils/annotations.js';
 import {
 	confirmDeletionModal,
 	dumpDatabase,
@@ -41,7 +42,6 @@ import {
 	waitForLoadingEnd,
 	waitForRoute,
 } from './utils/index.js';
-import { dependsOnTags } from './utils/annotations.js';
 
 const fullProtocol = _fullProtocol as ExportedProtocol;
 
