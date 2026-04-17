@@ -95,6 +95,16 @@ export const HELPERS = /** @type {const} */ ({
 			return Math.min(Math.max(value, min), max);
 		},
 	},
+	trim: {
+		documentation: 'Supprime les espaces au début et à la fin d’un texte',
+		usage: [["'   some text   '"], 'some text'],
+		/**
+		 * @param {string} subject
+		 */
+		implementation(subject) {
+			return subject.trim();
+		},
+	},
 	percentage: {
 		documentation:
 			'Display a percentage string, with a optional number of decimals (default: 0)',
