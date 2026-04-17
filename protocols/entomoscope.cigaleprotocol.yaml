@@ -2,6 +2,10 @@
 id: fr.osug.terra-forma-web.entomoscope
 name: Entomoscope
 
+updates: automatic
+version: 1
+source: https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/entomoscope.cigaleprotocol.yaml
+
 description: Protocole de collecte d'images d'insectes via l'Entomoscope
 
 authors:
@@ -24,10 +28,58 @@ crop:
 sidecars:
   filepath: ./{{ stem filepath }}.json
 
+remote:
+  kobocollect:
+    form: https://kf.kobotoolbox.org/#/forms/ao3ZXMuHX9hCufTYbEzEcY/summary
+    title: |
+      {{ trim survey.Esp_ce_de_la_fleur_naturelle }}, {{ formatDate survey.Date_et_heure_du_d_but_du_monitoring "dd MMM" }}
+    thumbnails:
+      - Prendre_une_photo_du_microhabi
+      - Prendre_une_photo_du_microhabitat_monitor
+      - Prendre_une_photo_du_paysgae
+
+metadataOrder:
+  # Session
+  - monitoring_start
+  - monitoring_end
+  - device_location
+  - microhabitat
+  - landscape
+  - inflorescence_count
+  - samespecies_flowering_plants_count
+  - flowering_plant_coverage
+  - target
+  - target_species
+  - plantnat_score
+  - grass_height
+  - audio_enabled
+  - timelapse_enabled
+  - ai_enabled
+  - fisheye
+  # Observations
+  - species
+  - genus
+  - family
+  - order
+  - class
+  - phylum
+  - kingdom
+  - shoot_location
+  - shoot_date
+  - conservation_status
+  - identification_difficulty
+
+metadataGroups:
+  recording_type:
+    name: Type d'enregistrement
+    description: Types d'enregistrement activés sur l'entomoscope
+    collapsed: false
+
 sessionMetadata:
   monitoring_start:
     type: date
     label: Début du monitoring
+    kobocollect: Date_et_heure_du_d_but_du_monitoring
     description: Date de début du monitoring de l'entomoscope
     mergeMethod: min
     required: false
@@ -36,6 +88,7 @@ sessionMetadata:
   monitoring_end:
     type: date
     label: Fin du monitoring
+    kobocollect: Date_et_heure_fin_du_monitoring
     description: Date de fin du monitoring de l'entomoscope
     mergeMethod: max
     required: false
@@ -43,15 +96,27 @@ sessionMetadata:
   microhabitat:
     type: file
     label: Microhabitat
+    kobocollect:
+      - Prendre_une_photo_du_microhabi
+      - Prendre_une_photo_du_microhabitat_monitor
     description: Photo du microhabitat monitoré
     mergeMethod: none
     required: false
     size:
       maximum: 5 MB
 
+  device_location:
+    type: location
+    label: Emplacement de l'entomoscope
+    kobocollect: Emplacement_de_l_entomoscope
+    description: ''
+    mergeMethod: average
+    required: false
+
   landscape:
     type: file
     label: Paysage
+    kobocollect: Prendre_une_photo_du_paysgae
     description: Photo du paysage environnant l'entomoscope
     mergeMethod: none
     required: false
@@ -61,6 +126,7 @@ sessionMetadata:
   inflorescence_count:
     type: integer
     label: Nombre d'inflorescences
+    kobocollect: Nombre_d_inflorescen_monitor_e_hors_cadre
     description: Nombre d'inflorescences sur la plante monitorée hors cadre
     mergeMethod: average
     required: false
@@ -69,6 +135,7 @@ sessionMetadata:
   samespecies_flowering_plants_count:
     type: integer
     label: Plantes en fleur de la même espèce
+    kobocollect: Nombre_de_plantes_en_e_dans_un_rayon_d_1m
     description: Nombre de plantes en fleur de la même espèce que celle monitorée dans un rayon d'1m
     mergeMethod: average
     required: false
@@ -77,7 +144,10 @@ sessionMetadata:
   flowering_plant_coverage:
     type: float
     label: Recouvrement floral
-    description: Recouvrement en % de fleurs de toutes espèces confondues dans un rayon de 10m
+    kobocollect:
+      - Recouvrement_en_de_dans_un_rayon_de_10m
+      - Recouvrement_en_de_dans_un_rayon_de_2m
+    description: Recouvrement en % de fleurs de toutes espèces confondues dans un rayon de 2m
     mergeMethod: average
     required: false
     range: 0..100
@@ -88,16 +158,22 @@ sessionMetadata:
     description: ''
     mergeMethod: none
     required: false
+    kobocollect: Cible_monitoree
     options:
       - key: ground
+        kobocollect: sol
         label: Sol
       - key: natural_flower
+        kobocollect: fleur_naturelle
         label: Fleur naturelle
       - key: artificial_flower
+        kobocollect: coupelle
         label: Fleur artificielle
       - key: barber
+        kobocollect: barber
         label: Barber
       - key: malaise_trap
+        kobocollect: tente_malaise
         label: Tente malaise
         description: Aussi appelé "Piège Malaise"
         learnMore: https://fr.wikipedia.org/wiki/Pi%C3%A8ge_Malaise
@@ -105,6 +181,7 @@ sessionMetadata:
   target_species:
     type: string
     label: Espèce cible
+    kobocollect: Esp_ce_de_la_fleur_naturelle
     description: Espèce de la plante ou du microhabitat monitoré, si applicable
     mergeMethod: none
     required: false
@@ -112,6 +189,7 @@ sessionMetadata:
   plantnat_score:
     type: float
     label: Score plantn@t
+    kobocollect: Score_plantn_t
     description: ''
     mergeMethod: average
     required: false
@@ -119,29 +197,53 @@ sessionMetadata:
   grass_height:
     type: float
     label: Hauteur d'herbe
+    kobocollect: Hauteur_d_herbe_cm
     unit: cm
     description: ''
     mergeMethod: average
     required: false
     range: x > 0
 
-  recording_type:
-    type: enum
-    label: Enregistrement
+  audio_enabled:
+    type: boolean
+    group: recording_type
+    label: Acoustique
     description: ''
-    mergeMethod: none
+    mergeMethod: min
     required: false
-    options:
-      - key: timelapse
-        label: Photo time lapse
-      - key: ai
-        label: Photo IA
-      - key: acoustic
-        label: acoustique
+    kobocollect:
+      list: Enregistrement
+      choice: acoustique
+
+  timelapse_enabled:
+    type: boolean
+    group: recording_type
+    label: Timelapse
+    description: ''
+    mergeMethod: min
+    required: false
+    kobocollect:
+      list: Enregistrement
+      choice: photo_time_lapse
+
+  ai_enabled:
+    type: boolean
+    group: recording_type
+    label: IA
+    description: ''
+    mergeMethod: min
+    required: false
+    kobocollect:
+      list: Enregistrement
+      choice: photo_ia
 
   fisheye:
     type: boolean
     label: Photo fisheye
+    kobocollect:
+      list: Photo_fisheye
+      'true': oui
+      'false': non
     description: Utilisé pour calculer l'ensoleillement
     mergeMethod: average
     required: true
