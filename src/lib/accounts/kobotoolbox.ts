@@ -213,7 +213,7 @@ export default class Provider implements Account {
 
 				const thumbFields = ensureArray(protocol.remote?.kobocollect?.thumbnails ?? []).map(
 					(field) =>
-						this.#columnByNameOrLabel(project, {
+						this.#columnByNameOrLabel(project, result, {
 							both: field,
 						})
 				);
@@ -346,10 +346,13 @@ export default class Provider implements Account {
 			if (!def) continue;
 			if (def.type !== 'file') continue;
 
-			const column = this.#columnOfMetadata(project, def);
+			const column = this.#columnOfMetadata(project, row, def);
 			if (!column) continue;
 
-			const attachment = this.#findAttachment({ column, attachments: row._attachments });
+			const attachment = this.#findAttachment({
+				xpath: column.$xpath,
+				attachments: row._attachments,
+			});
 			if (!attachment) continue;
 
 			const file = await this.fetch(attachment.download_url);
@@ -397,12 +400,33 @@ export default class Provider implements Account {
 
 			if (!def) continue;
 
-			const column = this.#columnOfMetadata(project, def);
-			if (!column) continue;
+			const column = this.#columnOfMetadata(project, row, def);
 
-			const value = column.$xpath in row ? row[column.$xpath]?.toString() : undefined;
+			let xpath: string | undefined;
+			if (column) {
+				xpath = column.$xpath;
+			} else {
+				xpath = ensureArray(def.kobocollect)
+					.flatMap((field) =>
+						ensureArray(
+							typeof field === 'string'
+								? field
+								: field && 'list' in field
+									? field.list
+									: []
+						)
+					)
+					.find((field) => field in row);
+			}
 
-			if (!value) continue;
+			const value = xpath && xpath in row ? row[xpath]?.toString() : undefined;
+			if (!value) {
+				console.debug(
+					`No value found in KoboToolbox submission for metadata '${def.id}' (column xpath ${xpath})`,
+					{ metadata: def, column, row, xpath }
+				);
+				continue;
+			}
 
 			switch (def.type) {
 				case 'enum': {
@@ -413,8 +437,10 @@ export default class Provider implements Account {
 					break;
 				}
 				case 'file': {
+					if (!xpath) continue;
+
 					const file = this.#findAttachment({
-						column,
+						xpath,
 						attachments: row._attachments,
 					});
 
@@ -462,13 +488,13 @@ export default class Provider implements Account {
 	}
 
 	#findAttachment({
-		column,
+		xpath,
 		attachments,
 	}: {
 		attachments: (typeof Provider.ProjectDataResponse)['infer']['_attachments'];
-		column: { $xpath: string };
+		xpath: string;
 	}) {
-		return attachments.find((a) => a.question_xpath === column.$xpath && !a.is_deleted);
+		return attachments.find((a) => a.question_xpath === xpath && !a.is_deleted);
 	}
 
 	async #parseEnumCell(metadata: DB.Metadata & { type: 'enum' }, serializedValue: string) {
@@ -481,8 +507,12 @@ export default class Provider implements Account {
 		return options.find((option) => serializedValue === (option.kobocollect ?? option.key));
 	}
 
-	#columnOfMetadata(project: (typeof Provider.ProjectResponse)['infer'], metadata: DB.Metadata) {
-		return this.#columnByNameOrLabel(project, {
+	#columnOfMetadata(
+		project: (typeof Provider.ProjectResponse)['infer'],
+		row: (typeof Provider.ProjectDataResponse)['infer'],
+		metadata: DB.Metadata
+	) {
+		return this.#columnByNameOrLabel(project, row, {
 			name: removeNamespaceFromMetadataId(metadata.id),
 			label: metadata.label,
 			both: metadata.kobocollect
@@ -499,6 +529,8 @@ export default class Provider implements Account {
 
 	#columnByNameOrLabel(
 		project: (typeof Provider.ProjectResponse)['infer'],
+		/** Also filter for columns that have a matching $xpath in row's keys */
+		row: (typeof Provider.ProjectDataResponse)['infer'] | undefined,
 		{
 			name,
 			label,
@@ -511,7 +543,9 @@ export default class Provider implements Account {
 	) {
 		return project.content.survey.find(
 			(field) =>
-				matchesName(field, both ?? name ?? []) || matchesLabel(field, both ?? label ?? [])
+				(matchesName(field, both ?? name ?? []) ||
+					matchesLabel(field, both ?? label ?? [])) &&
+				(!row || field.$xpath in row)
 		);
 	}
 
