@@ -147,63 +147,62 @@ async function loadDefaultProtocol(swarpc) {
 
 	// const protocolsCount = await tables.Protocol.count();
 	const protocols = await tables.Protocol.list();
-	const ids = protocols.map((p) => p.id);
+	const sources = protocols.map((p) => p.source);
 
-	if (
-		ids.length === 0 ||
-		// TODO(2026-03-11): remove at some point
-		(ids.length === 1 && ids.at(0) === 'io.github.cigaleapp.arthropods.example')
-	) {
-		console.debug(`Importing built-in protocols`, import.meta.env.builtinProtocols);
-		for (const importUrl of import.meta.env.builtinProtocols) {
-			const filename = new URL(importUrl).pathname.split('/').at(-1);
-			console.debug(`Importing ${filename}`);
-			try {
-				const contents = await fetch(importUrl).then((res) => res.text());
-				const isJSON = Boolean(filename?.endsWith('.json'));
-				await swarpc.importProtocol({ contents, isJSON }, ({ phase, detail }) => {
-					let secondLine = '';
-					switch (phase) {
-						case 'parsing':
-							secondLine = 'Analyse';
-							break;
+	console.debug(`Importing built-in protocols`, import.meta.env.builtinProtocols);
+	for (const importUrl of import.meta.env.builtinProtocols) {
+		if (sources.includes(importUrl)) {
+			console.debug(`Protocol from ${importUrl} already exists, skipping import`);
+			continue;
+		}
 
-						case 'filtering-builtin-metadata':
-							secondLine = 'Filtrage des métadonnées intégrées';
-							break;
+		const filename = new URL(importUrl).pathname.split('/').at(-1);
+		console.debug(`Importing ${filename}`);
+		try {
+			const contents = await fetch(importUrl).then((res) => res.text());
+			const isJSON = Boolean(filename?.endsWith('.json'));
+			await swarpc.importProtocol({ contents, isJSON }, ({ phase, detail }) => {
+				let secondLine = '';
+				switch (phase) {
+					case 'parsing':
+						secondLine = 'Analyse';
+						break;
 
-						case 'input-validation':
-							secondLine = 'Validation';
-							break;
+					case 'filtering-builtin-metadata':
+						secondLine = 'Filtrage des métadonnées intégrées';
+						break;
 
-						case 'write-protocol':
-							secondLine = 'Écriture du protocole';
-							break;
+					case 'input-validation':
+						secondLine = 'Validation';
+						break;
 
-						case 'write-metadata':
-							secondLine = `Écriture de la métadonnée<br>${detail}`;
-							break;
+					case 'write-protocol':
+						secondLine = 'Écriture du protocole';
+						break;
 
-						case 'write-metadata-options':
-							secondLine = `Écriture des options de la métadonnée<br>${detail}`;
-							break;
+					case 'write-metadata':
+						secondLine = `Écriture de la métadonnée<br>${detail}`;
+						break;
 
-						case 'output-validation':
-							secondLine = 'Post-validation';
-							break;
+					case 'write-metadata-options':
+						secondLine = `Écriture des options de la métadonnée<br>${detail}`;
+						break;
 
-						default:
-							break;
-					}
+					case 'output-validation':
+						secondLine = 'Post-validation';
+						break;
 
-					setLoadingMessage(`${`Chargement du protocole ${filename}`}<br>${secondLine}`);
-				});
-			} catch (error) {
-				console.error(error);
-				toasts.error(
-					`Impossible de charger le protocole ${filename}. Vérifiez votre connexion Internet ou essayez de recharger la page.`
-				);
-			}
+					default:
+						break;
+				}
+
+				setLoadingMessage(`${`Chargement du protocole ${filename}`}<br>${secondLine}`);
+			});
+		} catch (error) {
+			console.error(error);
+			toasts.error(
+				`Impossible de charger le protocole ${filename}. Vérifiez votre connexion Internet ou essayez de recharger la page.`
+			);
 		}
 	}
 }
