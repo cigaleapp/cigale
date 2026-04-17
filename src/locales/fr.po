@@ -1872,11 +1872,6 @@ msgstr "Via {0}"
 msgid "<0/> Modifier <1>Beta</1>"
 msgstr "<0/> Modifier <1>Beta</1>"
 
-#. 0: updates[0].name
-#: src/routes/(app)/+layout.js
-msgid "Le protocole \"{0}\" a été mis à jour"
-msgstr "Le protocole \"{0}\" a été mis à jour"
-
 #: src/lib/AreaObservations.svelte
 msgid "Impossible de regrouper avec les paramètres choisis"
 msgstr "Impossible de regrouper avec les paramètres choisis"
@@ -2435,3 +2430,8 @@ msgstr "Autres noms possibles pour cette option. Permet de trouver l'option en c
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
 msgid "Permet de changer la valeur d'autres métadonnées quand cette option est choisie. Peut être pratique pour représenter des taxonomies, ajouter des attributs à une métadonnée, etc."
 msgstr "Permet de changer la valeur d'autres métadonnées quand cette option est choisie. Peut être pratique pour représenter des taxonomies, ajouter des attributs à une métadonnée, etc."
+
+#. 0: updates[0].name
+#: src/routes/(app)/+layout.js
+msgid "Protocole \"{0}\" mis à jour"
+msgstr "Protocole \"{0}\" mis à jour"

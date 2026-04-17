@@ -113,8 +113,8 @@ export async function load({ url }) {
 		if (updates.length === 0) return;
 		toasts.info(
 			updates.length === 1
-				? `Le protocole "${updates[0].name}" a été mis à jour`
-				: `${updates.length} protocoles ont été mis à jour: ${updates.map((u) => `"${u.name}"`).join(', ')}`
+				? `Protocole "${updates[0].name}" mis à jour`
+				: `${updates.length} protocoles ont été mis à jour: ${updates.map((u) => `"${u.name}"`).join(', ')}`,
 		);
 	});
 
@@ -149,15 +149,20 @@ async function loadDefaultProtocol(swarpc) {
 	const protocols = await tables.Protocol.list();
 	const sources = protocols.map((p) => p.source);
 
-	console.debug(`Importing built-in protocols`, import.meta.env.builtinProtocols);
-	for (const importUrl of import.meta.env.builtinProtocols) {
+	/** @type {string[]} */
+	const builtins =
+		JSON.parse(localStorage.getItem('builtinProtocols') ?? 'null') ??
+		import.meta.env.builtinProtocols;
+
+	console.debug(`Importing built-in protocols`, builtins);
+	for (const importUrl of builtins) {
 		if (sources.includes(importUrl)) {
 			console.debug(`Protocol from ${importUrl} already exists, skipping import`);
 			continue;
 		}
 
 		const filename = new URL(importUrl).pathname.split('/').at(-1);
-		console.debug(`Importing ${filename}`);
+		console.debug(`Importing ${filename} since ${importUrl} not in`, sources);
 		try {
 			const contents = await fetch(importUrl).then((res) => res.text());
 			const isJSON = Boolean(filename?.endsWith('.json'));

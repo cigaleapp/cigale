@@ -135,7 +135,7 @@ export type AppFixture = {
 		confirmDeletion(key: `modal_${string}`, type?: string): Promise<void>;
 	};
 	toasts: {
-		byMessage(type: Toast<unknown>['type'] | null, message: string): Locator;
+		byMessage(type: Toast<unknown>['type'] | null, message: string | RegExp): Locator;
 		byType(type: Toast<unknown>['type']): Locator;
 	};
 	settings: {
@@ -399,7 +399,7 @@ export const test = base.extend<
 		{ scope: 'worker', auto: true },
 	],
 	forEachTest: [
-		async ({ page, context, app }, use, info) => {
+		async ({ page, context, app, baseURL }, use, info) => {
 			if (process.env.DEBUG_WORKERS) {
 				let wwcount = 0;
 				page.on('worker', (worker) => {
@@ -465,6 +465,26 @@ export const test = base.extend<
 			) {
 				await setHardwareConcurrency(page, 1);
 			}
+
+			await context.setStorageState({
+				cookies: [],
+				origins: [
+					{
+						origin: baseURL!,
+
+						localStorage: [
+							{
+								name: 'builtinProtocols',
+								value: JSON.stringify([
+									info.tags.includes('@real-protocol')
+										? fullProtocol.source
+										: lightProtocol.source,
+								]),
+							},
+						],
+					},
+				],
+			});
 
 			if (!info.tags.includes('@blank')) {
 				await page.goto('./');

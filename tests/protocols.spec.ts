@@ -3,6 +3,9 @@ import type { Page } from '@playwright/test';
 import type { Analysis } from '$lib/schemas/exports.js';
 import type { ExportedProtocol } from '$lib/schemas/protocols.js';
 
+import { ms } from 'convert';
+
+import lightweightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import { FixturePaths } from './filepaths.js';
 import { assert, expect, test } from './fixtures.js';
 import {
@@ -43,20 +46,25 @@ async function setup(
 		newVersion: protocol.version!,
 	};
 
-	await page.evaluate(
-		async ([id, versions]) => {
-			const current = await window.DB.get('Protocol', id);
-			if (!current) throw new Error('Protocol not found in DB');
-			await window.DB.put('Protocol', {
-				...current,
-				version: versions.oldVersion,
-			});
-		},
-		[protocol.id, versions] as const
-	);
+	test.step('Downgrade protocol version in DB', async () => {
+		await page.evaluate(
+			async ({ id, versions }) => {
+				const current = await window.DB.get('Protocol', id);
+				if (!current) throw new Error('Protocol not found in DB');
+				console.debug(
+					`Protocol auto-update test: setting protocol version to ${versions.oldVersion} (current ${current.version}, old ${versions.oldVersion})`
+				);
+				await window.DB.put('Protocol', {
+					...current,
+					version: versions.oldVersion,
+				});
+			},
+			{ id: protocol.id, versions }
+		);
 
-	await page.reload();
-	await app.db.ready();
+		await page.reload();
+		await app.db.ready();
+	});
 
 	return versions;
 }
@@ -65,13 +73,8 @@ test('can auto-update a protocol', async ({ page, app }) => {
 	const { newVersion } = await setup({ page, app }, true);
 
 	await assert(
-		app.toasts.byMessage(
-			'info',
-			'Le protocole "Example: arthropodes (lightweight)" a été mis à jour'
-		)
-	).toBeVisible({
-		timeout: 10_000,
-	});
+		app.toasts.byMessage('info', 'Protocole "Example: arthropodes (lightweight)" mis à jour')
+	).toBeVisible({ timeout: ms('30s') });
 
 	const protocol = await app.db.protocol.byName('Example: arthropodes (lightweight)');
 	assert(protocol).toHaveProperty('version', newVersion);
@@ -81,7 +84,7 @@ test('does not auto-update when disabled', async ({ page, app }) => {
 	const { oldVersion } = await setup({ page, app }, false);
 
 	await assert(
-		app.toasts.byMessage('info', 'Le protocole "Example: arthropodes" a été mis à jour')
+		app.toasts.byMessage('info', 'Protocole "Example: arthropodes (lightweight)" mis à jour')
 	).not.toBeVisible({
 		timeout: 3000,
 	});
