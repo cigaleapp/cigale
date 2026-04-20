@@ -6,12 +6,18 @@ All notable changes to this project will be documented in this file, on a monthl
 
 ### Improvements
 
+- Add trim helper to protocol templated strings
 - Allow pulling remote sessions with metadata from KoboToolbox (#1373)
+- Handle older kobocollect rows before column xpath change
+- Skip builtin protocol imports only based on the presence of a same-source local protocol
+- Validate that protocol:remote.kobocollect.form URL is #/forms/...
 
 ### Data Updates
 
+- Add Entomoscope to built-in protocols
 - Add HQ to camera_model in entomoscope protocol
 - Regenerate example protocols
+- Setup kobocollect imports for Entomoscope protocol
 
 ## March 2026
 
