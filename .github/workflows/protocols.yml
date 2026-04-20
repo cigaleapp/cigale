@@ -67,7 +67,7 @@ jobs:
           EOS
       - name: Compute changes with last push
         id: changes
-        uses: tj-actions/changed-files@v47.0.5
+        uses: tj-actions/changed-files@v47.0.6
         with:
           since_last_remote_commit: true
           files: ${{ steps.paths.outputs.files }}
