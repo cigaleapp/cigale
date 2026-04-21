@@ -167,6 +167,7 @@ export const test = base.extend<
 		tempfiles: TempFilesFixture;
 		handlers: Array<import('msw').AnyHandler>;
 		network: import('@msw/playwright').NetworkFixture;
+		storageState: FixturePaths.Absolute<FixturePaths.StorageStates>
 	},
 	{ forEachWorker: void }
 >({

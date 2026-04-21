@@ -1,8 +1,10 @@
 import { mkdirSync } from 'node:fs';
 import path from 'node:path';
-import { expect, type Page } from '@playwright/test';
+import type { Page } from '@playwright/test';
 
-import type { FixturePaths } from '../filepaths.js';
+import { expect } from '@playwright/test';
+
+import { FixturePaths } from '../filepaths.js';
 import { exampleProtocol, test as setup } from '../fixtures.js';
 import {
 	confirmDeletionModal,
@@ -11,7 +13,7 @@ import {
 	importPhotos,
 	importProtocol,
 	importResults,
-	newSession
+	newSession,
 } from '../utils/index.js';
 
 setup('basic', async ({ page }) => {
@@ -45,20 +47,20 @@ setup('kitchensink-protocol', async ({ page, app }) => {
 
 	await app.tabs.go('import');
 	await importPhotos({ page }, 'cyan.jpeg', 'leaf.jpeg');
-	await app.wait('2s')
+	await app.wait('2s');
 
 	// Prevent storing current session state in localStorage
 	await goHome(page);
 
-	await writeStorageState(page, 'storage-states/kitchensink-protocol.json');
+	await writeStorageState(page, 'storage-states/kitchen-sink.json');
 });
 
 async function writeStorageState(page: Page, filename: FixturePaths.StorageStates) {
-	const destination = path.join(import.meta.dirname, '../..', filename);
+	const destination = path.join(FixturePaths.root, filename);
 
 	mkdirSync(path.dirname(destination), { recursive: true });
 	await page.context().storageState({
 		indexedDB: true,
-		path: destination
+		path: destination,
 	});
 }
