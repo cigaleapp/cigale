@@ -26,7 +26,7 @@ import {
  * @param {AppFixture} param0.app
  * @param {"example" | "kitchensink"} [param0.protocol]
  */
-async function initialize({ page, app, protocol = "example" }) {
+async function initialize({ page, app, protocol = 'example' }) {
 	await app.settings.set({ showTechnicalMetadata: false });
 	await chooseFirstSession(page);
 	if (protocol === 'kitchensink') await changeSessionProtocol(page, 'Kitchen sink');
