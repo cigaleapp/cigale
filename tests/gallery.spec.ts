@@ -8,7 +8,7 @@ import { addDays } from 'date-fns';
 
 import lightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import { assert, test } from './fixtures.js';
-import { chooseFirstSession, chooseInDropdown, loadDatabaseDump } from './utils/index.js';
+import { chooseFirstSession, chooseInDropdown } from './utils/index.js';
 
 const photos = [
 	'lil-fella.jpeg',

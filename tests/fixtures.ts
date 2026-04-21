@@ -1,5 +1,4 @@
 import { mkdir, rm } from 'node:fs/promises';
-import path from 'node:path';
 import type { TempFilesFixture } from './fixtures/tempfiles.js';
 import type { NavigationTab, PredownloadedModel } from './utils/index.js';
 import type { Locator } from '@playwright/test';
@@ -160,14 +159,13 @@ export type AppFixture = {
 	sidepanel: Locator;
 };
 
-export const test = base.extend<
+const _test = base.extend<
 	{
 		forEachTest: void;
 		app: AppFixture;
 		tempfiles: TempFilesFixture;
 		handlers: Array<import('msw').AnyHandler>;
 		network: import('@msw/playwright').NetworkFixture;
-		setStorageState: (state: FixturePaths.StorageStates | 'empty') => Promise<void>;
 		storageState:
 			| FixturePaths.Absolute<FixturePaths.StorageStates>
 			| Exclude<import('playwright').BrowserContextOptions['storageState'], string>;
@@ -176,16 +174,6 @@ export const test = base.extend<
 >({
 	tempfiles,
 	handlers: [],
-	setStorageState({ context }, use) {
-		use(async (state) => {
-			if (state === 'empty') {
-				await context.setStorageState({ cookies: [], origins: [] });
-				return;
-			}
-
-			await context.setStorageState(path.join(FixturePaths.root, state));
-		});
-	},
 	network: [
 		async ({ context, handlers }, use) => {
 			const network = defineNetworkFixture({ context, handlers });
@@ -588,16 +576,23 @@ export const assert = baseExpect.extend({
 export const expect = assert.soft;
 
 /**
+ * Default test has a "empty" storage state, that has the protocol already imported but no sessions
+ */
+export const test = _test.extend({
+	storageState: 'tests/fixtures/storage-states/empty.json',
+});
+
+/**
  * Test with a storage state set to basic (light example protocol, a session with photos imported and classified)
  */
-export const testBasic = test.extend({
+export const testBasic = _test.extend({
 	storageState: 'tests/fixtures/storage-states/basic.json',
 });
 
 /**
  * Test with a storage state set to kitchensink protocol
  */
-export const testKitchensink = test.extend({
+export const testKitchensink = _test.extend({
 	storageState: 'tests/fixtures/storage-states/kitchen-sink.json',
 });
 
