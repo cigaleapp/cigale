@@ -8,8 +8,21 @@ import { formatISO9075 } from 'date-fns';
 /** @typedef {NonNullable<import('@playwright/test').PlaywrightTestConfig['projects']>[number]} Project */
 
 /** @type {Project} */
+const setup = {
+	name: 'setup',
+	testMatch: /setup\/.*\.ts$/,
+};
+
+const dependencies = dependsOnTarget({
+	live: ['setup'],
+	dev: [],
+	built: ['setup'],
+});
+
+/** @type {Project} */
 const chromium = {
 	name: 'chromium',
+	dependencies,
 	use: {
 		...devices['Desktop Chrome'],
 		launchOptions: {
@@ -28,12 +41,14 @@ const chromium = {
 /** @type {Project} */
 const firefox = {
 	name: 'firefox',
+	dependencies,
 	use: { ...devices['Desktop Firefox'] },
 };
 
 /** @type {Project} */
 const webkit = {
 	name: 'webkit',
+	dependencies,
 	use: {
 		...devices['Desktop Safari'],
 		launchOptions: {
@@ -115,9 +130,9 @@ export default defineConfig({
 
 	/* Configure projects for major browsers */
 	projects: dependsOnTarget({
-		live: [chromium],
-		dev: [chromium, firefox, webkit],
-		built: [chromium, webkit],
+		live: [setup, chromium],
+		dev: [setup, chromium, firefox, webkit],
+		built: [setup, chromium, webkit],
 	}),
 
 	/* Run your local dev server before starting the tests */

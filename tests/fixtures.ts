@@ -1,5 +1,4 @@
 import { mkdir, rm } from 'node:fs/promises';
-import type { FixturePaths } from './filepaths.js';
 import type { TempFilesFixture } from './fixtures/tempfiles.js';
 import type { NavigationTab, PredownloadedModel } from './utils/index.js';
 import type { Locator } from '@playwright/test';
@@ -17,8 +16,8 @@ import { safeJSONParse } from '$lib/utils';
 
 import _fullProtocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
 import lightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
+import { FixturePaths } from './filepaths.js';
 import { tempfiles } from './fixtures/tempfiles.js';
-import { dependsOnTags } from './utils/annotations.js';
 import {
 	confirmDeletionModal,
 	dumpDatabase,
@@ -160,13 +159,16 @@ export type AppFixture = {
 	sidepanel: Locator;
 };
 
-export const test = base.extend<
+const _test = base.extend<
 	{
 		forEachTest: void;
 		app: AppFixture;
 		tempfiles: TempFilesFixture;
 		handlers: Array<import('msw').AnyHandler>;
 		network: import('@msw/playwright').NetworkFixture;
+		storageState:
+			| FixturePaths.Absolute<FixturePaths.StorageStates>
+			| Exclude<import('@playwright/test').BrowserContextOptions['storageState'], string>;
 	},
 	{ forEachWorker: void }
 >({
@@ -400,7 +402,7 @@ export const test = base.extend<
 		{ scope: 'worker', auto: true },
 	],
 	forEachTest: [
-		async ({ page, context, app, baseURL }, use, info) => {
+		async ({ page, context, app }, use, info) => {
 			if (process.env.DEBUG_WORKERS) {
 				let wwcount = 0;
 				page.on('worker', (worker) => {
@@ -466,28 +468,6 @@ export const test = base.extend<
 			) {
 				await setHardwareConcurrency(page, 1);
 			}
-
-			await context.setStorageState({
-				cookies: [],
-				origins: [
-					{
-						origin: baseURL!,
-
-						localStorage: [
-							{
-								name: 'builtinProtocols',
-								value: JSON.stringify(
-									dependsOnTags(info, {
-										'@no-builtins': [],
-										'@real-protocol': [fullProtocol.source],
-										'': [lightProtocol.source],
-									})
-								),
-							},
-						],
-					},
-				],
-			});
 
 			if (!info.tags.includes('@blank')) {
 				await page.goto('./');
@@ -594,5 +574,26 @@ export const assert = baseExpect.extend({
 
 // Encourage using soft expects in tests, and only use hard expects (assert in our case) when it's necessary for the rest of the test to continue
 export const expect = assert.soft;
+
+/**
+ * Default test has a "empty" storage state, that has the protocol already imported but no sessions
+ */
+export const test = _test.extend({
+	storageState: 'tests/fixtures/storage-states/empty.json',
+});
+
+/**
+ * Test with a storage state set to basic (light example protocol, a session with photos imported and classified)
+ */
+export const testBasic = _test.extend({
+	storageState: 'tests/fixtures/storage-states/basic.json',
+});
+
+/**
+ * Test with a storage state set to kitchensink protocol
+ */
+export const testKitchensink = _test.extend({
+	storageState: 'tests/fixtures/storage-states/kitchen-sink.json',
+});
 
 export { lightProtocol as exampleProtocol };

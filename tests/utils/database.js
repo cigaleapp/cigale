@@ -1,9 +1,3 @@
-import { readFileSync } from 'node:fs';
-import { mkdir, writeFile } from 'node:fs/promises';
-import path from 'node:path';
-
-import { FixturePaths } from '../filepaths.js';
-
 /**
  * @import { Page } from '@playwright/test';
  * @import {IDBDatabaseType} from '$lib/idb.svelte.js';
@@ -59,30 +53,11 @@ export async function listTable(page, tableName) {
 }
 
 /**
- * @overload
- * @param {Page} page
- * @param {null} filepath
- * @returns {Promise<string>}
- */
-
-/**
- * @overload
- * @param {Page} page
- * @param {FixturePaths.DatabaseDumps} filepath
- * @returns {Promise<undefined>}
- */
-
-/**
- * Store a database dump in the fixtures/db directory
+ * Capture a dump of the database
  * @param {import('@playwright/test').Page} page
- * @param {FixturePaths.DatabaseDumps | null} filepath relative to tests/fixtures/db. Null to skip saving the dump.
- * @returns {Promise<string|undefined>} the encoded dump, if filepath is null
+ * @returns {Promise<string>} the encoded dump
  */
-export async function dumpDatabase(page, filepath) {
-	const dest = filepath
-		? path.join(import.meta.dirname, '../..', FixturePaths.root, filepath)
-		: null;
-
+export async function dumpDatabase(page) {
 	const encodedDump = await page.evaluate(async () => {
 		const tableNames = window.DB.objectStoreNames;
 
@@ -96,96 +71,5 @@ export async function dumpDatabase(page, filepath) {
 		return window.devalue.stringify(dump);
 	});
 
-	if (dest) {
-		await mkdir(path.dirname(dest), {
-			recursive: true,
-		});
-
-		await writeFile(dest, encodedDump, 'utf-8');
-	} else {
-		return encodedDump;
-	}
-}
-
-/**
- * @typedef {{[ Table in import('idb').StoreNames<IDBDatabaseType>]: Array<IDBDatabaseType[Table]['value']>}} DatabaseDump
- */
-
-/**
- *
- * @param {import('@playwright/test').Page} page
- * @param {FixturePaths.DatabaseDumps} filepath relative to tests/fixtures/db
- */
-export async function loadDatabaseDump(page, filepath = 'db/basic.devalue') {
-	const location = path.join(FixturePaths.root, filepath);
-
-	await page.evaluate(
-		async (dump) => {
-			/**
-			 * @template {import('idb').StoreNames<IDBDatabaseType>} TableName
-			 * @param {undefined | import('idb').IDBPTransaction<IDBDatabaseType, TableName[], "readwrite">} tx
-			 * @param {TableName} tableName
-			 * @param {DatabaseDump[TableName]} rows
-			 */
-			async function setTableEntries(tx, tableName, rows) {
-				if (tx) {
-					await tx.objectStore(tableName).clear();
-				} else {
-					await window.DB.clear(tableName);
-				}
-
-				for (const row of rows) {
-					console.info('[loadDatabaseDump] Adding row to', tableName, row);
-
-					if (tx) {
-						await tx.objectStore(tableName).put(row);
-					} else {
-						await window.DB.put(tableName, row);
-					}
-				}
-			}
-
-			/** @type {DatabaseDump} */
-			const { Protocol, ...otherTables } = window.devalue.parse(dump);
-
-			await setTableEntries(undefined, 'Protocol', Protocol);
-
-			/**
-			 * @template {string} K
-			 * @param {Record<K, unknown>} subject
-			 * @returns {K[]}
-			 */
-			function keys(subject) {
-				// @ts-expect-error
-				return Object.keys(subject);
-			}
-
-			/**
-			 * @template {string} K
-			 * @template {any} V
-			 * @param {Record<K, V>} subject
-			 * @returns {Array<[K, V]>}
-			 */
-			function entries(subject) {
-				// @ts-expect-error
-				return Object.entries(subject);
-			}
-
-			const tx = window.DB.transaction(keys(otherTables), 'readwrite');
-
-			for (const [tableName, rows] of entries(otherTables)) {
-				await setTableEntries(tx, tableName, rows);
-			}
-
-			await tx.done;
-			window.refreshDB();
-		},
-		readFileSync(location, 'utf-8')
-	);
-
-	// FIXME await finishes before all [loadDatabaseDump] logs ??
-	await page.waitForTimeout(3_000);
-
-	await page.reload();
-	await page.waitForFunction(() => Boolean(window.devalue && window.DB && window.refreshDB));
+	return encodedDump;
 }

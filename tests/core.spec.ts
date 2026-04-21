@@ -9,7 +9,7 @@ import lightweightProtocol from '../examples/arthropods.light.cigaleprotocol.jso
 import { Analysis } from '../src/lib/schemas/exports.js';
 import { IssueCreatorRequest } from '../src/lib/schemas/issue-creator.js';
 import { withParallelism } from './annotations.js';
-import { assert, expect, test } from './fixtures.js';
+import { assert, expect, test, testBasic } from './fixtures.js';
 import {
 	browserConsole,
 	chooseFirstSession,
@@ -17,7 +17,6 @@ import {
 	exportResults,
 	firstObservationCard,
 	importPhotos,
-	loadDatabaseDump,
 	mockProtocolSourceURL,
 	mockUrl,
 	newSession,
@@ -242,7 +241,7 @@ test('can import a protocol via /protocols/import/url', async ({ page, app, cont
 	).toBeVisible();
 });
 
-test('can send a bug report', async ({ page, app, context }) => {
+testBasic('can send a bug report', async ({ page, app, context }) => {
 	let requestBody: undefined | typeof IssueCreatorRequest.inferIn;
 
 	await mockUrl(page, context, 'https://mkissue.cigale.gwen.works/**', async (route) => {
@@ -255,7 +254,6 @@ test('can send a bug report', async ({ page, app, context }) => {
 		};
 	});
 
-	await loadDatabaseDump(page, 'db/basic.devalue');
 	await chooseFirstSession(page);
 	await setInferenceModels(page, { crop: 'Aucune inférence' });
 	await app.tabs.go('crop');

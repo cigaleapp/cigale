@@ -1,7 +1,8 @@
+import { ms } from 'convert';
 import { addDays, format as formatDate } from 'date-fns';
 
 import { issue } from './annotations.js';
-import { assert, expect, test } from './fixtures.js';
+import { assert, expect, test, testBasic, testKitchensink } from './fixtures.js';
 import {
 	changeSessionProtocol,
 	chooseFirstSession,
@@ -9,7 +10,6 @@ import {
 	goToProtocolManagement,
 	importPhotos,
 	importProtocol,
-	loadDatabaseDump,
 	newSession,
 	setInferenceModels,
 } from './utils/index.js';
@@ -24,21 +24,18 @@ import {
  * @param {object} param0
  * @param {Page} param0.page
  * @param {AppFixture} param0.app
- * @param {import('./filepaths.js').FixturePaths.DatabaseDumps} [param0.dump=basic] name of the database dump to load, without extension
+ * @param {"example" | "kitchensink"} [param0.protocol]
  */
-async function initialize({ page, app, dump = 'db/basic.devalue' }) {
-	await loadDatabaseDump(page, dump);
+async function initialize({ page, app, protocol = "example" }) {
 	await app.settings.set({ showTechnicalMetadata: false });
 	await chooseFirstSession(page);
-	if (dump === 'db/kitchensink-protocol.devalue')
-		await changeSessionProtocol(page, 'Kitchen sink');
-	// Kitchen sink protocol has inference models set
-	if (dump !== 'db/kitchensink-protocol.devalue')
+	if (protocol === 'kitchensink') await changeSessionProtocol(page, 'Kitchen sink');
+	if (protocol !== 'kitchensink')
 		await setInferenceModels(page, { classify: 'Aucune inférence', crop: 'Aucune inférence' });
 	await app.tabs.go('classify');
 	await page
-		.getByText(dump === 'db/basic.devalue' ? 'lil-fella' : 'leaf', { exact: true })
-		.click({ timeout: 10_000 });
+		.getByText(protocol === 'example' ? 'lil-fella' : 'leaf', { exact: true })
+		.click({ timeout: ms('10s') });
 }
 
 /**
@@ -59,42 +56,45 @@ async function metadataValueInDatabase(
 	return app.db.metadata.values({ observation, protocolId }).then((metadata) => metadata[key]);
 }
 
-test('allows changing metadata values on import page', issue(440), async ({ page, app }) => {
-	await initialize({ page, app, dump: 'db/kitchensink-protocol.devalue' });
+testKitchensink(
+	'allows changing metadata values on import page',
+	issue(440),
+	async ({ page, app }) => {
+		await initialize({ page, app, protocol: 'kitchensink' });
 
-	await app.tabs.go('import');
-	await firstObservationCard(page).click();
-	await assert(page.getByTestId('sidepanel')).toBeVisible();
+		await app.tabs.go('import');
+		await firstObservationCard(page).click();
+		await assert(page.getByTestId('sidepanel')).toBeVisible();
 
-	// Set to True on image itself
-	await assert(app.metadata.section('bool')).toMatchAriaSnapshot(`
+		// Set to True on image itself
+		await assert(app.metadata.section('bool')).toMatchAriaSnapshot(`
 	  - text: bool
 	  - switch "":
 	    - img
 	  - button [disabled]:
 	    - img
 	`);
-	await app.metadata.switch('bool').click();
-	await assert(app.metadata.switch('bool')).toMatchAriaSnapshot(`
+		await app.metadata.switch('bool').click();
+		await assert(app.metadata.switch('bool')).toMatchAriaSnapshot(`
 	  - switch "" [checked]:
 	    - img
 	`);
 
-	// Set to False on observation
-	await app.tabs.go('classify');
-	await firstObservationCard(page).click();
-	await app.metadata.switch('bool').click();
-	await app.metadata.switch('bool').click();
-	await app.metadata.switch('bool').click();
-	await assert(app.metadata.switch('bool')).toMatchAriaSnapshot(`
+		// Set to False on observation
+		await app.tabs.go('classify');
+		await firstObservationCard(page).click();
+		await app.metadata.switch('bool').click();
+		await app.metadata.switch('bool').click();
+		await app.metadata.switch('bool').click();
+		await assert(app.metadata.switch('bool')).toMatchAriaSnapshot(`
 	  - switch "":
 	    - img
 	`);
 
-	// Expect image to be still True
-	await app.tabs.go('import');
-	await firstObservationCard(page).click();
-	await assert(app.metadata.section('bool')).toMatchAriaSnapshot(`
+		// Expect image to be still True
+		await app.tabs.go('import');
+		await firstObservationCard(page).click();
+		await assert(app.metadata.section('bool')).toMatchAriaSnapshot(`
 	  - text: bool
 	  - switch "" [checked]:
 	    - img
@@ -102,16 +102,17 @@ test('allows changing metadata values on import page', issue(440), async ({ page
 	  - button:
 	    - img
 	`);
-});
+	}
+);
 
-test('does not show technical metadata ', async ({ page, app }) => {
+testBasic('does not show technical metadata ', async ({ page, app }) => {
 	await initialize({ page, app });
 	await assert(
 		page.getByText('io.github.cigaleapp.arthropods.example__crop', { exact: true })
 	).toBeHidden();
 });
 
-test('can update a enum-type metadata with cascades', async ({ page, app }) => {
+testBasic('can update a enum-type metadata with cascades', async ({ page, app }) => {
 	await initialize({ page, app });
 
 	/** @param {number} n 1-based */
@@ -314,7 +315,7 @@ test('can update a enum-type metadata with cascades', async ({ page, app }) => {
 });
 
 test.describe('can search in a enum-type metadata combobox', () => {
-	test('by name', async ({ page, app }) => {
+	testBasic('by name', async ({ page, app }) => {
 		await initialize({ page, app });
 		await page.getByTestId('sidepanel').getByRole('combobox').first().fill('Dicyrt');
 
@@ -371,7 +372,7 @@ test.describe('can search in a enum-type metadata combobox', () => {
 		`);
 	});
 
-	test('by synonym', async ({ page, app }) => {
+	testBasic('by synonym', async ({ page, app }) => {
 		await initialize({ page, app });
 		await page.getByTestId('sidepanel').getByRole('combobox').first().fill('desoria');
 		await assert(page.getByTestId('metadata-combobox-viewport')).toMatchAriaSnapshot(`
@@ -425,8 +426,8 @@ test.describe('can search in a enum-type metadata combobox', () => {
 	});
 });
 
-test('can update a boolean-type metadata', issue(216), async ({ page, app }) => {
-	await initialize({ page, app, dump: 'db/kitchensink-protocol.devalue' });
+testKitchensink('can update a boolean-type metadata', issue(216), async ({ page, app }) => {
+	await initialize({ page, app, protocol: 'kitchensink' });
 	const switch_ = app.metadata.switch('bool');
 
 	await expect(switch_).toHaveAttribute('aria-checked', 'false');
@@ -443,8 +444,8 @@ test('can update a boolean-type metadata', issue(216), async ({ page, app }) => 
 	expect(await metadataValueInDatabase(app, 'bool')).toBe(false);
 });
 
-test('shows crop-type metadata as non representable', async ({ page, app }) => {
-	await initialize({ page, app, dump: 'db/kitchensink-protocol.devalue' });
+testKitchensink('shows crop-type metadata as non representable', async ({ page, app }) => {
+	await initialize({ page, app, protocol: 'kitchensink' });
 
 	await assert(app.metadata.section('crop')).toMatchAriaSnapshot(`
 	  - text: crop
@@ -455,8 +456,8 @@ test('shows crop-type metadata as non representable', async ({ page, app }) => {
 	`);
 });
 
-test('can update a date-type metadata', async ({ page, app }) => {
-	await initialize({ page, app, dump: 'db/kitchensink-protocol.devalue' });
+testKitchensink('can update a date-type metadata', async ({ page, app }) => {
+	await initialize({ page, app, protocol: 'kitchensink' });
 
 	await assert(app.metadata.textbox('date')).toHaveValue('');
 
@@ -476,8 +477,8 @@ test('can update a date-type metadata', async ({ page, app }) => {
 	await expect(app.metadata.section('date')).not.toHaveText(/must be .+ or later/);
 });
 
-test('can update a float-type metadata', async ({ page, app }) => {
-	await initialize({ page, app, dump: 'db/kitchensink-protocol.devalue' });
+testKitchensink('can update a float-type metadata', async ({ page, app }) => {
+	await initialize({ page, app, protocol: 'kitchensink' });
 
 	await assert(app.metadata.textbox('float')).toHaveValue('');
 
@@ -491,8 +492,8 @@ test('can update a float-type metadata', async ({ page, app }) => {
 	assert(await metadataValueInDatabase(app, 'float')).toBe(4.14);
 });
 
-test('can update a integer-type metadata', async ({ page, app }) => {
-	await initialize({ page, app, dump: 'db/kitchensink-protocol.devalue' });
+testKitchensink('can update a integer-type metadata', async ({ page, app }) => {
+	await initialize({ page, app, protocol: 'kitchensink' });
 
 	await assert(app.metadata.textbox('integer')).toHaveValue('');
 
@@ -513,8 +514,8 @@ test('can update a integer-type metadata', async ({ page, app }) => {
 	await expect(app.metadata.section('integer')).not.toHaveText('must be less than 100');
 });
 
-test('can update a string-type metadata', async ({ page, app }) => {
-	await initialize({ page, app, dump: 'db/kitchensink-protocol.devalue' });
+testKitchensink('can update a string-type metadata', async ({ page, app }) => {
+	await initialize({ page, app, protocol: 'kitchensink' });
 
 	const textbox = app.metadata.textbox('string');
 	await assert(textbox).toHaveValue('');

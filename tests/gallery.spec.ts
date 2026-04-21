@@ -8,7 +8,7 @@ import { addDays } from 'date-fns';
 
 import lightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import { assert, test } from './fixtures.js';
-import { chooseFirstSession, chooseInDropdown, loadDatabaseDump } from './utils/index.js';
+import { chooseFirstSession, chooseInDropdown } from './utils/index.js';
 
 const photos = [
 	'lil-fella.jpeg',
@@ -20,8 +20,9 @@ const photos = [
 const orders =
 	lightProtocol.metadata['io.github.cigaleapp.arthropods.example.light__order'].options;
 
+test.use({ storageState: 'tests/fixtures/storage-states/basic.json' });
+
 test.beforeEach(async ({ page, app }) => {
-	await loadDatabaseDump(page, 'db/basic.devalue');
 	await chooseFirstSession(page);
 	await app.tabs.go('import');
 

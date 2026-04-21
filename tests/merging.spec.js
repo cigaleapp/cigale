@@ -1,15 +1,11 @@
 import { issue } from './annotations.js';
 import { assert, expect, test } from './fixtures.js';
-import {
-	chooseFirstSession,
-	loadDatabaseDump,
-	observationCard,
-	setInferenceModels,
-} from './utils/index.js';
+import { chooseFirstSession, observationCard, setInferenceModels } from './utils/index.js';
+
+test.use({ storageState: 'tests/fixtures/storage-states/basic.json' });
 
 test.beforeEach(async ({ page, app }) => {
 	await app.settings.set({ gallerySort: { direction: 'asc', key: 'filename' } });
-	await loadDatabaseDump(page, 'db/basic.devalue');
 	await chooseFirstSession(page);
 	await setInferenceModels(page, { classify: 'Aucune inférence' });
 	await app.tabs.go('classify');
@@ -151,7 +147,6 @@ test('can split merged observations', async ({ page }) => {
 });
 
 test('selecting multiple images', issue(1054), async ({ page, app }) => {
-	await loadDatabaseDump(page, 'db/basic.devalue');
 	await chooseFirstSession(page);
 	await setInferenceModels(page, {
 		classify: 'Aucune inférence',
