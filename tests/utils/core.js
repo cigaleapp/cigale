@@ -434,13 +434,3 @@ export async function waitForDownload(page, trigger) {
 	await trigger();
 	return await event;
 }
-
-/**
- * Call .fill(value) and then .blur()
- * @param {import('@playwright/test').Locator} locator
- * @param {string} value
- */
-export async function fillAndBlur(locator, value) {
-	await locator.fill(value);
-	await locator.blur();
-}

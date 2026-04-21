@@ -8,7 +8,6 @@ import {
 	chooseFirstSession,
 	getDatabaseRowById,
 	imagesByName,
-	loadDatabaseDump,
 	setImageMetadata,
 } from './utils/index.js';
 import { controlOrMeta } from './utils/keyboard.js';
@@ -20,9 +19,10 @@ import { controlOrMeta } from './utils/keyboard.js';
 const CROP_METADATA_ID = `${exampleProtocol.id}__crop`;
 
 test.describe('Cropper view', () => {
+	test.use({ storageState: 'tests/fixtures/storage-states/basic.json' });
+
 	test.beforeEach(async ({ page, app }, testInfo) => {
 		testInfo.setTimeout(ms('2min'));
-		await loadDatabaseDump(page);
 		await chooseFirstSession(page);
 		await app.tabs.go('import');
 		const allImages = await app.db.image.list();

@@ -168,7 +168,7 @@ const _test = base.extend<
 		network: import('@msw/playwright').NetworkFixture;
 		storageState:
 			| FixturePaths.Absolute<FixturePaths.StorageStates>
-			| Exclude<import('playwright').BrowserContextOptions['storageState'], string>;
+			| Exclude<import('@playwright/test').BrowserContextOptions['storageState'], string>;
 	},
 	{ forEachWorker: void }
 >({

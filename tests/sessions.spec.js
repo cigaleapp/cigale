@@ -2,7 +2,7 @@ import { tz } from '@date-fns/tz';
 import { ms } from 'convert';
 import { differenceInMinutes, format as formatDate } from 'date-fns';
 
-import { assert, exampleProtocol, expect, test } from './fixtures.js';
+import { assert, exampleProtocol, expect, test, testKitchensink } from './fixtures.js';
 import {
 	chooseInDropdown,
 	deleteSession,
@@ -10,7 +10,6 @@ import {
 	goToSessionPage,
 	importPhotos,
 	importProtocol,
-	loadDatabaseDump,
 	newSession,
 	pickFiles,
 	setInferenceModels,
@@ -463,10 +462,9 @@ test('can change protocol of session', async ({ page, app }) => {
 	`);
 });
 
-test('session metadata form has default values @no-builtins', async ({ page, app }) => {
+testKitchensink('session metadata form has default values @no-builtins', async ({ page, app }) => {
 	// test.skip(browserName === 'webkit', 'Does not work on Webkit for some reason');
 
-	await loadDatabaseDump(page, 'db/kitchensink-protocol.devalue');
 	await app.settings.set({ showTechnicalMetadata: false });
 	await newSession(page, { name: 'Test', goto: '' });
 
@@ -509,8 +507,7 @@ test('session metadata form has default values @no-builtins', async ({ page, app
 	await expect(app.metadata.textbox('Code du transect')).toHaveValue('custom code');
 });
 
-test('can set file-type metadata @no-builtins', async ({ page, app }) => {
-	await loadDatabaseDump(page, 'db/kitchensink-protocol.devalue');
+testKitchensink('can set file-type metadata @no-builtins', async ({ page, app }) => {
 	await app.settings.set({ showTechnicalMetadata: false });
 	await newSession(page, { name: 'Test' });
 	await goToSessionPage(page);
@@ -599,9 +596,8 @@ test('can set file-type metadata @no-builtins', async ({ page, app }) => {
 	expect(session.metadata).not.toHaveProperty([metadataKey]);
 });
 
-test('can convert between units', async ({ page, app }) => {
+testKitchensink('can convert between units', async ({ page, app }) => {
 	await app.settings.set({ showTechnicalMetadata: false });
-	await loadDatabaseDump(page, 'db/kitchensink-protocol.devalue');
 	await page.getByRole('button', { name: 'Gérer' }).click();
 	await app.path.wait('/(app)/sessions/[id]');
 	const section = app.metadata.section('Has no default');

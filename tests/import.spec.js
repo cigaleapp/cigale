@@ -9,7 +9,6 @@ import {
 	firstObservationCard,
 	importPhotos,
 	importResults,
-	loadDatabaseDump,
 	loadingText,
 	mockUrl,
 	newSession,

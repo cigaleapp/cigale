@@ -17,6 +17,8 @@ import {
 	newSession,
 } from '../utils/index.js';
 
+setup.use({ storageState: { cookies: [], origins: [] } });
+
 setup('empty, basic', async ({ page }) => {
 	await goToProtocolManagement(page);
 	await importProtocol(page, 'examples/arthropods.light.cigaleprotocol.json');
