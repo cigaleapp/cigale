@@ -2,7 +2,7 @@ import { ms } from 'convert';
 import { addDays, format as formatDate } from 'date-fns';
 
 import { issue } from './annotations.js';
-import { assert, expect, test, testKitchensink } from './fixtures.js';
+import { assert, expect, test, testBasic, testKitchensink } from './fixtures.js';
 import {
 	changeSessionProtocol,
 	chooseFirstSession,
@@ -105,14 +105,14 @@ testKitchensink(
 	}
 );
 
-test('does not show technical metadata ', async ({ page, app }) => {
+testBasic('does not show technical metadata ', async ({ page, app }) => {
 	await initialize({ page, app });
 	await assert(
 		page.getByText('io.github.cigaleapp.arthropods.example__crop', { exact: true })
 	).toBeHidden();
 });
 
-test('can update a enum-type metadata with cascades', async ({ page, app }) => {
+testBasic('can update a enum-type metadata with cascades', async ({ page, app }) => {
 	await initialize({ page, app });
 
 	/** @param {number} n 1-based */
@@ -315,7 +315,7 @@ test('can update a enum-type metadata with cascades', async ({ page, app }) => {
 });
 
 test.describe('can search in a enum-type metadata combobox', () => {
-	test('by name', async ({ page, app }) => {
+	testBasic('by name', async ({ page, app }) => {
 		await initialize({ page, app });
 		await page.getByTestId('sidepanel').getByRole('combobox').first().fill('Dicyrt');
 
@@ -372,7 +372,7 @@ test.describe('can search in a enum-type metadata combobox', () => {
 		`);
 	});
 
-	test('by synonym', async ({ page, app }) => {
+	testBasic('by synonym', async ({ page, app }) => {
 		await initialize({ page, app });
 		await page.getByTestId('sidepanel').getByRole('combobox').first().fill('desoria');
 		await assert(page.getByTestId('metadata-combobox-viewport')).toMatchAriaSnapshot(`
