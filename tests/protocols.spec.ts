@@ -97,7 +97,6 @@ test('can use a protocol that imports metadata from another protocol', async ({
 	context,
 	app,
 }) => {
-	// await loadDatabaseDump(page, "db/kitchensink-protocol.devalue")
 	await goToProtocolManagement(page);
 	await page.getByText('Example: arthropodes (lightweight)').click();
 	await page.getByRole('button', { name: 'Supprimer', exact: true }).click();
