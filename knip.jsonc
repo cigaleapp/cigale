@@ -31,9 +31,9 @@
 		"forge.env.d.ts",
 		"vite.electron*.config.js",
 		"wuchale.config.js",
-		"tests/*.spec.js",
-		"tests/setup/*.spec.js",
-		"tests/tasks/*.spec.js",
+		"tests/*.spec.{js,ts}",
+		"tests/setup/*.ts",
+		"tests/tasks/*.spec.{js,ts}",
 	],
 	"paths": {
 		"~icons/*": ["node_modules/unplugin-icons/types/svelte5.d.ts"],
