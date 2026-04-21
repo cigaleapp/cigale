@@ -9,7 +9,6 @@ import {
 	firstObservationCard,
 	imagesByName,
 	importPhotos,
-	loadDatabaseDump,
 	newSession,
 	observationsByLabel,
 	setInferenceModels,

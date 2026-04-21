@@ -17,9 +17,13 @@ import {
 	newSession,
 } from '../utils/index.js';
 
-setup('basic', async ({ page }) => {
+setup('empty, basic', async ({ page }) => {
 	await goToProtocolManagement(page);
 	await importProtocol(page, 'examples/arthropods.light.cigaleprotocol.json');
+
+	await writeStorageState(page, 'storage-states/empty.json', {
+		builtinProtocols: JSON.stringify([lightProtocol.source]),
+	});
 
 	await importResults(page, 'exports/correct.zip');
 

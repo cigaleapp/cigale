@@ -1,7 +1,7 @@
 import * as dates from 'date-fns';
 
 import { issue } from './annotations.js';
-import { assert, test } from './fixtures.js';
+import { assert, test, testBasic } from './fixtures.js';
 import {
 	chooseFirstSession,
 	expectZipFiles,
@@ -399,11 +399,10 @@ test('can import in multiple batches', async ({ page, app }) => {
 	await assert(page.locator('main').locator('article.observation')).toHaveCount(5);
 });
 
-test(
+testBasic(
 	'deleting an image in the import tab does not create ghost observation cards',
 	issue(439),
 	async ({ page, app }) => {
-		await loadDatabaseDump(page, 'db/basic.devalue');
 		await chooseFirstSession(page);
 		await setInferenceModels(page, { classify: 'Aucune inférence' });
 		await app.tabs.go('classify');

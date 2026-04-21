@@ -587,4 +587,18 @@ export const assert = baseExpect.extend({
 // Encourage using soft expects in tests, and only use hard expects (assert in our case) when it's necessary for the rest of the test to continue
 export const expect = assert.soft;
 
+/**
+ * Test with a storage state set to basic (light example protocol, a session with photos imported and classified)
+ */
+export const testBasic = test.extend({
+	storageState: 'tests/fixtures/storage-states/basic.json',
+});
+
+/**
+ * Test with a storage state set to kitchensink protocol
+ */
+export const testKitchensink = test.extend({
+	storageState: 'tests/fixtures/storage-states/kitchen-sink.json',
+});
+
 export { lightProtocol as exampleProtocol };

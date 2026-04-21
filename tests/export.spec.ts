@@ -3,7 +3,7 @@ import type { Analysis } from '$lib/schemas/exports.js';
 import { ms } from 'convert';
 
 import { issue } from './annotations.js';
-import { assert, expect, test } from './fixtures.js';
+import { assert, expect, test, testBasic, testKitchensink } from './fixtures.js';
 import { mockFilesystemAccessAPI, writtenFilesOfHandle } from './utils/filesystemaccess.js';
 import {
 	chooseFirstSession,
@@ -13,7 +13,6 @@ import {
 	firstObservationCard,
 	goToSessionPage,
 	importPhotos,
-	loadDatabaseDump,
 	newSession,
 	pickFiles,
 	setInferenceModels,
@@ -54,9 +53,8 @@ test('correctly applies crop padding', issue(463), async ({ page, app }) => {
 	});
 });
 
-test('correctly shows .zip preview', async ({ page, app }) => {
+testBasic('correctly shows .zip preview', async ({ page, app }) => {
 	await app.settings.set({ showTechnicalMetadata: false });
-	await loadDatabaseDump(page, 'db/basic.devalue');
 	await chooseFirstSession(page);
 
 	await app.tabs.go('results');
@@ -193,8 +191,7 @@ test('correctly shows .zip preview', async ({ page, app }) => {
 	await expect(downloadButton).toHaveText('Archive ZIP ~13Mo');
 });
 
-test('export to a folder', async ({ page, app, browserName }) => {
-	await loadDatabaseDump(page, 'db/basic.devalue');
+testBasic('export to a folder', async ({ page, app, browserName }) => {
 	await chooseFirstSession(page);
 	await setInferenceModels(page, {
 		crop: 'Aucune inférence',
@@ -230,8 +227,7 @@ test('export to a folder', async ({ page, app, browserName }) => {
 	});
 });
 
-test('includes metadata files in export', async ({ page, app }) => {
-	await loadDatabaseDump(page, 'db/kitchensink-protocol.devalue');
+testKitchensink('includes metadata files in export', async ({ page, app }) => {
 	await chooseFirstSession(page);
 	await goToSessionPage(page);
 
@@ -279,19 +275,20 @@ test('includes metadata files in export', async ({ page, app }) => {
 	);
 });
 
-test('shows warning dialog when exporting with metadata problems', async ({ page, app }) => {
-	await loadDatabaseDump(page, 'db/kitchensink-protocol.devalue');
-	await chooseFirstSession(page);
-	await app.tabs.go('results');
+testKitchensink(
+	'shows warning dialog when exporting with metadata problems',
+	async ({ page, app }) => {
+		await chooseFirstSession(page);
+		await app.tabs.go('results');
 
-	await app.metadata.textbox('ohio respect').fill('16');
-	await app.metadata.textbox('ohio respect').blur();
-	await app.wait('200ms');
+		await app.metadata.textbox('ohio respect').fill('16');
+		await app.metadata.textbox('ohio respect').blur();
+		await app.wait('200ms');
 
-	await page.getByRole('button', { name: 'Archive ZIP' }).click();
-	const modal = app.modals.byTitle('Métadonnées incorrectes');
-	await assert(modal).toBeVisible();
-	await expect(modal).toMatchAriaSnapshot(`
+		await page.getByRole('button', { name: 'Archive ZIP' }).click();
+		const modal = app.modals.byTitle('Métadonnées incorrectes');
+		await assert(modal).toBeVisible();
+		await expect(modal).toMatchAriaSnapshot(`
 	  - dialog:
 	    - banner:
 	      - heading "Métadonnées incorrectes" [level=1]
@@ -305,39 +302,40 @@ test('shows warning dialog when exporting with metadata problems', async ({ page
 	      - button "Exporter quand même"
 	`);
 
-	let download = await waitForDownload(page, async () =>
-		modal.getByRole('button', { name: 'Exporter quand même' }).click()
-	);
+		let download = await waitForDownload(page, async () =>
+			modal.getByRole('button', { name: 'Exporter quand même' }).click()
+		);
 
-	expect(download.suggestedFilename()).toBe('results.zip');
+		expect(download.suggestedFilename()).toBe('results.zip');
 
-	const downloadShouldNotOccur = () =>
-		expect(true, { message: 'Download should not have occured' }).toBe(false);
+		const downloadShouldNotOccur = () =>
+			expect(true, { message: 'Download should not have occured' }).toBe(false);
 
-	page.on('download', downloadShouldNotOccur);
+		page.on('download', downloadShouldNotOccur);
 
-	await page.getByRole('button', { name: 'Archive ZIP' }).click();
-	await modal.getByRole('button', { name: 'Corriger' }).click();
-
-	// Correct the problem
-	await app.metadata.textbox('ohio respect').fill('3');
-	await app.metadata.textbox('ohio respect').blur();
-	await app.wait('200ms');
-
-	page.off('download', downloadShouldNotOccur);
-
-	download = await waitForDownload(page, async () => {
 		await page.getByRole('button', { name: 'Archive ZIP' }).click();
-		await app.wait('50ms');
-		await expect(modal).not.toBeVisible();
-	});
+		await modal.getByRole('button', { name: 'Corriger' }).click();
 
-	expect(download.suggestedFilename()).toBe('results.zip');
-});
+		// Correct the problem
+		await app.metadata.textbox('ohio respect').fill('3');
+		await app.metadata.textbox('ohio respect').blur();
+		await app.wait('200ms');
+
+		page.off('download', downloadShouldNotOccur);
+
+		download = await waitForDownload(page, async () => {
+			await page.getByRole('button', { name: 'Archive ZIP' }).click();
+			await app.wait('50ms');
+			await expect(modal).not.toBeVisible();
+		});
+
+		expect(download.suggestedFilename()).toBe('results.zip');
+	}
+);
 
 for (const width of [undefined, 1400, 1600]) {
 	test.describe(`with a ${width ?? 'default'}px-wide window`, () => {
-		test.use({ storageState: 'tests/fixtures/storage-states/kitchen-sink.json' })
+		test.use({ storageState: 'tests/fixtures/storage-states/kitchen-sink.json' });
 
 		test.beforeEach(async ({ page }) => {
 			if (!width) return;
@@ -352,7 +350,6 @@ for (const width of [undefined, 1400, 1600]) {
 			page,
 			app,
 		}) => {
-			// await loadDatabaseDump(page, 'db/kitchensink-protocol.devalue');
 			await chooseFirstSession(page);
 
 			// Make sure that going to the metadata form on results page does not remove metadata set in the session edit page

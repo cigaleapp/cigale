@@ -20,8 +20,9 @@ const photos = [
 const orders =
 	lightProtocol.metadata['io.github.cigaleapp.arthropods.example.light__order'].options;
 
+test.use({ storageState: 'tests/fixtures/storage-states/basic.json' });
+
 test.beforeEach(async ({ page, app }) => {
-	await loadDatabaseDump(page, 'db/basic.devalue');
 	await chooseFirstSession(page);
 	await app.tabs.go('import');
 
