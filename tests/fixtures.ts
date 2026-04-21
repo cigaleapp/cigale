@@ -414,7 +414,7 @@ export const test = base.extend<
 		{ scope: 'worker', auto: true },
 	],
 	forEachTest: [
-		async ({ page, context, app, baseURL }, use, info) => {
+		async ({ page, context, app }, use, info) => {
 			if (process.env.DEBUG_WORKERS) {
 				let wwcount = 0;
 				page.on('worker', (worker) => {
