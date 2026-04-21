@@ -1,5 +1,5 @@
 import { mkdir, rm } from 'node:fs/promises';
-import type { FixturePaths } from './filepaths.js';
+import path from 'node:path';
 import type { TempFilesFixture } from './fixtures/tempfiles.js';
 import type { NavigationTab, PredownloadedModel } from './utils/index.js';
 import type { Locator } from '@playwright/test';
@@ -17,8 +17,8 @@ import { safeJSONParse } from '$lib/utils';
 
 import _fullProtocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
 import lightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
+import { FixturePaths } from './filepaths.js';
 import { tempfiles } from './fixtures/tempfiles.js';
-import { dependsOnTags } from './utils/annotations.js';
 import {
 	confirmDeletionModal,
 	dumpDatabase,
@@ -167,12 +167,25 @@ export const test = base.extend<
 		tempfiles: TempFilesFixture;
 		handlers: Array<import('msw').AnyHandler>;
 		network: import('@msw/playwright').NetworkFixture;
-		storageState: FixturePaths.Absolute<FixturePaths.StorageStates>
+		setStorageState: (state: FixturePaths.StorageStates | 'empty') => Promise<void>;
+		storageState:
+			| FixturePaths.Absolute<FixturePaths.StorageStates>
+			| Exclude<import('playwright').BrowserContextOptions['storageState'], string>;
 	},
 	{ forEachWorker: void }
 >({
 	tempfiles,
 	handlers: [],
+	setStorageState({ context }, use) {
+		use(async (state) => {
+			if (state === 'empty') {
+				await context.setStorageState({ cookies: [], origins: [] });
+				return;
+			}
+
+			await context.setStorageState(path.join(FixturePaths.root, state));
+		});
+	},
 	network: [
 		async ({ context, handlers }, use) => {
 			const network = defineNetworkFixture({ context, handlers });
@@ -467,28 +480,6 @@ export const test = base.extend<
 			) {
 				await setHardwareConcurrency(page, 1);
 			}
-
-			await context.setStorageState({
-				cookies: [],
-				origins: [
-					{
-						origin: baseURL!,
-
-						localStorage: [
-							{
-								name: 'builtinProtocols',
-								value: JSON.stringify(
-									dependsOnTags(info, {
-										'@no-builtins': [],
-										'@real-protocol': [fullProtocol.source],
-										'': [lightProtocol.source],
-									})
-								),
-							},
-						],
-					},
-				],
-			});
 
 			if (!info.tags.includes('@blank')) {
 				await page.goto('./');

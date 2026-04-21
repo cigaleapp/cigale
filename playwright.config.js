@@ -10,13 +10,19 @@ import { formatISO9075 } from 'date-fns';
 /** @type {Project} */
 const setup = {
 	name: 'setup',
-	testMatch: /setup\/.*\.ts$/
+	testMatch: /setup\/.*\.ts$/,
 };
+
+const dependencies = dependsOnTarget({
+	live: ['setup'],
+	dev: [],
+	built: ['setup'],
+});
 
 /** @type {Project} */
 const chromium = {
 	name: 'chromium',
-	dependencies: ['setup'],
+	dependencies,
 	use: {
 		...devices['Desktop Chrome'],
 		launchOptions: {
@@ -35,14 +41,14 @@ const chromium = {
 /** @type {Project} */
 const firefox = {
 	name: 'firefox',
-	dependencies: ['setup'],
+	dependencies,
 	use: { ...devices['Desktop Firefox'] },
 };
 
 /** @type {Project} */
 const webkit = {
 	name: 'webkit',
-	dependencies: ['setup'],
+	dependencies,
 	use: {
 		...devices['Desktop Safari'],
 		launchOptions: {

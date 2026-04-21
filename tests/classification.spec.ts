@@ -38,10 +38,10 @@ test('allows cancelling classification of an observation', issue(430), async ({ 
 });
 
 test.describe('full-screen classification view', pr(1071), () => {
+	test.use({ storageState: 'tests/fixtures/storage-states/basic.json' });
+
 	test.beforeEach(async ({ page, app }) => {
 		await page.setViewportSize({ width: 1280, height: 800 });
-
-		await loadDatabaseDump(page, 'db/basic.devalue');
 
 		const speciesOfLilFella = lightweightProtocol.metadata[
 			'io.github.cigaleapp.arthropods.example.light__species'

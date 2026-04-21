@@ -4,6 +4,7 @@ import type { Page } from '@playwright/test';
 
 import { expect } from '@playwright/test';
 
+import lightProtocol from '../../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import { FixturePaths } from '../filepaths.js';
 import { exampleProtocol, test as setup } from '../fixtures.js';
 import {
@@ -25,7 +26,9 @@ setup('basic', async ({ page }) => {
 	// Prevent storing current session state in localStorage
 	await goHome(page);
 
-	await writeStorageState(page, 'storage-states/basic.json');
+	await writeStorageState(page, 'storage-states/basic.json', {
+		builtinProtocols: JSON.stringify([lightProtocol.source]),
+	});
 });
 
 setup('kitchensink-protocol', async ({ page, app }) => {
@@ -52,11 +55,24 @@ setup('kitchensink-protocol', async ({ page, app }) => {
 	// Prevent storing current session state in localStorage
 	await goHome(page);
 
-	await writeStorageState(page, 'storage-states/kitchen-sink.json');
+	await writeStorageState(page, 'storage-states/kitchen-sink.json', {
+		builtinProtocols: JSON.stringify([]),
+	});
 });
 
-async function writeStorageState(page: Page, filename: FixturePaths.StorageStates) {
+async function writeStorageState(
+	page: Page,
+	filename: FixturePaths.StorageStates,
+	localStorageOverrides?: Record<string, string>
+): Promise<void> {
 	const destination = path.join(FixturePaths.root, filename);
+
+	await page.evaluate((overrides) => {
+		if (!overrides) return;
+		for (const [key, value] of Object.entries(overrides)) {
+			localStorage.setItem(key, value);
+		}
+	}, localStorageOverrides);
 
 	mkdirSync(path.dirname(destination), { recursive: true });
 	await page.context().storageState({

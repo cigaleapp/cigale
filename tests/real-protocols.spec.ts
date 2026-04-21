@@ -10,6 +10,7 @@ import { importProtocol } from './utils/protocols.js';
 import { exportResults } from './utils/results.js';
 import { newSession } from './utils/sessions.js';
 
+// TODO: remove @real-protocol
 test('Entomoscope @real-protocol', async ({ app, page }) => {
 	await app.settings.set({ showTechnicalMetadata: false });
 	await goToProtocolManagement(page);

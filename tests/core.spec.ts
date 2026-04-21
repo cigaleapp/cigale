@@ -17,7 +17,6 @@ import {
 	exportResults,
 	firstObservationCard,
 	importPhotos,
-	loadDatabaseDump,
 	mockProtocolSourceURL,
 	mockUrl,
 	newSession,
@@ -242,54 +241,59 @@ test('can import a protocol via /protocols/import/url', async ({ page, app, cont
 	).toBeVisible();
 });
 
-test('can send a bug report', async ({ page, app, context }) => {
-	let requestBody: undefined | typeof IssueCreatorRequest.inferIn;
+test.describe('opened session', () => {
+	test.use({ storageState: 'tests/fixtures/storage-states/basic.json' });
 
-	await mockUrl(page, context, 'https://mkissue.cigale.gwen.works/**', async (route) => {
-		requestBody = route.request().postDataJSON();
-		await browserConsole.log(page, 'mocking route, body is', requestBody);
-		return {
-			json: {
-				url: 'https://example.com/issue/123',
-			},
-		};
+	test('can send a bug report', async ({ page, app, context }) => {
+		let requestBody: undefined | typeof IssueCreatorRequest.inferIn;
+
+		await mockUrl(page, context, 'https://mkissue.cigale.gwen.works/**', async (route) => {
+			requestBody = route.request().postDataJSON();
+			await browserConsole.log(page, 'mocking route, body is', requestBody);
+			return {
+				json: {
+					url: 'https://example.com/issue/123',
+				},
+			};
+		});
+
+		await chooseFirstSession(page);
+		await setInferenceModels(page, { crop: 'Aucune inférence' });
+		await app.tabs.go('crop');
+
+		const report = app.modals.byKey('modal_submit_issue_bug');
+
+		await page.getByTestId('open-bug-report').click();
+
+		await assert(report).toBeVisible();
+		await report
+			.getByRole('textbox', { name: 'Description' })
+			.fill('This is a test bug report.');
+		await report.getByRole('textbox', { name: 'Titre' }).fill('Test Bug Report');
+		await report.getByRole('button', { name: 'Envoyer' }).click();
+
+		await assert(
+			app.toasts.byMessage('success', 'Merci pour votre contribution!').getByRole('button', {
+				name: 'Voir',
+			})
+		).toHaveAttribute('href', 'https://example.com/issue/123');
+
+		expect(IssueCreatorRequest(requestBody)).not.toBeInstanceOf(ArkErrors);
+		expect(requestBody).toEqual({
+			title: 'Test Bug Report',
+			body: 'This is a test bug report.',
+			type: 'bug',
+			metadata: assert.objectContaining({
+				Route: '/(app)/(sidepanel)/crop' as const satisfies SvelteTypes.RouteId,
+				Protocol: assert.stringMatching(
+					// Version number depends on what was captured in the database dump
+					// TODO: use RegExp.escape once available (ie when VSCode ships with Node 24 ?? or something. Bun has it already, idk if it would work in CI yet)
+					new RegExp(`^${lightweightProtocol.id.replaceAll('.', '\\.')} v\\d+$`)
+				),
+				'Loaded objects': assert.stringMatching(
+					/^4 observations, 4 images, 1 sessions, \d+ metadatas, 1 protocols$/
+				),
+			}),
+		} satisfies typeof requestBody);
 	});
-
-	await loadDatabaseDump(page, 'db/basic.devalue');
-	await chooseFirstSession(page);
-	await setInferenceModels(page, { crop: 'Aucune inférence' });
-	await app.tabs.go('crop');
-
-	const report = app.modals.byKey('modal_submit_issue_bug');
-
-	await page.getByTestId('open-bug-report').click();
-
-	await assert(report).toBeVisible();
-	await report.getByRole('textbox', { name: 'Description' }).fill('This is a test bug report.');
-	await report.getByRole('textbox', { name: 'Titre' }).fill('Test Bug Report');
-	await report.getByRole('button', { name: 'Envoyer' }).click();
-
-	await assert(
-		app.toasts.byMessage('success', 'Merci pour votre contribution!').getByRole('button', {
-			name: 'Voir',
-		})
-	).toHaveAttribute('href', 'https://example.com/issue/123');
-
-	expect(IssueCreatorRequest(requestBody)).not.toBeInstanceOf(ArkErrors);
-	expect(requestBody).toEqual({
-		title: 'Test Bug Report',
-		body: 'This is a test bug report.',
-		type: 'bug',
-		metadata: assert.objectContaining({
-			Route: '/(app)/(sidepanel)/crop' as const satisfies SvelteTypes.RouteId,
-			Protocol: assert.stringMatching(
-				// Version number depends on what was captured in the database dump
-				// TODO: use RegExp.escape once available (ie when VSCode ships with Node 24 ?? or something. Bun has it already, idk if it would work in CI yet)
-				new RegExp(`^${lightweightProtocol.id.replaceAll('.', '\\.')} v\\d+$`)
-			),
-			'Loaded objects': assert.stringMatching(
-				/^4 observations, 4 images, 1 sessions, \d+ metadatas, 1 protocols$/
-			),
-		}),
-	} satisfies typeof requestBody);
 });

@@ -6,6 +6,8 @@ import { PerformanceMetricsCollector } from 'playwright-performance-metrics';
 
 import { assert, expect, test } from './fixtures.js';
 
+test.use({ storageState: { cookies: [], origins: [] } });
+
 benchmark(`startup @blank`, {
 	async run({ page, app }) {
 		await page.goto('./');

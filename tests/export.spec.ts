@@ -337,6 +337,8 @@ test('shows warning dialog when exporting with metadata problems', async ({ page
 
 for (const width of [undefined, 1400, 1600]) {
 	test.describe(`with a ${width ?? 'default'}px-wide window`, () => {
+		test.use({ storageState: 'tests/fixtures/storage-states/kitchen-sink.json' })
+
 		test.beforeEach(async ({ page }) => {
 			if (!width) return;
 			await page.setViewportSize({
@@ -345,11 +347,12 @@ for (const width of [undefined, 1400, 1600]) {
 			});
 		});
 
+		// TODO: remove @no-builtins
 		test.fixme('can change session metadata in results page @no-builtins', async ({
 			page,
 			app,
 		}) => {
-			await loadDatabaseDump(page, 'db/kitchensink-protocol.devalue');
+			// await loadDatabaseDump(page, 'db/kitchensink-protocol.devalue');
 			await chooseFirstSession(page);
 
 			// Make sure that going to the metadata form on results page does not remove metadata set in the session edit page
