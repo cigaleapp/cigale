@@ -11,7 +11,6 @@ const env = arkenv({
 	GITHUB_APP_KEY_FILE: 'string',
 	GITHUB_USERNAME: 'string > 0',
 	BOT_TOKEN: 'string > 0',
-	GUILD_ID: 'string.integer > 0',
 	GITHUB_REPOSITORY: [
 		regex('^(?<owner>[^/]+)/(?<repo>[^/]+)$'),
 		'=>',
@@ -41,33 +40,37 @@ const client = new DiscordJS.Client({
 
 client.on('clientReady', async () => {
 	console.info('Bot is ready.');
-	const guildId = process.env.GUILD_ID || '';
-
-	const guild = client.guilds.cache.get(guildId);
-	if (!guild) {
-		throw new Error('Guild not found');
+	const guilds = await client.guilds.fetch();
+	if (guilds.size === 0) {
+		console.warn('No guild found for command registration.');
+		return;
 	}
 
-	const commands = guild.commands;
+	for (const [guildId] of guilds) {
+		const guild = await client.guilds.fetch(guildId);
+		const commands = guild.commands;
 
-	for (const [, cmd] of await commands.fetch()) {
-		await commands.delete(cmd.id);
+		for (const [, cmd] of await commands.fetch()) {
+			await commands.delete(cmd.id);
+		}
+
+		await commands.create({
+			name: 'To Github Bug',
+			type: 3,
+		});
+
+		await commands.create({
+			name: 'To Github Feature Request',
+			type: 3,
+		});
+
+		await commands.create({
+			name: 'To Github Task',
+			type: 3,
+		});
+
+		console.info(`Registered commands for guild ${guildId}.`);
 	}
-
-	await commands.create({
-		name: 'To Github Bug',
-		type: 3,
-	});
-
-	await commands.create({
-		name: 'To Github Feature Request',
-		type: 3,
-	});
-
-	await commands.create({
-		name: 'To Github Task',
-		type: 3,
-	});
 });
 
 client.on('interactionCreate', async (interaction) => {
