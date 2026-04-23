@@ -1,5 +1,7 @@
+import { readFile, writeFile } from 'node:fs/promises';
 import type { AppFixture } from './fixtures.js';
 import type { Page, PlaywrightWorkerOptions } from '@playwright/test';
+import type { PerformanceMetrics } from 'playwright-performance-metrics';
 
 import { ms } from 'convert';
 import { PerformanceMetricsCollector } from 'playwright-performance-metrics';
@@ -73,20 +75,25 @@ function benchmark(
 			collector = new PerformanceMetricsCollector();
 		}
 
+		let end = 0,
+			start = 0;
+
 		await collectChromeDevtoolsTrace(page, testInfo, async () => {
-			const start = Date.now();
+			start = Date.now();
 
 			await run({ page, app });
 
-			const end = Date.now();
+			end = Date.now();
 
 			console.info('Total time:', end - start, 'ms');
 
 			expect(end - start).toBeLessThan(ms(limits.total[browserName]));
 		});
 
+		let metrics: PerformanceMetrics | undefined;
+
 		if (collector) {
-			const metrics = await collector.collectMetrics(page, {
+			metrics = await collector.collectMetrics(page, {
 				timeout: ms('10s'),
 			});
 
@@ -104,5 +111,25 @@ function benchmark(
 
 			console.info('Startup performance metrics:', metrics);
 		}
+
+		const filepath = 'metrics.json';
+		const existing: unknown[] = await readFile(filepath, 'utf-8')
+			.catch(() => '[]')
+			.then((content) => JSON.parse(content));
+
+		for (const [key, value] of Object.entries({ ...metrics, total: end - start })) {
+			if (typeof value !== 'number') continue;
+
+			existing.push({
+				test: testLabel,
+				browser: browserName,
+				metric: key,
+				title: `${browserName} / ${testLabel}: ${key}`,
+				value,
+				unit: key === 'total' ? 'ms' : '',
+			});
+		}
+
+		await writeFile(filepath, JSON.stringify(existing, null, 2));
 	});
 }

@@ -3,6 +3,7 @@ name: End-to-end tests
 permissions:
   actions: write
   contents: read
+  pull-requests: write
 
 on:
   workflow_call:
@@ -151,6 +152,8 @@ jobs:
           name: predownloaded-models
       - name: Remove task-type spec files for better sharding balance
         run: rm tests/tasks/*
+      - name: Initialize empty metrics.json (in case no tests wrote it in this shard)
+        run: echo "[]" > metrics.json
       - name: Run Playwright tests
         run: ${{ inputs.env }} bunx playwright test --shard=${{ matrix.shard-index}}/${{ matrix.shard-count }}
         env:
@@ -162,6 +165,12 @@ jobs:
         with:
           name: playwright-report-shard-${{ matrix.shard-index }}
           path: blob-report/
+          retention-days: 30
+      - uses: actions/upload-artifact@v7
+        if: ${{ !cancelled() }}
+        with:
+          name: performance-metrics-${{ matrix.shard-index }}
+          path: metrics.json
           retention-days: 30
 
   combine-reports:
@@ -178,14 +187,52 @@ jobs:
           pattern: playwright-report-shard-*
           merge-multiple: true
 
+      - uses: actions/download-artifact@v8
+        with:
+          path: ./performance-metrics
+          pattern: performance-metrics-*
+          merge-multiple: false
+
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version-file: .bun-version
+
+      - name: Merge performance metrics
+        run: |
+          # Merge all performance-metrics-*.json files into one metrics.json
+          bun run - <<'EOS'
+            import { Glob } from 'bun';
+
+            // Get all performance-metrics-*.json files
+            const result = []
+            const metrics = new Glob('./performance-metrics/**/metrics.json')
+
+            for await (const filepath of metrics.scan()) {
+              const content = await Bun.file(filepath).text()
+
+              try {
+                const json = JSON.parse(content)
+                if (Array.isArray(json)) {
+                  result.push(...json)
+                } else {
+                  console.warn(`File ${filepath} does not contain an array, skipping:`, json)
+                }
+              } catch (e) {
+                console.error(`Error parsing JSON from file ${filepath}:`, e)
+              }
+            }
+
+            // Write the merged results to a single metrics.json file
+            await Bun.file('./metrics.json').write(JSON.stringify(result))
+          EOS
 
       - name: Merge sharded reports into HTML
         run: bunx playwright merge-reports --reporter html ./playwright-report-shards
         env:
           NODE_OPTIONS: --max-old-space-size=4096
+
+      - name: Put metrics.json alongside report for dev-deployments workflow to pick up
+        run: mv metrics.json playwright-report/metrics.json
 
       - name: Save report
         if: ${{ !cancelled() }}
@@ -210,3 +257,74 @@ jobs:
       # #?show-metadata-other allows showing extra metadata sections in the report
       # Ref: https://github.com/microsoft/playwright/blob/e76ca6c/packages/html-reporter/src/metadataView.tsx#L62
       environment-url-append: '#?show-metadata-other'
+
+  compare-performance-with-main:
+    if: always() && github.event_name == 'pull_request'
+    name: Compare performance with main branch
+    needs: combine-reports
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: .bun-version
+      - name: Get head branch metrics
+        uses: actions/download-artifact@v8
+        with:
+          name: report
+          path: ./head-report
+
+      - name: Get base branch metrics
+        run: |
+          curl -sSL https://pr--reports.cigale.gwen.works/playwright/metrics.json > base-metrics.json
+
+      - name: Compare metrics
+        id: comparison
+        run: |
+          bun run - <<'EOS'
+            const headMetrics = await Bun.file('./head-report/metrics.json').text()
+              .then(contents => JSON.parse(contents))
+              .catch((err) => {
+                console.error(`Error parsing head metrics from file ./head-report/metrics.json:`, err);
+                return [];
+              })
+
+            const baseMetrics = await Bun.file('./base-metrics.json').text()
+              .then(contents => JSON.parse(contents))
+              .catch((err) => {
+                console.error(`Error parsing base metrics from file ./base-metrics.json:`, err);
+                return [];
+              })
+
+            let comment = "## Performance changes with [`main`](https://github.com/${{ github.repository }}/tree/main)\n\n"
+
+            // Prepare markdown table for sticky PR comment message
+            comment += '| Metric | Base | Head | Change |\n';
+            comment += '| --- | --- | --- | --- |\n';
+
+
+            for (const head of headMetrics) {
+              const base = baseMetrics.find(m => m.title === head.title);
+
+              const fmt = (value) => new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2 }).format(value) + " " + head.unit;
+
+              if (base) {
+                const change = head.value - base.value;
+                const trend = change>0 ? '🔺' : (change<0 ? '🔻' : '');
+                comment += `| ${head.title} | ${fmt(base.value)} | ${fmt(head.value)} | ${trend + fmt(change)} |\n`;
+              } else {
+                comment += `| ${head.title} | N/A | ${fmt(head.value)} | N/A |\n`;
+              }
+            }
+
+            // Write to $GITHUB_OUTPUT to pass to next step
+            const output = Bun.file(process.env.GITHUB_OUTPUT);
+
+            await output.write(`comment<<EOF\n${comment}\nEOF\n`);
+          EOS
+
+      - name: Post comment to PR
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: ⚡ Performance changes
+          message: ${{ steps.comparison.outputs.comment }}
