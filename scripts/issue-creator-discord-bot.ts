@@ -11,7 +11,6 @@ const env = arkenv({
 	GITHUB_APP_KEY_FILE: 'string',
 	GITHUB_USERNAME: 'string > 0',
 	BOT_TOKEN: 'string > 0',
-	GUILD_ID: 'string.integer > 0',
 	GITHUB_REPOSITORY: [
 		regex('^(?<owner>[^/]+)/(?<repo>[^/]+)$'),
 		'=>',
@@ -35,39 +34,59 @@ const { owner, repo } = env.GITHUB_REPOSITORY;
 const { data: repository } = await gh.rest.repos.get({ owner, repo });
 console.info(`Acting on ${repository.full_name}`);
 
+type IssueField = {
+	name: string;
+	description: string | null;
+	data_type: 'text' | 'date' | 'single_select' | 'number';
+	id: number;
+} & (
+	| { data_type: 'text' | 'date' | 'number' }
+	| { data_type: 'single_select'; options: Array<{ id: number; name: string; color: string }> }
+);
+
+const { data: issueFields }: { data: IssueField[] } = await gh
+	.request('GET /orgs/{org}/issue-fields', { org: owner })
+	.catch(() => ({
+		data: [] as IssueField[],
+	}));
+
 const client = new DiscordJS.Client({
 	intents: ['Guilds', 'GuildMessages'],
 });
 
 client.on('clientReady', async () => {
 	console.info('Bot is ready.');
-	const guildId = process.env.GUILD_ID || '';
-
-	const guild = client.guilds.cache.get(guildId);
-	if (!guild) {
-		throw new Error('Guild not found');
+	const guilds = await client.guilds.fetch();
+	if (guilds.size === 0) {
+		console.warn('No guild found for command registration.');
+		return;
 	}
 
-	const commands = guild.commands;
+	for (const [guildId] of guilds) {
+		const guild = await client.guilds.fetch(guildId);
+		const commands = guild.commands;
 
-	for (const [, cmd] of await commands.fetch()) {
-		await commands.delete(cmd.id);
+		for (const [, cmd] of await commands.fetch()) {
+			await commands.delete(cmd.id);
+		}
+
+		await commands.create({
+			name: 'To Github Bug',
+			type: 3,
+		});
+
+		await commands.create({
+			name: 'To Github Feature Request',
+			type: 3,
+		});
+
+		await commands.create({
+			name: 'To Github Task',
+			type: 3,
+		});
+
+		console.info(`Registered commands for guild ${guildId}.`);
 	}
-
-	await commands.create({
-		name: 'To Github Bug',
-		type: 3,
-	});
-
-	await commands.create({
-		name: 'To Github Feature Request',
-		type: 3,
-	});
-
-	await commands.create({
-		name: 'To Github Task',
-		type: 3,
-	});
 });
 
 client.on('interactionCreate', async (interaction) => {
@@ -114,9 +133,12 @@ client.on('interactionCreate', async (interaction) => {
 		const [milestone] = fields.fields.has('milestone')
 			? fields.getStringSelectValues('milestone')
 			: [];
-		const [assignee] = fields.fields.has('assignee')
-			? fields.getStringSelectValues('assignee')
+		const customFields = fields.fields.has('customFields')
+			? fields.getStringSelectValues('customFields')
 			: [];
+		// const [assignee] = fields.fields.has('assignee')
+		// 	? fields.getStringSelectValues('assignee')
+		// 	: [];
 
 		const type =
 			{
@@ -131,8 +153,8 @@ client.on('interactionCreate', async (interaction) => {
 			body,
 			labels,
 			milestone,
-			assignee,
 			type,
+			customFields,
 		});
 
 		const { data: issue } = await gh.rest.issues.create({
@@ -141,9 +163,20 @@ client.on('interactionCreate', async (interaction) => {
 			title,
 			body,
 			milestone,
-			assignee,
 			labels: [...labels],
 			type,
+		});
+
+		await gh.request('POST /repos/{owner}/{repo}/issues/{issue_number}/issue-field-values', {
+			owner,
+			repo,
+			issue_number: issue.number,
+			issue_field_values: customFields.map((fieldString) => {
+				const [name, value] = fieldString.split(' = ');
+				const field_id = issueFields.find((f) => f.name === name)?.id;
+				if (!field_id) throw new Error(`Custom field ${name} not found`);
+				return { field_id, value };
+			}),
 		});
 
 		await interaction.reply(`[Created #${issue.number}](${issue.html_url})`);
@@ -158,7 +191,6 @@ export const getModal = ({
 	message,
 	labels,
 	milestones,
-	collaborators,
 }: {
 	id: string;
 	user: DiscordJS.User;
@@ -185,12 +217,16 @@ export const getModal = ({
 		}),
 		Labels: selectMultipleMenu('labels', labels),
 		Milestone: selectOneMenu('milestone', milestones),
-		Assignee: selectOneMenu(
-			'assignee',
-			collaborators.map(({ login, name }) => ({
-				name: login,
-				description: name ?? null,
-			}))
+		'Custom fields': selectMultipleMenu(
+			'customFields',
+			issueFields
+				.filter((field) => field.data_type === 'single_select')
+				.flatMap(({ name, options, description }) =>
+					options.map((option) => ({
+						name: `${name} = ${option.name}`,
+						description,
+					}))
+				)
 		),
 	});
 };
