@@ -470,6 +470,7 @@ export async function openDatabase() {
 	// @ts-ignore
 	const tablesByName = Object.entries(Tables);
 
+	console.debug('Opening database', databaseName, 'revision', databaseRevision);
 	_database = await openDB(databaseName, databaseRevision, {
 		upgrade(db, oldVersion, _newVersion, tx) {
 			/**
