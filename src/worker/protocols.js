@@ -10,7 +10,7 @@ import { resolveProtocolImports } from '$lib/metadata/imports.js';
 import { compareProtocolWithUpstream } from '$lib/protocols.js';
 import { metadataOptionId, namespacedMetadataId } from '$lib/schemas/metadata.js';
 import { ExportedProtocol } from '$lib/schemas/protocols.js';
-import { entries, keys, omit, pick, prefixIDBKeyRange } from '$lib/utils.js';
+import { entries, keys, omit, orEmptyObj3, pick, prefixIDBKeyRange } from '$lib/utils.js';
 
 import { openDatabase, swarp } from './index.js';
 
@@ -19,12 +19,20 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 	/** @type {Set<string>} */
 	const iconsToPreload = new Set();
 
+	let total = 1;
+	let done = 0;
+
 	/**
 	 * @param {typeof import('./procedures.js').PROCEDURES.importProtocol.progress.infer.phase} phase
 	 * @param {string} [detail]
 	 */
 	const onLoadingState = (phase, detail) => {
-		onProgress(detail ? { phase, detail } : { phase });
+		onProgress({
+			done,
+			total,
+			phase,
+			...orEmptyObj3('detail', detail),
+		});
 	};
 
 	onLoadingState('parsing');
@@ -47,6 +55,8 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 	console.timeEnd('Resolve imports');
 
 	const tx = db.transaction(['Protocol', 'Metadata', 'MetadataOption'], 'readwrite');
+
+	total += importedProtocols.length;
 
 	for (const p of [...importedProtocols, protocol]) {
 		const exists = await tx.objectStore('Protocol').get(p.id);
@@ -120,10 +130,11 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 		});
 		console.timeEnd('Storing Protocol');
 
-		for (const [id, metadata] of entries({
-			...p.metadata,
-			...p.sessionMetadata,
-		})) {
+		const metadataToImport = { ...p.metadata, ...p.sessionMetadata };
+
+		total += keys(metadataToImport).length;
+		for (const [id, metadata] of entries(metadataToImport)) {
+			done++;
 			if (typeof metadata === 'string') continue;
 
 			onLoadingState('write-metadata', metadata.label || id);
@@ -132,16 +143,18 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 			console.timeEnd(`Storing Metadata ${id}`);
 
 			console.time(`Storing Metadata Options for ${id}`);
-			const total = metadata.options?.length ?? 0;
-			let done = 0;
+			const oTotal = metadata.options?.length ?? 0;
+			total += oTotal;
 			for (const [i, option] of metadata.options?.entries() ?? []) {
 				done++;
-				if (done % 1000 === 0) {
+
+				if (i % 1000 === 0) {
 					onLoadingState(
 						'write-metadata-options',
-						`${metadata.label || id} > ${option.label || option.key} (${done}/${total})`
+						`${metadata.label || id} > ${option.label || option.key} (${i + 1}/${total})`
 					);
 				}
+
 				tx.objectStore('MetadataOption').put({
 					id: metadataOptionId(namespacedMetadataId(p.id, id), option.key),
 					metadataId: namespacedMetadataId(p.id, id),
@@ -162,6 +175,8 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 				iconsToPreload: [...iconsToPreload],
 			};
 		}
+
+		done++;
 	}
 
 	throw 'unreachable';

@@ -25,7 +25,7 @@
 			}
 
 			#loading .spinner {
-				--size: 40px;
+				--size: var(--spinner-size);
 				width: var(--size);
 				height: var(--size);
 
@@ -62,6 +62,47 @@
 				color: gray;
 			}
 
+			#loading .progress-indicator {
+				width: 100%;
+				max-width: 600px;
+				--spinner-size: 40px;
+				height: var(--spinner-size);
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
+
+				progress:not([value]) {
+					display: none;
+				}
+
+				progress[value] + .spinner {
+					display: none;
+				}
+			}
+
+			#loading progress {
+				width: calc(100% - 20px);
+				height: 5px;
+				border-radius: 0;
+				border: 0;
+
+				appearance: none;
+				-webkit-appearance: none;
+
+				background: rgb(from var(--fg-neutral, white) r g b / 25%);
+
+				&::-webkit-progress-value {
+					background: var(--fg-neutral, white);
+					transition: width 0.5s;
+				}
+
+				&::-moz-progress-bar {
+					background: var(--fg-neutral, white);
+					transition: width 0.5s;
+				}
+			}
+
 			@keyframes spinner {
 				0% {
 					rotate: 0deg;
@@ -81,9 +122,12 @@
 	</head>
 	<body data-sveltekit-preload-data="hover">
 		<div id="loading">
-			<svg class="spinner" height="40" width="40" viewBox="0 0 40 40">
-				<circle cx="20" cy="20" r="18"></circle>
-			</svg>
+			<div class="progress-indicator">
+				<progress></progress>
+				<svg class="spinner" height="40" width="40" viewBox="0 0 40 40">
+					<circle cx="20" cy="20" r="18"></circle>
+				</svg>
+			</div>
 			<p>
 				<!-- Set dynamically because i18n -->
 				<span id="loading-title"></span>

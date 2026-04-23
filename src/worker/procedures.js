@@ -7,11 +7,10 @@ import { type } from 'arktype';
 import { Schemas } from '$lib/database.js';
 import { NodeProvenance } from '$lib/file-tree.js';
 
-
 export const LOCAL_STORAGE = type({
-	databaseName: "string",
-	databaseRevision: "string.integer.parse",
-})
+	databaseName: 'string',
+	databaseRevision: 'string.integer.parse',
+});
 
 /**
  * @typedef {typeof LOCAL_STORAGE['infer']} LocalStorage
@@ -82,6 +81,8 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 			isJSON: 'boolean = false',
 		}),
 		progress: type({
+			done: 'number >= 0',
+			total: 'number > 0',
 			phase: type.enumerated(
 				'parsing',
 				'filtering-builtin-metadata',
