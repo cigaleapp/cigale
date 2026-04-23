@@ -72,7 +72,7 @@ test('can auto-update a protocol', async ({ page, app }) => {
 	const { newVersion } = await setup({ page, app }, true);
 
 	await assert(
-		app.toasts.byMessage('info', 'Protocole "Example: arthropodes (lightweight)" mis à jour')
+		app.toasts.byMessage('info', /Protocole "Example: arthropodes (lightweight)" mis à jour à la v\d+/)
 	).toBeVisible({ timeout: ms('15s') });
 
 	const protocol = await app.db.protocol.byName('Example: arthropodes (lightweight)');
@@ -83,7 +83,7 @@ test('does not auto-update when disabled', async ({ page, app }) => {
 	const { oldVersion } = await setup({ page, app }, false);
 
 	await assert(
-		app.toasts.byMessage('info', 'Protocole "Example: arthropodes (lightweight)" mis à jour')
+		app.toasts.byMessage('info', /Protocole "Example: arthropodes (lightweight)" mis à jour à la v\d+/)
 	).not.toBeVisible({
 		timeout: 3000,
 	});

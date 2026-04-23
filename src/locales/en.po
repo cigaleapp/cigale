@@ -2427,11 +2427,6 @@ msgstr ""
 msgid "Permet de changer la valeur d'autres métadonnées quand cette option est choisie. Peut être pratique pour représenter des taxonomies, ajouter des attributs à une métadonnée, etc."
 msgstr ""
 
-#. 0: updates[0].name
-#: src/routes/(app)/+layout.js
-msgid "Protocole \"{0}\" mis à jour"
-msgstr ""
-
 #: src/lib/idb.svelte.js
 msgid "Initialize reactive table"
 msgstr ""
@@ -2479,4 +2474,9 @@ msgstr ""
 
 #: src/routes/(app)/+layout.js
 msgid "Load built-in protocols"
+msgstr ""
+
+#. 0: updates[0].name; 1: updates[0].version
+#: src/routes/(app)/+layout.js
+msgid "Protocole \"{0}\" mis à jour à la v{1}"
 msgstr ""

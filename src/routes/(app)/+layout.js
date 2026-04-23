@@ -153,7 +153,7 @@ export async function load({ url }) {
 		if (updates.length === 0) return;
 		toasts.info(
 			updates.length === 1
-				? `Protocole "${updates[0].name}" mis à jour`
+				? `Protocole "${updates[0].name}" mis à jour à la v${updates[0].version}`
 				: `${updates.length} protocoles ont été mis à jour: ${updates.map((u) => `"${u.name}"`).join(', ')}`
 		);
 	});
