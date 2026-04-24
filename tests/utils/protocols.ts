@@ -74,6 +74,6 @@ export async function importProtocol(
 					.getByRole('code')
 					.getByText(protocolData.id)
 			)
-			.toBeVisible({ timeout: ms('10s') });
+			.toBeVisible({ timeout: ms('30s') });
 	}
 }

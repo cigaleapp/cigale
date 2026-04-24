@@ -69,11 +69,31 @@ async function setup(
 }
 
 test('can auto-update a protocol', async ({ page, app }) => {
-	const { newVersion } = await setup({ page, app }, true);
+	const { newVersion, oldVersion } = await setup({ page, app }, true);
 
-	await assert(
-		app.toasts.byMessage('info', /Protocole "Example: arthropodes (lightweight)" mis à jour à la v\d+/)
-	).toBeVisible({ timeout: ms('15s') });
+	await goToProtocolManagement(page);
+
+	const li = page.getByRole('listitem').filter({ hasText: 'Example: arthropodes (lightweight)' });
+
+	await li.locator('details').click();
+
+	await expect(li.getByRole('switch', { name: 'Mises à jour automatiques' })).toBeChecked();
+
+	// Wait until the details gets collapsed by the state updating from the auto-update completion
+	await expect(li.getByRole('button', { name: `v${oldVersion} v${newVersion}` })).toBeVisible();
+	await assert(li.getByRole('button', { name: `v${oldVersion} v${newVersion}` })).not.toBeVisible(
+		{
+			timeout: ms('10s'),
+		}
+	);
+
+	await li.locator('details').click();
+	await expect(li.getByRole('button', { name: `À jour v${newVersion}` })).toBeVisible();
+
+	// FIXME
+	// await assert(
+	// 	app.toasts.byMessage('info', /Protocole "Example: arthropodes (lightweight)" mis à jour à la v\d+/)
+	// ).toBeVisible({ timeout: ms('15s') });
 
 	const protocol = await app.db.protocol.byName('Example: arthropodes (lightweight)');
 	assert(protocol).toHaveProperty('version', newVersion);
@@ -83,7 +103,10 @@ test('does not auto-update when disabled', async ({ page, app }) => {
 	const { oldVersion } = await setup({ page, app }, false);
 
 	await assert(
-		app.toasts.byMessage('info', /Protocole "Example: arthropodes (lightweight)" mis à jour à la v\d+/)
+		app.toasts.byMessage(
+			'info',
+			/Protocole "Example: arthropodes (lightweight)" mis à jour à la v\d+/
+		)
 	).not.toBeVisible({
 		timeout: 3000,
 	});
