@@ -52,7 +52,14 @@ export async function collectChromeDevtoolsTrace(
 			async end(track, label, data = {}) {
 				await page.evaluate(
 					({ track, label, data }) => {
-						console.debug('[Playwright custom tracing]', 'End', track, '/', label, data);
+						console.debug(
+							'[Playwright custom tracing]',
+							'End',
+							track,
+							'/',
+							label,
+							data
+						);
 						performance.measure(label, {
 							start: label,
 							detail: {

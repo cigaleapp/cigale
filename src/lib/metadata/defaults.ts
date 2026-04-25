@@ -424,9 +424,9 @@ if (import.meta.vitest) {
 				{ id: 'proto__label', type: 'string', default: { render: renderFn } },
 			]);
 
-			// Son 😭😭😭  w/o this call the mock resolves to a [] within the func call 
+			// Son 😭😭😭  w/o this call the mock resolves to a [] within the func call
 			// im crine
-			await _tables.Metadata.getMany()
+			await _tables.Metadata.getMany();
 
 			await resolveDefaults({
 				db,
