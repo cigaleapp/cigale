@@ -569,6 +569,7 @@
 	) {
 		display: flex;
 		align-items: center;
+		max-width: 30vw;
 
 		&:not(:has(.underscored)) {
 			border-bottom: 2px dashed var(--fg-neutral);

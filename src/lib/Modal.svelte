@@ -36,7 +36,9 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 	import { page } from '$app/state';
 	import { toasts } from '$lib/toasts.svelte.js';
 
+	import BottomDrawer from './BottomDrawer.svelte';
 	import ButtonIcon from './ButtonIcon.svelte';
+	import { IsMobile } from './mobile.svelte.js';
 	import ModalToasts from './ModalToasts.svelte';
 	import { getColorScheme } from './settings.svelte.js';
 	import { insideBoundingClientRect } from './utils.js';
@@ -100,60 +102,91 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 				break;
 		}
 	});
+
+	const mobile = new IsMobile();
 </script>
 
-<dialog
-	data-key={stateKey}
-	// Somehow page.state[stateKey] can be undefined sometimes
-	aria-hidden={page.state[stateKey] === false}
-	style:color-scheme={getColorScheme()}
-	bind:this={modalElement}
-	onclose={() => {
-		// Update state when dialog is closed via browser-controlled means (e.g. Esc key)
-		pushState('', { [stateKey]: false });
-	}}
-	onmousedown={({ target, currentTarget, offsetX, offsetY }) => {
-		// If we're close enough to the edge of the dialog but still "inside", don't close, because target === currentTarget but it's not the backdrop yet (see #469)
-		if (
-			insideBoundingClientRect(
-				{ offsetX, offsetY },
-				currentTarget.getBoundingClientRect(),
-				20
-			)
-		) {
-			return;
+{#if mobile.current}
+	<BottomDrawer
+	maxHeight={0.75}
+		bind:open={
+			() => page.state[stateKey] === true, (isOpen) => pushState('', { [stateKey]: isOpen })
 		}
-		// Close on backdrop click
-		if (target === currentTarget && !opening) close?.();
-	}}
->
-	<header>
-		<h1>{title}</h1>
-		<ButtonIcon
-			help="Fermer"
-			onclick={() => {
-				close?.();
-			}}
-		>
-			<IconClose />
-		</ButtonIcon>
-	</header>
-	<div class="contents">
-		{@render children({ close })}
-	</div>
+	>
+		<header class="mobile">
+			<p>{title}</p>
+		</header>
 
-	{#if toastsPool}
-		<section class="toasts">
-			<ModalToasts pool={toastsPool} />
-		</section>
-	{/if}
+		<div class="contents">
+			{@render children({ close })}
+		</div>
 
-	{#if footer}
-		<footer>
-			{@render footer({ close })}
-		</footer>
-	{/if}
-</dialog>
+		{#if toastsPool}
+			<section class="toasts">
+				<ModalToasts pool={toastsPool} />
+			</section>
+		{/if}
+
+		{#if footer}
+			<footer>
+				{@render footer({ close })}
+			</footer>
+		{/if}
+	</BottomDrawer>
+{:else}
+	<dialog
+		data-key={stateKey}
+		// Somehow page.state[stateKey] can be undefined sometimes
+		aria-hidden={page.state[stateKey] === false}
+		style:color-scheme={getColorScheme()}
+		bind:this={modalElement}
+		onclose={() => {
+			// Update state when dialog is closed via browser-controlled means (e.g. Esc key)
+			pushState('', { [stateKey]: false });
+		}}
+		onmousedown={({ target, currentTarget, offsetX, offsetY }) => {
+			// If we're close enough to the edge of the dialog but still "inside", don't close, because target === currentTarget but it's not the backdrop yet (see #469)
+			if (
+				insideBoundingClientRect(
+					{ offsetX, offsetY },
+					currentTarget.getBoundingClientRect(),
+					20
+				)
+			) {
+				return;
+			}
+			// Close on backdrop click
+			if (target === currentTarget && !opening) close?.();
+		}}
+	>
+		<header>
+			<h1>{title}</h1>
+			<ButtonIcon
+				help="Fermer"
+				onclick={() => {
+					close?.();
+				}}
+			>
+				<IconClose />
+			</ButtonIcon>
+		</header>
+		<div class="contents">
+			{@render children({ close })}
+		</div>
+
+		{#if toastsPool}
+			<section class="toasts">
+				<ModalToasts pool={toastsPool} />
+			</section>
+		{/if}
+
+		{#if footer}
+			<footer>
+				{@render footer({ close })}
+			</footer>
+		{/if}
+	</dialog>
+{/if}
 
 <style>
 	dialog {
@@ -200,6 +233,11 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
+
+		&.mobile {
+			justify-content: center;
+			margin-bottom: 2em;
+		}
 	}
 
 	.contents {
@@ -210,6 +248,7 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 	}
 
 	footer {
+		padding-top: 2rem;
 		margin-top: auto;
 		display: flex;
 		flex-direction: var(--footer-direction, row);

@@ -58,7 +58,7 @@
 					{/if} -->
 					{name}
 				</h3>
-				<small><code>{id}</code></small>
+				<small><OverflowableText tag="code" text={id} /></small>
 			</section>
 			<section class="actions">
 				<ButtonIcon
@@ -142,6 +142,12 @@
 		gap: 0.5em;
 	}
 
+	.more-actions {
+		@media (max-width: 600px) {
+			flex-wrap: wrap;
+		}
+	}
+
 	details {
 		padding: 1em;
 		border-radius: var(--corner-radius);
@@ -159,9 +165,14 @@
 	summary {
 		display: flex;
 		justify-content: space-between;
+		gap: 1em;
 
 		&::marker {
 			display: none;
+		}
+
+		.text {
+			width: 70%;
 		}
 	}
 

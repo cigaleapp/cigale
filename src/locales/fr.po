@@ -21,6 +21,7 @@ msgid "<0/> Chargement…"
 msgstr "<0/> Chargement…"
 
 #: src/routes/(app)/protocols/+page.svelte
+#: src/routes/(app)/sessions/+page.svelte
 msgid "<0/> Créer"
 msgstr "<0/> Créer"
 
@@ -105,6 +106,7 @@ msgstr "API de GBIF"
 msgid "ATTENTION: SUPPRIME TOUTES VOS DONNÉES"
 msgstr "ATTENTION: SUPPRIME TOUTES VOS DONNÉES"
 
+#: src/routes/(app)/Navigation.svelte
 #: src/routes/+error.svelte
 msgid "Accueil"
 msgstr "Accueil"
@@ -620,6 +622,7 @@ msgstr "Protocole supprimé"
 msgid "Protocole “{0}” importé"
 msgstr "Protocole “{0}” importé"
 
+#: src/routes/(app)/Navigation.svelte
 #: src/routes/(app)/protocols/+page.svelte
 msgid "Protocoles"
 msgstr "Protocoles"
@@ -676,6 +679,7 @@ msgstr "Revenir au recadrage d'origine"
 msgid "Revenir au recadrage d'origine pour toutes les boîtes"
 msgstr "Revenir au recadrage d'origine pour toutes les boîtes"
 
+#: src/routes/(app)/Navigation.svelte
 #: src/routes/(app)/Settings.svelte
 msgid "Réglages"
 msgstr "Réglages"
@@ -1672,14 +1676,6 @@ msgstr "Protocoles <0/>"
 msgid "Sessions"
 msgstr "Sessions"
 
-#: src/routes/(app)/sessions/+page.svelte
-msgid "<0/> Importer un export .zip"
-msgstr "<0/> Importer un export .zip"
-
-#: src/routes/(app)/sessions/+page.svelte
-msgid "<0/> Nouvelle session"
-msgstr "<0/> Nouvelle session"
-
 #: src/routes/(app)/sessions/[id]/+page.svelte
 msgid "Ouvrir la session"
 msgstr "Ouvrir la session"
@@ -2245,6 +2241,7 @@ msgstr "Se connecter"
 msgid "Token"
 msgstr "Token"
 
+#: src/routes/(app)/Navigation.svelte
 #: src/routes/(app)/accounts/+page.svelte
 msgid "Comptes"
 msgstr "Comptes"
@@ -2485,3 +2482,11 @@ msgstr "Protocole \"{0}\" mis à jour à la v{1}"
 #: src/lib/i18n.js
 msgid "Error: "
 msgstr "Error: "
+
+#: src/routes/(app)/sessions/+page.svelte
+msgid "<0/> Importer .zip"
+msgstr "<0/> Importer .zip"
+
+#: src/routes/(app)/(sidepanel)/+layout.svelte
+msgid "Toutes les sessions"
+msgstr "Toutes les sessions"

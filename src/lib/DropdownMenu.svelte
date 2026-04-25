@@ -45,6 +45,10 @@
 
 	import { DropdownMenu } from 'bits-ui';
 
+	import BottomDrawer from './BottomDrawer.svelte';
+	import { IsMobile } from './mobile.svelte.js';
+	import Submenu from './Submenu.svelte';
+
 	interface Props {
 		items: ItemsGroup<D, SD>[];
 		item?: Snippet<[AnyItem<D, SD>['data'], AnyItem<D, SD> & { selected: boolean }]>;
@@ -64,134 +68,189 @@
 	}
 
 	let open = $state(false);
+
+	const mobile = new IsMobile();
 </script>
 
-<DropdownMenu.Root {open}>
-	<DropdownMenu.Trigger {...rest} data-testid={testids(testid).trigger}>
-		{#snippet child({ props })}
-			{@render trigger(
-				{
-					...props,
-					onclick: () => {
-						open = !open;
-					},
-				},
-				{}
+{#if mobile.current}
+	{@render trigger(
+		{
+			onclick: () => {
+				open = !open;
+			},
+		},
+		{}
+	)}
+
+	<BottomDrawer bind:open maxHeight={0.6}>
+		<Submenu
+			items={groups.flatMap((group) =>
+				group.items.map((item, i) => ({
+					label: item.label,
+					data: { ...item, i, groupTitle: i === 0 ? group.label : undefined, group },
+				}))
 			)}
-		{/snippet}
-	</DropdownMenu.Trigger>
+		>
+			{#snippet item(i)}
+				{#if i.groupTitle}
+					<p class="bottom-drawer-heading">{i.groupTitle}</p>
+				{/if}
+				<button
+					class="bottom-drawer-item"
+					onclick={() => {
+						if (i.type === 'submenu') {
+							//TODO
+						} else {
+							i.onclick();
+						}
 
-	<DropdownMenu.Portal>
-		<DropdownMenu.Content data-testid={testids(testid).content} preventScroll={!scrollable}>
-			{#each groups as group (group.label)}
-				{#if group.items.length > 0}
-					<DropdownMenu.Group data-testid={group.testid}>
-						{#if group.label}
-							<DropdownMenu.GroupHeading>{group.label}</DropdownMenu.GroupHeading>
+						open = false;
+					}}
+				>
+					{#if i.type === 'clickable'}
+						{#if item}
+							{@render item(i.data, { selected: false, ...i })}
+						{:else}
+							{i.label}
 						{/if}
+					{:else if item}
+						{@render item(i.data, i)}
+					{:else}
+						{i.label}
+					{/if}
+				</button>
+			{/snippet}
+		</Submenu>
+	</BottomDrawer>
+{:else}
+	<DropdownMenu.Root {open}>
+		<DropdownMenu.Trigger {...rest} data-testid={testids(testid).trigger}>
+			{#snippet child({ props })}
+				{@render trigger(
+					{
+						...props,
+						onclick: () => {
+							open = !open;
+						},
+					},
+					{}
+				)}
+			{/snippet}
+		</DropdownMenu.Trigger>
 
-						{#each group.items as i (i.label)}
-							{#if i.type === 'clickable'}
-								<DropdownMenu.Item
-									textValue={i.label}
-									onSelect={i.onclick}
-									closeOnSelect={i.closeOnSelect ?? true}
-									aria-label={i.label}
-								>
-									{#if item}
-										{@render item(i.data, { selected: false, ...i })}
-									{:else}
-										{i.label}
-									{/if}
-								</DropdownMenu.Item>
-							{:else if i.type === 'selectable'}
-								<DropdownMenu.CheckboxItem
-									checked={i.selected}
-									onSelect={i.onclick}
-									closeOnSelect={i.closeOnSelect ?? true}
-									value={i.key.toString()}
-									textValue={i.label}
-									aria-label={i.label}
-								>
-									{#if item}
-										{@render item(i.data, i)}
-									{:else}
-										{i.label}
-									{/if}
-								</DropdownMenu.CheckboxItem>
-							{:else if i.type === 'submenu'}
-								<DropdownMenu.Sub>
-									<DropdownMenu.SubTrigger
-										data-testid={testids(i.testid).trigger}
+		<DropdownMenu.Portal>
+			<DropdownMenu.Content data-testid={testids(testid).content} preventScroll={!scrollable}>
+				{#each groups as group (group.label)}
+					{#if group.items.length > 0}
+						<DropdownMenu.Group data-testid={group.testid}>
+							{#if group.label}
+								<DropdownMenu.GroupHeading>{group.label}</DropdownMenu.GroupHeading>
+							{/if}
+
+							{#each group.items as i (i.label)}
+								{#if i.type === 'clickable'}
+									<DropdownMenu.Item
+										textValue={i.label}
+										onSelect={i.onclick}
+										closeOnSelect={i.closeOnSelect ?? true}
+										aria-label={i.label}
 									>
 										{#if item}
 											{@render item(i.data, { selected: false, ...i })}
 										{:else}
 											{i.label}
 										{/if}
-									</DropdownMenu.SubTrigger>
-									<DropdownMenu.SubContent
-										data-testid={testids(i.testid).content}
+									</DropdownMenu.Item>
+								{:else if i.type === 'selectable'}
+									<DropdownMenu.CheckboxItem
+										checked={i.selected}
+										onSelect={i.onclick}
+										closeOnSelect={i.closeOnSelect ?? true}
+										value={i.key.toString()}
+										textValue={i.label}
+										aria-label={i.label}
 									>
-										<DropdownMenu.Group>
-											{#if i.submenu.label}
-												<DropdownMenu.GroupHeading
-													>{i.submenu.label}</DropdownMenu.GroupHeading
-												>
-											{/if}
-
-											{#each i.submenu.items as j (j.label)}
-												{#if j.type === 'clickable'}
-													<DropdownMenu.Item
-														textValue={j.label}
-														onSelect={j.onclick}
-														closeOnSelect={j.closeOnSelect ?? true}
-														aria-label={j.label}
-													>
-														{#if item}
-															{@render item(j.data, {
-																...j,
-																selected: false,
-															})}
-														{:else}
-															{j.label}
-														{/if}
-													</DropdownMenu.Item>
-												{:else if j.type === 'selectable'}
-													<DropdownMenu.CheckboxItem
-														checked={j.selected}
-														onSelect={j.onclick}
-														closeOnSelect={j.closeOnSelect ?? true}
-														value={j.key.toString()}
-														textValue={j.label}
-														aria-label={j.label}
-													>
-														{#if item}
-															{@render item(j.data, j)}
-														{:else}
-															{j.label}
-														{/if}
-													</DropdownMenu.CheckboxItem>
-												{/if}
+										{#if item}
+											{@render item(i.data, i)}
+										{:else}
+											{i.label}
+										{/if}
+									</DropdownMenu.CheckboxItem>
+								{:else if i.type === 'submenu'}
+									<DropdownMenu.Sub>
+										<DropdownMenu.SubTrigger
+											data-testid={testids(i.testid).trigger}
+										>
+											{#if item}
+												{@render item(i.data, { selected: false, ...i })}
 											{:else}
-												<DropdownMenu.Item disabled>
-													<div class="empty-submenu">
-														{i.submenu.empty ??
-															'Aucun élément disponible'}
-													</div>
-												</DropdownMenu.Item>
-											{/each}
-										</DropdownMenu.Group>
-									</DropdownMenu.SubContent>
-								</DropdownMenu.Sub>
-							{/if}
-						{/each}
-					</DropdownMenu.Group>
-				{/if}
-			{/each}
-		</DropdownMenu.Content>
-	</DropdownMenu.Portal>
-</DropdownMenu.Root>
+												{i.label}
+											{/if}
+										</DropdownMenu.SubTrigger>
+										<DropdownMenu.SubContent
+											data-testid={testids(i.testid).content}
+										>
+											<DropdownMenu.Group>
+												{#if i.submenu.label}
+													<DropdownMenu.GroupHeading
+														>{i.submenu
+															.label}</DropdownMenu.GroupHeading
+													>
+												{/if}
+
+												{#each i.submenu.items as j (j.label)}
+													{#if j.type === 'clickable'}
+														<DropdownMenu.Item
+															textValue={j.label}
+															onSelect={j.onclick}
+															closeOnSelect={j.closeOnSelect ?? true}
+															aria-label={j.label}
+														>
+															{#if item}
+																{@render item(j.data, {
+																	...j,
+																	selected: false,
+																})}
+															{:else}
+																{j.label}
+															{/if}
+														</DropdownMenu.Item>
+													{:else if j.type === 'selectable'}
+														<DropdownMenu.CheckboxItem
+															checked={j.selected}
+															onSelect={j.onclick}
+															closeOnSelect={j.closeOnSelect ?? true}
+															value={j.key.toString()}
+															textValue={j.label}
+															aria-label={j.label}
+														>
+															{#if item}
+																{@render item(j.data, j)}
+															{:else}
+																{j.label}
+															{/if}
+														</DropdownMenu.CheckboxItem>
+													{/if}
+												{:else}
+													<DropdownMenu.Item disabled>
+														<div class="empty-submenu">
+															{i.submenu.empty ??
+																'Aucun élément disponible'}
+														</div>
+													</DropdownMenu.Item>
+												{/each}
+											</DropdownMenu.Group>
+										</DropdownMenu.SubContent>
+									</DropdownMenu.Sub>
+								{/if}
+							{/each}
+						</DropdownMenu.Group>
+					{/if}
+				{/each}
+			</DropdownMenu.Content>
+		</DropdownMenu.Portal>
+	</DropdownMenu.Root>
+{/if}
 
 <style>
 	:global([data-dropdown-menu-content]) {
@@ -232,6 +291,23 @@
 		display: flex;
 		align-items: center;
 		text-align: center;
+		color: var(--gay);
+	}
+
+	.bottom-drawer-item {
+		padding: 0.5em;
+		width: 100%;
+		text-align: left;
+		background: none;
+		border: none;
+		font-size: 1.125rem;
+	}
+
+	.bottom-drawer-heading {
+		margin: 1em 0 0.5em;
+		padding: 0 0.5em;
+		font-size: 0.9rem;
+		font-style: italic;
 		color: var(--gay);
 	}
 </style>

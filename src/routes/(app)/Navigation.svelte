@@ -4,7 +4,15 @@
 
 	import IconNext from '~icons/ri/arrow-right-s-fill';
 	import IconDismiss from '~icons/ri/close-line';
+	import IconProtocolsFilled from '~icons/ri/file-list-3-fill';
+	import IconProtocols from '~icons/ri/file-list-3-line';
+	import IconAccountsFilled from '~icons/ri/group-fill';
+	import IconAccounts from '~icons/ri/group-line';
+	import IconHomeFilled from '~icons/ri/home-2-fill';
+	import IconHome from '~icons/ri/home-2-line';
 	import IconNotificationsOn from '~icons/ri/notification-2-line';
+	import IconSettingsFilled from '~icons/ri/settings-3-fill';
+	import IconSettings from '~icons/ri/settings-3-line';
 	import { page } from '$app/state';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonInk from '$lib/ButtonInk.svelte';
@@ -12,15 +20,14 @@
 	import { previewingPrNumber, tables } from '$lib/idb.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import Logo from '$lib/Logo.svelte';
-	import { askForNotificationPermission, hasNotificationsEnabled } from '$lib/notifications';
-	import { resolve } from '$lib/paths';
-	import { goto } from '$lib/paths.js';
+	import { askForNotificationPermission, hasNotificationsEnabled } from '$lib/notifications.js';
+	import { goto, resolve } from '$lib/paths';
 	import ProgressBar from '$lib/ProgressBar.svelte';
-	import { switchSession } from '$lib/sessions';
-	import { getSettings, setSetting } from '$lib/settings.svelte';
-	import { uiState } from '$lib/state.svelte';
-	import { tooltip } from '$lib/tooltips';
-	import { clamp } from '$lib/utils';
+	import { switchSession } from '$lib/sessions.js';
+	import { getSettings, setSetting } from '$lib/settings.svelte.js';
+	import { uiState } from '$lib/state.svelte.js';
+	import { tooltip } from '$lib/tooltips.js';
+	import { clamp } from '$lib/utils.js';
 
 	import DeploymentDetails from './DeploymentDetails.svelte';
 	import ModalSubmitIssue from './ModalSubmitIssue.svelte';
@@ -355,9 +362,69 @@
 	{/if}
 </header>
 
+<header class="mobile">
+	<nav>
+		<a
+			href={resolve('/')}
+			data-testid="mobile-goto-home"
+			class:active={path.startsWith('/sessions')}
+		>
+			{#if path.startsWith('/sessions')}
+				<IconHomeFilled />
+			{:else}
+				<IconHome />
+			{/if}
+			<span class="label">Accueil</span>
+		</a>
+
+		<a
+			href={resolve('/protocols')}
+			data-testid="mobile-goto-protocols"
+			class:active={path.startsWith('/protocols')}
+		>
+			{#if path.startsWith('/protocols')}
+				<IconProtocolsFilled />
+			{:else}
+				<IconProtocols />
+			{/if}
+			<span class="label">Protocoles</span>
+		</a>
+
+		<a
+			href={resolve('/accounts')}
+			data-testid="mobile-goto-accounts"
+			class:active={path.startsWith('/accounts')}
+		>
+			{#if path.startsWith('/accounts')}
+				<IconAccountsFilled />
+			{:else}
+				<IconAccounts />
+			{/if}
+			<span class="label">Comptes</span>
+		</a>
+
+		<a
+			href={resolve('/settings')}
+			data-testid="mobile-goto-settings"
+			class:active={path.startsWith('/settings')}
+		>
+			{#if path.startsWith('/settings')}
+				<IconSettingsFilled />
+			{:else}
+				<IconSettings />
+			{/if}
+			<span class="label">Réglages</span>
+		</a>
+	</nav>
+</header>
+
 <style>
 	header {
 		app-region: drag;
+	}
+
+	header.mobile {
+		display: none;
 	}
 
 	header :global(:is(a, button)) {
@@ -526,5 +593,43 @@
 
 		--height: 0.5rem;
 		--fill-color: var(--bg-primary);
+	}
+
+	@media (max-width: 600px) {
+		header {
+			display: none;
+		}
+
+		header.mobile {
+			display: flex;
+			font-size: 1.125em;
+			padding: 0.25em 0;
+
+			nav {
+				display: flex;
+				align-items: center;
+				justify-content: space-around;
+				width: 100%;
+				padding: 0;
+			}
+
+			nav a {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 0.25em;
+				color: var(--fg-neutral);
+				width: 100%;
+			}
+
+			nav .label {
+				font-size: 0.65rem;
+				transition: font-size 0.2s;
+			}
+
+			nav a.active .label {
+				font-size: 0.85rem;
+			}
+		}
 	}
 </style>

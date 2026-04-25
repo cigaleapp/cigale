@@ -5,7 +5,9 @@
 	import { dequal } from 'dequal/lite';
 	import { watch } from 'runed';
 
+	import IconShowPanel from '~icons/ri/arrow-up-s-line';
 	import IconObservation from '~icons/ri/bug-line';
+	import IconClose from '~icons/ri/close-line';
 	import IconDelete from '~icons/ri/delete-bin-line';
 	import IconFullScreen from '~icons/ri/fullscreen-line';
 	import IconSplit from '~icons/ri/function-line';
@@ -13,6 +15,7 @@
 	import IconMerge from '~icons/ri/shadow-line';
 	import IconImport from '~icons/ri/upload-2-line';
 	import { page } from '$app/state';
+	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import CroppedImg from '$lib/CroppedImg.svelte';
 	import { plural } from '$lib/i18n.js';
@@ -24,9 +27,13 @@
 	import Metadata from '$lib/Metadata.svelte';
 	import { metadataOptionsOf } from '$lib/metadata/index.js';
 	import MetadataList from '$lib/MetadataList.svelte';
+	import { IsMobile } from '$lib/mobile.svelte.js';
 	import { goto } from '$lib/paths.js';
 	import { metadataDefinitionComparator } from '$lib/protocols.js';
 	import { uiState } from '$lib/state.svelte.js';
+
+	import BottombarContent from '../BottombarContent.svelte';
+	import TopbarContent from '../TopbarContent.svelte';
 
 	/**
 	 * @import * as DB from '$lib/database.js';
@@ -57,6 +64,9 @@
 		canmerge,
 		metadata,
 	} = $props();
+
+	const mobile = new IsMobile();
+	let collapsed = $derived(mobile.current);
 
 	const definitions = $derived.by(() => {
 		const protocol = uiState.currentProtocol;
@@ -147,7 +157,60 @@
 	}
 </script>
 
-<aside data-testid="sidepanel" class="sidepanel" class:empty={loadingOptions}>
+{#snippet title()}
+	{#if singleObservationSelected}
+		<IconObservation />
+		<InlineTextInput
+			label="Nom de l'observation"
+			value={singleObservationSelected.label}
+			onblur={async (value) => {
+				if (value === singleObservationSelected.label) return;
+				await tables.Observation.update(singleObservationSelected.id, 'label', value);
+			}}
+		/>
+	{:else if singleImageSelected}
+		<IconImage />
+		{singleImageSelected.filename}
+	{:else if selectionCounts.image > 0 && selectionCounts.observation > 0}
+		{plural(selectionCounts.all, ['1 élément', '# éléments'])}
+	{:else if selectionCounts.image > 0}
+		{plural(selectionCounts.image, ['1 image', '# images'])}
+	{:else if selectionCounts.observation > 0}
+		{plural(selectionCounts.observation, ['1 observation', '# observations'])}
+	{:else}
+		Aucune sélection
+	{/if}
+{/snippet}
+
+{#if mobile.current}
+	{#if collapsed}
+		<BottombarContent>
+			<p>{@render title()}</p>
+			<ButtonIcon
+				help="Ouvrir le panneau de prévisualisation"
+				onclick={() => {
+					collapsed = false;
+				}}
+			>
+				<IconShowPanel />
+			</ButtonIcon>
+		</BottombarContent>
+	{:else}
+		<TopbarContent>
+			<p>{@render title()}</p>
+			<ButtonIcon
+				help="Fermer"
+				onclick={() => {
+					collapsed = true;
+				}}
+			>
+				<IconClose />
+			</ButtonIcon>
+		</TopbarContent>
+	{/if}
+{/if}
+
+<aside data-testid="sidepanel" class="sidepanel" class:empty={loadingOptions} class:collapsed>
 	{#if !loadingOptions}
 		<div class="images">
 			{#each images as { src, box, dimensions }, i (i)}
@@ -166,34 +229,11 @@
 				<div class="image empty"></div>
 			{/each}
 		</div>
-		<h2>
-			{#if singleObservationSelected}
-				<IconObservation />
-				<InlineTextInput
-					label="Nom de l'observation"
-					value={singleObservationSelected.label}
-					onblur={async (value) => {
-						if (value === singleObservationSelected.label) return;
-						await tables.Observation.update(
-							singleObservationSelected.id,
-							'label',
-							value
-						);
-					}}
-				/>
-			{:else if singleImageSelected}
-				<IconImage />
-				{singleImageSelected.filename}
-			{:else if selectionCounts.image > 0 && selectionCounts.observation > 0}
-				{plural(selectionCounts.all, ['1 élément', '# éléments'])}
-			{:else if selectionCounts.image > 0}
-				{plural(selectionCounts.image, ['1 image', '# images'])}
-			{:else if selectionCounts.observation > 0}
-				{plural(selectionCounts.observation, ['1 observation', '# observations'])}
-			{:else}
-				Aucune sélection
-			{/if}
-		</h2>
+		{#if !mobile.current}
+			<h2>
+				{@render title()}
+			</h2>
+		{/if}
 		<div class="metadatas" class:empty={images.length === 0}>
 			<MetadataList
 				testid="sidepanel-metadata"
@@ -291,17 +331,32 @@
 <style>
 	.sidepanel {
 		width: 40vw;
-		resize: horizontal;
-		direction: rtl;
+		min-width: calc(min(520px, 100vw));
 		background-color: var(--bg-neutral);
-		overflow-x: auto;
 		padding: 1.7em;
 		display: grid;
-		grid-template-rows: max-content max-content auto max-content;
 		height: 100%;
 		flex-shrink: 0;
 		gap: 30px;
-		min-width: 520px;
+		grid-template-rows: max-content max-content auto max-content;
+
+		@media (min-width: 600px) {
+			overflow-x: auto;
+			resize: horizontal;
+			direction: rtl;
+		}
+
+		@media (max-width: 600px) {
+			grid-template-rows: max-content auto max-content;
+			gap: 1rem;
+			padding: 0 1em;
+		}
+	}
+
+	.sidepanel.collapsed {
+		width: 0;
+		min-width: 0;
+		padding: 0;
 	}
 
 	/* Direction is set to RTL on .pannel to put the resize handle on the left of the container, this sets it back to LTR for every child so that text still has the correction direction (for French) */
@@ -318,6 +373,7 @@
 		display: flex;
 		flex-direction: column;
 		overflow-y: auto;
+		overflow-x: hidden;
 
 		&.empty {
 			opacity: 0.25;

@@ -193,7 +193,7 @@
 				}}
 			>
 				<IconImport />
-				Importer un export .zip
+				Importer .zip
 			</ButtonSecondary>
 			<ButtonSecondary
 				testid="new-session"
@@ -202,7 +202,7 @@
 				}}
 			>
 				<IconAdd />
-				Nouvelle session
+				Créer
 			</ButtonSecondary>
 		</section>
 	</header>
@@ -382,11 +382,17 @@
 		align-items: center;
 		justify-content: space-between;
 		margin-bottom: 2rem;
+		gap: 1rem;
+		flex-wrap: wrap;
 
 		.actions {
 			display: flex;
 			align-items: center;
 			gap: 1rem;
+		}
+
+		@media (max-width: 600px) {
+			justify-content: center;
 		}
 	}
 

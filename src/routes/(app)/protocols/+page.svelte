@@ -122,6 +122,12 @@
 		justify-content: space-between;
 		align-items: center;
 		width: 100%;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+
+		@media (max-width: 600px) {
+			justify-content: center;
+		}
 	}
 
 	header h1 {

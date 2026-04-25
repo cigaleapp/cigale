@@ -7,6 +7,7 @@
 	import * as db from '$lib/idb.svelte';
 	import { openTransaction, tables } from '$lib/idb.svelte';
 	import { deleteImageFile, imageFileId, imageIdToFileId } from '$lib/images';
+	import IconBack from '~icons/ri/arrow-left-line';
 	import { ACCEPTED_IMPORT_TYPES } from '$lib/import.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import {
@@ -21,6 +22,12 @@
 	import { toasts } from '$lib/toasts.svelte';
 
 	import PreviewSidePanel from './PreviewSidePanel.svelte';
+	import { IsMobile } from '$lib/mobile.svelte.js';
+	import { goto } from '$app/navigation';
+	import ButtonIcon from '$lib/ButtonIcon.svelte';
+	import OverflowableText from '$lib/OverflowableText.svelte';
+	import { switchSession } from '$lib/sessions.js';
+	import TopbarContent from '../TopbarContent.svelte';
 
 	seo({ title: 'Importer' });
 
@@ -184,12 +191,30 @@
 			return {};
 		}
 	});
+
+	const mobile = new IsMobile()
 </script>
+
+
+<TopbarContent>
+	<ButtonIcon
+	help="Toutes les sessions"
+		onclick={async () => {
+			await switchSession(null);
+			await goto('/sessions/');
+		}}
+	>
+		<IconBack />
+	</ButtonIcon>
+
+	<OverflowableText text={uiState.currentSession?.name ?? ""} />
+</TopbarContent>
 
 <div class="main-and-sidepanel" class:has-sidepanel={showSidePanel} in:fade={{ duration: 100 }}>
 	<div class="main" data-testid="app-main">{@render children?.()}</div>
 	{#if showSidePanel}
 		<PreviewSidePanel
+			collapsed={mobile.current}
 			images={selectedHrefsWithCropboxes}
 			metadata={mergedMetadataValues}
 			canmerge={uiState.selection.length > 0}
