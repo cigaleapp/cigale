@@ -20,9 +20,7 @@ TODO: Don't animate when progress decreases (e.g. when a new task starts and it 
 	const inactive = $derived([0, 1].includes(progress) && !alwaysActive);
 </script>
 
-<div class="progress-bar" class:inactive>
-	<div class="completed" style:width="{clamp(progress * 100, 0, 100)}%"></div>
-</div>
+<progress class="progress-bar" class:inactive value={clamp(progress, 0, 1)} max="1"></progress>
 
 {#if percentage && !inactive}
 	<p>
@@ -44,10 +42,18 @@ TODO: Don't animate when progress decreases (e.g. when a new task starts and it 
 		border-radius: var(--corners, 0);
 		background: var(--inactive-bg);
 		overflow: hidden;
+		appearance: none;
+		-webkit-appearance: none;
+		border: 0;
+		color: var(--fill-color, var(--fg-primary));
 	}
 
-	.progress-bar .completed {
-		height: 100%;
+	.progress-bar::-webkit-progress-value {
+		background: var(--fill-color, var(--fg-primary));
+		transition: width 0.5s;
+	}
+
+	.progress-bar::-moz-progress-bar {
 		background: var(--fill-color, var(--fg-primary));
 		transition: width 0.5s;
 	}

@@ -67,3 +67,5 @@ tests/filepaths.ts
 scripts/.ssh
 *.pem
 /storage-states
+
+.metrics.json

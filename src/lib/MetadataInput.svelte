@@ -133,7 +133,7 @@
 						{#snippet children({ label, icon, color, description, images })}
 							<div class="with-image">
 								{#if images && images.length > 0}
-									<img src={images[0]} alt="" />
+									<img loading="lazy" src={images[0]} alt="" />
 								{/if}
 								<div class="label">
 									<div class="first-line">

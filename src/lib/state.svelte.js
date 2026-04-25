@@ -161,8 +161,6 @@ export class UIState {
 		if (id === null) {
 			localStorage.removeItem('currentSessionId');
 		} else {
-			// eslint-disable-next-line svelte/prefer-svelte-reactivity
-			void tables.Session.update(id, 'openedAt', new Date().toISOString());
 			localStorage.setItem('currentSessionId', id);
 		}
 

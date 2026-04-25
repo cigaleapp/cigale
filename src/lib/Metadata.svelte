@@ -105,7 +105,7 @@
 <div class="metadata">
 	<div class="side-image-and-main-area">
 		{#if displayImageOnTheSide}
-			<div class="side-image"><img src={definition.images[0]} /></div>
+			<div class="side-image"><img loading="lazy" src={definition.images[0]} /></div>
 		{/if}
 		<div class="main-area">
 			<section class="first-line">

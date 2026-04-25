@@ -164,7 +164,7 @@ const _test = base.extend<
 		forEachTest: void;
 		app: AppFixture;
 		tempfiles: TempFilesFixture;
-		handlers: Array<import('msw').AnyHandler>;
+		networkHandlers: Array<import('msw').AnyHandler>;
 		network: import('@msw/playwright').NetworkFixture;
 		storageState:
 			| FixturePaths.Absolute<FixturePaths.StorageStates>
@@ -173,10 +173,19 @@ const _test = base.extend<
 	{ forEachWorker: void }
 >({
 	tempfiles,
-	handlers: [],
+	async networkHandlers({}, use) {
+		await use([]);
+	},
 	network: [
-		async ({ context, handlers }, use) => {
-			const network = defineNetworkFixture({ context, handlers });
+		async ({ context, networkHandlers: additionalHandlers }, use) => {
+			const network = defineNetworkFixture({
+				context,
+				handlers: [
+					// No default handlers for now, but, should we add some, they'd go here
+					...additionalHandlers,
+				],
+			});
+
 			await network.enable();
 			await use(network);
 			await network.disable();
@@ -403,6 +412,30 @@ const _test = base.extend<
 	],
 	forEachTest: [
 		async ({ page, context, app }, use, info) => {
+			await context.route('**/*', async (route) => {
+				const request = route.request();
+				if (request.resourceType() !== 'document') {
+					return route.fallback();
+				}
+
+				const url = new URL(request.url());
+				const isLocalhost =
+					url.hostname === 'localhost' ||
+					url.hostname === '127.0.0.1' ||
+					url.hostname === '::1';
+				if (!isLocalhost) {
+					return route.fallback();
+				}
+
+				const response = await route.fetch();
+				const headers = {
+					...response.headers(),
+					'Document-Policy': 'js-profiling',
+				};
+
+				await route.fulfill({ response, headers });
+			});
+
 			if (process.env.DEBUG_WORKERS) {
 				let wwcount = 0;
 				page.on('worker', (worker) => {

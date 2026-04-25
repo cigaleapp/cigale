@@ -1,16 +1,23 @@
+import { readFile, writeFile } from 'node:fs/promises';
 import type { AppFixture } from './fixtures.js';
 import type { Page, PlaywrightWorkerOptions } from '@playwright/test';
+import type { PerformanceMetrics } from 'playwright-performance-metrics';
 
 import { ms } from 'convert';
 import { PerformanceMetricsCollector } from 'playwright-performance-metrics';
 
 import { assert, expect, test } from './fixtures.js';
+import { collectChromeDevtoolsTrace } from './utils/performance.js';
 
 test.use({ storageState: { cookies: [], origins: [] } });
 
 benchmark(`startup @blank`, {
-	async run({ page, app }) {
-		await page.goto('./');
+	async prepare({ page }) {
+		await page.goto('./', {
+			waitUntil: 'commit',
+		});
+	},
+	async run({ app }) {
 		await app.db.ready();
 		await assert(app.tabs.get('sessions')).toBeVisible({ timeout: ms('1min') });
 	},
@@ -59,7 +66,7 @@ function benchmark(
 		run(arg: { page: Page; app: AppFixture }): Promise<void>;
 	}
 ) {
-	test(testLabel, async ({ page, browserName, app }) => {
+	test(testLabel, async ({ page, browserName, app }, testInfo) => {
 		await prepare?.({ page, app });
 
 		let collector: PerformanceMetricsCollector | undefined;
@@ -68,18 +75,25 @@ function benchmark(
 			collector = new PerformanceMetricsCollector();
 		}
 
-		const start = Date.now();
+		let end = 0,
+			start = 0;
 
-		await run({ page, app });
+		await collectChromeDevtoolsTrace(page, testInfo, async () => {
+			start = Date.now();
 
-		const end = Date.now();
+			await run({ page, app });
 
-		console.info('Total time:', end - start, 'ms');
+			end = Date.now();
 
-		expect(end - start).toBeLessThan(ms(limits.total[browserName]));
+			console.info('Total time:', end - start, 'ms');
+
+			expect(end - start).toBeLessThan(ms(limits.total[browserName]));
+		});
+
+		let metrics: PerformanceMetrics | undefined;
 
 		if (collector) {
-			const metrics = await collector.collectMetrics(page, {
+			metrics = await collector.collectMetrics(page, {
 				timeout: ms('10s'),
 			});
 
@@ -97,5 +111,25 @@ function benchmark(
 
 			console.info('Startup performance metrics:', metrics);
 		}
+
+		const filepath = 'metrics.json';
+		const existing: unknown[] = await readFile(filepath, 'utf-8')
+			.catch(() => '[]')
+			.then((content) => JSON.parse(content));
+
+		for (const [key, value] of Object.entries({ ...metrics, total: end - start })) {
+			if (typeof value !== 'number') continue;
+
+			existing.push({
+				test: testLabel,
+				browser: browserName,
+				metric: key,
+				title: `${browserName} / ${testLabel}: ${key}`,
+				value,
+				unit: key === 'total' ? 'ms' : '',
+			});
+		}
+
+		await writeFile(filepath, JSON.stringify(existing, null, 2));
 	});
 }

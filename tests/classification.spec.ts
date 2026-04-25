@@ -272,13 +272,22 @@ test.describe('full-screen classification view', pr(1071), () => {
 				});
 			});
 
-			test('can navigate to other images', async ({ page }) => {
+			test('can navigate to other images', async ({ page, app }) => {
 				const navigation = page.getByTestId('panel').getByTestId('nav');
 				const title = page.getByTestId('panel').getByRole('heading', { level: 1 });
 				const selectedOption = page
 					.getByTestId('panel')
 					.getByTestId('focused-option')
 					.getByTestId('current');
+
+				async function go(direction: 'suivante' | 'précédente', times = 1) {
+					for (let i = 0; i < times; i++) {
+						await navigation
+							.getByRole('button', { name: `Observation ${direction}` })
+							.click();
+						await app.wait('200ms');
+					}
+				}
 
 				await expect(title).toHaveAccessibleName('lil-fella');
 
@@ -289,14 +298,11 @@ test.describe('full-screen classification view', pr(1071), () => {
 				await expect(selectedOption).toHaveText('21%');
 				await expect(selectedOption.getByRole('combobox')).toHaveValue('Orchesella cincta');
 
-				await navigation.getByRole('button', { name: 'Observation suivante' }).click();
-				await navigation.getByRole('button', { name: 'Observation suivante' }).click();
+				await go('suivante', 2);
 				await expect(title).toHaveAccessibleName('with-exif-gps');
 				await expect(selectedOption).toHaveText('--%');
 
-				await navigation.getByRole('button', { name: 'Observation précédente' }).click();
-				await navigation.getByRole('button', { name: 'Observation précédente' }).click();
-				await navigation.getByRole('button', { name: 'Observation précédente' }).click();
+				await go('précédente', 3);
 				await expect(title).toHaveAccessibleName('lil-fella');
 				await expect(selectedOption).toHaveText('32%');
 				await expect(selectedOption.getByRole('combobox')).toHaveValue(

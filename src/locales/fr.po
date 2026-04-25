@@ -1442,10 +1442,6 @@ msgstr "Nombre de tâches en parallèle"
 msgid "Augmenter"
 msgstr "Augmenter"
 
-#: src/routes/(app)/+layout.js
-msgid "Initialisation du worker…"
-msgstr "Initialisation du worker…"
-
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 msgid "1 élément"
 msgid_plural "# éléments"
@@ -2431,7 +2427,56 @@ msgstr "Autres noms possibles pour cette option. Permet de trouver l'option en c
 msgid "Permet de changer la valeur d'autres métadonnées quand cette option est choisie. Peut être pratique pour représenter des taxonomies, ajouter des attributs à une métadonnée, etc."
 msgstr "Permet de changer la valeur d'autres métadonnées quand cette option est choisie. Peut être pratique pour représenter des taxonomies, ajouter des attributs à une métadonnée, etc."
 
-#. 0: updates[0].name
+#: src/lib/idb.svelte.js
+msgid "Initialize reactive table"
+msgstr "Initialize reactive table"
+
+#: src/lib/idb.svelte.js
+#: src/lib/idb.svelte.js
+msgid "Key range"
+msgstr "Key range"
+
 #: src/routes/(app)/+layout.js
-msgid "Protocole \"{0}\" mis à jour"
-msgstr "Protocole \"{0}\" mis à jour"
+#: src/routes/(app)/+layout.js
+#: src/routes/(app)/+layout.js
+#: src/routes/(app)/+layout.js
+#: src/routes/(app)/+layout.js
+msgid "Startup"
+msgstr "Startup"
+
+#: src/routes/(app)/+layout.js
+msgid "Get language setting"
+msgstr "Get language setting"
+
+#: src/routes/(app)/+layout.js
+msgid "Load locale"
+msgstr "Load locale"
+
+#: src/routes/(app)/+layout.js
+msgid "Initialize settings"
+msgstr "Initialize settings"
+
+#: src/routes/(app)/+layout.js
+msgid "Initialisation des workers…"
+msgstr "Initialisation des workers…"
+
+#: src/routes/(app)/+layout.js
+msgid "Workers"
+msgstr "Workers"
+
+#: src/routes/(app)/+layout.js
+msgid "App"
+msgstr "App"
+
+#: src/routes/(app)/+layout.js
+msgid "Initialize database"
+msgstr "Initialize database"
+
+#: src/routes/(app)/+layout.js
+msgid "Load built-in protocols"
+msgstr "Load built-in protocols"
+
+#. 0: updates[0].name; 1: updates[0].version
+#: src/routes/(app)/+layout.js
+msgid "Protocole \"{0}\" mis à jour à la v{1}"
+msgstr "Protocole \"{0}\" mis à jour à la v{1}"

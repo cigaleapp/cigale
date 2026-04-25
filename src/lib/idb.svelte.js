@@ -9,7 +9,7 @@ import {
 	isSessionDependentReactiveTable,
 	Tables,
 } from './database.js';
-import { nonnull, safeJSONStringify } from './utils.js';
+import { displayKeyRange, profiler, safeJSONStringify } from './utils.js';
 
 /** @type {number | null} */
 export const previewingPrNumber =
@@ -17,6 +17,8 @@ export const previewingPrNumber =
 
 export const databaseName = previewingPrNumber ? `previews/pr-${previewingPrNumber}` : 'database';
 export const databaseRevision = 7;
+
+const profile = profiler('Database');
 
 /**
  * @typedef {typeof import('./database.js').NO_REACTIVE_STATE_TABLES[number]} NonReactiveTableNames
@@ -46,7 +48,7 @@ export const _tablesState = $state({
  * @type {{
  *  [Name in ReactiveTableNames]: ReturnType<typeof wrangler<Name>>
  * } & {
- * 	initialize: (sessionId: string|null) => Promise<void>
+ * 	initialize: (...args: Parameters<ReturnType<typeof wrangler>['refresh']>) => Promise<void>
  * }}
  */
 // @ts-ignore
@@ -55,10 +57,12 @@ export const tables = {
 	/**
 	 * Initialize reactive tables for the current session
 	 */
-	async initialize(sessionId) {
+	async initialize(...args) {
 		for (const name of tableNames) {
 			if (!isReactiveTable(name)) continue;
-			await tables[name].refresh(sessionId);
+			await profile(name, 'Initialize reactive table', async () => {
+				await tables[name].refresh(...args);
+			});
 		}
 	},
 };
@@ -73,8 +77,12 @@ function wrangler(table) {
 		get state() {
 			return _tablesState[table];
 		},
-		/** @param {string|null} sessionId */
-		async refresh(sessionId) {
+		/**
+		 * @param {string|null} sessionId
+		 * @param {object} options
+		 * @param {boolean} options.sessionOnly if true, only refresh session-dependent tables
+		 */
+		async refresh(sessionId, { sessionOnly = false } = {}) {
 			if (!sessionId && isSessionDependentReactiveTable(table)) {
 				console.debug(`refresh ${table} without session: clearing state`);
 				_tablesState[table] = [];
@@ -82,7 +90,7 @@ function wrangler(table) {
 				console.debug(`refresh ${table} for session ${sessionId}`);
 				// @ts-ignore
 				_tablesState[table] = await this.list('sessionId', sessionId);
-			} else {
+			} else if (!sessionOnly) {
 				console.debug(`refresh ${table}`);
 				// @ts-ignore
 				_tablesState[table] = await this.list();
@@ -279,19 +287,21 @@ export async function get(tableName, key) {
  * @template {keyof typeof Tables} TableName
  */
 export async function getMany(tableName, keys) {
-	/** @type {Array<typeof Tables[TableName]['infer']>} */
-	const results = [];
-	const validator = Tables[tableName];
+	return profile(tableName, 'getMany', { Keys: keys.length }, async () => {
+		/** @type {Array<typeof Tables[TableName]['infer']>} */
+		const results = [];
+		const validator = Tables[tableName];
 
-	await openTransaction([tableName], {}, async (tx) => {
-		for (const key of keys) {
-			const found = await tx.objectStore(tableName).get(key);
-			if (!found) continue;
-			results.push(validator.assert(found));
-		}
+		await openTransaction([tableName], {}, async (tx) => {
+			for (const key of keys) {
+				const found = await tx.objectStore(tableName).get(key);
+				if (!found) continue;
+				results.push(validator.assert(found));
+			}
+		});
+
+		return results;
 	});
-
-	return results;
 }
 
 /**
@@ -302,15 +312,17 @@ export async function getMany(tableName, keys) {
  * @template {keyof typeof Tables} TableName
  */
 export async function list(tableName, keyRange = undefined) {
-	const db = await openDatabase();
-	const validator = Tables[tableName];
-	// @ts-ignore
-	return await db
-		.getAll(tableName, keyRange)
-		.then((values) => values.map((v) => validator.assert(v)).sort(idComparator))
-		.then((result) => {
-			return result;
-		});
+	return profile(tableName, 'list', { 'Key range': displayKeyRange(keyRange) }, async () => {
+		const db = await openDatabase();
+		const validator = Tables[tableName];
+		// @ts-ignore
+		return await db
+			.getAll(tableName, keyRange)
+			.then((values) => values.map((v) => validator.assert(v)).sort(idComparator))
+			.then((result) => {
+				return result;
+			});
+	});
 }
 
 /**
@@ -321,19 +333,26 @@ export async function list(tableName, keyRange = undefined) {
  * @returns {Promise<Array<typeof Tables[TableName]['infer']>>}
  */
 export async function listByIndex(tableName, indexName, keyRange = undefined) {
-	const db = await openDatabase();
-	const validator = Tables[tableName];
-	// @ts-ignore
-	return await db
-		.getAllFromIndex(
-			tableName,
-			indexName,
-			typeof keyRange === 'string' ? IDBKeyRange.only(keyRange) : keyRange
-		)
-		.then((values) => values.map((v) => validator.assert(v)).sort(idComparator))
-		.then((result) => {
-			return result;
-		});
+	return profile(
+		tableName,
+		'listByIndex',
+		{ Index: indexName, 'Key range': displayKeyRange(keyRange) },
+		async () => {
+			const db = await openDatabase();
+			const validator = Tables[tableName];
+			// @ts-ignore
+			return await db
+				.getAllFromIndex(
+					tableName,
+					indexName,
+					typeof keyRange === 'string' ? IDBKeyRange.only(keyRange) : keyRange
+				)
+				.then((values) => values.map((v) => validator.assert(v)).sort(idComparator))
+				.then((result) => {
+					return result;
+				});
+		}
+	);
 }
 
 /**
@@ -451,6 +470,7 @@ export async function openDatabase() {
 	// @ts-ignore
 	const tablesByName = Object.entries(Tables);
 
+	console.debug('Opening database', databaseName, 'revision', databaseRevision);
 	_database = await openDB(databaseName, databaseRevision, {
 		upgrade(db, oldVersion, _newVersion, tx) {
 			/**

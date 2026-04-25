@@ -6,7 +6,7 @@
 import { openDB } from 'idb';
 import * as Swarp from 'swarpc';
 
-import { PROCEDURES } from './procedures.js';
+import { LOCAL_STORAGE, PROCEDURES } from './procedures.js';
 
 /**
  * @type {import('idb').IDBPDatabase<import('../lib/idb.svelte.js').IDBDatabaseType> | undefined}
@@ -17,9 +17,11 @@ let _db;
 let databaseParams;
 
 export async function openDatabase() {
-	if (!databaseParams) {
-		throw new Error('Database parameters not set, call swarp.init() first');
-	}
+	databaseParams = {
+		name: getLocalStorage('databaseName'),
+		revision: getLocalStorage('databaseRevision'),
+	};
+
 	if (_db) return _db;
 	_db = await openDB(databaseParams.name, databaseParams.revision);
 	return _db;
@@ -27,6 +29,13 @@ export async function openDatabase() {
 
 export const swarp = Swarp.Server(PROCEDURES);
 
-swarp.init(async ({ databaseName, databaseRevision }) => {
-	databaseParams = { name: databaseName, revision: databaseRevision };
-});
+swarp.wakeup(async () => true);
+
+/**
+ * @template {keyof import('./procedures.js').LocalStorage} K
+ * @param {K} key
+ * @return {import('./procedures.js').LocalStorage[K]}
+ */
+function getLocalStorage(key) {
+	return LOCAL_STORAGE.get(key).assert(localStorage.getItem(key));
+}

@@ -8,6 +8,10 @@
 		{
 			"id": "fr.osug.terra-forma-web.insecta",
 			"url": "https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/insecta.cigaleprotocol.yaml"
+		},
+		{
+			"id": "fr.osug.terra-forma-web.entomoscope",
+			"url": "https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/entomoscope.cigaleprotocol.yaml"
 		}
 	]
 }
