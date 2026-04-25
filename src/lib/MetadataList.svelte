@@ -92,7 +92,7 @@
 		scrollbar-color: var(--gray) transparent;
 		scrollbar-gutter: stable;
 		scrollbar-width: thin;
-		overflow-y: auto;
+		/* overflow-y: auto; */
 	}
 
 	.grouped-metadata {

@@ -1,20 +1,15 @@
-<script>
+<script lang="ts">
 	/**
 	 * @import { TopLeftBoundingBox } from '$lib/BoundingBoxes.svelte.js';
 	 */
 	import { dequal } from 'dequal/lite';
 	import { watch } from 'runed';
 
-	import IconObservation from '~icons/ri/bug-line';
-	import IconDelete from '~icons/ri/delete-bin-line';
-	import IconFullScreen from '~icons/ri/fullscreen-line';
-	import IconSplit from '~icons/ri/function-line';
-	import IconImage from '~icons/ri/image-2-line';
-	import IconMerge from '~icons/ri/shadow-line';
-	import IconImport from '~icons/ri/upload-2-line';
 	import { page } from '$app/state';
+	import BottomDrawer from '$lib/BottomDrawer.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import CroppedImg from '$lib/CroppedImg.svelte';
+	import { onSwipe } from '$lib/gestures';
 	import { plural } from '$lib/i18n.js';
 	import * as idb from '$lib/idb.svelte.js';
 	import { tables } from '$lib/idb.svelte.js';
@@ -24,9 +19,20 @@
 	import Metadata from '$lib/Metadata.svelte';
 	import { metadataOptionsOf } from '$lib/metadata/index.js';
 	import MetadataList from '$lib/MetadataList.svelte';
+	import { IsMobile } from '$lib/mobile.svelte.js';
 	import { goto } from '$lib/paths.js';
 	import { metadataDefinitionComparator } from '$lib/protocols.js';
 	import { uiState } from '$lib/state.svelte.js';
+	import IconShowPanel from '~icons/ri/arrow-up-s-line';
+	import IconObservation from '~icons/ri/bug-line';
+	import IconDelete from '~icons/ri/delete-bin-line';
+	import IconFullScreen from '~icons/ri/fullscreen-line';
+	import IconSplit from '~icons/ri/function-line';
+	import IconImage from '~icons/ri/image-2-line';
+	import IconMerge from '~icons/ri/shadow-line';
+	import IconImport from '~icons/ri/upload-2-line';
+
+	import BottombarContent from '../BottombarContent.svelte';
 
 	/**
 	 * @import * as DB from '$lib/database.js';
@@ -57,6 +63,9 @@
 		canmerge,
 		metadata,
 	} = $props();
+
+	const mobile = new IsMobile();
+	let collapsed = $derived(mobile.current);
 
 	const definitions = $derived.by(() => {
 		const protocol = uiState.currentProtocol;
@@ -145,9 +154,26 @@
 
 		return [apply(dimensions.width, box?.width), apply(dimensions.height, box?.height)];
 	}
+
+	const selectionTitle = $derived.by(() => {
+		if (loadingOptions) {
+			return 'Chargement des métadonnées…';
+		}
+
+		if (selectionCounts.image > 0 && selectionCounts.observation > 0) {
+			return plural(selectionCounts.all, ['1 élément', '# éléments']);
+		}
+		if (selectionCounts.image > 0) {
+			return plural(selectionCounts.image, ['1 image', '# images']);
+		}
+		if (selectionCounts.observation > 0) {
+			return plural(selectionCounts.observation, ['1 observation', '# observations']);
+		}
+		return 'Aucune sélection';
+	});
 </script>
 
-<aside data-testid="sidepanel" class="sidepanel" class:empty={loadingOptions}>
+{#snippet content()}
 	{#if !loadingOptions}
 		<div class="images">
 			{#each images as { src, box, dimensions }, i (i)}
@@ -166,34 +192,36 @@
 				<div class="image empty"></div>
 			{/each}
 		</div>
-		<h2>
-			{#if singleObservationSelected}
-				<IconObservation />
-				<InlineTextInput
-					label="Nom de l'observation"
-					value={singleObservationSelected.label}
-					onblur={async (value) => {
-						if (value === singleObservationSelected.label) return;
-						await tables.Observation.update(
-							singleObservationSelected.id,
-							'label',
-							value
-						);
-					}}
-				/>
-			{:else if singleImageSelected}
-				<IconImage />
-				{singleImageSelected.filename}
-			{:else if selectionCounts.image > 0 && selectionCounts.observation > 0}
-				{plural(selectionCounts.all, ['1 élément', '# éléments'])}
-			{:else if selectionCounts.image > 0}
-				{plural(selectionCounts.image, ['1 image', '# images'])}
-			{:else if selectionCounts.observation > 0}
-				{plural(selectionCounts.observation, ['1 observation', '# observations'])}
-			{:else}
-				Aucune sélection
-			{/if}
-		</h2>
+		{#if !mobile.current}
+			<h2>
+				{#if singleObservationSelected}
+					<IconObservation />
+					<InlineTextInput
+						label="Nom de l'observation"
+						value={singleObservationSelected.label}
+						onblur={async (value) => {
+							if (value === singleObservationSelected.label) return;
+							await tables.Observation.update(
+								singleObservationSelected.id,
+								'label',
+								value
+							);
+						}}
+					/>
+				{:else if singleImageSelected}
+					<IconImage />
+					{singleImageSelected.filename}
+				{:else if selectionCounts.image > 0 && selectionCounts.observation > 0}
+					{plural(selectionCounts.all, ['1 élément', '# éléments'])}
+				{:else if selectionCounts.image > 0}
+					{plural(selectionCounts.image, ['1 image', '# images'])}
+				{:else if selectionCounts.observation > 0}
+					{plural(selectionCounts.observation, ['1 observation', '# observations'])}
+				{:else}
+					Aucune sélection
+				{/if}
+			</h2>
+		{/if}
 		<div class="metadatas" class:empty={images.length === 0}>
 			<MetadataList
 				testid="sidepanel-metadata"
@@ -229,7 +257,7 @@
 			<p>Sélectionnez une ou plusieurs images pour voir et modifier leurs métadonnées</p>
 		</section>
 	{/if}
-	<section class="button">
+	<section class="actions">
 		{#if onmerge && onsplit}
 			<div class="side-by-side">
 				<ButtonSecondary
@@ -258,7 +286,7 @@
 				Importer d'autres images
 			</ButtonSecondary>
 		{/if}
-		{#if page.route.id === '/(app)/(sidepanel)/classify'}
+		{#if page.route.id === '/(app)/(sidepanel)/classify' && !mobile.current}
 			<ButtonSecondary
 				disabled={!singleObservationSelected}
 				loading
@@ -286,22 +314,72 @@
 			Supprimer {images.length} images
 		</ButtonSecondary>
 	</section>
-</aside>
+{/snippet}
+
+{#if mobile.current}
+	<BottombarContent>
+		<button
+			class="open-drawer"
+			{@attach onSwipe('up', () => {
+				collapsed = false;
+			})}
+			onclick={() => {
+				collapsed = false;
+			}}
+		>
+			{selectionTitle}
+			<IconShowPanel />
+		</button>
+	</BottombarContent>
+	<BottomDrawer
+		maxHeight={0.95}
+		title={selectionTitle}
+		bind:open={
+			() => !collapsed,
+			(open) => {
+				collapsed = !open;
+			}
+		}
+	>
+		<div class="sidepanel mobile">{@render content()}</div>
+	</BottomDrawer>
+{:else}
+	<aside data-testid="sidepanel" class="sidepanel" class:empty={loadingOptions} class:collapsed>
+		{@render content()}
+	</aside>
+{/if}
 
 <style>
 	.sidepanel {
-		width: 40vw;
-		resize: horizontal;
-		direction: rtl;
 		background-color: var(--bg-neutral);
-		overflow-x: auto;
-		padding: 1.7em;
 		display: grid;
-		grid-template-rows: max-content max-content auto max-content;
 		height: 100%;
 		flex-shrink: 0;
 		gap: 30px;
-		min-width: 520px;
+		grid-template-rows: max-content max-content auto max-content;
+
+		&:not(.mobile) {
+			padding: 1.7em;
+			width: 40vw;
+			min-width: calc(min(520px, 100vw));
+			overflow-x: auto;
+			resize: horizontal;
+			direction: rtl;
+		}
+
+		&.mobile {
+			grid-template-rows: max-content auto max-content;
+			gap: 1rem;
+
+			/* XXX: Approximate max height of .actions */
+			padding-bottom: 300px;
+		}
+	}
+
+	.sidepanel.collapsed {
+		width: 0;
+		min-width: 0;
+		padding: 0;
 	}
 
 	/* Direction is set to RTL on .pannel to put the resize handle on the left of the container, this sets it back to LTR for every child so that text still has the correction direction (for French) */
@@ -318,6 +396,7 @@
 		display: flex;
 		flex-direction: column;
 		overflow-y: auto;
+		overflow-x: hidden;
 
 		&.empty {
 			opacity: 0.25;
@@ -355,18 +434,36 @@
 		overflow: hidden;
 	}
 
-	.button {
+	.actions {
 		display: flex;
 		gap: 0.75em;
 		align-items: center;
 		flex-direction: column;
 		--width: 100%;
+
+		@media (max-width: 600px) {
+			position: fixed;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			padding: 0.75em;
+			background: var(--bg-neutral);
+		}
 	}
 
-	.button .side-by-side {
+	.actions .side-by-side {
 		display: flex;
 		align-items: center;
 		gap: 0.75em;
 		width: 100%;
+	}
+
+	button.open-drawer {
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
+		justify-content: space-between;
+		width: 100%;
+		font-size: 1rem;
 	}
 </style>

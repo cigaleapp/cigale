@@ -344,6 +344,7 @@
 		align-items: center;
 		justify-content: space-between;
 		gap: 1em;
+		flex-wrap: wrap;
 	}
 	.value {
 		display: flex;
@@ -391,6 +392,7 @@
 	.alternatives {
 		display: flex;
 		justify-content: space-between;
+		flex-wrap: wrap;
 	}
 
 	.alternatives .title {

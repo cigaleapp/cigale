@@ -1,20 +1,17 @@
 <script lang="ts">
 	import type * as DB from '$lib/database.js';
-	import type { Snippet } from 'svelte';
 
-	import { format as formatDate, formatDistanceToNow } from 'date-fns';
-
+	import IconDisconnect from '~icons/ri/close-circle-line';
 	import { providers } from '$lib/accounts/registry.js';
-	import OverflowableText from '$lib/OverflowableText.svelte';
-	import { tooltip } from '$lib/tooltips.js';
+	import ButtonIcon from '$lib/ButtonIcon.svelte';
 
 	interface Props {
 		tag?: string;
 		account: DB.Account;
-		action: Snippet;
+		disconnect: () => Promise<void>;
 	}
 
-	const { tag = 'li', account, action }: Props = $props();
+	const { tag = 'li', account, disconnect }: Props = $props();
 
 	const provider = $derived(providers.get(account.type));
 </script>
@@ -31,22 +28,16 @@
 			<span class="with-provider-logo">
 				<img src={provider.logoURL.href} alt="Logo de {provider.displayName}" />
 				<span>{provider.displayName}</span>
-				&nbsp;&middot;&nbsp;
-				<span
-					class="added-at"
-					use:tooltip={`Ajouté le ${formatDate(account.addedAt, 'PPPpp')}`}
-				>
-					<OverflowableText
-						no-tooltip
-						text={formatDistanceToNow(account.addedAt, { addSuffix: true })}
-					/>
-				</span>
 			</span>
 		{:else}
 			<strong class="error">Type de compte inconnu</strong>
 		{/if}
 	</p>
-	<div class="action">{@render action()}</div>
+	<section class="actions">
+		<ButtonIcon dangerous onclick={disconnect} help="Déconnecter">
+			<IconDisconnect />
+		</ButtonIcon>
+	</section>
 </svelte:element>
 
 <style>
@@ -66,12 +57,12 @@
 	}
 
 	li strong {
-		font-size: 1.2em;
+		font-size: 1rem;
 	}
 
 	li img {
-		height: 3.7rem;
-		width: 3.7rem;
+		height: 3rem;
+		width: 3rem;
 		border-radius: var(--corner-radius);
 		&.avatar {
 			border-radius: 50%;
@@ -82,6 +73,7 @@
 		display: inline-flex;
 		align-items: center;
 		gap: 0.2em;
+		font-size: 0.9em;
 
 		img {
 			height: 1.4em;

@@ -162,6 +162,14 @@
 </div>
 
 <style>
+	.metadata-combobox {
+		width: 100%;
+
+		:global(input) {
+			width: 100%;
+		}
+	}
+
 	.metadata-combobox.wide-docs {
 		--combobox-content-width: 800px;
 	}

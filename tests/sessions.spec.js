@@ -68,7 +68,7 @@ test.describe('isolation', () => {
 test('import into new session', async ({ page, app }) => {
 	await app.settings.set({ showTechnicalMetadata: false });
 	const picker = page.waitForEvent('filechooser');
-	await page.getByRole('button', { name: 'Importer un export .zip' }).click();
+	await page.getByRole('button', { name: 'Importer .zip' }).click();
 	await picker.then((picker) => {
 		picker.setFiles('./tests/fixtures/exports/correct.zip');
 	});
@@ -88,7 +88,7 @@ test('import into new session', async ({ page, app }) => {
 	});
 
 	await app.tabs.go('crop');
-	await assert(page.locator('main header > *').nth(2)).toHaveText('4 éléments');
+	await assert(page.locator('main header > *').nth(2)).toHaveText('4');
 
 	await app.tabs.go('classify');
 	await page.getByText('cyan', { exact: true }).click();

@@ -58,6 +58,7 @@
 		hasRuntimeType,
 		storeMetadataValue,
 	} from '$lib/metadata/index.js';
+	import MobileWIPOverlay from '$lib/MobileWIPOverlay.svelte';
 	import OverflowableText from '$lib/OverflowableText.svelte';
 	import { goto } from '$lib/paths.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
@@ -857,6 +858,18 @@
 
 	const zoomSpeed = $derived(zoom.scale * 0.1);
 </script>
+
+<MobileWIPOverlay
+	feature="Le recadrage"
+	issue={1518}
+	back={async () => {
+		if (params.from) {
+			await goto('/(app)/(sidepanel)/classify/[observation]', { observation: params.from });
+		} else {
+			await goto('/crop/');
+		}
+	}}
+/>
 
 <ConfirmedOverlay bind:show={showConfirmedOverlay} />
 

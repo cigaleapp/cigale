@@ -355,7 +355,18 @@ function tupleSizeIs(tuple, ...sizes) {
  * @param {Tuple<string | RegExp, 1 | 2 | 3 | 4>} option [option name] or [group label, option name] or [group label, option name that opens a submenu, submenu option name] or [group label, option name that opens a submenu, submenu group name, submenu option name]
  */
 export async function chooseInDropdown(page, trigger, ...option) {
-	if (!(await trigger.getAttribute('aria-controls'))) {
+	await clickInDropdown(page, trigger, ...option);
+	await page.keyboard.press('Escape'); // Close the dropdown after selection
+}
+
+/**
+ * Opens a dropdown and clicks on an item by its name. Just like {@link chooseInDropdown}, but doesn't close the dropdown after selection.
+ * @param {Page} page
+ * @param {Locator} trigger locator or test id
+ * @param {Tuple<string | RegExp, 1 | 2 | 3 | 4>} option [option name] or [group label, option name] or [group label, option name that opens a submenu, submenu option name] or [group label, option name that opens a submenu, submenu group name, submenu option name]
+ */
+export async function clickInDropdown(page, trigger, ...option) {
+	while (!(await trigger.getAttribute('aria-controls'))) {
 		await trigger.click({ force: true });
 	}
 
@@ -387,8 +398,6 @@ export async function chooseInDropdown(page, trigger, ...option) {
 		await locateOption(options, ...option).click();
 	}
 
-	await page.keyboard.press('Escape'); // Close the dropdown after selection
-
 	/**
 	 * @param {Locator} options
 	 * @param {Tuple<string | RegExp, 1 | 2>} query
@@ -405,9 +414,10 @@ export async function chooseInDropdown(page, trigger, ...option) {
 				.or(group.getByRole('menuitemradio', { name: sublocator }));
 		}
 
-		return options.getByRole('menuitemcheckbox', {
-			name: locator,
-		});
+		return options
+			.getByRole('menuitemcheckbox', { name: locator })
+			.or(options.getByRole('menuitemradio', { name: locator }))
+			.or(options.getByRole('menuitem', { name: locator }));
 	}
 }
 

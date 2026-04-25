@@ -1,12 +1,15 @@
 import { issue } from './annotations.js';
 import { expect, test } from './fixtures.js';
-import { newSession } from './utils/index.js';
+import { clickInDropdown, newSession } from './utils/index.js';
 
 test.describe('closing a modal', () => {
 	test('when clicking outside', issue(469), async ({ page, app }) => {
 		await newSession(page);
-		await app.settings.open();
-		await page.getByRole('button', { name: 'Préparation hors-ligne' }).click();
+		await clickInDropdown(
+			page,
+			page.getByRole('button', { name: 'Réglages', exact: true }),
+			'Préparation hors-ligne…'
+		);
 
 		// Wait for modal animation
 		await page.waitForTimeout(1000);

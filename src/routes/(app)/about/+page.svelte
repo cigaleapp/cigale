@@ -10,6 +10,8 @@
 	import lockfile from '$lib/../../bun.lock?raw';
 	import Logo from '$lib/Logo.svelte';
 	import { seo } from '$lib/seo.svelte';
+	import TopbarBackToHome from '../TopbarBackToHome.svelte';
+	import OverflowableText from '$lib/OverflowableText.svelte';
 
 	const { data } = $props();
 
@@ -79,6 +81,10 @@
 		return pkgs.map((name) => [name, packages[name][0].replace(`${name}@`, '')]);
 	}
 </script>
+
+<TopbarBackToHome>
+	À propos
+</TopbarBackToHome>
 
 <header>
 	<Logo drawpercent={logoDrawPercent} />
@@ -225,7 +231,9 @@
 					<dt>
 						<a target="_blank" href="https://npmjs.com/package/{name}">{name}</a>
 					</dt>
-					<dd><code>{version}</code></dd>
+					<dd><code>
+						<OverflowableText text={version} />
+					</code></dd>
 				{/each}
 			</dl>
 		{:catch error}
@@ -284,11 +292,16 @@
 	dd {
 		padding-left: 0.5em;
 		margin-bottom: 1em;
+		max-width: 80vw;
 	}
 
 	dl > dd > dl {
 		display: grid;
 		grid-template-columns: max-content max-content;
+
+		@media (max-width: 600px) {
+			grid-template-columns: max-content;
+		}
 	}
 
 	dl > dd > dl > dd {

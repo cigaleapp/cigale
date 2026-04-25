@@ -1,5 +1,10 @@
 import { assert, test } from '../fixtures.js';
-import { firstObservationCard, importPhotos, newSession } from '../utils/index.js';
+import {
+	chooseInDropdown,
+	firstObservationCard,
+	importPhotos,
+	newSession,
+} from '../utils/index.js';
 
 test.describe('screenshots', { tag: '@real-protocol' }, () => {
 	test.skip(
@@ -30,9 +35,13 @@ test.describe('screenshots', { tag: '@real-protocol' }, () => {
 
 				await app.settings.set({ showTechnicalMetadata: false });
 
-				await page.getByTestId('settings-button').click();
-				await page.getByRole('radio', { name: languageNames[language] }).click();
-				await page.getByTestId('settings-button').click();
+				await chooseInDropdown(
+					page,
+					page.getByRole('button', { name: 'Réglages' }),
+					'Réglages',
+					'Langue',
+					languageNames[language]
+				);
 			});
 
 			test('protocol', async ({ page }) => {

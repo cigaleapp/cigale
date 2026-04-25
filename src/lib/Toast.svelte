@@ -140,6 +140,8 @@
 		width: max-content;
 		min-width: calc(min(200px, 100vw));
 		max-width: calc(100vw - 2em);
+		max-height: 80vh;
+		overflow: auto;
 	}
 
 	p {

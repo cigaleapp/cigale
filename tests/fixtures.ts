@@ -34,7 +34,6 @@ import {
 	mockProtocolSourceURL,
 	mockUrl,
 	modal,
-	openSettings,
 	setHardwareConcurrency,
 	setSettings,
 	toast,
@@ -375,7 +374,6 @@ const _test = base.extend<
 					const key = maybeKey[0];
 					return key ? settings[key] : settings;
 				},
-				open: async (options) => openSettings(page, options),
 			},
 			tabs: {
 				go: async (tab) => goToTab(page, tab),
