@@ -314,7 +314,7 @@ jobs:
               const { test, browser, metric, unit } = head[0]
               const base = byTitle.base.get(title)
 
-              const avg = (branch) => branch.reduce((a, b) => a.value + b.value, 0) / branch.length;
+              const avg = (branch) => branch.reduce((sum, m) => sum + m.value, 0) / branch.length;
 
               const fmt = (value) => new Intl.NumberFormat('fr-FR', { 
                 style: unit ? 'unit' : 'decimal',
@@ -333,6 +333,9 @@ jobs:
               } else {
                 comment += column('N/A', fmt(avg(head)), 'N/A');
               }
+
+              previousBrowser = browser;
+              previousTest = test;
             }
 
             // Write to $GITHUB_OUTPUT to pass to next step
