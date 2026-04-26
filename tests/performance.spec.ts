@@ -53,8 +53,11 @@ function benchmark(
 	{
 		run,
 		prepare,
+		repeats = 5,
 		...limits
 	}: {
+		/** Run the benchmark multiple times to allow for averaging */
+		repeats?: number;
 		total: {
 			[browser in PlaywrightWorkerOptions['browserName']]: `${number}${'s' | 'ms' | 'min'}`;
 		};
@@ -66,70 +69,74 @@ function benchmark(
 		run(arg: { page: Page; app: AppFixture }): Promise<void>;
 	}
 ) {
-	test(testLabel, async ({ page, browserName, app }, testInfo) => {
-		await prepare?.({ page, app });
+	test.describe(testLabel, () => {
+		for (let i = 0; i < repeats; i++) {
+			test(`run ${i + 1}/${repeats}`, async ({ page, browserName, app }, testInfo) => {
+				await prepare?.({ page, app });
 
-		let collector: PerformanceMetricsCollector | undefined;
-		if (browserName === 'chromium') {
-			// playwright-performance-metrics only supports Chromium-based browsers
-			collector = new PerformanceMetricsCollector();
-		}
+				let collector: PerformanceMetricsCollector | undefined;
+				if (browserName === 'chromium') {
+					// playwright-performance-metrics only supports Chromium-based browsers
+					collector = new PerformanceMetricsCollector();
+				}
 
-		let end = 0,
-			start = 0;
+				let end = 0,
+					start = 0;
 
-		await collectChromeDevtoolsTrace(page, testInfo, async () => {
-			start = Date.now();
+				await collectChromeDevtoolsTrace(page, testInfo, async () => {
+					start = Date.now();
 
-			await run({ page, app });
+					await run({ page, app });
 
-			end = Date.now();
+					end = Date.now();
 
-			console.info('Total time:', end - start, 'ms');
+					console.info('Total time:', end - start, 'ms');
 
-			expect(end - start).toBeLessThan(ms(limits.total[browserName]));
-		});
+					expect(end - start).toBeLessThan(ms(limits.total[browserName]));
+				});
 
-		let metrics: PerformanceMetrics | undefined;
+				let metrics: PerformanceMetrics | undefined;
 
-		if (collector) {
-			metrics = await collector.collectMetrics(page, {
-				timeout: ms('10s'),
+				if (collector) {
+					metrics = await collector.collectMetrics(page, {
+						timeout: ms('10s'),
+					});
+
+					if (limits.largestContentfulPaint) {
+						expect(metrics.largestContentfulPaint).toBeLessThan(
+							ms(limits.largestContentfulPaint)
+						);
+					}
+
+					if (limits.firstContentfulPaint) {
+						expect(metrics.paint?.firstContentfulPaint).toBeLessThan(
+							ms(limits.firstContentfulPaint)
+						);
+					}
+
+					console.info('Startup performance metrics:', metrics);
+				}
+
+				const filepath = 'metrics.json';
+				const existing: unknown[] = await readFile(filepath, 'utf-8')
+					.catch(() => '[]')
+					.then((content) => JSON.parse(content));
+
+				for (const [key, value] of Object.entries({ ...metrics, total: end - start })) {
+					if (typeof value !== 'number') continue;
+
+					existing.push({
+						test: testLabel,
+						browser: browserName,
+						metric: key,
+						title: `${browserName} / ${testLabel}: ${key}`,
+						value,
+						unit: key === 'total' ? 'millisecond' : '',
+					});
+				}
+
+				await writeFile(filepath, JSON.stringify(existing, null, 2));
 			});
-
-			if (limits.largestContentfulPaint) {
-				expect(metrics.largestContentfulPaint).toBeLessThan(
-					ms(limits.largestContentfulPaint)
-				);
-			}
-
-			if (limits.firstContentfulPaint) {
-				expect(metrics.paint?.firstContentfulPaint).toBeLessThan(
-					ms(limits.firstContentfulPaint)
-				);
-			}
-
-			console.info('Startup performance metrics:', metrics);
 		}
-
-		const filepath = 'metrics.json';
-		const existing: unknown[] = await readFile(filepath, 'utf-8')
-			.catch(() => '[]')
-			.then((content) => JSON.parse(content));
-
-		for (const [key, value] of Object.entries({ ...metrics, total: end - start })) {
-			if (typeof value !== 'number') continue;
-
-			existing.push({
-				test: testLabel,
-				browser: browserName,
-				metric: key,
-				title: `${browserName} / ${testLabel}: ${key}`,
-				value,
-				unit: key === 'total' ? 'ms' : '',
-			});
-		}
-
-		await writeFile(filepath, JSON.stringify(existing, null, 2));
 	});
 }
