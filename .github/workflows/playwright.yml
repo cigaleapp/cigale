@@ -318,7 +318,7 @@ jobs:
             let comment = "## Performance changes with [`main`](https://github.com/${{ github.repository }}/tree/main)\n\n"
 
             // Prepare markdown table for sticky PR comment message
-            comment += '| Browser | Test | Metric | Base | Head | Change |\n';
+            comment += '| Browser | Test | Metric | Head | Base | Change |\n';
             comment += '| ------- | ---- | --- | --- | --- | --- |\n';
 
             const byTitle = {
@@ -354,9 +354,9 @@ jobs:
               if (base) {
                 const change = avg(head) - avg(base);
                 const trend = change>0 ? '🔺+' : (change<0 ? '🔻' : '');
-                comment += column(fmt(avg(base)), fmt(avg(head)), trend + fmt(change));
+                comment += column(fmt(avg(head)), fmt(avg(base)), trend + fmt(change));
               } else {
-                comment += column('N/A', fmt(avg(head)), 'N/A');
+                comment += column(fmt(avg(head)), 'N/A', 'N/A');
               }
 
               previousBrowser = browser;
