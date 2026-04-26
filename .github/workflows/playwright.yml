@@ -282,6 +282,25 @@ jobs:
         id: comparison
         run: |
           bun run - <<'EOS'
+            const logos = {
+              chromium: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Google_Chrome_icon_%28February_2022%29.svg/3840px-Google_Chrome_icon_%28February_2022%29.svg.png",
+              webkit: "https://upload.wikimedia.org/wikipedia/fr/thumb/b/be/WebKit_logo_%282015%29.svg/1280px-WebKit_logo_%282015%29.svg.png",
+            }
+
+            const logo = (name) => logos[name] ? `<img src="${logos[name]}" alt="${name}" width="32" height="32">` : name;
+
+            const abbreviations = {
+              total: "Total",
+              domCompleteTiming: "DOM",
+              pageloadTiming: "Load",
+              totalBytes: "Bytes",
+              largestContentfulPaint: "LCP",
+              totalBlockingTime: "TBT",
+              cumulativeLayoutShift: "CLS",
+            }
+
+            const abbr = (metric) => abbreviations[metric] ?? metric
+
             const headMetrics = await Bun.file('./head-report/metrics.json').text()
               .then(contents => JSON.parse(contents))
               .catch((err) => {
@@ -299,7 +318,7 @@ jobs:
             let comment = "## Performance changes with [`main`](https://github.com/${{ github.repository }}/tree/main)\n\n"
 
             // Prepare markdown table for sticky PR comment message
-            comment += '| Browser | Test | Metric | Base | Head | Change |\n';
+            comment += '| Browser | Test | Metric | Head | Base | Change |\n';
             comment += '| ------- | ---- | --- | --- | --- | --- |\n';
 
             const byTitle = {
@@ -314,7 +333,7 @@ jobs:
               const { test, browser, metric, unit } = head[0]
               const base = byTitle.base.get(title)
 
-              const avg = (branch) => branch.reduce((a, b) => a.value + b.value, 0) / branch.length;
+              const avg = (branch) => branch.reduce((sum, m) => sum + m.value, 0) / branch.length;
 
               const fmt = (value) => new Intl.NumberFormat('fr-FR', { 
                 style: unit ? 'unit' : 'decimal',
@@ -323,17 +342,33 @@ jobs:
               }).format(value);
 
               const browserIfDiffers = browser === previousBrowser ? '' : browser;
-              const testIfDiffers = test === previousTest ? '' : test;
-              const column = (...fields) => '| ' + [browserIfDiffers, testIfDiffers, metric, ...fields].join(' | ') + ' |\n';
+              const testIfDiffers = test === previousTest && browser === previousBrowser ? '' : test;
+
+              const column = (...fields) => '| ' + [
+                logo(browserIfDiffers),
+                testIfDiffers, 
+                abbr(metric), 
+                ...fields
+              ].join(' | ') + ' |\n';
 
               if (base) {
                 const change = avg(head) - avg(base);
                 const trend = change>0 ? '🔺+' : (change<0 ? '🔻' : '');
-                comment += column(fmt(avg(base)), fmt(avg(head)), trend + fmt(change));
+                comment += column(fmt(avg(head)), fmt(avg(base)), trend + fmt(change));
               } else {
-                comment += column('N/A', fmt(avg(head)), 'N/A');
+                comment += column(fmt(avg(head)), 'N/A', 'N/A');
               }
+
+              previousBrowser = browser;
+              previousTest = test;
             }
+            comment += "\n\n"
+
+            comment += "<small>"
+            for (const [expansion, abbreviation] of Object.entries(abbreviations)) {
+              comment += `${abbreviation}: \`${expansion}\`, `
+            }
+            comment += "</small>"
 
             // Write to $GITHUB_OUTPUT to pass to next step
             const output = Bun.file(process.env.GITHUB_OUTPUT);
