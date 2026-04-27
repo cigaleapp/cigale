@@ -15,6 +15,7 @@
 	import IconMerge from '~icons/ri/shadow-line';
 	import IconImport from '~icons/ri/upload-2-line';
 	import { page } from '$app/state';
+	import BottomDrawer from '$lib/BottomDrawer.svelte';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import CroppedImg from '$lib/CroppedImg.svelte';
@@ -182,35 +183,7 @@
 	{/if}
 {/snippet}
 
-{#if mobile.current}
-	{#if collapsed}
-		<BottombarContent>
-			<p>{@render title()}</p>
-			<ButtonIcon
-				help="Ouvrir le panneau de prévisualisation"
-				onclick={() => {
-					collapsed = false;
-				}}
-			>
-				<IconShowPanel />
-			</ButtonIcon>
-		</BottombarContent>
-	{:else}
-		<TopbarContent>
-			<p>{@render title()}</p>
-			<ButtonIcon
-				help="Fermer"
-				onclick={() => {
-					collapsed = true;
-				}}
-			>
-				<IconClose />
-			</ButtonIcon>
-		</TopbarContent>
-	{/if}
-{/if}
-
-<aside data-testid="sidepanel" class="sidepanel" class:empty={loadingOptions} class:collapsed>
+{#snippet content()}
 	{#if !loadingOptions}
 		<div class="images">
 			{#each images as { src, box, dimensions }, i (i)}
@@ -326,30 +299,58 @@
 			Supprimer {images.length} images
 		</ButtonSecondary>
 	</section>
-</aside>
+{/snippet}
+
+{#if mobile.current}
+	<BottombarContent>
+		<button
+			class="open-drawer"
+			onclick={() => {
+				collapsed = false;
+			}}
+		>
+			{@render title()}
+			<IconShowPanel />
+		</button>
+	</BottombarContent>
+	<BottomDrawer
+		maxHeight={0.95}
+		bind:open={
+			() => !collapsed,
+			(open) => {
+				collapsed = !open;
+			}
+		}
+	>
+		<div class="sidepanel mobile">{@render content()}</div>
+	</BottomDrawer>
+{:else}
+	<aside data-testid="sidepanel" class="sidepanel" class:empty={loadingOptions} class:collapsed>
+		{@render content()}
+	</aside>
+{/if}
 
 <style>
 	.sidepanel {
-		width: 40vw;
-		min-width: calc(min(520px, 100vw));
 		background-color: var(--bg-neutral);
-		padding: 1.7em;
 		display: grid;
 		height: 100%;
 		flex-shrink: 0;
 		gap: 30px;
 		grid-template-rows: max-content max-content auto max-content;
 
-		@media (min-width: 600px) {
+		&:not(.mobile) {
+			padding: 1.7em;
+			width: 40vw;
+			min-width: calc(min(520px, 100vw));
 			overflow-x: auto;
 			resize: horizontal;
 			direction: rtl;
 		}
 
-		@media (max-width: 600px) {
+		&.mobile {
 			grid-template-rows: max-content auto max-content;
 			gap: 1rem;
-			padding: 0 1em;
 		}
 	}
 
@@ -424,5 +425,14 @@
 		align-items: center;
 		gap: 0.75em;
 		width: 100%;
+	}
+
+	button.open-drawer {
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
+		justify-content: space-between;
+		width: 100%;
+		font-size: 1rem;
 	}
 </style>

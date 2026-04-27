@@ -5,6 +5,16 @@
 	import IconNext from '~icons/ri/arrow-right-s-fill';
 	import IconDismiss from '~icons/ri/close-line';
 	import IconProtocolsFilled from '~icons/ri/file-list-3-fill';
+	import IconManageSession from '~icons/ri/draft-line';
+	import IconManageSessionFilled from '~icons/ri/draft-fill';
+	import IconImport from '~icons/ri/import-line';
+	import IconImportFilled from '~icons/ri/import-fill';
+	import IconCrop from '~icons/ri/crop-line';
+	import IconCropFilled from '~icons/ri/crop-fill';
+	import IconClassify from '~icons/ri/checkbox-multiple-line';
+	import IconClassifyFilled from '~icons/ri/checkbox-multiple-fill';
+	import IconResults from '~icons/ri/file-chart-line';
+	import IconResultsFilled from '~icons/ri/file-chart-fill';
 	import IconProtocols from '~icons/ri/file-list-3-line';
 	import IconAccountsFilled from '~icons/ri/group-fill';
 	import IconAccounts from '~icons/ri/group-line';
@@ -159,6 +169,10 @@
 			help: 'Gérer les protocoles',
 		},
 	});
+
+	const isSessionDependentRoute = $derived(
+ page.route.id !== '/(app)/sessions' && page.route.id !== '/(app)/protocols' && page.route.id !== '(app)/accounts'
+	)
 </script>
 
 {#if previewingPrNumber}
@@ -202,7 +216,7 @@
 				{/if}
 			</div>
 
-			{#if uiState.currentSession && page.route.id !== '/(app)/sessions' && page.route.id !== '/(app)/protocols' && page.route.id !== '(app)/accounts'}
+			{#if uiState.currentSession && isSessionDependentRoute}
 				<div class="steps" in:fade={{ duration: 100 }}>
 					<a
 						class="session-link"
@@ -364,6 +378,75 @@
 
 <header class="mobile">
 	<nav>
+	{#if uiState.currentSession && isSessionDependentRoute}
+		<a
+			href={resolve('/(app)/sessions/[id]', { id: uiState.currentSession.id })}
+			data-testid="mobile-goto-current-session"
+			class:active={path === `/sessions/${uiState.currentSession.id}/`}
+		>
+			{#if path === `/sessions/${uiState.currentSession.id}/`}
+				<IconManageSessionFilled />
+			{:else}
+				<IconManageSession />
+			{/if}
+			<span class="label">Session</span>
+		</a>
+
+		<a
+			href={resolve('/import')}
+			data-testid="mobile-goto-import"
+			aria-disabled={!uiState.currentProtocol}
+			class:active={path == '/import/'}
+		>
+			{#if path == '/import/'}
+				<IconImportFilled />
+			{:else}
+				<IconImport />
+			{/if}
+			<span class="label">Importer</span>
+		</a>
+
+		<a
+			href={resolve('/crop')}
+			data-testid="mobile-goto-crop"
+			aria-disabled={!uiState.currentProtocol || !hasImages}
+			class:active={path.startsWith('/crop')}
+		>
+			{#if path.startsWith('/crop')}
+				<IconCropFilled />
+			{:else}
+				<IconCrop />
+			{/if}
+			<span class="label">Recadrer</span>
+		</a>
+
+		<a
+			href={resolve('/classify')}
+			data-testid="mobile-goto-classify"
+			aria-disabled={!uiState.currentProtocol || !hasImages}
+			class:active={path.startsWith('/classify')}
+		>
+			{#if path.startsWith('/classify')}
+				<IconClassifyFilled />
+			{:else}
+				<IconClassify />
+			{/if}
+			<span class="label">Classifier</span>
+		</a>
+
+		<a
+			href={resolve('/results')}
+			data-testid="mobile-goto-results"
+			class:active={path == '/results/'}
+		>
+			{#if path == '/results/'}
+				<IconResultsFilled />
+			{:else}
+				<IconResults />
+			{/if}
+			<span class="label">Résultats</span>
+		</a>
+	{:else}
 		<a
 			href={resolve('/')}
 			data-testid="mobile-goto-home"
@@ -415,6 +498,7 @@
 			{/if}
 			<span class="label">Réglages</span>
 		</a>
+		{/if}
 	</nav>
 </header>
 

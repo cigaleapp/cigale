@@ -26,8 +26,8 @@
 	<ButtonIcon
 	help="Toutes les sessions"
 		onclick={async () => {
-			await switchSession(null);
 			await goto('/sessions/');
+			await switchSession(null);
 		}}
 	>
 		<IconBack />
