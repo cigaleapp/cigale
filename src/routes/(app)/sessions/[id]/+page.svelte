@@ -2,7 +2,6 @@
 	import { fade } from 'svelte/transition';
 
 	import { invalidate } from '$app/navigation';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
 	import Field from '$lib/Field.svelte';
 	import { plural } from '$lib/i18n.js';
@@ -10,31 +9,17 @@
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import InputSelectProtocol from '$lib/InputSelectProtocol.svelte';
 	import ModalConfirmDeletion from '$lib/ModalConfirmDeletion.svelte';
-	import OverflowableText from '$lib/OverflowableText.svelte';
 	import { goto } from '$lib/paths.js';
 	import SessionMetadataForm from '$lib/SessionMetadataForm.svelte';
 	import { deleteSession, switchSession } from '$lib/sessions.js';
 	import { toasts } from '$lib/toasts.svelte.js';
-	import TopbarContent from '$routes/(app)/TopbarContent.svelte';
-	import IconBack from '~icons/ri/arrow-left-line';
+	import TopbarOpenSession from '$routes/(app)/TopbarOpenSession.svelte';
 
 	const { data } = $props();
 	let { protocol: protocolId, name } = $derived(data.session);
 </script>
 
-<TopbarContent>
-	<ButtonIcon
-	help="Toutes les sessions"
-		onclick={async () => {
-			await goto('/sessions/');
-			await switchSession(null);
-		}}
-	>
-		<IconBack />
-	</ButtonIcon>
-
-	<OverflowableText text={name} />
-</TopbarContent>
+<TopbarOpenSession />
 
 <main in:fade={{ duration: 100 }}>
 	<h1>

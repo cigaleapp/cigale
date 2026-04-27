@@ -19,5 +19,6 @@
 		justify-content: space-between;
 		padding: 0.5rem 1rem;
 		gap: 1rem;
+		width: 100%;
 	}
 </style>

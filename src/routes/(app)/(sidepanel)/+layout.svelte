@@ -5,6 +5,7 @@
 	import { toTopLeftCoords } from '$lib/BoundingBoxes.svelte';
 	import { promptForFiles } from '$lib/files';
 	import * as db from '$lib/idb.svelte';
+	import IconClose from '~icons/ri/close-line';
 	import { openTransaction, tables } from '$lib/idb.svelte';
 	import { deleteImageFile, imageFileId, imageIdToFileId } from '$lib/images';
 	import IconBack from '~icons/ri/arrow-left-line';
@@ -28,6 +29,7 @@
 	import OverflowableText from '$lib/OverflowableText.svelte';
 	import { switchSession } from '$lib/sessions.js';
 	import TopbarContent from '../TopbarContent.svelte';
+	import TopbarOpenSession from '../TopbarOpenSession.svelte';
 
 	seo({ title: 'Importer' });
 
@@ -195,20 +197,7 @@
 	const mobile = new IsMobile()
 </script>
 
-
-<TopbarContent>
-	<ButtonIcon
-	help="Toutes les sessions"
-		onclick={async () => {
-			await switchSession(null);
-			await goto('/sessions/');
-		}}
-	>
-		<IconBack />
-	</ButtonIcon>
-
-	<OverflowableText text={uiState.currentSession?.name ?? ""} />
-</TopbarContent>
+<TopbarOpenSession />
 
 <div class="main-and-sidepanel" class:has-sidepanel={showSidePanel} in:fade={{ duration: 100 }}>
 	<div class="main" data-testid="app-main">{@render children?.()}</div>

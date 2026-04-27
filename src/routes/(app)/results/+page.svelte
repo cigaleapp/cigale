@@ -37,6 +37,8 @@
 	import { entries } from '$lib/utils.js';
 	import ZipContentsTree from '$lib/ZipContentsTree.svelte';
 
+	import TopbarOpenSession from '../TopbarOpenSession.svelte';
+
 	const { data } = $props();
 	const swarpc = $derived(data.swarpc);
 
@@ -250,6 +252,8 @@
 </ModalConfirm>
 
 <svelte:window bind:innerWidth={windowWidth} />
+
+<TopbarOpenSession />
 
 <main>
 	<section class="session">

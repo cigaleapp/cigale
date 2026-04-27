@@ -10,6 +10,7 @@
 	import lockfile from '$lib/../../bun.lock?raw';
 	import Logo from '$lib/Logo.svelte';
 	import { seo } from '$lib/seo.svelte';
+	import TopbarBackToHome from '../TopbarBackToHome.svelte';
 
 	const { data } = $props();
 
@@ -79,6 +80,10 @@
 		return pkgs.map((name) => [name, packages[name][0].replace(`${name}@`, '')]);
 	}
 </script>
+
+<TopbarBackToHome>
+	À propos
+</TopbarBackToHome>
 
 <header>
 	<Logo drawpercent={logoDrawPercent} />
