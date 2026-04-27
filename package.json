@@ -160,7 +160,7 @@
 		"idb": "^8.0.3",
 		"jimp": "^1.6.0",
 		"jsonata": "^2.1.0",
-		"maplibre-gl": "^5.23.0",
+		"maplibre-gl": "^5.24.0",
 		"marked": "^18.0.2",
 		"microdiff": "^1.5.0",
 		"nanoid": "^5.1.9",
