@@ -18,6 +18,8 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		padding: 0rem 1.5rem;
+		padding: .5rem 1.5rem;
+		border-radius: var(--corner-radius) var(--corner-radius) 0 0;
+		border-top: 1px solid var(--gray);
 	}
 </style>

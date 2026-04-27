@@ -24,6 +24,10 @@
 </div>
 
 <style>
+	[data-bottomsheet-wrapper] {
+		z-index: 1000;
+	}
+
 	[data-bottomsheet-wrapper] :global(.bottom-sheet) {
 		transition: max-height 0.01s ease !important;
 	}

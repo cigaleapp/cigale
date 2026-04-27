@@ -344,6 +344,7 @@
 		align-items: center;
 		justify-content: space-between;
 		gap: 1em;
+		flex-wrap: wrap;
 	}
 	.value {
 		display: flex;

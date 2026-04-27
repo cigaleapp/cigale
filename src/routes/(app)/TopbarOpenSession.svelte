@@ -1,26 +1,78 @@
-
 <script lang="ts">
-	import { goto } from "$lib/paths.js";
-	import ButtonIcon from "$lib/ButtonIcon.svelte";
-	import IconClose from "~icons/ri/close-line";
-	import OverflowableText from "$lib/OverflowableText.svelte";
-	import { switchSession } from "$lib/sessions.js";
-	import { uiState } from "$lib/state.svelte.js";
-	import TopbarContent from "./TopbarContent.svelte";
+	import type { ComponentProps } from 'svelte';
 
+	import IconClose from '~icons/ri/close-line';
+	import IconSettings from '~icons/ri/settings-2-line';
+	import { page } from '$app/state';
+	import ButtonIcon from '$lib/ButtonIcon.svelte';
+	import OverflowableText from '$lib/OverflowableText.svelte';
+	import { goto } from '$lib/paths.js';
+	import { switchSession } from '$lib/sessions.js';
+	import { uiState } from '$lib/state.svelte.js';
+
+	import TabSettings from './TabSettings.svelte';
+	import TopbarContent from './TopbarContent.svelte';
 </script>
 
 <TopbarContent>
+	<OverflowableText text={uiState.currentSession?.name ?? ''} />
 
-	<OverflowableText text={uiState.currentSession?.name ?? ""} />
+	<div class="actions">
+		{#snippet tabSettingsTrigger(props: { help: string; onclick: () => void })}
+			<ButtonIcon {...props}>
+				<IconSettings />
+			</ButtonIcon>
+		{/snippet}
 
-	<ButtonIcon
-	help="Fermer la session"
-		onclick={async () => {
-			await switchSession(null);
-			await goto('/sessions/');
-		}}
-	>
-		<IconClose />
-	</ButtonIcon>
+		{#if page.route.id === '/(app)/(sidepanel)/import'}
+			<TabSettings
+				tab="import"
+				label="Réglages d'import"
+				trigger={tabSettingsTrigger}
+				models={[]}
+				currentModelIndex={-1}
+				setModel={async () => {}}
+			/>
+		{:else if page.route.id === '/(app)/(sidepanel)/crop'}
+			<TabSettings
+				tab="crop"
+				label="Réglages de recadrage"
+				trigger={tabSettingsTrigger}
+				models={uiState.cropModels}
+				currentModelIndex={uiState.selectedCropModel}
+				setModel={async (i) => {
+					uiState.setModelSelections({ crop: i });
+				}}
+			/>
+		{:else if page.route.id === '/(app)/(sidepanel)/classify'}
+			<TabSettings
+				tab="classify"
+				label="Réglages de classification"
+				trigger={tabSettingsTrigger}
+				models={uiState.classificationModels}
+				currentModelIndex={uiState.selectedClassificationModel}
+				setModel={async (i) => {
+					uiState.setModelSelections({ classification: i });
+				}}
+			/>
+		{/if}
+
+		<ButtonIcon
+			help="Fermer la session"
+			onclick={async () => {
+				await goto('/sessions/');
+				await switchSession(null);
+			}}
+		>
+			<IconClose />
+		</ButtonIcon>
+	</div>
 </TopbarContent>
+
+<style>
+	.actions {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+</style>

@@ -24,6 +24,7 @@
 		label: string;
 		selected?: boolean;
 		testid?: string;
+		key?: string | number;
 		submenu: {
 			label?: string;
 			/** Text to show when items is empty */
@@ -118,9 +119,10 @@
 		)}
 	>
 		<Submenu
-			items={groups.flatMap((group) =>
+			items={groups.flatMap((group, ii) =>
 				group.items.map((item, i) => ({
 					label: item.label,
+					key: item.key ?? `${ii}/${i}`,
 					data: { ...item, i, groupTitle: i === 0 ? group.label : undefined, group },
 				}))
 			)}
@@ -346,6 +348,9 @@
 		background: none;
 		border: none;
 		font-size: 1.125rem;
+		display: flex;
+		align-items: center;
+		gap: 1rem;
 	}
 
 	.bottom-drawer-heading {

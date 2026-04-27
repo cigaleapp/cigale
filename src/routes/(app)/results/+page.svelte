@@ -490,7 +490,7 @@
 
 <style>
 	main {
-		max-width: 1400px;
+		max-width: calc(min(1400px, 100vw ));
 		width: 100%;
 		margin: 0 auto;
 		display: flex;
@@ -519,7 +519,8 @@
 		display: flex;
 		flex-direction: column;
 		gap: 2em;
-		padding: 2rem;
+		max-width: 50rem;
+		width: 100%;
 	}
 
 	.session .metadata {
@@ -578,6 +579,10 @@
 		display: grid;
 		grid-template-columns: auto calc(3 * (var(--gallery-thumb) + var(--gallery-gap)));
 		gap: 3em;
+
+		@media (max-width: 600px) {
+			grid-template-columns: auto;
+		}
 	}
 
 	.gallery {
@@ -645,6 +650,7 @@
 		gap: 1em;
 		align-items: center;
 		justify-content: center;
+		flex-wrap: wrap;
 	}
 
 	@media (max-width: 1300px) {

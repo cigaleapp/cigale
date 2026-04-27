@@ -80,6 +80,7 @@
 <DropdownMenu
 	items={[
 		{
+			label: mobile.current ? undefined : 'Réglages',
 			items: [
 				...mobileOnly({
 					type: 'clickable' as const,
@@ -211,7 +212,7 @@
 				{
 					type: 'selectable',
 					key: 'debug-mode',
-					label: 'Mode débug',
+					label: 'Mode debug',
 					selected: showTechnicalMetadata,
 					closeOnSelect: false,
 					data: {

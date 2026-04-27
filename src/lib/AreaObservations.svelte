@@ -23,6 +23,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	import IconTrash from '~icons/ri/delete-bin-line';
 	import { uiState } from '$lib/state.svelte.js';
 
+	import { IsMobile } from '$lib/mobile.svelte.js';
 	import ButtonIcon from './ButtonIcon.svelte';
 	import ButtonInk from './ButtonInk.svelte';
 	import { DragSelect } from './dragselect.svelte.js';
@@ -34,6 +35,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	import Logo from './Logo.svelte';
 	import { mutationobserver, resizeobserver } from './mutations.js';
 	import { deleteObservation } from './observations.js';
+	import OverflowableText from './OverflowableText.svelte';
 	import { cancelTask } from './queue.svelte.js';
 	import { isDebugMode } from './settings.svelte.js';
 	import { toasts } from './toasts.svelte.js';
@@ -245,6 +247,8 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 			el.dataset.roundCornerRight = row.every(({ x }) => x <= coords.x).toString();
 		});
 	}
+
+	const mobile = new IsMobile();
 </script>
 
 <section
@@ -300,9 +304,11 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 									<IconCollapse />
 								{/if}
 							</ButtonIcon>
-							<h2>{label}</h2>
+							<h2>
+								<OverflowableText text={label} />
+							</h2>
 							<p>
-								{plural(items.length, ['# élément', '# éléments'])}
+								{items.length}
 							</p>
 							<div class="actions">
 								<ButtonInk
@@ -331,7 +337,10 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 									}}
 								>
 									<IconTrash />
-									Supprimer</ButtonInk
+									{#if !mobile.current}
+									Supprimer
+									{/if}
+									</ButtonInk
 								>
 							</div>
 						</header>
@@ -390,10 +399,18 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		flex-wrap: wrap;
 		align-content: flex-start;
 		padding: 0 2.5em;
+
+		@media (max-width: 600px) {
+			padding: 0;
+		}
 	}
 
 	.item-unroll-container {
 		padding: 1em;
+
+		@media (max-width: 600px) {
+			padding: 0.5em;
+		}
 	}
 
 	.item-unroll-container.unrolled {
@@ -449,6 +466,10 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		background-color: var(--bg-neutral);
 		padding: 0 2.5em 0.75em 2.5em;
 
+		@media (max-width: 600px) {
+			padding: 0 0.75em 0.75em 0.5em;
+		}
+
 		* {
 			font-size: 1.1rem;
 		}
@@ -459,6 +480,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 
 		h2 {
 			margin-right: 0.5em;
+			max-width: calc(100vw - 10rem);
 		}
 	}
 

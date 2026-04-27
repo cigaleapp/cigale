@@ -1701,15 +1701,36 @@ export function displayKeyRange(keyRange) {
 }
 
 /**
+ * @template {Record<string|number, unknown>} const T
+ * @template {keyof T} V
+ * @overload
+ * @param {V} value
+ * @param {NoInfer<Partial<T>>} cases
+ * @param {T[V]} fallback
+ * @returns {T[V]}
+ */
+
+
+/**
+ * @template {Record<string|number, unknown>} const T
+ * @template {keyof T} V
+ * @overload
+ * @param {NoInfer<V>} value
+ * @param {T} cases
+ * @returns {T[V]}
+ */
+
+/**
  * Like a switch statement but for expressions.
  * Equivalent to `({ ... } as const)[value]`
  * 
  * @template {Record<string|number, unknown>} const T
  * @template {keyof T} V
  * @param {V} value
- * @param {T} cases
+ * @param {NoInfer<Partial<T>>} cases
+ * @param {T[V]} [fallback]
  * @returns {T[V]}
  */
-export function switchValue(value, cases) {
-	return cases[value];
+export function switchValue(value, cases, fallback) {
+	return cases[value] ?? fallback; 
 }
