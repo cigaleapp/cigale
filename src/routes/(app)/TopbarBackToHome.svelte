@@ -16,7 +16,7 @@
 <TopbarContent>
 	<div class="back">
 		<ButtonIcon
-			help="Toutes les sessions"
+			help="Retour"
 			onclick={async () => {
 				await goto('/sessions/');
 			}}

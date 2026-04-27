@@ -1,29 +1,50 @@
-<script>
+<script lang="ts">
+	import type { Component } from 'svelte';
+
 	import IconIncrease from '~icons/ri/add-line';
+	import IconMore from '~icons/ri/arrow-right-s-line';
+	import IconCheck from '~icons/ri/check-line';
 	import Cross from '~icons/ri/close-circle-line';
+	import IconDebugMode from '~icons/ri/code-line';
+	import IconTheme from '~icons/ri/contrast-2-line';
+	import IconProtocols from '~icons/ri/file-list-3-line';
+	import IconAccounts from '~icons/ri/group-line';
+	import IconAbout from '~icons/ri/information-line';
 	import IconSyncWithSystemTheme from '~icons/ri/loop-left-fill';
 	import Moon from '~icons/ri/moon-line';
+	import IconNotifications from '~icons/ri/notification-line';
+	import IconManage from '~icons/ri/settings-3-line';
 	import Gears from '~icons/ri/settings-3-line';
 	import IconDecrease from '~icons/ri/subtract-line';
 	import Sun from '~icons/ri/sun-line';
+	import IconOffline from '~icons/ri/wifi-off-line';
+	import { version } from '$app/environment';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import { tables } from '$lib/idb.svelte';
+	import DropdownMenu from '$lib/DropdownMenu.svelte';
+	import { plural } from '$lib/i18n.js';
+	import { tables } from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import InputRange from '$lib/InputRange.svelte';
+	import KeyboardShortcuts from '$lib/KeyboardShortcuts.svelte';
+	import Logo from '$lib/Logo.svelte';
+	import { IsMobile } from '$lib/mobile.svelte.js';
 	import { askForNotificationPermission, hasNotificationsEnabled } from '$lib/notifications.js';
+	import OverflowableText from '$lib/OverflowableText.svelte';
 	import { resolve } from '$lib/paths';
+	import { goto } from '$lib/paths.js';
 	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
 	import { getColorScheme, getSettings, setSetting } from '$lib/settings.svelte';
+	import { uiState } from '$lib/state.svelte.js';
 	import Switch from '$lib/Switch.svelte';
+	import { orEmpty } from '$lib/utils.js';
 	import { getTheme } from '$routes/+layout.svelte';
 
-	/**
-	 * @type {{openKeyboardShortcuts?: (() => void) | undefined, openPrepareForOfflineUse?: (() => void) | undefined}}
-	 */
-	const { openKeyboardShortcuts, openPrepareForOfflineUse } = $props();
+	import PrepareForOffline from './PrepareForOffline.svelte';
 
-	let open = $state(false);
+	let openPrepareForOfflineUse = $state<() => void>();
+	let openKeyboardShortcuts = $state<() => void>();
+
 	/** @type {HTMLDialogElement|undefined} */
 	let dialogElement = $state();
 
@@ -49,258 +70,315 @@
 			)
 		);
 	});
+
+	const mobile = new IsMobile();
+
+	const mobileOnly = <T,>(item: T) => orEmpty(mobile.current, item);
+	const desktopOnly = <T,>(item: T) => orEmpty(!mobile.current, item);
 </script>
 
-<ButtonIcon
-	--fg="var(--trigger-fg)"
-	--bg="var(--trigger-bg)"
-	--hover-fg="var(--trigger-hover-fg)"
-	--hover-bg="var(--trigger-hover-bg)"
-	data-testid="settings-button"
-	help={open ? 'Fermer' : 'Réglages'}
-	onclick={() => {
-		open = !open;
-	}}
->
-	{#if open}
-		<Cross />
-	{:else}
-		<Gears />
-	{/if}
-</ButtonIcon>
+<DropdownMenu
+	items={[
+		{
+			items: [
+				...mobileOnly({
+					type: 'clickable' as const,
+					data: {
+						icon: IconProtocols,
+						subtext: plural(tables.Protocol.state.length, [
+							'# installé',
+							'# installés',
+						]),
+					},
+					label: 'Gérer les protocoles',
+					async onclick() {
+						await goto('/(app)/protocols');
+					},
+				}),
+				...mobileOnly({
+					type: 'clickable' as const,
+					data: {
+						icon: IconAccounts,
+						subtext: plural(tables.Account.state.length, ['# connecté', '# connectés']),
+					},
+					label: 'Gérer les comptes',
+					async onclick() {
+						await goto('/(app)/accounts');
+					},
+				}),
 
-<dialog
-	style:color-scheme={getColorScheme()}
-	class="container"
-	data-testid="app-settings"
-	open={open ? true : undefined}
-	bind:this={dialogElement}
+				{
+					type: 'clickable',
+					label: 'Thème',
+					closeOnSelect: false,
+					data: {
+						icon: theme.effective === 'dark' ? Moon : Sun,
+						subtext:
+							{
+								light: 'Clair',
+								dark: 'Sombre',
+								auto: 'Système',
+							}[theme.setting] ?? '?',
+					},
+					async onclick() {
+						await setSetting(
+							'theme',
+							{
+								light: 'dark',
+								dark: 'auto',
+								auto: 'light',
+							}[theme.setting]
+						);
+					},
+				},
+				{
+					type: 'selectable',
+					key: 'notifications',
+					label: 'Notifications',
+					selected: Boolean(notificationsEnabled),
+					closeOnSelect: false,
+					data: {
+						icon: IconNotifications,
+						subtext: '',
+					},
+					async onclick() {
+						if (notificationsEnabled) {
+							await setSetting('notifications', false);
+						} else {
+							await askForNotificationPermission();
+							await setSetting('notifications', true);
+						}
+					},
+				},
+
+				{
+					type: 'submenu',
+					label: 'Langue',
+					data: {
+						icon: undefined,
+						subtext:
+							{
+								fr: 'Français',
+								en: 'English',
+							}[language] ?? '?',
+					},
+					submenu: {
+						label: 'Langue',
+						items: [
+							{
+								type: 'selectable',
+								key: 'language-fr',
+								label: 'Français',
+								selected: language === 'fr',
+								data: {
+									icon: undefined,
+									subtext: '',
+								},
+								async onclick() {
+									await setSetting('language', 'fr');
+									window.location.reload();
+								},
+							},
+							{
+								type: 'selectable',
+								key: 'language-en',
+								label: 'English',
+								selected: language === 'en',
+								data: {
+									icon: undefined,
+									subtext: '',
+								},
+								async onclick() {
+									await setSetting('language', 'en');
+									window.location.reload();
+								},
+							},
+						],
+					},
+				},
+				{
+					type: 'clickable',
+					label: 'Parallélisme',
+					key: 'parallelism',
+					closeOnSelect: false,
+					data: {
+						icon: undefined,
+						subtext: '',
+					},
+					onclick() {
+						// noop, handled in a custom way belowk
+					},
+				},
+				{
+					type: 'selectable',
+					key: 'debug-mode',
+					label: 'Mode débug',
+					selected: showTechnicalMetadata,
+					closeOnSelect: false,
+					data: {
+						icon: IconDebugMode,
+						subtext: '',
+					},
+					async onclick() {
+						await setSetting('showTechnicalMetadata', !showTechnicalMetadata);
+					},
+				},
+				{
+					type: 'clickable',
+					label: 'Préparation hors-ligne…',
+					data: {
+						icon: IconOffline,
+						subtext: '',
+					},
+					closeOnSelect: !mobile.current,
+					onclick() {
+						openPrepareForOfflineUse?.();
+					},
+				},
+				...desktopOnly({
+					type: 'clickable' as const,
+					label: 'Raccourcis clavier…',
+					data: {
+						icon: undefined,
+						subtext: '',
+					},
+					closeOnSelect: !mobile.current,
+					onclick() {
+						openKeyboardShortcuts?.();
+					},
+				}),
+				{
+					type: 'clickable' as const,
+					data: { icon: IconAbout, subtext: `Version ${version}` },
+					label: 'À propos…',
+					async onclick() {
+						await goto('/(app)/about');
+					},
+				},
+			],
+		},
+	]}
 >
-	<header>Réglages</header>
-	<div class="listParam">
-		<div class="label">Thème</div>
-		<div class="setting">
-			<Switch
-				value={theme.effective === 'light'}
-				onchange={async (isLight) => {
-					await setSetting('theme', isLight ? 'light' : 'dark');
-				}}
-				icons={{ on: Sun, off: Moon }}
-			></Switch>
-			<ButtonIcon
-				disabled={theme.setting === 'auto'}
-				onclick={async () => await setSetting('theme', 'auto')}
-				help="Synchroniser avec le thème du système"
-			>
-				<IconSyncWithSystemTheme />
-			</ButtonIcon>
-		</div>
-		<div class="label">
-			Notifications
-			<p class="details">Quand un traitement est terminé</p>
-		</div>
-		<div class="setting">
-			<Switch
-				data-testid="notifications"
-				value={notificationsEnabled}
-				onchange={async (enabled) => {
-					if (enabled) {
-						await askForNotificationPermission();
-						setSetting('notifications', true);
-					} else {
-						setSetting('notifications', false);
-					}
-				}}
-			/>
-		</div>
-		<div class="label">Mode debug</div>
-		<div class="setting">
-			<Switch
-				data-testid="debug-mode"
-				value={showTechnicalMetadata}
-				onchange={async (show) => {
-					await setSetting('showTechnicalMetadata', show);
-				}}
-			/>
-		</div>
-		<div class="label">Taille des images</div>
-		<div class="setting">
-			<InputRange
-				min={0.5}
-				max={2}
-				granularity={0.01}
-				ticks={[1]}
-				onblur={async () => setSetting('gridSize', gridSize)}
-				bind:value={
-					() => gridSize,
-					(value) => {
-						// Don't write to database too eagerly, it lags the UI
-						const settings = tables.Settings.state;
-						settings[settings.findIndex((s) => s.id === 'user')].gridSize = value;
-					}
-				}
-			/>
-		</div>
-		<div class="label">Langue</div>
-		<div class="setting">
-			<SegmentedGroup
-				data-testid="language-selection"
-				aria-label="Langue de l'interface"
-				clickable-custom-options
-				options={['en', 'fr']}
-				value={language}
-				onchange={async (code) => {
-					await setSetting('language', code);
-					window.location.reload();
-				}}
-			>
-				{#snippet customOption(code)}
-					<!-- @wc-ignore: language names are left in their native language on purpose -->
-					{@const names = { en: 'English', fr: 'Français', ja: '日本語' }}
-					{names[code] || code}
-				{/snippet}
-			</SegmentedGroup>
-		</div>
-		<div class="label">
-			Parallélisme
-			<p class="details">Nombre de tâches en parallèle</p>
-		</div>
-		<div class="setting">
-			<ButtonIcon
-				help="Réduire"
-				onclick={async () => {
-					await setSetting('parallelism', Math.max(1, parallelism - 1));
-				}}
-			>
-				<IconDecrease />
-			</ButtonIcon>
-			<div class="number-input">
-				<InlineTextInput
-					label="Nombre de tâches en parallèle"
-					value={parallelism}
-					onblur={async (value) => {
-						await setSetting('parallelism', Number.parseInt(value));
-					}}
-				/>
+	{#snippet item({ icon: Icon, subtext }, { label, selected, key, type })}
+		<div class="settings-item">
+			<div class="icon">
+				{#if Icon}
+					<Icon />
+				{:else if selected}
+					<IconCheck />
+				{/if}
 			</div>
-			<ButtonIcon
-				help="Augmenter"
-				onclick={async () => {
-					await setSetting('parallelism', parallelism + 1);
-				}}
-			>
-				<IconIncrease />
-			</ButtonIcon>
+			<!-- 
+				On mobile, the … is replaced with a caret icon at the right 
+				This is because the expectation on mobile is the same whether it opens a modal or goes into a submenu (it changes the screen completely)
+
+				Whereas on desktop, the caret icon sets an expectation of a sub-dropdown, so it only appears when there is actually a submenu
+			-->
+			<span>{mobile.current ? label.replace(/…$/, '') : label}</span>
+			{#if key === 'parallelism'}
+				<div class="input">
+					<ButtonIcon
+						help="Réduire"
+						onclick={async () => {
+							await setSetting('parallelism', Math.max(1, parallelism - 1));
+						}}
+					>
+						<IconDecrease />
+					</ButtonIcon>
+					<div class="number-input">
+						<InlineTextInput
+							label="Nombre de tâches en parallèle"
+							value={parallelism}
+							onblur={async (value) => {
+								await setSetting('parallelism', Number.parseInt(value));
+							}}
+						/>
+					</div>
+					<ButtonIcon
+						help="Augmenter"
+						onclick={async () => {
+							await setSetting('parallelism', parallelism + 1);
+						}}
+					>
+						<IconIncrease />
+					</ButtonIcon>
+				</div>
+			{:else}
+				<span class="subtext">
+					{#if subtext}
+						<OverflowableText text={subtext} />
+						<!-- If the selected state is already indicated by the checkmark, don't show this -->
+					{:else if type === 'selectable' && Icon !== undefined}
+						{selected ? 'Oui' : 'Non'}
+					{/if}
+				</span>
+			{/if}
+
+			{#if type === 'submenu' || (mobile.current && label.endsWith('…'))}
+				<div class="icon">
+					<IconMore />
+				</div>
+			{/if}
 		</div>
-	</div>
-	<section class="actions">
-		<ButtonSecondary
-			onclick={() => {
-				openKeyboardShortcuts?.();
-			}}
+	{/snippet}
+
+	{#snippet trigger({ open, ...props })}
+		<ButtonIcon
+			--fg="var(--trigger-fg)"
+			--bg="var(--trigger-bg)"
+			--hover-fg="var(--trigger-hover-fg)"
+			--hover-bg="var(--trigger-hover-bg)"
+			data-testid="settings-button"
+			help={open ? 'Fermer' : 'Réglages'}
+			{...props}
 		>
-			Raccourcis clavier
-		</ButtonSecondary>
-		<ButtonSecondary
-			help="Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne. Télécharge tout les modèles pour tout les protocoles actuellement installés."
-			onclick={() => {
-				openPrepareForOfflineUse?.();
-			}}
-		>
-			Préparation hors-ligne
-		</ButtonSecondary>
-	</section>
-	<footer>
-		CIGALE ver. <a
-			href="https://github.com/cigaleapp/cigale/tree/{import.meta.env.buildCommit}"
-		>
-			{import.meta.env.buildCommit.slice(0, 7)}
-		</a>
-		·
-		<a
-			onclick={() => {
-				open = false;
-			}}
-			href={resolve('/about')}>À propos</a
-		>
-	</footer>
-</dialog>
+			{#if open}
+				<Cross />
+			{:else}
+				<Gears />
+			{/if}
+		</ButtonIcon>
+	{/snippet}
+</DropdownMenu>
+
+<KeyboardShortcuts bind:openHelp={openKeyboardShortcuts} preventDefault binds={uiState.keybinds} />
+<PrepareForOffline bind:open={openPrepareForOfflineUse} />
 
 <style>
-	dialog:not([open]) {
-		opacity: 0;
-		pointer-events: none;
-		transform: scale(0.75);
-	}
-
-	.container {
-		position: fixed;
-		top: var(--navbar-height, 70px);
-		border: none;
-		margin-left: auto;
-		margin-right: 1rem;
+	.settings-item {
 		display: flex;
-		flex-direction: column;
-		padding: 2rem;
-		z-index: 2;
-		background-color: var(--bg-neutral);
-		border-radius: var(--corner-radius);
-		border: 1px solid var(--fg-primary);
-		font-size: smaller;
+		width: 100%;
+		align-items: center;
+		gap: 1rem;
+
+		.icon {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			width: 1.5em;
+			height: 1.5em;
+		}
+
+		.subtext {
+			display: flex;
+			align-items: center;
+			margin-left: auto;
+			color: var(--gay);
+			font-size: 0.875rem;
+		}
 	}
 
-	header {
-		font-size: 1.5em;
-		font-weight: bold;
-		margin-bottom: 0.5em;
-	}
-
-	.listParam {
-		display: grid;
-		grid-template-columns: max-content auto;
-		gap: 1em;
-	}
-
-	.listParam > div {
+	.input {
 		display: flex;
 		align-items: center;
-		gap: 0 1em;
+		gap: 0.5em;
+		margin-left: auto;
 	}
 
-	.listParam .label {
-		font-weight: bold;
-		flex-wrap: wrap;
-		max-width: 10rem;
-	}
-
-	.listParam .label .details {
-		font-weight: normal;
-		font-size: 0.8em;
-	}
-
-	.listParam .setting {
-		max-width: 12rem;
-	}
-
-	.listParam .number-input {
+	.number-input {
 		font-family: var(--font-mono);
 		width: 3ch;
-		font-size: 1.4em;
+		font-size: 1rem;
 		font-weight: 200;
-	}
-
-	.actions {
-		display: flex;
-		justify-content: center;
-		gap: 1em;
-		margin-top: 2em;
-		margin-bottom: 1em;
-		/* flex-wrap: wrap; */
-		max-width: 400px;
-	}
-
-	footer {
-		font-weight: bold;
-		text-align: center;
 	}
 </style>

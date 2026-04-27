@@ -12,17 +12,9 @@
 	import IconManageSession from '~icons/ri/draft-line';
 	import IconResultsFilled from '~icons/ri/file-chart-fill';
 	import IconResults from '~icons/ri/file-chart-line';
-	import IconProtocolsFilled from '~icons/ri/file-list-3-fill';
-	import IconProtocols from '~icons/ri/file-list-3-line';
-	import IconAccountsFilled from '~icons/ri/group-fill';
-	import IconAccounts from '~icons/ri/group-line';
-	import IconHomeFilled from '~icons/ri/home-2-fill';
-	import IconHome from '~icons/ri/home-2-line';
 	import IconImportFilled from '~icons/ri/import-fill';
 	import IconImport from '~icons/ri/import-line';
 	import IconNotificationsOn from '~icons/ri/notification-2-line';
-	import IconSettingsFilled from '~icons/ri/settings-3-fill';
-	import IconSettings from '~icons/ri/settings-3-line';
 	import { page } from '$app/state';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonInk from '$lib/ButtonInk.svelte';
@@ -38,6 +30,7 @@
 	import { uiState } from '$lib/state.svelte.js';
 	import { tooltip } from '$lib/tooltips.js';
 	import { clamp } from '$lib/utils.js';
+	import { IsMobile } from '$lib/mobile.svelte.js';
 
 	import DeploymentDetails from './DeploymentDetails.svelte';
 	import ModalSubmitIssue from './ModalSubmitIssue.svelte';
@@ -50,19 +43,11 @@
 	 * @property {number} [progress=0]
 	 * @property {number} [eta=Infinity]
 	 * @property {import('swarpc').SwarpcClient<typeof import('$worker/procedures.js').PROCEDURES>} swarpc
-	 * @property {(() => void) | undefined} [openKeyboardShortcuts]
-	 * @property {(() => void) | undefined} [openPrepareForOfflineUse]
 	 * @property {boolean} [progressbarOnly] Only show the progress bar, hide the navbar and logo
 	 */
 
 	/** @type {Props} */
-	let {
-		openKeyboardShortcuts,
-		openPrepareForOfflineUse,
-		progress = 0,
-		eta = Infinity,
-		progressbarOnly = false,
-	} = $props();
+	let { progress = 0, eta = Infinity, progressbarOnly = false } = $props();
 
 	// @ts-expect-error
 	const path = $derived(resolve(page.url.pathname));
@@ -145,27 +130,27 @@
 		},
 		// [I]mport images
 		'g i': {
-			do: () => goto('/import'),
+			do: () => goto('/import/'),
 			help: 'Importer des images',
 		},
 		// Adjust C[r]ops
 		'g r': {
-			do: () => goto('/crop'),
+			do: () => goto('/crop/'),
 			help: 'Recadrer les images',
 		},
 		// A[n]notate images
 		'g n': {
-			do: () => goto('/classify'),
+			do: () => goto('/classify/'),
 			help: 'Classifier les images',
 		},
 		// E[x]port results
 		'g x': {
-			do: () => goto('/results'),
+			do: () => goto('/results/'),
 			help: 'Exporter les résultats',
 		},
 		// [M]anage protocols
 		'g m': {
-			do: () => goto('/protocols'),
+			do: () => goto('/protocols/'),
 			help: 'Gérer les protocoles',
 		},
 	});
@@ -173,14 +158,18 @@
 	const isSessionDependentRoute = $derived(
 		page.route.id !== '/(app)/sessions' &&
 			page.route.id !== '/(app)/protocols' &&
-			page.route.id !== '(app)/accounts'
+			page.route.id !== '/(app)/accounts'
 	);
+
+	const mobile = new IsMobile()
+	const isDesktop = $derived(!mobile.current);
 </script>
 
 {#if previewingPrNumber}
 	<DeploymentDetails bind:open={openPreviewPRDetails} />
 {/if}
 
+{#if isDesktop}
 <header bind:clientHeight={height} class:native-window={isNativeWindow}>
 	<div class="progressbar">
 		<ProgressBar {progress} />
@@ -367,16 +356,13 @@
 				<ModalSubmitIssue type="feature" />
 
 				<div class="settings">
-					<Settings
-						{openPrepareForOfflineUse}
-						{openKeyboardShortcuts}
-						--navbar-height="{height}px"
-					/>
+					<Settings --navbar-height="{height}px" />
 				</div>
 			</aside>
 		</nav>
 	{/if}
 </header>
+{:else}
 
 <!-- 
 Tab bar is only when a session is active
@@ -454,14 +440,11 @@ Tab bar is only when a session is active
 		</nav>
 	</header>
 {/if}
+{/if}
 
 <style>
 	header {
 		app-region: drag;
-	}
-
-	header.mobile {
-		display: none;
 	}
 
 	header :global(:is(a, button)) {
@@ -632,11 +615,6 @@ Tab bar is only when a session is active
 		--fill-color: var(--bg-primary);
 	}
 
-	@media (max-width: 600px) {
-		header {
-			display: none;
-		}
-
 		header.mobile {
 			display: flex;
 			font-size: 1.125em;
@@ -668,5 +646,4 @@ Tab bar is only when a session is active
 				font-size: 0.85rem;
 			}
 		}
-	}
 </style>

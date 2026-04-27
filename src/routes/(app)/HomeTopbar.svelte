@@ -2,6 +2,7 @@
 	import IconProtocols from '~icons/ri/file-list-3-line';
 	import IconAccounts from '~icons/ri/group-line';
 	import IconAbout from '~icons/ri/information-line';
+	import Settings from './Settings.svelte';
 	import IconManage from '~icons/ri/settings-3-line';
 	import { version } from '$app/environment';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
@@ -16,74 +17,18 @@
 </script>
 
 <TopbarContent>
+{#snippet children(props)}
 	<div class="title">
 		<Logo />
 		Cigale
 	</div>
 	<!-- Wrapper is because DropdownMenu creates another 0x0 element wrapper alongside its trigger... -->
 	<div class="settings">
-		<DropdownMenu
-			items={[
-				{
-					items: [
-						{
-							type: 'clickable',
-							data: {
-								icon: IconProtocols,
-								subtext: plural(tables.Protocol.state.length, [
-									'# installé',
-									'# installés',
-								]),
-							},
-							label: 'Protocoles',
-							onclick() {
-								goto('/(app)/protocols');
-							},
-						},
-						{
-							type: 'clickable',
-							data: {
-								icon: IconAccounts,
-								subtext: plural(tables.Account.state.length, [
-									'# connecté',
-									'# connectés',
-								]),
-							},
-							label: 'Comptes',
-							onclick() {
-								goto('/(app)/accounts');
-							},
-						},
-						{
-							type: 'clickable',
-							data: { icon: IconAbout, subtext: `Version ${version}` },
-							label: 'À propos',
-							onclick() {
-								goto('/(app)/about');
-							},
-						},
-					],
-				},
-			]}
-		>
-			{#snippet item({ icon: Icon, subtext }, { label })}
-				<div class="settings-item">
-					<div class="icon">
-						<Icon />
-					</div>
-					<span>{label}</span>
-					<span class="subtext">
-						<OverflowableText text={subtext} />
-					</span>
-				</div>
-			{/snippet}
-			{#snippet trigger(props)}
-				<ButtonIcon help="Réglages" {...props}>
-					<IconManage />
-				</ButtonIcon>
-			{/snippet}
-		</DropdownMenu>
+		
+
+		<Settings {...props} />
 	</div>
+	{/snippet}
 </TopbarContent>
 
 <style>
@@ -92,13 +37,15 @@
 		align-items: center;
 		gap: 0.5rem;
 
-		font-size: 1.3rem;
+		font-size: 1.1rem;
 		text-transform: uppercase;
+		letter-spacing: 0.125ch;
+		font-weight: 200;
 		/* font-family: var(--font-mono); */
 
 		/* <Logo /> props */
-		--size: 1.2em;
-		--stroke-width: 4.5rem;
+		--size: 1.4em;
+		--stroke-width: 4rem;
 	}
 
 	.settings-item {

@@ -3,12 +3,16 @@
 
 	import { Portal } from 'bits-ui';
 
-	const { children }: { children: Snippet } = $props();
+	type  Props = {
+		children: Snippet;
+	}
+
+	const { children, }: Props = $props();
 </script>
 
 <Portal to="#portal-target-mobile-topbar">
 	<div class="topbar">
-		{@render children?.()}
+		{@render children()}
 	</div>
 </Portal>
 

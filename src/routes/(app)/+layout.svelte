@@ -22,6 +22,7 @@
 	import { loadPreviewImage } from '$lib/images';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import KeyboardShortcuts from '$lib/KeyboardShortcuts.svelte';
+	import { IsMobile } from '$lib/mobile.svelte.js';
 	import { initializeProcessingQueue } from '$lib/queue.svelte';
 	import { switchSession } from '$lib/sessions';
 	import { getColorScheme, isDebugMode, setSetting } from '$lib/settings.svelte';
@@ -154,29 +155,23 @@
 		});
 	});
 
-	/** @type {undefined|(() => void)} */
-	let openKeyboardShortcuts = $state();
-	/** @type {undefined|(() => void)} */
-	let openPrepareForOfflineUse = $state();
+	const mobile = new IsMobile();
 </script>
 
 <svelte:head>
 	<base href={resolve('/') === '/' ? '' : resolve('/') + 'index.html'} />
 </svelte:head>
 
-<KeyboardShortcuts bind:openHelp={openKeyboardShortcuts} preventDefault binds={uiState.keybinds} />
-<PrepareForOffline bind:open={openPrepareForOfflineUse} />
-
 <div class="layout">
 	<Navigation
-		{openKeyboardShortcuts}
-		{openPrepareForOfflineUse}
 		progressbarOnly={navbarAppearance === 'hidden'}
 		progress={uiState.processing.progress}
 		eta={uiState.eta}
 	/>
 
-	<div id="portal-target-mobile-bottombar"></div>
+	{#if mobile.current}
+		<div id="portal-target-mobile-bottombar"></div>
+	{/if}
 
 	<section class="toasts" data-testid="toasts-area">
 		{#each toasts.items('default') as toast (toast.id)}
@@ -203,7 +198,9 @@
 		{@render children?.()}
 	</div>
 
-	<div id="portal-target-mobile-topbar"></div>
+	{#if mobile.current}
+		<div id="portal-target-mobile-topbar"></div>
+	{/if}
 </div>
 
 <style>
@@ -241,25 +238,8 @@
 		flex-direction: column;
 		height: 100svh;
 
-		#portal-target-mobile-topbar {
-			display: none;
-		}
-
-		#portal-target-mobile-bottombar {
-			display: none;
-		}
-
 		@media (max-width: 600px) {
 			flex-direction: column-reverse;
-
-			#portal-target-mobile-topbar {
-				display: block;
-			}
-
-			#portal-target-mobile-bottombar {
-				display: block;
-			}
 		}
 	}
-
 </style>
