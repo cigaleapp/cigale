@@ -376,7 +376,7 @@ jobs:
           EOS
 
       - name: Post comment to PR
-        uses: marocchino/sticky-pull-request-comment@v2
+        uses: marocchino/sticky-pull-request-comment@v3.0.4
         with:
           header: ⚡ Performance changes
           message: ${{ steps.comparison.outputs.comment }}
