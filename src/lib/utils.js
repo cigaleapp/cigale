@@ -1699,3 +1699,17 @@ export function displayKeyRange(keyRange) {
 
 	return `${lowerBound}, ${upperBound}`;
 }
+
+/**
+ * Like a switch statement but for expressions.
+ * Equivalent to `({ ... } as const)[value]`
+ * 
+ * @template {Record<string|number, unknown>} const T
+ * @template {keyof T} V
+ * @param {V} value
+ * @param {T} cases
+ * @returns {T[V]}
+ */
+export function switchValue(value, cases) {
+	return cases[value];
+}

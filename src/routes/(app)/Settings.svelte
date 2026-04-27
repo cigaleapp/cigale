@@ -37,7 +37,7 @@
 	import { getColorScheme, getSettings, setSetting } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte.js';
 	import Switch from '$lib/Switch.svelte';
-	import { orEmpty } from '$lib/utils.js';
+	import { orEmpty, switchValue } from '$lib/utils.js';
 	import { getTheme } from '$routes/+layout.svelte';
 
 	import PrepareForOffline from './PrepareForOffline.svelte';
@@ -84,7 +84,7 @@
 				...mobileOnly({
 					type: 'clickable' as const,
 					data: {
-						icon: IconProtocols,
+						icon: IconProtocols as Component | undefined,
 						subtext: plural(tables.Protocol.state.length, [
 							'# installé',
 							'# installés',
@@ -113,21 +113,20 @@
 					closeOnSelect: false,
 					data: {
 						icon: theme.effective === 'dark' ? Moon : Sun,
-						subtext:
-							{
-								light: 'Clair',
-								dark: 'Sombre',
-								auto: 'Système',
-							}[theme.setting] ?? '?',
+						subtext: switchValue(theme.setting, {
+							light: 'Clair',
+							dark: 'Sombre',
+							auto: 'Système',
+						}),
 					},
 					async onclick() {
 						await setSetting(
 							'theme',
-							{
+							switchValue(theme.setting, {
 								light: 'dark',
 								dark: 'auto',
 								auto: 'light',
-							}[theme.setting]
+							})
 						);
 					},
 				},
@@ -332,7 +331,7 @@
 			help={open ? 'Fermer' : 'Réglages'}
 			{...props}
 		>
-			{#if open}
+			{#if open && !mobile.current}
 				<Cross />
 			{:else}
 				<Gears />
@@ -365,6 +364,8 @@
 			margin-left: auto;
 			color: var(--gay);
 			font-size: 0.875rem;
+			/* TODO: find a better way to prevent subtext overflow, maybe with a display:grid on the .settings-item? */
+			max-width: 30%;
 		}
 	}
 

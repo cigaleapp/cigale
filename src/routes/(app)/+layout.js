@@ -20,7 +20,7 @@ import {
 import { autoUpdateProtocols } from '$lib/protocols';
 import { getSetting } from '$lib/settings.svelte';
 import { toasts } from '$lib/toasts.svelte';
-import { clamp, fetchHttpRequest, profiler, progressSplitter } from '$lib/utils.js';
+import { clamp, fetchHttpRequest, profiler, progressSplitter, switchValue } from '$lib/utils.js';
 import { PROCEDURES } from '$worker/procedures.js';
 import WebWorker from '$worker/start.js?worker';
 
@@ -54,7 +54,7 @@ export async function load({ url }) {
 	setLoadingMessage(
 		// Translations not loaded yet
 		// @wc-ignore
-		{ fr: 'Chargement des traductions…', en: 'Loading translations…' }[locale]
+		switchValue(locale, { fr: 'Chargement des traductions…', en: 'Loading translations…' })
 	);
 
 	await profile('Startup', 'Load locale', async () => loadLocale(locale));

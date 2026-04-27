@@ -3,18 +3,24 @@
 
 	import { Portal } from 'bits-ui';
 
-	type  Props = {
-		children: Snippet;
-	}
+	import { IsMobile } from '$lib/mobile.svelte.js';
 
-	const { children, }: Props = $props();
+	type Props = {
+		children: Snippet;
+	};
+
+	const { children }: Props = $props();
+	const mobile = new IsMobile();
 </script>
 
-<Portal to="#portal-target-mobile-topbar">
-	<div class="topbar">
-		{@render children()}
-	</div>
-</Portal>
+<!-- This ensures the portal content is copied over if the target element gets destroyed then recreated (this happens when mobile.current changes). See file://./+layout.svelte -->
+{#key mobile.current}
+	<Portal to="#portal-target-mobile-topbar">
+		<div class="topbar">
+			{@render children()}
+		</div>
+	</Portal>
+{/key}
 
 <style>
 	.topbar {

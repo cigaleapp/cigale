@@ -49,6 +49,7 @@
 	import BottomDrawer from './BottomDrawer.svelte';
 	import { IsMobile } from './mobile.svelte.js';
 	import Submenu from './Submenu.svelte';
+	import { sum } from './utils.js';
 
 	interface Props {
 		items: ItemsGroup<D, SD>[];
@@ -71,7 +72,32 @@
 	let open = $state(false);
 
 	const mobile = new IsMobile();
+
+	/** [margin top, height, margin bottom]*/
+	const mobileGroupLabelHeight = [1 * 16, 20, 0.5 * 16];
+	const mobileItemHeight = 48; /*px*/
+	const estimatedHeight = $derived(
+		sum(
+			groups.map(
+				(group) =>
+					group.items.length * mobileItemHeight +
+					(group.label ? sum(mobileGroupLabelHeight) : 0)
+			)
+		) +
+			/* padding */
+			1.25 /*rem*/ * 16 +
+			/* handle area */
+			36 /*px*/ +
+			/* margin for error */
+			20 /*px*/
+	);
+
+	$inspect({ estimatedHeight });
+
+	let windowHeight = $state<number>(0);
 </script>
+
+<svelte:window bind:innerHeight={windowHeight} />
 
 {#if mobile.current}
 	{@render trigger(
@@ -84,7 +110,13 @@
 		{}
 	)}
 
-	<BottomDrawer bind:open maxHeight={0.6}>
+	<BottomDrawer
+		bind:open
+		maxHeight={Math.min(
+			estimatedHeight,
+			windowHeight * 0.9 /* don't take more than 90% of the screen height */
+		)}
+	>
 		<Submenu
 			items={groups.flatMap((group) =>
 				group.items.map((item, i) => ({
@@ -95,9 +127,17 @@
 		>
 			{#snippet item(i)}
 				{#if i.groupTitle}
-					<p class="bottom-drawer-heading">{i.groupTitle}</p>
+					<p
+						style:margin-top="{mobileGroupLabelHeight[0]}px"
+						style:margin-bottom="{mobileGroupLabelHeight[2]}px"
+						style:height="{mobileGroupLabelHeight[1]}px"
+						class="bottom-drawer-heading"
+					>
+						{i.groupTitle}
+					</p>
 				{/if}
 				<button
+					style:height="{mobileItemHeight}px"
 					class="bottom-drawer-item"
 					onclick={() => {
 						if (i.type === 'submenu') {
@@ -107,7 +147,7 @@
 						}
 
 						if (i.closeOnSelect ?? true) {
-						open = false;
+							open = false;
 						}
 					}}
 				>
@@ -300,7 +340,7 @@
 	}
 
 	.bottom-drawer-item {
-		padding: 0.5em;
+		/* padding: 0.5em; */
 		width: 100%;
 		text-align: left;
 		background: none;
@@ -310,7 +350,7 @@
 
 	.bottom-drawer-heading {
 		margin: 1em 0 0.5em;
-		padding: 0 0.5em;
+		/* padding: 0 0.5em; */
 		font-size: 0.9rem;
 		font-style: italic;
 		color: var(--gay);
