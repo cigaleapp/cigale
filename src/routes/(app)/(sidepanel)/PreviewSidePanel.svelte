@@ -32,6 +32,7 @@
 	import { goto } from '$lib/paths.js';
 	import { metadataDefinitionComparator } from '$lib/protocols.js';
 	import { uiState } from '$lib/state.svelte.js';
+	import { onSwipe } from '$lib/swipe';
 
 	import BottombarContent from '../BottombarContent.svelte';
 	import TopbarContent from '../TopbarContent.svelte';
@@ -305,6 +306,9 @@
 	<BottombarContent>
 		<button
 			class="open-drawer"
+			{@attach onSwipe('up', () => {
+				collapsed = false;
+			})}
 			onclick={() => {
 				collapsed = false;
 			}}
