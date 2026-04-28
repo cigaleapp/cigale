@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Estimation stockage</title>
+	</head>
+	<body>
+		<!-- 50 * 6 mois * 4 sessions/mois * 100 images/session * 10 MB/image = 1.2 To -->
+		<h1>Estimation stockage nécéssaire</h1>
+
+		<main>
+			<div class="row">
+				<input type="number" name="users" id="users" value="50" /> utilisateurs × <br />
+			</div>
+			<div class="row">
+				<input type="number" name="months" id="months" value="6" /> mois × <br />
+			</div>
+			<div class="row">
+				<input type="number" name="sessions" id="sessions" value="4" />
+				sessions/mois/utilisateur × <br />
+			</div>
+			<div class="row">
+				(<input type="number" name="images" id="images" value="100" /> images/session ×
+				<input type="number" name="size" id="size" value="10" /> MB/image + <br />
+			</div>
+			<div class="row">
+				<input type="number" name="audio-duration" id="audioDuration" value="5" /> heures
+				d'audio/session ×
+				<input type="number" name="audio-bitrate" id="audioBitrate" value="192" /> kbps)
+			</div>
+			<span id="result"></span>
+		</main>
+
+		<hr>
+
+		<footer>
+			<em>pour le kbps audio (en stéréo)</em>
+
+			<dl>
+				<dt>MP3 (basse qualité)</dt>
+				<dd>
+					<button onclick="audioBitrate.value = 128">128 kbps</button>
+				</dd>
+				<dt>MP3 (haute qualité)</dt>
+				<dd>
+					<button onclick="audioBitrate.value = 320">320 kbps</button>
+				</dd>
+				<dt>WAV (non compressé, CD 44.1 KHz, 16bit)</dt>
+				<dd>
+					<button onclick="audioBitrate.value = 1411">1411 kbps</button>
+				</dd>
+			</dl>
+		</footer>
+
+		<script>
+			calculateStorage();
+
+			function calculateStorage() {
+				const users = parseInt(document.getElementById('users').value);
+				const months = parseInt(document.getElementById('months').value);
+				const sessions = parseInt(document.getElementById('sessions').value);
+				const images = parseInt(document.getElementById('images').value);
+				const imageSize = parseInt(document.getElementById('size').value);
+				const audioDuration = parseInt(document.getElementById('audioDuration').value);
+				const audioBitrate = parseInt(document.getElementById('audioBitrate').value);
+
+				const totalMB =
+					users *
+					months *
+					sessions *
+					(images * imageSize + (audioDuration * 3600 * audioBitrate) / 8 / 1024);
+				// Convert to GB or TB
+				const totalGB = totalMB / 1024;
+				const totalTB = totalGB / 1024;
+
+				if (totalTB >= 1) {
+					document.getElementById('result').textContent =
+						'= ' + totalTB.toFixed(2) + ' To';
+				} else if (totalGB >= 1) {
+					document.getElementById('result').textContent =
+						'= ' + totalGB.toFixed(2) + ' Go';
+				} else {
+					document.getElementById('result').textContent =
+						'= ' + totalMB.toFixed(2) + ' Mo';
+				}
+			}
+
+			document.querySelectorAll('input[type="number"]').forEach((input) => {
+				input.addEventListener('input', calculateStorage);
+			});
+
+			document.querySelectorAll('dl button').forEach((button) => {
+				button.addEventListener('click', calculateStorage);
+			});
+		</script>
+
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+				padding: 20px;
+			}
+
+			input[type='number'] {
+				width: 60px;
+				margin: 0 5px;
+			}
+
+			#result {
+				font-weight: bold;
+				font-size: 1.2em;
+			}
+
+			main {
+				display: flex;
+				flex-direction: column;
+				align-items: flex-start;
+				gap: 1rem;
+			}
+		</style>
+	</body>
+</html>

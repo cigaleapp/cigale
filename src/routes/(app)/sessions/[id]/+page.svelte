@@ -88,7 +88,7 @@
 			loading
 			onclick={async () => {
 				await switchSession(data.session.id);
-				await goto(`/import`);
+				await goto(`/import/`);
 			}}
 		>
 			Ouvrir la session

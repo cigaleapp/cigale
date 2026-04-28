@@ -132,6 +132,7 @@
 
 <div class="inference">
 	<DropdownMenu
+	title={label}
 		testid="{tab}-settings"
 		items={[
 			{

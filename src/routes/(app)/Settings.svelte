@@ -78,9 +78,10 @@
 </script>
 
 <DropdownMenu
+title="Réglages"
 	items={[
 		{
-			label: mobile.current ? undefined : 'Réglages',
+			label: "",
 			items: [
 				...mobileOnly({
 					type: 'clickable' as const,

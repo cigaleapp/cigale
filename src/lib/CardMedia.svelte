@@ -40,9 +40,12 @@
 	import ButtonInk from './ButtonInk.svelte';
 	import Card from './Card.svelte';
 	import CroppedImg from './CroppedImg.svelte';
+	import { onLongPress } from './gestures.js';
 	import LoadingSpinner from './LoadingSpinner.svelte';
 	import Logo from './Logo.svelte';
+	import { IsMobile } from './mobile.svelte.js';
 	import OverflowableText from './OverflowableText.svelte';
+	import { uiState } from './state.svelte.js';
 	import { tooltip } from './tooltips.js';
 
 	/** @type {Props & Omit<Record<string, unknown>, keyof Props>}*/
@@ -69,6 +72,8 @@
 		...rest
 	} = $props();
 
+	const mobile = new IsMobile();
+
 	const stacked = $derived(stacksize > 1);
 
 	const loading = $derived(status === 'loading' || status === 'queued');
@@ -80,6 +85,14 @@
 		if (status === 'errored') return 'Erreur';
 		return '';
 	});
+
+	let longpressCooldown = $state(false);
+	const selectByClicking = $derived(
+		!longpressCooldown &&
+			mobile.current &&
+			uiState?.setSelection &&
+			uiState.selection.length > 0
+	);
 </script>
 
 <article
@@ -94,6 +107,22 @@
 	aria-label={title}
 	use:tooltip={tooltipText}
 	{...rest}
+	oncontextmenu={(e) => {
+		if (!mobile.current) return;
+		if (!uiState?.setSelection) return;
+		e.preventDefault();
+	}}
+	{@attach onLongPress(250, () => {
+		if (!selectable) return;
+		if (!mobile.current) return;
+		if (!uiState) return;
+		uiState.toggleSelection(id);
+
+		longpressCooldown = true;
+		setTimeout(() => {
+			longpressCooldown = false;
+		}, 500);
+	})}
 >
 	<div class="main-card">
 		<!-- use () => {} instead of undefined so that the hover/focus styles still apply -->
@@ -101,6 +130,13 @@
 			tag="div"
 			{ondoubleclick}
 			onclick={(e) => {
+				if (selectByClicking) {
+					// Add to selection instead
+					e.preventDefault();
+					uiState?.toggleSelection(id);
+					return;
+				}
+
 				if (loading || errored) return;
 				if (!(e instanceof MouseEvent)) return;
 				onclick?.(e, (newProps) => {

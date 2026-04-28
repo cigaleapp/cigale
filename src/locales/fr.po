@@ -65,7 +65,6 @@ msgstr "<0/> Réinitialiser la base de données"
 msgid "<0/> Rééssayer"
 msgstr "<0/> Rééssayer"
 
-#: src/lib/AreaObservations.svelte
 #: src/lib/CardMedia.svelte
 #: src/routes/(app)/(sidepanel)/crop/[image]/[[from]]/+page@(app).svelte
 #: src/routes/(app)/protocols/RowProtocol.svelte
@@ -704,6 +703,7 @@ msgstr "Sous la supervision de"
 msgid "Supprime toutes les données pour ce déploiement de preview"
 msgstr "Supprime toutes les données pour ce déploiement de preview"
 
+#: src/lib/AreaObservations.svelte
 #: src/lib/ModalConfirmDeletion.svelte
 msgid "Supprimer"
 msgstr "Supprimer"
@@ -1478,7 +1478,6 @@ msgstr "Protocole mis à jour vers la v{0}"
 msgid "Impossible de mettre à jour le protocole: {0}"
 msgstr "Impossible de mettre à jour le protocole: {0}"
 
-#: src/lib/AreaObservations.svelte
 #: src/lib/ZipContentsTree.svelte
 #: src/lib/ZipContentsTree.svelte
 msgid "# élément"

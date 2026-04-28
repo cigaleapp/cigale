@@ -21,9 +21,10 @@
 
 <DropdownMenu
 	{testid}
+	title="Choisir un protocole"
 	items={[
 		{
-			label: 'Choisir un protocole',
+			label: '',
 			items: tables.Protocol.state.map((p) => ({
 				type: 'selectable',
 				data: { protocol: p },

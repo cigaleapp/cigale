@@ -108,15 +108,12 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 
 {#if mobile.current}
 	<BottomDrawer
-	maxHeight={0.75}
+		{title}
+		maxHeight={0.75}
 		bind:open={
 			() => page.state[stateKey] === true, (isOpen) => pushState('', { [stateKey]: isOpen })
 		}
 	>
-		<header class="mobile">
-			<p>{title}</p>
-		</header>
-
 		<div class="contents">
 			{@render children({ close })}
 		</div>
@@ -233,11 +230,6 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-
-		&.mobile {
-			justify-content: center;
-			margin-bottom: 2em;
-		}
 	}
 
 	.contents {

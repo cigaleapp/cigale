@@ -1,7 +1,5 @@
 import type { Attachment } from 'svelte/attachments';
 
-type SwipeCallback = () => void;
-
 export type SwipeOptions = {
 	minDistance?: number;
 };
@@ -11,11 +9,11 @@ export type SwipeOptions = {
  */
 export function onSwipe(
 	// TODO: other directions
-	direction: "up",
-	callback: SwipeCallback,
+	direction: 'up',
+	callback: () => void,
 	{ minDistance = 30 }: SwipeOptions = {}
 ): Attachment<HTMLElement> {
-	if (direction !== "up") {
+	if (direction !== 'up') {
 		throw new Error(`Unsupported swipe direction: ${direction}`);
 	}
 
@@ -63,6 +61,41 @@ export function onSwipe(
 			node.removeEventListener('touchstart', onTouchStart);
 			node.removeEventListener('touchend', onTouchEnd);
 			node.removeEventListener('touchcancel', onTouchCancel);
+		};
+	};
+}
+
+export function onLongPress(timeout: number, callback: () => void): Attachment<HTMLElement> {
+	return (node) => {
+		let pressTimer: ReturnType<typeof setTimeout> | null = null;
+
+		const ondown = () => {
+			pressTimer = setTimeout(() => {
+				callback();
+			}, timeout);
+		};
+
+		const onup = () => {
+			if (pressTimer) {
+				clearTimeout(pressTimer);
+				pressTimer = null;
+			}
+		};
+
+		// node.addEventListener('mousedown', onMouseDown);
+		// node.addEventListener('mouseup', onMouseUp);
+		// node.addEventListener('mouseleave', onMouseUp);
+		node.addEventListener('pointerdown', ondown);
+		node.addEventListener('pointerup', onup);
+		node.addEventListener('pointerleave', onup);
+
+		return () => {
+			// node.removeEventListener('mousedown', onMouseDown);
+			// node.removeEventListener('mouseup', onMouseUp);
+			// node.removeEventListener('mouseleave', onMouseUp);
+			node.removeEventListener('pointerdown', ondown);
+			node.removeEventListener('pointerup', onup);
+			node.removeEventListener('pointerleave', onup);
 		};
 	};
 }

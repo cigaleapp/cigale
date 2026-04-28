@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type { ComponentProps } from 'svelte';
 
-	import IconClose from '~icons/ri/close-line';
-	import IconSettings from '~icons/ri/settings-2-line';
+	import IconClose from '~icons/ri/arrow-left-s-line';
+	import IconSettings from '~icons/ri/more-2-fill';
 	import { page } from '$app/state';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import OverflowableText from '$lib/OverflowableText.svelte';
@@ -15,6 +15,17 @@
 </script>
 
 <TopbarContent>
+
+		<ButtonIcon
+			help="Fermer la session"
+			onclick={async () => {
+				await goto('/sessions/');
+				await switchSession(null);
+			}}
+		>
+			<IconClose />
+		</ButtonIcon>
+
 	<OverflowableText text={uiState.currentSession?.name ?? ''} />
 
 	<div class="actions">
@@ -57,15 +68,6 @@
 			/>
 		{/if}
 
-		<ButtonIcon
-			help="Fermer la session"
-			onclick={async () => {
-				await goto('/sessions/');
-				await switchSession(null);
-			}}
-		>
-			<IconClose />
-		</ButtonIcon>
 	</div>
 </TopbarContent>
 

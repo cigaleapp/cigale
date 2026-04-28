@@ -1,5 +1,5 @@
 <script lang="ts">
-	import IconBack from '~icons/ri/arrow-left-line';
+	import IconBack from '~icons/ri/arrow-left-s-line';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 
 	import TopbarContent from './TopbarContent.svelte';

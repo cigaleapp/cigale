@@ -53,6 +53,9 @@
 	import { sum } from './utils.js';
 
 	interface Props {
+		/** Shown on mobile (when it's a drawer) and in place of the first item group's label if not set */
+		title?: string;
+
 		items: ItemsGroup<D, SD>[];
 		item?: Snippet<[AnyItem<D, SD>['data'], AnyItem<D, SD> & { selected: boolean }]>;
 		/** IMPORTANT: Don't put just onclick on the button, spread the entire object */
@@ -61,7 +64,15 @@
 		scrollable?: boolean;
 	}
 
-	const { items: groups, item, trigger, testid, scrollable = false, ...rest }: Props = $props();
+	const {
+		items: groups,
+		item,
+		trigger,
+		testid,
+		scrollable = false,
+		title,
+		...rest
+	}: Props = $props();
 
 	function testids(testid: string | undefined) {
 		return {
@@ -80,15 +91,15 @@
 	const estimatedHeight = $derived(
 		sum(
 			groups.map(
-				(group) =>
+				(group, i) =>
 					group.items.length * mobileItemHeight +
-					(group.label ? sum(mobileGroupLabelHeight) : 0)
+					(group.label ? sum(mobileGroupLabelHeight.slice(i === 0 ? 1 : 0)) : 0)
 			)
 		) +
 			/* padding */
 			1.25 /*rem*/ * 16 +
 			/* handle area */
-			36 /*px*/ +
+			(title ? 60 : 36) /*px*/ +
 			/* margin for error */
 			20 /*px*/
 	);
@@ -113,6 +124,7 @@
 
 	<BottomDrawer
 		bind:open
+		{title}
 		maxHeight={Math.min(
 			estimatedHeight,
 			windowHeight * 0.9 /* don't take more than 90% of the screen height */
@@ -123,14 +135,20 @@
 				group.items.map((item, i) => ({
 					label: item.label,
 					key: item.key ?? `${ii}/${i}`,
-					data: { ...item, i, groupTitle: i === 0 ? group.label : undefined, group },
+					data: {
+						...item,
+						i,
+						groupIndex: ii,
+						groupTitle: i === 0 ? group.label : undefined,
+						group,
+					},
 				}))
 			)}
 		>
 			{#snippet item(i)}
 				{#if i.groupTitle}
 					<p
-						style:margin-top="{mobileGroupLabelHeight[0]}px"
+						style:margin-top="{i.groupIndex === 0 ? 0 : mobileGroupLabelHeight[0]}px"
 						style:margin-bottom="{mobileGroupLabelHeight[2]}px"
 						style:height="{mobileGroupLabelHeight[1]}px"
 						class="bottom-drawer-heading"
@@ -190,8 +208,8 @@
 				{#each groups as group (group.label)}
 					{#if group.items.length > 0}
 						<DropdownMenu.Group data-testid={group.testid}>
-							{#if group.label}
-								<DropdownMenu.GroupHeading>{group.label}</DropdownMenu.GroupHeading>
+							{#if group.label || (groups.length === 1 && title)}
+								<DropdownMenu.GroupHeading>{group.label || title}</DropdownMenu.GroupHeading>
 							{/if}
 
 							{#each group.items as i (i.label)}
@@ -355,7 +373,6 @@
 
 	.bottom-drawer-heading {
 		margin: 1em 0 0.5em;
-		/* padding: 0 0.5em; */
 		font-size: 0.9rem;
 		font-style: italic;
 		color: var(--gay);

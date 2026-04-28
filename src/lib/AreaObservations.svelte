@@ -21,9 +21,9 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	import IconCollapse from '~icons/ri/arrow-down-s-line';
 	import IconExpand from '~icons/ri/arrow-right-s-line';
 	import IconTrash from '~icons/ri/delete-bin-line';
+	import { IsMobile } from '$lib/mobile.svelte.js';
 	import { uiState } from '$lib/state.svelte.js';
 
-	import { IsMobile } from '$lib/mobile.svelte.js';
 	import ButtonIcon from './ButtonIcon.svelte';
 	import ButtonInk from './ButtonInk.svelte';
 	import { DragSelect } from './dragselect.svelte.js';
@@ -63,6 +63,8 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	/** @type {Props } */
 	let { items, item, onemptyclick, zone, highlight, unroll = ['', []] } = $props();
 
+	const mobile = new IsMobile();
+
 	const componentId = $props.id();
 
 	const [unrolledId, unrolledItems] = $derived(unroll);
@@ -83,7 +85,35 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	/** @type {DragSelect |undefined} */
 	let dragselect;
 
-	onMount(() => {
+	watch([() => mobile.current], () => {
+		if (mobile.current) {
+			console.debug('mobile device detected, disabling drag selection');
+			uiState.setSelection = (newSelection) => {
+				uiState.selection = [...new Set(newSelection)];
+			};
+			// Set onemptyclick. When a selection is non empty, clear selection instead of calling the callback
+			// Set the handler on imagesContainer
+			if (imagesContainer) {
+				imagesContainer.onclick = (e) => {
+					console.debug('click on images container', e.target);
+					if (e.target?.dataset?.startsSelection === undefined) return;
+					if (uiState.selection.length > 0) {
+						uiState.selection = [];
+						dragselect?.setSelection([]);
+						e.preventDefault();
+						e.stopPropagation();
+					} else {
+						onemptyclick?.(e);
+					}
+				};
+			}
+
+			return () => {
+				uiState.setSelection = undefined;
+				if (imagesContainer) imagesContainer.onclick = null;
+			};
+		}
+
 		if (!imagesContainer) return;
 
 		dragselect?.destroy();
@@ -247,8 +277,6 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 			el.dataset.roundCornerRight = row.every(({ x }) => x <= coords.x).toString();
 		});
 	}
-
-	const mobile = new IsMobile();
 </script>
 
 <section
@@ -338,10 +366,9 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 								>
 									<IconTrash />
 									{#if !mobile.current}
-									Supprimer
+										Supprimer
 									{/if}
-									</ButtonInk
-								>
+								</ButtonInk>
 							</div>
 						</header>
 					{/if}
@@ -459,16 +486,13 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		justify-content: start;
 		gap: 0.5em;
 		position: sticky;
+		container-type: scroll-state;
 		top: 0;
 		left: 0;
 		right: 0;
 		z-index: 100;
 		background-color: var(--bg-neutral);
 		padding: 0 2.5em 0.75em 2.5em;
-
-		@media (max-width: 600px) {
-			padding: 0 0.75em 0.75em 0.5em;
-		}
 
 		* {
 			font-size: 1.1rem;
@@ -481,6 +505,41 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		h2 {
 			margin-right: 0.5em;
 			max-width: calc(100vw - 10rem);
+			display: flex;
+			align-items: center;
+		}
+
+		&::after {
+			position: absolute;
+			inset: auto 0 0 0;
+			content: '';
+			border-bottom: 1px solid transparent;
+			transition: border-color 0.2s;
+		}
+
+		@container scroll-state(stuck: top) {
+			&::after {
+				border-color: rgb(from var(--gray) r g b / 75%);
+			}
+		}
+
+		@media (max-width: 600px) {
+			padding: 0.125em 0.75em 0.125em 0.5em;
+
+			&:not(:first-child) {
+				margin-top: 0.5em;
+			}
+
+			.actions {
+				margin-left: 0;
+			}
+
+			h2 {
+				margin-right: auto;
+				max-width: calc(100vw - 8rem);
+				font-weight: 500;
+				font-size: 0.95rem;
+			}
 		}
 	}
 

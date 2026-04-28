@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	/**
 	 * @import { TopLeftBoundingBox } from '$lib/BoundingBoxes.svelte.js';
 	 */
@@ -32,7 +32,7 @@
 	import { goto } from '$lib/paths.js';
 	import { metadataDefinitionComparator } from '$lib/protocols.js';
 	import { uiState } from '$lib/state.svelte.js';
-	import { onSwipe } from '$lib/swipe';
+	import { onSwipe } from '$lib/gestures';
 
 	import BottombarContent from '../BottombarContent.svelte';
 	import TopbarContent from '../TopbarContent.svelte';
@@ -157,32 +157,20 @@
 
 		return [apply(dimensions.width, box?.width), apply(dimensions.height, box?.height)];
 	}
-</script>
 
-{#snippet title()}
-	{#if singleObservationSelected}
-		<IconObservation />
-		<InlineTextInput
-			label="Nom de l'observation"
-			value={singleObservationSelected.label}
-			onblur={async (value) => {
-				if (value === singleObservationSelected.label) return;
-				await tables.Observation.update(singleObservationSelected.id, 'label', value);
-			}}
-		/>
-	{:else if singleImageSelected}
-		<IconImage />
-		{singleImageSelected.filename}
-	{:else if selectionCounts.image > 0 && selectionCounts.observation > 0}
-		{plural(selectionCounts.all, ['1 élément', '# éléments'])}
-	{:else if selectionCounts.image > 0}
-		{plural(selectionCounts.image, ['1 image', '# images'])}
-	{:else if selectionCounts.observation > 0}
-		{plural(selectionCounts.observation, ['1 observation', '# observations'])}
-	{:else}
-		Aucune sélection
-	{/if}
-{/snippet}
+	const selectionTitle = $derived.by(() => {
+		if (selectionCounts.image > 0 && selectionCounts.observation > 0) {
+			return plural(selectionCounts.all, ['1 élément', '# éléments']);
+		}
+		if (selectionCounts.image > 0) {
+			return plural(selectionCounts.image, ['1 image', '# images']);
+		}
+		if (selectionCounts.observation > 0) {
+			return plural(selectionCounts.observation, ['1 observation', '# observations']);
+		}
+		return 'Aucune sélection';
+	});
+</script>
 
 {#snippet content()}
 	{#if !loadingOptions}
@@ -205,7 +193,32 @@
 		</div>
 		{#if !mobile.current}
 			<h2>
-				{@render title()}
+				{#if singleObservationSelected}
+					<IconObservation />
+					<InlineTextInput
+						label="Nom de l'observation"
+						value={singleObservationSelected.label}
+						onblur={async (value) => {
+							if (value === singleObservationSelected.label) return;
+							await tables.Observation.update(
+								singleObservationSelected.id,
+								'label',
+								value
+							);
+						}}
+					/>
+				{:else if singleImageSelected}
+					<IconImage />
+					{singleImageSelected.filename}
+				{:else if selectionCounts.image > 0 && selectionCounts.observation > 0}
+					{plural(selectionCounts.all, ['1 élément', '# éléments'])}
+				{:else if selectionCounts.image > 0}
+					{plural(selectionCounts.image, ['1 image', '# images'])}
+				{:else if selectionCounts.observation > 0}
+					{plural(selectionCounts.observation, ['1 observation', '# observations'])}
+				{:else}
+					Aucune sélection
+				{/if}
 			</h2>
 		{/if}
 		<div class="metadatas" class:empty={images.length === 0}>
@@ -313,12 +326,13 @@
 				collapsed = false;
 			}}
 		>
-			{@render title()}
+			{selectionTitle}
 			<IconShowPanel />
 		</button>
 	</BottombarContent>
 	<BottomDrawer
 		maxHeight={0.95}
+		title={selectionTitle}
 		bind:open={
 			() => !collapsed,
 			(open) => {

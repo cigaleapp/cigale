@@ -23,6 +23,7 @@
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import KeyboardShortcuts from '$lib/KeyboardShortcuts.svelte';
 	import { IsMobile } from '$lib/mobile.svelte.js';
+	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { initializeProcessingQueue } from '$lib/queue.svelte';
 	import { switchSession } from '$lib/sessions';
 	import { getColorScheme, isDebugMode, setSetting } from '$lib/settings.svelte';
@@ -169,9 +170,7 @@
 		eta={uiState.eta}
 	/>
 
-	{#if mobile.current}
-		<div id="portal-target-mobile-bottombar"></div>
-	{/if}
+	<div id="portal-target-mobile-bottombar"></div>
 
 	<section class="toasts" data-testid="toasts-area">
 		{#each toasts.items('default') as toast (toast.id)}
@@ -198,9 +197,7 @@
 		{@render children?.()}
 	</div>
 
-	{#if mobile.current}
-		<div id="portal-target-mobile-topbar"></div>
-	{/if}
+	<div id="portal-target-mobile-topbar"></div>
 </div>
 
 <style>
