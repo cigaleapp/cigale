@@ -61,7 +61,12 @@
 </script>
 
 {#if mobile.current}
-	<section class="dropzone disabled">{@render children?.()}</section>
+	<section class="dropzone disabled" role={clickable ? 'form' : undefined}>
+		{@render children?.()}
+		{#if clickable}
+			{@render fileInput()}
+		{/if}
+	</section>
 {:else}
 	<section
 		class="dropzone"
@@ -80,18 +85,22 @@
 			<p>Déposer des images ici…</p>
 		</div>
 		{#if clickable}
-			<input
-				type="file"
-				multiple
-				accept={filetypes?.join(',')}
-				oninput={(e) => {
-					if (!e.currentTarget.files) return;
-					onfiles?.({ event: e, files: [...e.currentTarget.files] });
-				}}
-			/>
+			{@render fileInput()}
 		{/if}
 	</section>
 {/if}
+
+{#snippet fileInput()}
+	<input
+		type="file"
+		multiple
+		accept={filetypes?.join(',')}
+		oninput={(e) => {
+			if (!e.currentTarget.files) return;
+			onfiles?.({ event: e, files: [...e.currentTarget.files] });
+		}}
+	/>
+{/snippet}
 
 <style>
 	input {
