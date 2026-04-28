@@ -6,37 +6,28 @@
 	import IconCheck from '~icons/ri/check-line';
 	import Cross from '~icons/ri/close-circle-line';
 	import IconDebugMode from '~icons/ri/code-line';
-	import IconTheme from '~icons/ri/contrast-2-line';
 	import IconProtocols from '~icons/ri/file-list-3-line';
 	import IconAccounts from '~icons/ri/group-line';
 	import IconAbout from '~icons/ri/information-line';
-	import IconSyncWithSystemTheme from '~icons/ri/loop-left-fill';
 	import Moon from '~icons/ri/moon-line';
 	import IconNotifications from '~icons/ri/notification-line';
-	import IconManage from '~icons/ri/settings-3-line';
 	import Gears from '~icons/ri/settings-3-line';
 	import IconDecrease from '~icons/ri/subtract-line';
 	import Sun from '~icons/ri/sun-line';
 	import IconOffline from '~icons/ri/wifi-off-line';
 	import { version } from '$app/environment';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import DropdownMenu from '$lib/DropdownMenu.svelte';
 	import { plural } from '$lib/i18n.js';
 	import { tables } from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
-	import InputRange from '$lib/InputRange.svelte';
 	import KeyboardShortcuts from '$lib/KeyboardShortcuts.svelte';
-	import Logo from '$lib/Logo.svelte';
 	import { IsMobile } from '$lib/mobile.svelte.js';
 	import { askForNotificationPermission, hasNotificationsEnabled } from '$lib/notifications.js';
 	import OverflowableText from '$lib/OverflowableText.svelte';
-	import { resolve } from '$lib/paths';
 	import { goto } from '$lib/paths.js';
-	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
-	import { getColorScheme, getSettings, setSetting } from '$lib/settings.svelte';
+	import { getSettings, setSetting } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte.js';
-	import Switch from '$lib/Switch.svelte';
 	import { orEmpty, switchValue } from '$lib/utils.js';
 	import { getTheme } from '$routes/+layout.svelte';
 
@@ -78,10 +69,10 @@
 </script>
 
 <DropdownMenu
-title="Réglages"
+	title="Réglages"
 	items={[
 		{
-			label: "",
+			label: '',
 			items: [
 				...mobileOnly({
 					type: 'clickable' as const,

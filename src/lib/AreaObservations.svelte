@@ -14,7 +14,6 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 
 <script generics="ItemData">
 	import { watch } from 'runed';
-	import { onMount } from 'svelte';
 	import { SvelteSet } from 'svelte/reactivity';
 	import { fade } from 'svelte/transition';
 
@@ -28,7 +27,6 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	import ButtonInk from './ButtonInk.svelte';
 	import { DragSelect } from './dragselect.svelte.js';
 	import { galleryItemsGrouper, galleryItemsSorter } from './gallery.js';
-	import { plural } from './i18n.js';
 	import { openTransaction } from './idb.svelte.js';
 	import { deleteImageFile } from './images.js';
 	import { defineKeyboardShortcuts } from './keyboard.svelte.js';

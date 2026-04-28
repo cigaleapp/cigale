@@ -104,7 +104,6 @@
 			20 /*px*/
 	);
 
-	$inspect({ estimatedHeight });
 
 	let windowHeight = $state<number>(0);
 </script>

@@ -2,15 +2,13 @@
 	import type { AccountConstructor } from '$lib/accounts/types.js';
 
 	import { providers } from '$lib/accounts/registry.js';
-	import ButtonInk from '$lib/ButtonInk.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import { databaseHandle, tables } from '$lib/idb.svelte.js';
 	import Logo from '$lib/Logo.svelte';
 
+	import TopbarBackToHome from '../TopbarBackToHome.svelte';
 	import ModalAddAccount from './ModalAddAccount.svelte';
 	import RowAccount from './RowAccount.svelte';
-	import HomeTopbar from '../HomeTopbar.svelte';
-	import TopbarBackToHome from '../TopbarBackToHome.svelte';
 
 	let login: undefined | (() => Promise<boolean>) = $state();
 	let adding = $state<undefined | AccountConstructor>();
@@ -20,9 +18,7 @@
 
 <ModalAddAccount {adding} bind:open={login} />
 
-<TopbarBackToHome>
-	Comptes
-</TopbarBackToHome>
+<TopbarBackToHome>Comptes</TopbarBackToHome>
 
 <main>
 	<header>

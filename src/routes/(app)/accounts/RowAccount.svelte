@@ -1,14 +1,9 @@
 <script lang="ts">
 	import type * as DB from '$lib/database.js';
-	import type { Snippet } from 'svelte';
-
-	import { format as formatDate, formatDistanceToNow } from 'date-fns';
 
 	import IconDisconnect from '~icons/ri/close-circle-line';
 	import { providers } from '$lib/accounts/registry.js';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import OverflowableText from '$lib/OverflowableText.svelte';
-	import { tooltip } from '$lib/tooltips.js';
 
 	interface Props {
 		tag?: string;

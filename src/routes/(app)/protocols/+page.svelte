@@ -9,7 +9,6 @@
 	import { promptAndImportProtocol } from '$lib/protocols';
 	import { toasts } from '$lib/toasts.svelte';
 
-	import HomeTopbar from '../HomeTopbar.svelte';
 	import TopbarBackToHome from '../TopbarBackToHome.svelte';
 	import ModalCreateProtocol from './ModalCreateProtocol.svelte';
 	import ModalDeleteProtocol from './ModalDeleteProtocol.svelte';

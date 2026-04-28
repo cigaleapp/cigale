@@ -5,20 +5,11 @@
 	import { dequal } from 'dequal/lite';
 	import { watch } from 'runed';
 
-	import IconShowPanel from '~icons/ri/arrow-up-s-line';
-	import IconObservation from '~icons/ri/bug-line';
-	import IconClose from '~icons/ri/close-line';
-	import IconDelete from '~icons/ri/delete-bin-line';
-	import IconFullScreen from '~icons/ri/fullscreen-line';
-	import IconSplit from '~icons/ri/function-line';
-	import IconImage from '~icons/ri/image-2-line';
-	import IconMerge from '~icons/ri/shadow-line';
-	import IconImport from '~icons/ri/upload-2-line';
 	import { page } from '$app/state';
 	import BottomDrawer from '$lib/BottomDrawer.svelte';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import CroppedImg from '$lib/CroppedImg.svelte';
+	import { onSwipe } from '$lib/gestures';
 	import { plural } from '$lib/i18n.js';
 	import * as idb from '$lib/idb.svelte.js';
 	import { tables } from '$lib/idb.svelte.js';
@@ -32,10 +23,16 @@
 	import { goto } from '$lib/paths.js';
 	import { metadataDefinitionComparator } from '$lib/protocols.js';
 	import { uiState } from '$lib/state.svelte.js';
-	import { onSwipe } from '$lib/gestures';
+	import IconShowPanel from '~icons/ri/arrow-up-s-line';
+	import IconObservation from '~icons/ri/bug-line';
+	import IconDelete from '~icons/ri/delete-bin-line';
+	import IconFullScreen from '~icons/ri/fullscreen-line';
+	import IconSplit from '~icons/ri/function-line';
+	import IconImage from '~icons/ri/image-2-line';
+	import IconMerge from '~icons/ri/shadow-line';
+	import IconImport from '~icons/ri/upload-2-line';
 
 	import BottombarContent from '../BottombarContent.svelte';
-	import TopbarContent from '../TopbarContent.svelte';
 
 	/**
 	 * @import * as DB from '$lib/database.js';

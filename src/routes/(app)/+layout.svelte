@@ -21,9 +21,7 @@
 	import { tables } from '$lib/idb.svelte';
 	import { loadPreviewImage } from '$lib/images';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
-	import KeyboardShortcuts from '$lib/KeyboardShortcuts.svelte';
 	import { IsMobile } from '$lib/mobile.svelte.js';
-	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { initializeProcessingQueue } from '$lib/queue.svelte';
 	import { switchSession } from '$lib/sessions';
 	import { getColorScheme, isDebugMode, setSetting } from '$lib/settings.svelte';
@@ -34,7 +32,6 @@
 	import { nonnull, pick } from '$lib/utils';
 
 	import Navigation from './Navigation.svelte';
-	import PrepareForOffline from './PrepareForOffline.svelte';
 
 	const { children, data } = $props();
 	const { swarpc, parallelism } = $derived(data);

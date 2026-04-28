@@ -1,16 +1,5 @@
 <script lang="ts">
-	import IconProtocols from '~icons/ri/file-list-3-line';
-	import IconAccounts from '~icons/ri/group-line';
-	import IconAbout from '~icons/ri/information-line';
-	import IconManage from '~icons/ri/settings-3-line';
-	import { version } from '$app/environment';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import DropdownMenu from '$lib/DropdownMenu.svelte';
-	import { plural } from '$lib/i18n.js';
-	import { tables } from '$lib/idb.svelte.js';
 	import Logo from '$lib/Logo.svelte';
-	import OverflowableText from '$lib/OverflowableText.svelte';
-	import { goto } from '$lib/paths.js';
 
 	import Settings from './Settings.svelte';
 	import TopbarContent from './TopbarContent.svelte';

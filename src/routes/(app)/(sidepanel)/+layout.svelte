@@ -5,10 +5,8 @@
 	import { toTopLeftCoords } from '$lib/BoundingBoxes.svelte';
 	import { promptForFiles } from '$lib/files';
 	import * as db from '$lib/idb.svelte';
-	import IconClose from '~icons/ri/close-line';
 	import { openTransaction, tables } from '$lib/idb.svelte';
 	import { deleteImageFile, imageFileId, imageIdToFileId } from '$lib/images';
-	import IconBack from '~icons/ri/arrow-left-line';
 	import { ACCEPTED_IMPORT_TYPES } from '$lib/import.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import {
@@ -16,20 +14,15 @@
 		mergeMetadataFromImagesAndObservations,
 		storeMetadataValue,
 	} from '$lib/metadata/index.js';
+	import { IsMobile } from '$lib/mobile.svelte.js';
 	import { deleteObservation, mergeToObservation, newObservation } from '$lib/observations';
 	import { cancelTask, importMore } from '$lib/queue.svelte.js';
 	import { seo } from '$lib/seo.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 
-	import PreviewSidePanel from './PreviewSidePanel.svelte';
-	import { IsMobile } from '$lib/mobile.svelte.js';
-	import { goto } from '$app/navigation';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import OverflowableText from '$lib/OverflowableText.svelte';
-	import { switchSession } from '$lib/sessions.js';
-	import TopbarContent from '../TopbarContent.svelte';
 	import TopbarOpenSession from '../TopbarOpenSession.svelte';
+	import PreviewSidePanel from './PreviewSidePanel.svelte';
 
 	seo({ title: 'Importer' });
 
@@ -194,7 +187,7 @@
 		}
 	});
 
-	const mobile = new IsMobile()
+	const mobile = new IsMobile();
 </script>
 
 <TopbarOpenSession />
