@@ -30,6 +30,7 @@
 	import { uiState } from '$lib/state.svelte.js';
 	import { nonnull } from '$lib/utils.js';
 
+	import HomeTopbar from '../HomeTopbar.svelte';
 	import Cards from './Cards.svelte';
 	import { createSession } from './create.js';
 	import { downloadRemoteSession } from './download.js';
@@ -59,6 +60,8 @@
 		},
 	});
 </script>
+
+<HomeTopbar />
 
 <main in:fade={{ duration: 100 }}>
 	<header>
@@ -180,6 +183,8 @@
 				{/snippet}
 			</DropdownMenu>
 		</section>
+		<!-- TODO: allow creating sessions remotely for platforms that support uploading ? -->
+		{#if directory.platform === "local"}
 		<section class="actions">
 			<ButtonSecondary
 				onclick={async () => {
@@ -193,7 +198,7 @@
 				}}
 			>
 				<IconImport />
-				Importer un export .zip
+				Importer .zip
 			</ButtonSecondary>
 			<ButtonSecondary
 				testid="new-session"
@@ -202,9 +207,10 @@
 				}}
 			>
 				<IconAdd />
-				Nouvelle session
+				Créer
 			</ButtonSecondary>
 		</section>
+		{/if}
 	</header>
 
 	<section class="sessions">
@@ -382,11 +388,17 @@
 		align-items: center;
 		justify-content: space-between;
 		margin-bottom: 2rem;
+		gap: 1rem;
+		flex-wrap: wrap;
 
 		.actions {
 			display: flex;
 			align-items: center;
 			gap: 1rem;
+		}
+
+		@media (max-width: 600px) {
+			justify-content: center;
 		}
 	}
 

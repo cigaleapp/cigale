@@ -21,7 +21,6 @@
 	import { tables } from '$lib/idb.svelte';
 	import { loadPreviewImage } from '$lib/images';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
-	import KeyboardShortcuts from '$lib/KeyboardShortcuts.svelte';
 	import { initializeProcessingQueue } from '$lib/queue.svelte';
 	import { switchSession } from '$lib/sessions';
 	import { getColorScheme, isDebugMode, setSetting } from '$lib/settings.svelte';
@@ -32,7 +31,6 @@
 	import { nonnull, pick } from '$lib/utils';
 
 	import Navigation from './Navigation.svelte';
-	import PrepareForOffline from './PrepareForOffline.svelte';
 
 	const { children, data } = $props();
 	const { swarpc, parallelism } = $derived(data);
@@ -145,6 +143,7 @@
 					labels: {
 						action: 'Recharger',
 					},
+					data: undefined,
 					action() {
 						location.reload();
 					},
@@ -153,50 +152,47 @@
 		});
 	});
 
-	/** @type {undefined|(() => void)} */
-	let openKeyboardShortcuts = $state();
-	/** @type {undefined|(() => void)} */
-	let openPrepareForOfflineUse = $state();
 </script>
 
 <svelte:head>
 	<base href={resolve('/') === '/' ? '' : resolve('/') + 'index.html'} />
 </svelte:head>
 
-<KeyboardShortcuts bind:openHelp={openKeyboardShortcuts} preventDefault binds={uiState.keybinds} />
-<PrepareForOffline bind:open={openPrepareForOfflineUse} />
+<div class="layout">
+	<Navigation
+		progressbarOnly={navbarAppearance === 'hidden'}
+		progress={uiState.processing.progress}
+		eta={uiState.eta}
+	/>
 
-<Navigation
-	{openKeyboardShortcuts}
-	{openPrepareForOfflineUse}
-	progressbarOnly={navbarAppearance === 'hidden'}
-	progress={uiState.processing.progress}
-	eta={uiState.eta}
-/>
+	<div id="portal-target-mobile-bottombar"></div>
 
-<section class="toasts" data-testid="toasts-area">
-	{#each toasts.items('default') as toast (toast.id)}
-		<Toast
-			{...toast}
-			action={toast.labels.action}
-			dismiss={toast.labels.close}
-			onaction={toast.callbacks.action instanceof URL
-				? toast.callbacks.action
-				: async () => toast.callbacks.action?.(toast)}
-			ondismiss={async () => {
-				await toast.callbacks.closed?.(toast);
-				toasts.remove(toast.id);
-			}}
-		/>
-	{/each}
-</section>
+	<section class="toasts" data-testid="toasts-area">
+		{#each toasts.items('default') as toast (toast.id)}
+			<Toast
+				{...toast}
+				action={toast.labels.action}
+				dismiss={toast.labels.close}
+				onaction={toast.callbacks.action instanceof URL
+					? toast.callbacks.action
+					: async () => toast.callbacks.action?.(toast)}
+				ondismiss={async () => {
+					await toast.callbacks.closed?.(toast);
+					toasts.remove(toast.id);
+				}}
+			/>
+		{/each}
+	</section>
 
-<div
-	class="contents"
-	class:padded={!page.route.id?.includes('/(sidepanel)') &&
-		!page.route.id?.includes('protocols/[id]/')}
->
-	{@render children?.()}
+	<div
+		class="contents"
+		class:padded={!page.route.id?.includes('/(sidepanel)') &&
+			!page.route.id?.includes('protocols/[id]/')}
+	>
+		{@render children?.()}
+	</div>
+
+	<div id="portal-target-mobile-topbar"></div>
 </div>
 
 <style>
@@ -227,5 +223,15 @@
 
 	.contents.padded {
 		padding: 1.2em;
+	}
+
+	.layout {
+		display: flex;
+		flex-direction: column;
+		height: 100svh;
+
+		@media (max-width: 600px) {
+			flex-direction: column-reverse;
+		}
 	}
 </style>

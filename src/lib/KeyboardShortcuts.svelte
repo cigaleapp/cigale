@@ -121,7 +121,7 @@
 		<dl>
 			{#each binds as [shortcut, { help }] (shortcut)}
 				<dt>
-					<KeyboardHint --size="1.2em" {shortcut} {help} />
+					<KeyboardHint mobile --size="1.2em" {shortcut} {help} />
 				</dt>
 				<dd>{help}</dd>
 			{/each}

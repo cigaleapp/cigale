@@ -58,12 +58,12 @@ export async function newSession(page, { name, protocol, models, goto = 'import'
 		while (page.url().includes('/sessions/')) {
 			await page
 				.getByRole('button', {
-					name: 'Ouvrir',
+					name: 'Ouvrir la session',
 					exact: true,
 				})
 				.click();
 
-			await new Promise((r) => setTimeout(r, 500));
+			await page.waitForTimeout(500);
 		}
 
 		await waitForRoute(page, '/(app)/(sidepanel)/import');

@@ -6,6 +6,7 @@
 	import * as dates from 'date-fns';
 
 	import { tooltip } from './tooltips.js';
+	import { switchValue } from './utils.js';
 
 	/**
 	 * @typedef {object} Props
@@ -21,7 +22,7 @@
 
 	const relative = $derived(dates.formatDistanceToNow(parsedDate, { addSuffix: true }));
 	const absolute = $derived(
-		dates.format(parsedDate, { both: 'PPpp', date: 'PP', time: 'pp' }[parts])
+		dates.format(parsedDate, switchValue(parts, { both: 'PPpp', date: 'PP', time: 'pp' }))
 	);
 </script>
 

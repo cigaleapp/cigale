@@ -14,12 +14,14 @@
 		mergeMetadataFromImagesAndObservations,
 		storeMetadataValue,
 	} from '$lib/metadata/index.js';
+	import { IsMobile } from '$lib/mobile.svelte.js';
 	import { deleteObservation, mergeToObservation, newObservation } from '$lib/observations';
 	import { cancelTask, importMore } from '$lib/queue.svelte.js';
 	import { seo } from '$lib/seo.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 
+	import TopbarOpenSession from '../TopbarOpenSession.svelte';
 	import PreviewSidePanel from './PreviewSidePanel.svelte';
 
 	seo({ title: 'Importer' });
@@ -184,12 +186,17 @@
 			return {};
 		}
 	});
+
+	const mobile = new IsMobile();
 </script>
+
+<TopbarOpenSession />
 
 <div class="main-and-sidepanel" class:has-sidepanel={showSidePanel} in:fade={{ duration: 100 }}>
 	<div class="main" data-testid="app-main">{@render children?.()}</div>
 	{#if showSidePanel}
 		<PreviewSidePanel
+			collapsed={mobile.current}
 			images={selectedHrefsWithCropboxes}
 			metadata={mergedMetadataValues}
 			canmerge={uiState.selection.length > 0}

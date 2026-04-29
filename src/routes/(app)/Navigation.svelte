@@ -3,7 +3,17 @@
 	import { fade } from 'svelte/transition';
 
 	import IconNext from '~icons/ri/arrow-right-s-fill';
+	import IconClassifyFilled from '~icons/ri/checkbox-multiple-fill';
+	import IconClassify from '~icons/ri/checkbox-multiple-line';
 	import IconDismiss from '~icons/ri/close-line';
+	import IconCropFilled from '~icons/ri/crop-fill';
+	import IconCrop from '~icons/ri/crop-line';
+	import IconManageSessionFilled from '~icons/ri/draft-fill';
+	import IconManageSession from '~icons/ri/draft-line';
+	import IconResultsFilled from '~icons/ri/file-chart-fill';
+	import IconResults from '~icons/ri/file-chart-line';
+	import IconImportFilled from '~icons/ri/import-fill';
+	import IconImport from '~icons/ri/import-line';
 	import IconNotificationsOn from '~icons/ri/notification-2-line';
 	import { page } from '$app/state';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
@@ -12,15 +22,15 @@
 	import { previewingPrNumber, tables } from '$lib/idb.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import Logo from '$lib/Logo.svelte';
-	import { askForNotificationPermission, hasNotificationsEnabled } from '$lib/notifications';
-	import { resolve } from '$lib/paths';
-	import { goto } from '$lib/paths.js';
+	import { askForNotificationPermission, hasNotificationsEnabled } from '$lib/notifications.js';
+	import { goto, resolve } from '$lib/paths';
 	import ProgressBar from '$lib/ProgressBar.svelte';
-	import { switchSession } from '$lib/sessions';
-	import { getSettings, setSetting } from '$lib/settings.svelte';
-	import { uiState } from '$lib/state.svelte';
-	import { tooltip } from '$lib/tooltips';
-	import { clamp } from '$lib/utils';
+	import { switchSession } from '$lib/sessions.js';
+	import { getSettings, setSetting } from '$lib/settings.svelte.js';
+	import { uiState } from '$lib/state.svelte.js';
+	import { tooltip } from '$lib/tooltips.js';
+	import { clamp } from '$lib/utils.js';
+	import { IsMobile } from '$lib/mobile.svelte.js';
 
 	import DeploymentDetails from './DeploymentDetails.svelte';
 	import ModalSubmitIssue from './ModalSubmitIssue.svelte';
@@ -33,19 +43,11 @@
 	 * @property {number} [progress=0]
 	 * @property {number} [eta=Infinity]
 	 * @property {import('swarpc').SwarpcClient<typeof import('$worker/procedures.js').PROCEDURES>} swarpc
-	 * @property {(() => void) | undefined} [openKeyboardShortcuts]
-	 * @property {(() => void) | undefined} [openPrepareForOfflineUse]
 	 * @property {boolean} [progressbarOnly] Only show the progress bar, hide the navbar and logo
 	 */
 
 	/** @type {Props} */
-	let {
-		openKeyboardShortcuts,
-		openPrepareForOfflineUse,
-		progress = 0,
-		eta = Infinity,
-		progressbarOnly = false,
-	} = $props();
+	let { progress = 0, eta = Infinity, progressbarOnly = false } = $props();
 
 	// @ts-expect-error
 	const path = $derived(resolve(page.url.pathname));
@@ -128,36 +130,46 @@
 		},
 		// [I]mport images
 		'g i': {
-			do: () => goto('/import'),
+			do: () => goto('/import/'),
 			help: 'Importer des images',
 		},
 		// Adjust C[r]ops
 		'g r': {
-			do: () => goto('/crop'),
+			do: () => goto('/crop/'),
 			help: 'Recadrer les images',
 		},
 		// A[n]notate images
 		'g n': {
-			do: () => goto('/classify'),
+			do: () => goto('/classify/'),
 			help: 'Classifier les images',
 		},
 		// E[x]port results
 		'g x': {
-			do: () => goto('/results'),
+			do: () => goto('/results/'),
 			help: 'Exporter les résultats',
 		},
 		// [M]anage protocols
 		'g m': {
-			do: () => goto('/protocols'),
+			do: () => goto('/protocols/'),
 			help: 'Gérer les protocoles',
 		},
 	});
+
+	const isSessionDependentRoute = $derived(
+		page.route.id !== '/(app)/sessions' &&
+			page.route.id !== '/(app)/protocols' &&
+			page.route.id !== '/(app)/accounts'
+	);
+
+	const mobile = new IsMobile()
+	const isDesktop = $derived(!mobile.current);
 </script>
 
 {#if previewingPrNumber}
 	<DeploymentDetails bind:open={openPreviewPRDetails} />
 {/if}
 
+{#if isDesktop}
 <header bind:clientHeight={height} class:native-window={isNativeWindow}>
 	<div class="progressbar">
 		<ProgressBar {progress} />
@@ -195,7 +207,7 @@
 				{/if}
 			</div>
 
-			{#if uiState.currentSession && page.route.id !== '/(app)/sessions' && page.route.id !== '/(app)/protocols' && page.route.id !== '(app)/accounts'}
+			{#if uiState.currentSession && isSessionDependentRoute}
 				<div class="steps" in:fade={{ duration: 100 }}>
 					<a
 						class="session-link"
@@ -344,16 +356,91 @@
 				<ModalSubmitIssue type="feature" />
 
 				<div class="settings">
-					<Settings
-						{openPrepareForOfflineUse}
-						{openKeyboardShortcuts}
-						--navbar-height="{height}px"
-					/>
+					<Settings --navbar-height="{height}px" />
 				</div>
 			</aside>
 		</nav>
 	{/if}
 </header>
+{:else}
+
+<!-- 
+Tab bar is only when a session is active
+ -->
+{#if uiState.currentSession && isSessionDependentRoute}
+	<header class="mobile">
+		<nav>
+			<a
+				href={resolve('/(app)/sessions/[id]', { id: uiState.currentSession.id })}
+				data-testid="mobile-goto-current-session"
+				class:active={path === `/sessions/${uiState.currentSession.id}/`}
+			>
+				{#if path === `/sessions/${uiState.currentSession.id}/`}
+					<IconManageSessionFilled />
+				{:else}
+					<IconManageSession />
+				{/if}
+				<span class="label">Session</span>
+			</a>
+
+			<a
+				href={resolve('/import/')}
+				data-testid="mobile-goto-import"
+				aria-disabled={!uiState.currentProtocol}
+				class:active={path == '/import/'}
+			>
+				{#if path == '/import/'}
+					<IconImportFilled />
+				{:else}
+					<IconImport />
+				{/if}
+				<span class="label">Importer</span>
+			</a>
+
+			<a
+				href={resolve('/crop/')}
+				data-testid="mobile-goto-crop"
+				aria-disabled={!uiState.currentProtocol || !hasImages}
+				class:active={path.startsWith('/crop')}
+			>
+				{#if path.startsWith('/crop')}
+					<IconCropFilled />
+				{:else}
+					<IconCrop />
+				{/if}
+				<span class="label">Recadrer</span>
+			</a>
+
+			<a
+				href={resolve('/classify/')}
+				data-testid="mobile-goto-classify"
+				aria-disabled={!uiState.currentProtocol || !hasImages}
+				class:active={path.startsWith('/classify')}
+			>
+				{#if path.startsWith('/classify')}
+					<IconClassifyFilled />
+				{:else}
+					<IconClassify />
+				{/if}
+				<span class="label">Classifier</span>
+			</a>
+
+			<a
+				href={resolve('/results/')}
+				data-testid="mobile-goto-results"
+				class:active={path == '/results/'}
+			>
+				{#if path == '/results/'}
+					<IconResultsFilled />
+				{:else}
+					<IconResults />
+				{/if}
+				<span class="label">Résultats</span>
+			</a>
+		</nav>
+	</header>
+{/if}
+{/if}
 
 <style>
 	header {
@@ -527,4 +614,36 @@
 		--height: 0.5rem;
 		--fill-color: var(--bg-primary);
 	}
+
+		header.mobile {
+			display: flex;
+			font-size: 1.125em;
+			padding: 0.25em 0;
+
+			nav {
+				display: flex;
+				align-items: center;
+				justify-content: space-around;
+				width: 100%;
+				padding: 0;
+			}
+
+			nav a {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 0.25em;
+				color: var(--fg-neutral);
+				width: 100%;
+			}
+
+			nav .label {
+				font-size: 0.65rem;
+				transition: font-size 0.2s;
+			}
+
+			nav a.active .label {
+				font-size: 0.85rem;
+			}
+		}
 </style>

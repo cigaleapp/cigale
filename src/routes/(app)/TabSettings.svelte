@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { NeuralInference } from '$lib/schemas/neural';
+	import type { Snippet } from 'svelte';
 
 	import IconSelect from '~icons/ri/arrow-down-s-line';
 	import IconSubmenu from '~icons/ri/arrow-right-s-line';
@@ -29,9 +30,17 @@
 		models: NeuralInference[];
 		currentModelIndex: number;
 		setModel: (_i: number) => Promise<void>;
+		trigger: Snippet<[{ help: string; onclick: () => void } & Record<string, unknown>]>;
 	}
 
-	const { tab, models, currentModelIndex, setModel, label }: Props = $props();
+	const {
+		tab,
+		models,
+		currentModelIndex,
+		setModel,
+		label,
+		trigger: customTrigger,
+	}: Props = $props();
 
 	const isOnTabItself = $derived.by(() => {
 		switch (page.route.id) {
@@ -123,6 +132,7 @@
 
 <div class="inference">
 	<DropdownMenu
+		title={label}
 		testid="{tab}-settings"
 		items={[
 			{
@@ -295,9 +305,13 @@
 		]}
 	>
 		{#snippet trigger(props)}
-			<ButtonIcon help={label} {...props}>
-				<IconSelect />
-			</ButtonIcon>
+			{#if customTrigger}
+				{@render customTrigger({label, ...props})}
+			{:else}
+				<ButtonIcon help={label} {...props}>
+					<IconSelect />
+				</ButtonIcon>
+			{/if}
 		{/snippet}
 		{#snippet item({ direction, icon }, { label, selected, type })}
 			<div class="icon">
@@ -326,7 +340,6 @@
 
 <style>
 	.inference {
-		color: var(--fg-warning);
 		display: flex;
 		align-items: center;
 		font-size: 0.9em;

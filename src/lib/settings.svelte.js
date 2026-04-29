@@ -1,4 +1,5 @@
 import { tables } from './idb.svelte.js';
+import { switchValue } from './utils.js';
 
 /**
  * @import {Settings} from './database.js';
@@ -89,4 +90,11 @@ export async function toggleSetting(key) {
 
 export function isDebugMode() {
 	return getSettings().showTechnicalMetadata;
+}
+
+export function locale() {
+	return switchValue(getSettings().language, {
+		fr: 'fr-FR',
+		en: 'en-US',
+	});
 }

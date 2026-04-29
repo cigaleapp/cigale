@@ -3,6 +3,7 @@
 /// <reference lib="esnext" />
 /// <reference lib="webworker" />
 
+import { ms } from 'convert';
 import * as ort from 'onnxruntime-web';
 
 import { FULL_IMAGE_CROPBOX } from '$lib/BoundingBoxes.svelte.js';
@@ -10,6 +11,7 @@ import { Schemas } from '$lib/database.js';
 import { loadToTensor } from '$lib/inference_utils.js';
 import { classify, infer } from '$lib/inference.js';
 import { getMetadataValue, storeMetadataValue } from '$lib/metadata/index.js';
+import { sleep } from '$lib/utils.js';
 
 import { openDatabase, swarp } from './index.js';
 
@@ -54,6 +56,9 @@ swarp.inferBoundingBoxes(async ({ fileId, taskSettings }, _, tools) => {
 	if (!session) {
 		throw new Error('Modèle de détection non chargé');
 	}
+
+	// XXX: DONT MERGE
+	await sleep(ms('30s'));
 
 	const db = await openDatabase();
 	tools.abortSignal?.throwIfAborted();

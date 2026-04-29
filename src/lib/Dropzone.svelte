@@ -1,4 +1,6 @@
 <script>
+	import { IsMobile } from '$lib/mobile.svelte.js';
+
 	/**
 	 * @typedef Props
 	 * @type {object}
@@ -54,36 +56,51 @@
 
 		onfiles?.({ event, files });
 	}
+
+	const mobile = new IsMobile();
 </script>
 
-<section
-	class="dropzone"
-	role="form"
-	class:dragging
-	class:clickable
-	ondragover={(e) => {
-		if (!e.dataTransfer) return;
-		e.preventDefault();
-		dragging = true;
-	}}
-	ondrop={handleDrop}
->
-	{@render children?.()}
-	<div class="dragging-overlay">
-		<p>Déposer des images ici…</p>
-	</div>
-	{#if clickable}
-		<input
-			type="file"
-			multiple
-			accept={filetypes?.join(',')}
-			oninput={(e) => {
-				if (!e.currentTarget.files) return;
-				onfiles?.({ event: e, files: [...e.currentTarget.files] });
-			}}
-		/>
-	{/if}
-</section>
+{#if mobile.current}
+	<section class="dropzone disabled" role={clickable ? 'form' : undefined}>
+		{@render children?.()}
+		{#if clickable}
+			{@render fileInput()}
+		{/if}
+	</section>
+{:else}
+	<section
+		class="dropzone"
+		role="form"
+		class:dragging
+		class:clickable
+		ondragover={(e) => {
+			if (!e.dataTransfer) return;
+			e.preventDefault();
+			dragging = true;
+		}}
+		ondrop={handleDrop}
+	>
+		{@render children?.()}
+		<div class="dragging-overlay">
+			<p>Déposer des images ici…</p>
+		</div>
+		{#if clickable}
+			{@render fileInput()}
+		{/if}
+	</section>
+{/if}
+
+{#snippet fileInput()}
+	<input
+		type="file"
+		multiple
+		accept={filetypes?.join(',')}
+		oninput={(e) => {
+			if (!e.currentTarget.files) return;
+			onfiles?.({ event: e, files: [...e.currentTarget.files] });
+		}}
+	/>
+{/snippet}
 
 <style>
 	input {

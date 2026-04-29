@@ -21,6 +21,7 @@ msgid "<0/> Chargement…"
 msgstr "<0/> Loading…"
 
 #: src/routes/(app)/protocols/+page.svelte
+#: src/routes/(app)/sessions/+page.svelte
 msgid "<0/> Créer"
 msgstr "<0/> Create"
 
@@ -64,7 +65,6 @@ msgstr "<0/> Reset database"
 msgid "<0/> Rééssayer"
 msgstr "<0/> Retry"
 
-#: src/lib/AreaObservations.svelte
 #: src/lib/CardMedia.svelte
 #: src/routes/(app)/(sidepanel)/crop/[image]/[[from]]/+page@(app).svelte
 #: src/routes/(app)/protocols/RowProtocol.svelte
@@ -105,6 +105,7 @@ msgstr "GBIF API"
 msgid "ATTENTION: SUPPRIME TOUTES VOS DONNÉES"
 msgstr "WARNING: DELETES ALL YOUR DATA"
 
+#: src/routes/(app)/Navigation.svelte
 #: src/routes/+error.svelte
 msgid "Accueil"
 msgstr "Home"
@@ -620,6 +621,7 @@ msgstr "Protocol deleted"
 msgid "Protocole “{0}” importé"
 msgstr "Imported protocol “{0}”"
 
+#: src/routes/(app)/Navigation.svelte
 #: src/routes/(app)/protocols/+page.svelte
 msgid "Protocoles"
 msgstr "Protocols"
@@ -676,6 +678,7 @@ msgstr "Revert to original crop"
 msgid "Revenir au recadrage d'origine pour toutes les boîtes"
 msgstr "Revert all to original crop"
 
+#: src/routes/(app)/Navigation.svelte
 #: src/routes/(app)/Settings.svelte
 msgid "Réglages"
 msgstr "Settings"
@@ -700,6 +703,7 @@ msgstr "Under the supervision of"
 msgid "Supprime toutes les données pour ce déploiement de preview"
 msgstr "Deletes all data for this preview deployment"
 
+#: src/lib/AreaObservations.svelte
 #: src/lib/ModalConfirmDeletion.svelte
 msgid "Supprimer"
 msgstr "Delete"
@@ -958,6 +962,8 @@ msgstr "<0/> Metadata “{0}” was not found"
 msgid "Protocole {0}"
 msgstr "Protocol {0}"
 
+#: src/lib/Submenu.svelte
+#: src/lib/Submenu.svelte
 #: src/routes/(app)/protocols/[id]/+layout.svelte
 msgid "<0/> Retour"
 msgstr "<0/> Back"
@@ -1474,7 +1480,6 @@ msgstr "Updated protocol to v{0}"
 msgid "Impossible de mettre à jour le protocole: {0}"
 msgstr "Could not update protocol: {0}"
 
-#: src/lib/AreaObservations.svelte
 #: src/lib/ZipContentsTree.svelte
 #: src/lib/ZipContentsTree.svelte
 msgid "# élément"
@@ -1671,14 +1676,6 @@ msgstr "Protocols <0/>"
 #: src/routes/(app)/sessions/+page.svelte
 msgid "Sessions"
 msgstr "Sessions"
-
-#: src/routes/(app)/sessions/+page.svelte
-msgid "<0/> Importer un export .zip"
-msgstr "<0/> Import a .zip export"
-
-#: src/routes/(app)/sessions/+page.svelte
-msgid "<0/> Nouvelle session"
-msgstr "<0/> New session"
 
 #: src/routes/(app)/sessions/[id]/+page.svelte
 msgid "Ouvrir la session"
@@ -1880,6 +1877,7 @@ msgstr "Cannot sort with the selected settings"
 msgid "Tri en cours…"
 msgstr "Sorting…"
 
+#: src/lib/InputSelectProtocol.svelte
 #: src/lib/InputSelectProtocol.svelte
 msgid "Choisir un protocole"
 msgstr "Choose a protocol"
@@ -2245,6 +2243,7 @@ msgstr ""
 msgid "Token"
 msgstr ""
 
+#: src/routes/(app)/Navigation.svelte
 #: src/routes/(app)/accounts/+page.svelte
 msgid "Comptes"
 msgstr ""
@@ -2484,4 +2483,25 @@ msgstr ""
 #: src/lib/i18n.js
 #: src/lib/i18n.js
 msgid "Error: "
+msgstr ""
+
+#: src/routes/(app)/sessions/+page.svelte
+msgid "<0/> Importer .zip"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/+layout.svelte
+msgid "Toutes les sessions"
+msgstr ""
+
+#. 0: feature
+#: src/lib/MobileWIPOverlay.svelte
+msgid "{0} est en cours de développement pour les appareils mobiles. En attendant, veuillez utiliser un ordinateur pour y accéder."
+msgstr ""
+
+#: src/lib/MobileWIPOverlay.svelte
+msgid "Retour"
+msgstr ""
+
+#: src/lib/MobileWIPOverlay.svelte
+msgid "Suivez l'avancement de son développement sur Github: c'est <0>l'issue <0/></0>."
 msgstr ""
