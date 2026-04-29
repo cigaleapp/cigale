@@ -21,7 +21,6 @@
 	import { tables } from '$lib/idb.svelte';
 	import { loadPreviewImage } from '$lib/images';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
-	import { IsMobile } from '$lib/mobile.svelte.js';
 	import { initializeProcessingQueue } from '$lib/queue.svelte';
 	import { switchSession } from '$lib/sessions';
 	import { getColorScheme, isDebugMode, setSetting } from '$lib/settings.svelte';
@@ -153,7 +152,6 @@
 		});
 	});
 
-	const mobile = new IsMobile();
 </script>
 
 <svelte:head>

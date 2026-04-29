@@ -102,7 +102,6 @@
 		if (!current || !target) return;
 		const width = current.offsetWidth;
 
-
 		target.style.width = `${width}px`;
 
 		const sign = direction === 'next' ? '-' : '';

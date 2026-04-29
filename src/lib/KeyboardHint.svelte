@@ -109,7 +109,6 @@
 
 	const mobile = new IsMobile();
 
-	$inspect({showOnMobile})
 </script>
 
 {#if !mobile.current || showOnMobile}

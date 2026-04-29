@@ -50,7 +50,7 @@
 		});
 	});
 
-	const { showTechnicalMetadata, gridSize, language, parallelism } = $derived(getSettings());
+	const { showTechnicalMetadata, language, parallelism } = $derived(getSettings());
 
 	const theme = getTheme();
 
