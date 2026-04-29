@@ -49,6 +49,7 @@
 		display: flex;
 		flex-direction: column;
 		height: 100vh;
+		-webkit-tap-highlight-color: transparent;
 
 		@media (max-width: 600px) {
 			overflow: hidden;

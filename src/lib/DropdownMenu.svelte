@@ -381,6 +381,10 @@
 		display: flex;
 		align-items: center;
 		gap: 1rem;
+
+		&:focus {
+			background: var(--bg-primary-translucent);
+		}
 	}
 
 	.bottom-drawer-heading {
