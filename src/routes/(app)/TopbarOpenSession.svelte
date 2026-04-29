@@ -1,4 +1,8 @@
 <script lang="ts">
+	// TODO: remove when Intl.DurationFormat is Baseline Widely Available (in Sep 2027)
+	import { DurationFormat } from '@formatjs/intl-durationformat';
+	import { formatDistanceToNow, intervalToDuration } from 'date-fns';
+
 	import IconClose from '~icons/ri/arrow-left-s-line';
 	import IconSettings from '~icons/ri/more-2-fill';
 	import { page } from '$app/state';
@@ -7,9 +11,26 @@
 	import { goto } from '$lib/paths.js';
 	import { switchSession } from '$lib/sessions.js';
 	import { uiState } from '$lib/state.svelte.js';
+	import { tooltip } from '$lib/tooltips.js';
 
 	import TabSettings from './TabSettings.svelte';
 	import TopbarContent from './TopbarContent.svelte';
+
+	const eta = $derived(uiState.eta);
+	const progress = $derived(uiState.processing.progress);
+	const showingEta = $derived(eta < Infinity && progress > 0 && progress < 1);
+	/** [number, unit] */
+	const formattedEta = $derived(
+		new DurationFormat('fr-FR', { style: 'narrow' })
+			.formatToParts(
+				intervalToDuration({
+					start: Date.now(),
+					end: Date.now() + eta,
+				})
+			)
+			.map((part) => part.value)
+			.filter((value) => value.trim())
+	);
 </script>
 
 <TopbarContent>
@@ -26,6 +47,16 @@
 	<OverflowableText text={uiState.currentSession?.name ?? ''} />
 
 	<div class="actions">
+		{#if showingEta}
+			<div
+				class="eta"
+				use:tooltip={`Termine ${formatDistanceToNow(Date.now() + eta, { addSuffix: true, includeSeconds: true })}`}
+			>
+				<code>{formattedEta[0]}</code>
+				<span>{formattedEta[1]}</span>
+			</div>
+		{/if}
+
 		{#snippet tabSettingsTrigger(props: { help: string; onclick: () => void })}
 			<ButtonIcon {...props}>
 				<IconSettings />

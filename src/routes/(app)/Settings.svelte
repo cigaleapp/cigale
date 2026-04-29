@@ -242,7 +242,7 @@
 				{
 					type: 'clickable' as const,
 					data: { icon: IconAbout, subtext: `Version ${version}` },
-					label: 'À propos…',
+					label: 'À propos',
 					async onclick() {
 						await goto('/(app)/about');
 					},

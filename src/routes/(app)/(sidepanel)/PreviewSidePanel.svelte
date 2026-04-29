@@ -156,6 +156,10 @@
 	}
 
 	const selectionTitle = $derived.by(() => {
+		if (loadingOptions) {
+			return 'Chargement des métadonnées…';
+		}
+
 		if (selectionCounts.image > 0 && selectionCounts.observation > 0) {
 			return plural(selectionCounts.all, ['1 élément', '# éléments']);
 		}
@@ -253,7 +257,7 @@
 			<p>Sélectionnez une ou plusieurs images pour voir et modifier leurs métadonnées</p>
 		</section>
 	{/if}
-	<section class="button">
+	<section class="actions">
 		{#if onmerge && onsplit}
 			<div class="side-by-side">
 				<ButtonSecondary
@@ -282,7 +286,7 @@
 				Importer d'autres images
 			</ButtonSecondary>
 		{/if}
-		{#if page.route.id === '/(app)/(sidepanel)/classify'}
+		{#if page.route.id === '/(app)/(sidepanel)/classify' && !mobile.current}
 			<ButtonSecondary
 				disabled={!singleObservationSelected}
 				loading
@@ -366,6 +370,9 @@
 		&.mobile {
 			grid-template-rows: max-content auto max-content;
 			gap: 1rem;
+
+			/* XXX: Approximate max height of .actions */
+			padding-bottom: 300px;
 		}
 	}
 
@@ -427,15 +434,24 @@
 		overflow: hidden;
 	}
 
-	.button {
+	.actions {
 		display: flex;
 		gap: 0.75em;
 		align-items: center;
 		flex-direction: column;
 		--width: 100%;
+
+		@media (max-width: 600px) {
+			position: fixed;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			padding: 0.75em;
+			background: var(--bg-neutral);
+		}
 	}
 
-	.button .side-by-side {
+	.actions .side-by-side {
 		display: flex;
 		align-items: center;
 		gap: 0.75em;

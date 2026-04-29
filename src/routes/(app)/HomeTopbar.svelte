@@ -3,8 +3,6 @@
 
 	import Settings from './Settings.svelte';
 	import TopbarContent from './TopbarContent.svelte';
-
-	import '$lib/fonts-math/import.css';
 </script>
 
 <TopbarContent>
@@ -30,33 +28,10 @@
 		text-transform: uppercase;
 		letter-spacing: 0.125ch;
 		font-weight: 200;
-		font-family: 'Latin Modern Math', var(--font-regular);
 		/* font-family: var(--font-mono); */
 
 		/* <Logo /> props */
 		--size: 1.5em;
 		--stroke-width: 4.2rem;
-	}
-
-	.settings-item {
-		display: flex;
-		align-items: center;
-		gap: 1rem;
-
-		.icon {
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			width: 1.5em;
-			height: 1.5em;
-		}
-
-		.subtext {
-			display: flex;
-			align-items: center;
-			margin-left: auto;
-			color: var(--gay);
-			font-size: 0.875rem;
-		}
 	}
 </style>

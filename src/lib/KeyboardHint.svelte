@@ -101,15 +101,18 @@
 	 * @type {object}
 	 * @property {string} shortcut
 	 * @property {string} [help]
+	 * @property {boolean} [mobile] whether to show the hint on mobile (not recommended, since it can take a lot of space for little benefit)
 	 */
 
 	/** @type {Props} */
-	const { shortcut, help = '' } = $props();
+	const { shortcut, help = '',mobile: showOnMobile = false  } = $props();
 
 	const mobile = new IsMobile();
+
+	$inspect({showOnMobile})
 </script>
 
-{#if !mobile.current}
+{#if !mobile.current || showOnMobile}
 	<kbd class="hint" use:tooltip={help}>
 		<!-- .entries() gives us [[0, a], [1, b], ...] for [a, b, ...] -->
 		{#each displayPattern(shortcut).entries() as [i, part] (i)}

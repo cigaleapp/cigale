@@ -1876,6 +1876,7 @@ msgid "Tri en cours…"
 msgstr "Tri en cours…"
 
 #: src/lib/InputSelectProtocol.svelte
+#: src/lib/InputSelectProtocol.svelte
 msgid "Choisir un protocole"
 msgstr "Choisir un protocole"
 

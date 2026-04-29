@@ -78,3 +78,7 @@ if (import.meta.vitest) {
 		});
 	});
 }
+
+export function formatDistanceToNowShort(date) {
+	
+}
