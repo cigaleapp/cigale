@@ -2480,3 +2480,8 @@ msgstr ""
 #: src/routes/(app)/+layout.js
 msgid "Protocole \"{0}\" mis à jour à la v{1}"
 msgstr ""
+
+#: src/lib/i18n.js
+#: src/lib/i18n.js
+msgid "Error: "
+msgstr ""
