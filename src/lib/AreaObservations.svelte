@@ -475,6 +475,10 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		display: flex;
 		flex-direction: column;
 		gap: 3em;
+
+		@media (max-width: 600px) {
+			padding-bottom: 1em;
+		}
 	}
 
 	.group header {

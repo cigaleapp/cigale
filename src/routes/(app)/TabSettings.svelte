@@ -132,7 +132,7 @@
 
 <div class="inference">
 	<DropdownMenu
-	title={label}
+		title={label}
 		testid="{tab}-settings"
 		items={[
 			{
@@ -340,7 +340,6 @@
 
 <style>
 	.inference {
-		color: var(--fg-warning);
 		display: flex;
 		align-items: center;
 		font-size: 0.9em;

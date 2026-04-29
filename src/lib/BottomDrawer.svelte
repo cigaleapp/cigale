@@ -45,6 +45,8 @@
 	}
 
 	[data-bottomsheet-wrapper] :global(.handle-container) {
+		background-color: var(--bg-neutral);
+
 		&:has(.title) {
 			border-bottom: 1px solid rgb(from var(--gray) r g b / 50%);
 		}

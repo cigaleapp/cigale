@@ -46,6 +46,7 @@
 	import type { Snippet } from 'svelte';
 
 	import { DropdownMenu } from 'bits-ui';
+	import { watch } from 'runed';
 
 	import BottomDrawer from './BottomDrawer.svelte';
 	import { IsMobile } from './mobile.svelte.js';
@@ -85,27 +86,43 @@
 
 	const mobile = new IsMobile();
 
-	/** [margin top, height, margin bottom]*/
-	const mobileGroupLabelHeight = [1 * 16, 20, 0.5 * 16];
-	const mobileItemHeight = 48; /*px*/
-	const estimatedHeight = $derived(
-		sum(
-			groups.map(
-				(group, i) =>
-					group.items.length * mobileItemHeight +
-					(group.label ? sum(mobileGroupLabelHeight.slice(i === 0 ? 1 : 0)) : 0)
-			)
-		) +
+	const rem = (x: number) => x * 16;
+
+	/** Used to estimate the total height of the drawer content on mobile */
+	const heights = {
+		item: { height: 48 },
+		group: {
+			marginTop: rem(1),
+			height: 20,
+			marginBottom: rem(0.5),
+		},
+	};
+
+	let windowHeight = $state<number>(0);
+
+	// Don't change estimated height if the items change, because it causes jank
+	let estimatedHeight = $state<number>();
+	watch([() => title], () => {
+		const { item, group } = heights;
+
+		const groupHeights = groups.map(
+			({ label, items: { length } }, i) =>
+				length * item.height +
+				(label && length
+					? sum([i > 0 ? group.marginTop : 0, group.height, group.marginBottom])
+					: 0)
+		);
+
+		estimatedHeight =
+			/* groups */
+			sum(groupHeights) +
 			/* padding */
 			1.25 /*rem*/ * 16 +
 			/* handle area */
 			(title ? 60 : 36) /*px*/ +
 			/* margin for error */
-			20 /*px*/
-	);
-
-
-	let windowHeight = $state<number>(0);
+			20; /*px*/
+	});
 </script>
 
 <svelte:window bind:innerHeight={windowHeight} />
@@ -130,40 +147,34 @@
 		)}
 	>
 		<Submenu
-			items={groups.flatMap((group, ii) =>
-				group.items.map((item, i) => ({
-					label: item.label,
-					key: item.key ?? `${ii}/${i}`,
+			items={groups.flatMap((group, i) =>
+				group.items.map((item, j) => ({
+					...item,
+					key: `${i}/${item.key ?? j}`,
 					data: {
-						...item,
-						i,
-						groupIndex: ii,
-						groupTitle: i === 0 ? group.label : undefined,
-						group,
+						...item.data,
+						groupIndex: i,
+						groupTitle: j === 0 ? group.label : undefined,
 					},
 				}))
 			)}
 		>
-			{#snippet item(i)}
-				{#if i.groupTitle}
+			{#snippet item({ groupTitle, groupIndex }, i)}
+				{#if groupTitle}
 					<p
-						style:margin-top="{i.groupIndex === 0 ? 0 : mobileGroupLabelHeight[0]}px"
-						style:margin-bottom="{mobileGroupLabelHeight[2]}px"
-						style:height="{mobileGroupLabelHeight[1]}px"
+						style:margin-top="{groupIndex === 0 ? 0 : heights.group.marginTop}px"
+						style:height="{heights.group.height}px"
+						style:margin-bottom="{heights.group.marginBottom}px"
 						class="bottom-drawer-heading"
 					>
-						{i.groupTitle}
+						{groupTitle}
 					</p>
 				{/if}
 				<button
-					style:height="{mobileItemHeight}px"
+					style:height="{heights.item.height}px"
 					class="bottom-drawer-item"
-					onclick={() => {
-						if (i.type === 'submenu') {
-							//TODO
-						} else {
-							i.onclick();
-						}
+					onclick={async () => {
+						i.onclick();
 
 						if (i.closeOnSelect ?? true) {
 							open = false;
@@ -208,7 +219,9 @@
 					{#if group.items.length > 0}
 						<DropdownMenu.Group data-testid={group.testid}>
 							{#if group.label || (groups.length === 1 && title)}
-								<DropdownMenu.GroupHeading>{group.label || title}</DropdownMenu.GroupHeading>
+								<DropdownMenu.GroupHeading
+									>{group.label || title}</DropdownMenu.GroupHeading
+								>
 							{/if}
 
 							{#each group.items as i (i.label)}
