@@ -962,6 +962,8 @@ msgstr "<0/> Métadonnée “{0}” introuvable"
 msgid "Protocole {0}"
 msgstr "Protocole {0}"
 
+#: src/lib/Submenu.svelte
+#: src/lib/Submenu.svelte
 #: src/routes/(app)/protocols/[id]/+layout.svelte
 msgid "<0/> Retour"
 msgstr "<0/> Retour"
@@ -2490,3 +2492,16 @@ msgstr "<0/> Importer .zip"
 #: src/routes/(app)/(sidepanel)/+layout.svelte
 msgid "Toutes les sessions"
 msgstr "Toutes les sessions"
+
+#. 0: feature
+#: src/lib/MobileWIPOverlay.svelte
+msgid "{0} est en cours de développement pour les appareils mobiles. En attendant, veuillez utiliser un ordinateur pour y accéder."
+msgstr "{0} est en cours de développement pour les appareils mobiles. En attendant, veuillez utiliser un ordinateur pour y accéder."
+
+#: src/lib/MobileWIPOverlay.svelte
+msgid "Retour"
+msgstr "Retour"
+
+#: src/lib/MobileWIPOverlay.svelte
+msgid "Suivez l'avancement de son développement sur Github: c'est <0>l'issue <0/></0>."
+msgstr "Suivez l'avancement de son développement sur Github: c'est <0>l'issue <0/></0>."

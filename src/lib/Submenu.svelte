@@ -1,5 +1,5 @@
 <script lang="ts" generics="D, SD">
-	import type { AnyItem, SubmenuItem } from './DropdownMenu.svelte';
+	import type { AnyItem } from './DropdownMenu.svelte';
 	import type { Snippet } from 'svelte';
 
 	import { ms } from 'convert';
@@ -9,7 +9,7 @@
 
 	import ButtonInk from './ButtonInk.svelte';
 	import Logo from './Logo.svelte';
-	import { climbDOMUntil, logexpr, sleep } from './utils.js';
+	import { climbDOMUntil, sleep } from './utils.js';
 
 	type Item = AnyItem<D, SD>;
 
@@ -102,7 +102,6 @@
 		if (!current || !target) return;
 		const width = current.offsetWidth;
 
-		console.log({ width });
 
 		target.style.width = `${width}px`;
 
@@ -166,7 +165,6 @@
 									...item,
 									closeOnSelect: false,
 									async onclick() {
-										console.log('Opening submenu', item);
 										if (!item.key)
 											throw new Error('Submenu items must have a key');
 										armNestedSubmenu(item.key);
@@ -249,7 +247,6 @@
 			top: 0;
 		}
 	}
-
 
 	.label {
 		width: 100%;

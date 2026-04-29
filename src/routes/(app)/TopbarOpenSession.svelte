@@ -1,15 +1,15 @@
 <script lang="ts">
-	// TODO: remove when Intl.DurationFormat is Baseline Widely Available (in Sep 2027)
-	import { DurationFormat } from '@formatjs/intl-durationformat';
-	import { formatDistanceToNow, intervalToDuration } from 'date-fns';
+	import { formatDistanceToNow } from 'date-fns';
 
 	import IconClose from '~icons/ri/arrow-left-s-line';
 	import IconSettings from '~icons/ri/more-2-fill';
 	import { page } from '$app/state';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
+	import { formatDistanceToNowShortParts } from '$lib/date.js';
 	import OverflowableText from '$lib/OverflowableText.svelte';
 	import { goto } from '$lib/paths.js';
 	import { switchSession } from '$lib/sessions.js';
+	import { locale } from '$lib/settings.svelte.js';
 	import { uiState } from '$lib/state.svelte.js';
 	import { tooltip } from '$lib/tooltips.js';
 
@@ -19,18 +19,6 @@
 	const eta = $derived(uiState.eta);
 	const progress = $derived(uiState.processing.progress);
 	const showingEta = $derived(eta < Infinity && progress > 0 && progress < 1);
-	/** [number, unit] */
-	const formattedEta = $derived(
-		new DurationFormat('fr-FR', { style: 'narrow' })
-			.formatToParts(
-				intervalToDuration({
-					start: Date.now(),
-					end: Date.now() + eta,
-				})
-			)
-			.map((part) => part.value)
-			.filter((value) => value.trim())
-	);
 </script>
 
 <TopbarContent>
@@ -48,12 +36,14 @@
 
 	<div class="actions">
 		{#if showingEta}
+			{@const [quantity, unit] = formatDistanceToNowShortParts(locale(), Date.now() + eta)}
+
 			<div
 				class="eta"
 				use:tooltip={`Termine ${formatDistanceToNow(Date.now() + eta, { addSuffix: true, includeSeconds: true })}`}
 			>
-				<code>{formattedEta[0]}</code>
-				<span>{formattedEta[1]}</span>
+				<code>{quantity}</code>
+				<span>{unit}</span>
 			</div>
 		{/if}
 
@@ -103,5 +93,13 @@
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
+	}
+
+	.eta {
+		display: flex;
+		align-items: center;
+		font-size: 0.85em;
+		min-width: 3ch;
+		max-width: 6ch;
 	}
 </style>
