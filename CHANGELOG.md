@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file, on a monthl
 - Add trim helper to protocol templated strings
 - Allow pulling remote sessions with metadata from KoboToolbox (#1373)
 - Handle older kobocollect rows before column xpath change
+- Redirect to / when trying to access /results without a current session
 - Skip builtin protocol imports only based on the presence of a same-source local protocol
 - Validate that protocol:remote.kobocollect.form URL is #/forms/...
 
@@ -19,6 +20,7 @@ All notable changes to this project will be documented in this file, on a monthl
 
 ### Bug Fixes
 
+- Fix /results
 - Fix jank when going back to sessions list
 - Fix worker local storage type handling
 
