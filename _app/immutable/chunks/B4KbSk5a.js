@@ -1,0 +1,1 @@
+import{K as e,U as t,_ as n,o as r}from"./0f5badY6.js";import"./DCbV68uA.js";var i=e(`<svg><path fill="currentColor" d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z"></path></svg>`);function a(e,a){let o=r(a,[`$$slots`,`$$events`,`$$legacy`]);var s=i();n(s,()=>({class:`icon`,viewBox:`0 0 24 24`,width:`1.2em`,height:`1.2em`,...o})),t(e,s)}export{a as t};

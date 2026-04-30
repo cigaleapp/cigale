@@ -1,0 +1,1 @@
+import{n as e}from"../chunks/CpejtAKt.js";import"../chunks/0f5badY6.js";import{m as t}from"../chunks/Bqf7YUIv.js";import"../chunks/DCbV68uA.js";import{n}from"../chunks/C8hEaazR.js";import"../chunks/D1yrDjXO.js";var r=e({load:()=>i});async function i({url:e}){let r=new URL(t(`/sessions`),e.origin);r.search=e.search,n(307,r)}function a(e){}export{a as component,r as universal};
