@@ -112,7 +112,7 @@
 		"google-auth-library": "^10.6.2",
 		"google-fonts-helper": "^3.7.4",
 		"googleapis": "^171.4.0",
-		"jsdom": "^29.0.2",
+		"jsdom": "^29.1.1",
 		"json-schema-doc-ts": "^2.0.0",
 		"jszip": "^3.10.1",
 		"knip": "^5.88.1",
