@@ -32,6 +32,10 @@ All notable changes to this project will be documented in this file, on a monthl
 - Regenerate example protocols
 - Setup kobocollect imports for Entomoscope protocol
 
+### Translation Updates
+
+- Refresh translation files
+
 ## March 2026
 
 ### Improvements
