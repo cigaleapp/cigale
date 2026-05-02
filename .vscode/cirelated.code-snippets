@@ -35,4 +35,24 @@
 			"console.log(`$1`);",
 		],
 	},
+	"DONTMERGE comment (JS/TS)": {
+		"scope": "javascript,typescript",
+		"prefix": "dontmerge",
+		"body": "// XXX\u003a DONT MERGE\n$0"
+	},
+	"DONTMERGE comment (HTML)": {
+		"scope": "html",
+		"prefix": "dontmerge",
+		"body": "<!-- XXX\u003a DONT MERGE -->\n$0"
+	},
+	"DONTMERGE comment (YAML)": {
+		"scope": "yaml",
+		"prefix": "dontmerge",
+		"body": "# XXX\u003a DONT MERGE\n$0"
+	},
+	"DONTMERGE comment (CSS)": {
+		"scope": "css,scss",
+		"prefix": "dontmerge",
+		"body": "/* XXX:\u003aDONT MERGE */\n$0"
+	},
 }
