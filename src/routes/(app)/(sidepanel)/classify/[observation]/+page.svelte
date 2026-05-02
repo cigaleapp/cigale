@@ -7,7 +7,6 @@
 	import type { Attachment } from 'svelte/attachments';
 
 	import { marked } from 'marked';
-	import MobileWIPOverlay from '$lib/MobileWIPOverlay.svelte';
 	import { fade } from 'svelte/transition';
 
 	import IconDescription from '~icons/ri/align-left';
@@ -19,13 +18,14 @@
 	import LearnMoreLink from '$lib/LearnMoreLink.svelte';
 	import { getMetadataValue } from '$lib/metadata/index.js';
 	import MetadataCascadesTable from '$lib/MetadataCascadesTable.svelte';
+	import MobileWIPOverlay from '$lib/MobileWIPOverlay.svelte';
 	import { observationMetadata } from '$lib/observations';
+	import { goto } from '$lib/paths.js';
 	import { namespaceOfMetadataId } from '$lib/schemas/metadata.js';
 	import { scrollfader } from '$lib/scrollfader';
 	import { isDebugMode } from '$lib/settings.svelte.js';
 	import { uiState } from '$lib/state.svelte.js';
 	import { undo } from '$lib/undo.svelte';
-	import {goto} from '$lib/paths.js';
 
 	import Header from './Header.svelte';
 	import LayoutSwitcher from './LayoutSwitcher.svelte';
@@ -77,10 +77,13 @@
 	}
 </script>
 
-<MobileWIPOverlay feature="La classification plein-écran"  issue={1519}
+<MobileWIPOverlay
+	feature="La classification plein-écran"
+	issue={1519}
 	back={async () => {
 		await goto('/classify/');
-	}} />
+	}}
+/>
 
 <main data-layout={layout} data-expand={expand} data-layout-transitions={layoutTransitions}>
 	<div class="references" {@attach area('references')} in:fade={{ duration: 200 }}>

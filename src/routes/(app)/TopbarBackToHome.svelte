@@ -1,11 +1,12 @@
 <script lang="ts">
+	import type { Snippet } from 'svelte';
+
 	import IconBack from '~icons/ri/arrow-left-s-line';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
-
-	import TopbarContent from './TopbarContent.svelte';
 	import { goto } from '$lib/paths.js';
-	import type { Snippet } from 'svelte';
+
 	import ModalSubmitIssue from './ModalSubmitIssue.svelte';
+	import TopbarContent from './TopbarContent.svelte';
 
 	interface Props {
 		children: Snippet;

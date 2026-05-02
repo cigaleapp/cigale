@@ -105,10 +105,9 @@
 	 */
 
 	/** @type {Props} */
-	const { shortcut, help = '',mobile: showOnMobile = false  } = $props();
+	const { shortcut, help = '', mobile: showOnMobile = false } = $props();
 
 	const mobile = new IsMobile();
-
 </script>
 
 {#if !mobile.current || showOnMobile}

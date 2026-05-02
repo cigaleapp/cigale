@@ -13,9 +13,9 @@
 	import { uiState } from '$lib/state.svelte.js';
 	import { tooltip } from '$lib/tooltips.js';
 
+	import ModalSubmitIssue from './ModalSubmitIssue.svelte';
 	import TabSettings from './TabSettings.svelte';
 	import TopbarContent from './TopbarContent.svelte';
-	import ModalSubmitIssue from './ModalSubmitIssue.svelte';
 
 	const eta = $derived(uiState.eta);
 	const progress = $derived(uiState.processing.progress);
@@ -47,7 +47,6 @@
 				<span>{unit}</span>
 			</div>
 		{/if}
-
 
 		<ModalSubmitIssue type="bug" />
 

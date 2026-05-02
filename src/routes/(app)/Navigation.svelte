@@ -22,6 +22,7 @@
 	import { previewingPrNumber, tables } from '$lib/idb.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import Logo from '$lib/Logo.svelte';
+	import { IsMobile } from '$lib/mobile.svelte.js';
 	import { askForNotificationPermission, hasNotificationsEnabled } from '$lib/notifications.js';
 	import { goto, resolve } from '$lib/paths';
 	import ProgressBar from '$lib/ProgressBar.svelte';
@@ -30,7 +31,6 @@
 	import { uiState } from '$lib/state.svelte.js';
 	import { tooltip } from '$lib/tooltips.js';
 	import { clamp } from '$lib/utils.js';
-	import { IsMobile } from '$lib/mobile.svelte.js';
 
 	import DeploymentDetails from './DeploymentDetails.svelte';
 	import ModalSubmitIssue from './ModalSubmitIssue.svelte';
@@ -161,7 +161,7 @@
 			page.route.id !== '/(app)/accounts'
 	);
 
-	const mobile = new IsMobile()
+	const mobile = new IsMobile();
 	const isDesktop = $derived(!mobile.current);
 </script>
 
@@ -170,276 +170,277 @@
 {/if}
 
 {#if isDesktop}
-<header bind:clientHeight={height} class:native-window={isNativeWindow}>
-	<div class="progressbar">
-		<ProgressBar {progress} />
-	</div>
+	<header bind:clientHeight={height} class:native-window={isNativeWindow}>
+		<div class="progressbar">
+			<ProgressBar {progress} />
+		</div>
 
-	{#if !progressbarOnly}
-		<nav bind:clientHeight={navHeight} data-testid="app-nav">
-			<div class="logo">
-				<button
-					data-testid="goto-home"
-					use:tooltip={showingEta
-						? `Termine ${formatDistanceToNow(Date.now() + eta, { addSuffix: true, includeSeconds: true })}`
-						: 'Accueil'}
-					onclick={async () => {
-						if (uiState.currentSession) {
-							await goto('/(app)/sessions');
-							await switchSession(null);
-						} else {
-							await goto('/');
-						}
-					}}
-				>
-					{#if showingEta}
-						<div class="progress-overlay" transition:fade>
-							{percent(progress)}
+		{#if !progressbarOnly}
+			<nav bind:clientHeight={navHeight} data-testid="app-nav">
+				<div class="logo">
+					<button
+						data-testid="goto-home"
+						use:tooltip={showingEta
+							? `Termine ${formatDistanceToNow(Date.now() + eta, { addSuffix: true, includeSeconds: true })}`
+							: 'Accueil'}
+						onclick={async () => {
+							if (uiState.currentSession) {
+								await goto('/(app)/sessions');
+								await switchSession(null);
+							} else {
+								await goto('/');
+							}
+						}}
+					>
+						{#if showingEta}
+							<div class="progress-overlay" transition:fade>
+								{percent(progress)}
+							</div>
+						{/if}
+						<Logo --stroke-width="75" --size="2rem" --fill="transparent" />
+					</button>
+
+					{#if previewingPrNumber}
+						<button class="pr-number" onclick={openPreviewPRDetails}>
+							Preview #{previewingPrNumber}
+						</button>
+					{/if}
+				</div>
+
+				{#if uiState.currentSession && isSessionDependentRoute}
+					<div class="steps" in:fade={{ duration: 100 }}>
+						<a
+							class="session-link"
+							href={resolve('/(app)/sessions/[id]', {
+								id: uiState.currentSession.id,
+							})}
+							data-testid="goto-current-session"
+							use:tooltip={'Session'}
+						>
+							{uiState.currentSession.name}
+							{#if path === `/sessions/${uiState.currentSession.id}/`}
+								<div class="line"></div>
+							{/if}
+						</a>
+						<div class="with-inference-indicator">
+							<a
+								href={resolve('/import')}
+								data-testid="goto-import"
+								aria-disabled={!uiState.currentProtocol}
+							>
+								Importer
+								{#if path == '/import/'}
+									<div class="line"></div>
+								{/if}
+							</a>
+
+							<TabSettings
+								label="Réglages d'import"
+								tab="import"
+								models={[]}
+								currentModelIndex={-1}
+								setModel={async () => {}}
+							/>
+						</div>
+						<div class="separator"><IconNext /></div>
+						<div class="with-inference-indicator">
+							<!-- eslint-disable svelte/no-navigation-without-resolve -->
+							<a
+								href={page.route.id !== '/(app)/(sidepanel)/crop/[image]' &&
+								uiState.imageOpenedInCropper
+									? resolve('/(app)/(sidepanel)/crop/[image]', {
+											image: uiState.imageOpenedInCropper,
+										})
+									: resolve('/crop')}
+								data-testid="goto-crop"
+								aria-disabled={!uiState.currentProtocol || !hasImages}
+							>
+								<!-- eslint-enable svelte/no-navigation-without-resolve -->
+								Recadrer
+								{#if path.startsWith('/crop')}
+									<div class="line"></div>
+								{/if}
+							</a>
+
+							<TabSettings
+								label="Réglages de recadrage"
+								tab="crop"
+								models={uiState.cropModels}
+								currentModelIndex={uiState.selectedCropModel}
+								setModel={async (i) => uiState.setModelSelections({ crop: i })}
+							/>
+						</div>
+						<div class="separator"><IconNext /></div>
+						<div
+							class="with-inference-indicator"
+							use:tooltip={uiState.processing.task === 'detection' &&
+							uiState.processing.progress < 1
+								? "Veuillez attendre la fin de l'analyse des images avant de les classifier"
+								: undefined}
+						>
+							<a
+								href={resolve('/classify')}
+								aria-disabled={!uiState.currentProtocol ||
+									!hasImages ||
+									(uiState.processing.task === 'detection' &&
+										uiState.processing.progress < 1)}
+								data-testid="goto-classify"
+							>
+								Classifier
+								{#if path.startsWith('/classify')}
+									<div class="line"></div>
+								{/if}
+							</a>
+
+							<TabSettings
+								tab="classify"
+								label="Réglages de classification"
+								models={uiState.classificationModels}
+								currentModelIndex={uiState.selectedClassificationModel}
+								setModel={async (i) =>
+									uiState.setModelSelections({ classification: i })}
+							/>
+						</div>
+						<div class="separator"><IconNext /></div>
+						<a href={resolve('/results')} data-testid="goto-results">
+							Résultats
+							{#if path == '/results/'}
+								<div class="line"></div>
+							{/if}
+						</a>
+					</div>
+				{:else}
+					<div class="steps" in:fade={{ duration: 100 }}>
+						<a href={resolve('/sessions')} data-testid="goto-sessions">
+							Sessions
+							{#if path.startsWith('/sessions')}
+								<div class="line"></div>
+							{/if}
+						</a>
+						<a href={resolve('/protocols')} data-testid="goto-protocols">
+							Protocoles
+							{#if path.startsWith('/protocols')}
+								<div class="line"></div>
+							{/if}
+						</a>
+						<a href={resolve('/accounts')} data-testid="goto-accounts">
+							Comptes
+							{#if path.startsWith('/accounts')}
+								<div class="line"></div>
+							{/if}
+						</a>
+					</div>
+				{/if}
+
+				<aside class:native={isNativeWindow}>
+					{#if getSettings().notifications === null}
+						<div class="notifications">
+							<ButtonInk
+								help="Activer les notifications pour savoir quand un traitement est terminé."
+								onclick={async () => {
+									await askForNotificationPermission();
+									setSetting('notifications', hasNotificationsEnabled());
+								}}
+							>
+								<IconNotificationsOn />
+								Activer
+							</ButtonInk>
+							<ButtonIcon
+								onclick={() => setSetting('notifications', false)}
+								help="Ne pas activer les notifications"
+							>
+								<IconDismiss />
+							</ButtonIcon>
 						</div>
 					{/if}
-					<Logo --stroke-width="75" --size="2rem" --fill="transparent" />
-				</button>
 
-				{#if previewingPrNumber}
-					<button class="pr-number" onclick={openPreviewPRDetails}>
-						Preview #{previewingPrNumber}
-					</button>
-				{/if}
-			</div>
+					<ModalSubmitIssue type="bug" />
+					<ModalSubmitIssue type="feature" />
 
-			{#if uiState.currentSession && isSessionDependentRoute}
-				<div class="steps" in:fade={{ duration: 100 }}>
-					<a
-						class="session-link"
-						href={resolve('/(app)/sessions/[id]', { id: uiState.currentSession.id })}
-						data-testid="goto-current-session"
-						use:tooltip={'Session'}
-					>
-						{uiState.currentSession.name}
-						{#if path === `/sessions/${uiState.currentSession.id}/`}
-							<div class="line"></div>
-						{/if}
-					</a>
-					<div class="with-inference-indicator">
-						<a
-							href={resolve('/import')}
-							data-testid="goto-import"
-							aria-disabled={!uiState.currentProtocol}
-						>
-							Importer
-							{#if path == '/import/'}
-								<div class="line"></div>
-							{/if}
-						</a>
-
-						<TabSettings
-							label="Réglages d'import"
-							tab="import"
-							models={[]}
-							currentModelIndex={-1}
-							setModel={async () => {}}
-						/>
+					<div class="settings">
+						<Settings --navbar-height="{height}px" />
 					</div>
-					<div class="separator"><IconNext /></div>
-					<div class="with-inference-indicator">
-						<!-- eslint-disable svelte/no-navigation-without-resolve -->
-						<a
-							href={page.route.id !== '/(app)/(sidepanel)/crop/[image]' &&
-							uiState.imageOpenedInCropper
-								? resolve('/(app)/(sidepanel)/crop/[image]', {
-										image: uiState.imageOpenedInCropper,
-									})
-								: resolve('/crop')}
-							data-testid="goto-crop"
-							aria-disabled={!uiState.currentProtocol || !hasImages}
-						>
-							<!-- eslint-enable svelte/no-navigation-without-resolve -->
-							Recadrer
-							{#if path.startsWith('/crop')}
-								<div class="line"></div>
-							{/if}
-						</a>
-
-						<TabSettings
-							label="Réglages de recadrage"
-							tab="crop"
-							models={uiState.cropModels}
-							currentModelIndex={uiState.selectedCropModel}
-							setModel={async (i) => uiState.setModelSelections({ crop: i })}
-						/>
-					</div>
-					<div class="separator"><IconNext /></div>
-					<div
-						class="with-inference-indicator"
-						use:tooltip={uiState.processing.task === 'detection' &&
-						uiState.processing.progress < 1
-							? "Veuillez attendre la fin de l'analyse des images avant de les classifier"
-							: undefined}
-					>
-						<a
-							href={resolve('/classify')}
-							aria-disabled={!uiState.currentProtocol ||
-								!hasImages ||
-								(uiState.processing.task === 'detection' &&
-									uiState.processing.progress < 1)}
-							data-testid="goto-classify"
-						>
-							Classifier
-							{#if path.startsWith('/classify')}
-								<div class="line"></div>
-							{/if}
-						</a>
-
-						<TabSettings
-							tab="classify"
-							label="Réglages de classification"
-							models={uiState.classificationModels}
-							currentModelIndex={uiState.selectedClassificationModel}
-							setModel={async (i) =>
-								uiState.setModelSelections({ classification: i })}
-						/>
-					</div>
-					<div class="separator"><IconNext /></div>
-					<a href={resolve('/results')} data-testid="goto-results">
-						Résultats
-						{#if path == '/results/'}
-							<div class="line"></div>
-						{/if}
-					</a>
-				</div>
-			{:else}
-				<div class="steps" in:fade={{ duration: 100 }}>
-					<a href={resolve('/sessions')} data-testid="goto-sessions">
-						Sessions
-						{#if path.startsWith('/sessions')}
-							<div class="line"></div>
-						{/if}
-					</a>
-					<a href={resolve('/protocols')} data-testid="goto-protocols">
-						Protocoles
-						{#if path.startsWith('/protocols')}
-							<div class="line"></div>
-						{/if}
-					</a>
-					<a href={resolve('/accounts')} data-testid="goto-accounts">
-						Comptes
-						{#if path.startsWith('/accounts')}
-							<div class="line"></div>
-						{/if}
-					</a>
-				</div>
-			{/if}
-
-			<aside class:native={isNativeWindow}>
-				{#if getSettings().notifications === null}
-					<div class="notifications">
-						<ButtonInk
-							help="Activer les notifications pour savoir quand un traitement est terminé."
-							onclick={async () => {
-								await askForNotificationPermission();
-								setSetting('notifications', hasNotificationsEnabled());
-							}}
-						>
-							<IconNotificationsOn />
-							Activer
-						</ButtonInk>
-						<ButtonIcon
-							onclick={() => setSetting('notifications', false)}
-							help="Ne pas activer les notifications"
-						>
-							<IconDismiss />
-						</ButtonIcon>
-					</div>
-				{/if}
-
-				<ModalSubmitIssue type="bug" />
-				<ModalSubmitIssue type="feature" />
-
-				<div class="settings">
-					<Settings --navbar-height="{height}px"  />
-				</div>
-			</aside>
-		</nav>
-	{/if}
-</header>
+				</aside>
+			</nav>
+		{/if}
+	</header>
 {:else}
-
-<!-- 
+	<!-- 
 Tab bar is only when a session is active
  -->
-{#if uiState.currentSession && isSessionDependentRoute}
-	<header class="mobile">
-		<nav>
-			<a
-				href={resolve('/(app)/sessions/[id]', { id: uiState.currentSession.id })}
-				data-testid="mobile-goto-current-session"
-				class:active={path === `/sessions/${uiState.currentSession.id}/`}
-			>
-				{#if path === `/sessions/${uiState.currentSession.id}/`}
-					<IconManageSessionFilled />
-				{:else}
-					<IconManageSession />
-				{/if}
-				<span class="label">Session</span>
-			</a>
+	{#if uiState.currentSession && isSessionDependentRoute}
+		<header class="mobile">
+			<nav>
+				<a
+					href={resolve('/(app)/sessions/[id]', { id: uiState.currentSession.id })}
+					data-testid="mobile-goto-current-session"
+					class:active={path === `/sessions/${uiState.currentSession.id}/`}
+				>
+					{#if path === `/sessions/${uiState.currentSession.id}/`}
+						<IconManageSessionFilled />
+					{:else}
+						<IconManageSession />
+					{/if}
+					<span class="label">Session</span>
+				</a>
 
-			<a
-				href={resolve('/import/')}
-				data-testid="mobile-goto-import"
-				aria-disabled={!uiState.currentProtocol}
-				class:active={path == '/import/'}
-			>
-				{#if path == '/import/'}
-					<IconImportFilled />
-				{:else}
-					<IconImport />
-				{/if}
-				<span class="label">Importer</span>
-			</a>
+				<a
+					href={resolve('/import/')}
+					data-testid="mobile-goto-import"
+					aria-disabled={!uiState.currentProtocol}
+					class:active={path == '/import/'}
+				>
+					{#if path == '/import/'}
+						<IconImportFilled />
+					{:else}
+						<IconImport />
+					{/if}
+					<span class="label">Importer</span>
+				</a>
 
-			<a
-				href={resolve('/crop/')}
-				data-testid="mobile-goto-crop"
-				aria-disabled={!uiState.currentProtocol || !hasImages}
-				class:active={path.startsWith('/crop')}
-			>
-				{#if path.startsWith('/crop')}
-					<IconCropFilled />
-				{:else}
-					<IconCrop />
-				{/if}
-				<span class="label">Recadrer</span>
-			</a>
+				<a
+					href={resolve('/crop/')}
+					data-testid="mobile-goto-crop"
+					aria-disabled={!uiState.currentProtocol || !hasImages}
+					class:active={path.startsWith('/crop')}
+				>
+					{#if path.startsWith('/crop')}
+						<IconCropFilled />
+					{:else}
+						<IconCrop />
+					{/if}
+					<span class="label">Recadrer</span>
+				</a>
 
-			<a
-				href={resolve('/classify/')}
-				data-testid="mobile-goto-classify"
-				aria-disabled={!uiState.currentProtocol || !hasImages}
-				class:active={path.startsWith('/classify')}
-			>
-				{#if path.startsWith('/classify')}
-					<IconClassifyFilled />
-				{:else}
-					<IconClassify />
-				{/if}
-				<span class="label">Classifier</span>
-			</a>
+				<a
+					href={resolve('/classify/')}
+					data-testid="mobile-goto-classify"
+					aria-disabled={!uiState.currentProtocol || !hasImages}
+					class:active={path.startsWith('/classify')}
+				>
+					{#if path.startsWith('/classify')}
+						<IconClassifyFilled />
+					{:else}
+						<IconClassify />
+					{/if}
+					<span class="label">Classifier</span>
+				</a>
 
-			<a
-				href={resolve('/results/')}
-				data-testid="mobile-goto-results"
-				class:active={path == '/results/'}
-			>
-				{#if path == '/results/'}
-					<IconResultsFilled />
-				{:else}
-					<IconResults />
-				{/if}
-				<span class="label">Résultats</span>
-			</a>
-		</nav>
-	</header>
-{/if}
+				<a
+					href={resolve('/results/')}
+					data-testid="mobile-goto-results"
+					class:active={path == '/results/'}
+				>
+					{#if path == '/results/'}
+						<IconResultsFilled />
+					{:else}
+						<IconResults />
+					{/if}
+					<span class="label">Résultats</span>
+				</a>
+			</nav>
+		</header>
+	{/if}
 {/if}
 
 <style>
@@ -615,35 +616,35 @@ Tab bar is only when a session is active
 		--fill-color: var(--bg-primary);
 	}
 
-		header.mobile {
+	header.mobile {
+		display: flex;
+		font-size: 1.125em;
+		padding: 0.25em 0;
+
+		nav {
 			display: flex;
-			font-size: 1.125em;
-			padding: 0.25em 0;
-
-			nav {
-				display: flex;
-				align-items: center;
-				justify-content: space-around;
-				width: 100%;
-				padding: 0;
-			}
-
-			nav a {
-				display: flex;
-				flex-direction: column;
-				align-items: center;
-				gap: 0.25em;
-				color: var(--fg-neutral);
-				width: 100%;
-			}
-
-			nav .label {
-				font-size: 0.65rem;
-				transition: font-size 0.2s;
-			}
-
-			nav a.active .label {
-				font-size: 0.85rem;
-			}
+			align-items: center;
+			justify-content: space-around;
+			width: 100%;
+			padding: 0;
 		}
+
+		nav a {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 0.25em;
+			color: var(--fg-neutral);
+			width: 100%;
+		}
+
+		nav .label {
+			font-size: 0.65rem;
+			transition: font-size 0.2s;
+		}
+
+		nav a.active .label {
+			font-size: 0.85rem;
+		}
+	}
 </style>

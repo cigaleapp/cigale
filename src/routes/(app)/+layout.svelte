@@ -16,7 +16,6 @@
 	import { tables } from '$lib/idb.svelte';
 	import { loadPreviewImage } from '$lib/images';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
-	import PrepareForOffline from './PrepareForOffline.svelte';
 	import KeyboardShortcuts from '$lib/KeyboardShortcuts.svelte';
 	import { globalModals } from '$lib/modals.svelte.js';
 	import { initializeProcessingQueue } from '$lib/queue.svelte';
@@ -29,6 +28,7 @@
 	import { nonnull, pick } from '$lib/utils';
 
 	import Navigation from './Navigation.svelte';
+	import PrepareForOffline from './PrepareForOffline.svelte';
 
 	const { children, data } = $props();
 	const { swarpc, parallelism } = $derived(data);
@@ -159,7 +159,6 @@
 	preventDefault
 	binds={uiState.keybinds}
 />
-
 
 <PrepareForOffline bind:open={globalModals.modal_prepare_for_offline_use.open} />
 

@@ -9,9 +9,10 @@
 	import { version } from '$app/environment';
 	import lockfile from '$lib/../../bun.lock?raw';
 	import Logo from '$lib/Logo.svelte';
-	import { seo } from '$lib/seo.svelte';
-	import TopbarBackToHome from '../TopbarBackToHome.svelte';
 	import OverflowableText from '$lib/OverflowableText.svelte';
+	import { seo } from '$lib/seo.svelte';
+
+	import TopbarBackToHome from '../TopbarBackToHome.svelte';
 
 	const { data } = $props();
 
@@ -82,9 +83,7 @@
 	}
 </script>
 
-<TopbarBackToHome>
-	À propos
-</TopbarBackToHome>
+<TopbarBackToHome>À propos</TopbarBackToHome>
 
 <header>
 	<Logo drawpercent={logoDrawPercent} />
@@ -231,9 +230,11 @@
 					<dt>
 						<a target="_blank" href="https://npmjs.com/package/{name}">{name}</a>
 					</dt>
-					<dd><code>
-						<OverflowableText text={version} />
-					</code></dd>
+					<dd>
+						<code>
+							<OverflowableText text={version} />
+						</code>
+					</dd>
 				{/each}
 			</dl>
 		{:catch error}

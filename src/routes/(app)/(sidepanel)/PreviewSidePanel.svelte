@@ -5,6 +5,14 @@
 	import { dequal } from 'dequal/lite';
 	import { watch } from 'runed';
 
+	import IconShowPanel from '~icons/ri/arrow-up-s-line';
+	import IconObservation from '~icons/ri/bug-line';
+	import IconDelete from '~icons/ri/delete-bin-line';
+	import IconFullScreen from '~icons/ri/fullscreen-line';
+	import IconSplit from '~icons/ri/function-line';
+	import IconImage from '~icons/ri/image-2-line';
+	import IconMerge from '~icons/ri/shadow-line';
+	import IconImport from '~icons/ri/upload-2-line';
 	import { page } from '$app/state';
 	import BottomDrawer from '$lib/BottomDrawer.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
@@ -23,14 +31,6 @@
 	import { goto } from '$lib/paths.js';
 	import { metadataDefinitionComparator } from '$lib/protocols.js';
 	import { uiState } from '$lib/state.svelte.js';
-	import IconShowPanel from '~icons/ri/arrow-up-s-line';
-	import IconObservation from '~icons/ri/bug-line';
-	import IconDelete from '~icons/ri/delete-bin-line';
-	import IconFullScreen from '~icons/ri/fullscreen-line';
-	import IconSplit from '~icons/ri/function-line';
-	import IconImage from '~icons/ri/image-2-line';
-	import IconMerge from '~icons/ri/shadow-line';
-	import IconImport from '~icons/ri/upload-2-line';
 
 	import BottombarContent from '../BottombarContent.svelte';
 

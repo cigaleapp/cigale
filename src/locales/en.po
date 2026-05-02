@@ -204,10 +204,6 @@ msgstr "Box #{0}"
 msgid "C.i.g.a.l.e."
 msgstr "C.i.g.a.l.e."
 
-#: src/routes/(app)/Settings.svelte
-msgid "CIGALE ver. <0/> · <1>À propos</1>"
-msgstr "CIGALE ver. <0/> · <1>About</1>"
-
 #: src/routes/(app)/(sidepanel)/crop/[image]/[[from]]/+page@(app).svelte
 msgid "Cacher les boîtes non sélectionnées"
 msgstr "Hide unselected boxes"
@@ -521,14 +517,6 @@ msgstr "Image is too large to be processed. Images must be less than {0} Megapix
 msgid "L'image {0} n'a pas de recadrage alternatif, impossible de revenir au recadrage d'origine"
 msgstr "Image {0} has no alternative crop values, unable to revert to original crop"
 
-#: src/routes/(app)/Settings.svelte
-msgid "Langue"
-msgstr "Language"
-
-#: src/routes/(app)/Settings.svelte
-msgid "Langue de l'interface"
-msgstr "Interface language"
-
 #. 0: file.name
 #: src/lib/results.svelte.js
 msgid "Le fichier d'analyse de {0} n'est pas au format JSON ou est corrompu"
@@ -565,10 +553,6 @@ msgstr "Update"
 msgctxt "Upgrading a protocol. The <0 /> is an icon arrow"
 msgid "Mise à jour…"
 msgstr "Updating…"
-
-#: src/routes/(app)/Settings.svelte
-msgid "Mode debug"
-msgstr "Debug mode"
 
 #: src/routes/(app)/DeploymentDetails.svelte
 msgid "Nettoyer la base de données"
@@ -626,7 +610,6 @@ msgid "Protocoles"
 msgstr "Protocols"
 
 #: src/routes/(app)/PrepareForOffline.svelte
-#: src/routes/(app)/Settings.svelte
 msgid "Préparation hors-ligne"
 msgstr "Prepare for offline use"
 
@@ -635,7 +618,6 @@ msgid "Quitter le mode recadrage"
 msgstr "Exit cropping mode"
 
 #: src/lib/KeyboardShortcuts.svelte
-#: src/routes/(app)/Settings.svelte
 msgid "Raccourcis clavier"
 msgstr "Keyboard shortcuts"
 
@@ -724,10 +706,6 @@ msgstr "Delete image"
 msgid "Supprimer toutes les images sélectionnées. Attention, impossible d'annuler"
 msgstr "Delete all selected images. Warning, cannot undo"
 
-#: src/routes/(app)/Settings.svelte
-msgid "Synchroniser avec le thème du système"
-msgstr "Sync with system theme"
-
 #: src/routes/(app)/(sidepanel)/crop/[image]/[[from]]/+page@(app).svelte
 msgid "Sélectionner la boîte précédente"
 msgstr "Select previous box"
@@ -745,10 +723,6 @@ msgstr "Select one or more images to see and edit their metadata"
 msgid "Séparer toutes les observations sélectionnées en images seules"
 msgstr "Separate all selected observations into individual images"
 
-#: src/routes/(app)/Settings.svelte
-msgid "Taille des images"
-msgstr "Images size"
-
 #: src/routes/(app)/DeploymentDetails.svelte
 msgid "Tests E2E"
 msgstr "E2E tests"
@@ -756,10 +730,6 @@ msgstr "E2E tests"
 #: src/routes/(app)/DeploymentDetails.svelte
 msgid "Tests unitaires"
 msgstr "Unit tests"
-
-#: src/routes/(app)/Settings.svelte
-msgid "Thème"
-msgstr "Theme"
 
 #: src/lib/AreaObservations.svelte
 msgid "Tout désélectionner"
@@ -770,7 +740,6 @@ msgid "Tout sélectionner"
 msgstr "Select all"
 
 #: src/routes/(app)/PrepareForOffline.svelte
-#: src/routes/(app)/Settings.svelte
 msgid "Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne. Télécharge tout les modèles pour tout les protocoles actuellement installés."
 msgstr "Download everything needed to use the application offline. Downloads all models for all currently installed protocols."
 
@@ -1432,10 +1401,6 @@ msgid "Option not found"
 msgstr "Option not found"
 
 #: src/routes/(app)/Settings.svelte
-msgid "Parallélisme <0>Nombre de tâches en parallèle</0>"
-msgstr "Parallelism<0>Amount of tasks to run in parallel</0>"
-
-#: src/routes/(app)/Settings.svelte
 msgid "Réduire"
 msgstr "Decrease"
 
@@ -1513,10 +1478,6 @@ msgstr "<0/> Enable"
 #: src/routes/(app)/Navigation.svelte
 msgid "Ne pas activer les notifications"
 msgstr "Don't enable notifications"
-
-#: src/routes/(app)/Settings.svelte
-msgid "Notifications <0>Quand un traitement est terminé</0>"
-msgstr "Notifications <0>When processing finishes</0>"
 
 #: src/lib/notifications.js
 msgid "Vous avez refusé les notifications système. Veuillez changer cela dans les paramètres de votre navigateur."
@@ -2515,3 +2476,15 @@ msgstr ""
 #: src/routes/(app)/Navigation.svelte
 msgid "Résultats"
 msgstr ""
+
+#: src/routes/(app)/Settings.svelte
+msgid "# installé"
+msgid_plural "# installés"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/routes/(app)/Settings.svelte
+msgid "# connecté"
+msgid_plural "# connectés"
+msgstr[0] ""
+msgstr[1] ""

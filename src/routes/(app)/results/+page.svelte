@@ -490,7 +490,7 @@
 
 <style>
 	main {
-		max-width: calc(min(1400px, 100vw ));
+		max-width: calc(min(1400px, 100vw));
 		width: 100%;
 		margin: 0 auto;
 		display: flex;

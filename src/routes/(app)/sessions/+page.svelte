@@ -184,32 +184,32 @@
 			</DropdownMenu>
 		</section>
 		<!-- TODO: allow creating sessions remotely for platforms that support uploading ? -->
-		{#if directory.platform === "local"}
-		<section class="actions">
-			<ButtonSecondary
-				onclick={async () => {
-					const zipfile = await promptForFiles({
-						accept: 'application/zip',
-						multiple: false,
-					});
-					await switchSession(null);
-					importMore(zipfile);
-					await goto('/(app)/(sidepanel)/import');
-				}}
-			>
-				<IconImport />
-				Importer .zip
-			</ButtonSecondary>
-			<ButtonSecondary
-				testid="new-session"
-				onclick={async () => {
-					await createSession();
-				}}
-			>
-				<IconAdd />
-				Créer
-			</ButtonSecondary>
-		</section>
+		{#if directory.platform === 'local'}
+			<section class="actions">
+				<ButtonSecondary
+					onclick={async () => {
+						const zipfile = await promptForFiles({
+							accept: 'application/zip',
+							multiple: false,
+						});
+						await switchSession(null);
+						importMore(zipfile);
+						await goto('/(app)/(sidepanel)/import');
+					}}
+				>
+					<IconImport />
+					Importer .zip
+				</ButtonSecondary>
+				<ButtonSecondary
+					testid="new-session"
+					onclick={async () => {
+						await createSession();
+					}}
+				>
+					<IconAdd />
+					Créer
+				</ButtonSecondary>
+			</section>
 		{/if}
 	</header>
 

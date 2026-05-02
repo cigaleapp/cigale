@@ -3,6 +3,8 @@
 
 	import { fade } from 'svelte/transition';
 
+	import IconCheck from '~icons/ri/check-line';
+	import IconFail from '~icons/ri/error-warning-line';
 	import KoboToolbox from '$lib/accounts/kobotoolbox.js';
 	import { errorMessage } from '$lib/i18n.js';
 	import { databaseHandle, tables } from '$lib/idb.svelte.js';
@@ -13,18 +15,13 @@
 	import Stepper from '$lib/Stepper.svelte';
 	import { tooltip } from '$lib/tooltips.js';
 	import { orEmpty, safeJSONParse } from '$lib/utils.js';
-	import IconCheck from '~icons/ri/check-line';
-
-	import IconFail from '~icons/ri/error-warning-line';
-
 
 	interface Props {
-
-		adding : undefined | AccountConstructor;
+		adding: undefined | AccountConstructor;
 		open: undefined | (() => Promise<boolean>);
 	}
 
-	let {open=$bindable(), adding}: Props = $props();
+	let { open = $bindable(), adding }: Props = $props();
 
 	let loginData: undefined | LoginData = $state();
 
@@ -46,8 +43,6 @@
 </script>
 
 <ModalConfirm
-
-
 	key="modal_add_account"
 	title="Ajouter un compte {adding?.displayName}"
 	confirm="Se connecter"
@@ -181,45 +176,44 @@
 </ModalConfirm>
 
 <style>
-
 	.add-account {
 		padding-left: 2em;
 		width: 100%;
 	}
 
-		.token-with-feedback {
-			display: flex;
-			align-items: center;
-			gap: 1em;
-			margin-top: 0.5em;
-			width: 100%;
+	.token-with-feedback {
+		display: flex;
+		align-items: center;
+		gap: 1em;
+		margin-top: 0.5em;
+		width: 100%;
+	}
+
+	.feedback {
+		transition:
+			width 250ms ease,
+			opacity 100ms ease;
+		padding: 1em;
+		border-radius: 99999px;
+		height: 2ch;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		flex-shrink: 0;
+		gap: 0.5ch;
+		overflow: hidden;
+		white-space: nowrap;
+
+		color: var(--gay);
+
+		&.ok {
+			color: var(--fg-success);
+			background-color: var(--bg-success);
 		}
 
-		.feedback {
-			transition:
-				width 250ms ease,
-				opacity 100ms ease;
-			padding: 1em;
-			border-radius: 99999px;
-			height: 2ch;
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			flex-shrink: 0;
-			gap: 0.5ch;
-			overflow: hidden;
-			white-space: nowrap;
-
-			color: var(--gay);
-
-			&.ok {
-				color: var(--fg-success);
-				background-color: var(--bg-success);
-			}
-
-			&.err {
-				color: var(--fg-error);
-				background-color: var(--bg-error);
-			}
+		&.err {
+			color: var(--fg-error);
+			background-color: var(--bg-error);
 		}
+	}
 </style>

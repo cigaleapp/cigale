@@ -75,7 +75,6 @@
 
 	:global(body) {
 		font-family: var(--font-regular);
-
 	}
 
 	:global(input, textarea, button) {

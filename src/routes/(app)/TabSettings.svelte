@@ -306,7 +306,7 @@
 	>
 		{#snippet trigger(props)}
 			{#if customTrigger}
-				{@render customTrigger({label, ...props})}
+				{@render customTrigger({ label, ...props })}
 			{:else}
 				<ButtonIcon help={label} {...props}>
 					<IconSelect />

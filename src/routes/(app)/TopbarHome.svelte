@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Logo from '$lib/Logo.svelte';
-	import ModalSubmitIssue from './ModalSubmitIssue.svelte';
 
+	import ModalSubmitIssue from './ModalSubmitIssue.svelte';
 	import Settings from './Settings.svelte';
 	import TopbarContent from './TopbarContent.svelte';
 </script>
@@ -14,7 +14,7 @@
 		</div>
 		<!-- Wrapper is because DropdownMenu creates another 0x0 element wrapper alongside its trigger... -->
 		<div class="actions">
-<ModalSubmitIssue type="bug" />
+			<ModalSubmitIssue type="bug" />
 
 			<Settings {...props} />
 		</div>
