@@ -339,7 +339,7 @@
 								help="Activer les notifications pour savoir quand un traitement est terminé."
 								onclick={async () => {
 									await askForNotificationPermission();
-									setSetting('notifications', hasNotificationsEnabled());
+									setSetting('notifications', await hasNotificationsEnabled());
 								}}
 							>
 								<IconNotificationsOn />

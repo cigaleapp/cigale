@@ -33,7 +33,12 @@
 	/** @type {HTMLDialogElement|undefined} */
 	let dialogElement = $state();
 
-	const notificationsEnabled = $derived(hasNotificationsEnabled() && getSettings().notifications);
+	let notificationsEnabled = $state(getSettings().notifications);
+	$effect(() => {
+		void (async () => {
+			notificationsEnabled = await hasNotificationsEnabled();
+		})();
+	});
 
 	$effect(() => {
 		window.addEventListener('mouseup', ({ target }) => {
@@ -274,7 +279,7 @@
 					<div class="number-input">
 						<InlineTextInput
 							label="Nombre de tâches en parallèle"
-							value={parallelism}
+							value={parallelism.toString()}
 							onblur={async (value) => {
 								await setSetting('parallelism', Number.parseInt(value));
 							}}

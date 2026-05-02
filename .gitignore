@@ -69,3 +69,4 @@ scripts/.ssh
 /storage-states
 
 .metrics.json
+*.jks
