@@ -34,7 +34,7 @@ swarp.wakeup(async () => true);
 /**
  * @template {keyof import('./procedures.js').LocalStorage} K
  * @param {K} key
- * @return {import('./procedures.js').LocalStorage[K]}
+ * @returns {import('./procedures.js').LocalStorage[K]}
  */
 function getLocalStorage(key) {
 	return LOCAL_STORAGE.get(key).assert(localStorage.getItem(key));

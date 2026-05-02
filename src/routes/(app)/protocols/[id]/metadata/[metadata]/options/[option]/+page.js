@@ -38,7 +38,7 @@ export async function load({ parent, params }) {
 		})
 	);
 
-	const options = await metadataOptionsOf(databaseHandle(), params.id);
+	const options = await metadataOptionsOf(databaseHandle(), params.id, null);
 
 	const reverseCascades = await Promise.all(
 		protocol.metadata.flatMap(async (mid) => {
@@ -47,7 +47,7 @@ export async function load({ parent, params }) {
 			if (metadata.type !== 'enum') return [];
 
 			return options
-				.filter((o) => metadataOptionsKeyRange)
+				.filter(() => metadataOptionsKeyRange)
 				.filter((o) => o.cascade?.[params.metadata] === option.key)
 				.map((o) => ({
 					value: o.key,

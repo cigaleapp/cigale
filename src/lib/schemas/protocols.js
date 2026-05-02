@@ -16,7 +16,6 @@ import {
 	Metadata,
 	MetadataGroup,
 	MetadataRecord,
-	MetadataRecordValue,
 	namespacedMetadataId,
 	SidecarFilepathTemplate,
 } from './metadata.js';

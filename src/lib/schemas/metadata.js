@@ -23,7 +23,7 @@ import {
 	NeuralBoundingBoxInference,
 	NeuralEnumInference,
 } from './neural.js';
-import { NumericUnit as NumberUnit, NumericUnit } from './units.js';
+import { NumericUnit } from './units.js';
 
 /**
  * @param {string} metadataId
@@ -475,7 +475,7 @@ export const MetadataInteger = MetadataBase.and({
 	'range?': NumberRangeLiteral,
 	'default?': MetadataDefault('number.integer'),
 	'infer?': type.or(InferenceConfigs.exif, InferenceConfigs.sidecar(type('number.integer'))),
-	'unit?': NumberUnit,
+	'unit?': NumericUnit,
 }).pipe();
 
 export const MetadataFloat = MetadataBase.and({
@@ -483,7 +483,7 @@ export const MetadataFloat = MetadataBase.and({
 	'range?': NumberRangeLiteral,
 	'default?': MetadataDefault('number'),
 	'infer?': type.or(InferenceConfigs.exif, InferenceConfigs.sidecar(type('number'))),
-	'unit?': NumberUnit,
+	'unit?': NumericUnit,
 });
 
 export const MetadataDate = MetadataBase.and({
