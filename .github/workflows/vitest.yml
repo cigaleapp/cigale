@@ -89,7 +89,7 @@ jobs:
     uses: ./.github/workflows/dev-deploy.yml
     secrets: inherit
     with:
-      environment: '#${{ github.event.number }}: Coverage'
+      environment: Coverage
       artifact: coverage-report-head
       subdomain: pr-${{ github.event.number }}-reports
       path: /coverage
@@ -101,7 +101,7 @@ jobs:
     uses: ./.github/workflows/dev-deploy.yml
     secrets: inherit
     with:
-      environment: '#${{ github.event.number }}: Unit tests'
+      environment: Unit tests
       artifact: vitest-report-head
       subdomain: pr-${{ github.event.number }}-reports
       path: /vitest

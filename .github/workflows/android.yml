@@ -1,0 +1,209 @@
+name: Android
+
+permissions:
+  actions: write
+  contents: read
+  pull-requests: write
+
+on:
+  workflow_call:
+    inputs: 
+      flavor:
+        required: true
+        type: string
+        description: The product flavor to use
+      artifact:
+        required: true
+        type: string
+        description: The name of the artifact (contents of the built app, i.e. contents of ./public/) to use
+      diawi-comment:
+        required: true
+        type: string
+        description: Sentence to start Diawi comment with. For example, "Built from PR #..."
+
+    secrets:
+      DEV_DEPLOYMENTS_HOST_KEY:
+        required: true
+        description: 'SSH host key for the dev deployments server, used to verify the server identity when deploying previews'
+      DEV_DEPLOYMENTS_SSH_PRIVATE_KEY:
+        required: true
+        description: 'SSH private key for deploying to dev deployments server'
+      ANDROID_KEYSTORE_BASE64:
+        required: true
+        description: 'Base64-encoded keystore file for Android app signing'
+      ANDROID_KEYSTORE_PASSWORD:
+        required: true
+        description: 'Password for the Android keystore'
+      ANDROID_KEY_ALIAS:
+        required: true
+        description: 'Key alias in the Android keystore'
+      ANDROID_KEY_PASSWORD:
+        required: true
+        description: 'Password for the key alias in the Android keystore'
+      DIAWI_TOKEN:
+        required: true
+        description: 'API token for Diawi, used to upload Android app previews'
+
+env:
+  PR_NUMBER: ${{ github.event.number }}
+  BUILD_COMMIT: ${{ github.sha }}
+
+jobs:
+  apk:
+    name: Build APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: .bun-version
+
+      - name: Setup NodeJS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.15.0
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Retrieve built app
+        uses: actions/download-artifact@v7
+        with:
+          name: app
+          path: ./public
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v4
+
+      # Needed for apksigner 
+      # See https://github.com/android-actions/setup-android/issues/461#issuecomment-2700722085
+      - name: Add Android build tools to PATH
+        run: |
+          for directory in $ANDROID_HOME/build-tools/*; do
+            echo Adding $directory to PATH
+            echo "$directory" >> "$GITHUB_PATH"
+          done
+
+      - name: Make gradlew executable
+        run: chmod +x ./android/gradlew
+
+      - name: Sync built app to capacitor
+        run: bun cap sync
+
+      - name: Write keystore
+        uses: mobiledevops/secret-to-file-action@v1
+        with:
+          base64-encoded-secret: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          filename: keystore.jks
+          is-executable: false
+          working-directory: ./android
+
+      - name: Build Android app
+        run: bun cap build android
+          --keystorepath keystore.jks
+          --keystorepass ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          --keystorealias ${{ secrets.ANDROID_KEY_ALIAS }}
+          --keystorealiaspass ${{ secrets.ANDROID_KEY_PASSWORD }}
+          --androidreleasetype APK
+          --flavor ${{ inputs.flavor }}
+
+      - name: Save problems report webpage
+        uses: actions/upload-artifact@v7
+        with:
+          name: android-problems-report
+          path: ./android/build/reports/problems/problems-report.html
+
+      - name: Move APK file
+        run: mv ./android/app/build/outputs/apk/${{ inputs.flavor }}/release/app-${{ inputs.flavor }}-release-signed.apk ./app.apk
+
+      - name: Save APK file
+        uses: actions/upload-artifact@v7
+        id: artifact
+        with:
+          name: apk
+          path: ./app.apk
+
+      - name: Add link to artifact download
+        if: github.event_name == 'pull_request'
+        uses: nefrob/pr-description@v1.2.0
+        with:
+          token: ${{ github.token }}
+          appendContentOnMatchOnly: false
+          regex: '<!-- apk -->.*?<!-- /apk -->'
+          regexFlags: ims
+          content: |
+            <!-- apk -->
+            The Android app preview has been built. You can download the signed APK file here:
+
+            ${{ steps.artifact.outputs.artifact-url }}
+
+            (wait a bit for a QR code and Diawi link)
+            <!-- /apk -->
+
+  diawi:
+    name: Upload to Diawi
+    runs-on: ubuntu-latest
+    needs: apk
+    environment:
+      name: '${{ github.event.pull_request.number || github.ref_name }}: Android APK'
+      url: ${{ steps.diawi.outputs.url }}
+    steps:
+      - name: Retrieve APK file
+        uses: actions/download-artifact@v7
+        with:
+          name: apk
+
+      - name: Upload to Diawi
+        uses: rnkdsh/action-upload-diawi@v1.5.12
+        id: diawi
+        with:
+          token: ${{ secrets.DIAWI_TOKEN }}
+          file: ./app.apk
+          # TODO: cigale mailing list ?
+          # recipients: 
+          comment: |
+            ${{ inputs.diawi-comment }}
+
+            Flavor:     ${{ inputs.flavor }}
+            Commit:     https://github.com/${{ github.repository }}/commit/${{ github.sha }} 
+            CI run:     https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            Key alias:  ${{ secrets.ANDROID_KEY_ALIAS }}
+
+
+      - name: Add QR code to PR description
+        if: github.event_name == 'pull_request'
+        uses: nefrob/pr-description@v1.2.0
+        with:
+          token: ${{ github.token }}
+          appendContentOnMatchOnly: false
+          regex: '<!-- apk -->.*?<!-- /apk -->'
+          regexFlags: ims
+          content: |
+            <!-- apk -->
+            Downloading the Android app preview from Diawi:
+              
+            <img alt="QR code" src="${{ steps.diawi.outputs.qrcode }}" height=200>
+
+            ${{ steps.diawi.outputs.url }}
+            <!-- /apk -->
+
+  report:
+    name: Upload problems report
+    needs: apk
+    uses: ./.github/workflows/dev-deploy.yml
+    secrets: inherit
+    with:
+      environment: Android problems report
+      artifact: android-problems-report
+      subdomain: pr-${{ github.event.number }}-reports
+      path: /android
+      file: problems-report.html

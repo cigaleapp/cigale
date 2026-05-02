@@ -17,7 +17,7 @@ on:
     inputs:
       environment:
         type: string
-        description: Name of the Github Environment
+        description: Name of the Github Environment. Prefixed by PR number or branch name
       environment-url-append:
         type: string
         description: Suffix to append to the environment URL
@@ -39,6 +39,10 @@ on:
         type: string
         description: Path to put the contents at. Must start with a slash
         required: true
+      file:
+        type: string
+        description: File to be renamed to index.html before uploading.
+        default: 'index.html'
       live-check:
         type: boolean
         default: true
@@ -51,7 +55,7 @@ jobs:
     # name: Deploy to ${{ inputs.subdomain }}.${{ inputs.domain }}${{ inputs.path }}
     name: Deploy
     environment:
-      name: ${{ inputs.environment }}
+      name: "${{ github.event.pull_request.number || github.ref_name }}: ${{ inputs.environment }}"
       url: https://${{ inputs.subdomain }}.${{ inputs.domain }}${{ inputs.path }}${{ inputs.environment-url-append }}
     steps:
       - name: Get the archive
@@ -59,6 +63,10 @@ jobs:
         with:
           name: ${{ inputs.artifact }}
           path: to-upload
+
+      - name: Rename file to index.html
+        if: inputs.file != 'index.html'
+        run: mv "to-upload/${{ inputs.file }}" to-upload/index.html
 
       - name: Inject live-check comment
         if: inputs.live-check

@@ -23,9 +23,6 @@ jobs:
   analyze:
     if: ${{ !startsWith(github.head_ref, 'renovate/') }}
     runs-on: ubuntu-latest
-    environment:
-      name: '#${{ github.event.pull_request.number }}: node_modules analysis'
-      url: ${{ steps.upload.outputs.preview-url }}
     steps:
       - uses: actions/checkout@v6
       - uses: oven-sh/setup-bun@v2
@@ -49,6 +46,7 @@ jobs:
     uses: ./.github/workflows/dev-deploy.yml
     secrets: inherit
     with:
+      environment: node_modules analysis
       artifact: report
       subdomain: pr-${{ github.event.number }}-reports
       path: /node-modules
