@@ -1699,3 +1699,82 @@ export function displayKeyRange(keyRange) {
 
 	return `${lowerBound}, ${upperBound}`;
 }
+
+/**
+ * @template {Record<string|number, unknown>} const T
+ * @template {keyof T} V
+ * @overload
+ * @param {V} value
+ * @param {NoInfer<Partial<T>>} cases
+ * @param {T[V]} fallback
+ * @returns {T[V]}
+ */
+
+/**
+ * @template {Record<string|number, unknown>} const T
+ * @template {keyof T} V
+ * @overload
+ * @param {NoInfer<V>} value
+ * @param {T} cases
+ * @returns {T[V]}
+ */
+
+/**
+ * Like a switch statement but for expressions.
+ * Equivalent to `({ ... } as const)[value]`
+ *
+ * @template {Record<string|number, unknown>} const T
+ * @template {keyof T} V
+ * @param {V} value
+ * @param {NoInfer<Partial<T>>} cases
+ * @param {T[V]} [fallback]
+ * @returns {T[V]}
+ */
+export function switchValue(value, cases, fallback) {
+	return cases[value] ?? fallback;
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('switchValue', () => {
+		expect(switchValue('a', { a: 1, b: 2 })).toBe(1);
+		expect(switchValue('b', { a: 1, b: 2 })).toBe(2);
+		expect(switchValue('c', { a: 1, b: 2 }, 3)).toBe(3);
+		// @ts-expect-error test that it returns undefined if no fallback is provided
+		expect(switchValue('c', { a: 1, b: 2 })).toBeUndefined();
+	});
+}
+
+/**
+ * @param {HTMLElement|null} element
+ * @param {(element: HTMLElement) => boolean} predicate
+ */
+export function climbDOMUntil(element, predicate) {
+	while (element) {
+		if (predicate(element)) return element;
+		element = element.parentElement;
+	}
+	return null;
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('climbDOMUntil', () => {
+		document.body.innerHTML = `
+			<div id="parent">
+				<div id="child">
+					<div id="grandchild"></div>
+				</div>
+			</div>
+		`;
+
+		const parent = document.getElementById('parent');
+		const child = document.getElementById('child');
+		const grandchild = document.getElementById('grandchild');
+
+		expect(climbDOMUntil(grandchild, (el) => el.id === 'child')).toBe(child);
+		expect(climbDOMUntil(grandchild, (el) => el.id === 'parent')).toBe(parent);
+		expect(climbDOMUntil(grandchild, (el) => el.id === 'grandchild')).toBe(grandchild);
+		expect(climbDOMUntil(grandchild, (el) => el.id === 'nonexistent')).toBe(null);
+	});
+}

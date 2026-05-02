@@ -329,6 +329,26 @@ export class UIState {
 			...changes,
 		});
 	}
+
+	/**
+	 * Toggle selection of given id(s).
+	 * Does nothing if setSelection is not defined
+	 *
+	 * When given multiple IDs, it'll add them all unless they are all already selected, in which case it'll remove them all.
+	 * @param {...string} ids
+	 */
+	toggleSelection(...ids) {
+		if (!this.setSelection) return;
+		if (ids.length === 0) return;
+
+		const allSelected = ids.every((id) => this.selection.includes(id));
+
+		if (allSelected) {
+			this.setSelection(this.selection.filter((id) => !ids.includes(id)));
+		} else {
+			this.setSelection([...this.selection, ...ids]);
+		}
+	}
 }
 
 export const uiState = new UIState();

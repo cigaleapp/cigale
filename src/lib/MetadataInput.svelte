@@ -570,6 +570,10 @@
 		display: flex;
 		align-items: center;
 
+		.underscored {
+			max-width: 30vw;
+		}
+
 		&:not(:has(.underscored)) {
 			border-bottom: 2px dashed var(--fg-neutral);
 
@@ -593,6 +597,10 @@
 
 		.underscored input {
 			width: 8ch;
+
+			@media (max-width: 600px) {
+				width: 5ch;
+			}
 		}
 
 		/* .increment, .decrement {

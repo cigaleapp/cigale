@@ -1,15 +1,10 @@
-<script module>
-	/**
-	 * @type {Map<string, import("swarpc").CancelablePromise["cancel"]>}
-	 */
-	export const cancellers = new SvelteMap();
+<script lang="ts" module>
+	export const cancellers = new SvelteMap<string, import('swarpc').CancelablePromise['cancel']>();
 
-	/**
-	 * @typedef {'full' | 'hidden'} NavbarAppearance
-	 */
+	type NavbarAppearance = 'full' | 'hidden';
 </script>
 
-<script>
+<script lang="ts">
 	import { watch } from 'runed';
 	import { onMount } from 'svelte';
 	import { SvelteMap } from 'svelte/reactivity';
@@ -21,7 +16,9 @@
 	import { tables } from '$lib/idb.svelte';
 	import { loadPreviewImage } from '$lib/images';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
+	import PrepareForOffline from './PrepareForOffline.svelte';
 	import KeyboardShortcuts from '$lib/KeyboardShortcuts.svelte';
+	import { globalModals } from '$lib/modals.svelte.js';
 	import { initializeProcessingQueue } from '$lib/queue.svelte';
 	import { switchSession } from '$lib/sessions';
 	import { getColorScheme, isDebugMode, setSetting } from '$lib/settings.svelte';
@@ -32,15 +29,13 @@
 	import { nonnull, pick } from '$lib/utils';
 
 	import Navigation from './Navigation.svelte';
-	import PrepareForOffline from './PrepareForOffline.svelte';
 
 	const { children, data } = $props();
 	const { swarpc, parallelism } = $derived(data);
 
 	initializeProcessingQueue({ swarpc, cancellers, parallelism });
 
-	/** @type {NavbarAppearance} */
-	const navbarAppearance = $derived.by(() => {
+	const navbarAppearance = $derived.by<NavbarAppearance>(() => {
 		if (page.route.id === '/(app)/(sidepanel)/classify/[observation]') return 'hidden';
 		if (page.route.id === '/(app)/(sidepanel)/crop/[image]/[[from]]') return 'hidden';
 		if (page.route.id?.startsWith('/(app)/protocols/[id]')) return 'hidden';
@@ -102,7 +97,7 @@
 	defineKeyboardShortcuts(
 		'debugmode',
 		Object.fromEntries(
-			/**@type{const}*/ (['warn', 'error', 'info', 'debug', 'success']).map((type) => {
+			(['warn', 'error', 'info', 'debug', 'success'] as const).map((type) => {
 				const toastFns = {
 					warn: () => toasts.warn(/* @wc-ignore */ 'Example warning toast'),
 					error: () => toasts.error(/* @wc-ignore */ 'Example error toast'),
@@ -145,6 +140,7 @@
 					labels: {
 						action: 'Recharger',
 					},
+					data: undefined,
 					action() {
 						location.reload();
 					},
@@ -152,51 +148,56 @@
 			});
 		});
 	});
-
-	/** @type {undefined|(() => void)} */
-	let openKeyboardShortcuts = $state();
-	/** @type {undefined|(() => void)} */
-	let openPrepareForOfflineUse = $state();
 </script>
 
 <svelte:head>
 	<base href={resolve('/') === '/' ? '' : resolve('/') + 'index.html'} />
 </svelte:head>
 
-<KeyboardShortcuts bind:openHelp={openKeyboardShortcuts} preventDefault binds={uiState.keybinds} />
-<PrepareForOffline bind:open={openPrepareForOfflineUse} />
-
-<Navigation
-	{openKeyboardShortcuts}
-	{openPrepareForOfflineUse}
-	progressbarOnly={navbarAppearance === 'hidden'}
-	progress={uiState.processing.progress}
-	eta={uiState.eta}
+<KeyboardShortcuts
+	bind:openHelp={globalModals.modal_keyboard_shortcuts_help.open}
+	preventDefault
+	binds={uiState.keybinds}
 />
 
-<section class="toasts" data-testid="toasts-area">
-	{#each toasts.items('default') as toast (toast.id)}
-		<Toast
-			{...toast}
-			action={toast.labels.action}
-			dismiss={toast.labels.close}
-			onaction={toast.callbacks.action instanceof URL
-				? toast.callbacks.action
-				: async () => toast.callbacks.action?.(toast)}
-			ondismiss={async () => {
-				await toast.callbacks.closed?.(toast);
-				toasts.remove(toast.id);
-			}}
-		/>
-	{/each}
-</section>
 
-<div
-	class="contents"
-	class:padded={!page.route.id?.includes('/(sidepanel)') &&
-		!page.route.id?.includes('protocols/[id]/')}
->
-	{@render children?.()}
+<PrepareForOffline bind:open={globalModals.modal_prepare_for_offline_use.open} />
+
+<div class="layout">
+	<Navigation
+		progressbarOnly={navbarAppearance === 'hidden'}
+		progress={uiState.processing.progress}
+		eta={uiState.eta}
+	/>
+
+	<div id="portal-target-mobile-bottombar"></div>
+
+	<section class="toasts" data-testid="toasts-area">
+		{#each toasts.items('default') as toast (toast.id)}
+			<Toast
+				{...toast}
+				action={toast.labels.action}
+				dismiss={toast.labels.close}
+				onaction={toast.callbacks.action instanceof URL
+					? toast.callbacks.action
+					: async () => toast.callbacks.action?.(toast)}
+				ondismiss={async () => {
+					await toast.callbacks.closed?.(toast);
+					toasts.remove(toast.id);
+				}}
+			/>
+		{/each}
+	</section>
+
+	<div
+		class="contents"
+		class:padded={!page.route.id?.includes('/(sidepanel)') &&
+			!page.route.id?.includes('protocols/[id]/')}
+	>
+		{@render children?.()}
+	</div>
+
+	<div id="portal-target-mobile-topbar"></div>
 </div>
 
 <style>
@@ -227,5 +228,15 @@
 
 	.contents.padded {
 		padding: 1.2em;
+	}
+
+	.layout {
+		display: flex;
+		flex-direction: column;
+		height: 100svh;
+
+		@media (max-width: 600px) {
+			flex-direction: column-reverse;
+		}
 	}
 </style>

@@ -57,12 +57,3 @@ export async function getSettings({ page }) {
 
 	return Schemas.Settings.assert(raw);
 }
-
-/**
- *
- * @param {Page} page
- * @param {Parameters<import('@playwright/test').Locator['click']>[0]} [clickOptions]
- */
-export function openSettings(page, clickOptions) {
-	return page.getByTestId('settings-button').click(clickOptions);
-}

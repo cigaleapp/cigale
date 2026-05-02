@@ -13,6 +13,7 @@ import { assert, expect, test, testBasic } from './fixtures.js';
 import {
 	browserConsole,
 	chooseFirstSession,
+	clickInDropdown,
 	expectZipFiles,
 	exportResults,
 	firstObservationCard,
@@ -33,11 +34,11 @@ for (const offline of [false, true]) {
 				test.skip(context.serviceWorkers().length === 0, "No sw, can't test offline");
 
 				// Open settings and prepare for offline use
-				await page.getByTestId('settings-button').click();
-				await page
-					.getByTestId('app-settings')
-					.getByRole('button', { name: 'Préparation hors-ligne' })
-					.click();
+				await clickInDropdown(
+					page,
+					page.getByRole('button', { name: 'Réglages', exact: true }),
+					'Préparation hors-ligne…'
+				);
 
 				await app.modals
 					.byTitle('Préparation hors-ligne')

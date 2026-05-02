@@ -3,7 +3,6 @@
 
 	import { invalidate } from '$app/navigation';
 	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
-	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import Field from '$lib/Field.svelte';
 	import { plural } from '$lib/i18n.js';
 	import { dependencyURI, tables } from '$lib/idb.svelte.js';
@@ -14,10 +13,13 @@
 	import SessionMetadataForm from '$lib/SessionMetadataForm.svelte';
 	import { deleteSession, switchSession } from '$lib/sessions.js';
 	import { toasts } from '$lib/toasts.svelte.js';
+	import TopbarOpenSession from '$routes/(app)/TopbarOpenSession.svelte';
 
 	const { data } = $props();
 	let { protocol: protocolId, name } = $derived(data.session);
 </script>
+
+<TopbarOpenSession />
 
 <main in:fade={{ duration: 100 }}>
 	<h1>
@@ -34,35 +36,7 @@
 			}}
 		/>
 
-		<section class="actions">
-			<ModalConfirmDeletion
-				key="modal_delete_session"
-				typeToConfirm={name}
-				consequences={[
-					plural(data.counts.images, [
-						'La suppression de 1 image',
-						'La suppression de # images',
-					]),
-					plural(data.counts.observations, [
-						'La suppression de 1 observation',
-						'La suppression de # observations',
-					]),
-				]}
-				onconfirm={async () => {
-					await deleteSession(data.session.id);
-					toasts.success('Session supprimée.');
-					await goto('/sessions');
-				}}
-			/>
-			<ButtonSecondary
-				onclick={async () => {
-					await switchSession(data.session.id);
-					await goto('/import');
-				}}
-			>
-				Ouvrir
-			</ButtonSecondary>
-		</section>
+		<section class="actions"></section>
 	</h1>
 
 	<form
@@ -109,15 +83,36 @@
 		/>
 	{/if}
 
-	<ButtonPrimary
-		loading
-		onclick={async () => {
-			await switchSession(data.session.id);
-			await goto(`/import`);
-		}}
-	>
-		Ouvrir la session
-	</ButtonPrimary>
+	<div class="actions">
+		<ButtonPrimary
+			loading
+			onclick={async () => {
+				await switchSession(data.session.id);
+				await goto(`/import/`);
+			}}
+		>
+			Ouvrir la session
+		</ButtonPrimary>
+		<ModalConfirmDeletion
+			key="modal_delete_session"
+			typeToConfirm={name}
+			consequences={[
+				plural(data.counts.images, [
+					'La suppression de 1 image',
+					'La suppression de # images',
+				]),
+				plural(data.counts.observations, [
+					'La suppression de 1 observation',
+					'La suppression de # observations',
+				]),
+			]}
+			onconfirm={async () => {
+				await deleteSession(data.session.id);
+				toasts.success('Session supprimée.');
+				await goto('/sessions');
+			}}
+		/>
+	</div>
 
 	<Field label="ID de la session">
 		<code>{data.session.id}</code>
@@ -141,12 +136,12 @@
 		gap: 1rem;
 	}
 
-	h1 .actions {
+	.actions {
 		font-weight: normal;
 		font-size: 1rem;
 		display: flex;
-		align-items: center;
-		gap: 1rem;
+		flex-direction: column;
+		gap: 0.5rem;
 	}
 
 	form {

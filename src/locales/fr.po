@@ -21,6 +21,7 @@ msgid "<0/> Chargement…"
 msgstr "<0/> Chargement…"
 
 #: src/routes/(app)/protocols/+page.svelte
+#: src/routes/(app)/sessions/+page.svelte
 msgid "<0/> Créer"
 msgstr "<0/> Créer"
 
@@ -64,7 +65,6 @@ msgstr "<0/> Réinitialiser la base de données"
 msgid "<0/> Rééssayer"
 msgstr "<0/> Rééssayer"
 
-#: src/lib/AreaObservations.svelte
 #: src/lib/CardMedia.svelte
 #: src/routes/(app)/(sidepanel)/crop/[image]/[[from]]/+page@(app).svelte
 #: src/routes/(app)/protocols/RowProtocol.svelte
@@ -473,6 +473,7 @@ msgstr "Image suivante"
 #: src/routes/(app)/(sidepanel)/+layout.svelte
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
 #: src/routes/(app)/(sidepanel)/crop/+page.svelte
+#: src/routes/(app)/Navigation.svelte
 #: src/routes/(app)/protocols/import/[...url]/+page.svelte
 msgid "Importer"
 msgstr "Importer"
@@ -639,6 +640,7 @@ msgid "Raccourcis clavier"
 msgstr "Raccourcis clavier"
 
 #: src/routes/(app)/(sidepanel)/crop/+page.svelte
+#: src/routes/(app)/Navigation.svelte
 msgid "Recadrer"
 msgstr "Recadrer"
 
@@ -700,6 +702,7 @@ msgstr "Sous la supervision de"
 msgid "Supprime toutes les données pour ce déploiement de preview"
 msgstr "Supprime toutes les données pour ce déploiement de preview"
 
+#: src/lib/AreaObservations.svelte
 #: src/lib/ModalConfirmDeletion.svelte
 msgid "Supprimer"
 msgstr "Supprimer"
@@ -958,6 +961,8 @@ msgstr "<0/> Métadonnée “{0}” introuvable"
 msgid "Protocole {0}"
 msgstr "Protocole {0}"
 
+#: src/lib/Submenu.svelte
+#: src/lib/Submenu.svelte
 #: src/routes/(app)/protocols/[id]/+layout.svelte
 msgid "<0/> Retour"
 msgstr "<0/> Retour"
@@ -1474,7 +1479,6 @@ msgstr "Protocole mis à jour vers la v{0}"
 msgid "Impossible de mettre à jour le protocole: {0}"
 msgstr "Impossible de mettre à jour le protocole: {0}"
 
-#: src/lib/AreaObservations.svelte
 #: src/lib/ZipContentsTree.svelte
 #: src/lib/ZipContentsTree.svelte
 msgid "# élément"
@@ -1671,14 +1675,6 @@ msgstr "Protocoles <0/>"
 #: src/routes/(app)/sessions/+page.svelte
 msgid "Sessions"
 msgstr "Sessions"
-
-#: src/routes/(app)/sessions/+page.svelte
-msgid "<0/> Importer un export .zip"
-msgstr "<0/> Importer un export .zip"
-
-#: src/routes/(app)/sessions/+page.svelte
-msgid "<0/> Nouvelle session"
-msgstr "<0/> Nouvelle session"
 
 #: src/routes/(app)/sessions/[id]/+page.svelte
 msgid "Ouvrir la session"
@@ -1880,6 +1876,7 @@ msgstr "Impossible de trier avec les paramètres choisis"
 msgid "Tri en cours…"
 msgstr "Tri en cours…"
 
+#: src/lib/InputSelectProtocol.svelte
 #: src/lib/InputSelectProtocol.svelte
 msgid "Choisir un protocole"
 msgstr "Choisir un protocole"
@@ -2485,3 +2482,36 @@ msgstr "Protocole \"{0}\" mis à jour à la v{1}"
 #: src/lib/i18n.js
 msgid "Error: "
 msgstr "Error: "
+
+#: src/routes/(app)/sessions/+page.svelte
+msgid "<0/> Importer .zip"
+msgstr "<0/> Importer .zip"
+
+#: src/routes/(app)/(sidepanel)/+layout.svelte
+msgid "Toutes les sessions"
+msgstr "Toutes les sessions"
+
+#. 0: feature
+#: src/lib/MobileWIPOverlay.svelte
+msgid "{0} est en cours de développement pour les appareils mobiles. En attendant, veuillez utiliser un ordinateur pour y accéder."
+msgstr "{0} est en cours de développement pour les appareils mobiles. En attendant, veuillez utiliser un ordinateur pour y accéder."
+
+#: src/lib/MobileWIPOverlay.svelte
+msgid "Retour"
+msgstr "Retour"
+
+#: src/lib/MobileWIPOverlay.svelte
+msgid "Suivez l'avancement de son développement sur Github: c'est <0>l'issue <0/></0>."
+msgstr "Suivez l'avancement de son développement sur Github: c'est <0>l'issue <0/></0>."
+
+#: src/routes/(app)/Navigation.svelte
+msgid "Session"
+msgstr "Session"
+
+#: src/routes/(app)/Navigation.svelte
+msgid "Classifier"
+msgstr "Classifier"
+
+#: src/routes/(app)/Navigation.svelte
+msgid "Résultats"
+msgstr "Résultats"

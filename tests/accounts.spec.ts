@@ -230,7 +230,7 @@ async function registerKobotoolboxAccount({
 	const main = page.locator('main');
 	const modal = app.modals.byTitle('Ajouter un compte KoboToolbox');
 
-	await main.getByRole('button', { name: 'Ajouter' }).first().click();
+	await main.getByRole('button', { name: 'KoboToolbox' }).first().click();
 	await modal.getByRole('radio', { name: 'Global' }).check();
 	await modal.getByRole('link', { name: 'kf.kobotoolbox.org' }).click();
 	await context.waitForEvent('page');

@@ -10,10 +10,13 @@
 	import { deleteImageFile } from '$lib/images';
 	import { ACCEPTED_IMPORT_TYPES } from '$lib/import.svelte';
 	import Logo from '$lib/Logo.svelte';
+	import { IsMobile } from '$lib/mobile.svelte.js';
 	import { deleteObservation } from '$lib/observations';
 	import { cancelTask, importMore } from '$lib/queue.svelte.js';
 	import { uiState } from '$lib/state.svelte.js';
 	import { unique } from '$lib/utils';
+
+	const mobile = new IsMobile();
 
 	const allImages = $derived([
 		...unique(
@@ -54,6 +57,7 @@
 			items={allImages}
 			zone="import"
 			onemptyclick={async () => {
+				if (mobile.current) return;
 				if (uiState.selection.length > 0) return;
 				importMore(await promptForFiles({ accept: ACCEPTED_IMPORT_TYPES, multiple: true }));
 			}}

@@ -93,6 +93,7 @@
 </script>
 
 <script>
+	import { IsMobile } from './mobile.svelte.js';
 	import { tooltip } from './tooltips.js';
 
 	/**
@@ -100,26 +101,32 @@
 	 * @type {object}
 	 * @property {string} shortcut
 	 * @property {string} [help]
+	 * @property {boolean} [mobile] whether to show the hint on mobile (not recommended, since it can take a lot of space for little benefit)
 	 */
 
 	/** @type {Props} */
-	const { shortcut, help = '' } = $props();
+	const { shortcut, help = '',mobile: showOnMobile = false  } = $props();
+
+	const mobile = new IsMobile();
+
 </script>
 
-<kbd class="hint" use:tooltip={help}>
-	<!-- .entries() gives us [[0, a], [1, b], ...] for [a, b, ...] -->
-	{#each displayPattern(shortcut).entries() as [i, part] (i)}
-		{#if i % 2 == 0}
-			<!-- Every even part represents a key -->
-			<kbd class:apple-glyph={APPLE_GLYPHS.includes(part)}>
-				{part}
-			</kbd>
-		{:else}
-			<!-- Every odd part is either "+" or a space -->
-			<span class="separator">{part}</span>
-		{/if}
-	{/each}
-</kbd>
+{#if !mobile.current || showOnMobile}
+	<kbd class="hint" use:tooltip={help}>
+		<!-- .entries() gives us [[0, a], [1, b], ...] for [a, b, ...] -->
+		{#each displayPattern(shortcut).entries() as [i, part] (i)}
+			{#if i % 2 == 0}
+				<!-- Every even part represents a key -->
+				<kbd class:apple-glyph={APPLE_GLYPHS.includes(part)}>
+					{part}
+				</kbd>
+			{:else}
+				<!-- Every odd part is either "+" or a space -->
+				<span class="separator">{part}</span>
+			{/if}
+		{/each}
+	</kbd>
+{/if}
 
 <style>
 	/*  :global because tooltips also use this, see $lib/tooltips.js */
