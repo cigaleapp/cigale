@@ -606,6 +606,7 @@ msgid "Protocole “{0}” importé"
 msgstr "Protocole “{0}” importé"
 
 #: src/routes/(app)/protocols/+page.svelte
+#: src/routes/(app)/protocols/+page.svelte
 msgid "Protocoles"
 msgstr "Protocoles"
 
@@ -1670,10 +1671,6 @@ msgstr "Nom de la session"
 #: src/routes/(app)/sessions/[id]/+page.svelte
 msgid "Session supprimée."
 msgstr "Session supprimée."
-
-#: src/routes/(app)/sessions/[id]/+page.svelte
-msgid "Ouvrir"
-msgstr "Ouvrir"
 
 #: src/routes/(app)/sessions/[id]/+page.svelte
 msgid "Protocole"
