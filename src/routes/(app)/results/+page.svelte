@@ -151,7 +151,7 @@
 			}
 
 			if (exportFormat === 'zip') {
-				downloadAsFile(zipfileBytes, 'results.zip', 'application/zip');
+				await downloadAsFile(zipfileBytes, 'results.zip', 'application/zip');
 			}
 		} catch (error) {
 			console.error(error);

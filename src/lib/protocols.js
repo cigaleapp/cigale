@@ -112,7 +112,7 @@ export async function exportProtocol(db, base, id, format = 'json') {
  * @param {'yaml'|'json'} format
  * @param {typeof import('./schemas/protocols.js').ExportedProtocol.infer} exportedProtocol
  */
-function downloadProtocol(base, format, exportedProtocol) {
+async function downloadProtocol(base, format, exportedProtocol) {
 	let jsoned = stringifyWithToplevelOrdering(format, jsonSchemaURL(base), exportedProtocol, [
 		'id',
 		'name',
@@ -124,7 +124,7 @@ function downloadProtocol(base, format, exportedProtocol) {
 	]);
 
 	// application/yaml is finally a thing, see https://www.rfc-editor.org/rfc/rfc9512.html
-	downloadAsFile(jsoned, `${exportedProtocol.id}.${format}`, `application/${format}`);
+	await downloadAsFile(jsoned, `${exportedProtocol.id}.${format}`, `application/${format}`);
 }
 
 /**

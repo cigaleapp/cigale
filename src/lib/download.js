@@ -1,27 +1,61 @@
+import { Capacitor } from '@capacitor/core';
+import { Directory, Encoding, Filesystem } from '@capacitor/filesystem';
+import { Share } from '@capacitor/share';
 import YAML from 'yaml';
 
 /**
- *
- * @param {BlobPart | string} content
+ * **WARNING:** On native platforms, binary data is converted to base64 before writing, which can lag the UI for large files.
+ * @param {Blob | ArrayBuffer | string} content
  * @param {string} filename
  * @param {string} [contentType] defaults to 'text/plain' for strings and 'application/octet-stream' for blobs
  */
-export function downloadAsFile(content, filename, contentType) {
-	const blob =
-		content instanceof Blob
-			? content
-			: new Blob([content], {
-					type:
-						contentType ??
-						(typeof content === 'string' ? 'text/plain' : 'application/octet-stream'),
-				});
+export async function downloadAsFile(content, filename, contentType) {
+	if (Capacitor.isNativePlatform()) {
+		/** @type {Pick<import('@capacitor/filesystem').WriteFileOptions, 'data' | 'encoding'>} */
+		let input;
 
-	const url = URL.createObjectURL(blob);
-	const a = document.createElement('a');
-	a.href = url;
-	a.download = filename;
-	a.click();
-	URL.revokeObjectURL(url);
+		if (typeof content === 'string') {
+			input = {
+				data: content,
+				encoding: Encoding.UTF8,
+			};
+		} else {
+			input = {
+				data: new Uint8Array(
+					content instanceof Blob ? await content.arrayBuffer() : content
+				).toBase64(),
+			};
+		}
+
+		const { uri } = await Filesystem.writeFile({
+			path: filename,
+			directory: Directory.Cache,
+			...input,
+		});
+
+		await Share.share({
+			dialogTitle: filename,
+			files: [uri],
+		});
+	} else {
+		const blob =
+			content instanceof Blob
+				? content
+				: new Blob([content], {
+						type:
+							contentType ??
+							(typeof content === 'string'
+								? 'text/plain'
+								: 'application/octet-stream'),
+					});
+
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = filename;
+		a.click();
+		URL.revokeObjectURL(url);
+	}
 }
 
 /**
