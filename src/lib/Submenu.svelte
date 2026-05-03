@@ -11,7 +11,7 @@
 	import Logo from './Logo.svelte';
 	import { climbDOMUntil, sleep } from './utils.js';
 
-	type Item = AnyItem<D, SD>;
+	type Item = AnyItem<D, SD> & { groupIndex: number };
 
 	// type Item<D> = {
 	// 	key?: string | number | undefined;
@@ -23,7 +23,7 @@
 
 	interface Props {
 		items: Item[];
-		item: Snippet<[D | SD, Item & { closeOnSelect?: boolean; onclick: () => void }]>;
+		item: Snippet<[D | SD, AnyItem<D, SD> & { closeOnSelect?: boolean; onclick: () => void }]>;
 	}
 
 	const { items, item: itemSnippet }: Props = $props();
@@ -48,14 +48,20 @@
 	let next = $state<StackEntry | undefined>(undefined);
 
 	function submenuOf(key: string | number | undefined) {
-		const withNoEmptyText = <T,>(items: T) => ({ items, empty: '' });
+		const withNoEmptyText = <T,>(items: T) => ({ items, groupIndex: 0, empty: '' });
 
 		if (key === undefined) return withNoEmptyText([]);
 		if (key === '') return withNoEmptyText(items);
 
 		const submenus = items.filter((i) => i.type === 'submenu');
+		const item = submenus.find((i) => i.key === key);
 
-		return submenus.find((i) => i.key === key)?.submenu ?? withNoEmptyText([]);
+		if (!item) return withNoEmptyText([]);
+
+		return {
+			groupIndex: item.groupIndex,
+			...item.submenu,
+		};
 	}
 
 	const nodes = $state({
@@ -152,9 +158,9 @@
 </script>
 
 {#snippet listing(entry: StackEntry | undefined)}
-	{@const { items, empty: emptyText } = submenuOf(entry?.key)}
+	{@const { items, empty: emptyText, groupIndex } = submenuOf(entry?.key)}
 	<div class="submenu">
-		{#each items as item (item.key || item.label)}
+		{#each items as item (`${groupIndex}/${item.key || item.label}`)}
 			<div class="item">
 				<div class="label">
 					{@render itemSnippet(

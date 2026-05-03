@@ -149,8 +149,9 @@
 		<Submenu
 			items={groups.flatMap((group, i) =>
 				group.items.map((item, j) => ({
+					key: `${i}/${j}`,
 					...item,
-					key: `${i}/${item.key ?? j}`,
+					groupIndex: i,
 					data: {
 						...item.data,
 						groupIndex: i,

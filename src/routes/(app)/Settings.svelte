@@ -185,8 +185,8 @@
 				{
 					type: 'clickable',
 					label: 'Parallélisme',
-					key: 'parallelism',
 					closeOnSelect: false,
+					key: "parallelism",
 					data: {
 						icon: undefined,
 						subtext: '',
@@ -332,6 +332,10 @@
 		width: 100%;
 		align-items: center;
 		gap: 1rem;
+
+		@media (min-width: 600px) {
+			max-width: 300px;
+		}
 
 		.icon {
 			display: flex;
