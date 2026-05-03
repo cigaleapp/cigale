@@ -3,6 +3,7 @@ import { LocalNotifications } from '@capacitor/local-notifications';
 
 import { getSettings } from './settings.svelte';
 import { toasts } from './toasts.svelte';
+import { millisecondsToSeconds } from 'date-fns';
 
 /**
  * Ask the user for permission to send system notifications
@@ -54,7 +55,8 @@ export async function sendNotification(title, options) {
 					{
 						title,
 						body: options.body ?? '',
-						id: Date.now(),
+						// Needs to be a Java (signed, 32-bit) Int, so max. 2^(32-1) 
+						id: millisecondsToSeconds(Date.now()),
 						smallIcon: 'ic_notification',
 					},
 				],
