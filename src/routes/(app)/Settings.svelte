@@ -186,7 +186,7 @@
 					type: 'clickable',
 					label: 'Parallélisme',
 					closeOnSelect: false,
-					key: "parallelism",
+					key: 'parallelism',
 					data: {
 						icon: undefined,
 						subtext: '',
