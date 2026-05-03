@@ -1,5 +1,6 @@
 import { mkdirSync } from 'node:fs';
 
+const nightly = process.env.FLAVOR === 'nightly';
 const prNumber = process.env.PR_NUMBER;
 const assetsDir = './capacitor-assets';
 
@@ -7,11 +8,12 @@ mkdirSync(assetsDir, {
 	recursive: true,
 });
 
-const svg = prNumber
-	? await Bun.file('./static/logo-pr-preview.svg')
-			.text()
-			.then((svg) => svg.replace('#9999', `#${prNumber}`))
-	: await Bun.file('./static/logo.svg').text();
+const svg =
+	prNumber || nightly
+		? await Bun.file('./static/logo-pr-preview.svg')
+				.text()
+				.then((svg) => svg.replace('#9999', prNumber ? `#${prNumber}` : 'Dev'))
+		: await Bun.file('./static/logo.svg').text();
 
 await Bun.file(`${assetsDir}/logo.svg`).write(svg);
 

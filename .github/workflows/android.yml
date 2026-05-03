@@ -51,6 +51,7 @@ on:
 env:
   PR_NUMBER: ${{ github.event.number }}
   BUILD_COMMIT: ${{ github.sha }}
+  FLAVOR: ${{ inputs.flavor }}
 
 jobs:
   apk:
