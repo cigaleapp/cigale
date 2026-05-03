@@ -2458,6 +2458,7 @@ msgid "{0} est en cours de développement pour les appareils mobiles. En attenda
 msgstr ""
 
 #: src/lib/MobileWIPOverlay.svelte
+#: src/routes/(app)/TopbarBackToHome.svelte
 msgid "Retour"
 msgstr ""
 
@@ -2488,3 +2489,7 @@ msgid "# connecté"
 msgid_plural "# connectés"
 msgstr[0] ""
 msgstr[1] ""
+
+#: src/routes/(app)/TopbarHome.svelte
+msgid "<0/> Cigale"
+msgstr ""
