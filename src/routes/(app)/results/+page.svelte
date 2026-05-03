@@ -2,6 +2,7 @@
 	import type { TreeNode, TreeNodeMaybeLoading } from '$lib/file-tree.js';
 	import type { NamespacedMetadataID } from '$lib/schemas/common.js';
 
+	import { Capacitor } from '@capacitor/core';
 	import { watch } from 'runed';
 	import { tick } from 'svelte';
 	import { SvelteMap } from 'svelte/reactivity';
@@ -450,40 +451,42 @@
 					</LoadingText>
 				</code>
 			</ButtonSecondary>
-			<ButtonSecondary
-				disabled={!supportsWritingFolder}
-				help={supportsWritingFolder
-					? undefined
-					: "Votre navigateur ne supporte pas l'exportation en dossier, utilisez Chrome ou Edge."}
-				onclick={async () => {
-					if (!supportsWritingFolder) return;
-					const directory = await (window as any).showDirectoryPicker({
-						mode: 'readwrite',
-						startIn: 'documents',
-						id: 'results-export',
-					});
-					await downloadExport(directory);
-				}}
-			>
-				{#if exporting === 'folder'}
-					<LoadingSpinner />
-				{:else}
-					<IconDownloadAsFolder />
-				{/if}
-				Dossier
-				{#if supportsWritingFolder}
-					<code class="size" use:tooltip={'Taille totale estimée du dossier'}>
-						<LoadingText
-							value={sizeEstimates.uncompressed}
-							mask="~{formatBytesSize(150e3, 'narrow')}"
-						>
-							{#snippet loaded(size)}
-								~{formatBytesSize(size, 'narrow')}
-							{/snippet}
-						</LoadingText>
-					</code>
-				{/if}
-			</ButtonSecondary>
+			{#if !Capacitor.isNativePlatform()}
+				<ButtonSecondary
+					disabled={!supportsWritingFolder}
+					help={supportsWritingFolder
+						? undefined
+						: "Votre navigateur ne supporte pas l'exportation en dossier, utilisez Chrome ou Edge."}
+					onclick={async () => {
+						if (!supportsWritingFolder) return;
+						const directory = await (window as any).showDirectoryPicker({
+							mode: 'readwrite',
+							startIn: 'documents',
+							id: 'results-export',
+						});
+						await downloadExport(directory);
+					}}
+				>
+					{#if exporting === 'folder'}
+						<LoadingSpinner />
+					{:else}
+						<IconDownloadAsFolder />
+					{/if}
+					Dossier
+					{#if supportsWritingFolder}
+						<code class="size" use:tooltip={'Taille totale estimée du dossier'}>
+							<LoadingText
+								value={sizeEstimates.uncompressed}
+								mask="~{formatBytesSize(150e3, 'narrow')}"
+							>
+								{#snippet loaded(size)}
+									~{formatBytesSize(size, 'narrow')}
+								{/snippet}
+							</LoadingText>
+						</code>
+					{/if}
+				</ButtonSecondary>
+			{/if}
 		</div>
 	</section>
 </main>
