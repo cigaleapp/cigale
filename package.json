@@ -139,7 +139,7 @@
 		"yauzl-promise": "^4.0.0"
 	},
 	"dependencies": {
-		"@formatjs/intl-durationformat": "^0.10.5",
+		"@formatjs/intl-durationformat": "^0.10.7",
 		"@iconify/svelte": "^5.2.1",
 		"@sveltejs/svelte-virtual-list": "^3.0.1",
 		"@viselect/vanilla": "^3.9.0",
