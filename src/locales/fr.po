@@ -898,7 +898,7 @@ msgid "<0/> Inaccessible: HTTP {0} <1/>"
 msgstr "<0/> Inaccessible: HTTP {0} <1/>"
 
 #: src/lib/FieldURL.svelte
-#: src/routes/(app)/accounts/+page.svelte
+#: src/routes/(app)/accounts/ModalAddAccount.svelte
 msgid "<0/> Vérification…"
 msgstr "<0/> Vérification…"
 
@@ -1034,8 +1034,6 @@ msgid "Forme de la sortie"
 msgstr "Forme de la sortie"
 
 #: src/lib/MetadataInput.svelte
-#: src/routes/(app)/accounts/+page.svelte
-#: src/routes/(app)/accounts/+page.svelte
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelOutputShapeDiagram.svelte
 msgid "Ajouter"
 msgstr "Ajouter"
@@ -2198,19 +2196,7 @@ msgstr "Certaines métadonnées sont incorrectes <0/>"
 msgid "Comptes <0/>"
 msgstr "Comptes <0/>"
 
-#. 0: adding?.displayName
 #: src/routes/(app)/accounts/+page.svelte
-msgid "Ajouter un compte {0}"
-msgstr "Ajouter un compte {0}"
-
-#: src/routes/(app)/accounts/+page.svelte
-msgid "Se connecter"
-msgstr "Se connecter"
-
-#: src/routes/(app)/accounts/+page.svelte
-msgid "Token"
-msgstr "Token"
-
 #: src/routes/(app)/accounts/+page.svelte
 msgid "Comptes"
 msgstr "Comptes"
@@ -2219,18 +2205,6 @@ msgstr "Comptes"
 #: src/routes/(app)/accounts/+page.svelte
 msgid "Logo de {0}"
 msgstr "Logo de {0}"
-
-#: src/routes/(app)/accounts/+page.svelte
-msgid "Connectés"
-msgstr "Connectés"
-
-#: src/routes/(app)/accounts/+page.svelte
-msgid "Déconnecter"
-msgstr "Déconnecter"
-
-#: src/routes/(app)/accounts/+page.svelte
-msgid "Aucun compte"
-msgstr "Aucun compte"
 
 #. 0: submittedBy
 #: src/routes/(app)/sessions/+page.svelte
@@ -2245,23 +2219,6 @@ msgstr "Voir sur {0}"
 #: src/routes/(app)/sessions/Cards.svelte
 msgid "<0/> Aucune session"
 msgstr "<0/> Aucune session"
-
-#: src/routes/(app)/accounts/+page.svelte
-msgid "Connecte-toi sur <0/>"
-msgstr "Connecte-toi sur <0/>"
-
-#. 0: '{}'
-#: src/routes/(app)/accounts/+page.svelte
-msgid "Copie-colle <0>ton token</0> (c'est la partie entre les {0})"
-msgstr "Copie-colle <0>ton token</0> (c'est la partie entre les {0})"
-
-#: src/routes/(app)/accounts/+page.svelte
-msgid "<0/> Token valide"
-msgstr "<0/> Token valide"
-
-#: src/routes/(app)/accounts/+page.svelte
-msgid "<0/> Token invalide"
-msgstr "<0/> Token invalide"
 
 #: src/routes/(app)/accounts/+page.svelte
 msgid "Pour ouvrir ou publier des sessions en ligne"
@@ -2505,3 +2462,37 @@ msgstr "Fermer la session"
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 msgid "Chargement des métadonnées…"
 msgstr "Chargement des métadonnées…"
+
+#: src/routes/(app)/accounts/+page.svelte
+msgid "<0/> Aucun compte"
+msgstr "<0/> Aucun compte"
+
+#. 0: adding?.displayName
+#: src/routes/(app)/accounts/ModalAddAccount.svelte
+msgid "Ajouter un compte {0}"
+msgstr "Ajouter un compte {0}"
+
+#: src/routes/(app)/accounts/ModalAddAccount.svelte
+msgid "Se connecter"
+msgstr "Se connecter"
+
+#: src/routes/(app)/accounts/ModalAddAccount.svelte
+msgid "Connecte-toi sur <0/>"
+msgstr "Connecte-toi sur <0/>"
+
+#. 0: '{}'
+#: src/routes/(app)/accounts/ModalAddAccount.svelte
+msgid "Copie-colle <0>ton token</0> (c'est la partie entre les {0})"
+msgstr "Copie-colle <0>ton token</0> (c'est la partie entre les {0})"
+
+#: src/routes/(app)/accounts/ModalAddAccount.svelte
+msgid "Token"
+msgstr "Token"
+
+#: src/routes/(app)/accounts/ModalAddAccount.svelte
+msgid "<0/> Token valide"
+msgstr "<0/> Token valide"
+
+#: src/routes/(app)/accounts/ModalAddAccount.svelte
+msgid "<0/> Token invalide"
+msgstr "<0/> Token invalide"
