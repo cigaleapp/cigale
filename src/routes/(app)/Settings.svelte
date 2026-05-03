@@ -36,7 +36,7 @@
 	let notificationsEnabled = $state(getSettings().notifications);
 	$effect(() => {
 		void (async () => {
-			notificationsEnabled = await hasNotificationsEnabled();
+			notificationsEnabled = await hasNotificationsEnabled(getSettings().notifications);
 		})();
 	});
 

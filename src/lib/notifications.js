@@ -1,9 +1,9 @@
 import { Capacitor } from '@capacitor/core';
 import { LocalNotifications } from '@capacitor/local-notifications';
+import { millisecondsToSeconds } from 'date-fns';
 
 import { getSettings } from './settings.svelte';
 import { toasts } from './toasts.svelte';
-import { millisecondsToSeconds } from 'date-fns';
 
 /**
  * Ask the user for permission to send system notifications
@@ -55,7 +55,7 @@ export async function sendNotification(title, options) {
 					{
 						title,
 						body: options.body ?? '',
-						// Needs to be a Java (signed, 32-bit) Int, so max. 2^(32-1) 
+						// Needs to be a Java (signed, 32-bit) Int, so max. 2^(32-1)
 						id: millisecondsToSeconds(Date.now()),
 						smallIcon: 'ic_notification',
 					},
@@ -73,20 +73,20 @@ export async function sendNotification(title, options) {
 		return;
 	}
 
-	const enabled = await hasNotificationsEnabled();
+	const enabled = await hasNotificationsEnabled(getSettings().notifications);
 
 	if (!enabled) return;
 	new Notification(title, options);
 }
 
-export async function hasNotificationsEnabled() {
+/**
+ * @param {boolean|null} isSettingOn
+ */
+export async function hasNotificationsEnabled(isSettingOn) {
 	if (Capacitor.isNativePlatform()) {
-		return (
-			(await LocalNotifications.checkPermissions()) === 'granted' &&
-			getSettings().notifications
-		);
+		return isSettingOn && (await LocalNotifications.checkPermissions()).display === 'granted';
 	}
 
 	if (!('Notification' in window)) return false;
-	return Notification.permission === 'granted' && getSettings().notifications;
+	return isSettingOn && Notification.permission === 'granted';
 }
