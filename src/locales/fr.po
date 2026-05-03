@@ -2493,3 +2493,11 @@ msgstr "<0/> Token valide"
 #: src/routes/(app)/accounts/ModalAddAccount.svelte
 msgid "<0/> Token invalide"
 msgstr "<0/> Token invalide"
+
+#: src/routes/(app)/(sidepanel)/classify/[observation]/+page.svelte
+msgid "La classification plein-écran"
+msgstr "La classification plein-écran"
+
+#: src/routes/(app)/(sidepanel)/crop/[image]/[[from]]/+page@(app).svelte
+msgid "Le recadrage"
+msgstr "Le recadrage"
