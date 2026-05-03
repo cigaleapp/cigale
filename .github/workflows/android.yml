@@ -96,6 +96,9 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./android/gradlew
 
+      - name: Generate logo assets
+        run: bun run scripts/generate-logo-assets.ts
+
       - name: Sync built app to capacitor
         run: bun cap sync
 

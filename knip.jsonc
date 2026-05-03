@@ -16,10 +16,12 @@
 		"bun",
 		"@sveltejs/vite-plugin-svelte-inspector",
 		"svelte-mathml",
+		"@capacitor/assets"
 	],
 	"entry": [
 		"scripts/issue-creator-server.ts",
 		"scripts/issue-creator-discord-bot.ts",
+		"scripts/generate-logo-assets.ts",
 		// TODO add to a CI workflow
 		"scripts/generate-contributing-tables.js",
 		"src/electron/main.{d.ts,js}",
