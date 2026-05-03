@@ -46,7 +46,7 @@
 		"body": "<!-- XXX\u003a DONT MERGE -->\n$0",
 	},
 	"DONTMERGE comment (YAML)": {
-		"scope": "yaml",
+		"scope": "yaml,github-actions-workflow",
 		"prefix": "dontmerge",
 		"body": "# XXX\u003a DONT MERGE\n$0",
 	},
