@@ -63,6 +63,7 @@ jobs:
         with:
           name: app
           path: ./public
+          include-hidden-files: true
           retention-days: 1
 
   android:
