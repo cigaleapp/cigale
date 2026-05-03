@@ -24,6 +24,10 @@ on:
         required: true
         type: string
         description: Sentence to start Diawi comment with. For example, "Built from PR #..."
+      app-name:
+        required: false
+        type: string
+        description: The app's name
 
     secrets:
       DEV_DEPLOYMENTS_HOST_KEY:
@@ -57,6 +61,8 @@ jobs:
   apk:
     name: Build APK
     runs-on: ubuntu-latest
+    env:
+      STRINGS_FILE: ./android/app/src/main/res/values/strings.xml
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -126,7 +132,11 @@ jobs:
       - name: Set website_host string for PR domain
         if: github.event_name == 'pull_request'
         run: |
-          sed -i "s|<string name=\"website_host\">.*</string>|<string name=\"website_host\">pr-${{ github.event.number }}.cigaleapp.github.io</string>|" ./android/app/src/main/res/values/strings.xml
+          sed -i "s|<string name=\"website_host\">.*</string>|<string name=\"website_host\">pr-${{ github.event.number }}.cigaleapp.github.io</string>|" $STRINGS_FILE
+
+      - name: Set app_name string depending on flavor
+        run: |
+          sed -i "s|<string name=\"app_name\">.*</string>|<string name=\"app_name\">${{ inputs.app-name || 'Cigale' }}</string>|" $STRINGS_FILE
 
       - name: Build Android app
         run: bun cap build android

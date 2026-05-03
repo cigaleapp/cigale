@@ -82,6 +82,7 @@ jobs:
       flavor: preview
       artifact: app
       version: PR${{ github.event.number }}/${{ github.sha }}
+      app-name: Cigale (PR ${{ github.event.number }})
       diawi-comment: |
         This is a PR preview build.
 

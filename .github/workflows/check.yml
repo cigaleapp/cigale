@@ -116,6 +116,7 @@ jobs:
       flavor: nightly
       artifact: ${{ needs.build.outputs.artifact }}
       version: NIGHTLY/${{ github.sha }}
+      app-name: Cigale Dev
       diawi-comment: |
         This is a nightly build from the ${{ github.ref_name }} branch.
 
