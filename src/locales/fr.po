@@ -807,6 +807,7 @@ msgid "À jour"
 msgstr "À jour"
 
 #: src/routes/(app)/about/+page.svelte
+#: src/routes/(app)/about/+page.svelte
 msgid "À propos"
 msgstr "À propos"
 
@@ -1413,17 +1414,20 @@ msgid "Augmenter"
 msgstr "Augmenter"
 
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 msgid "1 élément"
 msgid_plural "# éléments"
 msgstr[0] "1 élément"
 msgstr[1] "# éléments"
 
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 msgid "1 image"
 msgid_plural "# images"
 msgstr[0] "1 image"
 msgstr[1] "# images"
 
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 msgid "1 observation"
 msgid_plural "# observations"
@@ -2132,6 +2136,7 @@ msgid "Erreur lors du traitement du/des fichiers annexes associés à {0}"
 msgstr "Erreur lors du traitement du/des fichiers annexes associés à {0}"
 
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 msgid "Aucune sélection"
 msgstr "Aucune sélection"
 
@@ -2496,3 +2501,7 @@ msgstr "<0/> Cigale"
 #: src/routes/(app)/TopbarOpenSession.svelte
 msgid "Fermer la session"
 msgstr "Fermer la session"
+
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
+msgid "Chargement des métadonnées…"
+msgstr "Chargement des métadonnées…"
