@@ -1847,14 +1847,17 @@ msgid "Mismatch"
 msgstr "Mismatch"
 
 #: src/routes/(app)/Navigation.svelte
+#: src/routes/(app)/TopbarOpenSession.svelte
 msgid "Réglages d'import"
 msgstr "Réglages d'import"
 
 #: src/routes/(app)/Navigation.svelte
+#: src/routes/(app)/TopbarOpenSession.svelte
 msgid "Réglages de recadrage"
 msgstr "Réglages de recadrage"
 
 #: src/routes/(app)/Navigation.svelte
+#: src/routes/(app)/TopbarOpenSession.svelte
 msgid "Réglages de classification"
 msgstr "Réglages de classification"
 
@@ -2448,10 +2451,6 @@ msgstr "Error: "
 msgid "<0/> Importer .zip"
 msgstr "<0/> Importer .zip"
 
-#: src/routes/(app)/(sidepanel)/+layout.svelte
-msgid "Toutes les sessions"
-msgstr "Toutes les sessions"
-
 #. 0: feature
 #: src/lib/MobileWIPOverlay.svelte
 msgid "{0} est en cours de développement pour les appareils mobiles. En attendant, veuillez utiliser un ordinateur pour y accéder."
@@ -2493,3 +2492,7 @@ msgstr[1] "# connectés"
 #: src/routes/(app)/TopbarHome.svelte
 msgid "<0/> Cigale"
 msgstr "<0/> Cigale"
+
+#: src/routes/(app)/TopbarOpenSession.svelte
+msgid "Fermer la session"
+msgstr "Fermer la session"
