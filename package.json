@@ -145,6 +145,7 @@
 		"@capacitor/core": "^8.3.1",
 		"@capacitor/local-notifications": "^8.0.2",
 		"@formatjs/intl-durationformat": "^0.10.7",
+		"@capacitor/splash-screen": "^8.0.1",
 		"@iconify/svelte": "^5.2.1",
 		"@sveltejs/svelte-virtual-list": "^3.0.1",
 		"@viselect/vanilla": "^3.9.0",

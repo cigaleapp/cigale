@@ -9,6 +9,7 @@
 	import './style.css';
 
 	import { App as CapacitorApp } from '@capacitor/app';
+	import { SplashScreen } from '@capacitor/splash-screen';
 	import { createContext } from 'svelte';
 
 	import { Theme } from '$lib/colorscheme.svelte';
@@ -24,6 +25,12 @@
 			firstTimeDuration: 1_000,
 		})
 	);
+
+	// Just in case we're on a page that's not in the (app) layout
+	// See also file://./(app)/+layout.js
+	$effect(() => {
+		void SplashScreen.hide();
+	});
 
 	$effect(() => {
 		// Source - https://stackoverflow.com/a/69084017
@@ -42,7 +49,6 @@
 
 <svelte:window
 	{@attach (window) => {
-		// @ts-expect-error
 		window.uiState = uiState;
 	}}
 	{@attach (window) => {
