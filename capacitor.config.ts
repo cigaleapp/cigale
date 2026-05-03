@@ -5,6 +5,8 @@ const config: CapacitorConfig = {
 	appName: 'Cigale',
 	webDir: 'public',
 	android: {
+		// The app is open source, let's allow anyone to inspect the webview :)
+		webContentsDebuggingEnabled: true,
 		buildOptions: {
 			// https://stackoverflow.com/a/77159058/9943464
 			signingType: "apksigner"
