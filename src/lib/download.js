@@ -1,6 +1,6 @@
 import { Capacitor } from '@capacitor/core';
 import { Directory, Encoding, Filesystem } from '@capacitor/filesystem';
-import { Share } from '@capacitor/share';
+import { FilePicker } from '@capawesome/capacitor-file-picker';
 import YAML from 'yaml';
 
 /**
@@ -11,6 +11,15 @@ import YAML from 'yaml';
  */
 export async function downloadAsFile(content, filename, contentType) {
 	if (Capacitor.isNativePlatform()) {
+		const permission = await Filesystem.checkPermissions();
+		if (permission.publicStorage !== 'granted') {
+			await Filesystem.requestPermissions();
+		}
+
+		const { path: directory } = await FilePicker.pickDirectory();
+
+		console.info('Saving file to', directory);
+
 		/** @type {Pick<import('@capacitor/filesystem').WriteFileOptions, 'data' | 'encoding'>} */
 		let input;
 
@@ -28,15 +37,12 @@ export async function downloadAsFile(content, filename, contentType) {
 		}
 
 		const { uri } = await Filesystem.writeFile({
-			path: filename,
-			directory: Directory.Cache,
+			path: `${directory.replace(/^content:\/\//, '')}/${filename}`,
+			directory: Directory.ExternalStorage,
 			...input,
 		});
 
-		await Share.share({
-			dialogTitle: filename,
-			files: [uri],
-		});
+		console.info('File saved to', uri);
 	} else {
 		const blob =
 			content instanceof Blob
