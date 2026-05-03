@@ -8,6 +8,7 @@
 	import '$lib/tippy-svg-arrow.css';
 	import './style.css';
 
+	import { App as CapacitorApp } from '@capacitor/app';
 	import { createContext } from 'svelte';
 
 	import { Theme } from '$lib/colorscheme.svelte';
@@ -23,6 +24,20 @@
 			firstTimeDuration: 1_000,
 		})
 	);
+
+	$effect(() => {
+		// Source - https://stackoverflow.com/a/69084017
+		// Posted by Siyahul Haq, modified by community. See post 'Timeline' for change history
+		// Retrieved 2026-05-03, License - CC BY-SA 4.0
+
+		CapacitorApp.addListener('backButton', ({ canGoBack }) => {
+			if (!canGoBack) {
+				CapacitorApp.exitApp();
+			} else {
+				window.history.back();
+			}
+		});
+	});
 </script>
 
 <svelte:window
