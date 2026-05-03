@@ -7,8 +7,8 @@ android {
         applicationId "io.github.cigaleapp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode project.hasProperty('VERSION_CODE') ? VERSION_CODE.toInteger() : 1
+        versionName project.hasProperty('VERSION_NAME') ? VERSION_NAME : "dev"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.

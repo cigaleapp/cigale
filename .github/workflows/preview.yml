@@ -80,6 +80,7 @@ jobs:
     with:
       flavor: preview
       artifact: app
+      version: PR${{ github.event.number }}/${{ github.sha }}
       diawi-comment: |
         This is a PR preview build.
 

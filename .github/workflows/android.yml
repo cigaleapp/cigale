@@ -7,7 +7,7 @@ permissions:
 
 on:
   workflow_call:
-    inputs: 
+    inputs:
       flavor:
         required: true
         type: string
@@ -16,6 +16,10 @@ on:
         required: true
         type: string
         description: The name of the artifact (contents of the built app, i.e. contents of ./public/) to use
+      version:
+        required: true
+        type: string
+        description: Version name to set for the Android app
       diawi-comment:
         required: true
         type: string
@@ -84,7 +88,7 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v4
 
-      # Needed for apksigner 
+      # Needed for apksigner
       # See https://github.com/android-actions/setup-android/issues/461#issuecomment-2700722085
       - name: Add Android build tools to PATH
         run: |
@@ -109,6 +113,14 @@ jobs:
           filename: keystore.jks
           is-executable: false
           working-directory: ./android
+
+      - name: Write Gradle properties
+        run: |
+          file=$HOME/.gradle/gradle.properties
+          mkdir -p $(dirname $file)
+          echo "" > $file
+          echo "VERSION_CODE=${{ github.run_number }}" >> $file
+          echo "VERSION_NAME=${{ inputs.version }}" >> $file
 
       - name: Build Android app
         run: bun cap build android
@@ -176,7 +188,7 @@ jobs:
           token: ${{ secrets.DIAWI_TOKEN }}
           file: ./app.apk
           # TODO: cigale mailing list ?
-          # recipients: 
+          # recipients:
           comment: |
             ${{ inputs.diawi-comment }}
 
