@@ -122,6 +122,11 @@ jobs:
           echo "VERSION_CODE=${{ github.run_number }}" >> $file
           echo "VERSION_NAME=${{ inputs.version }}" >> $file
 
+      - name: Set website_host string for PR domain
+        if: github.event_name == 'pull_request'
+        run: |
+          sed -i "s|<string name=\"website_host\">.*</string>|<string name=\"website_host\">pr-${{ github.event.number }}.cigaleapp.github.io</string>|" ./android/app/src/main/res/values/strings.xml
+
       - name: Build Android app
         run: bun cap build android
           --keystorepath keystore.jks

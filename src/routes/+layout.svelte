@@ -12,6 +12,8 @@
 	import { SplashScreen } from '@capacitor/splash-screen';
 	import { createContext } from 'svelte';
 
+	import { goto } from '$app/navigation';
+	import { match, resolve } from '$app/paths';
 	import { Theme } from '$lib/colorscheme.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { fadeOutElement } from '$lib/utils';
@@ -43,6 +45,22 @@
 			} else {
 				window.history.back();
 			}
+		});
+
+		// https://capacitorjs.com/docs/guides/deep-links#react
+		CapacitorApp.addListener('appUrlOpen', async ({ url }) => {
+			const route = await match(url);
+			if (!route) {
+				console.warn(`No route matched URL: ${url}`);
+				return;
+			}
+
+			console.info(
+				`Deep link opened: ${url}, matched route: ${route.id} with params ${JSON.stringify(route.params)}`
+			);
+
+			// @ts-expect-error
+			await goto(resolve(route.id, route.params), { replaceState: true });
 		});
 	});
 </script>
