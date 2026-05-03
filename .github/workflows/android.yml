@@ -132,6 +132,10 @@ jobs:
           name: apk
           path: ./app.apk
 
+      - name: Get current datetime
+        id: datetime
+        run: echo "now=$(date)" >> $GITHUB_OUTPUT
+
       - name: Add link to artifact download
         if: github.event_name == 'pull_request'
         uses: nefrob/pr-description@v1.2.0
@@ -142,7 +146,7 @@ jobs:
           regexFlags: ims
           content: |
             <!-- apk -->
-            The Android app preview has been built. You can download the signed APK file here:
+            [${{ steps.datetime.outputs.now }}] The Android app preview has been built. You can download the signed APK file here:
 
             ${{ steps.artifact.outputs.artifact-url }}
 
@@ -178,6 +182,9 @@ jobs:
             CI run:     https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
             Key alias:  ${{ secrets.ANDROID_KEY_ALIAS }}
 
+      - name: Get current datetime
+        id: datetime
+        run: echo "now=$(date)" >> $GITHUB_OUTPUT
 
       - name: Add QR code to PR description
         if: github.event_name == 'pull_request'
@@ -189,7 +196,7 @@ jobs:
           regexFlags: ims
           content: |
             <!-- apk -->
-            Downloading the Android app preview from Diawi:
+            [${{ steps.datetime.outputs.now }}] Downloading the Android app preview from Diawi:
               
             <img alt="QR code" src="${{ steps.diawi.outputs.qrcode }}" height=200>
 
