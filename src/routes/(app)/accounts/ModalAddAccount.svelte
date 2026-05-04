@@ -1,6 +1,8 @@
 <script lang="ts">
 	import type { AccountConstructor, LoginData } from '$lib/accounts/types.js';
 
+	import { CapacitorHttp } from '@capacitor/core';
+	import { ArkErrors, type } from 'arktype';
 	import { fade } from 'svelte/transition';
 
 	import IconCheck from '~icons/ri/check-line';
@@ -8,11 +10,13 @@
 	import KoboToolbox from '$lib/accounts/kobotoolbox.js';
 	import { errorMessage } from '$lib/i18n.js';
 	import { databaseHandle, tables } from '$lib/idb.svelte.js';
+	import { inAppBrowser } from '$lib/inappbrowser.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 	import ModalConfirm from '$lib/ModalConfirm.svelte';
 	import RadioButtons from '$lib/RadioButtons.svelte';
 	import Stepper from '$lib/Stepper.svelte';
+	import { toasts } from '$lib/toasts.svelte.js';
 	import { tooltip } from '$lib/tooltips.js';
 	import { orEmpty, safeJSONParse } from '$lib/utils.js';
 
@@ -95,9 +99,68 @@
 							<a
 								href="https://{loginData.server}"
 								target="_blank"
+								title="Se connecter à {loginData.server}"
 								onclick={() => {
 									done();
 								}}
+								{@attach inAppBrowser({
+									async onUrlChange(browser, url) {
+										if (!loginData) return;
+
+										const kobonaut = await browser
+											.cookie('kobonaut')
+											.catch(() => null);
+
+										if (!kobonaut) {
+											console.debug('kobonaut cookie not found', { url });
+											return;
+										}
+
+										// Fetch with CapacitorHttp to avoid CORS issue
+										// The CORS proxy we usually use doesn't forward cookies, so that isn't an option
+										// (see https://github.com/Rob--W/cors-anywhere/issues/56)
+										const response = await CapacitorHttp.get({
+											url: `https://${loginData.server}/token`,
+											headers: {
+												Cookie: `kobonaut=${kobonaut}`,
+											},
+										});
+
+										// In that case, the user probably just isn't logged in on that page, so we wait for another URL change. Weird that kobonaut is set, but whatever.
+										// Is can happen when switching between kf. and eu., (happened during testing)
+										if (response.status === 401) {
+											return;
+										}
+
+										if (response.status >= 400) {
+											await browser.close();
+											toasts.error(
+												'Impossible de récupérer le token : échec de la requête'
+											);
+										}
+
+										const schema = type({ token: 'string' });
+										const data = schema(response.data);
+
+										if (data instanceof ArkErrors) {
+											await browser.close();
+											toasts.error(
+												'Impossible de récupérer le token : réponse invalide'
+											);
+											console.error('Invalid token response', {
+												response,
+												data,
+											});
+										} else {
+											// So that we aren't already logged-in when adding
+											// another account of the same provider
+											await browser.clearCookies();
+											await browser.close();
+											loginData.token = data.token;
+											done();
+										}
+									},
+								})}
 							>
 								{loginData.server}
 							</a>
@@ -110,7 +173,9 @@
 							Copie-colle
 							<a
 								href={KoboToolbox.tokenPageURL(loginData.server).href}
+								title="Copie-colle ton token (partie entre les {'{}'})"
 								target="_blank"
+								{@attach inAppBrowser()}
 							>
 								ton token
 							</a>

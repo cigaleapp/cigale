@@ -153,6 +153,7 @@
 		"@capacitor/share": "^8.0.1",
 		"@capacitor/splash-screen": "^8.0.1",
 		"@capawesome/capacitor-file-picker": "^8.0.2",
+		"@capgo/inappbrowser": "^8.6.2",
 		"@formatjs/intl-durationformat": "^0.10.7",
 		"@iconify/svelte": "^5.2.1",
 		"@sveltejs/svelte-virtual-list": "^3.0.1",
