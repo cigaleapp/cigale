@@ -107,6 +107,7 @@
         "json-schema-doc-ts": "^2.0.0",
         "jszip": "^3.10.1",
         "knip": "^5.88.1",
+        "magic-string": "^0.30.21",
         "msw": "^2.14.2",
         "octokit": "^5.0.5",
         "odt2html": "^1.0.1",

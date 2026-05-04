@@ -5,6 +5,7 @@ import { sveltekit } from '@sveltejs/kit/vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import arkenv from 'arkenv';
 import { type } from 'arktype';
+import MagicString from 'magic-string';
 import postcssPresetEnv from 'postcss-preset-env';
 import icons from 'unplugin-icons/vite';
 import { analyzer } from 'vite-bundle-analyzer';
@@ -102,6 +103,34 @@ export default defineConfig({
 		}),
 		// FIXME Wuchale doesnt play well with Vitest for now
 		env.VITEST ? undefined : wuchale(),
+		{
+			name: 'v8-ignore-if-capacitor',
+			transform(code, id) {
+				if (!/\.(js|ts|svelte)$/.test(id)) return;
+
+				const s = new MagicString(code);
+				const lines = code.split('\n');
+				let offset = 0;
+
+				for (const line of lines) {
+					// Check if line contains if(Capacitor.isNativePlatform())
+					if (/^\s*if\s*\(\s*Capacitor\.isNativePlatform\s*\(\s*\)\s*/.test(line)) {
+						// Get the indentation
+						const indent = line.match(/^\s*/)[0];
+						// Insert comment before the line
+						s.appendLeft(offset, `${indent}/* v8 ignore if */\n`);
+					}
+					offset += line.length + 1; // +1 for the newline
+				}
+
+				if (s.hasChanged()) {
+					return {
+						code: s.toString(),
+						map: s.generateMap({ hires: true }),
+					};
+				}
+			},
+		},
 		sveltekit(),
 		crossOriginIsolation(),
 	],
