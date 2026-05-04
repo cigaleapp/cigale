@@ -2501,3 +2501,67 @@ msgstr ""
 #: src/routes/(app)/(sidepanel)/crop/[image]/[[from]]/+page@(app).svelte
 msgid "Le recadrage"
 msgstr ""
+
+#: src/lib/gallery.test.ts
+msgid "Option 1"
+msgstr ""
+
+#: src/lib/gallery.test.ts
+msgid "Option 2"
+msgstr ""
+
+#: src/lib/gallery.test.ts
+#: src/lib/gallery.test.ts
+msgid "Item A"
+msgstr ""
+
+#: src/lib/gallery.test.ts
+#: src/lib/gallery.test.ts
+msgid "Item B"
+msgstr ""
+
+#: src/lib/gallery.test.ts
+msgid "Apple"
+msgstr ""
+
+#: src/lib/gallery.test.ts
+msgid "Banana"
+msgstr ""
+
+#: src/lib/gallery.test.ts
+msgid "Tried to sort by metadata confidence without specifying metadata ID"
+msgstr ""
+
+#: src/lib/gallery.test.ts
+msgid "Item 1"
+msgstr ""
+
+#: src/lib/gallery.test.ts
+msgid "Item 2"
+msgstr ""
+
+#: src/lib/gallery.test.ts
+#: src/lib/gallery.test.ts
+#: src/lib/gallery.test.ts
+#: src/lib/gallery.test.ts
+#: src/lib/gallery.test.ts
+msgid "Field"
+msgstr ""
+
+#: src/lib/gallery.test.ts
+msgid "Avec"
+msgstr ""
+
+#: src/lib/gallery.test.ts
+msgid "Sans"
+msgstr ""
+
+#. 0: loginData.server
+#: src/routes/(app)/accounts/ModalAddAccount.svelte
+msgid "Se connecter à {0}"
+msgstr ""
+
+#. 0: '{}'
+#: src/routes/(app)/accounts/ModalAddAccount.svelte
+msgid "Copie-colle ton token (partie entre les {0})"
+msgstr ""

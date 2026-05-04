@@ -2501,3 +2501,67 @@ msgstr "La classification plein-écran"
 #: src/routes/(app)/(sidepanel)/crop/[image]/[[from]]/+page@(app).svelte
 msgid "Le recadrage"
 msgstr "Le recadrage"
+
+#: src/lib/gallery.test.ts
+msgid "Option 1"
+msgstr "Option 1"
+
+#: src/lib/gallery.test.ts
+msgid "Option 2"
+msgstr "Option 2"
+
+#: src/lib/gallery.test.ts
+#: src/lib/gallery.test.ts
+msgid "Item A"
+msgstr "Item A"
+
+#: src/lib/gallery.test.ts
+#: src/lib/gallery.test.ts
+msgid "Item B"
+msgstr "Item B"
+
+#: src/lib/gallery.test.ts
+msgid "Apple"
+msgstr "Apple"
+
+#: src/lib/gallery.test.ts
+msgid "Banana"
+msgstr "Banana"
+
+#: src/lib/gallery.test.ts
+msgid "Tried to sort by metadata confidence without specifying metadata ID"
+msgstr "Tried to sort by metadata confidence without specifying metadata ID"
+
+#: src/lib/gallery.test.ts
+msgid "Item 1"
+msgstr "Item 1"
+
+#: src/lib/gallery.test.ts
+msgid "Item 2"
+msgstr "Item 2"
+
+#: src/lib/gallery.test.ts
+#: src/lib/gallery.test.ts
+#: src/lib/gallery.test.ts
+#: src/lib/gallery.test.ts
+#: src/lib/gallery.test.ts
+msgid "Field"
+msgstr "Field"
+
+#: src/lib/gallery.test.ts
+msgid "Avec"
+msgstr "Avec"
+
+#: src/lib/gallery.test.ts
+msgid "Sans"
+msgstr "Sans"
+
+#. 0: loginData.server
+#: src/routes/(app)/accounts/ModalAddAccount.svelte
+msgid "Se connecter à {0}"
+msgstr "Se connecter à {0}"
+
+#. 0: '{}'
+#: src/routes/(app)/accounts/ModalAddAccount.svelte
+msgid "Copie-colle ton token (partie entre les {0})"
+msgstr "Copie-colle ton token (partie entre les {0})"
