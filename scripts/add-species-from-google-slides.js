@@ -208,7 +208,11 @@ for (const [i, { name, id }] of files.entries()) {
 			viewportScale: 4,
 		})
 			.then((results) =>
-				Promise.all(results.map(async ({ content }) => Jimp.fromBuffer(content)))
+				Promise.all(
+					results
+						.filter(({ kind, content }) => kind === 'content' && content !== undefined)
+						.map(async ({ content }) => Jimp.fromBuffer(content))
+				)
 			)
 			.then((images) =>
 				images.map((image) => {

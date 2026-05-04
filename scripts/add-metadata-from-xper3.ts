@@ -62,9 +62,9 @@ const Xper3Descriptor = type({
 	name: 'string',
 	detail: UnderscoreableString,
 	uniqueid: 'string',
-	stateIds: 'number[]',
+	stateIds: 'null | number[]',
 	inapplicableState: 'null | number[]',
-	unit: 'null',
+	unit: 'null | string',
 	resourceIds: 'number[]',
 	id: 'number',
 	feedback: 'number[]',
@@ -234,7 +234,7 @@ async function requestItemDescriptors(item: typeof Xper3Item.infer) {
 						resources: Xper3Resource.array(),
 						states: Xper3State.array(),
 						note: 'null',
-						quantitativeMeasure: 'null',
+						// quantitativeMeasure: 'null',
 						// TODO
 						// calculatedStateEvaluations: 'object',
 						unknown: 'boolean',
@@ -292,7 +292,7 @@ if (import.meta.main) {
 			learnMore: APP_URL,
 			required: false,
 			options: States.filter(
-				(s): s is NonNullable<typeof s> => s !== null && stateIds.includes(s.id)
+				(s): s is NonNullable<typeof s> => Boolean(s !== null && stateIds?.includes(s.id))
 			).map(({ name, detail, uniqueid, resourceIds }) => {
 				const resource = Resources.filter((r) => r !== null).find((r) =>
 					resourceIds?.includes(r.id)

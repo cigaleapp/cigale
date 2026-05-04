@@ -64,7 +64,7 @@ if (cacheFreshness > millisecondsToHours(24 * 31)) {
 
 async function fetchWithCache<Path extends keyof typeof cachedGbifData>(
 	path: Path
-): Promise<(typeof cachedGbifData)[Path]> {
+): Promise<undefined | (typeof cachedGbifData)[Path]> {
 	if (cachedGbifData[path]) {
 		return cachedGbifData[path];
 	}
@@ -72,7 +72,8 @@ async function fetchWithCache<Path extends keyof typeof cachedGbifData>(
 	const response = await fetch(`https://api.gbif.org/v1/species/${path}`);
 	if (!response.ok) {
 		console.error(`\n\nGBIF API request failed for ${path}:`, await response.text());
-		throw new Error(`GBIF API request failed with status ${response.status}`);
+		// throw new Error(`GBIF API request failed with status ${response.status}`);
+		return;
 	}
 
 	const data = await response.json();
