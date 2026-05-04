@@ -108,7 +108,7 @@
 		"eslint-plugin-svelte": "^3.17.1",
 		"fake-indexeddb": "^6.2.5",
 		"gitmoji-cli": "^9.7.0",
-		"globals": "^17.5.0",
+		"globals": "^17.6.0",
 		"google-auth-library": "^10.6.2",
 		"google-fonts-helper": "^3.7.4",
 		"googleapis": "^171.4.0",
