@@ -42,7 +42,7 @@
 	"scripts": {
 		"dev": "vite dev",
 		"dev:native": "electron-forge start",
-		"prebuild": "bun run scripts/download-google-fonts.js && bun run scripts/generate-json-schemas.js && bun run scripts/codegen-filepath-types.ts && bun wuchale --clean --sync",
+		"prebuild": "bun run scripts/download-google-fonts.js && bun run scripts/generate-json-schemas.js && bun run scripts/codegen-filepath-types.ts && bun run scripts/generate-assetlinks.ts && bun wuchale --clean --sync",
 		"build": "vite build",
 		"preview": "vite preview",
 		"prepare": "bun run prebuild",

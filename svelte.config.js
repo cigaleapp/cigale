@@ -10,6 +10,9 @@ const config = {
 			pages: process.env.ELECTRON_BUILD ? '.vite/build/sveltekit' : 'public',
 			fallback: process.env.SVELTE_FALLBACK_PAGE || 'index.html',
 		}),
+		prerender: {
+			entries: ['*', '/.well-known/assetlinks.json'],
+		},
 		alias: {
 			$worker: 'src/worker',
 			$locales: 'src/locales',
