@@ -2531,3 +2531,22 @@ msgstr "Version de l'app"
 #: src/routes/(app)/about/+page.svelte
 msgid "Build de l'app"
 msgstr "Build de l'app"
+
+#: src/lib/notifications.js
+msgid "Vous avez refusé les notifications."
+msgstr "Vous avez refusé les notifications."
+
+#: src/lib/notifications.js
+#: src/lib/notifications.js
+#: src/lib/notifications.js
+msgid "Notification"
+msgstr "Notification"
+
+#: src/lib/notifications.js
+#: src/lib/notifications.js
+msgid "Votre navigateur ne supporte pas les notifications système."
+msgstr "Votre navigateur ne supporte pas les notifications système."
+
+#: src/lib/notifications.js
+msgid "Impossible d'envoyer la notification système."
+msgstr "Impossible d'envoyer la notification système."
