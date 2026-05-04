@@ -93,7 +93,7 @@ jobs:
       - name: Retrieve built app
         uses: actions/download-artifact@v7
         with:
-          name: app
+          name: ${{ inputs.artifact }}
           path: ./public
 
       - name: Setup Android SDK
