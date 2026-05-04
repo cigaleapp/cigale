@@ -2565,3 +2565,47 @@ msgstr "Se connecter à {0}"
 #: src/routes/(app)/accounts/ModalAddAccount.svelte
 msgid "Copie-colle ton token (partie entre les {0})"
 msgstr "Copie-colle ton token (partie entre les {0})"
+
+#: src/lib/inappbrowser.test.ts
+msgid "Capacitor"
+msgstr "Capacitor"
+
+#: src/lib/inappbrowser.test.ts
+msgid "In-app browser is only supported on native platforms"
+msgstr "In-app browser is only supported on native platforms"
+
+#: src/lib/inappbrowser.test.ts
+#: src/lib/inappbrowser.test.ts
+#: src/lib/inappbrowser.test.ts
+#: src/lib/inappbrowser.test.ts
+msgid "Custom title"
+msgstr "Custom title"
+
+#: src/lib/inappbrowser.test.ts
+#: src/lib/inappbrowser.test.ts
+msgid "Next title"
+msgstr "Next title"
+
+#: src/lib/inappbrowser.test.ts
+msgid "Link title"
+msgstr "Link title"
+
+#: src/routes/(app)/about/+page.svelte
+msgid "Plateforme"
+msgstr "Plateforme"
+
+#: src/routes/(app)/about/+page.svelte
+msgid "Nom de l'app"
+msgstr "Nom de l'app"
+
+#: src/routes/(app)/about/+page.svelte
+msgid "ID de l'app"
+msgstr "ID de l'app"
+
+#: src/routes/(app)/about/+page.svelte
+msgid "Version de l'app"
+msgstr "Version de l'app"
+
+#: src/routes/(app)/about/+page.svelte
+msgid "Build de l'app"
+msgstr "Build de l'app"
