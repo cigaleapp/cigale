@@ -22,6 +22,10 @@ jobs:
     name: App
     outputs:
       artifact: ${{ steps.artifact.outputs.name }}
+    env:
+      PR_NUMBER: ${{ github.event.number }}
+      BUILD_COMMIT: ${{ github.sha }}
+      BUILTIN_PROTOCOLS: https://raw.githubusercontent.com/${{ github.repository }}/${{ github.head_ref || github.ref_name }}/examples/arthropods.cigaleprotocol.json,https://raw.githubusercontent.com/${{ github.repository }}/${{ github.head_ref }}/protocols/insecta.cigaleprotocol.yaml,https://raw.githubusercontent.com/${{ github.repository }}/${{ github.head_ref || github.ref_name }}/protocols/entomoscope.cigaleprotocol.yaml
     steps:
       - uses: actions/checkout@v6
       - uses: oven-sh/setup-bun@v2
@@ -29,6 +33,17 @@ jobs:
           bun-version-file: .bun-version
       - name: Install dependencies
         run: bun install --frozen-lockfile
+      - name: Set env vars depending on $PR_NUMBER
+        run: |
+          # Production builds are deployed to Github Pages
+          if [[ -z "$PR_NUMBER" ]]; then
+            echo "SVELTE_FALLBACK_PAGE=404.html" >> $GITHUB_ENV
+            echo "BASE_PATH=/${GITHUB_REPOSITORY##*/}" >> $GITHUB_ENV
+          # PR previews are deployed to a dev server
+          else
+            echo "SVELTE_FALLBACK_PAGE=index.html" >> $GITHUB_ENV
+            echo "BASE_PATH=" >> $GITHUB_ENV
+          fi
       - if: inputs.debug
         name: Build
         run: bun run build

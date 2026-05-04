@@ -31,40 +31,10 @@ on:
         required: true
         description: 'API token for Diawi, used to upload Android app previews'
 
-env:
-  PR_NUMBER: ${{ github.event.number }}
-  BUILD_COMMIT: ${{ github.sha }}
-  SVELTEKIT_FALLBACK_PAGE: index.html
-
 jobs:
   build:
     name: Build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version-file: .bun-version
-
-      - name: Install dependencies
-        run: bun install
-
-      - name: Build
-        if: github.event.action != 'closed'
-        run: bun run build
-        env:
-          BUILTIN_PROTOCOLS: https://raw.githubusercontent.com/${{ github.repository }}/${{ github.head_ref }}/examples/arthropods.cigaleprotocol.json,https://raw.githubusercontent.com/${{ github.repository }}/${{ github.head_ref }}/protocols/insecta.cigaleprotocol.yaml,https://raw.githubusercontent.com/${{ github.repository }}/${{ github.head_ref }}/protocols/entomoscope.cigaleprotocol.yaml
-
-      - name: Save preview
-        uses: actions/upload-artifact@v7
-        with:
-          name: app
-          path: ./public
-          include-hidden-files: true
-          retention-days: 1
+    uses: ./.github/workflows/build.yml
 
   android:
     needs: build
@@ -81,7 +51,7 @@ jobs:
       DIAWI_TOKEN: ${{ secrets.DIAWI_TOKEN }}
     with:
       flavor: preview
-      artifact: app
+      artifact: ${{ needs.build.outputs.artifact }}
       version: PR${{ github.event.number }}/${{ github.sha }}
       app-name: Cigale (PR ${{ github.event.number }})
       diawi-comment: |

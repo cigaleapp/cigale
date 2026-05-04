@@ -92,35 +92,14 @@ jobs:
 
   deploy:
     if: github.event_name == 'push' && github.ref_name == 'main'
-    needs: [e2e, dont-merge-comment]
+    needs: [build, e2e, dont-merge-comment]
     name: Deploy
     concurrency:
       group: deploy-gh-pages
       cancel-in-progress: true
     uses: ./.github/workflows/deploy.yml
-
-  nightly-apk:
-    if: github.event_name == 'push' && github.ref_name == 'main'
-    needs: [deploy, build]
-    name: Nightly APK
-    uses: ./.github/workflows/android.yml
-    secrets:
-      ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_PROD_KEY_ALIAS }}
-      ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_PROD_KEY_PASSWORD }}
-      ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_PROD_KEYSTORE_BASE64 }}
-      ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_PROD_KEYSTORE_PASSWORD }}
-      DIAWI_TOKEN: ${{ secrets.DIAWI_TOKEN }}
-      DEV_DEPLOYMENTS_SSH_PRIVATE_KEY: ${{ secrets.DEV_DEPLOYMENTS_SSH_PRIVATE_KEY }}
-      DEV_DEPLOYMENTS_HOST_KEY: ${{ secrets.DEV_DEPLOYMENTS_HOST_KEY }}
     with:
-      flavor: nightly
       artifact: ${{ needs.build.outputs.artifact }}
-      version: NIGHTLY/${{ github.sha }}
-      app-name: Cigale Dev
-      diawi-comment: |
-        This is a nightly build from the ${{ github.ref_name }} branch.
-
-        Branch: https://github.com/${{ github.repository }}/tree/${{ github.ref_name }}
 
   electron:
     if: github.event_name == 'pull_request'
@@ -166,3 +145,68 @@ jobs:
         run: echo "Some tests failed :'("; exit 1
       - if: ${{ !contains(needs.*.result, 'failure') }}
         run: echo "All checks passed! This PR is mergeable :D"
+
+  nightly-apk:
+    if: github.event_name == 'push' && github.ref_name == 'main'
+    needs: [build, test]
+    name: Nightly APK
+    uses: ./.github/workflows/android.yml
+    secrets:
+      ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_PROD_KEY_ALIAS }}
+      ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_PROD_KEY_PASSWORD }}
+      ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_PROD_KEYSTORE_BASE64 }}
+      ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_PROD_KEYSTORE_PASSWORD }}
+      DIAWI_TOKEN: ${{ secrets.DIAWI_TOKEN }}
+      DEV_DEPLOYMENTS_SSH_PRIVATE_KEY: ${{ secrets.DEV_DEPLOYMENTS_SSH_PRIVATE_KEY }}
+      DEV_DEPLOYMENTS_HOST_KEY: ${{ secrets.DEV_DEPLOYMENTS_HOST_KEY }}
+    with:
+      flavor: nightly
+      artifact: ${{ needs.build.outputs.artifact }}
+      version: NIGHTLY/${{ github.sha }}
+      app-name: Cigale Dev
+      diawi-comment: |
+        This is a nightly build from the ${{ github.ref_name }} branch.
+
+        Branch: https://github.com/${{ github.repository }}/tree/${{ github.ref_name }}
+
+  apk-webpage:
+    if: github.event_name == 'push' && github.ref_name == 'main'
+    name: Prepare APK webpage
+    needs: [deploy, nightly-apk]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Retrieve APK file
+        uses: actions/download-artifact@v7
+        with:
+          name: ${{ needs.nightly-apk.outputs.artifact }}
+
+      - name: Create a simple index.html
+        run: |
+          mv app.apk cigale.apk
+          echo "<html><body>" > index.html
+          echo "<h1>Latest APK</h1>" >> index.html
+          echo "<p>Built from commit ${{ github.sha }} on branch ${{ github.ref_name }}.</p>" >> index.html
+          echo "<a href=\"app.apk\">Download APK</a>" >> index.html
+          echo "<p>Scan the QR code below to download the APK on your Android device:</p>" >> index.html
+          echo "<img alt=\"QR code\" src=\"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://apk.cigale.gwen.works/cigale.apk\">" >> index.html
+          echo "</body></html>" >> index.html
+
+      - name: Save artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: apk-webpage
+          path: |
+            index.html
+            cigale.apk
+
+  apk-webpage-deploy:
+    if: github.event_name == 'push' && github.ref_name == 'main'
+    needs: apk-webpage
+    name: Upload latest APK to dev deployments
+    uses: ./.github/workflows/dev-deploy.yml
+    secrets: inherit
+    with:
+      environment: APK Download Page
+      artifact: apk-webpage
+      path: /
+      subdomain: apk
