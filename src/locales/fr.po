@@ -2512,30 +2512,6 @@ msgstr "Se connecter à {0}"
 msgid "Copie-colle ton token (partie entre les {0})"
 msgstr "Copie-colle ton token (partie entre les {0})"
 
-#: src/lib/inappbrowser.test.ts
-msgid "Capacitor"
-msgstr "Capacitor"
-
-#: src/lib/inappbrowser.test.ts
-msgid "In-app browser is only supported on native platforms"
-msgstr "In-app browser is only supported on native platforms"
-
-#: src/lib/inappbrowser.test.ts
-#: src/lib/inappbrowser.test.ts
-#: src/lib/inappbrowser.test.ts
-#: src/lib/inappbrowser.test.ts
-msgid "Custom title"
-msgstr "Custom title"
-
-#: src/lib/inappbrowser.test.ts
-#: src/lib/inappbrowser.test.ts
-msgid "Next title"
-msgstr "Next title"
-
-#: src/lib/inappbrowser.test.ts
-msgid "Link title"
-msgstr "Link title"
-
 #: src/routes/(app)/about/+page.svelte
 msgid "Plateforme"
 msgstr "Plateforme"
