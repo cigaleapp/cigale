@@ -21,6 +21,8 @@ const env = arkenv(
 			.default(() => []),
 		VITEST: 'boolean = false',
 		DEBUG: 'boolean = false',
+		/** Required for mobile app, since window.location.origin returns localhost */
+		WEB_ORIGIN: 'string.url = "https://cigaleapp.github.io"',
 		BUILTIN_PROTOCOLS: type('string.url')
 			.array()
 			.default(() => [
@@ -70,6 +72,7 @@ export default defineConfig({
 		),
 		'import.meta.env.previewingPrNumber': prNumber ?? 'null',
 		'import.meta.env.builtinProtocols': JSON.stringify(env.BUILTIN_PROTOCOLS),
+		'import.meta.env.webOrigin': JSON.stringify(env.WEB_ORIGIN),
 	},
 	worker: {
 		format: 'es',

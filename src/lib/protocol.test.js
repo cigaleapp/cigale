@@ -28,6 +28,8 @@ test('jsonSchemaURL', () => {
 		writable: true,
 	});
 
+	import.meta.env.webOrigin = 'https://example.com';
+
 	expect(jsonSchemaURL('')).toBe('https://example.com/protocol.schema.json');
 	expect(jsonSchemaURL('/app')).toBe('https://example.com/app/protocol.schema.json');
 	expect(jsonSchemaURL('/some/path')).toBe('https://example.com/some/path/protocol.schema.json');

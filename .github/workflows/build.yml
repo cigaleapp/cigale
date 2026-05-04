@@ -37,10 +37,12 @@ jobs:
         run: |
           # Production builds are deployed to Github Pages
           if [[ -z "$PR_NUMBER" ]]; then
+            echo "WEB_ORIGIN=https://cigaleapp.github.io" >> $GITHUB_ENV
             echo "SVELTE_FALLBACK_PAGE=404.html" >> $GITHUB_ENV
             echo "BASE_PATH=/${GITHUB_REPOSITORY##*/}" >> $GITHUB_ENV
           # PR previews are deployed to a dev server
           else
+            echo "WEB_ORIGIN=https://pr-${PR_NUMBER}.cigale.gwen.works" >> $GITHUB_ENV
             echo "SVELTE_FALLBACK_PAGE=index.html" >> $GITHUB_ENV
             echo "BASE_PATH=" >> $GITHUB_ENV
           fi

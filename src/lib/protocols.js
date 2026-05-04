@@ -32,7 +32,7 @@ import {
  * @param {string} base base path of the app - import `base` from `$app/paths`
  */
 export function jsonSchemaURL(base) {
-	return `${window.location.origin}${base}/protocol.schema.json`;
+	return `${import.meta.env.webOrigin}${base}/protocol.schema.json`;
 }
 
 /**
