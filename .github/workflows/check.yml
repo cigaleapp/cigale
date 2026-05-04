@@ -101,7 +101,7 @@ jobs:
 
   nightly-apk:
     if: github.event_name == 'push' && github.ref_name == 'main'
-    needs: [e2e, dont-merge-comment, build]
+    needs: [deploy, build]
     name: Nightly APK
     uses: ./.github/workflows/android.yml
     secrets:
