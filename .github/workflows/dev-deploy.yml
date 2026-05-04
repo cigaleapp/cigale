@@ -55,7 +55,7 @@ jobs:
     # name: Deploy to ${{ inputs.subdomain }}.${{ inputs.domain }}${{ inputs.path }}
     name: Deploy
     environment:
-      name: "${{ github.event.pull_request.number || github.ref_name }}: ${{ inputs.environment }}"
+      name: '${{ github.event.pull_request.number || github.ref_name }}: ${{ inputs.environment }}'
       url: https://${{ inputs.subdomain }}.${{ inputs.domain }}${{ inputs.path }}${{ inputs.environment-url-append }}
     steps:
       - name: Get the archive

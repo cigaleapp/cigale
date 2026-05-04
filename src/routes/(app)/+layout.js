@@ -1,5 +1,6 @@
 import '$locales/main.loader.svelte.js';
 
+import { SplashScreen } from '@capacitor/splash-screen';
 import { loadIcons } from '@iconify/svelte';
 import { error } from '@sveltejs/kit';
 import * as dates from 'date-fns';
@@ -23,7 +24,6 @@ import { toasts } from '$lib/toasts.svelte';
 import { clamp, fetchHttpRequest, profiler, progressSplitter, switchValue } from '$lib/utils.js';
 import { PROCEDURES } from '$worker/procedures.js';
 import WebWorker from '$worker/start.js?worker';
-import { SplashScreen } from '@capacitor/splash-screen';
 
 export const ssr = false;
 
@@ -50,7 +50,7 @@ export async function load({ url }) {
 		})
 	);
 
-	// Hide at the start so the progress bar can be shown, 
+	// Hide at the start so the progress bar can be shown,
 	// which is better UX than a static splash screen for long startups
 	await SplashScreen.hide();
 
@@ -167,7 +167,6 @@ export async function load({ url }) {
 	void swarpc.wakeup(undefined);
 
 	console.timeEnd('background things');
-
 
 	return { swarpc, parallelism };
 }

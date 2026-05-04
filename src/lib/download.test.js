@@ -80,11 +80,9 @@ describe('download module', () => {
 			const Filesystem = {
 				checkPermissions: vi.fn().mockResolvedValue({ publicStorage: 'granted' }),
 				requestPermissions: vi.fn().mockResolvedValue({}),
-				writeFile: vi
-					.fn()
-					.mockResolvedValue({
-						uri: 'content://primary:Documents/cigale%20exports/file.txt',
-					}),
+				writeFile: vi.fn().mockResolvedValue({
+					uri: 'content://primary:Documents/cigale%20exports/file.txt',
+				}),
 			};
 			return {
 				Directory: { ExternalStorage: 'ExternalStorage' },

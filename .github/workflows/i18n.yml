@@ -29,7 +29,7 @@ jobs:
 
       # Run it 10 times to ensure it converges, as it's not that stable
       # See for example: https://github.com/cigaleapp/cigale/compare/e50dfe886...598dbcf
-      - name: Run wuchale to update .po files. 
+      - name: Run wuchale to update .po files.
         run: |
           for i in {1..10}; do 
             bun wuchale --clean --sync 

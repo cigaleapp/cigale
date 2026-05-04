@@ -1,3 +1,4 @@
+import { Capacitor } from '@capacitor/core';
 import { type } from 'arktype';
 
 import { localeFromNavigator } from './i18n.js';
@@ -28,7 +29,6 @@ import {
 } from './schemas/protocols.js';
 import { Session as SessionSchema } from './schemas/sessions.js';
 import { clamp } from './utils.js';
-import { Capacitor } from '@capacitor/core';
 
 /**
  * Generate an ID for a given table

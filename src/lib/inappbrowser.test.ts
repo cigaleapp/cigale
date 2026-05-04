@@ -9,14 +9,14 @@ const mockGetCookies = vi.fn();
 const mockIsNativePlatform = vi.fn();
 
 vi.mock('@capgo/inappbrowser', () => ({
-    InAppBrowser: {
-        addListener: mockAddListener,
-        openWebView: mockOpenWebView,
-        clearCookies: mockClearCookies,
-        close: mockClose,
-        hide: mockHide,
-        getCookies: mockGetCookies,
-    },
+	InAppBrowser: {
+		addListener: mockAddListener,
+		openWebView: mockOpenWebView,
+		clearCookies: mockClearCookies,
+		close: mockClose,
+		hide: mockHide,
+		getCookies: mockGetCookies,
+	},
 }));
 
 const importModule = async () => import('./inappbrowser.js');

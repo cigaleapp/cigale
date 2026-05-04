@@ -15,7 +15,11 @@ const mockIsNativePlatform = vi.fn();
 let notificationMock: ReturnType<typeof createNotificationMock>;
 
 const createNotificationMock = () => {
-	const NotificationMock = vi.fn(function (this: unknown, title: string, options?: NotificationOptions) {
+	const NotificationMock = vi.fn(function (
+		this: unknown,
+		title: string,
+		options?: NotificationOptions
+	) {
 		return { title, options };
 	}) as unknown as typeof Notification;
 
@@ -40,11 +44,9 @@ vi.mock('@capacitor/local-notifications', () => ({
 	},
 }));
 
-
 vi.mock('./settings.svelte.js', () => ({
 	getSettings: mockGetSettings,
 }));
-
 
 vi.mock('./toasts.svelte.js', () => ({
 	toasts: {
@@ -117,15 +119,19 @@ describe('notifications', () => {
 
 		await askForNotificationPermission();
 
-		expect(mockToastError).toHaveBeenCalledWith('Votre navigateur ne supporte pas les notifications système.');
+		expect(mockToastError).toHaveBeenCalledWith(
+			'Votre navigateur ne supporte pas les notifications système.'
+		);
 	});
 
 	it('sends native notifications and registers action callbacks', async () => {
 		mockIsNativePlatform.mockReturnValue(true);
-		let listener: ((event: {
-			notification?: { actionTypeId?: string };
-			actionId: string;
-		}) => Promise<void> | void) | undefined;
+		let listener:
+			| ((event: {
+					notification?: { actionTypeId?: string };
+					actionId: string;
+			  }) => Promise<void> | void)
+			| undefined;
 		mockAddListener.mockImplementation(async (_eventName, callback) => {
 			listener = callback;
 			return { remove: vi.fn() };
@@ -203,7 +209,9 @@ describe('notifications', () => {
 
 		await sendNotification('Hello', { body: 'World' });
 
-		expect(mockToastError).toHaveBeenCalledWith('Votre navigateur ne supporte pas les notifications système.');
+		expect(mockToastError).toHaveBeenCalledWith(
+			'Votre navigateur ne supporte pas les notifications système.'
+		);
 	});
 
 	it('reports native schedule failures', async () => {
@@ -215,8 +223,13 @@ describe('notifications', () => {
 
 		await sendNotification('Hello', { body: 'World' });
 
-		expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to send local notification', expect.any(Error));
-		expect(mockToastError).toHaveBeenCalledWith("Impossible d'envoyer la notification système.");
+		expect(consoleErrorSpy).toHaveBeenCalledWith(
+			'Failed to send local notification',
+			expect.any(Error)
+		);
+		expect(mockToastError).toHaveBeenCalledWith(
+			"Impossible d'envoyer la notification système."
+		);
 		consoleErrorSpy.mockRestore();
 	});
 

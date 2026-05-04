@@ -1,5 +1,9 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { GroupSettings, SortSettings } from './schemas/sessions.js';
+
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { galleryEffectiveSorter, galleryItemsGrouper, galleryItemsSorter } from './gallery.ts';
+import * as idb from './idb.svelte.js';
 
 type MockGalleryItem = {
 	id?: string;
@@ -66,9 +70,6 @@ vi.mock('./schemas/metadata.js', () => ({
 	}),
 }));
 
-import { galleryItemsSorter, galleryItemsGrouper, galleryEffectiveSorter } from './gallery.ts';
-import * as idb from './idb.svelte.js';
-
 describe('gallery', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
@@ -125,8 +126,16 @@ describe('gallery', () => {
 
 			const sorter = await galleryItemsSorter(settings);
 
-			const item1 = { id: '1', name: 'Item 1', metadata: { 'namespace:field': { confidence: 0.5 } } };
-			const item2 = { id: '2', name: 'Item 2', metadata: { 'namespace:field': { confidence: 0.9 } } };
+			const item1 = {
+				id: '1',
+				name: 'Item 1',
+				metadata: { 'namespace:field': { confidence: 0.5 } },
+			};
+			const item2 = {
+				id: '2',
+				name: 'Item 2',
+				metadata: { 'namespace:field': { confidence: 0.9 } },
+			};
 
 			expect(sorter(item1, item2)).toBeLessThan(0);
 		});
@@ -138,7 +147,9 @@ describe('gallery', () => {
 				label: 'Field',
 			};
 			vi.mocked(idb.tables.Metadata.getOrThrow).mockResolvedValue(
-				mockMetadata as unknown as Awaited<ReturnType<typeof idb.tables.Metadata.getOrThrow>>
+				mockMetadata as unknown as Awaited<
+					ReturnType<typeof idb.tables.Metadata.getOrThrow>
+				>
 			);
 
 			const settings = {
@@ -180,7 +191,9 @@ describe('gallery', () => {
 				label: 'Field',
 			};
 			vi.mocked(idb.tables.Metadata.getOrThrow).mockResolvedValue(
-				mockMetadata as unknown as Awaited<ReturnType<typeof idb.tables.Metadata.getOrThrow>>
+				mockMetadata as unknown as Awaited<
+					ReturnType<typeof idb.tables.Metadata.getOrThrow>
+				>
 			);
 
 			const settings = {
@@ -210,7 +223,9 @@ describe('gallery', () => {
 				label: 'Field',
 			};
 			vi.mocked(idb.tables.Metadata.getOrThrow).mockResolvedValue(
-				mockMetadata as unknown as Awaited<ReturnType<typeof idb.tables.Metadata.getOrThrow>>
+				mockMetadata as unknown as Awaited<
+					ReturnType<typeof idb.tables.Metadata.getOrThrow>
+				>
 			);
 
 			const settings = {
@@ -240,7 +255,9 @@ describe('gallery', () => {
 				label: 'Field',
 			};
 			vi.mocked(idb.tables.Metadata.getOrThrow).mockResolvedValue(
-				mockMetadata as unknown as Awaited<ReturnType<typeof idb.tables.Metadata.getOrThrow>>
+				mockMetadata as unknown as Awaited<
+					ReturnType<typeof idb.tables.Metadata.getOrThrow>
+				>
 			);
 
 			const settings = {
@@ -262,7 +279,9 @@ describe('gallery', () => {
 				label: 'Field',
 			};
 			vi.mocked(idb.tables.Metadata.getOrThrow).mockResolvedValue(
-				mockMetadata as unknown as Awaited<ReturnType<typeof idb.tables.Metadata.getOrThrow>>
+				mockMetadata as unknown as Awaited<
+					ReturnType<typeof idb.tables.Metadata.getOrThrow>
+				>
 			);
 
 			const sortSettings = {

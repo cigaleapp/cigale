@@ -516,10 +516,9 @@ if (import.meta.vitest) {
 			});
 
 			expect(padding.inPixels(200)).toBe(12);
-			expect(padding.apply(
-				{ width: 200, height: 100 },
-				{ x: 0.5, y: 0.5, w: 0.25, h: 0.25 }
-			)).toEqual({
+			expect(
+				padding.apply({ width: 200, height: 100 }, { x: 0.5, y: 0.5, w: 0.25, h: 0.25 })
+			).toEqual({
 				x: 63,
 				y: 25.5,
 				width: 74,

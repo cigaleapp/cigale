@@ -13,7 +13,7 @@ const files = lines
 
 // Filter for existing files
 const dirtyFiles = (
-	await Promise.all(files.map(async (f) => (await f.file.exists()) ? f.path : null))
+	await Promise.all(files.map(async (f) => ((await f.file.exists()) ? f.path : null)))
 ).filter(Boolean) as string[];
 
 if (dirtyFiles.length === 0) {

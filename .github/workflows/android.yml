@@ -6,7 +6,7 @@ permissions:
   pull-requests: write
 
 concurrency:
-  group: "android-preview-${{ github.ref_name }}"
+  group: 'android-preview-${{ github.ref_name }}'
   cancel-in-progress: true
 
 on:
@@ -201,7 +201,6 @@ jobs:
         with:
           name: android-problems-report
           path: ./android/build/reports/problems/problems-report.html
-
 
       - name: Save APK file
         uses: actions/upload-artifact@v7

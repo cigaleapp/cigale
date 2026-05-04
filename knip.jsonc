@@ -16,7 +16,7 @@
 		"bun",
 		"@sveltejs/vite-plugin-svelte-inspector",
 		"svelte-mathml",
-		"@capacitor/assets"
+		"@capacitor/assets",
 	],
 	"entry": [
 		"scripts/issue-creator-server.ts",

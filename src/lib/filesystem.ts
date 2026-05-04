@@ -32,8 +32,14 @@ if (import.meta.vitest) {
 
 		type MockDirectoryHandle = {
 			name: string;
-			getDirectoryHandle: (dirName: string, _options: { create: true }) => Promise<MockDirectoryHandle>;
-			getFileHandle: (fileName: string, _options: { create: true }) => Promise<MockFileHandle>;
+			getDirectoryHandle: (
+				dirName: string,
+				_options: { create: true }
+			) => Promise<MockDirectoryHandle>;
+			getFileHandle: (
+				fileName: string,
+				_options: { create: true }
+			) => Promise<MockFileHandle>;
 		};
 
 		// Track directory handles and files
