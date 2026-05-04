@@ -22,14 +22,14 @@ export const MOCK_SESSION_REMOTEID = (dataid = MOCK_SESSION_REMOTEID_DATA_ID) =>
 	`/api/v2/assets/${MOCK_SESSION_REMOTEID_ASSET_ID}/data/${dataid}/` as SessionRemoteID;
 
 const RESPONSES = {
-	invalid: HttpResponse.json({ detail: 'Jeton invalide.' }, { status: 401 }),
-	notfound: HttpResponse.json({ detail: 'Not found.' }, { status: 404 }),
+	invalid: () => HttpResponse.json({ detail: 'Jeton invalide.' }, { status: 401 }),
+	notfound: () => HttpResponse.json({ detail: 'Not found.' }, { status: 404 }),
 };
 
 export const handlers = [
 	get('/**', ({ params, request: { headers } }) => {
-		if (params.server !== 'kf') return RESPONSES.invalid;
-		if (headers.get('Authorization') !== `Token ${MOCK_TOKEN}`) return RESPONSES.invalid;
+		if (params.server !== 'kf') return RESPONSES.invalid();
+		if (headers.get('Authorization') !== `Token ${MOCK_TOKEN}`) return RESPONSES.invalid();
 	}),
 	get('/me/', () => HttpResponse.json(me)),
 	post('/login{/}?', () => HttpResponse.json(me)),
@@ -38,7 +38,7 @@ export const handlers = [
 	}),
 	get('/api/v2/assets/:id', () => HttpResponse.json(asset)),
 	get<{ dataid: string }>('/api/v2/assets/:id/data/:dataid{/}?', ({ params }) => {
-		if (params.dataid === MOCK_SESSION_REMOTEID_NOTFOUND_DATA_ID) return RESPONSES.notfound;
+		if (params.dataid === MOCK_SESSION_REMOTEID_NOTFOUND_DATA_ID) return RESPONSES.notfound();
 		return HttpResponse.json(dataOne);
 	}),
 	get('/api/v2/assets/:id/data', ({ request }) => {
