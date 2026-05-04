@@ -313,7 +313,7 @@ jobs:
           echo "<img alt=\"QR code\" src=\"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://apk.cigale.gwen.works/cigale.apk\">" >> index.html
           echo "</body></html>" >> index.html
 
-      - name: Save artifact 
+      - name: Save artifact
         uses: actions/upload-artifact@v7
         with:
           name: apk-webpage
