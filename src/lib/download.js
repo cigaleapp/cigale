@@ -16,7 +16,14 @@ export async function downloadAsFile(content, filename, contentType) {
 			await Filesystem.requestPermissions();
 		}
 
-		const { path: directory } = await FilePicker.pickDirectory();
+		const { path: directoryUri } = await FilePicker.pickDirectory();
+
+		console.info('Got directory URI', directoryUri);
+
+		// Directory URI looks like: content://com.android.externalstorage.documents/tree/primary%3ADocuments%2Fcigale%20exports
+		const directory = new URL(
+			decodeURIComponent(new URL(directoryUri).pathname.split('/').at(-1) || '')
+		).pathname;
 
 		console.info('Saving file to', directory);
 
