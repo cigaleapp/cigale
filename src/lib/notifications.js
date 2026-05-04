@@ -16,7 +16,6 @@ let _notificationActionsListenerStarted = false;
  * Ask the user for permission to send system notifications
  */
 export async function askForNotificationPermission() {
-	/* v8 ignore if */
 	if (Capacitor.isNativePlatform()) {
 		try {
 			const status = await LocalNotifications.requestPermissions();
@@ -57,7 +56,6 @@ export async function askForNotificationPermission() {
  * @returns
  */
 export async function sendNotification(title, { actionsTypeId = title, actions = [], ...options }) {
-	/* v8 ignore if */
 	if (Capacitor.isNativePlatform()) {
 		try {
 			if (actions.length > 0) {
@@ -155,7 +153,6 @@ export async function sendNotification(title, { actionsTypeId = title, actions =
  * @param {boolean|null} isSettingOn
  */
 export async function hasNotificationsEnabled(isSettingOn) {
-	/* v8 ignore if */
 	if (Capacitor.isNativePlatform()) {
 		return isSettingOn && (await LocalNotifications.checkPermissions()).display === 'granted';
 	}

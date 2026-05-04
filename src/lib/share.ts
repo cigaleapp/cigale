@@ -34,7 +34,6 @@ async function shareAsFile(
 	filename: string,
 	contentType?: string
 ) {
-	/* v8 ignore if */
 	if (Capacitor.isNativePlatform()) {
 		let input: Pick<WriteFileOptions, 'data' | 'encoding'>;
 
