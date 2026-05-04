@@ -102,6 +102,13 @@ jobs:
         with:
           name: ${{ inputs.artifact }}
 
+      - name: Show directory tree for public/
+        uses: jaywcjlove/github-action-folder-tree@main
+        with:
+          path: ./public
+          depth: 4
+
+
       - name: Setup Android SDK
         uses: android-actions/setup-android@v4
 
