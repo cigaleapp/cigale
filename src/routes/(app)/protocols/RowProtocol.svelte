@@ -9,14 +9,12 @@
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import ButtonUpdateProtocol from '$lib/ButtonUpdateProtocol.svelte';
-	import { databaseHandle } from '$lib/idb.svelte';
 	import OverflowableText from '$lib/OverflowableText.svelte';
 	import { goto, resolve } from '$lib/paths';
-	import { exportProtocol } from '$lib/protocols';
 	import { getSettings, setSetting } from '$lib/settings.svelte';
+	import { shareUrl } from '$lib/share.js';
 	import { uiState } from '$lib/state.svelte';
 	import Switch from '$lib/Switch.svelte';
-	import { toasts } from '$lib/toasts.svelte';
 
 	interface Props extends Partial<Protocol> {
 		id: string;
@@ -62,10 +60,18 @@
 			</section>
 			<section class="actions">
 				<ButtonIcon
-					help="Exporter"
+					help="Partager"
+					disabled={!source}
 					onclick={async () => {
-						await exportProtocol(databaseHandle(), resolve('/'), id).catch((e) =>
-							toasts.error(e)
+						if (!source) return;
+
+						await shareUrl(
+							new URL(
+								resolve('/(app)/protocols/import/[...url]', {
+									url: source,
+								}),
+								import.meta.env.webOrigin
+							)
 						);
 					}}
 				>

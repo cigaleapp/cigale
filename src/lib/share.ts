@@ -73,3 +73,21 @@ async function shareAsFile(
 		});
 	}
 }
+
+export async function shareUrl(url: string|URL, title?: string) {
+	if (Capacitor.isNativePlatform()) {
+		await Share.share({
+			title,
+			url: url.toString(),
+		});
+	} else if (navigator.canShare && navigator.canShare({ url })) {
+		await navigator.share({
+			title,
+			url: url.toString(),
+		});
+	} else {
+		// Fallback to copying the URL to clipboard if sharing is not supported
+		await navigator.clipboard.writeText(url.toString());
+		alert('Lien copié dans le presse-papiers : ' + url.toString());
+	}
+}
