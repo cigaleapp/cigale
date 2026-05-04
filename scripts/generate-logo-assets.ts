@@ -15,6 +15,24 @@ const scenario = prNumber
 			? 'production'
 			: 'local';
 
+const badge = {
+	preview: {
+		text: `#${prNumber}`,
+		fill: await getCSSVariable('fg-primary', 'light'),
+		color: '#FFFFFF',
+	},
+	nightly: {
+		text: 'Dev',
+		fill: await getCSSVariable('fg-warning', 'dark'),
+		color: '#000000',
+	},
+	local: {
+		text: 'Local',
+		fill: await getCSSVariable('fg-error', 'light'),
+		color: '#FFFFFF',
+	},
+};
+
 console.info(`Generating logo assets for ${scenario} scenario...`);
 
 const svg =
@@ -23,14 +41,13 @@ const svg =
 		: await Bun.file('./static/logo-pr-preview.svg')
 				.text()
 				.then((svg) =>
-					svg.replace(
-						'#9999',
-						{
-							preview: '#' + prNumber,
-							nightly: 'Dev',
-							local: 'Local',
-						}[scenario]
-					)
+					svg
+						// Text of badge
+						.replace('PILLTXT', badge[scenario].text)
+						// Background color of badge
+						.replace('#FF0000', badge[scenario].fill)
+						// Text color of badge
+						.replace('#00FF00', badge[scenario].color)
 				);
 
 await Bun.file(`${assetsDir}/logo.svg`).write(svg);
