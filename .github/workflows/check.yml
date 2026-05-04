@@ -55,17 +55,7 @@ jobs:
     uses: ./.github/workflows/vitest.yml
     secrets: inherit
     with:
-      publish-report: false
-      compare-coverage: false
-
-  coverage:
-    if: github.event_name == 'pull_request' && !startsWith(github.head_ref, 'renovate/')
-    needs: test
-    name: Check coverage
-    uses: ./.github/workflows/vitest.yml
-    secrets: inherit
-    with:
-      compare-coverage: true
+      compare-coverage: ${{ github.event_name == 'pull_request' }}
 
   e2e:
     if: github.event_name != 'pull_request' || !github.event.pull_request.draft
@@ -132,7 +122,6 @@ jobs:
       - json-schema
       - lint
       - test
-      - coverage
       - e2e
       - clutter
       - preview
