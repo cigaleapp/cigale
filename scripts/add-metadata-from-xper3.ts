@@ -291,8 +291,8 @@ if (import.meta.main) {
 			mergeMethod: 'none',
 			learnMore: APP_URL,
 			required: false,
-			options: States.filter(
-				(s): s is NonNullable<typeof s> => Boolean(s !== null && stateIds?.includes(s.id))
+			options: States.filter((s): s is NonNullable<typeof s> =>
+				Boolean(s !== null && stateIds?.includes(s.id))
 			).map(({ name, detail, uniqueid, resourceIds }) => {
 				const resource = Resources.filter((r) => r !== null).find((r) =>
 					resourceIds?.includes(r.id)
