@@ -66,6 +66,7 @@ jobs:
     secrets: inherit
     with:
       environment: App preview
-      artifact: app
+      artifact: ${{ needs.build.outputs.artifact }}
       subdomain: pr-${{ github.event.number }}
+      artifact-at: /public
       path: /

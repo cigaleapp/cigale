@@ -35,6 +35,10 @@ on:
         type: string
         description: Name of artifact to upload to the subdomain
         required: true
+      artifact-at:
+        type: string
+        description: Path inside the artifact to upload. Must start with a slash. Defaults to root of the artifact. Must begin WITH a slash and NOT end with a slash.
+        default: ''
       path:
         type: string
         description: Path to put the contents at. Must start with a slash
@@ -62,7 +66,12 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           name: ${{ inputs.artifact }}
-          path: to-upload
+          path: contents
+
+      - name: Create to-upload directory
+        run: |
+          rm -rf to-upload
+          mv contents${{ inputs.artifact-at}} to-upload
 
       - name: Rename file to index.html
         if: inputs.file != 'index.html'
