@@ -158,7 +158,8 @@
 	const isSessionDependentRoute = $derived(
 		page.route.id !== '/(app)/sessions' &&
 			page.route.id !== '/(app)/protocols' &&
-			page.route.id !== '/(app)/accounts'
+			page.route.id !== '/(app)/accounts' &&
+			page.route.id !== '/(app)/about'
 	);
 
 	const mobile = new IsMobile();
