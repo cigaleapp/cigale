@@ -120,7 +120,7 @@
 		"octokit": "^5.0.5",
 		"odt2html": "^1.0.1",
 		"oxlint": "^1.62.0",
-		"pdf-to-png-converter": "^3.18.0",
+		"pdf-to-png-converter": "^4.0.0",
 		"playwright-performance-metrics": "^1.2.5",
 		"postcss-preset-env": "^11.2.1",
 		"prettier": "^3.8.3",
