@@ -70,6 +70,7 @@ jobs:
     needs: build
     name: Android app
     uses: ./.github/workflows/android.yml
+    if: contains(github.event.pull_request.labels.*.name, 'mobile') || !startsWith(github.base_ref, 'renovate/')
     secrets:
       ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_PR_KEYSTORE_BASE64 }}
       ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_PR_KEYSTORE_PASSWORD }}
