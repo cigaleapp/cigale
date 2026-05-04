@@ -153,14 +153,55 @@ jobs:
           --androidreleasetype APK
           --flavor ${{ inputs.flavor }}
 
+      - name: Move APK file
+        run: mv ./android/app/build/outputs/apk/${{ inputs.flavor }}/release/app-${{ inputs.flavor }}-release-signed.apk ./app.apk
+
+      - name: Check that assetlinks fingerprint matches the APK's
+        run: |
+          apksigner_output=$(apksigner verify --print-certs ./app.apk)
+          echo "apksigner output:"
+          echo "$apksigner_output"
+
+          # We need to make it uppercase and add colons every 2 characters to match the format in assetlinks.json
+          apk_fingerprint=$(
+            echo "$apksigner_output" \
+            | grep "SHA-256 digest:" \
+            | cut -d: -f3 \
+            | tr -d '[:space:]' \
+            | tr '[:lower:]' '[:upper:]' \
+            | sed 's/../&:/g;s/:$//'
+            )
+
+          echo "APK fingerprint: $apk_fingerprint"
+
+          if [ "$FLAVOR" = "play" ]; then
+            package_id="io.github.cigaleapp"
+          else
+            package_id="io.github.cigaleapp.${FLAVOR}"
+          fi
+
+          echo "Searching for fingerprint in assetlinks.json for target.package_name=$package_id"
+
+          assetlinks_fingerprints=$(
+            jq -r --arg package_id "$package_id" '.[] | select(.target.package_name == $package_id) | .target.sha256_cert_fingerprints[]' static/.well-known/assetlinks.json
+          )
+
+          echo "Assetlinks fingerprints for $package_id:"
+          echo "$assetlinks_fingerprints"
+
+          if echo "$assetlinks_fingerprints" | grep -q "$apk_fingerprint"; then
+            echo "Fingerprint matches assetlinks.json"
+          else
+            echo "Error: APK fingerprint does not match any fingerprint in assetlinks.json for package $package_id"
+            exit 1
+          fi
+
       - name: Save problems report webpage
         uses: actions/upload-artifact@v7
         with:
           name: android-problems-report
           path: ./android/build/reports/problems/problems-report.html
 
-      - name: Move APK file
-        run: mv ./android/app/build/outputs/apk/${{ inputs.flavor }}/release/app-${{ inputs.flavor }}-release-signed.apk ./app.apk
 
       - name: Save APK file
         uses: actions/upload-artifact@v7
