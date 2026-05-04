@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file, on a monthly basis, with a consistent, simple format: month/year heading > type of change heading > list of changes.
 
+## May 2026
+
+### Bug Fixes
+
+- Fix parallelism setting's input not showing on mobile
+
+### Translation Updates
+
+- Refresh translation files
+
 ## April 2026
 
 ### Improvements
