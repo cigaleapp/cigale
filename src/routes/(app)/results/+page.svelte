@@ -2,6 +2,8 @@
 	import type { TreeNode, TreeNodeMaybeLoading } from '$lib/file-tree.js';
 	import type { NamespacedMetadataID } from '$lib/schemas/common.js';
 
+	import { Capacitor } from '@capacitor/core';
+	import { FileViewer } from '@capacitor/file-viewer';
 	import { watch } from 'runed';
 	import { tick } from 'svelte';
 	import { SvelteMap } from 'svelte/reactivity';
@@ -27,6 +29,7 @@
 	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 	import LoadingText, { Loading } from '$lib/LoadingText.svelte';
 	import ModalConfirm from '$lib/ModalConfirm.svelte';
+	import { sendNotification } from '$lib/notifications.js';
 	import { ensureNoLoneImages } from '$lib/observations.js';
 	import RadioButtons from '$lib/RadioButtons.svelte';
 	import SessionMetadataForm from '$lib/SessionMetadataForm.svelte';
@@ -151,7 +154,27 @@
 			}
 
 			if (exportFormat === 'zip') {
-				downloadAsFile(zipfileBytes, 'results.zip', 'application/zip');
+				const savedAt = await downloadAsFile(
+					zipfileBytes,
+					'results.zip',
+					'application/zip'
+				);
+				if (savedAt) {
+					await sendNotification('Export terminé', {
+						body: `Fichier disponible à ${decodeURIComponent(savedAt.pathname)}`,
+						actions: [
+							{
+								id: 'open-export',
+								title: 'Ouvrir',
+								async callback() {
+									await FileViewer.openDocumentFromLocalPath({
+										path: savedAt.pathname,
+									});
+								},
+							},
+						],
+					});
+				}
 			}
 		} catch (error) {
 			console.error(error);
@@ -450,40 +473,42 @@
 					</LoadingText>
 				</code>
 			</ButtonSecondary>
-			<ButtonSecondary
-				disabled={!supportsWritingFolder}
-				help={supportsWritingFolder
-					? undefined
-					: "Votre navigateur ne supporte pas l'exportation en dossier, utilisez Chrome ou Edge."}
-				onclick={async () => {
-					if (!supportsWritingFolder) return;
-					const directory = await (window as any).showDirectoryPicker({
-						mode: 'readwrite',
-						startIn: 'documents',
-						id: 'results-export',
-					});
-					await downloadExport(directory);
-				}}
-			>
-				{#if exporting === 'folder'}
-					<LoadingSpinner />
-				{:else}
-					<IconDownloadAsFolder />
-				{/if}
-				Dossier
-				{#if supportsWritingFolder}
-					<code class="size" use:tooltip={'Taille totale estimée du dossier'}>
-						<LoadingText
-							value={sizeEstimates.uncompressed}
-							mask="~{formatBytesSize(150e3, 'narrow')}"
-						>
-							{#snippet loaded(size)}
-								~{formatBytesSize(size, 'narrow')}
-							{/snippet}
-						</LoadingText>
-					</code>
-				{/if}
-			</ButtonSecondary>
+			{#if !Capacitor.isNativePlatform()}
+				<ButtonSecondary
+					disabled={!supportsWritingFolder}
+					help={supportsWritingFolder
+						? undefined
+						: "Votre navigateur ne supporte pas l'exportation en dossier, utilisez Chrome ou Edge."}
+					onclick={async () => {
+						if (!supportsWritingFolder) return;
+						const directory = await (window as any).showDirectoryPicker({
+							mode: 'readwrite',
+							startIn: 'documents',
+							id: 'results-export',
+						});
+						await downloadExport(directory);
+					}}
+				>
+					{#if exporting === 'folder'}
+						<LoadingSpinner />
+					{:else}
+						<IconDownloadAsFolder />
+					{/if}
+					Dossier
+					{#if supportsWritingFolder}
+						<code class="size" use:tooltip={'Taille totale estimée du dossier'}>
+							<LoadingText
+								value={sizeEstimates.uncompressed}
+								mask="~{formatBytesSize(150e3, 'narrow')}"
+							>
+								{#snippet loaded(size)}
+									~{formatBytesSize(size, 'narrow')}
+								{/snippet}
+							</LoadingText>
+						</code>
+					{/if}
+				</ButtonSecondary>
+			{/if}
 		</div>
 	</section>
 </main>

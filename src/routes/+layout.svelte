@@ -8,8 +8,12 @@
 	import '$lib/tippy-svg-arrow.css';
 	import './style.css';
 
+	import { App as CapacitorApp } from '@capacitor/app';
+	import { SplashScreen } from '@capacitor/splash-screen';
 	import { createContext } from 'svelte';
 
+	import { goto } from '$app/navigation';
+	import { match, resolve } from '$app/paths';
 	import { Theme } from '$lib/colorscheme.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { fadeOutElement } from '$lib/utils';
@@ -23,11 +27,46 @@
 			firstTimeDuration: 1_000,
 		})
 	);
+
+	// Just in case we're on a page that's not in the (app) layout
+	// See also file://./(app)/+layout.js
+	$effect(() => {
+		void SplashScreen.hide();
+	});
+
+	$effect(() => {
+		// Source - https://stackoverflow.com/a/69084017
+		// Posted by Siyahul Haq, modified by community. See post 'Timeline' for change history
+		// Retrieved 2026-05-03, License - CC BY-SA 4.0
+
+		CapacitorApp.addListener('backButton', ({ canGoBack }) => {
+			if (!canGoBack) {
+				CapacitorApp.exitApp();
+			} else {
+				window.history.back();
+			}
+		});
+
+		// https://capacitorjs.com/docs/guides/deep-links#react
+		CapacitorApp.addListener('appUrlOpen', async ({ url }) => {
+			const route = await match(url);
+			if (!route) {
+				console.warn(`No route matched URL: ${url}`);
+				return;
+			}
+
+			console.info(
+				`Deep link opened: ${url}, matched route: ${route.id} with params ${JSON.stringify(route.params)}`
+			);
+
+			// @ts-expect-error
+			await goto(resolve(route.id, route.params), { replaceState: true });
+		});
+	});
 </script>
 
 <svelte:window
 	{@attach (window) => {
-		// @ts-expect-error
 		window.uiState = uiState;
 	}}
 	{@attach (window) => {

@@ -22,3 +22,36 @@ export async function promptForFiles({ accept = '', multiple = false } = {}) {
 		input.click();
 	});
 }
+
+if (import.meta.vitest) {
+	const { it, expect, vi } = import.meta.vitest;
+	it('promptForFiles', async () => {
+		const mockFiles = [new File(['content'], 'test.txt', { type: 'text/plain' })];
+
+		// Mock the input.click() to trigger change event with mock files
+		const origClick = HTMLInputElement.prototype.click;
+		HTMLInputElement.prototype.click = function () {
+			if (this.type === 'file') {
+				// Use Object.defineProperty to set files on the input
+				Object.defineProperty(this, 'files', {
+					value: mockFiles,
+					writable: false,
+				});
+				// Dispatch change event
+				const event = new Event('change', { bubbles: true });
+				Object.defineProperty(event, 'currentTarget', { value: this, writable: false });
+				this.dispatchEvent(event);
+			}
+		};
+
+		const result = await promptForFiles({ accept: 'text/*', multiple: false });
+
+		expect(result).toEqual(mockFiles);
+
+		// Test with array of accept types
+		const result2 = await promptForFiles({ accept: ['.jpg', '.png'], multiple: true });
+		expect(result2).toEqual(mockFiles);
+
+		HTMLInputElement.prototype.click = origClick;
+	});
+}

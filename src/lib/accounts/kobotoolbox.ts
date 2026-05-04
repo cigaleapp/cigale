@@ -769,9 +769,9 @@ export default class Provider implements Account {
 		extra_details: {
 			name: 'string',
 			sector: 'string',
-			country: '3 <= string <= 3',
+			country: 'string',
 			organization: 'string',
-			last_ui_language: '2 <= string <= 2',
+			last_ui_language: 'string',
 			organization_type: 'string',
 			organization_website: 'string',
 			newsletter_subscription: 'boolean',

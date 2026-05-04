@@ -3,14 +3,33 @@ name: Deploy PR previews
 permissions:
   actions: write
   contents: read
+  pull-requests: write
 
 on:
   workflow_call:
     inputs: {}
     secrets:
+      DEV_DEPLOYMENTS_HOST_KEY:
+        required: true
+        description: 'SSH host key for the dev deployments server, used to verify the server identity when deploying previews'
       DEV_DEPLOYMENTS_SSH_PRIVATE_KEY:
         required: true
         description: 'SSH private key for deploying to dev deployments server'
+      ANDROID_PR_KEYSTORE_BASE64:
+        required: true
+        description: 'Base64-encoded keystore file for Android app signing'
+      ANDROID_PR_KEYSTORE_PASSWORD:
+        required: true
+        description: 'Password for the Android keystore'
+      ANDROID_PR_KEY_PASSWORD:
+        required: true
+        description: 'Password for the key alias in the Android keystore'
+      ANDROID_PR_KEY_ALIAS:
+        required: true
+        description: 'Key alias in the Android keystore'
+      DIAWI_TOKEN:
+        required: true
+        description: 'API token for Diawi, used to upload Android app previews'
 
 env:
   PR_NUMBER: ${{ github.event.number }}
@@ -44,7 +63,31 @@ jobs:
         with:
           name: app
           path: ./public
+          include-hidden-files: true
           retention-days: 1
+
+  android:
+    needs: build
+    name: Android app
+    uses: ./.github/workflows/android.yml
+    if: contains(github.event.pull_request.labels.*.name, 'mobile') || !startsWith(github.base_ref, 'renovate/')
+    secrets:
+      ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_PR_KEYSTORE_BASE64 }}
+      ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_PR_KEYSTORE_PASSWORD }}
+      ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_PR_KEY_ALIAS }}
+      ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_PR_KEY_PASSWORD }}
+      DEV_DEPLOYMENTS_SSH_PRIVATE_KEY: ${{ secrets.DEV_DEPLOYMENTS_SSH_PRIVATE_KEY }}
+      DEV_DEPLOYMENTS_HOST_KEY: ${{ secrets.DEV_DEPLOYMENTS_HOST_KEY }}
+      DIAWI_TOKEN: ${{ secrets.DIAWI_TOKEN }}
+    with:
+      flavor: preview
+      artifact: app
+      version: PR${{ github.event.number }}/${{ github.sha }}
+      app-name: Cigale (PR ${{ github.event.number }})
+      diawi-comment: |
+        This is a PR preview build.
+
+        PR: https://github.com/${{ github.repository }}/pull/${{ github.event.number }}
 
   upload:
     name: Deploy
@@ -52,7 +95,7 @@ jobs:
     uses: ./.github/workflows/dev-deploy.yml
     secrets: inherit
     with:
-      environment: '#${{ github.event.number }}: App preview'
+      environment: App preview
       artifact: app
       subdomain: pr-${{ github.event.number }}
       path: /

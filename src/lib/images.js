@@ -501,3 +501,43 @@ export function parseCropPadding(padding) {
 		},
 	};
 }
+
+if (import.meta.vitest) {
+	const { test, expect, describe } = import.meta.vitest;
+
+	describe('parseCropPadding', () => {
+		test('parses px padding and applies it', () => {
+			const padding = parseCropPadding('12px');
+
+			expect(padding).toMatchObject({
+				withUnit: '12px',
+				unitless: 12,
+				unit: 'px',
+			});
+
+			expect(padding.inPixels(200)).toBe(12);
+			expect(padding.apply(
+				{ width: 200, height: 100 },
+				{ x: 0.5, y: 0.5, w: 0.25, h: 0.25 }
+			)).toEqual({
+				x: 63,
+				y: 25.5,
+				width: 74,
+				height: 49,
+			});
+		});
+
+		test('parses percent padding', () => {
+			const padding = parseCropPadding('10%');
+
+			expect(padding.inPixels(200)).toBe(20);
+			expect(padding.inPixels(99)).toBe(10);
+		});
+
+		test('throws on invalid padding', () => {
+			expect(() => parseCropPadding('12')).toThrowErrorMatchingInlineSnapshot(
+				`[Error: Invalid crop padding: 12]`
+			);
+		});
+	});
+}

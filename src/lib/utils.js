@@ -3,6 +3,7 @@
 import fetchProgress from 'fetch-progress';
 import JSONC from 'tiny-jsonc';
 import YAML from 'yaml';
+import {UAParser} from 'ua-parser-js'
 
 /**
  * @template {string} K

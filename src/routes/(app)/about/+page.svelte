@@ -1,4 +1,6 @@
-<script>
+<script lang="ts">
+	import { App } from '@capacitor/app';
+	import { Capacitor } from '@capacitor/core';
 	import JSONC from 'tiny-jsonc';
 
 	import IconSuccess from '~icons/ri/checkbox-circle-line';
@@ -18,10 +20,21 @@
 
 	seo({ title: 'À propos' });
 
-	/**
-	 * @type {undefined | { node: string; chrome: string; electron: string; os?: { name: string; version: string; architecture: string; archIsUnusual: boolean }; sw: string[] }}
-	 */
-	let electronVersions = $state();
+	let electronVersions = $state<
+		| undefined
+		| {
+				node: string;
+				chrome: string;
+				electron: string;
+				os?: {
+					name: string;
+					version: string;
+					architecture: string;
+					archIsUnusual: boolean;
+				};
+				sw: string[];
+		  }
+	>();
 
 	$effect(() => {
 		if (window.versions) {
@@ -37,6 +50,28 @@
 				electronVersions.sw = os.serviceWorkers;
 			});
 		}
+	});
+
+	let capacitorInfo = $state<
+		| undefined
+		| {
+				platform: string;
+				name: string;
+				id: string;
+				version: string;
+				build: string;
+		  }
+	>();
+
+	$effect(() => {
+		if (!Capacitor.isNativePlatform()) return;
+
+		void App.getInfo().then((info) => {
+			capacitorInfo = {
+				platform: Capacitor.getPlatform(),
+				...info,
+			};
+		});
 	});
 
 	let logoDrawPercent = $state(0);
@@ -67,9 +102,9 @@
 	];
 
 	/**
-	 * @returns {Promise<Array<[string, string]>>} Array of [package name, version used]
+	 * @returns Array of [package name, version used]
 	 */
-	async function showDependencies() {
+	async function showDependencies(): Promise<Array<[string, string]>> {
 		const { workspaces, packages } = JSONC.parse(lockfile);
 
 		// Get list of package names
@@ -109,7 +144,7 @@
 		“Projet long” de l'<a href="https://enseeiht.fr">INP-ENSEEIHT</a>
 	</dd>
 	<dt>Versions</dt>
-	<dd>
+	<dd class="versions">
 		<dl>
 			<dt>Appli</dt>
 			<dd>{version}</dd>
@@ -138,6 +173,19 @@
 						{/each}
 					</dd>
 				{/if}
+			{/if}
+
+			{#if capacitorInfo}
+				<dt>Plateforme</dt>
+				<dd>{capacitorInfo.platform}</dd>
+				<dt>Nom de l'app</dt>
+				<dd>{capacitorInfo.name}</dd>
+				<dt>ID de l'app</dt>
+				<dd>{capacitorInfo.id}</dd>
+				<dt>Version de l'app</dt>
+				<dd>{capacitorInfo.version}</dd>
+				<dt>Build de l'app</dt>
+				<dd>{capacitorInfo.build}</dd>
 			{/if}
 		</dl>
 	</dd>
@@ -294,6 +342,10 @@
 		padding-left: 0.5em;
 		margin-bottom: 1em;
 		max-width: 80vw;
+	}
+
+	.versions dd {
+		word-break: break-all;
 	}
 
 	dl > dd > dl {

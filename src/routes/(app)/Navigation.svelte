@@ -158,7 +158,8 @@
 	const isSessionDependentRoute = $derived(
 		page.route.id !== '/(app)/sessions' &&
 			page.route.id !== '/(app)/protocols' &&
-			page.route.id !== '/(app)/accounts'
+			page.route.id !== '/(app)/accounts' &&
+			page.route.id !== '/(app)/about'
 	);
 
 	const mobile = new IsMobile();
@@ -339,7 +340,7 @@
 								help="Activer les notifications pour savoir quand un traitement est terminé."
 								onclick={async () => {
 									await askForNotificationPermission();
-									setSetting('notifications', hasNotificationsEnabled());
+									setSetting('notifications', await hasNotificationsEnabled());
 								}}
 							>
 								<IconNotificationsOn />

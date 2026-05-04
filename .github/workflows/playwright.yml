@@ -250,7 +250,7 @@ jobs:
     uses: ./.github/workflows/dev-deploy.yml
     secrets: inherit
     with:
-      environment: '#${{ github.event.number }}: E2E tests'
+      environment: E2E tests
       artifact: report
       subdomain: pr-${{ github.event.number }}-reports
       path: /playwright

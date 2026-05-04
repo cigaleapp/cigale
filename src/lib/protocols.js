@@ -8,6 +8,7 @@ import { errorMessage } from './i18n.js';
 import { metadataOptionsOf } from './metadata/index.js';
 import { removeNamespaceFromMetadataId } from './schemas/metadata.js';
 import { ExportedProtocol, isMetadataInProtocol, Protocol } from './schemas/protocols.js';
+import { shareOrDownloadAsFile } from './share.js';
 import {
 	compareBy,
 	fetchHttpRequest,
@@ -89,14 +90,14 @@ export async function toExportedProtocol(db, protocol) {
 }
 
 /**
- * Exports a protocol by ID into a JSON file, and triggers a download of that file.
+ * Exports a protocol by ID into a JSON file, and triggers a download (on computers) or a share (on mobile) of that file.
  * @param {import('./idb.svelte.js').DatabaseHandle} db
  * @param {string} base base path of the app - import `base` from `$app/paths`
  * @param {import("./database").ID} id
  * @param {'json' | 'yaml'} [format='json']
  */
 export async function exportProtocol(db, base, id, format = 'json') {
-	downloadProtocol(
+	shareOrDownloadProtocol(
 		base,
 		format,
 		await db
@@ -112,7 +113,7 @@ export async function exportProtocol(db, base, id, format = 'json') {
  * @param {'yaml'|'json'} format
  * @param {typeof import('./schemas/protocols.js').ExportedProtocol.infer} exportedProtocol
  */
-function downloadProtocol(base, format, exportedProtocol) {
+async function shareOrDownloadProtocol(base, format, exportedProtocol) {
 	let jsoned = stringifyWithToplevelOrdering(format, jsonSchemaURL(base), exportedProtocol, [
 		'id',
 		'name',
@@ -123,8 +124,12 @@ function downloadProtocol(base, format, exportedProtocol) {
 		'inference',
 	]);
 
-	// application/yaml is finally a thing, see https://www.rfc-editor.org/rfc/rfc9512.html
-	downloadAsFile(jsoned, `${exportedProtocol.id}.${format}`, `application/${format}`);
+	await shareOrDownloadAsFile(
+		jsoned,
+		`${exportedProtocol.id}.${format}`,
+		// application/yaml is finally a thing, see https://www.rfc-editor.org/rfc/rfc9512.html
+		`application/${format}`
+	);
 }
 
 /**
