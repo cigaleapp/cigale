@@ -62,6 +62,7 @@ export default defineConfig({
 			heuristic({ msgStr: [msg], details: { file, funcName, call } }) {
 				// Strings in test files
 				if (file.endsWith('.test.js') || file.endsWith('.test.svelte.js')) return false;
+				if (file.endsWith('.test.ts') || file.endsWith('.test.svelte.ts')) return false;
 
 				// Probably keyboard shortcuts
 				if (msg.length === 1) return false;
