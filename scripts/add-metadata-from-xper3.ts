@@ -234,7 +234,7 @@ async function requestItemDescriptors(item: typeof Xper3Item.infer) {
 						resources: Xper3Resource.array(),
 						states: Xper3State.array(),
 						note: 'null',
-						quantitativeMeasure: 'null',
+						// quantitativeMeasure: 'null',
 						// TODO
 						// calculatedStateEvaluations: 'object',
 						unknown: 'boolean',
