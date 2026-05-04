@@ -210,7 +210,7 @@ for (const [i, { name, id }] of files.entries()) {
 			.then((results) =>
 				Promise.all(
 					results
-						.filter(({ kind, content }) => kind !== 'content' && content !== undefined)
+						.filter(({ kind, content }) => kind === 'content' && content !== undefined)
 						.map(async ({ content }) => Jimp.fromBuffer(content))
 				)
 			)
