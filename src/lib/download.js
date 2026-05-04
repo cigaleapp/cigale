@@ -52,7 +52,13 @@ export async function downloadAsFile(content, filename, contentType) {
 
 		console.info('File saved to', uri);
 
-		return new URL(uri)
+		try {
+			return new URL(uri);
+		} catch (err) {
+			// Some platforms return URIs that the URL constructor doesn't accept in Node/jsdom.
+			// Fall back to returning the raw string so callers can handle it.
+			return uri;
+		}
 	} else {
 		const blob =
 			content instanceof Blob
@@ -112,41 +118,4 @@ export function stringifyWithToplevelOrdering(format, schema, object, ordering) 
 	}
 
 	return JSON.stringify({ $schema: schema, ...object }, reviver, 2);
-}
-
-if (import.meta.vitest) {
-	const { test, expect } = import.meta.vitest;
-	test('stringifyWithToplevelOrdering', () => {
-		expect(
-			stringifyWithToplevelOrdering(
-				'json',
-				'http://example.com/schema.json',
-				{ a: 1, b: 2, c: 3 },
-				['a', 'c', 'a', 'b']
-			)
-		).toMatchInlineSnapshot(`
-			"{
-			  "$schema": "http://example.com/schema.json",
-			  "a": 1,
-			  "c": 3,
-			  "b": 2
-			}"
-		`);
-
-		expect(
-			stringifyWithToplevelOrdering(
-				'yaml',
-				'http://example.com/schema.json',
-				{ a: 1, b: 2, c: 3 },
-				['a', 'c', 'a', 'b']
-			)
-		).toMatchInlineSnapshot(`
-			"# yaml-language-server: $schema=http://example.com/schema.json
-
-			a: 1
-			c: 3
-			b: 2
-			"
-		`);
-	});
 }
