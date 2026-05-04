@@ -183,6 +183,7 @@ const Settings = table(
 		parallelism: type('number').default(() => {
 			try {
 				// On mobile devices, seems like parallelism causes crashes
+				/* v8 ignore if */
 				if (Capacitor.isNativePlatform()) return 1;
 				// Seems like >4 nodes consumes too much RAM (we might wanna check for navigator.deviceMemory buts it's Chromium-only...)
 				// See https://github.com/cigaleapp/cigale/issues/1333

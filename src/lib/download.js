@@ -11,6 +11,7 @@ import YAML from 'yaml';
  * @returns {Promise<URL|void>} Saved file's URI on native platforms, void on web
  */
 export async function downloadAsFile(content, filename, contentType) {
+	/* v8 ignore if */
 	if (Capacitor.isNativePlatform()) {
 		const permission = await Filesystem.checkPermissions();
 		if (permission.publicStorage !== 'granted') {
