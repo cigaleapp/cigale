@@ -21,7 +21,6 @@ export function inAppBrowser(options?: OpenInAppBrowserOptions): Attachment {
 		if (!(node instanceof HTMLAnchorElement)) {
 			throw new Error('inAppBrowser attachment can only be used on <a> elements');
 		}
-
 		node.onclick = (event) => {
 			event.preventDefault();
 
@@ -36,7 +35,7 @@ export function inAppBrowser(options?: OpenInAppBrowserOptions): Attachment {
 	};
 }
 
-async function openInAppBrowser(url: string | URL, options?: OpenInAppBrowserOptions) {
+export async function openInAppBrowser(url: string | URL, options?: OpenInAppBrowserOptions) {
 	if (!Capacitor.isNativePlatform()) {
 		throw new Error('In-app browser is only supported on native platforms');
 	}
