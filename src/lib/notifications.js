@@ -6,6 +6,13 @@ import { getSettings } from './settings.svelte';
 import { toasts } from './toasts.svelte';
 
 /**
+ * Maps actionTypeId to action id to action details (title and callback)
+ * @type {Record<string, Record<string, {title: string, callback: () => Promise<void>}>>}
+ */
+let _notificationActions = {};
+let _notificationActionsListenerStarted = false;
+
+/**
  * Ask the user for permission to send system notifications
  */
 export async function askForNotificationPermission() {
@@ -43,13 +50,74 @@ export async function askForNotificationPermission() {
 
 /**
  * Send a system notification if permission was granted
+ * `actionTypeId` defaults to the title
  * @param {string} title
- * @param {NotificationOptions} options
+ * @param {NotificationOptions & { actionsTypeId?: string,  actions?: Array<{ id: string, callback: () => Promise<void>, title: string }> }} options actions are only supported on native
  * @returns
  */
-export async function sendNotification(title, options) {
+export async function sendNotification(title, { actionsTypeId = title, actions = [], ...options }) {
 	if (Capacitor.isNativePlatform()) {
 		try {
+			if (actions.length > 0) {
+				for (const { id, ...action } of actions) {
+					_notificationActions[actionsTypeId] ??= {};
+					_notificationActions[actionsTypeId][id] = action;
+				}
+
+				await LocalNotifications.registerActionTypes({
+					types: Object.entries(_notificationActions).map(([id, actions]) => ({
+						id,
+						actions: Object.entries(actions).map(([id, { title }]) => ({ id, title })),
+					})),
+				});
+
+				if (!_notificationActionsListenerStarted) {
+					await LocalNotifications.addListener(
+						'localNotificationActionPerformed',
+						async (event) => {
+							if (!event.notification?.actionTypeId) {
+								console.error(
+									'Received notification action without actionTypeId, doing nothing',
+									event
+								);
+								return;
+							}
+
+							const action =
+								_notificationActions[event.notification.actionTypeId]?.[
+									event.actionId
+								];
+							if (!action) {
+								console.error(
+									`Received notification action with unregistered id ${event.actionId}, doing nothing`,
+									{ event, _notificationActions }
+								);
+								return;
+							}
+
+							try {
+								await action.callback();
+							} catch (e) {
+								console.error(
+									`Error while executing callback for notification action ${event.actionId}`,
+									e
+								);
+							}
+
+							return {
+								async remove() {
+									_notificationActionsListenerStarted = false;
+									console.info('Local notification actions listener was removed');
+								},
+							};
+						}
+					);
+
+					_notificationActionsListenerStarted = true;
+					console.info('Started local notification actions listener');
+				}
+			}
+
 			await LocalNotifications.schedule({
 				notifications: [
 					{
@@ -57,7 +125,9 @@ export async function sendNotification(title, options) {
 						body: options.body ?? '',
 						// Needs to be a Java (signed, 32-bit) Int, so max. 2^(32-1)
 						id: millisecondsToSeconds(Date.now()),
+						// TODO: put an actual icon here
 						smallIcon: 'ic_notification',
+						actionTypeId: actionsTypeId,
 					},
 				],
 			});

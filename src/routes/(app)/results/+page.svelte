@@ -3,6 +3,7 @@
 	import type { NamespacedMetadataID } from '$lib/schemas/common.js';
 
 	import { Capacitor } from '@capacitor/core';
+	import { FileViewer } from '@capacitor/file-viewer';
 	import { watch } from 'runed';
 	import { tick } from 'svelte';
 	import { SvelteMap } from 'svelte/reactivity';
@@ -28,6 +29,7 @@
 	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 	import LoadingText, { Loading } from '$lib/LoadingText.svelte';
 	import ModalConfirm from '$lib/ModalConfirm.svelte';
+	import { sendNotification } from '$lib/notifications.js';
 	import { ensureNoLoneImages } from '$lib/observations.js';
 	import RadioButtons from '$lib/RadioButtons.svelte';
 	import SessionMetadataForm from '$lib/SessionMetadataForm.svelte';
@@ -152,7 +154,27 @@
 			}
 
 			if (exportFormat === 'zip') {
-				await downloadAsFile(zipfileBytes, 'results.zip', 'application/zip');
+				const savedAt = await downloadAsFile(
+					zipfileBytes,
+					'results.zip',
+					'application/zip'
+				);
+				if (savedAt) {
+					await sendNotification('Export terminé', {
+						body: `Fichier disponible à ${decodeURIComponent(savedAt.pathname)}`,
+						actions: [
+							{
+								id: 'open-export',
+								title: 'Ouvrir',
+								async callback() {
+									await FileViewer.openDocumentFromLocalPath({
+										path: savedAt.pathname,
+									});
+								},
+							},
+						],
+					});
+				}
 			}
 		} catch (error) {
 			console.error(error);

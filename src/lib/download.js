@@ -8,6 +8,7 @@ import YAML from 'yaml';
  * @param {Blob | ArrayBuffer | string} content
  * @param {string} filename
  * @param {string} [contentType] defaults to 'text/plain' for strings and 'application/octet-stream' for blobs
+ * @returns {Promise<URL|void>} Saved file's URI on native platforms, void on web
  */
 export async function downloadAsFile(content, filename, contentType) {
 	if (Capacitor.isNativePlatform()) {
@@ -50,6 +51,8 @@ export async function downloadAsFile(content, filename, contentType) {
 		});
 
 		console.info('File saved to', uri);
+
+		return new URL(uri)
 	} else {
 		const blob =
 			content instanceof Blob
