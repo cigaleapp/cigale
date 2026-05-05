@@ -33,7 +33,6 @@ jobs:
       GITHUB_PAGES: ${{ inputs.github-pages }}
       PR_NUMBER: ${{ github.event.number }}
       BUILD_COMMIT: ${{ github.sha }}
-      BUILTIN_PROTOCOLS: https://raw.githubusercontent.com/${{ github.repository }}/${{ github.head_ref || github.ref_name }}/examples/arthropods.cigaleprotocol.json,https://raw.githubusercontent.com/${{ github.repository }}/${{ github.head_ref || github.ref_name }}/protocols/insecta.cigaleprotocol.yaml,https://raw.githubusercontent.com/${{ github.repository }}/${{ github.head_ref || github.ref_name }}/protocols/entomoscope.cigaleprotocol.yaml
     steps:
       - uses: actions/checkout@v6
       - uses: oven-sh/setup-bun@v2
@@ -41,6 +40,42 @@ jobs:
           bun-version-file: .bun-version
       - name: Install dependencies
         run: bun install --frozen-lockfile
+      - name: Determine which branch to use for BUILTIN_PROTOCOLS
+        env:
+          GH_TOKEN: ${{ github.token }}
+          protocols: |
+            protocols/insecta.cigaleprotocol.yaml
+            protocols/entomoscope.cigaleprotocol.yaml
+            examples/arthropods.cigaleprotocol.json
+        run: |
+          builtins_list=""
+          changes=""
+          if [[ -z "$PR_NUMBER" ]]; then
+            echo "No PR number, using main branch for BUILTIN_PROTOCOLS"
+          else
+            changes=$(gh pr diff --name-only $PR_NUMBER)
+            echo "Changed files in PR #$PR_NUMBER:"
+            echo "$changes"
+          fi
+          
+          for file in $protocols; do
+            if echo "$changes" | grep -qE "^$file"; then
+              echo "File $file is changed in this PR, using PR branch for BUILTIN_PROTOCOLS"
+              branch=${{ github.head_ref }}
+            else
+              echo "File $file is not changed in this PR, using main branch for BUILTIN_PROTOCOLS"
+              branch=main
+            fi
+            url="https://raw.githubusercontent.com/${{ github.repository }}/$branch/$file"
+            echo "Adding $url to BUILTIN_PROTOCOLS"
+            builtins_list="$builtins_list$url,"
+          done
+
+          builtins_list=${builtins_list%,} # Remove trailing comma
+
+          echo "Using BUILTIN_PROTOCOLS=$builtins_list"
+
+          echo "BUILTIN_PROTOCOLS=$builtins_list" >> $GITHUB_ENV
       - name: Set env vars depending on $PR_NUMBER
         run: |
           if [[ -z "$PR_NUMBER" ]]; then
