@@ -47,16 +47,16 @@ jobs:
             echo "BASE_PATH=" >> $GITHUB_ENV
           fi
       - if: inputs.debug
-        name: Build
+        name: Build (debug)
         run: bun run build
       - if: ${{ !inputs.debug }}
-        name: Build (without minification)
+        name: Build (production)
         run: bun run build
         env:
           DEBUG: 'true'
       - name: Determine artifact name
         id: artifact
-        run: echo "name=build-${{ inputs.debug && 'minified' || 'full' }}-${{ github.sha }}" >> $GITHUB_OUTPUT
+        run: echo "name=build-${{ inputs.debug && 'debug' || 'production' }}-${{ github.sha }}" >> $GITHUB_OUTPUT
       - name: Upload build as artifact
         uses: actions/upload-artifact@v7
         with:

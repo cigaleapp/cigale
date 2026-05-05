@@ -44,7 +44,8 @@ jobs:
         run: bun knip --reporter github-actions
 
   build:
-    name: Build
+    name: Build (production)
+    needs: build-debug
     uses: ./.github/workflows/build.yml
     with:
       debug: false
@@ -57,14 +58,21 @@ jobs:
     with:
       compare-coverage: ${{ github.event_name == 'pull_request' }}
 
-  e2e:
+  build-debug:
+    # Run on PRs (only if not in draft) or on other events
     if: github.event_name != 'pull_request' || !github.event.pull_request.draft
-    needs: [build, json-schema, lint, test]
+    name: Build (debug)
+    uses: ./.github/workflows/build.yml
+    with:
+      debug: true
+
+  e2e:
+    needs: [build-debug, json-schema, lint, test]
     name: E2E
     uses: ./.github/workflows/playwright.yml
     secrets: inherit
     with:
-      artifact: ${{ needs.build.outputs.artifact }}
+      artifact: ${{ needs.build-debug.outputs.artifact }}
 
   bundlesize:
     if: github.ref_name != 'main'
@@ -75,10 +83,12 @@ jobs:
 
   preview:
     if: github.event_name == 'pull_request'
-    needs: [json-schema]
+    needs: [build, json-schema]
     name: PR Preview
     uses: ./.github/workflows/preview.yml
     secrets: inherit
+    with:
+      artifact: ${{ needs.build.outputs.artifact }}
 
   deploy:
     if: github.event_name == 'push' && github.ref_name == 'main'

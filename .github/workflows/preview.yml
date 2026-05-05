@@ -7,7 +7,11 @@ permissions:
 
 on:
   workflow_call:
-    inputs: {}
+    inputs:
+      artifact:
+        required: true
+        type: string
+        description: The build artifact name to deploy (output from the build workflow)
     secrets:
       DEV_DEPLOYMENTS_HOST_KEY:
         required: true
@@ -32,12 +36,7 @@ on:
         description: 'API token for Diawi, used to upload Android app previews'
 
 jobs:
-  build:
-    name: Build
-    uses: ./.github/workflows/build.yml
-
   android:
-    needs: build
     name: Android app
     uses: ./.github/workflows/android.yml
     if: contains(github.event.pull_request.labels.*.name, 'mobile') || !startsWith(github.base_ref, 'renovate/')
@@ -51,7 +50,7 @@ jobs:
       DIAWI_TOKEN: ${{ secrets.DIAWI_TOKEN }}
     with:
       flavor: preview
-      artifact: ${{ needs.build.outputs.artifact }}
+      artifact: ${{ inputs.artifact}}
       version: PR${{ github.event.number }}/${{ github.sha }}
       app-name: Cigale (PR ${{ github.event.number }})
       diawi-comment: |
@@ -61,12 +60,11 @@ jobs:
 
   upload:
     name: Deploy
-    needs: build
     uses: ./.github/workflows/dev-deploy.yml
     secrets: inherit
     with:
       environment: App preview
-      artifact: ${{ needs.build.outputs.artifact }}
+      artifact: ${{ inputs.artifact }}
       subdomain: pr-${{ github.event.number }}
       artifact-at: /public
       path: /
