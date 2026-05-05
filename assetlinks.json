@@ -5,7 +5,7 @@
 			"namespace": "android_app",
 			"package_name": "io.github.cigaleapp",
 			"sha256_cert_fingerprints": [
-				"6F:D9:0C:B4:9D:66:5B:0F:AB:2E:79:4C:61:4C:09:D0:1F:47:C6:6A:2D:B1:57:E9:CB:BD:12:48:77:C1:27:1A"
+				"68:B6:58:73:6F:E9:AB:06:FA:F7:26:33:F0:34:E1:86:68:D3:6C:3E:85:DD:F2:7C:0C:89:59:A0:8A:9E:2D:65"
 			]
 		}
 	},
@@ -15,7 +15,7 @@
 			"namespace": "android_app",
 			"package_name": "io.github.cigaleapp.nightly",
 			"sha256_cert_fingerprints": [
-				"6F:D9:0C:B4:9D:66:5B:0F:AB:2E:79:4C:61:4C:09:D0:1F:47:C6:6A:2D:B1:57:E9:CB:BD:12:48:77:C1:27:1A"
+				"68:B6:58:73:6F:E9:AB:06:FA:F7:26:33:F0:34:E1:86:68:D3:6C:3E:85:DD:F2:7C:0C:89:59:A0:8A:9E:2D:65"
 			]
 		}
 	},
