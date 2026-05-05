@@ -2,6 +2,7 @@
 	import { App } from '@capacitor/app';
 	import { Capacitor } from '@capacitor/core';
 	import JSONC from 'tiny-jsonc';
+	import { UAParser } from 'ua-parser-js';
 
 	import IconSuccess from '~icons/ri/checkbox-circle-line';
 	import IconError from '~icons/ri/close-circle-line';
@@ -19,6 +20,10 @@
 	const { data } = $props();
 
 	seo({ title: 'À propos' });
+
+	const ua = new UAParser(navigator.userAgent);
+	const device = ua.getDevice();
+	const browser = ua.getBrowser();
 
 	let electronVersions = $state<
 		| undefined
@@ -174,6 +179,17 @@
 					</dd>
 				{/if}
 			{/if}
+
+			<dt>Navigateur</dt>
+			<dd>
+				{browser.name} <code>{browser.version}</code>
+			</dd>
+
+			<dt>Appareil</dt>
+			<dd>
+				{device.vendor}
+				{device.model}
+			</dd>
 
 			{#if capacitorInfo}
 				<dt>Plateforme</dt>
