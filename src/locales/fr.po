@@ -2557,3 +2557,11 @@ msgstr "Lien copié dans le presse-papiers : "
 #: src/routes/(app)/protocols/RowProtocol.svelte
 msgid "Partager"
 msgstr "Partager"
+
+#: src/routes/(app)/about/+page.svelte
+msgid "Navigateur"
+msgstr "Navigateur"
+
+#: src/routes/(app)/about/+page.svelte
+msgid "Appareil"
+msgstr "Appareil"

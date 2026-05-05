@@ -2557,3 +2557,11 @@ msgstr ""
 #: src/routes/(app)/protocols/RowProtocol.svelte
 msgid "Partager"
 msgstr ""
+
+#: src/routes/(app)/about/+page.svelte
+msgid "Navigateur"
+msgstr ""
+
+#: src/routes/(app)/about/+page.svelte
+msgid "Appareil"
+msgstr ""
