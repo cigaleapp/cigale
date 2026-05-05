@@ -56,8 +56,8 @@ jobs:
     strategy:
       matrix:
         include:
-          - { name: head, ref: '${{ github.head_ref }}', analyzer: "json,static" }
-          - { name: base, ref: '${{ github.base_ref }}', analyzer: "json" }
+          - { name: head, ref: '${{ github.head_ref }}', analyzer: 'json,static' }
+          - { name: base, ref: '${{ github.base_ref }}', analyzer: 'json' }
     steps:
       - uses: actions/checkout@v6
         with:
