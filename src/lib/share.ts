@@ -74,7 +74,7 @@ async function shareAsFile(
 	}
 }
 
-export async function shareUrl(url: string|URL, title?: string) {
+export async function shareUrl(url: string | URL, title?: string) {
 	if (Capacitor.isNativePlatform()) {
 		await Share.share({
 			title,
