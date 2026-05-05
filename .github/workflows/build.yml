@@ -38,8 +38,6 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version-file: .bun-version
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
       - name: Determine which branch to use for BUILTIN_PROTOCOLS
         env:
           GH_TOKEN: ${{ github.token }}
@@ -91,6 +89,8 @@ jobs:
             echo "SVELTE_FALLBACK_PAGE=index.html" >> $GITHUB_ENV
             echo "BASE_PATH=" >> $GITHUB_ENV
           fi
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
       - name: Build
         run: bun run build
       - name: Determine artifact name
