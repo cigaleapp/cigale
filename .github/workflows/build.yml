@@ -57,7 +57,7 @@ jobs:
             echo "Changed files in PR #$PR_NUMBER:"
             echo "$changes"
           fi
-          
+
           for file in $protocols; do
             if echo "$changes" | grep -qE "^$file"; then
               echo "File $file is changed in this PR, using PR branch for BUILTIN_PROTOCOLS"
