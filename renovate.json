@@ -24,6 +24,11 @@
 			"description": "Auto-merge patch upgrades (E2E tests should validate that nothing catastrophic happens)",
 			"matchUpdateTypes": ["patch"],
 			"automerge": true
+		},
+		{
+			"description": "Do not auto-merge gradle or gradle-wrapper updates",
+			"matchManagers": ["gradle", "gradle-wrapper"],
+			"automerge": false
 		}
 	]
 }
