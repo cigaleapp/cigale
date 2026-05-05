@@ -31,7 +31,7 @@ sidecars:
 remote:
   kobocollect:
     form: https://kf.kobotoolbox.org/#/forms/ao3ZXMuHX9hCufTYbEzEcY/summary
-    title: "{{ survey.session_id }}"
+    title: '{{ survey.session_id }}'
     thumbnails:
       - Prendre_une_photo_du_microhabi
       - Prendre_une_photo_du_microhabitat_monitor
@@ -143,21 +143,21 @@ sessionMetadata:
     required: false
     mergeMethod: average
     options:
-      - key: "0"
+      - key: '0'
         label: 0 - Pas de vent
-      - key: "1"
+      - key: '1'
         label: 1 - Très légère brise (dérive de la fumée)
-      - key: "2"
+      - key: '2'
         label: 2 - Légère brise (bruissement des feuilles / girouettes commencent à tourner)
-      - key: "3"
+      - key: '3'
         label: 3 - Brise (feuilles et brindilles en constant mouvement)
-      - key: "4"
+      - key: '4'
         label: 4 - Brise modérée (poussière, feuilles et petites branches en agitation)
-      - key: "5"
+      - key: '5'
         label: 5 - Brise forte (jeunes arbres commencent à se balancer)
-      - key: "6"
+      - key: '6'
         label: 6 - Brise très forte (grosses branches des arbres en mouvement, sifflement du vent)
-      - key: "7"
+      - key: '7'
         label: 7 - Tempête (grands arbres en mouvement, résistance du vent lors de la marche)
 
   microhabitat:
