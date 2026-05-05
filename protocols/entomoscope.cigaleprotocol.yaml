@@ -3,7 +3,7 @@ id: fr.osug.terra-forma-web.entomoscope
 name: Entomoscope
 
 updates: automatic
-version: 2
+version: 3
 source: https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/entomoscope.cigaleprotocol.yaml
 
 description: Protocole de collecte d'images d'insectes via l'Entomoscope
@@ -33,9 +33,8 @@ remote:
     form: https://kf.kobotoolbox.org/#/forms/ao3ZXMuHX9hCufTYbEzEcY/summary
     title: '{{ survey.session_id }}'
     thumbnails:
-      - Prendre_une_photo_du_microhabi
-      - Prendre_une_photo_du_microhabitat_monitor
-      - Prendre_une_photo_du_paysgae
+      - microhabitat
+      - landscape
 
 metadataOrder:
   # Session
