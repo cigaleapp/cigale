@@ -404,7 +404,6 @@ msgstr "Erreur lors de la récupération des étiquettes en cascade: {0}"
 msgid "Erreur lors du chargement du modèle de classification"
 msgstr "Erreur lors du chargement du modèle de classification"
 
-#: src/routes/(app)/protocols/RowProtocol.svelte
 #: src/routes/(app)/results/+page.svelte
 msgid "Exporter"
 msgstr "Exporter"
@@ -2550,3 +2549,11 @@ msgstr "Votre navigateur ne supporte pas les notifications système."
 #: src/lib/notifications.js
 msgid "Impossible d'envoyer la notification système."
 msgstr "Impossible d'envoyer la notification système."
+
+#: src/lib/share.ts
+msgid "Lien copié dans le presse-papiers : "
+msgstr "Lien copié dans le presse-papiers : "
+
+#: src/routes/(app)/protocols/RowProtocol.svelte
+msgid "Partager"
+msgstr "Partager"

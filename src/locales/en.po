@@ -404,7 +404,6 @@ msgstr "Error while getting cascaded labels: {0}"
 msgid "Erreur lors du chargement du modèle de classification"
 msgstr "Error while loading classification model"
 
-#: src/routes/(app)/protocols/RowProtocol.svelte
 #: src/routes/(app)/results/+page.svelte
 msgid "Exporter"
 msgstr "Export"
@@ -2549,4 +2548,12 @@ msgstr ""
 
 #: src/lib/notifications.js
 msgid "Impossible d'envoyer la notification système."
+msgstr ""
+
+#: src/lib/share.ts
+msgid "Lien copié dans le presse-papiers : "
+msgstr ""
+
+#: src/routes/(app)/protocols/RowProtocol.svelte
+msgid "Partager"
 msgstr ""
