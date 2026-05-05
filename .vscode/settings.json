@@ -15,7 +15,7 @@
 	"githubIssues.queries": [
 		{
 			"label": "Cahier des charges",
-			"query": "repo:${owner}/${repository} milestone:\"Terraforma: Échéance 1\" state:open"
+			"query": "repo:${owner}/${repository} milestone:\"InsectDetective\" state:open"
 		},
 		{
 			"label": "Kobotoolbox",
