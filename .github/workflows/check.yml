@@ -45,10 +45,17 @@ jobs:
 
   build:
     name: Build (production)
-    needs: build-debug
     uses: ./.github/workflows/build.yml
     with:
       debug: false
+
+  build-github-pages:
+    if: github.event_name == 'push' && github.ref_name == 'main'
+    name: Build (GitHub Pages)
+    uses: ./.github/workflows/build.yml
+    with:
+      debug: false
+      github-pages: true
 
   test:
     needs: lint
@@ -92,14 +99,14 @@ jobs:
 
   deploy:
     if: github.event_name == 'push' && github.ref_name == 'main'
-    needs: [build, e2e, dont-merge-comment]
+    needs: [build-github-pages, e2e, dont-merge-comment]
     name: Deploy
     concurrency:
       group: deploy-gh-pages
       cancel-in-progress: true
     uses: ./.github/workflows/deploy.yml
     with:
-      artifact: ${{ needs.build.outputs.artifact }}
+      artifact: ${{ needs.build-github-pages.outputs.artifact }}
 
   electron:
     if: github.event_name == 'pull_request'

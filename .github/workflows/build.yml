@@ -11,6 +11,12 @@ on:
         type: boolean
         default: true
         description: Build with debug info (non-minified + sourcemaps)
+      # TODO: remove once we don't have to publish to Github Pages
+      github-pages:
+        required: false
+        type: boolean
+        default: false
+        description: Build for Github Pages (sets SVELTE_FALLBACK_PAGE to 404.html and BASE_PATH to the repo name, which is required for correct routing on Github Pages)
     outputs:
       artifact:
         description: The build artifact name
@@ -23,6 +29,8 @@ jobs:
     outputs:
       artifact: ${{ steps.artifact.outputs.name }}
     env:
+      DEBUG: ${{ inputs.debug }}
+      GITHUB_PAGES: ${{ inputs.github-pages }}
       PR_NUMBER: ${{ github.event.number }}
       BUILD_COMMIT: ${{ github.sha }}
       BUILTIN_PROTOCOLS: https://raw.githubusercontent.com/${{ github.repository }}/${{ github.head_ref || github.ref_name }}/examples/arthropods.cigaleprotocol.json,https://raw.githubusercontent.com/${{ github.repository }}/${{ github.head_ref }}/protocols/insecta.cigaleprotocol.yaml,https://raw.githubusercontent.com/${{ github.repository }}/${{ github.head_ref || github.ref_name }}/protocols/entomoscope.cigaleprotocol.yaml
@@ -35,28 +43,24 @@ jobs:
         run: bun install --frozen-lockfile
       - name: Set env vars depending on $PR_NUMBER
         run: |
-          # Production builds are deployed to Github Pages
           if [[ -z "$PR_NUMBER" ]]; then
             echo "WEB_ORIGIN=https://cigaleapp.github.io" >> $GITHUB_ENV
-            echo "SVELTE_FALLBACK_PAGE=404.html" >> $GITHUB_ENV
-            echo "BASE_PATH=/${GITHUB_REPOSITORY##*/}" >> $GITHUB_ENV
-          # PR previews are deployed to a dev server
           else
             echo "WEB_ORIGIN=https://pr-${PR_NUMBER}.cigale.gwen.works" >> $GITHUB_ENV
+          fi
+
+          if [[ "$GITHUB_PAGES" == "true" ]]; then
+            echo "SVELTE_FALLBACK_PAGE=404.html" >> $GITHUB_ENV
+            echo "BASE_PATH=/$(basename $GITHUB_REPOSITORY)" >> $GITHUB_ENV
+          else
             echo "SVELTE_FALLBACK_PAGE=index.html" >> $GITHUB_ENV
             echo "BASE_PATH=" >> $GITHUB_ENV
           fi
-      - if: inputs.debug
-        name: Build (debug)
+      - name: Build
         run: bun run build
-      - if: ${{ !inputs.debug }}
-        name: Build (production)
-        run: bun run build
-        env:
-          DEBUG: 'true'
       - name: Determine artifact name
         id: artifact
-        run: echo "name=build-${{ inputs.debug && 'debug' || 'production' }}-${{ github.sha }}" >> $GITHUB_OUTPUT
+        run: echo "name=build-${{ case(inputs.debug, 'debug', 'production') }}-${{ github.sha }}-${{ case(inputs.github-pages, 'ghpages', '') }}" >> $GITHUB_OUTPUT
       - name: Upload build as artifact
         uses: actions/upload-artifact@v7
         with:

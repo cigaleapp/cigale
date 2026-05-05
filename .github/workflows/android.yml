@@ -102,12 +102,6 @@ jobs:
         with:
           name: ${{ inputs.artifact }}
 
-      - name: Rename 404.html to index.html
-        run: |
-          if [ -f ./public/404.html ]; then
-            mv ./public/404.html ./public/index.html
-          fi
-
       - name: Show directory tree for public/
         uses: jaywcjlove/github-action-folder-tree@main
         with:
