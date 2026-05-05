@@ -214,11 +214,14 @@ jobs:
           name: android-problems-report
           path: ./android/build/reports/problems/problems-report.html
 
+      - name: Set artifact name
+        id: artifact
+        run: echo "name=apk-${{ github.sha }}-${{ inputs.flavor }}" >> $GITHUB_OUTPUT
+
       - name: Save APK file
         uses: actions/upload-artifact@v7
-        id: artifact
         with:
-          name: apk
+          name: ${{ steps.artifact.outputs.name }}
           path: ./app.apk
 
       - name: Get current datetime
@@ -253,7 +256,7 @@ jobs:
       - name: Retrieve APK file
         uses: actions/download-artifact@v7
         with:
-          name: apk
+          name: ${{ needs.apk.outputs.artifact }}
 
       - name: Upload to Diawi
         uses: rnkdsh/action-upload-diawi@v1.5.12
