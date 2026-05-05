@@ -1,8 +1,9 @@
+import { Capacitor } from '@capacitor/core';
 import { ArkErrors } from 'arktype';
 import microdiff from 'microdiff';
 
 import { idComparator, Schemas } from './database.js';
-import { downloadAsFile, stringifyWithToplevelOrdering } from './download.js';
+import { stringifyWithToplevelOrdering } from './download.js';
 import { promptForFiles } from './files.js';
 import { errorMessage } from './i18n.js';
 import { metadataOptionsOf } from './metadata/index.js';
@@ -144,13 +145,15 @@ async function shareOrDownloadProtocol(base, format, exportedProtocol) {
  * @returns {Promise<Multiple extends true ? NoInfer<Out>[] : NoInfer<Out>>}
  */
 export async function promptAndImportProtocol({
-	allowMultiple,
+	allowMultiple = false,
 	onInput = () => {},
 	importProtocol,
 }) {
 	const files = await promptForFiles({
 		multiple: allowMultiple,
-		accept: '.json,.yaml,application/json',
+		// FIXME: figure out why .yaml files are not selectable on mobile even if we include .yaml in the accept string
+		// see #1560
+		accept: Capacitor.isNativePlatform() ? '*' : '.json,.yaml,application/json',
 	});
 
 	onInput();
