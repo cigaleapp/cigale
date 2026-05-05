@@ -33,7 +33,7 @@ jobs:
       GITHUB_PAGES: ${{ inputs.github-pages }}
       PR_NUMBER: ${{ github.event.number }}
       BUILD_COMMIT: ${{ github.sha }}
-      BUILTIN_PROTOCOLS: https://raw.githubusercontent.com/${{ github.repository }}/${{ github.head_ref || github.ref_name }}/examples/arthropods.cigaleprotocol.json,https://raw.githubusercontent.com/${{ github.repository }}/${{ github.head_ref }}/protocols/insecta.cigaleprotocol.yaml,https://raw.githubusercontent.com/${{ github.repository }}/${{ github.head_ref || github.ref_name }}/protocols/entomoscope.cigaleprotocol.yaml
+      BUILTIN_PROTOCOLS: https://raw.githubusercontent.com/${{ github.repository }}/${{ github.head_ref || github.ref_name }}/examples/arthropods.cigaleprotocol.json,https://raw.githubusercontent.com/${{ github.repository }}/${{ github.head_ref || github.ref_name }}/protocols/insecta.cigaleprotocol.yaml,https://raw.githubusercontent.com/${{ github.repository }}/${{ github.head_ref || github.ref_name }}/protocols/entomoscope.cigaleprotocol.yaml
     steps:
       - uses: actions/checkout@v6
       - uses: oven-sh/setup-bun@v2
