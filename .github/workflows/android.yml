@@ -108,7 +108,6 @@ jobs:
           path: ./public
           depth: 4
 
-
       - name: Setup Android SDK
         uses: android-actions/setup-android@v4
 
