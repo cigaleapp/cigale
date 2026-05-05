@@ -8,6 +8,8 @@ import type { RuntimeValue } from '$lib/schemas/metadata';
 import type { ExportedProtocol } from '$lib/schemas/protocols';
 import type { Toast } from '$lib/toasts.svelte.js';
 
+import 'urlpattern-polyfill';
+
 import { defineNetworkFixture } from '@msw/playwright';
 import { test as base, expect as baseExpect } from '@playwright/test';
 import { ms } from 'convert';
@@ -461,9 +463,14 @@ const _test = base.extend<
 						new URLPattern('https://*/**/*.cigaleprotocol.*').test(u) &&
 						!ALLOWED_PROTOCOLS.some((source) => {
 							if (typeof source !== 'string') return false;
-							const url = new URL(source);
-							// Handles requests that contain a ?v= cachebuster in the URL
-							return url.pathname === u.pathname && url.host === u.host;
+							const src = new URL(source);
+							return new URLPattern({
+								hostname: src.hostname,
+								pathname: src.pathname.replace(
+									'cigaleapp/cigale/main/',
+									'cigaleapp/cigale/:branch/'
+								),
+							}).test(u);
 						})
 					),
 				{

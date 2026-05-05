@@ -148,7 +148,9 @@ export async function mockProtocolSourceURL(page, context, source, mockedResult)
 		context,
 		(u) => {
 			u.searchParams.delete('v');
-			return u.toString() === source;
+			return new URLPattern(
+				source.replace('/cigaleapp/cigale/main/', '/cigaleapp/cigale/:branch/')
+			).test(u);
 		},
 		mockedResult
 	);
