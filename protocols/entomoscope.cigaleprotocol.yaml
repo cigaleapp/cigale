@@ -3,7 +3,7 @@ id: fr.osug.terra-forma-web.entomoscope
 name: Entomoscope
 
 updates: automatic
-version: 1
+version: 2
 source: https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/entomoscope.cigaleprotocol.yaml
 
 description: Protocole de collecte d'images d'insectes via l'Entomoscope
@@ -31,8 +31,7 @@ sidecars:
 remote:
   kobocollect:
     form: https://kf.kobotoolbox.org/#/forms/ao3ZXMuHX9hCufTYbEzEcY/summary
-    title: |
-      {{ trim survey.Esp_ce_de_la_fleur_naturelle }}, {{ formatDate survey.Date_et_heure_du_d_but_du_monitoring "dd MMM" }}
+    title: "{{ survey.session_id }}"
     thumbnails:
       - Prendre_une_photo_du_microhabi
       - Prendre_une_photo_du_microhabitat_monitor
@@ -40,9 +39,11 @@ remote:
 
 metadataOrder:
   # Session
+  - session_id
   - monitoring_start
   - monitoring_end
   - device_location
+  - starting_temperature
   - microhabitat
   - landscape
   - inflorescence_count
@@ -76,10 +77,24 @@ metadataGroups:
     collapsed: false
 
 sessionMetadata:
+  session_id:
+    type: string
+    label: ID de session
+    description: Nomsite_année_mois_jour_IDentomoscope_mode_numérosession. par exemple, "JadMoulis_2026_04_01_b7ab8683_pitfall"
+    mergeMethod: none
+    required: false
+    pattern: |
+      alphanumeric one or more times, underscore,
+      year, underscore,
+      month, underscore,
+      day, underscore,
+      alphanumeric one or more times, underscore,
+      alphanumeric one or more times, 
+      group underscore, number end group optional
+
   monitoring_start:
     type: date
     label: Début du monitoring
-    kobocollect: Date_et_heure_du_d_but_du_monitoring
     description: Date de début du monitoring de l'entomoscope
     mergeMethod: min
     required: false
@@ -88,17 +103,66 @@ sessionMetadata:
   monitoring_end:
     type: date
     label: Fin du monitoring
-    kobocollect: Date_et_heure_fin_du_monitoring
     description: Date de fin du monitoring de l'entomoscope
     mergeMethod: max
     required: false
 
+  starting_temperature:
+    type: float
+    label: Température de départ
+    description: Température au lancement du dispositif
+    unit: °C
+    mergeMethod: average
+    required: false
+    range: x > -273.15
+
+  starting_cloud_coverage:
+    type: enum
+    label: Couverture nuageuse
+    description: Couverture nuageuse au lancement du dispositif
+    mergeMethod: average
+    required: false
+    options:
+      - key: 0-25
+        kobocollect: 0_25
+        label: 0 à 25%
+      - key: 25-50
+        kobocollect: 25_50
+        label: 25 à 50%
+      - key: 50-75
+        kobocollect: 50_75
+        label: 50 à 75%
+      - key: 75-100
+        kobocollect: 75_100
+        label: 75 à 100%
+
+  starting_wind_speed:
+    type: enum
+    label: Vent
+    description: lors du lancement du dispositif, en échelle de Beaufort
+    required: false
+    mergeMethod: average
+    options:
+      - key: "0"
+        label: 0 - Pas de vent
+      - key: "1"
+        label: 1 - Très légère brise (dérive de la fumée)
+      - key: "2"
+        label: 2 - Légère brise (bruissement des feuilles / girouettes commencent à tourner)
+      - key: "3"
+        label: 3 - Brise (feuilles et brindilles en constant mouvement)
+      - key: "4"
+        label: 4 - Brise modérée (poussière, feuilles et petites branches en agitation)
+      - key: "5"
+        label: 5 - Brise forte (jeunes arbres commencent à se balancer)
+      - key: "6"
+        label: 6 - Brise très forte (grosses branches des arbres en mouvement, sifflement du vent)
+      - key: "7"
+        label: 7 - Tempête (grands arbres en mouvement, résistance du vent lors de la marche)
+
   microhabitat:
     type: file
     label: Microhabitat
-    kobocollect:
-      - Prendre_une_photo_du_microhabi
-      - Prendre_une_photo_du_microhabitat_monitor
     description: Photo du microhabitat monitoré
     mergeMethod: none
     required: false
@@ -108,7 +172,6 @@ sessionMetadata:
   device_location:
     type: location
     label: Emplacement de l'entomoscope
-    kobocollect: Emplacement_de_l_entomoscope
     description: ''
     mergeMethod: average
     required: false
@@ -116,7 +179,6 @@ sessionMetadata:
   landscape:
     type: file
     label: Paysage
-    kobocollect: Prendre_une_photo_du_paysgae
     description: Photo du paysage environnant l'entomoscope
     mergeMethod: none
     required: false
@@ -126,7 +188,6 @@ sessionMetadata:
   inflorescence_count:
     type: integer
     label: Nombre d'inflorescences
-    kobocollect: Nombre_d_inflorescen_monitor_e_hors_cadre
     description: Nombre d'inflorescences sur la plante monitorée hors cadre
     mergeMethod: average
     required: false
@@ -135,7 +196,6 @@ sessionMetadata:
   samespecies_flowering_plants_count:
     type: integer
     label: Plantes en fleur de la même espèce
-    kobocollect: Nombre_de_plantes_en_e_dans_un_rayon_d_1m
     description: Nombre de plantes en fleur de la même espèce que celle monitorée dans un rayon d'1m
     mergeMethod: average
     required: false
@@ -144,9 +204,6 @@ sessionMetadata:
   flowering_plant_coverage:
     type: float
     label: Recouvrement floral
-    kobocollect:
-      - Recouvrement_en_de_dans_un_rayon_de_10m
-      - Recouvrement_en_de_dans_un_rayon_de_2m
     description: Recouvrement en % de fleurs de toutes espèces confondues dans un rayon de 2m
     mergeMethod: average
     required: false
@@ -158,7 +215,6 @@ sessionMetadata:
     description: ''
     mergeMethod: none
     required: false
-    kobocollect: Cible_monitoree
     options:
       - key: ground
         kobocollect: sol
@@ -181,7 +237,6 @@ sessionMetadata:
   target_species:
     type: string
     label: Espèce cible
-    kobocollect: Esp_ce_de_la_fleur_naturelle
     description: Espèce de la plante ou du microhabitat monitoré, si applicable
     mergeMethod: none
     required: false
@@ -189,7 +244,6 @@ sessionMetadata:
   plantnat_score:
     type: float
     label: Score plantn@t
-    kobocollect: Score_plantn_t
     description: ''
     mergeMethod: average
     required: false
@@ -197,7 +251,6 @@ sessionMetadata:
   grass_height:
     type: float
     label: Hauteur d'herbe
-    kobocollect: Hauteur_d_herbe_cm
     unit: cm
     description: ''
     mergeMethod: average
@@ -212,7 +265,7 @@ sessionMetadata:
     mergeMethod: min
     required: false
     kobocollect:
-      list: Enregistrement
+      list: recording_type
       choice: acoustique
 
   timelapse_enabled:
@@ -223,7 +276,7 @@ sessionMetadata:
     mergeMethod: min
     required: false
     kobocollect:
-      list: Enregistrement
+      list: recording_type
       choice: photo_time_lapse
 
   ai_enabled:
@@ -234,14 +287,14 @@ sessionMetadata:
     mergeMethod: min
     required: false
     kobocollect:
-      list: Enregistrement
+      list: recording_type
       choice: photo_ia
 
   fisheye:
     type: boolean
     label: Photo fisheye
     kobocollect:
-      list: Photo_fisheye
+      list: fisheye
       'true': oui
       'false': non
     description: Utilisé pour calculer l'ensoleillement
