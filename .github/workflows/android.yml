@@ -239,7 +239,7 @@ jobs:
 
             ${{ steps.artifact.outputs.artifact-url }}
 
-            (wait a bit for a QR code and Diawi link)
+            ([wait](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs/${{ github.job }}?pr=${{ github.event.pull_request.number }}) a bit for a QR code and Diawi link)
             <!-- /apk -->
 
   diawi:
