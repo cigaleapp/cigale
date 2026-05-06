@@ -23,7 +23,9 @@ jobs:
           ssh-key: ${{ secrets.AUTOCOMMITS_DEPLOY_KEY }}
           fetch-depth: 2
       - name: Bump version of modified protocols
+        id: bump
         run: |
+          bumped_list=""
           for file in $(git diff --name-only HEAD^ HEAD -- 'protocols/*.yaml'); do
             # Skip deleted files
             [ -f "$file" ] || continue
@@ -36,9 +38,13 @@ jobs:
               bumped=$(( new_version + 1 ))
               sed -i "s/^version: ${new_version}$/version: ${bumped}/" "$file"
               echo "Bumped $file: v$old_version → v$bumped"
+              bumped_list="$file, "
             fi
           done
+
+          bumped_list=${bumped_list%, }
+          echo "changed=$bumped_list" >> $GITHUB_OUTPUT
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
-          commit_message: 🔖 Bump protocol version [ci skip]
+          commit_message: 🍱 Bump protocol version of ${{ steps.bump.outputs.bumped }} [ci skip]
