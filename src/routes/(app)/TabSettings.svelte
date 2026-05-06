@@ -30,7 +30,7 @@
 		models: NeuralInference[];
 		currentModelIndex: number;
 		setModel: (_i: number) => Promise<void>;
-		trigger: Snippet<[{ help: string; onclick: () => void } & Record<string, unknown>]>;
+		trigger?: Snippet<[{ help: string; onclick: () => void } & Record<string, unknown>]>;
 	}
 
 	const {

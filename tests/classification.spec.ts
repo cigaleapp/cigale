@@ -245,13 +245,13 @@ test.describe('full-screen classification view', pr(1071), () => {
 					.getByRole('button', { name: 'Recadrer' })
 					.click();
 
-				await app.path.wait('/(app)/(sidepanel)/crop/[image]/[[from]]');
+				await app.path.wait('/(app)/(sidepanel)/o/[observation]/crop/[image]');
 
 				await expect(page).toHaveTitle(/^Recadrer lil-fella.jpeg · /);
 
 				await page.getByRole('button', { name: 'Retour' }).click();
 
-				await app.path.wait('/(app)/(sidepanel)/classify/[observation]');
+				await app.path.wait('/(app)/(sidepanel)/o/[observation]/classify/suggestions');
 				await expect(page).toHaveURL(url);
 			});
 
@@ -416,7 +416,7 @@ test.describe('full-screen classification view', pr(1071), () => {
 
 		await page.getByRole('article', { name: 'cyan' }).dblclick();
 
-		await app.path.wait('/(app)/(sidepanel)/classify/[observation]');
+		await app.path.wait('/(app)/(sidepanel)/o/[observation]/classify/suggestions');
 
 		await expect(page.getByTestId('focused-option').getByText('21%')).toBeVisible();
 		await expect(page.getByTestId('focused-option').getByRole('combobox')).toHaveValue(

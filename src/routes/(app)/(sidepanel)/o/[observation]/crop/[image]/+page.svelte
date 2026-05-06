@@ -81,6 +81,7 @@
 		sign,
 		throwError,
 	} from '$lib/utils';
+	import {fullscreenState} from '../../+layout@(app).svelte';
 
 	/**
 	 * @import { RuntimeValue } from '$lib/schemas/metadata';
@@ -175,8 +176,8 @@
 	let activeTool = $derived(tools.find(({ name }) => name === activeToolName) || tools[0]);
 
 	let focusedImageId = $derived(
-		params.from
-			? idb.tables.Observation.getFromState(params.from)?.images.find(
+		params.observation
+			? idb.tables.Observation.getFromState(params.observation)?.images.find(
 					(i) => i.fileId === params.image
 				)
 			: ''
@@ -219,6 +220,11 @@
 	const croppedImagesCount = $derived(sortedFileIds.filter(hasCrop).length);
 	const confirmedCropsCount = $derived(sortedFileIds.filter(hasConfirmedCrop).length);
 
+	$effect(() => {
+		fullscreenState.progress.treated = croppedImagesCount / sortedFileIds.length;
+		fullscreenState.progress.confirmed = confirmedCropsCount / sortedFileIds.length;
+	})
+
 	/** @type {Record<string, undefined | { value: RuntimeValue<'boundingbox'>, confidence: number }>} */
 	const initialCrops = $derived(
 		Object.fromEntries(
@@ -255,6 +261,18 @@
 	);
 
 	/**
+	 * @param {string|undefined} fileId
+	 */
+	async function goToFile(fileId) {
+		if (!fileId) return;
+		await goto('/(app)/(sidepanel)/o/[observation]/crop/[image]', {
+			// Changing files might mean changing observations, so we can't keep the same
+			observation: '_',
+			image: fileId,
+		});
+	}
+
+	/**
 	 * @param {string} imageFileId
 	 */
 	function hasCrop(imageFileId) {
@@ -287,16 +305,13 @@
 		if (!uiState.currentSessionId) return;
 		if (!uiState.cropMetadataId) return;
 
-		let value = uiState.cropMetadataValueOf(image);
-		if (!value) {
-			value = {
-				confidence: 1,
-				manuallyModified: true,
-				value: FULL_IMAGE_CROPBOX,
-				alternatives: {},
-				confirmed: true,
-			};
-		}
+		const value = uiState.cropMetadataValueOf(image) ?? {
+			confidence: 1,
+			manuallyModified: true,
+			value: FULL_IMAGE_CROPBOX,
+			alternatives: {},
+			confirmed: true,
+		};
 
 		await storeMetadataValue({
 			db: idb.databaseHandle(),
@@ -584,7 +599,7 @@
 
 		if (willAutoskip) {
 			if (nextUnconfirmedImageId) {
-				await goto('/(app)/(sidepanel)/crop/[image]', { image: nextUnconfirmedImageId });
+				await goToFile(nextUnconfirmedImageId);
 			} else {
 				await goto('/(app)/(sidepanel)/classify');
 			}
@@ -603,7 +618,7 @@
 		}
 
 		if (nextUnconfirmedImageId) {
-			await goto('/(app)/(sidepanel)/crop/[image]', { image: nextUnconfirmedImageId });
+			await goToFile(nextUnconfirmedImageId);
 		} else {
 			await goto('/(app)/(sidepanel)/classify');
 		}
@@ -614,7 +629,7 @@
 		await deleteImageFile(fileId);
 
 		if (nextFileIdBeforeDelete) {
-			await goto('/(app)/(sidepanel)/crop/[image]', { image: nextFileIdBeforeDelete });
+			await goToFile(nextFileIdBeforeDelete);
 		} else {
 			// If nextFileId (and not nextFileIdBeforeDelete) is undefined,
 			// it means we just deleted the last image; so we go back to the import tab
@@ -639,8 +654,8 @@
 
 	function exit() {
 		uiState.imagePreviouslyOpenedInCropper = fileId;
-		if (params.from) {
-			goto('/(app)/(sidepanel)/classify/[observation]', { observation: params.from });
+		if (params.observation) {
+			goto('/(app)/(sidepanel)/o/[observation]/classify/suggestions', params);
 		} else {
 			goto('/crop/');
 		}
@@ -667,17 +682,17 @@
 		ArrowLeft: {
 			help: 'Image précédente',
 			when: () => Boolean(prevFileId),
-			do: () => goto('/(app)/(sidepanel)/crop/[image]', { image: prevFileId }),
+			do: () => goToFile(prevFileId),
 		},
 		'Shift+Space': {
 			help: 'Image précédente',
 			when: () => Boolean(prevFileId),
-			do: () => goto('/(app)/(sidepanel)/crop/[image]', { image: prevFileId }),
+			do: () => goToFile(prevFileId),
 		},
 		ArrowRight: {
 			help: 'Image suivante',
 			when: () => Boolean(nextFileId),
-			do: () => goto('/(app)/(sidepanel)/crop/[image]', { image: nextFileId }),
+			do: () => goToFile(nextFileId),
 		},
 		Space: {
 			help: 'Continuer',
@@ -863,8 +878,8 @@
 	feature="Le recadrage"
 	issue={1518}
 	back={async () => {
-		if (params.from) {
-			await goto('/(app)/(sidepanel)/classify/[observation]', { observation: params.from });
+		if (params.observation) {
+			await goto('/(app)/(sidepanel)/o/[observation]/classify', params);
 		} else {
 			await goto('/crop/');
 		}
@@ -998,23 +1013,6 @@
 	<aside class="info">
 		<section class="top">
 			<section class="preactions">
-				{#if params.from}
-					<ButtonInk
-						inline
-						onclick={exit}
-						help="Retourner à la classification de l'image"
-					>
-						<IconBack />
-						Retour
-						<KeyboardHint shortcut="Escape" />
-					</ButtonInk>
-				{:else}
-					<ButtonInk inline onclick={exit}>
-						<IconGallery />
-						Autres photos
-						<KeyboardHint shortcut="Escape" />
-					</ButtonInk>
-				{/if}
 				<ButtonInk
 					dangerous
 					onclick={deleteImageFileAndGotoNext}
@@ -1027,22 +1025,7 @@
 					Supprimer
 				</ButtonInk>
 			</section>
-			<section class="filename">
-				{#if firstImage}
-					<h1>
-						<OverflowableText text={firstImage.filename} />
-						{#if hasConfirmedCrop(fileId)}
-							<div class="status" use:tooltip={'Recadrage confirmé'}>
-								<IconConfirmedCrop />
-							</div>
-						{/if}
-					</h1>
-				{:else}
-					<h1>
-						<code>Image introuvable</code>
-					</h1>
-				{/if}
-			</section>
+
 			<section class="actions">
 				<ButtonSecondary
 					keyboard="$mod+U"
@@ -1161,30 +1144,7 @@
 				{/if}
 			</ul>
 		</section>
-		<section class="progress">
-			{#snippet percentage(/** @type {number} */ value)}
-				<code>
-					{percent(value / sortedFileIds.length)}
-				</code>
-			{/snippet}
-
-			<div class="bar">
-				<p>
-					<IconHasCrop />
-					Images avec recadrage
-					{@render percentage(croppedImagesCount)}
-				</p>
-				<ProgressBar alwaysActive progress={croppedImagesCount / sortedFileIds.length} />
-			</div>
-			<div class="bar">
-				<p>
-					<IconConfirmedCrop />
-					Recadrages confirmés
-					{@render percentage(confirmedCropsCount)}
-				</p>
-				<ProgressBar alwaysActive progress={confirmedCropsCount / sortedFileIds.length} />
-			</div>
-		</section>
+		
 		<nav>
 			<div class="navigation">
 				<ButtonIcon
@@ -1193,7 +1153,7 @@
 					keyboard="ArrowLeft"
 					onclick={() => {
 						if (!prevFileId) return;
-						goto('/(app)/(sidepanel)/crop/[image]', { image: prevFileId });
+						goToFile(prevFileId);
 					}}
 				>
 					<IconPrev />
@@ -1209,7 +1169,7 @@
 					keyboard="ArrowRight"
 					onclick={() => {
 						if (!nextFileId) return;
-						goto('/(app)/(sidepanel)/crop/[image]', { image: nextFileId });
+						goToFile(nextFileId);
 					}}
 				>
 					<IconNext />

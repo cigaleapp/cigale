@@ -293,7 +293,7 @@
 				help={!singleObservationSelected ? 'Sélectionnez une seule observation' : ''}
 				onclick={async () => {
 					if (!singleObservationSelected) return;
-					await goto('/(app)/(sidepanel)/classify/[observation]', {
+					await goto('/(app)/(sidepanel)/o/[observation]/classify/suggestions', {
 						observation: singleObservationSelected.id,
 					});
 				}}
