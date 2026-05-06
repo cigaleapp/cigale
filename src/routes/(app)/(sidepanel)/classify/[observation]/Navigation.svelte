@@ -81,7 +81,7 @@
 		if (nextUnconfirmedObservation) {
 			await goto(observationRoute(nextUnconfirmedObservation));
 		} else if (allConfirmed) {
-			await goto(resolve('/results'));
+			await goto(resolve('/results/'));
 		}
 	}
 

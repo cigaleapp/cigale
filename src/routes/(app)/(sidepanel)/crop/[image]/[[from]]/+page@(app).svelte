@@ -642,7 +642,7 @@
 		if (params.from) {
 			goto('/(app)/(sidepanel)/classify/[observation]', { observation: params.from });
 		} else {
-			goto('/crop');
+			goto('/crop/');
 		}
 	}
 

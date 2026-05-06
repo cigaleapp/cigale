@@ -48,7 +48,7 @@
 
 <header>
 	<div class="line">
-		<ButtonInk inline href={resolve('/classify')}>
+		<ButtonInk inline href={resolve('/classify/')}>
 			<IconGallery />
 			Voir tout
 			<KeyboardHint shortcut="Escape" />

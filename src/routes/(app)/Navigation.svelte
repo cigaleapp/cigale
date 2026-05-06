@@ -225,7 +225,7 @@
 						</a>
 						<div class="with-inference-indicator">
 							<a
-								href={resolve('/import')}
+								href={resolve('/import/')}
 								data-testid="goto-import"
 								aria-disabled={!uiState.currentProtocol}
 							>
@@ -252,7 +252,7 @@
 									? resolve('/(app)/(sidepanel)/crop/[image]', {
 											image: uiState.imageOpenedInCropper,
 										})
-									: resolve('/crop')}
+									: resolve('/crop/')}
 								data-testid="goto-crop"
 								aria-disabled={!uiState.currentProtocol || !hasImages}
 							>
@@ -280,7 +280,7 @@
 								: undefined}
 						>
 							<a
-								href={resolve('/classify')}
+								href={resolve('/classify/')}
 								aria-disabled={!uiState.currentProtocol ||
 									!hasImages ||
 									(uiState.processing.task === 'detection' &&
@@ -303,7 +303,7 @@
 							/>
 						</div>
 						<div class="separator"><IconNext /></div>
-						<a href={resolve('/results')} data-testid="goto-results">
+						<a href={resolve('/results/')} data-testid="goto-results">
 							Résultats
 							{#if path == '/results/'}
 								<div class="line"></div>
@@ -312,19 +312,19 @@
 					</div>
 				{:else}
 					<div class="steps" in:fade={{ duration: 100 }}>
-						<a href={resolve('/sessions')} data-testid="goto-sessions">
+						<a href={resolve('/sessions/')} data-testid="goto-sessions">
 							Sessions
 							{#if path.startsWith('/sessions')}
 								<div class="line"></div>
 							{/if}
 						</a>
-						<a href={resolve('/protocols')} data-testid="goto-protocols">
+						<a href={resolve('/protocols/')} data-testid="goto-protocols">
 							Protocoles
 							{#if path.startsWith('/protocols')}
 								<div class="line"></div>
 							{/if}
 						</a>
-						<a href={resolve('/accounts')} data-testid="goto-accounts">
+						<a href={resolve('/accounts/')} data-testid="goto-accounts">
 							Comptes
 							{#if path.startsWith('/accounts')}
 								<div class="line"></div>

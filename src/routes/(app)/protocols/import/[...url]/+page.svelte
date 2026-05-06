@@ -55,7 +55,7 @@
 			await swarpc.importProtocol({ contents: raw });
 			await tables.Protocol.refresh(null);
 			await tables.Metadata.refresh(null);
-			await goto('/protocols');
+			await goto('/protocols/');
 		} catch (error) {
 			toasts.error(`Erreur lors de l'import du protocole distant: ${error}`);
 		} finally {

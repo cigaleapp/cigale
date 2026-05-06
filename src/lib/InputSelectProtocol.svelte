@@ -44,7 +44,7 @@
 					data: { protocol: null },
 					label: 'Gérer les protocoles',
 					async onclick() {
-						await goto('/protocols');
+						await goto('/protocols/');
 					},
 				},
 			],

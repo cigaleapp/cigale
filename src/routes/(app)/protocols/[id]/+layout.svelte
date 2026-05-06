@@ -155,7 +155,7 @@
 		{#if !collapsedSidebar}
 			<header in:fade>
 				<div class="top-actions">
-					<ButtonInk onclick={() => goto('/protocols')}>
+					<ButtonInk onclick={() => goto('/protocols/')}>
 						<IconBack />
 						Retour
 					</ButtonInk>
@@ -213,14 +213,14 @@
 				<ButtonIcon
 					help="Retour aux protocoles"
 					tooltipParams={{ placement: 'right' }}
-					onclick={() => goto('/protocols')}
+					onclick={() => goto('/protocols/')}
 				>
 					<IconBack />
 				</ButtonIcon>
 			</header>
 		{/if}
 
-		<ModalDeleteProtocol {id} bind:open={deleteProtocol} ondelete={() => goto('/protocols')} />
+		<ModalDeleteProtocol {id} bind:open={deleteProtocol} ondelete={() => goto('/protocols/')} />
 
 		<nav>
 			{@render navlink('Informations', 'infos', IconInfo)}
