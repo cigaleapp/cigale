@@ -1,0 +1,44 @@
+name: Bump protocol version
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - protocols/*.yaml
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  bump:
+    name: Bump version
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ssh-key: ${{ secrets.AUTOCOMMITS_DEPLOY_KEY }}
+          fetch-depth: 2
+      - name: Bump version of modified protocols
+        run: |
+          for file in $(git diff --name-only HEAD^ HEAD -- 'protocols/*.yaml'); do
+            # Skip deleted files
+            [ -f "$file" ] || continue
+
+            old_version=$(git show HEAD^:"$file" 2>/dev/null | grep -E '^version:' | awk '{print $2}' || true)
+            new_version=$(grep -E '^version:' "$file" | awk '{print $2}' || true)
+
+            # Only bump if the file had a version before and it hasn't changed
+            if [ -n "$old_version" ] && [ "$old_version" = "$new_version" ]; then
+              bumped=$(( new_version + 1 ))
+              sed -i "s/^version: ${new_version}$/version: ${bumped}/" "$file"
+              echo "Bumped $file: v$old_version → v$bumped"
+            fi
+          done
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v7
+        with:
+          commit_message: 🔖 Bump protocol version [ci skip]
