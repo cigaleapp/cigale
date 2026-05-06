@@ -34,17 +34,17 @@
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import Logo from '$lib/Logo.svelte';
 	import { serializeMetadataValue } from '$lib/metadata/serializing.js';
+	import { deleteMetadataValue, storeMetadataValue } from '$lib/metadata/storage.js';
 	import MetadataInput from '$lib/MetadataInput.svelte';
 	import { observationMetadata } from '$lib/observations.js';
 	import OverflowableText from '$lib/OverflowableText.svelte';
 	import { goto } from '$lib/paths.js';
 	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
-	import { compareBy, entries } from '$lib/utils.js';
+	import { uiState } from '$lib/state.svelte.js';
+	import { compareBy, entries, transformObject } from '$lib/utils.js';
 
 	import { fullscreenState } from '../../+layout@(app).svelte';
 	import Subject from '../Subject.svelte';
-	import { storeMetadataValue, deleteMetadataValue } from '$lib/metadata/storage.js';
-	import { uiState } from '$lib/state.svelte.js';
 
 	const { children } = $props();
 
@@ -59,24 +59,29 @@
 	const definitions = $derived(narrowingState.definitions);
 
 	const metadataValues = $derived(narrowingState.metadataValues);
-	$inspect(definitions);
 
 	$effect(() => {
 		narrowingState.definitions = tables.Metadata.state
 			.filter((m) => m.group === narrowingState.metadataGroup)
-			.map((m) => ({
-				...m,
-				group: '',
-			}));
 	});
 
 	$effect(() => {
-		narrowingState.metadataValues = observationMetadata({
-			observation,
-			definitions,
-			images: tables.Image.state.filter((img) => observation?.images.includes(img.id)),
-			filterType: 'enum',
-		});
+		// Only get values that are relevant to the narrowing view
+		narrowingState.metadataValues = transformObject(
+			observationMetadata({
+				observation,
+				definitions,
+				images: tables.Image.state.filter((img) => observation?.images.includes(img.id)),
+				filterType: 'enum',
+			}),
+			(id, value) => {
+				if( definitions.some((d) => d.id === id)) {
+					return [id, value];
+				}
+
+				return undefined;
+			}
+		);
 	});
 </script>
 
@@ -128,11 +133,12 @@
 											db: databaseHandle(),
 											metadataId: id,
 											subjectId: observation.id,
+											sessionId: uiState.currentSession?.id,
 											type: 'enum',
 											value,
 											confidence: 1,
 											manuallyModified: true,
-										})
+										});
 									}}
 								></MetadataInput>
 							</div>
@@ -168,7 +174,25 @@
 			</ol>
 		</section>
 		<section class="restart">
-			<ButtonInk>
+			<ButtonInk
+				onclick={async () => {
+					if (!observation) return;
+					const obs = await tables.Observation.raw.get(observation.id);
+					if (!obs) return;
+					// Wipe all metadata values that are in the current metadata group
+					await tables.Observation.update(
+						observation.id,
+						'metadataOverrides',
+						transformObject(obs.metadataOverrides, (id, value) => {
+							const def = definitions.find((d) => d.id === id);
+							if (!def) return [id, value];
+							if (def.group !== narrowingState.metadataGroup) return [id, value];
+
+							return undefined;
+						})
+					);
+				}}
+			>
 				<IconRestart />
 				Recommencer
 			</ButtonInk>
@@ -238,7 +262,7 @@
 	}
 
 	aside {
-		width: max(500px, 33%);
+		width: max(600px, 33%);
 		flex-shrink: 0;
 		display: flex;
 		flex-direction: column;
@@ -270,12 +294,12 @@
 			}
 
 			.metadata {
-				max-width: 20ch;
+				max-width: 40ch;
 			}
 
 			.input {
 				margin-left: auto;
-				width: 10ch;
+				width: 20ch;
 			}
 		}
 

@@ -24,6 +24,7 @@
 	const definitions = $derived(narrowingState.definitions);
 	const metadataValues = $derived(narrowingState.metadataValues);
 
+
 	const observation = $derived(tables.Observation.getFromState(page.params.observation ?? ''));
 
 	const debouncedSearch = new Debounced(() => narrowingState.search.query, 300);
@@ -135,7 +136,7 @@
 		<div class="scrollable">
 			<MetadataList
 				definitions={definitions
-					.filter((def) => searchResults?.some((r) => r.id === def.id) ?? true)
+					.filter((def) => searchResults?.some((r) => r.id === def.id) ?? true).map(def => ({...def, group: ""}))
 					}
 				ordering={searchResults?.map((result) => result.id) ??
 					uiState.currentProtocol?.metadataOrder}
@@ -210,5 +211,13 @@
 	.scrollable {
 		overflow: auto;
 		height: 100%;
+	}
+
+	.metadata {
+		/* 
+		Fiddled with manually in order to get approx. 66 chars/line max 
+		See https://www.uxpin.com/studio/blog/optimal-line-length-for-readability/
+		*/
+		max-width: 650px;
 	}
 </style>
