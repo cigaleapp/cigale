@@ -310,9 +310,12 @@ metadata:
     required: false
     infer:
       sidecar: |
+        EntomoscopeLatitude = "" or EntomoscopeLongitude = "" ? null :
         {
-          "latitude": EntomoscopeLatitude, 
-          "longitude": EntomoscopeLongitude
+          /* 1.2345 N */
+          "latitude": EntomoscopeLatitude ~> $string ~> $replace("N", "") ~> $trim ~> $number ,
+          /* 1.2345 E */
+          "longitude": EntomoscopeLongitude ~> $string ~> $replace("E", "") ~> $trim ~> $number
         }
 
   altitude:
@@ -419,6 +422,7 @@ metadata:
       # TODO: guard against missing or malformed metadata
       # and return an empty array in that case
       sidecar: |
+        EntomoscopeAiEnable = false ? [] : 
         (
           $boxes := EntomoscopeAiPredictionBoxes;
           $scores := EntomoscopeAiPredictionConf;
