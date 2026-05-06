@@ -101,7 +101,7 @@
 
 	const supervisors = [
 		{ name: 'Axel Carlier', url: 'https://github.com/axelcarlier' },
-		{ name: 'Maxime Cauchois', url: 'https://github.com/mcauchoix' },
+		{ name: 'Maxime Cauchoix', url: 'https://github.com/mcauchoix' },
 		{ name: 'Edgar Remy', url: 'https://github.com/edgaremy' },
 		{ name: 'Thomas Forgione', url: 'https://github.com/tforgione' },
 	];
