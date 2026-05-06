@@ -59,16 +59,16 @@
 		display: flex;
 		align-items: center;
 		gap: 0.25em;
-		padding: 0.25em;
+		padding: 0.5em;
 		font-size: 1rem;
-		border: 2px solid var(--fg-neutral);
-		background: var(--bg-neutral);
+		/* border: 1px solid var(--fg-neutral); */
+		background: color-mix(var(--gray)  15%, var(--bg-neutral));
 		border-radius: var(--corner-radius);
 		width: min-content;
 		height: min-content;
 
 		&:is(:has(:focus-visible), :hover) {
-			background-color: var(--gray);
+		background: color-mix(var(--gray)  35%, var(--bg-neutral));
 			.icon:not(.active) {
 				color: var(--fg-neutral);
 			}

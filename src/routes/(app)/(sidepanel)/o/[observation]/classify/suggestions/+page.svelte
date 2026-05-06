@@ -27,7 +27,7 @@
 	import { uiState } from '$lib/state.svelte.js';
 	import { undo } from '$lib/undo.svelte';
 
-	import Header from './Header.svelte';
+	import { fullscreenState } from '../../+layout@(app).svelte';
 	import LayoutSwitcher from './LayoutSwitcher.svelte';
 	import Navigation from './Navigation.svelte';
 	import OptionBar from './OptionBar.svelte';
@@ -64,7 +64,18 @@
 
 	let expand = $state<Expandable>('none');
 	let layoutTransitions = $state(true);
-	let currentImage = $state(images[0]);
+	let currentImage = $derived(images[0]);
+
+	$effect(() => {
+		fullscreenState.currentImage = currentImage.id;
+	});
+
+	$effect(() => {
+		fullscreenState.progress.treated =
+			navigation.classifiedObservationsCount / navigation.totalObservations;
+		fullscreenState.progress.confirmed =
+			navigation.confirmedClassificationsCount / navigation.totalObservations;
+	});
 
 	undo.initialize(100);
 
@@ -97,10 +108,6 @@
 		{/if}
 	</div>
 	<div class="panel" {@attach area('panel')}>
-		<div class="header" {@attach area('header')}>
-			<Header {observation} {focusedMetadata} {currentImage} />
-		</div>
-
 		<div class="layout-switcher" {@attach area('layout-switcher')}>
 			<LayoutSwitcher
 				toggleLayoutTransitions={(enable) => {
@@ -189,7 +196,7 @@
 <style>
 	main {
 		display: grid;
-		height: 100dvh;
+		height: 100%;
 		overflow: hidden;
 	}
 
@@ -237,7 +244,7 @@
 
 	main[data-layout='top-bottom'] {
 		grid-template-areas: 'subject panel' 'references panel';
-		grid-template-columns: 3fr 2fr;
+		grid-template-columns: 50% 50%;
 		grid-template-rows: 50% 50%;
 
 		&[data-expand='subject'] {
@@ -252,12 +259,12 @@
 
 		.subject,
 		.references {
-			border-right: 3px solid var(--fg-neutral);
+			border-right: 1px solid var(--gray);
 		}
 
 		.references {
-			border-top: 3px solid var(--fg-neutral);
-			height: calc(100% - 3px);
+			border-top: 1px solid var(--gray);
+			height: calc(100% - 1px);
 		}
 	}
 
@@ -278,41 +285,40 @@
 
 		.subject,
 		.references {
-			border-bottom: 3px solid var(--fg-neutral);
+			border-bottom: 1px solid var(--gray);
 		}
 
 		.references {
-			border-right: 3px solid var(--fg-neutral);
-			width: calc(100% - 3px);
+			border-right: 1px solid var(--gray);
+			width: calc(100% - 1px);
 		}
 	}
 
 	main[data-layout='left-right'] .panel {
-		margin-top: -1.4lh;
-		height: calc(100% + 1.4lh);
-		z-index: 10;
-		grid-template-columns: 25% 1fr 25%;
+		grid-template-columns: min(max(33%, 260px), 400px) auto min(33%, 500px);
 		grid-template-rows: min-content 1fr 1fr;
-		padding: 0 2em 2em 2em;
+		padding: 2em;
 		row-gap: 0.5em;
 		grid-template-areas:
-			'. focused-option layout-switcher'
-			'cascades description header'
+			'. . layout-switcher'
+			'cascades description focused-option'
 			'synonyms description nav';
 
+
 		.layout-switcher {
-			margin-top: 0.4lh;
-			display: flex;
-			justify-self: flex-end;
+			z-index: 10;
+			position: absolute;
+			left: 50%;
+			top: 53%;
+			translate: -50% -50%;
 		}
 	}
 
 	main[data-layout='top-bottom'] .panel {
-		padding: 1em 2em;
+		padding: 2em;
 		grid-template-columns: 1fr 1fr;
-		grid-template-rows: min-content min-content 1.5fr min-content min-content;
+		grid-template-rows: min-content 1.5fr min-content min-content;
 		grid-template-areas:
-			'header header'
 			'focused-option focused-option'
 			'description description'
 			'cascades synonyms'
@@ -321,8 +327,8 @@
 		.layout-switcher {
 			z-index: 10;
 			position: absolute;
-			left: 60%;
-			top: 50%;
+			left: 50%;
+			top: 53%;
 			translate: -50% -50%;
 		}
 	}

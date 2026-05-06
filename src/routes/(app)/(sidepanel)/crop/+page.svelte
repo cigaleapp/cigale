@@ -82,7 +82,10 @@
 				}}
 				onclick={async (_e, set) => {
 					set({ status: 'loading', loadingStatusText: 'Ouverture…' });
-					await goto('/(app)/(sidepanel)/crop/[image]', { image: fileId });
+					await goto('/(app)/(sidepanel)/o/[observation]/crop/[image]', {
+						image: fileId,
+						observation: '_',
+					});
 				}}
 			/>
 		{/snippet}

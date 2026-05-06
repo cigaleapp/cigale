@@ -45,7 +45,7 @@
 	let showOverlay = $state(async () => {});
 
 	function observationRoute(observation: { id: string }) {
-		return resolve('/(app)/(sidepanel)/classify/[observation]', {
+		return resolve('/(app)/(sidepanel)/o/[observation]/classify', {
 			observation: observation.id,
 		});
 	}
@@ -88,7 +88,9 @@
 	defineKeyboardShortcuts('classification', {
 		'$mod+ArrowRight': {
 			help: 'Observation suivante',
-			do: async () => nextObservation && goto(observationRoute(nextObservation)),
+			async do() {
+				if (nextObservation) await goto(observationRoute(nextObservation));
+			},
 		},
 		Space: {
 			help: 'Marquer la classification comme confirmée et passer à la prochaine observation non confirmée',
@@ -96,41 +98,20 @@
 		},
 		'$mod+ArrowLeft': {
 			help: 'Observation précédente',
-			do: async () => prevObservation && goto(observationRoute(prevObservation)),
+			async do() {
+				if (prevObservation) await goto(observationRoute(prevObservation));
+			},
 		},
 		'Shift+Space': {
 			help: 'Observation précédente',
-			do: async () => prevObservation && goto(observationRoute(prevObservation)),
+			async do() {
+				if (prevObservation) await goto(observationRoute(prevObservation));
+			},
 		},
 	});
 </script>
 
 <ConfirmedOverlay bind:show={showOverlay} />
-
-<section class="progress">
-	{#snippet percentage(value: number)}
-		<code>
-			{percent(value / totalObservations)}
-		</code>
-	{/snippet}
-
-	<div class="bar">
-		<p>
-			<IconClassified />
-			Observations classifiées
-			{@render percentage(classifiedObservationsCount)}
-		</p>
-		<ProgressBar alwaysActive progress={classifiedObservationsCount / totalObservations} />
-	</div>
-	<div class="bar">
-		<p>
-			<IconConfirmedClassification />
-			Classifications confirmées
-			{@render percentage(confirmedClassificationsCount)}
-		</p>
-		<ProgressBar alwaysActive progress={confirmedClassificationsCount / totalObservations} />
-	</div>
-</section>
 
 <nav>
 	<div class="image-switcher">
@@ -140,7 +121,8 @@
 			disabled={!prevObservation}
 			preload={() => {
 				if (!prevObservation) return;
-				void preloadData(observationRoute(prevObservation));
+				// FIXME: causes a navigation...
+				// void preloadData(observationRoute(prevObservation));
 			}}
 			onclick={async () => {
 				if (!prevObservation) return;
@@ -160,7 +142,8 @@
 			disabled={!nextObservation}
 			preload={() => {
 				if (!nextObservation) return;
-				void preloadData(observationRoute(nextObservation));
+				// FIXME: causes a navigation...
+				// void preloadData(observationRoute(nextObservation));
 			}}
 			onclick={async () => {
 				if (!nextObservation) return;

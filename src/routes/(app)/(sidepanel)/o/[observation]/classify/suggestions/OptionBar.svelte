@@ -15,6 +15,7 @@
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import { storeMetadataValue } from '$lib/metadata/index.js';
 	import MetadataCombobox from '$lib/MetadataCombobox.svelte';
+	import OverflowableText from '$lib/OverflowableText.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { undo } from '$lib/undo.svelte.js';
 	import { compareBy, entries, mapKeys, nonnull } from '$lib/utils.js';
@@ -156,29 +157,6 @@
 </script>
 
 <div class="bar" data-layout={layout}>
-	<div class="prev" style:grid-area="prev">
-		<ButtonSecondary
-			aria-label="Option précédente"
-			disabled={!prevOption}
-			onclick={async () => setOption(prevOption!, confidences)}
-			help={{
-				text: prevOption?.label ?? '',
-				keyboard: 'J',
-			}}
-		>
-			<div class="button-contents prev">
-				<ConfidencePercentage
-					tooltip={() => ''}
-					value={prevOption ? confidences[prevOption.key] : undefined}
-				/>
-				{#if layout === 'left-right'}
-					Précédente
-				{/if}
-				<IconPrevious />
-			</div>
-		</ButtonSecondary>
-	</div>
-
 	<div class="current" style:grid-area="current" data-testid="current">
 		<ButtonSecondary
 			onclick={() => focusOptionCombobox('focus')}
@@ -203,32 +181,50 @@
 			<IconExpand />
 		</ButtonSecondary>
 	</div>
+	<div class="others">
+		<div class="prev">
+			<ButtonSecondary
+				aria-label="Option précédente"
+				disabled={!prevOption}
+				onclick={async () => setOption(prevOption!, confidences)}
+				help={{
+					text: prevOption?.label ?? '',
+					keyboard: 'J',
+				}}
+			>
+				<div class="button-contents prev">
+					<IconPrevious />
+					<OverflowableText no-tooltip text="Précédente" />
+					<ConfidencePercentage
+						tooltip={() => ''}
+						value={prevOption ? confidences[prevOption.key] : undefined}
+					/>
+				</div>
+			</ButtonSecondary>
+		</div>
 
-	<div class="next" style:grid-area="next">
-		<ButtonSecondary
-			aria-label="Option suivante"
-			disabled={!nextOption}
-			onclick={async () => setOption(nextOption!, confidences)}
-			help={{
-				text: nextOption?.label ?? '',
-				keyboard: 'L',
-			}}
-		>
-			<div class="button-contents">
-				<IconNext />
-				{#if layout === 'left-right'}
-					Suivante
-				{/if}
-				<ConfidencePercentage
-					tooltip={() => ''}
-					value={nextOption ? confidences[nextOption.key] : undefined}
-				/>
-			</div>
-		</ButtonSecondary>
-	</div>
+		<div class="next">
+			<ButtonSecondary
+				aria-label="Option suivante"
+				disabled={!nextOption}
+				onclick={async () => setOption(nextOption!, confidences)}
+				help={{
+					text: nextOption?.label ?? '',
+					keyboard: 'L',
+				}}
+			>
+				<div class="button-contents">
+					<IconNext />
+					<OverflowableText no-tooltip text="Suivante" />
+					<ConfidencePercentage
+						tooltip={() => ''}
+						value={nextOption ? confidences[nextOption.key] : undefined}
+					/>
+				</div>
+			</ButtonSecondary>
+		</div>
 
-	{#if layout === 'top-bottom'}
-		<div class="confirmation" style:grid-area="confirmation" data-testid="confirmation">
+		<div class="confirmation" data-testid="confirmation">
 			<ButtonSecondary
 				onclick={async () => {
 					if (!option) return;
@@ -253,30 +249,35 @@
 				</div>
 			</ButtonSecondary>
 		</div>
-	{/if}
+	</div>
 </div>
 
 <style>
 	.bar {
-		display: grid;
+		display: flex;
 		align-items: center;
 		justify-content: center;
 		gap: 1em;
 
 		&[data-layout='left-right'] {
-			grid-template-areas: 'prev current next';
-			grid-template-columns: 1fr auto 1fr;
+			flex-direction: column;
 		}
+	}
 
-		&[data-layout='top-bottom'] {
-			justify-content: start;
-			grid-template-areas: 'current prev next confirmation';
-			grid-template-columns: auto 1fr 1fr;
+	.others {
+		width: 100%;
+		display: grid;
+		grid-template-columns: 1fr 1fr auto;
+		gap: 1em;
 
-			.button-contents.prev {
-				flex-direction: row-reverse;
-			}
+		> * {
+			min-width: 0;
+			overflow: hidden;
 		}
+	}
+
+	.current {
+		width: 100%;
 	}
 
 	.button-contents {
@@ -299,6 +300,6 @@
 	.current :global(input) {
 		font-size: 1em;
 		background: transparent;
-		width: 150px;
+		/* width: 150px; */
 	}
 </style>

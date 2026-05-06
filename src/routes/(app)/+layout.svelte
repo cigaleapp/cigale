@@ -36,8 +36,7 @@
 	initializeProcessingQueue({ swarpc, cancellers, parallelism });
 
 	const navbarAppearance = $derived.by<NavbarAppearance>(() => {
-		if (page.route.id === '/(app)/(sidepanel)/classify/[observation]') return 'hidden';
-		if (page.route.id === '/(app)/(sidepanel)/crop/[image]/[[from]]') return 'hidden';
+		if (page.route.id?.startsWith('/(app)/(sidepanel)/o/[observation]')) return 'hidden';
 		if (page.route.id?.startsWith('/(app)/protocols/[id]')) return 'hidden';
 
 		return 'full';
