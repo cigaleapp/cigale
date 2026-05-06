@@ -8,24 +8,29 @@
 	type Props = {
 		options: Key[];
 		current: NoInfer<Key>;
-		disabled: (key: Key) => boolean | string;
+		disabled?: (key: Key) => boolean | string;
 	} & Record<`option_${NoInfer<Key>}`, Snippet>;
 
-	let { options, disabled, current = $bindable(), ...snippets }: Props = $props();
+	let {
+		options,
+		disabled: isDisabled = () => false,
+		current = $bindable(),
+		...snippets
+	}: Props = $props();
 
 	const id = $props.id();
 </script>
 
 <div class="segmented-group">
 	{#each options as key (key)}
-		<label
-			for="{id}-{key}"
-			use:tooltip={typeof disabled(key) === 'string' ? disabled(key) : undefined}
-		>
+		{@const disabled = isDisabled(key)}
+		{@const disabledWhy = typeof disabled === 'string' ? disabled : undefined}
+
+		<label for="{id}-{key}" use:tooltip={disabledWhy}>
 			<input
-				disabled={disabled(key)}
+				disabled={Boolean(disabled)}
 				type="radio"
-				name="segmented-group"
+				name={id}
 				bind:group={current}
 				value={key}
 				id="{id}-{key}"

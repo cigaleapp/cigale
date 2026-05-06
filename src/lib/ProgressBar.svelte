@@ -57,7 +57,7 @@ TODO: Don't animate when progress decreases (e.g. when a new task starts and it 
 			class:inactive
 			value={clamp(p, 0, 1)}
 			max="1"
-			style:--phased-fill-color="color-mix(var(--_fill-color) {((i+1) /
+			style:--phased-fill-color="color-mix(var(--_fill-color) {((i + 1) /
 				ensureArray(progress).length) *
 				100}%, var(--bg-neutral))"
 		></progress>

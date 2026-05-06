@@ -1,3 +1,7 @@
+<script lang="ts" module>
+	export type Expandable = 'references' | 'subject' | 'none';
+</script>
+
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 

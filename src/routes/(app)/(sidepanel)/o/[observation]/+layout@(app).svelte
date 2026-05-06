@@ -9,6 +9,7 @@
 </script>
 
 <script lang="ts">
+	import { fade } from 'svelte/transition';
 	import { UAParser } from 'ua-parser-js';
 
 	import IconConfirmed from '~icons/ri/check-double-line';
@@ -18,7 +19,7 @@
 	import { page } from '$app/state';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import { dependencyURI, tables } from '$lib/idb.svelte';
-	import { imageId } from '$lib/images';
+	import { imageId, imageIdToFileId } from '$lib/images';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
 	import { goto } from '$lib/paths.js';
@@ -36,6 +37,14 @@
 
 	const currentImage = $derived(tables.Image.getFromState(fullscreenState.currentImage ?? ''));
 
+	const imageToCrop = $derived(
+		imageFile?.id ??
+			currentImage?.fileId ??
+			(observation && observation.images.length === 1
+				? imageIdToFileId(observation.images[0])
+				: undefined)
+	);
+
 	const focusedMetadata = $derived(
 		tables.Metadata.getFromState(
 			uiState.currentSession?.fullscreenClassifier.focusedMetadata ??
@@ -48,7 +57,7 @@
 		switch (page.route.id) {
 			case '/(app)/(sidepanel)/o/[observation]/classify':
 			case '/(app)/(sidepanel)/o/[observation]/classify/suggestions':
-			case '/(app)/(sidepanel)/o/[observation]/classify/narrow/eliminate':
+			case '/(app)/(sidepanel)/o/[observation]/classify/narrow/describe':
 			case '/(app)/(sidepanel)/o/[observation]/classify/narrow/candidates': {
 				await goto('/(app)/(sidepanel)/classify');
 				break;
@@ -59,6 +68,22 @@
 			}
 		}
 	}
+
+	const tab = $derived.by(() => {
+		switch (page.route.id) {
+			case '/(app)/(sidepanel)/o/[observation]/crop/[image]':
+				return 'crop';
+			case '/(app)/(sidepanel)/o/[observation]/classify/suggestions':
+				return 'suggestions';
+			case '/(app)/(sidepanel)/o/[observation]/classify/narrow/describe':
+			case '/(app)/(sidepanel)/o/[observation]/classify/narrow/candidates':
+			case '/(app)/(sidepanel)/o/[observation]/classify/narrow':
+				return 'narrow';
+			default:
+				// Unreachable
+				return 'crop';
+		}
+	});
 
 	defineKeyboardShortcuts('general', {
 		Escape: {
@@ -71,8 +96,6 @@
 		const platform = new UAParser(navigator.userAgent).getOS().name;
 		return platform === 'Windows' || platform === 'Linux';
 	});
-
-	$inspect({fullscreenState});
 </script>
 
 <!-- Close button can be on the right (Windows, Linux) or on the left (macOS) -->
@@ -91,6 +114,7 @@
 		<h1>
 			{#if observation}
 				<InlineTextInput
+					help="Modifier le nom de l'observation"
 					label="Nom de l'observation"
 					value={observation.label}
 					onblur={async (newLabel) => {
@@ -121,37 +145,21 @@
 
 		<nav>
 			<SegmentedGroup
-				options={['crop', 'suggestions', 'eliminate']}
+				options={['crop', 'suggestions', 'narrow']}
 				disabled={(key) => {
 					if (!observation && key !== 'crop')
 						return 'Ouvrir une observation pour la classifier';
-					if (!imageFile && !currentImage && key === 'crop')
-						return 'Ouvrir une image pour le recadrage';
+					if (!imageToCrop && key === 'crop') return 'Ouvrir une image pour le recadrage';
 					return false;
 				}}
 				bind:current={
-					() => {
-						switch (page.route.id) {
-							case '/(app)/(sidepanel)/o/[observation]/crop/[image]':
-								return 'crop';
-							case '/(app)/(sidepanel)/o/[observation]/classify/suggestions':
-								return 'suggestions';
-							case '/(app)/(sidepanel)/o/[observation]/classify/narrow/eliminate':
-							case '/(app)/(sidepanel)/o/[observation]/classify/narrow/candidates':
-								return 'eliminate';
-							default:
-								// Unreachable
-								return 'crop';
-						}
-					},
+					() => tab,
 					(value) => {
-						const image = imageFile?.id ?? currentImage?.fileId;
-						console.log('Switching view to', value, { image, observation });
 						switch (value) {
 							case 'crop':
-								if (!image) return;
+								if (!imageToCrop) return;
 								goto('/(app)/(sidepanel)/o/[observation]/crop/[image]', {
-									image,
+									image: imageToCrop,
 									observation: observation?.id ?? '_',
 								});
 								break;
@@ -161,10 +169,10 @@
 									observation: observation.id,
 								});
 								break;
-							case 'eliminate':
+							case 'narrow':
 								if (!observation) return;
 								goto(
-									'/(app)/(sidepanel)/o/[observation]/classify/narrow/eliminate',
+									'/(app)/(sidepanel)/o/[observation]/classify/narrow/describe',
 									{
 										observation: observation.id,
 									}
@@ -180,7 +188,7 @@
 				{#snippet option_suggestions()}
 					Suggestions
 				{/snippet}
-				{#snippet option_eliminate()}
+				{#snippet option_narrow()}
 					Élimination
 				{/snippet}
 			</SegmentedGroup>
@@ -191,9 +199,11 @@
 		{/if}
 	</header>
 
-	<div class="content">
-		{@render children()}
-	</div>
+	{#key tab}
+		<div class="content" in:fade={{ duration: 200 }}>
+			{@render children()}
+		</div>
+	{/key}
 </div>
 
 <style>
@@ -219,7 +229,7 @@
 			display: flex;
 			align-items: center;
 			gap: 0.5em;
-			font-size: 1.5em;
+			font-size: 1.2em;
 		}
 
 		nav {
@@ -241,7 +251,7 @@
 	.progress {
 		width: 200px;
 		--height: 0.5em;
-		--inactive-bg: rgb( from var(--gray) r g b / 50%);
+		--inactive-bg: rgb(from var(--gray) r g b / 50%);
 		overflow: hidden;
 		border-radius: var(--corner-radius);
 	}

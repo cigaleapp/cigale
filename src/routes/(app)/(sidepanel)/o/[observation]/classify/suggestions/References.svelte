@@ -9,7 +9,7 @@
 	import Logo from '$lib/Logo.svelte';
 	import { uiState } from '$lib/state.svelte';
 
-	import WithExpandButton from './WithExpandButton.svelte';
+	import WithExpandButton from '../WithExpandButton.svelte';
 
 	interface Props {
 		option: MetadataEnumVariant;

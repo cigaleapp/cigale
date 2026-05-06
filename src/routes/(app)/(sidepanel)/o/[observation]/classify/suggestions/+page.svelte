@@ -1,8 +1,5 @@
-<script module lang="ts">
-	export type Expandable = 'references' | 'subject' | 'none';
-</script>
-
 <script lang="ts">
+	import type { Expandable } from '../WithExpandButton.svelte';
 	import type { CascadeLabelsCache } from '$lib/cascades';
 	import type { Attachment } from 'svelte/attachments';
 
@@ -28,11 +25,11 @@
 	import { undo } from '$lib/undo.svelte';
 
 	import { fullscreenState } from '../../+layout@(app).svelte';
+	import Subject from '../Subject.svelte';
 	import LayoutSwitcher from './LayoutSwitcher.svelte';
 	import Navigation from './Navigation.svelte';
 	import OptionBar from './OptionBar.svelte';
 	import References from './References.svelte';
-	import Subject from './Subject.svelte';
 
 	const { data } = $props();
 	const {
@@ -104,7 +101,12 @@
 	</div>
 	<div class="subject" {@attach area('subject')} in:fade={{ duration: 200 }}>
 		{#if observation}
-			<Subject {images} bind:expand bind:currentImage />
+			<Subject
+				buttons={layout === 'top-bottom' ? 'top-left' : 'top-right'}
+				{images}
+				bind:expand
+				bind:currentImage
+			/>
 		{/if}
 	</div>
 	<div class="panel" {@attach area('panel')}>
@@ -297,13 +299,11 @@
 	main[data-layout='left-right'] .panel {
 		grid-template-columns: min(max(33%, 260px), 400px) auto min(33%, 500px);
 		grid-template-rows: min-content 1fr 1fr;
-		padding: 2em;
 		row-gap: 0.5em;
 		grid-template-areas:
 			'. . layout-switcher'
 			'cascades description focused-option'
 			'synonyms description nav';
-
 
 		.layout-switcher {
 			z-index: 10;
@@ -315,7 +315,6 @@
 	}
 
 	main[data-layout='top-bottom'] .panel {
-		padding: 2em;
 		grid-template-columns: 1fr 1fr;
 		grid-template-rows: min-content 1.5fr min-content min-content;
 		grid-template-areas:
@@ -345,6 +344,7 @@
 	.panel {
 		display: grid;
 		gap: 2em;
+		padding: 1em;
 	}
 
 	.panel {

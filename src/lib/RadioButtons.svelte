@@ -13,7 +13,10 @@
 		cards?: boolean;
 		value?: NoInfer<OptionKey> | undefined;
 		// eslint-disable-next-line no-unused-vars
-		onchange?: (value: OptionKey | undefined, fieldset: HTMLFieldSetElement) => void;
+		onchange?: (
+			value: OptionKey | undefined,
+			fieldset: HTMLFieldSetElement
+		) => void | Promise<void>;
 		children?: import('svelte').Snippet<
 			[Item<NoInfer<OptionKey>> & { value: typeof value; selected: boolean }]
 		>;
@@ -32,11 +35,6 @@
 	}: Props = $props();
 
 	let fieldset: HTMLFieldSetElement | undefined = $state();
-
-	$effect(() => {
-		if (!fieldset) return;
-		onchange(value, fieldset);
-	});
 </script>
 
 <fieldset
@@ -53,7 +51,16 @@
 	{#each options as option (option.key)}
 		{@const { key, label, disabled } = option}
 		<label class="radio" class:card={cards}>
-			<input {disabled} type="radio" value={key} bind:group={value} />
+			<input
+				{disabled}
+				type="radio"
+				value={key}
+				bind:group={value}
+				onchange={async () => {
+					if (!fieldset) return;
+					await onchange(value, fieldset);
+				}}
+			/>
 			{#if children}
 				{@render children({ ...option, value, selected: key === value })}
 			{:else}

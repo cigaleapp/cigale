@@ -161,7 +161,7 @@
 
 <PrepareForOffline bind:open={globalModals.modal_prepare_for_offline_use.open} />
 
-<div class="layout">
+<div class="layout" id="app-layout">
 	<Navigation
 		progressbarOnly={navbarAppearance === 'hidden'}
 		progress={uiState.processing.progress}

@@ -4,7 +4,7 @@
 	 * @property {string|undefined} value
 	 * @property {(newValue: string) => void} onValueChange
 	 * @property {Pick<import('./database.js').Metadata, "id">} metadata
-	 * @property {import('./database.js').MetadataEnumVariant[]} options
+	 * @property {import('./database.js').MetadataEnumVariant[] | undefined} options
 	 * @property {WithoutChildrenOrChild<import('bits-ui').Combobox.InputProps>} [inputProps]
 	 * @property {WithoutChildrenOrChild<import('bits-ui').Combobox.ContentProps>} [contentProps]
 	 * @property {string} [id]
@@ -28,6 +28,9 @@
 	import MetadataCascadesTable from './MetadataCascadesTable.svelte';
 	import { namespaceOfMetadataId } from './schemas/metadata.js';
 	import { readableOn } from './utils.js';
+	import { metadataOptionsOf } from './metadata/index.js';
+	import { databaseHandle } from './idb.svelte.js';
+	import { uiState } from './state.svelte';
 
 	/**
 	 * @import {WithoutChildrenOrChild} from 'bits-ui';
@@ -39,7 +42,7 @@
 	 * @type {Props & Omit<import('bits-ui').Combobox.RootProps, keyof Props>}
 	 */
 	let {
-		options,
+		options: precomputedOptions,
 		metadata,
 		confidences = {},
 		value = $bindable(),
@@ -51,6 +54,20 @@
 	} = $props();
 
 	const protocolId = $derived(namespaceOfMetadataId(metadata.id));
+
+	let options = $derived(precomputedOptions)
+
+	$effect(() => {
+		void (async () => {
+			if (!uiState.currentProtocolId) return;
+			console.info('Fetching options for metadata', { metadataId: metadata.id, protocolId: uiState.currentProtocolId });
+			options = await metadataOptionsOf(
+				databaseHandle(),
+				uiState.currentProtocolId,
+				metadata.id
+			)
+		})()
+	})
 
 	const hasImages = $derived(options.some((opt) => opt.image));
 
@@ -74,6 +91,8 @@
 			val.toLowerCase().includes(search.toLowerCase())
 		);
 	}
+
+	$inspect({confidences})
 
 	/**
 	 * @type {CascadeLabelsCache}
@@ -121,9 +140,12 @@
 							{/if}
 						</div>
 					{/if}
+
+					{#if Object.keys(confidences).length > 0}
 					<div class="confidence">
 						<ConfidencePercentage value={confidences[item.key]} />
 					</div>
+						{/if}
 				</div>
 			</div>
 		{/snippet}
