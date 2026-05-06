@@ -416,6 +416,8 @@ metadata:
     mergeMethod: union
     required: false
     infer:
+      # TODO: guard against missing or malformed metadata
+      # and return an empty array in that case
       sidecar: |
         (
           $boxes := EntomoscopeAiPredictionBoxes;
