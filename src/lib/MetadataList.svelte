@@ -2,6 +2,8 @@
 	import type * as DB from '$lib/database.js';
 	import type { Snippet } from 'svelte';
 
+	import VirtualList from '@sveltejs/svelte-virtual-list';
+
 	import IconExpand from '~icons/ri/arrow-down-s-line';
 
 	import { metadataDefinitionComparator } from './protocols.js';
@@ -51,33 +53,40 @@
 				return 0;
 			})
 	);
+
+	$inspect({
+		groupedDefinitions,
+	});
 </script>
 
 <div class="liste" data-testid={testid}>
-	{#each groupedDefinitions as { group, definitions, iterationKey } (iterationKey)}
-		{#if group}
-			<details open={!group.collapsed}>
-				<summary>
-					<div class="icon">
-						<IconExpand />
-					</div>
-					{group.name}
-				</summary>
-				<p class="description">{group.description}</p>
-				<div class="grouped-metadata">{@render defs()}</div>
-			</details>
-		{:else}
-			{@render defs()}
-		{/if}
+	<VirtualList items={groupedDefinitions} let:item>
+		{@const { group, definitions, iterationKey } = item}
+		<div class="definition-group">
+			{#if group}
+				<details open={!group.collapsed}>
+					<summary>
+						<div class="icon">
+							<IconExpand />
+						</div>
+						{group.name}
+					</summary>
+					<p class="description">{group.description}</p>
+					<div class="grouped-metadata">{@render defs()}</div>
+				</details>
+			{:else}
+				{@render defs()}
+			{/if}
 
-		{#snippet defs()}
-			{#each definitions as def (def.id)}
-				{#if def.label || showTechnicalMetadata}
-					{@render children(def)}
-				{/if}
-			{/each}
-		{/snippet}
-	{/each}
+			{#snippet defs()}
+				{#each definitions as def (def.id)}
+					{#if def.label || showTechnicalMetadata}
+						{@render children(def)}
+					{/if}
+				{/each}
+			{/snippet}
+		</div>
+	</VirtualList>
 </div>
 
 <style>
@@ -93,6 +102,7 @@
 		scrollbar-gutter: stable;
 		scrollbar-width: thin;
 		/* overflow-y: auto; */
+		height: 100%;
 	}
 
 	.grouped-metadata {

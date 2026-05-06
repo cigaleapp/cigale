@@ -8,7 +8,7 @@ import {
 	serializeMetadataFullValue,
 } from './metadata/index.js';
 import { uiState } from './state.svelte.js';
-import { compareBy, mapValues, nonnull } from './utils.js';
+import { compareBy, mapValues, nonnull, transformObject } from './utils.js';
 
 /**
  * @import * as DB from '$lib/database.js'
@@ -188,25 +188,37 @@ export async function ensureNoLoneImages(tx) {
 
 /**
  * Gets all metadata for an observation, including metadata derived from merging the metadata values of the images that make up the observation.
+ * @template {DB.MetadataType} [T=DB.MetadataType]
  * @param {object} arg0
  * @param {DB.Metadata[]} arg0.definitions
  * @param {Pick<DB.Observation, 'images' | 'metadataOverrides'>} arg0.observation
  * @param {DB.Image[]} arg0.images
- * @returns {DB.MetadataValues}
+ * @param {T} [arg0.filterType] If provided, only return values for metadata of this type
+ * @returns {Record<NamespacedMetadataID, TypedMetadataValue<T>>}
  */
-export function observationMetadata({ definitions, observation, images }) {
+export function observationMetadata({ definitions, observation, images, filterType }) {
 	const metadataFromImages = mergeMetadataFromImagesAndObservations({
-		definitions,
+		definitions: definitions.filter((d) => !filterType || d.type === filterType),
 		observations: [],
 		images: images
 			.filter(({ id }) => observation.images.includes(id))
 			.toSorted(compareBy(({ id }) => observation.images.indexOf(id))),
 	});
 
-	return {
-		...metadataFromImages,
-		...observation.metadataOverrides,
-	};
+	return transformObject(
+		{
+			...metadataFromImages,
+			...observation.metadataOverrides,
+		},
+		(id, value) => {
+			if (!filterType) return [id, value];
+			if (definitions.find((d) => d.id === id)?.type !== filterType) {
+				return undefined;
+			}
+
+			return [id, value];
+		}
+	);
 }
 
 if (import.meta.vitest) {

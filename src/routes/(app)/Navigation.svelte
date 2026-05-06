@@ -247,10 +247,11 @@
 						<div class="with-inference-indicator">
 							<!-- eslint-disable svelte/no-navigation-without-resolve -->
 							<a
-								href={page.route.id !== '/(app)/(sidepanel)/o/[observation]/crop/[image]' &&
+								href={page.route.id !==
+									'/(app)/(sidepanel)/o/[observation]/crop/[image]' &&
 								uiState.imageOpenedInCropper
 									? resolve('/(app)/(sidepanel)/o/[observation]/crop/[image]', {
-										observation: "_",
+											observation: '_',
 											image: uiState.imageOpenedInCropper,
 										})
 									: resolve('/crop/')}

@@ -9,8 +9,9 @@
 </script>
 
 <script lang="ts">
-	import { UAParser } from 'ua-parser-js';
+	import { fade } from 'svelte/transition';
 
+	import {plural} from '$lib/i18n.js';
 	import IconConfirmed from '~icons/ri/check-double-line';
 	import IconClose from '~icons/ri/close-line';
 	import IconUnconfirmed from '~icons/ri/error-warning-line';
@@ -18,7 +19,7 @@
 	import { page } from '$app/state';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import { dependencyURI, tables } from '$lib/idb.svelte';
-	import { imageId } from '$lib/images';
+	import { imageId, imageIdToFileId } from '$lib/images';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
 	import { goto } from '$lib/paths.js';
@@ -34,7 +35,28 @@
 		tables.Image.getFromState(page.params.image ? imageId(page.params.image, 0) : '')
 	);
 
+	const observationsOfImageFile = $derived(
+		tables.Observation.state.filter(obs => obs.images.some(imageId => 
+
+		imageIdToFileId(imageId) === page.params.image
+		))
+	)
+
+	const observationToClassify = $derived(
+		observation ?? (
+			observationsOfImageFile.length === 1 ? observationsOfImageFile[0] : undefined
+		)
+	)
+
 	const currentImage = $derived(tables.Image.getFromState(fullscreenState.currentImage ?? ''));
+
+	const imageToCrop = $derived(
+		imageFile?.id ??
+			currentImage?.fileId ??
+			(observation && observation.images.length === 1
+				? imageIdToFileId(observation.images[0])
+				: undefined)
+	);
 
 	const focusedMetadata = $derived(
 		tables.Metadata.getFromState(
@@ -48,7 +70,7 @@
 		switch (page.route.id) {
 			case '/(app)/(sidepanel)/o/[observation]/classify':
 			case '/(app)/(sidepanel)/o/[observation]/classify/suggestions':
-			case '/(app)/(sidepanel)/o/[observation]/classify/narrow/eliminate':
+			case '/(app)/(sidepanel)/o/[observation]/classify/narrow/describe':
 			case '/(app)/(sidepanel)/o/[observation]/classify/narrow/candidates': {
 				await goto('/(app)/(sidepanel)/classify');
 				break;
@@ -60,37 +82,82 @@
 		}
 	}
 
+	const tab = $derived.by(() => {
+		switch (page.route.id) {
+			case '/(app)/(sidepanel)/o/[observation]/crop/[image]':
+				return 'crop';
+			case '/(app)/(sidepanel)/o/[observation]/classify/suggestions':
+				return 'suggestions';
+			case '/(app)/(sidepanel)/o/[observation]/classify/narrow/describe':
+			case '/(app)/(sidepanel)/o/[observation]/classify/narrow/candidates':
+			case '/(app)/(sidepanel)/o/[observation]/classify/narrow':
+				return 'narrow';
+			default:
+				// Unreachable
+				return 'crop';
+		}
+	});
+
+	async function goToTab(target: typeof tab) {
+		switch (target) {
+			case 'crop':
+				if (!imageToCrop) return;
+				goto('/(app)/(sidepanel)/o/[observation]/crop/[image]', {
+					image: imageToCrop,
+					observation: observation?.id ?? '_',
+				});
+				break;
+			case 'suggestions':
+				if (!observationToClassify) return;
+				goto('/(app)/(sidepanel)/o/[observation]/classify/suggestions', {
+					observation: observationToClassify.id,
+				});
+				break;
+			case 'narrow':
+				if (!observationToClassify) return;
+				goto('/(app)/(sidepanel)/o/[observation]/classify/narrow/describe', {
+					observation: observationToClassify.id,
+				});
+				break;
+		}
+	}
+
 	defineKeyboardShortcuts('general', {
 		Escape: {
 			help: 'Retour',
 			do: backToGalleryView,
 		},
+		B: {
+			help: "Recadrer l'image",
+			async do() {
+				await goToTab('crop');
+			},
+		},
+		S: {
+			help: 'Voir les suggestions de classification',
+			async do() {
+				await goToTab('suggestions');
+			},
+		},
+		N: {
+			help: 'Classifier par élimination',
+			async do() {
+				await goToTab('narrow');
+			},
+		},
 	});
-
-	const platformHasRightSideCloseButtons = $derived.by(() => {
-		const platform = new UAParser(navigator.userAgent).getOS().name;
-		return platform === 'Windows' || platform === 'Linux';
-	});
-
-	$inspect({fullscreenState});
 </script>
-
-<!-- Close button can be on the right (Windows, Linux) or on the left (macOS) -->
-{#snippet closeButton()}
-	<ButtonIcon onclick={backToGalleryView} help="Retour" keyboard="Escape">
-		<IconClose />
-	</ButtonIcon>
-{/snippet}
 
 <div class="with-header">
 	<header>
-		{#if !platformHasRightSideCloseButtons}
-			{@render closeButton()}
-		{/if}
+		<ButtonIcon onclick={backToGalleryView} help="Retour" keyboard="Escape">
+			<IconClose />
+		</ButtonIcon>
 
 		<h1>
 			{#if observation}
 				<InlineTextInput
+					help="Modifier le nom de l'observation"
 					label="Nom de l'observation"
 					value={observation.label}
 					onblur={async (newLabel) => {
@@ -113,7 +180,7 @@
 		<div class="progress">
 			<ProgressBar
 				progress={[fullscreenState.progress.treated, fullscreenState.progress.confirmed]}
-				phases={page.route.id === '/(app)/(sidepanel)/o/[observation]/crop'
+				phases={page.route.id === '/(app)/(sidepanel)/o/[observation]/crop/[image]'
 					? ['Images recadrées', 'Recadrages confirmés']
 					: ['Observations classifiées', 'Classifications confirmées']}
 			/>
@@ -121,56 +188,17 @@
 
 		<nav>
 			<SegmentedGroup
-				options={['crop', 'suggestions', 'eliminate']}
+				options={['crop', 'suggestions', 'narrow']}
 				disabled={(key) => {
-					if (!observation && key !== 'crop')
-						return 'Ouvrir une observation pour la classifier';
-					if (!imageFile && !currentImage && key === 'crop')
-						return 'Ouvrir une image pour le recadrage';
+					if (!observationToClassify && key !== 'crop') 
+						return observationsOfImageFile.length === 0 ? "Cette image n'apparaît dans aucune observation" :  `Cette image apparaît dans ${plural(observationsOfImageFile.length, ['# observation', '# observations'])}`;
+					if (!imageToCrop && key === 'crop') return 'Ouvrir une image pour le recadrage';
 					return false;
 				}}
 				bind:current={
-					() => {
-						switch (page.route.id) {
-							case '/(app)/(sidepanel)/o/[observation]/crop/[image]':
-								return 'crop';
-							case '/(app)/(sidepanel)/o/[observation]/classify/suggestions':
-								return 'suggestions';
-							case '/(app)/(sidepanel)/o/[observation]/classify/narrow/eliminate':
-							case '/(app)/(sidepanel)/o/[observation]/classify/narrow/candidates':
-								return 'eliminate';
-							default:
-								// Unreachable
-								return 'crop';
-						}
-					},
+					() => tab,
 					(value) => {
-						const image = imageFile?.id ?? currentImage?.fileId;
-						console.log('Switching view to', value, { image, observation });
-						switch (value) {
-							case 'crop':
-								if (!image) return;
-								goto('/(app)/(sidepanel)/o/[observation]/crop/[image]', {
-									image,
-									observation: observation?.id ?? '_',
-								});
-								break;
-							case 'suggestions':
-								if (!observation) return;
-								goto('/(app)/(sidepanel)/o/[observation]/classify/suggestions', {
-									observation: observation.id,
-								});
-								break;
-							case 'eliminate':
-								if (!observation) return;
-								goto(
-									'/(app)/(sidepanel)/o/[observation]/classify/narrow/eliminate',
-									{
-										observation: observation.id,
-									}
-								);
-								break;
-						}
+						goToTab(value);
 					}
 				}
 			>
@@ -180,20 +208,18 @@
 				{#snippet option_suggestions()}
 					Suggestions
 				{/snippet}
-				{#snippet option_eliminate()}
+				{#snippet option_narrow()}
 					Élimination
 				{/snippet}
 			</SegmentedGroup>
 		</nav>
-
-		{#if platformHasRightSideCloseButtons}
-			{@render closeButton()}
-		{/if}
 	</header>
 
-	<div class="content">
-		{@render children()}
-	</div>
+	{#key tab}
+		<div class="content" in:fade={{ duration: 200 }}>
+			{@render children()}
+		</div>
+	{/key}
 </div>
 
 <style>
@@ -219,7 +245,7 @@
 			display: flex;
 			align-items: center;
 			gap: 0.5em;
-			font-size: 1.5em;
+			font-size: 1.2em;
 		}
 
 		nav {
@@ -241,7 +267,7 @@
 	.progress {
 		width: 200px;
 		--height: 0.5em;
-		--inactive-bg: rgb( from var(--gray) r g b / 50%);
+		--inactive-bg: rgb(from var(--gray) r g b / 50%);
 		overflow: hidden;
 		border-radius: var(--corner-radius);
 	}

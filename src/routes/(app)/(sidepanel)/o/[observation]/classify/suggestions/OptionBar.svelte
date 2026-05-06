@@ -167,7 +167,7 @@
 		>
 			<MetadataCombobox
 				{confidences}
-				{options}
+				options={undefined}
 				metadata={focusedMetadata}
 				type="single"
 				value={option?.key ?? ''}

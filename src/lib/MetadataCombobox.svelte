@@ -4,7 +4,7 @@
 	 * @property {string|undefined} value
 	 * @property {(newValue: string) => void} onValueChange
 	 * @property {Pick<import('./database.js').Metadata, "id">} metadata
-	 * @property {import('./database.js').MetadataEnumVariant[]} options
+	 * @property {import('./database.js').MetadataEnumVariant[] | undefined} options
 	 * @property {WithoutChildrenOrChild<import('bits-ui').Combobox.InputProps>} [inputProps]
 	 * @property {WithoutChildrenOrChild<import('bits-ui').Combobox.ContentProps>} [contentProps]
 	 * @property {string} [id]
@@ -23,11 +23,14 @@
 	import Combobox from './Combobox.svelte';
 	import ConfidencePercentage from './ConfidencePercentage.svelte';
 	import * as idb from './idb.svelte.js';
+	import { databaseHandle } from './idb.svelte.js';
 	import LearnMoreLink from './LearnMoreLink.svelte';
 	import Markdown from './Markdown.svelte';
+	import { metadataOptionsOf } from './metadata/index.js';
 	import MetadataCascadesTable from './MetadataCascadesTable.svelte';
 	import { namespaceOfMetadataId } from './schemas/metadata.js';
-	import { readableOn } from './utils.js';
+	import { uiState } from './state.svelte';
+	import { cancellable, readableOn } from './utils.js';
 
 	/**
 	 * @import {WithoutChildrenOrChild} from 'bits-ui';
@@ -39,7 +42,7 @@
 	 * @type {Props & Omit<import('bits-ui').Combobox.RootProps, keyof Props>}
 	 */
 	let {
-		options,
+		options: precomputedOptions,
 		metadata,
 		confidences = {},
 		value = $bindable(),
@@ -51,6 +54,25 @@
 	} = $props();
 
 	const protocolId = $derived(namespaceOfMetadataId(metadata.id));
+
+	let options = $derived(precomputedOptions ?? []);
+
+	const optionsLoader = cancellable(async () => {
+		if (precomputedOptions && precomputedOptions.length > 0) return;
+		if (!uiState.currentProtocolId) return;
+		console.info('Fetching options for metadata', {
+			metadataId: metadata.id,
+			protocolId: uiState.currentProtocolId,
+		});
+		options = await metadataOptionsOf(databaseHandle(), uiState.currentProtocolId, metadata.id);
+	});
+
+	$effect(() => {
+		const loader = optionsLoader();
+
+		loader.do();
+		return loader.cancel;
+	});
 
 	const hasImages = $derived(options.some((opt) => opt.image));
 
@@ -74,6 +96,8 @@
 			val.toLowerCase().includes(search.toLowerCase())
 		);
 	}
+
+	$inspect({ confidences });
 
 	/**
 	 * @type {CascadeLabelsCache}
@@ -121,9 +145,12 @@
 							{/if}
 						</div>
 					{/if}
-					<div class="confidence">
-						<ConfidencePercentage value={confidences[item.key]} />
-					</div>
+
+					{#if Object.keys(confidences).length > 0}
+						<div class="confidence">
+							<ConfidencePercentage value={confidences[item.key]} />
+						</div>
+					{/if}
 				</div>
 			</div>
 		{/snippet}
@@ -183,6 +210,10 @@
 	.item.selected {
 		color: var(--fg-primary);
 		font-weight: bold;
+	}
+
+	.item .right {
+		margin-left: auto;
 	}
 
 	.item .check {

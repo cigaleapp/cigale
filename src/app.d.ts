@@ -23,6 +23,7 @@ declare global {
 		meta(): {
 			// meta properties should always be optional
 			table?: {
+				/** List of indexes for the table. If the index is multivariate, add a '[]' at the end of the string */
 				indexes: string[];
 			};
 		};

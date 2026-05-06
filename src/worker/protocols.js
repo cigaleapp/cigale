@@ -10,7 +10,16 @@ import { resolveProtocolImports } from '$lib/metadata/imports.js';
 import { compareProtocolWithUpstream } from '$lib/protocols.js';
 import { metadataOptionId, namespacedMetadataId } from '$lib/schemas/metadata.js';
 import { ExportedProtocol } from '$lib/schemas/protocols.js';
-import { entries, keys, omit, orEmptyObj3, pick, prefixIDBKeyRange } from '$lib/utils.js';
+import {
+	entries,
+	keys,
+	omit,
+	orEmptyObj,
+	orEmptyObj2,
+	orEmptyObj3,
+	pick,
+	prefixIDBKeyRange,
+} from '$lib/utils.js';
 
 import { openDatabase, swarp } from './index.js';
 
@@ -31,7 +40,7 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 			done,
 			total,
 			phase,
-			...orEmptyObj3('detail', detail),
+			...orEmptyObj(Boolean(detail), { detail }),
 		});
 	};
 
@@ -130,6 +139,17 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 		});
 		console.timeEnd('Storing Protocol');
 
+		/** Maps metadata IDs to list of metadata group names the metadata is a part of that are narrowable  */
+		const narrowableMetadata = Object.fromEntries(
+			Object.entries(p.metadata).map(([id, metadata]) => {
+				const groups = Object.entries(p.metadataGroups)
+					.filter(([id, { narrowable }]) => narrowable && metadata.group === id)
+					.map(([id, group]) => ({ id, ...group }));
+
+				return [namespacedMetadataId(p.id, id), new Set(groups.map((g) => g.id))];
+			})
+		);
+
 		const metadataToImport = { ...p.metadata, ...p.sessionMetadata };
 
 		total += keys(metadataToImport).length;
@@ -145,8 +165,14 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 			console.time(`Storing Metadata Options for ${id}`);
 			const oTotal = metadata.options?.length ?? 0;
 			total += oTotal;
+			let l = false;
 			for (const [i, option] of metadata.options?.entries() ?? []) {
 				done++;
+
+				if (!l && option.cascade) {
+					console.log('cascade', option.cascade);
+					l = true;
+				}
 
 				if (i % 1000 === 0) {
 					onLoadingState(
@@ -155,10 +181,28 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 					);
 				}
 
+				const narrowableIn = new Set(
+					Object.entries(narrowableMetadata)
+						.filter(([id]) =>
+							Object.keys(option.cascade ?? {}).some(
+								(key) => id === namespacedMetadataId(p.id, key)
+							)
+						)
+						.flatMap(([_, groups]) => [...groups])
+				);
+
+				if (narrowableIn.size > 0) {
+					console.log(
+						`Option ${option.key} of metadata ${metadata.label || id} is narrowable in groups: ${[...narrowableIn].join(', ')}`,
+						option
+					);
+				}
+
 				tx.objectStore('MetadataOption').put({
 					id: metadataOptionId(namespacedMetadataId(p.id, id), option.key),
 					metadataId: namespacedMetadataId(p.id, id),
 					index: i,
+					_narrowableIn: [...narrowableIn],
 					...option,
 				});
 

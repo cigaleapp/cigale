@@ -54,7 +54,7 @@
 			value: undefined | RuntimeValue,
 			// eslint-disable-next-line no-unused-vars
 			unit?: typeof NumericUnit.infer | undefined
-		) => void;
+		) => void | Promise<void>;
 		validationErrors: ArkErrors | undefined;
 		id: string;
 		disabled?: boolean;
@@ -95,8 +95,8 @@
 		};
 	});
 
-	const debouncedOnblur = useDebounce(() => {
-		onblur(temporaryValue, selectedUnit);
+	const debouncedOnblur = useDebounce(async () => {
+		await onblur(temporaryValue, selectedUnit);
 	}, 500);
 
 	const selectedUnit = $derived.by(() => {
@@ -121,7 +121,9 @@
 				{#if isCompactEnum}
 					<RadioButtons
 						value={value?.toString()}
-						onchange={(value) => onblur(value)}
+						onchange={async (value) => {
+							await onblur(value);
+						}}
 						// cards={options.every((opt) => opt.icon || opt.color)}
 						cards
 						options={options
@@ -166,13 +168,20 @@
 						type="single"
 						disabled={disabled ?? false}
 						value={safeJSONParse(value?.toString())?.toString() ?? value}
-						onValueChange={(value) => onblur(value)}
+						onValueChange={async (value) => {
+							await onblur(value);
+						}}
 					/>
 				{/if}
 			{/snippet}
 			{#snippet boolean(value)}
 				<div class="boolean-switch">
-					<Switch value={value ?? false} onchange={(value) => onblur(value)} />
+					<Switch
+						value={value ?? false}
+						onchange={async (value) => {
+							await onblur(value);
+						}}
+					/>
 					{#if value}
 						Oui
 					{:else if value === false}
@@ -186,7 +195,12 @@
 					{value}
 					{id}
 					{disabled}
-					onblur={(e) => onblur(e.currentTarget.value)}
+					onblur={async (e) => {
+						console.log('onchange(): onblur(): change string value', {
+							value: e.currentTarget.value,
+						});
+						await onblur(e.currentTarget.value);
+					}}
 				/>
 			{/snippet}
 			{#snippet numeric(val, { range: intervalInBaseUnit, unit: baseUnit })}
@@ -204,11 +218,11 @@
 						type="text"
 						inputmode="numeric"
 						{...interval}
-						onblur={({ currentTarget }) => {
+						onblur={async ({ currentTarget }) => {
 							if (!(currentTarget instanceof HTMLInputElement)) return;
 							const newValue = currentTarget.value;
 							if (!newValue) {
-								onblur(undefined);
+								await onblur(undefined);
 								return;
 							}
 
@@ -221,7 +235,7 @@
 								parsedValue = undefined;
 							}
 
-							onblur(parsedValue, selectedUnit);
+							await onblur(parsedValue, selectedUnit);
 						}}
 						value={temporaryValue ?? val?.toString() ?? ''}
 					/>
@@ -242,13 +256,13 @@
 										type: 'selectable',
 										label: name || symbol,
 										selected: u === selectedUnit,
-										onclick() {
+										async onclick() {
 											if (val === undefined) return;
 											const converted = convert(
 												val,
 												valueUnit ?? baseUnit
 											).to(u);
-											onblur(converted, u);
+											await onblur(converted, u);
 											valueUnit = u;
 										},
 									};
@@ -295,8 +309,8 @@
 							onvalue={(v) => {
 								temporaryValue = v;
 							}}
-							onblur={() => {
-								onblur(temporaryValue, valueUnit);
+							onblur={async () => {
+								await onblur(temporaryValue, valueUnit);
 							}}
 						/>
 					</div>
@@ -306,12 +320,12 @@
 					<button
 						class="decrement"
 						aria-label="Décrémenter"
-						onclick={() => {
+						onclick={async () => {
 							if (value !== undefined && typeof value !== 'number') return;
 							if (temporaryValue !== undefined && typeof temporaryValue !== 'number')
 								return;
 							temporaryValue = round((temporaryValue ?? value ?? 0) - 1, 5);
-							debouncedOnblur();
+							await debouncedOnblur();
 						}}
 					>
 						<IconDecrement />
@@ -319,12 +333,12 @@
 					<button
 						class="increment"
 						aria-label="Incrémenter"
-						onclick={() => {
+						onclick={async () => {
 							if (value !== undefined && typeof value !== 'number') return;
 							if (temporaryValue !== undefined && typeof temporaryValue !== 'number')
 								return;
 							temporaryValue = round((temporaryValue ?? value ?? 0) + 1, 5);
-							debouncedOnblur();
+							await debouncedOnblur();
 						}}
 					>
 						<IconIncrement />
@@ -338,16 +352,16 @@
 					{id}
 					{disabled}
 					value={value === undefined ? undefined : dates.format(value, 'yyyy-MM-dd')}
-					onblur={({ currentTarget }) => {
+					onblur={async ({ currentTarget }) => {
 						const newValue = currentTarget.value;
 
 						if (newValue === undefined) {
-							onblur(undefined);
+							await onblur(undefined);
 							return undefined;
 						}
 
 						const parsed = dates.parse(newValue, 'yyyy-MM-dd', new Date());
-						onblur(parsed);
+						await onblur(parsed);
 						return newValue;
 					}}
 				/>
@@ -355,7 +369,7 @@
 			{#snippet location(value)}
 				<WorldLocationCombobox
 					value={value as RuntimeValue<'location'>}
-					onblur={(value) => onblur(value)}
+					onblur={async (value) => await onblur(value)}
 				/>
 			{/snippet}
 			{#snippet file(currentFileId)}
@@ -428,7 +442,7 @@
 
 										if (!file) {
 											savingFile = false;
-											onblur(undefined);
+											await onblur(undefined);
 											return;
 										}
 
@@ -461,7 +475,7 @@
 										}
 
 										savingFile = false;
-										onblur(id);
+										await onblur(id);
 									}}
 								>
 									{#if savingFile}

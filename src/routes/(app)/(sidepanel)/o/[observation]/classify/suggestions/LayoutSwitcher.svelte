@@ -62,13 +62,13 @@
 		padding: 0.5em;
 		font-size: 1rem;
 		/* border: 1px solid var(--fg-neutral); */
-		background: color-mix(var(--gray)  15%, var(--bg-neutral));
+		background: color-mix(var(--gray) 15%, var(--bg-neutral));
 		border-radius: var(--corner-radius);
 		width: min-content;
 		height: min-content;
 
 		&:is(:has(:focus-visible), :hover) {
-		background: color-mix(var(--gray)  35%, var(--bg-neutral));
+			background: color-mix(var(--gray) 35%, var(--bg-neutral));
 			.icon:not(.active) {
 				color: var(--fg-neutral);
 			}

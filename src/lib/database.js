@@ -113,7 +113,7 @@ const Session = table(['id', 'remoteId'], SessionSchema);
 
 const Metadata = table('id', MetadataSchema.omit('options'));
 const MetadataOption = table(
-	['id', 'kobocollectId'],
+	['id', 'kobocollectId', '_narrowableIn[]'],
 	MetadataEnumVariant.and({
 		id: [/\w+__\w+:\w+/, '@', 'ID of the form namespaced_metadata_id:key'],
 		metadataId: NamespacedMetadataID,
@@ -299,6 +299,7 @@ export const Tables = {
  * Every element is an index to be created.
  * Indexes are dot-joined paths to keys in the objects.
  * First index is given as the keyPath argument when creating the object store instead.
+ * Indexes with '[]' at the end are multivariate indexes, meaning they index arrays of values instead of single values.
  * @param {Schema} schema
  * @template {import('arktype').Type} Schema
  * @returns

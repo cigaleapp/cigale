@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Expandable } from './+page.svelte';
+	import type { Expandable } from './WithExpandButton.svelte';
 	import type { Props as CarouselProps } from '$lib/Carousel.svelte';
 	import type { Image } from '$lib/database';
 
@@ -18,11 +18,15 @@
 		images: Image[];
 		currentImage: Image;
 		expand: Expandable;
+		buttons: `${'top' | 'bottom'}-${'left' | 'right'}`;
 	}
 
-	let { images, currentImage = $bindable(), expand = $bindable() }: Props = $props();
-
-	const layout = $derived(uiState.currentSession?.fullscreenClassifier.layout ?? 'top-bottom');
+	let {
+		images,
+		currentImage = $bindable(),
+		expand = $bindable(),
+		buttons: buttonsCorner,
+	}: Props = $props();
 
 	let zoomed = $state(true);
 	let transitionCrop = $state(false);
@@ -58,7 +62,7 @@
 </script>
 
 <WithExpandButton
-	corner={layout === 'top-bottom' ? 'top-left' : 'top-right'}
+	corner={buttonsCorner}
 	keyboard="O"
 	bind:expand={
 		() => expand === 'subject',

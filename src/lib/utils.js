@@ -1779,3 +1779,24 @@ if (import.meta.vitest) {
 		expect(climbDOMUntil(grandchild, (el) => el.id === 'nonexistent')).toBe(null);
 	});
 }
+
+/**
+ * Turns a async function into a { do: starts the function synchronously, cancel: cancels the function if it's still running } object
+ * @template {unknown[]} Args
+ * @template R
+ * @param {(signal: AbortSignal, ...args: Args) => Promise<R>} asyncFunction
+ * @returns {( ...args: Args) => { do: () => Promise<R>, cancel: () => void } }
+ */
+export function cancellable(asyncFunction) {
+	let controller = new AbortController();
+
+	return (...args) => {
+		controller.abort();
+		controller = new AbortController();
+
+		return {
+			do: () => asyncFunction(controller.signal, ...args),
+			cancel: () => controller.abort(),
+		};
+	};
+}

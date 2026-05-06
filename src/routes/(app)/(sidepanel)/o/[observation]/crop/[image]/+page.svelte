@@ -81,7 +81,8 @@
 		sign,
 		throwError,
 	} from '$lib/utils';
-	import {fullscreenState} from '../../+layout@(app).svelte';
+
+	import { fullscreenState } from '../../+layout@(app).svelte';
 
 	/**
 	 * @import { RuntimeValue } from '$lib/schemas/metadata';
@@ -223,7 +224,7 @@
 	$effect(() => {
 		fullscreenState.progress.treated = croppedImagesCount / sortedFileIds.length;
 		fullscreenState.progress.confirmed = confirmedCropsCount / sortedFileIds.length;
-	})
+	});
 
 	/** @type {Record<string, undefined | { value: RuntimeValue<'boundingbox'>, confidence: number }>} */
 	const initialCrops = $derived(
@@ -652,14 +653,7 @@
 		return [w, h];
 	}
 
-	function exit() {
-		uiState.imagePreviouslyOpenedInCropper = fileId;
-		if (params.observation) {
-			goto('/(app)/(sidepanel)/o/[observation]/classify/suggestions', params);
-		} else {
-			goto('/crop/');
-		}
-	}
+
 
 	$effect(() => {
 		uiState.imageOpenedInCropper = fileId;
@@ -701,10 +695,6 @@
 		'$mod+Delete': {
 			help: 'Supprimer l’image',
 			do: deleteImageFileAndGotoNext,
-		},
-		Escape: {
-			help: 'Quitter le mode recadrage',
-			do: exit,
 		},
 		a: {
 			help: 'Activer/désactiver la continuation automatique',
@@ -1144,7 +1134,7 @@
 				{/if}
 			</ul>
 		</section>
-		
+
 		<nav>
 			<div class="navigation">
 				<ButtonIcon
