@@ -3,7 +3,7 @@ id: fr.osug.terra-forma-web.entomoscope
 name: Entomoscope
 
 updates: automatic
-version: 3
+version: 4
 source: https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/entomoscope.cigaleprotocol.yaml
 
 description: Protocole de collecte d'images d'insectes via l'Entomoscope
