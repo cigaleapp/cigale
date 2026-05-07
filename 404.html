@@ -1,0 +1,194 @@
+<!doctype html>
+<html dir="ltr">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="manifest" href="/cigale/manifest.json" />
+		<link rel="icon" href="/cigale/favicon.png" />
+		<link rel="stylesheet" href="/cigale/fonts.css" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Cigale</title>
+		<style>
+			#loading {
+				app-region: drag;
+				position: fixed;
+				inset: 0;
+				z-index: 10000000000;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				flex-direction: column;
+				gap: 2rem;
+				font-family: 'Host Grotesk', sans-serif;
+				font-size: 2rem;
+				background-color: var(--bg-neutral, black);
+				color: var(--fg-neutral, white);
+			}
+
+			#loading .spinner {
+				--size: var(--spinner-size);
+				width: var(--size);
+				height: var(--size);
+
+				circle {
+					fill: transparent;
+					stroke: var(--fg-neutral, black);
+					stroke-width: 4;
+					stroke-linecap: square;
+					stroke-dasharray: calc(3.14 * var(--size));
+					transform-origin: calc(0.5 * var(--size)) calc(0.5 * var(--size));
+					animation: spinner 1.5s linear infinite;
+				}
+			}
+
+			#loading p {
+				text-align: center;
+			}
+
+			#loading #loading-message {
+				font-size: 0.8rem;
+				margin-top: 0.5em;
+				opacity: 0.75;
+				display: block;
+				text-align: center;
+			}
+
+			#loading .app-version {
+				position: fixed;
+				bottom: 1.5rem;
+				text-align: center;
+				left: 0;
+				right: 0;
+				font-size: 0.8rem;
+				color: gray;
+			}
+
+			#loading .progress-indicator {
+				width: 100%;
+				max-width: 600px;
+				--spinner-size: 40px;
+				height: var(--spinner-size);
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
+
+				progress:not([value]) {
+					display: none;
+				}
+
+				progress[value] + .spinner {
+					display: none;
+				}
+			}
+
+			#loading progress {
+				width: calc(100% - 20px);
+				height: 5px;
+				border-radius: 0;
+				border: 0;
+
+				appearance: none;
+				-webkit-appearance: none;
+
+				background: rgb(from var(--fg-neutral, white) r g b / 15%);
+
+				&::-webkit-progress-value {
+					background: var(--fg-neutral, white);
+					transition: width 0.5s;
+				}
+
+				&::-moz-progress-bar {
+					background: var(--fg-neutral, white);
+					transition: width 0.5s;
+				}
+			}
+
+			@keyframes spinner {
+				0% {
+					rotate: 0deg;
+					stroke-dashoffset: calc(0.66 * var(--size));
+				}
+				50% {
+					rotate: 720deg;
+					stroke-dashoffset: calc(3.14 * var(--size));
+				}
+				100% {
+					rotate: 1080deg;
+					stroke-dashoffset: calc(0.66 * var(--size));
+				}
+			}
+		</style>
+		<link href="/cigale/_app/immutable/entry/start.CLe81lns.js" rel="modulepreload">
+		<link href="/cigale/_app/immutable/chunks/BxAvdiuX.js" rel="modulepreload">
+		<link href="/cigale/_app/immutable/chunks/0NqiQ2k5.js" rel="modulepreload">
+		<link href="/cigale/_app/immutable/chunks/0f5badY6.js" rel="modulepreload">
+		<link href="/cigale/_app/immutable/chunks/CpejtAKt.js" rel="modulepreload">
+		<link href="/cigale/_app/immutable/entry/app.lIqAIr-8.js" rel="modulepreload">
+		<link href="/cigale/_app/immutable/chunks/JHaCXZUh.js" rel="modulepreload">
+		<link href="/cigale/_app/immutable/chunks/BEDIq91W.js" rel="modulepreload">
+		<link href="/cigale/_app/immutable/nodes/0.D1gi6BWn.js" rel="modulepreload">
+		<link href="/cigale/_app/immutable/chunks/B1W5lfyT.js" rel="modulepreload">
+		<link href="/cigale/_app/immutable/chunks/DtxdpPGQ.js" rel="modulepreload">
+		<link href="/cigale/_app/immutable/chunks/CwhC6LAe.js" rel="modulepreload">
+		<link href="/cigale/_app/immutable/chunks/XNnx8EWX.js" rel="modulepreload">
+		<link href="/cigale/_app/immutable/chunks/Dpw0WM0x.js" rel="modulepreload">
+		<link href="/cigale/_app/immutable/chunks/Cb3G3a0U.js" rel="modulepreload">
+		<link href="/cigale/_app/immutable/chunks/CZIOgE3H.js" rel="modulepreload">
+		<link href="/cigale/_app/immutable/chunks/DBOryN0O.js" rel="modulepreload">
+		<link href="/cigale/_app/immutable/chunks/BeVjFNcS.js" rel="modulepreload">
+		<link href="/cigale/_app/immutable/chunks/CIXwC4p4.js" rel="modulepreload">
+		<link href="/cigale/_app/immutable/chunks/-dVZokgA.js" rel="modulepreload">
+		<link href="/cigale/_app/immutable/chunks/TEMukhyc.js" rel="modulepreload">
+		<link href="/cigale/_app/immutable/chunks/CF_euG-D.js" rel="modulepreload">
+		<link href="/cigale/_app/immutable/chunks/CSzYLdJK.js" rel="modulepreload">
+		
+		<link href="/cigale/_app/immutable/assets/_layout.CmsgiThg.css" rel="stylesheet">
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<div id="loading">
+			<div class="progress-indicator">
+				<progress></progress>
+				<svg class="spinner" height="40" width="40" viewBox="0 0 40 40">
+					<circle cx="20" cy="20" r="18"></circle>
+				</svg>
+			</div>
+			<p>
+				<!-- Set dynamically because i18n -->
+				<span id="loading-title"></span>
+				<code id="loading-message"></code>
+			</p>
+			<code class="app-version">51ddf0a2ee4f3fc8e825a5736e4aee2c78daee16</code>
+		</div>
+		<div style="display: contents">
+			<script>
+				{
+					__sveltekit_1fc7uw8 = {
+						base: "/cigale",
+						assets: "/cigale"
+					};
+
+					const element = document.currentScript.parentElement;
+
+					Promise.all([
+						import("/cigale/_app/immutable/entry/start.CLe81lns.js"),
+						import("/cigale/_app/immutable/entry/app.lIqAIr-8.js")
+					]).then(([kit, app]) => {
+						kit.start(app, element);
+					});
+
+					if ('serviceWorker' in navigator) {
+						const script_url = '/cigale/service-worker.js';
+						const policy = globalThis?.window?.trustedTypes?.createPolicy(
+							'sveltekit-trusted-url',
+							{ createScriptURL(url) { return url; } }
+						);
+						const sanitised = policy?.createScriptURL(script_url) ?? script_url;
+						addEventListener('load', function () {
+							navigator.serviceWorker.register(sanitised);
+						});
+					}
+				}
+			</script>
+		</div>
+	</body>
+</html>

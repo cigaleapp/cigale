@@ -1,0 +1,1 @@
+import{Ot as e}from"./0f5badY6.js";var t=class{#e;#t;constructor(t,n){this.#e=t,this.#t=e(n)}get current(){return this.#t(),this.#e()}};export{t};

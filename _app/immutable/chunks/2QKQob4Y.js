@@ -1,0 +1,1 @@
+import{g as e,n as t}from"./BxAvdiuX.js";import"./XNnx8EWX.js";async function n(...n){await t(e(...n))}export{n as t};
