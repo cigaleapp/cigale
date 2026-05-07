@@ -3,6 +3,7 @@
 
 	import LearnMoreLink from '$lib/LearnMoreLink.svelte';
 	import Markdown from '$lib/Markdown.svelte';
+	import IconNoImage from '~icons/ri/question-line';
 	import { scrollfader } from '$lib/scrollfader.js';
 
 	import { narrowingState } from '../+layout.svelte';
@@ -38,9 +39,14 @@ const searchResults = $derived.by(() => {
 	<VirtualList items={searchResults} let:item>
 	{@const candidate = item as typeof candidates[number]}
 		<article>
-			<div class="image">
+			<div class="image" class:empty={!candidate.images?.[0]}>
 				{#if candidate.images?.at(0)}
 					<img src={candidate.images?.at(0)} alt="Image de {candidate.label}" class="specimen" />
+					{:else}
+					<p>
+
+<IconNoImage />
+					</p>
 				{/if}
 			</div>
 			<div class="info">
@@ -64,14 +70,26 @@ const searchResults = $derived.by(() => {
 
 	article {
 		display: flex;
-		gap: 1em;
+		gap: 3em;
 		padding: 2em;
 		max-width: calc(67ch + 10em + 2em);
 
 		.image {
-			width: 10em;
-			height: 10em;
+			width: 10rem;
+			height: 10rem;
 			flex-shrink: 0;
+
+			&.empty {
+				border-radius: var(--corner-radius);
+				border: 2px dashed var(--gray);
+				color: var(--gray);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				text-align: center;
+				font-size: 2em;
+
+			}
 		}
 
 		img {
@@ -79,6 +97,11 @@ const searchResults = $derived.by(() => {
 			height: 100%;
 			object-fit: contain;
 			border-radius: var(--corner-radius);
+		}
+
+		.label {
+			font-weight: bold;
+			font-size: 1.3em;
 		}
 
 		.description {
