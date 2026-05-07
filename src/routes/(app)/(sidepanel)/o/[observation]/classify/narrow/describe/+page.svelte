@@ -27,10 +27,10 @@
 
 	const observation = $derived(tables.Observation.getFromState(page.params.observation ?? ''));
 
-	const debouncedSearch = new Debounced(() => narrowingState.search.query, 300);
+	const debouncedSearch = new Debounced(() => narrowingState.search.describe.query, 300);
 
 	$effect(() => {
-		if (narrowingState.search.query === '') debouncedSearch.setImmediately('');
+		if (narrowingState.search.describe.query === '') debouncedSearch.setImmediately('');
 	});
 
 	const searcher = $derived(
@@ -56,7 +56,7 @@
 	);
 
 	$effect(() => {
-		narrowingState.search.resultsCount = searchResults?.length ?? 0;
+		narrowingState.search.describe.resultsCount = searchResults?.length ?? 0;
 	});
 
 	/**
@@ -66,7 +66,7 @@
 	const options: Record<string, Map<string, DB.MetadataEnumVariant>> = $state.raw({});
 
 	// TODO: use this in sidepanel too! it works nicely.
-	const optionsLoader = cancellable(async (sig) => {
+	const optionsLoader = cancellable(async (sig, definitions: DB.Metadata[]) => {
 		loadingOptions = 0;
 
 		if (!uiState.currentProtocol) {
@@ -93,7 +93,6 @@
 			for (const def of definitions) {
 				sig.throwIfAborted();
 				options[def.id] ??= new Map();
-				console.log('loading options for', def.id)
 				const results = await metadataOptionsOf(
 					databaseHandle(),
 					uiState.currentProtocol.id,
@@ -114,9 +113,9 @@
 	})
 
 	let loadingOptions = $state(0);
-	watch([() => definitions], () => {
+	$effect(() => {
 		loadingOptions = 0;
-		const loader = optionsLoader();
+		const loader = optionsLoader(definitions);
 
 		loader.do()
 		return loader.cancel
@@ -191,7 +190,6 @@
 
 <style>
 	main {
-		padding: 1em;
 		height: 100%;
 	}
 
@@ -209,6 +207,7 @@
 	}
 
 	.scrollable {
+
 		overflow: auto;
 		height: 100%;
 	}
@@ -219,5 +218,6 @@
 		See https://www.uxpin.com/studio/blog/optimal-line-length-for-readability/
 		*/
 		max-width: 650px;
+		padding: 1em;
 	}
 </style>

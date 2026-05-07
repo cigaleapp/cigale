@@ -9,7 +9,7 @@
 		options: Key[];
 		current: NoInfer<Key>;
 		disabled?: (key: Key) => boolean | string;
-	} & Record<`option_${NoInfer<Key>}`, Snippet>;
+	} & Record<`option_${NoInfer<Key>}`, Snippet<[{current: boolean}]>>;
 
 	let {
 		options,
@@ -35,7 +35,7 @@
 				value={key}
 				id="{id}-{key}"
 			/>
-			{@render snippets[`option_${key}`]()}
+			{@render snippets[`option_${key}`]({ current: current === key })}
 		</label>
 	{/each}
 </div>

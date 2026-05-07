@@ -16,7 +16,7 @@ export const previewingPrNumber =
 	import.meta.env.previewingPrNumber === 'null' ? null : import.meta.env.previewingPrNumber;
 
 export const databaseName = previewingPrNumber ? `previews/pr-${previewingPrNumber}` : 'database';
-export const databaseRevision = 7;
+export const databaseRevision = 8;
 
 const profile = profiler('Database');
 
@@ -486,7 +486,9 @@ export async function openDatabase() {
 				}
 				const store = db.createObjectStore(tableName, { keyPath });
 				for (const index of schema.meta.table.indexes.slice(1)) {
-					store.createIndex(index, index);
+					const multiEntry = index.endsWith('[]');
+					const indexName = multiEntry ? index.slice(0, -2) : index;
+					store.createIndex(indexName, indexName, { multiEntry });
 				}
 			};
 
@@ -503,7 +505,9 @@ export async function openDatabase() {
 				}
 				// Recreate indexes
 				for (const index of schema.meta.table.indexes.slice(1)) {
-					store.createIndex(index, index);
+					const multiEntry = index.endsWith('[]');
+					const indexName = multiEntry ? index.slice(0, -2) : index;
+					store.createIndex(indexName, indexName, { multiEntry });
 				}
 			};
 
@@ -529,6 +533,10 @@ export async function openDatabase() {
 
 			if (oldVersion === 6) {
 				rebuildIndexes('Session');
+			}
+
+			if (oldVersion === 7) {
+				rebuildIndexes('MetadataOption');
 			}
 
 			for (const [tableName, schema] of tablesByName) {

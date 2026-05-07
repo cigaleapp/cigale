@@ -1,6 +1,9 @@
 <script lang="ts" module>
 	export const narrowingState = $state({
-		search: { query: '', resultsCount: 0 },
+		search: {
+			describe: { query: '', resultsCount: 0 },
+			candidates: { query: '', resultsCount: 0 },
+		},
 		//TODO
 		// metadataGroup: "io.github.cigaleapp.arthropods.example__andrena",
 		metadataGroup: 'andrena',
@@ -12,6 +15,9 @@
 		candidates: {
 			all: [] as DB.MetadataEnumVariant[],
 			remaining: [] as DB.MetadataEnumVariant[],
+			get ratio() {
+				return 1 - this.remaining.length / (this.all.length - 1 || 1);
+			},
 		},
 	});
 </script>
@@ -32,6 +38,8 @@
 	import { plural } from '$lib/i18n.js';
 	import { databaseHandle, tables } from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
+	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
+	import KeyboardHint from '$lib/KeyboardHint.svelte';
 	import Logo from '$lib/Logo.svelte';
 	import { serializeMetadataValue } from '$lib/metadata/serializing.js';
 	import { deleteMetadataValue, storeMetadataValue } from '$lib/metadata/storage.js';
@@ -39,12 +47,14 @@
 	import { observationMetadata } from '$lib/observations.js';
 	import OverflowableText from '$lib/OverflowableText.svelte';
 	import { goto } from '$lib/paths.js';
+	import ProgressBar from '$lib/ProgressBar.svelte';
 	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
 	import { uiState } from '$lib/state.svelte.js';
 	import { compareBy, entries, transformObject } from '$lib/utils.js';
 
 	import { fullscreenState } from '../../+layout@(app).svelte';
 	import Subject from '../Subject.svelte';
+	import { getAllCandidates, getMatchingCandidates } from './candidates.js';
 
 	const { children } = $props();
 
@@ -61,8 +71,24 @@
 	const metadataValues = $derived(narrowingState.metadataValues);
 
 	$effect(() => {
-		narrowingState.definitions = tables.Metadata.state
-			.filter((m) => m.group === narrowingState.metadataGroup)
+		void (async () => {
+			narrowingState.candidates.all = await getAllCandidates({
+				narrowableGroup: narrowingState.metadataGroup,
+			});
+		})();
+	});
+
+	$effect(() => {
+		narrowingState.candidates.remaining = getMatchingCandidates({
+			allCandidates: narrowingState.candidates.all,
+			choices: metadataValues,
+		});
+	});
+
+	$effect(() => {
+		narrowingState.definitions = tables.Metadata.state.filter(
+			(m) => m.group === narrowingState.metadataGroup
+		);
 	});
 
 	$effect(() => {
@@ -75,13 +101,55 @@
 				filterType: 'enum',
 			}),
 			(id, value) => {
-				if( definitions.some((d) => d.id === id)) {
+				if (definitions.some((d) => d.id === id)) {
 					return [id, value];
 				}
 
 				return undefined;
 			}
 		);
+	});
+
+	let toggleFocusSearchBar = $state<() => void>();
+
+	const tab = $derived.by(() => {
+		switch (page.route.id) {
+			case '/(app)/(sidepanel)/o/[observation]/classify/narrow/describe':
+				return 'describe';
+			case '/(app)/(sidepanel)/o/[observation]/classify/narrow/candidates':
+				return 'candidates';
+			default:
+				// Unreachable
+				return 'describe';
+		}
+	});
+
+	defineKeyboardShortcuts('classification', {
+		tab: {
+			help: 'Basculer entre les onglets Décrire et Candidats',
+			async do() {
+				switch (page.route.id) {
+					case '/(app)/(sidepanel)/o/[observation]/classify/narrow/describe':
+						await goto(
+							`/(app)/(sidepanel)/o/[observation]/classify/narrow/candidates`,
+							page.params
+						);
+						break;
+					case '/(app)/(sidepanel)/o/[observation]/classify/narrow/candidates':
+						await goto(
+							`/(app)/(sidepanel)/o/[observation]/classify/narrow/describe`,
+							page.params
+						);
+						break;
+				}
+			},
+		},
+		'$mod+f': {
+			help: 'Entrer dans la barre de recherche',
+			do() {
+				toggleFocusSearchBar?.();
+			},
+		},
 	});
 </script>
 
@@ -200,24 +268,45 @@
 	</aside>
 
 	<div class="content-and-footer">
+		<div class="progress">
+			<ProgressBar progress={narrowingState.candidates.ratio} />
+			<div class="remaining-count">
+				{plural(narrowingState.candidates.remaining.length, ['# restant', '# restants'])}
+			</div>
+		</div>
+
 		{#key page.route.id}
 			<div class="content" in:fade={{ duration: 200 }}>
 				{@render children()}
 			</div>
 		{/key}
+
 		<footer>
-			<search>
+			<search
+				{@attach (node) => {
+					const input = node.querySelector('input');
+					if (!input) return;
+					toggleFocusSearchBar = () => {
+						if (document.activeElement === input) {
+							input.blur();
+						} else {
+							input.focus();
+						}
+					};
+				}}
+			>
 				<IconSearch />
 				<InlineTextInput
 					discreet
 					label="Rechercher"
 					placeholder="Rechercher"
-					bind:value={narrowingState.search.query}
+					bind:value={narrowingState.search[tab].query}
 				/>
+				<KeyboardHint shortcut="$mod+F" />
 
-				{#if narrowingState.search.query}
+				{#if narrowingState.search[tab].query}
 					<span class="count"
-						>{plural(narrowingState.search.resultsCount, [
+						>{plural(narrowingState.search[tab].resultsCount, [
 							'# résultat',
 							'# résultats',
 						])}</span
@@ -227,7 +316,7 @@
 			<SegmentedGroup
 				options={['describe', 'candidates']}
 				bind:current={
-					() => page.route.id?.split('/').at(-1) as 'describe' | 'candidates',
+					() => tab,
 					(option) => {
 						void goto(
 							`/(app)/(sidepanel)/o/[observation]/classify/narrow/${option}`,
@@ -236,14 +325,24 @@
 					}
 				}
 			>
-				{#snippet option_describe()}
-					Décrire
+				{#snippet option_describe({ current })}
+					<div class="tab">
+						Décrire
+						{#if !current}
+							<KeyboardHint shortcut="Tab" />
+						{/if}
+					</div>
 				{/snippet}
-				{#snippet option_candidates()}
-					Candidats
-					<code class="candidates-count">
-						<!-- TODO -->
-					</code>
+				{#snippet option_candidates({ current })}
+					<div class="tab">
+						Candidats
+						<code class="candidates-count">
+							{narrowingState.candidates.remaining.length}
+						</code>
+						{#if !current}
+							<KeyboardHint shortcut="Tab" />
+						{/if}
+					</div>
 				{/snippet}
 			</SegmentedGroup>
 		</footer>
@@ -346,7 +445,25 @@
 		height: 100%;
 		width: 100%;
 		display: grid;
-		grid-template-rows: 1fr max-content;
+		grid-template-rows: max-content 1fr max-content;
+	}
+
+	.content-and-footer .progress {
+		width: 100%;
+
+		/** We make the candidates count hang down over the content */
+		--height: 0.25rem; /* Progress bar height */
+		height: 0.25rem;
+		overflow: visible;
+		position: relative;
+
+		.remaining-count {
+			position: absolute;
+			inset: var(--height) 0 auto 0;
+			text-align: right;
+			color: var(--fg-primary);
+			padding: 0.25em 0.5em;
+		}
 	}
 
 	.content {
@@ -385,6 +502,12 @@
 
 		.candidates-count {
 			color: var(--fg-primary);
+		}
+
+		.tab {
+			display: flex;
+			align-items: center;
+			gap: 0.5em;
 		}
 	}
 </style>

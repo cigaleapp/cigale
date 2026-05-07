@@ -44,11 +44,11 @@ TODO: Don't animate when progress decreases (e.g. when a new task starts and it 
 
 <div class="bars">
 	{#each ensureArray(progress) as p, i (i)}
-		{@const phase = phases[progress.length - 1 - i]}
-		{@const percentage = Math.round(clamp(progress[progress.length - 1 - i], 0, 1) * 100)}
+		{@const phase = phases[ensureArray(progress).length - 1 - i]}
+		{@const percentage = Math.round(clamp(ensureArray(progress)[progress.length - 1 - i], 0, 1) * 100)}
 		<div
 			class="tooltip-container"
-			use:tooltip={`${phase}: ${percentage}%`}
+			use:tooltip={phase ? `${phase}: ${percentage}%` : ""}
 			style:left="{(incrementalProgresses[i - 1] ?? 0) * 100}%"
 			style:width="{(incrementalProgresses[i] ?? 0) * 100}%"
 		></div>
@@ -101,6 +101,7 @@ TODO: Don't animate when progress decreases (e.g. when a new task starts and it 
 		position: absolute;
 		inset: 0;
 		width: 100%;
+		height: 100%;
 		appearance: none;
 		-webkit-appearance: none;
 		border: 0;

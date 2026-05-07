@@ -68,7 +68,7 @@
 								return;
 							}
 							// Prevent non-$mod-prefixed shortcuts from working while in a input or textarea
-							if (isTextEntryEvent(e) && !pattern.startsWith('$mod+')) {
+							if (isTextEntryEvent(e) && !pattern.startsWith('$mod+') && !pattern.endsWith('tab')) {
 								console.warn(`in input, ignoring keybinding ${pattern}`, e.target);
 								return;
 							}

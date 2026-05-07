@@ -10,7 +10,6 @@
 
 <script lang="ts">
 	import { fade } from 'svelte/transition';
-	import { UAParser } from 'ua-parser-js';
 
 	import IconConfirmed from '~icons/ri/check-double-line';
 	import IconClose from '~icons/ri/close-line';
@@ -92,24 +91,14 @@
 		},
 	});
 
-	const platformHasRightSideCloseButtons = $derived.by(() => {
-		const platform = new UAParser(navigator.userAgent).getOS().name;
-		return platform === 'Windows' || platform === 'Linux';
-	});
 </script>
 
-<!-- Close button can be on the right (Windows, Linux) or on the left (macOS) -->
-{#snippet closeButton()}
-	<ButtonIcon onclick={backToGalleryView} help="Retour" keyboard="Escape">
-		<IconClose />
-	</ButtonIcon>
-{/snippet}
 
 <div class="with-header">
 	<header>
-		{#if !platformHasRightSideCloseButtons}
-			{@render closeButton()}
-		{/if}
+	<ButtonIcon onclick={backToGalleryView} help="Retour" keyboard="Escape">
+		<IconClose />
+	</ButtonIcon>
 
 		<h1>
 			{#if observation}
@@ -194,9 +183,6 @@
 			</SegmentedGroup>
 		</nav>
 
-		{#if platformHasRightSideCloseButtons}
-			{@render closeButton()}
-		{/if}
 	</header>
 
 	{#key tab}
