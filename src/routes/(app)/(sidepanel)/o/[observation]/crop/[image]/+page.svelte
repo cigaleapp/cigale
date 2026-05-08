@@ -83,6 +83,7 @@
 	} from '$lib/utils';
 
 	import { fullscreenState } from '../../+layout@(app).svelte';
+	import { ensureNoEmptyObservations } from '$lib/observations.js';
 
 	/**
 	 * @import { RuntimeValue } from '$lib/schemas/metadata';
@@ -441,6 +442,9 @@
 		} else {
 			await idb.tables.Image.remove(imageId);
 		}
+
+
+			await ensureNoEmptyObservations()
 	}
 
 	/**
