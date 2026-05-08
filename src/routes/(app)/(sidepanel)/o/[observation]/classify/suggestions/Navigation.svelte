@@ -20,7 +20,6 @@
 		totalObservations: number;
 		nextObservation: { id: string } | undefined | null;
 		prevObservation: { id: string } | undefined | null;
-		classifiedObservationsCount: number;
 		confirmedClassificationsCount: number;
 		nextUnconfirmedObservation?: { id: string } | undefined | null;
 		focusedMetadata: Metadata | undefined;

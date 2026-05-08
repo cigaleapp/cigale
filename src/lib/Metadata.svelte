@@ -387,6 +387,7 @@
 
 	.learnmore p {
 		text-wrap: balance;
+		max-width: 67ch;
 	}
 
 	label {

@@ -580,6 +580,7 @@
 		.label {
 			gap: 0.75em;
 			margin-left: 0.25em;
+			max-width: 67ch;
 		}
 
 		.label:not(:has(.subtext)) {

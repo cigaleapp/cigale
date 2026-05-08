@@ -9,10 +9,8 @@
 		choicesHistory: [] as NamespacedMetadataID[],
 		metadataValues: {} as Record<NamespacedMetadataID, TypedMetadataValue<'enum'>>,
 
-		get definitions() {
-			return tables.Metadata.state.filter(
-				(m) => m.group === uiState.currentSession?.fullscreenClassifier.narrowableGroup
-			);
+		definitions(narrowableGroup: string | undefined) {
+			return tables.Metadata.state.filter((m) => m.group === narrowableGroup);
 		},
 
 		candidates: {
@@ -52,11 +50,13 @@
 	import OverflowableText from '$lib/OverflowableText.svelte';
 	import { goto } from '$lib/paths.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
+	import RadialProgress from '$lib/RadialProgress.svelte';
+	import { scrollfader } from '$lib/scrollfader.js';
 	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte.js';
 	import { tooltip } from '$lib/tooltips.js';
-	import { compareBy, entries, fromEntries, transformObject } from '$lib/utils.js';
+	import { entries, fromEntries, transformObject } from '$lib/utils.js';
 
 	import { fullscreenState } from '../../+layout@(app).svelte';
 	import Subject from '../Subject.svelte';
@@ -77,19 +77,19 @@
 		tables.Image.state.filter((image) => observation?.images.includes(image.id))
 	);
 
-	const definitions = $derived(narrowingState.definitions);
+	const definitions = $derived(
+		narrowingState.definitions(uiState.currentSession?.fullscreenClassifier.narrowableGroup)
+	);
 
 	const metadataValues = $derived(narrowingState.metadataValues);
 
-	const choices = $derived(
-		entries(metadataValues).toSorted(
-			compareBy(([id]) => {
-				const idx = narrowingState.choicesHistory.indexOf(id);
-				if (idx === -1) return Infinity;
-				return -idx;
-			})
-		)
-	);
+	const choices = $derived([
+		...narrowingState.choicesHistory
+			.toReversed()
+			.filter((id) => id in metadataValues)
+			.map((id) => [id, metadataValues[id]] as const),
+		...entries(metadataValues).filter(([id]) => !narrowingState.choicesHistory.includes(id)),
+	]);
 
 	$effect(() => {
 		narrowingState.focusedMetadataId =
@@ -221,7 +221,7 @@
 				}
 			/>
 		</section>
-		<section class="choices">
+		<section class="choices" {@attach scrollfader}>
 			<ol>
 				{#if focusedMetadata && focusedMetadataValue}
 					<li class="focused">
@@ -283,11 +283,11 @@
 					{@const narrowing = narrowingPower({
 						allCandidates: narrowingState.candidates.all,
 						currentChoices: choicesBeforeThisOne,
-						choice: { metadataId: id, optionKey: value.value },
+						choice: { metadataId: id, optionKey: value.value.toString() },
 					})}
 
 					{#if definition}
-						<li>
+						<li in:fade={{ duration: 200 }}>
 							<div class="metadata"><OverflowableText text={definition.label} /></div>
 							<div class="input">
 								<MetadataInput
@@ -314,8 +314,14 @@
 									}}
 								></MetadataInput>
 							</div>
-							<div class="todo"></div>
-							<span class="filter-count">
+							<div class="ratio">
+								<RadialProgress progress={1 - narrowing.ratio} />
+							</div>
+							<span
+								class="filter-count"
+								style:width="{narrowingState.candidates.all.length.toString()
+									.length}ch"
+							>
 								{narrowing.countAfterChoice}
 							</span>
 							<div class="remove">
@@ -323,6 +329,8 @@
 									help="Enlever ce choix"
 									onclick={async () => {
 										if (!observation) return;
+										narrowingState.choicesHistory =
+											narrowingState.choicesHistory.filter((v) => v !== id);
 										await deleteMetadataValue({
 											db: databaseHandle(),
 											subjectId: observation.id,
@@ -341,7 +349,7 @@
 						</li>
 					{/if}
 				{:else}
-					<li class="empty">
+					<li class="empty" in:fade={{ duration: 200 }}>
 						<Logo variant="empty" />
 						Aucun choix effectué pour l'instant
 					</li>
@@ -357,6 +365,7 @@
 					if (!observation) return;
 					const obs = await tables.Observation.raw.get(observation.id);
 					if (!obs) return;
+					narrowingState.choicesHistory = [];
 					// Wipe all metadata values that are in the current metadata group
 					await tables.Observation.update(
 						observation.id,
@@ -364,7 +373,11 @@
 						transformObject(obs.metadataOverrides, (id, value) => {
 							const def = definitions.find((d) => d.id === id);
 							if (!def) return [id, value];
-							if (def.group !== narrowingState.metadataGroup) return [id, value];
+							if (
+								def.group !==
+								uiState.currentSession.fullscreenClassifier.narrowableGroup
+							)
+								return [id, value];
 
 							return undefined;
 						})
@@ -381,7 +394,7 @@
 		{#if !narrowableGroup}
 			<Logo variant="empty" />
 			<p>Choisir un groupe de métadonnées avec lequel classifier par élimination</p>
-			<NarrowableGroupPicker /> 
+			<NarrowableGroupPicker />
 		{:else}
 			<div class="progress">
 				<ProgressBar progress={narrowingState.candidates.ratio} />
@@ -500,6 +513,7 @@
 	aside .choices {
 		height: 100%;
 		overflow: auto;
+		scrollbar-gutter: stable;
 
 		ol {
 			list-style: none;
@@ -511,7 +525,7 @@
 		}
 
 		li:not(.empty) {
-			gap: 0.5em;
+			gap: 1em;
 			padding: 0 0.5em;
 
 			&,
@@ -525,11 +539,21 @@
 				padding: 0.5em;
 			}
 
+			.filter-count {
+				flex-shrink: 0;
+			}
+
 			.metadata {
-				max-width: 40ch;
+				min-width: 0;
+				max-width: 30ch;
+				color: var(--gay);
+				text-transform: uppercase;
+				letter-spacing: 0.25ch;
+				font-size: 0.85em;
 			}
 
 			.input {
+				flex-shrink: 0;
 				margin-left: auto;
 				width: 20ch;
 			}
@@ -555,6 +579,7 @@
 		margin-top: auto;
 		display: flex;
 		justify-content: space-between;
+		align-items: end;
 		padding: 1em;
 	}
 

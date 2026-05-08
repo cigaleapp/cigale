@@ -65,12 +65,14 @@
 			{#if children}
 				{@render children({ ...option, value, selected: key === value })}
 			{:else}
-				{label}
-				{#if 'subtext' in option}
-					<p class="subtext">
-						{option.subtext}
-					</p>
-				{/if}
+				<div class="text">
+					{label}
+					{#if 'subtext' in option}
+						<p class="subtext">
+							{option.subtext}
+						</p>
+					{/if}
+				</div>
 			{/if}
 		</label>
 	{/each}
@@ -138,6 +140,10 @@
 
 	.radio {
 		align-items: center;
+	}
+
+	.text {
+		max-width: 67ch;
 	}
 
 	.subtext {

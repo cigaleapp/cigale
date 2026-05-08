@@ -1,9 +1,10 @@
 <script lang="ts">
 	import type * as DB from '$lib/database.js';
-	import type { NamespacedMetadataId } from '$lib/metadata/namespacing.js';
+	import type { NamespacedMetadataId } from '$lib/schemas/metadata.js';
 
 	import Fuse from 'fuse.js';
 	import { Debounced } from 'runed';
+	import { fade } from 'svelte/transition';
 
 	import { page } from '$app/state';
 	import { databaseHandle, tables } from '$lib/idb.svelte.js';
@@ -17,13 +18,14 @@
 	import MetadataList from '$lib/MetadataList.svelte';
 	import { ensureNamespacedMetadataId, namespaceOfMetadataId } from '$lib/schemas/metadata.js';
 	import { uiState } from '$lib/state.svelte.js';
-	import { cancellable, entries } from '$lib/utils.js';
+	import { cancellable, mapKeys } from '$lib/utils.js';
 
 	import { narrowingState } from '../+layout.svelte';
 
-	// Destructuring causes unecessary updates since we derive the entire narrowingState object
-	const definitions = $derived(narrowingState.definitions);
 	const metadataValues = $derived(narrowingState.metadataValues);
+	const definitions = $derived(
+		narrowingState.definitions(uiState.currentSession?.fullscreenClassifier.narrowableGroup)
+	);
 
 	const observation = $derived(tables.Observation.getFromState(page.params.observation ?? ''));
 
@@ -32,7 +34,6 @@
 	$effect(() => {
 		if (narrowingState.search.describe.query === '') debouncedSearch.setImmediately('');
 	});
-
 
 	const searcher = $derived(
 		new Fuse(definitions, {
@@ -132,20 +133,27 @@
 				.map((def) => [def.id, new Set()])
 		);
 
-		for (const candidate of narrowingState.candidates.remaining) {
-			for (const [cascadeMetadata, key] of entries(candidate.cascade ?? {})) {
-				const metadataId = ensureNamespacedMetadataId(
-					cascadeMetadata,
-					namespaceOfMetadataId(definitions[0].id)
+		metadata: for (const { id } of definitions) {
+			if (!(id in result)) continue;
+
+			for (const candidate of narrowingState.candidates.remaining) {
+				const cascades = mapKeys(candidate.cascade ?? {}, (metadataId) =>
+					ensureNamespacedMetadataId(metadataId, namespaceOfMetadataId(id))
 				);
-				if (!(metadataId in result)) continue;
-				result[metadataId].add(key.toString());
+
+				// If the candidate doesn't have a cascade for this metadata, it means that all options are still possible
+				// Go immediately to the next metadata
+				if (!(id in cascades)) {
+					delete result[id];
+					continue metadata;
+				}
+
+				result[id].add(cascades[id].toString());
 			}
 		}
 
 		return result;
 	});
-
 </script>
 
 <main>
@@ -157,7 +165,7 @@
 			{loadingOptions} / {definitions.length}
 		</div>
 	{:else}
-		<div class="scrollable">
+		<div class="scrollable" in:fade={{ duration: 200 }}>
 			<MetadataList
 				definitions={shownDefinitions}
 				ordering={searchResults?.map((result) => result.id) ??
@@ -184,9 +192,13 @@
 								const choiceIndex = narrowingState.choicesHistory.indexOf(
 									definition.id
 								);
-								// Delete old value if we had one
-								if (choiceIndex !== -1)
+
+								if (value && choiceIndex === -1) {
+									narrowingState.choicesHistory.push(definition.id);
+								} else if (!value && choiceIndex !== -1) {
 									narrowingState.choicesHistory.splice(choiceIndex, 1);
+								}
+
 								// Add new value to end unless we're removing it (undefined case)
 								if (value) {
 									await storeMetadataValue({
@@ -199,7 +211,6 @@
 										// updateReactiveState: false,
 										value,
 									});
-									narrowingState.choicesHistory.push(definition.id);
 								} else {
 									await deleteMetadataValue({
 										db: databaseHandle(),
@@ -246,7 +257,7 @@
 		Fiddled with manually in order to get approx. 66 chars/line max 
 		See https://www.uxpin.com/studio/blog/optimal-line-length-for-readability/
 		*/
-		max-width: 650px;
 		padding: 1em;
+		border-bottom: 1px solid var(--gray);
 	}
 </style>
