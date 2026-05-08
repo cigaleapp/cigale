@@ -1,14 +1,12 @@
 <script lang="ts">
 	import type { Metadata, MetadataEnumVariant } from './database.js';
-	import type { MetadataFile, RuntimeValue } from './schemas/metadata.js';
+	import type { MetadataFile, RuntimeValue, NamespacedMetadataId } from './schemas/metadata.js';
 
-import type {NamespacedMetadataId} from './metadata/namespacing.js';
 	import Icon from '@iconify/svelte';
 	import { ArkErrors, type } from 'arktype';
 	import { convert, MeasureKind, ms } from 'convert';
 	import * as dates from 'date-fns';
 	import { useDebounce } from 'runed';
-	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
 
 	import IconIncrement from '~icons/ri/add-line';
@@ -43,7 +41,6 @@ import type {NamespacedMetadataId} from './metadata/namespacing.js';
 		compareBy,
 		gradientedColor,
 		mapValues,
-		orEmpty2,
 		pick,
 		readableOn,
 		round,
@@ -65,6 +62,7 @@ import type {NamespacedMetadataId} from './metadata/namespacing.js';
 		id: string;
 		disabled?: boolean;
 		options?: MetadataEnumVariant[] | undefined;
+		// eslint-disable-next-line no-unused-vars
 		optionIsDisabled?: (option: MetadataEnumVariant) => boolean | string;
 		confidences?: Record<string, number>;
 		isCompactEnum?: boolean;
@@ -142,7 +140,6 @@ import type {NamespacedMetadataId} from './metadata/namespacing.js';
 		loader.do();
 		return loader.cancel;
 	});
-
 </script>
 
 <div

@@ -8,6 +8,7 @@
 	type Props = {
 		options: Key[];
 		current: NoInfer<Key>;
+		// eslint-disable-next-line no-unused-vars
 		disabled?: (key: Key) => boolean | string;
 	} & Record<`option_${NoInfer<Key>}`, Snippet<[{current: boolean, disabled: boolean}]>>;
 

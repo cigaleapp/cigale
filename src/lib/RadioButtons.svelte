@@ -12,9 +12,10 @@
 		horizontal?: boolean;
 		cards?: boolean;
 		value?: NoInfer<OptionKey> | undefined;
-		// eslint-disable-next-line no-unused-vars
 		onchange?: (
+			// eslint-disable-next-line no-unused-vars
 			value: OptionKey | undefined,
+			// eslint-disable-next-line no-unused-vars
 			fieldset: HTMLFieldSetElement
 		) => void | Promise<void>;
 		children?: import('svelte').Snippet<

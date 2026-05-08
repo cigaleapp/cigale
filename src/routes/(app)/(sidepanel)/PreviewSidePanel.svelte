@@ -3,7 +3,6 @@
 	 * @import { TopLeftBoundingBox } from '$lib/BoundingBoxes.svelte.js';
 	 */
 	import { dequal } from 'dequal/lite';
-	import { watch } from 'runed';
 
 	import IconShowPanel from '~icons/ri/arrow-up-s-line';
 	import IconObservation from '~icons/ri/bug-line';
@@ -19,13 +18,10 @@
 	import CroppedImg from '$lib/CroppedImg.svelte';
 	import { onSwipe } from '$lib/gestures';
 	import { plural } from '$lib/i18n.js';
-	import * as idb from '$lib/idb.svelte.js';
 	import { tables } from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import KeyboardHint from '$lib/KeyboardHint.svelte';
-	import Logo from '$lib/Logo.svelte';
 	import Metadata from '$lib/Metadata.svelte';
-	import { metadataOptionsOf } from '$lib/metadata/index.js';
 	import MetadataList from '$lib/MetadataList.svelte';
 	import { IsMobile } from '$lib/mobile.svelte.js';
 	import { goto } from '$lib/paths.js';

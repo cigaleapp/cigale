@@ -3,20 +3,16 @@
 
 	import IconPrev from '~icons/ri/arrow-left-s-line';
 	import IconNext from '~icons/ri/arrow-right-s-line';
-	import IconConfirmedClassification from '~icons/ri/check-double-line';
-	import IconClassified from '~icons/ri/check-line';
-	import { goto, invalidate, preloadData } from '$app/navigation';
+	import { goto, invalidate } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import ConfirmedOverlay from '$lib/ConfirmedOverlay.svelte';
-	import { percent } from '$lib/i18n';
-	import { databaseHandle, dependencyURI } from '$lib/idb.svelte';
+	import { databaseHandle, dependencyURI } from '$lib/idb.svelte.js';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
 	import { storeMetadataValue } from '$lib/metadata/index.js';
-	import ProgressBar from '$lib/ProgressBar.svelte';
-	import { uiState } from '$lib/state.svelte';
-	import { toasts } from '$lib/toasts.svelte';
+	import { uiState } from '$lib/state.svelte.js';
+	import { toasts } from '$lib/toasts.svelte.js';
 
 	interface Props {
 		currentObservation: Observation;
@@ -36,7 +32,6 @@
 		totalObservations,
 		nextObservation,
 		prevObservation,
-		classifiedObservationsCount,
 		confirmedClassificationsCount,
 		nextUnconfirmedObservation,
 		focusedMetadata,

@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type * as DB from '$lib/database.js';
-	import { onMount, type Snippet } from 'svelte';
 
 	import VirtualList from '@sveltejs/svelte-virtual-list';
+	import { type Snippet } from 'svelte';
 
 	import IconExpand from '~icons/ri/arrow-right-s-line';
 
@@ -10,7 +10,7 @@
 	import { getSettings } from './settings.svelte.js';
 
 	interface Props {
-		children: Snippet<[DB.Metadata, DB.MetadataValue, {collapsed: boolean}]>;
+		children: Snippet<[DB.Metadata, DB.MetadataValue, { collapsed: boolean }]>;
 		testid?: string;
 		definitions: DB.Metadata[];
 		values: DB.MetadataValues;
@@ -57,12 +57,11 @@
 
 	/* Virtualize only if there are no groups, since item size height is drastically dynamic when collapsing/expanding groups, there's too much glitching when trying to virtualize in that case */
 	const virtualize = $derived(groups.length === 0);
-
 </script>
 
 <div class="liste" data-testid={testid}>
 	{#snippet metadata(item: (typeof groupedDefinitions)[number])}
-		{@const { group, definitions, iterationKey } = item}
+		{@const { group, definitions } = item}
 		<div class="definition-group">
 			{#if group}
 				<details open={!group.collapsed}>
@@ -82,7 +81,9 @@
 			{#snippet defs()}
 				{#each definitions as def (def.id)}
 					{#if def.label || showTechnicalMetadata}
-						{@render children(def, values[def.id], {collapsed: group?.collapsed ?? false})}
+						{@render children(def, values[def.id], {
+							collapsed: group?.collapsed ?? false,
+						})}
 					{/if}
 				{/each}
 			{/snippet}
@@ -90,7 +91,7 @@
 	{/snippet}
 
 	{#if virtualize}
-		<VirtualList items={groupedDefinitions} let:item >
+		<VirtualList items={groupedDefinitions} let:item>
 			{@render metadata(item)}
 		</VirtualList>
 	{:else}

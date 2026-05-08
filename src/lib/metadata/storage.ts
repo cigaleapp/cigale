@@ -21,7 +21,7 @@ import { resolveMetadataImport } from './imports.js';
 import { serializeMetadataValue } from './serializing.js';
 
 // TODO: use everywhere
-export function metadataOptionDatabaseKey(
+function metadataOptionDatabaseKey(
 	protocolId: string,
 	metadataId: string,
 	optionKey: string

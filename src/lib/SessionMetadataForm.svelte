@@ -9,11 +9,7 @@
 	import { databaseHandle, openDatabase, tables } from './idb.svelte.js';
 	import Metadata from './Metadata.svelte';
 	import { resolveDefaults } from './metadata/defaults.js';
-	import {
-		deleteMetadataValue,
-		metadataOptionsOf,
-		storeMetadataValue,
-	} from './metadata/storage.js';
+	import { deleteMetadataValue, storeMetadataValue } from './metadata/storage.js';
 	import MetadataList from './MetadataList.svelte';
 
 	interface Props {

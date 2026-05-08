@@ -10,16 +10,13 @@
 	import IconUndo from '~icons/ri/arrow-go-back-fill';
 	import IconUnconfirmedCrop from '~icons/ri/arrow-go-back-line';
 	import IconRedo from '~icons/ri/arrow-go-forward-fill';
-	import IconBack from '~icons/ri/arrow-left-line';
 	import IconPrev from '~icons/ri/arrow-left-s-line';
 	import IconNext from '~icons/ri/arrow-right-s-line';
 	import IconConfirmedCrop from '~icons/ri/check-double-line';
-	import IconHasCrop from '~icons/ri/crop-line';
 	import IconTwoPointCrop from '~icons/ri/crosshair-2-line';
 	import IconFocus from '~icons/ri/crosshair-line';
 	import IconDelete from '~icons/ri/delete-bin-line';
 	import IconToolMove from '~icons/ri/drag-move-2-fill';
-	import IconGallery from '~icons/ri/function-line';
 	import IconToolHand from '~icons/ri/hand';
 	import IconRevert from '~icons/ri/reset-left-fill';
 	import IconToolDragCrop from '~icons/ri/shape-2-line';
@@ -50,7 +47,6 @@
 		parseImageId,
 	} from '$lib/images.js';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
-	import KeyboardHint from '$lib/KeyboardHint.svelte';
 	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 	import {
 		assertIs,
@@ -60,9 +56,7 @@
 	} from '$lib/metadata/index.js';
 	import MobileWIPOverlay from '$lib/MobileWIPOverlay.svelte';
 	import { ensureNoEmptyObservations } from '$lib/observations.js';
-	import OverflowableText from '$lib/OverflowableText.svelte';
 	import { goto } from '$lib/paths.js';
-	import ProgressBar from '$lib/ProgressBar.svelte';
 	import SentenceJoin from '$lib/SentenceJoin.svelte';
 	import { seo } from '$lib/seo.svelte';
 	import { getSettings, setSetting, toggleSetting } from '$lib/settings.svelte';

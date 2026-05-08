@@ -13,7 +13,6 @@
 
 	import IconConfirmed from '~icons/ri/check-double-line';
 	import IconClose from '~icons/ri/close-line';
-	import IconUnconfirmed from '~icons/ri/error-warning-line';
 	import { invalidate } from '$app/navigation';
 	import { page } from '$app/state';
 	import Badge from '$lib/Badge.svelte';
@@ -195,9 +194,13 @@
 							: `Cette image apparaît dans ${plural(observationsOfImageFile.length, ['# observation', '# observations'])}`;
 					if (!imageToCrop && key === 'crop') return 'Ouvrir une image pour le recadrage';
 
-					if (key === "narrow") {
-						const narrowableGroups = uiState.currentProtocol?.metadataGroups.filter(group => group.narrowable) ?? [];
-						if (narrowableGroups.length === 0) return "Non disponible pour ce protocole"
+					if (key === 'narrow') {
+						const narrowableGroups =
+							uiState.currentProtocol?.metadataGroups.filter(
+								(group) => group.narrowable
+							) ?? [];
+						if (narrowableGroups.length === 0)
+							return 'Non disponible pour ce protocole';
 					}
 
 					return false;

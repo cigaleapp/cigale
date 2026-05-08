@@ -16,11 +16,9 @@
 	import { scrollfader } from '$lib/scrollfader.js';
 	import { uiState } from '$lib/state.svelte.js';
 
-	import { fullscreenState } from '../../../+layout@(app).svelte';
 	import { maximumListableCandidates, narrowingState } from '../+layout.svelte';
 
 	const candidates = $derived(narrowingState.candidates.remaining);
-
 
 	const searcher = $derived(
 		new Fuse(candidates, {

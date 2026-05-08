@@ -11,32 +11,29 @@
 	import IconClear from '~icons/ri/close-line';
 	import IconTechnical from '~icons/ri/settings-line';
 	import IconMerged from '~icons/ri/stack-line';
-	import LoadingText, { Loading } from '$lib/LoadingText.svelte';
+	import LoadingText from '$lib/LoadingText.svelte';
 	import { metadataOption } from '$lib/metadata/storage.js';
 
 	import Carousel from './Carousel.svelte';
 	import ConfidencePercentage from './ConfidencePercentage.svelte';
 	import { databaseHandle } from './idb.svelte.js';
-	import * as db from './idb.svelte.js';
 	import {
 		metadataValueValidatorDate,
 		metadataValueValidatorNumeric,
 		metadataValueValidatorString,
 	} from './metadata/constraints.js';
-	import { hasRuntimeType } from './metadata/index.js';
 	import MetadataInput from './MetadataInput.svelte';
 	import OverflowableText from './OverflowableText.svelte';
-	import { namespaceOfMetadataId, splitMetadataId } from './schemas/metadata.js';
+	import { splitMetadataId } from './schemas/metadata.js';
 	import { isDebugMode } from './settings.svelte.js';
-	import { uiState } from './state.svelte.js';
 	import { tooltip } from './tooltips.js';
 	import { orEmpty, orEmpty2, pick, safeJSONParse, switchValue } from './utils.js';
 	import WorldMap from './WorldMap.svelte';
-	import { onMount } from 'svelte';
 
 	interface Props {
 		definition: Metadata;
 		options?: MetadataEnumVariant[] | undefined;
+		// eslint-disable-next-line no-unused-vars
 		optionIsDisabled?: (option: MetadataEnumVariant) => boolean | string;
 		value: undefined | TypedMetadataValue<NoInfer<T>>;
 		merged?: boolean;
@@ -65,7 +62,6 @@
 		onchange = async () => {},
 		onvalidation = () => {},
 	}: Props = $props();
-
 
 	const valueValidator = $derived.by(() => {
 		switch (definition.type) {
@@ -99,12 +95,11 @@
 
 	const isCompactEnum = $derived(
 		definition.type === 'enum' &&
-		switchValue(definition.presentation, {
-			auto: 
-			definition._optionsCount > 0 && definition._optionsCount <= 10 ,
-			dropdown: false,
-			buttons: definition._optionsCount < 100
-		})
+			switchValue(definition.presentation, {
+				auto: definition._optionsCount > 0 && definition._optionsCount <= 10,
+				dropdown: false,
+				buttons: definition._optionsCount < 100,
+			})
 	);
 
 	const inputIsInline = $derived(!isCompactEnum && definition.type !== 'file');
@@ -115,7 +110,6 @@
 
 	const optional = $derived(requiredness === 'all' && !definition.required);
 	const required = $derived(requiredness !== 'none' && definition.required);
-
 </script>
 
 <div class="metadata">
@@ -299,7 +293,10 @@
 				safeJSONParse(key)?.toString(),
 				value,
 			]),
-			...orEmpty2(value, ({value, confidence}) => [safeJSONParse(value)?.toString(), confidence]),
+			...orEmpty2(value, ({ value, confidence }) => [
+				safeJSONParse(value)?.toString(),
+				confidence,
+			]),
 		])}
 	/>
 {/snippet}

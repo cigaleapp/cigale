@@ -16,8 +16,6 @@
 
 <script>
 	import Icon from '@iconify/svelte';
-	import { watch } from 'runed';
-	import { onMount, untrack } from 'svelte';
 
 	import IconCheck from '~icons/ri/check-line';
 	import LoadingText, { Loading } from '$lib/LoadingText.svelte';
@@ -65,7 +63,6 @@
 		Object.keys(confidences).length > 0 &&
 			Object.values(confidences).some((conf) => conf > 0 && conf < 1)
 	);
-
 
 	let options = $derived(precomputedOptions ?? []);
 
@@ -123,8 +120,6 @@
 	 * @type {CascadeLabelsCache}
 	 */
 	let cascadeLabelsCache = $state({});
-
-
 </script>
 
 <div class="metadata-combobox" class:wide-docs={hasImages}>

@@ -6,7 +6,7 @@ TODO: Don't animate when progress decreases (e.g. when a new task starts and it 
 
 <script lang="ts">
 	import { tooltip } from './tooltips.js';
-	import { clamp, ensureArray, sum } from './utils.js';
+	import { clamp, ensureArray } from './utils.js';
 
 	interface Props {
 		/** Pass in an array of values for a multi-phase progress bar. Numbers must be in decreasing order for this to make sense */
