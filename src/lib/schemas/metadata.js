@@ -524,13 +524,19 @@ const MetadataLocation = MetadataBase.and({
 const MetadataEnum = MetadataBase.and({
 	type: '"enum"',
 	'default?': MetadataDefault('string | number'),
+	presentation: type
+		.enumerated('dropdown', 'buttons', 'auto')
+		.describe(
+			"Comment présenter les options de cette métadonnée dans l'interface utilisateur. Dropdown pour une liste déroulante avec recherche, Buttons pour des boutons affichant directement toutes les optiosn, Auto pour laisser l'application décider (souvent en fonction du nombre d'options)"
+		)
+		.default('auto'),
 	'infer?': type.and(
 		InferenceConfigs.exif.partial(),
 		InferenceConfigs.sidecar(type('string|number')).partial(),
 		InferenceConfigs.neuralEnum.partial()
 	),
 	// --- Technical fields ---
-	'_optionsCount': 'number.integer = 0'
+	_optionsCount: 'number.integer = 0',
 });
 
 const MetadataBoundingbox = MetadataBase.and({

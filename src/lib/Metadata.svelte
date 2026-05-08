@@ -30,7 +30,7 @@
 	import { isDebugMode } from './settings.svelte.js';
 	import { uiState } from './state.svelte.js';
 	import { tooltip } from './tooltips.js';
-	import { orEmpty, orEmpty2, pick, safeJSONParse } from './utils.js';
+	import { orEmpty, orEmpty2, pick, safeJSONParse, switchValue } from './utils.js';
 	import WorldMap from './WorldMap.svelte';
 	import { onMount } from 'svelte';
 
@@ -99,7 +99,12 @@
 
 	const isCompactEnum = $derived(
 		definition.type === 'enum' &&
-			definition._optionsCount > 0 && definition._optionsCount <= 10 
+		switchValue(definition.presentation, {
+			auto: 
+			definition._optionsCount > 0 && definition._optionsCount <= 10 ,
+			dropdown: false,
+			buttons: definition._optionsCount < 100
+		})
 	);
 
 	const inputIsInline = $derived(!isCompactEnum && definition.type !== 'file');
