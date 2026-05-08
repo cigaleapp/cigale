@@ -169,10 +169,30 @@ for (const [i, { key }] of options.entries()) {
 	await addToOptions(protocols, 'kingdom', keys.kingdom, species.kingdom);
 
 	await setCascadeOnOption(protocols, 'species', key, 'genus', keys.genus);
+	await setCascadeOnOption(protocols, 'species', key, 'family', keys.family);
+	await setCascadeOnOption(protocols, 'species', key, 'order', keys.order);
+	await setCascadeOnOption(protocols, 'species', key, 'class', keys.class);
+	await setCascadeOnOption(protocols, 'species', key, 'phylum', keys.phylum);
+	await setCascadeOnOption(protocols, 'species', key, 'kingdom', keys.kingdom);
+
 	await setCascadeOnOption(protocols, 'genus', keys.genus, 'family', keys.family);
+	await setCascadeOnOption(protocols, 'genus', keys.genus, 'order', keys.order);
+	await setCascadeOnOption(protocols, 'genus', keys.genus, 'class', keys.class);
+	await setCascadeOnOption(protocols, 'genus', keys.genus, 'phylum', keys.phylum);
+	await setCascadeOnOption(protocols, 'genus', keys.genus, 'kingdom', keys.kingdom);
+
 	await setCascadeOnOption(protocols, 'family', keys.family, 'order', keys.order);
+	await setCascadeOnOption(protocols, 'family', keys.family, 'class', keys.class);
+	await setCascadeOnOption(protocols, 'family', keys.family, 'phylum', keys.phylum);
+	await setCascadeOnOption(protocols, 'family', keys.family, 'kingdom', keys.kingdom);
+
 	await setCascadeOnOption(protocols, 'order', keys.order, 'class', keys.class);
+	await setCascadeOnOption(protocols, 'order', keys.order, 'phylum', keys.phylum);
+	await setCascadeOnOption(protocols, 'order', keys.order, 'kingdom', keys.kingdom);
+
 	await setCascadeOnOption(protocols, 'class', keys.class, 'phylum', keys.phylum);
+	await setCascadeOnOption(protocols, 'class', keys.class, 'kingdom', keys.kingdom);
+
 	await setCascadeOnOption(protocols, 'phylum', keys.phylum, 'kingdom', keys.kingdom);
 
 	await setICUNStatus(protocols, 'species', key);

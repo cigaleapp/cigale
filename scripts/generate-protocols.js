@@ -221,6 +221,7 @@ const protocol = {
 		taxonomy: {
 			name: 'Taxonomie',
 			description: "Classification taxonomique de l'espèce",
+			narrowable: true
 		},
 	},
 	sessionMetadata: {
