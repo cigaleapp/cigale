@@ -9,7 +9,7 @@
 		options: Key[];
 		current: NoInfer<Key>;
 		disabled?: (key: Key) => boolean | string;
-	} & Record<`option_${NoInfer<Key>}`, Snippet<[{current: boolean}]>>;
+	} & Record<`option_${NoInfer<Key>}`, Snippet<[{current: boolean, disabled: boolean}]>>;
 
 	let {
 		options,
@@ -35,7 +35,7 @@
 				value={key}
 				id="{id}-{key}"
 			/>
-			{@render snippets[`option_${key}`]({ current: current === key })}
+			{@render snippets[`option_${key}`]({ current: current === key, disabled: Boolean(disabled) })}
 		</label>
 	{/each}
 </div>
@@ -58,6 +58,10 @@
 		border-radius: var(--corner-radius);
 		padding: 0.25em 0.5em;
 		border: 1px solid transparent;
+
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
 
 		&:has(input:checked) {
 			background-color: var(--bg-neutral);

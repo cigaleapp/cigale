@@ -529,6 +529,8 @@ const MetadataEnum = MetadataBase.and({
 		InferenceConfigs.sidecar(type('string|number')).partial(),
 		InferenceConfigs.neuralEnum.partial()
 	),
+	// --- Technical fields ---
+	'_optionsCount': 'number.integer = 0'
 });
 
 const MetadataBoundingbox = MetadataBase.and({

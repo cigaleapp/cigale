@@ -11,13 +11,14 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
 
-	import {plural} from '$lib/i18n.js';
 	import IconConfirmed from '~icons/ri/check-double-line';
 	import IconClose from '~icons/ri/close-line';
 	import IconUnconfirmed from '~icons/ri/error-warning-line';
 	import { invalidate } from '$app/navigation';
 	import { page } from '$app/state';
+	import Badge from '$lib/Badge.svelte';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
+	import { plural } from '$lib/i18n.js';
 	import { dependencyURI, tables } from '$lib/idb.svelte';
 	import { imageId, imageIdToFileId } from '$lib/images';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
@@ -36,17 +37,15 @@
 	);
 
 	const observationsOfImageFile = $derived(
-		tables.Observation.state.filter(obs => obs.images.some(imageId => 
-
-		imageIdToFileId(imageId) === page.params.image
-		))
-	)
+		tables.Observation.state.filter((obs) =>
+			obs.images.some((imageId) => imageIdToFileId(imageId) === page.params.image)
+		)
+	);
 
 	const observationToClassify = $derived(
-		observation ?? (
-			observationsOfImageFile.length === 1 ? observationsOfImageFile[0] : undefined
-		)
-	)
+		observation ??
+			(observationsOfImageFile.length === 1 ? observationsOfImageFile[0] : undefined)
+	);
 
 	const currentImage = $derived(tables.Image.getFromState(fullscreenState.currentImage ?? ''));
 
@@ -190,9 +189,17 @@
 			<SegmentedGroup
 				options={['crop', 'suggestions', 'narrow']}
 				disabled={(key) => {
-					if (!observationToClassify && key !== 'crop') 
-						return observationsOfImageFile.length === 0 ? "Cette image n'apparaît dans aucune observation" :  `Cette image apparaît dans ${plural(observationsOfImageFile.length, ['# observation', '# observations'])}`;
+					if (!observationToClassify && key !== 'crop')
+						return observationsOfImageFile.length === 0
+							? "Cette image n'apparaît dans aucune observation"
+							: `Cette image apparaît dans ${plural(observationsOfImageFile.length, ['# observation', '# observations'])}`;
 					if (!imageToCrop && key === 'crop') return 'Ouvrir une image pour le recadrage';
+
+					if (key === "narrow") {
+						const narrowableGroups = uiState.currentProtocol?.metadataGroups.filter(group => group.narrowable) ?? [];
+						if (narrowableGroups.length === 0) return "Non disponible pour ce protocole"
+					}
+
 					return false;
 				}}
 				bind:current={
@@ -210,6 +217,7 @@
 				{/snippet}
 				{#snippet option_narrow()}
 					Élimination
+					<Badge>Beta</Badge>
 				{/snippet}
 			</SegmentedGroup>
 		</nav>

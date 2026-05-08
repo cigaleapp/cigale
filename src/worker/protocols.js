@@ -159,20 +159,19 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 
 			onLoadingState('write-metadata', metadata.label || id);
 			console.time(`Storing Metadata ${id}`);
-			tx.objectStore('Metadata').put({ id, ...omit(metadata, 'options') });
+			tx.objectStore('Metadata').put({
+				id,
+				...omit(metadata, 'options'),
+				_optionsCount: metadata.options?.length ?? 0,
+			});
 			console.timeEnd(`Storing Metadata ${id}`);
 
 			console.time(`Storing Metadata Options for ${id}`);
 			const oTotal = metadata.options?.length ?? 0;
 			total += oTotal;
-			let l = false;
 			for (const [i, option] of metadata.options?.entries() ?? []) {
 				done++;
 
-				if (!l && option.cascade) {
-					console.log('cascade', option.cascade);
-					l = true;
-				}
 
 				if (i % 1000 === 0) {
 					onLoadingState(
@@ -190,13 +189,6 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 						)
 						.flatMap(([_, groups]) => [...groups])
 				);
-
-				if (narrowableIn.size > 0) {
-					console.log(
-						`Option ${option.key} of metadata ${metadata.label || id} is narrowable in groups: ${[...narrowableIn].join(', ')}`,
-						option
-					);
-				}
 
 				tx.objectStore('MetadataOption').put({
 					id: metadataOptionId(namespacedMetadataId(p.id, id), option.key),

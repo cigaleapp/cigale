@@ -2,9 +2,10 @@ import { databaseHandle, tables } from '$lib/idb.svelte.js';
 import { resolveDefaults } from '$lib/metadata/defaults.js';
 import { goto } from '$lib/paths.js';
 import { defaultClassificationMetadata, defaultCropMetadata } from '$lib/protocols.js';
+import { isNamespacedToProtocol } from '$lib/schemas/metadata.js';
 import { switchSession } from '$lib/sessions.js';
 import { toasts } from '$lib/toasts.svelte.js';
-import { orEmptyObj } from '$lib/utils.js';
+import { compareBy, orEmptyObj } from '$lib/utils.js';
 
 export async function createSession() {
 	const defaultProtocol = tables.Protocol.state.at(0);
@@ -23,6 +24,21 @@ export async function createSession() {
 
 	const mtimeMetadata = defaultProtocol.exports?.images.mtime;
 
+	const narrowableGroups = defaultProtocol.metadataGroups
+		.filter((group) => group.narrowable)
+		.map((group) => ({
+			...group,
+			metadataCount: tables.Metadata.state.filter(
+				(metadata) =>
+					isNamespacedToProtocol(defaultProtocol.id, metadata.id) &&
+					metadata.group === group.id
+			).length,
+		}));
+
+	const largestNarrowableGroup = narrowableGroups
+		.toSorted(compareBy((group) => group.metadataCount))
+		.at(-1);
+
 	const { id } = await tables.Session.add({
 		name: `Session du ${Intl.DateTimeFormat().format(new Date())}`,
 		description: '',
@@ -32,6 +48,9 @@ export async function createSession() {
 		metadata: {},
 		fullscreenClassifier: {
 			layout: 'top-bottom',
+			...orEmptyObj(largestNarrowableGroup !== undefined, {
+				narrowableGroup: largestNarrowableGroup?.id ?? '',
+			}),
 			...orEmptyObj(classificationMetadata !== undefined, {
 				focusedMetadata: classificationMetadata?.id ?? '',
 			}),

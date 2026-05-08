@@ -11,9 +11,13 @@
 	import IconClear from '~icons/ri/close-line';
 	import IconTechnical from '~icons/ri/settings-line';
 	import IconMerged from '~icons/ri/stack-line';
+	import LoadingText, { Loading } from '$lib/LoadingText.svelte';
+	import { metadataOption } from '$lib/metadata/storage.js';
 
 	import Carousel from './Carousel.svelte';
 	import ConfidencePercentage from './ConfidencePercentage.svelte';
+	import { databaseHandle } from './idb.svelte.js';
+	import * as db from './idb.svelte.js';
 	import {
 		metadataValueValidatorDate,
 		metadataValueValidatorNumeric,
@@ -22,15 +26,18 @@
 	import { hasRuntimeType } from './metadata/index.js';
 	import MetadataInput from './MetadataInput.svelte';
 	import OverflowableText from './OverflowableText.svelte';
-	import { splitMetadataId } from './schemas/metadata.js';
+	import { namespaceOfMetadataId, splitMetadataId } from './schemas/metadata.js';
 	import { isDebugMode } from './settings.svelte.js';
+	import { uiState } from './state.svelte.js';
 	import { tooltip } from './tooltips.js';
-	import { orEmpty, pick, safeJSONParse } from './utils.js';
+	import { orEmpty, orEmpty2, pick, safeJSONParse } from './utils.js';
 	import WorldMap from './WorldMap.svelte';
+	import { onMount } from 'svelte';
 
 	interface Props {
 		definition: Metadata;
-		options?: MetadataEnumVariant[];
+		options?: MetadataEnumVariant[] | undefined;
+		optionIsDisabled?: (option: MetadataEnumVariant) => boolean | string;
 		value: undefined | TypedMetadataValue<NoInfer<T>>;
 		merged?: boolean;
 		/** Display requiredness indicators */
@@ -53,10 +60,12 @@
 		merged,
 		definition,
 		requiredness,
-		options = [],
+		options = undefined,
+		optionIsDisabled = () => false,
 		onchange = async () => {},
 		onvalidation = () => {},
 	}: Props = $props();
+
 
 	const valueValidator = $derived.by(() => {
 		switch (definition.type) {
@@ -89,7 +98,8 @@
 	const _id = $props.id();
 
 	const isCompactEnum = $derived(
-		definition.type === 'enum' && options.length <= 10 && !options.some((opt) => opt.learnMore)
+		definition.type === 'enum' &&
+			definition._optionsCount > 0 && definition._optionsCount <= 10 
 	);
 
 	const inputIsInline = $derived(!isCompactEnum && definition.type !== 'file');
@@ -100,6 +110,7 @@
 
 	const optional = $derived(requiredness === 'all' && !definition.required);
 	const required = $derived(requiredness !== 'none' && definition.required);
+
 </script>
 
 <div class="metadata">
@@ -154,12 +165,16 @@
 					.sort(([, a], [, b]) => b - a)
 					.slice(0, 3) as [jsonValue, confidence] (jsonValue)}
 					{@const stringValue = safeJSONParse(jsonValue)?.toString()}
-					{@const enumVariant = hasRuntimeType('enum', stringValue)
-						? options?.find(({ key }) => key === stringValue)
-						: undefined}
 					<li>
-						<div class="value" use:tooltip={enumVariant?.description}>
-							{enumVariant?.label || stringValue}
+						<div class="value">
+							<LoadingText
+								value={async () =>
+									metadataOption(databaseHandle(), definition.id, stringValue)}
+							>
+								{#snippet loaded(option)}
+									{option?.label ?? stringValue}
+								{/snippet}
+							</LoadingText>
 						</div>
 						<ConfidencePercentage value={confidence} />
 						<button
@@ -208,7 +223,7 @@
 				{
 					type: definition.type,
 					...splitMetadataId(definition.id),
-					...(options.length <= 10 ? { options } : {}),
+					...(options && options.length <= 10 ? { options } : {}),
 					value,
 					validationErrors,
 					constraints: {
@@ -261,6 +276,7 @@
 		id={_id}
 		{definition}
 		{options}
+		{optionIsDisabled}
 		value={value?.value}
 		unit={value?.unit}
 		{validationErrors}
@@ -278,7 +294,7 @@
 				safeJSONParse(key)?.toString(),
 				value,
 			]),
-			[safeJSONParse(value?.value)?.toString(), value?.confidence],
+			...orEmpty2(value, ({value, confidence}) => [safeJSONParse(value)?.toString(), confidence]),
 		])}
 	/>
 {/snippet}
@@ -344,7 +360,9 @@
 		align-items: center;
 		justify-content: space-between;
 		gap: 1em;
-		flex-wrap: wrap;
+		@media (max-width: 600px) {
+			flex-wrap: wrap;
+		}
 	}
 	.value {
 		display: flex;

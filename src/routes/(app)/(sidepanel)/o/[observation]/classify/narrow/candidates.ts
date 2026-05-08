@@ -6,10 +6,16 @@ import { listByIndex } from '$lib/idb.svelte.js';
 import { removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';
 import { entries } from '$lib/utils.js';
 
-export async function getAllCandidates({ narrowableGroup, focusedMetadataId }: { narrowableGroup: string, focusedMetadataId: NamespacedMetadataID }) {
+export async function getAllCandidates({
+	narrowableGroup,
+	focusedMetadataId,
+}: {
+	narrowableGroup: string;
+	focusedMetadataId: NamespacedMetadataID;
+}) {
 	// TODO: metadata group names should be namespaced!
 	const narrowables = await listByIndex('MetadataOption', '_narrowableIn', narrowableGroup);
-	return narrowables.filter(option => option.metadataId === focusedMetadataId);
+	return narrowables.filter((option) => option.metadataId === focusedMetadataId);
 }
 
 export function getMatchingCandidates({

@@ -8,7 +8,7 @@
 </script>
 
 <!-- Credits: https://github.com/nolimits4web/skeleton-elements -->
-<script lang="ts" generics="T extends string | number = string | number">
+<script lang="ts" generics="T extends string | number | boolean | Record<string, unknown> | undefined | null">
 	import LoadingText from './LoadingText.svelte';
 	import { tooltip } from './tooltips.js';
 	import { LOREM_IPSUM } from './utils.js';

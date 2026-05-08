@@ -81,7 +81,6 @@
 
 		<SessionMetadataForm
 			session={data.session}
-			metadataOptions={new Map()}
 			onmetadatachange={() => {
 				invalidate(dependencyURI('Session', data.session.id));
 			}}

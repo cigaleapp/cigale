@@ -39,7 +39,6 @@ TODO: Don't animate when progress decreases (e.g. when a new task starts and it 
 
 		return increments;
 	});
-	$inspect({ incrementalProgresses });
 </script>
 
 <div class="bars">

@@ -18,7 +18,6 @@
 
 	interface Props {
 		session: DB.Session;
-		metadataOptions?: Map<NamespacedMetadataID, DB.MetadataEnumVariant[]>;
 		onmetadatachange?: () => Promise<void> | void;
 		/** Bind to this prop to check if all metadata values are valid (required metadata are filled, nothing breaks constraints, etc). Maps metadata IDs to error messages for that metadata */
 		errors?: Map<NamespacedMetadataID, string[]>;
@@ -26,12 +25,7 @@
 
 	let refreshDefaults = $state(0);
 
-	let {
-		session,
-		errors = new SvelteMap(),
-		metadataOptions = new Map(),
-		onmetadatachange,
-	}: Props = $props();
+	let { session, errors = new SvelteMap(), onmetadatachange }: Props = $props();
 	const protocol = $derived(tables.Protocol.getFromState(session.protocol));
 
 	const metadataDefs = $derived(
@@ -46,18 +40,6 @@
 				)
 			: []
 	);
-
-	watch([() => protocol, () => session.protocol], () => {
-		void (async () => {
-			if (!protocol) return;
-			const options = await metadataOptionsOf(
-				await openDatabase(),
-				protocol.id,
-				protocol.sessionMetadata
-			);
-			metadataOptions = options.byMetadata;
-		})();
-	});
 
 	watch([() => refreshDefaults], () => {
 		void (async () => {
@@ -83,7 +65,7 @@
 				{@const value = session.metadata[def.id]}
 				<Metadata
 					requiredness="all"
-					options={metadataOptions.get(def.id) ?? []}
+					options={undefined}
 					definition={def}
 					{value}
 					onvalidation={(messages) => {

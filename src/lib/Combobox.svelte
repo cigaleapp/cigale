@@ -23,6 +23,14 @@
 		focuser?: (action: 'focus' | 'blur' | 'toggle') => void;
 		highlight: Snippet<[I, I[]]>;
 		listItem: Snippet<[I & { selected: boolean; highlighted: boolean; matchedFrom: string }]>;
+		/** Usage:
+		 * ```svelte
+		 * {#snippet searchbox({ focusSetter, ...props })}
+		 * 		<input {...props} {@attach focusSetter}>
+		 * {/snippet}
+		 * ```
+		 * */
+		searchbox?: Snippet<[Record<string, unknown>]>;
 	};
 </script>
 
@@ -37,6 +45,7 @@
 	import Logo from './Logo.svelte';
 	import { scrollfader } from './scrollfader.js';
 	import { compareBy } from './utils.js';
+	import type { Attachment } from 'svelte/attachments';
 
 	type MergedProps = Props<I, V> & Omit<Combobox.RootProps, keyof Props<I, V>>;
 
@@ -53,6 +62,7 @@
 		contentProps,
 		listItem,
 		highlight,
+		searchbox,
 		...restProps
 	}: MergedProps = $props();
 
@@ -115,6 +125,28 @@
 	);
 
 	let highlightedItem: undefined | I = $state();
+
+	const focusSetter: Attachment<HTMLInputElement> = (node) => {
+		focuser = (action) => {
+			switch (action) {
+				case 'focus':
+					node.focus();
+					break;
+				case 'blur':
+					node.blur();
+					open = false;
+					break;
+				case 'toggle':
+					if (document.activeElement === node) {
+						node.blur();
+						open = false;
+					} else {
+						node.focus();
+					}
+					break;
+			}
+		};
+	};
 </script>
 
 <Combobox.Root
@@ -128,31 +160,11 @@
 	</div> -->
 	<Combobox.Input {...mergedInputProps}>
 		{#snippet child({ props: { value, ...props } })}
-			<input
-				{...props}
-				value={open ? value : label || value}
-				{@attach (e) => {
-					focuser = (action) => {
-						switch (action) {
-							case 'focus':
-								e.focus();
-								break;
-							case 'blur':
-								e.blur();
-								open = false;
-								break;
-							case 'toggle':
-								if (document.activeElement === e) {
-									e.blur();
-									open = false;
-								} else {
-									e.focus();
-								}
-								break;
-						}
-					};
-				}}
-			/>
+			{#if searchbox}
+				{@render searchbox({ value: open ? value : label || value, ...props, focusSetter })}
+			{:else}
+				<input {...props} value={open ? value : label || value} {@attach focusSetter} />
+			{/if}
 		{/snippet}
 	</Combobox.Input>
 	<!-- <Combobox.Trigger>Open</Combobox.Trigger> -->

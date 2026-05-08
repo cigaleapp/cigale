@@ -4,17 +4,16 @@
 			describe: { query: '', resultsCount: 0 },
 			candidates: { query: '', resultsCount: 0 },
 		},
-		//TODO
-		// metadataGroup: "io.github.cigaleapp.arthropods.example__andrena",
-		metadataGroup: 'andrena',
 		focusedMetadataId: undefined as NamespacedMetadataID | undefined,
 		// TODO persist by using the observation's metadata overrides
 		choicesHistory: [] as NamespacedMetadataID[],
 		metadataValues: {} as Record<NamespacedMetadataID, TypedMetadataValue<'enum'>>,
 
 		get definitions() {
-			return tables.Metadata.state.filter((m) => m.group === this.metadataGroup);
-		} ,
+			return tables.Metadata.state.filter(
+				(m) => m.group === uiState.currentSession?.fullscreenClassifier.narrowableGroup
+			);
+		},
 
 		candidates: {
 			all: [] as DB.MetadataEnumVariant[],
@@ -24,6 +23,8 @@
 			},
 		},
 	});
+
+	export const maximumListableCandidates = 5_000;
 </script>
 
 <script lang="ts">
@@ -35,34 +36,38 @@
 
 	import IconRemove from '~icons/ri/close-line';
 	import IconRestart from '~icons/ri/restart-line';
-	import ConfidencePercentage from '$lib/ConfidencePercentage.svelte';
 	import IconSearch from '~icons/ri/search-line';
 	import { page } from '$app/state';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonInk from '$lib/ButtonInk.svelte';
+	import ConfidencePercentage from '$lib/ConfidencePercentage.svelte';
 	import { plural } from '$lib/i18n.js';
 	import { databaseHandle, tables } from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
 	import KeyboardHint from '$lib/KeyboardHint.svelte';
 	import Logo from '$lib/Logo.svelte';
-	import { serializeMetadataValue } from '$lib/metadata/serializing.js';
 	import { deleteMetadataValue, storeMetadataValue } from '$lib/metadata/storage.js';
 	import MetadataInput from '$lib/MetadataInput.svelte';
-	import { observationMetadata } from '$lib/observations.js';
 	import OverflowableText from '$lib/OverflowableText.svelte';
 	import { goto } from '$lib/paths.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
 	import { uiState } from '$lib/state.svelte.js';
+	import { toasts } from '$lib/toasts.svelte.js';
 	import { tooltip } from '$lib/tooltips.js';
 	import { compareBy, entries, fromEntries, transformObject } from '$lib/utils.js';
 
 	import { fullscreenState } from '../../+layout@(app).svelte';
 	import Subject from '../Subject.svelte';
 	import { getAllCandidates, getMatchingCandidates, narrowingPower } from './candidates.js';
+	import NarrowableGroupPicker from './NarrowableGroupPicker.svelte';
 
 	const { children } = $props();
+
+	const narrowableGroup = $derived(
+		uiState.currentSession?.fullscreenClassifier.narrowableGroup || undefined
+	);
 
 	let expandedSubject = $state(false);
 
@@ -94,9 +99,10 @@
 
 	$effect(() => {
 		void (async () => {
+			if (!narrowableGroup) return;
 			if (!narrowingState.focusedMetadataId) return;
 			narrowingState.candidates.all = await getAllCandidates({
-				narrowableGroup: narrowingState.metadataGroup,
+				narrowableGroup,
 				focusedMetadataId: narrowingState.focusedMetadataId,
 			});
 		})();
@@ -114,31 +120,30 @@
 	);
 
 	const focusedMetadataValue = $derived(
-		observationMetadata({
-			observation, 
-			definitions: [focusedMetadata],
-			images: tables.Image.state.filter((img) => observation?.images.includes(img.id)),
-			filterType: 'enum',
-		})[narrowingState.focusedMetadataId]
-	)
-
-
+		// observationMetadata({
+		// 	observation,
+		// 	definitions: [focusedMetadata],
+		// 	images: tables.Image.state.filter((img) => observation?.images.includes(img.id)),
+		// 	filterType: 'enum',
+		// })[narrowingState.focusedMetadataId]
+		observation.metadataOverrides[narrowingState.focusedMetadataId ?? '']
+	);
 
 	$effect(() => {
 		// Only get values that are relevant to the narrowing view
 		narrowingState.metadataValues = transformObject(
-			observationMetadata({
-				observation,
-				definitions,
-				images: tables.Image.state.filter((img) => observation?.images.includes(img.id)),
-				filterType: 'enum',
-			}),
+			// observationMetadata({
+			// 	observation,
+			// 	definitions,
+			// 	images: tables.Image.state.filter((img) => observation?.images.includes(img.id)),
+			// 	filterType: 'enum',
+			// }),
+			observation.metadataOverrides,
 			(id, value) => {
-				if (definitions.some((d) => d.id === id)) {
-					return [id, value];
-				}
-
-				return undefined;
+				const def = definitions.find((d) => d.id === id);
+				if (!def) return;
+				if (def.type !== 'enum') return;
+				return [id, value];
 			}
 		);
 	});
@@ -157,23 +162,32 @@
 		}
 	});
 
+	const tooManyRemainingCandidates = $derived(
+		narrowingState.candidates.remaining.length > maximumListableCandidates
+	);
+
 	defineKeyboardShortcuts('classification', {
 		tab: {
 			help: 'Basculer entre les onglets Décrire et Candidats',
 			async do() {
 				switch (page.route.id) {
 					case '/(app)/(sidepanel)/o/[observation]/classify/narrow/describe':
-						await goto(
+						if (tooManyRemainingCandidates) {
+							toasts.error(
+								`Impossible de lister les candidats, il y en a plus de ${maximumListableCandidates.toLocaleString()}`
+							);
+							return;
+						}
+
+						return goto(
 							`/(app)/(sidepanel)/o/[observation]/classify/narrow/candidates`,
 							page.params
 						);
-						break;
 					case '/(app)/(sidepanel)/o/[observation]/classify/narrow/candidates':
-						await goto(
+						return goto(
 							`/(app)/(sidepanel)/o/[observation]/classify/narrow/describe`,
 							page.params
 						);
-						break;
 				}
 			},
 		},
@@ -209,57 +223,58 @@
 		</section>
 		<section class="choices">
 			<ol>
+				{#if focusedMetadata && focusedMetadataValue}
+					<li class="focused">
+						<div class="metadata">
+							<OverflowableText text={focusedMetadata.label} />
+						</div>
+						<div class="input">
+							<MetadataInput
+								definition={focusedMetadata}
+								id={focusedMetadata.id}
+								validationErrors={undefined}
+								options={undefined}
+								value={focusedMetadataValue?.value}
+								isCompactEnum={false}
+								unit={undefined}
+								onblur={async (value) => {
+									if (!value) return;
+									if (!observation) return;
+									await storeMetadataValue({
+										db: databaseHandle(),
+										metadataId: focusedMetadata.id,
+										subjectId: observation.id,
+										sessionId: uiState.currentSession?.id,
+										type: 'enum',
+										value,
+										confidence: 1,
+										manuallyModified: true,
+									});
+								}}
+							></MetadataInput>
+						</div>
+						<div class="todo"></div>
+						<div class="confidence">
+							<ConfidencePercentage value={focusedMetadataValue.confidence} />
+						</div>
 
-				{#if focusedMetadata &&focusedMetadataValue}
-				<li class=focused>
-					<div class=metadata><OverflowableText text={focusedMetadata.label} /></div>
-					<div class=input>
-						<MetadataInput
-						definition={focusedMetadata}
-						id={focusedMetadata.id}
-						validationErrors={undefined}
-						options={undefined}
-						value={focusedMetadataValue?.value}
-						isCompactEnum={false}
-						unit={undefined}
-						onblur={async (value) => {
-							if (!value) return;
-							if (!observation) return;
-							await storeMetadataValue({
-								db: databaseHandle(),
-								metadataId: focusedMetadata.id,
-								subjectId: observation.id,
-								sessionId: uiState.currentSession?.id,
-								type: 'enum',
-								value,
-								confidence: 1,
-								manuallyModified: true,
-							});
-						}}
-						></MetadataInput>
-					</div>
-					<div class=todo></div>
-					<div class=confidence>
-						<ConfidencePercentage value={focusedMetadataValue.confidence} />
-					</div>
-
-					<div class=remove>
-						<ButtonIcon
-							help="Enlever ce choix"
-							onclick={async () => {
-								if (!observation) return;
-								await deleteMetadataValue({
-									db: databaseHandle(),
-									subjectId: observation.id,
-									metadataId: focusedMetadata.id,
-									sessionId: uiState.currentSession?.id,
-								});
-							}}
-						>
-							<IconRemove />
-						</ButtonIcon>
-					</div>
-				</li>
+						<div class="remove">
+							<ButtonIcon
+								help="Enlever ce choix"
+								onclick={async () => {
+									if (!observation) return;
+									await deleteMetadataValue({
+										db: databaseHandle(),
+										subjectId: observation.id,
+										metadataId: focusedMetadata.id,
+										sessionId: uiState.currentSession?.id,
+									});
+								}}
+							>
+								<IconRemove />
+							</ButtonIcon>
+						</div>
+					</li>
 				{/if}
 
 				{#each choices as [id, value], i (id)}
@@ -333,7 +348,10 @@
 				{/each}
 			</ol>
 		</section>
-		<section class="restart">
+		<section class="actions">
+			<div class="settings">
+				<NarrowableGroupPicker />
+			</div>
 			<ButtonInk
 				onclick={async () => {
 					if (!observation) return;
@@ -359,85 +377,102 @@
 		</section>
 	</aside>
 
-	<div class="content-and-footer">
-		<div class="progress">
-			<ProgressBar progress={narrowingState.candidates.ratio} />
-			<div class="remaining-count">
-				{plural(narrowingState.candidates.remaining.length, ['# restant', '# restants'])}
+	<div class="content-and-footer" class:no-narrowable-group={!narrowableGroup}>
+		{#if !narrowableGroup}
+			<Logo variant="empty" />
+			<p>Choisir un groupe de métadonnées avec lequel classifier par élimination</p>
+			<NarrowableGroupPicker /> 
+		{:else}
+			<div class="progress">
+				<ProgressBar progress={narrowingState.candidates.ratio} />
+				<div class="remaining-count">
+					{plural(narrowingState.candidates.remaining.length, [
+						'# restant',
+						'# restants',
+					])}
+				</div>
 			</div>
-		</div>
 
-		{#key page.route.id}
-			<div class="content" in:fade={{ duration: 200 }}>
-				{@render children()}
-			</div>
-		{/key}
+			{#key page.route.id}
+				<div class="content" in:fade={{ duration: 200 }}>
+					{@render children()}
+				</div>
+			{/key}
 
-		<footer>
-			<search
-				{@attach (node) => {
-					const input = node.querySelector('input');
-					if (!input) return;
-					toggleFocusSearchBar = () => {
-						if (document.activeElement === input) {
-							input.blur();
-						} else {
-							input.focus();
+			<footer>
+				<search
+					{@attach (node) => {
+						const input = node.querySelector('input');
+						if (!input) return;
+						toggleFocusSearchBar = () => {
+							if (document.activeElement === input) {
+								input.blur();
+							} else {
+								input.focus();
+							}
+						};
+					}}
+				>
+					<IconSearch />
+					<InlineTextInput
+						discreet
+						label="Rechercher"
+						placeholder="Rechercher"
+						bind:value={narrowingState.search[tab].query}
+					/>
+					<KeyboardHint shortcut="$mod+F" />
+
+					{#if narrowingState.search[tab].query}
+						<span class="count"
+							>{plural(narrowingState.search[tab].resultsCount, [
+								'# résultat',
+								'# résultats',
+							])}</span
+						>
+					{/if}
+				</search>
+				<SegmentedGroup
+					options={['describe', 'candidates']}
+					disabled={(key) => {
+						if (key === 'candidates' && tooManyRemainingCandidates) {
+							return `Plus de ${maximumListableCandidates.toLocaleString()} candidats restants`;
 						}
-					};
-				}}
-			>
-				<IconSearch />
-				<InlineTextInput
-					discreet
-					label="Rechercher"
-					placeholder="Rechercher"
-					bind:value={narrowingState.search[tab].query}
-				/>
-				<KeyboardHint shortcut="$mod+F" />
-
-				{#if narrowingState.search[tab].query}
-					<span class="count"
-						>{plural(narrowingState.search[tab].resultsCount, [
-							'# résultat',
-							'# résultats',
-						])}</span
-					>
-				{/if}
-			</search>
-			<SegmentedGroup
-				options={['describe', 'candidates']}
-				bind:current={
-					() => tab,
-					(option) => {
-						void goto(
-							`/(app)/(sidepanel)/o/[observation]/classify/narrow/${option}`,
-							page.params
-						);
+						return false;
+					}}
+					bind:current={
+						() => tab,
+						(option) => {
+							void goto(
+								`/(app)/(sidepanel)/o/[observation]/classify/narrow/${option}`,
+								page.params
+							);
+						}
 					}
-				}
-			>
-				{#snippet option_describe({ current })}
-					<div
-						class="tab"
-						use:tooltip={{ text: "Décrire l'observation", keyboard: 'tab' }}
-					>
-						Décrire
-					</div>
-				{/snippet}
-				{#snippet option_candidates({ current })}
-					<div
-						class="tab"
-						use:tooltip={{ text: 'Voir les candidats possibles', keyboard: 'tab' }}
-					>
-						Candidats
-						<code class="candidates-count">
-							{narrowingState.candidates.remaining.length}
-						</code>
-					</div>
-				{/snippet}
-			</SegmentedGroup>
-		</footer>
+				>
+					{#snippet option_describe()}
+						<div
+							class="tab"
+							use:tooltip={{ text: "Décrire l'observation", keyboard: 'tab' }}
+						>
+							Décrire
+						</div>
+					{/snippet}
+					{#snippet option_candidates({ disabled })}
+						<div
+							class="tab"
+							use:tooltip={disabled
+								? undefined
+								: { text: 'Voir les candidats possibles', keyboard: 'tab' }}
+						>
+							Candidats
+							<code class="candidates-count">
+								{narrowingState.candidates.remaining.length}
+							</code>
+						</div>
+					{/snippet}
+				</SegmentedGroup>
+			</footer>
+		{/if}
 	</div>
 </div>
 
@@ -465,7 +500,6 @@
 	aside .choices {
 		height: 100%;
 		overflow: auto;
-		padding: 0.5em;
 
 		ol {
 			list-style: none;
@@ -476,17 +510,19 @@
 			gap: 1em;
 		}
 
-		li.focused {
-			border-bottom: 1px solid var(--gray);
-		}
-
 		li:not(.empty) {
 			gap: 0.5em;
+			padding: 0 0.5em;
 
 			&,
 			> * {
 				display: flex;
 				align-items: center;
+			}
+
+			&.focused {
+				border-bottom: 1px solid var(--gray);
+				padding: 0.5em;
 			}
 
 			.metadata {
@@ -497,6 +533,10 @@
 				margin-left: auto;
 				width: 20ch;
 			}
+		}
+
+		ol:not(:has(.focused)) li:first-child {
+			padding-top: 0.5em;
 		}
 
 		.empty {
@@ -511,10 +551,10 @@
 		}
 	}
 
-	aside .restart {
+	aside .actions {
 		margin-top: auto;
 		display: flex;
-		justify-content: flex-end;
+		justify-content: space-between;
 		padding: 1em;
 	}
 
@@ -544,6 +584,19 @@
 		width: 100%;
 		display: grid;
 		grid-template-rows: max-content 1fr max-content;
+	}
+
+	.content-and-footer.no-narrowable-group {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		text-align: center;
+		gap: 1em;
+		padding: 2em;
+
+		/* Logo size */
+		--size: 5em;
 	}
 
 	.content-and-footer .progress {

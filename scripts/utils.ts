@@ -93,8 +93,10 @@ export async function updateCheckrunProgress(
 ) {
 	const percentage = Math.round((done / total) * 100);
 	const perc = percentage.toString().padStart(3);
+	const checkrun = checkruns.get(id);
+	if (!checkrun) return;
 
-	if (checkruns.get(id)!.progressPercent == percentage) return;
+	if (checkrun.progressPercent == percentage) return;
 
 	const arrivalDate = new Date(Date.now() + eta.estimate());
 	const time = isValidDate(arrivalDate)
@@ -116,7 +118,8 @@ export async function emitCheckrun(
 	step: string | null,
 	details: string
 ) {
-	if (!process.env.GH_TOKEN && process.env.CI) {
+	if (!process.env.CI) return;
+	if (!process.env.GH_TOKEN) {
 		console.warn('GH_TOKEN env variable not set, cannot emit check runs');
 		return;
 	}

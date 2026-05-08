@@ -20,6 +20,15 @@ import { groupBy, orEmptyObj3, prefixIDBKeyRange } from '$lib/utils.js';
 import { resolveMetadataImport } from './imports.js';
 import { serializeMetadataValue } from './serializing.js';
 
+// TODO: use everywhere
+export function metadataOptionDatabaseKey(
+	protocolId: string,
+	metadataId: string,
+	optionKey: string
+) {
+	return `${ensureNamespacedMetadataId(metadataId, protocolId)}:${optionKey}`;
+}
+
 /**
  *
  * @param protocolId
@@ -31,7 +40,7 @@ export function metadataOptionsKeyRange(
 ): IDBKeyRange {
 	return prefixIDBKeyRange(
 		metadataId
-			? ensureNamespacedMetadataId(metadataId, protocolId) + ':'
+			? metadataOptionDatabaseKey(protocolId, metadataId, '')
 			: namespacedMetadataId(protocolId, '')
 	);
 }
@@ -40,6 +49,22 @@ const METADATA_OPTIONS_CACHE = new Map<NamespacedMetadataID, DB.MetadataEnumVari
 
 export function clearMetadataOptionsCache() {
 	METADATA_OPTIONS_CACHE.clear();
+}
+
+export async function metadataOption(
+	db: DatabaseHandle,
+	metadataId: NamespacedMetadataID,
+	optionKey: string
+) {
+	const cachedOptions = METADATA_OPTIONS_CACHE.get(metadataId);
+	if (cachedOptions) {
+		return cachedOptions.find((opt) => opt.key === optionKey);
+	}
+
+	return db.get(
+		'MetadataOption',
+		metadataOptionDatabaseKey(namespaceOfMetadataId(metadataId)!, metadataId, optionKey)
+	);
 }
 
 /**
@@ -183,7 +208,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 		| Array<{ value: RuntimeValue<Type>; confidence: number }>;
 	cascadedFrom?: string[];
 	abortSignal?: AbortSignal | undefined;
-	sessionId?: string | undefined|null;
+	sessionId?: string | undefined | null;
 	updateReactiveState?: boolean;
 }) {
 	if (!isNamespacedToProtocol(null, metadataId)) {

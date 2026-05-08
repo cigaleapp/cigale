@@ -1,24 +1,25 @@
 <script lang="ts">
 	import type * as DB from '$lib/database.js';
-	import type { Snippet } from 'svelte';
+	import { onMount, type Snippet } from 'svelte';
 
 	import VirtualList from '@sveltejs/svelte-virtual-list';
 
-	import IconExpand from '~icons/ri/arrow-down-s-line';
+	import IconExpand from '~icons/ri/arrow-right-s-line';
 
 	import { metadataDefinitionComparator } from './protocols.js';
 	import { getSettings } from './settings.svelte.js';
 
 	interface Props {
-		children: Snippet<[DB.Metadata]>;
+		children: Snippet<[DB.Metadata, DB.MetadataValue, {collapsed: boolean}]>;
 		testid?: string;
 		definitions: DB.Metadata[];
+		values: DB.MetadataValues;
 		/** List of metadata IDs in order */
 		ordering: DB.Protocol['metadataOrder'] | undefined;
 		groups: DB.Protocol['metadataGroups'] | undefined;
 	}
 
-	const { children, testid, definitions, ordering, groups = [] }: Props = $props();
+	const { children, values, testid, definitions, ordering, groups = [] }: Props = $props();
 
 	const { showTechnicalMetadata } = $derived(getSettings());
 
@@ -54,13 +55,13 @@
 			})
 	);
 
-	$inspect({
-		groupedDefinitions,
-	});
+	/* Virtualize only if there are no groups, since item size height is drastically dynamic when collapsing/expanding groups, there's too much glitching when trying to virtualize in that case */
+	const virtualize = $derived(groups.length === 0);
+
 </script>
 
 <div class="liste" data-testid={testid}>
-	<VirtualList items={groupedDefinitions} let:item>
+	{#snippet metadata(item: (typeof groupedDefinitions)[number])}
 		{@const { group, definitions, iterationKey } = item}
 		<div class="definition-group">
 			{#if group}
@@ -81,20 +82,39 @@
 			{#snippet defs()}
 				{#each definitions as def (def.id)}
 					{#if def.label || showTechnicalMetadata}
-						{@render children(def)}
+						{@render children(def, values[def.id], {collapsed: group?.collapsed ?? false})}
 					{/if}
 				{/each}
 			{/snippet}
 		</div>
-	</VirtualList>
+	{/snippet}
+
+	{#if virtualize}
+		<VirtualList items={groupedDefinitions} let:item >
+			{@render metadata(item)}
+		</VirtualList>
+	{:else}
+		{#each groupedDefinitions as item (item.iterationKey)}
+			{@render metadata(item)}
+		{/each}
+	{/if}
 </div>
 
 <style>
 	.liste,
 	.grouped-metadata {
-		gap: var(--metadata-list-gap, 1.5em);
 		display: flex;
 		flex-direction: column;
+	}
+
+	/* FIXME: :first-child doesn't work because of virtualization so we have extra whitespace on top of the list */
+	.definition-group {
+		--pad: calc(var(--metadata-list-gap, 1.5em) / 2);
+		padding: var(--pad) 0;
+	}
+
+	.grouped-metadata {
+		gap: var(--metadata-list-gap, 1.5em);
 	}
 
 	.liste {
@@ -118,7 +138,7 @@
 	}
 
 	details:open .icon {
-		rotate: -180deg;
+		rotate: 90deg;
 	}
 
 	summary {

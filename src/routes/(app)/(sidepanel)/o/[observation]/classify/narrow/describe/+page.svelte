@@ -1,8 +1,9 @@
 <script lang="ts">
 	import type * as DB from '$lib/database.js';
+	import type { NamespacedMetadataId } from '$lib/metadata/namespacing.js';
 
 	import Fuse from 'fuse.js';
-	import { Debounced, watch } from 'runed';
+	import { Debounced } from 'runed';
 
 	import { page } from '$app/state';
 	import { databaseHandle, tables } from '$lib/idb.svelte.js';
@@ -14,9 +15,9 @@
 		storeMetadataValue,
 	} from '$lib/metadata/storage.js';
 	import MetadataList from '$lib/MetadataList.svelte';
-	import { scrollfader } from '$lib/scrollfader.js';
+	import { ensureNamespacedMetadataId, namespaceOfMetadataId } from '$lib/schemas/metadata.js';
 	import { uiState } from '$lib/state.svelte.js';
-	import { cancellable, compareBy } from '$lib/utils.js';
+	import { cancellable, entries } from '$lib/utils.js';
 
 	import { narrowingState } from '../+layout.svelte';
 
@@ -32,8 +33,9 @@
 		if (narrowingState.search.describe.query === '') debouncedSearch.setImmediately('');
 	});
 
+
 	const searcher = $derived(
-		new Fuse(structuredClone(definitions), {
+		new Fuse(definitions, {
 			keys: ['label', 'id', 'description'],
 			includeMatches: true,
 		})
@@ -58,18 +60,25 @@
 		narrowingState.search.describe.resultsCount = searchResults?.length ?? 0;
 	});
 
+	const shownDefinitions = $derived(
+		definitions
+			.filter((def) => searchResults?.some((r) => r.id === def.id) ?? true)
+			.map((def) => ({ ...def, group: '' }))
+	);
+
 	/**
 	 * Contains EVERY options for every metadata.
 	 * This is a SHALLOW $state, otherwise it makes the browser lag the hell out cuz Svelte's runtime tries to deeply proxify everything (some metadata can have tens of thousands of options).
 	 */
-	const options: Record<string, Map<string, DB.MetadataEnumVariant>> = $state.raw({});
+	const options: Record<NamespacedMetadataId, Map<string, DB.MetadataEnumVariant>> = $state.raw(
+		{}
+	);
 
 	// TODO: use this in sidepanel too! it works nicely.
 	const optionsLoader = cancellable(async (sig, definitions: DB.Metadata[]) => {
 		loadingOptions = 0;
 
 		if (!uiState.currentProtocol) {
-			console.log('no current protocol (early)');
 			loadingOptions = definitions.length;
 			return;
 		}
@@ -77,18 +86,15 @@
 		// Prevent double-load
 		const loadedCount = Object.keys(options).length;
 		if (loadedCount > 0 && loadedCount >= definitions.length) {
-			console.log('options already loaded');
 			loadingOptions = definitions.length;
 			return;
 		}
 
 		if (!uiState.currentProtocol) {
-			console.log('no current protocol');
 			loadingOptions = definitions.length;
 			return;
 		}
 
-		console.log('start loading');
 		for (const def of definitions) {
 			sig.throwIfAborted();
 			options[def.id] ??= new Map();
@@ -106,7 +112,6 @@
 			loadingOptions++;
 		}
 
-		console.log('finished loading', options);
 		loadingOptions = definitions.length;
 	});
 
@@ -118,6 +123,29 @@
 		loader.do();
 		return loader.cancel;
 	});
+
+	const remainingMetadataValues = $derived.by<Record<NamespacedMetadataId, Set<string>>>(() => {
+		const result: Record<NamespacedMetadataId, Set<string>> = Object.fromEntries(
+			definitions
+				// Don't consider metadata that has been chosen
+				.filter((def) => !(def.id in (observation?.metadataOverrides ?? {})))
+				.map((def) => [def.id, new Set()])
+		);
+
+		for (const candidate of narrowingState.candidates.remaining) {
+			for (const [cascadeMetadata, key] of entries(candidate.cascade ?? {})) {
+				const metadataId = ensureNamespacedMetadataId(
+					cascadeMetadata,
+					namespaceOfMetadataId(definitions[0].id)
+				);
+				if (!(metadataId in result)) continue;
+				result[metadataId].add(key.toString());
+			}
+		}
+
+		return result;
+	});
+
 </script>
 
 <main>
@@ -131,9 +159,7 @@
 	{:else}
 		<div class="scrollable">
 			<MetadataList
-				definitions={definitions
-					.filter((def) => searchResults?.some((r) => r.id === def.id) ?? true)
-					.map((def) => ({ ...def, group: '' }))}
+				definitions={shownDefinitions}
 				ordering={searchResults?.map((result) => result.id) ??
 					uiState.currentProtocol?.metadataOrder}
 				groups={undefined}
@@ -142,6 +168,13 @@
 					<div class="metadata">
 						<Metadata
 							options={[...(options[definition.id]?.values() ?? [])]}
+							optionIsDisabled={(option) => {
+								if (!option) return false;
+								const remaining = remainingMetadataValues[definition.id];
+								if (!remaining) return false;
+								if (remaining.size === 0) return false;
+								return !remaining.has(option.key);
+							}}
 							requiredness="none"
 							{definition}
 							value={metadataValues[definition.id]}

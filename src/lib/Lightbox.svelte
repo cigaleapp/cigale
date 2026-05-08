@@ -13,23 +13,19 @@
 
 	const { trigger, content }: Props = $props();
 
-	let toggle = $state<() => void>();
+	let close = $state<() => void>();
+	let open = $state<() => void>();
 </script>
 
 <dialog
-	onclick={() => toggle?.()}
+	onclick={() => close?.()}
 	{@attach (node) => {
-		toggle = () => {
-			if (node.open) {
-				node.close();
-			} else {
-				node.showModal();
-			}
-		};
+		close = () => node.close();
+		open = () => node.showModal();
 	}}
 >
 	<div class="close">
-		<ButtonIcon help="Fermer" onclick={() => toggle?.()}>
+		<ButtonIcon help="Fermer" onclick={() => close?.()}>
 			<IconClose />
 		</ButtonIcon>
 	</div>
@@ -37,7 +33,7 @@
 	{@render content()}
 </dialog>
 
-<button onclick={() => toggle?.()}>
+<button onclick={() => open?.()}>
 	{@render trigger()}
 </button>
 
@@ -72,12 +68,13 @@
 		position: fixed;
 		top: 0.5em;
 		right: 0.5em;
-		color: white;
+		--fg: white;
 		font-size: 1.5em;
 	}
 
 	button {
 		/* Make sure the button doesn't interfere with the dialog's layout */
 		all: unset;
+		cursor: zoom-in;
 	}
 </style>

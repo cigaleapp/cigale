@@ -288,7 +288,6 @@
 			{#if uiState.currentSession}
 				<SessionMetadataForm
 					session={uiState.currentSession}
-					metadataOptions={new Map()}
 					errors={metadataErrors}
 					onmetadatachange={() => {
 						reloadPreviews++;

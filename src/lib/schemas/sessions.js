@@ -116,6 +116,7 @@ export const Session = type({
 	fullscreenClassifier: type({
 		layout: type.enumerated(...FULLSCREEN_CLASSIFY_LAYOUTS),
 		'focusedMetadata?': ID,
+		'narrowableGroup?': 'string'
 	}).default(() => ({
 		layout: 'top-bottom',
 	})),

@@ -59,6 +59,7 @@
 		storeMetadataValue,
 	} from '$lib/metadata/index.js';
 	import MobileWIPOverlay from '$lib/MobileWIPOverlay.svelte';
+	import { ensureNoEmptyObservations } from '$lib/observations.js';
 	import OverflowableText from '$lib/OverflowableText.svelte';
 	import { goto } from '$lib/paths.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
@@ -83,7 +84,6 @@
 	} from '$lib/utils';
 
 	import { fullscreenState } from '../../+layout@(app).svelte';
-	import { ensureNoEmptyObservations } from '$lib/observations.js';
 
 	/**
 	 * @import { RuntimeValue } from '$lib/schemas/metadata';
@@ -443,8 +443,7 @@
 			await idb.tables.Image.remove(imageId);
 		}
 
-
-			await ensureNoEmptyObservations()
+		await ensureNoEmptyObservations();
 	}
 
 	/**
@@ -656,8 +655,6 @@
 		const { w, h } = mapValues(scaler(box), Math.round);
 		return [w, h];
 	}
-
-
 
 	$effect(() => {
 		uiState.imageOpenedInCropper = fileId;

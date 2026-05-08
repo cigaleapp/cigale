@@ -10,13 +10,17 @@
 	 * @property {string} [id]
 	 * @property {Record<string, number>} [confidences]
 	 * @property {(action: 'focus' | 'blur' | 'toggle') => void} [focuser]
+	 * @property {(option: import('./database.js').MetadataEnumVariant) => boolean|string} [optionIsDisabled]
 	 */
 </script>
 
 <script>
 	import Icon from '@iconify/svelte';
+	import { watch } from 'runed';
+	import { onMount, untrack } from 'svelte';
 
 	import IconCheck from '~icons/ri/check-line';
+	import LoadingText, { Loading } from '$lib/LoadingText.svelte';
 
 	import Badge from './Badge.svelte';
 	import { cascadeLabels } from './cascades.js';
@@ -30,11 +34,12 @@
 	import MetadataCascadesTable from './MetadataCascadesTable.svelte';
 	import { namespaceOfMetadataId } from './schemas/metadata.js';
 	import { uiState } from './state.svelte';
-	import { cancellable, readableOn } from './utils.js';
+	import { cancellable, compareBy, readableOn } from './utils.js';
 
 	/**
 	 * @import {WithoutChildrenOrChild} from 'bits-ui';
 	 * @import {CascadeLabelsCache} from './cascades.js';
+	 * @import {NamespacedMetadataId} from './metadata/namespacing.js';
 	 * @import * as DB from './database.js';
 	 */
 
@@ -48,6 +53,7 @@
 		value = $bindable(),
 		open = $bindable(false),
 		focuser = $bindable(),
+		optionIsDisabled = () => false,
 		inputProps,
 		contentProps,
 		...restProps
@@ -55,20 +61,36 @@
 
 	const protocolId = $derived(namespaceOfMetadataId(metadata.id));
 
+	const showConfidences = $derived(
+		Object.keys(confidences).length > 0 &&
+			Object.values(confidences).some((conf) => conf > 0 && conf < 1)
+	);
+
+
 	let options = $derived(precomputedOptions ?? []);
 
-	const optionsLoader = cancellable(async () => {
-		if (precomputedOptions && precomputedOptions.length > 0) return;
-		if (!uiState.currentProtocolId) return;
-		console.info('Fetching options for metadata', {
-			metadataId: metadata.id,
-			protocolId: uiState.currentProtocolId,
-		});
-		options = await metadataOptionsOf(databaseHandle(), uiState.currentProtocolId, metadata.id);
-	});
+	const loadingOptions = $derived(!precomputedOptions && options.length === 0);
+	const optionsLoader = cancellable(
+		async (
+			signal,
+			/** @type {NamespacedMetadataId} */ metadataId,
+			/** @type {boolean} */ precomputed
+		) => {
+			if (precomputed) return;
+			if (!uiState.currentProtocolId) return;
+			console.info('Fetching options for metadata', metadataId);
+			signal.throwIfAborted();
+			options = await metadataOptionsOf(
+				databaseHandle(),
+				uiState.currentProtocolId,
+				metadataId
+			);
+			console.info('Fetched options for metadata', metadataId, options);
+		}
+	);
 
 	$effect(() => {
-		const loader = optionsLoader();
+		const loader = optionsLoader(metadata.id, Boolean(precomputedOptions));
 
 		loader.do();
 		return loader.cancel;
@@ -97,17 +119,18 @@
 		);
 	}
 
-	$inspect({ confidences });
-
 	/**
 	 * @type {CascadeLabelsCache}
 	 */
 	let cascadeLabelsCache = $state({});
+
+
 </script>
 
 <div class="metadata-combobox" class:wide-docs={hasImages}>
 	<Combobox
-		items={options}
+		// Put disabled options last
+		items={options.toSorted(compareBy((opt) => (optionIsDisabled(opt) ? 1 : -1)))}
 		{value}
 		bind:open
 		bind:focuser
@@ -118,8 +141,17 @@
 		{contentProps}
 		{...restProps}
 	>
+		{#snippet searchbox({ focusSetter, ...props })}
+			<div class="searchbox">
+				{#if loadingOptions}
+					<LoadingText value={Loading}>Chargement</LoadingText>
+				{:else}
+					<input {...props} {@attach focusSetter} />
+				{/if}
+			</div>
+		{/snippet}
 		{#snippet listItem({ selected, ...item })}
-			<div class="item" class:selected>
+			<div class="item" class:selected class:disabled={optionIsDisabled(item)}>
 				<div class="check">
 					<IconCheck />
 				</div>
@@ -146,7 +178,7 @@
 						</div>
 					{/if}
 
-					{#if Object.keys(confidences).length > 0}
+					{#if showConfidences}
 						<div class="confidence">
 							<ConfidencePercentage value={confidences[item.key]} />
 						</div>
@@ -192,6 +224,10 @@
 	.metadata-combobox {
 		width: 100%;
 
+		.searchbox {
+			width: 100%;
+		}
+
 		:global(input) {
 			width: 100%;
 		}
@@ -210,6 +246,10 @@
 	.item.selected {
 		color: var(--fg-primary);
 		font-weight: bold;
+	}
+
+	.item.disabled {
+		opacity: 0.5;
 	}
 
 	.item .right {
