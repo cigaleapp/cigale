@@ -653,14 +653,7 @@
 		return [w, h];
 	}
 
-	function exit() {
-		uiState.imagePreviouslyOpenedInCropper = fileId;
-		if (params.observation) {
-			goto('/(app)/(sidepanel)/o/[observation]/classify/suggestions', params);
-		} else {
-			goto('/crop/');
-		}
-	}
+
 
 	$effect(() => {
 		uiState.imageOpenedInCropper = fileId;
@@ -702,10 +695,6 @@
 		'$mod+Delete': {
 			help: 'Supprimer l’image',
 			do: deleteImageFileAndGotoNext,
-		},
-		Escape: {
-			help: 'Quitter le mode recadrage',
-			do: exit,
 		},
 		a: {
 			help: 'Activer/désactiver la continuation automatique',

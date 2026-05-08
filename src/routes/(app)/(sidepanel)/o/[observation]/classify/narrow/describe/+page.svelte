@@ -16,14 +16,13 @@
 	import MetadataList from '$lib/MetadataList.svelte';
 	import { scrollfader } from '$lib/scrollfader.js';
 	import { uiState } from '$lib/state.svelte.js';
-	import { compareBy, cancellable } from '$lib/utils.js';
+	import { cancellable, compareBy } from '$lib/utils.js';
 
 	import { narrowingState } from '../+layout.svelte';
 
 	// Destructuring causes unecessary updates since we derive the entire narrowingState object
 	const definitions = $derived(narrowingState.definitions);
 	const metadataValues = $derived(narrowingState.metadataValues);
-
 
 	const observation = $derived(tables.Observation.getFromState(page.params.observation ?? ''));
 
@@ -34,7 +33,7 @@
 	});
 
 	const searcher = $derived(
-		new Fuse(definitions, {
+		new Fuse(structuredClone(definitions), {
 			keys: ['label', 'id', 'description'],
 			includeMatches: true,
 		})
@@ -70,57 +69,55 @@
 		loadingOptions = 0;
 
 		if (!uiState.currentProtocol) {
-			console.log('no current protocol (early)')
+			console.log('no current protocol (early)');
 			loadingOptions = definitions.length;
 			return;
 		}
 
 		// Prevent double-load
-		if (Object.keys(options).length >= definitions.length) {
-			console.log('options already loaded')
+		const loadedCount = Object.keys(options).length;
+		if (loadedCount > 0 && loadedCount >= definitions.length) {
+			console.log('options already loaded');
 			loadingOptions = definitions.length;
 			return;
 		}
 
-
-			if (!uiState.currentProtocol) {
-				console.log('no current protocol')
-				loadingOptions = definitions.length;
-				return;
-			}
-
-			console.log('start loading')
-			for (const def of definitions) {
-				sig.throwIfAborted();
-				options[def.id] ??= new Map();
-				const results = await metadataOptionsOf(
-					databaseHandle(),
-					uiState.currentProtocol.id,
-					def.id
-				);
-
-				for (const option of results) {
-					sig.throwIfAborted();
-					options[def.id].set(option.key, option);
-				}
-
-				loadingOptions++;
-			}
-
-			console.log('finished loading', options)
+		if (!uiState.currentProtocol) {
+			console.log('no current protocol');
 			loadingOptions = definitions.length;
+			return;
+		}
 
-	})
+		console.log('start loading');
+		for (const def of definitions) {
+			sig.throwIfAborted();
+			options[def.id] ??= new Map();
+			const results = await metadataOptionsOf(
+				databaseHandle(),
+				uiState.currentProtocol.id,
+				def.id
+			);
+
+			for (const option of results) {
+				sig.throwIfAborted();
+				options[def.id].set(option.key, option);
+			}
+
+			loadingOptions++;
+		}
+
+		console.log('finished loading', options);
+		loadingOptions = definitions.length;
+	});
 
 	let loadingOptions = $state(0);
 	$effect(() => {
 		loadingOptions = 0;
 		const loader = optionsLoader(definitions);
 
-		loader.do()
-		return loader.cancel
+		loader.do();
+		return loader.cancel;
 	});
-
 </script>
 
 <main>
@@ -128,15 +125,15 @@
 		<div class="loading">
 			<Logo drawpercent={loadingOptions / definitions.length} />
 			Chargement des options...
-			<br>
+			<br />
 			{loadingOptions} / {definitions.length}
 		</div>
 	{:else}
 		<div class="scrollable">
 			<MetadataList
 				definitions={definitions
-					.filter((def) => searchResults?.some((r) => r.id === def.id) ?? true).map(def => ({...def, group: ""}))
-					}
+					.filter((def) => searchResults?.some((r) => r.id === def.id) ?? true)
+					.map((def) => ({ ...def, group: '' }))}
 				ordering={searchResults?.map((result) => result.id) ??
 					uiState.currentProtocol?.metadataOrder}
 				groups={undefined}
@@ -207,7 +204,6 @@
 	}
 
 	.scrollable {
-
 		overflow: auto;
 		height: 100%;
 	}

@@ -11,6 +11,7 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
 
+	import {plural} from '$lib/i18n.js';
 	import IconConfirmed from '~icons/ri/check-double-line';
 	import IconClose from '~icons/ri/close-line';
 	import IconUnconfirmed from '~icons/ri/error-warning-line';
@@ -33,6 +34,19 @@
 	const imageFile = $derived(
 		tables.Image.getFromState(page.params.image ? imageId(page.params.image, 0) : '')
 	);
+
+	const observationsOfImageFile = $derived(
+		tables.Observation.state.filter(obs => obs.images.some(imageId => 
+
+		imageIdToFileId(imageId) === page.params.image
+		))
+	)
+
+	const observationToClassify = $derived(
+		observation ?? (
+			observationsOfImageFile.length === 1 ? observationsOfImageFile[0] : undefined
+		)
+	)
 
 	const currentImage = $derived(tables.Image.getFromState(fullscreenState.currentImage ?? ''));
 
@@ -84,21 +98,61 @@
 		}
 	});
 
+	async function goToTab(target: typeof tab) {
+		switch (target) {
+			case 'crop':
+				if (!imageToCrop) return;
+				goto('/(app)/(sidepanel)/o/[observation]/crop/[image]', {
+					image: imageToCrop,
+					observation: observation?.id ?? '_',
+				});
+				break;
+			case 'suggestions':
+				if (!observationToClassify) return;
+				goto('/(app)/(sidepanel)/o/[observation]/classify/suggestions', {
+					observation: observationToClassify.id,
+				});
+				break;
+			case 'narrow':
+				if (!observationToClassify) return;
+				goto('/(app)/(sidepanel)/o/[observation]/classify/narrow/describe', {
+					observation: observationToClassify.id,
+				});
+				break;
+		}
+	}
+
 	defineKeyboardShortcuts('general', {
 		Escape: {
 			help: 'Retour',
 			do: backToGalleryView,
 		},
+		B: {
+			help: "Recadrer l'image",
+			async do() {
+				await goToTab('crop');
+			},
+		},
+		S: {
+			help: 'Voir les suggestions de classification',
+			async do() {
+				await goToTab('suggestions');
+			},
+		},
+		N: {
+			help: 'Classifier par élimination',
+			async do() {
+				await goToTab('narrow');
+			},
+		},
 	});
-
 </script>
-
 
 <div class="with-header">
 	<header>
-	<ButtonIcon onclick={backToGalleryView} help="Retour" keyboard="Escape">
-		<IconClose />
-	</ButtonIcon>
+		<ButtonIcon onclick={backToGalleryView} help="Retour" keyboard="Escape">
+			<IconClose />
+		</ButtonIcon>
 
 		<h1>
 			{#if observation}
@@ -126,7 +180,7 @@
 		<div class="progress">
 			<ProgressBar
 				progress={[fullscreenState.progress.treated, fullscreenState.progress.confirmed]}
-				phases={page.route.id === '/(app)/(sidepanel)/o/[observation]/crop'
+				phases={page.route.id === '/(app)/(sidepanel)/o/[observation]/crop/[image]'
 					? ['Images recadrées', 'Recadrages confirmés']
 					: ['Observations classifiées', 'Classifications confirmées']}
 			/>
@@ -136,38 +190,15 @@
 			<SegmentedGroup
 				options={['crop', 'suggestions', 'narrow']}
 				disabled={(key) => {
-					if (!observation && key !== 'crop')
-						return 'Ouvrir une observation pour la classifier';
+					if (!observationToClassify && key !== 'crop') 
+						return observationsOfImageFile.length === 0 ? "Cette image n'apparaît dans aucune observation" :  `Cette image apparaît dans ${plural(observationsOfImageFile.length, ['# observation', '# observations'])}`;
 					if (!imageToCrop && key === 'crop') return 'Ouvrir une image pour le recadrage';
 					return false;
 				}}
 				bind:current={
 					() => tab,
 					(value) => {
-						switch (value) {
-							case 'crop':
-								if (!imageToCrop) return;
-								goto('/(app)/(sidepanel)/o/[observation]/crop/[image]', {
-									image: imageToCrop,
-									observation: observation?.id ?? '_',
-								});
-								break;
-							case 'suggestions':
-								if (!observation) return;
-								goto('/(app)/(sidepanel)/o/[observation]/classify/suggestions', {
-									observation: observation.id,
-								});
-								break;
-							case 'narrow':
-								if (!observation) return;
-								goto(
-									'/(app)/(sidepanel)/o/[observation]/classify/narrow/describe',
-									{
-										observation: observation.id,
-									}
-								);
-								break;
-						}
+						goToTab(value);
 					}
 				}
 			>
@@ -182,7 +213,6 @@
 				{/snippet}
 			</SegmentedGroup>
 		</nav>
-
 	</header>
 
 	{#key tab}

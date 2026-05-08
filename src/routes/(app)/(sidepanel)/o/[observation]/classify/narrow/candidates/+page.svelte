@@ -1,51 +1,76 @@
 <script lang="ts">
 	import VirtualList from '@sveltejs/svelte-virtual-list';
-
-	import LearnMoreLink from '$lib/LearnMoreLink.svelte';
-	import Markdown from '$lib/Markdown.svelte';
-	import IconNoImage from '~icons/ri/question-line';
-	import { scrollfader } from '$lib/scrollfader.js';
-
-	import { narrowingState } from '../+layout.svelte';
 	import Fuse from 'fuse.js';
+
+	import IconChoose from '~icons/ri/check-line';
+	import IconNoImage from '~icons/ri/question-line';
+	import { page } from '$app/state';
+	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
+	import { databaseHandle } from '$lib/idb.svelte.js';
+	import LearnMoreLink from '$lib/LearnMoreLink.svelte';
+	import Lightbox from '$lib/Lightbox.svelte';
+	import Markdown from '$lib/Markdown.svelte';
+	import { storeMetadataValue } from '$lib/metadata/storage.js';
+	import { scrollfader } from '$lib/scrollfader.js';
+	import { uiState } from '$lib/state.svelte.js';
+
+	import { fullscreenState } from '../../../+layout@(app).svelte';
+	import { narrowingState } from '../+layout.svelte';
 
 	const candidates = $derived(narrowingState.candidates.remaining);
 
-	const searcher = $derived(new Fuse(candidates, {
-		keys: ['label', 'description', 'key', 'learnMore'],
-		includeMatches: true,
-	}))
+	const searcher = $derived(
+		new Fuse(candidates, {
+			keys: ['label', 'description', 'key', 'learnMore'],
+			includeMatches: true,
+		})
+	);
 
-const searchResults = $derived.by(() => {
-	if (!searcher) return candidates;
-	if (!narrowingState.search.candidates.query) return candidates;
+	const searchResults = $derived.by(() => {
+		if (!searcher) return candidates;
+		if (!narrowingState.search.candidates.query) return candidates;
 
-	return searcher.search(narrowingState.search.candidates.query).map(({ item, matches: [label, description] }) => ({
-		...item,
-		highlights: {
-			label,
-			description,
-		},
-	}))});
+		return searcher
+			.search(narrowingState.search.candidates.query)
+			.map(({ item, matches: [label, description] }) => ({
+				...item,
+				highlights: {
+					label,
+					description,
+				},
+			}));
+	});
 
 	$effect(() => {
 		narrowingState.search.candidates.resultsCount = searchResults.length;
 	});
 </script>
 
-
-
 <main>
 	<VirtualList items={searchResults} let:item>
-	{@const candidate = item as typeof candidates[number]}
+		{@const candidate = item as (typeof candidates)[number]}
 		<article>
 			<div class="image" class:empty={!candidate.images?.[0]}>
 				{#if candidate.images?.at(0)}
-					<img src={candidate.images?.at(0)} alt="Image de {candidate.label}" class="specimen" />
-					{:else}
+					<Lightbox>
+						{#snippet trigger()}
+							<img
+								src={candidate.images?.at(0)}
+								alt="Image de {candidate.label}"
+								class="specimen"
+							/>
+						{/snippet}
+						{#snippet content()}
+							<img
+								src={candidate.images?.at(0)}
+								alt="Image de {candidate.label}"
+								class="specimen-fullscreen"
+							/>
+						{/snippet}
+					</Lightbox>
+				{:else}
 					<p>
-
-<IconNoImage />
+						<IconNoImage />
 					</p>
 				{/if}
 			</div>
@@ -54,9 +79,34 @@ const searchResults = $derived.by(() => {
 				<div class="description" {@attach scrollfader}>
 					<Markdown source={candidate.description ?? ''} />
 				</div>
-				{#if candidate.learnMore}
-					<LearnMoreLink href={candidate.learnMore} />
-				{/if}
+				<div class="actions">
+					<div class="learn-more">
+						{#if candidate.learnMore}
+							<LearnMoreLink href={candidate.learnMore} />
+						{/if}
+					</div>
+
+					<div class="pick">
+						<ButtonSecondary
+							onclick={async () => {
+								if (!page.params.observation) return;
+								if (!narrowingState.focusedMetadataId) return;
+
+								await storeMetadataValue({
+									db: databaseHandle(),
+									subjectId: page.params.observation,
+									sessionId: uiState.currentSessionId,
+									metadataId: narrowingState.focusedMetadataId,
+									type: 'enum',
+									value: candidate.key,
+								});
+							}}
+						>
+							<IconChoose />
+							Choisir
+						</ButtonSecondary>
+					</div>
+				</div>
 			</div>
 		</article>
 	</VirtualList>
@@ -70,9 +120,9 @@ const searchResults = $derived.by(() => {
 
 	article {
 		display: flex;
-		gap: 3em;
+		gap: 2em;
 		padding: 2em;
-		max-width: calc(67ch + 10em + 2em);
+		border-bottom: 1px solid var(--gray);
 
 		.image {
 			width: 10rem;
@@ -88,7 +138,6 @@ const searchResults = $derived.by(() => {
 				justify-content: center;
 				text-align: center;
 				font-size: 2em;
-
 			}
 		}
 
@@ -96,7 +145,9 @@ const searchResults = $derived.by(() => {
 			width: 100%;
 			height: 100%;
 			object-fit: contain;
-			border-radius: var(--corner-radius);
+			&.specimen {
+				border-radius: var(--corner-radius);
+			}
 		}
 
 		.label {
@@ -112,7 +163,22 @@ const searchResults = $derived.by(() => {
 		.info {
 			display: flex;
 			flex-direction: column;
-			gap: 0.5em;
+			gap: 1em;
+			width: 100%;
+			max-width: 67ch;
+		}
+
+		.actions {
+			width: 100%;
+			display: flex;
+			align-items: center;
+			gap: 2em;
+			justify-content: space-between;
+		}
+
+		&:not(:hover):not(:focus-within) .actions .pick {
+			opacity: 0;
+			pointer-events: none;
 		}
 	}
 </style>

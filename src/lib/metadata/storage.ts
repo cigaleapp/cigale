@@ -183,7 +183,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 		| Array<{ value: RuntimeValue<Type>; confidence: number }>;
 	cascadedFrom?: string[];
 	abortSignal?: AbortSignal | undefined;
-	sessionId?: string | undefined;
+	sessionId?: string | undefined|null;
 	updateReactiveState?: boolean;
 }) {
 	if (!isNamespacedToProtocol(null, metadataId)) {
