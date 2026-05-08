@@ -177,7 +177,7 @@
 				let id = uiState.selection.at(0);
 				if (!id) return;
 
-				await goto('/(app)/(sidepanel)/classify/[observation]', { observation: id });
+				await goto('/(app)/(sidepanel)/o/[observation]/classify', { observation: id });
 			},
 		},
 	});
@@ -217,7 +217,7 @@
 							unrolledObservation = unrolledObservation === id ? '' : id;
 						}}
 						ondoubleclick={() => {
-							goto('/(app)/(sidepanel)/classify/[observation]', {
+							goto('/(app)/(sidepanel)/o/[observation]/classify', {
 								observation: observation.id,
 							});
 						}}

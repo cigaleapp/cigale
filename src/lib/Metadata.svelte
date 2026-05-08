@@ -45,7 +45,7 @@
 			value: undefined | RuntimeValue<T>,
 			// eslint-disable-next-line no-unused-vars
 			unit?: undefined | typeof NumericUnit.infer
-		) => void;
+		) => Promise<void>;
 	}
 
 	let {
@@ -54,7 +54,7 @@
 		definition,
 		requiredness,
 		options = [],
-		onchange = () => {},
+		onchange = async () => {},
 		onvalidation = () => {},
 	}: Props = $props();
 
@@ -164,13 +164,13 @@
 						<ConfidencePercentage value={confidence} />
 						<button
 							use:tooltip={'Sélectionner cette valeur'}
-							onclick={() => {
+							onclick={async () => {
 								value = {
 									value: JSON.parse(jsonValue),
 									confidence,
 									alternatives: value?.alternatives ?? {},
 								};
-								onchange(value?.value, value?.unit);
+								await onchange(value?.value, value?.unit);
 							}}
 						>
 							<IconCheck />
@@ -190,14 +190,14 @@
 
 		<section class="map">
 			<WorldMap
-				onNewMarker={({ lngLat: { lng, lat } }) => {
-					onchange?.({ latitude: lat, longitude: lng });
+				onNewMarker={async ({ lngLat: { lng, lat } }) => {
+					await onchange?.({ latitude: lat, longitude: lng });
 				}}
 				markers={orEmpty(coords !== undefined, {
 					...coords!,
 					id: '_',
-					onMove({ lngLat: [longitude, latitude] }) {
-						onchange?.({ latitude, longitude });
+					async onMove({ lngLat: [longitude, latitude] }) {
+						await onchange?.({ latitude, longitude });
 					},
 				})}
 			/>
@@ -264,12 +264,12 @@
 		value={value?.value}
 		unit={value?.unit}
 		{validationErrors}
-		onblur={(val, unit) => {
+		onblur={async (val, unit) => {
 			// We eagerly update value.unit because otherwise it gets updated after the DB changes
 			// the validator would update separately to the unit+value change
 			// which causes a flickering false validation error
 			if (value) value.unit = unit;
-			onchange(val, unit);
+			await onchange(val, unit);
 			validation = val !== undefined ? valueValidator?.(val) : undefined;
 		}}
 		{isCompactEnum}
@@ -300,10 +300,10 @@
 		use:tooltip={'Supprimer cette valeur'}
 		aria-label="Supprimer cette valeur"
 		disabled={!value || value.isDefault}
-		onclick={() => {
+		onclick={async () => {
 			if (!value) return;
 			value = undefined;
-			onchange(undefined);
+			await onchange(undefined);
 		}}
 	>
 		<IconClear />

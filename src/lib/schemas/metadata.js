@@ -272,6 +272,9 @@ export const MetadataEnumVariant = type({
 		.describe(
 			'Objet contenant pour clés des identifiants d\'autres métadonnées, et pour valeurs la valeur à assigner à cette métadonnée si cette option est choisie. Le processus est récursif: Imaginons une métadonnée species ayant une option avec `{ key: "1", cascade: { genus: "2" } }`, une métadonnée genus ayant une option `{ key: "2", cascade: { family: "3" } }`. Si l\'option "1" de la métadonnée species est choisie, la métadonnée genus sera définie sur l\'option "2" et la métadonnée family sera à son tour définie sur l\'option "3".'
 		),
+	// --- Technical fields ---
+	/** Metadata group names that are narrowable and that have at least one metadata that exists in the enum variant's cascades. Used for indexing purposes: can be used to get all species that are narrowable by metadata of a certain metadata group. This is not set automatically (as the computation requires access to metadata definitions and metadata groups of the enum variant's protocol) */
+	_narrowableIn: type('string[]').default(() => []),
 });
 
 export const EXIFField = type.enumerated(...keys(EXIF_FIELDS));
@@ -592,6 +595,11 @@ export const MetadataGroup = type({
 	id: ID.brand('MetadataGroup'),
 	name: 'string',
 	description: "string = ''",
+	narrowable: type(
+		'boolean',
+		'@',
+		"Si le groupe peut être utilisé pour classifier une observation en mode 'élimination'. Dans ce mode, on propose de choisir des valeurs dans l'ensemble des métadonnées du groupe narrowable choisi, afin de réduire une liste de candidats possibles (les candidats sont les options de la métadonnée de classification (par exemple, 'Espèce') tels que leurs cascades correspondent à l'ensemble des choix effectués sur les métadonnées du groupe narrowable)"
+	).default(false),
 	collapsed: type(
 		'boolean',
 		'@',

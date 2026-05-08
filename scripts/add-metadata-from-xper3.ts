@@ -267,6 +267,7 @@ if (import.meta.main) {
 		name: 'Andrènes',
 		description: "Caractéristiques d'identification spécifiques aux abeilles du genre Andrena",
 		collapsed: true,
+		narrowable: true,
 	};
 
 	const descriptorMetadatas = new Map<
