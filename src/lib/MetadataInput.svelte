@@ -140,6 +140,8 @@
 		loader.do();
 		return loader.cancel;
 	});
+
+	let comboboxFocuser = $state<() => void>()
 </script>
 
 <div
@@ -215,12 +217,14 @@
 					{options}
 					{optionIsDisabled}
 					{confidences}
+					bind:focuser={comboboxFocuser}
 					metadata={definition}
 					type="single"
 					disabled={disabled ?? false}
 					value={safeJSONParse(value?.toString())?.toString() ?? value}
 					onValueChange={async (value) => {
 						await onblur(value);
+						comboboxFocuser("blur")
 					}}
 				/>
 			{/if}

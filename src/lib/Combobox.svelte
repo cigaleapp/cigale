@@ -37,6 +37,7 @@
 <script lang="ts" generics="I extends Item, V extends string">
 	import type { WithoutChildrenOrChild } from 'bits-ui';
 	import type { Snippet } from 'svelte';
+	import type { Attachment } from 'svelte/attachments';
 
 	import VirtualList from '@sveltejs/svelte-virtual-list';
 	import { Combobox, mergeProps } from 'bits-ui';
@@ -45,7 +46,6 @@
 	import Logo from './Logo.svelte';
 	import { scrollfader } from './scrollfader.js';
 	import { compareBy } from './utils.js';
-	import type { Attachment } from 'svelte/attachments';
 
 	type MergedProps = Props<I, V> & Omit<Combobox.RootProps, keyof Props<I, V>>;
 
@@ -159,11 +159,12 @@
 		<IconSearch />
 	</div> -->
 	<Combobox.Input {...mergedInputProps}>
-		{#snippet child({ props: { value, ...props } })}
+		{#snippet child({ props: { value: inputValue, ...props } })}
+			{@const effectiveValue = value ? (open ? inputValue : label) : ''}
 			{#if searchbox}
-				{@render searchbox({ value: open ? value : label || value, ...props, focusSetter })}
+				{@render searchbox({ value: effectiveValue, ...props, focusSetter })}
 			{:else}
-				<input {...props} value={open ? value : label || value} {@attach focusSetter} />
+				<input {...props} value={effectiveValue} {@attach focusSetter} />
 			{/if}
 		{/snippet}
 	</Combobox.Input>
