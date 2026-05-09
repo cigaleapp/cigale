@@ -38,8 +38,6 @@ export async function emulateNetworkProfile(page: Page, profile: NetworkProfile 
 	}
 
 	const client = await page.context().newCDPSession(page);
-	if (!client) throw new Error('Failed to create CDP session for Chromium network emulation');
-
 	await client.send('Network.enable');
 	await client.send('Network.emulateNetworkConditions', {
 		offline: false,
