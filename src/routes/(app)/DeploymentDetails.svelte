@@ -2,6 +2,7 @@
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import Datetime from '$lib/Datetime.svelte';
 	import { nukeDatabase, previewingPrNumber } from '$lib/idb.svelte';
+	import Markdown from '$lib/Markdown.svelte';
 	import Modal from '$lib/Modal.svelte';
 
 	const buildCommit = import.meta.env.buildCommit;
@@ -86,9 +87,7 @@
 			{/if}
 			<br />
 		</ul>
-		<p>
-			{body}
-		</p>
+		<Markdown source={body} />
 	{:catch _}
 		#{previewingPrNumber}
 	{/await}
