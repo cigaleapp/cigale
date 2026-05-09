@@ -123,6 +123,12 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./android/gradlew
 
+      - name: Install Martian Mono font
+        run: |
+          mkdir -p ~/.local/share/fonts
+          cp ./static/fonts/Martian_Mono-*.woff2 ~/.local/share/fonts/
+          fc-cache -f
+
       - name: Generate logo assets
         run: bun run scripts/generate-logo-assets.ts
 
