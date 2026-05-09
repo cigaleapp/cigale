@@ -22,12 +22,12 @@
 	const id = $props.id();
 </script>
 
-<div class="segmented-group">
+<div class="segmented-group" role="tablist"> 
 	{#each options as key (key)}
 		{@const disabled = isDisabled(key)}
 		{@const disabledWhy = typeof disabled === 'string' ? disabled : undefined}
 
-		<label for="{id}-{key}" use:tooltip={disabledWhy}>
+		<label for="{id}-{key}" use:tooltip={disabledWhy} role="tab">
 			<input
 				disabled={Boolean(disabled)}
 				type="radio"

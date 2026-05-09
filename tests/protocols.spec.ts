@@ -441,39 +441,17 @@ test('can use a protocol that imports metadata from another protocol', async ({
 	await app.metadata.switch('From child').click();
 	await app.metadata.combobox('Imported enum').fill('Option 20');
 	await expect(page.getByTestId('metadata-combobox-viewport')).toMatchAriaSnapshot(`
-	  - option /Option \\d+ --%/:
-	    - text: ""
-	    - code: "--%"
-	  - option /Option \\d+ --%/:
-	    - text: ""
-	    - code: "--%"
-	  - option /Option \\d+ --%/:
-	    - text: ""
-	    - code: "--%"
-	  - option /Option \\d+ --%/:
-	    - text: ""
-	    - code: "--%"
-	  - option /Option \\d+ --%/:
-	    - text: ""
-	    - code: "--%"
-	  - option /Option \\d+ --%/:
-	    - text: ""
-	    - code: "--%"
-	  - option /Option \\d+ --%/:
-	    - text: ""
-	    - code: "--%"
-	  - option /Option \\d+ --%/:
-	    - text: ""
-	    - code: "--%"
-	  - option /Option \\d+ --%/:
-	    - text: ""
-	    - code: "--%"
-	  - option /Option \\d+ --%/:
-	    - text: ""
-	    - code: "--%"
-	  - option /Option \\d+ --%/:
-	    - text: ""
-	    - code: "--%"
+	  - option /Option \\d+/
+	  - option /Option \\d+/
+	  - option /Option \\d+/
+	  - option /Option \\d+/
+	  - option /Option \\d+/
+	  - option /Option \\d+/
+	  - option /Option \\d+/
+	  - option /Option \\d+/
+	  - option /Option \\d+/
+	  - option /Option \\d+/
+	  - option /Option \\d+/
 	  - heading "Option 0" [level=2]
 	  - paragraph: This is the option №0 🤓
 	  - table:

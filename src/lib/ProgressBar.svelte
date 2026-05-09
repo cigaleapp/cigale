@@ -53,6 +53,7 @@ TODO: Don't animate when progress decreases (e.g. when a new task starts and it 
 		></div>
 		<progress
 			class="progress-bar"
+			aria-label="{phase?phase+": ":''}{percentage}%"
 			class:inactive
 			value={clamp(Number.isFinite(p) ?  p : 0, 0, 1)}
 			max="1"

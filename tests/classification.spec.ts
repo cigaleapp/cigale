@@ -81,7 +81,7 @@ test.describe('full-screen classification view', pr(1071), () => {
 		await app.db.refresh();
 
 		await firstObservationCard(page).dblclick();
-		await app.path.wait(`/classify/${lilFella.id}`);
+		await app.path.wait(`/o/${lilFella.id}/classify/suggestions/`);
 	});
 
 	for (const switchLayout of [false, true]) {
@@ -99,9 +99,9 @@ test.describe('full-screen classification view', pr(1071), () => {
 				const panel = page.getByTestId('panel');
 				const option = panel.getByTestId('focused-option');
 
-				await expect(panel.getByRole('heading', { level: 1 })).toHaveAccessibleName(
-					lilFella.label
-				);
+				await expect(
+					page.getByTestId('fullscreen-header').getByRole('heading', { level: 1 })
+				).toHaveAccessibleName(lilFella.label);
 
 				await expect(option.getByRole('combobox')).toHaveValue('Entomobrya muscorum');
 				await expect(option.getByTestId('current')).toHaveText(/32%\s*$/);
@@ -119,6 +119,7 @@ test.describe('full-screen classification view', pr(1071), () => {
 				await expect(next).toHaveText(/\s*(Suivante )?\s*18%\s*/);
 
 				await expect(page.getByTestId('cascades')).toMatchAriaSnapshot(`
+				  - img
 				  - text: Métadonnées associées
 				  - table:
 				    - rowgroup:
@@ -142,6 +143,7 @@ test.describe('full-screen classification view', pr(1071), () => {
 				        - cell "Entomobrya"
 				`);
 				await expect(page.getByTestId('synonyms')).toMatchAriaSnapshot(`
+				  - img
 				  - text: Synonymes
 				  - list:
 				    - listitem: Degeeria muscorum
@@ -165,6 +167,12 @@ test.describe('full-screen classification view', pr(1071), () => {
 				await expect(page.getByTestId('description')).toMatchAriaSnapshot(`
 				  - img
 				  - text: Description
+				  - paragraph:
+				    - text: A test description to test stuff out woooo here's some
+				    - strong: markdown
+				    - text: . I hope you get rendered into a
+				    - strong: HTML tag buddy! See you soon in a expect() call down there :p
+				  - strong
 				  - link "En savoir plus gbif.org":
 				    - /url: https://gbif.org/species/2120749
 				    - img
@@ -239,17 +247,13 @@ test.describe('full-screen classification view', pr(1071), () => {
 			test('can go to the crop view and back', async ({ page, app }) => {
 				const url = page.url();
 
-				await page
-					.getByTestId('panel')
-					.getByTestId('header')
-					.getByRole('button', { name: 'Recadrer' })
-					.click();
+				await page.getByRole('tab', { name: 'Recadrer' }).click();
 
 				await app.path.wait('/(app)/(sidepanel)/o/[observation]/crop/[image]');
 
 				await expect(page).toHaveTitle(/^Recadrer lil-fella.jpeg · /);
 
-				await page.getByRole('button', { name: 'Retour' }).click();
+				await page.getByRole('tab', { name: 'Suggestions' }).click();
 
 				await app.path.wait('/(app)/(sidepanel)/o/[observation]/classify/suggestions');
 				await expect(page).toHaveURL(url);
@@ -258,9 +262,8 @@ test.describe('full-screen classification view', pr(1071), () => {
 			test.describe('can exit out to the classification tab', () => {
 				test('with the button', async ({ page, app }) => {
 					await page
-						.getByTestId('panel')
-						.getByTestId('header')
-						.getByRole('button', { name: 'Voir tout' })
+						.getByTestId('fullscreen-header')
+						.getByRole('button', { name: 'Retour' })
 						.click();
 
 					await app.path.wait('/classify');
@@ -273,8 +276,7 @@ test.describe('full-screen classification view', pr(1071), () => {
 			});
 
 			test('can navigate to other images', async ({ page, app }) => {
-				const navigation = page.getByTestId('panel').getByTestId('nav');
-				const title = page.getByTestId('panel').getByRole('heading', { level: 1 });
+				const title = page.getByTestId('fullscreen-header').getByRole('heading', { level: 1 });
 				const selectedOption = page
 					.getByTestId('panel')
 					.getByTestId('focused-option')
@@ -282,7 +284,7 @@ test.describe('full-screen classification view', pr(1071), () => {
 
 				async function go(direction: 'suivante' | 'précédente', times = 1) {
 					for (let i = 0; i < times; i++) {
-						await navigation
+						await page
 							.getByRole('button', { name: `Observation ${direction}` })
 							.click();
 						await app.wait('200ms');
@@ -336,8 +338,12 @@ test.describe('full-screen classification view', pr(1071), () => {
 
 		// Initially
 
-		await expect(page.getByText('Observations classifiées 75%')).toBeVisible();
-		await expect(page.getByText('Classifications confirmées 0%')).toBeVisible();
+		await expect(
+			page.getByRole('progressbar', { name: 'Observations classifiées: 75%' })
+		).toBeVisible();
+		await expect(
+			page.getByRole('progressbar', { name: 'Classifications confirmées: 0%' })
+		).toBeVisible();
 		await assertDatabaseConfirmedStatus(lilFella.id, false);
 
 		// Confirming lil-fella
@@ -345,42 +351,58 @@ test.describe('full-screen classification view', pr(1071), () => {
 		await page.getByRole('button', { name: 'Continuer' }).click();
 		await expect(confirmedCropOverlay(page)).toBeVisible();
 
-		await expect(page.getByText('Observations classifiées 75%')).toBeVisible();
-		await expect(page.getByText('Classifications confirmées 25%')).toBeVisible();
+		await expect(
+			page.getByRole('progressbar', { name: 'Observations classifiées: 75%' })
+		).toBeVisible();
+		await expect(
+			page.getByRole('progressbar', { name: 'Classifications confirmées: 25%' })
+		).toBeVisible();
 		await assertDatabaseConfirmedStatus(lilFella.id, true);
 
 		// Confirming leaf
 
-		await app.path.wait(`/classify/${leaf.id}`);
+		await app.path.wait(`/o/${leaf.id}/classify/suggestions/`);
 
-		await page.keyboard.press('ArrowUp');
+		await page.keyboard.press(controlOrMeta(page, 'ArrowUp'));
 		await expect(confirmedCropOverlay(page)).not.toBeVisible();
 
-		await expect(page.getByText('Observations classifiées 75%')).toBeVisible();
-		await expect(page.getByText('Classifications confirmées 50%')).toBeVisible();
+		await expect(
+			page.getByRole('progressbar', { name: 'Observations classifiées: 75%' })
+		).toBeVisible();
+		await expect(
+			page.getByRole('progressbar', { name: 'Classifications confirmées: 50%' })
+		).toBeVisible();
 		await assertDatabaseConfirmedStatus(leaf.id, true);
 
 		// Confirming cyan
 
 		await page.keyboard.press(controlOrMeta(page, 'ArrowRight'));
-		await app.path.wait(`/classify/${cyan.id}`);
+		await app.path.wait(`/o/${cyan.id}/classify/suggestions/`);
 
-		await page.keyboard.press('ArrowUp');
+		await page.keyboard.press(controlOrMeta(page, 'ArrowUp'));
 		await expect(confirmedCropOverlay(page)).not.toBeVisible();
 
-		await expect(page.getByText('Observations classifiées 75%')).toBeVisible();
-		await expect(page.getByText('Classifications confirmées 75%')).toBeVisible();
+		await expect(
+			page.getByRole('progressbar', { name: 'Observations classifiées: 75%' })
+		).toBeVisible();
+		await expect(
+			page.getByRole('progressbar', { name: 'Classifications confirmées: 75%' })
+		).toBeVisible();
 		await assertDatabaseConfirmedStatus(cyan.id, true);
 
 		// Confirming with-exif-gps does nothing since theres no classification
 
 		await page.keyboard.press(controlOrMeta(page, 'ArrowRight'));
 
-		await app.path.wait(`/classify/${withExifGps.id}`);
-		await page.keyboard.press('ArrowUp');
+		await app.path.wait(`/o/${withExifGps.id}/classify/suggestions/`);
+		await page.keyboard.press(controlOrMeta(page, 'ArrowUp'));
 
-		await expect(page.getByText('Observations classifiées 75%')).toBeVisible();
-		await expect(page.getByText('Classifications confirmées 75%')).toBeVisible();
+		await expect(
+			page.getByRole('progressbar', { name: 'Observations classifiées: 75%' })
+		).toBeVisible();
+		await expect(
+			page.getByRole('progressbar', { name: 'Classifications confirmées: 75%' })
+		).toBeVisible();
 		await assertDatabaseConfirmedStatus(withExifGps.id, false);
 
 		// Classify it
@@ -388,22 +410,27 @@ test.describe('full-screen classification view', pr(1071), () => {
 		await page.getByTestId('current').getByRole('combobox').fill('Seira musarum');
 		await page.keyboard.press('Enter');
 		await page.getByTestId('current').getByRole('combobox').blur();
-		await expect(page.getByText('Observations classifiées 100%')).toBeVisible();
-		await expect(page.getByText('Classifications confirmées 75%')).toBeVisible();
+		await expect(
+			page.getByRole('progressbar', { name: 'Observations classifiées: 100%' })
+		).toBeVisible();
+		await expect(
+			page.getByRole('progressbar', { name: 'Classifications confirmées: 75%' })
+		).toBeVisible();
 
 		// Now that all other observations are classified, confirming should work
 
 		await page.getByRole('button', { name: 'Continuer' }).click();
 		await expect(confirmedCropOverlay(page)).toBeVisible();
+		await app.path.wait('/results/');
+
 		await assertDatabaseConfirmedStatus(withExifGps.id, true);
 
-		await app.path.wait('/results');
 	});
 
 	// TODO: revisit once https://github.com/cigaleapp/cigale/issues/1191 is closed
 	test('handles merged observations', async ({ page, app }) => {
 		await page.keyboard.press('Escape');
-		await app.path.wait('/classify');
+		await app.path.wait('/classify/');
 
 		await page.keyboard.down('Control');
 		await page.getByRole('article', { name: 'cyan' }).click();

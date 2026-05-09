@@ -74,6 +74,7 @@
 
 		await storeMetadataValue({
 			db: await openDatabase(),
+			sessionId: uiState.currentSessionId,
 			metadataId: focusedMetadata.id,
 			subjectId: observation.id,
 			type: 'enum',

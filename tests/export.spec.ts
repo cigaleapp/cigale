@@ -39,10 +39,10 @@ test('correctly applies crop padding', issue(463), async ({ page, app }) => {
 	await firstObservationCard(page).click();
 	await page.getByRole('button', { name: "Choisir l'outil 2 points" }).click();
 	// TODO fix coordinates for WebKit, current snapshots is off-center
-	await page.mouse.click(278, 255);
-	await page.mouse.click(487, 464);
+	await page.mouse.click(275, 282);
+	await page.mouse.click(488, 494);
 
-	await page.getByRole('button', { name: 'Autres photos Esc' }).click();
+	await page.getByRole('button', { name: 'Retour' }).click();
 
 	await app.tabs.go('results');
 	const zip = await exportResults(page, { cropPadding: '40px' });

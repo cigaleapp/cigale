@@ -61,7 +61,7 @@ test('Entomoscope @real-protocol', async ({ app, page }) => {
 
 	await app.tabs.go('crop');
 	await firstObservationCard(page).click();
-	await app.path.wait('/(app)/(sidepanel)/crop/[image]');
+	await app.path.wait('/(app)/(sidepanel)/o/[observation]/crop/[image]');
 
 	const box = (no: number) => page.getByRole('listitem', { name: `Boîte #${no}`, exact: true });
 
@@ -71,7 +71,7 @@ test('Entomoscope @real-protocol', async ({ app, page }) => {
 	await expect(box(14)).toHaveText(/\b115×108\b/);
 	await expect(box(15)).not.toBeVisible();
 
-	await page.getByRole('button', { name: 'Autres photos' }).click();
+	await page.getByRole('button', { name: 'Retour' }).click();
 	await app.path.wait('/(app)/(sidepanel)/crop');
 	await app.tabs.go('classify');
 	await app.loading.wait();

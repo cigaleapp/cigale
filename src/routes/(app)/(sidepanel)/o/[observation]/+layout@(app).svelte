@@ -134,7 +134,7 @@
 </script>
 
 <div class="with-header">
-	<header>
+	<header data-testid="fullscreen-header">
 		<ButtonIcon onclick={backToGalleryView} help="Retour" keyboard="Escape">
 			<IconClose />
 		</ButtonIcon>
