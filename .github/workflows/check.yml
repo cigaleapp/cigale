@@ -13,6 +13,60 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  db-revision:
+    name: Database revision is not decreased
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Check database revision monotonicity
+        run: |
+          current_revision=$(sed -nE 's/^export const databaseRevision[[:space:]]*=[[:space:]]*([0-9]+);?$/\1/p' src/lib/idb.svelte.js)
+          if [ -z "$current_revision" ]; then
+            echo "Could not read current databaseRevision from src/lib/idb.svelte.js"
+            exit 1
+          fi
+
+          null_sha="0000000000000000000000000000000000000000"
+
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            previous_sha="${{ github.event.pull_request.base.sha }}"
+          else
+            previous_sha="${{ github.event.before }}"
+          fi
+
+          if [ "$previous_sha" = "$null_sha" ]; then
+            echo "No previous commit available (new branch/repository history edge case), skipping comparison."
+            exit 0
+          fi
+
+          previous_revision=$(
+            git show "$previous_sha:src/lib/idb.svelte.js" \
+              | sed -nE 's/^export const databaseRevision[[:space:]]*=[[:space:]]*([0-9]+);?$/\1/p'
+          )
+          if [ -z "$previous_revision" ]; then
+            echo "Could not read previous databaseRevision from src/lib/idb.svelte.js at $previous_sha"
+            exit 1
+          fi
+
+          if ! [[ "$previous_revision" =~ ^[0-9]+$ && "$current_revision" =~ ^[0-9]+$ ]]; then
+            echo "databaseRevision values must be integers. Got previous='$previous_revision', current='$current_revision'."
+            exit 1
+          fi
+
+          echo "Previous databaseRevision: $previous_revision"
+          echo "Current databaseRevision: $current_revision"
+
+          if [ "$current_revision" -lt "$previous_revision" ]; then
+            echo "databaseRevision decreased from $previous_revision to $current_revision."
+            exit 1
+          fi
+
+          echo "databaseRevision did not decrease."
+
   lint:
     name: Lint
     runs-on: ubuntu-latest
@@ -135,6 +189,7 @@ jobs:
     if: github.event_name == 'pull_request' && !cancelled()
     name: Mergeable?
     needs:
+      - db-revision
       - build
       - json-schema
       - lint
