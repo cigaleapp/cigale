@@ -54,11 +54,11 @@
 	<form class="metadata" data-testid="session-metadata">
 		<MetadataList
 			definitions={metadataDefs}
+			values={session.metadata}
 			groups={protocol.metadataGroups}
 			ordering={protocol.metadataOrder}
 		>
-			{#snippet children(def)}
-				{@const value = session.metadata[def.id]}
+			{#snippet children(def, value)}
 				<Metadata
 					requiredness="all"
 					options={undefined}

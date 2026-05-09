@@ -167,6 +167,7 @@
 	{:else}
 		<div class="scrollable" in:fade={{ duration: 200 }}>
 			<MetadataList
+			virtualize
 				definitions={shownDefinitions}
 				ordering={searchResults?.map((result) => result.id) ??
 					uiState.currentProtocol?.metadataOrder}

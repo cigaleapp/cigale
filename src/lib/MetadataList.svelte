@@ -12,6 +12,8 @@
 	interface Props {
 		children: Snippet<[DB.Metadata, DB.MetadataValue, { collapsed: boolean }]>;
 		testid?: string;
+		/** Virtualize the list of metadatas. **Requires the parent element to have a defined height**. If there's grouping, this will be ignored and the list will not be virtualized, because it's not possible to. */
+		virtualize?: boolean;
 		definitions: DB.Metadata[];
 		values: DB.MetadataValues;
 		/** List of metadata IDs in order */
@@ -19,7 +21,7 @@
 		groups: DB.Protocol['metadataGroups'] | undefined;
 	}
 
-	const { children, values, testid, definitions, ordering, groups = [] }: Props = $props();
+	const { children, virtualize= false, values, testid, definitions, ordering, groups = [] }: Props = $props();
 
 	const { showTechnicalMetadata } = $derived(getSettings());
 
@@ -56,7 +58,7 @@
 	);
 
 	/* Virtualize only if there are no groups, since item size height is drastically dynamic when collapsing/expanding groups, there's too much glitching when trying to virtualize in that case */
-	const virtualize = $derived(groups.length === 0);
+	const _virtualize = $derived(virtualize && groups.length === 0);
 </script>
 
 <div class="liste" data-testid={testid}>
@@ -90,7 +92,7 @@
 		</div>
 	{/snippet}
 
-	{#if virtualize}
+	{#if _virtualize}
 		<VirtualList items={groupedDefinitions} let:item>
 			{@render metadata(item)}
 		</VirtualList>
