@@ -127,7 +127,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p ~/.local/share/fonts
-          font_url="https://raw.githubusercontent.com/google/fonts/main/ofl/martianmono/MartianMono%5Bwdth%2Cwght%5D.ttf"
+          font_url="https://raw.githubusercontent.com/google/fonts/b1aaa41a6990f651f2685a149a55c4a3fc02d28b/ofl/martianmono/MartianMono%5Bwdth%2Cwght%5D.ttf"
           curl -fL "$font_url" -o "$HOME/.local/share/fonts/MartianMono.ttf"
           fc-cache -f
 
