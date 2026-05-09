@@ -92,10 +92,11 @@
 				.item(metadata.length - 1)
 				?.scrollIntoView({ behavior: 'smooth', block: 'end' });
 
-			toasts.success(`Métadonnée ${shortId} créée`);
 			await goto('/(app)/protocols/[id]/metadata/[metadata]/infos', {
 				id,
 				metadata: shortId,
+			}).then(() => {
+				toasts.success(`Métadonnée ${shortId} créée`);
 			});
 		} catch (error) {
 			toasts.error(errorMessage(error, 'Impossible de créer la métadonnée'));
