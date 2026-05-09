@@ -47,7 +47,7 @@ export async function emulateNetworkProfile(page: Page, profile: NetworkProfile 
 		});
 	} catch (error) {
 		throw new Error(
-			`Failed to emulate "${profile}" network profile through Chromium CDP`,
+			`Failed to emulate "${profile}" network profile via CDP (Chromium only)`,
 			{ cause: error }
 		);
 	}
