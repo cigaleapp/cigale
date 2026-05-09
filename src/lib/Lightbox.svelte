@@ -21,6 +21,7 @@
 	onclick={() => close?.()}
 	{@attach (node) => {
 		close = () => node.close();
+
 		open = () => node.showModal();
 	}}
 >
@@ -30,7 +31,9 @@
 		</ButtonIcon>
 	</div>
 
-	{@render content()}
+	<div class="contents">
+		{@render content()}
+	</div>
 </dialog>
 
 <button onclick={() => open?.()}>
@@ -39,6 +42,8 @@
 
 <style>
 	dialog {
+		position: fixed;
+		inset: 0;
 		width: 100vw;
 		height: 100vh;
 		background: transparent;
@@ -49,19 +54,37 @@
 		justify-content: center;
 		z-index: 1000;
 		opacity: 0;
-		transition: opacity 0.5s;
+		transition: opacity 0.2s;
+
+		.contents {
+			transition: scale 0.2s;
+		}
 
 		&[open] {
 			opacity: 1;
-		}
+			pointer-events: auto;
 
-		&::backdrop {
-			background-color: rgb(0 0 0 / 0.75);
+			.contents {
+				scale: 1;
+			}
 		}
 
 		&:not([open]) {
-			display: none;
+			opacity: 0;
+			pointer-events: none;
+			.contents {
+				scale: 0.95;
+			}
 		}
+	}
+
+	dialog::backdrop {
+		background-color: rgb(0 0 0 / 0);
+		transition: all 2s;
+	}
+
+	dialog[open]::backdrop {
+		background-color: rgb(0 0 0 / 0.75);
 	}
 
 	.close {
