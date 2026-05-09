@@ -23,7 +23,7 @@
 			d="M-0.136353 480.039C-0.136353 452.425 22.2494 430.039 49.8637 430.039H586.864C614.478 430.039 636.864 452.425 636.864 480.039V637.039H-0.136353V480.039Z"
 			fill="#FF0000" />
 		<text x="50%" y="582.98075" fill="#00FF00"
-			font-family="Martian Mono" font-size="128" letter-spacing="-0.07em" text-anchor="middle"
+			font-family="Martian Mono" font-size="128" font-weight="600" font-stretch="87.5%" letter-spacing="-0.07em" text-anchor="middle"
 			dominant-baseline="middle">
 			PILLTXT
 		</text>
