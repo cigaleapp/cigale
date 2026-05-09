@@ -34,7 +34,7 @@ const networkProfiles: Record<
 
 export async function emulateNetworkProfile(page: Page, profile: NetworkProfile = '4g') {
 	if (page.context().browser()?.browserType().name() !== 'chromium') {
-		// CDP network emulation is only available in Chromium.
+		console.info(`Skipping "${profile}" network emulation: CDP is Chromium-only.`);
 		return;
 	}
 
