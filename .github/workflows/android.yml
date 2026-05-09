@@ -126,8 +126,9 @@ jobs:
       - name: Install Martian Mono font
         run: |
           mkdir -p ~/.local/share/fonts
-          curl -fL "https://raw.githubusercontent.com/google/fonts/b1aaa41a6990f651f2685a149a55c4a3fc02d28b/ofl/martianmono/MartianMono%5Bwdth,wght%5D.ttf" \
-            -o ~/.local/share/fonts/MartianMono.ttf
+          css=$(curl -fsSL "https://fonts.googleapis.com/css2?family=Martian+Mono:wght@800&text=DevLocal0123456789%23")
+          font_url=$(echo "$css" | sed -nE 's/.*url\((https:[^)]+)\).*/\1/p' | head -n1)
+          curl -fL "$font_url" -o ~/.local/share/fonts/MartianMono.woff2
           fc-cache -f
 
       - name: Generate logo assets
