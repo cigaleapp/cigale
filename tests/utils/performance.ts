@@ -1,6 +1,50 @@
 import { writeFileSync } from 'node:fs';
 import type { Page, TestInfo } from '@playwright/test';
 
+type NetworkProfile = '4g';
+
+const networkProfiles: Record<
+	NetworkProfile,
+	{
+		latency: number;
+		downloadThroughput: number;
+		uploadThroughput: number;
+		connectionType:
+			| 'none'
+			| 'cellular2g'
+			| 'cellular3g'
+			| 'cellular4g'
+			| 'bluetooth'
+			| 'ethernet'
+			| 'wifi'
+			| 'wimax'
+			| 'other';
+	}
+> = {
+	/** Similar to Chrome DevTools "Regular 4G". Throughputs are in bytes/second. */
+	'4g': {
+		latency: 20,
+		downloadThroughput: Math.round((4 * 1024 * 1024) / 8),
+		uploadThroughput: Math.round((3 * 1024 * 1024) / 8),
+		connectionType: 'cellular4g',
+	},
+};
+
+export async function emulateNetworkProfile(page: Page, profile: NetworkProfile = '4g') {
+	if (page.context().browser()?.browserType().name() !== 'chromium') {
+		return;
+	}
+
+	const client = await page.context().newCDPSession(page);
+	if (!client) throw new Error('Failed to create CDP session');
+
+	await client.send('Network.enable');
+	await client.send('Network.emulateNetworkConditions', {
+		offline: false,
+		...networkProfiles[profile],
+	});
+}
+
 export async function collectChromeDevtoolsTrace(
 	page: Page,
 	testInfo: TestInfo,

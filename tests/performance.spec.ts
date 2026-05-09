@@ -7,7 +7,7 @@ import { ms } from 'convert';
 import { PerformanceMetricsCollector } from 'playwright-performance-metrics';
 
 import { assert, expect, test } from './fixtures.js';
-import { collectChromeDevtoolsTrace } from './utils/performance.js';
+import { collectChromeDevtoolsTrace, emulateNetworkProfile } from './utils/performance.js';
 
 test.use({ storageState: { cookies: [], origins: [] } });
 
@@ -72,6 +72,7 @@ function benchmark(
 	test.describe(testLabel, () => {
 		for (let i = 0; i < repeats; i++) {
 			test(`run ${i + 1}/${repeats}`, async ({ page, browserName, app }, testInfo) => {
+				await emulateNetworkProfile(page, '4g');
 				await prepare?.({ page, app });
 
 				let collector: PerformanceMetricsCollector | undefined;
