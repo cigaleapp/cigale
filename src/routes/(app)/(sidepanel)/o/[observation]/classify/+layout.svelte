@@ -17,13 +17,13 @@
 	const focusedMetadata = $derived(
 		tables.Metadata.getFromState(
 			uiState.currentSession?.fullscreenClassifier.focusedMetadata ?? ''
-		)
+		)!
 	);
 
 	const allObservations = $derived(
 		tables.Observation.state.toSorted(compareBy((o) => data.sortedObservationIds.indexOf(o.id)))
 	);
-	const observation = $derived(tables.Observation.getFromState(page.params.observation!));
+	const observation = $derived(tables.Observation.getFromState(page.params.observation!)!);
 
 	function classification(observation: DB.Observation) {
 		if (!focusedMetadata) return;

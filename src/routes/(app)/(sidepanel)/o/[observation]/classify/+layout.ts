@@ -9,7 +9,7 @@ import { unique } from '$lib/utils.js';
 // Some stuff is loaded here to prevent loading it on every navigation within the fullscreen classifier
 // For instance, we wanna avoid re-sorting observations on every navigation, both for performance (it's one of the longest operations) and UX (otherwise changes in observations' metadata could re-order the observations while the user is inside the fullscreen classifier, which would be disruptive (imagine being on the 5/16 observation, correcting its species metadata, and finding yourself on the 16/16 instead of 6/16 after clicking "Next"))
 
-export async function load({ parent }) {
+export async function load({ parent, params }) {
 	// Make sure tables are loaded, otherwise uiState.currentSession will be undefined,
 	// even though uiState.currentSessionId is set.
 	await parent();
@@ -22,6 +22,21 @@ export async function load({ parent }) {
 	if (!currentSession) error(404, 'Session active introuvable');
 
 	const allObservations = await listByIndex('Observation', 'sessionId', currentSession.id);
+
+	if (!allObservations.some((obs) => obs.id === params.observation)) {
+		error(404, 'Observation introuvable');
+	}
+
+	if (
+		!metadataDefinitions.some(
+			(def) => def.id === currentSession.fullscreenClassifier.focusedMetadata
+		)
+	) {
+		error(
+			404,
+			"Métadonnée de classification introuvable. Le protocole de la session n'en définit peut-être pas."
+		);
+	}
 
 	const sortSettings = currentSession?.sort.classify ?? currentSession?.sort.global;
 	const groupSettings = currentSession?.group.classify ?? currentSession?.group.global;
@@ -65,6 +80,6 @@ export async function load({ parent }) {
 	return {
 		metadataDefinitions,
 		currentSession,
-		sortedObservationIds: allObservations.map(o => o.id),
+		sortedObservationIds: allObservations.map((o) => o.id),
 	};
 }
