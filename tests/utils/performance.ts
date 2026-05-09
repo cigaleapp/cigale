@@ -34,15 +34,23 @@ const networkProfiles: Record<
 
 export async function emulateNetworkProfile(page: Page, profile: NetworkProfile = '4g') {
 	if (page.context().browser()?.browserType().name() !== 'chromium') {
+		// CDP network emulation is only available in Chromium.
 		return;
 	}
 
-	const client = await page.context().newCDPSession(page);
-	await client.send('Network.enable');
-	await client.send('Network.emulateNetworkConditions', {
-		offline: false,
-		...networkProfiles[profile],
-	});
+	try {
+		const client = await page.context().newCDPSession(page);
+		await client.send('Network.enable');
+		await client.send('Network.emulateNetworkConditions', {
+			offline: false,
+			...networkProfiles[profile],
+		});
+	} catch (error) {
+		throw new Error(
+			`Failed to emulate "${profile}" network profile through Chromium CDP`,
+			{ cause: error }
+		);
+	}
 }
 
 export async function collectChromeDevtoolsTrace(
