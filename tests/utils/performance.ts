@@ -3,6 +3,8 @@ import type { Page, TestInfo } from '@playwright/test';
 
 type NetworkProfile = '4g';
 
+const MEBIBIT = 1024 * 1024;
+
 const networkProfiles: Record<
 	NetworkProfile,
 	{
@@ -24,8 +26,8 @@ const networkProfiles: Record<
 	/** Similar to Chrome DevTools "Regular 4G". Throughputs are in bytes/second. */
 	'4g': {
 		latency: 20,
-		downloadThroughput: Math.round((4 * 1024 * 1024) / 8),
-		uploadThroughput: Math.round((3 * 1024 * 1024) / 8),
+		downloadThroughput: Math.round((4 * MEBIBIT) / 8), // 4 Mbps
+		uploadThroughput: Math.round((3 * MEBIBIT) / 8), // 3 Mbps
 		connectionType: 'cellular4g',
 	},
 };
@@ -36,7 +38,7 @@ export async function emulateNetworkProfile(page: Page, profile: NetworkProfile 
 	}
 
 	const client = await page.context().newCDPSession(page);
-	if (!client) throw new Error('Failed to create CDP session');
+	if (!client) throw new Error('Failed to create CDP session for Chromium network emulation');
 
 	await client.send('Network.enable');
 	await client.send('Network.emulateNetworkConditions', {
