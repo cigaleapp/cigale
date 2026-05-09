@@ -64,7 +64,7 @@
 			<IconChoose />
 		</button>
 	{/snippet}
-	{#snippet item({ metadataCount }, { label,  selected })}
+	{#snippet item({ metadataCount }, { label, selected })}
 		<div class="item">
 			<div class="name-and-selected">
 				<div class="selected">

@@ -55,6 +55,6 @@ export function narrowingPower({
 
 	return {
 		countAfterChoice: candidatesAfter.length,
-		ratio: candidatesAfter.length / (candidatesBefore.length||1),
+		ratio: candidatesAfter.length / (candidatesBefore.length || 1),
 	};
 }

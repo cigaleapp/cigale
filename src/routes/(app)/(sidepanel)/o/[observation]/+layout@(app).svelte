@@ -1,17 +1,14 @@
 <script lang="ts" module>
 	export const fullscreenState = $state({
 		currentImage: undefined as undefined | string,
-		progress: {
-			treated: 0,
-			confirmed: 0,
-		},
 	});
+
+	export const topbarExtrasPortalId = 'topbar-extras-portal';
 </script>
 
 <script lang="ts">
 	import { fade } from 'svelte/transition';
 
-	import IconConfirmed from '~icons/ri/check-double-line';
 	import IconClose from '~icons/ri/close-line';
 	import { invalidate } from '$app/navigation';
 	import { page } from '$app/state';
@@ -23,10 +20,8 @@
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
 	import { goto } from '$lib/paths.js';
-	import ProgressBar from '$lib/ProgressBar.svelte';
 	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
 	import { uiState } from '$lib/state.svelte.js';
-	import { tooltip } from '$lib/tooltips';
 
 	const { children } = $props();
 
@@ -54,14 +49,6 @@
 			(observation && observation.images.length === 1
 				? imageIdToFileId(observation.images[0])
 				: undefined)
-	);
-
-	const focusedMetadata = $derived(
-		tables.Metadata.getFromState(
-			uiState.currentSession?.fullscreenClassifier.focusedMetadata ??
-				uiState.classificationMetadataId ??
-				''
-		)
 	);
 
 	async function backToGalleryView() {
@@ -164,25 +151,12 @@
 						await invalidate(dependencyURI('Observation', observation.id));
 					}}
 				/>
-
-				{#if focusedMetadata && observation.metadataOverrides[focusedMetadata.id]?.confirmed}
-					<div class="confirmed" use:tooltip={'Classification confirmée'}>
-						<IconConfirmed />
-					</div>
-				{/if}
 			{:else if imageFile}
 				{imageFile.filename}
 			{/if}
 		</h1>
 
-		<div class="progress">
-			<ProgressBar
-				progress={[fullscreenState.progress.treated, fullscreenState.progress.confirmed]}
-				phases={page.route.id === '/(app)/(sidepanel)/o/[observation]/crop/[image]'
-					? ['Images recadrées', 'Recadrages confirmés']
-					: ['Observations classifiées', 'Classifications confirmées']}
-			/>
-		</div>
+		<div class="extras" id={topbarExtrasPortalId}></div>
 
 		<nav>
 			<SegmentedGroup
@@ -257,16 +231,11 @@
 			align-items: center;
 			gap: 0.5em;
 			font-size: 1.2em;
+			min-width: 5ch;
 		}
 
 		nav {
 			margin-left: auto;
-		}
-
-		.confirmed {
-			display: inline-flex;
-			font-size: 0.8em;
-			color: var(--fg-success);
 		}
 	}
 
@@ -275,11 +244,9 @@
 		container-name: below-header;
 	}
 
-	.progress {
-		width: 200px;
-		--height: 0.5em;
-		--inactive-bg: rgb(from var(--gray) r g b / 50%);
-		overflow: hidden;
-		border-radius: var(--corner-radius);
+	.extras {
+		display: flex;
+		align-items: center;
+		gap: 1em;
 	}
 </style>

@@ -71,6 +71,7 @@
 
 	let expandedSubject = $state(false);
 
+
 	const observation = $derived(tables.Observation.getFromState(page.params.observation ?? ''));
 
 	const images = $derived(

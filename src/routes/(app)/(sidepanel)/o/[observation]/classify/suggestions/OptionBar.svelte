@@ -3,10 +3,8 @@
 	import type { TypedMetadataValue } from '$lib/metadata/index.js';
 	import type { Props as ComboboxProps } from '$lib/MetadataCombobox.svelte';
 
-	import IconUnconfirmed from '~icons/ri/arrow-go-back-line';
 	import IconPrevious from '~icons/ri/arrow-left-line';
 	import IconNext from '~icons/ri/arrow-right-line';
-	import IconConfirmed from '~icons/ri/check-double-line';
 	import IconExpand from '~icons/ri/expand-up-down-line';
 	import { invalidate } from '$app/navigation';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
@@ -139,20 +137,7 @@
 				window.open(option!.learnMore, '_blank');
 			},
 		},
-		ArrowUp: {
-			help: 'Marquer la classification comme confirmée',
-			async do() {
-				if (!option) return;
-				await setOption(option!, confidences, { confirmed: true, pushToUndoStack: false });
-			},
-		},
-		ArrowDown: {
-			help: 'Marquer la classification comme non confirmée',
-			async do() {
-				if (!option) return;
-				await setOption(option!, confidences, { confirmed: false, pushToUndoStack: false });
-			},
-		},
+	
 	});
 </script>
 
@@ -223,32 +208,6 @@
 				</div>
 			</ButtonSecondary>
 		</div>
-
-		<div class="confirmation" data-testid="confirmation">
-			<ButtonSecondary
-				onclick={async () => {
-					if (!option) return;
-					await setOption(option, confidences, {
-						confirmed: !current?.confirmed,
-						pushToUndoStack: false,
-					});
-				}}
-				help={{
-					text: current?.confirmed
-						? 'Marquer comme non confirmée '
-						: 'Confirmer la classification ',
-					keyboard: current?.confirmed ? 'ArrowDown' : 'ArrowUp',
-				}}
-			>
-				<div class="button-contents">
-					{#if current?.confirmed}
-						<IconUnconfirmed />
-					{:else}
-						<IconConfirmed />
-					{/if}
-				</div>
-			</ButtonSecondary>
-		</div>
 	</div>
 </div>
 
@@ -266,13 +225,14 @@
 
 	.others {
 		width: 100%;
-		display: grid;
-		grid-template-columns: 1fr 1fr auto;
+		display: flex;
+		align-items: center;
 		gap: 1em;
 
 		> * {
+			width: 100%;
 			min-width: 0;
-			overflow: hidden;
+			 overflow: hidden;
 		}
 	}
 

@@ -27,7 +27,6 @@
 	import { fullscreenState } from '../../+layout@(app).svelte';
 	import Subject from '../Subject.svelte';
 	import LayoutSwitcher from './LayoutSwitcher.svelte';
-	import Navigation from './Navigation.svelte';
 	import OptionBar from './OptionBar.svelte';
 	import References from './References.svelte';
 
@@ -35,7 +34,6 @@
 	const {
 		observation,
 		images,
-		navigation,
 		focusedMetadata,
 		metadataDefinitions,
 		allOptions: options,
@@ -65,13 +63,6 @@
 
 	$effect(() => {
 		fullscreenState.currentImage = currentImage.id;
-	});
-
-	$effect(() => {
-		fullscreenState.progress.treated =
-			navigation.classifiedObservationsCount / navigation.totalObservations;
-		fullscreenState.progress.confirmed =
-			navigation.confirmedClassificationsCount / navigation.totalObservations;
 	});
 
 	undo.initialize(100);
@@ -188,10 +179,6 @@
 				</Field>
 			</div>
 		{/if}
-
-		<div class="nav" {@attach area('nav')}>
-			<Navigation {...navigation} {focusedMetadata} currentObservation={observation} />
-		</div>
 	</div>
 </main>
 
@@ -303,7 +290,7 @@
 		grid-template-areas:
 			'. . layout-switcher'
 			'cascades description focused-option'
-			'synonyms description nav';
+			'synonyms description focused-option';
 
 		.layout-switcher {
 			z-index: 10;
@@ -320,8 +307,7 @@
 		grid-template-areas:
 			'focused-option focused-option'
 			'description description'
-			'cascades synonyms'
-			'nav nav';
+			'cascades synonyms';
 
 		.layout-switcher {
 			z-index: 10;

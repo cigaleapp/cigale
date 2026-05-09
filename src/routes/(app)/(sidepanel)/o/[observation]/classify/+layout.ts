@@ -63,8 +63,8 @@ export async function load({ parent }) {
 	}
 
 	return {
-		currentSession,
 		metadataDefinitions,
-		observationsOrder: new Map(allObservations.map(({ id }, i) => [id, i])),
+		currentSession,
+		sortedObservationIds: allObservations.map(o => o.id),
 	};
 }
