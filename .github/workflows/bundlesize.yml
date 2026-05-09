@@ -95,4 +95,4 @@ jobs:
       subdomain: pr-${{ github.event.pull_request.number }}-reports
       path: /bundlesize
       file: stats.html
-      environment: '#${{ github.event.pull_request.number }}: Bundle breakdown'
+      environment: Bundle analyzer
