@@ -35,20 +35,22 @@ const badge = {
 
 console.info(`Generating logo assets for ${scenario} scenario...`);
 
-const svg =
-	scenario === 'production'
-		? await Bun.file('./static/logo.svg').text()
-		: await Bun.file('./static/logo-pr-preview.svg')
-				.text()
-				.then((svg) =>
-					svg
-						// Text of badge
-						.replace('PILLTXT', badge[scenario].text)
-						// Background color of badge
-						.replace('#FF0000', badge[scenario].fill)
-						// Text color of badge
-						.replace('#00FF00', badge[scenario].color)
-				);
+let svg: string;
+if (scenario === 'production') {
+	svg = await Bun.file('./static/logo.svg').text();
+} else {
+	const logoPRPreviewSVG = await Bun.file('./static/logo-pr-preview.svg').text();
+	const fontsCSS = await Bun.file('./static/fonts.css').text();
+
+	svg = logoPRPreviewSVG
+		.replace('FONTS_CSS', fontsCSS)
+		// Text of badge
+		.replace('PILLTXT', badge[scenario].text)
+		// Background color of badge
+		.replace('#FF0000', badge[scenario].fill)
+		// Text color of badge
+		.replace('#00FF00', badge[scenario].color);
+}
 
 await Bun.file(`${assetsDir}/logo.svg`).write(svg);
 
