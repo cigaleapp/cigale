@@ -128,8 +128,9 @@ jobs:
           set -euo pipefail
           mkdir -p ~/.local/share/fonts
           css=$(curl -fsSL "https://fonts.googleapis.com/css2?family=Martian+Mono:wght@800&text=DevLocal0123456789%23")
-          font_url=$(echo "$css" | sed -nE 's/.*url\((https?:[^)]+)\).*/\1/p' | head -n1)
-          test -n "$font_url"
+          font_url=$(echo "$css" | sed -nE 's/.*url\(([^)]+)\).*/\1/p' | head -n1 | tr -d "\"'")
+          test -n "$font_url" || { echo "Error: Failed to extract font URL from Google Fonts CSS"; exit 1; }
+          [[ "$font_url" == //* ]] && font_url="https:${font_url}"
           curl -fL "$font_url" -o ~/.local/share/fonts/MartianMono.woff2
           fc-cache -f
 
