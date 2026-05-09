@@ -7,7 +7,7 @@ import { ms } from 'convert';
 import { PerformanceMetricsCollector } from 'playwright-performance-metrics';
 
 import { assert, expect, test } from './fixtures.js';
-import { collectChromeDevtoolsTrace } from './utils/performance.js';
+import { collectChromeDevtoolsTrace, emulateNetworkProfile } from './utils/performance.js';
 
 test.use({ storageState: { cookies: [], origins: [] } });
 
@@ -21,11 +21,11 @@ benchmark(`startup @blank`, {
 		await app.db.ready();
 		await assert(app.tabs.get('sessions')).toBeVisible({ timeout: ms('1min') });
 	},
-	largestContentfulPaint: '13s',
+	largestContentfulPaint: '15s',
 	firstContentfulPaint: '500ms',
 	// TODO: lower this
 	total: {
-		chromium: '13s',
+		chromium: '15s',
 		webkit: '25s',
 		firefox: '25s',
 	},
@@ -72,6 +72,7 @@ function benchmark(
 	test.describe(testLabel, () => {
 		for (let i = 0; i < repeats; i++) {
 			test(`run ${i + 1}/${repeats}`, async ({ page, browserName, app }, testInfo) => {
+				await emulateNetworkProfile(page, '4g');
 				await prepare?.({ page, app });
 
 				let collector: PerformanceMetricsCollector | undefined;

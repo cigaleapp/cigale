@@ -1,6 +1,66 @@
 import { writeFileSync } from 'node:fs';
 import type { Page, TestInfo } from '@playwright/test';
 
+type NetworkProfile = '4g';
+
+const MEBIBIT = 1024 * 1024;
+const DOWNLOAD_MBPS_4G = 4;
+const UPLOAD_MBPS_4G = 3;
+
+const networkProfiles: Record<
+	NetworkProfile,
+	{
+		latency: number;
+		downloadThroughput: number;
+		uploadThroughput: number;
+		connectionType:
+			| 'none'
+			| 'cellular2g'
+			| 'cellular3g'
+			| 'cellular4g'
+			| 'bluetooth'
+			| 'ethernet'
+			| 'wifi'
+			| 'wimax'
+			| 'other';
+	}
+> = {
+	/** Similar to Chrome DevTools "Regular 4G". Throughputs are in bytes/second. */
+	'4g': {
+		latency: 20,
+		downloadThroughput: Math.round((DOWNLOAD_MBPS_4G * MEBIBIT) / 8),
+		uploadThroughput: Math.round((UPLOAD_MBPS_4G * MEBIBIT) / 8),
+		connectionType: 'cellular4g',
+	},
+};
+
+/**
+ * Applies a network profile in Chromium via CDP.
+ * Non-Chromium browsers are intentionally left unthrottled, because CDP emulation is unavailable.
+ */
+export async function emulateNetworkProfile(page: Page, profile: NetworkProfile = '4g') {
+	// Performance benchmarks still run on non-Chromium browsers, but CDP throttling
+	// is unavailable there, so we intentionally keep those runs unthrottled.
+	if (page.context().browser()?.browserType().name() !== 'chromium') {
+		console.info(`Skipping "${profile}" network emulation: CDP is Chromium-only.`);
+		return;
+	}
+
+	try {
+		const client = await page.context().newCDPSession(page);
+		await client.send('Network.enable');
+		await client.send('Network.emulateNetworkConditions', {
+			offline: false,
+			...networkProfiles[profile],
+		});
+	} catch (error) {
+		throw new Error(
+			`Failed to emulate "${profile}" network profile via CDP. Ensure the test runs on a Chromium browser with CDP support.`,
+			{ cause: error }
+		);
+	}
+}
+
 export async function collectChromeDevtoolsTrace(
 	page: Page,
 	testInfo: TestInfo,
