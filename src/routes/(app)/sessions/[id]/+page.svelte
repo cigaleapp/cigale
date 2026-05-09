@@ -108,8 +108,9 @@
 			]}
 			onconfirm={async () => {
 				await deleteSession(data.session.id);
-				toasts.success('Session supprimée.');
-				await goto('/sessions/');
+				await goto('/sessions/').then(() => {
+					toasts.success('Session supprimée.');
+				});
 			}}
 		/>
 	</div>
