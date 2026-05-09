@@ -21,9 +21,9 @@ TODO: Don't animate when progress decreases (e.g. when a new task starts and it 
 
 	const { progress, percentage, alwaysActive = false, phases = [] }: Props = $props();
 
-	const inactive = $derived(
-		ensureArray(progress).every((p) => [0, 1].includes(p)) && !alwaysActive
-	);
+	const progresses = $derived(ensureArray(progress));
+
+	const inactive = $derived(progresses.every((p) => [0, 1].includes(p)) && !alwaysActive);
 
 	/**
 	 * If we have [0.85, 0.6], this will be [0.6, 0.25]
@@ -32,7 +32,7 @@ TODO: Don't animate when progress decreases (e.g. when a new task starts and it 
 		const increments: number[] = [];
 		let position = 0;
 
-		for (const p of ensureArray(progress).toReversed()) {
+		for (const p of progresses.toReversed()) {
 			increments.push(p - position);
 			position = p;
 		}
@@ -41,12 +41,10 @@ TODO: Don't animate when progress decreases (e.g. when a new task starts and it 
 	});
 </script>
 
-<div class="bars" class:full={ensureArray(progress).some((p) => p >= 1)}>
-	{#each ensureArray(progress) as p, i (i)}
-		{@const phase = phases[ensureArray(progress).length - 1 - i]}
-		{@const percentage = Math.round(
-			clamp(ensureArray(progress)[progress.length - 1 - i], 0, 1) * 100
-		)}
+<div class="bars" class:full={progresses.some((p) => p >= 1)}>
+	{#each progresses as p, i (i)}
+		{@const phase = phases[progresses.length - 1 - i]}
+		{@const percentage = Math.round(clamp(progresses[progresses.length - 1 - i], 0, 1) * 100)}
 		<div
 			class="tooltip-container"
 			use:tooltip={phase ? `${phase}: ${percentage}%` : ''}
@@ -56,21 +54,18 @@ TODO: Don't animate when progress decreases (e.g. when a new task starts and it 
 		<progress
 			class="progress-bar"
 			class:inactive
-			value={clamp(p, 0, 1)}
+			value={clamp(Number.isFinite(p) ?  p : 0, 0, 1)}
 			max="1"
-			style:--phased-fill-color="color-mix(var(--_fill-color) {((i + 1) /
-				ensureArray(progress).length) *
+			style:--phased-fill-color="color-mix(var(--_fill-color) {((i + 1) / progresses.length) *
 				100}%, var(--bg-neutral))"
 		></progress>
 	{/each}
 </div>
 
-{#if percentage && !inactive && ensureArray(progress).length === 1}
+{#if percentage && !inactive && progresses.length === 1}
 	<p>
 		<code class="progress-percentage">
-			{(ensureArray(progress)[0] * 100).toFixed(
-				typeof percentage === 'number' ? percentage : 0
-			)}%
+			{(progresses[0] * 100).toFixed(typeof percentage === 'number' ? percentage : 0)}%
 		</code>
 	</p>
 {/if}
