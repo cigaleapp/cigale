@@ -41,6 +41,11 @@ const svg =
 		: await Bun.file('./static/logo-pr-preview.svg')
 				.text()
 				.then((svg) =>
+					Bun.file('./static/fonts.css')
+						.text()
+						.then((fontsCSS) => svg.replace('FONTS_CSS', fontsCSS))
+				)
+				.then((svg) =>
 					svg
 						// Text of badge
 						.replace('PILLTXT', badge[scenario].text)
