@@ -16,8 +16,7 @@ export const previewingPrNumber =
 	import.meta.env.previewingPrNumber === 'null' ? null : import.meta.env.previewingPrNumber;
 
 export const databaseName = previewingPrNumber ? `previews/pr-${previewingPrNumber}` : 'database';
-// XXX: DONT MERGE
-export const databaseRevision = 8;
+export const databaseRevision = 7;
 
 const profile = profiler('Database');
 
