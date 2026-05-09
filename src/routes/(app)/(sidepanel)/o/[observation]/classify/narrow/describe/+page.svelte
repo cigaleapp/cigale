@@ -175,6 +175,7 @@
 				{#snippet children(definition)}
 					<div class="metadata">
 						<Metadata
+						removeByDeselect
 							options={[...(options[definition.id]?.values() ?? [])]}
 							optionIsDisabled={(option) => {
 								if (!option) return false;

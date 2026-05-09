@@ -12,6 +12,8 @@
 		horizontal?: boolean;
 		cards?: boolean;
 		value?: NoInfer<OptionKey> | undefined;
+		/** Allow de-selecting by clicking again on the selected option */
+		deselectable?: boolean;
 		onchange?: (
 			// eslint-disable-next-line no-unused-vars
 			value: OptionKey | undefined,
@@ -27,6 +29,7 @@
 	let {
 		options,
 		value = $bindable(),
+		deselectable = false,
 		children,
 		cards,
 		onchange = () => {},
@@ -57,8 +60,15 @@
 				type="radio"
 				value={key}
 				bind:group={value}
+				onclick={async () => {
+					if (!deselectable) return;
+					if (value !== key) return;
+					if (!fieldset) return;
+					await onchange(undefined, fieldset);
+				}}
 				onchange={async () => {
 					if (!fieldset) return;
+
 					await onchange(value, fieldset);
 				}}
 			/>

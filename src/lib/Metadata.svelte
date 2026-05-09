@@ -39,6 +39,8 @@
 		merged?: boolean;
 		/** Display requiredness indicators */
 		requiredness: 'all' | 'required' | 'none';
+		/** Remove metadata by de-selecting enum options, false by default */
+		removeByDeselect? : boolean
 		onvalidation?: (
 			/** Empty if okay */
 			// eslint-disable-next-line no-unused-vars
@@ -57,6 +59,7 @@
 		merged,
 		definition,
 		requiredness,
+		removeByDeselect = false,
 		options = undefined,
 		optionIsDisabled = () => false,
 		onchange = async () => {},
@@ -276,6 +279,7 @@
 		{definition}
 		{options}
 		{optionIsDisabled}
+		{removeByDeselect}
 		value={value?.value}
 		unit={value?.unit}
 		{validationErrors}

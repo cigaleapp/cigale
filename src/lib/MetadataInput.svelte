@@ -66,6 +66,8 @@
 		optionIsDisabled?: (option: MetadataEnumVariant) => boolean | string;
 		confidences?: Record<string, number>;
 		isCompactEnum?: boolean;
+		/** Remove metadata by de-selecting enum options, false by default */
+		removeByDeselect? : boolean
 	}
 
 	let {
@@ -79,6 +81,7 @@
 		options: precomputedOptions = undefined,
 		optionIsDisabled = () => false,
 		isCompactEnum = false,
+		removeByDeselect = false,
 		onblur,
 	}: Props = $props();
 
@@ -155,6 +158,7 @@
 		{#snippet enum_(value)}
 			{#if isCompactEnum}
 				<RadioButtons
+				deselectable={removeByDeselect}
 					value={value?.toString()}
 					onchange={async (value) => {
 						await onblur(value);
