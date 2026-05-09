@@ -4,6 +4,8 @@ import type { Page, TestInfo } from '@playwright/test';
 type NetworkProfile = '4g';
 
 const MEBIBIT = 1024 * 1024;
+const DOWNLOAD_MBPS_4G = 4;
+const UPLOAD_MBPS_4G = 3;
 
 const networkProfiles: Record<
 	NetworkProfile,
@@ -26,12 +28,16 @@ const networkProfiles: Record<
 	/** Similar to Chrome DevTools "Regular 4G". Throughputs are in bytes/second. */
 	'4g': {
 		latency: 20,
-		downloadThroughput: Math.round((4 * MEBIBIT) / 8), // 4 Mbps
-		uploadThroughput: Math.round((3 * MEBIBIT) / 8), // 3 Mbps
+		downloadThroughput: Math.round((DOWNLOAD_MBPS_4G * MEBIBIT) / 8),
+		uploadThroughput: Math.round((UPLOAD_MBPS_4G * MEBIBIT) / 8),
 		connectionType: 'cellular4g',
 	},
 };
 
+/**
+ * Applies a network profile in Chromium via CDP.
+ * Non-Chromium browsers are intentionally left unthrottled, because CDP emulation is unavailable.
+ */
 export async function emulateNetworkProfile(page: Page, profile: NetworkProfile = '4g') {
 	// Performance benchmarks still run on non-Chromium browsers, but CDP throttling
 	// is unavailable there, so we intentionally keep those runs unthrottled.
