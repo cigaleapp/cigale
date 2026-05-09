@@ -43,7 +43,9 @@ if (scenario === 'production') {
 	const fontsCSS = await Bun.file('./static/fonts.css').text();
 
 	svg = logoPRPreviewSVG
-		.replace('FONTS_CSS', fontsCSS)
+		// Contents of fonts.css
+		// XXX: the & in the URL comment fucks up XML parsing lol
+		.replace('FONTS_CSS', fontsCSS.replaceAll('&', '_'))
 		// Text of badge
 		.replace('PILLTXT', badge[scenario].text)
 		// Background color of badge
