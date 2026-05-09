@@ -33,6 +33,8 @@ const networkProfiles: Record<
 };
 
 export async function emulateNetworkProfile(page: Page, profile: NetworkProfile = '4g') {
+	// Performance benchmarks still run on non-Chromium browsers, but CDP throttling
+	// is unavailable there, so we intentionally keep those runs unthrottled.
 	if (page.context().browser()?.browserType().name() !== 'chromium') {
 		console.info(`Skipping "${profile}" network emulation: CDP is Chromium-only.`);
 		return;
@@ -46,7 +48,10 @@ export async function emulateNetworkProfile(page: Page, profile: NetworkProfile 
 			...networkProfiles[profile],
 		});
 	} catch (error) {
-		throw new Error(`Failed to emulate "${profile}" network profile via CDP`, { cause: error });
+		throw new Error(
+			`Failed to emulate "${profile}" network profile via CDP. Ensure the test runs on a Chromium browser with CDP support.`,
+			{ cause: error }
+		);
 	}
 }
 
