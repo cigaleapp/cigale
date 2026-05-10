@@ -71,7 +71,6 @@
 
 	let expandedSubject = $state(false);
 
-
 	const observation = $derived(tables.Observation.getFromState(page.params.observation ?? ''));
 
 	const images = $derived(
@@ -225,8 +224,8 @@
 		<section class="choices" {@attach scrollfader}>
 			<ol>
 				{#if focusedMetadata && focusedMetadataValue}
-					<li class="focused">
-						<div class="metadata">
+					<li class="focused" aria-labelledby="narrower-focused-metadata">
+						<div class="metadata" id="narrower-focused-metadata">
 							<OverflowableText text={focusedMetadata.label} />
 						</div>
 						<div class="input">
@@ -288,8 +287,11 @@
 					})}
 
 					{#if definition}
-						<li in:fade={{ duration: 200 }}>
-							<div class="metadata"><OverflowableText text={definition.label} /></div>
+						{@const ariaLabel = `narrowing-choices-list-${definition.id}`}
+						<li in:fade={{ duration: 200 }} aria-labelledby={ariaLabel}>
+							<div id={ariaLabel} class="metadata">
+								<OverflowableText text={definition.label} />
+							</div>
 							<div class="input">
 								<MetadataInput
 									{definition}
@@ -316,7 +318,10 @@
 								></MetadataInput>
 							</div>
 							<div class="ratio">
-								<RadialProgress progress={1 - narrowing.ratio} />
+								<RadialProgress
+									help="Candidats restants par rapport au choix précédent"
+									progress={1 - narrowing.ratio}
+								/>
 							</div>
 							<span
 								class="filter-count"
@@ -397,7 +402,7 @@
 			<p>Choisir un groupe de métadonnées avec lequel classifier par élimination</p>
 			<NarrowableGroupPicker />
 		{:else}
-			<div class="progress">
+			<div class="progress" data-testid="remaining-candidates">
 				<ProgressBar progress={narrowingState.candidates.ratio} />
 				<div class="remaining-count">
 					{plural(narrowingState.candidates.remaining.length, [

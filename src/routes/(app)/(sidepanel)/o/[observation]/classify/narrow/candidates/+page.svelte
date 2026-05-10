@@ -195,6 +195,7 @@
 		&:not(:hover):not(:focus-within) .actions .pick {
 			opacity: 0;
 			pointer-events: none;
+			visibility: hidden;
 		}
 	}
 

@@ -76,11 +76,28 @@ function sessionMetadataSectionFor(page, metadataLabel) {
 /**
  *
  * @param {Page} page
+ * @param {string | RegExp} metadataLabel
+ */
+function narrowingClassifierSectionFor(page, metadataLabel) {
+	return page
+		.getByTestId('descriptors')
+		.locator('.metadata')
+		.filter({
+			has: page.locator('label').filter({ hasText: metadataLabel }),
+		})
+		.first();
+}
+
+/**
+ *
+ * @param {Page} page
  */
 export function metadataSections(page) {
 	/** @param {string | RegExp} label */
 	const section = (label) =>
-		sidepanelMetadataSectionFor(page, label).or(sessionMetadataSectionFor(page, label));
+		sidepanelMetadataSectionFor(page, label)
+			.or(sessionMetadataSectionFor(page, label))
+			.or(narrowingClassifierSectionFor(page, label));
 
 	return {
 		section,

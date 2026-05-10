@@ -3,7 +3,7 @@ import type { Page } from '@playwright/test';
 
 import lightweightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import { issue, pr } from './annotations.js';
-import { assert, expect, test } from './fixtures.js';
+import { assert, expect, test, testBasic } from './fixtures.js';
 import {
 	chooseFirstSession,
 	firstObservationCard,
@@ -11,6 +11,8 @@ import {
 	importPhotos,
 	newSession,
 	observationsByLabel,
+	scrollAndClick,
+	scrollIntoViewVirtualized,
 	setInferenceModels,
 } from './utils/index.js';
 import { controlOrMeta } from './utils/keyboard.js';
@@ -276,7 +278,9 @@ test.describe('full-screen classification view', pr(1071), () => {
 			});
 
 			test('can navigate to other images', async ({ page, app }) => {
-				const title = page.getByTestId('fullscreen-header').getByRole('heading', { level: 1 });
+				const title = page
+					.getByTestId('fullscreen-header')
+					.getByRole('heading', { level: 1 });
 				const selectedOption = page
 					.getByTestId('panel')
 					.getByTestId('focused-option')
@@ -424,7 +428,6 @@ test.describe('full-screen classification view', pr(1071), () => {
 		await app.path.wait('/results/');
 
 		await assertDatabaseConfirmedStatus(withExifGps.id, true);
-
 	});
 
 	// TODO: revisit once https://github.com/cigaleapp/cigale/issues/1191 is closed
@@ -470,6 +473,305 @@ test.describe('full-screen classification view', pr(1071), () => {
 		await subject.getByRole('button', { name: 'Image précédente' }).click();
 		await expect(subject).toBeOnSlide('cyan.jpeg (1 sur 2)');
 		await expect(subject.getByRole('img', { name: 'cyan.jpeg' })).toBeInViewport();
+	});
+});
+
+test.describe('narrowing view', pr(1570), () => {
+	async function expectCandidatesCount(page: Page, count: number) {
+		await expect(page.getByRole('tab', { name: 'Candidats' })).toHaveText(
+			new RegExp(`${count}$`)
+		);
+		await expect(page.getByTestId('remaining-candidates')).toHaveText(`${count} restants`);
+	}
+
+	/**
+	 * Null to test for absence
+	 */
+	async function expectMetadataValues(app: AppFixture, values: Record<string, string | null>) {
+		// Wait a bit for changes to save to DB
+		await app.wait('500ms');
+
+		const db = await app.db.metadata.values({
+			protocolId: lightweightProtocol.id,
+			observation: 'with-exif-gps',
+		});
+
+		for (const [key, val] of Object.entries(values)) {
+			if (val === null) {
+				expect(db).not.toHaveProperty(key);
+			} else {
+				expect(db).toHaveProperty(key, val);
+			}
+		}
+	}
+
+	test.beforeEach(async ({ page, app }) => {
+		await app.settings.set({ showTechnicalMetadata: false });
+		await chooseFirstSession(page);
+		await setInferenceModels(page, {
+			classify: 'Aucune inférence',
+		});
+
+		await app.tabs.go('classify');
+		await page.getByRole('article', { name: 'with-exif-gps' }).click();
+		await page.getByRole('button', { name: 'Ouvrir en plein écran' }).click();
+		await app.path.wait('/(app)/(sidepanel)/o/[observation]/classify/suggestions');
+		await page.getByRole('tab', { name: 'Élimination' }).click();
+		await app.path.wait('/(app)/(sidepanel)/o/[observation]/classify/narrow/describe');
+	});
+
+	test.describe('describe tab', () => {
+		testBasic('can choose choices', async ({ page, app }) => {
+			await expectCandidatesCount(page, 166);
+
+			const choices = page.locator('aside').getByRole('list');
+			const choice = (name: string) => choices.getByRole('listitem', { name });
+			async function choose(
+				metadata: string,
+				name: string,
+				{ scroll = 'down' }: { scroll?: 'up' | 'down' | 'no' } = {}
+			) {
+				const option = app.metadata.radio(metadata, name, { exact: false });
+				if (scroll !== 'no') await scrollIntoViewVirtualized(option, scroll);
+				await option.click();
+			}
+
+			async function expectChoice(
+				name: string,
+				{ power, count, value }: { power: number; count: number; value: string }
+			) {
+				await expect(choice(name).getByRole('combobox')).toHaveValue(value);
+				await expect(choice(name).getByRole('progressbar')).toHaveAttribute(
+					'aria-valuenow',
+					power.toString()
+				);
+				await expect(choice(name)).toHaveText(new RegExp(`\\b${count}\\b`));
+			}
+
+			await choose('Pilosité occipitale', 'Pilosité majoritairement claire', {
+				scroll: 'no',
+			});
+
+			await expectCandidatesCount(page, 142);
+			await expect(choices).toHaveText(/Pilosité occipitale/);
+			await expectChoice('Pilosité occipitale', {
+				value: 'Pilosité majoritairement claire',
+				power: 14,
+				count: 142,
+			});
+
+			await choose('Forme de la tête', 'Plus large que haute');
+
+			await expectCandidatesCount(page, 110);
+			await expectChoice('Forme de la tête', {
+				value: 'Plus large que haute',
+				power: 23,
+				count: 110,
+			});
+
+			await expectMetadataValues(app, {
+				pilosite_occipitale: 'pilositmaj_1738780459445_3719',
+				forme_de_la_tete: 'pluslargeq_1738780492342_5503',
+			});
+
+			// Try clearing an option by clicking on it again
+
+			await choose('Pilosité occipitale', 'Pilosité majoritairement claire', {
+				scroll: 'up',
+			});
+
+			await expect(choice('Pilosité occipitale')).not.toBeVisible();
+			await expectCandidatesCount(page, 118);
+			await expectChoice('Forme de la tête', {
+				value: 'Plus large que haute',
+				power: 29,
+				count: 118,
+			});
+
+			await expectMetadataValues(app, {
+				pilosite_occipitale: null,
+				forme_de_la_tete: 'pluslargeq_1738780492342_5503',
+			});
+
+			await choose(
+				'Couleur de la face ventrale du flagelle antennaire',
+				'Flagelle orange ventralement'
+			);
+			await choose('Taille du 3ème segment antennaire', 'A3 plus court que A4+5');
+			await choose('Dépression des fovéas', 'Bien définie, fovéas creusées');
+			await choose('Ligne centrale du clypéus', 'Sans ligne longitudinale');
+
+			await expectMetadataValues(app, {
+				pilosite_occipitale: null,
+				couleur_de_la_face_ventrale_du_flagelle_antennaire: 'flagelleor_1738780660819_6814',
+				depression_des_foveas: 'biendfinie_1738780813959_8479',
+				forme_de_la_tete: 'pluslargeq_1738780492342_5503',
+				ligne_centrale_du_clypeus: 'sanslignel_1738781166639_9542',
+				taille_du_3eme_segment_antennaire: 'a3pluscour_1738780689285_1923',
+			});
+
+			// Try clearing an option by clicking on the x
+			await page
+				.getByRole('main')
+				.getByRole('button', { name: 'Supprimer cette valeur', disabled: false })
+				.first()
+				.click();
+
+			await expectMetadataValues(app, {
+				pilosite_occipitale: null,
+				couleur_de_la_face_ventrale_du_flagelle_antennaire: 'flagelleor_1738780660819_6814',
+				depression_des_foveas: 'biendfinie_1738780813959_8479',
+				forme_de_la_tete: 'pluslargeq_1738780492342_5503',
+				ligne_centrale_du_clypeus: null,
+				taille_du_3eme_segment_antennaire: 'a3pluscour_1738780689285_1923',
+			});
+
+			// Try clearing an option via the choices list
+
+			await choice('Taille du 3ème segment antennaire')
+				.getByRole('button', { name: 'Enlever ce choix' })
+				.click();
+
+			await expectMetadataValues(app, {
+				pilosite_occipitale: null,
+				couleur_de_la_face_ventrale_du_flagelle_antennaire: 'flagelleor_1738780660819_6814',
+				depression_des_foveas: 'biendfinie_1738780813959_8479',
+				forme_de_la_tete: 'pluslargeq_1738780492342_5503',
+				ligne_centrale_du_clypeus: null,
+				taille_du_3eme_segment_antennaire: null,
+			});
+
+			// Use reset button
+
+			await page.getByRole('button', { name: 'Recommencer' }).click();
+
+			await expectMetadataValues(app, {
+				pilosite_occipitale: null,
+				couleur_de_la_face_ventrale_du_flagelle_antennaire: null,
+				depression_des_foveas: null,
+				forme_de_la_tete: null,
+				ligne_centrale_du_clypeus: null,
+				taille_du_3eme_segment_antennaire: null,
+			});
+
+			expect(choices.getByRole('listitem')).toHaveCount(1);
+			expect(choices).toHaveText(/Aucun choix effectué pour l'instant/);
+		});
+
+		testBasic('can search through metadata', async ({ page, app }) => {
+			await page.getByRole('textbox', { name: 'Rechercher' }).fill('Pilosité');
+			await page.getByRole('textbox', { name: 'Rechercher' }).blur();
+			await expect(page.getByRole('search')).toHaveText(/38 résultats/);
+			await expect(app.metadata.section('Taille')).not.toBeVisible();
+			await expect(app.metadata.section('Pilosité occipitale')).toBeVisible();
+
+			// With a typo
+			await page.getByRole('textbox', { name: 'Rechercher' }).fill('fovéasss');
+			await page.getByRole('textbox', { name: 'Rechercher' }).blur();
+			await expect(page.getByRole('search')).toHaveText(/13 résultats/);
+			await expect(app.metadata.section('Fovéas latérales du tergite 2')).toBeVisible();
+			await expect(app.metadata.section('Pilosité occipitale')).not.toBeVisible();
+
+			// No results case
+			await page.getByRole('textbox', { name: 'Rechercher' }).fill('skibidi');
+			await page.getByRole('textbox', { name: 'Rechercher' }).blur();
+			await expect(page.getByRole('search')).toHaveText(/0 résultats/);
+			await expect(page.getByRole('main')).toHaveText(/Aucun résultat pour “skibidi”/);
+
+			// Show all
+			await page.getByRole('button', { name: 'Tout afficher' }).click();
+			await expect(page.getByRole('textbox', { name: 'Rechercher' })).toHaveValue('');
+			await expect(app.metadata.section('Taille')).toBeVisible();
+			await expect(app.metadata.section('Pilosité occipitale')).toBeVisible();
+		});
+	});
+
+	test.describe('candidates tab', () => {
+		test.beforeEach(async ({ page, app }) => {
+			await page.getByTestId('descriptors').hover({ force: true });
+			await scrollAndClick(
+				app.metadata.radio(
+					'Couleur de la pilosité de la face',
+					'Pilosité de la face différente',
+					{ exact: false }
+				)
+			);
+			await page.getByRole('tab', { name: 'Candidats' }).click();
+			await app.path.wait('/(app)/(sidepanel)/o/[observation]/classify/narrow/candidates');
+		});
+
+		testBasic('shows candidates that were narrowed down', async ({ page, app }) => {
+			const names = [
+				'Andrena gredana',
+				'Andrena orbitalis',
+				'Andrena brumanensis ',
+				'Andrena synadelpha',
+				'Andrena bucephala',
+				'Andrena binominata ',
+				'Andrena granulosa ',
+				'Andrena fulvata ',
+				'Andrena russula ',
+				'Andrena rugulosa ',
+				'Andrena afrensis ',
+				'Andrena parviceps ',
+				'Andrena limbata ',
+				'Andrena rogenhoferi ',
+				'Andrena chrysopus ',
+				'Andrena mucida ',
+				'Andrena pauxilla',
+			];
+
+			await page.getByRole('main').hover();
+			for (const name of names) {
+				await scrollIntoViewVirtualized(page.getByRole('main').getByText(name));
+			}
+
+			const species = page.getByRole('main').getByText('Andrena fulvata');
+			await scrollIntoViewVirtualized(species, 'up');
+			await species.hover();
+			await page.getByRole('button', { name: 'Choisir' }).click();
+
+			await expectMetadataValues(app, {
+				largeur_des_foveas_dorsalement: 'fovatrstro_1738780852057_7781',
+				divergeance_des_foveas: 'nedivergea_1738780918546_5646',
+				forme_des_foveas_au_milieu: 'fovasnonrt_1738780949142_3244',
+				ligne_centrale_du_clypeus: 'avecunelig_1738781162379_975',
+				aspect_de_la_ligne_centrale_du_clypeus: 'moinsmarqu_1738781197223_2786',
+				forme_de_lappendice_du_labre: 'enformedet_1738837442835_2826',
+				reflets_de_la_tete_et_du_mesosome: 'sansreflet_1738781679769_4181',
+				ride_du_pronotum: 'pronotumav_1738781708314_7333',
+				forme_de_la_pilosite_du_scutum: 'piliforme_1738781807041_8905',
+				corbeilles_du_propodeum: 'corbeilles_1738837562663_8904',
+				aspect_de_la_marge_des_tergites: 'margesdest_1738783146593_949',
+				type_de_pilosite_des_scopas: 'pilositmaj_1738784759008_2070',
+				forme_de_leperon_interne_du_tibia_3: 'perondutib_1738837728807_5472',
+				longueur_de_la_face: 'faceetpice_1738780627912_5962',
+				diagnose_a_fulva: 'thoraxetab_1763132717229_3725',
+				largeur_de_la_marge_du_tergite_2: 't2avecunem_1738784182703_8707',
+				echancrure_de_la_plaque_pygidiale: 'alapexnonc_1738784313047_3618',
+				couleur_de_la_pilosite_bordant_la_plaque_pygidiale: 'plaquepygi_1738784378366_3042',
+				nombre_de_cellules_cubitales: '3_1738784490337_8950',
+				identification_rapide: 'aucunedece_1774517089291_6062',
+				genus: '1345710',
+				family: '7901',
+				order: '1457',
+				class: '216',
+				phylum: '54',
+				kingdom: '1',
+			});
+
+			const speciesChoice = page.locator('aside').getByRole('listitem', { name: 'Espèce' });
+			await expect(speciesChoice).toBeVisible();
+			await expect(speciesChoice.getByRole('combobox')).toHaveValue('Andrena fulvata');
+
+			await speciesChoice.getByRole('button', { name: 'Enlever ce choix' }).click();
+			await expectMetadataValues(app, {
+				species: null,
+			});
+
+			await page.getByRole('button', { name: 'Recommencer' }).click();
+			await expect(page.getByRole('main').getByText('Andrena tenuistriata')).toBeVisible();
+		});
 	});
 });
 

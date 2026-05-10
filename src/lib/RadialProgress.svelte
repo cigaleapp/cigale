@@ -7,18 +7,26 @@
 -->
 
 <script lang="ts">
+	import { tooltip } from './tooltips.js';
+
 	interface Props {
 		/** Between 0 and 1 */
 		progress: number;
+		help: string;
 	}
 
-	const { progress }: Props = $props();
-
+	const { progress, help }: Props = $props();
 </script>
 
-<!-- <progress style:--progress={progress} value={clamp(progress, 0, 1)} max="1" class="radial-progress"></progress> -->
-
-<div class="progress" style:--progress={progress}></div>
+<div
+	use:tooltip={help}
+	aria-label={help}
+	role="progressbar"
+	aria-valuenow={Math.round(progress * 100)}
+	aria-valuemax="100"
+	class="progress"
+	style:--progress={progress}
+></div>
 
 <style>
 	@property --progress {
