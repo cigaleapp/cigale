@@ -7,6 +7,7 @@
 	import { fade } from 'svelte/transition';
 
 	import { page } from '$app/state';
+	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import { databaseHandle, tables } from '$lib/idb.svelte.js';
 	import Logo from '$lib/Logo.svelte';
 	import Metadata from '$lib/Metadata.svelte';
@@ -164,10 +165,10 @@
 			<br />
 			{loadingOptions} / {definitions.length}
 		</div>
-	{:else}
-		<div class="scrollable" in:fade={{ duration: 200 }}>
+	{:else if shownDefinitions.length > 0}
+		<div class="scrollable" data-testid="descriptors" in:fade={{ duration: 200 }}>
 			<MetadataList
-			virtualize
+				virtualize
 				definitions={shownDefinitions}
 				ordering={searchResults?.map((result) => result.id) ??
 					uiState.currentProtocol?.metadataOrder}
@@ -228,6 +229,19 @@
 				{/snippet}
 			</MetadataList>
 		</div>
+	{:else}
+		<div class="empty">
+			<Logo variant="empty" />
+			Aucun résultat pour “{narrowingState.search.describe.query}”
+			<br />
+			<ButtonSecondary
+				onclick={() => {
+					narrowingState.search.describe.query = '';
+				}}
+			>
+				Tout afficher
+			</ButtonSecondary>
+		</div>
 	{/if}
 </main>
 
@@ -236,7 +250,8 @@
 		height: 100%;
 	}
 
-	.loading {
+	.loading,
+	.empty {
 		height: 100%;
 		display: flex;
 		flex-direction: column;
