@@ -346,7 +346,8 @@ jobs:
 
               const column = (...fields) => '| ' + [
                 logo(browserIfDiffers),
-                testIfDiffers, 
+                // Put tags in code style to prevent mentioning random users
+                testIfDiffers.replaceAll(/@\w+/g, '`$&`'),
                 abbr(metric), 
                 ...fields
               ].join(' | ') + ' |\n';
