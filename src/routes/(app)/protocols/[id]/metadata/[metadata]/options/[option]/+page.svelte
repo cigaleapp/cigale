@@ -1,5 +1,5 @@
 <script>
-	import VirtualList from '@sveltejs/svelte-virtual-list';
+	import VirtualList from '$lib/VirtualList.svelte';
 	import { fade } from 'svelte/transition';
 
 	import IconArrow from '~icons/ri/arrow-right-line';
@@ -202,8 +202,8 @@
 				</p>
 			{/snippet}
 			<ul class="reverse-cascades">
-				<VirtualList items={reverseCascades} let:item>
-					{@const { metadataId, metadata, option, value } = item}
+				<VirtualList items={reverseCascades} >
+				{#snippet item({ metadataId, metadata, option, value })}
 					{@const shortId = removeNamespaceFromMetadataId(metadataId)}
 					<li>
 						Si
@@ -228,6 +228,7 @@
 							{value}
 						{/if}
 					</li>
+					{/snippet}
 				</VirtualList>
 			</ul>
 		</Field>

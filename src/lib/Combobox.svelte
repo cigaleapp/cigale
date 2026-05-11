@@ -42,13 +42,13 @@
 	import type { Snippet } from 'svelte';
 	import type { Attachment } from 'svelte/attachments';
 
-	import VirtualList from '@sveltejs/svelte-virtual-list';
 	import { Combobox, mergeProps } from 'bits-ui';
 	import { Debounced } from 'runed';
 
 	import Logo from './Logo.svelte';
 	import { scrollfader } from './scrollfader.js';
 	import { compareBy } from './utils.js';
+	import VirtualList from './VirtualList.svelte';
 
 	type MergedProps = Props<I, V> & Omit<Combobox.RootProps, keyof Props<I, V>>;
 
@@ -59,7 +59,7 @@
 		suggestions,
 		searcher,
 		value = $bindable(),
-		values ,
+		values,
 		open = $bindable(false),
 		focuser = $bindable(),
 		'viewport-testid': viewportTestId,
@@ -159,22 +159,22 @@
 	bind:open
 	{...mergedRootProps}
 	items={items.map((i) => ({ ...i, value: i.key }))}
-	{...(
-		multiple ? {
-			value: values ?? (value ? [value] : []),
-			type: "multiple",
-			async onValueChange(newValue: V[]) {
-				if (newValue.length === 0) return
-				await onValueChange?.(newValue[0], newValue)
+	{...multiple
+		? {
+				value: values ?? (value ? [value] : []),
+				type: 'multiple',
+				async onValueChange(newValue: V[]) {
+					if (newValue.length === 0) return;
+					await onValueChange?.(newValue[0], newValue);
+				},
 			}
-		} : {
-			value: value,
-			type: "single",
-			async onValueChange(newValue: V) {
-				await onValueChange?.(newValue, [])
-			}
-		}
-	)}
+		: {
+				value: value,
+				type: 'single',
+				async onValueChange(newValue: V) {
+					await onValueChange?.(newValue, []);
+				},
+			}}
 >
 	<!-- <div class="search-icon" class:shown={open}>
 		<IconSearch />
@@ -194,26 +194,25 @@
 		<Combobox.Content {...contentProps} sideOffset={8}>
 			<div class="viewport" data-testid={viewportTestId}>
 				<div class="items">
-					<VirtualList items={filteredItems} let:item>
-						<Combobox.Item
-							value={item.key}
-							label={item.label}
-							onHighlight={() => {
-								highlightedItem = items.find((i) => i.key === item.key);
-							}}
-						>
-							{#snippet children({ selected })}
-								{@render listItem({
-									...item,
-									selected,
-									highlighted: highlightedItem?.key === item.key,
-								})}
-							{/snippet}
-						</Combobox.Item>
+					<VirtualList items={filteredItems} empty="Aucun résultat :/">
+						{#snippet item(item)}
+							<Combobox.Item
+								value={item.key}
+								label={item.label}
+								onHighlight={() => {
+									highlightedItem = items.find((i) => i.key === item.key);
+								}}
+							>
+								{#snippet children({ selected })}
+									{@render listItem({
+										...item,
+										selected,
+										highlighted: highlightedItem?.key === item.key,
+									})}
+								{/snippet}
+							</Combobox.Item>
+						{/snippet}
 					</VirtualList>
-					{#if filteredItems.length === 0}
-						<span class="no-results">Aucun résultat :/</span>
-					{/if}
 				</div>
 				<div class="docs" {@attach scrollfader}>
 					{#if highlightedItem}

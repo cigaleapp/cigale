@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type * as DB from '$lib/database.js';
 
-	import VirtualList from '@sveltejs/svelte-virtual-list';
+	import VirtualList from '$lib/VirtualList.svelte';
 	import { type Snippet } from 'svelte';
 
 	import IconExpand from '~icons/ri/arrow-right-s-line';
@@ -93,9 +93,7 @@
 	{/snippet}
 
 	{#if _virtualize}
-		<VirtualList items={groupedDefinitions} let:item>
-			{@render metadata(item)}
-		</VirtualList>
+		<VirtualList items={groupedDefinitions} item={metadata} />
 	{:else}
 		{#each groupedDefinitions as item (item.iterationKey)}
 			{@render metadata(item)}

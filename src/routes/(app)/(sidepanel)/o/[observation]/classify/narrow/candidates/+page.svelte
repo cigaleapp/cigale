@@ -1,5 +1,4 @@
 <script lang="ts">
-	import VirtualList from '@sveltejs/svelte-virtual-list';
 	import Fuse from 'fuse.js';
 
 	import IconChoose from '~icons/ri/check-line';
@@ -15,6 +14,7 @@
 	import { goto } from '$lib/paths.js';
 	import { scrollfader } from '$lib/scrollfader.js';
 	import { uiState } from '$lib/state.svelte.js';
+	import VirtualList from '$lib/VirtualList.svelte';
 
 	import { maximumListableCandidates, narrowingState } from '../+layout.svelte';
 
@@ -49,68 +49,69 @@
 
 <main>
 	{#if searchResults.length <= maximumListableCandidates}
-		<VirtualList items={searchResults} let:item>
-			{@const candidate = item as (typeof candidates)[number]}
-			<article>
-				<div class="image" class:empty={!candidate.images?.[0]}>
-					{#if candidate.images?.at(0)}
-						<Lightbox>
-							{#snippet trigger()}
-								<img
-									src={candidate.images?.at(0)}
-									alt="Image de {candidate.label}"
-									class="specimen"
-								/>
-							{/snippet}
-							{#snippet content()}
-								<img
-									src={candidate.images?.at(0)}
-									alt="Image de {candidate.label}"
-									class="specimen-fullscreen"
-								/>
-							{/snippet}
-						</Lightbox>
-					{:else}
-						<p>
-							<IconNoImage />
-						</p>
-					{/if}
-				</div>
-				<div class="info">
-					<span class="label">{candidate.label}</span>
-					<div class="description" {@attach scrollfader}>
-						<Markdown source={candidate.description ?? ''} />
+		<VirtualList items={searchResults}>
+			{#snippet item(candidate)}
+				<article>
+					<div class="image" class:empty={!candidate.images?.[0]}>
+						{#if candidate.images?.at(0)}
+							<Lightbox>
+								{#snippet trigger()}
+									<img
+										src={candidate.images?.at(0)}
+										alt="Image de {candidate.label}"
+										class="specimen"
+									/>
+								{/snippet}
+								{#snippet content()}
+									<img
+										src={candidate.images?.at(0)}
+										alt="Image de {candidate.label}"
+										class="specimen-fullscreen"
+									/>
+								{/snippet}
+							</Lightbox>
+						{:else}
+							<p>
+								<IconNoImage />
+							</p>
+						{/if}
 					</div>
-					<div class="actions">
-						<div class="learn-more">
-							{#if candidate.learnMore}
-								<LearnMoreLink href={candidate.learnMore} />
-							{/if}
+					<div class="info">
+						<span class="label">{candidate.label}</span>
+						<div class="description" {@attach scrollfader}>
+							<Markdown source={candidate.description ?? ''} />
 						</div>
+						<div class="actions">
+							<div class="learn-more">
+								{#if candidate.learnMore}
+									<LearnMoreLink href={candidate.learnMore} />
+								{/if}
+							</div>
 
-						<div class="pick">
-							<ButtonSecondary
-								onclick={async () => {
-									if (!page.params.observation) return;
-									if (!narrowingState.focusedMetadataId) return;
+							<div class="pick">
+								<ButtonSecondary
+									onclick={async () => {
+										if (!page.params.observation) return;
+										if (!narrowingState.focusedMetadataId) return;
 
-									await storeMetadataValue({
-										db: databaseHandle(),
-										subjectId: page.params.observation,
-										sessionId: uiState.currentSessionId,
-										metadataId: narrowingState.focusedMetadataId,
-										type: 'enum',
-										value: candidate.key,
-									});
-								}}
-							>
-								<IconChoose />
-								Choisir
-							</ButtonSecondary>
+										await storeMetadataValue({
+											db: databaseHandle(),
+											subjectId: page.params.observation,
+											sessionId: uiState.currentSessionId,
+											metadataId: narrowingState.focusedMetadataId,
+											type: 'enum',
+											value: candidate.key,
+										});
+									}}
+								>
+									<IconChoose />
+									Choisir
+								</ButtonSecondary>
+							</div>
 						</div>
 					</div>
-				</div>
-			</article>
+				</article>
+			{/snippet}
 		</VirtualList>
 	{:else}
 		<div class="too-many">
