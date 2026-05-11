@@ -98,7 +98,7 @@ jobs:
         run: bun install
 
       - name: Retrieve built app
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: ${{ inputs.artifact }}
 
@@ -254,7 +254,7 @@ jobs:
       url: ${{ steps.diawi.outputs.url }}
     steps:
       - name: Retrieve APK file
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: ${{ needs.apk.outputs.artifact }}
 
