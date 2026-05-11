@@ -8,7 +8,9 @@ import { toasts } from '$lib/toasts.svelte.js';
 import { compareBy, orEmptyObj } from '$lib/utils.js';
 
 export async function createSession() {
-	const defaultProtocol = tables.Protocol.state.at(0);
+	const defaultProtocol =
+		tables.Protocol.getFromState('io.github.cigaleapp.arthropods.example') ??
+		tables.Protocol.state.at(0);
 
 	if (!defaultProtocol) {
 		toasts.error('Aucun protocole installé, impossible de créer une session.');
