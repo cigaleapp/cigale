@@ -30,7 +30,7 @@
 	import MetadataCombobox from './MetadataCombobox.svelte';
 	import { sendNotification } from './notifications.js';
 	import OverflowableText from './OverflowableText.svelte';
-	import RadioButtons from './RadioButtons.svelte';
+	import EnumButtons from './EnumButtons.svelte';
 	import { availableUnitsFor, displayUnit, NumericUnit, unitKind } from './schemas/units.js';
 	import { uiState } from './state.svelte.js';
 	import Switch from './Switch.svelte';
@@ -157,7 +157,7 @@
 	<MetadataTypeswitch {definition} {value}>
 		{#snippet enum_(value)}
 			{#if isCompactEnum}
-				<RadioButtons
+				<EnumButtons
 				deselectable={removeByDeselect}
 					value={value?.toString()}
 					onchange={async (value) => {
@@ -214,7 +214,7 @@
 							</div>
 						</div>
 					{/snippet}
-				</RadioButtons>
+				</EnumButtons>
 			{:else}
 				<MetadataCombobox
 					{id}
