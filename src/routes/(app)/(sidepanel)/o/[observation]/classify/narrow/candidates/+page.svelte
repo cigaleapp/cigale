@@ -1,5 +1,7 @@
 <script lang="ts">
+	import { dequal } from 'dequal';
 	import Fuse from 'fuse.js';
+	import { Previous } from 'runed';
 
 	import IconChoose from '~icons/ri/check-line';
 	import IconNoImage from '~icons/ri/question-line';
@@ -42,14 +44,24 @@
 			}));
 	});
 
+	const previousSearchResults = new Previous(() => searchResults);
+
 	$effect(() => {
 		narrowingState.search.candidates.resultsCount = searchResults.length;
+	});
+
+	$effect(() => {
+		if (!previousSearchResults.current) return;
+		const currentKeys = searchResults.map((r) => r.key);
+		const previousKeys = previousSearchResults.current.map((r) => r.key);
+		if (dequal(currentKeys, previousKeys)) return;
+		narrowingState.scroll.candidates = 0;
 	});
 </script>
 
 <main>
 	{#if searchResults.length <= maximumListableCandidates}
-		<VirtualList items={searchResults}>
+		<VirtualList items={searchResults} bind:scrollY={narrowingState.scroll.candidates}>
 			{#snippet item(candidate)}
 				<article>
 					<div class="image" class:empty={!candidate.images?.[0]}>

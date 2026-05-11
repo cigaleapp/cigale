@@ -14,6 +14,8 @@
 		testid?: string;
 		/** Virtualize the list of metadatas. **Requires the parent element to have a defined height**. If there's grouping, this will be ignored and the list will not be virtualized, because it's not possible to. */
 		virtualize?: boolean;
+		/** Bind to scrollY of the virtualized list. Does nothing if the list isn't virtualized */
+		virtualListScrollY?: number;
 		definitions: DB.Metadata[];
 		values: DB.MetadataValues;
 		/** List of metadata IDs in order */
@@ -21,7 +23,7 @@
 		groups: DB.Protocol['metadataGroups'] | undefined;
 	}
 
-	const { children, virtualize= false, values, testid, definitions, ordering, groups = [] }: Props = $props();
+	let { children, virtualize= false, values, testid, definitions, ordering, groups = [], virtualListScrollY = $bindable(0) }: Props = $props();
 
 	const { showTechnicalMetadata } = $derived(getSettings());
 
@@ -93,7 +95,7 @@
 	{/snippet}
 
 	{#if _virtualize}
-		<VirtualList items={groupedDefinitions} item={metadata} />
+		<VirtualList bind:scrollY={virtualListScrollY} items={groupedDefinitions} item={metadata} />
 	{:else}
 		{#each groupedDefinitions as item (item.iterationKey)}
 			{@render metadata(item)}

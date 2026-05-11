@@ -4,6 +4,10 @@
 			describe: { query: '', resultsCount: 0 },
 			candidates: { query: '', resultsCount: 0 },
 		},
+		scroll: {
+			describe: 0,
+			candidates: 0,
+		},
 		focusedMetadataId: undefined as NamespacedMetadataID | undefined,
 		// TODO persist by using the observation's metadata overrides
 		choicesHistory: [] as NamespacedMetadataID[],

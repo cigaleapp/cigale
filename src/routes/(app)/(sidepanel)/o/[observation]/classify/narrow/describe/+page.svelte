@@ -4,7 +4,7 @@
 
 	import { dequal } from 'dequal';
 	import Fuse from 'fuse.js';
-	import { Debounced } from 'runed';
+	import { Debounced, Previous } from 'runed';
 	import { fade } from 'svelte/transition';
 
 	import { page } from '$app/state';
@@ -62,9 +62,19 @@
 			: undefined
 	);
 
+	const previousSearchResults = new Previous(() => searchResults);
+
 	$effect(() => {
 		narrowingState.search.describe.resultsCount = searchResults?.length ?? 0;
 	});
+
+	$effect(() => {
+		if (!previousSearchResults.current) return;
+		const currentKeys = searchResults?.map((r) => r.id);
+		const previousKeys = previousSearchResults.current.map((r) => r.id);
+		if (dequal(currentKeys, previousKeys)) return;
+		narrowingState.scroll.describe = 0;
+	})
 
 	const shownDefinitions = $derived(
 		definitions
@@ -173,6 +183,7 @@
 		<div class="scrollable" data-testid="descriptors" in:fade={{ duration: 200 }}>
 			<MetadataList
 				virtualize
+				bind:virtualListScrollY={narrowingState.scroll.describe}
 				definitions={shownDefinitions}
 				ordering={searchResults?.map((result) => result.id) ??
 					uiState.currentProtocol?.metadataOrder}
