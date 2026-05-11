@@ -4,7 +4,7 @@ import type { NamespacedMetadataID } from '$lib/schemas/common.js';
 
 import { listByIndex } from '$lib/idb.svelte.js';
 import { removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';
-import { entries } from '$lib/utils.js';
+import { entries, safeJSONParse } from '$lib/utils.js';
 
 export async function getAllCandidates({
 	narrowableGroup,
@@ -23,14 +23,17 @@ export function getMatchingCandidates({
 	choices,
 }: {
 	allCandidates: DB.MetadataEnumVariant[];
-	choices: Record<NamespacedMetadataID, TypedMetadataValue<'enum'> | RuntimeValue<'enum'>>;
+	choices: Record<NamespacedMetadataID, TypedMetadataValue<'enum'>>;
 }) {
 	return allCandidates.filter((c) =>
-		entries(choices).every(([metadataId, val]) => {
-			const optionKey = typeof val === 'object' && 'value' in val ? val.value : val;
-			// if (c.metadataId !== metadataId) return false;
+		entries(choices).every(([metadataId, { value, alternatives }]) => {
+			const keys = new Set([
+				value,
+				...Object.keys(alternatives ?? {}).map((alt) => safeJSONParse(alt)?.toString()),
+			]);
+
 			const cascadeValue = c.cascade?.[removeNamespaceFromMetadataId(metadataId)];
-			return !cascadeValue || cascadeValue === optionKey.toString();
+			return !cascadeValue || keys.has(cascadeValue);
 		})
 	);
 }
@@ -46,11 +49,22 @@ export function narrowingPower({
 }) {
 	const candidatesBefore = getMatchingCandidates({ allCandidates, choices: currentChoices });
 
+	const currentValue = currentChoices[choice.metadataId];
+
 	const candidatesAfter = getMatchingCandidates({
 		allCandidates,
 		choices: {
 			...currentChoices,
-			[choice.metadataId]: { type: 'enum', value: choice.optionKey },
+			[choice.metadataId]: {
+				type: 'enum',
+				value: choice.optionKey,
+				alternatives: currentValue
+					? {
+							...currentValue.alternatives,
+							[JSON.stringify(currentValue.value)]: 1,
+						}
+					: {},
+			},
 		},
 	});
 
