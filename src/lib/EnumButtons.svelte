@@ -1,85 +1,112 @@
 <script lang="ts" generics="OptionKey extends string|number, AdditionalItemData = {}">
+	import type { MaybeLoading } from './LoadingText.svelte';
+
+	import LoadingText from './LoadingText.svelte';
+
 	type Item<Key extends string | number> = {
 		key: Key;
-		label: string;
-		subtext?: string;
-		disabled?: boolean;
+		label: MaybeLoading<string>;
+		subtext?: MaybeLoading<string>;
+		disabled?: boolean | string;
 	} & AdditionalItemData;
 
-	interface Props {
+	/* eslint-disable no-unused-vars */
+	type OnChange = (
+		/** When multiple=false */
+		value: OptionKey | undefined,
+		/** When multiple=true. If it's false, this will be undefined */
+		values: Array<OptionKey> | undefined,
+		fieldset: HTMLFieldSetElement
+	) => void | Promise<void>;
+	/* eslint-enable no-unused-vars */
+
+	type Props = {
 		options: Array<Item<OptionKey>>;
 		// vertical?: boolean;
 		horizontal?: boolean;
 		cards?: boolean;
+		onchange?: OnChange;
+		/** Always undefined if multiple=true */
 		value?: NoInfer<OptionKey> | undefined;
+		/** Used when multiple=true */
+		values?: Array<NoInfer<OptionKey>>;
+		/** Allow choosing multiple options. */
+		multiple?: boolean;
 		/** Allow de-selecting by clicking again on the selected option */
 		deselectable?: boolean;
-		onchange?: (
-			// eslint-disable-next-line no-unused-vars
-			value: OptionKey | undefined,
-			// eslint-disable-next-line no-unused-vars
-			fieldset: HTMLFieldSetElement
-		) => void | Promise<void>;
 		children?: import('svelte').Snippet<
 			[Item<NoInfer<OptionKey>> & { value: typeof value; selected: boolean }]
 		>;
 		label?: string;
-	}
+	};
 
 	let {
 		options,
 		value = $bindable(),
+		values = $bindable([]),
 		deselectable = false,
 		children,
 		cards,
-		onchange = () => {},
 		label,
 		horizontal,
-		// vertical
+		multiple,
+		onchange,
 	}: Props = $props();
 
 	let fieldset: HTMLFieldSetElement | undefined = $state();
+
+	const id = $props.id();
 </script>
 
 <fieldset
 	bind:this={fieldset}
 	class="radio-inputs"
 	class:horizontal
-	// class:smart-horizontal={!horizontal && !vertical}
-	role="radiogroup"
-	aria-label={label}
+	role={multiple ? 'group' : 'radiogroup'}
+	aria-labelledby={label ? `${id}-label` : undefined}
 >
 	{#if label}
-		<legend>{label}</legend>
+		<legend id="{id}-label">{label}</legend>
 	{/if}
 	{#each options as option (option.key)}
 		{@const { key, label, disabled } = option}
 		<label class="radio" class:card={cards}>
 			<input
-				{disabled}
-				type="radio"
+				disabled={Boolean(disabled)}
+				type={multiple ? 'checkbox' : 'radio'}
 				value={key}
-				bind:group={value}
+				checked={multiple ? values.includes(key) : key === value}
 				onclick={async () => {
+					if (multiple) return;
 					if (!deselectable) return;
-					if (value !== key) return;
 					if (!fieldset) return;
-					await onchange(undefined, fieldset);
+					if (value !== key) return;
+
+					value = undefined;
+
+					await onchange?.(value, values, fieldset);
 				}}
-				onchange={async () => {
+				onchange={async (e) => {
 					if (!fieldset) return;
 
-					await onchange(value, fieldset);
+					if (e.currentTarget.checked) {
+						values = [...new Set([...values, key])];
+						value = key;
+					} else {
+						values = values.filter((v) => v !== key);
+					}
+
+					await onchange?.(value, values, fieldset);
 				}}
 			/>
 			{#if children}
-				{@render children({ ...option, value, selected: key === value })}
+				{@render children({ ...option, value, selected: multiple ? values.includes(key)  : key === value })}
 			{:else}
 				<div class="text">
-					{label}
+					<LoadingText value={label} />
 					{#if 'subtext' in option}
 						<p class="subtext">
-							{option.subtext}
+							<LoadingText value={option.subtext} />
 						</p>
 					{/if}
 				</div>
@@ -137,13 +164,13 @@
 		}
 	}
 
-	input[type='radio'] {
+	input {
 		accent-color: var(--bg-primary);
 		color: var(--bg-neutral);
 		align-items: center;
 	}
 
-	input[type='radio']:hover {
+	input:hover {
 		color: var(--bg-primary);
 		border-radius: 50%;
 	}

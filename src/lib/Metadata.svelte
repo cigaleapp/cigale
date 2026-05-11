@@ -27,20 +27,17 @@
 	import { splitMetadataId } from './schemas/metadata.js';
 	import { isDebugMode } from './settings.svelte.js';
 	import { tooltip } from './tooltips.js';
-	import { orEmpty, orEmpty2, pick, safeJSONParse, switchValue } from './utils.js';
+	import { orEmpty, mapKeys, orEmpty2, pick, safeJSONParse, switchValue } from './utils.js';
 	import WorldMap from './WorldMap.svelte';
+	import type { ComponentProps } from 'svelte';
 
-	interface Props {
+	type Props = {
 		definition: Metadata;
 		options?: MetadataEnumVariant[] | undefined;
-		// eslint-disable-next-line no-unused-vars
-		optionIsDisabled?: (option: MetadataEnumVariant) => boolean | string;
 		value: undefined | TypedMetadataValue<NoInfer<T>>;
 		merged?: boolean;
 		/** Display requiredness indicators */
 		requiredness: 'all' | 'required' | 'none';
-		/** Remove metadata by de-selecting enum options, false by default */
-		removeByDeselect? : boolean
 		onvalidation?: (
 			/** Empty if okay */
 			// eslint-disable-next-line no-unused-vars
@@ -50,21 +47,26 @@
 			// eslint-disable-next-line no-unused-vars
 			value: undefined | RuntimeValue<T>,
 			// eslint-disable-next-line no-unused-vars
-			unit?: undefined | typeof NumericUnit.infer
+			unit?: undefined | typeof NumericUnit.infer,
+			/** Keys are **serialized** metadata values! not bare string */
+			// eslint-disable-next-line no-unused-vars
+			alternatives?: Record<string, number>
 		) => Promise<void>;
-	}
+	} & Pick<ComponentProps<typeof MetadataInput>, "addToAlternativesBySelect" | "removeByDeselect" | "optionIsDisabled" | "enumOptionsExtraContent">;
 
 	let {
 		value,
 		merged,
 		definition,
 		requiredness,
-		removeByDeselect = false,
 		options = undefined,
-		optionIsDisabled = () => false,
 		onchange = async () => {},
 		onvalidation = () => {},
+		...inputProps
 	}: Props = $props();
+
+	/** If we have addToAlternativesBySelect, the alternatives are already shown for enum metadata */
+	const showAlternatives = $derived(inputProps.addToAlternativesBySelect ? definition.type !== 'enum' : true)
 
 	const valueValidator = $derived.by(() => {
 		switch (definition.type) {
@@ -158,7 +160,7 @@
 		</div>
 	{/if}
 
-	{#if value && Object.keys(value.alternatives).length > 0}
+	{#if showAlternatives && value && Object.keys(value.alternatives).length > 0}
 		<section class="alternatives">
 			<div class="title">Alternatives</div>
 			<ul class="options">
@@ -278,20 +280,20 @@
 		id={_id}
 		{definition}
 		{options}
-		{optionIsDisabled}
-		{removeByDeselect}
+		{...inputProps}
 		value={value?.value}
 		unit={value?.unit}
 		{validationErrors}
-		onblur={async (val, unit) => {
+		{isCompactEnum}
+		alternatives={value?.alternatives ? mapKeys(value.alternatives, key => safeJSONParse(key)?.toString()) : undefined}
+		onblur={async (val, unit, alternatives) => {
 			// We eagerly update value.unit because otherwise it gets updated after the DB changes
 			// the validator would update separately to the unit+value change
 			// which causes a flickering false validation error
 			if (value) value.unit = unit;
-			await onchange(val, unit);
+			await onchange(val, unit, mapKeys(alternatives, key => JSON.stringify(key)));
 			validation = val !== undefined ? valueValidator?.(val) : undefined;
 		}}
-		{isCompactEnum}
 		confidences={Object.fromEntries([
 			...Object.entries(value?.alternatives ?? {}).map(([key, value]) => [
 				safeJSONParse(key)?.toString(),

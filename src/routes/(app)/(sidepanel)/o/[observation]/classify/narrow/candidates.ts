@@ -23,10 +23,11 @@ export function getMatchingCandidates({
 	choices,
 }: {
 	allCandidates: DB.MetadataEnumVariant[];
-	choices: Record<NamespacedMetadataID, TypedMetadataValue<'enum'>>;
+	choices: Record<NamespacedMetadataID, TypedMetadataValue<'enum'> | RuntimeValue<'enum'>>;
 }) {
 	return allCandidates.filter((c) =>
-		entries(choices).every(([metadataId, { value: optionKey }]) => {
+		entries(choices).every(([metadataId, val]) => {
+			const optionKey = typeof val === 'object' && 'value' in val ? val.value : val;
 			// if (c.metadataId !== metadataId) return false;
 			const cascadeValue = c.cascade?.[removeNamespaceFromMetadataId(metadataId)];
 			return !cascadeValue || cascadeValue === optionKey.toString();
@@ -40,7 +41,7 @@ export function narrowingPower({
 	choice,
 }: {
 	allCandidates: DB.MetadataEnumVariant[];
-	currentChoices: Record<NamespacedMetadataID, TypedMetadataValue<'enum'>>;
+	currentChoices: Parameters<typeof getMatchingCandidates>[0]['choices'];
 	choice: { metadataId: NamespacedMetadataID; optionKey: string };
 }) {
 	const candidatesBefore = getMatchingCandidates({ allCandidates, choices: currentChoices });

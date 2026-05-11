@@ -2,6 +2,7 @@
 	import type * as DB from '$lib/database.js';
 	import type { NamespacedMetadataId } from '$lib/schemas/metadata.js';
 
+	import { dequal } from 'dequal';
 	import Fuse from 'fuse.js';
 	import { Debounced } from 'runed';
 	import { fade } from 'svelte/transition';
@@ -17,11 +18,14 @@
 		storeMetadataValue,
 	} from '$lib/metadata/storage.js';
 	import MetadataList from '$lib/MetadataList.svelte';
+	import RadialProgress from '$lib/RadialProgress.svelte';
 	import { ensureNamespacedMetadataId, namespaceOfMetadataId } from '$lib/schemas/metadata.js';
 	import { uiState } from '$lib/state.svelte.js';
+	import { tooltip } from '$lib/tooltips.js';
 	import { cancellable, mapKeys } from '$lib/utils.js';
 
 	import { narrowingState } from '../+layout.svelte';
+	import { narrowingPower } from '../candidates.js';
 
 	const metadataValues = $derived(narrowingState.metadataValues);
 	const definitions = $derived(
@@ -178,6 +182,7 @@
 					<div class="metadata">
 						<Metadata
 							removeByDeselect
+							addToAlternativesBySelect
 							options={[...(options[definition.id]?.values() ?? [])]}
 							optionIsDisabled={(option) => {
 								if (!option) return false;
@@ -189,8 +194,20 @@
 							requiredness="none"
 							{definition}
 							value={metadataValues[definition.id]}
-							onchange={async (value) => {
-								if (metadataValues[definition.id]?.value === value) return;
+							onchange={async (value, _unit, alternatives) => {
+								if (!observation) return;
+								if (
+									metadataValues[definition.id]?.value === value &&
+									dequal(
+										new Set(
+											Object.keys(
+												metadataValues[definition.id]?.alternatives ?? {}
+											)
+										),
+										new Set(Object.keys(alternatives ?? {}))
+									)
+								)
+									return;
 
 								const choiceIndex = narrowingState.choicesHistory.indexOf(
 									definition.id
@@ -213,6 +230,7 @@
 										sessionId: uiState.currentSession?.id,
 										// updateReactiveState: false,
 										value,
+										alternatives,
 									});
 								} else {
 									await deleteMetadataValue({
@@ -224,7 +242,41 @@
 									});
 								}
 							}}
-						/>
+						>
+							{#snippet enumOptionsExtraContent({ option: { key }, selected })}
+								{@const { countAfterChoice, ratio } = narrowingPower({
+									allCandidates: narrowingState.candidates.all,
+									currentChoices: metadataValues,
+									choice: { metadataId: definition.id, optionKey: key },
+								})}
+
+								<div
+									class="narrowing-power"
+									use:tooltip={'Candidats restants après ce choix'}
+								>
+									{#if !selected && ratio > 0 && ratio < 1}
+										<div class="ratio" transition:fade={{ duration: 100 }}>
+											<RadialProgress progress={1 - ratio} />
+										</div>
+									{/if}
+									{#if !selected}
+										<span
+											transition:fade={{ duration: 100 }}
+											class="filter-count"
+											style:width="{narrowingState.candidates.all.length.toString()
+												.length + 1}ch"
+										>
+											{#if countAfterChoice > narrowingState.candidates.remaining.length}
+												+{countAfterChoice -
+													narrowingState.candidates.remaining.length}
+											{:else}
+												{countAfterChoice}
+											{/if}
+										</span>
+									{/if}
+								</div>
+							{/snippet}
+						</Metadata>
 					</div>
 				{/snippet}
 			</MetadataList>
@@ -276,5 +328,12 @@
 		*/
 		padding: 1em;
 		border-bottom: 1px solid var(--gray);
+	}
+
+	.narrowing-power {
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
+		z-index: 10;
 	}
 </style>

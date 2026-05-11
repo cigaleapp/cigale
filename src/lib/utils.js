@@ -1800,3 +1800,22 @@ export function cancellable(asyncFunction) {
 		};
 	};
 }
+
+export function setsAreEqual(setA, setB) {
+	if (setA.size !== setB.size) return false;
+	for (const item of setA) {
+		if (!setB.has(item)) return false;
+	}
+	return true;
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('setsAreEqual', () => {
+		expect(setsAreEqual(new Set([1, 2, 3]), new Set([1, 2, 3]))).toBe(true);
+		expect(setsAreEqual(new Set([1, 2, 3]), new Set([3, 2, 1]))).toBe(true);
+		expect(setsAreEqual(new Set([1, 2, 3]), new Set([1, 2]))).toBe(false);
+		expect(setsAreEqual(new Set([1, 2]), new Set([1, 2, 3]))).toBe(false);
+		expect(setsAreEqual(new Set([1, 2, 3]), new Set([4, 5, 6]))).toBe(false);
+	});
+}

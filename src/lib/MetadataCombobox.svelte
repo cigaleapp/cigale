@@ -2,15 +2,18 @@
 	/**
 	 * @typedef {object} Props
 	 * @property {string|undefined} value
-	 * @property {(newValue: string) => void} onValueChange
+	 * @property {boolean} [multiple]
+	 * @property {(newValue: string, newValues: string[]) => void} onValueChange
 	 * @property {Pick<import('./database.js').Metadata, "id">} metadata
 	 * @property {import('./database.js').MetadataEnumVariant[] | undefined} options
 	 * @property {WithoutChildrenOrChild<import('bits-ui').Combobox.InputProps>} [inputProps]
 	 * @property {WithoutChildrenOrChild<import('bits-ui').Combobox.ContentProps>} [contentProps]
 	 * @property {string} [id]
 	 * @property {Record<string, number>} [confidences]
-	 * @property {(action: 'focus' | 'blur' | 'toggle') => void} [focuser]
+	 * @property {Record<string, number>} [alternatives] to show as additionally selected when multiple=true
+	 * @property {undefined | ((action: 'focus' | 'blur' | 'toggle') => void)} [focuser]
 	 * @property {(option: import('./database.js').MetadataEnumVariant) => boolean|string} [optionIsDisabled]
+	 * @property {import('svelte').ComponentProps<typeof import('$lib/MetadataInput.svelte').default>["enumOptionsExtraContent"]} [enumOptionsExtraContent]
 	 */
 </script>
 
@@ -47,6 +50,8 @@
 	let {
 		options: precomputedOptions,
 		metadata,
+		multiple = false,
+		alternatives = {},
 		confidences = {},
 		value = $bindable(),
 		open = $bindable(false),
@@ -54,6 +59,7 @@
 		optionIsDisabled = () => false,
 		inputProps,
 		contentProps,
+		enumOptionsExtraContent,
 		...restProps
 	} = $props();
 
@@ -120,13 +126,16 @@
 	 * @type {CascadeLabelsCache}
 	 */
 	let cascadeLabelsCache = $state({});
+
 </script>
 
-<div class="metadata-combobox" class:wide-docs={hasImages}>
+<div class="metadata-combobox" class:wide-docs={hasImages} class:multiple>
 	<Combobox
 		// Put disabled options last
 		items={options.toSorted(compareBy((opt) => (optionIsDisabled(opt) ? 1 : -1)))}
 		{value}
+		values={multiple ? [value, ...Object.keys(alternatives)] : undefined}
+		{multiple}
 		bind:open
 		bind:focuser
 		sorter={compareByConfidence}
@@ -176,6 +185,17 @@
 					{#if showConfidences}
 						<div class="confidence">
 							<ConfidencePercentage value={confidences[item.key]} />
+						</div>
+					{/if}
+
+					{#if enumOptionsExtraContent}
+						<div class="extra-content">
+							{@render enumOptionsExtraContent({
+								option: item,
+								disabled: optionIsDisabled(item),
+								selected,
+								confidence: confidences[item.key],
+							})}
 						</div>
 					{/if}
 				</div>

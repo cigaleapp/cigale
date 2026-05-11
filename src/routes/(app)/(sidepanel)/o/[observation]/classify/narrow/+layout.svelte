@@ -56,7 +56,7 @@
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte.js';
 	import { tooltip } from '$lib/tooltips.js';
-	import { entries, fromEntries, transformObject } from '$lib/utils.js';
+	import { entries, fromEntries, transformObject, mapKeys, safeJSONParse } from '$lib/utils.js';
 
 	import { fullscreenState } from '../../+layout@(app).svelte';
 	import Subject from '../Subject.svelte';
@@ -120,24 +120,13 @@
 	);
 
 	const focusedMetadataValue = $derived(
-		// observationMetadata({
-		// 	observation,
-		// 	definitions: [focusedMetadata],
-		// 	images: tables.Image.state.filter((img) => observation?.images.includes(img.id)),
-		// 	filterType: 'enum',
-		// })[narrowingState.focusedMetadataId]
-		observation.metadataOverrides[narrowingState.focusedMetadataId ?? '']
+		observation?.metadataOverrides[narrowingState.focusedMetadataId ?? '']
 	);
 
 	$effect(() => {
+		if (!observation) return;
 		// Only get values that are relevant to the narrowing view
 		narrowingState.metadataValues = transformObject(
-			// observationMetadata({
-			// 	observation,
-			// 	definitions,
-			// 	images: tables.Image.state.filter((img) => observation?.images.includes(img.id)),
-			// 	filterType: 'enum',
-			// }),
 			observation.metadataOverrides,
 			(id, value) => {
 				const def = definitions.find((d) => d.id === id);
@@ -296,12 +285,16 @@
 								<MetadataInput
 									{definition}
 									{id}
+									addToAlternativesBySelect
 									validationErrors={undefined}
 									options={undefined}
 									value={value?.value}
 									isCompactEnum={false}
 									unit={undefined}
-									onblur={async (value) => {
+									alternatives={
+										mapKeys(value?.alternatives ?? {}, (key) => safeJSONParse(key)?.toString() ?? key)
+									}
+									onblur={async (value, _unit, alternatives) => {
 										if (!value) return;
 										if (!observation) return;
 										await storeMetadataValue({
@@ -311,6 +304,7 @@
 											sessionId: uiState.currentSession?.id,
 											type: 'enum',
 											value,
+											alternatives,
 											confidence: 1,
 											manuallyModified: true,
 										});

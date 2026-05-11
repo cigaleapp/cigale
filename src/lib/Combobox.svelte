@@ -7,8 +7,11 @@
 	type Props<I extends Item, V extends string> = {
 		items: I[];
 		value: V | undefined;
+		/** Used when multiple=true. **NOT BINDABLE** (at least for now) */
+		values?: V[];
+		multiple?: boolean;
 		// eslint-disable-next-line no-unused-vars
-		onValueChange?: (newValue: V) => void;
+		onValueChange?: (newValue: V, newValues: V[]) => Promise<void>;
 		// eslint-disable-next-line no-unused-vars
 		searcher: (search: string, item: I) => string | undefined;
 		// eslint-disable-next-line no-unused-vars
@@ -50,11 +53,13 @@
 	type MergedProps = Props<I, V> & Omit<Combobox.RootProps, keyof Props<I, V>>;
 
 	let {
+		multiple,
 		items: staticItems,
 		sorter,
 		suggestions,
 		searcher,
 		value = $bindable(),
+		values ,
 		open = $bindable(false),
 		focuser = $bindable(),
 		'viewport-testid': viewportTestId,
@@ -63,6 +68,7 @@
 		listItem,
 		highlight,
 		searchbox,
+		onValueChange,
 		...restProps
 	}: MergedProps = $props();
 
@@ -150,10 +156,25 @@
 </script>
 
 <Combobox.Root
-	{value}
 	bind:open
 	{...mergedRootProps}
 	items={items.map((i) => ({ ...i, value: i.key }))}
+	{...(
+		multiple ? {
+			value: values ?? (value ? [value] : []),
+			type: "multiple",
+			async onValueChange(newValue: V[]) {
+				if (newValue.length === 0) return
+				await onValueChange?.(newValue[0], newValue)
+			}
+		} : {
+			value: value,
+			type: "single",
+			async onValueChange(newValue: V) {
+				await onValueChange?.(newValue, [])
+			}
+		}
+	)}
 >
 	<!-- <div class="search-icon" class:shown={open}>
 		<IconSearch />

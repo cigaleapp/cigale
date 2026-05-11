@@ -1,6 +1,9 @@
 <script lang="ts">
 	import type { Metadata, MetadataEnumVariant } from './database.js';
-	import type { MetadataFile, RuntimeValue, NamespacedMetadataId } from './schemas/metadata.js';
+	import type { MaybeLoading } from './LoadingText.svelte';
+	import type { NamespacedMetadataID } from './schemas/common.js';
+	import type { MetadataFile, RuntimeValue } from './schemas/metadata.js';
+	import type { ComponentProps, Snippet } from 'svelte';
 
 	import Icon from '@iconify/svelte';
 	import { ArkErrors, type } from 'arktype';
@@ -19,6 +22,7 @@
 	import ButtonInk from './ButtonInk.svelte';
 	import { generateId } from './database.js';
 	import DropdownMenu from './DropdownMenu.svelte';
+	import EnumButtons from './EnumButtons.svelte';
 	import FilePreview from './FilePreview.svelte';
 	import { promptForFiles } from './files.js';
 	import { formatBytesSize } from './i18n.js';
@@ -30,7 +34,6 @@
 	import MetadataCombobox from './MetadataCombobox.svelte';
 	import { sendNotification } from './notifications.js';
 	import OverflowableText from './OverflowableText.svelte';
-	import EnumButtons from './EnumButtons.svelte';
 	import { availableUnitsFor, displayUnit, NumericUnit, unitKind } from './schemas/units.js';
 	import { uiState } from './state.svelte.js';
 	import Switch from './Switch.svelte';
@@ -51,12 +54,17 @@
 	interface Props {
 		definition: Metadata;
 		value: undefined | RuntimeValue;
+		/** Shows up as additinal selected values if addToAlternativesBySelect is true */
+		alternatives?: Record<string, number>;
 		unit: typeof NumericUnit.infer | undefined;
 		onblur: (
 			// eslint-disable-next-line no-unused-vars
 			value: undefined | RuntimeValue,
 			// eslint-disable-next-line no-unused-vars
-			unit?: typeof NumericUnit.infer | undefined
+			unit?: typeof NumericUnit.infer | undefined,
+			/** See addToAlternativesBySelect */
+			// eslint-disable-next-line no-unused-vars
+			alternatives?: Record<string, number>
 		) => void | Promise<void>;
 		validationErrors: ArkErrors | undefined;
 		id: string;
@@ -67,11 +75,25 @@
 		confidences?: Record<string, number>;
 		isCompactEnum?: boolean;
 		/** Remove metadata by de-selecting enum options, false by default */
-		removeByDeselect? : boolean
+		removeByDeselect?: boolean;
+		/** Add to alternatives by selecting other options, instead of changing the selected one. false by default */
+		addToAlternativesBySelect?: boolean;
+		/** Add content to enum options. Must be non-interactive. */
+		enumOptionsExtraContent?: Snippet<
+			[
+				{
+					option: MetadataEnumVariant;
+					disabled: boolean | string;
+					selected: boolean;
+					confidence: number | undefined;
+				},
+			]
+		>;
 	}
 
 	let {
 		value,
+		alternatives = {},
 		unit: valueUnit = $bindable(),
 		confidences = {},
 		validationErrors,
@@ -82,7 +104,9 @@
 		optionIsDisabled = () => false,
 		isCompactEnum = false,
 		removeByDeselect = false,
+		addToAlternativesBySelect = false,
 		onblur,
+		enumOptionsExtraContent,
 	}: Props = $props();
 
 	let savingFile = $state(false);
@@ -120,7 +144,7 @@
 		definition.type === 'enum' && !precomputedOptions && options.length === 0
 	);
 	const optionsLoader = cancellable(
-		async (signal, metadataId: NamespacedMetadataId, skip: boolean) => {
+		async (signal, metadataId: NamespacedMetadataID, skip: boolean) => {
 			if (skip) return;
 			if (!uiState.currentProtocolId) return;
 			console.info('Fetching options for metadata', metadataId);
@@ -144,7 +168,7 @@
 		return loader.cancel;
 	});
 
-	let comboboxFocuser = $state<() => void>()
+	let comboboxFocuser = $state<ComponentProps<typeof MetadataCombobox>['focuser']>();
 </script>
 
 <div
@@ -155,28 +179,43 @@
 	class:has-validation-errors={Boolean(validationErrors)}
 >
 	<MetadataTypeswitch {definition} {value}>
-		{#snippet enum_(value)}
+		{#snippet enum_(value, { _optionsCount })}
 			{#if isCompactEnum}
 				<EnumButtons
-				deselectable={removeByDeselect}
+					multiple={addToAlternativesBySelect}
+					deselectable={removeByDeselect}
 					value={value?.toString()}
-					onchange={async (value) => {
-						await onblur(value);
+					values={value ? [value.toString(), ...Object.keys(alternatives)] : []}
+					onchange={async (value, values) => {
+						if (values && addToAlternativesBySelect) {
+							const [value, ...alternatives] = values;
+							await onblur(
+								value,
+								undefined,
+								Object.fromEntries(alternatives.map((alt) => [alt, 1]))
+							);
+						} else {
+							await onblur(value);
+						}
 					}}
 					// cards={options.every((opt) => opt.icon || opt.color)}
 					cards
 					options={loadingOptions
-						? Array.from({ length: definition._optionsCount }).map((_, i) => ({
+						? Array.from({ length: _optionsCount }).map((_, i) => ({
 								key: `option-${i}`,
-								label: Loading,
+								label: Loading as MaybeLoading<string>,
 								description: '',
-								images: [],
-								color: undefined,
-								icon: undefined,
-								disabled: false,
+								images: [] as string[],
+								color: undefined as string | undefined,
+								icon: undefined as string | undefined,
+								disabled: false as boolean | string,
 							}))
 						: options.toSorted(compareBy(({ index }) => index)).map((opt) => ({
 								disabled: optionIsDisabled(opt),
+								description: '',
+								images: [] as string[],
+								color: undefined,
+								icon: undefined,
 								...pick(
 									opt,
 									'key',
@@ -188,7 +227,9 @@
 								),
 							}))}
 				>
-					{#snippet children({ label, icon, color, description, images, disabled })}
+					{#snippet children(option)}
+						{@const { label, icon, color, description, images, disabled, selected } =
+							option}
 						<div class="with-image" class:disabled>
 							{#if images && images.length > 0}
 								<img loading="lazy" src={images[0]} alt="" />
@@ -212,6 +253,17 @@
 									<p class="subtext">{description}</p>
 								{/if}
 							</div>
+
+							{#if enumOptionsExtraContent}
+								<div class="extra-content">
+									{@render enumOptionsExtraContent({
+										option,
+										disabled,
+										selected,
+										confidence: confidences[option.key],
+									})}
+								</div>
+							{/if}
 						</div>
 					{/snippet}
 				</EnumButtons>
@@ -221,14 +273,28 @@
 					{options}
 					{optionIsDisabled}
 					{confidences}
+					multiple={addToAlternativesBySelect}
 					bind:focuser={comboboxFocuser}
 					metadata={definition}
 					type="single"
 					disabled={disabled ?? false}
 					value={safeJSONParse(value?.toString())?.toString() ?? value}
-					onValueChange={async (value) => {
-						await onblur(value);
-						comboboxFocuser("blur")
+					{alternatives}
+					onValueChange={async (value, values) => {
+						if (addToAlternativesBySelect) {
+							const [val, ...alternatives] = values;
+							await onblur(
+								val,
+								undefined,
+								Object.fromEntries(
+									alternatives.map((alt) => [JSON.stringify(alt), 1])
+								)
+							);
+						} else {
+							await onblur(value);
+						}
+
+						if (!addToAlternativesBySelect) comboboxFocuser?.('blur');
 					}}
 				/>
 			{/if}
@@ -626,6 +692,10 @@
 			object-fit: contain;
 			overflow: hidden;
 			border-radius: var(--corner-radius);
+		}
+
+		.extra-content {
+			margin-left: auto;
 		}
 	}
 
