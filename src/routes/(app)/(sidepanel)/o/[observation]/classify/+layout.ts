@@ -3,6 +3,7 @@ import { error } from '@sveltejs/kit';
 import { galleryEffectiveSorter } from '$lib/gallery.js';
 import { listByIndex, tables } from '$lib/idb.svelte.js';
 import { observationMetadata } from '$lib/observations.js';
+import { defaultClassificationMetadata } from '$lib/protocols.js';
 import { uiState } from '$lib/state.svelte.js';
 import { unique } from '$lib/utils.js';
 
@@ -27,11 +28,20 @@ export async function load({ parent, params }) {
 		error(404, 'Observation introuvable');
 	}
 
-	if (
-		!metadataDefinitions.some(
-			(def) => def.id === currentSession.fullscreenClassifier.focusedMetadata
-		)
-	) {
+	let focusedMetadata = metadataDefinitions.find(
+		(def) => def.id === currentSession.fullscreenClassifier.focusedMetadata
+	);
+
+	// Try setting it to a default value.
+	// Could happen if e.g. the session's protocol was changed
+	if (!focusedMetadata && uiState.currentProtocol) {
+		focusedMetadata = defaultClassificationMetadata(
+			uiState.currentProtocol,
+			metadataDefinitions
+		);
+	}
+
+	if (!focusedMetadata) {
 		error(
 			404,
 			"Métadonnée de classification introuvable. Le protocole de la session n'en définit peut-être pas."
