@@ -4,9 +4,54 @@ All notable changes to this project will be documented in this file, on a monthl
 
 ## May 2026
 
+### Improvements
+
+- Add browser ^& device info on about page (Closes #1568)
+- Add notification on mobile app when export saved to open the file
+- Create a rudimentary "latest APK" download page for nightly builds
+- Defer toast emission until after navigation in toast+goto sequences (#1579)
+- Hide export-to-folder button on mobile app
+- Only hide native splash screen once loading bar starts
+- Open in-app browser for KoboToolbox account registration on mobile
+- Setup deeplinking
+- Share a /protocols/import URL instead of a file in protocol list (#1558)
+- Show directory picker to save file instead of sharing it on mobile app
+- Trigger a share instead of a download on export protocol button, on platforms where it's more appropriate
+- Use a different app icon for nightly builds
+- Use a different app name for different flavors
+
 ### Bug Fixes
 
+- Fix assetlinks fingerprint for non-preview builds
+- Fix back button behavior on Android
+- Fix cannot select YAML protocol file on mobile app (Closes #1560)
+- Fix deeplinking by removing custom URL scheme handling
+- Fix destination path computation for saving as file on mobile app
+- Fix file downloads not working on mobile app
+- Fix fonts falling back to Arial
+- Fix incorrect URL for INSECTA source in builtin protocols list on main
+- Fix notifications not being sent on mobile app
+- Fix notifications setting always showing state as Off
 - Fix parallelism setting's input not showing on mobile
+- Fix pdf-to-png-converter v4 filter condition (kind !== → kind ===)
+- Fix tab bar showing when in about page
+- Fix value of website_host for preview builds of android app
+- Make assetlinks static
+- Setup WEB_ORIGIN to prevent bugs on mobile app
+- Try fixing deeplinking by not adding non-preview assetlinks to PR preview domains and fixing fingerprint for preview domains
+
+### Data Updates
+
+- Bump protocol version of protocols/entomoscope.cigaleprotocol.yaml [ci skip]
+- Handle new location format, ai disabled case and no location case in Entomoscope sidecars
+- Regenerate example protocols
+- Regenerate logo assets for local development builds
+- Serve assetlinks
+- Setup logo assets generation
+- Update Entomoscope protocol
+- Update logo assets
+- Update thumbnail selector for Entomoscope protocol
+- Use different colors for the badges in the mobile app icon
 
 ### Translation Updates
 
