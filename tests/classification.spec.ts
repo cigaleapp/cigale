@@ -517,7 +517,7 @@ test.describe('narrowing view', pr(1570), () => {
 		await page.getByRole('button', { name: 'Ouvrir en plein écran' }).click();
 		await app.path.wait('/(app)/(sidepanel)/o/[observation]/classify/suggestions');
 		await page.getByRole('tab', { name: 'Élimination' }).click();
-		await app.path.wait('/(app)/(sidepanel)/o/[observation]/classify/narrow/describe');
+		await app.path.wait('/(app)/(sidepanel)/o/[observation]/classify/narrow/(options)/describe');
 	});
 
 	test.describe('describe tab', () => {

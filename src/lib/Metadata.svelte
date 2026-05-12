@@ -27,7 +27,7 @@
 	import { splitMetadataId } from './schemas/metadata.js';
 	import { isDebugMode } from './settings.svelte.js';
 	import { tooltip } from './tooltips.js';
-	import { orEmpty, mapKeys, orEmpty2, pick, safeJSONParse, switchValue } from './utils.js';
+	import { orEmpty, mapKeys, orEmpty2, pick, safeJSONParse, switchValue, proxifyIfLocalhost } from './utils.js';
 	import WorldMap from './WorldMap.svelte';
 	import type { ComponentProps } from 'svelte';
 
@@ -45,12 +45,15 @@
 		) => void;
 		onchange?: (
 			// eslint-disable-next-line no-unused-vars
+			data: {
 			value: undefined | RuntimeValue<T>,
-			// eslint-disable-next-line no-unused-vars
 			unit?: undefined | typeof NumericUnit.infer,
 			/** Keys are **serialized** metadata values! not bare string */
-			// eslint-disable-next-line no-unused-vars
-			alternatives?: Record<string, number>
+			alternatives?: Record<string, number>,
+			nodes: {
+				metadata:HTMLElement|undefined
+			}
+			}
 		) => Promise<void>;
 	} & Pick<ComponentProps<typeof MetadataInput>, "addToAlternativesBySelect" | "removeByDeselect" | "optionIsDisabled" | "enumOptionsExtraContent">;
 
@@ -115,12 +118,14 @@
 
 	const optional = $derived(requiredness === 'all' && !definition.required);
 	const required = $derived(requiredness !== 'none' && definition.required);
+
+	let element = $state<HTMLElement>()
 </script>
 
-<div class="metadata">
+<div class="metadata" bind:this={element}>
 	<div class="side-image-and-main-area">
 		{#if displayImageOnTheSide}
-			<div class="side-image"><img loading="lazy" src={definition.images[0]} /></div>
+			<div class="side-image"><img loading="lazy" src={proxifyIfLocalhost( definition.images[0])} /></div>
 		{/if}
 		<div class="main-area">
 			<section class="first-line">
@@ -189,7 +194,12 @@
 									confidence,
 									alternatives: value?.alternatives ?? {},
 								};
-								await onchange(value?.value, value?.unit);
+								await onchange({
+									value: value?.value, 
+									unit: value?.unit,
+									nodes:{metadata: element},
+
+							});
 							}}
 						>
 							<IconCheck />
@@ -216,7 +226,11 @@
 					...coords!,
 					id: '_',
 					async onMove({ lngLat: [longitude, latitude] }) {
-						await onchange?.({ latitude, longitude });
+						await onchange?.({
+							value: { latitude, longitude },
+
+									nodes:{metadata: element},
+					});
 					},
 				})}
 			/>
@@ -291,7 +305,12 @@
 			// the validator would update separately to the unit+value change
 			// which causes a flickering false validation error
 			if (value) value.unit = unit;
-			await onchange(val, unit, mapKeys(alternatives, key => JSON.stringify(key)));
+			await onchange({
+				value: val, unit, 
+				alternatives: mapKeys(alternatives, key => JSON.stringify(key)),
+
+									nodes:{metadata: element},
+		});
 			validation = val !== undefined ? valueValidator?.(val) : undefined;
 		}}
 		confidences={Object.fromEntries([
@@ -327,7 +346,11 @@
 		onclick={async () => {
 			if (!value) return;
 			value = undefined;
-			await onchange(undefined);
+			await onchange({
+				value: undefined,
+
+									nodes:{metadata: element},
+		});
 		}}
 	>
 		<IconClear />

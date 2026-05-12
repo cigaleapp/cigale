@@ -1819,3 +1819,13 @@ if (import.meta.vitest) {
 		expect(setsAreEqual(new Set([1, 2, 3]), new Set([4, 5, 6]))).toBe(false);
 	});
 }
+
+/** 
+ * Some image sources will not load on localhost. Pass them thru cors.gwen.works if we're on localhost 
+ * @param {string} src 
+ */
+export function proxifyIfLocalhost(src) {
+	if (location.hostname !== "localhost") return src
+
+	return `https://cors.gwen.works/${src}`
+}

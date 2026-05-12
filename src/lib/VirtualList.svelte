@@ -5,57 +5,18 @@
 	import VirtualList from '@sveltejs/svelte-virtual-list';
 
 	import Logo from './Logo.svelte';
+	import { scrollController } from './scrollcontroller.svelte.js';
 
 	interface Props {
 		items: Item[];
 		item: Snippet<[item: Item, index: number]>;
 		/** If given a string, shows a centered empty-variant Logo and the given string */
 		empty?: string | Snippet;
-		scrollY?: number;
+		scroll?: {y:number};
 	}
 
-	let { items, item: itemSnippet, empty, scrollY = $bindable(0) }: Props = $props();
+	let { items, item: itemSnippet, empty, scroll = $bindable({y: 0}) }: Props = $props();
 
-	let scrollable = $state<HTMLElement | null>(null);
-
-	// Prevent messing with scrollY while the user is scrolling
-	let mouseWheelActive = $state(false);
-
-	$effect(() => {
-		if (!scrollable) return;
-		if (scrollY === scrollable.scrollTop) return;
-		if (!scrollable.scrollHeight) return;
-		// TODO figure out a better way to ensure the scroll happens when the container is ready
-		requestAnimationFrame(() => {
-			if (!scrollable) return;
-			if (mouseWheelActive) return;
-			scrollable.scrollTo({
-				top: scrollY,
-			});
-		});
-	});
-
-	$effect(() => {
-		if (!scrollable) return;
-		const onscroll = () => {
-			if (!scrollable) return;
-			scrollY = scrollable.scrollTop;
-		};
-
-		const onmousewheel = () => {
-			mouseWheelActive = true;
-			setTimeout(() => {
-				mouseWheelActive = false;
-			}, 500);
-		};
-
-		scrollable.addEventListener('scroll', onscroll);
-		scrollable.addEventListener('mousewheel', onmousewheel, { passive: true });
-		return () => {
-			scrollable?.removeEventListener('scroll', onscroll);
-			scrollable?.removeEventListener('mousewheel', onmousewheel);
-		};
-	});
 </script>
 
 {#if items.length === 0 && empty}
@@ -72,7 +33,9 @@
 <div
 	class="virtual-list"
 	{@attach (node) => {
-		scrollable = node.querySelector('svelte-virtual-list-viewport');
+		const scrollable = node.querySelector('svelte-virtual-list-viewport');
+		if (!scrollable) return;
+		return scrollController(scroll)(scrollable);
 	}}
 >
 	<VirtualList {items} let:item let:index>

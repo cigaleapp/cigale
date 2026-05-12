@@ -1,21 +1,22 @@
 <script lang="ts">
 	import type * as DB from '$lib/database.js';
 
-	import VirtualList from '$lib/VirtualList.svelte';
-	import { type Snippet } from 'svelte';
+	import { untrack, type Snippet } from 'svelte';
 
 	import IconExpand from '~icons/ri/arrow-right-s-line';
+	import VirtualList from '$lib/VirtualList.svelte';
 
 	import { metadataDefinitionComparator } from './protocols.js';
 	import { getSettings } from './settings.svelte.js';
+	import { scrollController } from './scrollcontroller.svelte.js';
 
 	interface Props {
 		children: Snippet<[DB.Metadata, DB.MetadataValue, { collapsed: boolean }]>;
 		testid?: string;
 		/** Virtualize the list of metadatas. **Requires the parent element to have a defined height**. If there's grouping, this will be ignored and the list will not be virtualized, because it's not possible to. */
 		virtualize?: boolean;
-		/** Bind to scrollY of the virtualized list. Does nothing if the list isn't virtualized */
-		virtualListScrollY?: number;
+		/** Bind to scroll of the list. */
+		scroll?: { y: number };
 		definitions: DB.Metadata[];
 		values: DB.MetadataValues;
 		/** List of metadata IDs in order */
@@ -23,7 +24,16 @@
 		groups: DB.Protocol['metadataGroups'] | undefined;
 	}
 
-	let { children, virtualize= false, values, testid, definitions, ordering, groups = [], virtualListScrollY = $bindable(0) }: Props = $props();
+	let {
+		children,
+		virtualize = false,
+		values,
+		testid,
+		definitions,
+		ordering,
+		groups = [],
+		scroll = $bindable({ y: 0 }),
+	}: Props = $props();
 
 	const { showTechnicalMetadata } = $derived(getSettings());
 
@@ -63,7 +73,10 @@
 	const _virtualize = $derived(virtualize && groups.length === 0);
 </script>
 
-<div class="liste" data-testid={testid}>
+<div
+	class="liste"
+	data-testid={testid}
+>
 	{#snippet metadata(item: (typeof groupedDefinitions)[number])}
 		{@const { group, definitions } = item}
 		<div class="definition-group">
@@ -95,7 +108,7 @@
 	{/snippet}
 
 	{#if _virtualize}
-		<VirtualList bind:scrollY={virtualListScrollY} items={groupedDefinitions} item={metadata} />
+		<VirtualList bind:scroll items={groupedDefinitions} item={metadata} />
 	{:else}
 		{#each groupedDefinitions as item (item.iterationKey)}
 			{@render metadata(item)}
@@ -111,10 +124,10 @@
 	}
 
 	/* FIXME: :first-child doesn't work because of virtualization so we have extra whitespace on top of the list */
-	.definition-group {
+	/* .definition-group {
 		--pad: calc(var(--metadata-list-gap, 1.5em) / 2);
 		padding: var(--pad) 0;
-	}
+	} */
 
 	.grouped-metadata {
 		gap: var(--metadata-list-gap, 1.5em);

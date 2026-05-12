@@ -138,7 +138,6 @@
 				window.open(option!.learnMore, '_blank');
 			},
 		},
-	
 	});
 </script>
 
@@ -233,7 +232,7 @@
 		> * {
 			width: 100%;
 			min-width: 0;
-			 overflow: hidden;
+			overflow: hidden;
 		}
 	}
 

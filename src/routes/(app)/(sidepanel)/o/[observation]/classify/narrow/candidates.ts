@@ -38,7 +38,7 @@ export function getMatchingCandidates({
 	);
 }
 
-export function narrowingPower({
+export async function narrowingPower({
 	allCandidates,
 	currentChoices,
 	choice,

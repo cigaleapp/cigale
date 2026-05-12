@@ -48,6 +48,7 @@
 		readableOn,
 		round,
 		safeJSONParse,
+		proxifyIfLocalhost
 	} from './utils.js';
 	import WorldLocationCombobox from './WorldLocationCombobox.svelte';
 
@@ -232,7 +233,7 @@
 							option}
 						<div class="with-image" class:disabled>
 							{#if images && images.length > 0}
-								<img loading="lazy" src={images[0]} alt="" />
+								<img loading="lazy" src={proxifyIfLocalhost(images[0])} alt="" />
 							{/if}
 							<div class="label">
 								<div class="first-line">

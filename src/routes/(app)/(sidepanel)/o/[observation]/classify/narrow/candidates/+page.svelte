@@ -61,7 +61,7 @@
 
 <main>
 	{#if searchResults.length <= maximumListableCandidates}
-		<VirtualList items={searchResults} bind:scrollY={narrowingState.scroll.candidates}>
+		<VirtualList items={searchResults} bind:scroll={narrowingState.scroll.candidates}>
 			{#snippet item(candidate)}
 				<article>
 					<div class="image" class:empty={!candidate.images?.[0]}>
@@ -132,7 +132,7 @@
 			<ButtonSecondary
 				onclick={async () => {
 					await goto(
-						'/(app)/(sidepanel)/o/[observation]/classify/narrow/describe/',
+						'/(app)/(sidepanel)/o/[observation]/classify/narrow/(options)/describe/',
 						page.params
 					);
 				}}>Décrire</ButtonSecondary

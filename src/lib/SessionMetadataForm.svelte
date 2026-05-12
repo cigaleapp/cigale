@@ -71,7 +71,7 @@
 							errors.delete(def.id);
 						}
 					}}
-					onchange={async (v, unit) => {
+					onchange={async ({value: v, unit}) => {
 						if (dequal(v, value?.value) && unit === value?.unit) return;
 
 						if (v !== undefined) {

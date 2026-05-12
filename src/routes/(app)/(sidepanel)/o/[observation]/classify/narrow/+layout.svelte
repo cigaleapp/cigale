@@ -2,11 +2,13 @@
 	export const narrowingState = $state({
 		search: {
 			describe: { query: '', resultsCount: 0 },
+			choices: { query: '', resultsCount: 0 },
 			candidates: { query: '', resultsCount: 0 },
 		},
 		scroll: {
-			describe: 0,
-			candidates: 0,
+			describe: { y: 0 },
+			choices: { y: 0 },
+			candidates: { y: 0 },
 		},
 		focusedMetadataId: undefined as NamespacedMetadataID | undefined,
 		// TODO persist by using the observation's metadata overrides
@@ -60,7 +62,7 @@
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte.js';
 	import { tooltip } from '$lib/tooltips.js';
-	import { entries, fromEntries, transformObject, mapKeys, safeJSONParse } from '$lib/utils.js';
+	import { entries, fromEntries, mapKeys, safeJSONParse, transformObject } from '$lib/utils.js';
 
 	import { fullscreenState } from '../../+layout@(app).svelte';
 	import Subject from '../Subject.svelte';
@@ -145,8 +147,10 @@
 
 	const tab = $derived.by(() => {
 		switch (page.route.id) {
-			case '/(app)/(sidepanel)/o/[observation]/classify/narrow/describe':
+			case '/(app)/(sidepanel)/o/[observation]/classify/narrow/(options)/describe':
 				return 'describe';
+			case '/(app)/(sidepanel)/o/[observation]/classify/narrow/(options)/choices':
+				return 'choices';
 			case '/(app)/(sidepanel)/o/[observation]/classify/narrow/candidates':
 				return 'candidates';
 			default:
@@ -161,10 +165,10 @@
 
 	defineKeyboardShortcuts('classification', {
 		tab: {
-			help: 'Basculer entre les onglets Décrire et Candidats',
+			help: 'Basculer entre les onglets Décrire, Choix et Candidats',
 			async do() {
 				switch (page.route.id) {
-					case '/(app)/(sidepanel)/o/[observation]/classify/narrow/describe':
+					case '/(app)/(sidepanel)/o/[observation]/classify/narrow/(options)/describe': {
 						if (tooManyRemainingCandidates) {
 							toasts.error(
 								`Impossible de lister les candidats, il y en a plus de ${maximumListableCandidates.toLocaleString()}`
@@ -173,14 +177,22 @@
 						}
 
 						return goto(
+							`/(app)/(sidepanel)/o/[observation]/classify/narrow/(options)/choices`,
+							page.params
+						);
+					}
+					case '/(app)/(sidepanel)/o/[observation]/classify/narrow/(options)/choices': {
+						return goto(
 							`/(app)/(sidepanel)/o/[observation]/classify/narrow/candidates`,
 							page.params
 						);
-					case '/(app)/(sidepanel)/o/[observation]/classify/narrow/candidates':
+					}
+					case '/(app)/(sidepanel)/o/[observation]/classify/narrow/candidates': {
 						return goto(
-							`/(app)/(sidepanel)/o/[observation]/classify/narrow/describe`,
+							`/(app)/(sidepanel)/o/[observation]/classify/narrow/(options)/describe`,
 							page.params
 						);
+					}
 				}
 			},
 		},
@@ -273,11 +285,8 @@
 				{#each choices as [id, value], i (id)}
 					{@const definition = definitions.find((d) => d.id === id)}
 					{@const choicesBeforeThisOne = fromEntries(choices.slice(i + 1))}
-					{@const narrowing = narrowingPower({
-						allCandidates: narrowingState.candidates.all,
-						currentChoices: choicesBeforeThisOne,
-						choice: { metadataId: id, optionKey: value.value.toString() },
-					})}
+					{@const filterCountMaxChars =
+						narrowingState.candidates.all.length.toString().length}
 
 					{#if definition}
 						{@const ariaLabel = `narrowing-choices-list-${definition.id}`}
@@ -295,9 +304,10 @@
 									value={value?.value}
 									isCompactEnum={false}
 									unit={undefined}
-									alternatives={
-										mapKeys(value?.alternatives ?? {}, (key) => safeJSONParse(key)?.toString() ?? key)
-									}
+									alternatives={mapKeys(
+										value?.alternatives ?? {},
+										(key) => safeJSONParse(key)?.toString() ?? key
+									)}
 									onblur={async (value, _unit, alternatives) => {
 										if (!value) return;
 										if (!observation) return;
@@ -315,19 +325,23 @@
 									}}
 								></MetadataInput>
 							</div>
-							<div class="ratio">
-								<RadialProgress
-									help="Candidats restants par rapport au choix précédent"
-									progress={1 - narrowing.ratio}
-								/>
-							</div>
-							<span
-								class="filter-count"
-								style:width="{narrowingState.candidates.all.length.toString()
-									.length}ch"
-							>
-								{narrowing.countAfterChoice}
-							</span>
+							{#await narrowingPower( { allCandidates: narrowingState.candidates.all, currentChoices: choicesBeforeThisOne, choice: { metadataId: id, optionKey: value.value.toString() } } )}
+								<div class="ratio"></div>
+								<div
+									class="filter-count"
+									style:width="{filterCountMaxChars}ch"
+								></div>
+							{:then narrowing}
+								<div class="ratio">
+									<RadialProgress
+										help="Candidats restants par rapport au choix précédent"
+										progress={1 - narrowing.ratio}
+									/>
+								</div>
+								<span class="filter-count" style:width="{filterCountMaxChars}ch">
+									{narrowing.countAfterChoice}
+								</span>
+							{/await}
 							<div class="remove">
 								<ButtonIcon
 									help="Enlever ce choix"
@@ -449,7 +463,7 @@
 					{/if}
 				</search>
 				<SegmentedGroup
-					options={['describe', 'candidates']}
+					options={['describe', 'choices', 'candidates']}
 					disabled={(key) => {
 						if (key === 'candidates' && tooManyRemainingCandidates) {
 							return `Plus de ${maximumListableCandidates.toLocaleString()} candidats restants`;
@@ -472,6 +486,20 @@
 							use:tooltip={{ text: "Décrire l'observation", keyboard: 'tab' }}
 						>
 							Décrire
+						</div>
+					{/snippet}
+					{#snippet option_choices()}
+						<div
+							class="tab"
+							use:tooltip={{
+								text: 'Voir les descriptions choisies',
+								keyboard: 'tab',
+							}}
+						>
+							Choix
+							<code class="candidates-count">
+								{Object.keys(metadataValues).length}
+							</code>
 						</div>
 					{/snippet}
 					{#snippet option_candidates({ disabled })}

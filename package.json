@@ -169,6 +169,7 @@
 		"electron-serve": "^3.0.1",
 		"electron-squirrel-startup": "^1.0.1",
 		"embla-carousel-svelte": "^8.6.0",
+		"es-toolkit": "^1.46.1",
 		"exif-parser": "^0.1.12",
 		"fetch-progress": "git+https://github.com/gwennlbh/fetch-progress#explicit-import-extensions",
 		"fflate": "^0.8.2",
