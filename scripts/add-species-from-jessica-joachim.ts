@@ -19,6 +19,7 @@ import {
 	dim,
 	emitCheckrun,
 	percentage,
+	unique,
 	updateCheckrunProgress,
 	yellow,
 } from './utils.js';
@@ -324,14 +325,14 @@ async function searchFor(metadataKey: string) {
 }
 
 async function augmentMetadataOption(
-	{ key, cascade }: typeof MetadataEnumVariant.infer,
+	{ key, cascade, images }: typeof MetadataEnumVariant.infer,
 	page: typeof WordpressPage.infer
 ): Promise<Partial<typeof MetadataEnumVariant.infer>> {
 	const content: HTMLElement = page.content.rendered.window.document.body;
 	if (!content) throw new Error(`Could not find main content in page at ${page.link.toString()}`);
 
 	// We aren't using yoast's og_image because it often is either poor resolution or not the same as the main content's main image
-	let images: URL[] = [...page.content.raw.window.document.body.querySelectorAll('img')]
+	let newImages: URL[] = [...page.content.raw.window.document.body.querySelectorAll('img')]
 		.map((img) => parseURLSafe(img.src))
 		.filter((src): src is URL => {
 			if (!src) return false;
@@ -339,13 +340,13 @@ async function augmentMetadataOption(
 			return true;
 		});
 
-	if (images.length === 0)
-		images = [page.yoast_head_json.og_image.at(0)?.url].filter(
+	if (newImages.length === 0)
+		newImages = [page.yoast_head_json.og_image.at(0)?.url].filter(
 			(x): x is URL => x !== undefined
 		);
 
 	// The images might have a `?resize` query param, remove that
-	images.forEach((src) => src.searchParams.delete('resize'));
+	newImages.forEach((src) => src.searchParams.delete('resize'));
 
 	const hasImageWithFilename = (filename: string) =>
 		[...content.querySelectorAll(`img[src*="${filename}"]`)].some(
@@ -422,7 +423,7 @@ async function augmentMetadataOption(
 		key,
 		learnMore: page.yoast_head_json.canonical.toString(),
 		description: htmlToMarkdown(content.innerHTML).trim(),
-		images: images.map((u) => u.toString()),
+		images: unique([...(images ?? []), ...newImages.map((u) => u.toString())]),
 		cascade,
 	};
 }

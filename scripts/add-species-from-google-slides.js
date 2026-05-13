@@ -14,7 +14,7 @@ import { x } from 'tinyexec';
 import Turndown from 'turndown';
 
 import keys from '../google-drive-key.json' with { type: 'json' };
-import { emitCheckrun, range, updateCheckrunProgress } from './utils.js';
+import { emitCheckrun, range, unique, updateCheckrunProgress } from './utils.js';
 
 await emitCheckrun('protocols', 'in_progress', 'Google Slides', 'Starting…');
 
@@ -336,7 +336,7 @@ for (const [i, { name, id }] of files.entries()) {
 				option.learnMore = learnMore;
 				option.description = description;
 				option.links = links;
-				option.images = imageUrls.map((u) => u.toString());
+				option.images = unique([...option.images, ...imageUrls.map((u) => u.toString())]);
 			} else {
 				const optionKeys = (options) => options.map((o) => Number(o.key));
 				options.push({

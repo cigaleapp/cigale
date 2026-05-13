@@ -1,4 +1,3 @@
-import { type } from 'arktype';
 import { Estimation as ETA } from 'arrival-time';
 import { formatDistanceToNowStrict, isValid as isValidDate } from 'date-fns';
 import { Octokit } from 'octokit';
@@ -12,16 +11,6 @@ export function range(startOrEnd: number, end: number | undefined = undefined) {
 	}
 	return Array.from({ length: end - startOrEnd }, (_, i) => i + startOrEnd);
 }
-
-export const JSONPResponse = type('<T>', [
-	[
-		'string',
-		'=>',
-		(response) => JSON.parse(response.replace(new RegExp(`^[\\w_]+\\((.*)\\)$`), '$1')),
-	],
-	'|>',
-	'T',
-]);
 
 // ANSI control sequences
 class CC {
@@ -216,4 +205,19 @@ export async function emitCheckrun(
 			error
 		);
 	}
+}
+
+/** Preserves order */
+export function unique<T>(arr: T[]): T[] {
+	const result: T[] = [];
+	const seen = new Set<T>();
+
+	for (const item of arr) {
+		if (!seen.has(item)) {
+			seen.add(item);
+			result.push(item);
+		}
+	}
+
+	return result;
 }
