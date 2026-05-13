@@ -14,6 +14,14 @@
 		// TODO persist by using the observation's metadata overrides
 		choicesHistory: [] as NamespacedMetadataID[],
 		metadataValues: {} as Record<NamespacedMetadataID, TypedMetadataValue<'enum'>>,
+		get choices() {
+			return new Map(
+				entries(this.metadataValues).map(([id, { value, alternatives }]) => [
+					id,
+					new Set([value.toString(), ...Object.keys(alternatives ?? {}).map(k => safeJSONParse(k).toString())]),
+				] )
+			);
+		},
 
 		definitions(narrowableGroup: string | undefined) {
 			return tables.Metadata.state.filter((m) => m.group === narrowableGroup);
@@ -21,21 +29,32 @@
 
 		candidates: {
 			all: [] as DB.MetadataEnumVariant[],
-			remaining: [] as DB.MetadataEnumVariant[],
+			get allIds() {
+				return new Set(this.all.map((c) => c.key));
+			},
+			// remaining: [] as DB.MetadataEnumVariant[],
+			remainingIds: new Set<string>(),
+			get remaining() {
+				return this.all.filter((c) => this.remainingIds.has(c.key));
+			},
 			get ratio() {
 				return 1 - this.remaining.length / (this.all.length - 1 || 1);
 			},
 		},
+
+		descriptors: new Map() as Descriptors,
 	});
 
 	export const maximumListableCandidates = 5_000;
 </script>
 
 <script lang="ts">
+	import type { Descriptors } from './candidates.js';
 	import type * as DB from '$lib/database.js';
 	import type { TypedMetadataValue } from '$lib/metadata/types.js';
 	import type { NamespacedMetadataID } from '$lib/schemas/common.js';
 
+	import { SvelteSet } from 'svelte/reactivity';
 	import { fade } from 'svelte/transition';
 
 	import IconRemove from '~icons/ri/close-line';
@@ -66,8 +85,9 @@
 
 	import { fullscreenState } from '../../+layout@(app).svelte';
 	import Subject from '../Subject.svelte';
-	import { getAllCandidates, getMatchingCandidates, narrowingPower } from './candidates.js';
+	import { computeDescriptors, getAllCandidates, matches, narrowingPower } from './candidates.js';
 	import NarrowableGroupPicker from './NarrowableGroupPicker.svelte';
+	import OptionsLoader, { options } from './OptionsLoader.svelte';
 
 	const { children } = $props();
 
@@ -115,10 +135,13 @@
 	});
 
 	$effect(() => {
-		narrowingState.candidates.remaining = getMatchingCandidates({
-			allCandidates: narrowingState.candidates.all,
-			choices: metadataValues,
+		console.time('update matches')
+		narrowingState.candidates.remainingIds = matches({
+			descriptors: narrowingState.descriptors,
+			within: narrowingState.candidates.allIds,
+			choices: narrowingState.choices,
 		});
+		console.timeEnd('update matches');
 	});
 
 	const focusedMetadata = $derived(
@@ -141,6 +164,16 @@
 				return [id, value];
 			}
 		);
+	});
+
+	$effect(() => {
+		if (!options) return;
+		if (!narrowingState.candidates.all.length) return;
+
+		narrowingState.descriptors = computeDescriptors({
+			allCandidates: narrowingState.candidates.all,
+			options,
+		});
 	});
 
 	let toggleFocusSearchBar = $state<() => void>();
@@ -205,154 +238,75 @@
 	});
 </script>
 
-<div class="layout" class:expanded-subject={expandedSubject}>
-	<aside>
-		<section class="photo">
-			<Subject
-				buttons="top-left"
-				{images}
-				bind:expand={
-					() => (expandedSubject ? 'subject' : 'none'),
-					(value) => {
-						expandedSubject = value === 'subject';
+<OptionsLoader>
+	<div class="layout" class:expanded-subject={expandedSubject}>
+		<aside>
+			<section class="photo">
+				<Subject
+					buttons="top-left"
+					{images}
+					bind:expand={
+						() => (expandedSubject ? 'subject' : 'none'),
+						(value) => {
+							expandedSubject = value === 'subject';
+						}
 					}
-				}
-				bind:currentImage={
-					() =>
-						tables.Image.getFromState(fullscreenState.currentImage ?? '') ?? images[0],
-					(image) => {
-						fullscreenState.currentImage = image?.id;
+					bind:currentImage={
+						() =>
+							tables.Image.getFromState(fullscreenState.currentImage ?? '') ??
+							images[0],
+						(image) => {
+							fullscreenState.currentImage = image?.id;
+						}
 					}
-				}
-			/>
-		</section>
-		<section class="choices" {@attach scrollfader}>
-			<ol>
-				{#if focusedMetadata && focusedMetadataValue}
-					<li class="focused" aria-labelledby="narrower-focused-metadata">
-						<div class="metadata" id="narrower-focused-metadata">
-							<OverflowableText text={focusedMetadata.label} />
-						</div>
-						<div class="input">
-							<MetadataInput
-								definition={focusedMetadata}
-								id={focusedMetadata.id}
-								validationErrors={undefined}
-								options={undefined}
-								value={focusedMetadataValue?.value}
-								isCompactEnum={false}
-								unit={undefined}
-								onblur={async (value) => {
-									if (!value) return;
-									if (!observation) return;
-									await storeMetadataValue({
-										db: databaseHandle(),
-										metadataId: focusedMetadata.id,
-										subjectId: observation.id,
-										sessionId: uiState.currentSession?.id,
-										type: 'enum',
-										value,
-										confidence: 1,
-										manuallyModified: true,
-									});
-								}}
-							></MetadataInput>
-						</div>
-						<div class="todo"></div>
-						<div class="confidence">
-							<ConfidencePercentage value={focusedMetadataValue.confidence} />
-						</div>
-
-						<div class="remove">
-							<ButtonIcon
-								help="Enlever ce choix"
-								onclick={async () => {
-									if (!observation) return;
-									await deleteMetadataValue({
-										db: databaseHandle(),
-										subjectId: observation.id,
-										metadataId: focusedMetadata.id,
-										sessionId: uiState.currentSession?.id,
-									});
-								}}
-							>
-								<IconRemove />
-							</ButtonIcon>
-						</div>
-					</li>
-				{/if}
-
-				{#each choices as [id, value], i (id)}
-					{@const definition = definitions.find((d) => d.id === id)}
-					{@const choicesBeforeThisOne = fromEntries(choices.slice(i + 1))}
-					{@const filterCountMaxChars =
-						narrowingState.candidates.all.length.toString().length}
-
-					{#if definition}
-						{@const ariaLabel = `narrowing-choices-list-${definition.id}`}
-						<li in:fade={{ duration: 200 }} aria-labelledby={ariaLabel}>
-							<div id={ariaLabel} class="metadata">
-								<OverflowableText text={definition.label} />
+				/>
+			</section>
+			<section class="choices" {@attach scrollfader}>
+				<ol>
+					{#if focusedMetadata && focusedMetadataValue}
+						<li class="focused" aria-labelledby="narrower-focused-metadata">
+							<div class="metadata" id="narrower-focused-metadata">
+								<OverflowableText text={focusedMetadata.label} />
 							</div>
 							<div class="input">
 								<MetadataInput
-									{definition}
-									{id}
-									addToAlternativesBySelect
+									definition={focusedMetadata}
+									id={focusedMetadata.id}
 									validationErrors={undefined}
 									options={undefined}
-									value={value?.value}
+									value={focusedMetadataValue?.value}
 									isCompactEnum={false}
 									unit={undefined}
-									alternatives={mapKeys(
-										value?.alternatives ?? {},
-										(key) => safeJSONParse(key)?.toString() ?? key
-									)}
-									onblur={async (value, _unit, alternatives) => {
+									onblur={async (value) => {
 										if (!value) return;
 										if (!observation) return;
 										await storeMetadataValue({
 											db: databaseHandle(),
-											metadataId: id,
+											metadataId: focusedMetadata.id,
 											subjectId: observation.id,
 											sessionId: uiState.currentSession?.id,
 											type: 'enum',
 											value,
-											alternatives,
 											confidence: 1,
 											manuallyModified: true,
 										});
 									}}
 								></MetadataInput>
 							</div>
-							{#await narrowingPower( { allCandidates: narrowingState.candidates.all, currentChoices: choicesBeforeThisOne, choice: { metadataId: id, optionKey: value.value.toString() } } )}
-								<div class="ratio"></div>
-								<div
-									class="filter-count"
-									style:width="{filterCountMaxChars}ch"
-								></div>
-							{:then narrowing}
-								<div class="ratio">
-									<RadialProgress
-										help="Candidats restants par rapport au choix précédent"
-										progress={1 - narrowing.ratio}
-									/>
-								</div>
-								<span class="filter-count" style:width="{filterCountMaxChars}ch">
-									{narrowing.countAfterChoice}
-								</span>
-							{/await}
+							<div class="todo"></div>
+							<div class="confidence">
+								<ConfidencePercentage value={focusedMetadataValue.confidence} />
+							</div>
+
 							<div class="remove">
 								<ButtonIcon
 									help="Enlever ce choix"
 									onclick={async () => {
 										if (!observation) return;
-										narrowingState.choicesHistory =
-											narrowingState.choicesHistory.filter((v) => v !== id);
 										await deleteMetadataValue({
 											db: databaseHandle(),
 											subjectId: observation.id,
-											metadataId: id,
+											metadataId: focusedMetadata.id,
 											sessionId: uiState.currentSession?.id,
 										});
 									}}
@@ -361,165 +315,156 @@
 								</ButtonIcon>
 							</div>
 						</li>
-					{:else}
-						<li>
-							{id} not found
-						</li>
 					{/if}
-				{:else}
-					<li class="empty" in:fade={{ duration: 200 }}>
-						<Logo variant="empty" />
-						Aucun choix effectué pour l'instant
-					</li>
-				{/each}
-			</ol>
-		</section>
-		<section class="actions">
-			<div class="settings">
+				</ol>
+			</section>
+			<section class="actions">
+				<div class="settings">
+					<NarrowableGroupPicker />
+				</div>
+				<ButtonInk
+					onclick={async () => {
+						if (!observation) return;
+						const obs = await tables.Observation.raw.get(observation.id);
+						if (!obs) return;
+						narrowingState.choicesHistory = [];
+						// Wipe all metadata values that are in the current metadata group
+						await tables.Observation.update(
+							observation.id,
+							'metadataOverrides',
+							transformObject(obs.metadataOverrides, (id, value) => {
+								const def = definitions.find((d) => d.id === id);
+								if (!def) return [id, value];
+								if (
+									def.group !==
+									uiState.currentSession.fullscreenClassifier.narrowableGroup
+								)
+									return [id, value];
+
+								return undefined;
+							})
+						);
+					}}
+				>
+					<IconRestart />
+					Recommencer
+				</ButtonInk>
+			</section>
+		</aside>
+
+		<div class="content-and-footer" class:no-narrowable-group={!narrowableGroup}>
+			{#if !narrowableGroup}
+				<Logo variant="empty" />
+				<p>Choisir un groupe de métadonnées avec lequel classifier par élimination</p>
 				<NarrowableGroupPicker />
-			</div>
-			<ButtonInk
-				onclick={async () => {
-					if (!observation) return;
-					const obs = await tables.Observation.raw.get(observation.id);
-					if (!obs) return;
-					narrowingState.choicesHistory = [];
-					// Wipe all metadata values that are in the current metadata group
-					await tables.Observation.update(
-						observation.id,
-						'metadataOverrides',
-						transformObject(obs.metadataOverrides, (id, value) => {
-							const def = definitions.find((d) => d.id === id);
-							if (!def) return [id, value];
-							if (
-								def.group !==
-								uiState.currentSession.fullscreenClassifier.narrowableGroup
-							)
-								return [id, value];
-
-							return undefined;
-						})
-					);
-				}}
-			>
-				<IconRestart />
-				Recommencer
-			</ButtonInk>
-		</section>
-	</aside>
-
-	<div class="content-and-footer" class:no-narrowable-group={!narrowableGroup}>
-		{#if !narrowableGroup}
-			<Logo variant="empty" />
-			<p>Choisir un groupe de métadonnées avec lequel classifier par élimination</p>
-			<NarrowableGroupPicker />
-		{:else}
-			<div class="progress" data-testid="remaining-candidates">
-				<ProgressBar progress={narrowingState.candidates.ratio} />
-				<div class="remaining-count">
-					{plural(narrowingState.candidates.remaining.length, [
-						'# restant',
-						'# restants',
-					])}
+			{:else}
+				<div class="progress" data-testid="remaining-candidates">
+					<ProgressBar progress={narrowingState.candidates.ratio} />
+					<div class="remaining-count">
+						{plural(narrowingState.candidates.remaining.length, [
+							'# restant',
+							'# restants',
+						])}
+					</div>
 				</div>
-			</div>
 
-			{#key page.route.id}
-				<div class="content" in:fade={{ duration: 200 }}>
-					{@render children()}
-				</div>
-			{/key}
+				{#key page.route.id}
+					<div class="content" in:fade={{ duration: 200 }}>
+						{@render children()}
+					</div>
+				{/key}
 
-			<footer>
-				<search
-					{@attach (node) => {
-						const input = node.querySelector('input');
-						if (!input) return;
-						toggleFocusSearchBar = () => {
-							if (document.activeElement === input) {
-								input.blur();
-							} else {
-								input.focus();
+				<footer>
+					<search
+						{@attach (node) => {
+							const input = node.querySelector('input');
+							if (!input) return;
+							toggleFocusSearchBar = () => {
+								if (document.activeElement === input) {
+									input.blur();
+								} else {
+									input.focus();
+								}
+							};
+						}}
+					>
+						<IconSearch />
+						<InlineTextInput
+							discreet
+							label="Rechercher"
+							placeholder="Rechercher"
+							bind:value={narrowingState.search[tab].query}
+						/>
+						<KeyboardHint shortcut="$mod+F" />
+
+						{#if narrowingState.search[tab].query}
+							<span class="count"
+								>{plural(narrowingState.search[tab].resultsCount, [
+									'# résultat',
+									'# résultats',
+								])}</span
+							>
+						{/if}
+					</search>
+					<SegmentedGroup
+						options={['describe', 'choices', 'candidates']}
+						disabled={(key) => {
+							if (key === 'candidates' && tooManyRemainingCandidates) {
+								return `Plus de ${maximumListableCandidates.toLocaleString()} candidats restants`;
 							}
-						};
-					}}
-				>
-					<IconSearch />
-					<InlineTextInput
-						discreet
-						label="Rechercher"
-						placeholder="Rechercher"
-						bind:value={narrowingState.search[tab].query}
-					/>
-					<KeyboardHint shortcut="$mod+F" />
-
-					{#if narrowingState.search[tab].query}
-						<span class="count"
-							>{plural(narrowingState.search[tab].resultsCount, [
-								'# résultat',
-								'# résultats',
-							])}</span
-						>
-					{/if}
-				</search>
-				<SegmentedGroup
-					options={['describe', 'choices', 'candidates']}
-					disabled={(key) => {
-						if (key === 'candidates' && tooManyRemainingCandidates) {
-							return `Plus de ${maximumListableCandidates.toLocaleString()} candidats restants`;
+							return false;
+						}}
+						bind:current={
+							() => tab,
+							(option) => {
+								void goto(
+									`/(app)/(sidepanel)/o/[observation]/classify/narrow/${option}`,
+									page.params
+								);
+							}
 						}
-						return false;
-					}}
-					bind:current={
-						() => tab,
-						(option) => {
-							void goto(
-								`/(app)/(sidepanel)/o/[observation]/classify/narrow/${option}`,
-								page.params
-							);
-						}
-					}
-				>
-					{#snippet option_describe()}
-						<div
-							class="tab"
-							use:tooltip={{ text: "Décrire l'observation", keyboard: 'tab' }}
-						>
-							Décrire
-						</div>
-					{/snippet}
-					{#snippet option_choices()}
-						<div
-							class="tab"
-							use:tooltip={{
-								text: 'Voir les descriptions choisies',
-								keyboard: 'tab',
-							}}
-						>
-							Choix
-							<code class="candidates-count">
-								{Object.keys(metadataValues).length}
-							</code>
-						</div>
-					{/snippet}
-					{#snippet option_candidates({ disabled })}
-						<div
-							class="tab"
-							use:tooltip={disabled
-								? undefined
-								: { text: 'Voir les candidats possibles', keyboard: 'tab' }}
-						>
-							Candidats
-							<code class="candidates-count">
-								{narrowingState.candidates.remaining.length}
-							</code>
-						</div>
-					{/snippet}
-				</SegmentedGroup>
-			</footer>
-		{/if}
+					>
+						{#snippet option_describe()}
+							<div
+								class="tab"
+								use:tooltip={{ text: "Décrire l'observation", keyboard: 'tab' }}
+							>
+								Décrire
+							</div>
+						{/snippet}
+						{#snippet option_choices()}
+							<div
+								class="tab"
+								use:tooltip={{
+									text: 'Voir les descriptions choisies',
+									keyboard: 'tab',
+								}}
+							>
+								Choix
+								<code class="candidates-count">
+									{Object.keys(metadataValues).length}
+								</code>
+							</div>
+						{/snippet}
+						{#snippet option_candidates({ disabled })}
+							<div
+								class="tab"
+								use:tooltip={disabled
+									? undefined
+									: { text: 'Voir les candidats possibles', keyboard: 'tab' }}
+							>
+								Candidats
+								<code class="candidates-count">
+									{narrowingState.candidates.remaining.length}
+								</code>
+							</div>
+						{/snippet}
+					</SegmentedGroup>
+				</footer>
+			{/if}
+		</div>
 	</div>
-</div>
+</OptionsLoader>
 
 <style>
 	/* FIXME: why is this necessary here but not in other full-screen pages? */

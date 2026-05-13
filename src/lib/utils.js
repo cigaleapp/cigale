@@ -883,12 +883,19 @@ if (import.meta.vitest) {
 }
 
 /**
- * @param {number[]} values
+ * @param {Iterable<number>} values
  * @param {number} fallback if values is empty
  */
 export function avg(values, fallback = NaN) {
-	if (values.length === 0) return fallback;
-	return sum(values) / values.length;
+	let summed = 0
+	let length = 0;
+
+	for (const value of values) {
+		summed += value;
+		length++;
+	}
+
+	return length === 0 ? fallback : summed / length;
 }
 
 if (import.meta.vitest) {

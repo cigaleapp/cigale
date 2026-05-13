@@ -39,8 +39,6 @@
 		allOptions: options,
 	} = $derived(data);
 
-	const cascadeLabelsCache: CascadeLabelsCache = $state({});
-
 	const layout = $derived(uiState.currentSession?.fullscreenClassifier.layout ?? 'top-bottom');
 
 	const currentMetadataValue = $derived.by(() => {
@@ -129,7 +127,7 @@
 					indent-icon={false}
 				>
 					{#await openDatabase() then db}
-						{#await cascadeLabels( { cache: cascadeLabelsCache, db, protocolId: namespaceOfMetadataId(focusedMetadata.id), option } ) then cascades}
+						{#await cascadeLabels( { db, protocolId: namespaceOfMetadataId(focusedMetadata.id), option } ) then cascades}
 							<MetadataCascadesTable {cascades} />
 						{/await}
 					{/await}

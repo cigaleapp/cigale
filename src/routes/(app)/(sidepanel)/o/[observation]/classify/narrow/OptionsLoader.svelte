@@ -7,11 +7,14 @@
 		NamespacedMetadataID,
 		Map<string, DB.MetadataEnumVariant>
 	> = $state.raw({});
+
+	// export const narrowingPowers =
 </script>
 
 <script lang="ts">
 	import type * as DB from '$lib/database.js';
 	import type { NamespacedMetadataID } from '$lib/schemas/common.js';
+	import type { Snippet } from 'svelte';
 
 	import { databaseHandle } from '$lib/idb.svelte.js';
 	import Logo from '$lib/Logo.svelte';
@@ -19,9 +22,13 @@
 	import { uiState } from '$lib/state.svelte.js';
 	import { cancellable } from '$lib/utils.js';
 
-	import { narrowingState } from '../+layout.svelte';
+	import { narrowingState } from './+layout.svelte';
 
-	const { children } = $props();
+	interface Props {
+		children: Snippet;
+	}
+
+	const { children }: Props = $props();
 
 	const definitions = $derived(
 		narrowingState.definitions(uiState.currentSession?.fullscreenClassifier.narrowableGroup)

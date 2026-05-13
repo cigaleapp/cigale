@@ -3,7 +3,7 @@ import { ArkErrors, scope, type } from 'arktype';
 import { parseISOSafe } from '../date.js';
 import { EXIF_FIELDS } from '../exiffields.js';
 import { boundingBoxResolver } from '../inference_utils.js';
-import { entries, keys, transformObject, unique } from '../utils.js';
+import { ensureArray, entries, keys, mapValues, transformObject, unique } from '../utils.js';
 import {
 	ColorHex,
 	FilepathTemplate,
@@ -268,9 +268,10 @@ export const MetadataEnumVariant = type({
 		"Code Iconify d'une icône associée à cette option, provenant du pack d'icônes “Remix Icon”. Voir https://icon-sets.iconify.design/ri/ pour la liste."
 	),
 	'cascade?': type
-		.Record(ID, ID)
+		.Record(ID, ID.array().or(ID))
+		.pipe(record => mapValues(record, ensureArray))
 		.describe(
-			'Objet contenant pour clés des identifiants d\'autres métadonnées, et pour valeurs la valeur à assigner à cette métadonnée si cette option est choisie. Le processus est récursif: Imaginons une métadonnée species ayant une option avec `{ key: "1", cascade: { genus: "2" } }`, une métadonnée genus ayant une option `{ key: "2", cascade: { family: "3" } }`. Si l\'option "1" de la métadonnée species est choisie, la métadonnée genus sera définie sur l\'option "2" et la métadonnée family sera à son tour définie sur l\'option "3".'
+			"Objet contenant pour clés des identifiants d'autres métadonnées, et pour valeurs la ou les valeur(s) à assigner à cette métadonnée si cette option est choisie. Si il y en a plusieurs, une des options est choisie comme valeur de la métadonnée en question, et les autres sont mises en tant qu'alternatives, avec une confiance de 1."
 		),
 	// --- Technical fields ---
 	/** Metadata group names that are narrowable and that have at least one metadata that exists in the enum variant's cascades. Used for indexing purposes: can be used to get all species that are narrowable by metadata of a certain metadata group. This is not set automatically (as the computation requires access to metadata definitions and metadata groups of the enum variant's protocol) */

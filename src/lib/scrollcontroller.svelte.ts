@@ -19,12 +19,12 @@ class ScrollController {
 	 * Returns a cleanup function
 	 */
 	start() {
-		console.debug(
-			'[scroll controller] starting with scroll position',
-			this.scroll.y,
-			'on',
-			this.scrollable
-		);
+		// console.debug(
+		// 	'[scroll controller] starting with scroll position',
+		// 	this.scroll.y,
+		// 	'on',
+		// 	this.scrollable
+		// );
 
 		const cleanup = $effect.root(() => {
 			if (this.scroll.y === this.scrollable.scrollTop) return;

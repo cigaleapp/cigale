@@ -3,20 +3,21 @@
 
 	import { ms } from 'convert';
 	import { SvelteSet } from 'svelte/reactivity';
+	import { fade } from 'svelte/transition';
 
 	import { page } from '$app/state';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import { tables } from '$lib/idb.svelte.js';
 	import Logo from '$lib/Logo.svelte';
 	import MetadataList from '$lib/MetadataList.svelte';
-	import {fade} from 'svelte/transition';
 	import { goto } from '$lib/paths.js';
 	import { ensureNamespacedMetadataId, namespaceOfMetadataId } from '$lib/schemas/metadata.js';
+	import { isDebugMode } from '$lib/settings.svelte.js';
 	import { uiState } from '$lib/state.svelte.js';
 	import { compareBy, mapKeys } from '$lib/utils.js';
 
 	import { narrowingState } from '../../+layout.svelte';
-	import { options } from '../+layout.svelte';
+	import { options } from '../../OptionsLoader.svelte';
 	import Descriptor from '../Descriptor.svelte';
 	import Searcher from '../Searcher.svelte';
 
@@ -92,7 +93,7 @@
 					{#snippet children(definition)}
 						<div class="metadata">
 							<Descriptor
-								onchangeDelay={ms('1s')}
+								onchangeDelay={0}
 								collapsible
 								{expanded}
 								{options}
@@ -104,7 +105,7 @@
 					{/snippet}
 				</MetadataList>
 			{:else}
-			<div class="empty" in:fade={{ duration: 200 }}>
+				<div class="empty" in:fade={{ duration: 200 }}>
 					<Logo variant="empty" />
 					<p>Aucun choix effectué pour le moment</p>
 					<ButtonSecondary
@@ -119,6 +120,20 @@
 			{/if}
 		{/snippet}
 	</Searcher>
+
+	{#if isDebugMode()}
+		<pre>
+	choices = {'{'}
+		{#each narrowingState.choices.entries() as [metadata, picks]}
+				{metadata}: {'{'}
+			{#each [...picks] as pick}
+					{pick},
+				{/each}
+		{'}'},
+			{/each}
+	{'}'}
+				</pre>
+	{/if}
 </main>
 
 <style>

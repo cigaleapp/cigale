@@ -3,6 +3,7 @@
 	import type { NamespacedMetadataID } from '$lib/schemas/common.js';
 	import type { Snippet } from 'svelte';
 
+	import {untrack} from 'svelte';
 	import { dequal } from 'dequal';
 	import Fuse from 'fuse.js';
 	import { Debounced, Previous } from 'runed';
@@ -82,7 +83,7 @@
 {#if shownDefinitions.length > 0 || !query}
 	<div class="scrollable" data-testid="descriptors" in:fade={{ duration: 200 }}
 	
-	{@attach scrollController(scroll)}
+	{@attach scrollController(untrack(() => scroll))}
 	>
 		{@render children(
 			shownDefinitions,
@@ -105,7 +106,6 @@
 {/if}
 
 <style>
-	.loading,
 	.empty {
 		height: 100%;
 		display: flex;

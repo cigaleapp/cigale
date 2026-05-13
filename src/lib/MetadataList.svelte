@@ -1,14 +1,13 @@
 <script lang="ts">
 	import type * as DB from '$lib/database.js';
 
-	import { untrack, type Snippet } from 'svelte';
+	import { type Snippet } from 'svelte';
 
 	import IconExpand from '~icons/ri/arrow-right-s-line';
 	import VirtualList from '$lib/VirtualList.svelte';
 
 	import { metadataDefinitionComparator } from './protocols.js';
 	import { getSettings } from './settings.svelte.js';
-	import { scrollController } from './scrollcontroller.svelte.js';
 
 	interface Props {
 		children: Snippet<[DB.Metadata, DB.MetadataValue, { collapsed: boolean }]>;
@@ -73,10 +72,7 @@
 	const _virtualize = $derived(virtualize && groups.length === 0);
 </script>
 
-<div
-	class="liste"
-	data-testid={testid}
->
+<div class="liste" data-testid={testid}>
 	{#snippet metadata(item: (typeof groupedDefinitions)[number])}
 		{@const { group, definitions } = item}
 		<div class="definition-group">

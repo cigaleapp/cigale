@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type * as DB from '$lib/database.js';
 	import type { NamespacedMetadataID } from '$lib/schemas/common.js';
 
 	import { ms } from 'convert';
@@ -8,10 +9,11 @@
 	import MetadataList from '$lib/MetadataList.svelte';
 	import { ensureNamespacedMetadataId, namespaceOfMetadataId } from '$lib/schemas/metadata.js';
 	import { uiState } from '$lib/state.svelte.js';
-	import { compareBy, mapKeys } from '$lib/utils.js';
+	import { avg, compareBy, mapKeys } from '$lib/utils.js';
 
 	import { narrowingState } from '../../+layout.svelte';
-	import { options } from '../+layout.svelte';
+	import { narrowingPower } from '../../candidates.js';
+	import { options } from '../../OptionsLoader.svelte';
 	import Descriptor from '../Descriptor.svelte';
 	import Searcher from '../Searcher.svelte';
 
@@ -52,20 +54,43 @@
 		return result;
 	});
 
-	function metadataOrdering(searchResults?: NamespacedMetadataID[]) {
+	function metadataOrdering(
+		shownDefinitions: DB.Metadata[],
+		searchResults?: NamespacedMetadataID[]
+	) {
 		if (searchResults) return searchResults;
 
-		if (!Object.keys(remainingMetadataValues).length)
-			return uiState.currentProtocol?.metadataOrder ?? [];
+		console.time('metadata ordering');
+		// const ordering= definitions
+		// 	.toSorted(
+		// 		compareBy((def) =>
+		// 		avg(
+		// 			[...options[def.id].values()].map(({key}) => narrowingPower({
+		// 				dbg: true,
+		// 				allCandidates: narrowingState.candidates.remaining,
+		// 				currentChoices: metadataValues,
+		// 				choice: { metadataId: def.id, optionKey: key },
+		// 			}).ratio)
+		// 		)
+		// 		)
+		// 	)
+		// 	.map((def) => def.id);
 
-		return definitions
+		const ordering = shownDefinitions
+			.map((def) => def.id)
 			.toSorted(
-				compareBy((def) => {
-					// TODO
-					return 1;
-				})
-			)
-			.map((def) => def.id);
+				compareBy((id) =>
+					narrowingPower({
+						candidates: narrowingState.candidates.remainingIds,
+						descriptors: narrowingState.descriptors,
+						metadata: id,
+						options: options[id].keys(),
+					})
+				)
+			);
+
+		console.timeEnd('metadata ordering');
+		return ordering;
 	}
 </script>
 
@@ -84,7 +109,7 @@
 				definitions={searchResults
 					? shownDefinitions
 					: shownDefinitions.filter((def) => !(def.id in metadataValues))}
-				ordering={metadataOrdering(searchResults)}
+				ordering={metadataOrdering(shownDefinitions, searchResults)}
 				groups={undefined}
 			>
 				{#snippet children(definition)}

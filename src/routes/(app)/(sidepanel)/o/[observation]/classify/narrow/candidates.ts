@@ -3,8 +3,11 @@ import type { TypedMetadataValue } from '$lib/metadata/index.js';
 import type { NamespacedMetadataID } from '$lib/schemas/common.js';
 
 import { listByIndex } from '$lib/idb.svelte.js';
-import { removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';
-import { entries, safeJSONParse } from '$lib/utils.js';
+import { namespacedMetadataId, removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';
+import { uiState } from '$lib/state.svelte.js';
+import { avg, entries, profiler, safeJSONParse } from '$lib/utils.js';
+
+const profile = profiler('Narrowing Classifier');
 
 export async function getAllCandidates({
 	narrowableGroup,
@@ -18,58 +21,89 @@ export async function getAllCandidates({
 	return narrowables.filter((option) => option.metadataId === focusedMetadataId);
 }
 
-export function getMatchingCandidates({
+export type Descriptors = Map<string, Map<NamespacedMetadataID, Set<string>>>;
+
+/** A map of option sets */
+export function computeDescriptors({
 	allCandidates,
-	choices,
+	options,
 }: {
 	allCandidates: DB.MetadataEnumVariant[];
-	choices: Record<NamespacedMetadataID, TypedMetadataValue<'enum'>>;
-}) {
-	return allCandidates.filter((c) =>
-		entries(choices).every(([metadataId, { value, alternatives }]) => {
-			const keys = new Set([
-				value,
-				...Object.keys(alternatives ?? {}).map((alt) => safeJSONParse(alt)?.toString()),
-			]);
+	/** Options of all narrowable metadata */
+	options: Record<NamespacedMetadataID, Map<string, DB.MetadataEnumVariant>>;
+}): Descriptors {
+	const descriptors: Descriptors = new Map();
 
-			const cascadeValue = c.cascade?.[removeNamespaceFromMetadataId(metadataId)];
-			return !cascadeValue || keys.has(cascadeValue);
-		})
-	);
+	console.time('computeDescriptors');
+
+	for (const candidate of allCandidates) {
+		const descriptions = new Map<NamespacedMetadataID, Set<string>>();
+
+		for (const [id, opts] of entries(options)) {
+			const keys = candidate.cascade?.[removeNamespaceFromMetadataId(id)];
+			descriptions.set(id, keys ? new Set(keys) : new Set(opts.keys()));
+		}
+
+		descriptors.set(candidate.key, descriptions);
+	}
+
+	console.timeEnd('computeDescriptors');
+
+	console.debug('Computed descriptors for narrowing classifier', descriptors);
+
+	return descriptors;
 }
 
-export async function narrowingPower({
-	allCandidates,
-	currentChoices,
-	choice,
+export function matches({
+	descriptors,
+	within,
+	choices,
 }: {
-	allCandidates: DB.MetadataEnumVariant[];
-	currentChoices: Parameters<typeof getMatchingCandidates>[0]['choices'];
-	choice: { metadataId: NamespacedMetadataID; optionKey: string };
+	descriptors: Descriptors;
+	choices: Map<NamespacedMetadataID, Set<string>>;
+	/** Keys of candidates that we want to filter from. */
+	within: Set<string>;
+}): Set<string> {
+	const matching = new Set<string>();
+
+	candidates: for (const key of within) {
+		const descriptor = descriptors.get(key);
+		if (!descriptor) continue;
+
+		for (const [metadata, picks] of choices) {
+			const description = descriptor.get(metadata);
+			if (!description) continue;
+
+			if (picks.intersection(description).size === 0) {
+				continue candidates;
+			}
+		}
+
+		matching.add(key);
+	}
+
+	return matching;
+}
+
+export function narrowingPower({
+	candidates,
+	descriptors,
+	metadata,
+	options,
+}: {
+	candidates: Set<string>;
+	descriptors: Descriptors;
+	metadata: NamespacedMetadataID;
+	/** All option keys for the given metadata */
+	options: IteratorObject<string>;
 }) {
-	const candidatesBefore = getMatchingCandidates({ allCandidates, choices: currentChoices });
-
-	const currentValue = currentChoices[choice.metadataId];
-
-	const candidatesAfter = getMatchingCandidates({
-		allCandidates,
-		choices: {
-			...currentChoices,
-			[choice.metadataId]: {
-				type: 'enum',
-				value: choice.optionKey,
-				alternatives: currentValue
-					? {
-							...currentValue.alternatives,
-							[JSON.stringify(currentValue.value)]: 1,
-						}
-					: {},
-			},
-		},
-	});
-
-	return {
-		countAfterChoice: candidatesAfter.length,
-		ratio: candidatesAfter.length / (candidatesBefore.length || 1),
-	};
+	return avg(
+		options.map(
+			(option) =>
+				candidates
+					.values()
+					.filter((candidate) => descriptors.get(candidate)?.get(metadata)?.has(option))
+					.toArray().length
+		)
+	);
 }

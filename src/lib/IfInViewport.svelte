@@ -4,18 +4,20 @@
  
 -->
 
-<script lang="ts">
+<script lang="ts" generics="T">
 	import type { Snippet } from 'svelte';
 
 	import { IsInViewport } from 'runed';
 
 	interface Props {
-		children: Snippet;
+		children: Snippet<[T]>;
 		/** Only run once, afterwards the content stays rendered even if the component leaves the viewport */
 		once?: boolean;
+		/** Computation to run when in viewport. The result is availabe as a prop to the children snippet */
+		computation?: () => T|Promise<T>;
 	}
 
-	const { children, once = false }: Props = $props();
+	const { children, once = false, computation  }: Props = $props();
 
 	let node = $state<HTMLElement>();
 
@@ -24,7 +26,12 @@
 
 <div class="if-in-viewport" bind:this={node}>
 	{#if inViewport.current}
-		{@render children()}
+		{#await (async () => {
+			if (!computation) return undefined
+			return await computation();
+		})() then result}
+		{@render children(result)}
+		{/await}
 	{/if}
 </div>
 

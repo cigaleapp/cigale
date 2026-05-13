@@ -122,11 +122,7 @@
 		);
 	}
 
-	/**
-	 * @type {CascadeLabelsCache}
-	 */
-	let cascadeLabelsCache = $state({});
-
+	
 </script>
 
 <div class="metadata-combobox" class:wide-docs={hasImages} class:multiple>
@@ -221,7 +217,7 @@
 				<LearnMoreLink href={o.learnMore} />
 			{/if}
 
-			{#await cascadeLabels( { cache: cascadeLabelsCache, db: idb.databaseHandle(), protocolId, option: o } ) then cascades}
+			{#await cascadeLabels( { db: idb.databaseHandle(), protocolId, option: o } ) then cascades}
 				<MetadataCascadesTable {cascades} />
 				{#if Object.keys(cascades).length > 0}
 					<p><em>Métadonées mises à jour à la sélection de cette option</em></p>

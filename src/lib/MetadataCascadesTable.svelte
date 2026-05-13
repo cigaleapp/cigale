@@ -3,6 +3,7 @@
 
 	import Icon from '@iconify/svelte';
 
+	import { tables } from './idb.svelte.js';
 	import OverflowableText from './OverflowableText.svelte';
 	import { readableOn } from './utils.js';
 
@@ -16,26 +17,31 @@
 <table class="cascades">
 	<tbody>
 		<!-- Cascade's recursion tree is displayed reversed because deeply recursive cascades are mainly meant for taxonomic stuff -- it's the childmost metadata that set their parent, so, in the resulting recursion tree, the parentmost metadata end up childmost (eg. species have cascades that sets genus, genus sets family, etc. so family is deeper in the recursion tree than genus, whereas in a taxonomic tree it's the opposite) -->
-		{#each Object.entries(labels).toReversed() as [metadataId, { value, metadata, color, icon }] (metadataId)}
-			<tr>
-				<td>
-					<OverflowableText text={metadata} />
-				</td>
-				<td>
-					{#if icon || color}
-						<div
-							class="icon"
-							style:background-color={color}
-							style:color={color ? readableOn(color) : undefined}
-						>
-							{#if icon}
-								<Icon {icon} />
-							{/if}
-						</div>
-					{/if}
-					{value}
-				</td>
-			</tr>
+		{#each Object.entries(labels).toReversed() as [metadataId, options] (metadataId)}
+			{@const metadata = tables.Metadata.get(metadataId)}
+			{#each options as { key, icon, color }, i (key)}
+				<tr>
+					<td>
+						{#if metadata && i === 0}
+							<OverflowableText text={metadata.label} />
+						{/if}
+					</td>
+					<td>
+						{#if icon || color}
+							<div
+								class="icon"
+								style:background-color={color}
+								style:color={color ? readableOn(color) : undefined}
+							>
+								{#if icon}
+									<Icon {icon} />
+								{/if}
+							</div>
+						{/if}
+						{value}
+					</td>
+				</tr>
+			{/each}
 		{/each}
 	</tbody>
 </table>

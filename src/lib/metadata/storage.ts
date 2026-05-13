@@ -10,6 +10,7 @@ import { computeCascades } from '$lib/cascades.js';
 import {
 	ensureNamespacedMetadataId,
 	isNamespacedToProtocol,
+	MetadataEnumVariant,
 	MetadataError,
 	MetadataValue,
 	namespacedMetadataId,
@@ -21,11 +22,7 @@ import { resolveMetadataImport } from './imports.js';
 import { serializeMetadataValue } from './serializing.js';
 
 // TODO: use everywhere
-function metadataOptionDatabaseKey(
-	protocolId: string,
-	metadataId: string,
-	optionKey: string
-) {
+function metadataOptionDatabaseKey(protocolId: string, metadataId: string, optionKey: string) {
 	return `${ensureNamespacedMetadataId(metadataId, protocolId)}:${optionKey}`;
 }
 
@@ -61,10 +58,12 @@ export async function metadataOption(
 		return cachedOptions.find((opt) => opt.key === optionKey);
 	}
 
-	return db.get(
-		'MetadataOption',
-		metadataOptionDatabaseKey(namespaceOfMetadataId(metadataId)!, metadataId, optionKey)
-	);
+	return db
+		.get(
+			'MetadataOption',
+			metadataOptionDatabaseKey(namespaceOfMetadataId(metadataId)!, metadataId, optionKey)
+		)
+		.then((opt) => (opt ? MetadataEnumVariant.assert(opt) : undefined));
 }
 
 /**

@@ -24,7 +24,7 @@
 	import { proxifyIfLocalhost } from '$lib/utils.js';
 
 	import { narrowingState } from '../+layout.svelte';
-	import { narrowingPower } from '../candidates.js';
+	import { matches, narrowingPower } from '../candidates.js';
 
 	interface Props {
 		definition: DB.Metadata;
@@ -189,8 +189,21 @@
 		// TODO: flush debouncedOnChange when mouse quits the metadata component?
 	>
 		{#snippet enumOptionsExtraContent({ option: { key }, selected })}
-			<IfInViewport>
-				{#await narrowingPower( { allCandidates: narrowingState.candidates.all, currentChoices: metadataValues, choice: { metadataId: definition.id, optionKey: key } } ) then { countAfterChoice, ratio }}
+			<IfInViewport
+				computation={() => {
+					const choices = structuredClone(narrowingState.choices);
+					choices.set(definition.id, (choices.get(definition.id) ?? new Set()).add(key));
+
+					return matches({
+						descriptors: narrowingState.descriptors,
+						within: narrowingState.candidates.allIds,
+						choices,
+					}).size;
+				}}
+			>
+				{#snippet children(countAfter)}
+					{@const countBefore = narrowingState.candidates.remainingIds.size}
+					{@const ratio = countAfter / countBefore}
 					<div
 						class="narrowing-power"
 						use:tooltip={'Candidats restants après ce choix'}
@@ -208,15 +221,15 @@
 								style:width="{narrowingState.candidates.all.length.toString()
 									.length + 1}ch"
 							>
-								{#if countAfterChoice > narrowingState.candidates.remaining.length}
-									+{countAfterChoice - narrowingState.candidates.remaining.length}
+								{#if countAfter > countBefore}
+									+{countAfter - countBefore}
 								{:else}
-									{countAfterChoice}
+									{countAfter}
 								{/if}
 							</span>
 						{/if}
 					</div>
-				{/await}
+				{/snippet}
 			</IfInViewport>
 		{/snippet}
 	</Metadata>
