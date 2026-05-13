@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { NamespacedMetadataID } from '$lib/schemas/common.js';
 
-	import { ms } from 'convert';
 	import { SvelteSet } from 'svelte/reactivity';
 	import { fade } from 'svelte/transition';
 
@@ -122,17 +121,16 @@
 	</Searcher>
 
 	{#if isDebugMode()}
-		<pre>
-	choices = {'{'}
-		{#each narrowingState.choices.entries() as [metadata, picks]}
-				{metadata}: {'{'}
-			{#each [...picks] as pick}
-					{pick},
-				{/each}
-		{'}'},
-			{/each}
-	{'}'}
-				</pre>
+		<pre>choices = {JSON.stringify(
+				Object.fromEntries(
+					Array.from(narrowingState.choices.entries()).map(([metadataId, values]) => [
+						metadataId,
+						Array.from(values),
+					])
+				),
+				null,
+				2
+			)}</pre>
 	{/if}
 </main>
 

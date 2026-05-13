@@ -24,7 +24,7 @@
 	import { proxifyIfLocalhost } from '$lib/utils.js';
 
 	import { narrowingState } from '../+layout.svelte';
-	import { matches, narrowingPower } from '../candidates.js';
+	import { matches } from '../candidates.js';
 
 	interface Props {
 		definition: DB.Metadata;
@@ -192,6 +192,7 @@
 			<IfInViewport
 				computation={() => {
 					const choices = structuredClone(narrowingState.choices);
+					// eslint-disable-next-line svelte/prefer-svelte-reactivity
 					choices.set(definition.id, (choices.get(definition.id) ?? new Set()).add(key));
 
 					return matches({

@@ -9,7 +9,7 @@
 	import MetadataList from '$lib/MetadataList.svelte';
 	import { ensureNamespacedMetadataId, namespaceOfMetadataId } from '$lib/schemas/metadata.js';
 	import { uiState } from '$lib/state.svelte.js';
-	import { avg, compareBy, mapKeys } from '$lib/utils.js';
+	import { compareBy, mapKeys } from '$lib/utils.js';
 
 	import { narrowingState } from '../../+layout.svelte';
 	import { narrowingPower } from '../../candidates.js';

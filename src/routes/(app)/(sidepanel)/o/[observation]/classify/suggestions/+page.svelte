@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { Expandable } from '../WithExpandButton.svelte';
-	import type { CascadeLabelsCache } from '$lib/cascades';
 	import type { Attachment } from 'svelte/attachments';
 
 	import { marked } from 'marked';

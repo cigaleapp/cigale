@@ -1,13 +1,9 @@
 import type * as DB from '$lib/database.js';
-import type { TypedMetadataValue } from '$lib/metadata/index.js';
 import type { NamespacedMetadataID } from '$lib/schemas/common.js';
 
 import { listByIndex } from '$lib/idb.svelte.js';
-import { namespacedMetadataId, removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';
-import { uiState } from '$lib/state.svelte.js';
-import { avg, entries, profiler, safeJSONParse } from '$lib/utils.js';
-
-const profile = profiler('Narrowing Classifier');
+import { removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';
+import { avg, entries } from '$lib/utils.js';
 
 export async function getAllCandidates({
 	narrowableGroup,

@@ -18,8 +18,11 @@
 			return new Map(
 				entries(this.metadataValues).map(([id, { value, alternatives }]) => [
 					id,
-					new Set([value.toString(), ...Object.keys(alternatives ?? {}).map(k => safeJSONParse(k).toString())]),
-				] )
+					new Set<string>([
+						value.toString(),
+						...Object.keys(alternatives ?? {}).map((k) => safeJSONParse(k).toString()),
+					]),
+				])
 			);
 		},
 
@@ -54,7 +57,6 @@
 	import type { TypedMetadataValue } from '$lib/metadata/types.js';
 	import type { NamespacedMetadataID } from '$lib/schemas/common.js';
 
-	import { SvelteSet } from 'svelte/reactivity';
 	import { fade } from 'svelte/transition';
 
 	import IconRemove from '~icons/ri/close-line';
@@ -75,17 +77,16 @@
 	import OverflowableText from '$lib/OverflowableText.svelte';
 	import { goto } from '$lib/paths.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
-	import RadialProgress from '$lib/RadialProgress.svelte';
 	import { scrollfader } from '$lib/scrollfader.js';
 	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte.js';
 	import { tooltip } from '$lib/tooltips.js';
-	import { entries, fromEntries, mapKeys, safeJSONParse, transformObject } from '$lib/utils.js';
+	import { entries, safeJSONParse, transformObject } from '$lib/utils.js';
 
 	import { fullscreenState } from '../../+layout@(app).svelte';
 	import Subject from '../Subject.svelte';
-	import { computeDescriptors, getAllCandidates, matches, narrowingPower } from './candidates.js';
+	import { computeDescriptors, getAllCandidates, matches } from './candidates.js';
 	import NarrowableGroupPicker from './NarrowableGroupPicker.svelte';
 	import OptionsLoader, { options } from './OptionsLoader.svelte';
 
@@ -109,14 +110,6 @@
 
 	const metadataValues = $derived(narrowingState.metadataValues);
 
-	const choices = $derived([
-		...narrowingState.choicesHistory
-			.toReversed()
-			.filter((id) => id in metadataValues)
-			.map((id) => [id, metadataValues[id]] as const),
-		...entries(metadataValues).filter(([id]) => !narrowingState.choicesHistory.includes(id)),
-	]);
-
 	$effect(() => {
 		narrowingState.focusedMetadataId =
 			uiState.currentSession?.fullscreenClassifier.focusedMetadata ??
@@ -135,7 +128,7 @@
 	});
 
 	$effect(() => {
-		console.time('update matches')
+		console.time('update matches');
 		narrowingState.candidates.remainingIds = matches({
 			descriptors: narrowingState.descriptors,
 			within: narrowingState.candidates.allIds,
