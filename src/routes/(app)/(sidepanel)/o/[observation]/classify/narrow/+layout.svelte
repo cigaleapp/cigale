@@ -43,6 +43,10 @@
 			get ratio() {
 				return 1 - this.remaining.length / (this.all.length - 1 || 1);
 			},
+
+			eliminated({ key }: { key: string }): boolean {
+				return !this.remainingIds.has(key);
+			},
 		},
 
 		descriptors: new Map() as Descriptors,
@@ -77,12 +81,12 @@
 	import OverflowableText from '$lib/OverflowableText.svelte';
 	import { goto } from '$lib/paths.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
-	import { scrollfader } from '$lib/scrollfader.js';
 	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte.js';
 	import { tooltip } from '$lib/tooltips.js';
-	import { entries, safeJSONParse, transformObject } from '$lib/utils.js';
+	import { compareBy, entries, safeJSONParse, transformObject } from '$lib/utils.js';
+	import VirtualList from '$lib/VirtualList.svelte';
 
 	import { fullscreenState } from '../../+layout@(app).svelte';
 	import Subject from '../Subject.svelte';
@@ -106,6 +110,12 @@
 
 	const definitions = $derived(
 		narrowingState.definitions(uiState.currentSession?.fullscreenClassifier.narrowableGroup)
+	);
+
+	const eliminated = $derived(
+		narrowingState.candidates.all.filter(
+			(c) => !narrowingState.candidates.remainingIds.has(c.key)
+		)
 	);
 
 	const metadataValues = $derived(narrowingState.metadataValues);
@@ -170,6 +180,8 @@
 	});
 
 	let toggleFocusSearchBar = $state<() => void>();
+
+	let candidatesTab = $state<'all' | 'remaining' | 'eliminated'>('all');
 
 	const tab = $derived.by(() => {
 		switch (page.route.id) {
@@ -254,62 +266,106 @@
 					}
 				/>
 			</section>
-			<section class="choices" {@attach scrollfader}>
-				<ol>
-					{#if focusedMetadata && focusedMetadataValue}
-						<li class="focused" aria-labelledby="narrower-focused-metadata">
-							<div class="metadata" id="narrower-focused-metadata">
-								<OverflowableText text={focusedMetadata.label} />
-							</div>
-							<div class="input">
-								<MetadataInput
-									definition={focusedMetadata}
-									id={focusedMetadata.id}
-									validationErrors={undefined}
-									options={undefined}
-									value={focusedMetadataValue?.value}
-									isCompactEnum={false}
-									unit={undefined}
-									onblur={async (value) => {
-										if (!value) return;
-										if (!observation) return;
-										await storeMetadataValue({
-											db: databaseHandle(),
-											metadataId: focusedMetadata.id,
-											subjectId: observation.id,
-											sessionId: uiState.currentSession?.id,
-											type: 'enum',
-											value,
-											confidence: 1,
-											manuallyModified: true,
-										});
-									}}
-								></MetadataInput>
-							</div>
-							<div class="todo"></div>
-							<div class="confidence">
-								<ConfidencePercentage value={focusedMetadataValue.confidence} />
-							</div>
+			{#if focusedMetadata && focusedMetadataValue}
+				<section class="focused" aria-labelledby="narrower-focused-metadata">
+					<div class="metadata" id="narrower-focused-metadata">
+						<OverflowableText text={focusedMetadata.label} />
+					</div>
+					<div class="input">
+						<MetadataInput
+							definition={focusedMetadata}
+							id={focusedMetadata.id}
+							validationErrors={undefined}
+							options={undefined}
+							value={focusedMetadataValue?.value}
+							isCompactEnum={false}
+							unit={undefined}
+							onblur={async (value) => {
+								if (!value) return;
+								if (!observation) return;
+								await storeMetadataValue({
+									db: databaseHandle(),
+									metadataId: focusedMetadata.id,
+									subjectId: observation.id,
+									sessionId: uiState.currentSession?.id,
+									type: 'enum',
+									value,
+									confidence: 1,
+									manuallyModified: true,
+								});
+							}}
+						></MetadataInput>
+					</div>
+					<div class="todo"></div>
+					<div class="confidence">
+						<ConfidencePercentage value={focusedMetadataValue.confidence} />
+					</div>
 
-							<div class="remove">
-								<ButtonIcon
-									help="Enlever ce choix"
-									onclick={async () => {
-										if (!observation) return;
-										await deleteMetadataValue({
-											db: databaseHandle(),
-											subjectId: observation.id,
-											metadataId: focusedMetadata.id,
-											sessionId: uiState.currentSession?.id,
-										});
-									}}
-								>
-									<IconRemove />
-								</ButtonIcon>
+					<div class="remove">
+						<ButtonIcon
+							help="Enlever ce choix"
+							onclick={async () => {
+								if (!observation) return;
+								await deleteMetadataValue({
+									db: databaseHandle(),
+									subjectId: observation.id,
+									metadataId: focusedMetadata.id,
+									sessionId: uiState.currentSession?.id,
+								});
+							}}
+						>
+							<IconRemove />
+						</ButtonIcon>
+					</div>
+				</section>
+			{/if}
+
+			<section class="explainer">
+				<h2>Candidats</h2>
+
+				<SegmentedGroup
+					options={['all', 'remaining', 'eliminated']}
+					bind:current={candidatesTab}
+				>
+					{#snippet option_all()}
+						Tous
+					{/snippet}
+					{#snippet option_remaining()}
+						Restants
+					{/snippet}
+					{#snippet option_eliminated()}
+						Éliminés
+					{/snippet}
+				</SegmentedGroup>
+			</section>
+
+			<section class="candidates">
+				<VirtualList
+					empty="Aucun candidat à afficher"
+					items={candidatesTab === 'all'
+						? narrowingState.candidates.all.toSorted(
+								compareBy((c) => (narrowingState.candidates.eliminated(c) ? 1 : -1))
+							)
+						: candidatesTab === 'remaining'
+							? narrowingState.candidates.remaining
+							: eliminated}
+				>
+					{#snippet item({ images, label, key })}
+						{@const crossout =
+							!narrowingState.candidates.remainingIds.has(key) &&
+							candidatesTab !== 'eliminated'}
+						<button class="candidate" class:crossout>
+							<div class="image">
+								{#if images && images.length > 0}
+									<img src={images[0]} alt="" />
+								{:else}
+									?
+								{/if}
 							</div>
-						</li>
-					{/if}
-				</ol>
+							<span>{label}</span>
+						</button>
+					{/snippet}
+				</VirtualList>
 			</section>
 			<section class="actions">
 				<div class="settings">
@@ -468,80 +524,102 @@
 	.layout {
 		display: flex;
 		height: 100%;
-		overflow: hidden;
+		/* overflow: hidden; */
 	}
 
 	aside {
 		width: max(600px, 33%);
 		flex-shrink: 0;
-		display: flex;
+		display: grid;
 		flex-direction: column;
 		border-right: 1px solid var(--gray);
 		transition: width 250ms ease;
+		height: 100%;
+
+		&:not(:has(.focused)) {
+			grid-template-rows: max-content max-content auto max-content;
+		}
+		&:has(.focused) {
+			grid-template-rows: max-content max-content max-content auto max-content;
+		}
 	}
 
-	aside .choices {
-		height: 100%;
+	section.explainer {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0.5em 0.5em;
+	}
+
+	section.focused {
+		gap: 1em;
+		padding: 0 0.5em;
+		padding-top: 1em;
+
+		&,
+		> * {
+			display: flex;
+			align-items: center;
+		}
+
+		&.focused {
+			/* border-bottom: 1px solid var(--gray); */
+			padding: 0.5em;
+		}
+
+		.filter-count {
+			flex-shrink: 0;
+		}
+
+		.metadata {
+			min-width: 0;
+			max-width: 30ch;
+			color: var(--gay);
+			text-transform: uppercase;
+			letter-spacing: 0.25ch;
+			font-size: 0.85em;
+		}
+
+		.input {
+			flex-shrink: 0;
+			margin-left: auto;
+			width: 20ch;
+		}
+	}
+
+	section.candidates {
 		overflow: auto;
-		scrollbar-gutter: stable;
 
-		ol {
-			list-style: none;
-			padding: 0;
-			height: 100%;
+		.candidate {
+			padding: 0.75em;
+			border-bottom: 1px solid var(--gray);
+			font-size: 1rem;
+			width: 100%;
+			text-align: left;
 			display: flex;
-			flex-direction: column;
+			align-items: center;
 			gap: 1em;
 		}
 
-		li:not(.empty) {
-			gap: 1em;
-			padding: 0 0.5em;
-
-			&,
-			> * {
-				display: flex;
-				align-items: center;
-			}
-
-			&.focused {
-				border-bottom: 1px solid var(--gray);
-				padding: 0.5em;
-			}
-
-			.filter-count {
-				flex-shrink: 0;
-			}
-
-			.metadata {
-				min-width: 0;
-				max-width: 30ch;
-				color: var(--gay);
-				text-transform: uppercase;
-				letter-spacing: 0.25ch;
-				font-size: 0.85em;
-			}
-
-			.input {
-				flex-shrink: 0;
-				margin-left: auto;
-				width: 20ch;
-			}
+		.candidate:is(:focus-visible, :hover) {
+			background: var(--bg-primary-translucent);
 		}
 
-		ol:not(:has(.focused)) li:first-child {
-			padding-top: 0.5em;
+		.candidate.crossout {
+			text-decoration: line-through;
+			color: var(--gray);
 		}
 
-		.empty {
-			height: 100%;
+		.candidate .image {
+			width: 2.5em;
+			height: 2.5em;
+			flex-shrink: 0;
+			border-radius: var(--corner-radius);
+			overflow: hidden;
+			border: 1px solid var(--gray);
 			display: flex;
-			flex-direction: column;
 			align-items: center;
 			justify-content: center;
-			gap: 1em;
-			/* Logo size */
-			--size: 5em;
 		}
 	}
 
@@ -554,7 +632,7 @@
 	}
 
 	aside .photo {
-		height: 40%;
+		height: 100%;
 		transition: height 250ms ease;
 		border-bottom: 1px solid var(--gray);
 	}
