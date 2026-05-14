@@ -120,10 +120,10 @@
 	}
 
 	/* FIXME: :first-child doesn't work because of virtualization so we have extra whitespace on top of the list */
-	/* .definition-group {
-		--pad: calc(var(--metadata-list-gap, 1.5em) / 2);
+	.definition-group {
+		--pad: calc(var(--metadata-list-gap, 0) / 2);
 		padding: var(--pad) 0;
-	} */
+	}
 
 	.grouped-metadata {
 		gap: var(--metadata-list-gap, 1.5em);

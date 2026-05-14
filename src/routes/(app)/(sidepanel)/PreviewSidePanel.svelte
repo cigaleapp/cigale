@@ -330,16 +330,13 @@
 		direction: ltr;
 	}
 
-	.sidepanel.empty {
-		grid-template-rows: auto max-content;
-	}
-
 	.metadatas {
 		transition: opacity 0.3s ease;
 		display: flex;
 		flex-direction: column;
 		overflow-y: auto;
 		overflow-x: hidden;
+		--metadata-list-gap: 1.5em;
 
 		&.empty {
 			opacity: 0.25;
