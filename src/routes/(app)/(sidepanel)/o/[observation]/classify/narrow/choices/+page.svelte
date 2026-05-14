@@ -15,8 +15,8 @@
 	import { uiState } from '$lib/state.svelte.js';
 	import { compareBy, mapKeys } from '$lib/utils.js';
 
-	import { narrowingState } from '../../+layout.svelte';
-	import { options } from '../../OptionsLoader.svelte';
+	import { narrowingState } from '../+layout.svelte';
+	import { options } from '../OptionsLoader.svelte';
 	import Descriptor from '../Descriptor.svelte';
 	import Searcher from '../Searcher.svelte';
 
@@ -110,7 +110,7 @@
 					<ButtonSecondary
 						onclick={async () => {
 							await goto(
-								'/(app)/(sidepanel)/o/[observation]/classify/narrow/(options)/describe',
+								'/(app)/(sidepanel)/o/[observation]/classify/narrow/describe',
 								page.params
 							);
 						}}>Décrire l'observation</ButtonSecondary

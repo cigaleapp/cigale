@@ -11,9 +11,9 @@
 	import { uiState } from '$lib/state.svelte.js';
 	import { compareBy, mapKeys } from '$lib/utils.js';
 
-	import { narrowingState } from '../../+layout.svelte';
-	import { narrowingPower } from '../../candidates.js';
-	import { options } from '../../OptionsLoader.svelte';
+	import { narrowingState } from '../+layout.svelte';
+	import { narrowingPower } from '../candidates.js';
+	import { options } from '../OptionsLoader.svelte';
 	import Descriptor from '../Descriptor.svelte';
 	import Searcher from '../Searcher.svelte';
 
@@ -61,20 +61,7 @@
 		if (searchResults) return searchResults;
 
 		console.time('metadata ordering');
-		// const ordering= definitions
-		// 	.toSorted(
-		// 		compareBy((def) =>
-		// 		avg(
-		// 			[...options[def.id].values()].map(({key}) => narrowingPower({
-		// 				dbg: true,
-		// 				allCandidates: narrowingState.candidates.remaining,
-		// 				currentChoices: metadataValues,
-		// 				choice: { metadataId: def.id, optionKey: key },
-		// 			}).ratio)
-		// 		)
-		// 		)
-		// 	)
-		// 	.map((def) => def.id);
+		
 
 		const ordering = shownDefinitions
 			.map((def) => def.id)

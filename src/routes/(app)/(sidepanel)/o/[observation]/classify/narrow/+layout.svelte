@@ -173,9 +173,9 @@
 
 	const tab = $derived.by(() => {
 		switch (page.route.id) {
-			case '/(app)/(sidepanel)/o/[observation]/classify/narrow/(options)/describe':
+			case '/(app)/(sidepanel)/o/[observation]/classify/narrow/describe':
 				return 'describe';
-			case '/(app)/(sidepanel)/o/[observation]/classify/narrow/(options)/choices':
+			case '/(app)/(sidepanel)/o/[observation]/classify/narrow/choices':
 				return 'choices';
 			case '/(app)/(sidepanel)/o/[observation]/classify/narrow/candidates':
 				return 'candidates';
@@ -194,7 +194,7 @@
 			help: 'Basculer entre les onglets Décrire, Choix et Candidats',
 			async do() {
 				switch (page.route.id) {
-					case '/(app)/(sidepanel)/o/[observation]/classify/narrow/(options)/describe': {
+					case '/(app)/(sidepanel)/o/[observation]/classify/narrow/describe': {
 						if (tooManyRemainingCandidates) {
 							toasts.error(
 								`Impossible de lister les candidats, il y en a plus de ${maximumListableCandidates.toLocaleString()}`
@@ -203,11 +203,11 @@
 						}
 
 						return goto(
-							`/(app)/(sidepanel)/o/[observation]/classify/narrow/(options)/choices`,
+							`/(app)/(sidepanel)/o/[observation]/classify/narrow/choices`,
 							page.params
 						);
 					}
-					case '/(app)/(sidepanel)/o/[observation]/classify/narrow/(options)/choices': {
+					case '/(app)/(sidepanel)/o/[observation]/classify/narrow/choices': {
 						return goto(
 							`/(app)/(sidepanel)/o/[observation]/classify/narrow/candidates`,
 							page.params
@@ -215,7 +215,7 @@
 					}
 					case '/(app)/(sidepanel)/o/[observation]/classify/narrow/candidates': {
 						return goto(
-							`/(app)/(sidepanel)/o/[observation]/classify/narrow/(options)/describe`,
+							`/(app)/(sidepanel)/o/[observation]/classify/narrow/describe`,
 							page.params
 						);
 					}

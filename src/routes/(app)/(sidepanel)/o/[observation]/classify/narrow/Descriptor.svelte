@@ -23,8 +23,8 @@
 	import { tooltip } from '$lib/tooltips.js';
 	import { proxifyIfLocalhost } from '$lib/utils.js';
 
-	import { narrowingState } from '../+layout.svelte';
-	import { matches } from '../candidates.js';
+	import { narrowingState } from './+layout.svelte';
+	import { matches } from './candidates.js';
 
 	interface Props {
 		definition: DB.Metadata;

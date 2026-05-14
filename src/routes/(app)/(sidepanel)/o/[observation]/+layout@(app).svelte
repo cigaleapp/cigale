@@ -56,7 +56,7 @@
 		switch (page.route.id) {
 			case '/(app)/(sidepanel)/o/[observation]/classify':
 			case '/(app)/(sidepanel)/o/[observation]/classify/suggestions':
-			case '/(app)/(sidepanel)/o/[observation]/classify/narrow/(options)/describe':
+			case '/(app)/(sidepanel)/o/[observation]/classify/narrow/describe':
 			case '/(app)/(sidepanel)/o/[observation]/classify/narrow/candidates': {
 				await goto('/(app)/(sidepanel)/classify');
 				break;
@@ -74,8 +74,8 @@
 				return 'crop';
 			case '/(app)/(sidepanel)/o/[observation]/classify/suggestions':
 				return 'suggestions';
-			case '/(app)/(sidepanel)/o/[observation]/classify/narrow/(options)/describe':
-			case '/(app)/(sidepanel)/o/[observation]/classify/narrow/(options)/choices':
+			case '/(app)/(sidepanel)/o/[observation]/classify/narrow/describe':
+			case '/(app)/(sidepanel)/o/[observation]/classify/narrow/choices':
 			case '/(app)/(sidepanel)/o/[observation]/classify/narrow/candidates':
 			case '/(app)/(sidepanel)/o/[observation]/classify/narrow':
 				return 'narrow';
@@ -102,7 +102,7 @@
 				break;
 			case 'narrow':
 				if (!observationToClassify) return;
-				goto('/(app)/(sidepanel)/o/[observation]/classify/narrow/(options)/describe', {
+				goto('/(app)/(sidepanel)/o/[observation]/classify/narrow/describe', {
 					observation: observationToClassify.id,
 				});
 				break;

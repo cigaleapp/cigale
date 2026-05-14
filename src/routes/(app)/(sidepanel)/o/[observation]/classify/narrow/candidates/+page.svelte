@@ -132,7 +132,7 @@
 			<ButtonSecondary
 				onclick={async () => {
 					await goto(
-						'/(app)/(sidepanel)/o/[observation]/classify/narrow/(options)/describe/',
+						'/(app)/(sidepanel)/o/[observation]/classify/narrow/describe/',
 						page.params
 					);
 				}}>Décrire</ButtonSecondary
