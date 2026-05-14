@@ -397,6 +397,10 @@ if (import.meta.vitest) {
 		expect(safeJSONStringify(undefined)).toBeUndefined();
 		expect(safeJSONStringify(null)).toBe('null');
 		expect(safeJSONStringify(Symbol('feur'))).toBeUndefined();
+		/** @type {any} */
+		const a = { b: 2 };
+		a.a = a;
+		expect(safeJSONStringify(a)).toBeUndefined();
 	});
 }
 
@@ -887,7 +891,7 @@ if (import.meta.vitest) {
  * @param {number} fallback if values is empty
  */
 export function avg(values, fallback = NaN) {
-	let summed = 0
+	let summed = 0;
 	let length = 0;
 
 	for (const value of values) {
@@ -1337,6 +1341,61 @@ export function fadeOutElement(selector, duration, { firstTimeDuration } = {}) {
 	setTimeout(() => {
 		element.remove();
 	}, duration);
+}
+
+if (import.meta.vitest) {
+	const { test, expect, vi } = import.meta.vitest;
+
+	test('fadeOutElement applies transition, sets opacity and removes element after duration', () => {
+		document.body.innerHTML = '';
+		const el = document.createElement('div');
+		el.id = 'test-fade';
+		document.body.appendChild(el);
+
+		vi.useFakeTimers();
+		fadeOutElement('#test-fade', 1000);
+
+		const found = document.querySelector('#test-fade');
+		expect(found).toBeInstanceOf(HTMLElement);
+		expect(found.style.opacity).toBe('0');
+		expect(found.style.transition).toContain('opacity 1000ms');
+
+		vi.advanceTimersByTime(1000);
+		expect(document.querySelector('#test-fade')).toBeNull();
+		vi.useRealTimers();
+	});
+
+	test('fadeOutElement removes non-HTMLElement (SVG) immediately', () => {
+		document.body.innerHTML = '';
+		const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+		svg.setAttribute('id', 'test-svg');
+		document.body.appendChild(svg);
+
+		fadeOutElement('#test-svg', 1000);
+
+		// SVGElement is not an HTMLElement, so it should be removed synchronously
+		expect(document.querySelector('#test-svg')).toBeNull();
+	});
+
+	test('fadeOutElement uses firstTimeDuration on first run', () => {
+		document.body.innerHTML = '';
+		localStorage.removeItem('app_started_before');
+
+		const el = document.createElement('div');
+		el.id = 'first-fade';
+		document.body.appendChild(el);
+
+		vi.useFakeTimers();
+		fadeOutElement('#first-fade', 5000, { firstTimeDuration: 10 });
+
+		const found = document.querySelector('#first-fade');
+		expect(found).toBeInstanceOf(HTMLElement);
+		expect(found.style.transition).toContain('opacity 10ms');
+
+		vi.advanceTimersByTime(10);
+		expect(document.querySelector('#first-fade')).toBeNull();
+		vi.useRealTimers();
+	});
 }
 
 /**
@@ -1808,6 +1867,84 @@ export function cancellable(asyncFunction) {
 	};
 }
 
+if (import.meta.vitest) {
+	const { test, expect, vi } = import.meta.vitest;
+
+	test('cancellable resolves when not cancelled', async () => {
+		const asyncFn = async (signal) => {
+			await new Promise((resolve, reject) => {
+				signal.addEventListener('abort', () => reject(new DOMException('aborted', 'AbortError')));
+				setTimeout(() => resolve('ok'), 50);
+			});
+			return 'ok';
+		};
+
+		const make = cancellable(asyncFn);
+
+		vi.useFakeTimers();
+		const runner = make();
+		const p = runner.do();
+
+		vi.advanceTimersByTime(50);
+		await expect(p).resolves.toBe('ok');
+		vi.useRealTimers();
+	});
+
+	test('cancellable cancel rejects with AbortError', async () => {
+		const asyncFn = async (signal) => {
+			await new Promise((resolve, reject) => {
+				signal.addEventListener('abort', () => reject(new DOMException('aborted', 'AbortError')));
+				setTimeout(() => resolve('ok'), 100);
+			});
+			return 'ok';
+		};
+
+		const make = cancellable(asyncFn);
+
+		vi.useFakeTimers();
+		const runner = make();
+		const p = runner.do();
+
+		// cancel immediately
+		runner.cancel();
+
+		await expect(p).rejects.toHaveProperty('name', 'AbortError');
+		vi.useRealTimers();
+	});
+
+	test('starting a new run aborts the previous run', async () => {
+		const asyncFn = async (signal) => {
+			await new Promise((resolve, reject) => {
+				signal.addEventListener('abort', () => reject(new DOMException('aborted', 'AbortError')));
+				setTimeout(() => resolve('ok'), 80);
+			});
+			return 'ok';
+		};
+
+		const make = cancellable(asyncFn);
+
+		vi.useFakeTimers();
+		const run1 = make();
+		const p1 = run1.do();
+
+		const run2 = make();
+		const p2 = run2.do();
+
+		// first should be aborted by the second make() call
+		await expect(p1).rejects.toHaveProperty('name', 'AbortError');
+
+		// advance timers so the second resolves
+		vi.advanceTimersByTime(80);
+		await expect(p2).resolves.toBe('ok');
+		vi.useRealTimers();
+	});
+}
+
+/**
+ * @template T
+ * @param {Set<T>} setA 
+ * @param {Set<T>} setB
+ */
 export function setsAreEqual(setA, setB) {
 	if (setA.size !== setB.size) return false;
 	for (const item of setA) {
@@ -1827,12 +1964,12 @@ if (import.meta.vitest) {
 	});
 }
 
-/** 
- * Some image sources will not load on localhost. Pass them thru cors.gwen.works if we're on localhost 
- * @param {string} src 
+/**
+ * Some image sources will not load on localhost. Pass them thru cors.gwen.works if we're on localhost
+ * @param {string} src
  */
 export function proxifyIfLocalhost(src) {
-	if (location.hostname !== "localhost") return src
+	if (location.hostname !== 'localhost') return src;
 
-	return `https://cors.gwen.works/${src}`
+	return `https://cors.gwen.works/${src}`;
 }
