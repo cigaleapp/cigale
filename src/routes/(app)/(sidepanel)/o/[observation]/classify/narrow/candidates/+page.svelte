@@ -185,8 +185,9 @@
 		}
 
 		.description {
-			height: 10lh;
-			overflow: hidden;
+			min-height: 3lh;
+			max-height: 15lh;
+			overflow: auto;
 		}
 
 		.info {
