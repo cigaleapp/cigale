@@ -11,6 +11,7 @@ import {
 	ID,
 	MIMEType,
 	NamespacedMetadataID,
+	NamespacedMetadataOptionID,
 	Probability,
 	ProtocolID,
 	UniqueFileTypeSpecifier,
@@ -269,7 +270,7 @@ export const MetadataEnumVariant = type({
 	),
 	'cascade?': type
 		.Record(ID, ID.array().or(ID))
-		.pipe(record => mapValues(record, ensureArray))
+		.pipe((record) => mapValues(record, ensureArray))
 		.describe(
 			"Objet contenant pour clés des identifiants d'autres métadonnées, et pour valeurs la ou les valeur(s) à assigner à cette métadonnée si cette option est choisie. Si il y en a plusieurs, une des options est choisie comme valeur de la métadonnée en question, et les autres sont mises en tant qu'alternatives, avec une confiance de 1."
 		),
@@ -485,7 +486,7 @@ export const MetadataInteger = MetadataBase.and({
 		InferenceConfigs.sidecar(type('number.integer')).partial()
 	),
 	'unit?': NumericUnit,
-}).pipe();
+});
 
 export const MetadataFloat = MetadataBase.and({
 	type: '"float"',
@@ -496,6 +497,11 @@ export const MetadataFloat = MetadataBase.and({
 		InferenceConfigs.sidecar(type('number')).partial()
 	),
 	'unit?': NumericUnit,
+	'cascade?': type
+		.Record(NamespacedMetadataOptionID, NumberRangeLiteral)
+		.describe(
+			"Associe des options d'une métadonnée (de type Enum) dont la valeur changera si cette métadonnée a une valeur dans la plage spécifiée. Par exemple, en mettant `{'A:1': '0..5', 'A:2': '5..10', 'A:3': '10..15'}`, la métadonnée A sera mise à jour sur les options 1 et (en alternative) 2, si la valeur de cette métadonnée est mise à 5. (car on sera dans la plage 0..5 et 5..10)"
+		),
 });
 
 export const MetadataDate = MetadataBase.and({

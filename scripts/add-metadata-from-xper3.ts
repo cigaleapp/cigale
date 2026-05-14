@@ -47,12 +47,17 @@ console.info(
 	`⁄ Parsed SDD, found ${sdd.Characters.CategoricalCharacter.length} categorical characters`
 );
 
-console.info(`⁄ Indexing MediaObjects, TaxonNames and CategoricalCharacters from SDD…`);
+console.info(`⁄ Indexing MediaObjects, TaxonNames and Characters from SDD…`);
 const media = new Map(sdd.MediaObjects.MediaObject.map((m) => [m.$id, m]));
 console.info(`⁄ Indexed ${media.size} media objects`);
 const taxa = new Map(sdd.TaxonNames.TaxonName.map((t) => [t.$id, t]));
 console.info(`⁄ Indexed ${taxa.size} taxa`);
-const characters = new Map(sdd.Characters.CategoricalCharacter.map((c) => [c.$id, c]));
+const characters = new Map(
+	[
+		...sdd.Characters.CategoricalCharacter,
+		...ensureArray(sdd.Characters.QuantitativeCharacter ?? []),
+	].map((c) => [c.$id, c])
+);
 console.info(`⁄ Indexed ${characters.size} categorical characters`);
 
 await augment(
@@ -92,52 +97,81 @@ async function augment(protocolPath: string, protocol: typeof ExportedProtocol.i
 		};
 
 		const descriptorMetadatas = new Map<
-			string,
-			(typeof ExportedProtocol.inferIn)['metadata'][string]
+			`c${string}`,
+			{ id: string } & (typeof ExportedProtocol.inferIn)['metadata'][string]
 		>();
 
-		for (const character of sdd.Characters.CategoricalCharacter) {
-			const { $uniqueid } = character;
+		for (const character of [
+			...sdd.Characters.CategoricalCharacter,
+			...ensureArray(sdd.Characters.QuantitativeCharacter),
+		]) {
+			const { $uniqueid, $id } = character;
 			const { Label, Detail, MediaObject } = character.Representation;
-			const { StateDefinition } = character.States;
 
 			let id = slug(Label);
-			if (descriptorMetadatas.has(id)) {
+			if ([...descriptorMetadatas.values()].some((m) => m.id === id)) {
 				id = slug($uniqueid);
 			}
 
-			const images = ensureArray(MediaObject ?? [])
-				.map(googledriveThumbnailUrl)
-				.filter(nonnull);
+			protocol.metadataOrder?.push(id);
 
-			descriptorMetadatas.set(id, {
+			const metadata = {
+				id,
 				label: Label,
 				group: 'andrena',
-				description: noPlaceholder(Detail) ?? '',
-				images: images,
-				type: 'enum',
 				mergeMethod: 'none',
 				learnMore: MKEY_URL,
 				required: false,
-				options: ensureArray(StateDefinition).map(
-					({ $uniqueid, Representation: { Label, Detail, MediaObject } }) => ({
-						label: Label,
-						description: Detail,
-						key: slug($uniqueid),
-						images: ensureArray(MediaObject ?? [])
-							.map(googledriveThumbnailUrl)
-							.filter(nonnull),
-					})
-				),
-			});
+				description: noPlaceholder(Detail) ?? '',
+				images: ensureArray(MediaObject ?? [])
+					.map(googledriveThumbnailUrl)
+					.filter(nonnull),
+			} as const;
 
-			protocol.metadataOrder?.push(id);
+			if ('States' in character) {
+				const { StateDefinition } = character.States;
+
+				descriptorMetadatas.set($id, {
+					...metadata,
+					type: 'enum',
+					options: ensureArray(StateDefinition).map(
+						({ $uniqueid, Representation: { Label, Detail, MediaObject } }) => ({
+							label: Label,
+							description: Detail,
+							key: slug($uniqueid),
+							images: ensureArray(MediaObject ?? [])
+								.map(googledriveThumbnailUrl)
+								.filter(nonnull),
+						})
+					),
+				});
+			} else if ('MeasurementUnit' in character) {
+				const range = constraintsToRange(
+					sdd.CodedDescriptions.CodedDescription.flatMap((desc) =>
+						ensureArray(desc.SummaryData.Quantitative ?? [])
+							.filter((q) => q.$ref === character.$id)
+							.flatMap((q) => ensureArray(q.Measure))
+							.filter(nonnull)
+					)
+				);
+
+				descriptorMetadatas.set($id, {
+					...metadata,
+					type: 'float',
+					unit: character.MeasurementUnit.Label,
+					range,
+				});
+			}
 		}
 
 		console.info(`⁄ Added ${descriptorMetadatas.size} metadata from Xper3 descriptors:`);
 		for (const [, descriptor] of descriptorMetadatas) {
 			console.info(
-				`  - ${cyan(descriptor.label)}, ${descriptor.options?.length ?? 0} states: ${descriptor.options?.map((o) => o.key).join(', ')}`
+				descriptor.type === 'enum'
+					? `  - ${cyan(descriptor.label)}, ${descriptor.options?.length ?? 0} states: ${descriptor.options?.map((o) => o.key).join(', ')}`
+					: descriptor.type === 'float'
+						? `  - ${cyan(descriptor.label)}, range: ${descriptor.range}`
+						: `  - ${cyan(descriptor.label)}: ${descriptor.type}-type`
 			);
 		}
 
@@ -154,8 +188,8 @@ async function augment(protocolPath: string, protocol: typeof ExportedProtocol.i
 
 		const eta = new ETA({ total: total() });
 
-		for (const [key, metadata] of descriptorMetadatas) {
-			protocol.metadata[`${protocol.id}__${key}`] = metadata;
+		for (const { id, ...metadata } of descriptorMetadatas.values()) {
+			protocol.metadata[`${protocol.id}__${id}`] = metadata;
 		}
 
 		for (const item of sdd.CodedDescriptions.CodedDescription) {
@@ -181,7 +215,11 @@ async function augment(protocolPath: string, protocol: typeof ExportedProtocol.i
 			}
 
 			try {
-				const cascades = item.SummaryData.Categorical ?? [];
+				const cascades = [
+					...(item.SummaryData.Categorical ?? []),
+					...ensureArray(item.SummaryData.Quantitative ?? []),
+				];
+
 				totalsPerItem.set(item.$id, cascades.length);
 
 				for (const cascade of cascades) {
@@ -198,18 +236,9 @@ async function augment(protocolPath: string, protocol: typeof ExportedProtocol.i
 						continue;
 					}
 
-					const found = [...descriptorMetadatas].find(
-						([_, m]) => m.label === character.Representation.Label
-					);
+					const metadata = descriptorMetadatas.get(character.$id)!;
+					const id = `${protocol.id}__${metadata.id}` as const;
 
-					if (!found) {
-						console.error(
-							`${header.red} ${red(bold(`no metadata associated with ${character.Representation.Label} (${slug(character.$uniqueid)}, ${character.$id})`))}`
-						);
-						continue;
-					}
-
-					const [metadataKey] = found;
 					let optionIndex = species.options!.findIndex((o) => o.key === specie.key);
 					if (optionIndex === -1) {
 						const name = parseTaxonLabel(taxon.Representation.Label);
@@ -264,7 +293,7 @@ async function augment(protocolPath: string, protocol: typeof ExportedProtocol.i
 						]),
 					};
 
-					if (cascade.State) {
+					if ('State' in cascade && cascade.State && 'States' in character) {
 						const cascadeStates = ensureArray(cascade.State).map(({ $ref }) =>
 							slug(
 								ensureArray(character.States.StateDefinition).find(
@@ -276,9 +305,18 @@ async function augment(protocolPath: string, protocol: typeof ExportedProtocol.i
 						protocol.metadata[`${protocol.id}__species`].options![optionIndex].cascade =
 							{
 								...species.options![optionIndex]?.cascade,
-								[metadataKey]:
+								[metadata.id]:
 									cascadeStates.length === 1 ? cascadeStates[0] : cascadeStates,
 							};
+					} else if ('Measure' in cascade && cascade.Measure) {
+						const range = constraintsToRange(ensureArray(cascade.Measure));
+
+						if (range && protocol.metadata[id].type === 'float') {
+							protocol.metadata[id].cascade = {
+								...protocol.metadata[id].cascade,
+								[`${protocol.id}__species:${speciesOption.key}`]: range,
+							};
+						}
 					}
 
 					done++;
@@ -287,24 +325,30 @@ async function augment(protocolPath: string, protocol: typeof ExportedProtocol.i
 					await updateCheckrunProgress('protocols', done, total(), eta);
 
 					if (
-						cascade.State &&
-						(process.env.VERBOSE ||
-							done % Math.floor(total() / 20) === 0 ||
-							done === total())
+						process.env.VERBOSE ||
+						done % Math.floor(total() / 20) === 0 ||
+						done === total()
 					) {
-						console.info(
-							`${header} ${align(metadataKey, [...descriptorMetadatas.keys()])} = ${ensureArray(
-								cascade.State
-							)
-								.map((state) =>
-									ensureArray(character.States.StateDefinition).find(
-										(s) => s.$id === state.$ref
+						const lhs = `${header} ${align(metadata.id, [...descriptorMetadatas.keys()])}`;
+						if ('States' in character && 'State' in cascade && cascade.State) {
+							console.info(
+								`${lhs} = ${ensureArray(cascade.State)
+									.map((state) =>
+										ensureArray(character.States.StateDefinition).find(
+											(s) => s.$id === state.$ref
+										)
 									)
-								)
-								.filter(nonnull)
-								.map((s) => dim(s.Representation.Label))
-								.join(` ${cyan('+')} `)}`
-						);
+									.filter(nonnull)
+									.map((s) => dim(s.Representation.Label))
+									.join(` ${cyan('+')} `)}`
+							);
+						} else if ('Measure' in cascade && cascade.Measure) {
+							console.info(
+								`${lhs} ∈ ${dim(constraintsToRange(ensureArray(cascade.Measure)) ?? 'n/a')}`
+							);
+						} else {
+							console.info(`${lhs} ??`);
+						}
 					}
 				}
 			} catch (e) {
@@ -361,14 +405,14 @@ type SDD = {
 			Characters: {
 				QuantitativeCharacter: ArrayOrSingle<{
 					$id: `c${string}`;
-					uniqueid: string;
+					$uniqueid: string;
 					Representation: {
 						Label: string;
 						Detail: string;
 						MediaObject?: ArrayOrSingle<{ $ref: `m${string}` }>;
 					};
-					Measurement: {
-						Label: string;
+					MeasurementUnit: {
+						Label: 'mm';
 					};
 				}>;
 				CategoricalCharacter: Array<{
@@ -568,7 +612,7 @@ function noPlaceholder(s: undefined): undefined;
 function noPlaceholder(s: string): string | undefined;
 function noPlaceholder(s: string[]): string[];
 function noPlaceholder(s: string | string[] | undefined): string | string[] | undefined {
-	const PLACEHOLDERS = ['_', 'null']
+	const PLACEHOLDERS = ['_', 'null'];
 	if (!s) return s;
 	if (typeof s === 'string') {
 		return PLACEHOLDERS.includes(s) ? undefined : s;
@@ -610,4 +654,29 @@ function googledriveThumbnailUrl(
 	if (!id) return url;
 
 	return `https://drive.google.com/thumbnail?id=${id}&sz=w1000`;
+}
+
+function constraintsToRange(
+	constraints: Array<{ $type: 'Min' | 'Max'; $value: `${number}` }>
+): string | undefined {
+	const extrema = [...new Set(constraints.map((c) => Number.parseFloat(c.$value)))].toSorted(
+		(a, b) => a - b
+	);
+
+	const minimum = extrema.at(0);
+	const maximum = extrema.at(-1);
+
+	if (minimum !== undefined && maximum !== undefined) {
+		return `${minimum}..${maximum}`;
+	}
+
+	if (minimum !== undefined) {
+		return `>= ${minimum}`;
+	}
+
+	if (maximum !== undefined) {
+		return `<= ${maximum}`;
+	}
+
+	return undefined;
 }
