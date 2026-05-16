@@ -8,6 +8,7 @@
 	import { dependencyURI, tables } from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import InputSelectProtocol from '$lib/InputSelectProtocol.svelte';
+	import Markdown from '$lib/Markdown.svelte';
 	import ModalConfirmDeletion from '$lib/ModalConfirmDeletion.svelte';
 	import { goto } from '$lib/paths.js';
 	import SessionMetadataForm from '$lib/SessionMetadataForm.svelte';
@@ -72,6 +73,10 @@
 			Protocole <code>{data.session.protocol}</code> introuvable.
 		</section>
 	{:else}
+		<section class="protocol-description">
+			<Markdown source={data.protocol.description} />
+		</section>
+
 		<h2>Métadonnées</h2>
 
 		<SessionMetadataForm
