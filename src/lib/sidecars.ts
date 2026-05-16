@@ -47,7 +47,9 @@ export async function processSidecars({
 	type ExtractionPlanItem<T extends MetadataType> = {
 		metadataId: string;
 		type: T;
-		query: NonNullable<NonNullable<Extract<DB.Metadata, {type: T,}>['infer']>['sidecar']>['query'];
+		query: NonNullable<
+			NonNullable<Extract<DB.Metadata, { type: T }>['infer']>['sidecar']
+		>['query'];
 		filepath: string;
 	};
 
@@ -122,7 +124,7 @@ export async function processSidecars({
 		const sidecar = sidecars.find((f) => f.name === item.filepath);
 		if (!sidecar) {
 			console.warn(`Sidecar file ${item.filepath} not found for metadata ${item.metadataId}`);
-			return; 
+			return;
 		}
 
 		const context = {
