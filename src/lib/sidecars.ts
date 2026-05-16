@@ -47,10 +47,7 @@ export async function processSidecars({
 	type ExtractionPlanItem<T extends MetadataType> = {
 		metadataId: string;
 		type: T;
-		query: Extract<
-			Extract<DB.Metadata, { type: NoInfer<T> }>['infer'],
-			{ sidecar: unknown }
-		>['sidecar']['query'];
+		query: NonNullable<NonNullable<Extract<DB.Metadata, {type: T,}>['infer']>['sidecar']>['query'];
 		filepath: string;
 	};
 
@@ -63,6 +60,7 @@ export async function processSidecars({
 	for (const m of metadataOfProtocol) {
 		if (!m.infer) continue;
 		if (!('sidecar' in m.infer)) continue;
+		if (!m.infer.sidecar) continue;
 
 		const config = m.infer.sidecar;
 
@@ -124,7 +122,7 @@ export async function processSidecars({
 		const sidecar = sidecars.find((f) => f.name === item.filepath);
 		if (!sidecar) {
 			console.warn(`Sidecar file ${item.filepath} not found for metadata ${item.metadataId}`);
-			return;
+			return; 
 		}
 
 		const context = {

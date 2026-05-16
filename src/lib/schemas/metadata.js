@@ -310,7 +310,6 @@ export const SidecarInference = (QueryOutput) =>
 export const InferenceConfigs = /** @type {const} */ ({
 	exif: type({
 		exif: EXIFInference.describe("Inférer depuis les données EXIF de l'image"),
-		'+': 'reject',
 	}),
 
 	/**
@@ -322,20 +321,17 @@ export const InferenceConfigs = /** @type {const} */ ({
 			sidecar: SidecarInference(QueryOutput).describe(
 				"Inférer depuis un fichier annexe associé à l'image, dont le nom dépend du nom de l'image associée. Le fichier doit être au format JSON ou XML. L'inférence se fait à l'aide d'une expression Jsonata (https://docs.jsonata.org/), qui permet d'extraire la valeur de la métadonnée depuis ce fichier"
 			),
-			'+': 'reject',
 		}),
 
 	neuralEnum: type({
 		neural: NeuralEnumInference.array().describe(
 			'Inférer depuis un ou plusieurs réseaux neuronaux de classification'
 		),
-		'+': 'reject',
 	}),
 	neuralBoundingBox: type({
 		neural: NeuralBoundingBoxInference.array().describe(
 			"Inférer depuis un ou plusieurs réseaux neuronaux de détection d'objets"
 		),
-		'+': 'reject',
 	}),
 });
 
@@ -426,7 +422,10 @@ const MetadataBase = type({
 const MetadataBoolean = MetadataBase.omit('kobocollect').and({
 	type: '"boolean"',
 	'default?': MetadataDefault('boolean'),
-	'infer?': type.or(InferenceConfigs.exif, InferenceConfigs.sidecar(type('boolean'))),
+	'infer?': type.and(
+		InferenceConfigs.exif.partial(),
+		InferenceConfigs.sidecar(type('boolean')).partial()
+	),
 	'kobocollect?': type.or(
 		{
 			'list?': [
@@ -463,7 +462,10 @@ const MetadataBoolean = MetadataBase.omit('kobocollect').and({
 export const MetadataString = MetadataBase.and({
 	type: '"string"',
 	'default?': MetadataDefault('string'),
-	'infer?': type.or(InferenceConfigs.exif, InferenceConfigs.sidecar(type('string'))),
+	'infer?': type.and(
+		InferenceConfigs.exif.partial(),
+		InferenceConfigs.sidecar(type('string')).partial()
+	),
 	'regex?': RegexExpression.describe(
 		'Une expression régulière que la valeur de cette métadonnée doit respecter'
 	),
@@ -474,7 +476,10 @@ export const MetadataInteger = MetadataBase.and({
 	type: '"integer"',
 	'range?': NumberRangeLiteral,
 	'default?': MetadataDefault('number.integer'),
-	'infer?': type.or(InferenceConfigs.exif, InferenceConfigs.sidecar(type('number.integer'))),
+	'infer?': type.and(
+		InferenceConfigs.exif.partial(),
+		InferenceConfigs.sidecar(type('number.integer')).partial()
+	),
 	'unit?': NumericUnit,
 }).pipe();
 
@@ -482,7 +487,10 @@ export const MetadataFloat = MetadataBase.and({
 	type: '"float"',
 	'range?': NumberRangeLiteral,
 	'default?': MetadataDefault('number'),
-	'infer?': type.or(InferenceConfigs.exif, InferenceConfigs.sidecar(type('number'))),
+	'infer?': type.and(
+		InferenceConfigs.exif.partial(),
+		InferenceConfigs.sidecar(type('number')).partial()
+	),
 	'unit?': NumericUnit,
 });
 
@@ -490,32 +498,33 @@ export const MetadataDate = MetadataBase.and({
 	type: '"date"',
 	'range?': '"future" | "past"',
 	'default?': MetadataDefault('string.date.iso'),
-	'infer?': type.or(
-		InferenceConfigs.exif,
-		InferenceConfigs.sidecar(type('string.date.iso.parse'))
+	'infer?': type.and(
+		InferenceConfigs.exif.partial(),
+		InferenceConfigs.sidecar(type('string.date.iso.parse')).partial()
 	),
 });
 
 const MetadataLocation = MetadataBase.and({
 	type: '"location"',
 	'default?': MetadataDefault({ latitude: 'number', longitude: 'number' }),
-	'infer?': type.or(
-		InferenceConfigs.sidecar(type({ latitude: 'number', longitude: 'number', '+': 'reject' })),
-		{
+	'infer?': type.and(
+		InferenceConfigs.sidecar(
+			type({ latitude: 'number', longitude: 'number', '+': 'reject' })
+		).partial(),
+		type({
 			latitude: InferenceConfigs.exif,
 			longitude: InferenceConfigs.exif,
-			'+': 'reject',
-		}
+		}).partial()
 	),
 });
 
 const MetadataEnum = MetadataBase.and({
 	type: '"enum"',
 	'default?': MetadataDefault('string | number'),
-	'infer?': type.or(
-		InferenceConfigs.exif,
-		InferenceConfigs.sidecar(type('string|number')),
-		InferenceConfigs.neuralEnum
+	'infer?': type.and(
+		InferenceConfigs.exif.partial(),
+		InferenceConfigs.sidecar(type('string|number')).partial(),
+		InferenceConfigs.neuralEnum.partial()
 	),
 });
 
@@ -527,8 +536,8 @@ const MetadataBoundingbox = MetadataBase.and({
 		w: '0 <= number <= 1',
 		h: '0 <= number <= 1',
 	}),
-	'infer?': type.or(
-		InferenceConfigs.neuralBoundingBox,
+	'infer?': type.and(
+		InferenceConfigs.neuralBoundingBox.partial(),
 		InferenceConfigs.sidecar(
 			type({
 				'+': 'reject',
@@ -550,14 +559,14 @@ const MetadataBoundingbox = MetadataBase.and({
 						);
 					})
 				)
-		)
+		).partial()
 	),
 });
 
 export const MetadataFile = MetadataBase.and({
 	type: '"file"',
 	'default?': 'null',
-	'infer?': type.or(
+	'infer?': type.and(
 		InferenceConfigs.sidecar(
 			type({
 				name: 'string',
@@ -565,7 +574,7 @@ export const MetadataFile = MetadataBase.and({
 				'lastModified?': 'number',
 				content: type.or('string', ['instanceof', Uint8Array]),
 			}).pipe(({ name, content, ...attrs }) => new File([content], name, attrs))
-		)
+		).partial()
 	),
 	size: type({ 'minimum?': FileSize, 'maximum?': FileSize })
 		.describe('Limites sur la taille du fichier')

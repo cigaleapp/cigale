@@ -46,6 +46,11 @@ export async function processImageFile({ file, id, sidecars }) {
 		return;
 	}
 
+	if (!uiState.currentSessionId) {
+		toasts.error('Aucun session active');
+		return;
+	}
+
 	const originalBytes = await file.arrayBuffer();
 
 	if (originalBytes.byteLength > imageLimits.maxMemoryUsageInMB * Math.pow(2, 20)) {
@@ -78,11 +83,6 @@ export async function processImageFile({ file, id, sidecars }) {
 
 	// We have to remove the file from the processing files list once the Image database object has been created
 	uiState.processing.removeFile(id);
-
-	if (!uiState.currentSessionId) {
-		toasts.error('Aucun session active');
-		return;
-	}
 
 	// Process sidecars first since they can create new images!
 	// If we do EXIF extraction first, images created via sidecars processing won't get their EXIF-infered metadata
