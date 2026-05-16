@@ -3,7 +3,7 @@ id: fr.osug.terra-forma-web.entomoscope
 name: Entomoscope
 
 updates: automatic
-version: 4
+version: 5
 source: https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/entomoscope.cigaleprotocol.yaml
 
 description: Protocole de collecte d'images d'insectes via l'Entomoscope
@@ -419,6 +419,17 @@ metadata:
     mergeMethod: union
     required: false
     infer:
+      neural:
+        - model: https://huggingface.co/cigaleapp/built-in-protocols/resolve/main/detector-arthropoda.onnx?download=true
+          name: YOLO11
+          input:
+            height: 640
+            width: 640
+            disposition: 1CHW
+            normalized: true
+          output:
+            normalized: true
+            shape: [sx, sy, ex, ey, score, _]
       # TODO: guard against missing or malformed metadata
       # and return an empty array in that case
       sidecar: |
