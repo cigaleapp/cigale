@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file, on a monthl
 
 - Add browser ^& device info on about page (Closes #1568)
 - Add notification on mobile app when export saved to open the file
+- Allow both neural & sidecar inference at the same time on a crop metadata
 - Create a rudimentary "latest APK" download page for nightly builds
 - Defer toast emission until after navigation in toast+goto sequences (#1579)
 - Hide export-to-folder button on mobile app
@@ -16,6 +17,8 @@ All notable changes to this project will be documented in this file, on a monthl
 - Setup deeplinking
 - Share a /protocols/import URL instead of a file in protocol list (#1558)
 - Show directory picker to save file instead of sharing it on mobile app
+- Show protocol description above session metadata form in session details page
+- Space out paragraphs in rendered markdown text
 - Trigger a share instead of a download on export protocol button, on platforms where it's more appropriate
 - Use a different app icon for nightly builds
 - Use a different app name for different flavors
@@ -42,7 +45,9 @@ All notable changes to this project will be documented in this file, on a monthl
 
 ### Data Updates
 
+- Add neural inference to crop on Entomoscope protocol
 - Bump protocol version of protocols/entomoscope.cigaleprotocol.yaml [ci skip]
+- Fix logo assets generation for mobile app
 - Handle new location format, ai disabled case and no location case in Entomoscope sidecars
 - Regenerate example protocols
 - Regenerate logo assets for local development builds
