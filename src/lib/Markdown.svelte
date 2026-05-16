@@ -23,4 +23,8 @@
 	:global([data-rendered-markdown] code, [data-rendered-markdown] pre) {
 		font-size: 0.8em;
 	}
+
+	:global([data-rendered-markdown] p) {
+		margin-bottom: 0.75lh;
+	}
 </style>
