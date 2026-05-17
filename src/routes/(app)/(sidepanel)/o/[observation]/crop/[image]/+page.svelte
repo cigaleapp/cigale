@@ -167,7 +167,7 @@
 	let focusedImageId = $derived(
 		params.observation
 			? idb.tables.Observation.getFromState(params.observation)?.images.find(
-					(i) => i.fileId === params.image
+					(i) => imageIdToFileId(i) === params.image
 				)
 			: ''
 	);
