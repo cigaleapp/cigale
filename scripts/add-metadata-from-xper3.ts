@@ -137,7 +137,7 @@ async function augment(protocolPath: string, protocol: typeof ExportedProtocol.i
 					options: ensureArray(StateDefinition).map(
 						({ $uniqueid, Representation: { Label, Detail, MediaObject } }) => ({
 							label: Label,
-							description: Detail,
+							description: noPlaceholder(Detail) ?? '',
 							key: slug($uniqueid),
 							images: ensureArray(MediaObject ?? [])
 								.map(googledriveThumbnailUrl)
