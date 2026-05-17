@@ -308,47 +308,50 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 
 	abortSignal?.throwIfAborted();
 
-	const cascades = await computeCascades({
-		db,
-		metadataId,
-		value,
-		confidence,
-		alternatives,
-	});
-
-	for (const cascade of cascades) {
-		abortSignal?.throwIfAborted();
-
-		if (cascadedFrom.includes(cascade.metadataId)) {
-			throw new Error(
-				`Boucle infinie de cascade détectée pour ${cascade.metadataId} avec ${cascade.value}: ${cascadedFrom.join(' -> ')} -> ${metadataId} -> ${cascade.metadataId}`
-			);
-		}
-
-		console.info(
-			`Cascading metadata ${metadataId} @ ${value} -> ${cascade.metadataId}  = ${cascade.value}`
-		);
-
-		const metadataNamespace = namespaceOfMetadataId(metadataId);
-		if (!metadataNamespace)
-			throw new Error(
-				`Metadata ${metadataId} is not namespaced, cannot cascade onto ${cascade.metadataId}`
-			);
-
-		cascade.metadataId = ensureNamespacedMetadataId(cascade.metadataId, metadataNamespace);
-
-		await storeMetadataValue({
+	// Cascading is not recursive anymore (see #1571)
+	if (cascadedFrom.length === 0) {
+		const cascades = await computeCascades({
 			db,
-			sessionId,
-			subjectId,
-			manuallyModified,
-			isDefault,
-			confirmed,
-			cascadedFrom: [...cascadedFrom, metadataId],
-			abortSignal,
-			clearErrors,
-			...cascade,
+			metadataId,
+			value,
+			confidence,
+			alternatives,
 		});
+
+		for (const cascade of cascades) {
+			abortSignal?.throwIfAborted();
+
+			if (cascadedFrom.includes(cascade.metadataId)) {
+				throw new Error(
+					`Boucle infinie de cascade détectée pour ${cascade.metadataId} avec ${cascade.value}: ${cascadedFrom.join(' -> ')} -> ${metadataId} -> ${cascade.metadataId}`
+				);
+			}
+
+			console.info(
+				`Cascading metadata ${metadataId} @ ${value} -> ${cascade.metadataId}  = ${cascade.value}`
+			);
+
+			const metadataNamespace = namespaceOfMetadataId(metadataId);
+			if (!metadataNamespace)
+				throw new Error(
+					`Metadata ${metadataId} is not namespaced, cannot cascade onto ${cascade.metadataId}`
+				);
+
+			cascade.metadataId = ensureNamespacedMetadataId(cascade.metadataId, metadataNamespace);
+
+			await storeMetadataValue({
+				db,
+				sessionId,
+				subjectId,
+				manuallyModified,
+				isDefault,
+				confirmed,
+				cascadedFrom: [...cascadedFrom, metadataId],
+				abortSignal,
+				clearErrors,
+				...cascade,
+			});
+		}
 	}
 
 	// Only refresh table state once everything has been cascaded, meaning not inside recursive calls
