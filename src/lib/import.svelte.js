@@ -17,6 +17,7 @@ import { toasts } from '$lib/toasts.svelte.js';
 
 import { imageLimits } from './inference_utils.js';
 import { serializeMetadataValues } from './metadata/index.js';
+import { newObservation } from './observations.js';
 import { ACCEPTED_SIDECAR_TYPES, processSidecars } from './sidecars.js';
 
 export const ACCEPTED_IMPORT_TYPES = [
@@ -46,7 +47,7 @@ export async function processImageFile({ file, id, sidecars }) {
 		return;
 	}
 
-	if (!uiState.currentSessionId) {
+	if (!uiState.currentSession) {
 		toasts.error('Aucun session active');
 		return;
 	}
@@ -70,9 +71,9 @@ export async function processImageFile({ file, id, sidecars }) {
 		height,
 	});
 
-	await tables.Image.set({
+	const image = await tables.Image.set({
 		id: imageId(id, 0),
-		sessionId: uiState.currentSessionId,
+		sessionId: uiState.currentSession.id,
 		filename: file.name,
 		addedAt: dates.formatISO(Date.now()),
 		contentType: file.type,
@@ -80,6 +81,8 @@ export async function processImageFile({ file, id, sidecars }) {
 		fileId: id,
 		metadata: {},
 	});
+
+	await tables.Observation.add(newObservation(image, uiState.currentSession));
 
 	// We have to remove the file from the processing files list once the Image database object has been created
 	uiState.processing.removeFile(id);
