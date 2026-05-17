@@ -3,6 +3,7 @@
 
 	import IconClose from '~icons/ri/close-line';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
+	import { Portal } from 'bits-ui';
 
 	interface Props {
 		/** Content shown normally */
@@ -17,26 +18,43 @@
 	let open = $state<() => void>();
 </script>
 
-<dialog
-	onclick={() => close?.()}
-	{@attach (node) => {
-		close = () => node.close();
+<Portal to="#app-layout">
+	<dialog
+		onclick={(e) => {
+			console.log('stop propagation', e);
+			e.stopPropagation();
+			close?.();
+		}}
+		closedby="any"
+		{@attach (node) => {
+			close = () => node.close();
+			open = () => node.showModal();
+		}}
+	>
+		<div class="close">
+			<ButtonIcon
+				help="Fermer"
+				onclick={(e) => {
+					e.stopPropagation();
+					close?.();
+				}}
+			>
+				<IconClose />
+			</ButtonIcon>
+		</div>
 
-		open = () => node.showModal();
+		<div class="contents">
+			{@render content()}
+		</div>
+	</dialog>
+</Portal>
+
+<button
+	onclick={(e) => {
+		e.stopPropagation();
+		open?.();
 	}}
 >
-	<div class="close">
-		<ButtonIcon help="Fermer" onclick={() => close?.()}>
-			<IconClose />
-		</ButtonIcon>
-	</div>
-
-	<div class="contents">
-		{@render content()}
-	</div>
-</dialog>
-
-<button onclick={() => open?.()}>
 	{@render trigger()}
 </button>
 

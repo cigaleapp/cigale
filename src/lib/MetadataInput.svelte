@@ -28,6 +28,7 @@
 	import { formatBytesSize } from './i18n.js';
 	import { databaseHandle } from './idb.svelte.js';
 	import InputRange from './InputRange.svelte';
+	import Lightbox from './Lightbox.svelte';
 	import LoadingText, { Loading } from './LoadingText.svelte';
 	import MetadataTypeswitch from './metadata/MetadataTypeswitch.svelte';
 	import { metadataOptionsOf } from './metadata/storage.js';
@@ -45,10 +46,10 @@
 		gradientedColor,
 		mapValues,
 		pick,
+		proxifyIfLocalhost,
 		readableOn,
 		round,
 		safeJSONParse,
-		proxifyIfLocalhost
 	} from './utils.js';
 	import WorldLocationCombobox from './WorldLocationCombobox.svelte';
 
@@ -233,7 +234,22 @@
 							option}
 						<div class="with-image" class:disabled>
 							{#if images && images.length > 0}
-								<img loading="lazy" src={proxifyIfLocalhost(images[0])} alt="" />
+								<Lightbox>
+									{#snippet trigger()}
+										<img
+											loading="lazy"
+											src={proxifyIfLocalhost(images[0])}
+											alt=""
+										/>
+									{/snippet}
+									{#snippet content()}
+										<img
+											class="fullscreen"
+											src={proxifyIfLocalhost(images[0])}
+											alt=""
+										/>
+									{/snippet}
+								</Lightbox>
 							{/if}
 							<div class="label">
 								<div class="first-line">
@@ -686,7 +702,7 @@
 			color: var(--gay);
 		}
 
-		img {
+		img:not(.fullscreen) {
 			width: 4em;
 			height: 4em;
 			flex-shrink: 0;
@@ -698,6 +714,15 @@
 		.extra-content {
 			margin-left: auto;
 		}
+	}
+
+	img.fullscreen {
+		width: auto;
+		height: 85vh;
+		overflow: hidden;
+		object-fit: contain;
+		border-radius: var(--corner-radius);
+		background-color: var(--bg);
 	}
 
 	.metadata-input:not(

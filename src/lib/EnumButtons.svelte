@@ -161,6 +161,7 @@
 			position: absolute;
 			inset: 0;
 			opacity: 0;
+			pointer-events:none;
 		}
 	}
 
