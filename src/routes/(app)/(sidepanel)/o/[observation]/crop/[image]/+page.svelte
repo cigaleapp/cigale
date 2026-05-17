@@ -1274,6 +1274,7 @@
 		height: var(--size);
 		border-radius: var(--corner-radius);
 		background: color-mix(in srgb, var(--gray) 35%, transparent);
+		flex-shrink: 0;
 	}
 
 	.boxes li .dimensions {
@@ -1291,56 +1292,7 @@
 
 	.boxes li .actions {
 		margin-left: auto;
-	}
-
-	.info .progress {
-		display: flex;
-		flex-direction: column;
-		--inactive-bg: var(--gray);
-		gap: 1.25em;
-	}
-
-	.info .progress .bar p {
-		margin-bottom: 0.25em;
-		display: flex;
-		align-items: center;
-		gap: 0.5em;
-	}
-
-	.info .progress .bar p code {
-		color: var(--gay);
-		font-size: 0.9em;
-		margin-left: auto;
-	}
-
-	.info nav {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-	}
-
-	.info nav :is(div, span) {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-	}
-
-	.info nav .navigation {
-		gap: 0.25em;
-	}
-
-	.info nav .navigation .numbers {
-		display: flex;
-		align-self: center;
-		white-space: nowrap;
-	}
-
-	.info nav .continue {
-		gap: 1.5em;
-	}
-
-	.info nav .auto {
-		gap: 0.25em;
+		flex-shrink: 0;
 	}
 
 	img {
