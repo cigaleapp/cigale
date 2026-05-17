@@ -267,6 +267,7 @@
 					<NarrowableGroupPicker />
 				</div>
 				<ButtonInk
+					loading="Recommencer"
 					onclick={async () => {
 						if (!observation) return;
 						const obs = await tables.Observation.raw.get(observation.id);

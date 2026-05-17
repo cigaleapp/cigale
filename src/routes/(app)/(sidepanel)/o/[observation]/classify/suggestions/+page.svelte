@@ -127,7 +127,7 @@
 				>
 					{#await openDatabase() then db}
 						{#await cascadeLabels( { db, protocolId: namespaceOfMetadataId(focusedMetadata.id), option } ) then cascades}
-							<MetadataCascadesTable {cascades} />
+							<MetadataCascadesTable compact {cascades} />
 						{/await}
 					{/await}
 				</Field>

@@ -5,7 +5,7 @@
 
 	import { tables } from './idb.svelte.js';
 	import OverflowableText from './OverflowableText.svelte';
-	import { tooltip } from './tooltips.js';
+	import { uiState } from './state.svelte.js';
 	import { compareBy, readableOn } from './utils.js';
 
 	interface Props {
@@ -13,22 +13,25 @@
 		/** Cross out the value part of a row */
 		// eslint-disable-next-line no-unused-vars
 		crossout?: (metadataId: string, optionKey: string) => boolean;
-		/** Tooltip to show on hover of the row */
-		// eslint-disable-next-line no-unused-vars
-		help?: (metadataId: string) => string;
-		/** Metadata IDs in the order they should be displayed  */
+		/** Metadata IDs in the order they should be displayed. By default, the protocol's metadata order is used  */
 		ordering?: string[];
+		/** Don't show images */
+		compact?: boolean;
 	}
 
 	const {
 		cascades: labels,
-		ordering = [],
-		help = () => '',
+		ordering = uiState.currentProtocol?.metadataOrder ?? [],
+		compact = false,
 		crossout = () => false,
 	}: Props = $props();
 
 	const entries = $derived(
-		Object.entries(labels).toSorted(compareBy(([metadataId]) => -ordering.indexOf(metadataId)))
+		Object.entries(labels).toSorted(
+			compareBy(([metadataId]) =>
+				ordering.includes(metadataId) ? ordering.indexOf(metadataId) : Infinity
+			)
+		)
 	);
 
 	const showImages = $derived(
@@ -45,7 +48,7 @@
 				return (metadata?.label ?? metadata?.id ?? '').length;
 			})
 		)
-	)
+	);
 </script>
 
 <table class="cascades">
@@ -55,14 +58,17 @@
 			{@const metadata = tables.Metadata.getFromState(metadataId)}
 			{#each options as { key, icon, color, label }, i (key)}
 				<tr>
-				{#if showImages }
-					<td class="image">
-						{#if i===0 && metadata.images && metadata.images.length > 0}
-							<img src={metadata.images[0]} alt="" />
-						{/if}
-					</td>
+					{#if showImages && metadata}
+						<td class="image">
+							{#if i === 0 && metadata.images && metadata.images.length > 0}
+								<img src={metadata.images[0]} alt="" />
+							{/if}
+						</td>
 					{/if}
-					<td class="metadata" use:tooltip={help(metadataId)}>
+					<td
+						class="metadata"
+						style:width="{compact ? 10 : Math.min(longestMetadataLabelLength, 40)}ch"
+					>
 						{#if metadata && i === 0}
 							<OverflowableText text={metadata.label} />
 						{/if}
@@ -117,7 +123,6 @@
 	.cascades td.metadata {
 		overflow: hidden;
 		padding-right: 1rem;
-		width: max(30%, 15ch);
 	}
 
 	.cascades td.crossout {

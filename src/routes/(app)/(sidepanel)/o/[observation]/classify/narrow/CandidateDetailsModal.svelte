@@ -9,7 +9,6 @@
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import Carousel from '$lib/Carousel.svelte';
 	import { cascadeLabels } from '$lib/cascades.js';
-	import { databaseHandle } from '$lib/idb.svelte.js';
 	import LearnMoreLink from '$lib/LearnMoreLink.svelte';
 	import Markdown from '$lib/Markdown.svelte';
 	import { storeMetadataValue } from '$lib/metadata/storage.js';
@@ -28,7 +27,8 @@
 
 	let { open = $bindable() }: Props = $props();
 
-	const db = databaseHandle();
+	const db = $derived(page.data.db)
+
 	let opener = $state<() => void>();
 	let candidate = $state<DB.MetadataEnumVariant>();
 	const choices = $derived(narrowingState.choices);
@@ -48,7 +48,7 @@
 		if (!narrowingState.focusedMetadataId) return;
 
 		await storeMetadataValue({
-			db: databaseHandle(),
+			db,
 			subjectId: page.params.observation,
 			sessionId: uiState.currentSessionId,
 			metadataId: narrowingState.focusedMetadataId,

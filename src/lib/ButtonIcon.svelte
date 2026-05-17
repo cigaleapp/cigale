@@ -5,7 +5,7 @@
 	/**
 	 * @typedef Props
 	 * @type {object}
-	 * @property {(e: MouseEvent) => void} onclick
+	 * @property {(e: MouseEvent) => void|Promise<void>} onclick
 	 * @property {import('svelte').Snippet} children
 	 * @property {boolean} [submits] whether this button submits a form
 	 * @property {string} help
@@ -39,11 +39,11 @@
 
 <button
 	disabled={disabled || loading}
-	onclick={async () => {
+	onclick={async (e) => {
 		if (disabled) return;
 		loading = true;
 		try {
-			await onclick();
+			await onclick(e);
 		} finally {
 			loading = false;
 		}
@@ -57,7 +57,7 @@
 	{...rest}
 >
 	{#if showLoading && loading}
-		<LoadingSpinner />
+		<LoadingSpinner --size="1.2em" />
 	{:else}
 		{@render children()}
 	{/if}

@@ -1,5 +1,6 @@
 import { openDatabase } from '$lib/idb.svelte.js';
 
 export async function load() {
-	await openDatabase();
+	const db = await openDatabase();
+	return {db}
 }
