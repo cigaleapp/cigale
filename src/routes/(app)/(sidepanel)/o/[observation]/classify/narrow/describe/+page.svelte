@@ -19,7 +19,7 @@
 
 	const metadataValues = $derived(narrowingState.metadataValues);
 	const definitions = $derived(
-		narrowingState.definitions(uiState.currentSession?.fullscreenClassifier.narrowableGroup)
+		narrowingState.definitions
 	);
 
 	const observation = $derived(tables.Observation.getFromState(page.params.observation ?? ''));
@@ -35,7 +35,7 @@
 		metadata: for (const { id } of definitions) {
 			if (!(id in result)) continue;
 
-			for (const candidate of narrowingState.candidates.remaining) {
+			for (const candidate of narrowingState.remainingCandidates) {
 				const cascades = mapKeys(candidate.cascade ?? {}, (metadataId) =>
 					ensureNamespacedMetadataId(metadataId, namespaceOfMetadataId(id))
 				);
@@ -59,6 +59,7 @@
 		searchResults?: NamespacedMetadataID[]
 	) {
 		if (searchResults) return searchResults;
+		if (shownDefinitions.some(def => !(def.id in options))) return []
 
 		console.time('metadata ordering');
 		
@@ -68,7 +69,7 @@
 			.toSorted(
 				compareBy((id) =>
 					narrowingPower({
-						candidates: narrowingState.candidates.remainingIds,
+						candidates: narrowingState.remainingCandidateIds,
 						descriptors: narrowingState.descriptors,
 						metadata: id,
 						options: options[id].keys(),
@@ -102,7 +103,7 @@
 				{#snippet children(definition)}
 					<div class="metadata">
 						<Descriptor
-							onchangeDelay={ms('2s')}
+							onchangeDelay={ms('1s')}
 							{options}
 							{definition}
 							{remainingMetadataValues}

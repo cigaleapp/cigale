@@ -1873,7 +1873,9 @@ if (import.meta.vitest) {
 	test('cancellable resolves when not cancelled', async () => {
 		const asyncFn = async (signal) => {
 			await new Promise((resolve, reject) => {
-				signal.addEventListener('abort', () => reject(new DOMException('aborted', 'AbortError')));
+				signal.addEventListener('abort', () =>
+					reject(new DOMException('aborted', 'AbortError'))
+				);
 				setTimeout(() => resolve('ok'), 50);
 			});
 			return 'ok';
@@ -1893,7 +1895,9 @@ if (import.meta.vitest) {
 	test('cancellable cancel rejects with AbortError', async () => {
 		const asyncFn = async (signal) => {
 			await new Promise((resolve, reject) => {
-				signal.addEventListener('abort', () => reject(new DOMException('aborted', 'AbortError')));
+				signal.addEventListener('abort', () =>
+					reject(new DOMException('aborted', 'AbortError'))
+				);
 				setTimeout(() => resolve('ok'), 100);
 			});
 			return 'ok';
@@ -1915,7 +1919,9 @@ if (import.meta.vitest) {
 	test('starting a new run aborts the previous run', async () => {
 		const asyncFn = async (signal) => {
 			await new Promise((resolve, reject) => {
-				signal.addEventListener('abort', () => reject(new DOMException('aborted', 'AbortError')));
+				signal.addEventListener('abort', () =>
+					reject(new DOMException('aborted', 'AbortError'))
+				);
 				setTimeout(() => resolve('ok'), 80);
 			});
 			return 'ok';
@@ -1942,7 +1948,7 @@ if (import.meta.vitest) {
 
 /**
  * @template T
- * @param {Set<T>} setA 
+ * @param {Set<T>} setA
  * @param {Set<T>} setB
  */
 export function setsAreEqual(setA, setB) {
@@ -1972,4 +1978,66 @@ export function proxifyIfLocalhost(src) {
 	if (location.hostname !== 'localhost') return src;
 
 	return `https://cors.gwen.works/${src}`;
+}
+
+/**
+ * @template {string} K
+ * @template V
+ * @overload
+ * @param {Record<K, V>} record
+ * @param {(key: K) => boolean} predicate
+ * @returns {[Record<K, V>, Record<K, V>]}
+ */
+
+/**
+ * @template {string} K1
+ * @template {string} K2
+ * @template V
+ * @overload
+ * @param {Record<K1 | K2, V>} record
+ * @param {(key: K1 | K2) => key is K1} predicate
+ * @returns {[Record<K1, V>, Record<K2, V>]}
+ */
+
+/**
+ * Split a record into two based on a predicate on the keys
+ * @template {string} K1
+ * @template {string} K2
+ * @template V
+ * @param {Record<K1 | K2, V>} record
+ * @param {(key: K1 | K2) => boolean} predicate
+ * @returns {[Record<K1, V>, Record<K2, V>]}
+ */
+export function splitRecord(record, predicate) {
+	const record1 = /** @type {Record<K1, V>} */ ({});
+	const record2 = /** @type {Record<K2, V>} */ ({});
+
+	for (const key of keys(record)) {
+		if (predicate(key)) {
+			// @ts-expect-error
+			record1[key] = record[key];
+		} else {
+			// @ts-expect-error
+			record2[key] = record[key];
+		}
+	}
+
+	return [record1, record2];
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('splitRecord', () => {
+		const record = {
+			a: 1,
+			b: 2,
+			c: 3,
+			d: 4,
+		};
+
+		const [record1, record2] = splitRecord(record, (key) => key === 'a' || key === 'c');
+
+		expect(record1).toEqual({ a: 1, c: 3 });
+		expect(record2).toEqual({ b: 2, d: 4 });
+	});
 }

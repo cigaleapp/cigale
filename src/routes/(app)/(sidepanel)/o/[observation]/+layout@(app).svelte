@@ -23,6 +23,7 @@
 	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
 	import { uiState } from '$lib/state.svelte.js';
 	import ModalSubmitIssue from '$routes/(app)/ModalSubmitIssue.svelte';
+	import OverflowableText from '$lib/OverflowableText.svelte';
 
 	const { children } = $props();
 
@@ -89,23 +90,20 @@
 		switch (target) {
 			case 'crop':
 				if (!imageToCrop) return;
-				goto('/(app)/(sidepanel)/o/[observation]/crop/[image]', {
+				return goto('/(app)/(sidepanel)/o/[observation]/crop/[image]', {
 					image: imageToCrop,
 					observation: observation?.id ?? '_',
 				});
-				break;
 			case 'suggestions':
 				if (!observationToClassify) return;
-				goto('/(app)/(sidepanel)/o/[observation]/classify/suggestions', {
+				return goto('/(app)/(sidepanel)/o/[observation]/classify/suggestions', {
 					observation: observationToClassify.id,
 				});
-				break;
 			case 'narrow':
 				if (!observationToClassify) return;
-				goto('/(app)/(sidepanel)/o/[observation]/classify/narrow/describe', {
+				return goto('/(app)/(sidepanel)/o/[observation]/classify/narrow/describe', {
 					observation: observationToClassify.id,
 				});
-				break;
 		}
 	}
 
@@ -137,74 +135,73 @@
 
 <div class="with-header">
 	<header data-testid="fullscreen-header">
-		<ButtonIcon onclick={backToGalleryView} help="Retour" keyboard="Escape">
-			<IconClose />
-		</ButtonIcon>
-
-		<h1>
-			{#if observation}
-				<InlineTextInput
-					help="Modifier le nom de l'observation"
-					label="Nom de l'observation"
-					value={observation.label}
-					onblur={async (newLabel) => {
-						if (newLabel === observation.label) return;
-						await tables.Observation.update(observation.id, 'label', newLabel);
-						await invalidate(dependencyURI('Observation', observation.id));
-					}}
-				/>
-			{:else if imageFile}
-				{imageFile.filename}
-			{/if}
-		</h1>
-
-		<div class="extras" id={topbarExtrasPortalId}></div>
-
-		<div class="reports">
-			<ModalSubmitIssue type="feature" />
-			<ModalSubmitIssue type="bug" />
+		<div class="left-side">
+			<ButtonIcon loading onclick={backToGalleryView} help="Retour" keyboard="Escape">
+				<IconClose />
+			</ButtonIcon>
+			<h1>
+				{#if observation}
+					<InlineTextInput
+						help="Modifier le nom de l'observation"
+						label="Nom de l'observation"
+						value={observation.label}
+						onblur={async (newLabel) => {
+							if (newLabel === observation.label) return;
+							await tables.Observation.update(observation.id, 'label', newLabel);
+							await invalidate(dependencyURI('Observation', observation.id));
+						}}
+					/>
+				{:else if imageFile}
+					<OverflowableText text={imageFile.filename} />
+				{/if}
+			</h1>
+			<div class="extras" id={topbarExtrasPortalId}></div>
 		</div>
 
-		<nav>
-			<SegmentedGroup
-				options={['crop', 'suggestions', 'narrow']}
-				disabled={(key) => {
-					if (!observationToClassify && key !== 'crop')
-						return observationsOfImageFile.length === 0
-							? "Cette image n'apparaît dans aucune observation"
-							: `Cette image apparaît dans ${plural(observationsOfImageFile.length, ['# observation', '# observations'])}`;
-					if (!imageToCrop && key === 'crop') return 'Ouvrir une image pour le recadrage';
-
-					if (key === 'narrow') {
-						const narrowableGroups =
-							uiState.currentProtocol?.metadataGroups.filter(
-								(group) => group.narrowable
-							) ?? [];
-						if (narrowableGroups.length === 0)
-							return 'Non disponible pour ce protocole';
+		<div class="right-side">
+			<div class="reports">
+				<ModalSubmitIssue type="feature" />
+				<ModalSubmitIssue type="bug" />
+			</div>
+			<nav>
+				<SegmentedGroup
+					options={['crop', 'suggestions', 'narrow']}
+					disabled={(key) => {
+						if (!observationToClassify && key !== 'crop')
+							return observationsOfImageFile.length === 0
+								? "Cette image n'apparaît dans aucune observation"
+								: `Cette image apparaît dans ${plural(observationsOfImageFile.length, ['# observation', '# observations'])}`;
+						if (!imageToCrop && key === 'crop') return 'Ouvrir une image pour le recadrage';
+						if (key === 'narrow') {
+							const narrowableGroups =
+								uiState.currentProtocol?.metadataGroups.filter(
+									(group) => group.narrowable
+								) ?? [];
+							if (narrowableGroups.length === 0)
+								return 'Non disponible pour ce protocole';
+						}
+						return false;
+					}}
+					bind:current={
+						() => tab,
+						(value) => {
+							goToTab(value);
+						}
 					}
-
-					return false;
-				}}
-				bind:current={
-					() => tab,
-					(value) => {
-						goToTab(value);
-					}
-				}
-			>
-				{#snippet option_crop()}
-					Recadrer
-				{/snippet}
-				{#snippet option_suggestions()}
-					Suggestions
-				{/snippet}
-				{#snippet option_narrow()}
-					Élimination
-					<Badge>Beta</Badge>
-				{/snippet}
-			</SegmentedGroup>
-		</nav>
+				>
+					{#snippet option_crop()}
+						Recadrer
+					{/snippet}
+					{#snippet option_suggestions()}
+						Suggestions
+					{/snippet}
+					{#snippet option_narrow()}
+						Élimination
+						<Badge>Beta</Badge>
+					{/snippet}
+				</SegmentedGroup>
+			</nav>
+		</div>
 	</header>
 
 	{#key tab}
@@ -226,11 +223,14 @@
 	}
 
 	header {
-		display: flex;
+		display: grid;
 		align-items: center;
 		border-bottom: 1px solid var(--gray);
+		grid-template-columns: 2fr 1fr;
+		width: 100%;
 		padding: 0.5em 0.75em;
 		gap: 1em;
+		width: 100%;
 
 		h1 {
 			overflow: hidden;
@@ -238,11 +238,33 @@
 			align-items: center;
 			gap: 0.5em;
 			font-size: 1.2em;
+			width: 100%;
 			min-width: 5ch;
+			max-width: 20ch;
+			white-space: nowrap;
+		}
+
+		.extras {
+			width: 100%;
+		}
+
+		.right-side, .left-side {
+			display: flex;
+			align-items: center;
+			gap: 1em;
+		}
+
+		.right-side {
+			justify-content: flex-end;
+			overflow: hidden;
 		}
 
 		.reports {
-			margin-left: auto;
+			display: flex;
+			align-items: center;
+			gap: 0.5em;
+			overflow: hidden;
+			min-width: 0;
 		}
 	}
 

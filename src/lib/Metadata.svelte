@@ -476,6 +476,7 @@
 
 	.debug {
 		font-size: 0.7em;
+		overflow-y: auto;
 	}
 
 	.map {

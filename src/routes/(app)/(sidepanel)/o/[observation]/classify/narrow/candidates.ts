@@ -23,10 +23,12 @@ export type Descriptors = Map<string, Map<NamespacedMetadataID, Set<string>>>;
 export function computeDescriptors({
 	allCandidates,
 	options,
+	signal
 }: {
 	allCandidates: DB.MetadataEnumVariant[];
 	/** Options of all narrowable metadata */
 	options: Record<NamespacedMetadataID, Map<string, DB.MetadataEnumVariant>>;
+	signal: AbortSignal;
 }): Descriptors {
 	const descriptors: Descriptors = new Map();
 
@@ -36,6 +38,8 @@ export function computeDescriptors({
 		const descriptions = new Map<NamespacedMetadataID, Set<string>>();
 
 		for (const [id, opts] of entries(options)) {
+			signal.throwIfAborted();
+
 			const keys = candidate.cascade?.[removeNamespaceFromMetadataId(id)];
 			descriptions.set(id, keys ? new Set(keys) : new Set(opts.keys()));
 		}

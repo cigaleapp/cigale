@@ -16,20 +16,18 @@
 	import { compareBy, mapKeys } from '$lib/utils.js';
 
 	import { narrowingState } from '../+layout.svelte';
-	import { options } from '../OptionsLoader.svelte';
 	import Descriptor from '../Descriptor.svelte';
+	import { options } from '../OptionsLoader.svelte';
 	import Searcher from '../Searcher.svelte';
 
 	const expanded = new SvelteSet<NamespacedMetadataID>();
 
 	const metadataValues = $derived(narrowingState.metadataValues);
 	const definitions = $derived(
-		narrowingState
-			.definitions(uiState.currentSession?.fullscreenClassifier.narrowableGroup)
-			.filter((def) => def.id in metadataValues)
+		narrowingState.definitions.filter((def) => def.id in metadataValues)
 	);
 
-	const observation = $derived(tables.Observation.getFromState(page.params.observation ?? ''));
+	const observation = $derived(narrowingState.observation);
 
 	const remainingMetadataValues = $derived.by<Record<NamespacedMetadataID, Set<string>>>(() => {
 		const result: Record<NamespacedMetadataID, Set<string>> = Object.fromEntries(
@@ -42,7 +40,7 @@
 		metadata: for (const { id } of definitions) {
 			if (!(id in result)) continue;
 
-			for (const candidate of narrowingState.candidates.remaining) {
+			for (const candidate of narrowingState.remainingCandidates) {
 				const cascades = mapKeys(candidate.cascade ?? {}, (metadataId) =>
 					ensureNamespacedMetadataId(metadataId, namespaceOfMetadataId(id))
 				);
@@ -81,6 +79,18 @@
 		bind:resultsCount={narrowingState.search.choices.resultsCount}
 	>
 		{#snippet children(shownDefinitions, searchResults)}
+{#if isDebugMode()}
+				<pre>choices = {JSON.stringify(
+						Object.fromEntries(
+							Array.from(narrowingState.choices.entries()).map(
+								([metadataId, values]) => [metadataId, Array.from(values)]
+							)
+						),
+						null,
+						2
+					)}</pre>
+			{/if}
+
 			{#if shownDefinitions.length > 0}
 				<MetadataList
 					bind:scroll={narrowingState.scroll.choices}
@@ -117,21 +127,10 @@
 					>
 				</div>
 			{/if}
+
+			
 		{/snippet}
 	</Searcher>
-
-	{#if isDebugMode()}
-		<pre>choices = {JSON.stringify(
-				Object.fromEntries(
-					Array.from(narrowingState.choices.entries()).map(([metadataId, values]) => [
-						metadataId,
-						Array.from(values),
-					])
-				),
-				null,
-				2
-			)}</pre>
-	{/if}
 </main>
 
 <style>
@@ -160,5 +159,9 @@
 
 		/* Logo size */
 		--size: 5rem;
+	}
+
+	pre {
+		font-size: 0.75rem;
 	}
 </style>

@@ -1,3 +1,4 @@
+import { Tables } from './database.js';
 import { metadataOption } from './metadata/storage.js';
 import {
 	metadataOptionId,
@@ -138,7 +139,7 @@ export async function computeCascades({
  * Resolve (NOT recursively anymore, see #1571) cascades for the given metadata value, return labels to display
  *
  * @param {object} param0
- * @param {DB.MetadataEnumVariant | undefined} param0.option the currently selected option
+ * @param {DB.MetadataEnumVariant | typeof DB.Schemas.MetadataEnumVariant['inferIn'] | undefined} param0.option the currently selected option
  * @param {DatabaseHandle} param0.db
  * @param {string | undefined} param0.protocolId
  */
@@ -151,9 +152,11 @@ export async function cascadeLabels({ protocolId, option, db }) {
 
 	for (const [metadataId, values] of Object.entries(option.cascade ?? {})) {
 		const id = namespacedMetadataId(protocolId, metadataId);
-		labels[id] = await Promise.all(values.map(async (key) => metadataOption(db, id, key))).then(
-			(options) => options.filter(nonnull)
+		const options = await Promise.all(
+			ensureArray(values).map(async (key) => metadataOption(db, id, key))
 		);
+
+		labels[id] = options.filter(nonnull).map((option) => Tables.MetadataOption.assert(option));
 	}
 
 	return labels;

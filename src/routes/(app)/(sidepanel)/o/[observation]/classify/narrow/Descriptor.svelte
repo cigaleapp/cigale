@@ -144,6 +144,7 @@
 				{/if}
 			</div>
 			<ButtonIcon
+			help="Supprimer ce choix"
 				onclick={async () => {
 					if (!observation) return;
 
@@ -197,13 +198,13 @@
 
 					return matches({
 						descriptors: narrowingState.descriptors,
-						within: narrowingState.candidates.allIds,
+						within: narrowingState.remainingCandidateIds,
 						choices,
 					}).size;
 				}}
 			>
 				{#snippet children(countAfter)}
-					{@const countBefore = narrowingState.candidates.remainingIds.size}
+					{@const countBefore = narrowingState.remainingCandidateIds.size}
 					{@const ratio = countAfter / countBefore}
 					<div
 						class="narrowing-power"
@@ -219,7 +220,7 @@
 							<span
 								transition:fade={{ duration: 100 }}
 								class="filter-count"
-								style:width="{narrowingState.candidates.all.length.toString()
+								style:width="{narrowingState.allCandidateIds.size.toString()
 									.length + 1}ch"
 							>
 								{#if countAfter > countBefore}

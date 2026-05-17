@@ -42,7 +42,10 @@ export function metadataOptionsKeyRange(
 	);
 }
 
-const METADATA_OPTIONS_CACHE = new Map<NamespacedMetadataID, DB.MetadataEnumVariant[]>();
+const METADATA_OPTIONS_CACHE = new Map<
+	NamespacedMetadataID,
+	Array<(typeof DB.Schemas.MetadataEnumVariant)['inferIn']>
+>();
 
 export function clearMetadataOptionsCache() {
 	METADATA_OPTIONS_CACHE.clear();
@@ -85,7 +88,7 @@ export async function metadataOptionsOf(
 		return out;
 	}
 
-	const options = new Map<NamespacedMetadataID, DB.MetadataEnumVariant[]>();
+	const options: typeof METADATA_OPTIONS_CACHE = new Map();
 
 	const protocol = await db.get('Protocol', protocolId);
 	if (!protocol) return arrayAndMap('byMetadata', options);

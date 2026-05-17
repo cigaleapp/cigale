@@ -4,6 +4,7 @@
 	import IconChoose from '~icons/ri/check-line';
 	import IconNoImage from '~icons/ri/question-line';
 	import { page } from '$app/state';
+	import Badge from '$lib/Badge.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import { databaseHandle } from '$lib/idb.svelte.js';
 	import LearnMoreLink from '$lib/LearnMoreLink.svelte';
@@ -20,41 +21,17 @@
 	}
 
 	let { candidate }: Props = $props();
-
-	async function pick() {
-		if (!page.params.observation) return;
-		if (!narrowingState.focusedMetadataId) return;
-
-		await storeMetadataValue({
-			db: databaseHandle(),
-			subjectId: page.params.observation,
-			sessionId: uiState.currentSessionId,
-			metadataId: narrowingState.focusedMetadataId,
-			type: 'enum',
-			value: candidate.key,
-		});
-	}
 </script>
 
-<article>
+<button
+	class="candidate"
+	onclick={() => {
+		narrowingState.openCandidateDetails?.(candidate);
+	}}
+>
 	<div class="image" class:empty={!candidate.images?.[0]}>
 		{#if candidate.images?.at(0)}
-			<Lightbox>
-				{#snippet trigger()}
-					<img
-						src={candidate.images?.at(0)}
-						alt="Image de {candidate.label}"
-						class="specimen"
-					/>
-				{/snippet}
-				{#snippet content()}
-					<img
-						src={candidate.images?.at(0)}
-						alt="Image de {candidate.label}"
-						class="specimen-fullscreen"
-					/>
-				{/snippet}
-			</Lightbox>
+			<img src={candidate.images?.at(0)} alt="Image de {candidate.label}" class="specimen" />
 		{:else}
 			<p>
 				<IconNoImage />
@@ -62,7 +39,12 @@
 		{/if}
 	</div>
 	<div class="info">
-		<span class="label">{candidate.label}</span>
+		<div class="label">
+			<span>{candidate.label}</span>
+			{#if narrowingState.candidateIsEliminated(candidate)}
+				<Badge>Éliminé</Badge>
+			{/if}
+		</div>
 		<div class="description" {@attach scrollfader}>
 			<Markdown source={candidate.description ?? ''} />
 		</div>
@@ -72,23 +54,24 @@
 					<LearnMoreLink href={candidate.learnMore} />
 				{/if}
 			</div>
-
-			<div class="pick">
-				<ButtonSecondary onclick={pick}>
-					<IconChoose />
-					Choisir
-				</ButtonSecondary>
-			</div>
 		</div>
 	</div>
-</article>
+</button>
 
 <style>
-	article {
+	.candidate {
 		display: flex;
 		gap: 2em;
 		padding: 2em;
 		border-bottom: 1px solid var(--gray);
+		font-size: 1rem;
+		width: 100%;
+		text-align: left;
+
+		&:hover,
+		&:focus-visible {
+			background-color: var(--bg-primary-translucent);
+		}
 	}
 
 	.image {
@@ -121,12 +104,16 @@
 	.label {
 		font-weight: bold;
 		font-size: 1.3em;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		--badge-color: var(--fg-error);
 	}
 
 	.description {
 		min-height: 3lh;
 		max-height: 15lh;
-		overflow: auto;
+		overflow: hidden;
 	}
 
 	.info {
@@ -143,11 +130,5 @@
 		align-items: center;
 		gap: 2em;
 		justify-content: space-between;
-	}
-
-	article:not(:hover):not(:focus-within) .actions .pick {
-		opacity: 0;
-		pointer-events: none;
-		visibility: hidden;
 	}
 </style>

@@ -124,6 +124,7 @@
 					help="Marquer comme non-confirmée"
 					keyboard="$mod+ArrowDown"
 					onclick={async () => progress.mark('unconfirmed')}
+					loading
 				>
 					<IconConfirmed />
 				</ButtonIcon>
@@ -132,6 +133,7 @@
 					help="Marquer comme confirmée"
 					keyboard="$mod+ArrowUp"
 					onclick={async () => progress.mark('confirmed')}
+					loading
 				>
 					<IconUnconfirmed />
 				</ButtonIcon>
@@ -152,6 +154,7 @@
 					keyboard="$mod+ArrowLeft"
 					disabled={navigation.current === 1}
 					onclick={async () => navigation.previous()}
+					loading
 				>
 					<IconPrev />
 				</ButtonIcon>
@@ -165,6 +168,7 @@
 					keyboard="$mod+ArrowRight"
 					disabled={navigation.current === navigation.total}
 					onclick={async () => navigation.next()}
+					loading
 				>
 					<IconNext />
 				</ButtonIcon>
@@ -177,6 +181,7 @@
 				keyboard="Space"
 				help="Marquer l'{labels.item.toLowerCase()} comme confirmée et passer à la prochaine non confirmée"
 				onclick={async () => confirmAndNext()}
+				loading
 			>
 				Continuer
 			</ButtonSecondary>
@@ -187,9 +192,8 @@
 <style>
 	.progress {
 		width: 100%;
-		min-width: 50px;
+		min-width: 60px;
 		max-width: 150px;
-		flex-shrink: 0;
 		--height: 0.5em;
 		--inactive-bg: rgb(from var(--gray) r g b / 50%);
 		--full-bg: var(--fg-primary);

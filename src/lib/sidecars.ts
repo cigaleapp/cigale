@@ -11,9 +11,11 @@ import { storeMetadataValue } from './metadata/storage.js';
 import { MetadataType, namespaceOfMetadataId } from './schemas/metadata.js';
 import { compareBy } from './utils.js';
 
-export const ACCEPTED_SIDECAR_TYPES = ['.json', '.xml', '.xmp', '.yaml', '.yml'];
+export const ACCEPTED_SIDECAR_TYPES = ['.json', '.xml', '.xmp', '.yaml', '.yml'] as const;
 
-export function isSidecar(filepath: string) {
+export function isSidecar<T extends (typeof ACCEPTED_SIDECAR_TYPES)[number]>(
+	filepath: string
+): filepath is `${string}${T}` {
 	return ACCEPTED_SIDECAR_TYPES.some((ext) => filepath.endsWith(ext));
 }
 

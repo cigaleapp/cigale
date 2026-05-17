@@ -1,66 +1,10 @@
 <script lang="ts" module>
-	export const narrowingState = $state({
-		search: {
-			describe: { query: '', resultsCount: 0 },
-			choices: { query: '', resultsCount: 0 },
-			candidates: { query: '', resultsCount: 0 },
-		},
-		scroll: {
-			describe: { y: 0 },
-			choices: { y: 0 },
-			candidates: { y: 0 },
-		},
-		focusedMetadataId: undefined as NamespacedMetadataID | undefined,
-		// TODO persist by using the observation's metadata overrides
-		choicesHistory: [] as NamespacedMetadataID[],
-		metadataValues: {} as Record<NamespacedMetadataID, TypedMetadataValue<'enum'>>,
-		get choices() {
-			return new Map(
-				entries(this.metadataValues).map(([id, { value, alternatives }]) => [
-					id,
-					new Set<string>([
-						value.toString(),
-						...Object.keys(alternatives ?? {}).map((k) => safeJSONParse(k).toString()),
-					]),
-				])
-			);
-		},
-
-		definitions(narrowableGroup: string | undefined) {
-			return tables.Metadata.state.filter((m) => m.group === narrowableGroup);
-		},
-
-		candidates: {
-			all: [] as DB.MetadataEnumVariant[],
-			get allIds() {
-				return new Set(this.all.map((c) => c.key));
-			},
-			// remaining: [] as DB.MetadataEnumVariant[],
-			remainingIds: new Set<string>(),
-			get remaining() {
-				return this.all.filter((c) => this.remainingIds.has(c.key));
-			},
-			get ratio() {
-				return 1 - this.remaining.length / (this.all.length - 1 || 1);
-			},
-
-			eliminated({ key }: { key: string }): boolean {
-				return !this.remainingIds.has(key);
-			},
-		},
-
-		descriptors: new Map() as Descriptors,
-	});
+	export const narrowingState = new NarrowingState();
 
 	export const maximumListableCandidates = 5_000;
 </script>
 
 <script lang="ts">
-	import type { Descriptors } from './candidates.js';
-	import type * as DB from '$lib/database.js';
-	import type { TypedMetadataValue } from '$lib/metadata/types.js';
-	import type { NamespacedMetadataID } from '$lib/schemas/common.js';
-
 	import { fade } from 'svelte/transition';
 
 	import IconRemove from '~icons/ri/close-line';
@@ -85,67 +29,36 @@
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte.js';
 	import { tooltip } from '$lib/tooltips.js';
-	import { compareBy, entries, safeJSONParse, transformObject } from '$lib/utils.js';
+	import { compareBy, transformObject } from '$lib/utils.js';
 	import VirtualList from '$lib/VirtualList.svelte';
 
 	import { fullscreenState } from '../../+layout@(app).svelte';
 	import Subject from '../Subject.svelte';
-	import { computeDescriptors, getAllCandidates, matches } from './candidates.js';
+	import CandidateDetailsModal from './CandidateDetailsModal.svelte';
+	import { computeDescriptors } from './candidates.js';
 	import NarrowableGroupPicker from './NarrowableGroupPicker.svelte';
 	import OptionsLoader, { options } from './OptionsLoader.svelte';
+	import { NarrowingState } from './state.svelte.js';
 
 	const { children } = $props();
 
-	const narrowableGroup = $derived(
-		uiState.currentSession?.fullscreenClassifier.narrowableGroup || undefined
-	);
-
-	let expandedSubject = $state(false);
-
-	const observation = $derived(tables.Observation.getFromState(page.params.observation ?? ''));
+	const observation = $derived(narrowingState.observation);
 
 	const images = $derived(
 		tables.Image.state.filter((image) => observation?.images.includes(image.id))
 	);
 
-	const definitions = $derived(
-		narrowingState.definitions(uiState.currentSession?.fullscreenClassifier.narrowableGroup)
-	);
+	const narrowableGroup = $derived(narrowingState.narrowableGroup);
+
+	let expandedSubject = $state(false);
+
+	const definitions = $derived(narrowingState.definitions);
 
 	const eliminated = $derived(
-		narrowingState.candidates.all.filter(
-			(c) => !narrowingState.candidates.remainingIds.has(c.key)
-		)
+		narrowingState.allCandidates.filter((c) => !narrowingState.remainingCandidateIds.has(c.key))
 	);
 
 	const metadataValues = $derived(narrowingState.metadataValues);
-
-	$effect(() => {
-		narrowingState.focusedMetadataId =
-			uiState.currentSession?.fullscreenClassifier.focusedMetadata ??
-			uiState.classificationMetadataId;
-	});
-
-	$effect(() => {
-		void (async () => {
-			if (!narrowableGroup) return;
-			if (!narrowingState.focusedMetadataId) return;
-			narrowingState.candidates.all = await getAllCandidates({
-				narrowableGroup,
-				focusedMetadataId: narrowingState.focusedMetadataId,
-			});
-		})();
-	});
-
-	$effect(() => {
-		console.time('update matches');
-		narrowingState.candidates.remainingIds = matches({
-			descriptors: narrowingState.descriptors,
-			within: narrowingState.candidates.allIds,
-			choices: narrowingState.choices,
-		});
-		console.timeEnd('update matches');
-	});
 
 	const focusedMetadata = $derived(
 		tables.Metadata.getFromState(narrowingState.focusedMetadataId ?? '')
@@ -154,30 +67,6 @@
 	const focusedMetadataValue = $derived(
 		observation?.metadataOverrides[narrowingState.focusedMetadataId ?? '']
 	);
-
-	$effect(() => {
-		if (!observation) return;
-		// Only get values that are relevant to the narrowing view
-		narrowingState.metadataValues = transformObject(
-			observation.metadataOverrides,
-			(id, value) => {
-				const def = definitions.find((d) => d.id === id);
-				if (!def) return;
-				if (def.type !== 'enum') return;
-				return [id, value];
-			}
-		);
-	});
-
-	$effect(() => {
-		if (!options) return;
-		if (!narrowingState.candidates.all.length) return;
-
-		narrowingState.descriptors = computeDescriptors({
-			allCandidates: narrowingState.candidates.all,
-			options,
-		});
-	});
 
 	let toggleFocusSearchBar = $state<() => void>();
 
@@ -198,7 +87,7 @@
 	});
 
 	const tooManyRemainingCandidates = $derived(
-		narrowingState.candidates.remaining.length > maximumListableCandidates
+		narrowingState.remainingCandidateIds.size > maximumListableCandidates
 	);
 
 	defineKeyboardShortcuts('classification', {
@@ -242,6 +131,8 @@
 		},
 	});
 </script>
+
+<CandidateDetailsModal bind:open={narrowingState.openCandidateDetails} />
 
 <OptionsLoader>
 	<div class="layout" class:expanded-subject={expandedSubject}>
@@ -343,18 +234,23 @@
 				<VirtualList
 					empty="Aucun candidat à afficher"
 					items={candidatesTab === 'all'
-						? narrowingState.candidates.all.toSorted(
-								compareBy((c) => (narrowingState.candidates.eliminated(c) ? 1 : -1))
+						? narrowingState.allCandidates.toSorted(
+								compareBy((c) => (narrowingState.candidateIsEliminated(c) ? 1 : -1))
 							)
 						: candidatesTab === 'remaining'
-							? narrowingState.candidates.remaining
+							? narrowingState.remainingCandidates
 							: eliminated}
 				>
-					{#snippet item({ images, label, key })}
+					{#snippet item(option)}
+						{@const { images, label, key } = option}
 						{@const crossout =
-							!narrowingState.candidates.remainingIds.has(key) &&
+							!narrowingState.remainingCandidateIds.has(key) &&
 							candidatesTab !== 'eliminated'}
-						<button class="candidate" class:crossout>
+						<button
+							class="candidate"
+							class:crossout
+							onclick={() => narrowingState.openCandidateDetails?.(option)}
+						>
 							<div class="image">
 								{#if images && images.length > 0}
 									<img src={images[0]} alt="" />
@@ -384,15 +280,14 @@
 							transformObject(obs.metadataOverrides, (id, value) => {
 								const def = definitions.find((d) => d.id === id);
 								if (!def) return [id, value];
-								if (
-									def.group !==
-									uiState.currentSession.fullscreenClassifier.narrowableGroup
-								)
+								if (def.group !== narrowingState.narrowableGroup)
 									return [id, value];
 
 								return undefined;
 							})
 						);
+
+						narrowingState.resetScrollAndSearch();
 					}}
 				>
 					<IconRestart />
@@ -408,9 +303,9 @@
 				<NarrowableGroupPicker />
 			{:else}
 				<div class="progress" data-testid="remaining-candidates">
-					<ProgressBar progress={narrowingState.candidates.ratio} />
+					<ProgressBar progress={narrowingState.candidatesRatio} />
 					<div class="remaining-count">
-						{plural(narrowingState.candidates.remaining.length, [
+						{plural(narrowingState.remainingCandidateIds.size, [
 							'# restant',
 							'# restants',
 						])}
@@ -504,7 +399,7 @@
 							>
 								Candidats
 								<code class="candidates-count">
-									{narrowingState.candidates.remaining.length}
+									{narrowingState.remainingCandidateIds.size}
 								</code>
 							</div>
 						{/snippet}
@@ -632,6 +527,7 @@
 	}
 
 	aside .photo {
+		min-height: 100px;
 		height: 100%;
 		transition: height 250ms ease;
 		border-bottom: 1px solid var(--gray);
@@ -680,13 +576,17 @@
 		height: 0.25rem;
 		overflow: visible;
 		position: relative;
+		z-index: 10;
 
 		.remaining-count {
 			position: absolute;
-			inset: var(--height) 0 auto 0;
+			top: var(--height);
+			right: 0;
 			text-align: right;
 			color: var(--fg-primary);
+			background: var(--bg-neutral);
 			padding: 0.25em 0.5em;
+			border-bottom-left-radius: var(--corner-radius);
 		}
 	}
 

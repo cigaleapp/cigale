@@ -7,8 +7,6 @@
 		NamespacedMetadataID,
 		Map<string, DB.MetadataEnumVariant>
 	> = $state.raw({});
-
-	// export const narrowingPowers =
 </script>
 
 <script lang="ts">
@@ -30,12 +28,13 @@
 
 	const { children }: Props = $props();
 
-	const definitions = $derived(
-		narrowingState.definitions(uiState.currentSession?.fullscreenClassifier.narrowableGroup)
-	);
+	const definitions = $derived(narrowingState.definitions);
+
+	let loadingOptions = $state(0);
+	let loadingDescriptors = $state(false);
 
 	// TODO: use this in sidepanel too! it works nicely.
-	const optionsLoader = cancellable(async (sig, definitions: DB.Metadata[]) => {
+	const optionsLoader = cancellable(async (sig, definitions: DB.Metadata[], loaded: boolean) => {
 		loadingOptions = 0;
 
 		if (!uiState.currentProtocol) {
@@ -45,7 +44,7 @@
 
 		// Prevent double-load
 		const loadedCount = Object.keys(options).length;
-		if (loadedCount > 0 && loadedCount >= definitions.length) {
+		if (loadedCount > 0 && loadedCount >= definitions.length && loaded) {
 			loadingOptions = definitions.length;
 			return;
 		}
@@ -54,6 +53,8 @@
 			loadingOptions = definitions.length;
 			return;
 		}
+
+		loadingDescriptors = true;
 
 		for (const def of definitions) {
 			sig.throwIfAborted();
@@ -72,25 +73,32 @@
 			loadingOptions++;
 		}
 
+		await narrowingState.loadAllCandidates(sig, options);
+
+		loadingDescriptors = false;
 		loadingOptions = definitions.length;
 	});
 
-	let loadingOptions = $state(0);
 	$effect(() => {
 		loadingOptions = 0;
-		const loader = optionsLoader(definitions);
+		const loader = optionsLoader(definitions, narrowingState.loaded);
 
 		loader.do();
 		return loader.cancel;
 	});
 </script>
 
-{#if !loadingOptions || Object.keys(options).length < definitions.length}
+{#if !loadingOptions || Object.keys(options).length < definitions.length || loadingDescriptors}
 	<div class="loading">
-		<Logo drawpercent={loadingOptions / definitions.length} />
-		Chargement des options...
-		<br />
-		{loadingOptions} / {definitions.length}
+		{#if loadingOptions < definitions.length}
+			<Logo drawpercent={loadingOptions / definitions.length} />
+			Chargement des options...
+			<br />
+			{loadingOptions} / {definitions.length}
+		{:else}
+			<Logo loading />
+			Chargement des descripteurs...
+		{/if}
 	</div>
 {:else}
 	{@render children()}

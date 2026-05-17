@@ -12,18 +12,16 @@
 	import { maximumListableCandidates, narrowingState } from '../+layout.svelte';
 	import Candidate from '../Candidate.svelte';
 
-	const candidates = $derived(narrowingState.candidates.remaining);
-
 	const searcher = $derived(
-		new Fuse(candidates, {
+		new Fuse(narrowingState.allCandidates, {
 			keys: ['label', 'description', 'key', 'learnMore'],
 			includeMatches: true,
 		})
 	);
 
 	const searchResults = $derived.by(() => {
-		if (!searcher) return candidates;
-		if (!narrowingState.search.candidates.query) return candidates;
+		if (!searcher) return narrowingState.remainingCandidates;
+		if (!narrowingState.search.candidates.query) return narrowingState.remainingCandidates;
 
 		return searcher
 			.search(narrowingState.search.candidates.query)
@@ -47,7 +45,7 @@
 		const currentKeys = searchResults.map((r) => r.key);
 		const previousKeys = previousSearchResults.current.map((r) => r.key);
 		if (dequal(currentKeys, previousKeys)) return;
-		narrowingState.scroll.candidates = 0;
+		narrowingState.scroll.candidates.y = 0;
 	});
 </script>
 
