@@ -54,8 +54,6 @@ export async function mergeToObservation(parts) {
 		),
 	};
 
-	observation.label = defaultObservationLabel({ protocol, images, observation });
-
 	await tables.Observation.do(undefined, (tx) => {
 		tx.add(observation);
 		for (const { id } of observations) {
@@ -107,20 +105,6 @@ export async function deleteObservation(
 }
 
 /**
- * @param {object} arg0
- * @param {Array<typeof import('$lib/database').Schemas.Image.inferIn>} arg0.images
- * @param {typeof import('$lib/database').Schemas.Observation.inferIn} arg0.observation
- * @param {import('$lib/database').Protocol} arg0.protocol
- * @returns {string} computed default label for the new observation
- */
-function defaultObservationLabel({ images, observation, protocol }) {
-	return (
-		protocol?.observations?.defaultLabel?.render({ images, observation }) ||
-		fallbackObservationLabel([observation, ...images])
-	);
-}
-
-/**
  * @param {Array<{ filename: string} | {label: string}>} parts
  * @returns {string} computed fallback label for the new observation
  */
@@ -134,25 +118,19 @@ function fallbackObservationLabel(parts) {
 
 /**
  *
- * @param {typeof import('$lib/database').Schemas.Image.inferIn} image
- * @param {import('$lib/database').Protocol} protocol
+ * @param {Pick<typeof import('$lib/database').Schemas.Image.inferIn & DB.Image, "id" | "filename">} image
  * @param {import('$lib/database').Session} session
  * @returns {typeof import('$lib/database').Schemas.Observation.inferIn}
  */
-export function newObservation(image, protocol, session) {
+export function newObservation(image, session) {
 	const observationId = generateId('Observation');
-	const newObs = {
+	return {
 		id: observationId,
 		sessionId: session.id,
 		images: [image.id],
 		addedAt: new Date().toISOString(),
 		label: fallbackObservationLabel([image]),
 		metadataOverrides: {},
-	};
-
-	return {
-		...newObs,
-		label: defaultObservationLabel({ images: [image], observation: newObs, protocol }),
 	};
 }
 
@@ -175,7 +153,7 @@ export async function ensureNoLoneImages(tx) {
 
 		for (const image of images) {
 			if (!observations.some((o) => o.images.includes(image.id))) {
-				const newObs = newObservation(image, protocol, session);
+				const newObs = newObservation(image, session);
 				tx.objectStore('Observation').add(newObs);
 				// Update ui selection so we don't have ghosts in preview side panel
 				uiState.setSelection?.(
@@ -209,7 +187,7 @@ export async function ensureNoEmptyObservations(tx) {
 				uiState.setSelection?.(uiState.selection.filter((sel) => sel !== observation.id));
 				uiState.erroredImages.delete(observation.id);
 			} else {
-				// If some images exist, but not all, remove the non-existing ones from the observation. 
+				// If some images exist, but not all, remove the non-existing ones from the observation.
 				if (existing.length !== observation.images.length) {
 					tx.objectStore('Observation').put({
 						...observation,

@@ -56,7 +56,7 @@
 				for (const imageId of obs.images) {
 					const image = await tx.objectStore('Image').get(imageId);
 					if (!image) continue;
-					const obs = newObservation(image, protocol, uiState.currentSession);
+					const obs = newObservation(image, uiState.currentSession);
 					tx.objectStore('Observation').add(obs);
 					toselect.push(obs.id);
 				}
