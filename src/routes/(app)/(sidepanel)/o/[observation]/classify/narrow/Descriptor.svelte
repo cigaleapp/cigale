@@ -144,7 +144,7 @@
 				{/if}
 			</div>
 			<ButtonIcon
-			help="Supprimer ce choix"
+				help="Supprimer ce choix"
 				onclick={async () => {
 					if (!observation) return;
 

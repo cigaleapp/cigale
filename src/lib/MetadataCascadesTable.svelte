@@ -11,8 +11,10 @@
 	interface Props {
 		cascades: Awaited<ReturnType<typeof cascadeLabels>>;
 		/** Cross out the value part of a row */
+		// eslint-disable-next-line no-unused-vars
 		crossout?: (metadataId: string, optionKey: string) => boolean;
 		/** Tooltip to show on hover of the row */
+		// eslint-disable-next-line no-unused-vars
 		help?: (metadataId: string) => string;
 		/** Metadata IDs in the order they should be displayed  */
 		ordering?: string[];
@@ -30,8 +32,18 @@
 	);
 
 	const showImages = $derived(
-		tables.Metadata.state.some(
-			metadata => metadata.id in labels && metadata.images && metadata.images.length > 0
+		!compact &&
+			tables.Metadata.state.some(
+				(metadata) => metadata.id in labels && metadata.images && metadata.images.length > 0
+			)
+	);
+
+	const longestMetadataLabelLength = $derived(
+		Math.max(
+			...entries.map(([metadataId]) => {
+				const metadata = tables.Metadata.getFromState(metadataId);
+				return (metadata?.label ?? metadata?.id ?? '').length;
+			})
 		)
 	)
 </script>

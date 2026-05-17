@@ -8,19 +8,16 @@
 	import { tables } from '$lib/idb.svelte.js';
 	import MetadataList from '$lib/MetadataList.svelte';
 	import { ensureNamespacedMetadataId, namespaceOfMetadataId } from '$lib/schemas/metadata.js';
-	import { uiState } from '$lib/state.svelte.js';
 	import { compareBy, mapKeys } from '$lib/utils.js';
 
 	import { narrowingState } from '../+layout.svelte';
 	import { narrowingPower } from '../candidates.js';
-	import { options } from '../OptionsLoader.svelte';
 	import Descriptor from '../Descriptor.svelte';
+	import { options } from '../OptionsLoader.svelte';
 	import Searcher from '../Searcher.svelte';
 
 	const metadataValues = $derived(narrowingState.metadataValues);
-	const definitions = $derived(
-		narrowingState.definitions
-	);
+	const definitions = $derived(narrowingState.definitions);
 
 	const observation = $derived(tables.Observation.getFromState(page.params.observation ?? ''));
 
@@ -59,10 +56,9 @@
 		searchResults?: NamespacedMetadataID[]
 	) {
 		if (searchResults) return searchResults;
-		if (shownDefinitions.some(def => !(def.id in options))) return []
+		if (shownDefinitions.some((def) => !(def.id in options))) return [];
 
 		console.time('metadata ordering');
-		
 
 		const ordering = shownDefinitions
 			.map((def) => def.id)

@@ -6,7 +6,6 @@
 
 	import { page } from '$app/state';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import { tables } from '$lib/idb.svelte.js';
 	import Logo from '$lib/Logo.svelte';
 	import MetadataList from '$lib/MetadataList.svelte';
 	import { goto } from '$lib/paths.js';
@@ -79,7 +78,7 @@
 		bind:resultsCount={narrowingState.search.choices.resultsCount}
 	>
 		{#snippet children(shownDefinitions, searchResults)}
-{#if isDebugMode()}
+			{#if isDebugMode()}
 				<pre>choices = {JSON.stringify(
 						Object.fromEntries(
 							Array.from(narrowingState.choices.entries()).map(
@@ -127,8 +126,6 @@
 					>
 				</div>
 			{/if}
-
-			
 		{/snippet}
 	</Searcher>
 </main>

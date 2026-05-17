@@ -3,15 +3,15 @@
 	import type { NamespacedMetadataID } from '$lib/schemas/common.js';
 	import type { Snippet } from 'svelte';
 
-	import {untrack} from 'svelte';
 	import { dequal } from 'dequal';
 	import Fuse from 'fuse.js';
 	import { Debounced, Previous } from 'runed';
+	import { untrack } from 'svelte';
 	import { fade } from 'svelte/transition';
 
-	import {scrollController}from '$lib/scrollcontroller.svelte.js'
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import Logo from '$lib/Logo.svelte';
+	import { scrollController } from '$lib/scrollcontroller.svelte.js';
 
 	interface Props {
 		query: string;
@@ -81,9 +81,11 @@
 </script>
 
 {#if shownDefinitions.length > 0 || !query}
-	<div class="scrollable" data-testid="descriptors" in:fade={{ duration: 200 }}
-	
-	{@attach scrollController(untrack(() => scroll))}
+	<div
+		class="scrollable"
+		data-testid="descriptors"
+		in:fade={{ duration: 200 }}
+		{@attach scrollController(untrack(() => scroll))}
 	>
 		{@render children(
 			shownDefinitions,

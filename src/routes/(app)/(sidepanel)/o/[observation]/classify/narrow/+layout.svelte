@@ -35,9 +35,8 @@
 	import { fullscreenState } from '../../+layout@(app).svelte';
 	import Subject from '../Subject.svelte';
 	import CandidateDetailsModal from './CandidateDetailsModal.svelte';
-	import { computeDescriptors } from './candidates.js';
 	import NarrowableGroupPicker from './NarrowableGroupPicker.svelte';
-	import OptionsLoader, { options } from './OptionsLoader.svelte';
+	import OptionsLoader from './OptionsLoader.svelte';
 	import { NarrowingState } from './state.svelte.js';
 
 	const { children } = $props();

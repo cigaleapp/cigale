@@ -23,7 +23,7 @@ export type Descriptors = Map<string, Map<NamespacedMetadataID, Set<string>>>;
 export function computeDescriptors({
 	allCandidates,
 	options,
-	signal
+	signal,
 }: {
 	allCandidates: DB.MetadataEnumVariant[];
 	/** Options of all narrowable metadata */

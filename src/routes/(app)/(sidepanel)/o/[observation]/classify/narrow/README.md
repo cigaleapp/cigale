@@ -2,20 +2,17 @@ The naive solution was not performant at all, so I implemented a set-based appro
 
 Here's the little writeup that goes through my "research"
 
+Let $\mathcal{ S }$ a dictionary of dictionnaries of options as defined below: ($(k, v) \in \mathcal{S}$ means iterating over (key, value) _pairs_ of the dictionary)
 
+| keys ↓    | metadata A        | metadata B                 | metadata C              | metadata D              | $\cdots$ |
+| --------- | ----------------- | -------------------------- | ----------------------- | ----------------------- | -------- |
+| species 1 | $\{ \alpha_A \} $ | $\{ \beta_B, \delta_B \} $ | $\{ \alpha_C \} $       | $\overline{\emptyset} $ | $\cdots$ |
+| species 2 | $\{ \beta_A \} $  | $\{ \gamma_B \} $          | $\overline{\emptyset} $ | $\{ \delta_C \} $       | $\cdots$ |
+| $\cdots$  | $\cdots$          | $\cdots$                   | $\cdots$                | $\cdots$                | $\ddots$ |
 
-Let $\mathcal{ S }$ a dictionary of dictionnaries of options as defined below: ($(k, v) \in \mathcal{S}$ means iterating over (key, value) *pairs* of the dictionary)
+with
 
-keys ↓  | metadata A | metadata B | metadata C | metadata D | $\cdots$ |
----- | ----------- | ----------- |----------- | ----------- | ---- |
-species 1 | $\{ \alpha_A \} $ | $\{ \beta_B, \delta_B \} $ | $\{ \alpha_C \} $ | $\overline{\emptyset} $ | $\cdots$ |
-species 2 | $\{ \beta_A \} $ | $\{ \gamma_B \} $ | $\overline{\emptyset} $ | $\{ \delta_C \} $ | $\cdots$ |
-$\cdots$ | $\cdots$ | $\cdots$ | $\cdots$ | $\cdots$ | $\ddots$ | 
-
-
-with 
-
-- $\{ \alpha_M, \beta_M, \ldots \}$ being $M$'s options, for any metadata $M$; 
+- $\{ \alpha_M, \beta_M, \ldots \}$ being $M$'s options, for any metadata $M$;
 - species $n$ being the focused metadata's narrowable options
 
 computed once (in `(options)` route group's layout), possibly in a swarpc procedure
@@ -38,9 +35,7 @@ with:
 
 This gives us the species (elements of $\mathcal{S}$) that match the picked set of options $C$. Crucially, species that don't have a cascade of a given metadata have $\overline{\emptyset}$ joined to their set in $\mathcal{S}$, **not** $\emptyset$. This means adding all possible options of the metadata.[^1]
 
-[^1]: We could also do the empty set, but in that case the backbone protocol *has* to specify a full-set cascade for every empty case. Empty set could mean that a species matches with *no* option of a metadata (instead of just meaning "we don't care about that metadata, it could be anything)
-
-
+[^1]: We could also do the empty set, but in that case the backbone protocol _has_ to specify a full-set cascade for every empty case. Empty set could mean that a species matches with _no_ option of a metadata (instead of just meaning "we don't care about that metadata, it could be anything)
 
 ## ordering
 
@@ -57,5 +52,5 @@ This is basically a metadata's average (averaging over its options, $\overline{\
 Then:
 
 ```ts
-const ordering = definitions.toSorted(compareBy(def => npow(matches, def)))
+const ordering = definitions.toSorted(compareBy((def) => npow(matches, def)));
 ```

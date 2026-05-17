@@ -19,11 +19,11 @@
 	import { imageId, imageIdToFileId } from '$lib/images';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
+	import OverflowableText from '$lib/OverflowableText.svelte';
 	import { goto } from '$lib/paths.js';
 	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
 	import { uiState } from '$lib/state.svelte.js';
 	import ModalSubmitIssue from '$routes/(app)/ModalSubmitIssue.svelte';
-	import OverflowableText from '$lib/OverflowableText.svelte';
 
 	const { children } = $props();
 
@@ -171,7 +171,8 @@
 							return observationsOfImageFile.length === 0
 								? "Cette image n'apparaît dans aucune observation"
 								: `Cette image apparaît dans ${plural(observationsOfImageFile.length, ['# observation', '# observations'])}`;
-						if (!imageToCrop && key === 'crop') return 'Ouvrir une image pour le recadrage';
+						if (!imageToCrop && key === 'crop')
+							return 'Ouvrir une image pour le recadrage';
 						if (key === 'narrow') {
 							const narrowableGroups =
 								uiState.currentProtocol?.metadataGroups.filter(
@@ -248,7 +249,8 @@
 			width: 100%;
 		}
 
-		.right-side, .left-side {
+		.right-side,
+		.left-side {
 			display: flex;
 			align-items: center;
 			gap: 1em;

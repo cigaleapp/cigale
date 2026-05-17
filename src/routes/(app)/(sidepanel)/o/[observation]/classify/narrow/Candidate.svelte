@@ -1,18 +1,11 @@
 <script lang="ts">
 	import type * as DB from '$lib/database.js';
 
-	import IconChoose from '~icons/ri/check-line';
 	import IconNoImage from '~icons/ri/question-line';
-	import { page } from '$app/state';
 	import Badge from '$lib/Badge.svelte';
-	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import { databaseHandle } from '$lib/idb.svelte.js';
 	import LearnMoreLink from '$lib/LearnMoreLink.svelte';
-	import Lightbox from '$lib/Lightbox.svelte';
 	import Markdown from '$lib/Markdown.svelte';
-	import { storeMetadataValue } from '$lib/metadata/storage.js';
 	import { scrollfader } from '$lib/scrollfader.js';
-	import { uiState } from '$lib/state.svelte.js';
 
 	import { narrowingState } from './+layout.svelte';
 

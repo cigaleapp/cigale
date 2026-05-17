@@ -1,3 +1,5 @@
+/* eslint-disable svelte/prefer-svelte-reactivity */
+
 import type { Descriptors } from './candidates.js';
 import type * as DB from '$lib/database.js';
 import type { TypedMetadataValue } from '$lib/metadata/index.js';
