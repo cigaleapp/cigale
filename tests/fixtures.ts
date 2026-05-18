@@ -5,7 +5,6 @@ import type { Locator } from '@playwright/test';
 import type { MetadataValue, Settings } from '$lib/database';
 import type { IDBDatabaseType } from '$lib/idb.svelte';
 import type { RuntimeValue } from '$lib/schemas/metadata';
-import type { ExportedProtocol } from '$lib/schemas/protocols';
 import type { Toast } from '$lib/toasts.svelte.js';
 
 import 'urlpattern-polyfill';
@@ -43,7 +42,7 @@ import {
 	waitForRoute,
 } from './utils/index.js';
 
-const fullProtocol = _fullProtocol as ExportedProtocol;
+const fullProtocol = _fullProtocol;
 
 type RemoveNamespace<Key extends `io.github.cigaleapp.arthropods.example.light__${string}`> =
 	Key extends `io.github.cigaleapp.arthropods.example.light__${infer Rest}` ? Rest : never;
