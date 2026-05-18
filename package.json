@@ -199,7 +199,7 @@
 		"word-diff": "^1.0.1",
 		"wuchale": "^0.23.3",
 		"xss": "^1.0.15",
-		"yaml": "^2.8.4"
+		"yaml": "^2.9.0"
 	},
 	"patchedDependencies": {
 		"natural-regex@0.5.0": "patches/natural-regex@0.5.0.patch"
