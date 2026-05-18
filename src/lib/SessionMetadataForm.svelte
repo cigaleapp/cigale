@@ -7,6 +7,7 @@
 	import { SvelteMap } from 'svelte/reactivity';
 
 	import { databaseHandle, openDatabase, tables } from './idb.svelte.js';
+	import Logo from './Logo.svelte';
 	import Metadata from './Metadata.svelte';
 	import { resolveDefaults } from './metadata/defaults.js';
 	import { deleteMetadataValue, storeMetadataValue } from './metadata/storage.js';
@@ -19,6 +20,7 @@
 		errors?: Map<NamespacedMetadataID, string[]>;
 	}
 
+	let resolvingDefaults = $state(false);
 	let refreshDefaults = $state(0);
 
 	let { session, errors = new SvelteMap(), onmetadatachange }: Props = $props();
@@ -40,64 +42,88 @@
 	watch([() => refreshDefaults], () => {
 		void (async () => {
 			if (!protocol) return;
-			await resolveDefaults({
-				db: await openDatabase(),
-				metadataToConsider: protocol.sessionMetadata,
-				sessionId: session.id,
-			});
-			onmetadatachange?.();
+			resolvingDefaults = true;
+			try {
+				await resolveDefaults({
+					db: await openDatabase(),
+					metadataToConsider: protocol.sessionMetadata,
+					sessionId: session.id,
+				});
+				onmetadatachange?.();
+			} finally {
+				resolvingDefaults = false;
+			}
 		})();
 	});
 </script>
 
 {#if protocol}
-	<form class="metadata" data-testid="session-metadata">
-		<MetadataList
-			definitions={metadataDefs}
-			values={session.metadata}
-			groups={protocol.metadataGroups}
-			ordering={protocol.metadataOrder}
-		>
-			{#snippet children(def, value)}
-				<Metadata
-					requiredness="all"
-					options={undefined}
-					definition={def}
-					{value}
-					onvalidation={(messages) => {
-						if (messages.length > 0) {
-							errors.set(def.id, messages);
-						} else {
-							errors.delete(def.id);
-						}
-					}}
-					onchange={async ({value: v, unit}) => {
-						if (dequal(v, value?.value) && unit === value?.unit) return;
+	{#if resolvingDefaults && refreshDefaults === 0}
+		<div class="loading">
+			<Logo loading />
+			Chargement…
+		</div>
+	{:else}
+		<form class="metadata" data-testid="session-metadata">
+			<MetadataList
+				definitions={metadataDefs}
+				values={session.metadata}
+				groups={protocol.metadataGroups}
+				ordering={protocol.metadataOrder}
+			>
+				{#snippet children(def, value)}
+					<Metadata
+						requiredness="all"
+						options={undefined}
+						definition={def}
+						{value}
+						onvalidation={(messages) => {
+							if (messages.length > 0) {
+								errors.set(def.id, messages);
+							} else {
+								errors.delete(def.id);
+							}
+						}}
+						onchange={async ({ value: v, unit }) => {
+							if (dequal(v, value?.value) && unit === value?.unit) return;
 
-						if (v !== undefined) {
-							await storeMetadataValue({
-								db: databaseHandle(),
-								manuallyModified: true,
-								subjectId: session.id,
-								sessionId: session.id,
-								metadataId: def.id,
-								value: v,
-								unit,
-							});
-						} else {
-							await deleteMetadataValue({
-								db: databaseHandle(),
-								subjectId: session.id,
-								sessionId: session.id,
-								metadataId: def.id,
-							});
-						}
+							if (v !== undefined) {
+								await storeMetadataValue({
+									db: databaseHandle(),
+									manuallyModified: true,
+									subjectId: session.id,
+									sessionId: session.id,
+									metadataId: def.id,
+									value: v,
+									unit,
+								});
+							} else {
+								await deleteMetadataValue({
+									db: databaseHandle(),
+									subjectId: session.id,
+									sessionId: session.id,
+									metadataId: def.id,
+								});
+							}
 
-						refreshDefaults++;
-						onmetadatachange?.();
-					}}
-				/>
-			{/snippet}
-		</MetadataList>
-	</form>
+							refreshDefaults++;
+							onmetadatachange?.();
+						}}
+					/>
+				{/snippet}
+			</MetadataList>
+		</form>
+	{/if}
 {/if}
+
+<style>
+	.loading {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 1rem;
+		font-size: 1.25rem;
+
+		--size: 5rem; /* Logo size */
+	}
+</style>
