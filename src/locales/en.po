@@ -1,11 +1,15 @@
 msgid ""
 msgstr ""
-"Plural-Forms: nplurals=2; plural=n != 1;\n"
-"Source-Language: fr\n"
+"PO-Revision-Date: 2026-05-18 15:15+0000\n"
+"Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
 "Language: en\n"
-"MIME-Version: 1.0\n"
+"Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"MIME-Version: 1.0\n"
+"X-Generator: Weblate 5.12.2\n"
+"Source-Language: fr\n"
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/[[from]]/+page@(app).svelte
 msgid "<0/> Auto"
@@ -1862,56 +1866,56 @@ msgstr "Classification settings"
 #. 0: i + 1
 #: src/lib/Carousel.svelte
 msgid "Aller à l'image {0}"
-msgstr ""
+msgstr "Go to image {0}"
 
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 msgid "<0/> Ouvrir en plein écran <1/>"
-msgstr ""
+msgstr "<0/> Open in full screen <1/>"
 
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
 msgid "Classifier l'image sélectionnée en plein écran"
-msgstr ""
+msgstr "Classify selected image in full screen"
 
 #: src/routes/(app)/(sidepanel)/classify/[observation]/+page.svelte
 msgid "Métadonnées associées"
-msgstr ""
+msgstr "Associated metadata"
 
 #: src/routes/(app)/(sidepanel)/classify/[observation]/+page.svelte
 msgid "Aucun synonyme défini."
-msgstr ""
+msgstr "No synonyms defined."
 
 #: src/routes/(app)/(sidepanel)/classify/[observation]/Header.svelte
 msgid "Retour à la galerie"
-msgstr ""
+msgstr "Back to gallery"
 
 #: src/routes/(app)/(sidepanel)/classify/[observation]/Header.svelte
 msgid "Recadrer l'image"
-msgstr ""
+msgstr "Crop image"
 
 #: src/routes/(app)/(sidepanel)/classify/[observation]/Header.svelte
 msgid "<0/> Recadrer <1/>"
-msgstr ""
+msgstr "<0/> Crop <1/>"
 
 #: src/routes/(app)/(sidepanel)/classify/[observation]/LayoutSwitcher.svelte
 msgid "Changer de disposition"
-msgstr ""
+msgstr "Switch layouts"
 
 #: src/routes/(app)/(sidepanel)/classify/[observation]/Navigation.svelte
 msgid "Aucune classification à confirmer pour cette image."
-msgstr ""
+msgstr "No classification to confirm for this image."
 
 #: src/routes/(app)/(sidepanel)/classify/[observation]/Navigation.svelte
 msgid "<0/> Classifications confirmées <1/>"
-msgstr ""
+msgstr "<0/> Confirmed classifications <1/>"
 
 #: src/routes/(app)/(sidepanel)/classify/[observation]/Navigation.svelte
 msgid "Marquer la classification comme confirmée et passer à la prochaine classification non confirmée"
-msgstr ""
+msgstr "Mark classification as confirmed and go to next unconfirmed one"
 
 #: src/routes/(app)/(sidepanel)/classify/[observation]/OptionBar.svelte
 #: src/routes/(app)/(sidepanel)/classify/[observation]/OptionBar.svelte
 msgid "Option suivante"
-msgstr ""
+msgstr "Next option"
 
 #: src/routes/(app)/(sidepanel)/classify/[observation]/OptionBar.svelte
 #: src/routes/(app)/(sidepanel)/classify/[observation]/OptionBar.svelte
