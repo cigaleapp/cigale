@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2026-05-18 15:15+0000\n"
+"PO-Revision-Date: 2026-05-18 15:24+0000\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
 "Language: en\n"
 "Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
@@ -1920,102 +1920,102 @@ msgstr "Next option"
 #: src/routes/(app)/(sidepanel)/classify/[observation]/OptionBar.svelte
 #: src/routes/(app)/(sidepanel)/classify/[observation]/OptionBar.svelte
 msgid "Option précédente"
-msgstr ""
+msgstr "Previous option"
 
 #: src/routes/(app)/(sidepanel)/classify/[observation]/OptionBar.svelte
 msgid "Ouvrir/Fermer la liste des options"
-msgstr ""
+msgstr "Open/Close the options list"
 
 #: src/routes/(app)/(sidepanel)/classify/[observation]/OptionBar.svelte
 msgid "Ouvrir le lien \"En savoir plus\" dans un nouvel onglet"
-msgstr ""
+msgstr "Open the \"Learn more\" link in a new tab"
 
 #: src/routes/(app)/(sidepanel)/classify/[observation]/OptionBar.svelte
 msgid "Marquer la classification comme confirmée"
-msgstr ""
+msgstr "Mark classification as confirmed"
 
 #: src/routes/(app)/(sidepanel)/classify/[observation]/OptionBar.svelte
 msgid "Marquer la classification comme non confirmée"
-msgstr ""
+msgstr "Mark classification as unconfirmed"
 
 #: src/routes/(app)/(sidepanel)/classify/[observation]/OptionBar.svelte
 msgid "Précédente"
-msgstr ""
+msgstr "Previous"
 
 #: src/routes/(app)/(sidepanel)/classify/[observation]/OptionBar.svelte
 msgid "Suivante"
-msgstr ""
+msgstr "Next"
 
 #: src/routes/(app)/(sidepanel)/classify/[observation]/References.svelte
 msgid "Image de référence suivante"
-msgstr ""
+msgstr "Next reference image"
 
 #: src/routes/(app)/(sidepanel)/classify/[observation]/References.svelte
 msgid "Image de référence précédente"
-msgstr ""
+msgstr "Previous reference image"
 
 #: src/routes/(app)/(sidepanel)/classify/[observation]/References.svelte
 msgid "Agrandir/Réduire les images de référence"
-msgstr ""
+msgstr "Expand/Reduce reference images"
 
 #: src/routes/(app)/(sidepanel)/classify/[observation]/References.svelte
 msgid "Aucune image de référence pour <0/> <1/>"
-msgstr ""
+msgstr "No reference image for <0/> <1/>"
 
 #: src/routes/(app)/(sidepanel)/classify/[observation]/Subject.svelte
 msgid "Agrandir/Réduire l'image"
-msgstr ""
+msgstr "Enlarge/reduce image"
 
 #: src/routes/(app)/(sidepanel)/classify/[observation]/Subject.svelte
 msgid "Voir l'image entière/recadrée"
-msgstr ""
+msgstr "View full/cropped image"
 
 #. 0: imageId
 #: src/routes/(app)/(sidepanel)/crop/[image]/[[from]]/+page@(app).svelte
 msgid "Impossible de trouver l'image {0} pour la confirmer"
-msgstr ""
+msgstr "Cannot find {0} to confirm it"
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/[[from]]/+page@(app).svelte
 msgid "Retourner à la classification de l'image"
-msgstr ""
+msgstr "Back to image classification"
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/[[from]]/+page@(app).svelte
 msgid "<0/> Retour <1/>"
-msgstr ""
+msgstr "<0/> Back <1/>"
 
 #: src/routes/(app)/(sidepanel)/classify/[observation]/+layout.ts
 msgid "Aucune session active"
-msgstr ""
+msgstr "No active session"
 
 #: src/routes/(app)/(sidepanel)/classify/[observation]/+layout.ts
 msgid "Session active introuvable"
-msgstr ""
+msgstr "Active session not found"
 
 #: src/routes/(app)/(sidepanel)/classify/[observation]/+page.ts
 msgid "Image introuvable dans la session"
-msgstr ""
+msgstr "Image not found in session"
 
 #. 0: directoryHandle.name
 #: src/routes/(app)/results/+page.svelte
 msgid "Fichiers sauvegardés dans {0}"
-msgstr ""
+msgstr "Files saved in {0}"
 
 #: src/routes/(app)/results/+page.svelte
 msgid "<0/> Archive ZIP <1/>"
-msgstr ""
+msgstr "<0/> ZIP Archive <1/>"
 
 #: src/routes/(app)/results/+page.svelte
 msgid "<0/> Dossier <1/>"
-msgstr ""
+msgstr "<0/> Folder <1/>"
 
 #: src/routes/(app)/(sidepanel)/classify/[observation]/Header.svelte
 msgid "<0/> Voir tout <1/>"
-msgstr ""
+msgstr "<0/> See all <1/>"
 
 #: src/routes/(app)/(sidepanel)/classify/[observation]/Navigation.svelte
 #: src/routes/(app)/(sidepanel)/classify/[observation]/Navigation.svelte
 msgid "Observation suivante"
-msgstr ""
+msgstr "Next observation"
 
 #: src/routes/(app)/(sidepanel)/classify/[observation]/Navigation.svelte
 msgid "Marquer la classification comme confirmée et passer à la prochaine observation non confirmée"
