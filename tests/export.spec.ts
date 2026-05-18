@@ -238,6 +238,7 @@ testKitchensink('includes metadata files in export', async ({ page, app }) => {
 
 	await app.tabs.go('results');
 	await expect(page.getByTestId('zip-preview')).toMatchAriaSnapshot(`
+	  - text: Contenu de l'export
 	  - list:
 	    - listitem:
 	      - img
@@ -289,18 +290,18 @@ testKitchensink(
 		const modal = app.modals.byTitle('Métadonnées incorrectes');
 		await assert(modal).toBeVisible();
 		await expect(modal).toMatchAriaSnapshot(`
-	  - dialog:
-	    - banner:
-	      - heading "Métadonnées incorrectes" [level=1]
-	      - button "Fermer":
-	        - img
-	    - text: Certaines métadonnées sont incorrectes ohio respect
-	    - list:
-	      - listitem: /must be at most \\d+ \\(was \\d+\\)/
-	    - contentinfo:
-	      - button "Corriger"
-	      - button "Exporter quand même"
-	`);
+		  - dialog:
+		    - banner:
+		      - heading "Métadonnées incorrectes" [level=1]
+		      - button "Fermer":
+		        - img
+		    - text: Certaines métadonnées sont incorrectes ohio respect
+		    - list:
+		      - listitem: /must be at most \\d+ \\(was \\d+\\)/
+		    - contentinfo:
+		      - button "Corriger"
+		      - button "Exporter quand même"
+		`);
 
 		let download = await waitForDownload(page, async () =>
 			modal.getByRole('button', { name: 'Exporter quand même' }).click()

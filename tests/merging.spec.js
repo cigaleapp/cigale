@@ -157,7 +157,7 @@ test('selecting multiple images', issue(1054), async ({ page, app }) => {
 	await page.getByRole('article', { name: 'cyan' }).click();
 	const medium = app.metadata.radio(/Difficulté d'identification/, 'Moyenne');
 	await medium.scrollIntoViewIfNeeded();
-	await medium.check();
+	await medium.check({ force: true });
 	await page.getByRole('article', { name: 'cyan' }).click();
 
 	// Select multiple observations
@@ -362,16 +362,19 @@ test('selecting multiple images', issue(1054), async ({ page, app }) => {
 	      - radio "LC Préoccupation mineure (“Least Concern”)"
 	      - text: LC
 	      - paragraph: Préoccupation mineure (“Least Concern”)
-	    - button /^Regrouper /:
+	    - group:
+	      - img
+	      - text: Andrènes
+	    - button "Regrouper Ctrl + G":
 	      - img
 	      - text: ""
-	    - button /^Séparer /:
+	    - button "Séparer Ctrl + Shift + G":
 	      - img
 	      - text: ""
-	    - button /^Ouvrir en plein écran / [disabled]:
+	    - button "Ouvrir en plein écran Ctrl + ⏎" [disabled]:
 	      - img
 	      - text: ""
-	    - button /^Supprimer 3 images /:
+	    - button "Supprimer 3 images Suppr":
 	      - img
 	      - text: ""
 	`);

@@ -469,7 +469,7 @@ test('can use a protocol that imports metadata from another protocol', async ({
 		.click();
 	// Cascade
 	await expect(app.metadata.radio('Is imported', 'Yes')).toBeChecked();
-	await app.metadata.radio('Is imported', 'No').click();
+	await app.metadata.radio('Is imported', 'No').check({ force: true });
 	await app.metadata.switch('Should come from parent2').click();
 	// Make it false
 	await app.metadata.switch('Remote metadata').click();

@@ -3,6 +3,7 @@
 	import type { TypedMetadataValue } from './metadata/index.js';
 	import type { MetadataType, RuntimeValue } from './schemas/metadata.js';
 	import type { NumericUnit } from './schemas/units.js';
+	import type { ComponentProps } from 'svelte';
 
 	import { ArkErrors } from 'arktype';
 
@@ -27,9 +28,16 @@
 	import { splitMetadataId } from './schemas/metadata.js';
 	import { isDebugMode } from './settings.svelte.js';
 	import { tooltip } from './tooltips.js';
-	import { orEmpty, mapKeys, orEmpty2, pick, safeJSONParse, switchValue, proxifyIfLocalhost } from './utils.js';
+	import {
+		mapKeys,
+		orEmpty,
+		orEmpty2,
+		pick,
+		proxifyIfLocalhost,
+		safeJSONParse,
+		switchValue,
+	} from './utils.js';
 	import WorldMap from './WorldMap.svelte';
-	import type { ComponentProps } from 'svelte';
 
 	type Props = {
 		definition: Metadata;
@@ -46,16 +54,22 @@
 		onchange?: (
 			// eslint-disable-next-line no-unused-vars
 			data: {
-			value: undefined | RuntimeValue<T>,
-			unit?: undefined | typeof NumericUnit.infer,
-			/** Keys are **serialized** metadata values! not bare string */
-			alternatives?: Record<string, number>,
-			nodes: {
-				metadata:HTMLElement|undefined
-			}
+				value: undefined | RuntimeValue<T>;
+				unit?: undefined | typeof NumericUnit.infer;
+				/** Keys are **serialized** metadata values! not bare string */
+				alternatives?: Record<string, number>;
+				nodes: {
+					metadata: HTMLElement | undefined;
+				};
 			}
 		) => Promise<void>;
-	} & Pick<ComponentProps<typeof MetadataInput>, "addToAlternativesBySelect" | "removeByDeselect" | "optionIsDisabled" | "enumOptionsExtraContent">;
+	} & Pick<
+		ComponentProps<typeof MetadataInput>,
+		| 'addToAlternativesBySelect'
+		| 'removeByDeselect'
+		| 'optionIsDisabled'
+		| 'enumOptionsExtraContent'
+	>;
 
 	let {
 		value,
@@ -69,7 +83,9 @@
 	}: Props = $props();
 
 	/** If we have addToAlternativesBySelect, the alternatives are already shown for enum metadata */
-	const showAlternatives = $derived(inputProps.addToAlternativesBySelect ? definition.type !== 'enum' : true)
+	const showAlternatives = $derived(
+		inputProps.addToAlternativesBySelect ? definition.type !== 'enum' : true
+	);
 
 	const valueValidator = $derived.by(() => {
 		switch (definition.type) {
@@ -119,13 +135,15 @@
 	const optional = $derived(requiredness === 'all' && !definition.required);
 	const required = $derived(requiredness !== 'none' && definition.required);
 
-	let element = $state<HTMLElement>()
+	let element = $state<HTMLElement>();
 </script>
 
 <div class="metadata" bind:this={element}>
 	<div class="side-image-and-main-area">
 		{#if displayImageOnTheSide}
-			<div class="side-image"><img loading="lazy" src={proxifyIfLocalhost( definition.images[0])} /></div>
+			<div class="side-image">
+				<img loading="lazy" src={proxifyIfLocalhost(definition.images[0])} />
+			</div>
 		{/if}
 		<div class="main-area">
 			<section class="first-line">
@@ -195,11 +213,10 @@
 									alternatives: value?.alternatives ?? {},
 								};
 								await onchange({
-									value: value?.value, 
+									value: value?.value,
 									unit: value?.unit,
-									nodes:{metadata: element},
-
-							});
+									nodes: { metadata: element },
+								});
 							}}
 						>
 							<IconCheck />
@@ -229,8 +246,8 @@
 						await onchange?.({
 							value: { latitude, longitude },
 
-									nodes:{metadata: element},
-					});
+							nodes: { metadata: element },
+						});
 					},
 				})}
 			/>
@@ -299,18 +316,22 @@
 		unit={value?.unit}
 		{validationErrors}
 		{isCompactEnum}
-		alternatives={value?.alternatives ? mapKeys(value.alternatives, key => safeJSONParse(key)?.toString()) : undefined}
+		alternatives={value?.alternatives
+			? mapKeys(value.alternatives, (key) => safeJSONParse(key)?.toString())
+			: undefined}
 		onblur={async (val, unit, alternatives) => {
 			// We eagerly update value.unit because otherwise it gets updated after the DB changes
 			// the validator would update separately to the unit+value change
 			// which causes a flickering false validation error
-			if (value) value.unit = unit;
-			await onchange({
-				value: val, unit, 
-				alternatives: mapKeys(alternatives, key => JSON.stringify(key)),
+			if (value && unit) value.unit = unit;
 
-									nodes:{metadata: element},
-		});
+			await onchange({
+				value: val,
+				unit,
+				alternatives: mapKeys(alternatives ?? {}, (key) => JSON.stringify(key)),
+				nodes: { metadata: element },
+			});
+
 			validation = val !== undefined ? valueValidator?.(val) : undefined;
 		}}
 		confidences={Object.fromEntries([
@@ -349,8 +370,8 @@
 			await onchange({
 				value: undefined,
 
-									nodes:{metadata: element},
-		});
+				nodes: { metadata: element },
+			});
 		}}
 	>
 		<IconClear />

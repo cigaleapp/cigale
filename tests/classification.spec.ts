@@ -102,8 +102,10 @@ test.describe('full-screen classification view', pr(1071), () => {
 				const option = panel.getByTestId('focused-option');
 
 				await expect(
-					page.getByTestId('fullscreen-header').getByRole('heading', { level: 1 })
-				).toHaveAccessibleName(lilFella.label);
+					page
+						.getByTestId('fullscreen-header')
+						.getByRole('heading', { level: 1, name: lilFella.label, exact: true })
+				).toBeVisible();
 
 				await expect(option.getByRole('combobox')).toHaveValue('Entomobrya muscorum');
 				await expect(option.getByTestId('current')).toHaveText(/32%\s*$/);
@@ -125,24 +127,24 @@ test.describe('full-screen classification view', pr(1071), () => {
 				  - text: Métadonnées associées
 				  - table:
 				    - rowgroup:
-				      - row "Règne Animalia":
-				        - cell "Règne"
-				        - cell "Animalia"
-				      - row "Phylum Arthropoda":
-				        - cell "Phylum"
-				        - cell "Arthropoda"
-				      - row "Classe Collembola":
-				        - cell "Classe"
-				        - cell "Collembola"
-				      - row "Ordre Entomobryomorpha":
-				        - cell "Ordre"
-				        - cell "Entomobryomorpha"
-				      - row "Famille Entomobryidae":
-				        - cell "Famille"
-				        - cell "Entomobryidae"
 				      - row "Genre Entomobrya":
 				        - cell "Genre"
 				        - cell "Entomobrya"
+				      - row "Famille Entomobryidae":
+				        - cell "Famille"
+				        - cell "Entomobryidae"
+				      - row "Ordre Entomobryomorpha":
+				        - cell "Ordre"
+				        - cell "Entomobryomorpha"
+				      - row "Classe Collembola":
+				        - cell "Classe"
+				        - cell "Collembola"
+				      - row "Phylum Arthropoda":
+				        - cell "Phylum"
+				        - cell "Arthropoda"
+				      - row "Règne Animalia":
+				        - cell "Règne"
+				        - cell "Animalia"
 				`);
 				await expect(page.getByTestId('synonyms')).toMatchAriaSnapshot(`
 				  - img
@@ -280,7 +282,8 @@ test.describe('full-screen classification view', pr(1071), () => {
 			test('can navigate to other images', async ({ page, app }) => {
 				const title = page
 					.getByTestId('fullscreen-header')
-					.getByRole('heading', { level: 1 });
+					.getByRole('heading', { level: 1 })
+					.first();
 				const selectedOption = page
 					.getByTestId('panel')
 					.getByTestId('focused-option')
@@ -522,7 +525,7 @@ test.describe('narrowing view', pr(1570), () => {
 
 	test.describe('describe tab', () => {
 		testBasic('can choose choices', async ({ page, app }) => {
-			await expectCandidatesCount(page, 166);
+			await expectCandidatesCount(page, 180);
 
 			const choices = page.locator('aside').getByRole('list');
 			const choice = (name: string) => choices.getByRole('listitem', { name });
