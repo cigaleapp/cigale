@@ -7,6 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: src/lib/SessionMetadataForm.svelte
 #: src/routes/(app)/PrepareForOffline.svelte
 #: src/routes/(app)/sessions/Cards.svelte
 msgid "<0/> Chargement…"
@@ -178,9 +179,6 @@ msgstr "Ceci est un déploiement de preview"
 msgid "Chargement des dépendances…"
 msgstr "Chargement des dépendances…"
 
-#~ msgid "Chargement des options…"
-#~ msgstr "Chargement des options…"
-
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
 msgid "Chargement du modèle de classification"
 msgstr "Chargement du modèle de classification"
@@ -347,6 +345,7 @@ msgstr "Exporter les résultats"
 
 #: src/lib/Lightbox.svelte
 #: src/lib/Modal.svelte
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/CandidateDetailsModal.svelte
 #: src/routes/(app)/PrepareForOffline.svelte
 msgid "Fermer"
 msgstr "Fermer"
@@ -386,16 +385,11 @@ msgstr "Icônes"
 
 #: src/lib/Carousel.svelte
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/Subject.svelte
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
 msgid "Image précédente"
 msgstr "Image précédente"
 
 #: src/lib/Carousel.svelte
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/Subject.svelte
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
 msgid "Image suivante"
 msgstr "Image suivante"
 
@@ -592,9 +586,6 @@ msgstr "Supprimer les images et observations sélectionnées"
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 msgid "Supprimer toutes les images sélectionnées. Attention, impossible d'annuler"
 msgstr "Supprimer toutes les images sélectionnées. Attention, impossible d'annuler"
-
-#~ msgid "Sélectionnez une ou plusieurs images pour voir et modifier leurs métadonnées"
-#~ msgstr "Sélectionnez une ou plusieurs images pour voir et modifier leurs métadonnées"
 
 #: src/routes/(app)/(sidepanel)/+layout.svelte
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
@@ -1742,11 +1733,11 @@ msgstr "<0/> Ouvrir en plein écran <1/>"
 msgid "Classifier l'image sélectionnée en plein écran"
 msgstr "Classifier l'image sélectionnée en plein écran"
 
-#: src/routes/(app)/(sidepanel)/o/[observation]/classify/suggestions/+layout.ts
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/+layout.ts
 msgid "Aucune session active"
 msgstr "Aucune session active"
 
-#: src/routes/(app)/(sidepanel)/o/[observation]/classify/suggestions/+layout.ts
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/+layout.ts
 msgid "Session active introuvable"
 msgstr "Session active introuvable"
 
@@ -2181,9 +2172,6 @@ msgstr "<0/> Cigale"
 msgid "Fermer la session"
 msgstr "Fermer la session"
 
-#~ msgid "Chargement des métadonnées…"
-#~ msgstr "Chargement des métadonnées…"
-
 #: src/routes/(app)/accounts/+page.svelte
 msgid "<0/> Aucun compte"
 msgstr "<0/> Aucun compte"
@@ -2283,13 +2271,10 @@ msgstr "Navigateur"
 msgid "Appareil"
 msgstr "Appareil"
 
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/+layout.ts
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/suggestions/+page.ts
 msgid "Observation introuvable"
 msgstr "Observation introuvable"
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/classify/suggestions/+page.ts
-msgid "Image introuvable dans la session"
-msgstr "Image introuvable dans la session"
 
 #: src/lib/MetadataCombobox.svelte
 msgid "Chargement"
@@ -2349,32 +2334,7 @@ msgstr "Aucun synonyme défini."
 msgid "Changer de disposition"
 msgstr "Changer de disposition"
 
-#: src/routes/(app)/(sidepanel)/o/[observation]/classify/suggestions/Navigation.svelte
-msgid "Aucune classification à confirmer pour cette image."
-msgstr "Aucune classification à confirmer pour cette image."
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/classify/suggestions/Navigation.svelte
-#: src/routes/(app)/(sidepanel)/o/[observation]/classify/suggestions/Navigation.svelte
-msgid "Observation suivante"
-msgstr "Observation suivante"
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/classify/suggestions/Navigation.svelte
-msgid "Marquer la classification comme confirmée et passer à la prochaine observation non confirmée"
-msgstr "Marquer la classification comme confirmée et passer à la prochaine observation non confirmée"
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/classify/suggestions/Navigation.svelte
-#: src/routes/(app)/(sidepanel)/o/[observation]/classify/suggestions/Navigation.svelte
-#: src/routes/(app)/(sidepanel)/o/[observation]/classify/suggestions/Navigation.svelte
-msgid "Observation précédente"
-msgstr "Observation précédente"
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/classify/suggestions/Navigation.svelte
-msgid "Marquer la classification comme confirmée et passer à la prochaine classification non confirmée"
-msgstr "Marquer la classification comme confirmée et passer à la prochaine classification non confirmée"
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/classify/suggestions/Navigation.svelte
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
+#: src/routes/(app)/(sidepanel)/o/[observation]/TopbarExtras.svelte
 msgid "Continuer"
 msgstr "Continuer"
 
@@ -2395,14 +2355,6 @@ msgstr "Ouvrir/Fermer la liste des options"
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/suggestions/OptionBar.svelte
 msgid "Ouvrir le lien \"En savoir plus\" dans un nouvel onglet"
 msgstr "Ouvrir le lien \"En savoir plus\" dans un nouvel onglet"
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/classify/suggestions/OptionBar.svelte
-msgid "Marquer la classification comme confirmée"
-msgstr "Marquer la classification comme confirmée"
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/classify/suggestions/OptionBar.svelte
-msgid "Marquer la classification comme non confirmée"
-msgstr "Marquer la classification comme non confirmée"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/suggestions/OptionBar.svelte
 msgid "Précédente"
@@ -2438,10 +2390,6 @@ msgid_plural "# métadonnées"
 msgstr[0] "# métadonnée"
 msgstr[1] "# métadonnées"
 
-#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/+layout.svelte
-msgid "Basculer entre les onglets Décrire et Candidats"
-msgstr "Basculer entre les onglets Décrire et Candidats"
-
 #. 0: maximumListableCandidates.toLocaleString()
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/+layout.svelte
 msgid "Impossible de lister les candidats, il y en a plus de {0}"
@@ -2452,18 +2400,8 @@ msgid "Entrer dans la barre de recherche"
 msgstr "Entrer dans la barre de recherche"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/+layout.svelte
-#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/+layout.svelte
 msgid "Enlever ce choix"
 msgstr "Enlever ce choix"
-
-#. 0: id
-#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/+layout.svelte
-msgid "{0} not found"
-msgstr "{0} not found"
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/+layout.svelte
-msgid "<0/> Aucun choix effectué pour l'instant"
-msgstr "<0/> Aucun choix effectué pour l'instant"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/+layout.svelte
 msgid "<0/> Recommencer"
@@ -2536,17 +2474,8 @@ msgid "Revenir au recadrage d'origine"
 msgstr "Revenir au recadrage d'origine"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
 msgid "Revenir au recadrage d'origine pour toutes les boîtes"
 msgstr "Revenir au recadrage d'origine pour toutes les boîtes"
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
-msgid "Marquer le recadrage comme confirmé"
-msgstr "Marquer le recadrage comme confirmé"
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
-msgid "Marquer le recadrage comme non confirmé"
-msgstr "Marquer le recadrage comme non confirmé"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
 msgid "Zoomer"
@@ -2589,18 +2518,6 @@ msgstr "coucou toi :) <0/> passes une bonne journée ! 💖💖"
 msgid "Choisir l'outil {0}"
 msgstr "Choisir l'outil {0}"
 
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
-msgid "<0/> Réinit."
-msgstr "<0/> Réinit."
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
-msgid "<0/> Invalider"
-msgstr "<0/> Invalider"
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
-msgid "<0/> Valider"
-msgstr "<0/> Valider"
-
 #. 0: i + 1
 #. 0: i + 1
 #: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
@@ -2612,34 +2529,140 @@ msgstr "Boîte #{0}"
 msgid "Sélectionnez une boîte avec 1 à 9 pour la modifier avec des raccourcis clavier"
 msgstr "Sélectionnez une boîte avec 1 à 9 pour la modifier avec des raccourcis clavier"
 
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
-msgid "Auto"
-msgstr "Auto"
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
-msgid "<0/> Auto"
-msgstr "<0/> Auto"
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
-msgid "Marquer le recadrage comme confirmé et passer à la prochaine image non confirmée"
-msgstr "Marquer le recadrage comme confirmé et passer à la prochaine image non confirmée"
-
 #. 0: candidate.label
-#. 0: candidate.label
-#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/candidates/+page.svelte
-#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/candidates/+page.svelte
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/Candidate.svelte
 msgid "Image de {0}"
 msgstr "Image de {0}"
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/candidates/+page.svelte
-msgid "<0/> Choisir"
-msgstr "<0/> Choisir"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/candidates/+page.svelte
 msgid "Trop de candidats à afficher"
 msgstr "Trop de candidats à afficher"
 
 #. 0: loadingOptions; 1: definitions.length
-#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/describe/+page.svelte
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/OptionsLoader.svelte
 msgid "<0/> Chargement des options... <1/> {0} / {1}"
 msgstr "<0/> Chargement des options... <1/> {0} / {1}"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/+layout.ts
+msgid "Métadonnée de classification introuvable. Le protocole de la session n'en définit peut-être pas."
+msgstr "Métadonnée de classification introuvable. Le protocole de la session n'en définit peut-être pas."
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/TopbarExtras.svelte
+msgid "Confirmer et passer à la prochaine non confirmée"
+msgstr "Confirmer et passer à la prochaine non confirmée"
+
+#. 0: labels.item.toLowerCase()
+#: src/routes/(app)/(sidepanel)/o/[observation]/TopbarExtras.svelte
+msgid "Aller à l'{0} prochaine"
+msgstr "Aller à l'{0} prochaine"
+
+#. 0: labels.item.toLowerCase()
+#. 0: labels.item.toLowerCase()
+#: src/routes/(app)/(sidepanel)/o/[observation]/TopbarExtras.svelte
+#: src/routes/(app)/(sidepanel)/o/[observation]/TopbarExtras.svelte
+msgid "Aller à l'{0} précédente"
+msgstr "Aller à l'{0} précédente"
+
+#. 0: labels.item.toLowerCase()
+#: src/routes/(app)/(sidepanel)/o/[observation]/TopbarExtras.svelte
+msgid "Marquer l'{0} comme confirmée"
+msgstr "Marquer l'{0} comme confirmée"
+
+#. 0: labels.item.toLowerCase()
+#: src/routes/(app)/(sidepanel)/o/[observation]/TopbarExtras.svelte
+msgid "Marquer l'{0} comme non confirmée"
+msgstr "Marquer l'{0} comme non confirmée"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/TopbarExtras.svelte
+msgid "Marquer comme non-confirmée"
+msgstr "Marquer comme non-confirmée"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/TopbarExtras.svelte
+msgid "Marquer comme confirmée"
+msgstr "Marquer comme confirmée"
+
+#. 0: labels.item.toLowerCase()
+#: src/routes/(app)/(sidepanel)/o/[observation]/TopbarExtras.svelte
+msgid "Marquer l'{0} comme confirmée et passer à la prochaine non confirmée"
+msgstr "Marquer l'{0} comme confirmée et passer à la prochaine non confirmée"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/+layout.svelte
+msgid "Bien joué! Toutes les observations ont été recadrés, classifiées et confirmées… place à l'export des résultats 🥳"
+msgstr "Bien joué! Toutes les observations ont été recadrés, classifiées et confirmées… place à l'export des résultats 🥳"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
+msgid "<0/> Réinitialiser"
+msgstr "<0/> Réinitialiser"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/+layout.svelte
+msgid "Basculer entre les onglets Décrire, Choix et Candidats"
+msgstr "Basculer entre les onglets Décrire, Choix et Candidats"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/+layout.svelte
+msgid "Candidats"
+msgstr "Candidats"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/+layout.svelte
+msgid "Tous"
+msgstr "Tous"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/+layout.svelte
+msgid "Restants"
+msgstr "Restants"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/+layout.svelte
+msgid "Éliminés"
+msgstr "Éliminés"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/+layout.svelte
+msgid "Aucun candidat à afficher"
+msgstr "Aucun candidat à afficher"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/+layout.svelte
+msgid "Recommencer"
+msgstr "Recommencer"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/+layout.svelte
+msgid "Choix <0/>"
+msgstr "Choix <0/>"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/Candidate.svelte
+msgid "Éliminé"
+msgstr "Éliminé"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/CandidateDetailsModal.svelte
+msgid "Candidat éliminé"
+msgstr "Candidat éliminé"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/CandidateDetailsModal.svelte
+msgid "Choix effectués"
+msgstr "Choix effectués"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/CandidateDetailsModal.svelte
+msgid "Autres descripteurs"
+msgstr "Autres descripteurs"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/CandidateDetailsModal.svelte
+msgid "Choisir ce candidat"
+msgstr "Choisir ce candidat"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/Descriptor.svelte
+msgid "Supprimer ce choix"
+msgstr "Supprimer ce choix"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/OptionsLoader.svelte
+msgid "<0/> Chargement des descripteurs..."
+msgstr "<0/> Chargement des descripteurs..."
+
+#. 0: query
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/Searcher.svelte
+msgid "<0/> Aucun résultat pour “{0}” <1/> <2>Tout afficher</2>"
+msgstr "<0/> Aucun résultat pour “{0}” <1/> <2>Tout afficher</2>"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/choices/+page.svelte
+msgid "Aucun choix effectué pour le moment"
+msgstr "Aucun choix effectué pour le moment"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/choices/+page.svelte
+msgid "Décrire l'observation"
+msgstr "Décrire l'observation"
