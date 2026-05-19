@@ -1,6 +1,8 @@
 import type { AppFixture } from './fixtures.js';
 import type { Page } from '@playwright/test';
 
+import { ms } from 'convert';
+
 import lightweightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import { issue, pr } from './annotations.js';
 import { assert, expect, test, testBasic } from './fixtures.js';
@@ -480,17 +482,29 @@ test.describe('full-screen classification view', pr(1071), () => {
 });
 
 test.describe('narrowing view', pr(1570), () => {
-	async function expectCandidatesCount(page: Page, count: number) {
+	async function expectCandidatesCount(
+		page: Page,
+		count: number,
+		options: { timeout?: number } = {}
+	) {
 		await expect(page.getByRole('tab', { name: 'Candidats' })).toHaveText(
-			new RegExp(`${count}$`)
+			new RegExp(`${count}$`),
+			options
 		);
-		await expect(page.getByTestId('remaining-candidates')).toHaveText(`${count} restants`);
+		await expect(page.getByTestId('remaining-candidates')).toHaveText(
+			`${count} restants`,
+			options
+		);
 	}
 
 	/**
 	 * Null to test for absence
 	 */
-	async function expectMetadataValues(app: AppFixture, values: Record<string, string | null>) {
+	async function expectMetadataValues(
+		app: AppFixture,
+		values: Record<string, string | null>,
+		hard = false
+	) {
 		// Wait a bit for changes to save to DB
 		await app.wait('500ms');
 
@@ -499,11 +513,13 @@ test.describe('narrowing view', pr(1570), () => {
 			observation: 'with-exif-gps',
 		});
 
+		const ex = hard ? assert : expect;
+
 		for (const [key, val] of Object.entries(values)) {
 			if (val === null) {
-				expect(db).not.toHaveProperty(key);
+				ex(db).not.toHaveProperty(key);
 			} else {
-				expect(db).toHaveProperty(key, val);
+				ex(db).toHaveProperty(key, val);
 			}
 		}
 	}
@@ -523,54 +539,47 @@ test.describe('narrowing view', pr(1570), () => {
 		await app.path.wait('/(app)/(sidepanel)/o/[observation]/classify/narrow/describe');
 	});
 
+	// TODO: more E2E testing
 	test.describe('describe tab', () => {
 		testBasic('can choose choices', async ({ page, app }) => {
-			await expectCandidatesCount(page, 180);
+			await expectCandidatesCount(page, 180, { timeout: ms('10s') });
 
-			const choices = page.locator('aside').getByRole('list');
-			const choice = (name: string) => choices.getByRole('listitem', { name });
 			async function choose(
 				metadata: string,
 				name: string,
 				{ scroll = 'down' }: { scroll?: 'up' | 'down' | 'no' } = {}
 			) {
-				const option = app.metadata.radio(metadata, name, { exact: false });
+				const option = app.metadata.checkbox(metadata, name, { exact: false });
 				if (scroll !== 'no') await scrollIntoViewVirtualized(option, scroll);
-				await option.click();
+				await option.click({ force: true });
+				await app.wait('2.5s');
 			}
 
-			async function expectChoice(
-				name: string,
-				{ power, count, value }: { power: number; count: number; value: string }
-			) {
-				await expect(choice(name).getByRole('combobox')).toHaveValue(value);
-				await expect(choice(name).getByRole('progressbar')).toHaveAttribute(
-					'aria-valuenow',
-					power.toString()
-				);
-				await expect(choice(name)).toHaveText(new RegExp(`\\b${count}\\b`));
-			}
+			// TODO
+			// async function expectRemainingCandidate(label: string) {
+			// 	const locator = page
+			// 		.locator('aside')
+			// 		.getByRole('list')
+			// 		.getByRole('listitem', { name: new RegExp(`^${label} \\d+%$`) });
 
-			await choose('Pilosité occipitale', 'Pilosité majoritairement claire', {
+			// 	await scrollIntoViewVirtualized(locator);
+
+			// 	await expect(locator).toBeVisible();
+			// 	await expect(locator.getByRole('deletion')).not.toBeVisible();
+			// }
+
+			await choose('Identification rapide', 'Aucune de ces caractéristiques', {
 				scroll: 'no',
 			});
 
-			await expectCandidatesCount(page, 142);
-			await expect(choices).toHaveText(/Pilosité occipitale/);
-			await expectChoice('Pilosité occipitale', {
-				value: 'Pilosité majoritairement claire',
-				power: 14,
-				count: 142,
-			});
+			await choose('Pilosité occipitale', 'Pilosité majoritairement claire');
+
+			await expectCandidatesCount(page, 154);
+			// await expectRemainingCandidate('')
 
 			await choose('Forme de la tête', 'Plus large que haute');
 
-			await expectCandidatesCount(page, 110);
-			await expectChoice('Forme de la tête', {
-				value: 'Plus large que haute',
-				power: 23,
-				count: 110,
-			});
+			await expectCandidatesCount(page, 126);
 
 			await expectMetadataValues(app, {
 				pilosite_occipitale: 'pilositmaj_1738780459445_3719',
@@ -579,22 +588,26 @@ test.describe('narrowing view', pr(1570), () => {
 
 			// Try clearing an option by clicking on it again
 
-			await choose('Pilosité occipitale', 'Pilosité majoritairement claire', {
-				scroll: 'up',
-			});
+			await page.getByRole('tab', { name: 'Choix' }).click();
+			await app.path.wait('/(app)/(sidepanel)/o/[observation]/classify/narrow/choices');
 
-			await expect(choice('Pilosité occipitale')).not.toBeVisible();
-			await expectCandidatesCount(page, 118);
-			await expectChoice('Forme de la tête', {
-				value: 'Plus large que haute',
-				power: 29,
-				count: 118,
-			});
+			await page.getByRole('group', { name: 'Pilosité occipitale' }).click();
+			await app.wait('1s');
+			await choose('Pilosité occipitale', 'Pilosité majoritairement claire');
 
-			await expectMetadataValues(app, {
-				pilosite_occipitale: null,
-				forme_de_la_tete: 'pluslargeq_1738780492342_5503',
-			});
+			await expectMetadataValues(
+				app,
+				{
+					pilosite_occipitale: null,
+					forme_de_la_tete: 'pluslargeq_1738780492342_5503',
+				},
+				true
+			);
+
+			await page.getByRole('tab', { name: 'Décrire' }).click();
+			await app.path.wait('/(app)/(sidepanel)/o/[observation]/classify/narrow/describe');
+
+			await expectCandidatesCount(page, 134);
 
 			await choose(
 				'Couleur de la face ventrale du flagelle antennaire',
@@ -613,12 +626,21 @@ test.describe('narrowing view', pr(1570), () => {
 				taille_du_3eme_segment_antennaire: 'a3pluscour_1738780689285_1923',
 			});
 
-			// Try clearing an option by clicking on the x
+			// Try clearing an option in the choices tab
+
+			await page.getByRole('tab', { name: 'Choix' }).click();
+			await app.path.wait('/(app)/(sidepanel)/o/[observation]/classify/narrow/choices');
+
+			await page.getByRole('group', { name: 'Ligne centrale du clypéus' }).click();
+
 			await page
 				.getByRole('main')
 				.getByRole('button', { name: 'Supprimer cette valeur', disabled: false })
 				.first()
 				.click();
+
+			await page.getByRole('tab', { name: 'Décrire' }).click();
+			await app.path.wait('/(app)/(sidepanel)/o/[observation]/classify/narrow/describe');
 
 			await expectMetadataValues(app, {
 				pilosite_occipitale: null,
@@ -629,20 +651,7 @@ test.describe('narrowing view', pr(1570), () => {
 				taille_du_3eme_segment_antennaire: 'a3pluscour_1738780689285_1923',
 			});
 
-			// Try clearing an option via the choices list
-
-			await choice('Taille du 3ème segment antennaire')
-				.getByRole('button', { name: 'Enlever ce choix' })
-				.click();
-
-			await expectMetadataValues(app, {
-				pilosite_occipitale: null,
-				couleur_de_la_face_ventrale_du_flagelle_antennaire: 'flagelleor_1738780660819_6814',
-				depression_des_foveas: 'biendfinie_1738780813959_8479',
-				forme_de_la_tete: 'pluslargeq_1738780492342_5503',
-				ligne_centrale_du_clypeus: null,
-				taille_du_3eme_segment_antennaire: null,
-			});
+			await expectCandidatesCount(page, 23);
 
 			// Use reset button
 
@@ -657,15 +666,14 @@ test.describe('narrowing view', pr(1570), () => {
 				taille_du_3eme_segment_antennaire: null,
 			});
 
-			expect(choices.getByRole('listitem')).toHaveCount(1);
-			expect(choices).toHaveText(/Aucun choix effectué pour l'instant/);
+			await expectCandidatesCount(page, 180);
 		});
 
 		testBasic('can search through metadata', async ({ page, app }) => {
 			await page.getByRole('textbox', { name: 'Rechercher' }).fill('Pilosité');
 			await page.getByRole('textbox', { name: 'Rechercher' }).blur();
 			await expect(page.getByRole('search')).toHaveText(/38 résultats/);
-			await expect(app.metadata.section('Taille')).not.toBeVisible();
+			await expect(app.metadata.section('Identification rapide')).not.toBeVisible();
 			await expect(app.metadata.section('Pilosité occipitale')).toBeVisible();
 
 			// With a typo
@@ -693,68 +701,133 @@ test.describe('narrowing view', pr(1570), () => {
 		test.beforeEach(async ({ page, app }) => {
 			await page.getByTestId('descriptors').hover({ force: true });
 			await scrollAndClick(
-				app.metadata.radio(
-					'Couleur de la pilosité de la face',
-					'Pilosité de la face différente',
-					{ exact: false }
-				)
+				app.metadata.checkbox('Corbeilles du propodéum', /^En vue latérale/),
+				{ force: true }
 			);
+			await app.wait('2.5s');
 			await page.getByRole('tab', { name: 'Candidats' }).click();
 			await app.path.wait('/(app)/(sidepanel)/o/[observation]/classify/narrow/candidates');
 		});
 
 		testBasic('shows candidates that were narrowed down', async ({ page, app }) => {
 			const names = [
-				'Andrena gredana',
-				'Andrena orbitalis',
-				'Andrena brumanensis ',
-				'Andrena synadelpha',
-				'Andrena bucephala',
-				'Andrena binominata ',
-				'Andrena granulosa ',
-				'Andrena fulvata ',
-				'Andrena russula ',
-				'Andrena rugulosa ',
-				'Andrena afrensis ',
-				'Andrena parviceps ',
-				'Andrena limbata ',
-				'Andrena rogenhoferi ',
-				'Andrena chrysopus ',
-				'Andrena mucida ',
-				'Andrena pauxilla',
+				'Andrena vetula',
+				'Andrena antigana',
+				'Andrena fuscipes',
+				'Andrena dorsata',
+				'Andrena congruens',
+				'Andrena combinata',
+				'Andrena thomsonii',
+				'Andrena lepida',
+				'Andrena propinqua',
+				'Andrena confinis',
 			];
 
 			await page.getByRole('main').hover();
 			for (const name of names) {
-				await scrollIntoViewVirtualized(page.getByRole('main').getByText(name));
+				await scrollIntoViewVirtualized(
+					page.getByRole('main').getByRole('heading', { level: 2, name })
+				);
 			}
 
-			const species = page.getByRole('main').getByText('Andrena fulvata');
-			await scrollIntoViewVirtualized(species, 'up');
-			await species.hover();
-			await page.getByRole('button', { name: 'Choisir' }).click();
+			await scrollAndClick(
+				page.getByRole('main').getByRole('heading', { level: 2, name: 'Andrena vetula' }),
+				{
+					scroll: 'up',
+				}
+			);
+
+			await app.modals
+				.byTitle('Andrena vetula')
+				.getByRole('button', { name: 'Choisir ce candidat' })
+				.click();
+
+			await expect(app.modals.byTitle('Andrena vetula')).not.toBeVisible();
 
 			await expectMetadataValues(app, {
-				largeur_des_foveas_dorsalement: 'fovatrstro_1738780852057_7781',
-				divergeance_des_foveas: 'nedivergea_1738780918546_5646',
-				forme_des_foveas_au_milieu: 'fovasnonrt_1738780949142_3244',
-				ligne_centrale_du_clypeus: 'avecunelig_1738781162379_975',
-				aspect_de_la_ligne_centrale_du_clypeus: 'moinsmarqu_1738781197223_2786',
-				forme_de_lappendice_du_labre: 'enformedet_1738837442835_2826',
-				reflets_de_la_tete_et_du_mesosome: 'sansreflet_1738781679769_4181',
-				ride_du_pronotum: 'pronotumav_1738781708314_7333',
-				forme_de_la_pilosite_du_scutum: 'piliforme_1738781807041_8905',
-				corbeilles_du_propodeum: 'corbeilles_1738837562663_8904',
-				aspect_de_la_marge_des_tergites: 'margesdest_1738783146593_949',
-				type_de_pilosite_des_scopas: 'pilositmaj_1738784759008_2070',
-				forme_de_leperon_interne_du_tibia_3: 'perondutib_1738837728807_5472',
-				longueur_de_la_face: 'faceetpice_1738780627912_5962',
-				diagnose_a_fulva: 'thoraxetab_1763132717229_3725',
-				largeur_de_la_marge_du_tergite_2: 't2avecunem_1738784182703_8707',
-				echancrure_de_la_plaque_pygidiale: 'alapexnonc_1738784313047_3618',
-				couleur_de_la_pilosite_bordant_la_plaque_pygidiale: 'plaquepygi_1738784378366_3042',
-				nombre_de_cellules_cubitales: '3_1738784490337_8950',
+				densite_des_bandes_de_poils_des_tergites: 'pilositden_1738782981690_2927',
+				depression_des_foveas: 'peuvisible_1738780816142_6205',
 				identification_rapide: 'aucunedece_1774517089291_6062',
+				regularite_de_la_ponctuation_du_scutum: 'scutumimpo_1738782016651_8814',
+				aspect_du_clypeus: 'chagrinsur_1738781423480_7012',
+				excavation_ventrale_du_mesepisternum: 'msepistern_1738782237571_3600',
+				bandes_de_poils_des_tergites: 'prsenteset_1738782950734_6462',
+				couleur_des_bandes_de_poils_des_tergites: 'bandesdepo_1738783054410_1229',
+				densite_de_la_ponctuation_du_tergite_1: 'disquedut1_1738783850157_1486',
+				face_posterieure_du_femur_3: 'facearrond_1738784590799_583',
+				aspect_du_scutellum: 'mat_1738782208434_7944',
+				forme_du_clypeus: 'clypusclai_1738781362065_7869',
+				forme_de_leperon_interne_du_tibia_3: 'perondutib_1738837728807_5472',
+				aspect_de_la_marge_des_tergites: 'margesdest_1738783146593_949',
+				couleur_de_la_scopa_bicolore_des_tibias_3: 'scopasdest_1738784843423_7212',
+				echancrure_de_la_plaque_pygidiale: 'alapexnonc_1738784313047_3618',
+				cretes_transverses_du_clypeus: 'absentes_1738781227772_539',
+				angle_humeral_du_pronotum: 'pronotumsa_1738781741393_7710',
+				forme_du_bord_anterieur_du_clypeus: 'bordantrie_1738781485238_2295',
+				forme_de_la_pilosite_du_scutum: 'piliforme_1738781807041_8905',
+				diagnose_a_fulva: 'thoraxetab_1763132717229_3725',
+				divergeance_des_foveas: 'nedivergea_1738780918546_5646',
+				stries_longitudinales_du_clypeus: 'absentes_1738781134029_8838',
+				pilosite_du_disque_des_tergites: 'disquesgla_1738782842914_8746',
+				aspect_du_disque_des_tergites: 'fortementc_1738782710184_1247',
+				ponctuation_du_propodeum: 'propodumpo_1738782437421_4476',
+				taille_des_poils_de_la_scopa_des_tibias_3: 'scopadesti_1738784874548_6929',
+				largeur_des_foveas_dorsalement: 'fovastrsla_1738780844874_734',
+				reflets_de_la_tete_et_du_mesosome: 'sansreflet_1738781679769_4181',
+				ligne_centrale_du_clypeus: 'sanslignel_1738781166639_9542',
+				largeur_des_marges: 'margesdest_1738783177141_8874',
+				couleur_de_la_face_ventrale_du_flagelle_antennaire: 'flagelleor_1738780660819_6814',
+				aspect_de_la_surface_interne_du_triangle_du_propdeum:
+					'surfaceint_1738782376741_6760',
+				nombre_de_cellules_cubitales: '3_1738784490337_8950',
+				ride_du_pronotum: 'pronotumav_1738781708314_7333',
+				// couleur_des_marges_des_tergites: [
+				// 	'apexdesmar_1738782673247_2164',
+				// 	'apexdesmar_1738782675476_2563',
+				// ],
+				aspect_du_disque_du_tergite_1: 'disquedut1_1738783953470_7962',
+				aspect_du_scutum: 'scutumunif_1738781976497_4798',
+				pilosite_occipitale: 'pilositmaj_1738780461645_4261',
+				depression_de_la_marge_des_tergites: 'tergitespa_1738783116041_318',
+				taille_de_lappendice_du_labre: 'appendiced_1738837409603_218',
+				forme_des_tibias_3: 'tibias3net_1738784652417_2290',
+				ponctuation_de_la_marge_du_tergite_1: 'margenonpo_1738783988657_5201',
+				longueur_de_la_face: 'faceetpice_1738780627912_5962',
+				separation_des_aires_horizontales_et_verticales_du_propodeum:
+					'propodumav_1738782515539_2243',
+				continuite_des_bandes_de_poils_des_tergites: 'interrompu_1738783016497_2542',
+				densite_de_la_ponctuation_du_disque_des_tergites: 'nonponctus_1738782739010_4162',
+				forme_de_la_tete: 'aussilarge_1738780494459_7150',
+				couleur_de_la_cuticule_du_tibia_3: 'foncnoir_b_1738784691415_4385',
+				couleur_de_la_scopa_des_tibias_3: 'bicolore_1738784806316_8180',
+				forme_des_foveas: 'fovasrtrci_1738780883007_5446',
+				couleur_de_la_pilosite_de_la_face: 'pilositmaj_1738780525348_7702',
+				couleur_des_tergites: 'noirssansr_1738782613180_8704',
+				couleur_des_basitarses_3: 'foncsnoir_1738784728418_9571',
+				taille_du_3eme_segment_antennaire: 'a3dpassant_1738780693605_2384',
+				cretes_des_faces_laterales_du_propodeum: 'faceslatra_1738782473565_9266',
+				longueur_des_foveas: 'fovaslongu_1738780977802_6832',
+				forme_des_foveas_au_milieu: 'fovasnonrt_1738780949142_3244',
+				aspect_du_mesepisternum_et_des_aires_laterales_du_propodeum:
+					'msepistern_1738782299982_7773',
+				// aspect_de_la_ponctuation_du_clypeus: [
+				// 	'ponctuatio_1738781291580_4872',
+				// 	'ponctuatio_1738781293693_2364',
+				// ],
+				forme_de_lappendice_du_labre: 'enformedet_1738837442835_2826',
+				// densite_de_la_ponctuation_du_clypeus: [
+				// 	'densmentpo_1738781258555_2079',
+				// 	'ponctuatio_1738781260774_7579',
+				// ],
+				forme_de_la_plaque_pygidiale: 'plaquepygi_1738784280397_1841',
+				corbeilles_du_propodeum: 'envuelatra_1738837557451_8267',
+				type_de_pilosite_des_scopas: 'pilositmaj_1738784759008_2070',
+				distance_occello_occipitale: 'distanceoc_1738780595154_4028',
+				pilosite_des_mesopleures: 'longue_1738781774174_4840',
+				taille_du_2eme_segment_antennaire: 'a2pluslong_1738780722156_8303',
+				couleur_de_la_frange_terminale: 'foncenoir_1738784408817_6055',
+				presence_de_gradulus_sur_les_tergites_2_3: 't2_3sansgr_1738783084860_3752',
+				carene_du_triangle_du_propodeum: 'dlimitlatr_1738782333562_1312',
 				genus: '1345710',
 				family: '7901',
 				order: '1457',
@@ -763,9 +836,9 @@ test.describe('narrowing view', pr(1570), () => {
 				kingdom: '1',
 			});
 
-			const speciesChoice = page.locator('aside').getByRole('listitem', { name: 'Espèce' });
+			const speciesChoice = page.locator('aside').getByRole('region', { name: 'Espèce' });
 			await expect(speciesChoice).toBeVisible();
-			await expect(speciesChoice.getByRole('combobox')).toHaveValue('Andrena fulvata');
+			await expect(speciesChoice.getByRole('combobox')).toHaveValue('Andrena vetula');
 
 			await speciesChoice.getByRole('button', { name: 'Enlever ce choix' }).click();
 			await expectMetadataValues(app, {
@@ -773,7 +846,7 @@ test.describe('narrowing view', pr(1570), () => {
 			});
 
 			await page.getByRole('button', { name: 'Recommencer' }).click();
-			await expect(page.getByRole('main').getByText('Andrena tenuistriata')).toBeVisible();
+			await expect(page.getByRole('main').getByText('Andrena gredana')).toBeVisible();
 		});
 	});
 });

@@ -114,6 +114,7 @@
 
 {#if collapsible}
 	<details
+		aria-label={definition.label}
 		style:--collapsed-descriptor-height={collapsedDescriptorHeight}
 		bind:open={
 			() => expanded.has(definition.id),

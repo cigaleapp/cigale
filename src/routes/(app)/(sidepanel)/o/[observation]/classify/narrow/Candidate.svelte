@@ -33,7 +33,7 @@
 	</div>
 	<div class="info">
 		<div class="label">
-			<span>{candidate.label}</span>
+			<h2>{candidate.label}</h2>
 			{#if narrowingState.candidateIsEliminated(candidate)}
 				<Badge>Éliminé</Badge>
 			{/if}
@@ -101,6 +101,10 @@
 		align-items: center;
 		justify-content: space-between;
 		--badge-color: var(--fg-error);
+
+		h2 {
+			font-size: 1em;
+		}
 	}
 
 	.description {

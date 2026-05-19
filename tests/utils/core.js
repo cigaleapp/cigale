@@ -475,8 +475,9 @@ export async function scrollIntoViewVirtualized(locator, direction = 'down') {
  * @param {Locator} locator
  * @param {object} [options]
  * @param {"down" | "up"} [options.scroll] direction to scroll. Defaults to "down"
+ * @param {boolean} [options.force] option passed to Locator#click()
  */
-export async function scrollAndClick(locator, { scroll = 'down' } = {}) {
+export async function scrollAndClick(locator, { scroll = 'down', force = false } = {}) {
 	await scrollIntoViewVirtualized(locator, scroll);
-	await locator.click();
+	await locator.click({ force });
 }

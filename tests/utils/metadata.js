@@ -109,7 +109,7 @@ export function metadataSections(page) {
 		switch: (label) => section(label).getByRole('switch'),
 		/**
 		 * @param {string | RegExp} label
-		 * @param {string} option
+		 * @param {string | RegExp} option
 		 * @param {object} [params]
 		 * @param {boolean} [params.exact=true] whether to use exact matching for the option name
 		 */
@@ -117,6 +117,18 @@ export function metadataSections(page) {
 			return section(label)
 				.getByRole('radiogroup')
 				.getByRole('radio', { name: option, exact });
+		},
+		/**
+		 * Used in multi-select enums
+		 * @param {string | RegExp} label
+		 * @param {string | RegExp} option
+		 * @param {object} [params]
+		 * @param {boolean} [params.exact=true] whether to use exact matching for the option name
+		 */
+		checkbox(label, option, { exact = true } = { exact: true }) {
+			return section(label)
+				.getByRole('group')
+				.getByRole('checkbox', { name: option, exact });
 		},
 	};
 }

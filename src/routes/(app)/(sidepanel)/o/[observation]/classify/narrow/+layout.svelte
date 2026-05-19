@@ -266,7 +266,6 @@
 							candidatesTab !== 'eliminated'}
 						<button
 							class="candidate"
-							class:crossout
 							style:--closeness={candidatesTab === 'remaining' ? 0 : closeness}
 							onclick={() => narrowingState.openCandidateDetails?.(option)}
 						>
@@ -277,8 +276,14 @@
 									?
 								{/if}
 							</div>
-							<span class="label">{label}</span>
-							{#if candidatesTab !== 'remaining'}
+							<span class="label">
+							{#if crossout}
+							<s>{label}</s>
+							{:else}
+								{label}
+								{/if}
+							</span>
+							{#if !Number.isNaN(closeness) && candidatesTab !== 'remaining'}
 								<code
 									class="closeness"
 									use:tooltip={"Correspondance avec les choix effectués"}
@@ -532,12 +537,8 @@
 			);
 		}
 
-		.candidate.crossout {
+		.candidate:has(s) {
 			color: var(--gray);
-
-			.label {
-				text-decoration: line-through;
-			}
 		}
 
 		.candidate:is(:focus-visible, :hover) {
@@ -573,6 +574,7 @@
 
 	aside .photo {
 		min-height: 100px;
+		max-height: 40vh;
 		height: 100%;
 		transition: height 250ms ease;
 		border-bottom: 1px solid var(--gray);

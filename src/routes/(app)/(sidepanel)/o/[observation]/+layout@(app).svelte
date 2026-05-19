@@ -160,8 +160,8 @@
 
 		<div class="right-side">
 			<div class="reports">
-				<ModalSubmitIssue type="feature" />
 				<ModalSubmitIssue type="bug" />
+				<ModalSubmitIssue type="feature" />
 			</div>
 			<nav>
 				<SegmentedGroup

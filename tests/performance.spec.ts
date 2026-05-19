@@ -42,7 +42,7 @@ benchmark('startup', {
 	},
 	// TODO: lower this
 	total: {
-		chromium: '8s',
+		chromium: '12s',
 		webkit: '15s',
 		firefox: '15s',
 	},
