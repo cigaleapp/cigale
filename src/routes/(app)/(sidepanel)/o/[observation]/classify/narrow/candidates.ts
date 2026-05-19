@@ -3,7 +3,7 @@ import type { NamespacedMetadataID } from '$lib/schemas/common.js';
 
 import { listByIndex } from '$lib/idb.svelte.js';
 import { removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';
-import { avg, entries } from '$lib/utils.js';
+import { avg, entries, sum } from '$lib/utils.js';
 
 export async function getAllCandidates({
 	narrowableGroup,
@@ -105,5 +105,24 @@ export function narrowingPower({
 					.filter((candidate) => descriptors.get(candidate)?.get(metadata)?.has(option))
 					.toArray().length
 		)
+	);
+}
+
+export function distanceToChoices({
+	descriptors,
+	candidate,
+	choices,
+}: {
+	descriptors: Descriptors;
+	candidate: string;
+	choices: Map<NamespacedMetadataID, Set<string>>;
+}) {
+	return sum(
+		choices.entries().map(([metadata, picks]) => {
+			const description = descriptors.get(candidate)?.get(metadata);
+			if (!description) return 1;
+
+			return picks.intersection(description).size > 0 ? 0 : 1;
+		})
 	);
 }

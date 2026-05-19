@@ -14,7 +14,7 @@
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonInk from '$lib/ButtonInk.svelte';
 	import ConfidencePercentage from '$lib/ConfidencePercentage.svelte';
-	import { plural } from '$lib/i18n.js';
+	import { percent, plural } from '$lib/i18n.js';
 	import { databaseHandle, tables } from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
@@ -35,6 +35,7 @@
 	import { fullscreenState } from '../../+layout@(app).svelte';
 	import Subject from '../Subject.svelte';
 	import CandidateDetailsModal from './CandidateDetailsModal.svelte';
+	import { distanceToChoices } from './candidates.js';
 	import NarrowableGroupPicker from './NarrowableGroupPicker.svelte';
 	import OptionsLoader from './OptionsLoader.svelte';
 	import { NarrowingState } from './state.svelte.js';
@@ -70,6 +71,16 @@
 	let toggleFocusSearchBar = $state<() => void>();
 
 	let candidatesTab = $state<'all' | 'remaining' | 'eliminated'>('all');
+	const shownCandidates = $derived.by(() => {
+		switch (candidatesTab) {
+			case 'all':
+				return narrowingState.allCandidates;
+			case 'remaining':
+				return narrowingState.remainingCandidates;
+			case 'eliminated':
+				return eliminated;
+		}
+	});
 
 	const tab = $derived.by(() => {
 		switch (page.route.id) {
@@ -232,22 +243,31 @@
 			<section class="candidates">
 				<VirtualList
 					empty="Aucun candidat à afficher"
-					items={candidatesTab === 'all'
-						? narrowingState.allCandidates.toSorted(
-								compareBy((c) => (narrowingState.candidateIsEliminated(c) ? 1 : -1))
-							)
-						: candidatesTab === 'remaining'
-							? narrowingState.remainingCandidates
-							: eliminated}
+					items={shownCandidates.toSorted(
+						compareBy((c) =>
+							distanceToChoices({
+								descriptors: narrowingState.descriptors,
+								candidate: c.key,
+								choices: narrowingState.choices,
+							})
+						)
+					)}
 				>
 					{#snippet item(option)}
 						{@const { images, label, key } = option}
+						{@const distance = distanceToChoices({
+							descriptors: narrowingState.descriptors,
+							candidate: option.key,
+							choices: narrowingState.choices,
+						})}
+						{@const closeness = 1 - distance / narrowingState.choices.size}
 						{@const crossout =
 							!narrowingState.remainingCandidateIds.has(key) &&
 							candidatesTab !== 'eliminated'}
 						<button
 							class="candidate"
 							class:crossout
+							style:--closeness={candidatesTab === 'remaining' ? 0 : closeness}
 							onclick={() => narrowingState.openCandidateDetails?.(option)}
 						>
 							<div class="image">
@@ -257,7 +277,15 @@
 									?
 								{/if}
 							</div>
-							<span>{label}</span>
+							<span class="label">{label}</span>
+							{#if candidatesTab !== 'remaining'}
+								<code
+									class="closeness"
+									use:tooltip={"Correspondance avec les choix effectués"}
+								>
+									{percent(closeness, 0, { pad: 'nbsp' })}
+								</code>
+							{/if}
 						</button>
 					{/snippet}
 				</VirtualList>
@@ -494,15 +522,27 @@
 			display: flex;
 			align-items: center;
 			gap: 1em;
-		}
 
-		.candidate:is(:focus-visible, :hover) {
-			background: var(--bg-primary-translucent);
+			--highlight: rgb(from var(--bg-primary) r g b / 20%);
+
+			background-image: linear-gradient(
+				to right,
+				var(--highlight) calc(var(--closeness) * 100%),
+				transparent calc(var(--closeness) * 100%)
+			);
 		}
 
 		.candidate.crossout {
-			text-decoration: line-through;
 			color: var(--gray);
+
+			.label {
+				text-decoration: line-through;
+			}
+		}
+
+		.candidate:is(:focus-visible, :hover) {
+			background: rgb(from var(--bg-primary) r g b / 60%);
+			color: var(--fg-primary);
 		}
 
 		.candidate .image {
@@ -515,6 +555,11 @@
 			display: flex;
 			align-items: center;
 			justify-content: center;
+		}
+
+		.candidate .closeness {
+			margin-left: auto;
+			font-size: 0.85em;
 		}
 	}
 
