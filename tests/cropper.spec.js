@@ -52,15 +52,15 @@ test.describe('Cropper view', () => {
 			}) => {
 				const images = await imagesByName(app);
 				await page.getByText('leaf.jpeg', { exact: true }).click();
-				await app.path.wait(`/crop/${images.leaf.fileId}`);
-				await page.keyboard.press('ArrowRight');
-				await app.path.wait(`/crop/${images.withExifGps.fileId}`);
+				await app.path.wait(`/o/_/crop/${images.leaf.fileId}/`);
+				await page.keyboard.press(controlOrMeta(page, 'ArrowRight'));
+				await app.path.wait(`/o/_/crop/${images.withExifGps.fileId}/`);
 				await assert(page.getByText('with-exif-gps.jpeg', { exact: true })).toBeVisible();
-				await page.keyboard.press('ArrowLeft');
-				await app.path.wait(`/crop/${images.leaf.fileId}`);
+				await page.keyboard.press(controlOrMeta(page, 'ArrowLeft'));
+				await app.path.wait(`/o/_/crop/${images.leaf.fileId}/`);
 				await assert(page.getByText('leaf.jpeg', { exact: true })).toBeVisible();
-				await page.keyboard.press('ArrowLeft');
-				await app.path.wait(`/crop/${images.cyan.fileId}`);
+				await page.keyboard.press(controlOrMeta(page, 'ArrowLeft'));
+				await app.path.wait(`/o/_/crop/${images.cyan.fileId}/`);
 				await assert(page.getByText('cyan.jpeg', { exact: true })).toBeVisible();
 			});
 
@@ -70,7 +70,7 @@ test.describe('Cropper view', () => {
 			}) => {
 				const { leaf: image } = await imagesByName(app);
 				await page.getByText('leaf.jpeg', { exact: true }).click();
-				await app.path.wait(`/crop/${image.fileId}`);
+				await app.path.wait(`/o/_/crop/${image.fileId}/`);
 				await page.keyboard.press('Escape');
 				await app.path.wait('/crop');
 				await assert(
@@ -94,27 +94,27 @@ test.describe('Cropper view', () => {
 		test('should not skip on confirm button click', async ({ page, app }) => {
 			const { leaf: image } = await imagesByName(app);
 			await page.getByText('leaf.jpeg', { exact: true }).click();
-			await app.path.wait(`/crop/${image.fileId}`);
+			await app.path.wait(`/o/_/crop/${image.fileId}/`);
 			await page.waitForTimeout(1000);
 			await page.getByRole('button', { name: 'Continuer' }).click();
-			await app.path.wait(`/crop/${image.fileId}`);
+			await app.path.wait(`/o/_/crop/${image.fileId}/`);
 			await assert(page.getByText('leaf.jpeg', { exact: true })).not.toBeVisible();
 		});
 
 		test('should not skip on confirmation keybind', async ({ page, app }) => {
 			const { leaf: image } = await imagesByName(app);
 			await page.getByText('leaf.jpeg', { exact: true }).click();
-			await app.path.wait(`/crop/${image.fileId}`);
+			await app.path.wait(`/o/_/crop/${image.fileId}/`);
 			await page.waitForTimeout(1000);
 			await page.keyboard.press('Space');
-			await app.path.wait(`/crop/${image.fileId}`);
+			await app.path.wait(`/o/_/crop/${image.fileId}/`);
 			await assert(page.getByText('leaf.jpeg', { exact: true })).not.toBeVisible();
 		});
 
 		test('should toggle autoskip on on keybind press', async ({ page, app }) => {
 			const { leaf: image } = await imagesByName(app);
 			await page.getByText('leaf.jpeg', { exact: true }).click();
-			await app.path.wait(`/crop/${image.fileId}`);
+			await app.path.wait(`/o/_/crop/${image.fileId}/`);
 
 			const { cropAutoNext: _, ...othersBefore } = await app.settings.get();
 			await page.keyboard.press('a');
@@ -134,27 +134,27 @@ test.describe('Cropper view', () => {
 		test('should skip on confirm button click', async ({ page, app }) => {
 			const images = await imagesByName(app);
 			await page.getByText('leaf.jpeg', { exact: true }).click();
-			await app.path.wait(`/crop/${images.leaf.fileId}`);
+			await app.path.wait(`/o/_/crop/${images.leaf.fileId}/`);
 			await page.waitForTimeout(1000);
 			await page.getByRole('button', { name: 'Continuer' }).click();
-			await app.path.wait(`/crop/${images.withExifGps.fileId}`);
+			await app.path.wait(`/o/_/crop/${images.withExifGps.fileId}/`);
 			await assert(page.getByText('with-exif-gps.jpeg', { exact: true })).toBeVisible();
 		});
 
 		test('should skip on confirmation keybind', async ({ page, app }) => {
 			const images = await imagesByName(app);
 			await page.getByText('leaf.jpeg', { exact: true }).click();
-			await app.path.wait(`/crop/${images.leaf.fileId}`);
+			await app.path.wait(`/o/_/crop/${images.leaf.fileId}/`);
 			await page.waitForTimeout(1000);
 			await page.keyboard.press('Space');
-			await app.path.wait(`/crop/${images.withExifGps.fileId}`);
+			await app.path.wait(`/o/_/crop/${images.withExifGps.fileId}/`);
 			await assert(page.getByText('with-exif-gps.jpeg', { exact: true })).toBeVisible();
 		});
 
 		test('should toggle autoskip off on keybind press', async ({ page, app }) => {
 			const { leaf: image } = await imagesByName(app);
 			await page.getByText('leaf.jpeg', { exact: true }).click();
-			await app.path.wait(`/crop/${image.fileId}`);
+			await app.path.wait(`/o/_/crop/${image.fileId}/`);
 
 			const { cropAutoNext: _, ...othersBefore } = await app.settings.get();
 			await page.keyboard.press('a');
@@ -177,7 +177,7 @@ test.describe('Cropper view', () => {
 			);
 
 			await page.getByText('with-exif-gps.jpeg', { exact: true }).click();
-			await app.path.wait(`/crop/${image.fileId}`);
+			await app.path.wait(`/o/_/crop/${image.fileId}/`);
 			await page.getByRole('button', { name: 'Continuer' }).click();
 			await page.waitForTimeout(1000);
 			assert(new URL(page.url()).pathname).toMatch(/^\/classify\/?$/);
@@ -195,11 +195,11 @@ test.describe('Cropper view', () => {
 			const imagesBefore = await app.db.image.list();
 
 			await page.getByText('leaf.jpeg', { exact: true }).click();
-			await app.path.wait(`/crop/${leaf.fileId}`);
+			await app.path.wait(`/o/_/crop/${leaf.fileId}/`);
 
 			await deleteAction(page);
 
-			await app.path.wait(`/crop/${withExifGps.fileId}`);
+			await app.path.wait(`/o/_/crop/${withExifGps.fileId}/`);
 
 			await assert(page.getByText('with-exif-gps.jpeg', { exact: true })).toBeVisible();
 			await assert(page.getByText('leaf.jpeg', { exact: true })).not.toBeVisible();
@@ -265,7 +265,7 @@ test.describe('Cropper view', () => {
 		async function expectConfirmed(page, app, implicit = false) {
 			if (implicit) await assert(confirmedCropOverlay(page)).toBeVisible();
 			await assert(confirmedCropBadge(page)).toBeVisible();
-			await assert(page.getByRole('button', { name: 'Invalider' })).toBeVisible();
+			await assert(page.getByRole('button', { name: 'Marquer comme non-confirmée' })).toBeVisible();
 			await page.waitForTimeout(500);
 			await expectAllImagesConfirmedInDatabase(page, app, true);
 		}
@@ -465,8 +465,8 @@ test.describe('Cropper view', () => {
 				await page.keyboard.press('1');
 				await page.keyboard.press('Delete');
 				await makeBox(page, 10, 10, 50, 50, 50, 100, 10, 100);
-				await page.keyboard.press('ArrowLeft');
-				await app.path.wait(`/crop/${image.fileId}`);
+				await page.keyboard.press(controlOrMeta(page, "ArrowLeft"));
+				await app.path.wait(`/o/_/crop/${image.fileId}/`);
 
 				// Ensure that the ghost box does not appear ever, for 1 second, checking every 100ms
 				for (const _ of Array.from({ length: 10 })) {
@@ -607,14 +607,14 @@ test.describe('Cropper view', () => {
 			await zoomAt(page, 120, 100, 100);
 			await checkImageTransforms(page, 1.728, 254.761, 140.527);
 
-			await page.keyboard.press('ArrowLeft');
-			await app.path.wait(`/crop/${images.withExifGps.fileId}`);
+			await page.keyboard.press(controlOrMeta(page, 'ArrowLeft'));
+			await app.path.wait(`/o/_/crop/${images.withExifGps.fileId}/`);
 
 			await zoomAt(page, 40, 150, 150);
 			await checkImageTransforms(page, 1.44, 124.186, 73.1136);
 
-			await page.keyboard.press('ArrowRight');
-			await app.path.wait(`/crop/${images.lilFella.fileId}`);
+			await page.keyboard.press(controlOrMeta(page, 'ArrowRight'));
+			await app.path.wait(`/o/_/crop/${images.lilFella.fileId}/`);
 
 			await checkImageTransforms(page, 1.728, 254.761, 140.527);
 		});
@@ -678,7 +678,9 @@ function confirmedCropOverlay(page) {
  * @param {import('@playwright/test').Page} page
  */
 function confirmedCropBadge(page) {
-	return page.locator('aside').getByRole('heading').locator('.status');
+	return page
+		.getByTestId('fullscreen-header')
+		.getByRole('button', { name: 'Marquer comme non-confirmée' });
 }
 
 /**

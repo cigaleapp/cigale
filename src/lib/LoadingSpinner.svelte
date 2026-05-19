@@ -47,7 +47,6 @@ CSS Variables:
 
 <style>
 	.loading-spinner {
-		display: inline-block;
 		display: flex;
 		justify-content: center;
 		align-items: center;

@@ -3,10 +3,8 @@
 	import type { TypedMetadataValue } from '$lib/metadata/index.js';
 	import type { Props as ComboboxProps } from '$lib/MetadataCombobox.svelte';
 
-	import IconUnconfirmed from '~icons/ri/arrow-go-back-line';
 	import IconPrevious from '~icons/ri/arrow-left-line';
 	import IconNext from '~icons/ri/arrow-right-line';
-	import IconConfirmed from '~icons/ri/check-double-line';
 	import IconExpand from '~icons/ri/expand-up-down-line';
 	import { invalidate } from '$app/navigation';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
@@ -15,6 +13,7 @@
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import { storeMetadataValue } from '$lib/metadata/index.js';
 	import MetadataCombobox from '$lib/MetadataCombobox.svelte';
+	import OverflowableText from '$lib/OverflowableText.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { undo } from '$lib/undo.svelte.js';
 	import { compareBy, entries, mapKeys, nonnull } from '$lib/utils.js';
@@ -75,6 +74,7 @@
 
 		await storeMetadataValue({
 			db: await openDatabase(),
+			sessionId: uiState.currentSessionId,
 			metadataId: focusedMetadata.id,
 			subjectId: observation.id,
 			type: 'enum',
@@ -138,47 +138,10 @@
 				window.open(option!.learnMore, '_blank');
 			},
 		},
-		ArrowUp: {
-			help: 'Marquer la classification comme confirmée',
-			async do() {
-				if (!option) return;
-				await setOption(option!, confidences, { confirmed: true, pushToUndoStack: false });
-			},
-		},
-		ArrowDown: {
-			help: 'Marquer la classification comme non confirmée',
-			async do() {
-				if (!option) return;
-				await setOption(option!, confidences, { confirmed: false, pushToUndoStack: false });
-			},
-		},
 	});
 </script>
 
 <div class="bar" data-layout={layout}>
-	<div class="prev" style:grid-area="prev">
-		<ButtonSecondary
-			aria-label="Option précédente"
-			disabled={!prevOption}
-			onclick={async () => setOption(prevOption!, confidences)}
-			help={{
-				text: prevOption?.label ?? '',
-				keyboard: 'J',
-			}}
-		>
-			<div class="button-contents prev">
-				<ConfidencePercentage
-					tooltip={() => ''}
-					value={prevOption ? confidences[prevOption.key] : undefined}
-				/>
-				{#if layout === 'left-right'}
-					Précédente
-				{/if}
-				<IconPrevious />
-			</div>
-		</ButtonSecondary>
-	</div>
-
 	<div class="current" style:grid-area="current" data-testid="current">
 		<ButtonSecondary
 			onclick={() => focusOptionCombobox('focus')}
@@ -189,7 +152,7 @@
 		>
 			<MetadataCombobox
 				{confidences}
-				{options}
+				options={undefined}
 				metadata={focusedMetadata}
 				type="single"
 				value={option?.key ?? ''}
@@ -203,80 +166,78 @@
 			<IconExpand />
 		</ButtonSecondary>
 	</div>
-
-	<div class="next" style:grid-area="next">
-		<ButtonSecondary
-			aria-label="Option suivante"
-			disabled={!nextOption}
-			onclick={async () => setOption(nextOption!, confidences)}
-			help={{
-				text: nextOption?.label ?? '',
-				keyboard: 'L',
-			}}
-		>
-			<div class="button-contents">
-				<IconNext />
-				{#if layout === 'left-right'}
-					Suivante
-				{/if}
-				<ConfidencePercentage
-					tooltip={() => ''}
-					value={nextOption ? confidences[nextOption.key] : undefined}
-				/>
-			</div>
-		</ButtonSecondary>
-	</div>
-
-	{#if layout === 'top-bottom'}
-		<div class="confirmation" style:grid-area="confirmation" data-testid="confirmation">
+	<div class="others">
+		<div class="prev">
 			<ButtonSecondary
-				onclick={async () => {
-					if (!option) return;
-					await setOption(option, confidences, {
-						confirmed: !current?.confirmed,
-						pushToUndoStack: false,
-					});
-				}}
+				aria-label="Option précédente"
+				disabled={!prevOption}
+				onclick={async () => setOption(prevOption!, confidences)}
 				help={{
-					text: current?.confirmed
-						? 'Marquer comme non confirmée '
-						: 'Confirmer la classification ',
-					keyboard: current?.confirmed ? 'ArrowDown' : 'ArrowUp',
+					text: prevOption?.label ?? '',
+					keyboard: 'J',
 				}}
 			>
-				<div class="button-contents">
-					{#if current?.confirmed}
-						<IconUnconfirmed />
-					{:else}
-						<IconConfirmed />
-					{/if}
+				<div class="button-contents prev">
+					<IconPrevious />
+					<OverflowableText no-tooltip text="Précédente" />
+					<ConfidencePercentage
+						tooltip={() => ''}
+						value={prevOption ? confidences[prevOption.key] : undefined}
+					/>
 				</div>
 			</ButtonSecondary>
 		</div>
-	{/if}
+
+		<div class="next">
+			<ButtonSecondary
+				aria-label="Option suivante"
+				disabled={!nextOption}
+				onclick={async () => setOption(nextOption!, confidences)}
+				help={{
+					text: nextOption?.label ?? '',
+					keyboard: 'L',
+				}}
+			>
+				<div class="button-contents">
+					<IconNext />
+					<OverflowableText no-tooltip text="Suivante" />
+					<ConfidencePercentage
+						tooltip={() => ''}
+						value={nextOption ? confidences[nextOption.key] : undefined}
+					/>
+				</div>
+			</ButtonSecondary>
+		</div>
+	</div>
 </div>
 
 <style>
 	.bar {
-		display: grid;
+		display: flex;
 		align-items: center;
 		justify-content: center;
 		gap: 1em;
 
 		&[data-layout='left-right'] {
-			grid-template-areas: 'prev current next';
-			grid-template-columns: 1fr auto 1fr;
+			flex-direction: column;
 		}
+	}
 
-		&[data-layout='top-bottom'] {
-			justify-content: start;
-			grid-template-areas: 'current prev next confirmation';
-			grid-template-columns: auto 1fr 1fr;
+	.others {
+		width: 100%;
+		display: flex;
+		align-items: center;
+		gap: 1em;
 
-			.button-contents.prev {
-				flex-direction: row-reverse;
-			}
+		> * {
+			width: 100%;
+			min-width: 0;
+			overflow: hidden;
 		}
+	}
+
+	.current {
+		width: 100%;
 	}
 
 	.button-contents {
@@ -299,6 +260,6 @@
 	.current :global(input) {
 		font-size: 1em;
 		background: transparent;
-		width: 150px;
+		/* width: 150px; */
 	}
 </style>

@@ -13,6 +13,10 @@ export const NamespacedMetadataID = type('/^([\\w.-]+)__([\\w._-]+)$/').describe
 	'Identifiant de métadonnée avec namespace, sous la forme "protocolId__metadataId"'
 );
 
+export const NamespacedMetadataOptionID = type('/^([\\w.-]+)__([\\w._-]+):([\\w._-]+)$/').describe(
+	'Identifiant d\'option métadonnée avec namespace, sous la forme "protocolId__metadataId:optionKey"'
+);
+
 /**
  * @template {string} [P=string]
  * @typedef {`${P}__${string}`} NamespacedMetadataID

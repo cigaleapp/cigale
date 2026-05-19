@@ -69,25 +69,25 @@ describe('complex case with multiple metadata in the cascades', () => {
 		] = options;
 
 		species40.cascade = {
-			[genus]: genus1.key,
+			[genus]: [genus1.key],
 		};
 
 		species41.cascade = {
-			[genus]: genus1.key,
+			[genus]: [genus1.key],
 		};
 
 		species42.cascade = {
-			[genus]: genus2.key,
-			[difficulty]: difficulty3.key,
+			[genus]: [genus2.key],
+			[difficulty]: [difficulty3.key],
 		};
 
 		species44.cascade = {
-			[genus]: genus3.key,
-			[difficulty]: difficulty1.key,
+			[genus]: [genus3.key],
+			[difficulty]: [difficulty1.key],
 		};
 
 		genus1.cascade = {
-			[difficulty]: difficulty2.key,
+			[difficulty]: [difficulty2.key],
 		};
 
 		await Promise.all(options.map(async (opt) => db.add('MetadataOption', opt)));
@@ -161,25 +161,24 @@ describe('complex case with multiple metadata in the cascades', () => {
 		const result = await cascadeLabels({
 			db,
 			protocolId: 'mockproto',
-			cache: {},
 			option: species40,
 		});
 
 		expect(result).toMatchObject({
-			mockproto__difficulty: {
-				color: undefined,
-				depth: 1,
-				icon: undefined,
-				metadata: '',
-				value: 'Option 2',
-			},
-			mockproto__genus: {
-				color: undefined,
-				depth: 0,
-				icon: undefined,
-				metadata: '',
-				value: 'Option 1',
-			},
+			mockproto__genus: [
+				{
+					_narrowableIn: [],
+					cascade: {
+						mockproto__difficulty: ['2'],
+					},
+					description: '',
+					id: 'mockproto__genus:1',
+					key: '1',
+					label: 'Option 1',
+					metadataId: 'mockproto__genus',
+					synonyms: [],
+				},
+			],
 		});
 	});
 });

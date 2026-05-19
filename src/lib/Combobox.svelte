@@ -7,8 +7,11 @@
 	type Props<I extends Item, V extends string> = {
 		items: I[];
 		value: V | undefined;
+		/** Used when multiple=true. **NOT BINDABLE** (at least for now) */
+		values?: V[];
+		multiple?: boolean;
 		// eslint-disable-next-line no-unused-vars
-		onValueChange?: (newValue: V) => void;
+		onValueChange?: (newValue: V, newValues: V[]) => Promise<void>;
 		// eslint-disable-next-line no-unused-vars
 		searcher: (search: string, item: I) => string | undefined;
 		// eslint-disable-next-line no-unused-vars
@@ -23,29 +26,40 @@
 		focuser?: (action: 'focus' | 'blur' | 'toggle') => void;
 		highlight: Snippet<[I, I[]]>;
 		listItem: Snippet<[I & { selected: boolean; highlighted: boolean; matchedFrom: string }]>;
+		/** Usage:
+		 * ```svelte
+		 * {#snippet searchbox({ focusSetter, ...props })}
+		 * 		<input {...props} {@attach focusSetter}>
+		 * {/snippet}
+		 * ```
+		 * */
+		searchbox?: Snippet<[Record<string, unknown>]>;
 	};
 </script>
 
 <script lang="ts" generics="I extends Item, V extends string">
 	import type { WithoutChildrenOrChild } from 'bits-ui';
 	import type { Snippet } from 'svelte';
+	import type { Attachment } from 'svelte/attachments';
 
-	import VirtualList from '@sveltejs/svelte-virtual-list';
 	import { Combobox, mergeProps } from 'bits-ui';
 	import { Debounced } from 'runed';
 
 	import Logo from './Logo.svelte';
 	import { scrollfader } from './scrollfader.js';
 	import { compareBy } from './utils.js';
+	import VirtualList from './VirtualList.svelte';
 
 	type MergedProps = Props<I, V> & Omit<Combobox.RootProps, keyof Props<I, V>>;
 
 	let {
+		multiple,
 		items: staticItems,
 		sorter,
 		suggestions,
 		searcher,
 		value = $bindable(),
+		values,
 		open = $bindable(false),
 		focuser = $bindable(),
 		'viewport-testid': viewportTestId,
@@ -53,6 +67,8 @@
 		contentProps,
 		listItem,
 		highlight,
+		searchbox,
+		onValueChange,
 		...restProps
 	}: MergedProps = $props();
 
@@ -115,44 +131,62 @@
 	);
 
 	let highlightedItem: undefined | I = $state();
+
+	const focusSetter: Attachment<HTMLInputElement> = (node) => {
+		focuser = (action) => {
+			switch (action) {
+				case 'focus':
+					node.focus();
+					break;
+				case 'blur':
+					node.blur();
+					open = false;
+					break;
+				case 'toggle':
+					if (document.activeElement === node) {
+						node.blur();
+						open = false;
+					} else {
+						node.focus();
+					}
+					break;
+			}
+		};
+	};
 </script>
 
 <Combobox.Root
-	{value}
 	bind:open
 	{...mergedRootProps}
 	items={items.map((i) => ({ ...i, value: i.key }))}
+	{...multiple
+		? {
+				value: values ?? (value ? [value] : []),
+				type: 'multiple',
+				async onValueChange(newValue: V[]) {
+					if (newValue.length === 0) return;
+					await onValueChange?.(newValue[0], newValue);
+				},
+			}
+		: {
+				value: value,
+				type: 'single',
+				async onValueChange(newValue: V) {
+					await onValueChange?.(newValue, []);
+				},
+			}}
 >
 	<!-- <div class="search-icon" class:shown={open}>
 		<IconSearch />
 	</div> -->
 	<Combobox.Input {...mergedInputProps}>
-		{#snippet child({ props: { value, ...props } })}
-			<input
-				{...props}
-				value={open ? value : label || value}
-				{@attach (e) => {
-					focuser = (action) => {
-						switch (action) {
-							case 'focus':
-								e.focus();
-								break;
-							case 'blur':
-								e.blur();
-								open = false;
-								break;
-							case 'toggle':
-								if (document.activeElement === e) {
-									e.blur();
-									open = false;
-								} else {
-									e.focus();
-								}
-								break;
-						}
-					};
-				}}
-			/>
+		{#snippet child({ props: { value: inputValue, ...props } })}
+			{@const effectiveValue = value ? (open ? inputValue : label) : ''}
+			{#if searchbox}
+				{@render searchbox({ value: effectiveValue, ...props, focusSetter })}
+			{:else}
+				<input {...props} value={effectiveValue} {@attach focusSetter} />
+			{/if}
 		{/snippet}
 	</Combobox.Input>
 	<!-- <Combobox.Trigger>Open</Combobox.Trigger> -->
@@ -160,26 +194,25 @@
 		<Combobox.Content {...contentProps} sideOffset={8}>
 			<div class="viewport" data-testid={viewportTestId}>
 				<div class="items">
-					<VirtualList items={filteredItems} let:item>
-						<Combobox.Item
-							value={item.key}
-							label={item.label}
-							onHighlight={() => {
-								highlightedItem = items.find((i) => i.key === item.key);
-							}}
-						>
-							{#snippet children({ selected })}
-								{@render listItem({
-									...item,
-									selected,
-									highlighted: highlightedItem?.key === item.key,
-								})}
-							{/snippet}
-						</Combobox.Item>
+					<VirtualList items={filteredItems} empty="Aucun résultat :/">
+						{#snippet item(item)}
+							<Combobox.Item
+								value={item.key}
+								label={item.label}
+								onHighlight={() => {
+									highlightedItem = items.find((i) => i.key === item.key);
+								}}
+							>
+								{#snippet children({ selected })}
+									{@render listItem({
+										...item,
+										selected,
+										highlighted: highlightedItem?.key === item.key,
+									})}
+								{/snippet}
+							</Combobox.Item>
+						{/snippet}
 					</VirtualList>
-					{#if filteredItems.length === 0}
-						<span class="no-results">Aucun résultat :/</span>
-					{/if}
 				</div>
 				<div class="docs" {@attach scrollfader}>
 					{#if highlightedItem}

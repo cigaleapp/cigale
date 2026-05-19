@@ -24,7 +24,7 @@
 		border-radius: 999999px;
 		font-size: 0.75em;
 		font-weight: 600;
-		color: var(--fg-primary);
-		border: 1px solid var(--fg-primary);
+		color: var(--badge-color, var(--fg-primary));
+		border: 1px solid var(--badge-color, var(--fg-primary));
 	}
 </style>

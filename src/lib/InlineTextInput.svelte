@@ -7,8 +7,9 @@
 	 * @typedef {object} Props
 	 * @property {string} label
 	 * @property {string} value
+	 * @property {string} [help] shows a tooltip. supersedes label when discreet
 	 * @property {boolean} [required=false]
-	 * @property {boolean} [discreet=false] don't show bottom border until hover/focus
+	 * @property {boolean} [discreet=false] don't show bottom border until hover/focus, show tooltip on hover if no placeholder is set (even if help is not set, using label as tooltip content)
 	 * @property {boolean} [monospace] use a monospace font
 	 * @property {string | { idle: string; focused: string }} [placeholder] give an object to have a different placeholder when focused
 	 * @property {T} [Type=type.string] arktype Type for the value
@@ -23,6 +24,7 @@
 		discreet,
 		monospace,
 		required,
+		help,
 		value = $bindable(),
 		onblur = () => {},
 		onerror,
@@ -48,7 +50,7 @@
 	class:monospace
 	class:discreet
 	placeholder={focused ? placeholder.focused : placeholder.idle}
-	use:tooltip={discreet ? label : undefined}
+	use:tooltip={help || (discreet && !_placeholder ? label : undefined)}
 	bind:value
 	onfocus={() => (focused = true)}
 	onblur={async ({ currentTarget }) => {

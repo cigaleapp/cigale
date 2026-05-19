@@ -8,18 +8,11 @@
 
 	import IconFourPointCrop from '~icons/ri/apps-2-add-line';
 	import IconUndo from '~icons/ri/arrow-go-back-fill';
-	import IconUnconfirmedCrop from '~icons/ri/arrow-go-back-line';
 	import IconRedo from '~icons/ri/arrow-go-forward-fill';
-	import IconBack from '~icons/ri/arrow-left-line';
-	import IconPrev from '~icons/ri/arrow-left-s-line';
-	import IconNext from '~icons/ri/arrow-right-s-line';
-	import IconConfirmedCrop from '~icons/ri/check-double-line';
-	import IconHasCrop from '~icons/ri/crop-line';
 	import IconTwoPointCrop from '~icons/ri/crosshair-2-line';
 	import IconFocus from '~icons/ri/crosshair-line';
 	import IconDelete from '~icons/ri/delete-bin-line';
 	import IconToolMove from '~icons/ri/drag-move-2-fill';
-	import IconGallery from '~icons/ri/function-line';
 	import IconToolHand from '~icons/ri/hand';
 	import IconRevert from '~icons/ri/reset-left-fill';
 	import IconToolDragCrop from '~icons/ri/shape-2-line';
@@ -34,9 +27,7 @@
 	} from '$lib/BoundingBoxes.svelte';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonInk from '$lib/ButtonInk.svelte';
-	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import ConfidencePercentage from '$lib/ConfidencePercentage.svelte';
-	import ConfirmedOverlay from '$lib/ConfirmedOverlay.svelte';
 	import CroppedImg from '$lib/CroppedImg.svelte';
 	import DraggableBoundingBox from '$lib/DraggableBoundingBox.svelte';
 	import { INITIAL_ZOOM_STATE } from '$lib/DraggableBoundingBox.svelte.js';
@@ -50,7 +41,6 @@
 		parseImageId,
 	} from '$lib/images.js';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
-	import KeyboardHint from '$lib/KeyboardHint.svelte';
 	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 	import {
 		assertIs,
@@ -59,14 +49,12 @@
 		storeMetadataValue,
 	} from '$lib/metadata/index.js';
 	import MobileWIPOverlay from '$lib/MobileWIPOverlay.svelte';
-	import OverflowableText from '$lib/OverflowableText.svelte';
+	import { ensureNoEmptyObservations } from '$lib/observations.js';
 	import { goto } from '$lib/paths.js';
-	import ProgressBar from '$lib/ProgressBar.svelte';
 	import SentenceJoin from '$lib/SentenceJoin.svelte';
 	import { seo } from '$lib/seo.svelte';
-	import { getSettings, setSetting, toggleSetting } from '$lib/settings.svelte';
+	import { getSettings, toggleSetting } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
-	import Switch from '$lib/Switch.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import Tooltip from '$lib/Tooltip.svelte';
 	import { tooltip } from '$lib/tooltips';
@@ -81,6 +69,8 @@
 		sign,
 		throwError,
 	} from '$lib/utils';
+
+	import TopbarExtras from '../../TopbarExtras.svelte';
 
 	/**
 	 * @import { RuntimeValue } from '$lib/schemas/metadata';
@@ -175,9 +165,9 @@
 	let activeTool = $derived(tools.find(({ name }) => name === activeToolName) || tools[0]);
 
 	let focusedImageId = $derived(
-		params.from
-			? idb.tables.Observation.getFromState(params.from)?.images.find(
-					(i) => i.fileId === params.image
+		params.observation
+			? idb.tables.Observation.getFromState(params.observation)?.images.find(
+					(i) => imageIdToFileId(i) === params.image
 				)
 			: ''
 	);
@@ -216,8 +206,6 @@
 		// Loop around.
 		return sortedFileIds.find((fileId) => !hasConfirmedCrop(fileId));
 	});
-	const croppedImagesCount = $derived(sortedFileIds.filter(hasCrop).length);
-	const confirmedCropsCount = $derived(sortedFileIds.filter(hasConfirmedCrop).length);
 
 	/** @type {Record<string, undefined | { value: RuntimeValue<'boundingbox'>, confidence: number }>} */
 	const initialCrops = $derived(
@@ -255,6 +243,18 @@
 	);
 
 	/**
+	 * @param {string|undefined} fileId
+	 */
+	async function goToFile(fileId) {
+		if (!fileId) return;
+		await goto('/(app)/(sidepanel)/o/[observation]/crop/[image]', {
+			// Changing files might mean changing observations, so we can't keep the same
+			observation: '_',
+			image: fileId,
+		});
+	}
+
+	/**
 	 * @param {string} imageFileId
 	 */
 	function hasCrop(imageFileId) {
@@ -287,16 +287,13 @@
 		if (!uiState.currentSessionId) return;
 		if (!uiState.cropMetadataId) return;
 
-		let value = uiState.cropMetadataValueOf(image);
-		if (!value) {
-			value = {
-				confidence: 1,
-				manuallyModified: true,
-				value: FULL_IMAGE_CROPBOX,
-				alternatives: {},
-				confirmed: true,
-			};
-		}
+		const value = uiState.cropMetadataValueOf(image) ?? {
+			confidence: 1,
+			manuallyModified: true,
+			value: FULL_IMAGE_CROPBOX,
+			alternatives: {},
+			confirmed: true,
+		};
 
 		await storeMetadataValue({
 			db: idb.databaseHandle(),
@@ -425,6 +422,8 @@
 		} else {
 			await idb.tables.Image.remove(imageId);
 		}
+
+		await ensureNoEmptyObservations();
 	}
 
 	/**
@@ -584,7 +583,7 @@
 
 		if (willAutoskip) {
 			if (nextUnconfirmedImageId) {
-				await goto('/(app)/(sidepanel)/crop/[image]', { image: nextUnconfirmedImageId });
+				await goToFile(nextUnconfirmedImageId);
 			} else {
 				await goto('/(app)/(sidepanel)/classify');
 			}
@@ -593,28 +592,12 @@
 		return newImageId;
 	}
 
-	async function moveToNextUnconfirmed() {
-		const imagesAndBoxes = images.map(
-			(img) => /** @type {const}*/ ([img, boundingBoxes[img.id]])
-		);
-
-		for (const [image, box] of imagesAndBoxes) {
-			await onCropChange(image.id, box ? toTopLeftCoords(box) : undefined);
-		}
-
-		if (nextUnconfirmedImageId) {
-			await goto('/(app)/(sidepanel)/crop/[image]', { image: nextUnconfirmedImageId });
-		} else {
-			await goto('/(app)/(sidepanel)/classify');
-		}
-	}
-
 	async function deleteImageFileAndGotoNext() {
 		const nextFileIdBeforeDelete = $state.snapshot(nextFileId);
 		await deleteImageFile(fileId);
 
 		if (nextFileIdBeforeDelete) {
-			await goto('/(app)/(sidepanel)/crop/[image]', { image: nextFileIdBeforeDelete });
+			await goToFile(nextFileIdBeforeDelete);
 		} else {
 			// If nextFileId (and not nextFileIdBeforeDelete) is undefined,
 			// it means we just deleted the last image; so we go back to the import tab
@@ -637,15 +620,6 @@
 		return [w, h];
 	}
 
-	function exit() {
-		uiState.imagePreviouslyOpenedInCropper = fileId;
-		if (params.from) {
-			goto('/(app)/(sidepanel)/classify/[observation]', { observation: params.from });
-		} else {
-			goto('/crop/');
-		}
-	}
-
 	$effect(() => {
 		uiState.imageOpenedInCropper = fileId;
 	});
@@ -664,32 +638,9 @@
 	});
 
 	defineKeyboardShortcuts('cropping', {
-		ArrowLeft: {
-			help: 'Image précédente',
-			when: () => Boolean(prevFileId),
-			do: () => goto('/(app)/(sidepanel)/crop/[image]', { image: prevFileId }),
-		},
-		'Shift+Space': {
-			help: 'Image précédente',
-			when: () => Boolean(prevFileId),
-			do: () => goto('/(app)/(sidepanel)/crop/[image]', { image: prevFileId }),
-		},
-		ArrowRight: {
-			help: 'Image suivante',
-			when: () => Boolean(nextFileId),
-			do: () => goto('/(app)/(sidepanel)/crop/[image]', { image: nextFileId }),
-		},
-		Space: {
-			help: 'Continuer',
-			do: moveToNextUnconfirmed,
-		},
 		'$mod+Delete': {
 			help: 'Supprimer l’image',
 			do: deleteImageFileAndGotoNext,
-		},
-		Escape: {
-			help: 'Quitter le mode recadrage',
-			do: exit,
 		},
 		a: {
 			help: 'Activer/désactiver la continuation automatique',
@@ -736,16 +687,7 @@
 			when: () => Object.keys(boundingBoxes).length > 0,
 			do: revertAll,
 		},
-		ArrowUp: {
-			help: 'Marquer le recadrage comme confirmé',
-			when: () => !hasConfirmedCrop(fileId),
-			do: () => changeAllConfirmedStatuses(true),
-		},
-		ArrowDown: {
-			help: 'Marquer le recadrage comme non confirmé',
-			when: () => hasConfirmedCrop(fileId),
-			do: () => changeAllConfirmedStatuses(false),
-		},
+
 		'+': {
 			help: 'Zoomer',
 			do: () => {
@@ -863,15 +805,47 @@
 	feature="Le recadrage"
 	issue={1518}
 	back={async () => {
-		if (params.from) {
-			await goto('/(app)/(sidepanel)/classify/[observation]', { observation: params.from });
+		if (params.observation) {
+			await goto('/(app)/(sidepanel)/o/[observation]/classify', params);
 		} else {
 			await goto('/crop/');
 		}
 	}}
 />
 
-<ConfirmedOverlay bind:show={showConfirmedOverlay} />
+<TopbarExtras
+	bind:flashConfirmedOverlay={showConfirmedOverlay}
+	currentIsConfirmed={hasConfirmedCrop(fileId)}
+	keyboardShortcutsCategory="cropping"
+	labels={{
+		item: 'Image',
+		treated: 'Images recadrées',
+		confirmed: 'Recadrages confirmés',
+	}}
+	progress={{
+		treated: sortedFileIds.filter(hasCrop).length,
+		confirmed: sortedFileIds.filter(hasConfirmedCrop).length,
+		total: sortedFileIds.length,
+		async mark(status) {
+			await changeAllConfirmedStatuses(status === 'confirmed');
+		},
+	}}
+	navigation={{
+		current: sortedFileIds.indexOf(fileId) + 1,
+		total: sortedFileIds.length,
+		async previous() {
+			await goToFile(prevFileId);
+		},
+		async next() {
+			await goToFile(nextFileId);
+		},
+		async nextUnconfirmed() {
+			(await nextUnconfirmedImageId)
+				? goToFile(nextUnconfirmedImageId)
+				: goto('/(app)/(sidepanel)/classify');
+		},
+	}}
+/>
 
 <div class="layout">
 	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
@@ -998,23 +972,6 @@
 	<aside class="info">
 		<section class="top">
 			<section class="preactions">
-				{#if params.from}
-					<ButtonInk
-						inline
-						onclick={exit}
-						help="Retourner à la classification de l'image"
-					>
-						<IconBack />
-						Retour
-						<KeyboardHint shortcut="Escape" />
-					</ButtonInk>
-				{:else}
-					<ButtonInk inline onclick={exit}>
-						<IconGallery />
-						Autres photos
-						<KeyboardHint shortcut="Escape" />
-					</ButtonInk>
-				{/if}
 				<ButtonInk
 					dangerous
 					onclick={deleteImageFileAndGotoNext}
@@ -1026,48 +983,19 @@
 					<IconDelete />
 					Supprimer
 				</ButtonInk>
-			</section>
-			<section class="filename">
-				{#if firstImage}
-					<h1>
-						<OverflowableText text={firstImage.filename} />
-						{#if hasConfirmedCrop(fileId)}
-							<div class="status" use:tooltip={'Recadrage confirmé'}>
-								<IconConfirmedCrop />
-							</div>
-						{/if}
-					</h1>
-				{:else}
-					<h1>
-						<code>Image introuvable</code>
-					</h1>
-				{/if}
-			</section>
-			<section class="actions">
-				<ButtonSecondary
-					keyboard="$mod+U"
-					help="Revenir au recadrage d'origine pour toutes les boîtes"
+
+				<ButtonInk
+					help={{
+						text: "Revenir au recadrage d'origine pour toutes les boîtes",
+
+						keyboard: '$mod+U',
+					}}
 					onclick={revertAll}
 					disabled={!canRevertAll}
 				>
 					<IconRevert />
-					Réinit.
-				</ButtonSecondary>
-				<ButtonSecondary
-					keyboard={hasConfirmedCrop(fileId) ? 'ArrowDown' : 'ArrowUp'}
-					onclick={() => changeAllConfirmedStatuses(!hasConfirmedCrop(fileId))}
-					help={hasConfirmedCrop(fileId)
-						? 'Marquer le recadrage comme non confirmé'
-						: 'Marquer le recadrage comme confirmé'}
-				>
-					{#if hasConfirmedCrop(fileId)}
-						<IconUnconfirmedCrop />
-						Invalider
-					{:else}
-						<IconConfirmedCrop />
-						Valider
-					{/if}
-				</ButtonSecondary>
+					Réinitialiser
+				</ButtonInk>
 			</section>
 		</section>
 		<section class="boxes">
@@ -1161,86 +1089,6 @@
 				{/if}
 			</ul>
 		</section>
-		<section class="progress">
-			{#snippet percentage(/** @type {number} */ value)}
-				<code>
-					{percent(value / sortedFileIds.length)}
-				</code>
-			{/snippet}
-
-			<div class="bar">
-				<p>
-					<IconHasCrop />
-					Images avec recadrage
-					{@render percentage(croppedImagesCount)}
-				</p>
-				<ProgressBar alwaysActive progress={croppedImagesCount / sortedFileIds.length} />
-			</div>
-			<div class="bar">
-				<p>
-					<IconConfirmedCrop />
-					Recadrages confirmés
-					{@render percentage(confirmedCropsCount)}
-				</p>
-				<ProgressBar alwaysActive progress={confirmedCropsCount / sortedFileIds.length} />
-			</div>
-		</section>
-		<nav>
-			<div class="navigation">
-				<ButtonIcon
-					disabled={!prevFileId}
-					help="Image précédente"
-					keyboard="ArrowLeft"
-					onclick={() => {
-						if (!prevFileId) return;
-						goto('/(app)/(sidepanel)/crop/[image]', { image: prevFileId });
-					}}
-				>
-					<IconPrev />
-				</ButtonIcon>
-				<code class="numbers">
-					{sortedFileIds.indexOf(fileId) + 1}
-					<div class="separator">⁄</div>
-					{sortedFileIds.length}
-				</code>
-				<ButtonIcon
-					disabled={!nextFileId}
-					help="Image suivante"
-					keyboard="ArrowRight"
-					onclick={() => {
-						if (!nextFileId) return;
-						goto('/(app)/(sidepanel)/crop/[image]', { image: nextFileId });
-					}}
-				>
-					<IconNext />
-				</ButtonIcon>
-			</div>
-			<div class="continue">
-				<span
-					class="auto"
-					use:tooltip={{
-						text: "Passer automatiquement à l'image suivante quand celle-ci est recadrée",
-						keyboard: 'A',
-					}}
-				>
-					<Switch
-						bind:value={
-							() => getSettings().cropAutoNext,
-							(value) => setSetting('cropAutoNext', value)
-						}
-						label="Auto"
-					/>
-					Auto
-				</span>
-				<ButtonSecondary
-					onclick={moveToNextUnconfirmed}
-					keyboard="Space"
-					help="Marquer le recadrage comme confirmé et passer à la prochaine image non confirmée"
-				>
-					Continuer
-				</ButtonSecondary>
-			</div>
-		</nav>
 	</aside>
 </div>
 
@@ -1336,7 +1184,7 @@
 		flex: 1;
 		display: flex;
 		flex-direction: column;
-		gap: 2.5em;
+		gap: 1em;
 		min-width: 450px;
 		resize: horizontal;
 		/* to make resize work */
@@ -1426,6 +1274,7 @@
 		height: var(--size);
 		border-radius: var(--corner-radius);
 		background: color-mix(in srgb, var(--gray) 35%, transparent);
+		flex-shrink: 0;
 	}
 
 	.boxes li .dimensions {
@@ -1443,56 +1292,7 @@
 
 	.boxes li .actions {
 		margin-left: auto;
-	}
-
-	.info .progress {
-		display: flex;
-		flex-direction: column;
-		--inactive-bg: var(--gray);
-		gap: 1.25em;
-	}
-
-	.info .progress .bar p {
-		margin-bottom: 0.25em;
-		display: flex;
-		align-items: center;
-		gap: 0.5em;
-	}
-
-	.info .progress .bar p code {
-		color: var(--gay);
-		font-size: 0.9em;
-		margin-left: auto;
-	}
-
-	.info nav {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-	}
-
-	.info nav :is(div, span) {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-	}
-
-	.info nav .navigation {
-		gap: 0.25em;
-	}
-
-	.info nav .navigation .numbers {
-		display: flex;
-		align-self: center;
-		white-space: nowrap;
-	}
-
-	.info nav .continue {
-		gap: 1.5em;
-	}
-
-	.info nav .auto {
-		gap: 0.25em;
+		flex-shrink: 0;
 	}
 
 	img {

@@ -163,16 +163,6 @@ export const Protocol = type({
 	'metadataOrder?': type(NamespacedMetadataID.array()).describe(
 		"L'ordre dans lequel les métadonnées doivent être présentées dans l'interface utilisateur. Les métadonnées non listées ici seront affichées après toutes celles listées ici"
 	),
-	'observations?': {
-		'defaultLabel?': TemplatedString(
-			type({
-				images: Image.array(),
-				observation: Observation,
-			})
-		).describe(
-			"Label par défaut pour les observations. Template Handlebars, recevant une liste des images de l'observation à crééer (clé images) et l'observation elle-même (clé observation)"
-		),
-	},
 	'crop?': type({
 		padding: type(/^\d+(%|px)$/)
 			.describe(

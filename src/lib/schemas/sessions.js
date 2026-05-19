@@ -2,7 +2,7 @@ import { scope, type } from 'arktype';
 
 // schemas are imported by scripts that are run by Bun directly, so dont use $lib here
 import { keys } from '../utils.js';
-import { ID } from './common.js';
+import { ID, NamespacedMetadataID } from './common.js';
 import { MetadataValues } from './metadata.js';
 
 /**
@@ -115,7 +115,8 @@ export const Session = type({
 	metadata: MetadataValues,
 	fullscreenClassifier: type({
 		layout: type.enumerated(...FULLSCREEN_CLASSIFY_LAYOUTS),
-		'focusedMetadata?': ID,
+		'focusedMetadata?': NamespacedMetadataID,
+		'narrowableGroup?': 'string'
 	}).default(() => ({
 		layout: 'top-bottom',
 	})),

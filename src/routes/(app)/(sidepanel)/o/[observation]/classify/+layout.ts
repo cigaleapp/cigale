@@ -3,13 +3,14 @@ import { error } from '@sveltejs/kit';
 import { galleryEffectiveSorter } from '$lib/gallery.js';
 import { listByIndex, tables } from '$lib/idb.svelte.js';
 import { observationMetadata } from '$lib/observations.js';
+import { defaultClassificationMetadata } from '$lib/protocols.js';
 import { uiState } from '$lib/state.svelte.js';
 import { unique } from '$lib/utils.js';
 
 // Some stuff is loaded here to prevent loading it on every navigation within the fullscreen classifier
 // For instance, we wanna avoid re-sorting observations on every navigation, both for performance (it's one of the longest operations) and UX (otherwise changes in observations' metadata could re-order the observations while the user is inside the fullscreen classifier, which would be disruptive (imagine being on the 5/16 observation, correcting its species metadata, and finding yourself on the 16/16 instead of 6/16 after clicking "Next"))
 
-export async function load({ parent }) {
+export async function load({ parent, params }) {
 	// Make sure tables are loaded, otherwise uiState.currentSession will be undefined,
 	// even though uiState.currentSessionId is set.
 	await parent();
@@ -22,6 +23,30 @@ export async function load({ parent }) {
 	if (!currentSession) error(404, 'Session active introuvable');
 
 	const allObservations = await listByIndex('Observation', 'sessionId', currentSession.id);
+
+	if (!allObservations.some((obs) => obs.id === params.observation)) {
+		error(404, 'Observation introuvable');
+	}
+
+	let focusedMetadata = metadataDefinitions.find(
+		(def) => def.id === currentSession.fullscreenClassifier.focusedMetadata
+	);
+
+	// Try setting it to a default value.
+	// Could happen if e.g. the session's protocol was changed
+	if (!focusedMetadata && uiState.currentProtocol) {
+		focusedMetadata = defaultClassificationMetadata(
+			uiState.currentProtocol,
+			metadataDefinitions
+		);
+	}
+
+	if (!focusedMetadata) {
+		error(
+			404,
+			"Métadonnée de classification introuvable. Le protocole de la session n'en définit peut-être pas."
+		);
+	}
 
 	const sortSettings = currentSession?.sort.classify ?? currentSession?.sort.global;
 	const groupSettings = currentSession?.group.classify ?? currentSession?.group.global;
@@ -63,8 +88,8 @@ export async function load({ parent }) {
 	}
 
 	return {
-		currentSession,
 		metadataDefinitions,
-		observationsOrder: new Map(allObservations.map(({ id }, i) => [id, i])),
+		currentSession,
+		sortedObservationIds: allObservations.map((o) => o.id),
 	};
 }

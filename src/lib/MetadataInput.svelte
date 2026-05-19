@@ -1,6 +1,9 @@
 <script lang="ts">
 	import type { Metadata, MetadataEnumVariant } from './database.js';
+	import type { MaybeLoading } from './LoadingText.svelte';
+	import type { NamespacedMetadataID } from './schemas/common.js';
 	import type { MetadataFile, RuntimeValue } from './schemas/metadata.js';
+	import type { ComponentProps, Snippet } from 'svelte';
 
 	import Icon from '@iconify/svelte';
 	import { ArkErrors, type } from 'arktype';
@@ -19,26 +22,31 @@
 	import ButtonInk from './ButtonInk.svelte';
 	import { generateId } from './database.js';
 	import DropdownMenu from './DropdownMenu.svelte';
+	import EnumButtons from './EnumButtons.svelte';
 	import FilePreview from './FilePreview.svelte';
 	import { promptForFiles } from './files.js';
 	import { formatBytesSize } from './i18n.js';
+	import { databaseHandle } from './idb.svelte.js';
 	import InputRange from './InputRange.svelte';
+	import Lightbox from './Lightbox.svelte';
 	import LoadingText, { Loading } from './LoadingText.svelte';
 	import MetadataTypeswitch from './metadata/MetadataTypeswitch.svelte';
+	import { metadataOptionsOf } from './metadata/storage.js';
 	import MetadataCombobox from './MetadataCombobox.svelte';
 	import { sendNotification } from './notifications.js';
 	import OverflowableText from './OverflowableText.svelte';
-	import RadioButtons from './RadioButtons.svelte';
 	import { availableUnitsFor, displayUnit, NumericUnit, unitKind } from './schemas/units.js';
 	import { uiState } from './state.svelte.js';
 	import Switch from './Switch.svelte';
 	import { toasts } from './toasts.svelte.js';
 	import { tooltip } from './tooltips.js';
 	import {
+		cancellable,
 		compareBy,
 		gradientedColor,
 		mapValues,
 		pick,
+		proxifyIfLocalhost,
 		readableOn,
 		round,
 		safeJSONParse,
@@ -48,32 +56,59 @@
 	interface Props {
 		definition: Metadata;
 		value: undefined | RuntimeValue;
+		/** Shows up as additinal selected values if addToAlternativesBySelect is true */
+		alternatives?: Record<string, number>;
 		unit: typeof NumericUnit.infer | undefined;
 		onblur: (
 			// eslint-disable-next-line no-unused-vars
 			value: undefined | RuntimeValue,
 			// eslint-disable-next-line no-unused-vars
-			unit?: typeof NumericUnit.infer | undefined
-		) => void;
+			unit?: typeof NumericUnit.infer | undefined,
+			/** See addToAlternativesBySelect */
+			// eslint-disable-next-line no-unused-vars
+			alternatives?: Record<string, number>
+		) => void | Promise<void>;
 		validationErrors: ArkErrors | undefined;
 		id: string;
 		disabled?: boolean;
-		options?: MetadataEnumVariant[];
+		options?: MetadataEnumVariant[] | undefined;
+		// eslint-disable-next-line no-unused-vars
+		optionIsDisabled?: (option: MetadataEnumVariant) => boolean | string;
 		confidences?: Record<string, number>;
 		isCompactEnum?: boolean;
+		/** Remove metadata by de-selecting enum options, false by default */
+		removeByDeselect?: boolean;
+		/** Add to alternatives by selecting other options, instead of changing the selected one. false by default */
+		addToAlternativesBySelect?: boolean;
+		/** Add content to enum options. Must be non-interactive. */
+		enumOptionsExtraContent?: Snippet<
+			[
+				{
+					option: MetadataEnumVariant;
+					disabled: boolean | string;
+					selected: boolean;
+					confidence: number | undefined;
+				},
+			]
+		>;
 	}
 
 	let {
 		value,
+		alternatives = {},
 		unit: valueUnit = $bindable(),
 		confidences = {},
 		validationErrors,
 		id,
 		disabled,
 		definition,
-		options = [],
+		options: precomputedOptions = undefined,
+		optionIsDisabled = () => false,
 		isCompactEnum = false,
+		removeByDeselect = false,
+		addToAlternativesBySelect = false,
 		onblur,
+		enumOptionsExtraContent,
 	}: Props = $props();
 
 	let savingFile = $state(false);
@@ -95,8 +130,8 @@
 		};
 	});
 
-	const debouncedOnblur = useDebounce(() => {
-		onblur(temporaryValue, selectedUnit);
+	const debouncedOnblur = useDebounce(async () => {
+		await onblur(temporaryValue, selectedUnit);
 	}, 500);
 
 	const selectedUnit = $derived.by(() => {
@@ -105,6 +140,37 @@
 
 		return valueUnit ?? definition.unit;
 	});
+
+	let options = $derived(precomputedOptions ?? []);
+	const loadingOptions = $derived(
+		definition.type === 'enum' && !precomputedOptions && options.length === 0
+	);
+	const optionsLoader = cancellable(
+		async (signal, metadataId: NamespacedMetadataID, skip: boolean) => {
+			if (skip) return;
+			if (!uiState.currentProtocolId) return;
+			console.info('Fetching options for metadata', metadataId);
+			signal.throwIfAborted();
+			options = await metadataOptionsOf(
+				databaseHandle(),
+				uiState.currentProtocolId,
+				metadataId
+			);
+			console.info('Fetched options for metadata', metadataId, options);
+		}
+	);
+
+	$effect(() => {
+		const loader = optionsLoader(
+			definition.id,
+			Boolean(precomputedOptions) || definition.type !== 'enum'
+		);
+
+		loader.do();
+		return loader.cancel;
+	});
+
+	let comboboxFocuser = $state<ComponentProps<typeof MetadataCombobox>['focuser']>();
 </script>
 
 <div
@@ -114,395 +180,476 @@
 	class:compact-enum={isCompactEnum}
 	class:has-validation-errors={Boolean(validationErrors)}
 >
-	<!-- XXX: Is not reactive without an explicit {#key}, idk why -->
-	{#key value}
-		<MetadataTypeswitch {definition} {value}>
-			{#snippet enum_(value)}
-				{#if isCompactEnum}
-					<RadioButtons
-						value={value?.toString()}
-						onchange={(value) => onblur(value)}
-						// cards={options.every((opt) => opt.icon || opt.color)}
-						cards
-						options={options
-							.toSorted(compareBy(({ index }) => index))
-							.map((opt) =>
-								pick(opt, 'key', 'label', 'icon', 'color', 'description', 'images')
-							)}
-					>
-						{#snippet children({ label, icon, color, description, images })}
-							<div class="with-image">
-								{#if images && images.length > 0}
-									<img loading="lazy" src={images[0]} alt="" />
-								{/if}
-								<div class="label">
-									<div class="first-line">
-										{#if icon || color}
-											<div
-												class="icon"
-												style:background-color={color}
-												style:color={color ? readableOn(color) : undefined}
-											>
-												{#if icon}
-													<Icon {icon} />
-												{/if}
-											</div>
-										{/if}
-										{label}
-									</div>
-									{#if description}
-										<p class="subtext">{description}</p>
-									{/if}
-								</div>
-							</div>
-						{/snippet}
-					</RadioButtons>
-				{:else}
-					<MetadataCombobox
-						{id}
-						{options}
-						{confidences}
-						metadata={definition}
-						type="single"
-						disabled={disabled ?? false}
-						value={safeJSONParse(value?.toString())?.toString() ?? value}
-						onValueChange={(value) => onblur(value)}
-					/>
-				{/if}
-			{/snippet}
-			{#snippet boolean(value)}
-				<div class="boolean-switch">
-					<Switch value={value ?? false} onchange={(value) => onblur(value)} />
-					{#if value}
-						Oui
-					{:else if value === false}
-						Non
-					{/if}
-				</div>
-			{/snippet}
-			{#snippet string(value)}
-				<input
-					type="text"
-					{value}
-					{id}
-					{disabled}
-					onblur={(e) => onblur(e.currentTarget.value)}
-				/>
-			{/snippet}
-			{#snippet numeric(val, { range: intervalInBaseUnit, unit: baseUnit })}
-				{@const interval = intervalInBaseUnit
-					? mapValues(pick(intervalInBaseUnit, 'min', 'max'), (v) =>
-							valueUnit && baseUnit && v !== undefined
-								? Number(convert(v, baseUnit).to(valueUnit))
-								: v
-						)
-					: undefined}
-				<div class="underscored">
-					<input
-						{id}
-						{disabled}
-						type="text"
-						inputmode="numeric"
-						{...interval}
-						onblur={({ currentTarget }) => {
-							if (!(currentTarget instanceof HTMLInputElement)) return;
-							const newValue = currentTarget.value;
-							if (!newValue) {
-								onblur(undefined);
-								return;
-							}
-
-							let parsedValue: number | undefined =
-								definition.type === 'integer'
-									? Number.parseInt(newValue, 10)
-									: Number.parseFloat(newValue);
-
-							if (Number.isNaN(parsedValue)) {
-								parsedValue = undefined;
-							}
-
-							onblur(parsedValue, selectedUnit);
-						}}
-						value={temporaryValue ?? val?.toString() ?? ''}
-					/>
-				</div>
-
-				{#if baseUnit}
-					<DropdownMenu
-						scrollable
-						items={[
-							{
-								label: 'Unité',
-								items: availableUnitsFor(baseUnit).map((u) => {
-									const { symbol, name } = displayUnit(u);
-
-									return {
-										data: { symbol, name },
-										key: symbol || name,
-										type: 'selectable',
-										label: name || symbol,
-										selected: u === selectedUnit,
-										onclick() {
-											if (val === undefined) return;
-											const converted = convert(
-												val,
-												valueUnit ?? baseUnit
-											).to(u);
-											onblur(converted, u);
-											valueUnit = u;
-										},
-									};
-								}),
-							},
-						]}
-					>
-						{#snippet trigger(props)}
-							{#if selectedUnit}
-								{@const { symbol, name } = displayUnit(selectedUnit)}
-								<ButtonIcon help="Utiliser une autre unité" {...props}>
-									{symbol || name}
-								</ButtonIcon>
+	<MetadataTypeswitch {definition} {value}>
+		{#snippet enum_(value, { _optionsCount })}
+			{#if isCompactEnum}
+				<EnumButtons
+					multiple={addToAlternativesBySelect}
+					deselectable={removeByDeselect}
+					value={value?.toString()}
+					values={value ? [value.toString(), ...Object.keys(alternatives)] : []}
+					onchange={async (value, values) => {
+						if (values && addToAlternativesBySelect) {
+							const [value, ...alternatives] = values;
+							await onblur(
+								value,
+								undefined,
+								Object.fromEntries(alternatives.map((alt) => [alt, 1]))
+							);
+						} else {
+							await onblur(value);
+						}
+					}}
+					// cards={options.every((opt) => opt.icon || opt.color)}
+					cards
+					options={loadingOptions
+						? Array.from({ length: _optionsCount }).map((_, i) => ({
+								key: `option-${i}`,
+								label: Loading as MaybeLoading<string>,
+								description: '',
+								images: [] as string[],
+								color: undefined as string | undefined,
+								icon: undefined as string | undefined,
+								disabled: false as boolean | string,
+							}))
+						: options.toSorted(compareBy(({ index }) => index)).map((opt) => ({
+								disabled: optionIsDisabled(opt),
+								description: '',
+								images: [] as string[],
+								color: undefined,
+								icon: undefined,
+								...pick(
+									opt,
+									'key',
+									'label',
+									'icon',
+									'color',
+									'description',
+									'images'
+								),
+							}))}
+				>
+					{#snippet children(option)}
+						{@const { label, icon, color, description, images, disabled, selected } =
+							option}
+						<div class="with-image" class:disabled>
+							{#if images && images.length > 0}
+								<Lightbox>
+									{#snippet trigger()}
+										<img
+											loading="lazy"
+											src={proxifyIfLocalhost(images[0])}
+											alt=""
+										/>
+									{/snippet}
+									{#snippet content()}
+										<img
+											class="fullscreen"
+											src={proxifyIfLocalhost(images[0])}
+											alt=""
+										/>
+									{/snippet}
+								</Lightbox>
 							{/if}
-						{/snippet}
-
-						{#snippet item({ name, symbol }, { selected })}
-							<div class="unit">
-								<span class="symbol">{symbol}</span>
-								<span class="name">{name}</span>
-								<div class="icon">
-									{#if selected}
-										<IconCheck />
+							<div class="label">
+								<div class="first-line">
+									{#if icon || color}
+										<div
+											class="icon"
+											style:background-color={color}
+											style:color={color ? readableOn(color) : undefined}
+										>
+											{#if icon}
+												<Icon {icon} />
+											{/if}
+										</div>
 									{/if}
+									<LoadingText value={label} />
 								</div>
+								{#if description}
+									<p class="subtext">{description}</p>
+								{/if}
 							</div>
-						{/snippet}
-					</DropdownMenu>
-				{/if}
 
-				{#if interval?.min !== undefined && interval?.max !== undefined}
-					<div class="range-input">
-						<InputRange
-							min={interval.min}
-							max={interval.max}
-							granularity={definition.type === 'integer' ? 1 : 1e-6}
-							ticks={selectedUnit && unitKind(selectedUnit) === MeasureKind.Angle
-								? // Every 45deg from -360 to 360
-									Array.from({ length: (360 * 2) / 45 }).map(
-										(_, i) => i * 45 - 360
-									)
-								: 1}
-							value={val}
-							onvalue={(v) => {
-								temporaryValue = v;
-							}}
-							onblur={() => {
-								onblur(temporaryValue, valueUnit);
-							}}
-						/>
-					</div>
-				{/if}
-
-				<div class="increment-decrement-buttons">
-					<button
-						class="decrement"
-						aria-label="Décrémenter"
-						onclick={() => {
-							if (value !== undefined && typeof value !== 'number') return;
-							if (temporaryValue !== undefined && typeof temporaryValue !== 'number')
-								return;
-							temporaryValue = round((temporaryValue ?? value ?? 0) - 1, 5);
-							debouncedOnblur();
-						}}
-					>
-						<IconDecrement />
-					</button>
-					<button
-						class="increment"
-						aria-label="Incrémenter"
-						onclick={() => {
-							if (value !== undefined && typeof value !== 'number') return;
-							if (temporaryValue !== undefined && typeof temporaryValue !== 'number')
-								return;
-							temporaryValue = round((temporaryValue ?? value ?? 0) + 1, 5);
-							debouncedOnblur();
-						}}
-					>
-						<IconIncrement />
-					</button>
-				</div>
-			{/snippet}
-			{#snippet date(value)}
-				<!-- TODO use bits-ui datepicker -->
-				<input
-					type="date"
+							{#if enumOptionsExtraContent}
+								<div class="extra-content">
+									{@render enumOptionsExtraContent({
+										option,
+										disabled,
+										selected,
+										confidence: confidences[option.key],
+									})}
+								</div>
+							{/if}
+						</div>
+					{/snippet}
+				</EnumButtons>
+			{:else}
+				<MetadataCombobox
 					{id}
-					{disabled}
-					value={value === undefined ? undefined : dates.format(value, 'yyyy-MM-dd')}
-					onblur={({ currentTarget }) => {
-						const newValue = currentTarget.value;
-
-						if (newValue === undefined) {
-							onblur(undefined);
-							return undefined;
+					{options}
+					{optionIsDisabled}
+					{confidences}
+					multiple={addToAlternativesBySelect}
+					bind:focuser={comboboxFocuser}
+					metadata={definition}
+					type="single"
+					disabled={disabled ?? false}
+					value={safeJSONParse(value?.toString())?.toString() ?? value}
+					{alternatives}
+					onValueChange={async (value, values) => {
+						if (addToAlternativesBySelect) {
+							const [val, ...alternatives] = values;
+							await onblur(
+								val,
+								undefined,
+								Object.fromEntries(
+									alternatives.map((alt) => [JSON.stringify(alt), 1])
+								)
+							);
+						} else {
+							await onblur(value);
 						}
 
-						const parsed = dates.parse(newValue, 'yyyy-MM-dd', new Date());
-						onblur(parsed);
-						return newValue;
+						if (!addToAlternativesBySelect) comboboxFocuser?.('blur');
 					}}
 				/>
-			{/snippet}
-			{#snippet location(value)}
-				<WorldLocationCombobox
-					value={value as RuntimeValue<'location'>}
-					onblur={(value) => onblur(value)}
+			{/if}
+		{/snippet}
+		{#snippet boolean(value)}
+			<div class="boolean-switch">
+				<Switch
+					value={value ?? false}
+					onchange={async (value) => {
+						await onblur(value);
+					}}
 				/>
-			{/snippet}
-			{#snippet file(currentFileId)}
-				{@const { accept, size } = definition as typeof MetadataFile.infer}
-				<div class="file-input">
-					{#await idb.get('MetadataValueFile', currentFileId ?? '')}
-						<div class="current">
-							<code class="size">
-								<LoadingText value={Loading} mask={formatBytesSize(100e3)} />
-							</code>
-							<div class="name">
-								<LoadingText value={Loading} />
-							</div>
-							<div class="actions"></div>
-						</div>
-						<div class="preview">
-							<FilePreview file={undefined} />
-						</div>
-					{:then fileObject}
-						<div class="current">
-							{#if fileObject}
-								<code
-									class="size"
-									use:tooltip={size.maximum
-										? `La taille maximale est de ${formatBytesSize(size.maximum)}`
-										: undefined}
-									style:color={size.maximum !== undefined
-										? fileObject.size > size.maximum
-											? 'var(--fg-error)'
-											: gradientedColor(
-													fileObject.size / size.maximum,
-													'fg-success',
-													'fg-warning'
-												)
-										: undefined}
-								>
-									{formatBytesSize(fileObject.size)}
-								</code>
-								<span class="name">
-									<OverflowableText text={fileObject.filename} />
-								</span>
-							{:else}
-								<code
-									class="size"
-									class:infinite={size.maximum === undefined}
-									use:tooltip={size.maximum
-										? `La taille maximale est de ${formatBytesSize(size.maximum)}`
-										: 'Aucune limite de taille'}
-								>
-									{#if size.maximum}
-										&lt;{formatBytesSize(size.maximum, 'narrow')}
-									{:else}
-										<span>∞</span>
-									{/if}
-								</code>
-								<div class="name empty">Aucun fichier</div>
-							{/if}
+				{#if value}
+					Oui
+				{:else if value === false}
+					Non
+				{/if}
+			</div>
+		{/snippet}
+		{#snippet string(value)}
+			<input
+				type="text"
+				{value}
+				{id}
+				{disabled}
+				onblur={async (e) => {
+					await onblur(e.currentTarget.value);
+				}}
+			/>
+		{/snippet}
+		{#snippet numeric(val, { range: intervalInBaseUnit, unit: baseUnit })}
+			{@const interval = intervalInBaseUnit
+				? mapValues(pick(intervalInBaseUnit, 'min', 'max'), (v) =>
+						valueUnit && baseUnit && v !== undefined
+							? Number(convert(v, baseUnit).to(valueUnit))
+							: v
+					)
+				: undefined}
+			<div class="underscored">
+				<input
+					{id}
+					{disabled}
+					type="text"
+					inputmode="numeric"
+					{...interval}
+					onblur={async ({ currentTarget }) => {
+						if (!(currentTarget instanceof HTMLInputElement)) return;
+						const newValue = currentTarget.value;
+						if (!newValue) {
+							await onblur(undefined);
+							return;
+						}
 
-							<div class="actions">
-								<ButtonInk
-									onclick={async () => {
-										const [file] = await promptForFiles({ accept });
+						let parsedValue: number | undefined =
+							definition.type === 'integer'
+								? Number.parseInt(newValue, 10)
+								: Number.parseFloat(newValue);
 
-										const savingStart = performance.now();
-										savingFile = true;
+						if (Number.isNaN(parsedValue)) {
+							parsedValue = undefined;
+						}
 
-										if (fileObject) {
-											await idb.drop('MetadataValueFile', fileObject.id);
-										}
+						await onblur(parsedValue, selectedUnit);
+					}}
+					value={temporaryValue ?? val?.toString() ?? ''}
+				/>
+			</div>
 
-										if (!file) {
-											savingFile = false;
-											onblur(undefined);
-											return;
-										}
+			{#if baseUnit}
+				<DropdownMenu
+					scrollable
+					items={[
+						{
+							label: 'Unité',
+							items: availableUnitsFor(baseUnit).map((u) => {
+								const { symbol, name } = displayUnit(u);
 
-										if (!uiState.currentSessionId) {
-											toasts.error(
-												"Aucune session active. Impossible d'enregistrer le fichier."
-											);
-											savingFile = false;
-											return;
-										}
-
-										const id = await idb.set('MetadataValueFile', {
-											id: generateId('MetadataValueFile'),
-											sessionId: uiState.currentSessionId,
-											size: file.size,
-											contentType: file.type,
-											filename: file.name,
-											bytes: await file.arrayBuffer(),
-											lastModifiedAt: new Date(
-												file.lastModified || Date.now()
-											).toISOString(),
-										});
-
-										const timeElapsed = performance.now() - savingStart;
-
-										if (!windowIsFocused || timeElapsed > ms('5s')) {
-											sendNotification(`${file.name} enregistré`, {
-												body: 'Le fichier a été enregistré avec succès',
-											});
-										}
-
-										savingFile = false;
-										onblur(id);
-									}}
-								>
-									{#if savingFile}
-										Chargement…
-									{:else if fileObject}
-										Modifier
-									{:else}
-										Ajouter
-									{/if}
-								</ButtonInk>
-							</div>
-						</div>
-						{#if fileObject}
-							{@const file = new File([fileObject.bytes], fileObject.filename, {
-								type: fileObject.contentType,
-								lastModified: new Date(fileObject.lastModifiedAt).getTime(),
-							})}
-							<div class="preview" in:fade>
-								<FilePreview {file} />
-							</div>
-						{/if}
-					{/await}
-				</div>
-			{/snippet}
-			{#snippet boundingbox()}
-				<div class="unrepresentable" use:tooltip={JSON.stringify(value, null, 2)}>
-					<IconError />
-					<p>Irreprésentable</p>
-				</div>
-			{/snippet}
-			{#snippet error()}
-				<div
-					class="unrepresentable"
-					use:tooltip={`${JSON.stringify(value, null, 2)} n'est pas une valeur valide de type ${type}`}
+								return {
+									data: { symbol, name },
+									key: symbol || name,
+									type: 'selectable',
+									label: name || symbol,
+									selected: u === selectedUnit,
+									async onclick() {
+										if (val === undefined) return;
+										const converted = convert(val, valueUnit ?? baseUnit).to(u);
+										await onblur(converted, u);
+										valueUnit = u;
+									},
+								};
+							}),
+						},
+					]}
 				>
-					<IconError />
-					<p>Mismatch</p>
+					{#snippet trigger(props)}
+						{#if selectedUnit}
+							{@const { symbol, name } = displayUnit(selectedUnit)}
+							<ButtonIcon help="Utiliser une autre unité" {...props}>
+								{symbol || name}
+							</ButtonIcon>
+						{/if}
+					{/snippet}
+
+					{#snippet item({ name, symbol }, { selected })}
+						<div class="unit">
+							<span class="symbol">{symbol}</span>
+							<span class="name">{name}</span>
+							<div class="icon">
+								{#if selected}
+									<IconCheck />
+								{/if}
+							</div>
+						</div>
+					{/snippet}
+				</DropdownMenu>
+			{/if}
+
+			{#if interval?.min !== undefined && interval?.max !== undefined}
+				<div class="range-input">
+					<InputRange
+						min={interval.min}
+						max={interval.max}
+						granularity={definition.type === 'integer' ? 1 : 1e-6}
+						ticks={selectedUnit && unitKind(selectedUnit) === MeasureKind.Angle
+							? // Every 45deg from -360 to 360
+								Array.from({ length: (360 * 2) / 45 }).map((_, i) => i * 45 - 360)
+							: 1}
+						value={val}
+						onvalue={(v) => {
+							temporaryValue = v;
+						}}
+						onblur={async () => {
+							await onblur(temporaryValue, valueUnit);
+						}}
+					/>
 				</div>
-			{/snippet}
-		</MetadataTypeswitch>
-	{/key}
+			{/if}
+
+			<div class="increment-decrement-buttons">
+				<button
+					class="decrement"
+					aria-label="Décrémenter"
+					onclick={async () => {
+						if (value !== undefined && typeof value !== 'number') return;
+						if (temporaryValue !== undefined && typeof temporaryValue !== 'number')
+							return;
+						temporaryValue = round((temporaryValue ?? value ?? 0) - 1, 5);
+						await debouncedOnblur();
+					}}
+				>
+					<IconDecrement />
+				</button>
+				<button
+					class="increment"
+					aria-label="Incrémenter"
+					onclick={async () => {
+						if (value !== undefined && typeof value !== 'number') return;
+						if (temporaryValue !== undefined && typeof temporaryValue !== 'number')
+							return;
+						temporaryValue = round((temporaryValue ?? value ?? 0) + 1, 5);
+						await debouncedOnblur();
+					}}
+				>
+					<IconIncrement />
+				</button>
+			</div>
+		{/snippet}
+		{#snippet date(value)}
+			<!-- TODO use bits-ui datepicker -->
+			<input
+				type="date"
+				{id}
+				{disabled}
+				value={value === undefined ? undefined : dates.format(value, 'yyyy-MM-dd')}
+				onblur={async ({ currentTarget }) => {
+					const newValue = currentTarget.value;
+
+					if (newValue === undefined) {
+						await onblur(undefined);
+						return undefined;
+					}
+
+					const parsed = dates.parse(newValue, 'yyyy-MM-dd', new Date());
+					await onblur(parsed);
+					return newValue;
+				}}
+			/>
+		{/snippet}
+		{#snippet location(value)}
+			<WorldLocationCombobox
+				value={value as RuntimeValue<'location'>}
+				onblur={async (value) => await onblur(value)}
+			/>
+		{/snippet}
+		{#snippet file(currentFileId)}
+			{@const { accept, size } = definition as typeof MetadataFile.infer}
+			<div class="file-input">
+				{#await idb.get('MetadataValueFile', currentFileId ?? '')}
+					<div class="current">
+						<code class="size">
+							<LoadingText value={Loading} mask={formatBytesSize(100e3)} />
+						</code>
+						<div class="name">
+							<LoadingText value={Loading} />
+						</div>
+						<div class="actions"></div>
+					</div>
+					<div class="preview">
+						<FilePreview file={undefined} />
+					</div>
+				{:then fileObject}
+					<div class="current">
+						{#if fileObject}
+							<code
+								class="size"
+								use:tooltip={size.maximum
+									? `La taille maximale est de ${formatBytesSize(size.maximum)}`
+									: undefined}
+								style:color={size.maximum !== undefined
+									? fileObject.size > size.maximum
+										? 'var(--fg-error)'
+										: gradientedColor(
+												fileObject.size / size.maximum,
+												'fg-success',
+												'fg-warning'
+											)
+									: undefined}
+							>
+								{formatBytesSize(fileObject.size)}
+							</code>
+							<span class="name">
+								<OverflowableText text={fileObject.filename} />
+							</span>
+						{:else}
+							<code
+								class="size"
+								class:infinite={size.maximum === undefined}
+								use:tooltip={size.maximum
+									? `La taille maximale est de ${formatBytesSize(size.maximum)}`
+									: 'Aucune limite de taille'}
+							>
+								{#if size.maximum}
+									&lt;{formatBytesSize(size.maximum, 'narrow')}
+								{:else}
+									<span>∞</span>
+								{/if}
+							</code>
+							<div class="name empty">Aucun fichier</div>
+						{/if}
+
+						<div class="actions">
+							<ButtonInk
+								onclick={async () => {
+									const [file] = await promptForFiles({ accept });
+
+									const savingStart = performance.now();
+									savingFile = true;
+
+									if (fileObject) {
+										await idb.drop('MetadataValueFile', fileObject.id);
+									}
+
+									if (!file) {
+										savingFile = false;
+										await onblur(undefined);
+										return;
+									}
+
+									if (!uiState.currentSessionId) {
+										toasts.error(
+											"Aucune session active. Impossible d'enregistrer le fichier."
+										);
+										savingFile = false;
+										return;
+									}
+
+									const id = await idb.set('MetadataValueFile', {
+										id: generateId('MetadataValueFile'),
+										sessionId: uiState.currentSessionId,
+										size: file.size,
+										contentType: file.type,
+										filename: file.name,
+										bytes: await file.arrayBuffer(),
+										lastModifiedAt: new Date(
+											file.lastModified || Date.now()
+										).toISOString(),
+									});
+
+									const timeElapsed = performance.now() - savingStart;
+
+									if (!windowIsFocused || timeElapsed > ms('5s')) {
+										sendNotification(`${file.name} enregistré`, {
+											body: 'Le fichier a été enregistré avec succès',
+										});
+									}
+
+									savingFile = false;
+									await onblur(id);
+								}}
+							>
+								{#if savingFile}
+									Chargement…
+								{:else if fileObject}
+									Modifier
+								{:else}
+									Ajouter
+								{/if}
+							</ButtonInk>
+						</div>
+					</div>
+					{#if fileObject}
+						{@const file = new File([fileObject.bytes], fileObject.filename, {
+							type: fileObject.contentType,
+							lastModified: new Date(fileObject.lastModifiedAt).getTime(),
+						})}
+						<div class="preview" in:fade>
+							<FilePreview {file} />
+						</div>
+					{/if}
+				{/await}
+			</div>
+		{/snippet}
+		{#snippet boundingbox()}
+			<div class="unrepresentable" use:tooltip={JSON.stringify(value, null, 2)}>
+				<IconError />
+				<p>Irreprésentable</p>
+			</div>
+		{/snippet}
+		{#snippet error()}
+			<div
+				class="unrepresentable"
+				use:tooltip={`${JSON.stringify(value, null, 2)} n'est pas une valeur valide de type ${type}`}
+			>
+				<IconError />
+				<p>Mismatch</p>
+			</div>
+		{/snippet}
+	</MetadataTypeswitch>
 </div>
 
 <style>
@@ -524,6 +671,7 @@
 		.label {
 			gap: 0.75em;
 			margin-left: 0.25em;
+			max-width: 67ch;
 		}
 
 		.label:not(:has(.subtext)) {
@@ -554,7 +702,7 @@
 			color: var(--gay);
 		}
 
-		img {
+		img:not(.fullscreen) {
 			width: 4em;
 			height: 4em;
 			flex-shrink: 0;
@@ -562,6 +710,19 @@
 			overflow: hidden;
 			border-radius: var(--corner-radius);
 		}
+
+		.extra-content {
+			margin-left: auto;
+		}
+	}
+
+	img.fullscreen {
+		width: auto;
+		height: 85vh;
+		overflow: hidden;
+		object-fit: contain;
+		border-radius: var(--corner-radius);
+		background-color: var(--bg);
 	}
 
 	.metadata-input:not(

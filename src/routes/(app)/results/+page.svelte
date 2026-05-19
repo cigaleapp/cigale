@@ -31,7 +31,7 @@
 	import ModalConfirm from '$lib/ModalConfirm.svelte';
 	import { sendNotification } from '$lib/notifications.js';
 	import { ensureNoLoneImages } from '$lib/observations.js';
-	import RadioButtons from '$lib/RadioButtons.svelte';
+	import EnumButtons from '$lib/EnumButtons.svelte';
 	import SessionMetadataForm from '$lib/SessionMetadataForm.svelte';
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte.js';
@@ -288,7 +288,6 @@
 			{#if uiState.currentSession}
 				<SessionMetadataForm
 					session={uiState.currentSession}
-					metadataOptions={new Map()}
 					errors={metadataErrors}
 					onmetadatachange={() => {
 						reloadPreviews++;
@@ -324,7 +323,7 @@
 				<div class="settings">
 					<div class="include">
 						<Field label="Inclure">
-							<RadioButtons
+							<EnumButtons
 								bind:value={include}
 								options={[
 									{ key: 'metadataonly', label: 'Métadonnées seulement' },
@@ -347,7 +346,7 @@
 								Marge de recadrage
 								<p class="fineprint"></p>
 							{/snippet}
-							<RadioButtons
+							<EnumButtons
 								options={[
 									{ key: 'none', label: 'Aucune' },
 									{ key: 'small', label: '5%' },
@@ -398,7 +397,7 @@
 										{label}
 									{/if}
 								{/snippet}
-							</RadioButtons>
+							</EnumButtons>
 						</Field>
 					</div>
 				</div>

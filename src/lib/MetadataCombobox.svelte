@@ -2,14 +2,18 @@
 	/**
 	 * @typedef {object} Props
 	 * @property {string|undefined} value
-	 * @property {(newValue: string) => void} onValueChange
+	 * @property {boolean} [multiple]
+	 * @property {(newValue: string, newValues: string[]) => void} onValueChange
 	 * @property {Pick<import('./database.js').Metadata, "id">} metadata
-	 * @property {import('./database.js').MetadataEnumVariant[]} options
+	 * @property {import('./database.js').MetadataEnumVariant[] | undefined} options
 	 * @property {WithoutChildrenOrChild<import('bits-ui').Combobox.InputProps>} [inputProps]
 	 * @property {WithoutChildrenOrChild<import('bits-ui').Combobox.ContentProps>} [contentProps]
 	 * @property {string} [id]
 	 * @property {Record<string, number>} [confidences]
-	 * @property {(action: 'focus' | 'blur' | 'toggle') => void} [focuser]
+	 * @property {Record<string, number>} [alternatives] to show as additionally selected when multiple=true
+	 * @property {undefined | ((action: 'focus' | 'blur' | 'toggle') => void)} [focuser]
+	 * @property {(option: import('./database.js').MetadataEnumVariant) => boolean|string} [optionIsDisabled]
+	 * @property {import('svelte').ComponentProps<typeof import('$lib/MetadataInput.svelte').default>["enumOptionsExtraContent"]} [enumOptionsExtraContent]
 	 */
 </script>
 
@@ -17,21 +21,26 @@
 	import Icon from '@iconify/svelte';
 
 	import IconCheck from '~icons/ri/check-line';
+	import LoadingText, { Loading } from '$lib/LoadingText.svelte';
 
 	import Badge from './Badge.svelte';
 	import { cascadeLabels } from './cascades.js';
 	import Combobox from './Combobox.svelte';
 	import ConfidencePercentage from './ConfidencePercentage.svelte';
 	import * as idb from './idb.svelte.js';
+	import { databaseHandle } from './idb.svelte.js';
 	import LearnMoreLink from './LearnMoreLink.svelte';
 	import Markdown from './Markdown.svelte';
+	import { metadataOptionsOf } from './metadata/index.js';
 	import MetadataCascadesTable from './MetadataCascadesTable.svelte';
 	import { namespaceOfMetadataId } from './schemas/metadata.js';
-	import { readableOn } from './utils.js';
+	import { uiState } from './state.svelte';
+	import { cancellable, compareBy, readableOn } from './utils.js';
 
 	/**
 	 * @import {WithoutChildrenOrChild} from 'bits-ui';
 	 * @import {CascadeLabelsCache} from './cascades.js';
+	 * @import {NamespacedMetadataId} from './metadata/namespacing.js';
 	 * @import * as DB from './database.js';
 	 */
 
@@ -39,18 +48,56 @@
 	 * @type {Props & Omit<import('bits-ui').Combobox.RootProps, keyof Props>}
 	 */
 	let {
-		options,
+		options: precomputedOptions,
 		metadata,
+		multiple = false,
+		alternatives = {},
 		confidences = {},
 		value = $bindable(),
 		open = $bindable(false),
 		focuser = $bindable(),
+		optionIsDisabled = () => false,
 		inputProps,
 		contentProps,
+		enumOptionsExtraContent,
 		...restProps
 	} = $props();
 
 	const protocolId = $derived(namespaceOfMetadataId(metadata.id));
+
+	const showConfidences = $derived(
+		Object.keys(confidences).length > 0 &&
+			Object.values(confidences).some((conf) => conf > 0 && conf < 1)
+	);
+
+	let options = $derived(precomputedOptions ?? []);
+
+	const loadingOptions = $derived(!precomputedOptions && options.length === 0);
+	const optionsLoader = cancellable(
+		async (
+			signal,
+			/** @type {NamespacedMetadataId} */ metadataId,
+			/** @type {boolean} */ precomputed
+		) => {
+			if (precomputed) return;
+			if (!uiState.currentProtocolId) return;
+			console.info('Fetching options for metadata', metadataId);
+			signal.throwIfAborted();
+			options = await metadataOptionsOf(
+				databaseHandle(),
+				uiState.currentProtocolId,
+				metadataId
+			);
+			console.info('Fetched options for metadata', metadataId, options);
+		}
+	);
+
+	$effect(() => {
+		const loader = optionsLoader(metadata.id, Boolean(precomputedOptions));
+
+		loader.do();
+		return loader.cancel;
+	});
 
 	const hasImages = $derived(options.some((opt) => opt.image));
 
@@ -75,16 +122,16 @@
 		);
 	}
 
-	/**
-	 * @type {CascadeLabelsCache}
-	 */
-	let cascadeLabelsCache = $state({});
+	
 </script>
 
-<div class="metadata-combobox" class:wide-docs={hasImages}>
+<div class="metadata-combobox" class:wide-docs={hasImages} class:multiple>
 	<Combobox
-		items={options}
+		// Put disabled options last
+		items={options.toSorted(compareBy((opt) => (optionIsDisabled(opt) ? 1 : -1)))}
 		{value}
+		values={multiple ? [value, ...Object.keys(alternatives)] : undefined}
+		{multiple}
 		bind:open
 		bind:focuser
 		sorter={compareByConfidence}
@@ -94,8 +141,17 @@
 		{contentProps}
 		{...restProps}
 	>
+		{#snippet searchbox({ focusSetter, ...props })}
+			<div class="searchbox">
+				{#if loadingOptions}
+					<LoadingText value={Loading}>Chargement</LoadingText>
+				{:else}
+					<input {...props} {@attach focusSetter} />
+				{/if}
+			</div>
+		{/snippet}
 		{#snippet listItem({ selected, ...item })}
-			<div class="item" class:selected>
+			<div class="item" class:selected class:disabled={optionIsDisabled(item)}>
 				<div class="check">
 					<IconCheck />
 				</div>
@@ -121,9 +177,23 @@
 							{/if}
 						</div>
 					{/if}
-					<div class="confidence">
-						<ConfidencePercentage value={confidences[item.key]} />
-					</div>
+
+					{#if showConfidences}
+						<div class="confidence">
+							<ConfidencePercentage value={confidences[item.key]} />
+						</div>
+					{/if}
+
+					{#if enumOptionsExtraContent}
+						<div class="extra-content">
+							{@render enumOptionsExtraContent({
+								option: item,
+								disabled: optionIsDisabled(item),
+								selected,
+								confidence: confidences[item.key],
+							})}
+						</div>
+					{/if}
 				</div>
 			</div>
 		{/snippet}
@@ -147,7 +217,7 @@
 				<LearnMoreLink href={o.learnMore} />
 			{/if}
 
-			{#await cascadeLabels( { cache: cascadeLabelsCache, db: idb.databaseHandle(), protocolId, option: o } ) then cascades}
+			{#await cascadeLabels( { db: idb.databaseHandle(), protocolId, option: o } ) then cascades}
 				<MetadataCascadesTable {cascades} />
 				{#if Object.keys(cascades).length > 0}
 					<p><em>Métadonées mises à jour à la sélection de cette option</em></p>
@@ -164,6 +234,10 @@
 <style>
 	.metadata-combobox {
 		width: 100%;
+
+		.searchbox {
+			width: 100%;
+		}
 
 		:global(input) {
 			width: 100%;
@@ -183,6 +257,14 @@
 	.item.selected {
 		color: var(--fg-primary);
 		font-weight: bold;
+	}
+
+	.item.disabled {
+		opacity: 0.5;
+	}
+
+	.item .right {
+		margin-left: auto;
 	}
 
 	.item .check {

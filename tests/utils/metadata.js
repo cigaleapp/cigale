@@ -76,11 +76,28 @@ function sessionMetadataSectionFor(page, metadataLabel) {
 /**
  *
  * @param {Page} page
+ * @param {string | RegExp} metadataLabel
+ */
+function narrowingClassifierSectionFor(page, metadataLabel) {
+	return page
+		.getByTestId('descriptors')
+		.locator('.metadata')
+		.filter({
+			has: page.locator('label').filter({ hasText: metadataLabel }),
+		})
+		.first();
+}
+
+/**
+ *
+ * @param {Page} page
  */
 export function metadataSections(page) {
 	/** @param {string | RegExp} label */
 	const section = (label) =>
-		sidepanelMetadataSectionFor(page, label).or(sessionMetadataSectionFor(page, label));
+		sidepanelMetadataSectionFor(page, label)
+			.or(sessionMetadataSectionFor(page, label))
+			.or(narrowingClassifierSectionFor(page, label));
 
 	return {
 		section,
@@ -92,7 +109,7 @@ export function metadataSections(page) {
 		switch: (label) => section(label).getByRole('switch'),
 		/**
 		 * @param {string | RegExp} label
-		 * @param {string} option
+		 * @param {string | RegExp} option
 		 * @param {object} [params]
 		 * @param {boolean} [params.exact=true] whether to use exact matching for the option name
 		 */
@@ -100,6 +117,18 @@ export function metadataSections(page) {
 			return section(label)
 				.getByRole('radiogroup')
 				.getByRole('radio', { name: option, exact });
+		},
+		/**
+		 * Used in multi-select enums
+		 * @param {string | RegExp} label
+		 * @param {string | RegExp} option
+		 * @param {object} [params]
+		 * @param {boolean} [params.exact=true] whether to use exact matching for the option name
+		 */
+		checkbox(label, option, { exact = true } = { exact: true }) {
+			return section(label)
+				.getByRole('group')
+				.getByRole('checkbox', { name: option, exact });
 		},
 	};
 }

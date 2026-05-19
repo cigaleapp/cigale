@@ -6,7 +6,7 @@
 	import { EXIF_FIELDS } from '$lib/exiffields';
 	import FieldUrl from '$lib/FieldURL.svelte';
 	import { tables } from '$lib/idb.svelte';
-	import RadioButtons from '$lib/RadioButtons.svelte';
+	import EnumButtons from '$lib/EnumButtons.svelte';
 	import { EXIFField } from '$lib/schemas/metadata.js';
 	import { toasts } from '$lib/toasts.svelte.js';
 	import { keys, omit } from '$lib/utils';
@@ -43,7 +43,7 @@
 </script>
 
 <div class="content" in:fade={{ duration: 100 }}>
-	<RadioButtons
+	<EnumButtons
 		options={inferenceTypes}
 		value={currentInferenceType}
 		onchange={async (key) => {
@@ -108,7 +108,7 @@
 				</div>
 			{/if}
 		{/snippet}
-	</RadioButtons>
+	</EnumButtons>
 </div>
 
 <style>

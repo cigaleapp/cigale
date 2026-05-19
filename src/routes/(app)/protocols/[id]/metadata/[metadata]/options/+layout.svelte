@@ -45,7 +45,6 @@
 
 <script>
 	import { error } from '@sveltejs/kit';
-	import VirtualList from '@sveltejs/svelte-virtual-list';
 	import { fade } from 'svelte/transition';
 
 	import IconAdd from '~icons/ri/add-line';
@@ -62,6 +61,7 @@
 	import { removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';
 	import { toasts } from '$lib/toasts.svelte.js';
 	import { slugify } from '$lib/utils.js';
+	import VirtualList from '$lib/VirtualList.svelte';
 
 	const { data, children } = $props();
 
@@ -144,31 +144,32 @@
 		</form>
 
 		<nav>
-			<VirtualList items={searchResults} let:item>
-				{@const { key, label } = item}
-				<div class="navlink" class:active={page.params.option === key}>
-					<a
-						href={resolve(
-							'/(app)/protocols/[id]/metadata/[metadata]/options/[option]',
-							{
-								id: data.protocol.id,
-								metadata: removeNamespaceFromMetadataId(data.metadata.id),
-								option: key,
-							}
-						)}
-					>
-						{label}
-					</a>
-					<div class="delete">
-						<ButtonIcon
-							dangerous
-							help="Supprimer {label || key}"
-							onclick={async () => onDeleteOption(key, label)}
+			<VirtualList items={searchResults}>
+				{#snippet item({ key, label })}
+					<div class="navlink" class:active={page.params.option === key}>
+						<a
+							href={resolve(
+								'/(app)/protocols/[id]/metadata/[metadata]/options/[option]',
+								{
+									id: data.protocol.id,
+									metadata: removeNamespaceFromMetadataId(data.metadata.id),
+									option: key,
+								}
+							)}
 						>
-							<IconDelete />
-						</ButtonIcon>
+							{label}
+						</a>
+						<div class="delete">
+							<ButtonIcon
+								dangerous
+								help="Supprimer {label || key}"
+								onclick={async () => onDeleteOption(key, label)}
+							>
+								<IconDelete />
+							</ButtonIcon>
+						</div>
 					</div>
-				</div>
+				{/snippet}
 			</VirtualList>
 		</nav>
 	</aside>

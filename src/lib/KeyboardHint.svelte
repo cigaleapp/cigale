@@ -63,6 +63,7 @@
 			if (part === 'space') return '␣';
 			if (part === 'escape') return 'Esc';
 			if (part === 'enter') return '⏎';
+			if (part === 'tab') return '⇆ Tab';
 
 			// Single-letter parts most likely represent letter keys,
 			// so uppercase them cuz its prettier

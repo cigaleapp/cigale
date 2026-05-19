@@ -6,6 +6,8 @@ import 'urlpattern-polyfill';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
+import { ms } from 'convert';
+
 import { FixturePaths } from '../filepaths.js';
 
 /**
@@ -445,4 +447,37 @@ export async function waitForDownload(page, trigger) {
 	const event = page.waitForEvent('download');
 	await trigger();
 	return await event;
+}
+
+/**
+ * Like Locator.scrollIntoView, but works on virtualized lists, by repeatedly scrolling for a small amount and checking if the locator exists with a very short timeout
+ * @param {Locator} locator
+ * @param {"up" | "down"} [direction] down by default
+ */
+export async function scrollIntoViewVirtualized(locator, direction = 'down') {
+	const page = locator.page();
+	const deltaY = { up: -50, down: 50 }[direction];
+	let currentY = 0;
+	const maxY = deltaY * 1_000;
+
+	while (!(await locator.isVisible({ timeout: ms('100ms') }))) {
+		await page.mouse.wheel(0, deltaY);
+		currentY += deltaY;
+
+		if (Math.abs(currentY) > Math.abs(maxY)) {
+			await expect(locator).toBeVisible();
+		}
+	}
+}
+
+/**
+ * See {@link scrollIntoViewVirtualized}. Calls .click() on the element when found
+ * @param {Locator} locator
+ * @param {object} [options]
+ * @param {"down" | "up"} [options.scroll] direction to scroll. Defaults to "down"
+ * @param {boolean} [options.force] option passed to Locator#click()
+ */
+export async function scrollAndClick(locator, { scroll = 'down', force = false } = {}) {
+	await scrollIntoViewVirtualized(locator, scroll);
+	await locator.click({ force });
 }

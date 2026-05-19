@@ -6,7 +6,7 @@
 	import Field from '$lib/Field.svelte';
 	import FieldUrl from '$lib/FieldURL.svelte';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
-	import RadioButtons from '$lib/RadioButtons.svelte';
+	import EnumButtons from '$lib/EnumButtons.svelte';
 
 	import { updater as _updater } from '../updater.svelte';
 	import ModelOutputShapeDiagram from './ModelOutputShapeDiagram.svelte';
@@ -83,7 +83,7 @@
 </Field>
 
 <Field label="Disposition des pixels">
-	<RadioButtons
+	<EnumButtons
 		horizontal
 		cards
 		value={input.disposition ?? 'CHW'}
@@ -179,7 +179,7 @@
 				</Math.Line>
 			</div>
 		{/snippet}
-	</RadioButtons>
+	</EnumButtons>
 	{#snippet hint()}
 		<p class="disclaimer-no-batch-support">
 			<small>
@@ -193,13 +193,13 @@
 	{/snippet}
 </Field>
 <Field label="Valeur des pixels">
-	<RadioButtons
+	<EnumButtons
 		horizontal
 		cards
 		value={input.normalized ? 'normalized' : 'raw'}
 		onchange={updater((inf, newValue) => {
 			// The if prevent infinite loops since calling the updater
-			// See comment in updater() of RadioButtons above
+			// See comment in updater() of EnumButtons above
 			const newNormalized = newValue === 'normalized';
 			if (newNormalized === inf[i].input.normalized) return;
 
@@ -248,7 +248,7 @@
 				{/each}
 			</div>
 		{/snippet}
-	</RadioButtons>
+	</EnumButtons>
 </Field>
 
 {#if output && 'shape' in output}

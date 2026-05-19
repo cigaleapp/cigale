@@ -1,0 +1,1 @@
+The narrow mode is greatly inspired by Xper3, see [Xper3 technical documentation](https://xper3.fr/wp-content/uploads/2024/10/ikey_UserGuide_2011.pdf) and the [SDD Format specification](https://sdd.tdwg.org/primer/). 

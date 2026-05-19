@@ -8,7 +8,7 @@ import {
 	serializeMetadataFullValue,
 } from './metadata/index.js';
 import { uiState } from './state.svelte.js';
-import { compareBy, mapValues, nonnull } from './utils.js';
+import { compareBy, mapValues, nonnull, transformObject } from './utils.js';
 
 /**
  * @import * as DB from '$lib/database.js'
@@ -53,8 +53,6 @@ export async function mergeToObservation(parts) {
 			serializeMetadataFullValue
 		),
 	};
-
-	observation.label = defaultObservationLabel({ protocol, images, observation });
 
 	await tables.Observation.do(undefined, (tx) => {
 		tx.add(observation);
@@ -107,20 +105,6 @@ export async function deleteObservation(
 }
 
 /**
- * @param {object} arg0
- * @param {Array<typeof import('$lib/database').Schemas.Image.inferIn>} arg0.images
- * @param {typeof import('$lib/database').Schemas.Observation.inferIn} arg0.observation
- * @param {import('$lib/database').Protocol} arg0.protocol
- * @returns {string} computed default label for the new observation
- */
-function defaultObservationLabel({ images, observation, protocol }) {
-	return (
-		protocol?.observations?.defaultLabel?.render({ images, observation }) ||
-		fallbackObservationLabel([observation, ...images])
-	);
-}
-
-/**
  * @param {Array<{ filename: string} | {label: string}>} parts
  * @returns {string} computed fallback label for the new observation
  */
@@ -134,25 +118,19 @@ function fallbackObservationLabel(parts) {
 
 /**
  *
- * @param {typeof import('$lib/database').Schemas.Image.inferIn} image
- * @param {import('$lib/database').Protocol} protocol
+ * @param {Pick<typeof import('$lib/database').Schemas.Image.inferIn & DB.Image, "id" | "filename">} image
  * @param {import('$lib/database').Session} session
  * @returns {typeof import('$lib/database').Schemas.Observation.inferIn}
  */
-export function newObservation(image, protocol, session) {
+export function newObservation(image, session) {
 	const observationId = generateId('Observation');
-	const newObs = {
+	return {
 		id: observationId,
 		sessionId: session.id,
 		images: [image.id],
 		addedAt: new Date().toISOString(),
 		label: fallbackObservationLabel([image]),
 		metadataOverrides: {},
-	};
-
-	return {
-		...newObs,
-		label: defaultObservationLabel({ images: [image], observation: newObs, protocol }),
 	};
 }
 
@@ -175,7 +153,7 @@ export async function ensureNoLoneImages(tx) {
 
 		for (const image of images) {
 			if (!observations.some((o) => o.images.includes(image.id))) {
-				const newObs = newObservation(image, protocol, session);
+				const newObs = newObservation(image, session);
 				tx.objectStore('Observation').add(newObs);
 				// Update ui selection so we don't have ghosts in preview side panel
 				uiState.setSelection?.(
@@ -187,26 +165,78 @@ export async function ensureNoLoneImages(tx) {
 }
 
 /**
+ * Deletes observations that have no (existing) images
+ * @param {import('./idb.svelte').IDBTransactionWithAtLeast<["Observation", "Image"]>} [tx] reuse an existing transaction
+ */
+export async function ensureNoEmptyObservations(tx) {
+	await db.openTransaction(['Observation', 'Image'], { tx }, async (tx) => {
+		const observations = await tx.objectStore('Observation').getAll();
+		for (const observation of observations) {
+			const images = await Promise.all(
+				observation.images.map((imageId) => tx.objectStore('Image').get(imageId))
+			);
+			const existing = images.filter(nonnull);
+
+			if (existing.length === 0) {
+				console.warn(
+					`Deleting observation ${observation.id} because it has no images`,
+					observation
+				);
+				tx.objectStore('Observation').delete(observation.id);
+				// Update ui selection so we don't have ghosts in preview side panel
+				uiState.setSelection?.(uiState.selection.filter((sel) => sel !== observation.id));
+				uiState.erroredImages.delete(observation.id);
+			} else {
+				// If some images exist, but not all, remove the non-existing ones from the observation.
+				if (existing.length !== observation.images.length) {
+					tx.objectStore('Observation').put({
+						...observation,
+						images: existing.map(({ id }) => id),
+					});
+					console.info(
+						`Updating observation ${observation.id} because some of its images were deleted`,
+						observation,
+						existing
+					);
+				}
+			}
+		}
+	});
+}
+
+/**
  * Gets all metadata for an observation, including metadata derived from merging the metadata values of the images that make up the observation.
+ * @template {DB.MetadataType} [T=DB.MetadataType]
  * @param {object} arg0
  * @param {DB.Metadata[]} arg0.definitions
  * @param {Pick<DB.Observation, 'images' | 'metadataOverrides'>} arg0.observation
  * @param {DB.Image[]} arg0.images
- * @returns {DB.MetadataValues}
+ * @param {T} [arg0.filterType] If provided, only return values for metadata of this type
+ * @returns {Record<NamespacedMetadataID, TypedMetadataValue<T>>}
  */
-export function observationMetadata({ definitions, observation, images }) {
+export function observationMetadata({ definitions, observation, images, filterType }) {
 	const metadataFromImages = mergeMetadataFromImagesAndObservations({
-		definitions,
+		definitions: definitions.filter((d) => !filterType || d.type === filterType),
 		observations: [],
 		images: images
 			.filter(({ id }) => observation.images.includes(id))
 			.toSorted(compareBy(({ id }) => observation.images.indexOf(id))),
 	});
 
-	return {
-		...metadataFromImages,
-		...observation.metadataOverrides,
-	};
+	return transformObject(
+		{
+			...metadataFromImages,
+			...observation.metadataOverrides,
+		},
+		(id, value) => {
+			if (!filterType) return [id, value];
+			if (definitions.find((d) => d.id === id)?.type !== filterType) {
+				return undefined;
+			}
+
+			return [id, value];
+		}
+	);
 }
 
 if (import.meta.vitest) {

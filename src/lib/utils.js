@@ -397,6 +397,10 @@ if (import.meta.vitest) {
 		expect(safeJSONStringify(undefined)).toBeUndefined();
 		expect(safeJSONStringify(null)).toBe('null');
 		expect(safeJSONStringify(Symbol('feur'))).toBeUndefined();
+		/** @type {any} */
+		const a = { b: 2 };
+		a.a = a;
+		expect(safeJSONStringify(a)).toBeUndefined();
 	});
 }
 
@@ -883,12 +887,19 @@ if (import.meta.vitest) {
 }
 
 /**
- * @param {number[]} values
+ * @param {Iterable<number>} values
  * @param {number} fallback if values is empty
  */
 export function avg(values, fallback = NaN) {
-	if (values.length === 0) return fallback;
-	return sum(values) / values.length;
+	let summed = 0;
+	let length = 0;
+
+	for (const value of values) {
+		summed += value;
+		length++;
+	}
+
+	return length === 0 ? fallback : summed / length;
 }
 
 if (import.meta.vitest) {
@@ -1330,6 +1341,61 @@ export function fadeOutElement(selector, duration, { firstTimeDuration } = {}) {
 	setTimeout(() => {
 		element.remove();
 	}, duration);
+}
+
+if (import.meta.vitest) {
+	const { test, expect, vi } = import.meta.vitest;
+
+	test('fadeOutElement applies transition, sets opacity and removes element after duration', () => {
+		document.body.innerHTML = '';
+		const el = document.createElement('div');
+		el.id = 'test-fade';
+		document.body.appendChild(el);
+
+		vi.useFakeTimers();
+		fadeOutElement('#test-fade', 1000);
+
+		const found = document.querySelector('#test-fade');
+		expect(found).toBeInstanceOf(HTMLElement);
+		expect(found.style.opacity).toBe('0');
+		expect(found.style.transition).toContain('opacity 1000ms');
+
+		vi.advanceTimersByTime(1000);
+		expect(document.querySelector('#test-fade')).toBeNull();
+		vi.useRealTimers();
+	});
+
+	test('fadeOutElement removes non-HTMLElement (SVG) immediately', () => {
+		document.body.innerHTML = '';
+		const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+		svg.setAttribute('id', 'test-svg');
+		document.body.appendChild(svg);
+
+		fadeOutElement('#test-svg', 1000);
+
+		// SVGElement is not an HTMLElement, so it should be removed synchronously
+		expect(document.querySelector('#test-svg')).toBeNull();
+	});
+
+	test('fadeOutElement uses firstTimeDuration on first run', () => {
+		document.body.innerHTML = '';
+		localStorage.removeItem('app_started_before');
+
+		const el = document.createElement('div');
+		el.id = 'first-fade';
+		document.body.appendChild(el);
+
+		vi.useFakeTimers();
+		fadeOutElement('#first-fade', 5000, { firstTimeDuration: 10 });
+
+		const found = document.querySelector('#first-fade');
+		expect(found).toBeInstanceOf(HTMLElement);
+		expect(found.style.transition).toContain('opacity 10ms');
+
+		vi.advanceTimersByTime(10);
+		expect(document.querySelector('#first-fade')).toBeNull();
+		vi.useRealTimers();
+	});
 }
 
 /**
@@ -1777,5 +1843,201 @@ if (import.meta.vitest) {
 		expect(climbDOMUntil(grandchild, (el) => el.id === 'parent')).toBe(parent);
 		expect(climbDOMUntil(grandchild, (el) => el.id === 'grandchild')).toBe(grandchild);
 		expect(climbDOMUntil(grandchild, (el) => el.id === 'nonexistent')).toBe(null);
+	});
+}
+
+/**
+ * Turns a async function into a { do: starts the function synchronously, cancel: cancels the function if it's still running } object
+ * @template {unknown[]} Args
+ * @template R
+ * @param {(signal: AbortSignal, ...args: Args) => Promise<R>} asyncFunction
+ * @returns {( ...args: Args) => { do: () => Promise<R>, cancel: () => void } }
+ */
+export function cancellable(asyncFunction) {
+	let controller = new AbortController();
+
+	return (...args) => {
+		controller.abort();
+		controller = new AbortController();
+
+		return {
+			do: () => asyncFunction(controller.signal, ...args),
+			cancel: () => controller.abort(),
+		};
+	};
+}
+
+if (import.meta.vitest) {
+	const { test, expect, vi } = import.meta.vitest;
+
+	test('cancellable resolves when not cancelled', async () => {
+		const asyncFn = async (signal) => {
+			await new Promise((resolve, reject) => {
+				signal.addEventListener('abort', () =>
+					reject(new DOMException('aborted', 'AbortError'))
+				);
+				setTimeout(() => resolve('ok'), 50);
+			});
+			return 'ok';
+		};
+
+		const make = cancellable(asyncFn);
+
+		vi.useFakeTimers();
+		const runner = make();
+		const p = runner.do();
+
+		vi.advanceTimersByTime(50);
+		await expect(p).resolves.toBe('ok');
+		vi.useRealTimers();
+	});
+
+	test('cancellable cancel rejects with AbortError', async () => {
+		const asyncFn = async (signal) => {
+			await new Promise((resolve, reject) => {
+				signal.addEventListener('abort', () =>
+					reject(new DOMException('aborted', 'AbortError'))
+				);
+				setTimeout(() => resolve('ok'), 100);
+			});
+			return 'ok';
+		};
+
+		const make = cancellable(asyncFn);
+
+		vi.useFakeTimers();
+		const runner = make();
+		const p = runner.do();
+
+		// cancel immediately
+		runner.cancel();
+
+		await expect(p).rejects.toHaveProperty('name', 'AbortError');
+		vi.useRealTimers();
+	});
+
+	test('starting a new run aborts the previous run', async () => {
+		const asyncFn = async (signal) => {
+			await new Promise((resolve, reject) => {
+				signal.addEventListener('abort', () =>
+					reject(new DOMException('aborted', 'AbortError'))
+				);
+				setTimeout(() => resolve('ok'), 80);
+			});
+			return 'ok';
+		};
+
+		const make = cancellable(asyncFn);
+
+		vi.useFakeTimers();
+		const run1 = make();
+		const p1 = run1.do();
+
+		const run2 = make();
+		const p2 = run2.do();
+
+		// first should be aborted by the second make() call
+		await expect(p1).rejects.toHaveProperty('name', 'AbortError');
+
+		// advance timers so the second resolves
+		vi.advanceTimersByTime(80);
+		await expect(p2).resolves.toBe('ok');
+		vi.useRealTimers();
+	});
+}
+
+/**
+ * @template T
+ * @param {Set<T>} setA
+ * @param {Set<T>} setB
+ */
+export function setsAreEqual(setA, setB) {
+	if (setA.size !== setB.size) return false;
+	for (const item of setA) {
+		if (!setB.has(item)) return false;
+	}
+	return true;
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('setsAreEqual', () => {
+		expect(setsAreEqual(new Set([1, 2, 3]), new Set([1, 2, 3]))).toBe(true);
+		expect(setsAreEqual(new Set([1, 2, 3]), new Set([3, 2, 1]))).toBe(true);
+		expect(setsAreEqual(new Set([1, 2, 3]), new Set([1, 2]))).toBe(false);
+		expect(setsAreEqual(new Set([1, 2]), new Set([1, 2, 3]))).toBe(false);
+		expect(setsAreEqual(new Set([1, 2, 3]), new Set([4, 5, 6]))).toBe(false);
+	});
+}
+
+/**
+ * Some image sources will not load on localhost. Pass them thru cors.gwen.works if we're on localhost
+ * @param {string} src
+ */
+export function proxifyIfLocalhost(src) {
+	if (location.hostname !== 'localhost') return src;
+
+	return `https://cors.gwen.works/${src}`;
+}
+
+/**
+ * @template {string} K
+ * @template V
+ * @overload
+ * @param {Record<K, V>} record
+ * @param {(key: K) => boolean} predicate
+ * @returns {[Record<K, V>, Record<K, V>]}
+ */
+
+/**
+ * @template {string} K1
+ * @template {string} K2
+ * @template V
+ * @overload
+ * @param {Record<K1 | K2, V>} record
+ * @param {(key: K1 | K2) => key is K1} predicate
+ * @returns {[Record<K1, V>, Record<K2, V>]}
+ */
+
+/**
+ * Split a record into two based on a predicate on the keys
+ * @template {string} K1
+ * @template {string} K2
+ * @template V
+ * @param {Record<K1 | K2, V>} record
+ * @param {(key: K1 | K2) => boolean} predicate
+ * @returns {[Record<K1, V>, Record<K2, V>]}
+ */
+export function splitRecord(record, predicate) {
+	const record1 = /** @type {Record<K1, V>} */ ({});
+	const record2 = /** @type {Record<K2, V>} */ ({});
+
+	for (const key of keys(record)) {
+		if (predicate(key)) {
+			// @ts-expect-error
+			record1[key] = record[key];
+		} else {
+			// @ts-expect-error
+			record2[key] = record[key];
+		}
+	}
+
+	return [record1, record2];
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('splitRecord', () => {
+		const record = {
+			a: 1,
+			b: 2,
+			c: 3,
+			d: 4,
+		};
+
+		const [record1, record2] = splitRecord(record, (key) => key === 'a' || key === 'c');
+
+		expect(record1).toEqual({ a: 1, c: 3 });
+		expect(record2).toEqual({ b: 2, d: 4 });
 	});
 }

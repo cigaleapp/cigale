@@ -1,0 +1,163 @@
+<script lang="ts">
+	import type * as DB from '$lib/database.js';
+	import type { NamespacedMetadataID } from '$lib/schemas/common.js';
+
+	import { ms } from 'convert';
+
+	import { page } from '$app/state';
+	import { tables } from '$lib/idb.svelte.js';
+	import MetadataList from '$lib/MetadataList.svelte';
+	import {
+		ensureNamespacedMetadataId,
+		namespaceOfMetadataId,
+		removeNamespaceFromMetadataId,
+	} from '$lib/schemas/metadata.js';
+	import { avg, compareBy, mapKeys, nonnull } from '$lib/utils.js';
+
+	import { narrowingState } from '../+layout.svelte';
+	import { narrowingPower } from '../candidates.js';
+	import Descriptor from '../Descriptor.svelte';
+	import { options } from '../OptionsLoader.svelte';
+	import Searcher from '../Searcher.svelte';
+
+	const metadataValues = $derived(narrowingState.metadataValues);
+	const definitions = $derived(narrowingState.definitions);
+
+	const observation = $derived(tables.Observation.getFromState(page.params.observation ?? ''));
+
+	const remainingMetadataValues = $derived.by<Record<NamespacedMetadataID, Set<string>>>(() => {
+		const result: Record<NamespacedMetadataID, Set<string>> = Object.fromEntries(
+			definitions
+				// Don't consider metadata that has been chosen
+				.filter((def) => !(def.id in (observation?.metadataOverrides ?? {})))
+				.map((def) => [def.id, new Set()])
+		);
+
+		metadata: for (const { id } of definitions) {
+			if (!(id in result)) continue;
+
+			for (const candidate of narrowingState.remainingCandidates) {
+				const cascades = mapKeys(candidate.cascade ?? {}, (metadataId) =>
+					ensureNamespacedMetadataId(metadataId, namespaceOfMetadataId(id))
+				);
+
+				// If the candidate doesn't have a cascade for this metadata, it means that all options are still possible
+				// Go immediately to the next metadata
+				if (!(id in cascades)) {
+					delete result[id];
+					continue metadata;
+				}
+
+				result[id].add(cascades[id].toString());
+			}
+		}
+
+		return result;
+	});
+
+	const averageWeights = $derived(
+		new Map(
+			definitions
+				.map(
+					(def) =>
+						[
+							def.id,
+							avg(
+								narrowingState.allCandidates
+									.map(
+										(c) =>
+											c.narrowerWeights?.[
+												removeNamespaceFromMetadataId(def.id)
+											]
+									)
+									.filter(nonnull)
+							),
+						] as const
+				)
+				.filter(([_, weight]) => !Number.isNaN(weight))
+		)
+	);
+
+	function metadataOrdering(
+		shownDefinitions: DB.Metadata[],
+		searchResults?: NamespacedMetadataID[]
+	) {
+		if (searchResults) return searchResults;
+		if (shownDefinitions.some((def) => !(def.id in options))) return [];
+
+		console.time('metadata ordering');
+
+		const ordering = shownDefinitions
+			.map((def) => def.id)
+			.toSorted(
+				compareBy((id) => {
+					const weight = averageWeights.get(id);
+					const power =
+						narrowingPower({
+							candidates: narrowingState.remainingCandidateIds,
+							descriptors: narrowingState.descriptors,
+							metadata: id,
+							options: options[id].keys(),
+						}) / narrowingState.allCandidateIds.size;
+
+					if (weight === undefined) {
+						return power;
+					}
+
+					return avg([1 - weight, power]);
+				})
+			);
+
+		console.timeEnd('metadata ordering');
+		return ordering;
+	}
+</script>
+
+<main>
+	<Searcher
+		{definitions}
+		bind:scroll={narrowingState.scroll.describe}
+		bind:query={narrowingState.search.describe.query}
+		bind:resultsCount={narrowingState.search.describe.resultsCount}
+	>
+		{#snippet children(shownDefinitions, searchResults)}
+			<MetadataList
+				// virtualize
+				bind:scroll={narrowingState.scroll.describe}
+				values={metadataValues}
+				definitions={searchResults
+					? shownDefinitions
+					: shownDefinitions.filter((def) => !(def.id in metadataValues))}
+				ordering={metadataOrdering(shownDefinitions, searchResults)}
+				groups={undefined}
+			>
+				{#snippet children(definition)}
+					<div class="metadata">
+						<Descriptor
+							onchangeDelay={ms('1s')}
+							{options}
+							{definition}
+							{remainingMetadataValues}
+							{metadataValues}
+						/>
+					</div>
+				{/snippet}
+			</MetadataList>
+		{/snippet}
+	</Searcher>
+</main>
+
+<style>
+	main {
+		height: 100%;
+	}
+
+	.metadata {
+		/* 
+		Fiddled with manually in order to get approx. 66 chars/line max 
+		See https://www.uxpin.com/studio/blog/optimal-line-length-for-readability/
+		*/
+		border-bottom: 1px solid var(--gray);
+		padding: 1rem;
+	}
+</style>

@@ -14,7 +14,7 @@
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 	import ModalConfirm from '$lib/ModalConfirm.svelte';
-	import RadioButtons from '$lib/RadioButtons.svelte';
+	import EnumButtons from '$lib/EnumButtons.svelte';
 	import Stepper from '$lib/Stepper.svelte';
 	import { toasts } from '$lib/toasts.svelte.js';
 	import { tooltip } from '$lib/tooltips.js';
@@ -75,7 +75,7 @@
 				]}
 			>
 				{#snippet step_server({ done })}
-					<RadioButtons
+					<EnumButtons
 						options={adding!.servers.map(({ domain, name }) => ({
 							key: domain,
 							label: name ?? domain,

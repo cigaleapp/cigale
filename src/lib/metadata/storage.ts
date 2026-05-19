@@ -10,6 +10,7 @@ import { computeCascades } from '$lib/cascades.js';
 import {
 	ensureNamespacedMetadataId,
 	isNamespacedToProtocol,
+	MetadataEnumVariant,
 	MetadataError,
 	MetadataValue,
 	namespacedMetadataId,
@@ -19,6 +20,11 @@ import { groupBy, orEmptyObj3, prefixIDBKeyRange } from '$lib/utils.js';
 
 import { resolveMetadataImport } from './imports.js';
 import { serializeMetadataValue } from './serializing.js';
+
+// TODO: use everywhere
+function metadataOptionDatabaseKey(protocolId: string, metadataId: string, optionKey: string) {
+	return `${ensureNamespacedMetadataId(metadataId, protocolId)}:${optionKey}`;
+}
 
 /**
  *
@@ -31,15 +37,36 @@ export function metadataOptionsKeyRange(
 ): IDBKeyRange {
 	return prefixIDBKeyRange(
 		metadataId
-			? ensureNamespacedMetadataId(metadataId, protocolId) + ':'
+			? metadataOptionDatabaseKey(protocolId, metadataId, '')
 			: namespacedMetadataId(protocolId, '')
 	);
 }
 
-const METADATA_OPTIONS_CACHE = new Map<NamespacedMetadataID, DB.MetadataEnumVariant[]>();
+const METADATA_OPTIONS_CACHE = new Map<
+	NamespacedMetadataID,
+	Array<(typeof DB.Schemas.MetadataEnumVariant)['inferIn']>
+>();
 
 export function clearMetadataOptionsCache() {
 	METADATA_OPTIONS_CACHE.clear();
+}
+
+export async function metadataOption(
+	db: DatabaseHandle,
+	metadataId: NamespacedMetadataID,
+	optionKey: string
+) {
+	const cachedOptions = METADATA_OPTIONS_CACHE.get(metadataId);
+	if (cachedOptions) {
+		return cachedOptions.find((opt) => opt.key === optionKey);
+	}
+
+	return db
+		.get(
+			'MetadataOption',
+			metadataOptionDatabaseKey(namespaceOfMetadataId(metadataId)!, metadataId, optionKey)
+		)
+		.then((opt) => (opt ? MetadataEnumVariant.assert(opt) : undefined));
 }
 
 /**
@@ -61,7 +88,7 @@ export async function metadataOptionsOf(
 		return out;
 	}
 
-	const options = new Map<NamespacedMetadataID, DB.MetadataEnumVariant[]>();
+	const options: typeof METADATA_OPTIONS_CACHE = new Map();
 
 	const protocol = await db.get('Protocol', protocolId);
 	if (!protocol) return arrayAndMap('byMetadata', options);
@@ -183,7 +210,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 		| Array<{ value: RuntimeValue<Type>; confidence: number }>;
 	cascadedFrom?: string[];
 	abortSignal?: AbortSignal | undefined;
-	sessionId?: string | undefined;
+	sessionId?: string | undefined | null;
 	updateReactiveState?: boolean;
 }) {
 	if (!isNamespacedToProtocol(null, metadataId)) {
@@ -281,47 +308,50 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 
 	abortSignal?.throwIfAborted();
 
-	const cascades = await computeCascades({
-		db,
-		metadataId,
-		value,
-		confidence,
-		alternatives,
-	});
-
-	for (const cascade of cascades) {
-		abortSignal?.throwIfAborted();
-
-		if (cascadedFrom.includes(cascade.metadataId)) {
-			throw new Error(
-				`Boucle infinie de cascade détectée pour ${cascade.metadataId} avec ${cascade.value}: ${cascadedFrom.join(' -> ')} -> ${metadataId} -> ${cascade.metadataId}`
-			);
-		}
-
-		console.info(
-			`Cascading metadata ${metadataId} @ ${value} -> ${cascade.metadataId}  = ${cascade.value}`
-		);
-
-		const metadataNamespace = namespaceOfMetadataId(metadataId);
-		if (!metadataNamespace)
-			throw new Error(
-				`Metadata ${metadataId} is not namespaced, cannot cascade onto ${cascade.metadataId}`
-			);
-
-		cascade.metadataId = ensureNamespacedMetadataId(cascade.metadataId, metadataNamespace);
-
-		await storeMetadataValue({
+	// Cascading is not recursive anymore (see #1571)
+	if (cascadedFrom.length === 0) {
+		const cascades = await computeCascades({
 			db,
-			sessionId,
-			subjectId,
-			manuallyModified,
-			isDefault,
-			confirmed,
-			cascadedFrom: [...cascadedFrom, metadataId],
-			abortSignal,
-			clearErrors,
-			...cascade,
+			metadataId,
+			value,
+			confidence,
+			alternatives,
 		});
+
+		for (const cascade of cascades) {
+			abortSignal?.throwIfAborted();
+
+			if (cascadedFrom.includes(cascade.metadataId)) {
+				throw new Error(
+					`Boucle infinie de cascade détectée pour ${cascade.metadataId} avec ${cascade.value}: ${cascadedFrom.join(' -> ')} -> ${metadataId} -> ${cascade.metadataId}`
+				);
+			}
+
+			console.info(
+				`Cascading metadata ${metadataId} @ ${value} -> ${cascade.metadataId}  = ${cascade.value}`
+			);
+
+			const metadataNamespace = namespaceOfMetadataId(metadataId);
+			if (!metadataNamespace)
+				throw new Error(
+					`Metadata ${metadataId} is not namespaced, cannot cascade onto ${cascade.metadataId}`
+				);
+
+			cascade.metadataId = ensureNamespacedMetadataId(cascade.metadataId, metadataNamespace);
+
+			await storeMetadataValue({
+				db,
+				sessionId,
+				subjectId,
+				manuallyModified,
+				isDefault,
+				confirmed,
+				cascadedFrom: [...cascadedFrom, metadataId],
+				abortSignal,
+				clearErrors,
+				...cascade,
+			});
+		}
 	}
 
 	// Only refresh table state once everything has been cascaded, meaning not inside recursive calls

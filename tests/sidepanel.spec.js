@@ -68,17 +68,18 @@ testKitchensink(
 
 		// Set to True on image itself
 		await assert(app.metadata.section('bool')).toMatchAriaSnapshot(`
-	  - text: bool
-	  - switch "":
-	    - img
-	  - button [disabled]:
-	    - img
-	`);
+		  - text: bool
+		  - switch:
+		    - img
+		  - button "Supprimer cette valeur" [disabled]:
+		    - img
+		  - paragraph: boolean metadata
+		`);
 		await app.metadata.switch('bool').click();
 		await assert(app.metadata.switch('bool')).toMatchAriaSnapshot(`
-	  - switch "" [checked]:
-	    - img
-	`);
+		  - switch [checked]:
+		    - img
+		`);
 
 		// Set to False on observation
 		await app.tabs.go('classify');
@@ -87,21 +88,22 @@ testKitchensink(
 		await app.metadata.switch('bool').click();
 		await app.metadata.switch('bool').click();
 		await assert(app.metadata.switch('bool')).toMatchAriaSnapshot(`
-	  - switch "":
-	    - img
-	`);
+		  - switch:
+		    - img
+		`);
 
 		// Expect image to be still True
 		await app.tabs.go('import');
 		await firstObservationCard(page).click();
 		await assert(app.metadata.section('bool')).toMatchAriaSnapshot(`
-	  - text: bool
-	  - switch "" [checked]:
-	    - img
-	  - text: Oui
-	  - button:
-	    - img
-	`);
+		  - text: bool
+		  - switch [checked]:
+		    - img
+		  - text: Oui
+		  - button "Supprimer cette valeur":
+		    - img
+		  - paragraph: boolean metadata
+		`);
 	}
 );
 
@@ -162,24 +164,24 @@ testBasic('can update a enum-type metadata with cascades', async ({ page, app })
 	    - code: gbif.org
 	  - table:
 	    - rowgroup:
-	      - row "Règne Animalia":
-	        - cell "Règne"
-	        - cell "Animalia"
-	      - row "Phylum Arthropoda":
-	        - cell "Phylum"
-	        - cell "Arthropoda"
-	      - row "Classe Collembola":
-	        - cell "Classe"
-	        - cell "Collembola"
-	      - row "Ordre Entomobryomorpha":
-	        - cell "Ordre"
-	        - cell "Entomobryomorpha"
-	      - row "Famille Entomobryidae":
-	        - cell "Famille"
-	        - cell "Entomobryidae"
 	      - row "Genre Entomobrya":
 	        - cell "Genre"
 	        - cell "Entomobrya"
+	      - row "Famille Entomobryidae":
+	        - cell "Famille"
+	        - cell "Entomobryidae"
+	      - row "Ordre Entomobryomorpha":
+	        - cell "Ordre"
+	        - cell "Entomobryomorpha"
+	      - row "Classe Collembola":
+	        - cell "Classe"
+	        - cell "Collembola"
+	      - row "Phylum Arthropoda":
+	        - cell "Phylum"
+	        - cell "Arthropoda"
+	      - row "Règne Animalia":
+	        - cell "Règne"
+	        - cell "Animalia"
 	  - paragraph:
 	    - emphasis: Métadonées mises à jour à la sélection de cette option
 	`);
@@ -226,24 +228,24 @@ testBasic('can update a enum-type metadata with cascades', async ({ page, app })
 	    - code: gbif.org
 	  - table:
 	    - rowgroup:
-	      - row "Règne Animalia":
-	        - cell "Règne"
-	        - cell "Animalia"
-	      - row "Phylum Arthropoda":
-	        - cell "Phylum"
-	        - cell "Arthropoda"
-	      - row "Classe Collembola":
-	        - cell "Classe"
-	        - cell "Collembola"
-	      - row "Ordre Symphypleona":
-	        - cell "Ordre"
-	        - cell "Symphypleona"
-	      - row "Famille Dicyrtomidae":
-	        - cell "Famille"
-	        - cell "Dicyrtomidae"
 	      - row "Genre Dicyrtomina":
 	        - cell "Genre"
 	        - cell "Dicyrtomina"
+	      - row "Famille Dicyrtomidae":
+	        - cell "Famille"
+	        - cell "Dicyrtomidae"
+	      - row "Ordre Symphypleona":
+	        - cell "Ordre"
+	        - cell "Symphypleona"
+	      - row "Classe Collembola":
+	        - cell "Classe"
+	        - cell "Collembola"
+	      - row "Phylum Arthropoda":
+	        - cell "Phylum"
+	        - cell "Arthropoda"
+	      - row "Règne Animalia":
+	        - cell "Règne"
+	        - cell "Animalia"
 	  - paragraph:
 	    - emphasis: Métadonées mises à jour à la sélection de cette option
 	`);
@@ -254,11 +256,11 @@ testBasic('can update a enum-type metadata with cascades', async ({ page, app })
 		.getByText('Dicyrtomina saundersi 18%')
 		.click();
 	await expect(app.metadata.section('Espèce')).toMatchAriaSnapshot(`
-		  - text: Espèce
-		  - combobox: Dicyrtomina saundersi
-		  - button:
-		    - img
-		`);
+	  - text: Espèce
+	  - combobox: Dicyrtomina saundersi
+	  - button "Supprimer cette valeur":
+	    - img
+	`);
 
 	// Check the cascades
 	await expect(nthCombobox(2)).toMatchAriaSnapshot(`
@@ -293,7 +295,7 @@ testBasic('can update a enum-type metadata with cascades', async ({ page, app })
 		`
 	  - text: Espèce
 	  - combobox: Dicyrtomina saundersi
-	  - button:
+	  - button "Supprimer cette valeur":
 	    - img
 	`
 	);
@@ -349,24 +351,24 @@ test.describe('can search in a enum-type metadata combobox', () => {
 		    - code: gbif.org
 		  - table:
 		    - rowgroup:
-		      - row "Règne Animalia":
-		        - cell "Règne"
-		        - cell "Animalia"
-		      - row "Phylum Arthropoda":
-		        - cell "Phylum"
-		        - cell "Arthropoda"
-		      - row "Classe Collembola":
-		        - cell "Classe"
-		        - cell "Collembola"
-		      - row "Ordre Entomobryomorpha":
-		        - cell "Ordre"
-		        - cell "Entomobryomorpha"
-		      - row "Famille Entomobryidae":
-		        - cell "Famille"
-		        - cell "Entomobryidae"
 		      - row "Genre Entomobrya":
 		        - cell "Genre"
 		        - cell "Entomobrya"
+		      - row "Famille Entomobryidae":
+		        - cell "Famille"
+		        - cell "Entomobryidae"
+		      - row "Ordre Entomobryomorpha":
+		        - cell "Ordre"
+		        - cell "Entomobryomorpha"
+		      - row "Classe Collembola":
+		        - cell "Classe"
+		        - cell "Collembola"
+		      - row "Phylum Arthropoda":
+		        - cell "Phylum"
+		        - cell "Arthropoda"
+		      - row "Règne Animalia":
+		        - cell "Règne"
+		        - cell "Animalia"
 		  - paragraph:
 		    - emphasis: Métadonées mises à jour à la sélection de cette option
 		`);
@@ -402,24 +404,24 @@ test.describe('can search in a enum-type metadata combobox', () => {
 		    - code: gbif.org
 		  - table:
 		    - rowgroup:
-		      - row "Règne Animalia":
-		        - cell "Règne"
-		        - cell "Animalia"
-		      - row "Phylum Arthropoda":
-		        - cell "Phylum"
-		        - cell "Arthropoda"
-		      - row "Classe Collembola":
-		        - cell "Classe"
-		        - cell "Collembola"
-		      - row "Ordre Entomobryomorpha":
-		        - cell "Ordre"
-		        - cell "Entomobryomorpha"
-		      - row "Famille Entomobryidae":
-		        - cell "Famille"
-		        - cell "Entomobryidae"
 		      - row "Genre Entomobrya":
 		        - cell "Genre"
 		        - cell "Entomobrya"
+		      - row "Famille Entomobryidae":
+		        - cell "Famille"
+		        - cell "Entomobryidae"
+		      - row "Ordre Entomobryomorpha":
+		        - cell "Ordre"
+		        - cell "Entomobryomorpha"
+		      - row "Classe Collembola":
+		        - cell "Classe"
+		        - cell "Collembola"
+		      - row "Phylum Arthropoda":
+		        - cell "Phylum"
+		        - cell "Arthropoda"
+		      - row "Règne Animalia":
+		        - cell "Règne"
+		        - cell "Animalia"
 		  - paragraph:
 		    - emphasis: Métadonées mises à jour à la sélection de cette option
 		`);
@@ -451,7 +453,7 @@ testKitchensink('shows crop-type metadata as non representable', async ({ page, 
 	  - text: crop
 	  - img
 	  - paragraph: Irreprésentable
-	  - button [disabled]:
+	  - button "Supprimer cette valeur" [disabled]:
 	    - img
 	`);
 });

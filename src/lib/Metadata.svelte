@@ -3,6 +3,7 @@
 	import type { TypedMetadataValue } from './metadata/index.js';
 	import type { MetadataType, RuntimeValue } from './schemas/metadata.js';
 	import type { NumericUnit } from './schemas/units.js';
+	import type { ComponentProps } from 'svelte';
 
 	import { ArkErrors } from 'arktype';
 
@@ -11,26 +12,36 @@
 	import IconClear from '~icons/ri/close-line';
 	import IconTechnical from '~icons/ri/settings-line';
 	import IconMerged from '~icons/ri/stack-line';
+	import LoadingText from '$lib/LoadingText.svelte';
+	import { metadataOption } from '$lib/metadata/storage.js';
 
 	import Carousel from './Carousel.svelte';
 	import ConfidencePercentage from './ConfidencePercentage.svelte';
+	import { databaseHandle } from './idb.svelte.js';
 	import {
 		metadataValueValidatorDate,
 		metadataValueValidatorNumeric,
 		metadataValueValidatorString,
 	} from './metadata/constraints.js';
-	import { hasRuntimeType } from './metadata/index.js';
 	import MetadataInput from './MetadataInput.svelte';
 	import OverflowableText from './OverflowableText.svelte';
 	import { splitMetadataId } from './schemas/metadata.js';
 	import { isDebugMode } from './settings.svelte.js';
 	import { tooltip } from './tooltips.js';
-	import { orEmpty, pick, safeJSONParse } from './utils.js';
+	import {
+		mapKeys,
+		orEmpty,
+		orEmpty2,
+		pick,
+		proxifyIfLocalhost,
+		safeJSONParse,
+		switchValue,
+	} from './utils.js';
 	import WorldMap from './WorldMap.svelte';
 
-	interface Props {
+	type Props = {
 		definition: Metadata;
-		options?: MetadataEnumVariant[];
+		options?: MetadataEnumVariant[] | undefined;
 		value: undefined | TypedMetadataValue<NoInfer<T>>;
 		merged?: boolean;
 		/** Display requiredness indicators */
@@ -42,21 +53,39 @@
 		) => void;
 		onchange?: (
 			// eslint-disable-next-line no-unused-vars
-			value: undefined | RuntimeValue<T>,
-			// eslint-disable-next-line no-unused-vars
-			unit?: undefined | typeof NumericUnit.infer
-		) => void;
-	}
+			data: {
+				value: undefined | RuntimeValue<T>;
+				unit?: undefined | typeof NumericUnit.infer;
+				/** Keys are **serialized** metadata values! not bare string */
+				alternatives?: Record<string, number>;
+				nodes: {
+					metadata: HTMLElement | undefined;
+				};
+			}
+		) => Promise<void>;
+	} & Pick<
+		ComponentProps<typeof MetadataInput>,
+		| 'addToAlternativesBySelect'
+		| 'removeByDeselect'
+		| 'optionIsDisabled'
+		| 'enumOptionsExtraContent'
+	>;
 
 	let {
 		value,
 		merged,
 		definition,
 		requiredness,
-		options = [],
-		onchange = () => {},
+		options = undefined,
+		onchange = async () => {},
 		onvalidation = () => {},
+		...inputProps
 	}: Props = $props();
+
+	/** If we have addToAlternativesBySelect, the alternatives are already shown for enum metadata */
+	const showAlternatives = $derived(
+		inputProps.addToAlternativesBySelect ? definition.type !== 'enum' : true
+	);
 
 	const valueValidator = $derived.by(() => {
 		switch (definition.type) {
@@ -89,7 +118,12 @@
 	const _id = $props.id();
 
 	const isCompactEnum = $derived(
-		definition.type === 'enum' && options.length <= 10 && !options.some((opt) => opt.learnMore)
+		definition.type === 'enum' &&
+			switchValue(definition.presentation, {
+				auto: definition._optionsCount > 0 && definition._optionsCount <= 10,
+				dropdown: false,
+				buttons: definition._optionsCount < 100,
+			})
 	);
 
 	const inputIsInline = $derived(!isCompactEnum && definition.type !== 'file');
@@ -100,12 +134,16 @@
 
 	const optional = $derived(requiredness === 'all' && !definition.required);
 	const required = $derived(requiredness !== 'none' && definition.required);
+
+	let element = $state<HTMLElement>();
 </script>
 
-<div class="metadata">
+<div class="metadata" bind:this={element}>
 	<div class="side-image-and-main-area">
 		{#if displayImageOnTheSide}
-			<div class="side-image"><img loading="lazy" src={definition.images[0]} /></div>
+			<div class="side-image">
+				<img loading="lazy" src={proxifyIfLocalhost(definition.images[0])} />
+			</div>
 		{/if}
 		<div class="main-area">
 			<section class="first-line">
@@ -145,7 +183,7 @@
 		</div>
 	{/if}
 
-	{#if value && Object.keys(value.alternatives).length > 0}
+	{#if showAlternatives && value && Object.keys(value.alternatives).length > 0}
 		<section class="alternatives">
 			<div class="title">Alternatives</div>
 			<ul class="options">
@@ -154,23 +192,31 @@
 					.sort(([, a], [, b]) => b - a)
 					.slice(0, 3) as [jsonValue, confidence] (jsonValue)}
 					{@const stringValue = safeJSONParse(jsonValue)?.toString()}
-					{@const enumVariant = hasRuntimeType('enum', stringValue)
-						? options?.find(({ key }) => key === stringValue)
-						: undefined}
 					<li>
-						<div class="value" use:tooltip={enumVariant?.description}>
-							{enumVariant?.label || stringValue}
+						<div class="value">
+							<LoadingText
+								value={async () =>
+									metadataOption(databaseHandle(), definition.id, stringValue)}
+							>
+								{#snippet loaded(option)}
+									{option?.label ?? stringValue}
+								{/snippet}
+							</LoadingText>
 						</div>
 						<ConfidencePercentage value={confidence} />
 						<button
 							use:tooltip={'Sélectionner cette valeur'}
-							onclick={() => {
+							onclick={async () => {
 								value = {
 									value: JSON.parse(jsonValue),
 									confidence,
 									alternatives: value?.alternatives ?? {},
 								};
-								onchange(value?.value, value?.unit);
+								await onchange({
+									value: value?.value,
+									unit: value?.unit,
+									nodes: { metadata: element },
+								});
 							}}
 						>
 							<IconCheck />
@@ -190,14 +236,18 @@
 
 		<section class="map">
 			<WorldMap
-				onNewMarker={({ lngLat: { lng, lat } }) => {
-					onchange?.({ latitude: lat, longitude: lng });
+				onNewMarker={async ({ lngLat: { lng, lat } }) => {
+					await onchange?.({ latitude: lat, longitude: lng });
 				}}
 				markers={orEmpty(coords !== undefined, {
 					...coords!,
 					id: '_',
-					onMove({ lngLat: [longitude, latitude] }) {
-						onchange?.({ latitude, longitude });
+					async onMove({ lngLat: [longitude, latitude] }) {
+						await onchange?.({
+							value: { latitude, longitude },
+
+							nodes: { metadata: element },
+						});
 					},
 				})}
 			/>
@@ -208,7 +258,7 @@
 				{
 					type: definition.type,
 					...splitMetadataId(definition.id),
-					...(options.length <= 10 ? { options } : {}),
+					...(options && options.length <= 10 ? { options } : {}),
 					value,
 					validationErrors,
 					constraints: {
@@ -261,24 +311,38 @@
 		id={_id}
 		{definition}
 		{options}
+		{...inputProps}
 		value={value?.value}
 		unit={value?.unit}
 		{validationErrors}
-		onblur={(val, unit) => {
+		{isCompactEnum}
+		alternatives={value?.alternatives
+			? mapKeys(value.alternatives, (key) => safeJSONParse(key)?.toString())
+			: undefined}
+		onblur={async (val, unit, alternatives) => {
 			// We eagerly update value.unit because otherwise it gets updated after the DB changes
 			// the validator would update separately to the unit+value change
 			// which causes a flickering false validation error
-			if (value) value.unit = unit;
-			onchange(val, unit);
+			if (value && unit) value.unit = unit;
+
+			await onchange({
+				value: val,
+				unit,
+				alternatives: mapKeys(alternatives ?? {}, (key) => JSON.stringify(key)),
+				nodes: { metadata: element },
+			});
+
 			validation = val !== undefined ? valueValidator?.(val) : undefined;
 		}}
-		{isCompactEnum}
 		confidences={Object.fromEntries([
 			...Object.entries(value?.alternatives ?? {}).map(([key, value]) => [
 				safeJSONParse(key)?.toString(),
 				value,
 			]),
-			[safeJSONParse(value?.value)?.toString(), value?.confidence],
+			...orEmpty2(value, ({ value, confidence }) => [
+				safeJSONParse(value)?.toString(),
+				confidence,
+			]),
 		])}
 	/>
 {/snippet}
@@ -300,10 +364,14 @@
 		use:tooltip={'Supprimer cette valeur'}
 		aria-label="Supprimer cette valeur"
 		disabled={!value || value.isDefault}
-		onclick={() => {
+		onclick={async () => {
 			if (!value) return;
 			value = undefined;
-			onchange(undefined);
+			await onchange({
+				value: undefined,
+
+				nodes: { metadata: element },
+			});
 		}}
 	>
 		<IconClear />
@@ -344,7 +412,9 @@
 		align-items: center;
 		justify-content: space-between;
 		gap: 1em;
-		flex-wrap: wrap;
+		@media (max-width: 600px) {
+			flex-wrap: wrap;
+		}
 	}
 	.value {
 		display: flex;
@@ -367,6 +437,7 @@
 
 	.learnmore p {
 		text-wrap: balance;
+		max-width: 67ch;
 	}
 
 	label {
@@ -426,6 +497,7 @@
 
 	.debug {
 		font-size: 0.7em;
+		overflow-y: auto;
 	}
 
 	.map {

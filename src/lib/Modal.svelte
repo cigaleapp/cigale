@@ -195,10 +195,10 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 		border-radius: var(--corner-radius);
 		background: var(--bg-neutral);
 		border: 3px solid var(--bg-primary);
-		width: 75vw;
+		width: var(--modal-width, 75vw);
 		min-height: max(50vh, 300px);
 		min-width: min(100vw, 400px);
-		max-width: 700px;
+		max-width: calc(max(var(--modal-width, 0), 700px));
 		transition:
 			opacity,
 			transform 0.2s;
@@ -237,6 +237,7 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 		flex-direction: column;
 		gap: 1rem;
 		flex-grow: 1;
+		overflow: auto;
 	}
 
 	footer {

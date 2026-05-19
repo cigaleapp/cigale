@@ -1,16 +1,18 @@
-import { Schemas } from './database.js';
+import { Tables } from './database.js';
+import { metadataOption } from './metadata/storage.js';
 import {
 	metadataOptionId,
 	namespacedMetadataId,
 	parseMetadataOptionId,
 } from './schemas/metadata.js';
-import { entries, groupBy, nonnull, pick, sum } from './utils.js';
+import { ensureArray, entries, groupBy, nonnull, sum } from './utils.js';
 
 /**
  * @import * as DB from './database.js'
  * @import { RuntimeValue } from './metadata/index.js'
  * @import { DatabaseHandle } from './idb.svelte.js'
  * @import { MetadataEnumVariant } from './database.js'
+ * @import { NamespacedMetadataID } from './schemas/common.js';
  */
 
 /**
@@ -89,10 +91,12 @@ export async function computeCascades({
 			// Get a list of { option id, confidence } for every cascaded value,
 			// the confidence coming from the value that triggers it
 			options.filter(nonnull).flatMap(({ cascade, confidence }) => {
-				return entries(cascade).map(([metadataId, value]) => ({
-					optionId: metadataOptionId(metadataId, value),
-					confidence,
-				}));
+				return entries(cascade).flatMap(([metadataId, values]) =>
+					ensureArray(values).map((value) => ({
+						optionId: metadataOptionId(metadataId, value),
+						confidence,
+					}))
+				);
 			}),
 			(c) => c.optionId,
 			(c) => c.confidence
@@ -132,85 +136,28 @@ export async function computeCascades({
  */
 
 /**
- * Resolve (recursively) cascades for the given metadata value, return labels to display
+ * Resolve (NOT recursively anymore, see #1571) cascades for the given metadata value, return labels to display
  *
  * @param {object} param0
- * @param {CascadeLabelsCache} param0.cache used to store resolved cascades and avoid recomputing them
- * @param {MetadataEnumVariant | undefined} param0.option the currently selected option
+ * @param {DB.MetadataEnumVariant | typeof DB.Schemas.MetadataEnumVariant['inferIn'] | undefined} param0.option the currently selected option
  * @param {DatabaseHandle} param0.db
  * @param {string | undefined} param0.protocolId
  */
-export async function cascadeLabels({ cache, protocolId, option, db }) {
+export async function cascadeLabels({ protocolId, option, db }) {
 	if (!protocolId) return {};
 	if (!option) return {};
 
-	if (option.key in cache) {
-		return cache[option.key];
+	/** @type {Record<NamespacedMetadataID, DB.MetadataEnumVariant[]>} */
+	const labels = {};
+
+	for (const [metadataId, values] of Object.entries(option.cascade ?? {})) {
+		const id = namespacedMetadataId(protocolId, metadataId);
+		const options = await Promise.all(
+			ensureArray(values).map(async (key) => metadataOption(db, id, key))
+		);
+
+		labels[id] = options.filter(nonnull).map((option) => Tables.MetadataOption.assert(option));
 	}
 
-	/**
-	 * Subfunction to recursively collect cascades.
-	 * Base case: at some point all options will have no cascades
-	 * @param {string} protocolId
-	 * @param {Record<string, string>} cascade - The cascade we're collecting from
-	 * @param {Set<string>} seen id of metadata already seen, to avoid cycles
-	 * @param {number} [depth=0] - Current depth in the cascade
-	 */
-	async function collect(protocolId, cascade, seen, depth = 0) {
-		/**
-		 * @type {typeof cache[string]} labels
-		 */
-		const labels = {};
-		for (const [metadataId, value] of Object.entries(cascade ?? {})) {
-			if (seen.has(metadataId)) continue; // Avoid cycles
-			seen.add(metadataId); // Mark this metadataId as seen
-			const metadata = await db
-				.get('Metadata', namespacedMetadataId(protocolId, metadataId))
-				.then((d) => Schemas.Metadata.assert(d));
-			if (!metadata) continue;
-
-			// If the cascaded metadata value is from an enum, use label instead of the key,
-			// and see if there are nested cascades further down
-			if (metadata.type === 'enum') {
-				const option = await db.get(
-					'MetadataOption',
-					metadataOptionId(namespacedMetadataId(protocolId, metadata.id), value)
-				);
-				if (!option) continue;
-				labels[metadata.id] = {
-					value: option.label,
-					metadata: metadata.label,
-					depth,
-					...pick(option, 'color', 'icon'),
-				};
-
-				if (Object.keys(option.cascade ?? {}).length > 0) {
-					await collect(protocolId, option.cascade ?? {}, seen, depth + 1).then(
-						(nested) => {
-							Object.assign(labels, nested);
-						}
-					);
-				}
-			} else {
-				// For other types, just show the value directly
-				labels[metadata.id] = {
-					value: value,
-					metadata: metadata.label,
-					depth,
-				};
-			}
-		}
-
-		return labels;
-	}
-
-	cache[option.key] = await collect(protocolId, option.cascade ?? {}, new Set());
-
-	// Halve cache when its size reaches 4000
-	if (Object.keys(cache).length > 4000) {
-		console.debug('Halving cascadeLabels cache');
-		cache = Object.fromEntries(Object.entries(cache).slice(2000));
-	}
-
-	return cache[option.key];
+	return labels;
 }

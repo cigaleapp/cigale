@@ -181,7 +181,6 @@ export class UIState {
 			: undefined
 	);
 
-	/** @type {string|undefined} */
 	classificationMetadataId = $derived(this.classificationMetadata?.id);
 
 	cropMetadata = $derived(

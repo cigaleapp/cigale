@@ -3,7 +3,7 @@ import { ArkErrors, scope, type } from 'arktype';
 import { parseISOSafe } from '../date.js';
 import { EXIF_FIELDS } from '../exiffields.js';
 import { boundingBoxResolver } from '../inference_utils.js';
-import { entries, keys, transformObject, unique } from '../utils.js';
+import { ensureArray, entries, keys, mapValues, transformObject, unique } from '../utils.js';
 import {
 	ColorHex,
 	FilepathTemplate,
@@ -11,6 +11,7 @@ import {
 	ID,
 	MIMEType,
 	NamespacedMetadataID,
+	NamespacedMetadataOptionID,
 	Probability,
 	ProtocolID,
 	UniqueFileTypeSpecifier,
@@ -267,11 +268,21 @@ export const MetadataEnumVariant = type({
 	'icon?': type(/^ri:[\w-]+$/).describe(
 		"Code Iconify d'une icône associée à cette option, provenant du pack d'icônes “Remix Icon”. Voir https://icon-sets.iconify.design/ri/ pour la liste."
 	),
-	'cascade?': type
-		.Record(ID, ID)
+	narrowerWeights: type
+		.Record(ID, '0 <= number <= 1')
 		.describe(
-			'Objet contenant pour clés des identifiants d\'autres métadonnées, et pour valeurs la valeur à assigner à cette métadonnée si cette option est choisie. Le processus est récursif: Imaginons une métadonnée species ayant une option avec `{ key: "1", cascade: { genus: "2" } }`, une métadonnée genus ayant une option `{ key: "2", cascade: { family: "3" } }`. Si l\'option "1" de la métadonnée species est choisie, la métadonnée genus sera définie sur l\'option "2" et la métadonnée family sera à son tour définie sur l\'option "3".'
+			"Uniquement utile sur les métadonnées de classification (dont les options sont les candidats en mode Élimination). Poids à donner pour influencer l'ordre d'affichage des métadonnées en mode Élimination. un nombre élevé la mettra plus proche. Le poids utilisé pour trier est la moyenne des poids pour chacun des candidats non éliminés. Les clés sont les identifiants des métadonnées (descripteurs), et les valeurs sont les poids à appliquer pour cette option. Correspond à la notion de poids dans Xper3 (https://xper3.fr/wp-content/uploads/2024/10/ikey_UserGuide_2011.pdf, section 1.2.9 Weight parameters)"
+		)
+		.default(() => ({})),
+	'cascade?': type
+		.Record(ID, ID.array().or(ID))
+		.pipe((record) => mapValues(record, ensureArray))
+		.describe(
+			"Objet contenant pour clés des identifiants d'autres métadonnées, et pour valeurs la ou les valeur(s) à assigner à cette métadonnée si cette option est choisie. Si il y en a plusieurs, une des options est choisie comme valeur de la métadonnée en question, et les autres sont mises en tant qu'alternatives, avec une confiance de 1."
 		),
+	// --- Technical fields ---
+	/** Metadata group names that are narrowable and that have at least one metadata that exists in the enum variant's cascades. Used for indexing purposes: can be used to get all species that are narrowable by metadata of a certain metadata group. This is not set automatically (as the computation requires access to metadata definitions and metadata groups of the enum variant's protocol) */
+	_narrowableIn: type('string[]').default(() => []),
 });
 
 export const EXIFField = type.enumerated(...keys(EXIF_FIELDS));
@@ -481,7 +492,7 @@ export const MetadataInteger = MetadataBase.and({
 		InferenceConfigs.sidecar(type('number.integer')).partial()
 	),
 	'unit?': NumericUnit,
-}).pipe();
+});
 
 export const MetadataFloat = MetadataBase.and({
 	type: '"float"',
@@ -492,6 +503,11 @@ export const MetadataFloat = MetadataBase.and({
 		InferenceConfigs.sidecar(type('number')).partial()
 	),
 	'unit?': NumericUnit,
+	'cascade?': type
+		.Record(NamespacedMetadataOptionID, NumberRangeLiteral)
+		.describe(
+			"Associe des options d'une métadonnée (de type Enum) dont la valeur changera si cette métadonnée a une valeur dans la plage spécifiée. Par exemple, en mettant `{'A:1': '0..5', 'A:2': '5..10', 'A:3': '10..15'}`, la métadonnée A sera mise à jour sur les options 1 et (en alternative) 2, si la valeur de cette métadonnée est mise à 5. (car on sera dans la plage 0..5 et 5..10)"
+		),
 });
 
 export const MetadataDate = MetadataBase.and({
@@ -521,11 +537,19 @@ const MetadataLocation = MetadataBase.and({
 const MetadataEnum = MetadataBase.and({
 	type: '"enum"',
 	'default?': MetadataDefault('string | number'),
+	presentation: type
+		.enumerated('dropdown', 'buttons', 'auto')
+		.describe(
+			"Comment présenter les options de cette métadonnée dans l'interface utilisateur. Dropdown pour une liste déroulante avec recherche, Buttons pour des boutons affichant directement toutes les optiosn, Auto pour laisser l'application décider (souvent en fonction du nombre d'options)"
+		)
+		.default('auto'),
 	'infer?': type.and(
 		InferenceConfigs.exif.partial(),
 		InferenceConfigs.sidecar(type('string|number')).partial(),
 		InferenceConfigs.neuralEnum.partial()
 	),
+	// --- Technical fields ---
+	_optionsCount: 'number.integer = 0',
 });
 
 const MetadataBoundingbox = MetadataBase.and({
@@ -601,6 +625,11 @@ export const MetadataGroup = type({
 	id: ID.brand('MetadataGroup'),
 	name: 'string',
 	description: "string = ''",
+	narrowable: type(
+		'boolean',
+		'@',
+		"Si le groupe peut être utilisé pour classifier une observation en mode 'élimination'. Dans ce mode, on propose de choisir des valeurs dans l'ensemble des métadonnées du groupe narrowable choisi, afin de réduire une liste de candidats possibles (les candidats sont les options de la métadonnée de classification (par exemple, 'Espèce') tels que leurs cascades correspondent à l'ensemble des choix effectués sur les métadonnées du groupe narrowable)"
+	).default(false),
 	collapsed: type(
 		'boolean',
 		'@',

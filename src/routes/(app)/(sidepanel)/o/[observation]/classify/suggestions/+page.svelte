@@ -1,9 +1,5 @@
-<script module lang="ts">
-	export type Expandable = 'references' | 'subject' | 'none';
-</script>
-
 <script lang="ts">
-	import type { CascadeLabelsCache } from '$lib/cascades';
+	import type { Expandable } from '../WithExpandButton.svelte';
 	import type { Attachment } from 'svelte/attachments';
 
 	import { marked } from 'marked';
@@ -27,24 +23,20 @@
 	import { uiState } from '$lib/state.svelte.js';
 	import { undo } from '$lib/undo.svelte';
 
-	import Header from './Header.svelte';
+	import { fullscreenState } from '../../+layout@(app).svelte';
+	import Subject from '../Subject.svelte';
 	import LayoutSwitcher from './LayoutSwitcher.svelte';
-	import Navigation from './Navigation.svelte';
 	import OptionBar from './OptionBar.svelte';
 	import References from './References.svelte';
-	import Subject from './Subject.svelte';
 
 	const { data } = $props();
 	const {
 		observation,
 		images,
-		navigation,
 		focusedMetadata,
 		metadataDefinitions,
 		allOptions: options,
 	} = $derived(data);
-
-	const cascadeLabelsCache: CascadeLabelsCache = $state({});
 
 	const layout = $derived(uiState.currentSession?.fullscreenClassifier.layout ?? 'top-bottom');
 
@@ -64,7 +56,11 @@
 
 	let expand = $state<Expandable>('none');
 	let layoutTransitions = $state(true);
-	let currentImage = $state(images[0]);
+	let currentImage = $derived(images[0]);
+
+	$effect(() => {
+		fullscreenState.currentImage = currentImage.id;
+	});
 
 	undo.initialize(100);
 
@@ -93,14 +89,15 @@
 	</div>
 	<div class="subject" {@attach area('subject')} in:fade={{ duration: 200 }}>
 		{#if observation}
-			<Subject {images} bind:expand bind:currentImage />
+			<Subject
+				buttons={layout === 'top-bottom' ? 'top-left' : 'top-right'}
+				{images}
+				bind:expand
+				bind:currentImage
+			/>
 		{/if}
 	</div>
 	<div class="panel" {@attach area('panel')}>
-		<div class="header" {@attach area('header')}>
-			<Header {observation} {focusedMetadata} {currentImage} />
-		</div>
-
 		<div class="layout-switcher" {@attach area('layout-switcher')}>
 			<LayoutSwitcher
 				toggleLayoutTransitions={(enable) => {
@@ -129,8 +126,8 @@
 					indent-icon={false}
 				>
 					{#await openDatabase() then db}
-						{#await cascadeLabels( { cache: cascadeLabelsCache, db, protocolId: namespaceOfMetadataId(focusedMetadata.id), option } ) then cascades}
-							<MetadataCascadesTable {cascades} />
+						{#await cascadeLabels( { db, protocolId: namespaceOfMetadataId(focusedMetadata.id), option } ) then cascades}
+							<MetadataCascadesTable compact {cascades} />
 						{/await}
 					{/await}
 				</Field>
@@ -179,17 +176,13 @@
 				</Field>
 			</div>
 		{/if}
-
-		<div class="nav" {@attach area('nav')}>
-			<Navigation {...navigation} {focusedMetadata} currentObservation={observation} />
-		</div>
 	</div>
 </main>
 
 <style>
 	main {
 		display: grid;
-		height: 100dvh;
+		height: 100%;
 		overflow: hidden;
 	}
 
@@ -237,7 +230,7 @@
 
 	main[data-layout='top-bottom'] {
 		grid-template-areas: 'subject panel' 'references panel';
-		grid-template-columns: 3fr 2fr;
+		grid-template-columns: 50% 50%;
 		grid-template-rows: 50% 50%;
 
 		&[data-expand='subject'] {
@@ -252,12 +245,12 @@
 
 		.subject,
 		.references {
-			border-right: 3px solid var(--fg-neutral);
+			border-right: 1px solid var(--gray);
 		}
 
 		.references {
-			border-top: 3px solid var(--fg-neutral);
-			height: calc(100% - 3px);
+			border-top: 1px solid var(--gray);
+			height: calc(100% - 1px);
 		}
 	}
 
@@ -278,51 +271,46 @@
 
 		.subject,
 		.references {
-			border-bottom: 3px solid var(--fg-neutral);
+			border-bottom: 1px solid var(--gray);
 		}
 
 		.references {
-			border-right: 3px solid var(--fg-neutral);
-			width: calc(100% - 3px);
+			border-right: 1px solid var(--gray);
+			width: calc(100% - 1px);
 		}
 	}
 
 	main[data-layout='left-right'] .panel {
-		margin-top: -1.4lh;
-		height: calc(100% + 1.4lh);
-		z-index: 10;
-		grid-template-columns: 25% 1fr 25%;
+		grid-template-columns: min(max(33%, 260px), 400px) auto min(33%, 500px);
 		grid-template-rows: min-content 1fr 1fr;
-		padding: 0 2em 2em 2em;
 		row-gap: 0.5em;
 		grid-template-areas:
-			'. focused-option layout-switcher'
-			'cascades description header'
-			'synonyms description nav';
-
-		.layout-switcher {
-			margin-top: 0.4lh;
-			display: flex;
-			justify-self: flex-end;
-		}
-	}
-
-	main[data-layout='top-bottom'] .panel {
-		padding: 1em 2em;
-		grid-template-columns: 1fr 1fr;
-		grid-template-rows: min-content min-content 1.5fr min-content min-content;
-		grid-template-areas:
-			'header header'
-			'focused-option focused-option'
-			'description description'
-			'cascades synonyms'
-			'nav nav';
+			'. . layout-switcher'
+			'cascades description focused-option'
+			'synonyms description focused-option';
 
 		.layout-switcher {
 			z-index: 10;
 			position: absolute;
-			left: 60%;
-			top: 50%;
+			left: 50%;
+			top: 53%;
+			translate: -50% -50%;
+		}
+	}
+
+	main[data-layout='top-bottom'] .panel {
+		grid-template-columns: 1fr 1fr;
+		grid-template-rows: min-content 1.5fr min-content min-content;
+		grid-template-areas:
+			'focused-option focused-option'
+			'description description'
+			'cascades synonyms';
+
+		.layout-switcher {
+			z-index: 10;
+			position: absolute;
+			left: 50%;
+			top: 53%;
 			translate: -50% -50%;
 		}
 	}
@@ -339,6 +327,7 @@
 	.panel {
 		display: grid;
 		gap: 2em;
+		padding: 1em;
 	}
 
 	.panel {

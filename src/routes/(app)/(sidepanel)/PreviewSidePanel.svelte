@@ -3,7 +3,6 @@
 	 * @import { TopLeftBoundingBox } from '$lib/BoundingBoxes.svelte.js';
 	 */
 	import { dequal } from 'dequal/lite';
-	import { watch } from 'runed';
 
 	import IconShowPanel from '~icons/ri/arrow-up-s-line';
 	import IconObservation from '~icons/ri/bug-line';
@@ -19,13 +18,10 @@
 	import CroppedImg from '$lib/CroppedImg.svelte';
 	import { onSwipe } from '$lib/gestures';
 	import { plural } from '$lib/i18n.js';
-	import * as idb from '$lib/idb.svelte.js';
 	import { tables } from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import KeyboardHint from '$lib/KeyboardHint.svelte';
-	import Logo from '$lib/Logo.svelte';
 	import Metadata from '$lib/Metadata.svelte';
-	import { metadataOptionsOf } from '$lib/metadata/index.js';
 	import MetadataList from '$lib/MetadataList.svelte';
 	import { IsMobile } from '$lib/mobile.svelte.js';
 	import { goto } from '$lib/paths.js';
@@ -46,7 +42,7 @@
 	 * @property {(() => void) | undefined} [onsplit] callback to call when the user wants to split the selected observation(s). If not set, the split button is not shown.
 	 * @property {(() => void) | undefined} [onimport] callback to call when the user wants to import additional images. If not set, the import button is not shown.
 	 * @property {boolean} [cansplit=false] whether the user is allowed to split the selected observation(s)
-	 * @property {(key: string, value: undefined | import('$lib/schemas/metadata').RuntimeValue, unit: undefined | typeof import('$lib/schemas/units').NumericUnit.infer) => void} onmetadatachange callback to call when a metadata's value is modified
+	 * @property {(key: string, value: undefined | import('$lib/schemas/metadata').RuntimeValue, unit: undefined | typeof import('$lib/schemas/units').NumericUnit.infer) => void|Promise<void>} onmetadatachange callback to call when a metadata's value is modified
 	 * @property {boolean} [canmerge=false] whether the user is allowed to merge images or observations
 	 * @property {Record<string, import('$lib/database').MetadataValue & { merged: boolean } >} metadata values of the metadata we're viewing.
 	 */
@@ -80,43 +76,6 @@
 		]
 			.filter((m) => m !== undefined)
 			.toSorted(metadataDefinitionComparator(protocol));
-	});
-
-	/**
-	 * Contains EVERY options for every metadata.
-	 * This is a SHALLOW $state, otherwise it makes the browser lag the hell out cuz Svelte's runtime tries to deeply proxify everything (some metadata can have tens of thousands of options).
-	 * @type {Record<string, Map<string, DB.MetadataEnumVariant>>} */
-	const options = $state.raw({});
-
-	let loadingOptions = $state(true);
-	watch([() => definitions], () => {
-		if (!uiState.currentProtocol) {
-			loadingOptions = false;
-			return;
-		}
-
-		// Prevent double-load
-		if (Object.keys(options).length > 0) {
-			loadingOptions = false;
-			return;
-		}
-
-		void (async () => {
-			const results = await metadataOptionsOf(
-				idb.databaseHandle(),
-				uiState.currentProtocol.id,
-				null
-			);
-
-			for (const [metadataId, opts] of results.byMetadata) {
-				options[metadataId] ??= new Map();
-				for (const opt of opts) {
-					options[metadataId].set(opt.key, opt);
-				}
-			}
-
-			loadingOptions = false;
-		})();
 	});
 
 	const singleObservationSelected = $derived(
@@ -156,10 +115,6 @@
 	}
 
 	const selectionTitle = $derived.by(() => {
-		if (loadingOptions) {
-			return 'Chargement des métadonnées…';
-		}
-
 		if (selectionCounts.image > 0 && selectionCounts.observation > 0) {
 			return plural(selectionCounts.all, ['1 élément', '# éléments']);
 		}
@@ -174,89 +129,77 @@
 </script>
 
 {#snippet content()}
-	{#if !loadingOptions}
-		<div class="images">
-			{#each images as { src, box, dimensions }, i (i)}
-				{@const alt = singleObservationSelected
-					? `Image ${i + 1} de l'observation ${singleObservationSelected.label}`
-					: `Image ${i + 1} de la sélection`}
+	<div class="images">
+		{#each images as { src, box, dimensions }, i (i)}
+			{@const alt = singleObservationSelected
+				? `Image ${i + 1} de l'observation ${singleObservationSelected.label}`
+				: `Image ${i + 1} de la sélection`}
 
-				<div class="image" style:aspect-ratio={applyBox(dimensions, box).join(' / ')}>
-					{#if box}
-						<CroppedImg blurfill {src} {alt} {box} {dimensions} />
-					{:else}
-						<img {src} {alt} />
-					{/if}
-				</div>
-			{:else}
-				<div class="image empty"></div>
-			{/each}
-		</div>
-		{#if !mobile.current}
-			<h2>
-				{#if singleObservationSelected}
-					<IconObservation />
-					<InlineTextInput
-						label="Nom de l'observation"
-						value={singleObservationSelected.label}
-						onblur={async (value) => {
-							if (value === singleObservationSelected.label) return;
-							await tables.Observation.update(
-								singleObservationSelected.id,
-								'label',
-								value
-							);
-						}}
-					/>
-				{:else if singleImageSelected}
-					<IconImage />
-					{singleImageSelected.filename}
-				{:else if selectionCounts.image > 0 && selectionCounts.observation > 0}
-					{plural(selectionCounts.all, ['1 élément', '# éléments'])}
-				{:else if selectionCounts.image > 0}
-					{plural(selectionCounts.image, ['1 image', '# images'])}
-				{:else if selectionCounts.observation > 0}
-					{plural(selectionCounts.observation, ['1 observation', '# observations'])}
+			<div class="image" style:aspect-ratio={applyBox(dimensions, box).join(' / ')}>
+				{#if box}
+					<CroppedImg blurfill {src} {alt} {box} {dimensions} />
 				{:else}
-					Aucune sélection
+					<img {src} {alt} />
 				{/if}
-			</h2>
-		{/if}
-		<div class="metadatas" class:empty={images.length === 0}>
-			<MetadataList
-				testid="sidepanel-metadata"
-				{definitions}
-				groups={uiState.currentProtocol?.metadataGroups}
-				ordering={uiState.currentProtocol?.metadataOrder}
-			>
-				{#snippet children(definition)}
-					{@const value = metadata[definition.id]}
-					<Metadata
-						// TODO: actually support checking required metadata on observations. right now it's only for session metadata since thats way more important
-						requiredness="none"
-						merged={value?.merged}
-						{definition}
-						{value}
-						options={[...(options[definition.id] ?? new Map()).values()]}
-						onchange={async (v, unit) => {
-							if (dequal(v, value?.value) && unit === value?.unit) return;
-							onmetadatachange(definition.id, v, unit);
-						}}
-					/>
-				{/snippet}
-			</MetadataList>
-		</div>
-	{:else if loadingOptions}
-		<section class="empty-selection">
-			<Logo variant="empty" />
-			<p>Chargement des options…</p>
-		</section>
-	{:else}
-		<section class="empty-selection">
-			<Logo variant="empty" />
-			<p>Sélectionnez une ou plusieurs images pour voir et modifier leurs métadonnées</p>
-		</section>
+			</div>
+		{:else}
+			<div class="image empty"></div>
+		{/each}
+	</div>
+	{#if !mobile.current}
+		<h2>
+			{#if singleObservationSelected}
+				<IconObservation />
+				<InlineTextInput
+					label="Nom de l'observation"
+					value={singleObservationSelected.label}
+					onblur={async (value) => {
+						if (value === singleObservationSelected.label) return;
+						await tables.Observation.update(
+							singleObservationSelected.id,
+							'label',
+							value
+						);
+					}}
+				/>
+			{:else if singleImageSelected}
+				<IconImage />
+				{singleImageSelected.filename}
+			{:else if selectionCounts.image > 0 && selectionCounts.observation > 0}
+				{plural(selectionCounts.all, ['1 élément', '# éléments'])}
+			{:else if selectionCounts.image > 0}
+				{plural(selectionCounts.image, ['1 image', '# images'])}
+			{:else if selectionCounts.observation > 0}
+				{plural(selectionCounts.observation, ['1 observation', '# observations'])}
+			{:else}
+				Aucune sélection
+			{/if}
+		</h2>
 	{/if}
+	<div class="metadatas" class:empty={images.length === 0}>
+		<MetadataList
+			testid="sidepanel-metadata"
+			{definitions}
+			values={metadata}
+			groups={uiState.currentProtocol?.metadataGroups}
+			ordering={uiState.currentProtocol?.metadataOrder}
+		>
+			{#snippet children(definition, value, { collapsed })}
+				<Metadata
+					// TODO: actually support checking required metadata on observations. right now it's only for session metadata since thats way more important
+					requiredness="none"
+					merged={value?.merged}
+					{definition}
+					{value}
+					options={collapsed ? [] : undefined}
+					onchange={async ({value : v, unit}) => {
+						if (dequal(v, value?.value) && unit === value?.unit) return;
+						await onmetadatachange(definition.id, v, unit);
+					}}
+				/>
+			{/snippet}
+		</MetadataList>
+	</div>
 	<section class="actions">
 		{#if onmerge && onsplit}
 			<div class="side-by-side">
@@ -293,7 +236,7 @@
 				help={!singleObservationSelected ? 'Sélectionnez une seule observation' : ''}
 				onclick={async () => {
 					if (!singleObservationSelected) return;
-					await goto('/(app)/(sidepanel)/classify/[observation]', {
+					await goto('/(app)/(sidepanel)/o/[observation]/classify/suggestions', {
 						observation: singleObservationSelected.id,
 					});
 				}}
@@ -344,7 +287,7 @@
 		<div class="sidepanel mobile">{@render content()}</div>
 	</BottomDrawer>
 {:else}
-	<aside data-testid="sidepanel" class="sidepanel" class:empty={loadingOptions} class:collapsed>
+	<aside data-testid="sidepanel" class="sidepanel" class:collapsed>
 		{@render content()}
 	</aside>
 {/if}
@@ -387,16 +330,13 @@
 		direction: ltr;
 	}
 
-	.sidepanel.empty {
-		grid-template-rows: auto max-content;
-	}
-
 	.metadatas {
 		transition: opacity 0.3s ease;
 		display: flex;
 		flex-direction: column;
 		overflow-y: auto;
 		overflow-x: hidden;
+		--metadata-list-gap: 1.5em;
 
 		&.empty {
 			opacity: 0.25;

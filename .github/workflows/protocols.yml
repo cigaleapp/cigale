@@ -34,6 +34,10 @@ jobs:
   check:
     name: Skip?
     runs-on: ubuntu-latest
+    # Early skip when conditions can be eval'd directly with github action expressions:
+    # - PR is draft
+    # - PR has a bypass:protocol-regen label
+    if: github.event.pull_request.draft == false && !contains(github.event.pull_request.labels.*.name, 'bypass:protocol-regen')
     outputs:
       skip: ${{ !steps.changes.outputs.any_changed }}
     steps:
@@ -78,7 +82,7 @@ jobs:
 
   regenerate:
     needs: check
-    if: github.event.pull_request.draft == false && needs.check.outputs.skip != 'true'
+    if: needs.check.outputs.skip != 'true'
     name: Regenerate
     runs-on: ubuntu-latest
 

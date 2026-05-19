@@ -12,7 +12,7 @@
 	import { uppercaseFirst } from '$lib/i18n';
 	import IconDatatype from '$lib/IconDatatype.svelte';
 	import { MERGEABLE_METADATA_TYPES } from '$lib/metadata/index.js';
-	import RadioButtons from '$lib/RadioButtons.svelte';
+	import EnumButtons from '$lib/EnumButtons.svelte';
 	import {
 		METADATA_MERGE_METHODS,
 		METADATA_TYPES,
@@ -93,7 +93,7 @@
 	</Field>
 
 	<Field composite label="Type de métadonnée">
-		<RadioButtons
+		<EnumButtons
 			horizontal
 			cards
 			options={entries(METADATA_TYPES).map(([key, { label, help }]) => ({
@@ -127,7 +127,7 @@
 				</div>
 				<p class="datatype-description">{subtext}</p>
 			{/snippet}
-		</RadioButtons>
+		</EnumButtons>
 	</Field>
 
 	<Field composite>
@@ -138,7 +138,7 @@
 				observations en une seule
 			</p>
 		{/snippet}
-		<RadioButtons
+		<EnumButtons
 			horizontal
 			cards
 			value={mergeMethod}
@@ -170,7 +170,7 @@
 				</div>
 				<p class="datatype-description">{subtext}</p>
 			{/snippet}
-		</RadioButtons>
+		</EnumButtons>
 	</Field>
 </main>
 

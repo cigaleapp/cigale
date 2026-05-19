@@ -1,10 +1,11 @@
 <script>
+	import LoadingSpinner from './LoadingSpinner.svelte';
 	import { tooltip } from './tooltips.js';
 
 	/**
 	 * @typedef Props
 	 * @type {object}
-	 * @property {(e: MouseEvent) => void} onclick
+	 * @property {(e: MouseEvent) => void|Promise<void>} onclick
 	 * @property {import('svelte').Snippet} children
 	 * @property {boolean} [submits] whether this button submits a form
 	 * @property {string} help
@@ -13,6 +14,7 @@
 	 * @property {boolean} [crossout] draw a diagonal line through the button's content
 	 * @property {boolean} [dangerous] style the button to indicate a dangerous action
 	 * @property {() => void} [preload] function to call on mouseover, useful for preloading the next page in a navigation button for instance
+	 * @property {boolean} [loading] whether to show a loading state (disable the button and show a spinner, while the onclick handler is running)
 	 * @property {Partial<import('$lib/tooltips.js').TooltipParameters>} [tooltipParams] additional params for the tooltip
 	 */
 
@@ -28,13 +30,24 @@
 		dangerous,
 		submits,
 		tooltipParams = {},
+		loading: showLoading,
 		...rest
 	} = $props();
+
+	let loading = $state(false);
 </script>
 
 <button
-	{disabled}
-	{onclick}
+	disabled={disabled || loading}
+	onclick={async (e) => {
+		if (disabled) return;
+		loading = true;
+		try {
+			await onclick(e);
+		} finally {
+			loading = false;
+		}
+	}}
 	onmouseenter={() => preload?.()}
 	class:crossout
 	class:dangerous
@@ -43,7 +56,11 @@
 	type={submits ? 'submit' : 'button'}
 	{...rest}
 >
-	{@render children()}
+	{#if showLoading && loading}
+		<LoadingSpinner --size="1.2em" />
+	{:else}
+		{@render children()}
+	{/if}
 </button>
 
 <style>

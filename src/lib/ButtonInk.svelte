@@ -1,16 +1,18 @@
 <script>
+	import LoadingSpinner from './LoadingSpinner.svelte';
 	import { tooltip } from './tooltips.js';
 
 	/**
 	 * @typedef Props
 	 * @type {object}
-	 * @property {import('svelte').Snippet} children
-	 * @property {(e: MouseEvent) => void} [onclick]
+	 * @property {import('svelte').Snippet<[{loading: boolean}]>} children
+	 * @property {(e: MouseEvent) => void|Promise<void>} [onclick]
 	 * @property {URL | string} [href]
 	 * @property {boolean} [inline=false] removes horizontal padding so that it its neatly with other inline elements
 	 * @property {boolean} [dangerous=false]
 	 * @property {boolean} [disabled=false]
 	 * @property {boolean} [fills=false] fills the whole container
+	 * @property {string} [loading=""] when not empty, replaces the button content with a loading spinner and this text while the onclick handler is running
 	 * @property {string | { text: string; keyboard: string }} [help]
 	 */
 
@@ -24,11 +26,14 @@
 		disabled = false,
 		inline = false,
 		fills = false,
+		loading: loadingText = '',
 	} = $props();
 
 	const hrefIsExternal = $derived(
 		href && URL.canParse(href) ? new URL(href).origin !== location.origin : false
 	);
+
+	let loading = $state(false);
 </script>
 
 <svelte:element
@@ -36,12 +41,25 @@
 	href={href?.toString()}
 	target={hrefIsExternal ? '_blank' : undefined}
 	role="button"
-	{onclick}
+	onclick={async (event) => {
+		if (!onclick) return;
+		if (disabled || loading) return;
+		loading = true;
+		try {
+			await onclick(event);
+		} finally {
+			loading = false;
+		}
+	}}
 	use:tooltip={help}
-	{disabled}
+	disabled={disabled || loading}
 	class={{ dangerous, inline, fills }}
 >
-	{@render children()}
+	{#if loadingText && loading}
+		<LoadingSpinner /> {loadingText}
+	{:else}
+		{@render children({ loading })}
+	{/if}
 </svelte:element>
 
 <style>

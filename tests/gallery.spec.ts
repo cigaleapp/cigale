@@ -87,7 +87,7 @@ test.describe('sorting', () => {
 test.describe('grouping', () => {
 	testCardsGroups('Métadonnée…', 'order', {
 		'Ordre = Symphypleona': ['leaf.jpeg'],
-		'Ordre = Poduromorpha': ['cyan.jpeg', 'with-exif-gps.jpeg'],
+		'Ordre = Hymenoptera': ['cyan.jpeg', 'with-exif-gps.jpeg'],
 		'Sans Ordre': ['lil-fella.jpeg'],
 	});
 

@@ -1,22 +1,38 @@
 <script lang="ts">
 	import type * as DB from '$lib/database.js';
-	import type { Snippet } from 'svelte';
 
-	import IconExpand from '~icons/ri/arrow-down-s-line';
+	import { type Snippet } from 'svelte';
+
+	import IconExpand from '~icons/ri/arrow-right-s-line';
+	import VirtualList from '$lib/VirtualList.svelte';
 
 	import { metadataDefinitionComparator } from './protocols.js';
 	import { getSettings } from './settings.svelte.js';
 
 	interface Props {
-		children: Snippet<[DB.Metadata]>;
+		children: Snippet<[DB.Metadata, DB.MetadataValue, { collapsed: boolean }]>;
 		testid?: string;
+		/** Virtualize the list of metadatas. **Requires the parent element to have a defined height**. If there's grouping, this will be ignored and the list will not be virtualized, because it's not possible to. */
+		virtualize?: boolean;
+		/** Bind to scroll of the list. */
+		scroll?: { y: number };
 		definitions: DB.Metadata[];
+		values: DB.MetadataValues;
 		/** List of metadata IDs in order */
 		ordering: DB.Protocol['metadataOrder'] | undefined;
 		groups: DB.Protocol['metadataGroups'] | undefined;
 	}
 
-	const { children, testid, definitions, ordering, groups = [] }: Props = $props();
+	let {
+		children,
+		virtualize = false,
+		values,
+		testid,
+		definitions,
+		ordering,
+		groups = [],
+		scroll = $bindable({ y: 0 }),
+	}: Props = $props();
 
 	const { showTechnicalMetadata } = $derived(getSettings());
 
@@ -51,41 +67,66 @@
 				return 0;
 			})
 	);
+
+	/* Virtualize only if there are no groups, since item size height is drastically dynamic when collapsing/expanding groups, there's too much glitching when trying to virtualize in that case */
+	const _virtualize = $derived(virtualize && groups.length === 0);
 </script>
 
 <div class="liste" data-testid={testid}>
-	{#each groupedDefinitions as { group, definitions, iterationKey } (iterationKey)}
-		{#if group}
-			<details open={!group.collapsed}>
-				<summary>
-					<div class="icon">
-						<IconExpand />
-					</div>
-					{group.name}
-				</summary>
-				<p class="description">{group.description}</p>
-				<div class="grouped-metadata">{@render defs()}</div>
-			</details>
-		{:else}
-			{@render defs()}
-		{/if}
+	{#snippet metadata(item: (typeof groupedDefinitions)[number])}
+		{@const { group, definitions } = item}
+		<div class="definition-group">
+			{#if group}
+				<details open={!group.collapsed}>
+					<summary>
+						<div class="icon">
+							<IconExpand />
+						</div>
+						{group.name}
+					</summary>
+					<p class="description">{group.description}</p>
+					<div class="grouped-metadata">{@render defs()}</div>
+				</details>
+			{:else}
+				{@render defs()}
+			{/if}
 
-		{#snippet defs()}
-			{#each definitions as def (def.id)}
-				{#if def.label || showTechnicalMetadata}
-					{@render children(def)}
-				{/if}
-			{/each}
-		{/snippet}
-	{/each}
+			{#snippet defs()}
+				{#each definitions as def (def.id)}
+					{#if def.label || showTechnicalMetadata}
+						{@render children(def, values[def.id], {
+							collapsed: group?.collapsed ?? false,
+						})}
+					{/if}
+				{/each}
+			{/snippet}
+		</div>
+	{/snippet}
+
+	{#if _virtualize}
+		<VirtualList bind:scroll items={groupedDefinitions} item={metadata} />
+	{:else}
+		{#each groupedDefinitions as item (item.iterationKey)}
+			{@render metadata(item)}
+		{/each}
+	{/if}
 </div>
 
 <style>
 	.liste,
 	.grouped-metadata {
-		gap: var(--metadata-list-gap, 1.5em);
 		display: flex;
 		flex-direction: column;
+	}
+
+	/* FIXME: :first-child doesn't work because of virtualization so we have extra whitespace on top of the list */
+	.definition-group {
+		--pad: calc(var(--metadata-list-gap, 0) / 2);
+		padding: var(--pad) 0;
+	}
+
+	.grouped-metadata {
+		gap: var(--metadata-list-gap, 1.5em);
 	}
 
 	.liste {
@@ -93,6 +134,7 @@
 		scrollbar-gutter: stable;
 		scrollbar-width: thin;
 		/* overflow-y: auto; */
+		height: 100%;
 	}
 
 	.grouped-metadata {
@@ -108,7 +150,7 @@
 	}
 
 	details:open .icon {
-		rotate: -180deg;
+		rotate: 90deg;
 	}
 
 	summary {
