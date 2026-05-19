@@ -268,6 +268,12 @@ export const MetadataEnumVariant = type({
 	'icon?': type(/^ri:[\w-]+$/).describe(
 		"Code Iconify d'une icône associée à cette option, provenant du pack d'icônes “Remix Icon”. Voir https://icon-sets.iconify.design/ri/ pour la liste."
 	),
+	narrowerWeights: type
+		.Record(ID, '0 <= number <= 1')
+		.describe(
+			"Uniquement utile sur les métadonnées de classification (dont les options sont les candidats en mode Élimination). Poids à donner pour influencer l'ordre d'affichage des métadonnées en mode Élimination. un nombre élevé la mettra plus proche. Le poids utilisé pour trier est la moyenne des poids pour chacun des candidats non éliminés. Les clés sont les identifiants des métadonnées (descripteurs), et les valeurs sont les poids à appliquer pour cette option. Correspond à la notion de poids dans Xper3 (https://xper3.fr/wp-content/uploads/2024/10/ikey_UserGuide_2011.pdf, section 1.2.9 Weight parameters)"
+		)
+		.default(() => ({})),
 	'cascade?': type
 		.Record(ID, ID.array().or(ID))
 		.pipe((record) => mapValues(record, ensureArray))

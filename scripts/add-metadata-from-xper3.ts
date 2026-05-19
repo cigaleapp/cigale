@@ -121,6 +121,7 @@ async function augment(protocolPath: string, protocol: typeof ExportedProtocol.i
 				group: 'andrena',
 				mergeMethod: 'none',
 				learnMore: MKEY_URL,
+				'x-xper3-id': character.$id,
 				required: false,
 				description: noPlaceholder(Detail) ?? '',
 				images: ensureArray(MediaObject ?? [])
@@ -222,7 +223,61 @@ async function augment(protocolPath: string, protocol: typeof ExportedProtocol.i
 
 				totalsPerItem.set(item.$id, cascades.length);
 
+				let oidx = species.options!.findIndex((o) => o.key === specie.key);
+				if (oidx === -1) {
+					const name = parseTaxonLabel(taxon.Representation.Label);
+
+					const conflictingName = protocol.metadata[
+						`${protocol.id}__species`
+					].options!.find((o) => o.label === `${name.genus} ${name.species}`);
+					if (conflictingName) {
+						console.error(
+							`${header.red} ${red(bold(`species ${taxon.Representation.Label} not found in protocol options, adding it with key ${specie.key}, but there's already an option with the same label (${conflictingName.key})`))}`
+						);
+					}
+
+					oidx =
+						protocol.metadata[`${protocol.id}__species`].options!.push({
+							key: specie.key,
+							label: `${name.genus} ${name.species}`,
+						}) - 1;
+				}
+
+				let speciesOption = protocol.metadata[`${protocol.id}__species`].options![oidx];
+
+				protocol.metadata[`${protocol.id}__species`].options![oidx] = {
+					...speciesOption,
+					// @ts-expect-error private field
+					'x-generator': 'xper3',
+					description:
+						speciesOption.description ||
+						noPlaceholder(taxon.Representation.Detail) ||
+						'',
+					synonyms: unique([
+						...(speciesOption.synonyms ?? []),
+						// This one contains a subgenus which we don't keep in the main label, so we add it as a synonym for search purposes (amongst other things)
+						taxon.Representation.Label,
+						...noPlaceholder(ensureArray(taxon.Representation.AlternativeName ?? [])),
+					]),
+					images: unique([
+						...(speciesOption.images ?? []),
+						...ensureArray(taxon.Representation.MediaObject ?? [])
+							.map(googledriveThumbnailUrl)
+							.filter(nonnull),
+					]),
+					'x-credits': Object.fromEntries([
+						...ensureArray(taxon.Representation.MediaObject ?? [])
+							.map((m) => media.get(m.$ref))
+							.filter(nonnull)
+							.filter((m) => m.Author !== undefined)
+							.map((m) => [googledriveThumbnailUrl(m)!, m.Author!]),
+					]),
+				};
+
 				for (const cascade of cascades) {
+					// Update speciesOption in case it was modified by a previous cascade for the same species
+					speciesOption = protocol.metadata[`${protocol.id}__species`].options![oidx];
+
 					eta.update(done || 1, total());
 
 					const character = characters.get(cascade.$ref);
@@ -239,58 +294,14 @@ async function augment(protocolPath: string, protocol: typeof ExportedProtocol.i
 					const metadata = descriptorMetadatas.get(character.$id)!;
 					const id = `${protocol.id}__${metadata.id}` as const;
 
-					let optionIndex = species.options!.findIndex((o) => o.key === specie.key);
-					if (optionIndex === -1) {
-						const name = parseTaxonLabel(taxon.Representation.Label);
+					const rating = await Promise.resolve(cascade.Ratings.Rating.$rating)
+						.then((r) => r.replace(/Rating(\d)of5/, '$1'))
+						.then((r) => Number.parseInt(r, 10))
+						.then((r) => (r - 1) / 5);
 
-						const conflictingName = protocol.metadata[
-							`${protocol.id}__species`
-						].options!.find((o) => o.label === `${name.genus} ${name.species}`);
-						if (conflictingName) {
-							console.error(
-								`${header.red} ${red(bold(`species ${taxon.Representation.Label} not found in protocol options, adding it with key ${specie.key}, but there's already an option with the same label (${conflictingName.key})`))}`
-							);
-						}
-
-						optionIndex =
-							protocol.metadata[`${protocol.id}__species`].options!.push({
-								key: specie.key,
-								label: `${name.genus} ${name.species}`,
-							}) - 1;
-					}
-
-					const speciesOption =
-						protocol.metadata[`${protocol.id}__species`].options![optionIndex];
-
-					protocol.metadata[`${protocol.id}__species`].options![optionIndex] = {
-						...speciesOption,
-						// @ts-expect-error private field
-						'x-generator': 'xper3',
-						description:
-							speciesOption.description ||
-							noPlaceholder(taxon.Representation.Detail) ||
-							'',
-						synonyms: unique([
-							...(speciesOption.synonyms ?? []),
-							// This one contains a subgenus which we don't keep in the main label, so we add it as a synonym for search purposes (amongst other things)
-							taxon.Representation.Label,
-							...noPlaceholder(
-								ensureArray(taxon.Representation.AlternativeName ?? [])
-							),
-						]),
-						images: unique([
-							...(speciesOption.images ?? []),
-							...ensureArray(taxon.Representation.MediaObject ?? [])
-								.map(googledriveThumbnailUrl)
-								.filter(nonnull),
-						]),
-						'x-credits': Object.fromEntries([
-							...ensureArray(taxon.Representation.MediaObject ?? [])
-								.map((m) => media.get(m.$ref))
-								.filter(nonnull)
-								.filter((m) => m.Author !== undefined)
-								.map((m) => [googledriveThumbnailUrl(m)!, m.Author!]),
-						]),
+					protocol.metadata[`${protocol.id}__species`].options![oidx].narrowerWeights = {
+						...speciesOption.narrowerWeights,
+						[metadata.id]: rating,
 					};
 
 					if ('State' in cascade && cascade.State && 'States' in character) {
@@ -302,12 +313,11 @@ async function augment(protocolPath: string, protocol: typeof ExportedProtocol.i
 							)
 						);
 
-						protocol.metadata[`${protocol.id}__species`].options![optionIndex].cascade =
-							{
-								...species.options![optionIndex]?.cascade,
-								[metadata.id]:
-									cascadeStates.length === 1 ? cascadeStates[0] : cascadeStates,
-							};
+						protocol.metadata[`${protocol.id}__species`].options![oidx].cascade = {
+							...speciesOption.cascade,
+							[metadata.id]:
+								cascadeStates.length === 1 ? cascadeStates[0] : cascadeStates,
+						};
 					} else if ('Measure' in cascade && cascade.Measure) {
 						const range = constraintsToRange(ensureArray(cascade.Measure));
 
@@ -362,6 +372,8 @@ async function augment(protocolPath: string, protocol: typeof ExportedProtocol.i
 			}
 		}
 
+		protocol.metadataOrder = unique(protocol.metadataOrder ?? []);
+
 		await emitCheckrun('protocols', 'in_progress', null, 'Finishing…');
 
 		await Bun.file(protocolPath).write(JSON.stringify(protocol, null, 2));
@@ -388,9 +400,15 @@ type ArrayOrSingle<T> = T | T[];
 type SDD = {
 	Datasets: {
 		Dataset: {
+			/**
+			 * @see https://sdd.tdwg.org/primer/DatasetMetadata.html
+			 */
 			Representation: {
 				Label: string;
 			};
+			/**
+			 * @see https://sdd.tdwg.org/primer/TaxonNames.html
+			 */
 			TaxonNames: {
 				TaxonName: Array<{
 					$id: `t${string}`;
@@ -402,7 +420,13 @@ type SDD = {
 					};
 				}>;
 			};
+			/**
+			 * @see https://sdd.tdwg.org/primer/SddCharacters.html
+			 */
 			Characters: {
+				/**
+				 * @see https://sdd.tdwg.org/primer/SddCharacters.html#3-6-1-categorical-characters
+				 */
 				QuantitativeCharacter: ArrayOrSingle<{
 					$id: `c${string}`;
 					$uniqueid: string;
@@ -415,6 +439,9 @@ type SDD = {
 						Label: 'mm';
 					};
 				}>;
+				/**
+				 * @see https://sdd.tdwg.org/primer/SddCharacters.html#3-6-2-quantitative-characters
+				 */
 				CategoricalCharacter: Array<{
 					$id: `c${string}`;
 					$uniqueid: string;
@@ -436,6 +463,9 @@ type SDD = {
 					};
 				}>;
 			};
+			/**
+			 * @see https://sdd.tdwg.org/primer/CharacterHierarchies.html
+			 */
 			CharacterTrees: {
 				CharacterTree: Array<{
 					$id: `ct${string}`;
@@ -456,6 +486,9 @@ type SDD = {
 					};
 				}>;
 			};
+			/**
+			 * @see https://sdd.tdwg.org/primer/CodedData.html
+			 */
 			CodedDescriptions: {
 				CodedDescription: Array<{
 					$id: `D${string}`;
@@ -495,6 +528,9 @@ type SDD = {
 					};
 				}>;
 			};
+			/**
+			 * @see https://sdd.tdwg.org/primer/SddMedia.html
+			 */
 			MediaObjects: {
 				MediaObject: Array<{
 					$id: `m${string}`;

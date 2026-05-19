@@ -7,8 +7,12 @@
 	import { page } from '$app/state';
 	import { tables } from '$lib/idb.svelte.js';
 	import MetadataList from '$lib/MetadataList.svelte';
-	import { ensureNamespacedMetadataId, namespaceOfMetadataId } from '$lib/schemas/metadata.js';
-	import { compareBy, mapKeys } from '$lib/utils.js';
+	import {
+		ensureNamespacedMetadataId,
+		namespaceOfMetadataId,
+		removeNamespaceFromMetadataId,
+	} from '$lib/schemas/metadata.js';
+	import { avg, compareBy, mapKeys, nonnull } from '$lib/utils.js';
 
 	import { narrowingState } from '../+layout.svelte';
 	import { narrowingPower } from '../candidates.js';
@@ -51,6 +55,29 @@
 		return result;
 	});
 
+	const averageWeights = $derived(
+		new Map(
+			definitions
+				.map(
+					(def) =>
+						[
+							def.id,
+							avg(
+								narrowingState.allCandidates
+									.map(
+										(c) =>
+											c.narrowerWeights?.[
+												removeNamespaceFromMetadataId(def.id)
+											]
+									)
+									.filter(nonnull)
+							),
+						] as const
+				)
+				.filter(([_, weight]) => !Number.isNaN(weight))
+		)
+	);
+
 	function metadataOrdering(
 		shownDefinitions: DB.Metadata[],
 		searchResults?: NamespacedMetadataID[]
@@ -63,14 +90,22 @@
 		const ordering = shownDefinitions
 			.map((def) => def.id)
 			.toSorted(
-				compareBy((id) =>
-					narrowingPower({
-						candidates: narrowingState.remainingCandidateIds,
-						descriptors: narrowingState.descriptors,
-						metadata: id,
-						options: options[id].keys(),
-					})
-				)
+				compareBy((id) => {
+					const weight = averageWeights.get(id);
+					const power =
+						narrowingPower({
+							candidates: narrowingState.remainingCandidateIds,
+							descriptors: narrowingState.descriptors,
+							metadata: id,
+							options: options[id].keys(),
+						}) / narrowingState.allCandidateIds.size;
+
+					if (weight === undefined) {
+						return power;
+					}
+
+					return avg([1 - weight, power]);
+				})
 			);
 
 		console.timeEnd('metadata ordering');
