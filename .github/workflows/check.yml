@@ -67,6 +67,7 @@ jobs:
   build:
     name: Build (production)
     uses: ./.github/workflows/build.yml
+    secrets: inherit
     with:
       debug: false
 
@@ -74,6 +75,7 @@ jobs:
     if: github.event_name == 'push' && github.ref_name == 'main'
     name: Build (GitHub Pages)
     uses: ./.github/workflows/build.yml
+    secrets: inherit
     with:
       debug: false
       github-pages: true
@@ -91,6 +93,7 @@ jobs:
     if: github.event_name != 'pull_request' || !github.event.pull_request.draft
     name: Build (debug)
     uses: ./.github/workflows/build.yml
+    secrets: inherit
     with:
       debug: true
 
