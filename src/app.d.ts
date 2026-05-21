@@ -25,6 +25,8 @@ declare global {
 			table?: {
 				/** List of indexes for the table. If the index is multivariate, add a '[]' at the end of the string */
 				indexes: string[];
+				/** A function to update a _search multivariate, given the (raw, ie as-stored) columns of the object */
+				searchIndex?: (raw: Record<string, unknown>) => string[];
 			};
 		};
 	}

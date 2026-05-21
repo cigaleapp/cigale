@@ -28,7 +28,23 @@ import {
 	Protocol as ProtocolSchema,
 } from './schemas/protocols.js';
 import { Session as SessionSchema } from './schemas/sessions.js';
-import { clamp } from './utils.js';
+import { clamp, ensureArray } from './utils.js';
+
+
+/**
+ * Normalize a search index string or a search query
+ * - Lowercase it
+ * - Normalize unicode characters
+ * - Remove accents
+ * @param {string} s
+ */
+export function normalizeSearchStrings(s) {
+	return s
+		.normalize('NFKD')
+		.replaceAll(/\p{Diacritic}/gu, '')
+		.toLowerCase();
+}
+
 
 /**
  * Generate an ID for a given table
@@ -63,7 +79,7 @@ if (import.meta.vitest) {
 }
 
 const ImageFile = table(
-	['id', 'sessionId'],
+	['id', 'sessionId', 'filename'],
 	type({
 		/** ID of the associated Image object */
 		id: ID,
@@ -76,7 +92,7 @@ const ImageFile = table(
 );
 
 const ImagePreviewFile = table(
-	['id', 'sessionId'],
+	['id', 'sessionId', 'filename'],
 	type({
 		/** ID of the associated Image object */
 		id: ID,
@@ -105,19 +121,65 @@ const MetadataValueFile = table(
 	})
 );
 
-const Image = table(['id', 'addedAt', 'sessionId'], ImageSchema);
+const Image = table(
+	['id', 'addedAt', 'sessionId', '_search[]'],
+	ImageSchema.and({
+		/** Indexes for searching */
+		_search: ['string[]', '=', () => []],
+	}),
+	{
+		searchIndex({ filename, id }) {
+			return [filename, id];
+		},
+	}
+);
 
-const Observation = table(['id', 'addedAt', 'sessionId'], ObservationSchema);
+const Observation = table(
+	['id', 'addedAt', 'sessionId', 'images[]', '_search[]'],
+	ObservationSchema.and({
+		/** Indexes for searching */
+		_search: ['string[]', '=', () => []],
+	}),
+	{
+		searchIndex({ label, id, images }) {
+			return [label, id, ...images];
+		},
+	}
+);
 
-const Session = table(['id', 'remoteId'], SessionSchema);
+const Session = table(
+	['id', 'remoteId', 'protocol', '_search[]'],
+	SessionSchema.and({
+		/** Indexes for searching */
+		_search: ['string[]', '=', () => []],
+	}),
+	{
+		searchIndex({ name, id, remoteId, description, protocol }) {
+			return [name, id, remoteId, description, protocol];
+		},
+	}
+);
 
 const Metadata = table('id', MetadataSchema.omit('options'));
 const MetadataOption = table(
-	['id', 'kobocollectId', '_narrowableIn[]'],
+	['id', 'kobocollectId', 'metadataId', '_narrowableIn[]', '_search[]'],
 	MetadataEnumVariant.and({
 		id: [/\w+__\w+:\w+/, '@', 'ID of the form namespaced_metadata_id:key'],
 		metadataId: NamespacedMetadataID,
-	})
+		_search: ['string[]', '=', () => []],
+	}),
+	{
+		searchIndex({ key, label, synonyms, description, kobocollect, learnMore }) {
+			return [
+				key,
+				label,
+				learnMore,
+				...(synonyms ?? []),
+				description,
+				...ensureArray(kobocollect ?? []),
+			];
+		},
+	}
 );
 const Protocol = table('id', ProtocolSchema);
 
@@ -302,14 +364,29 @@ export const Tables = {
  * Indexes with '[]' at the end are multivariate indexes, meaning they index arrays of values instead of single values.
  * @param {Schema} schema
  * @template {import('arktype').Type} Schema
+ * @param {object} [options]
+ * @param {(object: Schema['inferIn']) => undefined | string | Array<string|undefined|null>} [options.searchIndex] Undefined means empty array, string means single-element array. Function to compute a value for a _search column
  * @returns
  */
-function table(keyPaths, schema) {
+function table(keyPaths, schema, options) {
 	const expandedKeyPaths = Array.isArray(keyPaths)
 		? keyPaths.map((keyPath) => keyPath)
 		: [keyPaths];
 
-	return schema.configure({ table: { indexes: expandedKeyPaths } });
+	return schema.configure({
+		table: {
+			indexes: expandedKeyPaths,
+			searchIndex(object) {
+				if (!options?.searchIndex) return [];
+				const result = options.searchIndex(object);
+				if (!result) return [];
+
+				return ensureArray(result)
+					.map((s) => normalizeSearchStrings(s ?? ''))
+					.filter((v) => Boolean(v));
+			},
+		},
+	});
 }
 
 /**

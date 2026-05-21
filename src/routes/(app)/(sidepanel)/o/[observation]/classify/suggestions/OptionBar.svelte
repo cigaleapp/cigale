@@ -146,7 +146,7 @@
 		<ButtonSecondary
 			onclick={() => focusOptionCombobox('focus')}
 			help={{
-				text: 'Voir toutes les options',
+				text: "Chercher d'autres options",
 				keyboard: '$mod+F',
 			}}
 		>

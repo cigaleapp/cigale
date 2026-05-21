@@ -8,7 +8,7 @@ import * as db from './idb.svelte.js';
 import { tables } from './idb.svelte.js';
 import { imageLimits } from './inference_utils.js';
 import { RAW_IMAGE_MEDIA_TYPES } from './raw.js';
-import { clamp, unique } from './utils.js';
+import { clamp, throwError, unique } from './utils.js';
 
 /**
  * @import { Image, Protocol } from './database.js';
@@ -182,7 +182,7 @@ export async function deleteImageFile(id, tx, notFoundOk = true) {
 						if (remainingImages.length === 0) {
 							tx.objectStore('Observation').delete(observation.id);
 						} else if (remainingImages.length < observation.images.length) {
-							tx.objectStore('Observation').put({
+							await db.set(tx, 'Observation', {
 								...observation,
 								images: remainingImages,
 							});
@@ -224,7 +224,7 @@ export async function deleteImageFile(id, tx, notFoundOk = true) {
  */
 export async function storeImageBytes({
 	id,
-	sessionId,
+	sessionId: explicitSessionId,
 	originalBytes,
 	resizedBytes,
 	contentType,
@@ -233,22 +233,27 @@ export async function storeImageBytes({
 	height,
 	tx,
 }) {
+	const sessionId =
+		explicitSessionId ??
+		uiState.currentSessionId ??
+		throwError("Can't store image without session");
+
 	await db.openTransaction(['ImageFile', 'ImagePreviewFile'], { tx }, async (tx) => {
-		tx.objectStore('ImageFile').put({
+		await db.set(tx, 'ImageFile', {
 			id,
 			bytes: originalBytes,
 			contentType,
 			filename,
 			dimensions: { width, height },
-			sessionId: sessionId ?? uiState.currentSessionId,
+			sessionId,
 		});
-		tx.objectStore('ImagePreviewFile').put({
+		await db.set(tx, 'ImagePreviewFile', {
 			id,
 			bytes: resizedBytes,
 			contentType,
 			filename,
 			dimensions: { width, height },
-			sessionId: sessionId ?? uiState.currentSessionId,
+			sessionId,
 		});
 		const preview = new Blob([resizedBytes], { type: contentType });
 		uiState.setPreviewURL(id, URL.createObjectURL(preview));

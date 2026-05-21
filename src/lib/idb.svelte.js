@@ -1,4 +1,5 @@
 import * as devalue from 'devalue';
+import Fuse from 'fuse.js';
 import { openDB } from 'idb';
 import { nanoid } from 'nanoid';
 
@@ -8,15 +9,16 @@ import {
 	isReactiveTable,
 	isSessionDependentReactiveTable,
 	Tables,
+	normalizeSearchStrings,
 } from './database.js';
-import { displayKeyRange, profiler, safeJSONStringify } from './utils.js';
+import { displayKeyRange, profiler, safeJSONStringify, throwError, unique } from './utils.js';
 
 /** @type {number | null} */
 export const previewingPrNumber =
 	import.meta.env.previewingPrNumber === 'null' ? null : import.meta.env.previewingPrNumber;
 
 export const databaseName = previewingPrNumber ? `previews/pr-${previewingPrNumber}` : 'database';
-export const databaseRevision = 8;
+export const databaseRevision = 9;
 
 const profile = profiler('Database');
 
@@ -209,6 +211,8 @@ function wrangler(table) {
 		 * @param {IDBKeyRange|string} [key]
 		 */
 		list: async (index, key) => (index && key ? listByIndex(table, index, key) : list(table)),
+		/** @param {string} query */
+		search: async (query) => search(table, query),
 		all: () => iterator(table),
 		count: async () => {
 			const db = await openDatabase();
@@ -219,6 +223,10 @@ function wrangler(table) {
 			/** @param {typeof Tables[Table]['inferIn']} value */
 			async set(value) {
 				const db = await openDatabase();
+				if (Tables[table].meta.table?.searchIndex) {
+					value._search = Tables[table].meta.table.searchIndex(value);
+				}
+
 				return await db.put(table, value);
 			},
 			/**
@@ -238,16 +246,61 @@ function wrangler(table) {
 }
 
 /**
- *
+ * @template {keyof typeof Tables} TableName
+ * @overload
+ * @param {import('idb').IDBPDatabase<IDBDatabaseType> | IDBTransactionWithAtLeast<[TableName]>} dbOrTx
  * @param {TableName} tableName
  * @param {typeof Tables[TableName]['inferIn']} value
- * @template {keyof typeof Tables} TableName
+ * @returns {Promise<typeof Tables[TableName]['inferOut']>}
  */
-export async function set(tableName, value) {
-	const db = await openDatabase();
+
+/**
+ *
+ * @template {keyof typeof Tables} TableName
+ * @overload
+ * @param {TableName} tableName
+ * @param {typeof Tables[TableName]['inferIn']} value
+ * @returns {Promise<typeof Tables[TableName]['inferOut']>}
+ */
+
+/**
+ * @template {keyof typeof Tables} TableName
+ * @param {import('idb').IDBPDatabase<IDBDatabaseType> | IDBTransactionWithAtLeast<[TableName]> | TableName} dbOrTxOrTableName
+ * @param {TableName | typeof Tables[TableName]['inferIn']} tableNameOrValue
+ * @param {typeof Tables[TableName]['inferIn']} [valueIfExplicitDbOrTx]
+ */
+export async function set(dbOrTxOrTableName, tableNameOrValue, valueIfExplicitDbOrTx) {
+	const dbOrTx = typeof dbOrTxOrTableName === 'string' ? undefined : dbOrTxOrTableName;
+
+	const tableName =
+		typeof dbOrTxOrTableName === 'string'
+			? dbOrTxOrTableName
+			: typeof tableNameOrValue === 'string'
+				? tableNameOrValue
+				: throwError(
+						'Invalid arguments: expected (dbOrTx, tableName, value) or (tableName, value)'
+					);
+
+	const value =
+		typeof tableNameOrValue === 'string'
+			? valueIfExplicitDbOrTx
+				? valueIfExplicitDbOrTx
+				: throwError('Invalid arguments: value is required')
+			: tableNameOrValue
+				? tableNameOrValue
+				: throwError('Invalid arguments: value is required');
+
+	const db = dbOrTx ?? (await openDatabase());
 	const validator = Tables[tableName];
 	validator.assert(value);
-	return await db.put(tableName, value).then((result) => {
+
+	if (validator.meta.table?.searchIndex) {
+		value._search = validator.meta.table.searchIndex(value);
+	}
+
+	return await (
+		'objectStore' in db ? db.objectStore(tableName).put(value) : db.put(tableName, value)
+	).then((result) => {
 		return result;
 	});
 }
@@ -353,6 +406,51 @@ export async function listByIndex(tableName, indexName, keyRange = undefined) {
 				});
 		}
 	);
+}
+/**
+ * @template {keyof typeof Tables} TableName
+ * @param {TableName} tableName
+ * @param {string} query
+ * @param {object} [options]
+ * @param {number} [options.max] maximum number of results to return, defaults to 100
+ * @returns {Promise<Array<typeof Tables[TableName]['infer']>>}
+ */
+export async function search(tableName, query, { max = 100 } = {}) {
+	const db = await openDatabase();
+	const validator = Tables[tableName];
+	const options = validator.meta.table;
+	if (!options?.searchIndex) {
+		throw new Error(`Table ${tableName} does not have a search index`);
+	}
+
+	query = normalizeSearchStrings(query);
+
+	return profile(tableName, 'search', { Query: query, Max: max }, async () => {
+		let coarse = await db.getAllFromIndex(
+			tableName,
+			'_search',
+			IDBKeyRange.bound(query, query + '\uffff'),
+			max
+		);
+
+		coarse = unique(coarse, (a) => a.id);
+
+		console.debug(
+			`search ${tableName} "${query}" got ${coarse.length} results from indexed search`
+		);
+
+		const refiner = new Fuse(coarse, {
+			keys: ['_search'],
+		});
+
+		return (
+			refiner
+				.search(query)
+				.map((result) => validator.assert(result.item))
+				// Just in case, should never be useful
+				.slice(0, max)
+		);
+	});
 }
 
 /**
@@ -509,6 +607,14 @@ export async function openDatabase() {
 					const indexName = multiEntry ? index.slice(0, -2) : index;
 					store.createIndex(indexName, indexName, { multiEntry });
 				}
+				// Re-compute _search
+				if (schema.meta.table.searchIndex) {
+					const all = await store.getAll();
+					for (const item of all) {
+						item._search = schema.meta.table.searchIndex(item);
+						store.put(item);
+					}
+				}
 			};
 
 			// No clean migration path for 1 -> 2, just drop everything
@@ -536,6 +642,13 @@ export async function openDatabase() {
 			}
 
 			if (oldVersion === 7) {
+				rebuildIndexes('MetadataOption');
+			}
+
+			if (oldVersion === 8) {
+				rebuildIndexes('Image');
+				rebuildIndexes('Observation');
+				rebuildIndexes('Session');
 				rebuildIndexes('MetadataOption');
 			}
 

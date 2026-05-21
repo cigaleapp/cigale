@@ -66,7 +66,7 @@
 	value={coordsToKey(value)}
 	sorter={() => 0}
 	searcher={(label) => label}
-	onValueChange={(val) => onblur(keyToCoords(val))}
+	onValueChange={async (val) => onblur(keyToCoords(val))}
 	suggestions={async (search) => {
 		const coords = Coords(search);
 

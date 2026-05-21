@@ -1,5 +1,5 @@
 import type * as DB from '$lib/database.js';
-import type { DatabaseHandle, ReactiveTableNames } from '$lib/idb.svelte.js';
+import { set, type DatabaseHandle, type ReactiveTableNames } from '$lib/idb.svelte.js';
 import type { NamespacedMetadataID } from '$lib/schemas/common.js';
 import type { RuntimeValue } from '$lib/schemas/metadata.js';
 import type { NumericUnit } from '$lib/schemas/units.js';
@@ -273,19 +273,19 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 		} else {
 			session.metadata = { [metadataId]: newValue };
 		}
-		db.put('Session', session);
+		await set(db, 'Session', session);
 	} else if (image) {
 		image.metadata[metadataId] = newValue;
 		if (clearErrors && image.metadataErrors?.[metadataId]) {
 			delete image.metadataErrors[metadataId];
 		}
-		db.put('Image', image);
+		await set(db, 'Image', image);
 	} else if (observation) {
 		observation.metadataOverrides[metadataId] = newValue;
 		if (clearErrors && observation.metadataErrors?.[metadataId]) {
 			delete observation.metadataErrors[metadataId];
 		}
-		db.put('Observation', observation);
+		await set(db, 'Observation', observation);
 	} else if (imagesFromImageFile.length > 0) {
 		for (const { id } of imagesFromImageFile) {
 			await storeMetadataValue({
@@ -397,11 +397,11 @@ export async function storeMetadataErrors(
 	if (image) {
 		image.metadataErrors ??= {};
 		image.metadataErrors[metadataId] = serializedErrors;
-		db.put('Image', image);
+		await set(db, 'Image', image);
 	} else if (observation) {
 		observation.metadataErrors ??= {};
 		observation.metadataErrors[metadataId] = serializedErrors;
-		db.put('Observation', observation);
+		await set(db, 'Observation', observation);
 	} else if (imagesFromImageFile) {
 		for (const { id } of imagesFromImageFile) {
 			await storeMetadataErrors(
@@ -459,15 +459,15 @@ export async function deleteMetadataValue({
 	if (image) {
 		deletedValue = MetadataValue(structuredClone(image.metadata[metadataId]));
 		delete image.metadata[metadataId];
-		db.put('Image', image);
+		await set(db, 'Image', image);
 	} else if (session) {
 		deletedValue = MetadataValue(structuredClone(session.metadata[metadataId]));
 		delete session.metadata[metadataId];
-		db.put('Session', session);
+		await set(db, 'Session', session);
 	} else if (observation) {
 		deletedValue = MetadataValue(structuredClone(observation.metadataOverrides[metadataId]));
 		delete observation.metadataOverrides[metadataId];
-		db.put('Observation', observation);
+		await set(db, 'Observation', observation);
 		if (recursive) {
 			for (const imageId of observation.images) {
 				await deleteMetadataValue({

@@ -22,6 +22,7 @@ import {
 } from '$lib/utils.js';
 
 import { openDatabase, swarp } from './index.js';
+import { set } from '$lib/idb.svelte.js';
 
 swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 	// ri: icons to preload from Iconify API. See MetadataEnumVariant's "icon" field.
@@ -98,7 +99,7 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 
 		onLoadingState('write-protocol', p.id);
 		console.time('Storing Protocol');
-		tx.objectStore('Protocol').put({
+		await set(tx, 'Protocol', {
 			...p,
 			importedMetadata: [
 				...(p.importedMetadata ?? []),
@@ -159,7 +160,7 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 
 			onLoadingState('write-metadata', metadata.label || id);
 			console.time(`Storing Metadata ${id}`);
-			tx.objectStore('Metadata').put({
+			await set(tx, 'Metadata', {
 				id,
 				...omit(metadata, 'options'),
 				_optionsCount: metadata.options?.length ?? 0,
@@ -189,7 +190,7 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 						.flatMap(([_, groups]) => [...groups])
 				);
 
-				tx.objectStore('MetadataOption').put({
+				await set(tx, 'MetadataOption', {
 					id: metadataOptionId(namespacedMetadataId(p.id, id), option.key),
 					metadataId: namespacedMetadataId(p.id, id),
 					index: i,

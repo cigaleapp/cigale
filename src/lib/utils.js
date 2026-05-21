@@ -504,6 +504,7 @@ if (import.meta.vitest) {
 }
 
 /**
+ * Preserves order
  * @template {*} T
  * @param {T[]} array
  * @param {(item: T) => string|number} [key]
@@ -1514,9 +1515,9 @@ export function orEmpty(predicate, obj) {
 // TODO: overload orEmpty instead of exporting orEmpty2, but we'll do this once we convert utils.js to typescript
 
 /**
+ * Spread into an array literal to conditionally add something to it.
  * [] if predicate is falsy, [obj(subject)] if predicate is truthy.
  * obj gets the non-nullable value
- * Spread into an array literal to conditionally add something to it
  * @template T, O
  * @param {T} subject
  * @param {(subject: NonNullable<T>) => O } obj

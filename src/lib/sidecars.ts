@@ -1,4 +1,4 @@
-import type { DatabaseHandle } from './idb.svelte.js';
+import { set, type DatabaseHandle } from './idb.svelte.js';
 
 import JSONC from 'tiny-jsonc';
 import * as YAML from 'yaml';
@@ -162,7 +162,7 @@ export async function processSidecars({
 			if (!file) continue;
 
 			const ref = DB.generateId('MetadataValueFile');
-			await db.put('MetadataValueFile', {
+			await set(db, 'MetadataValueFile', {
 				id: ref,
 				filename: file.name,
 				contentType: file.type,

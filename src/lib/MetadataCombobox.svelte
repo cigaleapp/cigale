@@ -31,11 +31,12 @@
 	import { databaseHandle } from './idb.svelte.js';
 	import LearnMoreLink from './LearnMoreLink.svelte';
 	import Markdown from './Markdown.svelte';
-	import { metadataOptionsOf } from './metadata/index.js';
+	import {Tables} from './database.js';
+	import { metadataOption, metadataOptionsOf } from './metadata/index.js';
 	import MetadataCascadesTable from './MetadataCascadesTable.svelte';
 	import { namespaceOfMetadataId } from './schemas/metadata.js';
 	import { uiState } from './state.svelte';
-	import { cancellable, compareBy, readableOn } from './utils.js';
+	import { cancellable, compareBy, orEmpty, orEmpty2, readableOn } from './utils.js';
 
 	/**
 	 * @import {WithoutChildrenOrChild} from 'bits-ui';
@@ -64,42 +65,32 @@
 	} = $props();
 
 	const protocolId = $derived(namespaceOfMetadataId(metadata.id));
+	const db = $derived(idb.databaseHandle());
 
 	const showConfidences = $derived(
 		Object.keys(confidences).length > 0 &&
 			Object.values(confidences).some((conf) => conf > 0 && conf < 1)
 	);
 
-	let options = $derived(precomputedOptions ?? []);
-
-	const loadingOptions = $derived(!precomputedOptions && options.length === 0);
-	const optionsLoader = cancellable(
-		async (
-			signal,
-			/** @type {NamespacedMetadataId} */ metadataId,
-			/** @type {boolean} */ precomputed
-		) => {
-			if (precomputed) return;
-			if (!uiState.currentProtocolId) return;
-			console.info('Fetching options for metadata', metadataId);
-			signal.throwIfAborted();
-			options = await metadataOptionsOf(
-				databaseHandle(),
-				uiState.currentProtocolId,
-				metadataId
-			);
-			console.info('Fetched options for metadata', metadataId, options);
-		}
-	);
+	/** @type {DB.MetadataEnumVariant|undefined} */
+	let currentlySelectedOption = $state();
 
 	$effect(() => {
-		const loader = optionsLoader(metadata.id, Boolean(precomputedOptions));
+		(async () => {
+			if (!value) {
+				currentlySelectedOption = undefined;
+				return;
+			}
 
-		loader.do();
-		return loader.cancel;
+			currentlySelectedOption = await metadataOption(db, metadata.id, value).then(opt => {
+				if (!opt) return undefined
+				return Tables.MetadataOption.assert(opt)
+			}).catch((err) => {
+				console.error('Failed to get currently selected option from database', err);
+				return undefined;
+			});
+		})();
 	});
-
-	const hasImages = $derived(options.some((opt) => opt.image));
 
 	/**
 	 * @param {DB.MetadataEnumVariant} a
@@ -123,17 +114,21 @@
 	}
 </script>
 
-<div class="metadata-combobox" class:wide-docs={hasImages} class:multiple>
+<div class="metadata-combobox wide-docs" class:multiple>
 	<Combobox
 		// Put disabled options last
-		items={options.toSorted(compareBy((opt) => (optionIsDisabled(opt) ? 1 : -1)))}
+		items={orEmpty2(currentlySelectedOption, (o) => o)}
 		{value}
 		values={multiple ? [value, ...Object.keys(alternatives)] : undefined}
 		{multiple}
 		bind:open
 		bind:focuser
-		sorter={compareByConfidence}
-		searcher={nameMatches}
+		sorter={() => 0}
+		searcher={(k) => k}
+		suggestions={async (query) => {
+			const results = await idb.search('MetadataOption', query);
+			return results.filter((result) => result.metadataId === metadata.id);
+		}}
 		viewport-testid="metadata-combobox-viewport"
 		{inputProps}
 		{contentProps}
@@ -141,11 +136,7 @@
 	>
 		{#snippet searchbox({ focusSetter, ...props })}
 			<div class="searchbox">
-				{#if loadingOptions}
-					<LoadingText value={Loading}>Chargement</LoadingText>
-				{:else}
-					<input {...props} {@attach focusSetter} />
-				{/if}
+				<input {...props} {@attach focusSetter} />
 			</div>
 		{/snippet}
 		{#snippet listItem({ selected, ...item })}

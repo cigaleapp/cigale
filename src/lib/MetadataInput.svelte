@@ -163,7 +163,7 @@
 	$effect(() => {
 		const loader = optionsLoader(
 			definition.id,
-			Boolean(precomputedOptions) || definition.type !== 'enum'
+			Boolean(precomputedOptions) || definition.type !== 'enum' || !isCompactEnum
 		);
 
 		loader.do();

@@ -20,7 +20,6 @@ export async function setImageMetadata({ page }, id, metadata, { refreshDB = tru
 
 		await window.DB.put('Image', {
 			...image,
-
 			metadata: {
 				...image.metadata,
 

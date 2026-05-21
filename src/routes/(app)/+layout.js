@@ -16,6 +16,7 @@ import {
 	databaseName,
 	databaseRevision,
 	openTransaction,
+	set,
 	tables,
 } from '$lib/idb.svelte.js';
 import { autoUpdateProtocols } from '$lib/protocols';
@@ -174,7 +175,7 @@ export async function load({ url }) {
 async function initializeSettings() {
 	setLoadingMessage('Initialisation des réglages par défaut…');
 	await openTransaction(['Metadata', 'Protocol', 'Settings'], {}, async (tx) => {
-		await tx.objectStore('Settings').put({
+		await set(tx, 'Settings', {
 			id: 'defaults',
 			protocols: [],
 			theme: 'auto',
