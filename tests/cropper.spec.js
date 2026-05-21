@@ -265,7 +265,9 @@ test.describe('Cropper view', () => {
 		async function expectConfirmed(page, app, implicit = false) {
 			if (implicit) await assert(confirmedCropOverlay(page)).toBeVisible();
 			await assert(confirmedCropBadge(page)).toBeVisible();
-			await assert(page.getByRole('button', { name: 'Marquer comme non-confirmée' })).toBeVisible();
+			await assert(
+				page.getByRole('button', { name: 'Marquer comme non-confirmée' })
+			).toBeVisible();
 			await page.waitForTimeout(500);
 			await expectAllImagesConfirmedInDatabase(page, app, true);
 		}
@@ -465,7 +467,7 @@ test.describe('Cropper view', () => {
 				await page.keyboard.press('1');
 				await page.keyboard.press('Delete');
 				await makeBox(page, 10, 10, 50, 50, 50, 100, 10, 100);
-				await page.keyboard.press(controlOrMeta(page, "ArrowLeft"));
+				await page.keyboard.press(controlOrMeta(page, 'ArrowLeft'));
 				await app.path.wait(`/o/_/crop/${image.fileId}/`);
 
 				// Ensure that the ghost box does not appear ever, for 1 second, checking every 100ms

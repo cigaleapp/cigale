@@ -277,16 +277,16 @@
 								{/if}
 							</div>
 							<span class="label">
-							{#if crossout}
-							<s>{label}</s>
-							{:else}
-								{label}
+								{#if crossout}
+									<s>{label}</s>
+								{:else}
+									{label}
 								{/if}
 							</span>
 							{#if !Number.isNaN(closeness) && candidatesTab !== 'remaining'}
 								<code
 									class="closeness"
-									use:tooltip={"Correspondance avec les choix effectués"}
+									use:tooltip={'Correspondance avec les choix effectués'}
 								>
 									{percent(closeness, 0, { pad: 'nbsp' })}
 								</code>

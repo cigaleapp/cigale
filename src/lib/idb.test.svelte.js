@@ -18,7 +18,7 @@ test('openDatabase', async () => {
 	expect(window).toHaveProperty('DB');
 	expect(window).toHaveProperty('refreshDB');
 	expect(db.name).toMatchInlineSnapshot(`"database"`);
-	expect(db.version).toBeGreaterThan(0)
+	expect(db.version).toBeGreaterThan(0);
 	expect(db.objectStoreNames).toMatchInlineSnapshot(`
 		FakeDOMStringList {
 		  "0": "Account",

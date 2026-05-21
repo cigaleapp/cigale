@@ -1,5 +1,4 @@
 <script>
-	import VirtualList from '$lib/VirtualList.svelte';
 	import { fade } from 'svelte/transition';
 
 	import IconArrow from '~icons/ri/arrow-right-line';
@@ -17,6 +16,7 @@
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import { goto } from '$lib/paths.js';
 	import { removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';
+	import VirtualList from '$lib/VirtualList.svelte';
 
 	import { onDeleteOption } from '../+layout.svelte';
 	import { updater } from './updater.svelte.js';
@@ -202,32 +202,32 @@
 				</p>
 			{/snippet}
 			<ul class="reverse-cascades">
-				<VirtualList items={reverseCascades} >
-				{#snippet item({ metadataId, metadata, option, value })}
-					{@const shortId = removeNamespaceFromMetadataId(metadataId)}
-					<li>
-						Si
-						{metadata?.label || shortId} =
-						{#if option}
-							{option.label || option.key}
-							<ButtonIcon
-								help="Voir {option.label || option.key}"
-								onclick={() =>
-									goto(
-										'/(app)/protocols/[id]/metadata/[metadata]/options/[option]',
-										{
-											id: page.params.id ?? '',
-											metadata: shortId,
-											option: option.key,
-										}
-									)}
-							>
-								<IconOpenInExternal />
-							</ButtonIcon>
-						{:else}
-							{value}
-						{/if}
-					</li>
+				<VirtualList items={reverseCascades}>
+					{#snippet item({ metadataId, metadata, option, value })}
+						{@const shortId = removeNamespaceFromMetadataId(metadataId)}
+						<li>
+							Si
+							{metadata?.label || shortId} =
+							{#if option}
+								{option.label || option.key}
+								<ButtonIcon
+									help="Voir {option.label || option.key}"
+									onclick={() =>
+										goto(
+											'/(app)/protocols/[id]/metadata/[metadata]/options/[option]',
+											{
+												id: page.params.id ?? '',
+												metadata: shortId,
+												option: option.key,
+											}
+										)}
+								>
+									<IconOpenInExternal />
+								</ButtonIcon>
+							{:else}
+								{value}
+							{/if}
+						</li>
 					{/snippet}
 				</VirtualList>
 			</ul>

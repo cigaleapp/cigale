@@ -100,7 +100,11 @@
 				}}
 			/>
 			{#if children}
-				{@render children({ ...option, value, selected: multiple ? values.includes(key)  : key === value })}
+				{@render children({
+					...option,
+					value,
+					selected: multiple ? values.includes(key) : key === value,
+				})}
 			{:else}
 				<div class="text">
 					<LoadingText value={label} />
@@ -161,7 +165,7 @@
 			position: absolute;
 			inset: 0;
 			opacity: 0;
-			pointer-events:none;
+			pointer-events: none;
 		}
 	}
 

@@ -172,7 +172,6 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 			for (const [i, option] of metadata.options?.entries() ?? []) {
 				done++;
 
-
 				if (i % 1000 === 0) {
 					onLoadingState(
 						'write-metadata-options',

@@ -3,10 +3,10 @@
 
 	import * as Math from 'svelte-mathml';
 
+	import EnumButtons from '$lib/EnumButtons.svelte';
 	import Field from '$lib/Field.svelte';
 	import FieldUrl from '$lib/FieldURL.svelte';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
-	import EnumButtons from '$lib/EnumButtons.svelte';
 
 	import { updater as _updater } from '../updater.svelte';
 	import ModelOutputShapeDiagram from './ModelOutputShapeDiagram.svelte';

@@ -155,7 +155,7 @@ const cladeMetadata = (clade, label) => ({
 	groupable: true,
 	group: 'taxonomy',
 	// Force dropdown presentation even for higher clades that technically have a few options
-	presentation: "dropdown"
+	presentation: 'dropdown',
 });
 
 /**
@@ -223,7 +223,7 @@ const protocol = {
 		taxonomy: {
 			name: 'Taxonomie',
 			description: "Classification taxonomique de l'espèce",
-			narrowable: true
+			narrowable: true,
 		},
 	},
 	sessionMetadata: {

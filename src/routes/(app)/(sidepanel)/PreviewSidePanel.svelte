@@ -192,7 +192,7 @@
 					{definition}
 					{value}
 					options={collapsed ? [] : undefined}
-					onchange={async ({value : v, unit}) => {
+					onchange={async ({ value: v, unit }) => {
 						if (dequal(v, value?.value) && unit === value?.unit) return;
 						await onmetadatachange(definition.id, v, unit);
 					}}

@@ -3,10 +3,10 @@
 	import { fade } from 'svelte/transition';
 
 	import { invalidateAll } from '$app/navigation';
+	import EnumButtons from '$lib/EnumButtons.svelte';
 	import { EXIF_FIELDS } from '$lib/exiffields';
 	import FieldUrl from '$lib/FieldURL.svelte';
 	import { tables } from '$lib/idb.svelte';
-	import EnumButtons from '$lib/EnumButtons.svelte';
 	import { EXIFField } from '$lib/schemas/metadata.js';
 	import { toasts } from '$lib/toasts.svelte.js';
 	import { keys, omit } from '$lib/utils';

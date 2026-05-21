@@ -19,6 +19,7 @@
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import CroppedImg from '$lib/CroppedImg.svelte';
 	import { downloadAsFile } from '$lib/download.js';
+	import EnumButtons from '$lib/EnumButtons.svelte';
 	import Field from '$lib/Field.svelte';
 	import { gatherToTree } from '$lib/file-tree.js';
 	import { writeToFilesystem } from '$lib/filesystem.js';
@@ -31,7 +32,6 @@
 	import ModalConfirm from '$lib/ModalConfirm.svelte';
 	import { sendNotification } from '$lib/notifications.js';
 	import { ensureNoLoneImages } from '$lib/observations.js';
-	import EnumButtons from '$lib/EnumButtons.svelte';
 	import SessionMetadataForm from '$lib/SessionMetadataForm.svelte';
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte.js';

@@ -7,12 +7,12 @@
 	import IconMergeUnion from '~icons/ri/shadow-line';
 	import IconMergeMinimum from '~icons/ri/skip-down-line';
 	import IconMergeMaximum from '~icons/ri/skip-up-line';
+	import EnumButtons from '$lib/EnumButtons.svelte';
 	import Field from '$lib/Field.svelte';
 	import FieldUrl from '$lib/FieldURL.svelte';
 	import { uppercaseFirst } from '$lib/i18n';
 	import IconDatatype from '$lib/IconDatatype.svelte';
 	import { MERGEABLE_METADATA_TYPES } from '$lib/metadata/index.js';
-	import EnumButtons from '$lib/EnumButtons.svelte';
 	import {
 		METADATA_MERGE_METHODS,
 		METADATA_TYPES,

@@ -1,9 +1,10 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 
+	import { Portal } from 'bits-ui';
+
 	import IconClose from '~icons/ri/close-line';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import { Portal } from 'bits-ui';
 
 	interface Props {
 		/** Content shown normally */

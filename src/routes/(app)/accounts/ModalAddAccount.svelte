@@ -8,13 +8,13 @@
 	import IconCheck from '~icons/ri/check-line';
 	import IconFail from '~icons/ri/error-warning-line';
 	import KoboToolbox from '$lib/accounts/kobotoolbox.js';
+	import EnumButtons from '$lib/EnumButtons.svelte';
 	import { errorMessage } from '$lib/i18n.js';
 	import { databaseHandle, tables } from '$lib/idb.svelte.js';
 	import { inAppBrowser } from '$lib/inappbrowser.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 	import ModalConfirm from '$lib/ModalConfirm.svelte';
-	import EnumButtons from '$lib/EnumButtons.svelte';
 	import Stepper from '$lib/Stepper.svelte';
 	import { toasts } from '$lib/toasts.svelte.js';
 	import { tooltip } from '$lib/tooltips.js';

@@ -14,10 +14,10 @@
 		/** Only run once, afterwards the content stays rendered even if the component leaves the viewport */
 		once?: boolean;
 		/** Computation to run when in viewport. The result is availabe as a prop to the children snippet */
-		computation?: () => T|Promise<T>;
+		computation?: () => T | Promise<T>;
 	}
 
-	const { children, once = false, computation  }: Props = $props();
+	const { children, once = false, computation }: Props = $props();
 
 	let node = $state<HTMLElement>();
 
@@ -27,10 +27,10 @@
 <div class="if-in-viewport" bind:this={node}>
 	{#if inViewport.current}
 		{#await (async () => {
-			if (!computation) return undefined
+			if (!computation) return undefined;
 			return await computation();
 		})() then result}
-		{@render children(result)}
+			{@render children(result)}
 		{/await}
 	{/if}
 </div>

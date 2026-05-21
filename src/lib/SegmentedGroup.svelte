@@ -10,7 +10,7 @@
 		current: NoInfer<Key>;
 		// eslint-disable-next-line no-unused-vars
 		disabled?: (key: Key) => boolean | string;
-	} & Record<`option_${NoInfer<Key>}`, Snippet<[{current: boolean, disabled: boolean}]>>;
+	} & Record<`option_${NoInfer<Key>}`, Snippet<[{ current: boolean; disabled: boolean }]>>;
 
 	let {
 		options,
@@ -22,7 +22,7 @@
 	const id = $props.id();
 </script>
 
-<div class="segmented-group" role="tablist"> 
+<div class="segmented-group" role="tablist">
 	{#each options as key (key)}
 		{@const disabled = isDisabled(key)}
 		{@const disabledWhy = typeof disabled === 'string' ? disabled : undefined}
@@ -36,7 +36,10 @@
 				value={key}
 				id="{id}-{key}"
 			/>
-			{@render snippets[`option_${key}`]({ current: current === key, disabled: Boolean(disabled) })}
+			{@render snippets[`option_${key}`]({
+				current: current === key,
+				disabled: Boolean(disabled),
+			})}
 		</label>
 	{/each}
 </div>

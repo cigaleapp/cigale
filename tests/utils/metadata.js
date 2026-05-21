@@ -126,9 +126,7 @@ export function metadataSections(page) {
 		 * @param {boolean} [params.exact=true] whether to use exact matching for the option name
 		 */
 		checkbox(label, option, { exact = true } = { exact: true }) {
-			return section(label)
-				.getByRole('group')
-				.getByRole('checkbox', { name: option, exact });
+			return section(label).getByRole('group').getByRole('checkbox', { name: option, exact });
 		},
 	};
 }

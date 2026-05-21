@@ -27,7 +27,7 @@
 
 	let { open = $bindable() }: Props = $props();
 
-	const db = $derived(page.data.db)
+	const db = $derived(page.data.db);
 
 	let opener = $state<() => void>();
 	let candidate = $state<DB.MetadataEnumVariant>();

@@ -121,8 +121,6 @@
 			val.toLowerCase().includes(search.toLowerCase())
 		);
 	}
-
-	
 </script>
 
 <div class="metadata-combobox" class:wide-docs={hasImages} class:multiple>

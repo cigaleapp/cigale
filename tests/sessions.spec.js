@@ -310,7 +310,7 @@ test('changing metadata values saves them in the database', async ({ page, app }
 
 	assert(await metadataValueFor('wind')).toBeUndefined();
 
-	await app.metadata.radio('Vent', 'Fort').check({force: true});
+	await app.metadata.radio('Vent', 'Fort').check({ force: true });
 
 	await page.waitForTimeout(500); // Wait for DB write
 
