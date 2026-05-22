@@ -90,22 +90,16 @@
 		const ordering = shownDefinitions
 			.map((def) => def.id)
 			.toSorted(
-				compareBy((id) => {
-					const weight = averageWeights.get(id);
-					const power =
+				compareBy(
+					(id) => 1 - (averageWeights.get(id) ?? 0),
+					(id) =>
 						narrowingPower({
 							candidates: narrowingState.remainingCandidateIds,
 							descriptors: narrowingState.descriptors,
 							metadata: id,
 							options: options[id].keys(),
-						}) / narrowingState.allCandidateIds.size;
-
-					if (weight === undefined) {
-						return power;
-					}
-
-					return avg([1 - weight, power]);
-				})
+						})
+				)
 			);
 
 		console.timeEnd('metadata ordering');

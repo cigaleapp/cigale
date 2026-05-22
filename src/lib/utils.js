@@ -585,22 +585,18 @@ if (import.meta.vitest) {
 
 /**
  * @template Item
- * @param {((item: Item) => string|number|undefined) | (keyof Item & string) } key function to create the comparator function with. Should return a string (will be used with localeCompare) or a number (will be subtracted)
+ * @param {...(((item: Item) => string|number|undefined) | (keyof Item & string))} keys function to create the comparator function with. Should return a string (will be used with localeCompare) or a number (will be subtracted). Additional functions will be used as tie-breakers when the previous ones return 0.
  * @returns {Comparator<Item>}
  */
-export function compareBy(key) {
-	if (typeof key === 'string') {
-		return compareBy((item) => item[key]);
-	}
-
+export function compareBy(...keys) {
 	/**
+	 * @param {typeof keys[number]} key
 	 * @param {Item} a
 	 * @param {Item} b
-	 * @returns {number}
 	 */
-	return (a, b) => {
-		const aKey = key(a);
-		const bKey = key(b);
+	const _compareWith = (key, a, b) => {
+		const aKey = typeof key === 'string' ? a[key] : key(a);
+		const bKey = typeof key === 'string' ? b[key] : key(b);
 
 		if (aKey === undefined && bKey === undefined) return 0;
 		if (aKey === undefined) return -1;
@@ -616,6 +612,22 @@ export function compareBy(key) {
 		}
 
 		return aKey.toString().localeCompare(bKey.toString());
+	};
+
+	/**
+	 * @param {Item} a
+	 * @param {Item} b
+	 * @returns {number}
+	 */
+	return (a, b) => {
+		let comparison = 0;
+
+		for (let i = 0; i < keys.length && comparison === 0; i++) {
+			const key = keys[i];
+			comparison = _compareWith(key, a, b);
+		}
+
+		return comparison;
 	};
 }
 
@@ -669,6 +681,18 @@ if (import.meta.vitest) {
 			expect(compareBy('id')(items[0], items[1])).toBe(1);
 			expect(compareBy('name')(items[1], items[0])).toBe(-1);
 			expect(compareBy('id')(items[0], items[0])).toBe(0);
+		});
+
+		test('it works with multiple keys', () => {
+			const items = [
+				{ id: 2, name: 'b' },
+				{ id: 1, name: 'a' },
+				{ id: 3, name: 'c' },
+			];
+
+			expect(compareBy('id', 'name')(items[0], items[1])).toBe(1);
+			expect(compareBy('id', 'name')(items[1], items[0])).toBe(-1);
+			expect(compareBy('id', 'name')(items[0], items[0])).toBe(0);
 		});
 	});
 }
