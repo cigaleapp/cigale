@@ -64,7 +64,7 @@ export async function processExifData(sessionId, imageFileId, imageBytes, file) 
 	});
 
 	const images = await db
-		.list('Image')
+		.listByIndex('Image', 'sessionId', sessionId)
 		.then((imgs) => imgs.filter((img) => img.fileId === imageFileId));
 
 	for (const { id: subjectId } of images) {
@@ -171,7 +171,8 @@ export function coerceExifValue(value, coerceTo) {
 			return Boolean(value);
 
 		case 'date':
-			if (typeof value !== 'number') throw new Error('Date value must be a number');
+			if (value instanceof Date) return new Date(value.getTime() * 1e3);
+			if (typeof value !== 'number') throw new Error(`Date value must be a number, was ${typeof value}`);
 			if (Number.isNaN(value)) throw new Error('Date value is invalid');
 			return new Date(value * 1e3);
 

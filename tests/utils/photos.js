@@ -19,7 +19,7 @@ import { loadingText } from './loading.js';
  *
  * @param {object} ctx
  * @param {Page} ctx.page
- * @param {boolean} [ctx.wait=true] whether to wait for the loading message to disappear
+ * @param {boolean} [ctx.wait=true] whether to wait for the loading message to disappear. true by default
  * @param {number} [ctx.additionalWaitTime] wait additional milliseconds between each import (when names.length > 1)
  * @param {...MaybeArray<FixturePaths.Photos | {filename: string} | (string & {})>} names paths relative to ./tests/fixtures. If no extension is provided, .jpeg is used. Pass in arrays to import multiple files at once.
  */

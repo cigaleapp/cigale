@@ -1,0 +1,19 @@
+diff --git a/node_modules/@types/piexifjs/.bun-tag-e723af2626c76235 b/.bun-tag-e723af2626c76235
+new file mode 100644
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+diff --git a/index.d.ts b/index.d.ts
+index d037e46ef04872f4ee8d4d93d90c5c9a61dd51a0..4e7c427d7aeae65805922559816db7192d92026c 100644
+--- a/index.d.ts
++++ b/index.d.ts
+@@ -322,9 +322,10 @@ declare namespace Piexif {
+         InteroperabilityIndex: number;
+     }
+ 
++
+     interface GPSHelper {
+         degToDmsRational: (degFloat: number) => [number, number][];
+-        dmsRationalToDeg: (dmsArray: number[], ref: string) => number;
++        dmsRationalToDeg: (dmsArray: Array<[number, number]>, ref: string) => number;
+     }
+ 
+     interface ExifDict {

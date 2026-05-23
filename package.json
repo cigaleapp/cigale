@@ -206,6 +206,7 @@
 		"yaml": "^2.8.4"
 	},
 	"patchedDependencies": {
-		"natural-regex@0.5.0": "patches/natural-regex@0.5.0.patch"
+		"natural-regex@0.5.0": "patches/natural-regex@0.5.0.patch",
+		"@types/piexifjs@1.0.0": "patches/@types%2Fpiexifjs@1.0.0.patch"
 	}
 }
