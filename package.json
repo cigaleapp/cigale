@@ -179,7 +179,7 @@
 		"idb": "^8.0.3",
 		"jimp": "^1.6.0",
 		"jsonata": "^2.1.0",
-		"libraw-wasm": "^1.1.2",
+		"libraw-wasm": "ybouane/LibRaw-Wasm#b031571ee6929ace10ce639e8ae833f68afafec5",
 		"maplibre-gl": "^5.24.0",
 		"marked": "^18.0.3",
 		"microdiff": "^1.5.0",

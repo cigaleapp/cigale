@@ -39,7 +39,7 @@
         "idb": "^8.0.3",
         "jimp": "^1.6.0",
         "jsonata": "^2.1.0",
-        "libraw-wasm": "^1.1.2",
+        "libraw-wasm": "ybouane/LibRaw-Wasm#b031571ee6929ace10ce639e8ae833f68afafec5",
         "maplibre-gl": "^5.24.0",
         "marked": "^18.0.3",
         "microdiff": "^1.5.0",
@@ -2091,7 +2091,7 @@
 
     "levn": ["levn@0.4.1", "", { "dependencies": { "prelude-ls": "^1.2.1", "type-check": "~0.4.0" } }, "sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ=="],
 
-    "libraw-wasm": ["libraw-wasm@1.1.2", "", {}, "sha512-lOVdqbzCkvsLtMoTz41Pc3alQptWHCyD71jGBTnQmoNK5CTVayXGqtTSBntLil7YaO3h/yESx7e9jMskMtnOEQ=="],
+    "libraw-wasm": ["libraw-wasm@github:ybouane/LibRaw-Wasm#b031571", {}, "ybouane-LibRaw-Wasm-b031571", "sha512-xZHni+o6Wi51zpbawDdAIjxSBWGQFG7eLiSPrnn0MgQvgSY9AAuNXXrS+21WQ7QQtpsSwn+Iz+EGW5UIRlcpjw=="],
 
     "lie": ["lie@3.3.0", "", { "dependencies": { "immediate": "~3.0.5" } }, "sha512-UaiMJzeWRlEujzAuw5LokY1L5ecNQYZKfmyZ9L7wDHb/p5etKaxXhohBcrw0EYby+G/NA52vRSN4N39dxHAIwQ=="],
 
