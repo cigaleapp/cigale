@@ -1,7 +1,8 @@
+import { ms } from 'convert';
 import * as dates from 'date-fns';
 
 import { issue } from './annotations.js';
-import { assert, test, testBasic } from './fixtures.js';
+import { assert, expect, test, testBasic } from './fixtures.js';
 import {
 	chooseFirstSession,
 	expectZipFiles,
@@ -324,15 +325,51 @@ test.describe('invalid json analysis', async () => {
 	});
 });
 
-test('fails when importing a .CR2 image', issue(413), async ({ page, app }) => {
+test('can import a RAW image', issue(413), async ({ page, app, browserName }) => {
+	test.fixme(
+		browserName === 'webkit',
+		'Playwright Reports UI has a bug that prevents me from retrieving the snapshot. Webkit testing is completely broken locally too'
+	);
+
 	await newSession(page);
+
 	await app.tabs.go('import');
-	await importPhotos({ page }, 'sample.cr2');
-	await assert(page.getByText(/Analyse…|En attente/)).toHaveCount(0, {
-		timeout: 5_000,
+	await importPhotos({ page }, 'IMG_6173.CR2');
+	await app.loading.wait(ms('20s'));
+
+	await expect(firstObservationCard(page)).toHaveAccessibleName('IMG_6173.CR2.jpeg');
+
+	await app.tabs.go('crop');
+	await app.loading.wait();
+
+	await app.tabs.go('classify');
+	await app.loading.wait();
+	await firstObservationCard(page).click();
+
+	await expect(app.metadata.combobox('Espèce')).toHaveValue('Pogonognathellus longicornis');
+	// TODO: use a test raw photo that has GPS data
+	expect(await app.db.metadata.of({ image: 'IMG_6173.CR2.jpeg' })).toMatchObject({
+		species: {
+			parsedValue: '4538732',
+			confidence: assert.closeTo(0.27, 0.01),
+		},
+		shoot_date: {
+			parsedValue: assert.stringMatching(/^2025-03-08/),
+		},
 	});
-	await assert(firstObservationCard(page)).toHaveTooltip(
-		/Les fichiers .+? ne sont pas (encore )?supportés/
+
+	await app.tabs.go('results');
+	const zip = await exportResults(page);
+	await expectZipFiles(
+		zip,
+		['analysis.json', 'metadata.csv', 'Cropped/Pogonognathellus longicornis_obs1_1.CR2.jpeg'],
+		{
+			'Cropped/Pogonognathellus longicornis_obs1_1.CR2.jpeg': {
+				async buffer(buf) {
+					expect(buf).toMatchSnapshot();
+				},
+			},
+		}
 	);
 });
 

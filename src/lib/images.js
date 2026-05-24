@@ -7,6 +7,7 @@ import { errorMessage, humanFormatName } from './i18n.js';
 import * as db from './idb.svelte.js';
 import { tables } from './idb.svelte.js';
 import { imageLimits } from './inference_utils.js';
+import { RAW_IMAGE_MEDIA_TYPES } from './raw.js';
 import { clamp, unique } from './utils.js';
 
 /**
@@ -274,27 +275,6 @@ const MAXWIDTH = 1024;
  * @param {number} param0.height
  */
 const MAXHEIGHT = ({ width, height }) => Math.round((MAXWIDTH * height) / width);
-
-const RAW_IMAGE_MEDIA_TYPES = [
-	'image/CR2',
-	'image/x-canon-cr2',
-	'image/x-dcraw',
-	'image/x-canon-crw',
-	'image/x-kodak-dcr',
-	'image/x-adobe-dng',
-	'image/x-epson-erf',
-	'image/x-kodak-k25',
-	'image/x-kodak-kdc',
-	'image/x-minolta-mrw',
-	'image/x-nikon-nef',
-	'image/x-olympus-orf',
-	'image/x-pentax-pef',
-	'image/x-fuji-raf',
-	'image/x-panasonic-raw',
-	'image/x-sony-sr2',
-	'image/x-sony-srf',
-	'image/x-sigma-x3f',
-];
 
 const ALWAYS_SUPPORTED_TYPES = ['image/jpeg', 'image/png'];
 const SUPPORT_PLANNED_TYPES = [...RAW_IMAGE_MEDIA_TYPES];

@@ -18,6 +18,13 @@ import { toasts } from '$lib/toasts.svelte.js';
 import { imageLimits } from './inference_utils.js';
 import { serializeMetadataValues } from './metadata/index.js';
 import { newObservation } from './observations.js';
+import {
+	isRawImage,
+	processRawMetadata,
+	RAW_IMAGE_FILE_EXTENSIONS,
+	RAW_IMAGE_MEDIA_TYPES,
+	transcodeRawPhotoToJPEG,
+} from './raw.js';
 import { ACCEPTED_SIDECAR_TYPES, processSidecars } from './sidecars.js';
 
 export const ACCEPTED_IMPORT_TYPES = [
@@ -25,12 +32,8 @@ export const ACCEPTED_IMPORT_TYPES = [
 	'application/zip',
 	'image/png',
 	'image/tiff',
-	'.cr2',
-	'.rw2',
-	'.dng',
-	'.crw',
-	'.raw',
-	'.cr3',
+	...RAW_IMAGE_MEDIA_TYPES,
+	...RAW_IMAGE_FILE_EXTENSIONS,
 	// Sidecar files
 	...ACCEPTED_SIDECAR_TYPES,
 ];
@@ -41,7 +44,7 @@ export const ACCEPTED_IMPORT_TYPES = [
  * @param {string} param0.id
  * @param {File[]} param0.sidecars
  */
-export async function processImageFile({ file, id, sidecars }) {
+export async function processImageFile({ file, id: fileId, sidecars }) {
 	if (!uiState.currentProtocol) {
 		toasts.error('Aucun protocole sélectionné');
 		return;
@@ -52,56 +55,76 @@ export async function processImageFile({ file, id, sidecars }) {
 		return;
 	}
 
-	const originalBytes = await file.arrayBuffer();
+	let originalBytes = await file.arrayBuffer();
 
 	if (originalBytes.byteLength > imageLimits.maxMemoryUsageInMB * Math.pow(2, 20)) {
 		toasts.error(errorMessageImageTooLarge());
 		return;
 	}
 
-	const [[width, height], resizedBytes] = await resizeToMaxSize({ source: file });
+	let transcoded = file;
+	/** @type {import('libraw-wasm').Metadata | undefined} */
+	let rawMetadata = undefined;
+
+	if (isRawImage(file)) {
+		const transcoding = await transcodeRawPhotoToJPEG(originalBytes);
+		originalBytes = transcoding.bytes;
+		rawMetadata = transcoding.metadata;
+		transcoded = new File([originalBytes], `${file.name}.jpeg`, {
+			type: 'image/jpeg',
+		});
+	}
+
+	const [[width, height], resizedBytes] = await resizeToMaxSize({ source: transcoded });
 
 	await storeImageBytes({
-		id,
+		id: fileId,
 		resizedBytes,
 		originalBytes,
-		contentType: file.type,
-		filename: file.name,
+		contentType: transcoded.type,
+		filename: transcoded.name,
 		width,
 		height,
 	});
 
 	const image = await tables.Image.set({
-		id: imageId(id, 0),
+		id: imageId(fileId, 0),
 		sessionId: uiState.currentSession.id,
-		filename: file.name,
+		filename: transcoded.name,
 		addedAt: dates.formatISO(Date.now()),
-		contentType: file.type,
+		contentType: transcoded.type,
 		dimensions: { width, height },
-		fileId: id,
+		fileId: fileId,
 		metadata: {},
 	});
 
 	await tables.Observation.add(newObservation(image, uiState.currentSession));
 
 	// We have to remove the file from the processing files list once the Image database object has been created
-	uiState.processing.removeFile(id);
+	uiState.processing.removeFile(fileId);
 
 	// Process sidecars first since they can create new images!
 	// If we do EXIF extraction first, images created via sidecars processing won't get their EXIF-infered metadata
 	await processSidecars({
 		db: databaseHandle(),
-		sessionId: uiState.currentSessionId,
+		sessionId: uiState.currentSession.id,
 		cropMetadataId: uiState.cropMetadataId,
 		file,
-		imageFileId: id,
+		imageFileId: fileId,
 		sidecars,
 	}).catch((e) => {
 		console.error(e);
 		toasts.error(`Erreur lors du traitement du/des fichiers annexes associés à ${file.name}`);
 	});
 
-	await processExifData(uiState.currentSessionId, id, originalBytes, file).catch((error) => {
+	if (rawMetadata) {
+		await processRawMetadata(uiState.currentSession.id, fileId, rawMetadata).catch((e) => {
+			console.error(e);
+			toasts.error(`Erreur lors de l'extraction des métadonnées du fichier RAW ${file.name}`);
+		});
+	}
+
+	await processExifData(uiState.currentSession.id, fileId, originalBytes, file).catch((error) => {
 		console.error(error);
 		toasts.error(`Erreur lors de l'extraction des métadonnées EXIF pour ${file.name}`);
 	});

@@ -34,6 +34,12 @@ export default [
 			],
 		},
 	})),
+	{
+		files: ['**/*.test.*'],
+		rules: {
+			'@typescript-eslint/no-explicit-any': 'off',
+		},
+	},
 	...svelte.configs['flat/recommended'],
 	prettier,
 	...svelte.configs['flat/prettier'],
