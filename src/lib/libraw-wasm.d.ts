@@ -166,7 +166,19 @@ declare module 'libraw-wasm' {
 	export type Vec7 = [number, number, number, number, number, number, number];
 	export type Vec8 = [number, number, number, number, number, number, number, number];
 	export type Vec9 = [number, number, number, number, number, number, number, number, number];
-	export type Vec11 = [number, number, number, number, number, number, number, number, number, number, number];
+	export type Vec11 = [
+		number,
+		number,
+		number,
+		number,
+		number,
+		number,
+		number,
+		number,
+		number,
+		number,
+		number,
+	];
 	export type Matrix4x3 = [Vec3, Vec3, Vec3, Vec3];
 
 	export interface CanonMetadata {
@@ -580,7 +592,7 @@ declare module 'libraw-wasm' {
 		/**
 		 * Fetch metadata extracted from the opened RAW file.
 		 *
-		 * @param fullOutput include vendor-specific metadata blocks (see {@link Metadata.canon}, {@link Metadata.nikon}, etc.) 
+		 * @param fullOutput include vendor-specific metadata blocks (see {@link Metadata.canon}, {@link Metadata.nikon}, etc.)
 		 */
 		metadata(fullOutput?: boolean): Promise<LibRawMetadata | undefined>;
 

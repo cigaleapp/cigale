@@ -172,7 +172,8 @@ export function coerceExifValue(value, coerceTo) {
 
 		case 'date':
 			if (value instanceof Date) return new Date(value.getTime() * 1e3);
-			if (typeof value !== 'number') throw new Error(`Date value must be a number, was ${typeof value}`);
+			if (typeof value !== 'number')
+				throw new Error(`Date value must be a number, was ${typeof value}`);
 			if (Number.isNaN(value)) throw new Error('Date value is invalid');
 			return new Date(value * 1e3);
 
