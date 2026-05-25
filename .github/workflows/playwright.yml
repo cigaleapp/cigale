@@ -355,7 +355,7 @@ jobs:
               if (base) {
                 const change = (avg(head) - avg(base)) / avg(base);
                 const trend = change>0 ? '🔺+' : (change<0 ? '🔻' : '');
-                comment += column(fmt(avg(head)), fmt(avg(base)), Math.abs(change) > 0.1 ? trend + fmt(change * 100, "%") : " ");
+                comment += column(fmt(avg(head)), fmt(avg(base)), Math.abs(change) > 0.1 ? trend + fmt(change * 100, "percent") : " ");
               } else {
                 comment += column(fmt(avg(head)), 'N/A', 'N/A');
               }
