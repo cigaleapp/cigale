@@ -8,6 +8,7 @@
 	import IconObservation from '~icons/ri/bug-line';
 	import IconDelete from '~icons/ri/delete-bin-line';
 	import IconFullScreen from '~icons/ri/fullscreen-line';
+	import OverflowableText from '$lib/OverflowableText.svelte';
 	import IconSplit from '~icons/ri/function-line';
 	import IconImage from '~icons/ri/image-2-line';
 	import IconMerge from '~icons/ri/shadow-line';
@@ -164,7 +165,7 @@
 				/>
 			{:else if singleImageSelected}
 				<IconImage />
-				{singleImageSelected.filename}
+				<OverflowableText text={singleImageSelected.filename} />
 			{:else if selectionCounts.image > 0 && selectionCounts.observation > 0}
 				{plural(selectionCounts.all, ['1 élément', '# éléments'])}
 			{:else if selectionCounts.image > 0}
@@ -347,6 +348,7 @@
 		display: flex;
 		align-items: center;
 		gap: 0.5em;
+		overflow-x: hidden;
 	}
 
 	.empty-selection {
