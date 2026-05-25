@@ -203,7 +203,7 @@
 		"word-diff": "^1.0.1",
 		"wuchale": "^0.23.3",
 		"xss": "^1.0.15",
-		"yaml": "^2.8.4"
+		"yaml": "^2.9.0"
 	},
 	"patchedDependencies": {
 		"@capacitor/file-viewer@2.0.1": "patches/@capacitor__file-viewer@2.0.1.patch",
