@@ -166,7 +166,7 @@
 		"convert": "^7.0.0",
 		"date-fns": "^4.2.1",
 		"dequal": "^2.0.3",
-		"devalue": "^5.8.0",
+		"devalue": "^5.8.1",
 		"electron-serve": "^3.0.1",
 		"electron-squirrel-startup": "^1.0.1",
 		"embla-carousel-svelte": "^8.6.0",
