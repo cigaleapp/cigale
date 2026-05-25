@@ -137,7 +137,7 @@
         "tinyexec": "^1.1.2",
         "turndown": "^7.2.4",
         "typescript": "^6.0.3",
-        "typescript-eslint": "^8.59.3",
+        "typescript-eslint": "^8.59.4",
         "urlpattern-polyfill": "^10.1.0",
         "vite": "^8.0.13",
         "vite-bundle-analyzer": "^1.3.8",
