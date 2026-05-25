@@ -38,7 +38,7 @@
         "handlebars": "^4.7.9",
         "idb": "^8.0.3",
         "jimp": "^1.6.0",
-        "jsonata": "^2.1.0",
+        "jsonata": "^2.2.0",
         "libraw-wasm": "ybouane/LibRaw-Wasm#b031571ee6929ace10ce639e8ae833f68afafec5",
         "maplibre-gl": "^5.24.0",
         "marked": "^18.0.3",
@@ -2064,7 +2064,7 @@
 
     "json-stringify-safe": ["json-stringify-safe@5.0.1", "", {}, "sha512-ZClg6AaYvamvYEE82d3Iyd3vSSIjQ+odgjaTzRuO3s7toCdFKczob2i0zCh7JE8kWn17yvAWhUVxvqGwUalsRA=="],
 
-    "jsonata": ["jsonata@2.1.0", "", {}, "sha512-OCzaRMK8HobtX8fp37uIVmL8CY1IGc/a6gLsDqz3quExFR09/U78HUzWYr7T31UEB6+Eu0/8dkVD5fFDOl9a8w=="],
+    "jsonata": ["jsonata@2.2.1", "", {}, "sha512-xd1uwUrKeIcJbsWhaoS3qAX4Ea8m0Mw0G5nlnAQvPT7TbZ5qaPdzBVTQia9KfyuyQm+nenfyjvzUDTRYHsC2sw=="],
 
     "jsonc-parser": ["jsonc-parser@3.3.1", "", {}, "sha512-HUgH65KyejrUFPvHFPbqOY0rsFip3Bo5wb4ngvdi1EpCYWUQDC5V+Y7mZws+DLkr4M//zQJoanu1SP+87Dv1oQ=="],
 
