@@ -15,7 +15,7 @@
         "@capacitor/splash-screen": "^8.0.1",
         "@capawesome/capacitor-file-picker": "^8.0.2",
         "@capgo/inappbrowser": "^8.6.6",
-        "@formatjs/intl-durationformat": "^0.10.8",
+        "@formatjs/intl-durationformat": "^0.10.11",
         "@iconify/svelte": "^5.2.1",
         "@sveltejs/svelte-virtual-list": "^3.0.1",
         "@viselect/vanilla": "^3.9.0",
@@ -500,13 +500,13 @@
 
     "@floating-ui/utils": ["@floating-ui/utils@0.2.10", "", {}, "sha512-aGTxbpbg8/b5JfU1HXSrbH3wXZuLPJcNEcZQFMxLs3oSzgtVu6nFPkbbGGUvBcUjKV2YyB9Wxxabo+HEH9tcRQ=="],
 
-    "@formatjs/bigdecimal": ["@formatjs/bigdecimal@0.2.3", "", {}, "sha512-d7LpumdsbHueHdlVMos2yROIumyisUJNlFAk3PpN/5YcnXhWnkYmeiaQnOjqmmGx8BbaphoIyaF2CPus3cownw=="],
+    "@formatjs/bigdecimal": ["@formatjs/bigdecimal@0.2.5", "", {}, "sha512-2XTKNrZRaCUyXK2976wfutqxMBuPO/S/zbJnQdysLI2Zy5mWPVNVEkE6tsTcSVWSE7DgO88t8DtBy+uf3I8bxg=="],
 
-    "@formatjs/fast-memoize": ["@formatjs/fast-memoize@3.1.4", "", {}, "sha512-Lbke1aOrsygKKR09Ux0NrZgbTqpDmiwXOgzyDOJ8Owr1zd5qOKTauf62hH+Seeku3ju77rHWH9I5SfX2CN0vuA=="],
+    "@formatjs/fast-memoize": ["@formatjs/fast-memoize@3.1.5", "", {}, "sha512-KLi3fan6WnCHmigd9pmEEN8Hid0v4wiFBW576M/d07KMWYecf1CvyMI3n34vCmHT4AoVqG2n702kiHbXjzZX2A=="],
 
-    "@formatjs/intl-durationformat": ["@formatjs/intl-durationformat@0.10.8", "", { "dependencies": { "@formatjs/bigdecimal": "0.2.3", "@formatjs/intl-localematcher": "0.8.6" } }, "sha512-1Crir41n1kMTVejBg7tkLfBRSWm7p1y+Bt4Nyny1DtxH41/+q2qZ2vSyTiQEdKbvSvmt0WG/gInFrMsK8lx1/A=="],
+    "@formatjs/intl-durationformat": ["@formatjs/intl-durationformat@0.10.12", "", { "dependencies": { "@formatjs/bigdecimal": "0.2.5", "@formatjs/intl-localematcher": "0.8.8" } }, "sha512-k9LXUGERtAKoav1my1JIfMZY++ifg/2+7zAjFCUu+tPP2PEfN2N0shdZ9hddHMbaD0icr2iAVT8zleLNf70W8A=="],
 
-    "@formatjs/intl-localematcher": ["@formatjs/intl-localematcher@0.8.6", "", { "dependencies": { "@formatjs/fast-memoize": "3.1.4" } }, "sha512-AZRgUxj0q93lyF7Z5lFS85bLINXuBLX4R3tCKicO6fSWo6cvh9GQfoR3B1WlsqQwefZ1QORTivhInx7gM6HUzQ=="],
+    "@formatjs/intl-localematcher": ["@formatjs/intl-localematcher@0.8.8", "", { "dependencies": { "@formatjs/fast-memoize": "3.1.5" } }, "sha512-pBr2hVKWvkHVnfXegW+53NT9U2uaVQCc+EgzLPCCwXqBA3nvM5fPbK9IcJlNjV+NMKGyZ2F3ZSG78iGdxAAqbA=="],
 
     "@gar/promisify": ["@gar/promisify@1.1.3", "", {}, "sha512-k2Ty1JcVojjJFwrg/ThKi2ujJ7XNLYaFGNB/bWT9wGR+oSMJHMa5w+CUq6p/pVrKeNNgA7pCqEcjSnHVoqJQFw=="],
 
