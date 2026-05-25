@@ -148,6 +148,8 @@
     },
   },
   "patchedDependencies": {
+    "@capacitor/file-viewer@2.0.1": "patches/@capacitor__file-viewer@2.0.1.patch",
+    "@capacitor/filesystem@8.1.2": "patches/@capacitor__filesystem@8.1.2.patch",
     "natural-regex@0.5.0": "patches/natural-regex@0.5.0.patch",
     "@types/piexifjs@1.0.0": "patches/@types%2Fpiexifjs@1.0.0.patch",
   },
