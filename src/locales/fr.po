@@ -2666,3 +2666,8 @@ msgstr "Aucun choix effectué pour le moment"
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/choices/+page.svelte
 msgid "Décrire l'observation"
 msgstr "Décrire l'observation"
+
+#. 0: file.name
+#: src/lib/import.svelte.js
+msgid "Erreur lors de l'extraction des métadonnées du fichier RAW {0}"
+msgstr "Erreur lors de l'extraction des métadonnées du fichier RAW {0}"
