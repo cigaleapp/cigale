@@ -636,9 +636,8 @@ location:
 	await expect(app.metadata.textbox('integer')).toHaveValue('100');
 	await expect(app.metadata.textbox('string')).toHaveValue('some text right there  ');
 	await expect(app.metadata.combobox('location')).toHaveValue(locationDisplayName);
-	await expect(app.metadata.section('sidecar').locator('pre')).toHaveText(
-		// there's also a <pre> tag for the fullscreen <dialog>
-		[sidecars.json.content, sidecars.json.content]
+	await expect(app.metadata.section('sidecar').locator('.file-preview > pre')).toHaveText(
+		sidecars.json.content
 	);
 
 	const dbvalues = await app.db.metadata.values({
