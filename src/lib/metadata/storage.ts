@@ -189,7 +189,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 	isDefault = false,
 	updateReactiveState = true,
 	unit = undefined,
-	cascadedFrom = [],
+	applyCascades = true,
 	sessionId,
 	abortSignal,
 }: {
@@ -208,7 +208,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 	alternatives?:
 		| DB.MetadataValue['alternatives']
 		| Array<{ value: RuntimeValue<Type>; confidence: number }>;
-	cascadedFrom?: string[];
+	applyCascades?: boolean;
 	abortSignal?: AbortSignal | undefined;
 	sessionId?: string | undefined | null;
 	updateReactiveState?: boolean;
@@ -308,8 +308,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 
 	abortSignal?.throwIfAborted();
 
-	// Cascading is not recursive anymore (see #1571)
-	if (cascadedFrom.length === 0) {
+	if (applyCascades) {
 		const cascades = await computeCascades({
 			db,
 			metadataId,
@@ -320,12 +319,6 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 
 		for (const cascade of cascades) {
 			abortSignal?.throwIfAborted();
-
-			if (cascadedFrom.includes(cascade.metadataId)) {
-				throw new Error(
-					`Boucle infinie de cascade détectée pour ${cascade.metadataId} avec ${cascade.value}: ${cascadedFrom.join(' -> ')} -> ${metadataId} -> ${cascade.metadataId}`
-				);
-			}
 
 			console.info(
 				`Cascading metadata ${metadataId} @ ${value} -> ${cascade.metadataId}  = ${cascade.value}`
@@ -346,16 +339,17 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 				manuallyModified,
 				isDefault,
 				confirmed,
-				cascadedFrom: [...cascadedFrom, metadataId],
+				...cascade,
+				applyCascades: false,
+				updateReactiveState: false,
 				abortSignal,
 				clearErrors,
-				...cascade,
 			});
 		}
 	}
 
-	// Only refresh table state once everything has been cascaded, meaning not inside recursive calls
-	if (cascadedFrom.length === 0 && sessionId && updateReactiveState) {
+	// Only refresh table state if asked
+	if (sessionId && updateReactiveState) {
 		await refreshTables(sessionId, session ? 'Session' : image ? 'Image' : 'Observation');
 	}
 }
