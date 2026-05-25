@@ -164,7 +164,7 @@
 		"arrival-time": "^1.0.6",
 		"bits-ui": "^1.8.0",
 		"convert": "^7.0.0",
-		"date-fns": "^4.1.0",
+		"date-fns": "^4.2.1",
 		"dequal": "^2.0.3",
 		"devalue": "^5.8.0",
 		"electron-serve": "^3.0.1",
