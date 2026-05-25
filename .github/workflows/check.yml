@@ -144,7 +144,7 @@ jobs:
     name: E2E
     concurrency:
       group: playwright-${{ needs.e2e-concurrency.outputs.bucket }}
-      cancel-in-progress: false
+      queue: max
     uses: ./.github/workflows/playwright.yml
     secrets: inherit
     with:
