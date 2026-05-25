@@ -10,7 +10,7 @@
         "@capacitor/core": "^8.3.3",
         "@capacitor/file-viewer": "^2.0.1",
         "@capacitor/filesystem": "^8.1.2",
-        "@capacitor/local-notifications": "^8.1.0",
+        "@capacitor/local-notifications": "^8.2.0",
         "@capacitor/share": "^8.0.1",
         "@capacitor/splash-screen": "^8.0.1",
         "@capawesome/capacitor-file-picker": "^8.0.2",
@@ -214,7 +214,7 @@
 
     "@capacitor/filesystem": ["@capacitor/filesystem@8.1.2", "", { "dependencies": { "@capacitor/synapse": "^1.0.4" }, "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-doaaMfGoFR2hWU6aV6u83I+5ZsGyJVq+Gz4r9lMpJzUKMm1eMu0hLnFdV1aXZlU9FlK/RndFrVD8oRZfNOqWgQ=="],
 
-    "@capacitor/local-notifications": ["@capacitor/local-notifications@8.1.0", "", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-rc1vWw7G7LXLL9AOoi6DKA740UMDEVpBbRBFByI4KVPV4wJi30gtr5k2D3/WwiwwYvjm55eD1k03QhOrGYf9cA=="],
+    "@capacitor/local-notifications": ["@capacitor/local-notifications@8.2.0", "", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-fvLY0w2w4MiX+DD4+Wv4DOwOLdzKZsMDwAcRv/Juudd+QbKbn69s6cM3xVqPwAiDqfnqsY4/S8xtQD6M73wY2A=="],
 
     "@capacitor/share": ["@capacitor/share@8.0.1", "", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-3cSBKBCJVon54rKDROP2rqGyeGks4pBh9TbaEk9S375Kbek/ZHe72N50zIa0Vn9Eac/SuhwgehO/mmA4CsUOiw=="],
 
