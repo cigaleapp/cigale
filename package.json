@@ -201,7 +201,7 @@
 		"unplugin-icons": "^23.0.1",
 		"update-electron-app": "^3.2.0",
 		"word-diff": "^1.0.1",
-		"wuchale": "^0.23.3",
+		"wuchale": "^0.23.4",
 		"xss": "^1.0.15",
 		"yaml": "^2.9.0"
 	},
