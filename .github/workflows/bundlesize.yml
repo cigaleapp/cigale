@@ -25,11 +25,11 @@ jobs:
 
     steps:
       - name: Download stats.json files
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
 
       - name: Compare bundle size
         id: comparison
-        uses: wojtekmaj/vite-compare-bundle-size@v1
+        uses: wojtekmaj/vite-compare-bundle-size@0769ef9346dbfc2168eb331ba77b62cd90ddaa01 # v1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           current-stats-json-path: ./head-stats/stats.json
@@ -59,10 +59,10 @@ jobs:
           - { name: head, ref: '${{ github.head_ref }}', analyzer: 'json,static' }
           - { name: base, ref: '${{ github.base_ref }}', analyzer: 'json' }
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           ref: ${{ matrix.ref }}
-      - uses: oven-sh/setup-bun@v2
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
         with:
           bun-version-file: .bun-version
 
@@ -73,14 +73,14 @@ jobs:
           BUNDLE_ANALYZER: ${{ matrix.analyzer }}
 
       - name: Upload stats.json
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: ${{ matrix.name }}-stats
           path: ./public/stats.json
 
       - if: matrix.name == 'head'
         name: Upload bundle analysis site
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           path: ./public/stats.html
           name: ${{ matrix.name }}-bundle-analysis

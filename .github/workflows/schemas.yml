@@ -9,8 +9,8 @@ jobs:
     name: Protocols
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: oven-sh/setup-bun@v2
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
         with:
           bun-version-file: .bun-version
       - name: Install dependencies
@@ -18,7 +18,7 @@ jobs:
       - name: Generate JSON schema
         run: bun run scripts/generate-json-schemas.js
       - name: Validate protocols with JSON schema
-        uses: GrantBirki/json-yaml-validate@v5.0.0
+        uses: GrantBirki/json-yaml-validate@3ff75979f3b21171f2e8a44705f0ff4bed30bbc0 # v5.0.0
         with:
           json_schema: static/protocol.schema.json
           json_schema_version: draft-2020-12
@@ -26,7 +26,7 @@ jobs:
             examples/*.cigaleprotocol.{yaml,json}
             protocols/*.cigaleprotocol.{yaml,json}
       - name: Validate registry with JSON schema
-        uses: GrantBirki/json-yaml-validate@v5.0.0
+        uses: GrantBirki/json-yaml-validate@3ff75979f3b21171f2e8a44705f0ff4bed30bbc0 # v5.0.0
         with:
           json_schema: static/registry.schema.json
           json_schema_version: draft-2020-12
