@@ -487,7 +487,13 @@ export const JsonataExpression = (Input, Output) =>
 						expr.assign(key, value);
 					}
 
-					const raw = await expr.evaluate(Input.assert(data));
+					let raw = await expr.evaluate(Input.assert(data));
+
+					// Jsonata can produce null-prototype objects, which causes issues with .toString() & others
+					if (raw && typeof raw === 'object' && Object.getPrototypeOf(raw) === null) {
+						raw = mapValues(raw, (v) => v);
+					}
+
 					const out = Output(raw);
 
 					if (out instanceof ArkErrors) {
