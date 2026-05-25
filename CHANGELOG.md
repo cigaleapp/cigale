@@ -7,36 +7,69 @@ All notable changes to this project will be documented in this file, on a monthl
 ### Improvements
 
 - Add browser ^& device info on about page (Closes #1568)
+- Add bug report button in fullscreen views
+- Add lightbox to enum options' images
+- Add loading screen while defaults are doing an initial resolve on session metadata form
 - Add notification on mobile app when export saved to open the file
+- Add separate tab for chosen metadata in narrowing classifier
 - Allow both neural & sidecar inference at the same time on a crop metadata
+- Allow deselecting by clicking on selected option in narrowing classifier
+- Allow protocols to force presentation of a enum metadata to combobox or buttons
+- Allow scrolling through description of candidate species
+- Allow selecting multiple options (stores them as alternatives), show narrowing power of every option in describe tab
+- Bring back gap in preview sidepanel metadata list
+- Catch not-found cases for observation & focused metadata in fullscreen classifier views
+- Compute matching candidates such that they take multiple choices for a same metadata into account
 - Create a rudimentary "latest APK" download page for nightly builds
+- Create observations at image import time
 - Defer toast emission until after navigation in toast+goto sequences (#1579)
+- Fix wrapping of boxes' action buttons on fullscreen cropper
+- Guard against crashes if a non-finite value is passed to ProgressBar
+- Handle RAW photos
+- Handle empty search result in describe tab of narrowing classifier
+- Hardcode backbone protocol as default for new sessions when available
 - Hide export-to-folder button on mobile app
+- Make taxonomy metadata group narrowable too
+- Move all navigation & confirmation related actions to top bar for all fullscreen views
 - Only hide native splash screen once loading bar starts
 - Open in-app browser for KoboToolbox account registration on mobile
+- Order by narrower weights first, then by narrowing power (#1619)
+- Prevent "classification metadata not found" errors when changing session's protocol
+- Preverse scroll between tab switches in narrowing classifier, and reset scroll when search results change
+- Rework layout of fullscreen views to add a global top-bar
 - Setup deeplinking
 - Share a /protocols/import URL instead of a file in protocol list (#1558)
 - Show directory picker to save file instead of sharing it on mobile app
+- Show distance to choices for eliminated candidates
+- Show list of remaining/eliminated candidates on the side in narrowing classifier
 - Show protocol description above session metadata form in session details page
 - Space out paragraphs in rendered markdown text
 - Trigger a share instead of a download on export protocol button, on platforms where it's more appropriate
 - Use a different app icon for nightly builds
 - Use a different app name for different flavors
 
+### Performance Improvements
+
+- Don't recurse when cascading metadata (Closes #1571)
+
 ### Bug Fixes
 
+- Delete empty observations when a bounding box is removed
 - Fix assetlinks fingerprint for non-preview builds
 - Fix back button behavior on Android
+- Fix bugs with combobox's input text when closed
 - Fix cannot select YAML protocol file on mobile app (Closes #1560)
 - Fix deeplinking by removing custom URL scheme handling
 - Fix destination path computation for saving as file on mobile app
 - Fix file downloads not working on mobile app
 - Fix fonts falling back to Arial
 - Fix incorrect URL for INSECTA source in builtin protocols list on main
+- Fix initial focused box for fullscreen cropper with set observation
 - Fix notifications not being sent on mobile app
 - Fix notifications setting always showing state as Off
 - Fix parallelism setting's input not showing on mobile
 - Fix pdf-to-png-converter v4 filter condition (kind !== → kind ===)
+- Fix session metadata form being always empty
 - Fix tab bar showing when in about page
 - Fix value of website_host for preview builds of android app
 - Make assetlinks static
@@ -45,12 +78,15 @@ All notable changes to this project will be documented in this file, on a monthl
 
 ### Data Updates
 
+- Add andrena group to Entomoscope protocol
 - Add neural inference to crop on Entomoscope protocol
 - Bump protocol version of protocols/entomoscope.cigaleprotocol.yaml [ci skip]
 - Fix logo assets generation for mobile app
 - Handle new location format, ai disabled case and no location case in Entomoscope sidecars
+- Improve Xper3 data import into backbone protocol
 - Regenerate example protocols
 - Regenerate logo assets for local development builds
+- Remove Xper3 placeholders from andrena metadata option descriptions
 - Serve assetlinks
 - Setup logo assets generation
 - Update Entomoscope protocol
@@ -61,6 +97,8 @@ All notable changes to this project will be documented in this file, on a monthl
 ### Translation Updates
 
 - Refresh translation files
+- Regenerate translations
+- Translate via Weblate (English)
 
 ## April 2026
 
