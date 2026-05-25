@@ -18,17 +18,20 @@
 				"lint-staged",
 				"svelte-check"
 			],
-			"automerge": true
+			"automerge": true,
+			"prPriority": 10
 		},
 		{
 			"description": "Auto-merge patch upgrades (E2E tests should validate that nothing catastrophic happens)",
 			"matchUpdateTypes": ["patch"],
-			"automerge": true
+			"automerge": true,
+			"prPriority": 5
 		},
 		{
 			"description": "Do not auto-merge gradle or gradle-wrapper updates",
 			"matchManagers": ["gradle", "gradle-wrapper"],
-			"automerge": false
+			"automerge": false,
+			"prPriority": -1
 		}
 	]
 }
