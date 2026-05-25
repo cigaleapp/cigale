@@ -124,9 +124,24 @@ jobs:
     with:
       debug: true
 
+  e2e-concurrency:
+    name: Compute E2E concurrency bucket
+    runs-on: ubuntu-latest
+    outputs:
+      bucket: ${{ steps.bucket.outputs.bucket }}
+    steps:
+      - name: Compute bucket from run number
+        id: bucket
+        run: echo "bucket=$(( RUN_NUMBER % 4 ))" >> "$GITHUB_OUTPUT"
+        env:
+          RUN_NUMBER: ${{ github.run_number }}
+
   e2e:
-    needs: [build-debug, json-schema, lint, test]
+    needs: [build-debug, json-schema, lint, test, e2e-concurrency]
     name: E2E
+    concurrency:
+      group: playwright-${{ needs.e2e-concurrency.outputs.bucket }}
+      cancel-in-progress: false
     uses: ./.github/workflows/playwright.yml
     secrets: inherit
     with:
