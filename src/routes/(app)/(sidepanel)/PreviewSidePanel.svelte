@@ -8,7 +8,6 @@
 	import IconObservation from '~icons/ri/bug-line';
 	import IconDelete from '~icons/ri/delete-bin-line';
 	import IconFullScreen from '~icons/ri/fullscreen-line';
-	import OverflowableText from '$lib/OverflowableText.svelte';
 	import IconSplit from '~icons/ri/function-line';
 	import IconImage from '~icons/ri/image-2-line';
 	import IconMerge from '~icons/ri/shadow-line';
@@ -25,6 +24,7 @@
 	import Metadata from '$lib/Metadata.svelte';
 	import MetadataList from '$lib/MetadataList.svelte';
 	import { IsMobile } from '$lib/mobile.svelte.js';
+	import OverflowableText from '$lib/OverflowableText.svelte';
 	import { goto } from '$lib/paths.js';
 	import { metadataDefinitionComparator } from '$lib/protocols.js';
 	import { uiState } from '$lib/state.svelte.js';
