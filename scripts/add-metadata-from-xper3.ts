@@ -135,6 +135,10 @@ async function augment(protocolPath: string, protocol: typeof ExportedProtocol.i
 				),
 		};
 
+		const morphogroups = protocol.metadata[`${protocol.id}__morphogroup`].options!.map(
+			(o) => o.key
+		);
+
 		const descriptorMetadatas = new Map<
 			`c${string}`,
 			{ id: string } & (typeof ExportedProtocol.inferIn)['metadata'][string]
@@ -408,6 +412,21 @@ async function augment(protocolPath: string, protocol: typeof ExportedProtocol.i
 				);
 				console.error(e);
 				continue;
+			}
+		}
+
+		for (const [oidx, speciesOption] of protocol.metadata[
+			`${protocol.id}__species`
+		].options!.entries()) {
+			const morphogroup = morphogroups.find(
+				(mg) => mg === speciesOption.label.split(' ').at(1)
+			);
+
+			if (morphogroup) {
+				protocol.metadata[`${protocol.id}__species`].options![oidx].cascade = {
+					...speciesOption.cascade,
+					morphogroup,
+				};
 			}
 		}
 

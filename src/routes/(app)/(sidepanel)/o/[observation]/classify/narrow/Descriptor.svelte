@@ -57,8 +57,9 @@
 	);
 
 	const moreSelections = $derived(
-		Object.values(metadataValues[definition.id]?.alternatives ?? {})
-			.filter(( confidence ) => confidence >= 1).length
+		Object.values(metadataValues[definition.id]?.alternatives ?? {}).filter(
+			(confidence) => confidence >= 1
+		).length
 	);
 
 	async function onChange({
