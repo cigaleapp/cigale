@@ -96,6 +96,45 @@ async function augment(protocolPath: string, protocol: typeof ExportedProtocol.i
 			narrowable: true,
 		};
 
+		protocol.metadata[`${protocol.id}__morphogroup`] = {
+			label: 'Morphogroupe',
+			group: 'andrena',
+			description: '',
+			type: 'enum',
+			mergeMethod: 'max',
+			required: false,
+			infer: {
+				neural: [
+					{
+						name: 'ConvNextV2 Tiny',
+						model: 'https://huggingface.co/edgaremy/andrena-classifier/resolve/main/convnextv2_tiny.andrena-cleaned.onnx?download=true',
+						classmapping:
+							'https://huggingface.co/edgaremy/andrena-classifier/resolve/main/class-mapping.txt?download=true',
+						input: {
+							height: 384,
+							width: 384,
+							normalized: true,
+							disposition: '1CHW',
+							name: 'input0',
+						},
+					},
+				],
+			},
+			options: await fetch(
+				'https://huggingface.co/edgaremy/andrena-classifier/resolve/main/class-mapping.txt?download=true'
+			)
+				.then((res) => res.text())
+				.then((text) =>
+					text
+						.split('\n')
+						.filter((line) => line.trim())
+						.map((key) => ({
+							key,
+							label: key[0].toUpperCase() + key.slice(1),
+						}))
+				),
+		};
+
 		const descriptorMetadatas = new Map<
 			`c${string}`,
 			{ id: string } & (typeof ExportedProtocol.inferIn)['metadata'][string]

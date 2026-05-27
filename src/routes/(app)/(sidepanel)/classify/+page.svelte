@@ -1,12 +1,12 @@
 <script>
 	import { watch } from 'runed';
 	import { fade } from 'svelte/transition';
+	import { SvelteSet } from 'svelte/reactivity';
 
 	import AreaObservations from '$lib/AreaObservations.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import CardImage from '$lib/CardImage.svelte';
 	import CardObservation from '$lib/CardObservation.svelte';
-	import { classificationInferenceSettings } from '$lib/classification.svelte.js';
 	import { tables } from '$lib/idb.svelte';
 	import {
 		deleteImageFile,
@@ -90,49 +90,18 @@
 
 	let modelAbortController = new AbortController();
 	let classifmodelLoaded = $state(false);
+	/** @type {Set<string>} metadata IDs for which models have been loaded */
+	let loadedClassificationModels = new SvelteSet();
 	/** @type {Error|undefined}*/
 	let classifModelLoadingError = $state();
-	async function loadClassifModel() {
-		// If the model is already loaded, we don't need to load it again
-		if (classifmodelLoaded) return;
-		if (!uiState.currentProtocol) return;
-		if (!uiState.classificationInferenceAvailable) return;
 
-		const settings = classificationInferenceSettings(
-			uiState.currentProtocol,
-			uiState.selectedClassificationModel
-		);
-		if (!settings) {
-			toasts.error(
-				`Aucun paramètre d'inférence défini pour le modèle ${uiState.selectedClassificationModel} sur le protocole ${uiState.currentProtocol.name}`
-			);
-			return;
-		}
-
-		modelAbortController.abort();
-		classifModelLoadingError = undefined;
-		modelAbortController = new AbortController();
-
-		await loadModel(data.swarpc, 'classification', {
-			abortSignal: modelAbortController.signal,
-			protocolId: uiState.currentProtocol.id,
-			requests: {
-				model: settings.model,
-				classmapping: settings.classmapping,
-			},
-			onProgress(p) {
-				modelLoadingProgress = p;
-			},
-		});
-	}
-
-	// TODO fix chunked batching: add a throttle to
-	// wait before starting classification batch
-	// so that tasks are more likely to be queued together
-	$effect(() => {
-		if (!uiState.classificationInferenceAvailable) return;
+	function queueClassificationsIfReady() {
 		if (!classifmodelLoaded) return;
 		if (classifModelLoadingError) return;
+		if (!uiState.classificationInferenceAvailable) return;
+
+		const allMetadataIds = uiState.allClassificationMetadata.map((m) => m.id);
+		if (!allMetadataIds.every((id) => loadedClassificationModels.has(id))) return;
 
 		const toClassify = tables.Image.state.filter(
 			(image) =>
@@ -143,21 +112,78 @@
 		);
 
 		classifyMore(toClassify.map((i) => i.id));
-	});
+	}
+
+	async function loadAllClassifModels() {
+		classifmodelLoaded = false;
+		modelLoadingProgress = 0;
+
+		// If all models are already loaded, we don't need to load them again
+		const allMetadataIds = uiState.allClassificationMetadata.map((m) => m.id);
+		if (allMetadataIds.length === 0) return;
+		if (allMetadataIds.every((id) => loadedClassificationModels.has(id))) return;
+
+		if (!uiState.currentProtocol) return;
+		if (!uiState.classificationInferenceAvailable) return;
+
+		modelAbortController.abort();
+		classifModelLoadingError = undefined;
+		modelAbortController = new AbortController();
+		loadedClassificationModels = new SvelteSet();
+
+		try {
+			// Load models for all classification metadata
+			for (let i = 0; i < uiState.allClassificationMetadata.length; i++) {
+				const metadata = uiState.allClassificationMetadata[i];
+				const modelIndex = uiState.selectedClassificationModels[metadata.id] ?? 0;
+				const allModels = uiState.allClassificationModels[metadata.id];
+
+				if (!allModels || !allModels[modelIndex]) {
+					console.warn(
+						`No model found for metadata ${metadata.id} at index ${modelIndex}`
+					);
+					continue;
+				}
+
+				const settings = allModels[modelIndex];
+
+				await loadModel(data.swarpc, 'classification', {
+					abortSignal: modelAbortController.signal,
+					protocolId: uiState.currentProtocol.id,
+					requests: {
+						model: settings.model,
+						classmapping: settings.classmapping,
+					},
+					onProgress(p) {
+						// Distribute progress across all models
+						modelLoadingProgress = (i + p) / uiState.allClassificationMetadata.length;
+					},
+				});
+
+				loadedClassificationModels.add(metadata.id);
+			}
+		} catch (error) {
+			throw error;
+		} finally {
+			classifmodelLoaded = true;
+			queueClassificationsIfReady();
+		}
+	}
 
 	watch(
-		() => uiState.selectedClassificationModel,
+		() => [uiState.allClassificationMetadata.length, uiState.selectedClassificationModels],
 		() => {
 			classifmodelLoaded = false;
-			void loadClassifModel()
+			loadedClassificationModels = new SvelteSet();
+			void loadAllClassifModels()
 				.catch((error) => {
 					classifModelLoadingError = error;
 					if (isAbortError(error)) return;
 					console.error(error);
 					toasts.error('Erreur lors du chargement du modèle de classification');
 				})
-				.then(() => {
-					classifmodelLoaded = true;
+				.finally(() => {
+					queueClassificationsIfReady();
 				});
 		}
 	);
@@ -172,7 +198,7 @@
 			help: "Classifier l'image sélectionnée en plein écran",
 			when: () =>
 				uiState.selection.length === 1 &&
-				tables.Observation.getFromState(uiState.selection[0]),
+				!!tables.Observation.getFromState(uiState.selection[0]),
 			async do() {
 				let id = uiState.selection.at(0);
 				if (!id) return;
@@ -185,12 +211,21 @@
 
 {#snippet modelsource()}
 	{#if uiState.classificationInferenceAvailable}
-		{@const { model } = uiState.classificationModels[uiState.selectedClassificationModel]}
-		{@const url = new URL(typeof model === 'string' ? model : model?.url)}
-		<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
-		<a href={url.toString()} target="_blank">
-			<code>{url.pathname.split('/').at(-1)}</code>
-		</a>
+		{#each uiState.allClassificationMetadata as metadata}
+			{@const modelIndex = uiState.selectedClassificationModels[metadata.id] ?? 0}
+			{@const models = uiState.allClassificationModels[metadata.id]}
+			{@const model = models?.[modelIndex]?.model}
+			{#if model}
+				{@const url = new URL(typeof model === 'string' ? model : model?.url)}
+				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
+				<a href={url.toString()} target="_blank" title={metadata.id}>
+					<code>{url.pathname.split('/').at(-1)}</code>
+				</a>
+				{#if uiState.allClassificationMetadata.length > 1}
+					<span class="metadata-label">{metadata.id}</span>
+				{/if}
+			{/if}
+		{/each}
 	{/if}
 {/snippet}
 

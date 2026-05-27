@@ -60,6 +60,7 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 		input: type({
 			imageId: 'string',
 			'webgpu?': 'boolean',
+			'inferenceSessionId?': 'string',
 			metadataIds: {
 				cropbox: 'string',
 				target: 'string',
