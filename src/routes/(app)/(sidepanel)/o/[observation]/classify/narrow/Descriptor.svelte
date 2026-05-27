@@ -96,7 +96,6 @@
 				type: 'enum',
 				manuallyModified: true,
 				sessionId: uiState.currentSession?.id,
-				// updateReactiveState: false,
 				value,
 				alternatives,
 			});
@@ -106,7 +105,6 @@
 				subjectId: observation.id,
 				metadataId: definition.id,
 				sessionId: uiState.currentSession?.id,
-				// updateReactiveState: false,
 			});
 		}
 	}
@@ -150,6 +148,8 @@
 				help="Supprimer ce choix"
 				onclick={async () => {
 					if (!observation) return;
+
+					// TODO: remove metadata value on observation's images too
 
 					await deleteMetadataValue({
 						db: databaseHandle(),

@@ -135,6 +135,8 @@ export class UIState {
 	previewURLs = new SvelteMap();
 	/** @type {Map<string, string>} These persist across session changes */
 	globalPreviewURLs = new SvelteMap();
+	/** @type {Set<string>} Persisted set of inference session IDs loaded on the client */
+	loadedInferenceSessions = new SvelteSet();
 	/** @type {Map<string, string>} */
 	erroredImages = new SvelteMap();
 	/** @type {Set<string>} */

@@ -35,6 +35,14 @@ let inferenceSessions = new Map();
 let latestSessionIdByTask = new Map();
 
 swarp.loadModel(async ({ task, model, classmapping, inferenceSessionId: id, webgpu }) => {
+	// If the worker already has a session with this id, treat the request as a no-op.
+	// This makes loadModel idempotent and avoids reloading the same model on
+	// repeated client requests (e.g., when components remount on tab switches).
+	if (inferenceSessions.has(id)) {
+		latestSessionIdByTask.set(task, id);
+		return true;
+	}
+
 	const onnx = await ort.InferenceSession.create(model, {
 		executionProviders: webgpu ? ['webgpu'] : [],
 	});

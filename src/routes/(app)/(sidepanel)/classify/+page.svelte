@@ -83,7 +83,7 @@
 	]);
 
 	/** Persist across route changes so the same model is not fetched twice. */
-	const loadedClassificationSessionIds = new Set();
+	// Use uiState.loadedInferenceSessions which persists on the UIState singleton
 
 	/**
 	 * loaded and total bytes counts, set and updated by loadModel()
@@ -144,7 +144,7 @@
 			return;
 		}
 
-		const pendingLoads = modelLoads.filter(({ sessionId }) => !loadedClassificationSessionIds.has(sessionId));
+		const pendingLoads = modelLoads.filter(({ sessionId }) => !uiState.loadedInferenceSessions.has(sessionId));
 		if (pendingLoads.length === 0) {
 			classifmodelLoaded = true;
 			queueClassificationsIfReady();
@@ -171,7 +171,7 @@
 						modelLoadingProgress = (i + p) / pendingLoads.length;
 					},
 				});
-				loadedClassificationSessionIds.add(sessionId);
+				uiState.loadedInferenceSessions.add(sessionId);
 			}
 		} catch (error) {
 			throw error;
