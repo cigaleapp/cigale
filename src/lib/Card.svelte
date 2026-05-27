@@ -52,7 +52,8 @@ Available CSS variables:
 
 	let _showLoading = $derived(showLoading);
 
-	let loading = $derived(alwaysLoading || false);
+	// Using $derived causes loading to reset to false if props change
+	let loading = $state(alwaysLoading || false);
 	const clickable = $derived(Boolean(onclick));
 </script>
 
