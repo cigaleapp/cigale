@@ -42,19 +42,6 @@
 		trigger: customTrigger,
 	}: Props = $props();
 
-	const isOnTabItself = $derived.by(() => {
-		switch (page.route.id) {
-			case '/(app)/(sidepanel)/crop':
-				return tab === 'crop';
-			case '/(app)/(sidepanel)/classify':
-				return tab === 'classify';
-			case '/(app)/(sidepanel)/import':
-				return tab === 'import';
-			default:
-				return false;
-		}
-	});
-
 	function selectableModel(i: number, label: string) {
 		return {
 			type: 'selectable' as const,
@@ -64,9 +51,6 @@
 			selected: currentModelIndex === i,
 			async onclick() {
 				await setModel(i);
-				if (isOnTabItself && currentModelIndex !== i) {
-					window.location.reload();
-				}
 			},
 		};
 	}
@@ -292,7 +276,7 @@
 						},
 					})),
 			}),
-			...orEmpty(uiState.currentProtocol && models.length > 0, {
+			...orEmpty(tab !== 'classify' && uiState.currentProtocol && models.length > 0, {
 				label: "Modèle d'inférence",
 				testid: `${tab}-settings-inference-model`,
 				items: [
@@ -301,6 +285,51 @@
 						selectableModel(i, model.name ?? `Modèle ${i + 1}`)
 					),
 				],
+			}),
+			...orEmpty(tab === 'classify' && uiState.currentProtocol && uiState.allClassificationMetadata.length > 0, {
+				label: "Modèle d'inférence",
+				testid: `${tab}-settings-inference-model`,
+				items: uiState.allClassificationMetadata.map((metadata) => {
+					const metadataLabel = metadata.label || removeNamespaceFromMetadataId(metadata.id);
+					const selectedModelIndex = uiState.selectedClassificationModels[metadata.id] ?? -1;
+					const modelsForMetadata = uiState.allClassificationModels[metadata.id] ?? [];
+
+					return {
+						type: 'submenu' as const,
+						data: { direction: null },
+						label: metadataLabel,
+						selected: selectedModelIndex !== -1,
+						submenu: {
+							label: metadataLabel,
+							testid: `${tab}-settings-inference-model-${metadata.id}`,
+							empty: 'Le protocole ne définit aucun modèle pour cette métadonnée.',
+							items: [
+								{
+									type: 'selectable' as const,
+									data: { direction: null },
+									key: `${metadata.id}:none`,
+									label: 'Aucune inférence',
+									selected: selectedModelIndex === -1,
+									closeOnSelect: false,
+									async onclick() {
+										await uiState.setClassificationModelSelection(metadata.id, -1);
+									},
+								},
+								...modelsForMetadata.map((model, i) => ({
+									type: 'selectable' as const,
+									data: { direction: null },
+									key: `${metadata.id}:${i}`,
+									label: model.name ?? `Modèle ${i + 1}`,
+									selected: selectedModelIndex === i,
+									closeOnSelect: false,
+									async onclick() {
+										await uiState.setClassificationModelSelection(metadata.id, i);
+									},
+								})),
+							],
+						},
+					};
+				}),
 			}),
 		]}
 	>

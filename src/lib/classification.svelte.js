@@ -18,7 +18,7 @@ export async function classifyImage(swarpc, id, cancellers) {
 	}
 
 	// Get all classification metadata for the current protocol
-	const allClassificationMetadata = uiState.allClassificationMetadata;
+	const allClassificationMetadata = uiState.enabledClassificationMetadata;
 	if (allClassificationMetadata.length === 0) {
 		console.warn(
 			'No metadata with neural inference defined, not analyzing image. Configure neural inference on enum metadata (set metadata.<your metadata id>.infer.neural) if this was not intentional.'

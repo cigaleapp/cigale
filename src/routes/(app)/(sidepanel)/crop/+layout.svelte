@@ -1,5 +1,6 @@
 <script>
 	import { watch } from 'runed';
+	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
 
 	import { loadModel } from '$lib/inference.js';
@@ -15,6 +16,8 @@
 	let modelLoaded = $state(false);
 	// let modelLoadingError = $state();
 	let modelAbortController = new AbortController();
+	let cropModelLoadPromise = undefined;
+	let requestedCropModel = -1;
 	/**
 	 * @param {number} selectedModel
 	 */
@@ -40,20 +43,41 @@
 		});
 	}
 
+	function loadSelectedCropModel(selectedModel = uiState.selectedCropModel) {
+		if (cropModelLoadPromise && requestedCropModel === selectedModel) {
+			return cropModelLoadPromise;
+		}
+
+		requestedCropModel = selectedModel;
+		modelLoaded = false;
+
+		cropModelLoadPromise = loadCropperModel(selectedModel)
+			.catch((error) => {
+				// modelLoadingError = error;
+				if (isAbortError(error)) return;
+				console.error(error);
+				toasts.error('Erreur lors du chargement du modèle de classification');
+			})
+			.then(() => {
+				modelLoaded = true;
+			})
+			.finally(() => {
+				if (requestedCropModel === selectedModel) {
+					cropModelLoadPromise = undefined;
+				}
+			});
+
+		return cropModelLoadPromise;
+	}
+
+	onMount(() => {
+		void loadSelectedCropModel();
+	});
+
 	watch(
 		() => uiState.selectedCropModel,
 		() => {
-			modelLoaded = false;
-			void loadCropperModel(uiState.selectedCropModel)
-				.catch((error) => {
-					// modelLoadingError = error;
-					if (isAbortError(error)) return;
-					console.error(error);
-					toasts.error('Erreur lors du chargement du modèle de classification');
-				})
-				.then(() => {
-					modelLoaded = true;
-				});
+			void loadSelectedCropModel();
 		}
 	);
 </script>

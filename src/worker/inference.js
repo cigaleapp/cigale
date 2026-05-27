@@ -56,10 +56,25 @@ swarp.loadModel(async ({ task, model, classmapping, inferenceSessionId: id, webg
 swarp.inferenceSessionId(async (task) => latestSessionIdByTask.get(task) ?? null);
 
 swarp.inferBoundingBoxes(async ({ fileId, taskSettings }, _, tools) => {
-	const session = inferenceSessions.get('detection')?.onnx;
+	const sessionId = latestSessionIdByTask.get('detection');
+	const session = sessionId ? inferenceSessions.get(sessionId)?.onnx : undefined;
 	if (!session) {
 		throw new Error('Modèle de détection non chargé');
 	}
+
+	const inputName = session.inputNames[0];
+	const outputName = taskSettings.output.name ?? 'output0';
+	const inferenceSettings = {
+		...taskSettings,
+		input: {
+			...taskSettings.input,
+			name: taskSettings.input.name ?? inputName,
+		},
+		output: {
+			...taskSettings.output,
+			name: outputName,
+		},
+	};
 
 	const db = await openDatabase();
 	tools.abortSignal?.throwIfAborted();
@@ -71,8 +86,8 @@ swarp.inferBoundingBoxes(async ({ fileId, taskSettings }, _, tools) => {
 
 	const [[boxes], [scores]] = await infer(
 		{
-			...taskSettings,
-			abortSignal: tools.abortSignal,
+			...inferenceSettings,
+			...(tools.abortSignal ? { abortSignal: tools.abortSignal } : {}),
 		},
 		[file.bytes],
 		session
@@ -127,10 +142,17 @@ swarp.classify(async ({ imageId, metadataIds, taskSettings, inferenceSessionId }
 		...taskSettings.input,
 		normalized: true,
 		crop: cropbox,
-		abortSignal: tools.abortSignal,
+		...(tools.abortSignal ? { abortSignal: tools.abortSignal } : {}),
 	});
 
-	const scores = await classify(taskSettings, img, onnx, tools.abortSignal);
+	const scores = await classify(
+		/** @type {Pick<import('$lib/schemas/neural.js').NeuralInference, 'input' | 'output'>} */ (
+			taskSettings
+		),
+		img,
+		onnx,
+		tools.abortSignal
+	);
 	tools.abortSignal?.throwIfAborted();
 
 	const results = scores

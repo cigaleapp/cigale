@@ -262,6 +262,16 @@ export class UIState {
 	});
 
 	/**
+	 * Classification metadata with an enabled neural model selection.
+	 * @type {import('./database').Metadata[]}
+	 */
+	enabledClassificationMetadata = $derived.by(() => {
+		return this.allClassificationMetadata.filter(
+			(metadata) => (this.currentSession?.inferenceModels[metadata.id] ?? 0) !== -1
+		);
+	});
+
+	/**
 	 * All metadata with neural enum inference (not just the first one)
 	 * @type {import('./database').Metadata[]}
 	 */
@@ -332,7 +342,25 @@ export class UIState {
 	/** @type {boolean} */
 	cropInferenceAvailable = $derived(this.cropModels.length > 0 && this.selectedCropModel !== -1);
 	/** @type {boolean} */
-	classificationInferenceAvailable = $derived(this.allClassificationMetadata.length > 0);
+	classificationInferenceAvailable = $derived(this.enabledClassificationMetadata.length > 0);
+
+	/**
+	 * Set the selected model index for a classification metadata.
+	 * @param {string} metadataId
+	 * @param {number} modelIndex -1 disables inference for that metadata
+	 * @returns {Promise<void>}
+	 */
+	async setClassificationModelSelection(metadataId, modelIndex) {
+		if (!this.currentSession) return;
+
+		const current = this.currentSession.inferenceModels;
+		if ((current[metadataId] ?? 0) === modelIndex) return;
+
+		await tables.Session.update(this.currentSession.id, 'inferenceModels', {
+			...current,
+			[metadataId]: modelIndex,
+		});
+	}
 
 	/**
 	 * @param {{ classification?: number | null, crop?: number | null }} indices

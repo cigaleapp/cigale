@@ -1,7 +1,6 @@
 <script>
 	import { watch } from 'runed';
 	import { fade } from 'svelte/transition';
-	import { SvelteSet } from 'svelte/reactivity';
 
 	import AreaObservations from '$lib/AreaObservations.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
@@ -15,7 +14,7 @@
 		imageIsClassified,
 		isValidImageId,
 	} from '$lib/images';
-	import { loadModel } from '$lib/inference.js';
+	import { inferenceModelId, loadModel } from '$lib/inference.js';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
 	import Logo from '$lib/Logo.svelte';
 	import { deleteObservation, ensureNoLoneImages, observationMetadata } from '$lib/observations';
@@ -83,6 +82,9 @@
 			})) ?? [],
 	]);
 
+	/** Persist across route changes so the same model is not fetched twice. */
+	const loadedClassificationSessionIds = new Set();
+
 	/**
 	 * loaded and total bytes counts, set and updated by loadModel()
 	 */
@@ -90,8 +92,6 @@
 
 	let modelAbortController = new AbortController();
 	let classifmodelLoaded = $state(false);
-	/** @type {Set<string>} metadata IDs for which models have been loaded */
-	let loadedClassificationModels = new SvelteSet();
 	/** @type {Error|undefined}*/
 	let classifModelLoadingError = $state();
 
@@ -99,9 +99,6 @@
 		if (!classifmodelLoaded) return;
 		if (classifModelLoadingError) return;
 		if (!uiState.classificationInferenceAvailable) return;
-
-		const allMetadataIds = uiState.allClassificationMetadata.map((m) => m.id);
-		if (!allMetadataIds.every((id) => loadedClassificationModels.has(id))) return;
 
 		const toClassify = tables.Image.state.filter(
 			(image) =>
@@ -115,52 +112,66 @@
 	}
 
 	async function loadAllClassifModels() {
+		const protocol = uiState.currentProtocol;
+		if (!protocol) return;
+		const protocolId = protocol.id;
+
+		const enabledMetadata = uiState.enabledClassificationMetadata;
+		const modelLoads = enabledMetadata.flatMap((metadata) => {
+			const modelIndex = uiState.selectedClassificationModels[metadata.id] ?? -1;
+			const settings = uiState.allClassificationModels[metadata.id]?.[modelIndex];
+
+			if (!settings) {
+				console.warn(`No model found for metadata ${metadata.id} at index ${modelIndex}`);
+				return [];
+			}
+
+			return [
+				{
+					metadataId: metadata.id,
+					settings,
+					sessionId: inferenceModelId(protocolId, settings.model),
+				},
+			];
+		});
+
 		classifmodelLoaded = false;
 		modelLoadingProgress = 0;
 
-		// If all models are already loaded, we don't need to load them again
-		const allMetadataIds = uiState.allClassificationMetadata.map((m) => m.id);
-		if (allMetadataIds.length === 0) return;
-		if (allMetadataIds.every((id) => loadedClassificationModels.has(id))) return;
+		// If nothing is enabled, there is nothing to load.
+		if (modelLoads.length === 0) {
+			classifmodelLoaded = true;
+			return;
+		}
 
-		if (!uiState.currentProtocol) return;
+		const pendingLoads = modelLoads.filter(({ sessionId }) => !loadedClassificationSessionIds.has(sessionId));
+		if (pendingLoads.length === 0) {
+			classifmodelLoaded = true;
+			queueClassificationsIfReady();
+			return;
+		}
+
 		if (!uiState.classificationInferenceAvailable) return;
 
 		modelAbortController.abort();
 		classifModelLoadingError = undefined;
 		modelAbortController = new AbortController();
-		loadedClassificationModels = new SvelteSet();
 
 		try {
-			// Load models for all classification metadata
-			for (let i = 0; i < uiState.allClassificationMetadata.length; i++) {
-				const metadata = uiState.allClassificationMetadata[i];
-				const modelIndex = uiState.selectedClassificationModels[metadata.id] ?? 0;
-				const allModels = uiState.allClassificationModels[metadata.id];
-
-				if (!allModels || !allModels[modelIndex]) {
-					console.warn(
-						`No model found for metadata ${metadata.id} at index ${modelIndex}`
-					);
-					continue;
-				}
-
-				const settings = allModels[modelIndex];
-
+			for (let i = 0; i < pendingLoads.length; i++) {
+				const { metadataId, settings, sessionId } = pendingLoads[i];
 				await loadModel(data.swarpc, 'classification', {
 					abortSignal: modelAbortController.signal,
-					protocolId: uiState.currentProtocol.id,
+					protocolId,
 					requests: {
 						model: settings.model,
 						classmapping: settings.classmapping,
 					},
 					onProgress(p) {
-						// Distribute progress across all models
-						modelLoadingProgress = (i + p) / uiState.allClassificationMetadata.length;
+						modelLoadingProgress = (i + p) / pendingLoads.length;
 					},
 				});
-
-				loadedClassificationModels.add(metadata.id);
+				loadedClassificationSessionIds.add(sessionId);
 			}
 		} catch (error) {
 			throw error;
@@ -171,10 +182,9 @@
 	}
 
 	watch(
-		() => [uiState.allClassificationMetadata.length, uiState.selectedClassificationModels],
+		() => [uiState.enabledClassificationMetadata.length, uiState.selectedClassificationModels],
 		() => {
 			classifmodelLoaded = false;
-			loadedClassificationModels = new SvelteSet();
 			void loadAllClassifModels()
 				.catch((error) => {
 					classifModelLoadingError = error;
