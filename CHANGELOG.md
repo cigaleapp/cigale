@@ -58,6 +58,7 @@ All notable changes to this project will be documented in this file, on a monthl
 - Fix assetlinks fingerprint for non-preview builds
 - Fix back button behavior on Android
 - Fix bugs with combobox's input text when closed
+- Fix cannot infer location- or boudingbox-type metadata from sidecar files
 - Fix cannot select YAML protocol file on mobile app (Closes #1560)
 - Fix deeplinking by removing custom URL scheme handling
 - Fix destination path computation for saving as file on mobile app
@@ -70,6 +71,7 @@ All notable changes to this project will be documented in this file, on a monthl
 - Fix parallelism setting's input not showing on mobile
 - Fix pdf-to-png-converter v4 filter condition (kind !== → kind ===)
 - Fix session metadata form being always empty
+- Fix sidepanel horizontal scroll when filename too long
 - Fix tab bar showing when in about page
 - Fix value of website_host for preview builds of android app
 - Make assetlinks static
