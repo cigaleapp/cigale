@@ -66,6 +66,7 @@ All notable changes to this project will be documented in this file, on a monthl
 - Fix fonts falling back to Arial
 - Fix incorrect URL for INSECTA source in builtin protocols list on main
 - Fix initial focused box for fullscreen cropper with set observation
+- Fix loading spinner hidden too soon when opening session
 - Fix notifications not being sent on mobile app
 - Fix notifications setting always showing state as Off
 - Fix parallelism setting's input not showing on mobile
