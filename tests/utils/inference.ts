@@ -1,21 +1,23 @@
 import { readFile } from 'node:fs/promises';
+import type { BrowserContext, Page } from '@playwright/test';
 
 import { chooseInDropdown, entries, mockUrl } from './core.js';
 
-/**
- * @import { Page } from '@playwright/test';
- */
+type InferenceModelName = 'Aucune inférence' | (string & {}) | RegExp;
+type ProtocolInfer = typeof import('../../src/lib/schemas/protocols.js').ExportedProtocol.infer;
 
 /**
- * @typedef {"Aucune inférence" | (string & {}) | RegExp} InferenceModelName
+ * Names of tasks to names of models to select. For classification, the keys of the object are the metadata labels. Pass a model name directly to use the same preference for all options.
  */
-
-/**
- *
- * @param {Page} page
- * @param {{ crop?: InferenceModelName, classify?: InferenceModelName | Partial<Record<"Morphogroupe" | "Espèce" | (string & {}), InferenceModelName>> }} models names of tasks to names of models to select. For classification, the keys of the object are the metadata labels. Pass a model name directly to use the same preference for all options
- */
-export async function setInferenceModels(page, models) {
+export async function setInferenceModels(
+	page: Page,
+	models: {
+		crop?: InferenceModelName;
+		classify?:
+			| InferenceModelName
+			| Partial<Record<'Morphogroupe' | 'Espèce' | (string & {}), InferenceModelName>>;
+	}
+) {
 	for (const [tab, model] of entries(models)) {
 		if (!model) continue;
 
@@ -26,8 +28,7 @@ export async function setInferenceModels(page, models) {
 		if (tab === 'crop') {
 			await chooseInDropdown(page, trigger, "Modèle d'inférence", model);
 		} else {
-			/** @type {Array<[string, InferenceModelName]>} */
-			let preferences;
+			let preferences: Array<[string, InferenceModelName]>;
 
 			if (typeof model === 'string' || model instanceof RegExp) {
 				// Retrieve all options for this task
@@ -39,9 +40,10 @@ export async function setInferenceModels(page, models) {
 					.then((options) => options.map((option) => [option, model]));
 				await page.keyboard.press('Escape');
 			} else {
-				preferences = Object.entries(model);
+				preferences = Object.entries(model).filter(
+					(entry): entry is [string, InferenceModelName] => Boolean(entry[1])
+				);
 			}
-			console.log('Setting inference model preferences for classification:', preferences);
 
 			for (const [metadata, model] of preferences) {
 				await chooseInDropdown(page, trigger, "Modèle d'inférence", metadata, model);
@@ -51,16 +53,18 @@ export async function setInferenceModels(page, models) {
 }
 
 /**
- * @typedef {{ model: Buffer<ArrayBufferLike>, classmapping: Buffer<ArrayBufferLike> | undefined, filename: string }} PredownloadedModel
+ * Reads a predownloaded model and optional classmapping from disk.
  */
+type PredownloadedModel = {
+	model: Buffer<ArrayBufferLike>;
+	classmapping: Buffer<ArrayBufferLike> | undefined;
+	filename: string;
+};
 
-/**
- *
- * @param {string} filename
- * @param {string} [classmappingFilename]
- * @returns {Promise<PredownloadedModel|null>}
- */
-export async function getPredownloadedModel(filename, classmappingFilename) {
+export async function getPredownloadedModel(
+	filename: string,
+	classmappingFilename?: string
+): Promise<PredownloadedModel | null> {
 	const model = await readFile(filename).catch(() => {
 		if (process.env.CI) {
 			console.warn(
@@ -93,18 +97,14 @@ export async function getPredownloadedModel(filename, classmappingFilename) {
 }
 
 /**
- * @param {Page} page
- * @param {import('@playwright/test').BrowserContext} context
- * @param {typeof import('$lib/schemas/protocols').ExportedProtocol.infer} protocol
- * @param {string} metadataId
- * @param {PredownloadedModel} model
+ * Mocks a predownloaded model for a metadata entry.
  */
 async function mockPredownloadedModel(
-	page,
-	context,
-	protocol,
-	metadataId,
-	{ filename, model, classmapping }
+	page: Page,
+	context: BrowserContext,
+	protocol: ProtocolInfer,
+	metadataId: string,
+	{ filename, model, classmapping }: PredownloadedModel
 ) {
 	const metadata = protocol.metadata[`${protocol.id}__${metadataId}`];
 
@@ -139,12 +139,14 @@ async function mockPredownloadedModel(
 }
 
 /**
- * @param {Page} page
- * @param {import('@playwright/test').BrowserContext} context
- * @param {typeof import('$lib/schemas/protocols').ExportedProtocol.infer} protocol
- * @param {Record<string, Array<null | PredownloadedModel>>} models
+ * Mocks the predownloaded models for each metadata entry.
  */
-export async function mockPredownloadedModels(page, context, protocol, models) {
+export async function mockPredownloadedModels(
+	page: Page,
+	context: BrowserContext,
+	protocol: ProtocolInfer,
+	models: Record<string, Array<null | PredownloadedModel>>
+) {
 	for (const [metadataId, taskModels] of Object.entries(models)) {
 		for (const model of taskModels) {
 			if (!model) continue;
