@@ -26,8 +26,6 @@
 		narrowingState.definitions.filter((def) => def.id in metadataValues)
 	);
 
-	const observation = $derived(narrowingState.observation);
-
 	const remainingMetadataValues = $derived.by<Record<NamespacedMetadataID, Set<string>>>(() => {
 		const result: Record<NamespacedMetadataID, Set<string>> = Object.fromEntries(
 			definitions

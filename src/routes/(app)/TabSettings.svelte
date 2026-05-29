@@ -7,7 +7,6 @@
 	import IconCheck from '~icons/ri/check-line';
 	import IconSortAsc from '~icons/ri/sort-asc';
 	import IconSortDesc from '~icons/ri/sort-desc';
-	import { page } from '$app/state';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import DropdownMenu from '$lib/DropdownMenu.svelte';
 	import { tables } from '$lib/idb.svelte';
@@ -286,51 +285,65 @@
 					),
 				],
 			}),
-			...orEmpty(tab === 'classify' && uiState.currentProtocol && uiState.allClassificationMetadata.length > 0, {
-				label: "Modèle d'inférence",
-				testid: `${tab}-settings-inference-model`,
-				items: uiState.allClassificationMetadata.map((metadata) => {
-					const metadataLabel = metadata.label || removeNamespaceFromMetadataId(metadata.id);
-					const selectedModelIndex = uiState.selectedClassificationModels[metadata.id] ?? -1;
-					const modelsForMetadata = uiState.allClassificationModels[metadata.id] ?? [];
+			...orEmpty(
+				tab === 'classify' &&
+					uiState.currentProtocol &&
+					uiState.allClassificationMetadata.length > 0,
+				{
+					label: "Modèle d'inférence",
+					testid: `${tab}-settings-inference-model`,
+					items: uiState.allClassificationMetadata.map((metadata) => {
+						const metadataLabel =
+							metadata.label || removeNamespaceFromMetadataId(metadata.id);
+						const selectedModelIndex =
+							uiState.selectedClassificationModels[metadata.id] ?? -1;
+						const modelsForMetadata =
+							uiState.allClassificationModels[metadata.id] ?? [];
 
-					return {
-						type: 'submenu' as const,
-						data: { direction: null },
-						label: metadataLabel,
-						selected: selectedModelIndex !== -1,
-						submenu: {
+						return {
+							type: 'submenu' as const,
+							data: { direction: null },
 							label: metadataLabel,
-							testid: `${tab}-settings-inference-model-${metadata.id}`,
-							empty: 'Le protocole ne définit aucun modèle pour cette métadonnée.',
-							items: [
-								{
-									type: 'selectable' as const,
-									data: { direction: null },
-									key: `${metadata.id}:none`,
-									label: 'Aucune inférence',
-									selected: selectedModelIndex === -1,
-									closeOnSelect: false,
-									async onclick() {
-										await uiState.setClassificationModelSelection(metadata.id, -1);
+							selected: selectedModelIndex !== -1,
+							submenu: {
+								label: metadataLabel,
+								testid: `${tab}-settings-inference-model-${metadata.id}`,
+								empty: 'Le protocole ne définit aucun modèle pour cette métadonnée.',
+								items: [
+									{
+										type: 'selectable' as const,
+										data: { direction: null },
+										key: `${metadata.id}:none`,
+										label: 'Aucune inférence',
+										selected: selectedModelIndex === -1,
+										closeOnSelect: false,
+										async onclick() {
+											await uiState.setClassificationModelSelection(
+												metadata.id,
+												-1
+											);
+										},
 									},
-								},
-								...modelsForMetadata.map((model, i) => ({
-									type: 'selectable' as const,
-									data: { direction: null },
-									key: `${metadata.id}:${i}`,
-									label: model.name ?? `Modèle ${i + 1}`,
-									selected: selectedModelIndex === i,
-									closeOnSelect: false,
-									async onclick() {
-										await uiState.setClassificationModelSelection(metadata.id, i);
-									},
-								})),
-							],
-						},
-					};
-				}),
-			}),
+									...modelsForMetadata.map((model, i) => ({
+										type: 'selectable' as const,
+										data: { direction: null },
+										key: `${metadata.id}:${i}`,
+										label: model.name ?? `Modèle ${i + 1}`,
+										selected: selectedModelIndex === i,
+										closeOnSelect: false,
+										async onclick() {
+											await uiState.setClassificationModelSelection(
+												metadata.id,
+												i
+											);
+										},
+									})),
+								],
+							},
+						};
+					}),
+				}
+			),
 		]}
 	>
 		{#snippet trigger(props)}
