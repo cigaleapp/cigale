@@ -2,8 +2,8 @@
 	"$schema": "https://cigaleapp.github.io/cigale/protocol.schema.json",
 	"id": "io.github.cigaleapp.arthropods.example.light",
 	"name": "Example: arthropodes (lightweight)",
-	"learnMore": "https://github.com/cigaleapp/cigale/tree/45f3c563d34fb1269575b607e7f2c69835055792/scripts/README.md#protocoles-arthropodsexamplelight",
-	"version": 95,
+	"learnMore": "https://github.com/cigaleapp/cigale/tree/a0dc7b4140f4d4c1cd698a5d80f6bad022e230d2/scripts/README.md#protocoles-arthropodsexamplelight",
+	"version": 96,
 	"updates": "automatic",
 	"source": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.light.cigaleprotocol.json",
 	"description": "Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification\n\nClés d'identification d'abeilles fournies par IDmyBee.com, extraites depuis [IDMYBEE - Andrena sur Xper3](https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html).",
@@ -391,10 +391,10 @@
 					"learnMore": "https://gbif.org/species/1"
 				},
 				{
-					"key": "322543845",
+					"key": "323335839",
 					"label": "Animalia",
 					"description": "",
-					"learnMore": "https://gbif.org/species/322543845"
+					"learnMore": "https://gbif.org/species/323335839"
 				}
 			],
 			"label": "Règne",
@@ -418,12 +418,12 @@
 					}
 				},
 				{
-					"key": "322543846",
+					"key": "323335840",
 					"label": "Arthropoda",
 					"description": "",
-					"learnMore": "https://gbif.org/species/322543846",
+					"learnMore": "https://gbif.org/species/323335840",
 					"cascade": {
-						"kingdom": "322543845"
+						"kingdom": "323335839"
 					}
 				}
 			],
@@ -459,13 +459,13 @@
 					}
 				},
 				{
-					"key": "322543847",
+					"key": "323335841",
 					"label": "Insecta",
 					"description": "",
-					"learnMore": "https://gbif.org/species/322543847",
+					"learnMore": "https://gbif.org/species/323335841",
 					"cascade": {
-						"phylum": "322543846",
-						"kingdom": "322543845"
+						"phylum": "323335840",
+						"kingdom": "323335839"
 					}
 				}
 			],
@@ -503,14 +503,14 @@
 					}
 				},
 				{
-					"key": "322543848",
+					"key": "323335842",
 					"label": "Hymenoptera",
 					"description": "",
-					"learnMore": "https://gbif.org/species/322543848",
+					"learnMore": "https://gbif.org/species/323335842",
 					"cascade": {
-						"class": "322543847",
-						"phylum": "322543846",
-						"kingdom": "322543845"
+						"class": "323335841",
+						"phylum": "323335840",
+						"kingdom": "323335839"
 					}
 				},
 				{
@@ -583,15 +583,15 @@
 					}
 				},
 				{
-					"key": "322543886",
+					"key": "323335880",
 					"label": "Andrenidae",
 					"description": "",
-					"learnMore": "https://gbif.org/species/322543886",
+					"learnMore": "https://gbif.org/species/323335880",
 					"cascade": {
-						"order": "322543848",
-						"class": "322543847",
-						"phylum": "322543846",
-						"kingdom": "322543845"
+						"order": "323335842",
+						"class": "323335841",
+						"phylum": "323335840",
+						"kingdom": "323335839"
 					}
 				},
 				{
@@ -813,16 +813,16 @@
 					}
 				},
 				{
-					"key": "322543889",
+					"key": "323335883",
 					"label": "Andrena",
 					"description": "",
-					"learnMore": "https://gbif.org/species/322543889",
+					"learnMore": "https://gbif.org/species/323335883",
 					"cascade": {
-						"family": "322543886",
-						"order": "322543848",
-						"class": "322543847",
-						"phylum": "322543846",
-						"kingdom": "322543845"
+						"family": "323335880",
+						"order": "323335842",
+						"class": "323335841",
+						"phylum": "323335840",
+						"kingdom": "323335839"
 					}
 				},
 				{
@@ -1853,6 +1853,7 @@
 					"description": "",
 					"learnMore": "https://gbif.org/species/2120806",
 					"cascade": {
+						"morphogroup": "marginata",
 						"genus": "2120412",
 						"family": "7216",
 						"order": "11776269",
@@ -2148,6 +2149,7 @@
 					"description": "",
 					"learnMore": "https://gbif.org/species/2121271",
 					"cascade": {
+						"morphogroup": "denticulata",
 						"genus": "2121254",
 						"family": "7215",
 						"order": "10802062",
@@ -3792,6 +3794,7 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": "gpe_hedikae",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -4075,6 +4078,7 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3sansgr_1738783084860_3752",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": "hystrix",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -4847,6 +4851,7 @@
 							"t2_3sansgr_1738783084860_3752"
 						],
 						"carene_du_triangle_du_propodeum": "maldfinisa_1738782338204_3844",
+						"morphogroup": "clarkella",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -5134,6 +5139,7 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3sansgr_1738783084860_3752",
 						"carene_du_triangle_du_propodeum": "maldfinisa_1738782338204_3844",
+						"morphogroup": "gpe_nigropilosa",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -5405,6 +5411,7 @@
 							"dlimitlatr_1738782333562_1312",
 							"maldfinisa_1738782338204_3844"
 						],
+						"morphogroup": "fulva",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -5683,6 +5690,7 @@
 							"dlimitlatr_1738782333562_1312",
 							"maldfinisa_1738782338204_3844"
 						],
+						"morphogroup": "gpe_helvola",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -5888,6 +5896,7 @@
 						"forme_de_la_plaque_pygidiale": "plaquepygi_1738784280397_1841",
 						"corbeilles_du_propodeum": "corbeilles_1738837562663_8904",
 						"type_de_pilosite_des_scopas": "pilositmaj_1738784759008_2070",
+						"morphogroup": "gpe_helvola",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -6184,6 +6193,7 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "maldfinisa_1738782338204_3844",
+						"morphogroup": "gpe_helvola",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -6479,6 +6489,7 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "maldfinisa_1738782338204_3844",
+						"morphogroup": "nycthemera",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -6764,6 +6775,7 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3sansgr_1738783084860_3752",
 						"carene_du_triangle_du_propodeum": "maldfinisa_1738782338204_3844",
+						"morphogroup": "gpe_praecox",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -6972,6 +6984,7 @@
 						"forme_de_la_plaque_pygidiale": "plaquepygi_1738784280397_1841",
 						"corbeilles_du_propodeum": "corbeilles_1738837562663_8904",
 						"type_de_pilosite_des_scopas": "pilositmaj_1738784759008_2070",
+						"morphogroup": "rogenhoferi",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -7171,6 +7184,7 @@
 						"forme_de_la_plaque_pygidiale": "plaquepygi_1738784280397_1841",
 						"corbeilles_du_propodeum": "corbeilles_1738837562663_8904",
 						"type_de_pilosite_des_scopas": "pilositmaj_1738784759008_2070",
+						"morphogroup": "gpe_scotica",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -7381,6 +7395,7 @@
 						"forme_de_la_plaque_pygidiale": "plaquepygi_1738784280397_1841",
 						"corbeilles_du_propodeum": "corbeilles_1738837562663_8904",
 						"type_de_pilosite_des_scopas": "pilositmaj_1738784759008_2070",
+						"morphogroup": "gpe_helvola",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -7837,6 +7852,7 @@
 							"maldfinisa_1738782338204_3844",
 							"dlimitlatr_1738782333562_1312"
 						],
+						"morphogroup": "panurgina",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -8110,6 +8126,7 @@
 						"couleur_de_la_frange_terminale": "orange_1738784415091_836",
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3sansgr_1738783084860_3752",
 						"carene_du_triangle_du_propodeum": "dlimitlatr_1738782333562_1312",
+						"morphogroup": "lagopus",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -8409,6 +8426,7 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3sansgr_1738783084860_3752",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": "gpe_colletiformis",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -8968,6 +8986,7 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "dlimitlatr_1738782333562_1312",
+						"morphogroup": "hattorfiana",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -9249,6 +9268,7 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": "gpe_humilis",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -9824,6 +9844,7 @@
 							"dlimitlatr_1738782333562_1312",
 							"maldfinisa_1738782338204_3844"
 						],
+						"morphogroup": "nigroolivacea",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -10091,6 +10112,7 @@
 							"t2_3sansgr_1738783084860_3752"
 						],
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": "gpe_humilis",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -10378,6 +10400,7 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": "gpe_humilis",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -10943,6 +10966,7 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3sansgr_1738783084860_3752",
 						"carene_du_triangle_du_propodeum": "maldfinisa_1738782338204_3844",
+						"morphogroup": "leucolippa",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -11234,6 +11258,7 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": "gpe_humilis",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -11715,6 +11740,7 @@
 							"clairement_1738782331321_8886",
 							"dlimitlatr_1738782333562_1312"
 						],
+						"morphogroup": "gpe_fulvago",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -12015,6 +12041,7 @@
 							"clairement_1738782331321_8886",
 							"maldfinisa_1738782338204_3844"
 						],
+						"morphogroup": "gpe_fulvago",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -12317,6 +12344,7 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3sansgr_1738783084860_3752",
 						"carene_du_triangle_du_propodeum": "maldfinisa_1738782338204_3844",
+						"morphogroup": "gpe_fuscipes",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -12577,6 +12605,7 @@
 						"couleur_de_la_frange_terminale": "foncenoir_1738784408817_6055",
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3sansgr_1738783084860_3752",
 						"carene_du_triangle_du_propodeum": "dlimitlatr_1738782340396_2673",
+						"morphogroup": "gpe_fuscipes",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -12872,6 +12901,7 @@
 						"couleur_de_la_frange_terminale": "foncenoir_1738784408817_6055",
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3sansgr_1738783084860_3752",
 						"carene_du_triangle_du_propodeum": "maldfinisa_1738782338204_3844",
+						"morphogroup": "gpe_fuscipes",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -13432,6 +13462,7 @@
 						"couleur_de_la_frange_terminale": "foncenoir_1738784408817_6055",
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3sansgr_1738783084860_3752",
 						"carene_du_triangle_du_propodeum": "maldfinisa_1738782338204_3844",
+						"morphogroup": "gpe_fuscipes",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -14102,6 +14133,7 @@
 							"pilositmaj_1738784759008_2070",
 							"pilsoitmaj_1738784763230_1485"
 						],
+						"morphogroup": "gpe_minutula",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -14699,6 +14731,7 @@
 						"couleur_de_la_frange_terminale": "foncenoir_1738784408817_6055",
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "maldfinisa_1738782338204_3844",
+						"morphogroup": "gpe_angustior",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -15191,6 +15224,7 @@
 						"couleur_de_la_frange_terminale": "foncenoir_1738784408817_6055",
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "maldfinisa_1738782338204_3844",
+						"morphogroup": "gpe_ruficrus",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -15483,6 +15517,7 @@
 						"couleur_de_la_frange_terminale": "foncenoir_1738784408817_6055",
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3sansgr_1738783084860_3752",
 						"carene_du_triangle_du_propodeum": "maldfinisa_1738782338204_3844",
+						"morphogroup": "gpe_angustior",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -15780,6 +15815,7 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "maldfinisa_1738782338204_3844",
+						"morphogroup": "gpe_angustior",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -16053,6 +16089,7 @@
 						"couleur_de_la_frange_terminale": "foncenoir_1738784408817_6055",
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3sansgr_1738783084860_3752",
 						"carene_du_triangle_du_propodeum": "maldfinisa_1738782338204_3844",
+						"morphogroup": "gpe_angustior",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -16249,6 +16286,7 @@
 						"forme_de_lappendice_du_labre": "enformedet_1738837442835_2826",
 						"corbeilles_du_propodeum": "corbeilles_1738837562663_8904",
 						"type_de_pilosite_des_scopas": "pilositmaj_1738784759008_2070",
+						"morphogroup": "gpe_angustior",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -16525,6 +16563,7 @@
 						"couleur_de_la_frange_terminale": "foncenoir_1738784408817_6055",
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "maldlimitc_1738782336008_1135",
+						"morphogroup": "gpe_angustior",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -16715,6 +16754,7 @@
 						"delimitation_des_foveas": "fovasdefor_1738781103431_9532",
 						"corbeilles_du_propodeum": "corbeilles_1738837562663_8904",
 						"type_de_pilosite_des_scopas": "pilsoitmaj_1738784763230_1485",
+						"morphogroup": "chrysopus",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -17188,6 +17228,7 @@
 							"brunclair_1738784410899_2134"
 						],
 						"carene_du_triangle_du_propodeum": "maldfinisa_1738782338204_3844",
+						"morphogroup": "symphyti",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -17950,6 +17991,7 @@
 						"couleur_de_la_frange_terminale": "foncenoir_1738784408817_6055",
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "maldfinisa_1738782338204_3844",
+						"morphogroup": "solenopalpa",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -18803,6 +18845,7 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": "gpe_flavipes",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -19068,6 +19111,7 @@
 						"couleur_de_la_frange_terminale": "jaune_1738784419275_4944",
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": "gpe_argentata",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -19363,6 +19407,7 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": "gpe_savignyi",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -19839,6 +19884,7 @@
 						"densite_de_la_ponctuation_du_clypeus": "densmentpo_1738781258555_2079",
 						"corbeilles_du_propodeum": "corbeilles_1738837562663_8904",
 						"type_de_pilosite_des_scopas": "pilositmaj_1738784759008_2070",
+						"morphogroup": "gpe_ruficrus",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -20118,6 +20164,7 @@
 							"maldfinisa_1738782338204_3844",
 							"dlimitlatr_1738782340396_2673"
 						],
+						"morphogroup": "gpe_ruficrus",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -20397,6 +20444,7 @@
 							"clairement_1738782331321_8886",
 							"dlimitlatr_1738782333562_1312"
 						],
+						"morphogroup": "gpe_scotica",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -20693,6 +20741,7 @@
 						"couleur_de_la_frange_terminale": "foncenoir_1738784408817_6055",
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "maldfinisa_1738782338204_3844",
+						"morphogroup": "gpe_labiata",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -20997,6 +21046,7 @@
 						"couleur_de_la_frange_terminale": "foncenoir_1738784408817_6055",
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "maldfinisa_1738782338204_3844",
+						"morphogroup": "gpe_trimmerana",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -21272,6 +21322,7 @@
 							"maldlimitc_1738782336008_1135",
 							"maldfinisa_1738782338204_3844"
 						],
+						"morphogroup": "gpe_scotica",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -21535,6 +21586,7 @@
 							"jaune_1738784419275_4944"
 						],
 						"carene_du_triangle_du_propodeum": "dlimitlatr_1738782333562_1312",
+						"morphogroup": "farinosa",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -21847,6 +21899,7 @@
 							"dlimitlatr_1738782333562_1312",
 							"maldfinisa_1738782338204_3844"
 						],
+						"morphogroup": "gpe_labiata",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -22314,6 +22367,7 @@
 						"type_de_pilosite_des_scopas": "pilositmaj_1738784759008_2070",
 						"distance_occello_occipitale": "distanceoc_1738780588710_9237",
 						"couleur_de_la_frange_terminale": "orange_1738784415091_836",
+						"morphogroup": "limbata",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -23139,6 +23193,7 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3sansgr_1738783084860_3752",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": "gpe_curvungula",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -23434,6 +23489,7 @@
 							"t2_3sansgr_1738783084860_3752"
 						],
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": "gpe_curvungula",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -23713,6 +23769,7 @@
 						"couleur_de_la_frange_terminale": "brunclair_1738784410899_2134",
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3sansgr_1738783084860_3752",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": "paucisquama",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -23999,6 +24056,7 @@
 							"maldlimitc_1738782336008_1135",
 							"maldfinisa_1738782338204_3844"
 						],
+						"morphogroup": "rufizona",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -24270,6 +24328,7 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3sansgr_1738783084860_3752",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": "gpe_wilkella",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -24544,6 +24603,7 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3sansgr_1738783084860_3752",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": "sardoa",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -24833,6 +24893,7 @@
 							"maldfinisa_1738782338204_3844",
 							"dlimitlatr_1738782333562_1312"
 						],
+						"morphogroup": "gpe_argentata",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -25123,6 +25184,7 @@
 						"couleur_de_la_frange_terminale": "foncenoir_1738784408817_6055",
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "dlimitlatr_1738782333562_1312",
+						"morphogroup": "gpe_barbilabris",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -25323,6 +25385,7 @@
 						"type_de_pilosite_des_scopas": "pilositmaj_1738784759008_2070",
 						"couleur_de_la_frange_terminale": "foncenoir_1738784408817_6055",
 						"carene_du_triangle_du_propodeum": "dlimitlatr_1738782333562_1312",
+						"morphogroup": "gpe_trimmerana",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -25891,6 +25954,7 @@
 							"t2_3sansgr_1738783084860_3752"
 						],
 						"carene_du_triangle_du_propodeum": "dlimitlatr_1738782333562_1312",
+						"morphogroup": "ventralis",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -26768,6 +26832,7 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "maldfinisa_1738782338204_3844",
+						"morphogroup": "pellucens",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -27051,6 +27116,7 @@
 						"couleur_de_la_frange_terminale": "foncenoir_1738784408817_6055",
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": "gpe_pilipes",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -27309,6 +27375,7 @@
 						"couleur_de_la_frange_terminale": "foncenoir_1738784408817_6055",
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3sansgr_1738783084860_3752",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": "gpe_cineraria",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -27572,6 +27639,7 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "dlimitlatr_1738782333562_1312",
+						"morphogroup": "gpe_flavipes",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -27830,6 +27898,7 @@
 							"dlimitlatr_1738782333562_1312",
 							"maldfinisa_1738782338204_3844"
 						],
+						"morphogroup": "gpe_cineraria",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -28120,6 +28189,7 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3sansgr_1738783084860_3752",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": "gpe_flavipes",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -28399,6 +28469,7 @@
 							"clairement_1738782331321_8886",
 							"dlimitlatr_1738782333562_1312"
 						],
+						"morphogroup": "gpe_flavipes",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -28676,6 +28747,7 @@
 						"couleur_de_la_frange_terminale": "foncenoir_1738784408817_6055",
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": "albopunctata",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -28958,6 +29030,7 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "dlimitlatr_1738782340396_2673",
+						"morphogroup": "morio",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -29238,6 +29311,7 @@
 						"couleur_de_la_frange_terminale": "foncenoir_1738784408817_6055",
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "dlimitlatr_1738782333562_1312",
+						"morphogroup": "gpe_thoracica",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -29533,6 +29607,7 @@
 						"couleur_de_la_frange_terminale": "foncenoir_1738784408817_6055",
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "dlimitlatr_1738782333562_1312",
+						"morphogroup": "gpe_thoracica",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -29815,6 +29890,7 @@
 						"couleur_de_la_frange_terminale": "foncenoir_1738784408817_6055",
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": "gpe_praecox",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -30074,6 +30150,7 @@
 							"clairement_1738782331321_8886",
 							"dlimitlatr_1738782333562_1312"
 						],
+						"morphogroup": "nitida",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -30344,6 +30421,7 @@
 							"t2_3sansgr_1738783084860_3752"
 						],
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": "gpe_thoracica",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -30609,6 +30687,7 @@
 						"couleur_de_la_frange_terminale": "brunclair_1738784410899_2134",
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "maldfinisa_1738782338204_3844",
+						"morphogroup": "vaga",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -30880,6 +30959,7 @@
 						"couleur_de_la_frange_terminale": "foncenoir_1738784408817_6055",
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3sansgr_1738783084860_3752",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": "gpe_thoracica",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -31159,6 +31239,7 @@
 						"couleur_de_la_frange_terminale": "foncenoir_1738784408817_6055",
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3sansgr_1738783084860_3752",
 						"carene_du_triangle_du_propodeum": "dlimitlatr_1738782333562_1312",
+						"morphogroup": "florentina",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -31707,6 +31788,7 @@
 							"clairement_1738782331321_8886",
 							"dlimitlatr_1738782333562_1312"
 						],
+						"morphogroup": "gpe_minutula",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -31986,6 +32068,7 @@
 							"t2_3sansgr_1738783084860_3752"
 						],
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": "gpe_minutula",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -32248,6 +32331,7 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": "gpe_minutula",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -32534,6 +32618,7 @@
 							"clairement_1738782331321_8886",
 							"maldfinisa_1738782338204_3844"
 						],
+						"morphogroup": "gpe_minutula",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -32809,6 +32894,7 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": "gpe_minutula",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -33102,6 +33188,7 @@
 							"maldlimitc_1738782336008_1135",
 							"dlimitlatr_1738782333562_1312"
 						],
+						"morphogroup": "gpe_minutula",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -34059,6 +34146,7 @@
 							"clairement_1738782331321_8886",
 							"maldfinisa_1738782338204_3844"
 						],
+						"morphogroup": "gpe_minutula",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -34630,6 +34718,7 @@
 							"clairement_1738782331321_8886",
 							"dlimitlatr_1738782333562_1312"
 						],
+						"morphogroup": "gpe_minutula",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -34903,6 +34992,7 @@
 							"dor_1738784417185_9766"
 						],
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": "gpe_minutula",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -36044,6 +36134,7 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": "gpe_proxima",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -36334,6 +36425,7 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": "gpe_proxima",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -37910,6 +38002,7 @@
 							"clairement_1738782331321_8886",
 							"dlimitlatr_1738782333562_1312"
 						],
+						"morphogroup": "gpe_minutula",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -38513,6 +38606,7 @@
 							"dlimitlatr_1738782333562_1312",
 							"maldfinisa_1738782338204_3844"
 						],
+						"morphogroup": "gpe_minutula",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -38803,6 +38897,7 @@
 							"dlimitlatr_1738782333562_1312",
 							"maldlimitc_1738782336008_1135"
 						],
+						"morphogroup": "gpe_wilkella",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -39354,6 +39449,7 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": "gpe_minutula",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -39816,6 +39912,7 @@
 						"forme_des_foveas_au_milieu": "fovasnonrt_1738780949142_3244",
 						"corbeilles_du_propodeum": "corbeilles_1738837562663_8904",
 						"type_de_pilosite_des_scopas": "pilositmaj_1738784759008_2070",
+						"morphogroup": "binominata",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -40662,6 +40759,7 @@
 							"dlimitlatr_1738782333562_1312",
 							"clairement_1738782331321_8886"
 						],
+						"morphogroup": "gpe_schencki",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -40929,6 +41027,7 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "maldfinisa_1738782338204_3844",
+						"morphogroup": "gpe_minutula",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -41206,6 +41305,7 @@
 							"clairement_1738782331321_8886",
 							"dlimitlatr_1738782333562_1312"
 						],
+						"morphogroup": "gpe_agilissima",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -41506,6 +41606,7 @@
 							"clairement_1738782331321_8886",
 							"dlimitlatr_1738782333562_1312"
 						],
+						"morphogroup": "gpe_trimmerana",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -41783,6 +41884,7 @@
 						"couleur_de_la_frange_terminale": "foncenoir_1738784408817_6055",
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": "gpe_pilipes",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -42075,6 +42177,7 @@
 							"clairement_1738782331321_8886",
 							"dlimitlatr_1738782333562_1312"
 						],
+						"morphogroup": "gpe_pilipes",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -42356,6 +42459,7 @@
 						"couleur_de_la_frange_terminale": "foncenoir_1738784408817_6055",
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3sansgr_1738783084860_3752",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": "tibialis",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -42552,6 +42656,7 @@
 						"corbeilles_du_propodeum": "corbeilles_1738837562663_8904",
 						"couleur_de_la_frange_terminale": "frangeterm_1738784425651_8256",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": "gpe_agilissima",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -42811,6 +42916,7 @@
 						"couleur_de_la_frange_terminale": "frangeterm_1738784425651_8256",
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": "gpe_agilissima",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -43089,6 +43195,7 @@
 							"t2_3sansgr_1738783084860_3752"
 						],
 						"carene_du_triangle_du_propodeum": "dlimitlatr_1738782333562_1312",
+						"morphogroup": "gpe_labiata",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -43380,6 +43487,7 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3sansgr_1738783084860_3752",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": "gpe_labiata",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -43664,6 +43772,7 @@
 							"clairement_1738782331321_8886",
 							"dlimitlatr_1738782333562_1312"
 						],
+						"morphogroup": "viridescens",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -43854,6 +43963,7 @@
 						"corbeilles_du_propodeum": "corbeilles_1738837562663_8904",
 						"type_de_pilosite_des_scopas": "pilsoitmaj_1738784763230_1485",
 						"depression_a_la_base_des_tergites": "dpressionl_1763132517082_9729",
+						"morphogroup": "gpe_fulvago",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -44412,6 +44522,7 @@
 							"clairement_1738782331321_8886",
 							"dlimitlatr_1738782333562_1312"
 						],
+						"morphogroup": "gpe_wilkella-argentata",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -44692,6 +44803,7 @@
 						"couleur_de_la_frange_terminale": "foncenoir_1738784408817_6055",
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3sansgr_1738783084860_3752",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": "gpe_wilkella-argentata",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -44993,6 +45105,7 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3sansgr_1738783084860_3752",
 						"carene_du_triangle_du_propodeum": "dlimitlatr_1738782333562_1312",
+						"morphogroup": "gpe_wilkella-argentata",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -45625,6 +45738,7 @@
 							"t2_3sansgr_1738783084860_3752"
 						],
 						"carene_du_triangle_du_propodeum": "dlimitlatr_1738782333562_1312",
+						"morphogroup": "gpe_wilkella-argentata",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -45884,6 +45998,7 @@
 						"couleur_de_la_frange_terminale": "foncenoir_1738784408817_6055",
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": "gpe_trimmerana",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -46145,6 +46260,7 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "maldfinisa_1738782338204_3844",
+						"morphogroup": "gpe_proxima",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -46401,6 +46517,7 @@
 						"couleur_de_la_frange_terminale": "foncenoir_1738784408817_6055",
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3sansgr_1738783084860_3752",
 						"carene_du_triangle_du_propodeum": "dlimitlatr_1738782333562_1312",
+						"morphogroup": "vetula",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -46968,6 +47085,7 @@
 						"pilosite_des_mesopleures": "longue_1738781774174_4840",
 						"couleur_de_la_frange_terminale": "foncenoir_1738784408817_6055",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": "gpe_savignyi",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -47252,6 +47370,7 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3sansgr_1738783084860_3752",
 						"carene_du_triangle_du_propodeum": "dlimitlatr_1738782333562_1312",
+						"morphogroup": "gpe_wilkella",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -47551,6 +47670,7 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "dlimitlatr_1738782333562_1312",
+						"morphogroup": "gpe_wilkella",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -47831,6 +47951,7 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "maldfinisa_1738782338204_3844",
+						"morphogroup": "gpe_wilkella",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -48125,6 +48246,7 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "maldlimitc_1738782336008_1135",
+						"morphogroup": "gpe_wilkella-argentata",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -48398,6 +48520,7 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3sansgr_1738783084860_3752",
 						"carene_du_triangle_du_propodeum": "dlimitlatr_1738782333562_1312",
+						"morphogroup": "gpe_wilkella",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -48678,6 +48801,7 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "dlimitlatr_1738782333562_1312",
+						"morphogroup": "gpe_wilkella-argentata",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -49729,6 +49853,7 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "dlimitlatr_1738782333562_1312",
+						"morphogroup": "gpe_wilkella",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -50302,6 +50427,7 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3sansgr_1738783084860_3752",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": "tarsata",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -50583,6 +50709,7 @@
 							"t2_3sansgr_1738783084860_3752"
 						],
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": "haemorrhoa",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -51151,6 +51278,7 @@
 							"clairement_1738782331321_8886",
 							"dlimitlatr_1738782333562_1312"
 						],
+						"morphogroup": "gpe_fuscipes",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -51421,6 +51549,7 @@
 							"maldlimitc_1738782336008_1135",
 							"maldfinisa_1738782338204_3844"
 						],
+						"morphogroup": "ferrugineicrus",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -51619,12 +51748,12 @@
 						"forme_des_foveas_au_milieu": "fovasnonrt_1738780949142_3244",
 						"corbeilles_du_propodeum": "corbeilles_1738837562663_8904",
 						"type_de_pilosite_des_scopas": "pilositmaj_1738784759008_2070",
-						"genus": "322543889",
-						"family": "322543886",
-						"order": "322543848",
-						"class": "322543847",
-						"phylum": "322543846",
-						"kingdom": "322543845"
+						"genus": "323335883",
+						"family": "323335880",
+						"order": "323335842",
+						"class": "323335841",
+						"phylum": "323335840",
+						"kingdom": "323335839"
 					}
 				},
 				{
@@ -51895,6 +52024,7 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "maldfinisa_1738782338204_3844",
+						"morphogroup": "gpe_helvola",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -52194,6 +52324,7 @@
 							"dlimitlatr_1738782333562_1312",
 							"maldfinisa_1738782338204_3844"
 						],
+						"morphogroup": "gpe_fulvago",
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
@@ -52218,6 +52349,343 @@
 					}
 				]
 			}
+		},
+		"io.github.cigaleapp.arthropods.example.light__morphogroup": {
+			"label": "Morphogroupe",
+			"group": "andrena",
+			"description": "",
+			"type": "enum",
+			"mergeMethod": "max",
+			"required": false,
+			"infer": {
+				"neural": [
+					{
+						"name": "ConvNextV2 Tiny",
+						"model": "https://huggingface.co/edgaremy/andrena-classifier/resolve/main/convnextv2_tiny.andrena-grouped.onnx?download=true",
+						"classmapping": [
+							"albopunctata",
+							"binominata",
+							"chrysopus",
+							"clarkella",
+							"denticulata",
+							"farinosa",
+							"ferrugineicrus",
+							"florentina",
+							"fulva",
+							"fuscosa",
+							"gpe_agilissima",
+							"gpe_angustior",
+							"gpe_argentata",
+							"gpe_barbilabris",
+							"gpe_cineraria",
+							"gpe_colletiformis",
+							"gpe_curvungula",
+							"gpe_flavipes",
+							"gpe_fulvago",
+							"gpe_fuscipes",
+							"gpe_hedikae",
+							"gpe_helvola",
+							"gpe_humilis",
+							"gpe_labiata",
+							"gpe_minutula",
+							"gpe_nigropilosa",
+							"gpe_pilipes",
+							"gpe_praecox",
+							"gpe_proxima",
+							"gpe_ruficrus",
+							"gpe_savignyi",
+							"gpe_schencki",
+							"gpe_scotica",
+							"gpe_thoracica",
+							"gpe_trimmerana",
+							"gpe_wilkella",
+							"gpe_wilkella-argentata",
+							"haemorrhoa",
+							"hattorfiana",
+							"hystrix",
+							"lagopus",
+							"leucolippa",
+							"limbata",
+							"marginata",
+							"morio",
+							"nigroolivacea",
+							"nitida",
+							"nycthemera",
+							"panurgina",
+							"paucisquama",
+							"pellucens",
+							"rogenhoferi",
+							"rufizona",
+							"sardoa",
+							"solenopalpa",
+							"symphyti",
+							"tarsata",
+							"tibialis",
+							"vaga",
+							"ventralis",
+							"vetula",
+							"viridescens"
+						],
+						"input": {
+							"height": 384,
+							"width": 384,
+							"normalized": true,
+							"disposition": "1CHW",
+							"name": "input0"
+						}
+					}
+				]
+			},
+			"options": [
+				{
+					"key": "albopunctata",
+					"label": "Albopunctata"
+				},
+				{
+					"key": "binominata",
+					"label": "Binominata"
+				},
+				{
+					"key": "chrysopus",
+					"label": "Chrysopus"
+				},
+				{
+					"key": "clarkella",
+					"label": "Clarkella"
+				},
+				{
+					"key": "denticulata",
+					"label": "Denticulata"
+				},
+				{
+					"key": "farinosa",
+					"label": "Farinosa"
+				},
+				{
+					"key": "ferrugineicrus",
+					"label": "Ferrugineicrus"
+				},
+				{
+					"key": "florentina",
+					"label": "Florentina"
+				},
+				{
+					"key": "fulva",
+					"label": "Fulva"
+				},
+				{
+					"key": "fuscosa",
+					"label": "Fuscosa"
+				},
+				{
+					"key": "gpe_agilissima",
+					"label": "Groupe agilissima"
+				},
+				{
+					"key": "gpe_angustior",
+					"label": "Groupe angustior"
+				},
+				{
+					"key": "gpe_argentata",
+					"label": "Groupe argentata"
+				},
+				{
+					"key": "gpe_barbilabris",
+					"label": "Groupe barbilabris"
+				},
+				{
+					"key": "gpe_cineraria",
+					"label": "Groupe cineraria"
+				},
+				{
+					"key": "gpe_colletiformis",
+					"label": "Groupe colletiformis"
+				},
+				{
+					"key": "gpe_curvungula",
+					"label": "Groupe curvungula"
+				},
+				{
+					"key": "gpe_flavipes",
+					"label": "Groupe flavipes"
+				},
+				{
+					"key": "gpe_fulvago",
+					"label": "Groupe fulvago"
+				},
+				{
+					"key": "gpe_fuscipes",
+					"label": "Groupe fuscipes"
+				},
+				{
+					"key": "gpe_hedikae",
+					"label": "Groupe hedikae"
+				},
+				{
+					"key": "gpe_helvola",
+					"label": "Groupe helvola"
+				},
+				{
+					"key": "gpe_humilis",
+					"label": "Groupe humilis"
+				},
+				{
+					"key": "gpe_labiata",
+					"label": "Groupe labiata"
+				},
+				{
+					"key": "gpe_minutula",
+					"label": "Groupe minutula"
+				},
+				{
+					"key": "gpe_nigropilosa",
+					"label": "Groupe nigropilosa"
+				},
+				{
+					"key": "gpe_pilipes",
+					"label": "Groupe pilipes"
+				},
+				{
+					"key": "gpe_praecox",
+					"label": "Groupe praecox"
+				},
+				{
+					"key": "gpe_proxima",
+					"label": "Groupe proxima"
+				},
+				{
+					"key": "gpe_ruficrus",
+					"label": "Groupe ruficrus"
+				},
+				{
+					"key": "gpe_savignyi",
+					"label": "Groupe savignyi"
+				},
+				{
+					"key": "gpe_schencki",
+					"label": "Groupe schencki"
+				},
+				{
+					"key": "gpe_scotica",
+					"label": "Groupe scotica"
+				},
+				{
+					"key": "gpe_thoracica",
+					"label": "Groupe thoracica"
+				},
+				{
+					"key": "gpe_trimmerana",
+					"label": "Groupe trimmerana"
+				},
+				{
+					"key": "gpe_wilkella",
+					"label": "Groupe wilkella"
+				},
+				{
+					"key": "gpe_wilkella-argentata",
+					"label": "Groupe wilkella-argentata"
+				},
+				{
+					"key": "haemorrhoa",
+					"label": "Haemorrhoa"
+				},
+				{
+					"key": "hattorfiana",
+					"label": "Hattorfiana"
+				},
+				{
+					"key": "hystrix",
+					"label": "Hystrix"
+				},
+				{
+					"key": "lagopus",
+					"label": "Lagopus"
+				},
+				{
+					"key": "leucolippa",
+					"label": "Leucolippa"
+				},
+				{
+					"key": "limbata",
+					"label": "Limbata"
+				},
+				{
+					"key": "marginata",
+					"label": "Marginata"
+				},
+				{
+					"key": "morio",
+					"label": "Morio"
+				},
+				{
+					"key": "nigroolivacea",
+					"label": "Nigroolivacea"
+				},
+				{
+					"key": "nitida",
+					"label": "Nitida"
+				},
+				{
+					"key": "nycthemera",
+					"label": "Nycthemera"
+				},
+				{
+					"key": "panurgina",
+					"label": "Panurgina"
+				},
+				{
+					"key": "paucisquama",
+					"label": "Paucisquama"
+				},
+				{
+					"key": "pellucens",
+					"label": "Pellucens"
+				},
+				{
+					"key": "rogenhoferi",
+					"label": "Rogenhoferi"
+				},
+				{
+					"key": "rufizona",
+					"label": "Rufizona"
+				},
+				{
+					"key": "sardoa",
+					"label": "Sardoa"
+				},
+				{
+					"key": "solenopalpa",
+					"label": "Solenopalpa"
+				},
+				{
+					"key": "symphyti",
+					"label": "Symphyti"
+				},
+				{
+					"key": "tarsata",
+					"label": "Tarsata"
+				},
+				{
+					"key": "tibialis",
+					"label": "Tibialis"
+				},
+				{
+					"key": "vaga",
+					"label": "Vaga"
+				},
+				{
+					"key": "ventralis",
+					"label": "Ventralis"
+				},
+				{
+					"key": "vetula",
+					"label": "Vetula"
+				},
+				{
+					"key": "viridescens",
+					"label": "Viridescens"
+				}
+			]
 		},
 		"io.github.cigaleapp.arthropods.example.light__pilosite_occipitale": {
 			"label": "Pilosité occipitale",
