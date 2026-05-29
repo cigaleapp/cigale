@@ -13,7 +13,7 @@ import { chooseInDropdown, entries, mockUrl } from './core.js';
 /**
  *
  * @param {Page} page
- * @param {{ crop?: InferenceModelName, classify?: InferenceModelName | Record<"Morphogroupe" | "Espèce" | (string & {}), InferenceModelName> }} models names of tasks to names of models to select. For classification, the keys of the object are the metadata labels. Pass a model name directly to use the same preference for all options
+ * @param {{ crop?: InferenceModelName, classify?: InferenceModelName | Partial<Record<"Morphogroupe" | "Espèce" | (string & {}), InferenceModelName>> }} models names of tasks to names of models to select. For classification, the keys of the object are the metadata labels. Pass a model name directly to use the same preference for all options
  */
 export async function setInferenceModels(page, models) {
 	for (const [tab, model] of entries(models)) {
@@ -31,14 +31,17 @@ export async function setInferenceModels(page, models) {
 
 			if (typeof model === 'string' || model instanceof RegExp) {
 				// Retrieve all options for this task
+				await trigger.click();
 				preferences = await page
 					.getByTestId('classify-settings-inference-model')
 					.getByRole('menuitem')
 					.allTextContents()
 					.then((options) => options.map((option) => [option, model]));
+				await page.keyboard.press('Escape');
 			} else {
 				preferences = Object.entries(model);
 			}
+			console.log('Setting inference model preferences for classification:', preferences);
 
 			for (const [metadata, model] of preferences) {
 				await chooseInDropdown(page, trigger, "Modèle d'inférence", metadata, model);
