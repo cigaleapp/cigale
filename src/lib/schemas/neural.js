@@ -76,7 +76,13 @@ export const NeuralBoundingBoxInference = ModelSettingsCommon.and({
 export const NeuralEnumInference = ModelSettingsCommon.and({
 	'output?': ModelOutputCommon,
 	classmapping: HTTPRequest.describe(
-		'Fichier texte contenant une clé de la métadonnée par ligne, dans le même ordre que les neurones de sortie du modèle.'
+		"Fichier texte contenant une clé d'option de la métadonnée par ligne, dans le même ordre que les neurones de sortie du modèle."
+	).or(
+		type(
+			'string[]',
+			'@',
+			"Liste de clés d'options de la métadonnée, dans le même ordre que les neurones de sortie du modèle"
+		)
 	),
 });
 

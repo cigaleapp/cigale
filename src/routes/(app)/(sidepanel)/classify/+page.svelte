@@ -1,7 +1,12 @@
-<script>
+<script lang="ts">
+	import type * as DB from '$lib/database.js';
+	import type { GalleryItem } from '$lib/gallery.js';
+
 	import { watch } from 'runed';
+	import { SvelteSet } from 'svelte/reactivity';
 	import { fade } from 'svelte/transition';
 
+	import IconLoaded from '~icons/ri/check-line';
 	import AreaObservations from '$lib/AreaObservations.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import CardImage from '$lib/CardImage.svelte';
@@ -26,21 +31,17 @@
 	import { toasts } from '$lib/toasts.svelte';
 	import { isAbortError, nonnull } from '$lib/utils.js';
 
-	/**
-	 * @import * as DB from '$lib/database.js';
-	 * @import { GalleryItem } from '$lib/gallery.js';
-	 */
-
-	/**
-	 * @typedef {GalleryItem<{ image: DB.Image | undefined; observation: DB.Observation | undefined; images: DB.Image[] }>} Item
-	 */
+	type Item = GalleryItem<{
+		image: DB.Image | undefined;
+		observation: DB.Observation | undefined;
+		images: DB.Image[];
+	}>;
 
 	seo({ title: 'Classification' });
 
 	const { data } = $props();
 
-	/** @type {Item[]} */
-	const items = $derived(
+	const items: Item[] = $derived(
 		tables.Observation.state.map((obs) => ({
 			id: obs.id,
 			sessionId: obs.sessionId,
@@ -62,8 +63,7 @@
 
 	let unrolledObservation = $state('');
 
-	/** @type {[string, Item[]]} */
-	const unroll = $derived([
+	const unroll: [string, Item[]] = $derived([
 		unrolledObservation,
 		items
 			.find((item) => item.id === unrolledObservation)
@@ -111,6 +111,7 @@
 		classifyMore(toClassify.map((i) => i.id));
 	}
 
+	const loadedModels = new SvelteSet<NamespacedMetadataID>();
 	async function loadAllClassifModels() {
 		const protocol = uiState.currentProtocol;
 		if (!protocol) return;
@@ -144,7 +145,9 @@
 			return;
 		}
 
-		const pendingLoads = modelLoads.filter(({ sessionId }) => !uiState.loadedInferenceSessions.has(sessionId));
+		const pendingLoads = modelLoads.filter(
+			({ sessionId }) => !uiState.loadedInferenceSessions.has(sessionId)
+		);
 		if (pendingLoads.length === 0) {
 			classifmodelLoaded = true;
 			queueClassificationsIfReady();
@@ -159,7 +162,7 @@
 
 		try {
 			for (let i = 0; i < pendingLoads.length; i++) {
-				const { metadataId, settings, sessionId } = pendingLoads[i];
+				const { settings, sessionId, metadataId } = pendingLoads[i];
 				await loadModel(data.swarpc, 'classification', {
 					abortSignal: modelAbortController.signal,
 					protocolId,
@@ -171,6 +174,7 @@
 						modelLoadingProgress = (i + p) / pendingLoads.length;
 					},
 				});
+				loadedModels.add(metadataId);
 				uiState.loadedInferenceSessions.add(sessionId);
 			}
 		} catch (error) {
@@ -221,19 +225,22 @@
 
 {#snippet modelsource()}
 	{#if uiState.classificationInferenceAvailable}
-		{#each uiState.allClassificationMetadata as metadata}
+		{#each uiState.allClassificationMetadata as metadata (metadata.id)}
 			{@const modelIndex = uiState.selectedClassificationModels[metadata.id] ?? 0}
 			{@const models = uiState.allClassificationModels[metadata.id]}
 			{@const model = models?.[modelIndex]?.model}
 			{#if model}
 				{@const url = new URL(typeof model === 'string' ? model : model?.url)}
+				<div class="is-loaded">
+					{#if loadedModels.has(metadata.id)}
+						<IconLoaded />
+					{/if}
+				</div>
+				<span class="metadata-label">{metadata.label}: </span>
 				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
 				<a href={url.toString()} target="_blank" title={metadata.id}>
 					<code>{url.pathname.split('/').at(-1)}</code>
 				</a>
-				{#if uiState.allClassificationMetadata.length > 1}
-					<span class="metadata-label">{metadata.id}</span>
-				{/if}
 			{/if}
 		{/each}
 	{/if}
@@ -333,6 +340,20 @@
 
 	.loading .source {
 		font-size: 0.8em;
+		display: grid;
+		grid-template-columns: 2ch max-content max-content;
+		gap: 0.25em 1em;
+	}
+
+	.loading .is-loaded {
+		color: var(--fg-success);
+		display: flex;
+		align-items: center;
+		font-size: 1.2em;
+	}
+
+	.loading .metadata-label {
+		font-size: 1.2em;
 	}
 
 	.empty {

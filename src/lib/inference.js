@@ -73,7 +73,7 @@ const MEAN = [0.485, 0.456, 0.406]; // valeurs de normalisation pour la classifi
  * @param {string} params.protocolId
  * @param {object} params.requests
  * @param {typeof import('$lib/schemas/common').HTTPRequest.infer} params.requests.model
- * @param {typeof import('$lib/schemas/common').HTTPRequest.infer | undefined} params.requests.classmapping
+ * @param {typeof import('$lib/schemas/neural.js').NeuralEnumInference.infer['classmapping'] | undefined} params.requests.classmapping
  * @param {boolean} [params.webgpu]
  * @param {(p: number) => void} [params.onProgress] called everytime the progress changes
  * @param {AbortSignal} [params.abortSignal] signal to abort the loading
@@ -89,10 +89,12 @@ export async function loadModel(
 
 	const id = inferenceModelId(protocolId, requests.model);
 
-	const existingSession = await swarpc.inferenceSessionId.broadcast.once.orThrow(task).catch((e) => {
-		console.error(e);
-		throw new Error(`Failed to get existing inference session for task ${task}: ${e}`);
-	});
+	const existingSession = await swarpc.inferenceSessionId.broadcast.once
+		.orThrow(task)
+		.catch((e) => {
+			console.error(e);
+			throw new Error(`Failed to get existing inference session for task ${task}: ${e}`);
+		});
 
 	if (existingSession.every((loadedSession) => loadedSession === id)) {
 		console.debug(`Model ${task} already loaded with ID ${id} on all nodes`);
@@ -111,7 +113,9 @@ export async function loadModel(
 
 	/** @type {string | undefined} */
 	let classmapping = undefined;
-	if (requests.classmapping) {
+	if (requests.classmapping && Array.isArray(requests.classmapping)) {
+		classmapping = requests.classmapping.join('\n');
+	} else if (requests.classmapping) {
 		classmapping = await fetchHttpRequest(requests.classmapping, {
 			signal: abortSignal,
 			cacheAs: 'model',

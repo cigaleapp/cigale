@@ -76,6 +76,17 @@ async function augment(protocolPath: string, protocol: typeof ExportedProtocol.i
 		{ type: 'enum' }
 	>;
 
+	const morphogroupClassmappingSanitized = await fetch(
+		'https://huggingface.co/edgaremy/andrena-classifier/resolve/main/class-mapping-grouped.txt?download=true'
+	)
+		.then((res) => res.text())
+		.then((text) =>
+			text
+				.split('\n')
+				.filter((line) => line.trim())
+				.map(formatMorphogroupKey)
+		);
+
 	if (import.meta.main) {
 		await emitCheckrun('protocols', 'in_progress', 'Xper3', 'Starting…');
 
@@ -120,19 +131,10 @@ async function augment(protocolPath: string, protocol: typeof ExportedProtocol.i
 					},
 				],
 			},
-			options: await fetch(
-				'https://huggingface.co/edgaremy/andrena-classifier/resolve/main/class-mapping-grouped.txt?download=true'
-			)
-				.then((res) => res.text())
-				.then((text) =>
-					text
-						.split('\n')
-						.filter((line) => line.trim())
-						.map((name) => ({
-							key: formatMorphogroupKey(name),
-							label: formatMorphogroupLabel(name),
-						}))
-				),
+			options: morphogroupClassmappingSanitized.map((key) => ({
+				key,
+				label: formatMorphogroupLabel(key),
+			})),
 		};
 
 		const descriptorMetadatas = new Map<
@@ -797,13 +799,11 @@ function constraintsToRange(
 }
 
 function formatMorphogroupKey(name: string) {
-	// XXX: breaks classmapping that is fetched at runtime otherwise
-	// return name.replaceAll(' ', '_').toLowerCase();
-	return name
+	return name.replaceAll(' ', '_').toLowerCase();
 }
 
-function formatMorphogroupLabel(name: string) {
-	let out = name.replace(/^gpe /, 'Groupe ');
+function formatMorphogroupLabel(key: string) {
+	let out = key.replaceAll('_', ' ').replace(/^gpe /, 'Groupe ');
 	out = out[0].toUpperCase() + out.slice(1);
 	return out;
 }
