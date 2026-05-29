@@ -105,6 +105,7 @@
 				subjectId: observation.id,
 				metadataId: definition.id,
 				sessionId: uiState.currentSession?.id,
+				recursive: true,
 			});
 		}
 	}
@@ -149,13 +150,12 @@
 				onclick={async () => {
 					if (!observation) return;
 
-					// TODO: remove metadata value on observation's images too
-
 					await deleteMetadataValue({
 						db: databaseHandle(),
 						subjectId: observation.id,
 						metadataId: definition.id,
 						sessionId: uiState.currentSession?.id,
+						recursive: true,
 					});
 
 					narrowingState.choicesHistory = narrowingState.choicesHistory.filter(

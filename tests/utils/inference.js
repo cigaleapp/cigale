@@ -13,7 +13,7 @@ import { chooseInDropdown, entries, mockUrl } from './core.js';
 /**
  *
  * @param {Page} page
- * @param {{ crop?: InferenceModelName, classify?: InferenceModelName }} models names of tasks to names of models to select. use "la détection" for the detection model, and the metadata's labels for classification model(s)
+ * @param {{ crop?: InferenceModelName, classify?: InferenceModelName | Record<"Morphogroupe" | "Espèce" | (string & {}), InferenceModelName> }} models names of tasks to names of models to select. For classification, the keys of the object are the metadata labels. Pass a model name directly to use the same preference for all options
  */
 export async function setInferenceModels(page, models) {
 	for (const [tab, model] of entries(models)) {
@@ -23,7 +23,27 @@ export async function setInferenceModels(page, models) {
 			name: { crop: 'Réglages de recadrage', classify: 'Réglages de classification' }[tab],
 		});
 
-		await chooseInDropdown(page, trigger, "Modèle d'inférence", model);
+		if (tab === 'crop') {
+			await chooseInDropdown(page, trigger, "Modèle d'inférence", model);
+		} else {
+			/** @type {Array<[string, InferenceModelName]>} */
+			let preferences;
+
+			if (typeof model === 'string' || model instanceof RegExp) {
+				// Retrieve all options for this task
+				preferences = await page
+					.getByTestId('classify-settings-inference-model')
+					.getByRole('menuitem')
+					.allTextContents()
+					.then((options) => options.map((option) => [option, model]));
+			} else {
+				preferences = Object.entries(model);
+			}
+
+			for (const [metadata, model] of preferences) {
+				await chooseInDropdown(page, trigger, "Modèle d'inférence", metadata, model);
+			}
+		}
 	}
 }
 
