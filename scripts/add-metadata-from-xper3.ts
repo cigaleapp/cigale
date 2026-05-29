@@ -107,9 +107,9 @@ async function augment(protocolPath: string, protocol: typeof ExportedProtocol.i
 				neural: [
 					{
 						name: 'ConvNextV2 Tiny',
-						model: 'https://huggingface.co/edgaremy/andrena-classifier/resolve/main/convnextv2_tiny.andrena-cleaned.onnx?download=true',
+						model: 'https://huggingface.co/edgaremy/andrena-classifier/resolve/main/convnextv2_tiny.andrena-grouped.onnx?download=true',
 						classmapping:
-							'https://huggingface.co/edgaremy/andrena-classifier/resolve/main/class-mapping.txt?download=true',
+							'https://huggingface.co/edgaremy/andrena-classifier/resolve/main/class-mapping-grouped.txt?download=true',
 						input: {
 							height: 384,
 							width: 384,
@@ -121,23 +121,19 @@ async function augment(protocolPath: string, protocol: typeof ExportedProtocol.i
 				],
 			},
 			options: await fetch(
-				'https://huggingface.co/edgaremy/andrena-classifier/resolve/main/class-mapping.txt?download=true'
+				'https://huggingface.co/edgaremy/andrena-classifier/resolve/main/class-mapping-grouped.txt?download=true'
 			)
 				.then((res) => res.text())
 				.then((text) =>
 					text
 						.split('\n')
 						.filter((line) => line.trim())
-						.map((key) => ({
-							key,
-							label: key[0].toUpperCase() + key.slice(1),
+						.map((name) => ({
+							key: formatMorphogroupKey(name),
+							label: formatMorphogroupLabel(name),
 						}))
 				),
 		};
-
-		const morphogroups = protocol.metadata[`${protocol.id}__morphogroup`].options!.map(
-			(o) => o.key
-		);
 
 		const descriptorMetadatas = new Map<
 			`c${string}`,
@@ -415,12 +411,37 @@ async function augment(protocolPath: string, protocol: typeof ExportedProtocol.i
 			}
 		}
 
+		const speciesToMorphogroup = Object.fromEntries(
+			await fetch(
+				'https://huggingface.co/edgaremy/andrena-classifier/resolve/main/morphogroup_to_species.csv?download=true'
+			)
+				.then((res) => res.text())
+				.then((text) =>
+					text
+						.split('\n')
+						.filter((line) => line.trim())
+						.filter((_, i) => i > 0)
+						.flatMap((line) => {
+							const [[morphogroup], species] = line
+								.split(',')
+								.map((cell) => cell.trim().split('|'));
+
+							return species
+								.map((name) => [
+									protocol.metadata[`${protocol.id}__species`].options!.find(
+										(o) => o.label.split(' ').at(1) === name
+									)?.key,
+									formatMorphogroupKey(morphogroup),
+								])
+								.filter(([key]) => key !== undefined);
+						})
+				)
+		);
+
 		for (const [oidx, speciesOption] of protocol.metadata[
 			`${protocol.id}__species`
 		].options!.entries()) {
-			const morphogroup = morphogroups.find(
-				(mg) => mg === speciesOption.label.split(' ').at(1)
-			);
+			const morphogroup = speciesToMorphogroup[speciesOption.key];
 
 			if (morphogroup) {
 				protocol.metadata[`${protocol.id}__species`].options![oidx].cascade = {
@@ -773,4 +794,14 @@ function constraintsToRange(
 	}
 
 	return undefined;
+}
+
+function formatMorphogroupKey(name: string) {
+	return name.replaceAll(' ', '_').toLowerCase();
+}
+
+function formatMorphogroupLabel(name: string) {
+	let out = name.replace('gpe ', 'Groupe ');
+	out = out[0].toUpperCase() + out.slice(1);
+	return out;
 }
