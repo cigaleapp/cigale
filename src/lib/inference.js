@@ -93,6 +93,9 @@ export async function loadModel(
 		.orThrow(task)
 		.catch((e) => {
 			console.error(e);
+			if (e instanceof AggregateError) {
+				console.error('Aggregate error occurred:', e.errors);
+			}
 			throw new Error(`Failed to get existing inference session for task ${task}: ${e}`);
 		});
 

@@ -119,8 +119,7 @@ async function augment(protocolPath: string, protocol: typeof ExportedProtocol.i
 					{
 						name: 'ConvNextV2 Tiny',
 						model: 'https://huggingface.co/edgaremy/andrena-classifier/resolve/main/convnextv2_tiny.andrena-grouped.onnx?download=true',
-						classmapping:
-							'https://huggingface.co/edgaremy/andrena-classifier/resolve/main/class-mapping-grouped.txt?download=true',
+						classmapping: morphogroupClassmappingSanitized,
 						input: {
 							height: 384,
 							width: 384,
