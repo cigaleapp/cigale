@@ -797,11 +797,13 @@ function constraintsToRange(
 }
 
 function formatMorphogroupKey(name: string) {
-	return name.replaceAll(' ', '_').toLowerCase();
+	// XXX: breaks classmapping that is fetched at runtime otherwise
+	// return name.replaceAll(' ', '_').toLowerCase();
+	return name
 }
 
 function formatMorphogroupLabel(name: string) {
-	let out = name.replace('gpe ', 'Groupe ');
+	let out = name.replace(/^gpe /, 'Groupe ');
 	out = out[0].toUpperCase() + out.slice(1);
 	return out;
 }
