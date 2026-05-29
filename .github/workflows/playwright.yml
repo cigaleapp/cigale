@@ -72,7 +72,7 @@ jobs:
           echo "non-huggingface-urls=$non_huggingface_urls" >> $GITHUB_OUTPUT
         env:
           JQ_SELECTORS: .metadata[].infer?.neural[]?.model,
-            .metadata[].infer?.neural[]?.classmapping
+            .metadata[].infer?.neural[]?.classmapping | select(. | type | match("string"))
 
       - name: Compute cache key
         id: caching
