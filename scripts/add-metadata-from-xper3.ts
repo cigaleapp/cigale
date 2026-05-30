@@ -114,6 +114,8 @@ async function augment(protocolPath: string, protocol: typeof ExportedProtocol.i
 			type: 'enum',
 			mergeMethod: 'max',
 			required: false,
+			groupable: true,
+			sortable: true,
 			infer: {
 				neural: [
 					{
