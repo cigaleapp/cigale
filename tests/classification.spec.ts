@@ -651,7 +651,7 @@ test.describe('narrowing view', pr(1570), () => {
 				taille_du_3eme_segment_antennaire: 'a3pluscour_1738780689285_1923',
 			});
 
-			await expectCandidatesCount(page, 23);
+			await expectCandidatesCount(page, 25);
 
 			// Use reset button
 
