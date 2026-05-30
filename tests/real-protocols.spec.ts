@@ -1,5 +1,3 @@
-import type { AnalyzedObservation } from '$lib/schemas/results.js';
-
 import { ms } from 'convert';
 
 import { Analysis } from '$lib/schemas/exports.js';
