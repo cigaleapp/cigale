@@ -149,6 +149,7 @@ describe('deleteSession', () => {
 			    "metadataGroups": [],
 			    "name": "Test Protocol",
 			    "sessionMetadata": [],
+			    "summary": "",
 			    "updates": "manual",
 			  },
 			]

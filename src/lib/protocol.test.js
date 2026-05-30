@@ -138,6 +138,7 @@ test('toExportedProtocol', async () => {
 
 	expect(exported).toEqual({
 		...pick(protocol, 'id', 'name', 'version', 'description', 'authors', 'updates'),
+		summary: '',
 		importedMetadata: [],
 		importedMetadataGroups: [],
 		metadataGroups: {},
@@ -261,6 +262,7 @@ describe('compareProtocolWithUpstream', () => {
 			get: async (_table, _id) => ({
 				id: 'protocol1',
 				name: 'Test Protocol',
+				summary: '',
 				updates: 'automatic',
 				version: 1,
 				metadata: [],
@@ -294,6 +296,7 @@ describe('compareProtocolWithUpstream', () => {
 				JSON.stringify({
 					id: 'protocol1',
 					name: 'Test Protocol',
+					summary: '',
 					version: 1,
 					updates: 'automatic',
 					metadata: {},
@@ -443,6 +446,7 @@ describe('compareProtocolWithUpstream', () => {
 					{
 						id: 'protocol1',
 						name: 'Test Protocol Updated',
+						summary: '',
 						version: 2,
 						updates: 'automatic',
 						crop: {
@@ -609,6 +613,7 @@ describe('compareProtocolWithUpstream', () => {
 					description: 'Desc 2',
 					key: 'opt2',
 					label: 'Option 2',
+					synonyms: [],
 				},
 			},
 			{
@@ -616,6 +621,7 @@ describe('compareProtocolWithUpstream', () => {
 					description: 'Desc 3',
 					key: 'opt3',
 					label: 'Option 3',
+					synonyms: [],
 				},
 				path: ['metadata', 'protocol1__meta1', 'options', 2],
 				type: 'REMOVE',
@@ -625,6 +631,7 @@ describe('compareProtocolWithUpstream', () => {
 					description: 'Desc B',
 					key: 'opt2',
 					label: 'Option B',
+					synonyms: [],
 				},
 				path: ['metadata', 'protocol1__meta2', 'options', 1],
 				type: 'REMOVE',
@@ -632,6 +639,8 @@ describe('compareProtocolWithUpstream', () => {
 			{
 				oldValue: {
 					description: 'Metadata 3 description',
+					groupable: false,
+					images: [],
 					label: 'Metadata 3',
 					mergeMethod: 'max',
 					options: [
@@ -639,9 +648,11 @@ describe('compareProtocolWithUpstream', () => {
 							description: 'Desc X',
 							key: 'opt1',
 							label: 'Option X',
+							synonyms: [],
 						},
 					],
 					required: false,
+					sortable: false,
 					type: 'enum',
 				},
 				path: ['metadata', 'protocol1__meta3'],
