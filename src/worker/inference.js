@@ -112,7 +112,7 @@ swarp.classify(async ({ imageId, metadataIds, taskSettings, inferenceSessionId }
 	const image = Schemas.Image.assert(await db.get('Image', imageId));
 
 	tools.abortSignal?.throwIfAborted();
-	
+
 	// Use the specified inference session, or fall back to the latest classification session
 	let session;
 	if (inferenceSessionId) {

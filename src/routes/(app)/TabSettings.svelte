@@ -126,7 +126,11 @@
 				testid: `${tab}-settings-sort`,
 				label: 'Trier par…',
 				items: entries(SORT_FIELDS).map(([key, { label }]) => {
-					type Extras = { direction: 'asc' | 'desc' | null, neural?: boolean, icon?: string }
+					type Extras = {
+						direction: 'asc' | 'desc' | null;
+						neural?: boolean;
+						icon?: string;
+					};
 					const direction = currentSettings?.sort.direction ?? null;
 					const field = currentSettings?.sort.field;
 					const metadata = currentSettings?.sort.metadata;

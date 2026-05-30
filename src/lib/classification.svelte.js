@@ -42,10 +42,7 @@ export async function classifyImage(swarpc, id, cancellers) {
 		const taskSettings = $state.snapshot(settings);
 
 		// Generate the inference session ID based on the protocol and model
-		const inferenceSessionId = inferenceModelId(
-			uiState.currentProtocol.id,
-			settings.model
-		);
+		const inferenceSessionId = inferenceModelId(uiState.currentProtocol.id, settings.model);
 
 		const { cancel, request: done } = swarpc.classify.cancelable({
 			imageId: id,

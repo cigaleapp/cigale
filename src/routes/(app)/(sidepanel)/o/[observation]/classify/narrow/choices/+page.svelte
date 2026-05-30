@@ -30,7 +30,7 @@
 		const result: Record<NamespacedMetadataID, Set<string>> = Object.fromEntries(
 			definitions
 				// Don't consider metadata that has been chosen
-				.filter((def) => !(narrowingState.choices.has(def.id)))
+				.filter((def) => !narrowingState.choices.has(def.id))
 				.map((def) => [def.id, new Set()])
 		);
 
@@ -120,10 +120,10 @@
 								'/(app)/(sidepanel)/o/[observation]/classify/narrow/describe',
 								page.params
 							);
-						}}>
-						Décrire l'observation
-						</ButtonSecondary
+						}}
 					>
+						Décrire l'observation
+					</ButtonSecondary>
 				</div>
 			{/if}
 		{/snippet}

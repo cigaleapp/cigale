@@ -146,7 +146,9 @@ export function imageIsClassified(image) {
 
 	return metadataIds.every(
 		(metadataId) =>
-			image.metadata[metadataId] || image.metadataErrors?.[metadataId]?.length || uiState.erroredImages.has(image.id)
+			image.metadata[metadataId] ||
+			image.metadataErrors?.[metadataId]?.length ||
+			uiState.erroredImages.has(image.id)
 	);
 }
 
