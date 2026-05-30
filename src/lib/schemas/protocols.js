@@ -19,7 +19,6 @@ import {
 	namespacedMetadataId,
 	SidecarFilepathTemplate,
 } from './metadata.js';
-import { Image, Observation } from './observations.js';
 import { AnalyzedImage, AnalyzedObservation } from './results.js';
 
 export const ExportsFilepathTemplateObservation = FilepathTemplate(
@@ -140,7 +139,13 @@ export const Protocol = type({
 		.describe("Permet de grouper les métadonnées dans l'interface utilisateur")
 		.default(() => []),
 	name: ['string', '@', 'Nom du protocole'],
+	summary: type('string')
+		.describe('Description courte du protocole, en quelques mots')
+		.default(''),
 	description: ['string', '@', 'Description du protocole'],
+	'logo?': URLString.describe(
+		'URL vers le logo du protocole, qui peut être utilisé dans l’interface utilisateur pour représenter ce protocole'
+	),
 	'learnMore?': URLString.describe(
 		"Lien vers un site où l'on peut se renseigner sur ce protocole. Cela peut aussi être simplement un lien de téléchargement direct de ce fichier"
 	),

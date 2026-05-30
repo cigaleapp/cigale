@@ -1,6 +1,8 @@
 # yaml-language-server: $schema=https://cigaleapp.github.io/cigale/protocol.schema.json
 id: fr.osug.terra-forma-web.insecta
 name: INSECTA
+summary: Relevé de 20 minutes avec appareil photo
+logo: https://cors.gwen.works/https://static.inaturalist.org/projects/137789-icon-thumb.png # TODO: find a higher-res image for the logo
 authors:
   - name: Maxime Cauchoix
 

@@ -1,6 +1,7 @@
 # yaml-language-server: $schema=../static/protocol.schema.json
 id: fr.osug.terra-forma-web.entomoscope
 name: Entomoscope
+summary: Analyse de captures de l'Entomoscope
 
 updates: automatic
 version: 6
