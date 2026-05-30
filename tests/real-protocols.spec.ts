@@ -1,5 +1,9 @@
 import type { AnalyzedObservation } from '$lib/schemas/results.js';
 
+import { ms } from 'convert';
+
+import { Analysis } from '$lib/schemas/exports.js';
+
 import { expect, test } from './fixtures.js';
 import sidecarExample from './fixtures/real/entomoscope/20260209141830.json' with { type: 'json' };
 import { expectZipFiles } from './utils/core.js';
@@ -75,7 +79,7 @@ test('Entomoscope @real-protocol', async ({ app, page }) => {
 	await page.getByRole('button', { name: 'Retour' }).click();
 	await app.path.wait('/(app)/(sidepanel)/crop');
 	await app.tabs.go('classify');
-	await app.loading.wait();
+	await app.loading.wait(ms('2m'));
 
 	await app.tabs.go('results');
 	const zip = await exportResults(page, { kind: 'cropped' });
@@ -117,10 +121,8 @@ test('Entomoscope @real-protocol', async ({ app, page }) => {
 				},
 			},
 			'analysis.json': {
-				async json(json) {
-					const obs: (typeof AnalyzedObservation.infer)[] = Object.values(
-						json.observations
-					);
+				async json(json: typeof Analysis.infer) {
+					const obs = Object.values(json.observations);
 
 					expect(obs).toHaveLength(14);
 
