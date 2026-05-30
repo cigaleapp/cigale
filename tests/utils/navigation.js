@@ -83,11 +83,20 @@ const appNavTabs = (lang = 'fr') =>
  * @param {NavigationTab} tabName
  * @param {object} [options]
  * @param {boolean} [options.waitForModel=true] wait for the model to be loaded (only for crop and classify)
+ * @param {boolean} [options.force=false] bypass disabled tab by navigating directly to the tab route
  * @param {import('$lib/i18n').Language} [options.language=fr]
  */
-export async function goToTab(page, tabName, { waitForModel = true, language = 'fr' } = {}) {
-	await getTab(page, tabName).click();
+export async function goToTab(
+	page,
+	tabName,
+	{ waitForModel = true, force = false, language = 'fr' } = {}
+) {
 	const tab = appNavTabs(language)[tabName];
+	if (force) {
+		await page.goto(`${process.env.BASE_PATH || ''}${tab.route}`);
+	} else {
+		await getTab(page, tabName).click();
+	}
 	await waitForRoute(page, tab.route);
 
 	if (waitForModel && (tabName === 'crop' || tabName === 'classify')) {

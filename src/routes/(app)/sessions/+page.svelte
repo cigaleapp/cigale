@@ -4,7 +4,6 @@
 	import { SvelteMap } from 'svelte/reactivity';
 	import { fade } from 'svelte/transition';
 
-	import ModalPickProtocol from '$lib/ModalPickProtocol.svelte';
 	import IconAdd from '~icons/ri/add-line';
 	import IconDropdown from '~icons/ri/arrow-down-s-fill';
 	import IconLocal from '~icons/ri/hard-drive-2-line';
@@ -22,6 +21,7 @@
 	import { loadPreviewImage } from '$lib/images.js';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
 	import LoadingText from '$lib/LoadingText.svelte';
+	import ModalPickProtocol from '$lib/ModalPickProtocol.svelte';
 	import OverflowableText from '$lib/OverflowableText.svelte';
 	import { goto } from '$lib/paths.js';
 	import { importMore } from '$lib/queue.svelte';

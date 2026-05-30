@@ -475,7 +475,7 @@ test('can use a protocol that imports metadata from another protocol', async ({
 	await app.metadata.switch('Remote metadata').click();
 	await app.metadata.switch('Remote metadata').click();
 
-	await app.tabs.go('results');
+	await app.tabs.go('results', { force: true });
 	const zip = await exportResults(page, { kind: 'metadata' });
 	await expectZipFiles(zip, ['analysis.json', 'metadata.csv'], {
 		'analysis.json': {
