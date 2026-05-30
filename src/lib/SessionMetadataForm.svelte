@@ -126,4 +126,8 @@
 
 		--size: 5rem; /* Logo size */
 	}
+
+	form {
+		--metadata-list-gap: 2em;
+	}
 </style>
