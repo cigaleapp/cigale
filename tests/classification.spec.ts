@@ -542,7 +542,7 @@ test.describe('narrowing view', pr(1570), () => {
 	// TODO: more E2E testing
 	test.describe('describe tab', () => {
 		testBasic('can choose choices', async ({ page, app }) => {
-			await expectCandidatesCount(page, 180, { timeout: ms('10s') });
+			await expectCandidatesCount(page, 182, { timeout: ms('10s') });
 
 			async function choose(
 				metadata: string,
@@ -574,12 +574,12 @@ test.describe('narrowing view', pr(1570), () => {
 
 			await choose('Pilosité occipitale', 'Pilosité majoritairement claire');
 
-			await expectCandidatesCount(page, 154);
+			await expectCandidatesCount(page, 156);
 			// await expectRemainingCandidate('')
 
 			await choose('Forme de la tête', 'Plus large que haute');
 
-			await expectCandidatesCount(page, 126);
+			await expectCandidatesCount(page, 128);
 
 			await expectMetadataValues(app, {
 				pilosite_occipitale: 'pilositmaj_1738780459445_3719',
@@ -607,7 +607,7 @@ test.describe('narrowing view', pr(1570), () => {
 			await page.getByRole('tab', { name: 'Décrire' }).click();
 			await app.path.wait('/(app)/(sidepanel)/o/[observation]/classify/narrow/describe');
 
-			await expectCandidatesCount(page, 134);
+			await expectCandidatesCount(page, 136);
 
 			await choose(
 				'Couleur de la face ventrale du flagelle antennaire',
@@ -666,7 +666,7 @@ test.describe('narrowing view', pr(1570), () => {
 				taille_du_3eme_segment_antennaire: null,
 			});
 
-			await expectCandidatesCount(page, 180);
+			await expectCandidatesCount(page, 182);
 		});
 
 		testBasic('can search through metadata', async ({ page, app }) => {

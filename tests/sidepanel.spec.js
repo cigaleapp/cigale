@@ -285,7 +285,6 @@ testBasic('can update a enum-type metadata with cascades', async ({ page, app })
 
 	// Unselect and reselect
 	await page.getByText('lil-fella', { exact: true }).click();
-	await page.getByText('lil-fella', { exact: true }).click();
 
 	await assert(app.metadata.section('Espèce')).toMatchAriaSnapshot(
 		`
