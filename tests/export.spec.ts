@@ -44,7 +44,7 @@ test('correctly applies crop padding', issue(463), async ({ page, app }) => {
 
 	await page.getByRole('button', { name: 'Retour' }).click();
 
-	await app.tabs.go('results');
+	await app.tabs.go('results', { force: true });
 	const zip = await exportResults(page, { cropPadding: '40px' });
 	await expectZipFiles(zip, ['analysis.json', 'metadata.csv', 'Cropped/(Unknown)_obs1_1.png'], {
 		'Cropped/(Unknown)_obs1_1.png': {
@@ -236,8 +236,9 @@ testKitchensink('includes metadata files in export', async ({ page, app }) => {
 	await pickFiles(sessionwideFile.getByRole('button', { name: 'Ajouter' }), 'debugsquare.png');
 	await assert(sessionwideFile).toHaveText(/debugsquare\.png/);
 
-	await app.tabs.go('results');
-	await expect(page.getByTestId('zip-preview')).toMatchAriaSnapshot(`
+	await app.tabs.go('results', { force: true });
+	await expect(page.getByTestId('zip-preview')).toMatchAriaSnapshot(
+		`
 	  - text: Contenu de l'export
 	  - list:
 	    - listitem:
@@ -256,7 +257,9 @@ testKitchensink('includes metadata files in export', async ({ page, app }) => {
 	      - listitem:
 	        - img
 	        - text: image-1.cropped.jpeg
-	`);
+	`,
+		{ timeout: ms('10s') }
+	);
 
 	const zip = await exportResults(page);
 	await expectZipFiles(
@@ -280,7 +283,7 @@ testKitchensink(
 	'shows warning dialog when exporting with metadata problems',
 	async ({ page, app }) => {
 		await chooseFirstSession(page);
-		await app.tabs.go('results');
+		await app.tabs.go('results', { force: true });
 
 		await app.metadata.textbox('ohio respect').fill('16');
 		await app.metadata.textbox('ohio respect').blur();

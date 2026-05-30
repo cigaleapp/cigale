@@ -204,6 +204,16 @@ export class UIState {
 	}
 
 	/**
+	 * @param {import('./database').Image} image
+	 * @returns {import('./metadata').TypedMetadataValue<'enum'>|undefined}
+	 */
+
+	classificationMetadataValueOf(image) {
+		if (!this.classificationMetadataId) return undefined;
+		return getMetadataValue(image, 'enum', this.classificationMetadataId);
+	}
+
+	/**
 	 * @param {string | undefined | null} imageFileId
 	 * @returns {boolean}
 	 */

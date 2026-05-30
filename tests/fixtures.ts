@@ -145,7 +145,7 @@ export type AppFixture = {
 		open(options?: Parameters<Locator['click']>[0]): Promise<void>;
 	};
 	tabs: {
-		go(tab: NavigationTab): Promise<void>;
+		go(tab: NavigationTab, options?: Parameters<typeof goToTab>[2]): Promise<void>;
 		get(tab: NavigationTab): Locator;
 	};
 	path: {
@@ -377,7 +377,7 @@ const _test = base.extend<
 				},
 			},
 			tabs: {
-				go: async (tab) => goToTab(page, tab),
+				go: async (tab, options) => goToTab(page, tab, options),
 				get: (tab) => getTab(page, tab),
 			},
 			path: {

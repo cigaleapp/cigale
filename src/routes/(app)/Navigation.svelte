@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { formatDistanceToNow } from 'date-fns';
 	import { fade } from 'svelte/transition';
 
@@ -27,7 +27,7 @@
 	import { goto, resolve } from '$lib/paths';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { switchSession } from '$lib/sessions.js';
-	import { getSettings, setSetting } from '$lib/settings.svelte.js';
+	import { getSettings, isDebugMode, setSetting } from '$lib/settings.svelte.js';
 	import { uiState } from '$lib/state.svelte.js';
 	import { tooltip } from '$lib/tooltips.js';
 	import { clamp } from '$lib/utils.js';
@@ -37,34 +37,45 @@
 	import Settings from './Settings.svelte';
 	import TabSettings from './TabSettings.svelte';
 
-	/**
-	 * @typedef Props
-	 * @type {object}
-	 * @property {number} [progress=0]
-	 * @property {number} [eta=Infinity]
-	 * @property {import('swarpc').SwarpcClient<typeof import('$worker/procedures.js').PROCEDURES>} swarpc
-	 * @property {boolean} [progressbarOnly] Only show the progress bar, hide the navbar and logo
-	 */
+	type Props = {
+		progress?: number;
+		eta?: number;
+		/**  Only show the progress bar, hide the navbar and logo */
+		progressbarOnly?: boolean;
+	};
 
-	/** @type {Props} */
-	let { progress = 0, eta = Infinity, progressbarOnly = false } = $props();
+	let { progress = 0, eta = Infinity, progressbarOnly = false }: Props = $props();
 
-	// @ts-expect-error
-	const path = $derived(resolve(page.url.pathname));
 
 	const hasImages = $derived(tables.Image.state.length > 0);
+	const hasImagesWithCrops = $derived(
+		tables.Image.state.some((image) => uiState.cropMetadataValueOf(image))
+	);
+	const hasImagesWithClassification = $derived(
+		tables.Image.state.some((image) => uiState.classificationMetadataValueOf(image))
+	);
 
-	/** @type {number|undefined} */
-	let height = $state();
+	const isAnalyzingCrops = $derived(
+		uiState.processing.task === 'detection' && uiState.processing.progress < 1
+	);
 
-	/** @type {number|undefined} */
-	let navHeight = $state();
+	const isAnalyzingClassifications = $derived(
+		uiState.processing.task === 'classification' && uiState.processing.progress < 1
+	);
 
-	/** @type {undefined | (() => void)} */
-	let openPreviewPRDetails = $state();
+	let height = $state<number>();
+
+	let navHeight = $state<number>();
+
+	let openPreviewPRDetails = $state<() => void>();
 
 	let browserTabFocused = $state(true);
 	let showingOKInTabTitle = $state(false);
+
+	const importTabDisabled = $derived(!uiState.currentProtocol);
+	const cropTabDisabled = $derived(importTabDisabled || !hasImages || isAnalyzingClassifications);
+	const classifyTabDisabled = $derived(cropTabDisabled || !hasImagesWithCrops || isAnalyzingCrops);
+	const resultsTabDisabled = $derived(classifyTabDisabled || !hasImagesWithClassification);
 
 	/* eslint-disable svelte/prefer-writable-derived */
 	// The window object is not reactive
@@ -219,7 +230,7 @@
 							use:tooltip={'Session'}
 						>
 							{uiState.currentSession.name}
-							{#if path === `/sessions/${uiState.currentSession.id}/`}
+							{#if page.route.id === "/(app)/sessions/[id]"}
 								<div class="line"></div>
 							{/if}
 						</a>
@@ -227,10 +238,10 @@
 							<a
 								href={resolve('/import/')}
 								data-testid="goto-import"
-								aria-disabled={!uiState.currentProtocol}
+								aria-disabled={!isDebugMode() && importTabDisabled}
 							>
 								Importer
-								{#if path == '/import/'}
+								{#if page.route.id === "/(app)/(sidepanel)/import"}
 									<div class="line"></div>
 								{/if}
 							</a>
@@ -256,11 +267,11 @@
 										})
 									: resolve('/crop/')}
 								data-testid="goto-crop"
-								aria-disabled={!uiState.currentProtocol || !hasImages}
+								aria-disabled={!isDebugMode() && cropTabDisabled}
 							>
 								<!-- eslint-enable svelte/no-navigation-without-resolve -->
 								Recadrer
-								{#if path.startsWith('/crop')}
+								{#if page.route.id === '/(app)/(sidepanel)/crop'}
 									<div class="line"></div>
 								{/if}
 							</a>
@@ -274,23 +285,14 @@
 							/>
 						</div>
 						<div class="separator"><IconNext /></div>
-						<div
-							class="with-inference-indicator"
-							use:tooltip={uiState.processing.task === 'detection' &&
-							uiState.processing.progress < 1
-								? "Veuillez attendre la fin de l'analyse des images avant de les classifier"
-								: undefined}
-						>
+						<div class="with-inference-indicator">
 							<a
 								href={resolve('/classify/')}
-								aria-disabled={!uiState.currentProtocol ||
-									!hasImages ||
-									(uiState.processing.task === 'detection' &&
-										uiState.processing.progress < 1)}
+								aria-disabled={!isDebugMode() && classifyTabDisabled}
 								data-testid="goto-classify"
 							>
 								Classifier
-								{#if path.startsWith('/classify')}
+								{#if page.route.id === '/(app)/(sidepanel)/classify'}
 									<div class="line"></div>
 								{/if}
 							</a>
@@ -305,9 +307,13 @@
 							/>
 						</div>
 						<div class="separator"><IconNext /></div>
-						<a href={resolve('/results/')} data-testid="goto-results">
+						<a
+							href={resolve('/results/')}
+							aria-disabled={!isDebugMode() && resultsTabDisabled}
+							data-testid="goto-results"
+						>
 							Résultats
-							{#if path == '/results/'}
+							{#if page.route.id === "/(app)/results"}
 								<div class="line"></div>
 							{/if}
 						</a>
@@ -316,19 +322,19 @@
 					<div class="steps" in:fade={{ duration: 100 }}>
 						<a href={resolve('/sessions/')} data-testid="goto-sessions">
 							Sessions
-							{#if path.startsWith('/sessions')}
+							{#if page.route.id === "/(app)/sessions"}
 								<div class="line"></div>
 							{/if}
 						</a>
 						<a href={resolve('/protocols/')} data-testid="goto-protocols">
 							Protocoles
-							{#if path.startsWith('/protocols')}
+							{#if page.route.id === "/(app)/protocols"}
 								<div class="line"></div>
 							{/if}
 						</a>
 						<a href={resolve('/accounts/')} data-testid="goto-accounts">
 							Comptes
-							{#if path.startsWith('/accounts')}
+							{#if page.route.id === "/(app)/accounts"}
 								<div class="line"></div>
 							{/if}
 						</a>
@@ -377,9 +383,9 @@ Tab bar is only when a session is active
 				<a
 					href={resolve('/(app)/sessions/[id]', { id: uiState.currentSession.id })}
 					data-testid="mobile-goto-current-session"
-					class:active={path === `/sessions/${uiState.currentSession.id}/`}
+					class:active={page.route.id === "/(app)/sessions/[id]"}
 				>
-					{#if path === `/sessions/${uiState.currentSession.id}/`}
+					{#if page.route.id === "/(app)/sessions/[id]"}
 						<IconManageSessionFilled />
 					{:else}
 						<IconManageSession />
@@ -390,10 +396,10 @@ Tab bar is only when a session is active
 				<a
 					href={resolve('/import/')}
 					data-testid="mobile-goto-import"
-					aria-disabled={!uiState.currentProtocol}
-					class:active={path == '/import/'}
+					aria-disabled={!isDebugMode() && importTabDisabled}
+					class:active={page.route.id === "/(app)/(sidepanel)/import"}
 				>
-					{#if path == '/import/'}
+					{#if page.route.id === "/(app)/(sidepanel)/import"}
 						<IconImportFilled />
 					{:else}
 						<IconImport />
@@ -404,10 +410,10 @@ Tab bar is only when a session is active
 				<a
 					href={resolve('/crop/')}
 					data-testid="mobile-goto-crop"
-					aria-disabled={!uiState.currentProtocol || !hasImages}
-					class:active={path.startsWith('/crop')}
+					aria-disabled={!isDebugMode() && cropTabDisabled}
+					class:active={page.route.id === "/(app)/(sidepanel)/crop"}
 				>
-					{#if path.startsWith('/crop')}
+					{#if page.route.id === "/(app)/(sidepanel)/crop"}
 						<IconCropFilled />
 					{:else}
 						<IconCrop />
@@ -418,10 +424,10 @@ Tab bar is only when a session is active
 				<a
 					href={resolve('/classify/')}
 					data-testid="mobile-goto-classify"
-					aria-disabled={!uiState.currentProtocol || !hasImages}
-					class:active={path.startsWith('/classify')}
+					aria-disabled={!isDebugMode() && classifyTabDisabled}
+					class:active={page.route.id === "/(app)/(sidepanel)/classify"}
 				>
-					{#if path.startsWith('/classify')}
+					{#if page.route.id === "/(app)/(sidepanel)/classify"}
 						<IconClassifyFilled />
 					{:else}
 						<IconClassify />
@@ -432,9 +438,10 @@ Tab bar is only when a session is active
 				<a
 					href={resolve('/results/')}
 					data-testid="mobile-goto-results"
-					class:active={path == '/results/'}
+					aria-disabled={!isDebugMode() && resultsTabDisabled}
+					class:active={page.route.id === "/(app)/results"}
 				>
-					{#if path == '/results/'}
+					{#if page.route.id === "/(app)/results"}
 						<IconResultsFilled />
 					{:else}
 						<IconResults />

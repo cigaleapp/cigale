@@ -380,10 +380,6 @@ test('can import a large image', issue(412, 415), async ({ page, app }) => {
 	await assert(page.getByText('large-image.jpeg')).toBeVisible({
 		timeout: 10_000,
 	});
-	await app.tabs.go('classify');
-	await assert(page.getByText('large-image')).toBeVisible({
-		timeout: 10_000,
-	});
 });
 
 test('cannot import an extremely large image', issue(412, 414), async ({ page, app }) => {

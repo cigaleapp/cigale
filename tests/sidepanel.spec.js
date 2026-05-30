@@ -32,7 +32,7 @@ async function initialize({ page, app, protocol = 'example' }) {
 	if (protocol === 'kitchensink') await changeSessionProtocol(page, 'Kitchen sink');
 	if (protocol !== 'kitchensink')
 		await setInferenceModels(page, { classify: 'Aucune inférence', crop: 'Aucune inférence' });
-	await app.tabs.go('classify');
+	await app.tabs.go('classify', { force: true });
 	await page
 		.getByText(protocol === 'example' ? 'lil-fella' : 'leaf', { exact: true })
 		.click({ timeout: ms('10s') });
@@ -82,7 +82,7 @@ testKitchensink(
 		`);
 
 		// Set to False on observation
-		await app.tabs.go('classify');
+		await app.tabs.go('classify', { force: true });
 		await firstObservationCard(page).click();
 		await app.metadata.switch('bool').click();
 		await app.metadata.switch('bool').click();
