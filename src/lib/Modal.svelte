@@ -2,6 +2,10 @@
 @component
 Show a pop-up dialog, that can be closed via a close button provided by the component, or navigating back in the browser history.
 
+CSS variables:
+- `--modal-width`: The width of the modal. Default is `75vw` on mobile and `50vw` on desktop.
+
+
 -->
 <script module>
 	/**

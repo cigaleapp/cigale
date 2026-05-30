@@ -1,3 +1,16 @@
+<!-- 
+
+@component 
+
+CSS variables:
+
+- `--size`: The size of the logo. Default is `1.2em`.
+- `--fill`: The fill color of the logo. Default is `none`.
+- `--stroke`: The stroke color of the logo. Default is `var(--fg-neutral)` for the regular variant and `var(--fg-error)` for the error variant.
+- `--stroke-width`: The stroke width of the logo. Default is `38`.
+ 
+-->
+
 <script>
 	/**
 	 * @type {{variant?: 'regular' | 'error' | "empty", drawpercent?: number, loading?: boolean }}

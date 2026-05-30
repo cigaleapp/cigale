@@ -55,7 +55,9 @@ setup('kitchensink-protocol', async ({ page, app }) => {
 
 	await confirmDeletionModal(page, { type: exampleProtocol.name });
 	await expect(page.getByText('Protocole supprimé')).toBeVisible();
-	await newSession(page);
+	await newSession(page, {
+		protocol: 'Kitchen sink',
+	});
 
 	await app.tabs.go('import');
 	await importPhotos({ page }, 'cyan.jpeg', 'leaf.jpeg');
