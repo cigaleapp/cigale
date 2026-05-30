@@ -116,11 +116,6 @@ msgstr "Taxonomic tree"
 msgid "Aucun fichier d'analyse trouvé dans l'export {0}"
 msgstr "No analysis file found in export {0}"
 
-#. 0: uiState.selectedClassificationModel; 1: uiState.currentProtocol.name
-#: src/routes/(app)/(sidepanel)/classify/+page.svelte
-msgid "Aucun paramètre d'inférence défini pour le modèle {0} sur le protocole {1}"
-msgstr "No inference parameters defined for model {0} on protocol {1}"
-
 #: src/lib/InputSelectProtocol.svelte
 #: src/lib/import.svelte.js
 #: src/lib/import.svelte.js
