@@ -519,7 +519,9 @@ export function defaultClassificationMetadata(protocol, metadata) {
 	return metadata
 		.filter((m) => m.type === 'enum')
 		.filter((m) => isMetadataInProtocol(protocol, m.id))
-		.find((m) => m.infer && 'neural' in m.infer);
+		.filter((m) => m.infer && 'neural' in m.infer)
+		.sort(metadataDefinitionComparator(protocol))
+		.at(0);
 }
 
 /**
