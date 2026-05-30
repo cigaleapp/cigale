@@ -26,13 +26,11 @@
 		narrowingState.definitions.filter((def) => def.id in metadataValues)
 	);
 
-	const observation = $derived(narrowingState.observation);
-
 	const remainingMetadataValues = $derived.by<Record<NamespacedMetadataID, Set<string>>>(() => {
 		const result: Record<NamespacedMetadataID, Set<string>> = Object.fromEntries(
 			definitions
 				// Don't consider metadata that has been chosen
-				.filter((def) => !(def.id in (observation?.metadataOverrides ?? {})))
+				.filter((def) => !(narrowingState.choices.has(def.id)))
 				.map((def) => [def.id, new Set()])
 		);
 
@@ -122,7 +120,9 @@
 								'/(app)/(sidepanel)/o/[observation]/classify/narrow/describe',
 								page.params
 							);
-						}}>Décrire l'observation</ButtonSecondary
+						}}>
+						Décrire l'observation
+						</ButtonSecondary
 					>
 				</div>
 			{/if}

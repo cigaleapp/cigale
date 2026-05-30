@@ -138,11 +138,15 @@ export function imageIsAnalyzed(protocol, imageFileId) {
  * @param {Image} image
  */
 export function imageIsClassified(image) {
-	return Boolean(
-		(uiState.classificationMetadataId && image.metadata[uiState.classificationMetadataId]) ||
-		uiState.erroredImages.has(image.id) ||
-		(uiState.classificationMetadataId &&
-			image.metadataErrors?.[uiState.classificationMetadataId]?.length)
+	const metadataIds = uiState.enabledClassificationMetadata.map((metadata) => metadata.id);
+
+	if (metadataIds.length === 0) {
+		return false;
+	}
+
+	return metadataIds.every(
+		(metadataId) =>
+			image.metadata[metadataId] || image.metadataErrors?.[metadataId]?.length || uiState.erroredImages.has(image.id)
 	);
 }
 

@@ -4,6 +4,7 @@ import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 import { tables } from './idb.svelte.js';
 import { getMetadataValue } from './metadata/index.js';
 import { defaultClassificationMetadata, defaultCropMetadata } from './protocols.js';
+import { isMetadataInProtocol } from './schemas/protocols.js';
 import { pick } from './utils.js';
 
 /**
@@ -134,6 +135,8 @@ export class UIState {
 	previewURLs = new SvelteMap();
 	/** @type {Map<string, string>} These persist across session changes */
 	globalPreviewURLs = new SvelteMap();
+	/** @type {Set<string>} Persisted set of inference session IDs loaded on the client */
+	loadedInferenceSessions = new SvelteSet();
 	/** @type {Map<string, string>} */
 	erroredImages = new SvelteMap();
 	/** @type {Set<string>} */
@@ -260,6 +263,59 @@ export class UIState {
 		return inference.neural;
 	});
 
+	/**
+	 * Classification metadata with an enabled neural model selection.
+	 * @type {import('./database').Metadata[]}
+	 */
+	enabledClassificationMetadata = $derived.by(() => {
+		return this.allClassificationMetadata.filter(
+			(metadata) => (this.currentSession?.inferenceModels[metadata.id] ?? 0) !== -1
+		);
+	});
+
+	/**
+	 * All metadata with neural enum inference (not just the first one)
+	 * @type {import('./database').Metadata[]}
+	 */
+	allClassificationMetadata = $derived.by(() => {
+		const protocol = this.currentProtocol;
+		if (!protocol) return [];
+		const inferenceMetadata = tables.Metadata.state
+			.filter((m) => m.type === 'enum')
+			.filter((m) => isMetadataInProtocol(protocol, m.id))
+			.filter((m) => m.infer && 'neural' in m.infer);
+		return inferenceMetadata;
+	});
+
+	/**
+	 * Maps metadata IDs to their neural inference models
+	 * @type {import('./database').Metadata['id'] extends string ? Record<import('./database').Metadata['id'], typeof import('$lib/schemas/neural.js').NeuralEnumInference.infer[]> : never}
+	 */
+	allClassificationModels = $derived.by(() => {
+		/** @type {Record<string, any>} */
+		const result = {};
+		for (const metadata of this.allClassificationMetadata) {
+			const inference = metadata.infer;
+			if (inference && 'neural' in inference) {
+				result[metadata.id] = inference.neural;
+			}
+		}
+		return result;
+	});
+
+	/**
+	 * Maps metadata IDs to their selected model indices
+	 * @type {import('./database').Metadata['id'] extends string ? Record<import('./database').Metadata['id'], number> : never}
+	 */
+	selectedClassificationModels = $derived.by(() => {
+		/** @type {Record<string, number>} */
+		const result = {};
+		for (const metadata of this.allClassificationMetadata) {
+			result[metadata.id] = this.currentSession?.inferenceModels[metadata.id] ?? 0;
+		}
+		return result;
+	});
+
 	/** @type {typeof import('$lib/schemas/neural.js').NeuralBoundingBoxInference.infer[]} */
 	cropModels = $derived.by(() => {
 		const inference = this.cropMetadata?.infer;
@@ -288,9 +344,25 @@ export class UIState {
 	/** @type {boolean} */
 	cropInferenceAvailable = $derived(this.cropModels.length > 0 && this.selectedCropModel !== -1);
 	/** @type {boolean} */
-	classificationInferenceAvailable = $derived(
-		this.classificationModels.length > 0 && this.selectedClassificationModel !== -1
-	);
+	classificationInferenceAvailable = $derived(this.enabledClassificationMetadata.length > 0);
+
+	/**
+	 * Set the selected model index for a classification metadata.
+	 * @param {string} metadataId
+	 * @param {number} modelIndex -1 disables inference for that metadata
+	 * @returns {Promise<void>}
+	 */
+	async setClassificationModelSelection(metadataId, modelIndex) {
+		if (!this.currentSession) return;
+
+		const current = this.currentSession.inferenceModels;
+		if ((current[metadataId] ?? 0) === modelIndex) return;
+
+		await tables.Session.update(this.currentSession.id, 'inferenceModels', {
+			...current,
+			[metadataId]: modelIndex,
+		});
+	}
 
 	/**
 	 * @param {{ classification?: number | null, crop?: number | null }} indices

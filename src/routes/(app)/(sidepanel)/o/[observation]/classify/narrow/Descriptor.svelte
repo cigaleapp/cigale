@@ -57,7 +57,9 @@
 	);
 
 	const moreSelections = $derived(
-		Object.keys(metadataValues[definition.id]?.alternatives ?? {}).length
+		Object.values(metadataValues[definition.id]?.alternatives ?? {}).filter(
+			(confidence) => confidence >= 1
+		).length
 	);
 
 	async function onChange({
@@ -94,7 +96,6 @@
 				type: 'enum',
 				manuallyModified: true,
 				sessionId: uiState.currentSession?.id,
-				// updateReactiveState: false,
 				value,
 				alternatives,
 			});
@@ -104,7 +105,7 @@
 				subjectId: observation.id,
 				metadataId: definition.id,
 				sessionId: uiState.currentSession?.id,
-				// updateReactiveState: false,
+				recursive: true,
 			});
 		}
 	}
@@ -154,6 +155,7 @@
 						subjectId: observation.id,
 						metadataId: definition.id,
 						sessionId: uiState.currentSession?.id,
+						recursive: true,
 					});
 
 					narrowingState.choicesHistory = narrowingState.choicesHistory.filter(
@@ -186,7 +188,14 @@
 		}}
 		requiredness="none"
 		{definition}
-		value={metadataValues[definition.id]}
+		value={{
+			...metadataValues[definition.id],
+			alternatives: Object.fromEntries(
+				Object.entries(metadataValues[definition.id]?.alternatives ?? {}).filter(
+					([, confidence]) => confidence >= 1
+				)
+			),
+		}}
 		onchange={debouncedOnChange}
 		// TODO: flush debouncedOnChange when mouse quits the metadata component?
 	>

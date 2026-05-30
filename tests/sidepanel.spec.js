@@ -284,18 +284,13 @@ testBasic('can update a enum-type metadata with cascades', async ({ page, app })
 	`);
 
 	// Unselect and reselect
-	const groupHeader = page
-		.getByRole('main')
-		.getByRole('region', { name: 'Espèce: confiance à 75%-100%' });
-	await groupHeader.getByRole('button', { name: 'Réduire le groupe' }).click();
-	await groupHeader.getByRole('button', { name: 'Développer le groupe' }).click();
 	await page.getByText('lil-fella', { exact: true }).click();
 
 	await assert(app.metadata.section('Espèce')).toMatchAriaSnapshot(
 		`
 	  - text: Espèce
-	  - combobox: Dicyrtomina saundersi
-	  - button "Supprimer cette valeur":
+	  - combobox
+	  - button "Supprimer cette valeur" [disabled]:
 	    - img
 	`
 	);

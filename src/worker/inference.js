@@ -17,6 +17,7 @@ import { openDatabase, swarp } from './index.js';
  * @typedef {object} InferenceSession
  * @property {import('onnxruntime-web').InferenceSession} onnx
  * @property {string} id
+ * @property {string} task
  * @property {string[]} [classmapping]
  */
 
@@ -25,11 +26,23 @@ import { openDatabase, swarp } from './index.js';
  */
 
 /**
- * @type {Map<InferenceTask, InferenceSession>}
+ * @type {Map<string, InferenceSession>} keyed by inferenceSessionId
  */
 let inferenceSessions = new Map();
+/**
+ * @type {Map<InferenceTask, string>} map from task to latest inferenceSessionId
+ */
+let latestSessionIdByTask = new Map();
 
 swarp.loadModel(async ({ task, model, classmapping, inferenceSessionId: id, webgpu }) => {
+	// If the worker already has a session with this id, treat the request as a no-op.
+	// This makes loadModel idempotent and avoids reloading the same model on
+	// repeated client requests (e.g., when components remount on tab switches).
+	if (inferenceSessions.has(id)) {
+		latestSessionIdByTask.set(task, id);
+		return true;
+	}
+
 	const onnx = await ort.InferenceSession.create(model, {
 		executionProviders: webgpu ? ['webgpu'] : [],
 	});
@@ -37,23 +50,39 @@ swarp.loadModel(async ({ task, model, classmapping, inferenceSessionId: id, webg
 	if (!onnx) throw new Error('Impossible de charger le modèle ONNX');
 
 	/** @type {InferenceSession} */
-	const session = { id, onnx };
+	const session = { id, task, onnx };
 
 	if (classmapping) {
 		session.classmapping = classmapping.split(/\r?\n/).filter(Boolean);
 	}
 
-	inferenceSessions.set(task, session);
+	inferenceSessions.set(id, session);
+	latestSessionIdByTask.set(task, id);
 	return true;
 });
 
-swarp.inferenceSessionId(async (task) => inferenceSessions.get(task)?.id ?? null);
+swarp.inferenceSessionId(async (task) => latestSessionIdByTask.get(task) ?? null);
 
 swarp.inferBoundingBoxes(async ({ fileId, taskSettings }, _, tools) => {
-	const session = inferenceSessions.get('detection')?.onnx;
+	const sessionId = latestSessionIdByTask.get('detection');
+	const session = sessionId ? inferenceSessions.get(sessionId)?.onnx : undefined;
 	if (!session) {
 		throw new Error('Modèle de détection non chargé');
 	}
+
+	const inputName = session.inputNames[0];
+	const outputName = taskSettings.output.name ?? 'output0';
+	const inferenceSettings = {
+		...taskSettings,
+		input: {
+			...taskSettings.input,
+			name: taskSettings.input.name ?? inputName,
+		},
+		output: {
+			...taskSettings.output,
+			name: outputName,
+		},
+	};
 
 	const db = await openDatabase();
 	tools.abortSignal?.throwIfAborted();
@@ -65,8 +94,8 @@ swarp.inferBoundingBoxes(async ({ fileId, taskSettings }, _, tools) => {
 
 	const [[boxes], [scores]] = await infer(
 		{
-			...taskSettings,
-			abortSignal: tools.abortSignal,
+			...inferenceSettings,
+			...(tools.abortSignal ? { abortSignal: tools.abortSignal } : {}),
 		},
 		[file.bytes],
 		session
@@ -75,7 +104,7 @@ swarp.inferBoundingBoxes(async ({ fileId, taskSettings }, _, tools) => {
 	return { boxes, scores };
 });
 
-swarp.classify(async ({ imageId, metadataIds, taskSettings }, _, tools) => {
+swarp.classify(async ({ imageId, metadataIds, taskSettings, inferenceSessionId }, _, tools) => {
 	tools.abortSignal?.throwIfAborted();
 
 	const db = await openDatabase();
@@ -83,8 +112,23 @@ swarp.classify(async ({ imageId, metadataIds, taskSettings }, _, tools) => {
 	const image = Schemas.Image.assert(await db.get('Image', imageId));
 
 	tools.abortSignal?.throwIfAborted();
-	const session = inferenceSessions.get('classification');
-	if (!session) return { scores: [] };
+	
+	// Use the specified inference session, or fall back to the latest classification session
+	let session;
+	if (inferenceSessionId) {
+		session = inferenceSessions.get(inferenceSessionId);
+		if (!session) {
+			throw new Error(
+				`Inference session ${inferenceSessionId} not found. Models may not be loaded.`
+			);
+		}
+	} else {
+		session = inferenceSessions.get(latestSessionIdByTask.get('classification') ?? '');
+		if (!session) {
+			return { scores: [] };
+		}
+	}
+
 	const { classmapping, onnx } = session;
 	if (!classmapping)
 		throw new Error("Le modèle de classification n'a pas de classmapping associé");
@@ -106,10 +150,17 @@ swarp.classify(async ({ imageId, metadataIds, taskSettings }, _, tools) => {
 		...taskSettings.input,
 		normalized: true,
 		crop: cropbox,
-		abortSignal: tools.abortSignal,
+		...(tools.abortSignal ? { abortSignal: tools.abortSignal } : {}),
 	});
 
-	const scores = await classify(taskSettings, img, onnx, tools.abortSignal);
+	const scores = await classify(
+		/** @type {Pick<import('$lib/schemas/neural.js').NeuralInference, 'input' | 'output'>} */ (
+			taskSettings
+		),
+		img,
+		onnx,
+		tools.abortSignal
+	);
 	tools.abortSignal?.throwIfAborted();
 
 	const results = scores

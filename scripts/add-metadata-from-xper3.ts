@@ -76,6 +76,17 @@ async function augment(protocolPath: string, protocol: typeof ExportedProtocol.i
 		{ type: 'enum' }
 	>;
 
+	const morphogroupClassmappingSanitized = await fetch(
+		'https://huggingface.co/edgaremy/andrena-classifier/resolve/main/class-mapping-grouped.txt?download=true'
+	)
+		.then((res) => res.text())
+		.then((text) =>
+			text
+				.split('\n')
+				.filter((line) => line.trim())
+				.map(formatMorphogroupKey)
+		);
+
 	if (import.meta.main) {
 		await emitCheckrun('protocols', 'in_progress', 'Xper3', 'Starting…');
 
@@ -94,6 +105,35 @@ async function augment(protocolPath: string, protocol: typeof ExportedProtocol.i
 				"Caractéristiques d'identification spécifiques aux abeilles du genre Andrena",
 			collapsed: true,
 			narrowable: true,
+		};
+
+		protocol.metadata[`${protocol.id}__morphogroup`] = {
+			label: 'Morphogroupe',
+			group: 'andrena',
+			description: '',
+			type: 'enum',
+			mergeMethod: 'max',
+			required: false,
+			infer: {
+				neural: [
+					{
+						name: 'ConvNextV2 Tiny',
+						model: 'https://huggingface.co/edgaremy/andrena-classifier/resolve/main/convnextv2_tiny.andrena-grouped.onnx?download=true',
+						classmapping: morphogroupClassmappingSanitized,
+						input: {
+							height: 384,
+							width: 384,
+							normalized: true,
+							disposition: '1CHW',
+							name: 'input0',
+						},
+					},
+				],
+			},
+			options: morphogroupClassmappingSanitized.map((key) => ({
+				key,
+				label: formatMorphogroupLabel(key),
+			})),
 		};
 
 		const descriptorMetadatas = new Map<
@@ -369,6 +409,46 @@ async function augment(protocolPath: string, protocol: typeof ExportedProtocol.i
 				);
 				console.error(e);
 				continue;
+			}
+		}
+
+		const speciesToMorphogroup = Object.fromEntries(
+			await fetch(
+				'https://huggingface.co/edgaremy/andrena-classifier/resolve/main/morphogroup_to_species.csv?download=true'
+			)
+				.then((res) => res.text())
+				.then((text) =>
+					text
+						.split('\n')
+						.filter((line) => line.trim())
+						.filter((_, i) => i > 0)
+						.flatMap((line) => {
+							const [[morphogroup], species] = line
+								.split(',')
+								.map((cell) => cell.trim().split('|'));
+
+							return species
+								.map((name) => [
+									protocol.metadata[`${protocol.id}__species`].options!.find(
+										(o) => o.label.split(' ').at(1) === name
+									)?.key,
+									formatMorphogroupKey(morphogroup),
+								])
+								.filter(([key]) => key !== undefined);
+						})
+				)
+		);
+
+		for (const [oidx, speciesOption] of protocol.metadata[
+			`${protocol.id}__species`
+		].options!.entries()) {
+			const morphogroup = speciesToMorphogroup[speciesOption.key];
+
+			if (morphogroup) {
+				protocol.metadata[`${protocol.id}__species`].options![oidx].cascade = {
+					...speciesOption.cascade,
+					morphogroup,
+				};
 			}
 		}
 
@@ -715,4 +795,14 @@ function constraintsToRange(
 	}
 
 	return undefined;
+}
+
+function formatMorphogroupKey(name: string) {
+	return name.replaceAll(' ', '_').toLowerCase();
+}
+
+function formatMorphogroupLabel(key: string) {
+	let out = key.replaceAll('_', ' ').replace(/^gpe /, 'Groupe ');
+	out = out[0].toUpperCase() + out.slice(1);
+	return out;
 }

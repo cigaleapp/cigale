@@ -212,6 +212,7 @@
 									subjectId: observation.id,
 									metadataId: focusedMetadata.id,
 									sessionId: uiState.currentSession?.id,
+									recursive: true,
 								});
 							}}
 						>

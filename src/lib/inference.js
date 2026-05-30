@@ -73,7 +73,7 @@ const MEAN = [0.485, 0.456, 0.406]; // valeurs de normalisation pour la classifi
  * @param {string} params.protocolId
  * @param {object} params.requests
  * @param {typeof import('$lib/schemas/common').HTTPRequest.infer} params.requests.model
- * @param {typeof import('$lib/schemas/common').HTTPRequest.infer | undefined} params.requests.classmapping
+ * @param {typeof import('$lib/schemas/neural.js').NeuralEnumInference.infer['classmapping'] | undefined} params.requests.classmapping
  * @param {boolean} [params.webgpu]
  * @param {(p: number) => void} [params.onProgress] called everytime the progress changes
  * @param {AbortSignal} [params.abortSignal] signal to abort the loading
@@ -89,11 +89,15 @@ export async function loadModel(
 
 	const id = inferenceModelId(protocolId, requests.model);
 
-	// TODO cancel previous calls once https://github.com/gwennlbh/swarpc/issues/126 is implemented
-	const existingSession = await swarpc.inferenceSessionId.broadcast.orThrow(task).catch((e) => {
-		console.error(e);
-		throw new Error(`Failed to get existing inference session for task ${task}: ${e}`);
-	});
+	const existingSession = await swarpc.inferenceSessionId.broadcast.once
+		.orThrow(task)
+		.catch((e) => {
+			console.error(e);
+			if (e instanceof AggregateError) {
+				console.error('Aggregate error occurred:', e.errors);
+			}
+			throw new Error(`Failed to get existing inference session for task ${task}: ${e}`);
+		});
 
 	if (existingSession.every((loadedSession) => loadedSession === id)) {
 		console.debug(`Model ${task} already loaded with ID ${id} on all nodes`);
@@ -112,7 +116,9 @@ export async function loadModel(
 
 	/** @type {string | undefined} */
 	let classmapping = undefined;
-	if (requests.classmapping) {
+	if (requests.classmapping && Array.isArray(requests.classmapping)) {
+		classmapping = requests.classmapping.join('\n');
+	} else if (requests.classmapping) {
 		classmapping = await fetchHttpRequest(requests.classmapping, {
 			signal: abortSignal,
 			cacheAs: 'model',
@@ -144,7 +150,7 @@ export async function loadModel(
  * @param {import('$lib/database.js').HTTPRequest} request
  * @returns {string}
  */
-function inferenceModelId(protocolId, request) {
+export function inferenceModelId(protocolId, request) {
 	/** @type {Array<string|undefined>} */
 	let components = [protocolId];
 
@@ -258,30 +264,36 @@ export async function infer(
 		start = Date.now();
 	}
 
+	const inputName = session.inputNames[0];
+	const outputName = taskSettings?.output?.name ?? 'output0';
+
 	taskSettings = {
 		...taskSettings,
 		input: {
 			width: TARGETWIDTH,
 			height: TARGETHEIGHT,
-			name: session.inputNames[0],
+			name: inputName,
 			normalized: true,
 			...taskSettings?.input,
 		},
 		output: {
-			name: 'output0',
+			name: outputName,
 			...taskSettings?.output,
 		},
 	};
 	let inputTensor;
 
-	inputTensor = await loadToTensor(buffers, { ...taskSettings.input, abortSignal });
+	inputTensor = await loadToTensor(buffers, {
+		...taskSettings.input,
+		...(abortSignal ? { abortSignal } : {}),
+	});
 
 	// TODO figure out a way to use the abortSignal while running the inference
-	const outputTensor = await session.run({ [taskSettings.input.name]: inputTensor });
+	const outputTensor = await session.run({ [inputName]: inputTensor });
 
 	const bbs = output2BB(
 		taskSettings.output.shape,
-		/** @type {Float32Array} */ (outputTensor[taskSettings.output.name].data),
+		/** @type {Float32Array} */ (outputTensor[outputName].data),
 		buffers.length,
 		NUMCONF,
 		abortSignal
@@ -298,7 +310,7 @@ export async function infer(
 
 /**
  *
- * @param {import('$lib/schemas/neural.js').NeuralInference} settings
+ * @param {Pick<import('$lib/schemas/neural.js').NeuralInference, 'input' | 'output'>} settings
  * @param {ort.Tensor} image
  * @param {import('onnxruntime-web').InferenceSession} model
  * @param {AbortSignal} [abortSignal]

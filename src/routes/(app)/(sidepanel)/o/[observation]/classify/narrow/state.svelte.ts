@@ -7,6 +7,8 @@ import type { NamespacedMetadataID } from '$lib/schemas/common.js';
 
 import { page } from '$app/state';
 import { tables } from '$lib/idb.svelte.js';
+import { observationMetadata } from '$lib/observations.js';
+import { isNamespacedToProtocol } from '$lib/schemas/metadata.js';
 import { uiState } from '$lib/state.svelte.js';
 import { entries, safeJSONParse, transformObject } from '$lib/utils.js';
 
@@ -50,17 +52,35 @@ export class NarrowingState {
 			uiState.classificationMetadataId
 	);
 
+	narrowableGroup = $derived(uiState.currentSession?.fullscreenClassifier.narrowableGroup);
+	definitions = $derived(
+		tables.Metadata.state.filter(
+			(m) =>
+				isNamespacedToProtocol(uiState.currentProtocolId, m.id) &&
+				m.group === this.narrowableGroup
+		)
+	);
+
 	choicesHistory = $state<NamespacedMetadataID[]>([]);
 	descriptors: Descriptors = $state(new Map());
 
 	metadataValues = $derived(
-		transformObject(this.observation?.metadataOverrides ?? {}, (id, value) => {
-			const def = this.definitions.find((d) => d.id === id);
-			if (!def) return undefined;
-			if (def.type !== 'enum') return undefined;
+		transformObject(
+			this.observation
+				? observationMetadata({
+						observation: this.observation,
+						definitions: this.definitions,
+						images: tables.Image.state,
+					})
+				: {},
+			(id, value) => {
+				const def = this.definitions.find((d) => d.id === id);
+				if (!def) return undefined;
+				if (def.type !== 'enum') return undefined;
 
-			return [id, value as TypedMetadataValue<'enum'>];
-		})
+				return [id, value as TypedMetadataValue<'enum'>];
+			}
+		)
 	);
 
 	choices = $derived(
@@ -69,14 +89,13 @@ export class NarrowingState {
 				id,
 				new Set<string>([
 					value.toString(),
-					...Object.keys(alternatives ?? {}).map((k) => safeJSONParse(k).toString()),
+					...Object.entries(alternatives ?? {})
+						.filter(([, confidence]) => confidence >= 1)
+						.map(([key]) => safeJSONParse(key).toString()),
 				]),
 			])
 		)
 	);
-
-	narrowableGroup = $derived(uiState.currentSession?.fullscreenClassifier.narrowableGroup);
-	definitions = $derived(tables.Metadata.state.filter((m) => m.group === this.narrowableGroup));
 
 	allCandidates = $state<DB.MetadataEnumVariant[]>([]);
 	allCandidateIds = $derived(new Set(this.allCandidates.map((c) => c.key)));

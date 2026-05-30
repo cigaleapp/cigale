@@ -135,6 +135,13 @@
 
 		.images {
 			grid-area: images;
+			max-width: 40vw;
+		}
+
+		.images img {
+			object-fit: contain;
+			max-width: 100%;
+			max-height: 100%;
 		}
 
 		.description {
