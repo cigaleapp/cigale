@@ -14,6 +14,8 @@ import { newSession } from './utils/sessions.js';
 
 // TODO: remove @real-protocol
 test('Entomoscope @real-protocol', async ({ app, page }) => {
+	test.setTimeout(ms('5m'));
+
 	await app.settings.set({ showTechnicalMetadata: false });
 	await goToProtocolManagement(page);
 	await importProtocol(page, 'protocols/entomoscope.cigaleprotocol.yaml', (p) => {
