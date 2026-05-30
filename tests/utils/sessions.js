@@ -3,6 +3,7 @@ import {
 	confirmDeletionModal,
 	goHome,
 	goToTab,
+	modal,
 	setInferenceModels,
 	waitForRoute,
 } from './index.js';
@@ -29,15 +30,14 @@ export async function newSession(page, { name, protocol, models, goto = 'import'
 	await page.waitForTimeout(500);
 
 	await page.getByTestId('new-session').click();
-	await waitForRoute(page, '/(app)/sessions/[id]');
 
-	if (protocol) {
-		await chooseInDropdown(
-			page,
-			page.getByRole('button', { name: 'Choisir un protocole' }),
-			protocol
-		);
-	}
+	const protocolPicker = modal(page, { key: 'modal_pick_protocol' });
+	await protocolPicker.waitFor({ state: 'visible' });
+	await protocolPicker
+		.getByRole('menuitem', { name: protocol ?? 'Example: arthropodes (lightweight)' })
+		.click();
+
+	await waitForRoute(page, '/(app)/sessions/[id]');
 
 	if (name) {
 		const textbox = page.getByRole('textbox', {

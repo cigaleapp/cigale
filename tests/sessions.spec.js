@@ -466,7 +466,7 @@ testKitchensink('session metadata form has default values @no-builtins', async (
 	// test.skip(browserName === 'webkit', 'Does not work on Webkit for some reason');
 
 	await app.settings.set({ showTechnicalMetadata: false });
-	await newSession(page, { name: 'Test', goto: '' });
+	await newSession(page, { name: 'Test', goto: '', protocol: 'Kitchen sink' });
 
 	const session = await app.db.session.byName('Test');
 	if (!session) throw new Error('Session not found');
@@ -509,7 +509,7 @@ testKitchensink('session metadata form has default values @no-builtins', async (
 
 testKitchensink('can set file-type metadata @no-builtins', async ({ page, app }) => {
 	await app.settings.set({ showTechnicalMetadata: false });
-	await newSession(page, { name: 'Test' });
+	await newSession(page, { name: 'Test', protocol: 'Kitchen sink' });
 	await goToSessionPage(page);
 
 	const metadataKey = 'io.github.cigaleapp.kitchensink__sessionwide_file';
@@ -598,7 +598,7 @@ testKitchensink('can set file-type metadata @no-builtins', async ({ page, app })
 
 testKitchensink('can convert between units', async ({ page, app }) => {
 	await app.settings.set({ showTechnicalMetadata: false });
-	await page.getByRole('button', { name: 'Gérer' }).click();
+	await page.getByRole('button', { name: 'Gérer', exact: true }).click();
 	await app.path.wait('/(app)/sessions/[id]');
 	const section = app.metadata.section('Has no default');
 	const unitChanger = section.getByRole('button', {

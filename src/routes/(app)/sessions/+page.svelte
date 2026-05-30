@@ -4,6 +4,7 @@
 	import { SvelteMap } from 'svelte/reactivity';
 	import { fade } from 'svelte/transition';
 
+	import ModalPickProtocol from '$lib/ModalPickProtocol.svelte';
 	import IconAdd from '~icons/ri/add-line';
 	import IconDropdown from '~icons/ri/arrow-down-s-fill';
 	import IconLocal from '~icons/ri/hard-drive-2-line';
@@ -62,6 +63,8 @@
 </script>
 
 <TopbarHome />
+
+<ModalPickProtocol />
 
 <main in:fade={{ duration: 100 }}>
 	<header>
