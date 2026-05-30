@@ -14,6 +14,8 @@ All notable changes to this project will be documented in this file, on a monthl
 - Add separate tab for chosen metadata in narrowing classifier
 - Allow both neural & sidecar inference at the same time on a crop metadata
 - Allow deselecting by clicking on selected option in narrowing classifier
+- Allow grouping/sorting by morphogroup
+- Allow neural inference on multiple metadata, use inferred metadata in classifying narrower (#1657)
 - Allow protocols to force presentation of a enum metadata to combobox or buttons
 - Allow scrolling through description of candidate species
 - Allow selecting multiple options (stores them as alternatives), show narrowing power of every option in describe tab
