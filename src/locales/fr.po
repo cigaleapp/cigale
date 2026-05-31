@@ -2666,3 +2666,11 @@ msgstr "Décrire l'observation"
 #: src/lib/import.svelte.js
 msgid "Erreur lors de l'extraction des métadonnées du fichier RAW {0}"
 msgstr "Erreur lors de l'extraction des métadonnées du fichier RAW {0}"
+
+#: src/lib/ModalPickProtocol.svelte
+msgid "Choisir un protocole pour la session"
+msgstr "Choisir un protocole pour la session"
+
+#: src/lib/ModalPickProtocol.svelte
+msgid "<0/> Gérer les protocoles"
+msgstr "<0/> Gérer les protocoles"
