@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file, on a monthl
 - Add bug report button in fullscreen views
 - Add lightbox to enum options' images
 - Add loading screen while defaults are doing an initial resolve on session metadata form
+- Add logo & summary fields to protocols (Closes #1621)
 - Add notification on mobile app when export saved to open the file
 - Add separate tab for chosen metadata in narrowing classifier
 - Allow both neural & sidecar inference at the same time on a crop metadata
@@ -25,6 +26,9 @@ All notable changes to this project will be documented in this file, on a monthl
 - Create a rudimentary "latest APK" download page for nightly builds
 - Create observations at image import time
 - Defer toast emission until after navigation in toast+goto sequences (#1579)
+- Disable next-step tabs until they are relevant (#1663)
+- Explicitly ask for protocol when creating session (Closes #1580) (#1661)
+- Fix missing gap between metadata inputs on session metadata forms
 - Fix wrapping of boxes' action buttons on fullscreen cropper
 - Guard against crashes if a non-finite value is passed to ProgressBar
 - Handle RAW photos
@@ -84,8 +88,10 @@ All notable changes to this project will be documented in this file, on a monthl
 ### Data Updates
 
 - Add andrena group to Entomoscope protocol
+- Add logos to INSECTA project type metadatas
 - Add neural inference to crop on Entomoscope protocol
 - Bump protocol version of protocols/entomoscope.cigaleprotocol.yaml [ci skip]
+- Bump protocol version of protocols/insecta.cigaleprotocol.yaml [ci skip]
 - Fix logo assets generation for mobile app
 - Handle new location format, ai disabled case and no location case in Entomoscope sidecars
 - Improve Xper3 data import into backbone protocol
