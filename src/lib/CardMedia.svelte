@@ -328,7 +328,7 @@
 	img,
 	.img-placeholder {
 		width: 100%;
-		height: var(--card-height);
+		height: 100%;
 	}
 
 	.img-placeholder {
