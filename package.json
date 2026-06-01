@@ -133,7 +133,7 @@
 		"prettier-plugin-svelte": "^4.0.1",
 		"svelte": "^5.55.9",
 		"svelte-check": "^4.4.8",
-		"tinyexec": "^1.1.2",
+		"tinyexec": "^1.2.2",
 		"turndown": "^7.2.4",
 		"typescript": "^6.0.3",
 		"typescript-eslint": "^8.59.4",
