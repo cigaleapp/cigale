@@ -77,6 +77,7 @@ All notable changes to this project will be documented in this file, on a monthl
 - Fix notifications setting always showing state as Off
 - Fix parallelism setting's input not showing on mobile
 - Fix pdf-to-png-converter v4 filter condition (kind !== → kind ===)
+- Fix photos stretched on observation/image cards
 - Fix session metadata form being always empty
 - Fix sidepanel horizontal scroll when filename too long
 - Fix tab bar showing when in about page
