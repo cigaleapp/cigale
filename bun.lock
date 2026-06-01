@@ -132,7 +132,7 @@
         "postcss-preset-env": "^11.3.0",
         "prettier": "^3.8.3",
         "prettier-plugin-svelte": "^3.5.2",
-        "svelte": "^5.55.8",
+        "svelte": "^5.55.9",
         "svelte-check": "^4.4.8",
         "tinyexec": "^1.1.2",
         "turndown": "^7.2.4",
