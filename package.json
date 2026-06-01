@@ -88,7 +88,7 @@
 		"@msw/playwright": "^0.6.7",
 		"@playwright/test": "^1.59.1",
 		"@sveltejs/adapter-static": "^3.0.10",
-		"@sveltejs/kit": "^2.60.1",
+		"@sveltejs/kit": "^2.61.1",
 		"@sveltejs/vite-plugin-svelte": "^7.1.2",
 		"@sveltejs/vite-plugin-svelte-inspector": "^5.0.2",
 		"@types/braces": "^3.0.5",
