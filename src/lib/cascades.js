@@ -1,4 +1,5 @@
 import { Tables } from './database.js';
+import { resolveMetadataImport } from './metadata/imports.js';
 import { metadataOption } from './metadata/storage.js';
 import {
 	metadataOptionId,
@@ -150,8 +151,13 @@ export async function cascadeLabels({ protocolId, option, db }) {
 	/** @type {Record<NamespacedMetadataID, DB.MetadataEnumVariant[]>} */
 	const labels = {};
 
+	const protocol = await db.get('Protocol', protocolId);
+	if (!protocol) return {};
+
+
+
 	for (const [metadataId, values] of Object.entries(option.cascade ?? {})) {
-		const id = namespacedMetadataId(protocolId, metadataId);
+		const id = resolveMetadataImport(protocol, namespacedMetadataId(protocolId, metadataId));
 		const options = await Promise.all(
 			ensureArray(values).map(async (key) => metadataOption(db, id, key))
 		);

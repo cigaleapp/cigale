@@ -8,7 +8,11 @@ import YAML from 'yaml';
 
 import { resolveProtocolImports } from '$lib/metadata/imports.js';
 import { compareProtocolWithUpstream } from '$lib/protocols.js';
-import { metadataOptionId, namespacedMetadataId } from '$lib/schemas/metadata.js';
+import {
+	metadataOptionId,
+	namespacedMetadataId,
+	removeNamespaceFromMetadataId,
+} from '$lib/schemas/metadata.js';
 import { ExportedProtocol } from '$lib/schemas/protocols.js';
 import {
 	entries,
@@ -98,7 +102,7 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 
 		onLoadingState('write-protocol', p.id);
 		console.time('Storing Protocol');
-		tx.objectStore('Protocol').put({
+		const storedProtocol = {
 			...p,
 			importedMetadata: [
 				...(p.importedMetadata ?? []),
@@ -136,17 +140,41 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 					...group,
 				})),
 			],
-		});
+		};
+		tx.objectStore('Protocol').put(storedProtocol);
 		console.timeEnd('Storing Protocol');
+
+		/** Includes imported metadata definitions */
+		const allMetadata = {
+			...p.metadata,
+			...Object.fromEntries(
+				await Promise.all(
+					p.importedMetadata.map(async ({ source }) => [
+						source,
+						await tx.objectStore('Metadata').get(source),
+					])
+				)
+			),
+			...Object.fromEntries(
+				await Promise.all(
+					importedGroups.flatMap(({ metadata }) =>
+						metadata.map(async (id) => [id, await tx.objectStore('Metadata').get(id)])
+					)
+				)
+			),
+		};
 
 		/** Maps metadata IDs to list of metadata group names the metadata is a part of that are narrowable  */
 		const narrowableMetadata = Object.fromEntries(
-			Object.entries(p.metadata).map(([id, metadata]) => {
-				const groups = Object.entries(p.metadataGroups)
+			Object.entries(allMetadata).map(([id, metadata]) => {
+				const groups = [
+					...Object.entries(p.metadataGroups),
+					...importedGroups.map(({ id, group }) => [id, group]),
+				]
 					.filter(([id, { narrowable }]) => narrowable && metadata.group === id)
 					.map(([id, group]) => ({ id, ...group }));
 
-				return [namespacedMetadataId(p.id, id), new Set(groups.map((g) => g.id))];
+				return [removeNamespaceFromMetadataId(id), new Set(groups.map((g) => g.id))];
 			})
 		);
 
@@ -182,9 +210,7 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 				const narrowableIn = new Set(
 					Object.entries(narrowableMetadata)
 						.filter(([id]) =>
-							Object.keys(option.cascade ?? {}).some(
-								(key) => id === namespacedMetadataId(p.id, key)
-							)
+							Object.keys(option.cascade ?? {}).some((key) => key === id)
 						)
 						.flatMap(([_, groups]) => [...groups])
 				);

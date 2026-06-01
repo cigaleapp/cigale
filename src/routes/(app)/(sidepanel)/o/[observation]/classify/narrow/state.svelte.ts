@@ -8,9 +8,9 @@ import type { NamespacedMetadataID } from '$lib/schemas/common.js';
 import { page } from '$app/state';
 import { tables } from '$lib/idb.svelte.js';
 import { observationMetadata } from '$lib/observations.js';
-import { isNamespacedToProtocol } from '$lib/schemas/metadata.js';
 import { uiState } from '$lib/state.svelte.js';
 import { entries, safeJSONParse, transformObject } from '$lib/utils.js';
+import { resolveMetadataImport } from '$lib/metadata/imports.js';
 
 import { computeDescriptors, getAllCandidates, matches } from './candidates.js';
 
@@ -54,11 +54,12 @@ export class NarrowingState {
 
 	narrowableGroup = $derived(uiState.currentSession?.fullscreenClassifier.narrowableGroup);
 	definitions = $derived(
-		tables.Metadata.state.filter(
-			(m) =>
-				isNamespacedToProtocol(uiState.currentProtocolId, m.id) &&
-				m.group === this.narrowableGroup
-		)
+		uiState.currentProtocol
+			? uiState.currentProtocol.metadata
+					.map((id) => resolveMetadataImport(uiState.currentProtocol!, id))
+					.map((id) => tables.Metadata.getFromState(id))
+					.filter((m) => m.group === this.narrowableGroup)
+			: []
 	);
 
 	choicesHistory = $state<NamespacedMetadataID[]>([]);
