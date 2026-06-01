@@ -196,7 +196,7 @@
 		"swarpc": "^0.20.2",
 		"tiny-jsonc": "^1.0.2",
 		"tinykeys": "^3.0.0",
-		"ua-parser-js": "^2.0.9",
+		"ua-parser-js": "^2.0.10",
 		"ulid": "^3.0.2",
 		"unplugin-icons": "^23.0.1",
 		"update-electron-app": "^3.2.0",
