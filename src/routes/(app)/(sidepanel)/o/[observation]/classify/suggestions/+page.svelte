@@ -140,7 +140,7 @@
 				in:fade={{ duration: 200 }}
 			>
 				<Field composite label="Synonymes" Icon={IconSynonyms} indent-icon={false}>
-					{#if option.synonyms.length === 0}
+					{#if option.synonyms && option.synonyms.length === 0}
 						<p>Aucun synonyme défini.</p>
 					{:else}
 						<ul>
