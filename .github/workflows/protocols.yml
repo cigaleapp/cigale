@@ -12,6 +12,7 @@ on:
       - scripts/add-species-from-google-slides.js
       - scripts/add-taxonomic-parents-from-gbif.js
       - scripts/add-metadata-from-xper3.ts
+      - scripts/create-idmybee-protocol.ts
       - scripts/utils.ts
       - .github/workflows/protocols.yml
   push:
@@ -142,6 +143,9 @@ jobs:
         env:
           WORDPRESS_USERNAME: ${{ secrets.WORDPRESS_USERNAME }}
           WORDPRESS_APP_PASSWORD: ${{ secrets.WORDPRESS_APP_PASSWORD }}
+
+      - name: Create IDmyBee protocol
+        run: bun run scripts/create-idmybee-protocol.ts
 
       - name: Clean old protocol
         run: rm examples/old-*.json

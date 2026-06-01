@@ -6,6 +6,10 @@
 			"url": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json"
 		},
 		{
+			"id": "io.github.cigaleapp.idmybee",
+			"url": "https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/idmybee.cigaleprotocol.json"
+		},
+		{
 			"id": "fr.osug.terra-forma-web.insecta",
 			"url": "https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/insecta.cigaleprotocol.yaml"
 		},
