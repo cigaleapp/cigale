@@ -13,8 +13,6 @@ permissions:
 
 jobs:
   deploy:
-    # Disabled during demo at Dynabiod
-    if: false
     name: Deploy
 
     permissions:
