@@ -84,7 +84,12 @@
 							await bind.do(e);
 						},
 					])
-			)
+			),
+			{
+				// We do our own event filtering. We can't use this because our filtering is on a per-keybind basis
+				// Also, the option was added in tinykeys v4 and our code is earlier lol
+				ignore: () => false,
+			}
 		)
 	);
 
