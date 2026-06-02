@@ -14,6 +14,9 @@ on:
       PLEYE_API_KEY:
         required: false
         description: 'API key for uploading test results to Pleye'
+      HUGGINGFACE_ACCESS_TOKEN:
+        required: true
+        description: Access token for the Huggingface Hub API. Used to pre-download models from Huggingface. Shouldn't need any specific permissions, as repos it downloads files from are public. 
     inputs:
       artifact:
         type: string
@@ -76,11 +79,13 @@ jobs:
 
       - name: Compute cache key
         id: caching
+        env:
+          hf_token: ${{ secrets.HUGGINGFACE_ACCESS_TOKEN }}
         run: |
           key=""
           for repo in ${{ steps.models.outputs.huggingface-repos }}; do
             echo "Getting latest commit hash for $repo"
-            hash=$(curl -s "https://huggingface.co/api/models/$repo/commits/main?limit=1" | jq -r '.[0].id')
+            hash=$(curl --header "Authorization: Bearer $hf_token" -s "https://huggingface.co/api/models/$repo/commits/main?limit=1" | jq -r '.[0].id')
             key+="$repo@$hash;"
           done
 
