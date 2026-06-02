@@ -27,7 +27,6 @@ imports:
   - from: io.github.cigaleapp.arthropods.example
     metadataGroups:
       - taxonomy
-      - andrena
     metadata:
       - species
       - identification_difficulty
