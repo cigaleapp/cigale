@@ -1,14 +1,16 @@
 <script lang="ts">
 	import type { Component } from 'svelte';
 
+	import { UAParser } from 'ua-parser-js';
+
 	import IconIncrease from '~icons/ri/add-line';
 	import IconMore from '~icons/ri/arrow-right-s-line';
 	import IconCheck from '~icons/ri/check-line';
 	import Cross from '~icons/ri/close-circle-line';
 	import IconDebugMode from '~icons/ri/code-line';
+	import IconWarning from '~icons/ri/error-warning-line';
 	import IconProtocols from '~icons/ri/file-list-3-line';
 	import IconAccounts from '~icons/ri/group-line';
-	import IconAbout from '~icons/ri/information-line';
 	import Moon from '~icons/ri/moon-line';
 	import IconNotifications from '~icons/ri/notification-line';
 	import Gears from '~icons/ri/settings-3-line';
@@ -18,7 +20,7 @@
 	import { version } from '$app/environment';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import DropdownMenu from '$lib/DropdownMenu.svelte';
-	import { plural } from '$lib/i18n.js';
+	import { formatBytesSize, plural } from '$lib/i18n.js';
 	import { tables } from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import { IsMobile } from '$lib/mobile.svelte.js';
@@ -30,8 +32,18 @@
 	import { orEmpty, switchValue } from '$lib/utils.js';
 	import { getTheme } from '$routes/+layout.svelte';
 
-	/** @type {HTMLDialogElement|undefined} */
-	let dialogElement = $state();
+	import ModalChromePersistentStorage, {
+		askForPersistentStorageOnChrome,
+	} from './ModalChromePersistentStorage.svelte';
+
+	interface Props {
+		/** The settings button should show a little red dot to call attention to it */
+		callout?: boolean;
+	}
+
+	let { callout = $bindable() }: Props = $props();
+
+	let dialogElement = $state<HTMLDialogElement>();
 
 	let notificationsEnabled = $state(getSettings().notifications);
 	$effect(() => {
@@ -65,7 +77,27 @@
 
 	const mobileOnly = <T,>(item: T) => orEmpty(mobile.current, item);
 	const desktopOnly = <T,>(item: T) => orEmpty(!mobile.current, item);
+
+	let estimate = $state<StorageEstimate>();
+	$effect(() => {
+		void (async () => {
+			estimate = await navigator.storage.estimate();
+		})();
+	});
+
+	let storageIsPersistent = $state(true);
+	$effect(() => {
+		void (async () => {
+			storageIsPersistent = await navigator.storage.persisted();
+		})();
+	});
+
+	$effect(() => {
+		callout = !storageIsPersistent;
+	});
 </script>
+
+<ModalChromePersistentStorage />
 
 <DropdownMenu
 	title="Réglages"
@@ -240,7 +272,37 @@
 				}),
 				{
 					type: 'clickable' as const,
-					data: { icon: IconAbout, subtext: `Version ${version}` },
+					label: 'Gérer le stockage…',
+					data: {
+						icon: undefined,
+						subtext: estimate?.usage
+							? `${formatBytesSize(estimate.usage)} utilisés`
+							: '',
+					},
+					async onclick() {
+						await goto('/(app)/storage');
+					},
+				},
+				...orEmpty(!storageIsPersistent, {
+					type: 'clickable' as const,
+					label: 'Stockage non persistant',
+					data: {
+						icon: IconWarning,
+						subtext: '',
+					},
+					async onclick() {
+						const granted = await navigator.storage.persist();
+						const isChrome = new UAParser().getBrowser().name === 'Chrome';
+						if (granted) {
+							callout = false;
+						} else if (isChrome) {
+							askForPersistentStorageOnChrome();
+						}
+					},
+				}),
+				{
+					type: 'clickable' as const,
+					data: { icon: undefined, subtext: `Version ${version}` },
 					label: 'À propos',
 					async onclick() {
 						await goto('/(app)/about');
@@ -251,7 +313,7 @@
 	]}
 >
 	{#snippet item({ icon: Icon, subtext }, { label, selected, key, type })}
-		<div class="settings-item">
+		<div class="settings-item" class:warning={Icon === IconWarning}>
 			<div class="icon">
 				{#if Icon}
 					<Icon />
@@ -322,11 +384,16 @@
 			help={open ? 'Fermer' : 'Réglages'}
 			{...props}
 		>
-			{#if open && !mobile.current}
-				<Cross />
-			{:else}
-				<Gears />
-			{/if}
+			<div class="btn-content">
+				{#if callout && !open}
+					<div class="callout" />
+				{/if}
+				{#if open && !mobile.current}
+					<Cross />
+				{:else}
+					<Gears />
+				{/if}
+			</div>
 		</ButtonIcon>
 	{/snippet}
 </DropdownMenu>
@@ -340,6 +407,12 @@
 
 		@media (min-width: 600px) {
 			max-width: 300px;
+		}
+
+		&.warning {
+			color: var(--fg-warning);
+			/* TODO */
+			/* background-color: var(--bg-warning); */
 		}
 
 		.icon {
@@ -373,5 +446,23 @@
 		width: 3ch;
 		font-size: 1rem;
 		font-weight: 200;
+	}
+
+	.btn-content {
+		position: relative;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+
+		.callout {
+			position: absolute;
+			--size: 7.5px;
+			width: var(--size);
+			height: var(--size);
+			top: 0;
+			right: 0;
+			background-color: var(--fg-error);
+			border-radius: 50%;
+		}
 	}
 </style>
