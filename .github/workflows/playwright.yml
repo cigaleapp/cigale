@@ -16,7 +16,7 @@ on:
         description: 'API key for uploading test results to Pleye'
       HUGGINGFACE_ACCESS_TOKEN:
         required: true
-        description: Access token for the Huggingface Hub API. Used to pre-download models from Huggingface. Shouldn't need any specific permissions, as repos it downloads files from are public. 
+        description: Access token for the Huggingface Hub API. Used to pre-download models from Huggingface. Shouldn't need any specific permissions, as repos it downloads files from are public.
     inputs:
       artifact:
         type: string
