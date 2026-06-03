@@ -16,7 +16,7 @@ await Bun.write(
 			'Un protocole pour identifier des abeilles genre Andrena via des descripteurs, avec pré-élimination par classification par inférence de Morphogroupes',
 		version: 1,
 		updates: 'automatic',
-		source: 'https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/insecta.cigaleprotocol.yaml',
+		source: 'https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/idmybee.cigaleprotocol.json',
 		authors: [],
 		sessionMetadata: {},
 		imports: [
@@ -28,7 +28,16 @@ await Bun.write(
 				metadata: ['crop', 'conservation_status', 'identification_difficulty'],
 			},
 		],
-		metadataOrder: backbone.metadataOrder,
+		metadataOrder: ["morphogroup", ...backbone.metadataOrder.filter(m => !m.includes('morphogroup'))],
+		metadataGroups: {
+			andrena: {
+				name: "Andrènes",
+				collapsed: false,
+				narrowable: true,
+				"description": "Caractéristiques d'identification spécifiques aux abeilles du genre Andrena",
+
+			}
+		},
 		metadata: {
 			species: {
 				label: 'Espèce',
