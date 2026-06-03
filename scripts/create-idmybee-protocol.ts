@@ -28,15 +28,18 @@ await Bun.write(
 				metadata: ['crop', 'conservation_status', 'identification_difficulty'],
 			},
 		],
-		metadataOrder: ["morphogroup", ...backbone.metadataOrder.filter(m => !m.includes('morphogroup'))],
+		metadataOrder: [
+			'morphogroup',
+			...backbone.metadataOrder.filter((m) => !m.includes('morphogroup')),
+		],
 		metadataGroups: {
 			andrena: {
-				name: "Andrènes",
+				name: 'Andrènes',
 				collapsed: false,
 				narrowable: true,
-				"description": "Caractéristiques d'identification spécifiques aux abeilles du genre Andrena",
-
-			}
+				description:
+					"Caractéristiques d'identification spécifiques aux abeilles du genre Andrena",
+			},
 		},
 		metadata: {
 			species: {
