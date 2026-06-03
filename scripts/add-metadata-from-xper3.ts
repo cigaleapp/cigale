@@ -23,8 +23,7 @@ import {
 
 const here = import.meta.dir;
 
-const SDD_URL =
-	'https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/IDMYBEE-Andrena.sdd.xml';
+const SDD_URL = process.env.IDMYBEE_ANDRENA_SDD_URL;
 
 const MKEY_URL = SDD_URL.replace('/IDMYBEE-Andrena.sdd.xml', '/mkey.html');
 
