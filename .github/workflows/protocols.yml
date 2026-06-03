@@ -114,6 +114,8 @@ jobs:
 
       - name: Add metadata from Xper3
         run: bun run scripts/add-metadata-from-xper3.ts
+        env:
+          IDMYBEE_ANDRENA_SDD_URL: ${{ secrets.IDMYBEE_ANDRENA_SDD_URL }} 
 
       - name: Add species descriptions from JJ
         run: bun run scripts/add-species-from-jessica-joachim.ts species
