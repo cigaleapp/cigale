@@ -21,7 +21,7 @@
 	import RadialProgress from '$lib/RadialProgress.svelte';
 	import { uiState } from '$lib/state.svelte.js';
 	import { tooltip } from '$lib/tooltips.js';
-	import { proxifyIfLocalhost } from '$lib/utils.js';
+	import { corsfixIfLocalhost } from '$lib/utils.js';
 
 	import { narrowingState } from './+layout.svelte';
 	import { matches } from './candidates.js';
@@ -129,7 +129,7 @@
 			<div class="icon">
 				<IconExpand />
 			</div>
-			<img loading="lazy" src={proxifyIfLocalhost(definition.images?.[0])} alt="" />
+			<img loading="lazy" src={corsfixIfLocalhost(definition.images?.[0])} alt="" />
 			<span class="label">{definition.label}</span>
 			<div class="selected">
 				<OverflowableText text={selected} />

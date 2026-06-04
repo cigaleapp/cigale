@@ -65,7 +65,7 @@ function get<ExtraParams extends Record<string, unknown> = BaseParams>(
 	...[route, resolver, options]: CorsedHandlerArgs<ExtraParams>
 ) {
 	return http.get<BaseParams & ExtraParams>(
-		'https://cors.gwen.works/https\\://:server.kobotoolbox.org' + route,
+		'https://cors.gwen.works/:server.kobotoolbox.org' + route,
 		resolver,
 		options
 	);
@@ -75,7 +75,7 @@ function post<P extends Record<string, unknown> = BaseParams>(
 	...[route, resolver, options]: CorsedHandlerArgs<P>
 ) {
 	return http.post<BaseParams & P>(
-		'https://cors.gwen.works/https\\://:server.kobotoolbox.org' + route,
+		'https://cors.gwen.works/:server.kobotoolbox.org' + route,
 		resolver,
 		options
 	);

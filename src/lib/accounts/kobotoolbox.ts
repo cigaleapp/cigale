@@ -14,7 +14,7 @@ import { metadataOptionsKeyRange } from '$lib/metadata/storage.js';
 import { MIMEType, NamespacedMetadataID } from '$lib/schemas/common.js';
 import { removeNamespaceFromMetadataId, splitMetadataId } from '$lib/schemas/metadata.js';
 import { SessionRemoteID } from '$lib/schemas/sessions.js';
-import { ensureArray, mapValues } from '$lib/utils.js';
+import { corsfix, ensureArray, mapValues } from '$lib/utils.js';
 
 export default class Provider implements Account {
 	static id = 'kobotoolbox' as const;
@@ -662,7 +662,7 @@ export default class Provider implements Account {
 			...init.headers,
 		};
 
-		return fetch(`https://cors.gwen.works/${url.toString()}`, init);
+		return fetch(corsfix(url), init);
 	}
 
 	static PaginatedResponse = type('<T>', {

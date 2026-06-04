@@ -1994,14 +1994,23 @@ if (import.meta.vitest) {
 	});
 }
 
+
+/**
+ * Pass a URL thru cors.gwen.works 
+ * @param {string|URL} url 
+ */
+export function corsfix(url) {
+	return "https://cors.gwen.works/" + url.toString().replace(/^https?:\/\//, '');
+}
+
 /**
  * Some image sources will not load on localhost. Pass them thru cors.gwen.works if we're on localhost
  * @param {string} src
  */
-export function proxifyIfLocalhost(src) {
+export function corsfixIfLocalhost(src) {
 	if (location.hostname !== 'localhost') return src;
 
-	return `https://cors.gwen.works/${src}`;
+	return corsfix(src)
 }
 
 /**

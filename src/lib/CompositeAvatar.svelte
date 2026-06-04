@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { tooltip } from '$lib/tooltips.js';
 
+	import { corsfix } from './utils.js';
+
 	interface Props {
 		sublogo: string | URL | undefined;
 		avatar: string | URL | undefined;
@@ -13,7 +15,7 @@
 	{#if sublogo}
 		<img class="provider-logo" src={sublogo.toString()} />
 	{/if}
-	<img class="avatar" src="https://cors.gwen.works/{avatar?.toString() ?? ''}" />
+	<img class="avatar" src={corsfix(avatar?.toString() ?? '')} />
 </div>
 
 <style>
