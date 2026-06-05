@@ -46,7 +46,7 @@
 		gradientedColor,
 		mapValues,
 		pick,
-		proxifyIfLocalhost,
+		corsfixIfLocalhost,
 		readableOn,
 		round,
 		safeJSONParse,
@@ -238,14 +238,14 @@
 									{#snippet trigger()}
 										<img
 											loading="lazy"
-											src={proxifyIfLocalhost(images[0])}
+											src={corsfixIfLocalhost(images[0])}
 											alt=""
 										/>
 									{/snippet}
 									{#snippet content()}
 										<img
 											class="fullscreen"
-											src={proxifyIfLocalhost(images[0])}
+											src={corsfixIfLocalhost(images[0])}
 											alt=""
 										/>
 									{/snippet}

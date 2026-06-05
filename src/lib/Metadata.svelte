@@ -33,7 +33,7 @@
 		orEmpty,
 		orEmpty2,
 		pick,
-		proxifyIfLocalhost,
+		corsfixIfLocalhost,
 		safeJSONParse,
 		switchValue,
 	} from './utils.js';
@@ -142,7 +142,7 @@
 	<div class="side-image-and-main-area">
 		{#if displayImageOnTheSide}
 			<div class="side-image">
-				<img loading="lazy" src={proxifyIfLocalhost(definition.images[0])} />
+				<img loading="lazy" src={corsfixIfLocalhost(definition.images[0])} />
 			</div>
 		{/if}
 		<div class="main-area">

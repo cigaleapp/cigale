@@ -4,6 +4,7 @@
 	import IconDisconnect from '~icons/ri/close-circle-line';
 	import { providers } from '$lib/accounts/registry.js';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
+	import { corsfix } from '$lib/utils.js';
 
 	interface Props {
 		tag?: string;
@@ -19,7 +20,7 @@
 <svelte:element this={tag}>
 	<img
 		class="avatar"
-		src="https://cors.gwen.works/{account.avatarURL.href}"
+		src={corsfix(account.avatarURL.href)}
 		alt="Photo de {account.username}"
 	/>
 	<p>

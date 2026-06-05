@@ -3,11 +3,11 @@
 	import type { Props as CarouselProps } from '$lib/Carousel.svelte';
 	import type { MetadataEnumVariant } from '$lib/database';
 
-	import { page } from '$app/state';
 	import Carousel from '$lib/Carousel.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import Logo from '$lib/Logo.svelte';
 	import { uiState } from '$lib/state.svelte';
+	import { corsfixIfLocalhost } from '$lib/utils.js';
 
 	import WithExpandButton from '../WithExpandButton.svelte';
 
@@ -60,11 +60,7 @@
 			keyboard-next="Shift+L"
 		>
 			{#snippet item(src)}
-				{#if src && page.url.hostname === 'localhost'}
-					<img src="https://cors.gwen.works/{src}" />
-				{:else}
-					<img {src} />
-				{/if}
+				<img src={corsfixIfLocalhost(src)} />
 			{/snippet}
 		</Carousel>
 	</WithExpandButton>
