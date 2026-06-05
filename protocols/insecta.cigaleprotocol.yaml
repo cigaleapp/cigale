@@ -6,7 +6,7 @@ logo: https://cors.gwen.works/static.inaturalist.org/projects/137789-icon-thumb.
 authors:
   - name: Maxime Cauchoix
 
-version: 4
+version: 5
 updates: automatic
 source: https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/insecta.cigaleprotocol.yaml
 
