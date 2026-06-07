@@ -66,7 +66,7 @@
 
 	let navHeight = $state<number>();
 
-		let calloutToSettings = $state(false)
+	let calloutToSettings = $state(false);
 
 	let openPreviewPRDetails = $state<() => void>();
 
