@@ -13,6 +13,7 @@
 </script>
 
 <script lang="ts">
+	import IconInfo from '~icons/ri/information-line';
 	import { formatBytesSize } from '$lib/i18n.js';
 	import { list, listByIndex } from '$lib/idb.svelte.js';
 	import LoadingText, { Loading } from '$lib/LoadingText.svelte';
@@ -21,6 +22,7 @@
 	import { sum } from '$lib/utils.js';
 
 	import Table from './Table.svelte';
+	import { tooltip } from '$lib/tooltips.js';
 
 	$effect(() => {
 		void reestimateStorage();
@@ -53,6 +55,13 @@
 						value={estimating ? Loading : formatBytesSize(estimate.quota)}
 						mask={formatBytesSize(0)}
 					/>
+
+					<span 
+					 class="quota-help"
+						use:tooltip={"Le quota de stockage est attribué par votre navigateur, en fonction de divers signaux comme la fréquence d'utilisation du site"}
+					>
+						<IconInfo />
+				</span>
 				</p>
 			</section>
 		{/if}
@@ -178,6 +187,18 @@
 		justify-content: space-between;
 		align-items: center;
 		gap: 1rem;
+	}
+
+	header .summary {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	header .quota-help {
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
 
 	.quota {
