@@ -2,6 +2,13 @@
 @component Requires a parent element with a defined width
 
 TODO: Don't animate when progress decreases (e.g. when a new task starts and it goes back to 0)
+
+CSS Variables:
+-- `--height`: Height of the progress bar (default: 0.25rem)
+-- `--corners`: Border radius of the progress bar (default: 0)
+-- `--fill-color`: Base color of the progress bar (default: var(--fg-primary))
+-- `--inactive-bg`: Background color of the progress bar when progress is 0 (default to a transparent version of the fill color)
+-- `--full-bg`: Background color of the progress bar when progress is 100% (default to a transparent version of the fill color)
 -->
 
 <script lang="ts">

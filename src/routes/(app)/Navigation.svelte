@@ -66,6 +66,8 @@
 
 	let navHeight = $state<number>();
 
+		let calloutToSettings = $state(false)
+
 	let openPreviewPRDetails = $state<() => void>();
 
 	let browserTabFocused = $state(true);
@@ -368,7 +370,7 @@
 					<ModalSubmitIssue type="feature" />
 
 					<div class="settings">
-						<Settings --navbar-height="{height}px" />
+						<Settings bind:callout={calloutToSettings} --navbar-height="{height}px" />
 					</div>
 				</aside>
 			</nav>

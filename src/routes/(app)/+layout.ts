@@ -6,6 +6,7 @@ import { error } from '@sveltejs/kit';
 import * as dates from 'date-fns';
 import * as dateFnsLocales from 'date-fns/locale';
 import * as Swarpc from 'swarpc';
+import { UAParser } from 'ua-parser-js';
 import { loadLocale } from 'wuchale/load-utils';
 
 import { dev } from '$app/environment';
@@ -24,6 +25,8 @@ import { toasts } from '$lib/toasts.svelte';
 import { clamp, fetchHttpRequest, profiler, progressSplitter, switchValue } from '$lib/utils.js';
 import { PROCEDURES } from '$worker/procedures.js';
 import WebWorker from '$worker/start.js?worker';
+
+import { askForPersistentStorageOnChrome } from './ModalChromePersistentStorage.svelte';
 
 export const ssr = false;
 
@@ -53,6 +56,17 @@ export async function load({ url }) {
 	// Hide at the start so the progress bar can be shown,
 	// which is better UX than a static splash screen for long startups
 	await SplashScreen.hide();
+
+	// Ask for storage persistence
+	let storageIsPersistent: boolean | undefined;
+	try {
+		storageIsPersistent = await navigator.storage?.persisted();
+		if (!storageIsPersistent) {
+			storageIsPersistent = await navigator.storage.persist();
+		}
+	} catch (e) {
+		console.warn('Storage persistence not supported', e);
+	}
 
 	document.documentElement.lang = locale;
 	setLoadingProgress('translations', 0);
@@ -94,11 +108,10 @@ export async function load({ url }) {
 	const swarpc = Swarpc.Client(PROCEDURES, {
 		worker: WebWorker,
 		nodes: parallelism,
-		localStorage:
-			/** @satisfies {typeof import('$worker/procedures').LOCAL_STORAGE['inferIn']} */ ({
-				databaseName,
-				databaseRevision: databaseRevision.toString(),
-			}),
+		localStorage: {
+			databaseName,
+			databaseRevision: databaseRevision.toString(),
+		} satisfies (typeof import('$worker/procedures').LOCAL_STORAGE)['inferIn'],
 		hooks: {
 			success({ procedure, data, duration }) {
 				performance.measure(procedure, {
@@ -168,6 +181,24 @@ export async function load({ url }) {
 
 	console.timeEnd('background things');
 
+	if (!storageIsPersistent) {
+		toasts.warn(
+			"Le stockage de votre navigateur n'est pas persistant, les données pourraient être perdues en cas de manque d'espace de stockage.",
+			{
+				data: {},
+				labels: { action: 'Activer' },
+				async action() {
+					const isChrome = new UAParser().getBrowser().name === 'Chrome';
+					if (isChrome) {
+						askForPersistentStorageOnChrome();
+					} else {
+						await navigator.storage.persist?.();
+					}
+				},
+			}
+		);
+	}
+
 	return { swarpc, parallelism };
 }
 
@@ -211,11 +242,7 @@ async function loadDefaultProtocol() {
 	for (const [i, importUrl] of toImport.entries()) {
 		const splitProgress = progressSplitter('download', 0.7, 'import');
 
-		/**
-		 * @param {Parameters<typeof splitProgress>[0]} phase
-		 * @param {number} progress
-		 */
-		function setLoading(phase, progress) {
+		function setLoading(phase: Parameters<typeof splitProgress>[0], progress: number) {
 			progress = clamp(progress, 0, 1);
 
 			setLoadingProgress('protocols', (i + splitProgress(phase, progress)) / toImport.length);
@@ -287,15 +314,8 @@ async function loadDefaultProtocol() {
 	setLoadingProgress('protocols', 1);
 }
 
-/**
- * @param {string} message
- */
-function setLoadingMessage(message) {
-	/**
-	 * @param {string} id
-	 * @param {string} html
-	 */
-	const setHTML = (id, html) => {
+function setLoadingMessage(message: string) {
+	const setHTML = (id: string, html: string) => {
 		const element = document.getElementById(id);
 		if (element) element.innerHTML = html;
 	};
@@ -304,12 +324,7 @@ function setLoadingMessage(message) {
 	setHTML('loading-message', message);
 }
 
-/**
- *
- * @param {Parameters<typeof splitProgress>[0]} phase
- * @param {number} progress
- */
-function setLoadingProgress(phase, progress) {
+function setLoadingProgress(phase: Parameters<typeof splitProgress>[0], progress: number) {
 	const bar = document.querySelector('#loading')?.querySelector('progress');
 	if (!bar) return;
 
