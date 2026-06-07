@@ -85,6 +85,8 @@
 		})();
 	});
 
+	const lowOnStorage = $derived(estimate && estimate.usage / estimate.quota > 0.9);
+
 	let storageIsPersistent = $state(true);
 	$effect(() => {
 		void (async () => {
@@ -93,7 +95,7 @@
 	});
 
 	$effect(() => {
-		callout = !storageIsPersistent;
+		callout = !storageIsPersistent || lowOnStorage;
 	});
 </script>
 
@@ -274,10 +276,12 @@
 					type: 'clickable' as const,
 					label: 'Gérer le stockage…',
 					data: {
-						icon: undefined,
-						subtext: estimate?.usage
-							? `${formatBytesSize(estimate.usage)} utilisés`
-							: '',
+						icon: lowOnStorage ? IconWarning : undefined,
+						subtext: lowOnStorage
+							? 'Stockage bientôt plein'
+							: estimate?.usage
+								? `${formatBytesSize(estimate.usage)} utilisés`
+								: '',
 					},
 					async onclick() {
 						await goto('/(app)/storage');
