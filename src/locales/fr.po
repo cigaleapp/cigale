@@ -182,13 +182,13 @@ msgstr "Chargement du modèle de classification"
 msgid "Chargement du modèle de recadrage…"
 msgstr "Chargement du modèle de recadrage…"
 
-#: src/routes/(app)/+layout.js
+#: src/routes/(app)/+layout.ts
 msgid "Chargement du protocole intégré"
 msgstr "Chargement du protocole intégré"
 
 #: src/lib/CardMedia.svelte
 #: src/lib/MetadataInput.svelte
-#: src/routes/(app)/+layout.js
+#: src/routes/(app)/+layout.ts
 #: src/routes/(app)/DeploymentDetails.svelte
 msgid "Chargement…"
 msgstr "Chargement…"
@@ -197,6 +197,7 @@ msgstr "Chargement…"
 msgid "Choisir le protocole"
 msgstr "Choisir le protocole"
 
+#: src/routes/(app)/+layout.ts
 #: src/routes/(app)/about/+page.svelte
 msgid "Chrome"
 msgstr "Chrome"
@@ -304,7 +305,7 @@ msgstr "Erreur"
 #: src/lib/i18n.js
 #: src/lib/i18n.js
 #: src/lib/toasts.svelte.js
-#: src/routes/(app)/+layout.js
+#: src/routes/(app)/+layout.ts
 msgid "Erreur inattendue"
 msgstr "Erreur inattendue"
 
@@ -421,7 +422,7 @@ msgstr "Impossible de charger les dépendances"
 msgid "Incrémenter"
 msgstr "Incrémenter"
 
-#: src/routes/(app)/+layout.js
+#: src/routes/(app)/+layout.ts
 msgid "Initialisation des réglages par défaut…"
 msgstr "Initialisation des réglages par défaut…"
 
@@ -571,6 +572,7 @@ msgstr "Supprime toutes les données pour ce déploiement de preview"
 
 #: src/lib/AreaObservations.svelte
 #: src/lib/ModalConfirmDeletion.svelte
+#: src/routes/(app)/storage/Table.svelte
 msgid "Supprimer"
 msgstr "Supprimer"
 
@@ -1431,41 +1433,41 @@ msgstr "Erreur lors de l'exportation des résultats: {0}"
 msgid "Métadonnée {0} créée"
 msgstr "Métadonnée {0} créée"
 
-#: src/routes/(app)/+layout.js
+#: src/routes/(app)/+layout.ts
 msgid "Initialisation de la base de données…"
 msgstr "Initialisation de la base de données…"
 
-#: src/routes/(app)/+layout.js
+#: src/routes/(app)/+layout.ts
 msgid "Chargement des données intégrées…"
 msgstr "Chargement des données intégrées…"
 
-#: src/routes/(app)/+layout.js
+#: src/routes/(app)/+layout.ts
 msgid "Analyse"
 msgstr "Analyse"
 
-#: src/routes/(app)/+layout.js
+#: src/routes/(app)/+layout.ts
 msgid "Filtrage des métadonnées intégrées"
 msgstr "Filtrage des métadonnées intégrées"
 
-#: src/routes/(app)/+layout.js
+#: src/routes/(app)/+layout.ts
 msgid "Validation"
 msgstr "Validation"
 
-#: src/routes/(app)/+layout.js
+#: src/routes/(app)/+layout.ts
 msgid "Écriture du protocole"
 msgstr "Écriture du protocole"
 
 #. 0: detail
-#: src/routes/(app)/+layout.js
+#: src/routes/(app)/+layout.ts
 msgid "Écriture de la métadonnée<br>{0}"
 msgstr "Écriture de la métadonnée<br>{0}"
 
 #. 0: detail
-#: src/routes/(app)/+layout.js
+#: src/routes/(app)/+layout.ts
 msgid "Écriture des options de la métadonnée<br>{0}"
 msgstr "Écriture des options de la métadonnée<br>{0}"
 
-#: src/routes/(app)/+layout.js
+#: src/routes/(app)/+layout.ts
 msgid "Post-validation"
 msgstr "Post-validation"
 
@@ -1492,6 +1494,7 @@ msgid "Protocoles <0/>"
 msgstr "Protocoles <0/>"
 
 #: src/routes/(app)/sessions/+page.svelte
+#: src/routes/(app)/storage/+page.svelte
 msgid "Sessions"
 msgstr "Sessions"
 
@@ -1853,12 +1856,12 @@ msgid "Utiliser une autre unité"
 msgstr "Utiliser une autre unité"
 
 #. 0: filename
-#: src/routes/(app)/+layout.js
+#: src/routes/(app)/+layout.ts
 msgid "Chargement du protocole {0}"
 msgstr "Chargement du protocole {0}"
 
 #. 0: filename
-#: src/routes/(app)/+layout.js
+#: src/routes/(app)/+layout.ts
 msgid "Impossible de charger le protocole {0}. Vérifiez votre connexion Internet ou essayez de recharger la page."
 msgstr "Impossible de charger le protocole {0}. Vérifiez votre connexion Internet ou essayez de recharger la page."
 
@@ -2065,48 +2068,48 @@ msgstr "Initialize reactive table"
 msgid "Key range"
 msgstr "Key range"
 
-#: src/routes/(app)/+layout.js
-#: src/routes/(app)/+layout.js
-#: src/routes/(app)/+layout.js
-#: src/routes/(app)/+layout.js
-#: src/routes/(app)/+layout.js
+#: src/routes/(app)/+layout.ts
+#: src/routes/(app)/+layout.ts
+#: src/routes/(app)/+layout.ts
+#: src/routes/(app)/+layout.ts
+#: src/routes/(app)/+layout.ts
 msgid "Startup"
 msgstr "Startup"
 
-#: src/routes/(app)/+layout.js
+#: src/routes/(app)/+layout.ts
 msgid "Get language setting"
 msgstr "Get language setting"
 
-#: src/routes/(app)/+layout.js
+#: src/routes/(app)/+layout.ts
 msgid "Load locale"
 msgstr "Load locale"
 
-#: src/routes/(app)/+layout.js
+#: src/routes/(app)/+layout.ts
 msgid "Initialize settings"
 msgstr "Initialize settings"
 
-#: src/routes/(app)/+layout.js
+#: src/routes/(app)/+layout.ts
 msgid "Initialisation des workers…"
 msgstr "Initialisation des workers…"
 
-#: src/routes/(app)/+layout.js
+#: src/routes/(app)/+layout.ts
 msgid "Workers"
 msgstr "Workers"
 
-#: src/routes/(app)/+layout.js
+#: src/routes/(app)/+layout.ts
 msgid "App"
 msgstr "App"
 
-#: src/routes/(app)/+layout.js
+#: src/routes/(app)/+layout.ts
 msgid "Initialize database"
 msgstr "Initialize database"
 
-#: src/routes/(app)/+layout.js
+#: src/routes/(app)/+layout.ts
 msgid "Load built-in protocols"
 msgstr "Load built-in protocols"
 
 #. 0: updates[0].name; 1: updates[0].version
-#: src/routes/(app)/+layout.js
+#: src/routes/(app)/+layout.ts
 msgid "Protocole \"{0}\" mis à jour à la v{1}"
 msgstr "Protocole \"{0}\" mis à jour à la v{1}"
 
@@ -2674,3 +2677,47 @@ msgstr "Choisir un protocole pour la session"
 #: src/lib/ModalPickProtocol.svelte
 msgid "<0/> Gérer les protocoles"
 msgstr "<0/> Gérer les protocoles"
+
+#: src/routes/(app)/+layout.ts
+msgid "Le stockage de votre navigateur n'est pas persistant, les données pourraient être perdues en cas de manque d'espace de stockage."
+msgstr "Le stockage de votre navigateur n'est pas persistant, les données pourraient être perdues en cas de manque d'espace de stockage."
+
+#: src/routes/(app)/+layout.ts
+msgid "Activer"
+msgstr "Activer"
+
+#: src/routes/(app)/ModalChromePersistentStorage.svelte
+msgid "Activer le stockage persistant sur Chrome"
+msgstr "Activer le stockage persistant sur Chrome"
+
+#: src/routes/(app)/ModalChromePersistentStorage.svelte
+msgid "Activer les notifications"
+msgstr "Activer les notifications"
+
+#: src/routes/(app)/ModalChromePersistentStorage.svelte
+msgid "Sur Chrome, pour activer le stockage persistant, il faut activer les notifications."
+msgstr "Sur Chrome, pour activer le stockage persistant, il faut activer les notifications."
+
+#: src/routes/(app)/ModalChromePersistentStorage.svelte
+msgid "Vous pourrez les désactiver en suite, l'acceptation des notifications sert à Chrome de signal pour prouver que le site vous ait suffisamment utile pour activer le stockage persistent."
+msgstr "Vous pourrez les désactiver en suite, l'acceptation des notifications sert à Chrome de signal pour prouver que le site vous ait suffisamment utile pour activer le stockage persistent."
+
+#: src/routes/(app)/ModalChromePersistentStorage.svelte
+msgid "Sans stockage persistant, Chrome peut supprimer les données de l'application à tout moment, notamment lorsque l'espace de stockage est faible, ce qui peut entraîner la perte de vos sessions et modèles d'inférence enregistrés."
+msgstr "Sans stockage persistant, Chrome peut supprimer les données de l'application à tout moment, notamment lorsque l'espace de stockage est faible, ce qui peut entraîner la perte de vos sessions et modèles d'inférence enregistrés."
+
+#: src/routes/(app)/storage/+page.svelte
+msgid "Stockage"
+msgstr "Stockage"
+
+#: src/routes/(app)/storage/+page.svelte
+msgid "<0/> utilisés sur <1/>"
+msgstr "<0/> utilisés sur <1/>"
+
+#: src/routes/(app)/storage/+page.svelte
+msgid "Modèles d'inférence"
+msgstr "Modèles d'inférence"
+
+#: src/routes/(app)/storage/+page.svelte
+msgid "Autres"
+msgstr "Autres"
