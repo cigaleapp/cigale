@@ -19,10 +19,10 @@
 	import LoadingText, { Loading } from '$lib/LoadingText.svelte';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { deleteSession } from '$lib/sessions.js';
+	import { tooltip } from '$lib/tooltips.js';
 	import { sum } from '$lib/utils.js';
 
 	import Table from './Table.svelte';
-	import { tooltip } from '$lib/tooltips.js';
 
 	$effect(() => {
 		void reestimateStorage();
@@ -56,12 +56,12 @@
 						mask={formatBytesSize(0)}
 					/>
 
-					<span 
-					 class="quota-help"
+					<span
+						class="quota-help"
 						use:tooltip={"Le quota de stockage est attribué par votre navigateur, en fonction de divers signaux comme la fréquence d'utilisation du site"}
 					>
 						<IconInfo />
-				</span>
+					</span>
 				</p>
 			</section>
 		{/if}
