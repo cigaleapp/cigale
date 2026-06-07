@@ -1994,13 +1994,12 @@ if (import.meta.vitest) {
 	});
 }
 
-
 /**
- * Pass a URL thru cors.gwen.works 
- * @param {string|URL} url 
+ * Pass a URL thru cors.gwen.works
+ * @param {string|URL} url
  */
 export function corsfix(url) {
-	return "https://cors.gwen.works/" + url.toString().replace(/^https?:\/\//, '');
+	return 'https://cors.gwen.works/' + url.toString().replace(/^https?:\/\//, '');
 }
 
 /**
@@ -2010,7 +2009,7 @@ export function corsfix(url) {
 export function corsfixIfLocalhost(src) {
 	if (location.hostname !== 'localhost') return src;
 
-	return corsfix(src)
+	return corsfix(src);
 }
 
 /**

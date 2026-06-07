@@ -15,7 +15,7 @@ import { newSession } from './utils/sessions.js';
 // TODO: remove @real-protocol
 test('Entomoscope @real-protocol', async ({ app, page, browserName }) => {
 	// FIXME
-	test.fixme(browserName === "webkit", "Flaky test on WebKit")
+	test.fixme(browserName === 'webkit', 'Flaky test on WebKit');
 	test.setTimeout(ms('5m'));
 
 	await app.settings.set({ showTechnicalMetadata: false });

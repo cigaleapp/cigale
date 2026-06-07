@@ -43,10 +43,10 @@
 	import {
 		cancellable,
 		compareBy,
+		corsfixIfLocalhost,
 		gradientedColor,
 		mapValues,
 		pick,
-		corsfixIfLocalhost,
 		readableOn,
 		round,
 		safeJSONParse,

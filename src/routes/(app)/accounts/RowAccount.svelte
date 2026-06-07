@@ -18,11 +18,7 @@
 </script>
 
 <svelte:element this={tag}>
-	<img
-		class="avatar"
-		src={corsfix(account.avatarURL.href)}
-		alt="Photo de {account.username}"
-	/>
+	<img class="avatar" src={corsfix(account.avatarURL.href)} alt="Photo de {account.username}" />
 	<p>
 		<strong>{account.displayName}</strong>
 		{#if provider}

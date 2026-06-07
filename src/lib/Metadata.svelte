@@ -29,11 +29,11 @@
 	import { isDebugMode } from './settings.svelte.js';
 	import { tooltip } from './tooltips.js';
 	import {
+		corsfixIfLocalhost,
 		mapKeys,
 		orEmpty,
 		orEmpty2,
 		pick,
-		corsfixIfLocalhost,
 		safeJSONParse,
 		switchValue,
 	} from './utils.js';

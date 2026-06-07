@@ -196,10 +196,7 @@ sessionMetadata:
       list: Code projet
       choice: wildnet
     learnMore: https://wildnet.org/
-    images:
-      [
-        https://cors.gwen.works/wildnet.org/wp-content/themes/wcn/theme/images/wcn-favicon.svg,
-      ]
+    images: [https://cors.gwen.works/wildnet.org/wp-content/themes/wcn/theme/images/wcn-favicon.svg]
     description: ''
     mergeMethod: min
     required: true
