@@ -2733,3 +2733,23 @@ msgstr "Show current UI State"
 #: src/routes/(app)/+layout.svelte
 msgid "UI State"
 msgstr "UI State"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/CandidatesListXper3.svelte
+msgid "Liste des candidats restants"
+msgstr "Liste des candidats restants"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/CandidatesListXper3.svelte
+msgid "Liste compatible avec un import dans Xper3"
+msgstr "Liste compatible avec un import dans Xper3"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/CandidatesListXper3.svelte
+msgid "Copié!"
+msgstr "Copié!"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/CandidatesListXper3.svelte
+msgid "Copier"
+msgstr "Copier"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/CandidatesListXper3.svelte
+msgid "Exporter la liste des candidats restants vers Xper3"
+msgstr "Exporter la liste des candidats restants vers Xper3"
