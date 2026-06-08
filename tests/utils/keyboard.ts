@@ -10,7 +10,7 @@ import type { Page } from '@playwright/test';
  */
 export function controlOrMeta(page: Page, presses: string) {
 	if (page.context().browser()?.browserType().name() === 'webkit') {
-		return `Meta+${presses}`;
+		return `ControlOrMeta+${presses}`;
 	}
 
 	return `Control+${presses}`;
