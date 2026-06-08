@@ -63,6 +63,11 @@
 			<Logo loading />
 			Chargement…
 		</div>
+	{:else if metadataDefs.length === 0}
+		<div class="empty">
+			<Logo variant="empty" />
+			Aucune métadonnée à renseigner
+		</div>
 	{:else}
 		<form class="metadata" data-testid="session-metadata">
 			<MetadataList
@@ -117,12 +122,13 @@
 {/if}
 
 <style>
-	.loading {
+	.loading,
+	.empty {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		gap: 1rem;
-		font-size: 1.25rem;
+		margin: 3rem 0;
 
 		--size: 5rem; /* Logo size */
 	}
