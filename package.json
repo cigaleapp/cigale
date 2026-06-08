@@ -130,7 +130,7 @@
 		"playwright-performance-metrics": "^1.2.5",
 		"postcss-preset-env": "^11.3.0",
 		"prettier": "^3.8.3",
-		"prettier-plugin-svelte": "^4.0.1",
+		"prettier-plugin-svelte": "^4.1.0",
 		"svelte": "^5.56.0",
 		"svelte-check": "^4.4.8",
 		"tinyexec": "^1.2.4",
