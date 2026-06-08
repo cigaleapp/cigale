@@ -181,7 +181,7 @@
 	</div> -->
 	<Combobox.Input {...mergedInputProps}>
 		{#snippet child({ props: { value: inputValue, ...props } })}
-			{@const effectiveValue = value ? (open ? inputValue : label) : ''}
+			{const effectiveValue = value ? (open ? inputValue : label) : ''}
 			{#if searchbox}
 				{@render searchbox({ value: effectiveValue, ...props, focusSetter })}
 			{:else}

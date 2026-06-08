@@ -74,8 +74,8 @@
 						}}
 					/>
 				{:else}
-					{@const error = uiState.erroredImages.get(id)}
-					{@const queued = uiState.queuedImages.has(id)}
+					{const error = uiState.erroredImages.get(id)}
+					{const queued = uiState.queuedImages.has(id)}
 					<CardMedia
 						{id}
 						title={name}

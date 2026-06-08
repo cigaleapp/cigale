@@ -255,14 +255,14 @@
 					)}
 				>
 					{#snippet item(option)}
-						{@const { images, label, key } = option}
-						{@const distance = distanceToChoices({
+						{const { images, label, key } = option}
+						{const distance = distanceToChoices({
 							descriptors: narrowingState.descriptors,
 							candidate: option.key,
 							choices: narrowingState.choices,
 						})}
-						{@const closeness = 1 - distance / narrowingState.choices.size}
-						{@const crossout =
+						{const closeness = 1 - distance / narrowingState.choices.size}
+						{const crossout =
 							!narrowingState.remainingCandidateIds.has(key) &&
 							candidatesTab !== 'eliminated'}
 						<button

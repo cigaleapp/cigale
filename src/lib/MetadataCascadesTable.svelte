@@ -55,7 +55,7 @@
 	<tbody>
 		<!-- Cascade's recursion tree is displayed reversed because deeply recursive cascades are mainly meant for taxonomic stuff -- it's the childmost metadata that set their parent, so, in the resulting recursion tree, the parentmost metadata end up childmost (eg. species have cascades that sets genus, genus sets family, etc. so family is deeper in the recursion tree than genus, whereas in a taxonomic tree it's the opposite) -->
 		{#each entries as [metadataId, options] (metadataId)}
-			{@const metadata = tables.Metadata.getFromState(metadataId)}
+			{const metadata = tables.Metadata.getFromState(metadataId)}
 			{#each options as { key, icon, color, label }, i (key)}
 				<tr>
 					{#if showImages && metadata}

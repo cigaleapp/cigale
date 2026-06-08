@@ -62,7 +62,7 @@
 				/** @type {import('svelte').Component} */ Icon,
 				/** @type {{ help?: string, count?: number }} */ { help, count } = {}
 			)}
-				{@const path = resolve(`/(app)/protocols/[id]/metadata/[metadata]/${route}`, {
+				{const path = resolve(`/(app)/protocols/[id]/metadata/[metadata]/${route}`, {
 					id: data.protocol.id,
 					metadata: removeNamespaceFromMetadataId(id),
 				})}

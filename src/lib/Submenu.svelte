@@ -158,7 +158,7 @@
 </script>
 
 {#snippet listing(entry: StackEntry | undefined)}
-	{@const { items, empty: emptyText, groupIndex } = submenuOf(entry?.key)}
+	{const { items, empty: emptyText, groupIndex } = submenuOf(entry?.key)}
 	<div class="submenu">
 		{#each items as item (`${groupIndex}/${item.key || item.label}`)}
 			<div class="item">

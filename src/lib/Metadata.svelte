@@ -191,7 +191,7 @@
 				{#each Object.entries(value.alternatives)
 					.sort(([, a], [, b]) => b - a)
 					.slice(0, 3) as [jsonValue, confidence] (jsonValue)}
-					{@const stringValue = safeJSONParse(jsonValue)?.toString()}
+					{const stringValue = safeJSONParse(jsonValue)?.toString()}
 					<li>
 						<div class="value">
 							<LoadingText
@@ -232,7 +232,7 @@
 	{/if}
 
 	{#if definition.type === 'location'}
-		{@const coords = (value as TypedMetadataValue<'location'> | undefined)?.value}
+		{const coords = (value as TypedMetadataValue<'location'> | undefined)?.value}
 
 		<section class="map">
 			<WorldMap

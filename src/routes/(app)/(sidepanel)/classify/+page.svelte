@@ -227,11 +227,11 @@
 {#snippet modelsource()}
 	{#if uiState.classificationInferenceAvailable}
 		{#each uiState.allClassificationMetadata as metadata (metadata.id)}
-			{@const modelIndex = uiState.selectedClassificationModels[metadata.id] ?? 0}
-			{@const models = uiState.allClassificationModels[metadata.id]}
-			{@const model = models?.[modelIndex]?.model}
+			{const modelIndex = uiState.selectedClassificationModels[metadata.id] ?? 0}
+			{const models = uiState.allClassificationModels[metadata.id]}
+			{const model = models?.[modelIndex]?.model}
 			{#if model}
-				{@const url = new URL(typeof model === 'string' ? model : model?.url)}
+				{const url = new URL(typeof model === 'string' ? model : model?.url)}
 				<div class="is-loaded">
 					{#if loadedModels.has(metadata.id)}
 						<IconLoaded />

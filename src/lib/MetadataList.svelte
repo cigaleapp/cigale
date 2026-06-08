@@ -74,7 +74,7 @@
 
 <div class="liste" data-testid={testid}>
 	{#snippet metadata(item: (typeof groupedDefinitions)[number])}
-		{@const { group, definitions } = item}
+		{const { group, definitions } = item}
 		<div class="definition-group">
 			{#if group}
 				<details open={!group.collapsed}>

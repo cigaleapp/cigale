@@ -90,9 +90,9 @@
 	/** @type {Array<string|number>} */ path,
 	/** @type {string|undefined} */ optionKey = undefined
 )}
-	{@const metadata =
+	{const metadata =
 		path[0] === 'metadata' ? tables.Metadata.getFromState(path[1].toString()) : undefined}
-	{@const option =
+	{const option =
 		metadata && path[2] === 'options' && optionKey
 			? get('MetadataOption', metadataOptionId(metadata.id, optionKey))
 			: undefined}
@@ -104,7 +104,7 @@
 			</span>
 		{/if}
 		{#if metadata}
-			{@const metadataId = splitMetadataId(metadata.id)}
+			{const metadataId = splitMetadataId(metadata.id)}
 			{#if i === 1 && typeof piece === 'string'}
 				<a
 					title="Voir la métadonnée"

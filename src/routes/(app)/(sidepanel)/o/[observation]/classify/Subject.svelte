@@ -96,7 +96,7 @@
 		keyboard-next="ArrowRight"
 	>
 		{#snippet item(image)}
-			{@const box = zoomed ? uiState.cropMetadataValueOf(image)?.value : FULL_IMAGE_CROPBOX}
+			{const box = zoomed ? uiState.cropMetadataValueOf(image)?.value : FULL_IMAGE_CROPBOX}
 			{#if box}
 				<CroppedImg
 					dimensions={image.dimensions}

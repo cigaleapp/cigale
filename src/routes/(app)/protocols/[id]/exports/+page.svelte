@@ -102,7 +102,7 @@
 			l'export
 		</dd>
 		{#each entries(HANDLEBARS_HELPERS) as [name, { documentation, usage }] (name)}
-			{@const [call, result] = usage.split('->').map((s) => s.trim())}
+			{const [call, result] = usage.split('->').map((s) => s.trim())}
 			<dt>
 				{call}<br /> &rarr; {result}
 			</dt>

@@ -146,7 +146,7 @@
 								</div>
 								<span class="label">Sur l'appareil</span>
 							{:else if account}
-								{@const provider = providers.get(directory.platform)!}
+								{const provider = providers.get(directory.platform)!}
 								<div class="icon">
 									<CompositeAvatar
 										avatar={account.avatarURL}

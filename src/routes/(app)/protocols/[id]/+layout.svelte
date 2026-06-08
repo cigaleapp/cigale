@@ -266,9 +266,9 @@
 			{/if}
 			<nav class="metadata" bind:this={metadataNav}>
 				{#each metadataDefinitions as def (def.id)}
-					{@const shortId = removeNamespaceFromMetadataId(def.id)}
-					{@const label = def.label || shortId}
-					{@const url = resolve(
+					{const shortId = removeNamespaceFromMetadataId(def.id)}
+					{const label = def.label || shortId}
+					{const url = resolve(
 						// @ts-expect-error
 						page.route.id?.includes('/protocols/[id]/metadata/[metadata]/')
 							? page.route.id
@@ -344,7 +344,7 @@
 	/** @type {import('svelte').Component} */ Icon,
 	/** @type {string|number|undefined} */ badge = undefined
 )}
-	{@const path = route === '' ? route : resolve(`/(app)/protocols/[id]/${route}`, { id })}
+	{const path = route === '' ? route : resolve(`/(app)/protocols/[id]/${route}`, { id })}
 	<svelte:element
 		this={path ? 'a' : 'span'}
 		href={path || undefined}

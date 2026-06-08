@@ -54,13 +54,13 @@
 	bind:open
 	title="Déploiement de preview pour la PR #{previewingPrNumber}"
 >
-	{@const prLink = `https://github.com/cigaleapp/cigale/pull/${previewingPrNumber}`}
+	{const prLink = `https://github.com/cigaleapp/cigale/pull/${previewingPrNumber}`}
 	{#await fetch(`https://api.github.com/repos/cigaleapp/cigale/pulls/${previewingPrNumber}`).then( (res) => res.json() )}
 		<p>
 			Déploiement de preview pour la <a href={prLink}>PR #{previewingPrNumber}</a>
 		</p>
 	{:then { title, user, body }}
-		{@const issueNumber = /(Closes|Fixes) #(\d+)/i.exec(body)?.[2]}
+		{const issueNumber = /(Closes|Fixes) #(\d+)/i.exec(body)?.[2]}
 		{#if buildCommit}
 			{#await fetch(`https://api.github.com/repos/cigaleapp/cigale/commits/${buildCommit}`).then( (res) => res.json() )}
 				<span class="build-date">Chargement…</span>
@@ -92,7 +92,7 @@
 		#{previewingPrNumber}
 	{/await}
 	{#snippet footer({ close })}
-		{@const open = (/** @type {string} */ url) => () => {
+		{const open = (/** @type {string} */ url) => () => {
 			window.open(url);
 			close?.();
 		}}

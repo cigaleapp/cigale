@@ -373,7 +373,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 					{#if !collapsedGroups.has(sortKey)}
 						<div class="items" data-starts-selection>
 							{#each items as props (virtualizeKey(props))}
-								{@const unrolled = unrolledId === props.id}
+								{const unrolled = unrolledId === props.id}
 								<div class="item-unroll-container" class:unrolled>
 									{@render item(props.data, props)}
 								</div>

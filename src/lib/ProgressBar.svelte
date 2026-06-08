@@ -50,8 +50,8 @@ CSS Variables:
 
 <div class="bars" class:full={progresses.every((p) => p >= 1)}>
 	{#each progresses as p, i (i)}
-		{@const phase = phases[progresses.length - 1 - i]}
-		{@const percentage = Math.round(clamp(progresses[progresses.length - 1 - i], 0, 1) * 100)}
+		{const phase = phases[progresses.length - 1 - i]}
+		{const percentage = Math.round(clamp(progresses[progresses.length - 1 - i], 0, 1) * 100)}
 		<div
 			class="tooltip-container"
 			use:tooltip={phase ? `${phase}: ${percentage}%` : ''}

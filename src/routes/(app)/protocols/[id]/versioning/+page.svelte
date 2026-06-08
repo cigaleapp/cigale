@@ -166,7 +166,7 @@
 									})}
 								>
 									{#snippet button({ state, help, onclick })}
-										{@const text = updateButtonTexts[state]}
+										{const text = updateButtonTexts[state]}
 										{#if text}
 											<ButtonInk
 												disabled={state === 'upgrading'}
@@ -187,7 +187,7 @@
 	</Field>
 
 	{#if version !== undefined && (upstreamComparison.changes.length > 0 || upstreamComparison.loading)}
-		{@const { changes, hasMore } = upstreamComparison}
+		{const { changes, hasMore } = upstreamComparison}
 		<section class="changes-with-remote">
 			<h3>
 				{#if upstreamComparison.progress >= 1}

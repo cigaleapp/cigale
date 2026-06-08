@@ -359,7 +359,7 @@
 							>
 								{#snippet children({ key: option, label })}
 									{#if option.startsWith('custom')}
-										{@const unit = option === 'customPercent' ? '%' : 'px'}
+										{const unit = option === 'customPercent' ? '%' : 'px'}
 										<div
 											class="numeric"
 											style:--width={unit === '%' ? '3ch' : '4ch'}
@@ -404,7 +404,7 @@
 
 				<div class="gallery">
 					{#each tables.Image.state.slice(0, 100) as image (image.id)}
-						{@const box = cropPadding.apply(
+						{const box = cropPadding.apply(
 							image.dimensions,
 							uiState.cropMetadataValueOf(image)?.value ?? FULL_IMAGE_CROPBOX
 						)}
