@@ -336,7 +336,10 @@ for (const [i, { name, id }] of files.entries()) {
 				option.learnMore = learnMore;
 				option.description = description;
 				option.links = links;
-				option.images = unique([...option.images, ...imageUrls.map((u) => u.toString())]);
+				option.images = unique([
+					...(option.images ?? []),
+					...imageUrls.map((u) => u.toString()),
+				]);
 			} else {
 				const optionKeys = (options) => options.map((o) => Number(o.key));
 				options.push({
