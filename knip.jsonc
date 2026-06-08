@@ -17,6 +17,8 @@
 		"@sveltejs/vite-plugin-svelte-inspector",
 		"svelte-mathml",
 		"@capacitor/assets",
+		"baseline-browser-mapping",
+		"caniuse-lite",
 	],
 	"entry": [
 		"scripts/issue-creator-server.ts",
