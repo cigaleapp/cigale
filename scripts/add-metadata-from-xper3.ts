@@ -431,7 +431,7 @@ async function augment(protocolPath: string, protocol: typeof ExportedProtocol.i
 							return species
 								.map((name) => [
 									protocol.metadata[`${protocol.id}__species`].options!.find(
-										(o) => o.label.split(' ').at(1) === name
+										(o) => o.label === `Andrena ${name}`
 									)?.key,
 									formatMorphogroupKey(morphogroup),
 								])
