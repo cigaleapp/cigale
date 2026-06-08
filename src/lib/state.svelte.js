@@ -63,9 +63,7 @@ export class UIState {
 				transformObject(bind, (key, value) => (key === 'do' ? undefined : [key, value]))
 			),
 			currentSessionId: this.currentSessionId,
-			currentSession: this.currentSession
-				? omit(this.currentSession, 'metadata')
-				: null,
+			currentSession: this.currentSession ? omit(this.currentSession, 'metadata') : null,
 			currentProtocol: this.currentProtocol ? pick(this.currentProtocol, 'id', 'name') : null,
 			classificationMetadata: this.classificationMetadata
 				? pick(this.classificationMetadata, 'id', 'infer')

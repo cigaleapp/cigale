@@ -398,7 +398,11 @@ const MetadataBase = type({
 		'@',
 		'Label(s) ou nom(s) de colonne de la question Kobocollect associée à cette métadonnée. Non sensible à la casse',
 	],
-	'classification?': ['boolean', '@', 'Marque la métadonnée comme utilisable comme métadonnée de classification'],
+	'classification?': [
+		'boolean',
+		'@',
+		'Marque la métadonnée comme utilisable comme métadonnée de classification',
+	],
 	'group?': ID.brand('MetadataGroup').describe(
 		'Identifiant du groupe dans lequel mettre cette métadonnée. Voir le champ metadataGroups du protocole'
 	),
