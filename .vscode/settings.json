@@ -18,7 +18,7 @@
 			"query": "repo:${owner}/${repository} state:open milestone:InsectDetective"
 		},
 		{
-			"label": "Terraforma 2"	,
+			"label": "Terraforma 2",
 			"query": "repo:${owner}/${repository} state:open milestone:Terraforma2"
 		},
 		{
