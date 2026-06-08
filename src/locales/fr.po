@@ -2721,3 +2721,15 @@ msgstr "Autres"
 #: src/routes/(app)/storage/+page.svelte
 msgid "<0/> utilisés sur <1/> <2/>"
 msgstr "<0/> utilisés sur <1/> <2/>"
+
+#: src/lib/SessionMetadataForm.svelte
+msgid "<0/> Aucune métadonnée à renseigner"
+msgstr "<0/> Aucune métadonnée à renseigner"
+
+#: src/routes/(app)/+layout.svelte
+msgid "Show current UI State"
+msgstr "Show current UI State"
+
+#: src/routes/(app)/+layout.svelte
+msgid "UI State"
+msgstr "UI State"
