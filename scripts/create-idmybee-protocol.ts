@@ -1,4 +1,5 @@
 import path from 'node:path';
+import type { ExportedProtocol } from '../src/lib/schemas/protocols.js';
 
 import backbone from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
 
@@ -7,6 +8,8 @@ const here = import.meta.dirname;
 await Bun.write(
 	path.join(here, '../protocols/idmybee.cigaleprotocol.json'),
 	JSON.stringify({
+		// TODO: remove once #1750 is fixed
+		// @ts-expect-error - $schema is technically not allowed
 		$schema: backbone.$schema,
 		id: 'io.github.cigaleapp.idmybee',
 		name: 'IDmyBee',
@@ -19,14 +22,15 @@ await Bun.write(
 		source: 'https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/idmybee.cigaleprotocol.json',
 		authors: [],
 		sessionMetadata: {},
+		// TODO: use this once #1696 is merged
 		imports: [
-			{
-				from: 'io.github.cigaleapp.arthropods.example',
-				metadataGroups: [
-					'taxonomy' /* TODO: fix bugs related to imported metadata and narrow mode  'andrena'*/,
-				],
-				metadata: ['crop', 'conservation_status', 'identification_difficulty'],
-			},
+			// {
+			// 	from: 'io.github.cigaleapp.arthropods.example',
+			// 	metadataGroups: [
+			// 		'taxonomy' /* TODO: fix bugs related to imported metadata and narrow mode  'andrena'*/,
+			// 	],
+			// 	metadata: ['crop', 'conservation_status', 'identification_difficulty'],
+			// },
 		],
 		metadataOrder: [
 			'morphogroup',
@@ -48,16 +52,16 @@ await Bun.write(
 				required: true,
 				description: '',
 				mergeMethod: 'max',
-				// XXX: Used to mark the metadata as the classification metadata
-				infer: { neural: [] },
+				classification: true,
 				options: backbone.metadata[
 					'io.github.cigaleapp.arthropods.example__species'
 				].options.filter((opt) => opt['x-generator'] === 'xper3'),
 			},
-
 			...Object.fromEntries(
-				Object.entries(backbone.metadata).filter(([, { group }]) => group === 'andrena')
+				Object.entries(backbone.metadata).filter(
+					([, m]) => 'group' in m && m.group === 'andrena'
+				)
 			),
 		},
-	} satisfies typeof ExportedProtocol.infer)
+	} satisfies typeof ExportedProtocol.inferIn)
 );

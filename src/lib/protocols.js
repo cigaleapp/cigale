@@ -489,22 +489,24 @@ export async function autoUpdateProtocols(db, swarpc) {
  * @returns {import('./utils.js').Comparator< string | { id: string }>}
  */
 export function metadataDefinitionComparator(protocol) {
+	if (protocol.metadataOrder) {
+		return compareBy((key) => {
+			if (typeof key !== 'string') key = key.id;
+
+			const index = protocol.metadataOrder
+				?.map(removeNamespaceFromMetadataId)
+				.indexOf(removeNamespaceFromMetadataId(key));
+
+			if (index === -1) return Number.POSITIVE_INFINITY;
+
+			return index;
+		});
+	}
+
 	return (a, b) => {
 		if (typeof a !== 'string') a = a.id;
 		if (typeof b !== 'string') b = b.id;
 
-		if (protocol.metadataOrder) {
-			// return protocol.metadataOrder.indexOf(a) - protocol.metadataOrder.indexOf(b);
-			return compareBy((key) => {
-				const index = protocol.metadataOrder
-					?.map(removeNamespaceFromMetadataId)
-					.indexOf(removeNamespaceFromMetadataId(key));
-
-				if (index === -1) return Number.POSITIVE_INFINITY;
-
-				return index;
-			})(a, b);
-		}
 		return idComparator(a, b);
 	};
 }
@@ -516,12 +518,16 @@ export function metadataDefinitionComparator(protocol) {
  * @returns
  */
 export function defaultClassificationMetadata(protocol, metadata) {
-	return metadata
+	const eligible = metadata
 		.filter((m) => m.type === 'enum')
 		.filter((m) => isMetadataInProtocol(protocol, m.id))
-		.filter((m) => m.infer && 'neural' in m.infer)
-		.sort(metadataDefinitionComparator(protocol))
-		.at(0);
+		.sort(metadataDefinitionComparator(protocol));
+
+	return (
+		eligible.filter((m) => m.classification).at(0) ??
+		// TODO(2026-06-08): remove this after some time
+		eligible.filter((m) => m.infer && 'neural' in m.infer).at(0)
+	);
 }
 
 /**

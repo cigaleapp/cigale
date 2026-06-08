@@ -503,6 +503,7 @@ const protocol = {
 			description: '',
 			required: true,
 			groupable: true,
+			classification: true,
 			mergeMethod: 'max',
 			options: options.sort((a, b) => parseFloat(a.key) - parseFloat(b.key)),
 			infer: {

@@ -16,6 +16,7 @@ export async function createSession() {
 					return;
 				}
 
+
 				const classificationMetadata = defaultClassificationMetadata(
 					selectedProtocol,
 					tables.Metadata.state
@@ -52,9 +53,12 @@ export async function createSession() {
 						...orEmptyObj(largestNarrowableGroup !== undefined, {
 							narrowableGroup: largestNarrowableGroup?.id ?? '',
 						}),
-						...orEmptyObj(classificationMetadata !== undefined, {
-							focusedMetadata: classificationMetadata?.id ?? '',
-						}),
+						// TODO: set this once we can change it in the UI
+						// otherwise, we lock ourselves into these values and changing the session's protocol afterwards does nothing 
+						//
+						// ...orEmptyObj(classificationMetadata !== undefined, {
+						// 	focusedMetadata: classificationMetadata?.id ?? '',
+						// }),
 					},
 					group: {
 						global: { field: 'none' },
