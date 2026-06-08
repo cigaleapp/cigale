@@ -14,8 +14,24 @@
 	},
 	"githubIssues.queries": [
 		{
-			"label": "Cahier des charges",
-			"query": "repo:${owner}/${repository} milestone:\"InsectDetective\" state:open"
+			"label": "InsectDetective",
+			"query": "repo:${owner}/${repository} state:open milestone:InsectDetective"
+		},
+		{
+			"label": "Terraforma 2"	,
+			"query": "repo:${owner}/${repository} state:open milestone:Terraforma2"
+		},
+		{
+			"label": "Urgent",
+			"query": "repo:${owner}/${repository} state:open field.priority:urgent"
+		},
+		{
+			"label": "Important",
+			"query": "repo:${owner}/${repository} state:open field.priority:high"
+		},
+		{
+			"label": "Easy",
+			"query": "repo:${owner}/${repository} state:open field.effort:low"
 		},
 		{
 			"label": "All Issues",
