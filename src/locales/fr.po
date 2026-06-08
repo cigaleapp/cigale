@@ -2711,13 +2711,13 @@ msgid "Stockage"
 msgstr "Stockage"
 
 #: src/routes/(app)/storage/+page.svelte
-msgid "<0/> utilisés sur <1/>"
-msgstr "<0/> utilisés sur <1/>"
-
-#: src/routes/(app)/storage/+page.svelte
 msgid "Modèles d'inférence"
 msgstr "Modèles d'inférence"
 
 #: src/routes/(app)/storage/+page.svelte
 msgid "Autres"
 msgstr "Autres"
+
+#: src/routes/(app)/storage/+page.svelte
+msgid "<0/> utilisés sur <1/> <2/>"
+msgstr "<0/> utilisés sur <1/> <2/>"
