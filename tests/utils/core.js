@@ -177,7 +177,7 @@ export function modal(page, query) {
 	return page.getByRole('dialog').filter({
 		visible: true,
 
-		has: page.getByRole('banner').getByRole('heading', {
+		has: page.locator('header').getByRole('heading', {
 			name: query.title,
 			exact: true,
 		}),

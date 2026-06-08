@@ -160,7 +160,9 @@ CSS variables:
 			if (target === currentTarget && !opening) close?.();
 		}}
 	>
-		<header>
+		<!-- Each page may have a banner landmark, but each page should generally be limited to a single element with the role of banner. -- MDN on role="banner" -->
+		<!-- Since <header> can be implicitly set to role="banner" in some situations, we force it to be role="generic"  -->
+		<header role="generic">
 			<h1>{title}</h1>
 			<ButtonIcon
 				help="Fermer"
