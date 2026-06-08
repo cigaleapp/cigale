@@ -17,6 +17,7 @@
 	import { loadPreviewImage } from '$lib/images';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import KeyboardShortcuts from '$lib/KeyboardShortcuts.svelte';
+	import Modal from '$lib/Modal.svelte';
 	import { globalModals } from '$lib/modals.svelte.js';
 	import { initializeProcessingQueue } from '$lib/queue.svelte';
 	import { switchSession } from '$lib/sessions';
@@ -93,9 +94,17 @@
 		},
 	});
 
-	defineKeyboardShortcuts(
-		'debugmode',
-		Object.fromEntries(
+	defineKeyboardShortcuts('debugmode', {
+		'x s': {
+			help: 'Show current UI State',
+			debug: true,
+			allowInModals: true,
+			when: isDebugMode,
+			do() {
+				globalModals.modal_debug_ui_state.open?.();
+			},
+		},
+		...Object.fromEntries(
 			(['warn', 'error', 'info', 'debug', 'success'] as const).map((type) => {
 				const toastFns = {
 					warn: () => toasts.warn(/* @wc-ignore */ 'Example warning toast'),
@@ -105,7 +114,7 @@
 					success: () => toasts.success(/* @wc-ignore */ 'Example success toast'),
 				};
 				return [
-					`t t ${type.charAt(0)}`,
+					`x t ${type.charAt(0)}`,
 					{
 						help: `Summon a ${type} toast`,
 						debug: true,
@@ -115,8 +124,8 @@
 					},
 				];
 			})
-		)
-	);
+		),
+	});
 
 	$effect(() => {
 		document.documentElement.style.colorScheme = getColorScheme();
@@ -160,6 +169,19 @@
 />
 
 <PrepareForOffline bind:open={globalModals.modal_prepare_for_offline_use.open} />
+
+<Modal
+	key="modal_debug_ui_state"
+	title="UI State"
+	bind:open={globalModals.modal_debug_ui_state.open}
+>
+	<!-- That if is for performance, since {#key uiState} could be expensive -->
+	{#if isDebugMode()}
+		{#key uiState}
+			<pre class="debug-ui-state">{JSON.stringify(uiState.snapshot(), null, 2)}</pre>
+		{/key}
+	{/if}
+</Modal>
 
 <div class="layout" id="app-layout">
 	<Navigation
@@ -236,5 +258,9 @@
 		@media (max-width: 600px) {
 			flex-direction: column-reverse;
 		}
+	}
+
+	.debug-ui-state {
+		font-size: 0.8rem;
 	}
 </style>

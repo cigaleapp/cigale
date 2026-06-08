@@ -5,7 +5,7 @@ import { tables } from './idb.svelte.js';
 import { getMetadataValue } from './metadata/index.js';
 import { defaultClassificationMetadata, defaultCropMetadata } from './protocols.js';
 import { isMetadataInProtocol } from './schemas/protocols.js';
-import { pick } from './utils.js';
+import { mapValues, omit, pick, transformObject } from './utils.js';
 
 /**
  * @import * as DB from './database';
@@ -59,10 +59,12 @@ export class UIState {
 			erroredImages: Object.fromEntries(this.erroredImages.entries()),
 			loadingImages: Array.from(this.loadingImages),
 			queuedImages: Array.from(this.queuedImages),
-			keybinds: this.keybinds,
+			keybinds: mapValues(this.keybinds, (bind) =>
+				transformObject(bind, (key, value) => (key === 'do' ? undefined : [key, value]))
+			),
 			currentSessionId: this.currentSessionId,
 			currentSession: this.currentSession
-				? pick(this.currentSession, 'id', 'protocol', 'inferenceModels')
+				? omit(this.currentSession, 'metadata')
 				: null,
 			currentProtocol: this.currentProtocol ? pick(this.currentProtocol, 'id', 'name') : null,
 			classificationMetadata: this.classificationMetadata
