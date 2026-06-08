@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file, on a monthly basis, with a consistent, simple format: month/year heading > type of change heading > list of changes.
 
+## June 2026
+
+### Improvements
+
+- Add explanation for quota in /storage
+- Enable persistent storage, add storage manager
+- Warn if low on storage quota
+
+### Bug Fixes
+
+- Fix cors proxy usage (#1707)
+
+### Data Updates
+
+- Add IDmyBee protocol
+- Bump protocol version of protocols/insecta.cigaleprotocol.yaml [ci skip]
+- Fix IDmyBee protocol
+- Regenerate example protocols
+- Remove andrena metadata group from entomoscope & insecta protocols
+
+### Translation Updates
+
+- Refresh translation files
+
 ## May 2026
 
 ### Improvements
