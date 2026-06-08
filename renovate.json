@@ -16,7 +16,8 @@
 				"prettier",
 				"prettier-*",
 				"lint-staged",
-				"svelte-check"
+				"svelte-check",
+				"typescript-eslint"
 			],
 			"automerge": true,
 			"prPriority": 10
