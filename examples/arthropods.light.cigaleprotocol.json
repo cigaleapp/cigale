@@ -3,8 +3,8 @@
 	"id": "io.github.cigaleapp.arthropods.example.light",
 	"name": "Example: arthropodes (lightweight)",
 	"summary": "Version légère de Exemple: arthropodes",
-	"learnMore": "https://github.com/cigaleapp/cigale/tree/3c6365982d72a09eae71f0293f9467b7c17cc031/scripts/README.md#protocoles-arthropodsexamplelight",
-	"version": 99,
+	"learnMore": "https://github.com/cigaleapp/cigale/tree/dd2d1eaff193e6fc240e0799ccfac28c6d825533/scripts/README.md#protocoles-arthropodsexamplelight",
+	"version": 100,
 	"updates": "automatic",
 	"source": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.light.cigaleprotocol.json",
 	"description": "Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification\n\nClés d'identification d'abeilles fournies par IDmyBee.com, extraites depuis [IDMYBEE - Andrena sur Xper3](https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html).",
@@ -392,10 +392,10 @@
 					"learnMore": "https://gbif.org/species/1"
 				},
 				{
-					"key": "323335839",
+					"key": "324044993",
 					"label": "Animalia",
 					"description": "",
-					"learnMore": "https://gbif.org/species/323335839"
+					"learnMore": "https://gbif.org/species/324044993"
 				}
 			],
 			"label": "Règne",
@@ -419,12 +419,12 @@
 					}
 				},
 				{
-					"key": "323335840",
+					"key": "324044994",
 					"label": "Arthropoda",
 					"description": "",
-					"learnMore": "https://gbif.org/species/323335840",
+					"learnMore": "https://gbif.org/species/324044994",
 					"cascade": {
-						"kingdom": "323335839"
+						"kingdom": "324044993"
 					}
 				}
 			],
@@ -460,13 +460,13 @@
 					}
 				},
 				{
-					"key": "323335841",
+					"key": "324044995",
 					"label": "Insecta",
 					"description": "",
-					"learnMore": "https://gbif.org/species/323335841",
+					"learnMore": "https://gbif.org/species/324044995",
 					"cascade": {
-						"phylum": "323335840",
-						"kingdom": "323335839"
+						"phylum": "324044994",
+						"kingdom": "324044993"
 					}
 				}
 			],
@@ -504,14 +504,14 @@
 					}
 				},
 				{
-					"key": "323335842",
+					"key": "324044996",
 					"label": "Hymenoptera",
 					"description": "",
-					"learnMore": "https://gbif.org/species/323335842",
+					"learnMore": "https://gbif.org/species/324044996",
 					"cascade": {
-						"class": "323335841",
-						"phylum": "323335840",
-						"kingdom": "323335839"
+						"class": "324044995",
+						"phylum": "324044994",
+						"kingdom": "324044993"
 					}
 				},
 				{
@@ -584,15 +584,15 @@
 					}
 				},
 				{
-					"key": "323335880",
+					"key": "324045034",
 					"label": "Andrenidae",
 					"description": "",
-					"learnMore": "https://gbif.org/species/323335880",
+					"learnMore": "https://gbif.org/species/324045034",
 					"cascade": {
-						"order": "323335842",
-						"class": "323335841",
-						"phylum": "323335840",
-						"kingdom": "323335839"
+						"order": "324044996",
+						"class": "324044995",
+						"phylum": "324044994",
+						"kingdom": "324044993"
 					}
 				},
 				{
@@ -814,16 +814,16 @@
 					}
 				},
 				{
-					"key": "323335883",
+					"key": "324045037",
 					"label": "Andrena",
 					"description": "",
-					"learnMore": "https://gbif.org/species/323335883",
+					"learnMore": "https://gbif.org/species/324045037",
 					"cascade": {
-						"family": "323335880",
-						"order": "323335842",
-						"class": "323335841",
-						"phylum": "323335840",
-						"kingdom": "323335839"
+						"family": "324045034",
+						"order": "324044996",
+						"class": "324044995",
+						"phylum": "324044994",
+						"kingdom": "324044993"
 					}
 				},
 				{
@@ -51749,12 +51749,12 @@
 						"forme_des_foveas_au_milieu": "fovasnonrt_1738780949142_3244",
 						"corbeilles_du_propodeum": "corbeilles_1738837562663_8904",
 						"type_de_pilosite_des_scopas": "pilositmaj_1738784759008_2070",
-						"genus": "323335883",
-						"family": "323335880",
-						"order": "323335842",
-						"class": "323335841",
-						"phylum": "323335840",
-						"kingdom": "323335839"
+						"genus": "324045037",
+						"family": "324045034",
+						"order": "324044996",
+						"class": "324044995",
+						"phylum": "324044994",
+						"kingdom": "324044993"
 					}
 				},
 				{
