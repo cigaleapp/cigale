@@ -53,6 +53,7 @@ await Bun.write(
 			},
 		},
 		metadata: {
+			crop: backbone.metadata[`${backbone.id}__crop`],
 			species: {
 				label: 'Espèce',
 				type: 'enum',
@@ -60,9 +61,9 @@ await Bun.write(
 				description: '',
 				mergeMethod: 'max',
 				classification: true,
-				options: backbone.metadata[
-					'io.github.cigaleapp.arthropods.example__species'
-				].options.filter((opt) => opt['x-generator'] === 'xper3'),
+				options: backbone.metadata[`${backbone.id}__species`].options.filter(
+					(opt) => opt['x-generator'] === 'xper3'
+				),
 			},
 			...descriptors,
 		},
