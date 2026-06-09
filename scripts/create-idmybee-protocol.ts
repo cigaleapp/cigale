@@ -2,8 +2,13 @@ import path from 'node:path';
 import type { ExportedProtocol } from '../src/lib/schemas/protocols.js';
 
 import backbone from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
+import { version as oldVersion } from '../protocols/idmybee.cigaleprotocol.json' with { type: 'json' };
 
 const here = import.meta.dirname;
+
+const descriptors = Object.fromEntries(
+	Object.entries(backbone.metadata).filter(([, m]) => 'group' in m && m.group === 'andrena')
+);
 
 await Bun.write(
 	path.join(here, '../protocols/idmybee.cigaleprotocol.json'),
@@ -17,7 +22,7 @@ await Bun.write(
 		logo: 'https://cigaleapp.github.io/cigale/logos/idmybee.png',
 		description:
 			'Un protocole pour identifier des abeilles genre Andrena via des descripteurs, avec pré-élimination par classification par inférence de Morphogroupes',
-		version: 1,
+		version: oldVersion + 1,
 		updates: 'automatic',
 		source: 'https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/idmybee.cigaleprotocol.json',
 		authors: [],
@@ -34,7 +39,9 @@ await Bun.write(
 		],
 		metadataOrder: [
 			'morphogroup',
-			...backbone.metadataOrder.filter((m) => !m.includes('morphogroup')),
+			...Object.keys(descriptors)
+				.map((d) => d.replace(`${backbone.id}__`, ''))
+				.filter((d) => d !== 'morphogroup'),
 		],
 		metadataGroups: {
 			andrena: {
@@ -57,11 +64,7 @@ await Bun.write(
 					'io.github.cigaleapp.arthropods.example__species'
 				].options.filter((opt) => opt['x-generator'] === 'xper3'),
 			},
-			...Object.fromEntries(
-				Object.entries(backbone.metadata).filter(
-					([, m]) => 'group' in m && m.group === 'andrena'
-				)
-			),
+			...descriptors,
 		},
 	} satisfies typeof ExportedProtocol.inferIn)
 );
