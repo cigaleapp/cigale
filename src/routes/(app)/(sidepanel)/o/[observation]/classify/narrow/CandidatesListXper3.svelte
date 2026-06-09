@@ -1,11 +1,12 @@
 <script lang="ts">
+	import { watch } from 'runed';
+
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import Modal from '$lib/Modal.svelte';
 	import IconExportCandidatesList from '$lib/Xper3Logo.svelte';
 
 	import { narrowingState } from './+layout.svelte';
-	import { watch } from 'runed';
 
 	let open = $state<() => void>();
 	let copied = $state(false);
@@ -19,9 +20,12 @@
 			']'
 	);
 
-watch(() => listText, () => {
-	copied = false;
-})
+	watch(
+		() => listText,
+		() => {
+			copied = false;
+		}
+	);
 </script>
 
 <Modal key="modal_candidates_list" title="Liste des candidats restants" bind:open>
@@ -56,7 +60,6 @@ watch(() => listText, () => {
 </ButtonIcon>
 
 <style>
-
 	.candidates-list-xper3 {
 		display: flex;
 		flex-direction: column;
@@ -65,5 +68,4 @@ watch(() => listText, () => {
 		text-align: center;
 		gap: 1em;
 	}
-
 </style>
