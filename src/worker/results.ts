@@ -33,7 +33,15 @@ import {
 	ExportsFilepathTemplateObservation,
 } from '$lib/schemas/protocols';
 import { AnalyzedImage, AnalyzedObservation, toMetadataRecord } from '$lib/schemas/results';
-import { compareBy, entries, mapValues, nonnull, progressSplitter, sum } from '$lib/utils';
+import {
+	compareBy,
+	entries,
+	mapValues,
+	nonnull,
+	progressSplitter,
+	sum,
+	UTF8_BOM,
+} from '$lib/utils';
 
 import { Schemas } from '../lib/database.js';
 import { toCSV } from '../lib/results.svelte.js';
@@ -95,8 +103,10 @@ swarp.generateResultsExport(
 			filename: string;
 		}> = [];
 
-		const files: Record<string, { contents: Uint8Array | string; mtime?: Date | undefined }> =
-			{};
+		const files: Record<
+			string,
+			{ contents: Uint8Array | string } & import('fflate').AsyncZipOptions
+		> = {};
 
 		let total = 1;
 		let done = 0;
@@ -245,42 +255,48 @@ swarp.generateResultsExport(
 		}
 
 		files[filepaths.metadata.csv] = {
-			contents: toCSV(
-				[
-					'Identifiant',
-					'Observation',
-					// 2 columns for each metadata: for the value itself, and for the confidence in the value
-					...allMetadataKeys
-						.filter((k) => Boolean(metadataDefinitions[k]?.label))
-						.flatMap((k) => [
-							metadataPrettyKey(metadataDefinitions[k]),
-							`${metadataPrettyKey(metadataDefinitions[k])}: Confiance`,
-						]),
-				],
-				observations.map((o) => ({
-					Identifiant: o.id,
-					Observation: o.label,
-					...Object.fromEntries(
-						Object.entries(exportedObservations[o.id].metadata).flatMap(
-							([key, { value, confidence, valueLabel }]) => [
-								[
-									metadataPrettyKey(metadataDefinitions[key]),
-									metadataPrettyValue(value, {
-										// Exports always have english value serializations for better interoperability
-										language: 'en',
-										type: metadataDefinitions[key].type,
-										valueLabel,
-									}),
-								],
-								[
-									`${metadataPrettyKey(metadataDefinitions[key])}: Confiance`,
-									confidence.toString(),
-								],
-							]
-						)
-					),
-				}))
-			),
+			// Excel needs a BOM to prevent Mojibake, bruh.
+			// See https://stackoverflow.com/a/155176/9943464
+			// TODO: maybe export a separate .xslx file that's exactly like the .csv one but has that BOM, so that we don't clutter the .csv with one.
+			// Although, this clutter is only annoying when processing with code, but in that case the .json offers a better user experience anyways
+			contents:
+				UTF8_BOM +
+				toCSV(
+					[
+						'Identifiant',
+						'Observation',
+						// 2 columns for each metadata: for the value itself, and for the confidence in the value
+						...allMetadataKeys
+							.filter((k) => Boolean(metadataDefinitions[k]?.label))
+							.flatMap((k) => [
+								metadataPrettyKey(metadataDefinitions[k]),
+								`${metadataPrettyKey(metadataDefinitions[k])}: Confiance`,
+							]),
+					],
+					observations.map((o) => ({
+						Identifiant: o.id,
+						Observation: o.label,
+						...Object.fromEntries(
+							Object.entries(exportedObservations[o.id].metadata).flatMap(
+								([key, { value, confidence, valueLabel }]) => [
+									[
+										metadataPrettyKey(metadataDefinitions[key]),
+										metadataPrettyValue(value, {
+											// Exports always have english value serializations for better interoperability
+											language: 'en',
+											type: metadataDefinitions[key].type,
+											valueLabel,
+										}),
+									],
+									[
+										`${metadataPrettyKey(metadataDefinitions[key])}: Confiance`,
+										confidence.toString(),
+									],
+								]
+							)
+						),
+					}))
+				),
 		};
 
 		if (format === 'folder') {

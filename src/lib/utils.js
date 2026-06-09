@@ -2073,3 +2073,5 @@ if (import.meta.vitest) {
 		expect(record2).toEqual({ b: 2, d: 4 });
 	});
 }
+
+export const UTF8_BOM = '\xEF\xBB\xBF';
