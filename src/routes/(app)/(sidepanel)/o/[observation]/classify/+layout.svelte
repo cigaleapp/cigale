@@ -6,6 +6,7 @@
 	import { storeMetadataValue } from '$lib/metadata/storage.js';
 	import { observationMetadata } from '$lib/observations.js';
 	import { goto } from '$lib/paths.js';
+	import { defaultClassificationMetadata } from '$lib/protocols.js';
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte.js';
 	import { compareBy } from '$lib/utils.js';
@@ -15,9 +16,10 @@
 	const { children, data } = $props();
 
 	const focusedMetadata = $derived(
-		tables.Metadata.getFromState(
-			uiState.currentSession?.fullscreenClassifier.focusedMetadata ?? ''
-		)!
+		defaultClassificationMetadata(uiState.currentProtocol!, tables.Metadata.state) ??
+			tables.Metadata.getFromState(
+				uiState.currentSession?.fullscreenClassifier.focusedMetadata ?? ''
+			)!
 	);
 
 	const allObservations = $derived(

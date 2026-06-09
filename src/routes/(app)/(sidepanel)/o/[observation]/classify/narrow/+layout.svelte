@@ -36,6 +36,7 @@
 	import Subject from '../Subject.svelte';
 	import CandidateDetailsModal from './CandidateDetailsModal.svelte';
 	import { distanceToChoices } from './candidates.js';
+	import CandidatesListXper3 from './CandidatesListXper3.svelte';
 	import NarrowableGroupPicker from './NarrowableGroupPicker.svelte';
 	import OptionsLoader from './OptionsLoader.svelte';
 	import { NarrowingState } from './state.svelte.js';
@@ -225,20 +226,24 @@
 			<section class="explainer">
 				<h2>Candidats</h2>
 
-				<SegmentedGroup
-					options={['all', 'remaining', 'eliminated']}
-					bind:current={candidatesTab}
-				>
-					{#snippet option_all()}
-						Tous
-					{/snippet}
-					{#snippet option_remaining()}
-						Restants
-					{/snippet}
-					{#snippet option_eliminated()}
-						Éliminés
-					{/snippet}
-				</SegmentedGroup>
+				<div class="actions">
+					<CandidatesListXper3 />
+
+					<SegmentedGroup
+						options={['all', 'remaining', 'eliminated']}
+						bind:current={candidatesTab}
+					>
+						{#snippet option_all()}
+							Tous
+						{/snippet}
+						{#snippet option_remaining()}
+							Restants
+						{/snippet}
+						{#snippet option_eliminated()}
+							Éliminés
+						{/snippet}
+					</SegmentedGroup>
+				</div>
 			</section>
 
 			<section class="candidates">
@@ -464,12 +469,17 @@
 		border-right: 1px solid var(--gray);
 		transition: width 250ms ease;
 		height: 100%;
+	}
 
-		&:not(:has(.focused)) {
-			grid-template-rows: max-content max-content auto max-content;
-		}
-		&:has(.focused) {
-			grid-template-rows: max-content max-content max-content auto max-content;
+	.layout:not(.expanded-subject) aside {
+		grid-template-rows: max-content max-content auto max-content;
+	}
+
+	.layout.expanded-subject aside {
+		grid-template-rows: calc(100% - 3 * 10px) repeat(3, 10px);
+
+		.photo {
+			max-height: unset;
 		}
 	}
 
@@ -478,6 +488,12 @@
 		align-items: center;
 		justify-content: space-between;
 		padding: 0.5em 0.5em;
+	}
+
+	section.explainer .actions {
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
 	}
 
 	section.focused {
@@ -494,10 +510,6 @@
 		&.focused {
 			/* border-bottom: 1px solid var(--gray); */
 			padding: 0.5em;
-		}
-
-		.filter-count {
-			flex-shrink: 0;
 		}
 
 		.metadata {
@@ -565,7 +577,7 @@
 		}
 	}
 
-	aside .actions {
+	aside section.actions {
 		margin-top: auto;
 		display: flex;
 		justify-content: space-between;
@@ -579,6 +591,7 @@
 		height: 100%;
 		transition: height 250ms ease;
 		border-bottom: 1px solid var(--gray);
+		z-index: 10;
 	}
 
 	.layout.expanded-subject {

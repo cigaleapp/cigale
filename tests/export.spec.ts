@@ -294,7 +294,7 @@ testKitchensink(
 		await assert(modal).toBeVisible();
 		await expect(modal).toMatchAriaSnapshot(`
 		  - dialog:
-		    - banner:
+		    - generic:
 		      - heading "Métadonnées incorrectes" [level=1]
 		      - button "Fermer":
 		        - img

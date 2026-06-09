@@ -848,6 +848,25 @@ test.describe('narrowing view', pr(1570), () => {
 			await page.getByRole('button', { name: 'Recommencer' }).click();
 			await expect(page.getByRole('main').getByText('Andrena gredana')).toBeVisible();
 		});
+
+		testBasic('exports remaining candidates list to Xper3', async ({ page, app }) => {
+			// Open the Xper3 candidates export modal
+			await page
+				.getByRole('button', {
+					name: 'Exporter la liste des candidats restants vers Xper3',
+				})
+				.click();
+
+			const modal = app.modals.byTitle('Liste des candidats restants');
+			await expect(modal).toBeVisible();
+
+			// Ensure textarea contains a bracketed, comma-separated list like [1, 2, 3]
+			// const listValue = await modal.locator('textarea').inputValue();
+			// expect(listValue).toMatch(/^\[\d+(,\s*\d+)*\]$/);
+			await expect(modal.getByRole('textbox')).toHaveValue(
+				'[158, 156, 32, 153, 152, 150, 157, 154, 155, 151]'
+			);
+		});
 	});
 });
 

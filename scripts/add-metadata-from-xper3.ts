@@ -245,6 +245,10 @@ async function augment(protocolPath: string, protocol: typeof ExportedProtocol.i
 				continue;
 			}
 
+			const taxonDeclarationIndex = sdd.TaxonNames.TaxonName.findIndex(
+				({ $id }) => $id === taxon.$id
+			);
+
 			const header = makeHeader({ taxon, done, total, eta });
 
 			const specie = await findGbifId(protocol, item);
@@ -290,6 +294,7 @@ async function augment(protocolPath: string, protocol: typeof ExportedProtocol.i
 					...speciesOption,
 					// @ts-expect-error private field
 					'x-generator': 'xper3',
+					'x-xper3-declaration-index': taxonDeclarationIndex,
 					description:
 						speciesOption.description ||
 						noPlaceholder(taxon.Representation.Detail) ||
