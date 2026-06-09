@@ -46,7 +46,7 @@ await Bun.write(
 		metadataGroups: {
 			andrena: {
 				name: 'Andrènes',
-				collapsed: false,
+				collapsed: true,
 				narrowable: true,
 				description:
 					"Caractéristiques d'identification spécifiques aux abeilles du genre Andrena",

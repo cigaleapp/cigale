@@ -5,7 +5,7 @@
 	"summary": "Identification d'Andrènes par élimination",
 	"logo": "https://cigaleapp.github.io/cigale/logos/idmybee.png",
 	"description": "Un protocole pour identifier des abeilles genre Andrena via des descripteurs, avec pré-élimination par classification par inférence de Morphogroupes",
-	"version": 5,
+	"version": 6,
 	"updates": "automatic",
 	"source": "https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/idmybee.cigaleprotocol.json",
 	"authors": [],
@@ -168,7 +168,7 @@
 	"metadataGroups": {
 		"andrena": {
 			"name": "Andrènes",
-			"collapsed": false,
+			"collapsed": true,
 			"narrowable": true,
 			"description": "Caractéristiques d'identification spécifiques aux abeilles du genre Andrena"
 		}
