@@ -46,7 +46,7 @@ if (import.meta.vitest) {
 }
 /**
  *
- * @param {import('$lib/schemas/neural.js').NeuralInference} settings
+ * @param {typeof import('$worker/procedures.js').PROCEDURES.classify.input['infer']['taskSettings']} settings
  * @param {ort.Tensor} tensor
  * @param {number[]} mean
  * @param {number[]} std

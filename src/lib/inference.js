@@ -310,7 +310,7 @@ export async function infer(
 
 /**
  *
- * @param {Pick<import('$lib/schemas/neural.js').NeuralInference, 'input' | 'output'>} settings
+ * @param {typeof import('$worker/procedures.js').PROCEDURES.classify.input['infer']['taskSettings']} settings
  * @param {ort.Tensor} image
  * @param {import('onnxruntime-web').InferenceSession} model
  * @param {AbortSignal} [abortSignal]

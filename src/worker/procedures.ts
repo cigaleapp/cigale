@@ -63,7 +63,12 @@ export const PROCEDURES = {
 			},
 			taskSettings: {
 				input: Schemas.ModelInput,
-				'output?': { name: 'string' },
+				'output?': {
+					name: 'string',
+					// TODO: use Schemas once https://github.com/gwennlbh/swarpc/issues/207 is done
+					/** We can't use the actual select schema here cuz JsonataExpression is not cloneable by postMessage() */
+					select: 'string | undefined',
+				},
 			},
 		}),
 		progress: type({}),

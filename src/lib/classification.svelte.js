@@ -38,11 +38,19 @@ export async function classifyImage(swarpc, id, cancellers) {
 			return;
 		}
 
-		const settings = allModels[modelIndex];
-		const taskSettings = $state.snapshot(settings);
+		const settings = $state.snapshot(allModels[modelIndex]);
 
 		// Generate the inference session ID based on the protocol and model
 		const inferenceSessionId = inferenceModelId(uiState.currentProtocol.id, settings.model);
+
+		const taskSettings = {
+			...settings,
+			output: {
+				name: settings.output?.name ?? 'output0',
+				// XXX: $state.snapshot turns the type of output.select into a string, idk why cuz at runtime it isnt
+				select: allModels[modelIndex].output?.select?.toJSON(),
+			},
+		};
 
 		const { cancel, request: done } = swarpc.classify.cancelable({
 			imageId: id,

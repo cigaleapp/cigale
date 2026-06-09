@@ -12,6 +12,8 @@ import { Schemas } from '$lib/database.js';
 import { loadToTensor } from '$lib/inference_utils.js';
 import { classify, infer } from '$lib/inference.js';
 import { getMetadataValue, storeMetadataValue } from '$lib/metadata/index.js';
+import { ModelOutputEnum } from '$lib/schemas/neural.js';
+import { compareBy, throwError } from '$lib/utils.js';
 
 import { openDatabase, swarp } from './index.js';
 
@@ -152,20 +154,16 @@ swarp.classify(async ({ imageId, metadataIds, taskSettings, inferenceSessionId }
 		...(tools.abortSignal ? { abortSignal: tools.abortSignal } : {}),
 	});
 
-	const scores = await classify(
-		taskSettings as Pick<import('$lib/schemas/neural.js').NeuralInference, 'input' | 'output'>,
-		img,
-		onnx,
-		tools.abortSignal
-	);
+	const scores = await classify(taskSettings, img, onnx, tools.abortSignal);
 	tools.abortSignal?.throwIfAborted();
 
 	const results = scores
 		?.map((score, i) => ({
-			confidence: score,
-			value: classmapping[i],
+			score,
+			key: classmapping[i],
 		}))
-		.sort((a, b) => b.confidence - a.confidence)
+		.sort(compareBy('score'))
+		.reverse()
 		.slice(0, 100);
 
 	tools.abortSignal?.throwIfAborted();
@@ -174,15 +172,54 @@ swarp.classify(async ({ imageId, metadataIds, taskSettings, inferenceSessionId }
 		throw new Error("Le modèle de classification n'a retourné aucun résultat");
 	}
 
-	const [firstChoice, ...otherChoices] = results;
+	const confidences = results.map((r) => ({
+		confidence: r.score,
+		value: r.key,
+	}));
+
+	let { value, confidence } = confidences[0];
+	let alternatives = [] as string[];
+
+	if (taskSettings.output?.select) {
+		const selector = ModelOutputEnum.get('select').assert(taskSettings.output.select);
+		const selection = await selector?.evaluate({
+			neurons: results,
+		});
+
+		console.debug(`Applied output.select to result of inference`, {
+			selector: selector?.toJSON(),
+			selection,
+		});
+
+		if (!selection) throw new Error("La sélection (output.select) n'a pas renvoyé de résultat");
+
+		const [first, ...others] = selection.map((key) => {
+			const result =
+				results.find((result) => result.key === key) ??
+				throwError(
+					`La sélection (output.select) contient une clé d'option (key) inconnue: ${key}`
+				);
+
+			return {
+				key,
+				score: result.score,
+			};
+		});
+
+		value = first.key;
+		confidence = first.score;
+		alternatives = others.map((result) => result.key);
+	}
 
 	await storeMetadataValue({
 		db,
 		abortSignal: tools.abortSignal,
 		metadataId: metadataIds.target,
 		subjectId: imageId,
-		confidences: otherChoices,
-		...firstChoice,
+		confidences,
+		value,
+		confidence,
+		alternatives,
 	});
 
 	return { scores };

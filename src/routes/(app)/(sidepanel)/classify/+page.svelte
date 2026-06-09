@@ -189,6 +189,9 @@
 					classifModelLoadingError = error;
 					if (isAbortError(error)) return;
 					console.error(error);
+					if (error instanceof AggregateError) {
+						console.error(error.errors);
+					}
 					toasts.error('Erreur lors du chargement du modèle de classification');
 				})
 				.finally(() => {
