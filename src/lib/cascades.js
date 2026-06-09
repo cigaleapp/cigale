@@ -1,8 +1,11 @@
 import { Tables } from './database.js';
+import { resolveMetadataImport } from './metadata/imports.js';
 import { metadataOption } from './metadata/storage.js';
 import {
+	ensureNamespacedMetadataId,
 	metadataOptionId,
 	namespacedMetadataId,
+	namespaceOfMetadataId,
 	parseMetadataOptionId,
 } from './schemas/metadata.js';
 import { ensureArray, entries, groupBy, nonnull, sum } from './utils.js';
@@ -69,6 +72,16 @@ export async function computeCascades({
 	value,
 	alternatives: _alternatives,
 }) {
+	const protocolId = namespaceOfMetadataId(metadataId);
+	if (!protocolId) {
+		throw new Error(`Metadata ${metadataId} is not namespaced, cannot cascade`);
+	}
+
+	const protocol = await db.get('Protocol', protocolId);
+	if (!protocol) {
+		throw new Error(`Metadata ${metadataId} is namespaced to unknown protocol ${protocolId}`);
+	}
+
 	const alternatives = !Array.isArray(_alternatives)
 		? Object.entries(_alternatives).map(([value, confidence]) => ({
 				value: /** @type {RuntimeValue} */ (JSON.parse(value)),
@@ -107,7 +120,14 @@ export async function computeCascades({
 		// cascades that lead to that option
 		const groupedByMetadata = groupBy(
 			groupedByOption.entries(),
-			([optionId]) => parseMetadataOptionId(optionId).metadataId,
+			([optionId]) =>
+				resolveMetadataImport(
+					protocol,
+					ensureNamespacedMetadataId(
+						parseMetadataOptionId(optionId).metadataId,
+						protocolId
+					)
+				),
 			([optionId, confidences]) =>
 				/** @type {const} */ ({
 					value: parseMetadataOptionId(optionId).key,

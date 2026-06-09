@@ -324,14 +324,6 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 				`Cascading metadata ${metadataId} @ ${value} -> ${cascade.metadataId}  = ${cascade.value}`
 			);
 
-			const metadataNamespace = namespaceOfMetadataId(metadataId);
-			if (!metadataNamespace)
-				throw new Error(
-					`Metadata ${metadataId} is not namespaced, cannot cascade onto ${cascade.metadataId}`
-				);
-
-			cascade.metadataId = ensureNamespacedMetadataId(cascade.metadataId, metadataNamespace);
-
 			await storeMetadataValue({
 				db,
 				sessionId,
