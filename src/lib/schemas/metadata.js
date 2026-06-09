@@ -129,6 +129,12 @@ export const MetadataError = type({
 
 export const MetadataErrors = type.Record(NamespacedMetadataID, MetadataError.array());
 
+const MetadataValueMain = type('string.json').pipe((jsonstring) => {
+	/** @type {RuntimeValue<typeof MetadataType.infer>}  */
+	let out = JSON.parse(jsonstring);
+	if (typeof out === 'string') out = parseISOSafe(out) ?? out;
+	return out;
+}, MetadataRuntimeValueAny);
 /**
  * @template {MetadataType} [Type=MetadataType]
  * @typedef  RuntimeValue
@@ -136,12 +142,7 @@ export const MetadataErrors = type.Record(NamespacedMetadataID, MetadataError.ar
  */
 
 export const MetadataValue = type({
-	value: type('string.json').pipe((jsonstring) => {
-		/** @type {RuntimeValue<typeof MetadataType.infer>}  */
-		let out = JSON.parse(jsonstring);
-		if (typeof out === 'string') out = parseISOSafe(out) ?? out;
-		return out;
-	}, MetadataRuntimeValueAny),
+	value: MetadataValueMain,
 	confidence: Probability.default(1),
 	'unit?': type(
 		/** @type {type.cast<typeof NumericUnit.infer>} */
@@ -156,30 +157,34 @@ export const MetadataValue = type({
 	isDefault: type('boolean')
 		.describe('Si la valeur est la valeur par défaut définie dans le protocole')
 		.default(false),
-	alternatives: {
+	alternatives: MetadataValueMain.array().default(() => []),
+	confidences: {
 		'[string.json]': Probability,
 	},
 });
 
 export const MetadataValues = type.Record(NamespacedMetadataID, MetadataValue);
 
-export const MetadataRecordValue = MetadataValue.omit('value').and({
-	value: [
-		type.or(
-			'null',
-			MetadataRuntimeValue.boolean,
-			MetadataRuntimeValue.integer,
-			MetadataRuntimeValue.float,
-			MetadataRuntimeValue.string,
-			// MetadataRuntimeValue.date
-			// Date is not compatible with JSON Schemas, use a datestring instead
-			'string.date.iso',
-			MetadataRuntimeValue.location,
-			MetadataRuntimeValue.boundingbox,
-			MetadataRuntimeValue.file
-		),
+const JSONSchemaCompatibleRuntimeValue = type.or(
+	'null',
+	MetadataRuntimeValue.boolean,
+	MetadataRuntimeValue.integer,
+	MetadataRuntimeValue.float,
+	MetadataRuntimeValue.string,
+	// MetadataRuntimeValue.date
+	// Date is not compatible with JSON Schemas, use a datestring instead
+	'string.date.iso',
+	MetadataRuntimeValue.location,
+	MetadataRuntimeValue.boundingbox,
+	MetadataRuntimeValue.file
+);
+
+export const MetadataRecordValue = MetadataValue.omit('value', 'alternatives').and({
+	value: [JSONSchemaCompatibleRuntimeValue, '@', 'Valeur de la métadonnée'],
+	alternatives: [
+		JSONSchemaCompatibleRuntimeValue.array(),
 		'@',
-		'Valeur de la métadonnée',
+		'Valeurs alternatives pour la métadonnée',
 	],
 	'valueLabel?': [
 		'string',

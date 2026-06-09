@@ -121,7 +121,8 @@ export const items: Array<{ id: string; metadata: DB.MetadataValues }> = [
 				manuallyModified: false,
 				confirmed: false,
 				confidence: 1,
-				alternatives: {},
+				confidences: {},
+				alternatives: []
 			} satisfies DB.MetadataValue,
 		])
 	),

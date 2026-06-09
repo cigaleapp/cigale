@@ -36,7 +36,6 @@ export async function processSidecars({
 }) {
 	const session = await db.get('Session', sessionId).then((s) => DB.Schemas.Session.assert(s));
 
-	// debugger;
 	// To store default sidecar filepaths for imported metadata
 	const protocols = new Map<string, DB.Protocol>();
 
@@ -229,7 +228,7 @@ export async function processSidecars({
 					});
 				}
 			} else {
-				const [{ score, ...coords }, ...alternatives] = boxes;
+				const [{ score, ...coords }, ...others] = boxes;
 
 				await storeMetadataValue({
 					db,
@@ -240,7 +239,7 @@ export async function processSidecars({
 					subjectId: imageFileId,
 					value: coords,
 					confidence: score,
-					alternatives: alternatives.map(({ score, ...coords }) => ({
+					confidences: others.map(({ score, ...coords }) => ({
 						value: coords,
 						confidence: score,
 					})),

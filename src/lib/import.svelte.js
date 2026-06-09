@@ -185,6 +185,8 @@ export async function inferBoundingBoxes(swarpc, cancellers, fileId) {
 	const toCropBox = ([x, y, w, h]) => toRelativeCoords(inferenceSettings.input)({ x, y, w, h });
 
 	for (let i = 0; i < boxes.length; i++) {
+		const serializedBox = JSON.stringify(toCropBox(boxes[i]));
+
 		await tables.Image.set({
 			...image,
 			id: imageId(image.fileId, i),
@@ -193,9 +195,9 @@ export async function inferBoundingBoxes(swarpc, cancellers, fileId) {
 			metadata: {
 				...serializeMetadataValues(image.metadata),
 				[uiState.cropMetadataId]: {
-					value: JSON.stringify(toCropBox(boxes[i])),
+					value: serializedBox,
 					confidence: scores[i],
-					alternatives: {},
+					confidences: { [serializedBox]: scores[i] },
 					manuallyModified: false,
 				},
 			},

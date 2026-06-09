@@ -64,7 +64,7 @@ describe('deleteSession', () => {
 			openedAt: new Date().toISOString(),
 			metadata: {
 				[namespacedMetadataId('com.example.test.protocol', 'no_exif')]: {
-					alternatives: {},
+					confidences: {},
 					value: '"oui"',
 					confidence: 1,
 				},

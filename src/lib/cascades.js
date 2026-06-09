@@ -36,7 +36,7 @@ import { ensureArray, entries, groupBy, nonnull, sum } from './utils.js';
  *  metadataId: "species",
  *  confidence: 0.4,
  *  value: 40,
- *  alternatives: { "41": 0.3, "42": 0.2, "44": 0.1 }
+ *  confidences: { "41": 0.3, "42": 0.2, "44": 0.1 }
  * })
  * ```
  *
@@ -50,7 +50,7 @@ import { ensureArray, entries, groupBy, nonnull, sum } from './utils.js';
  *    metadataId: "genus",
  *    value: "1",
  *    confidence: 0.7, // 0.4 + 0.3, from species:40 and species:41
- *    alternatives: {
+ *    confidences: {
  *      "2": 0.2, // from species:42
  *      "3": 0.1  // from species:44
  *    }
@@ -63,14 +63,14 @@ import { ensureArray, entries, groupBy, nonnull, sum } from './utils.js';
  * @param {string} param0.metadataId
  * @param {number} param0.confidence
  * @param {RuntimeValue} param0.value
- * @param { DB.MetadataValue["alternatives"] | Array<{ value: RuntimeValue, confidence: number }> } param0.alternatives
+ * @param { DB.MetadataValue["confidences"] | Array<{ value: RuntimeValue, confidence: number }> } param0.confidences
  */
 export async function computeCascades({
 	db,
 	metadataId,
 	confidence,
 	value,
-	alternatives: _alternatives,
+	confidences: _confidences,
 }) {
 	const protocolId = namespaceOfMetadataId(metadataId);
 	if (!protocolId) {
@@ -82,16 +82,16 @@ export async function computeCascades({
 		throw new Error(`Metadata ${metadataId} is namespaced to unknown protocol ${protocolId}`);
 	}
 
-	const alternatives = !Array.isArray(_alternatives)
-		? Object.entries(_alternatives).map(([value, confidence]) => ({
+	const confidences = !Array.isArray(_confidences)
+		? Object.entries(_confidences).map(([value, confidence]) => ({
 				value: /** @type {RuntimeValue} */ (JSON.parse(value)),
 				confidence,
 			}))
-		: _alternatives;
+		: _confidences;
 
 	return await Promise.all(
 		// List of { value, confidence }, that includes the main value as well as the alternatives
-		[{ value, confidence }, ...alternatives].map(async ({ confidence, value }) => {
+		[{ value, confidence }, ...confidences].map(async ({ confidence, value }) => {
 			// Get the cascades for the corresponding metadata option
 			const option = await db.get('MetadataOption', metadataOptionId(metadataId, value));
 			if (!option?.cascade) return undefined;
@@ -137,7 +137,7 @@ export async function computeCascades({
 
 		// Return a list of data ready for storeMetadataValue() for every cascaded metadata
 		return [...groupedByMetadata.entries()].map(([metadataId, options]) => {
-			const [{ value, confidence }, ...alternatives] = options.toSorted(
+			const [{ value, confidence }, ...confidences] = options.toSorted(
 				({ confidence: a }, { confidence: b }) => b - a
 			);
 
@@ -145,7 +145,7 @@ export async function computeCascades({
 				metadataId,
 				value,
 				confidence,
-				alternatives,
+				confidences,
 			};
 		});
 	});

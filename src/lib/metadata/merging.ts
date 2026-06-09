@@ -2,8 +2,9 @@ import type { RuntimeValuesPerType } from './types.js';
 import type * as DB from '$lib/database';
 
 import { type RuntimeValue } from '$lib/schemas/metadata.js';
-import { avg, mapValues, nonnull } from '$lib/utils.js';
+import { avg, mapValues, nonnull, unique } from '$lib/utils.js';
 
+import { serializeMetadataValue } from './serializing.js';
 import { switchOnMetadataType } from './types.js';
 
 export const MERGEABLE_METADATA_TYPES: Set<DB.MetadataType> = new Set([
@@ -117,17 +118,17 @@ function mergeMetadata(
 	values: DB.MetadataValue[],
 	options: DB.MetadataEnumVariant[] = []
 ) {
-	const mergeAlternatives = (
+	const mergeConfidences = (
 		merger: (probabilities: number[]) => number,
 		values: DB.MetadataValue[]
 	) =>
 		Object.fromEntries(
 			values
-				.flatMap((v) => Object.keys(v.alternatives))
+				.flatMap((v) => Object.keys(v.confidences))
 				.map((valueAsString) => [
 					valueAsString,
 					merger(
-						values.flatMap((v) => v.alternatives[valueAsString] ?? null).filter(Boolean)
+						values.flatMap((v) => v.confidences[valueAsString] ?? null).filter(Boolean)
 					),
 				])
 		);
@@ -143,7 +144,12 @@ function mergeMetadata(
 		manuallyModified: values.some((v) => v.manuallyModified),
 		confidence: confidences(values.map((v) => v.confidence)),
 		confirmed: values.every((v) => v.confirmed),
-		alternatives: mergeAlternatives(confidences, values),
+		confidences: mergeConfidences(confidences, values),
+		isDefault: values.every((v) => v.isDefault),
+		alternatives: unique(
+			values.flatMap((v) => v.alternatives),
+			serializeMetadataValue
+		),
 	});
 
 	switch (definition.mergeMethod) {

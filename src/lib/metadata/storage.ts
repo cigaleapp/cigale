@@ -7,6 +7,8 @@ import type { NumericUnit } from '$lib/schemas/units.js';
 import { ArkErrors } from 'arktype';
 
 import { computeCascades } from '$lib/cascades.js';
+import { Tables } from '$lib/database.js';
+import { observationMetadata } from '$lib/observations.js';
 import {
 	ensureNamespacedMetadataId,
 	isNamespacedToProtocol,
@@ -170,7 +172,8 @@ async function refreshTables(sessionId: string, ...tableNames: ReactiveTableName
  * @param options.confirmed si la valeur a été confirmée manuellement comme correcte
  * @param options.clearErrors effacer tout les metadataErrors associés à cette métadonnée. True par défaut.
  * @param options.db BDD à modifier
- * @param options.alternatives les autres valeurs possibles
+ * @param options.alternatives les autres valeurs possibles.
+ * @param options.clearConfidences effacer les confidences existantes au lieu de fusionner avec les anciennes
  * @param options.cascadedFrom ID des métadonnées dont celle-ci est dérivée, pour éviter les boucles infinies (cf "cascade" dans MetadataEnumVariant)
  * @param options.abortSignal signal d'abandon pour annuler la requête
  * @param options.sessionId id de la session en cours, important pour refresh le state réactif des tables
@@ -183,11 +186,13 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 	value,
 	confidence = 1,
 	confirmed = false,
+	confidences = [],
 	alternatives = [],
 	manuallyModified = false,
 	clearErrors = true,
 	isDefault = false,
 	updateReactiveState = true,
+	clearConfidences = false,
 	unit = undefined,
 	applyCascades = true,
 	sessionId,
@@ -205,9 +210,9 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 	isDefault?: boolean;
 	unit?: typeof NumericUnit.infer | undefined;
 	db: DatabaseHandle;
-	alternatives?:
-		| DB.MetadataValue['alternatives']
-		| Array<{ value: RuntimeValue<Type>; confidence: number }>;
+	alternatives?: Array<RuntimeValue<Type>>;
+	confidences?: Record<string, number> | Array<{ value: RuntimeValue<Type>; confidence: number }>;
+	clearConfidences?: boolean;
 	applyCascades?: boolean;
 	abortSignal?: AbortSignal | undefined;
 	sessionId?: string | undefined | null;
@@ -222,6 +227,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 		confidence = 1;
 	}
 
+
 	abortSignal?.throwIfAborted();
 	const newValue = {
 		value: serializeMetadataValue(value),
@@ -230,10 +236,11 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 		confirmed,
 		manuallyModified,
 		isDefault,
-		alternatives: !Array.isArray(alternatives)
-			? alternatives
+		alternatives: alternatives.map(serializeMetadataValue),
+		confidences: !Array.isArray(confidences)
+			? confidences
 			: Object.fromEntries(
-					alternatives.map(({ value, confidence }) => {
+					confidences.map(({ value, confidence }) => {
 						if (confidence > 1) {
 							console.warn(
 								`Confidence ${confidence} of alternative ${value} is greater than 1, capping to 1`
@@ -246,10 +253,20 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 				),
 	};
 
-	// Make sure the alternatives does not contain the value itself
-	newValue.alternatives = Object.fromEntries(
-		Object.entries(newValue.alternatives).filter(([key]) => key !== newValue.value)
-	);
+
+	newValue.confidences[serializeMetadataValue(value)] = confidence;
+
+	/**
+	 * Updates newValue.confidences to take into account the old confidences (if clearConfidences is false)
+	 */
+	function processConfidences(
+		target: typeof newValue,
+		oldValue: undefined | { confidences: Record<string, number> }
+	) {
+		if (oldValue && !clearConfidences) {
+			target.confidences = { ...oldValue.confidences, ...target.confidences };
+		}
+	}
 
 	console.debug(`Store metadata ${metadataId} = `, value, ` in ${subjectId}`, newValue);
 
@@ -268,6 +285,8 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 
 	abortSignal?.throwIfAborted();
 	if (session) {
+		processConfidences(newValue, session.metadata?.[metadataId]);
+
 		if (session.metadata) {
 			session.metadata[metadataId] = newValue;
 		} else {
@@ -275,12 +294,27 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 		}
 		db.put('Session', session);
 	} else if (image) {
+		processConfidences(newValue, image.metadata[metadataId]);
+
 		image.metadata[metadataId] = newValue;
 		if (clearErrors && image.metadataErrors?.[metadataId]) {
 			delete image.metadataErrors[metadataId];
 		}
 		db.put('Image', image);
 	} else if (observation) {
+		processConfidences(
+			newValue,
+			observationMetadata({
+				observation: Tables.Observation.assert(observation),
+				definitions: [Tables.Metadata.assert(await db.get('Metadata', metadataId))],
+				images: await Promise.all(
+					observation.images.map(async (img) =>
+						db.get('Image', img).then((i) => Tables.Image.assert(i))
+					)
+				),
+			})[metadataId]
+		);
+
 		observation.metadataOverrides[metadataId] = newValue;
 		if (clearErrors && observation.metadataErrors?.[metadataId]) {
 			delete observation.metadataErrors[metadataId];
@@ -314,7 +348,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 			metadataId,
 			value,
 			confidence,
-			alternatives,
+			confidences,
 		});
 
 		for (const cascade of cascades) {

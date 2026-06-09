@@ -16,7 +16,7 @@ export const previewingPrNumber =
 	import.meta.env.previewingPrNumber === 'null' ? null : import.meta.env.previewingPrNumber;
 
 export const databaseName = previewingPrNumber ? `previews/pr-${previewingPrNumber}` : 'database';
-export const databaseRevision = 8;
+export const databaseRevision = 9;
 
 const profile = profiler('Database');
 
@@ -472,7 +472,7 @@ export async function openDatabase() {
 
 	console.debug('Opening database', databaseName, 'revision', databaseRevision);
 	_database = await openDB(databaseName, databaseRevision, {
-		upgrade(db, oldVersion, _newVersion, tx) {
+		async upgrade(db, oldVersion, _newVersion, tx) {
 			/**
 			 * @param {keyof typeof Tables} tableName
 			 * @param {import('arktype').Type} schema
@@ -489,6 +489,18 @@ export async function openDatabase() {
 					const multiEntry = index.endsWith('[]');
 					const indexName = multiEntry ? index.slice(0, -2) : index;
 					store.createIndex(indexName, indexName, { multiEntry });
+				}
+			};
+
+			/**
+			 * @template {keyof typeof Tables} T
+			 * @param {T} tableName
+			 * @param {(old: Record<string, any>) => Promise<Record<string, any>>} mutator
+			 */
+			const mutateRows = async (tableName, mutator) => {
+				for (const item of await tx.objectStore(tableName).getAll()) {
+					// @ts-expect-error
+					await tx.objectStore(tableName).put(await mutator(item));
 				}
 			};
 
@@ -537,6 +549,32 @@ export async function openDatabase() {
 
 			if (oldVersion === 7) {
 				rebuildIndexes('MetadataOption');
+			}
+
+			if (oldVersion === 8) {
+				const migrateAlternativesIn =
+					(/** @type {string} */ propertyname) =>
+					async (/** @type {Record<string, any>} */ entry) => ({
+						...entry,
+						[propertyname]: Object.fromEntries(
+							Object.entries(entry[propertyname]).map(
+								([id, { alternatives, ...rest }]) => [
+									id,
+									{
+										...rest,
+										confidences: alternatives,
+										alternatives: Object.entries(alternatives)
+											.filter(([, score]) => score >= 1)
+											.map(([value]) => value),
+									},
+								]
+							)
+						),
+					});
+
+				await mutateRows('Observation', migrateAlternativesIn('metadataOverrides'));
+				await mutateRows('Image', migrateAlternativesIn('metadata'));
+				await mutateRows('Session', migrateAlternativesIn('metadata'));
 			}
 
 			for (const [tableName, schema] of tablesByName) {

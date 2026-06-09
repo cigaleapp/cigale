@@ -12,7 +12,8 @@ import { compareBy, mapValues, nonnull, transformObject } from './utils.js';
 
 /**
  * @import * as DB from '$lib/database.js'
- * @import { DatabaseHandle } from '$lib/idb.svelte.js'
+ * @import { NamespacedMetadataID } from '$lib/schemas/common.js'
+ * @import { TypedMetadataValue } from '$lib/metadata/types.js'
  */
 
 /**
@@ -279,9 +280,11 @@ if (import.meta.vitest) {
 			).toMatchInlineSnapshot(`
 				{
 				  "metadata_date": {
-				    "alternatives": {},
+				    "alternatives": [],
 				    "confidence": 1,
+				    "confidences": {},
 				    "confirmed": false,
+				    "isDefault": false,
 				    "manuallyModified": false,
 				    "merged": true,
 				    "value": 2023-01-01T12:00:15.000Z,
@@ -290,17 +293,21 @@ if (import.meta.vitest) {
 				    "value": "A",
 				  },
 				  "metadata_float": {
-				    "alternatives": {},
+				    "alternatives": [],
 				    "confidence": 1,
+				    "confidences": {},
 				    "confirmed": false,
+				    "isDefault": false,
 				    "manuallyModified": false,
 				    "merged": true,
 				    "value": 10.124500000000001,
 				  },
 				  "metadata_integer": {
-				    "alternatives": {},
+				    "alternatives": [],
 				    "confidence": 1,
+				    "confidences": {},
 				    "confirmed": false,
+				    "isDefault": false,
 				    "manuallyModified": false,
 				    "merged": false,
 				    "value": 10,

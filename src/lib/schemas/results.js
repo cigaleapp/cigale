@@ -49,8 +49,10 @@ export const AnalyzedObservation = type({
  * @returns {Record<K, typeof import('$lib/schemas/metadata.js').MetadataRecordValue.infer>}
  */
 export function toMetadataRecord(values) {
-	return mapValues(values, ({ value, ...rest }) => ({
-		value: value instanceof Date ? value.toISOString() : value,
+	const prepareForJSON = (value) => (value instanceof Date ? value.toISOString() : value);
+	return mapValues(values, ({ value, alternatives, ...rest }) => ({
+		value: prepareForJSON(value),
+		alternatives: (alternatives ?? []).map(prepareForJSON),
 		...rest,
 	}));
 }
@@ -65,7 +67,8 @@ if (import.meta.vitest) {
 					confidence: 0.9,
 					manuallyModified: false,
 					confirmed: true,
-					alternatives: {
+					alternatives: [],
+					confidences: {
 						alt1: 0.7,
 					},
 				},
@@ -83,7 +86,8 @@ if (import.meta.vitest) {
 					confidence: 0.8,
 					manuallyModified: true,
 					confirmed: false,
-					alternatives: {
+					alternatives: [],
+					confidences: {
 						alt1: 0.7,
 					},
 				},
@@ -92,7 +96,8 @@ if (import.meta.vitest) {
 					confidence: 1,
 					manuallyModified: false,
 					confirmed: false,
-					alternatives: {
+					alternatives: [],
+					confidences: {
 						alt1: 0.7,
 					},
 				},
@@ -101,7 +106,8 @@ if (import.meta.vitest) {
 					confidence: 0,
 					manuallyModified: false,
 					confirmed: false,
-					alternatives: {
+					alternatives: [],
+					confidences: {
 						alt1: 0.7,
 					},
 				},

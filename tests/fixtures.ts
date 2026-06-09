@@ -116,8 +116,8 @@ export type AppFixture = {
 				protocolId?: string | null;
 			}): Promise<Record<string, RuntimeValue>>;
 			set(
-				/** The image's ID  */
-				imageId: string,
+				/** The image/observation's ID  */
+				subjectId: string,
 				/** The metadata key. If not namespaced, it'll be namespaced to the lightweight protocol's id */
 				key: RemoveNamespace<keyof typeof lightProtocol.metadata> | (string & {}),
 				/** The new value to set it as. Use null to remove the value  */
@@ -297,11 +297,19 @@ const _test = base.extend<
 							Object.entries(vals).map(([key, { parsedValue }]) => [key, parsedValue])
 						);
 					},
-					async set(imageId, key, value) {
-						const original = await getDatabaseRowById(page, 'Image', imageId);
+					async set(subjectId, key, value) {
+						const original =
+							(await getDatabaseRowById(page, 'Image', subjectId)) ??
+							(await getDatabaseRowById(page, 'Observation', subjectId));
 						if (!original) {
-							throw new Error(`Could not find image with ID ${imageId}`);
+							throw new Error(
+								`Could not find image or observation with ID ${imageId}`
+							);
 						}
+
+						const isObservation = "metadataOverrides" in original
+						const subjectType = isObservation  ? "Observation" : "Image"
+						const property = isObservation ? "metadataOverrides" : "metadata"
 
 						if (!key.includes('__')) {
 							key = `${lightProtocol.id}__${key}`;
@@ -309,17 +317,17 @@ const _test = base.extend<
 
 						if (value === null) {
 							await page.evaluate(
-								async ([imageId, key]) => {
-									const image = await window.DB.get('Image', imageId);
-									if (!image) {
-										throw new Error(`Could not find image with ID ${imageId}`);
+								async ([subjectType, subjectId, property, key]) => {
+									const subject = await window.DB.get(subjectType, subjectId);
+									if (!subject) {
+										throw new Error(`Could not find ${subjectType} with ID ${subjectId}`);
 									}
 
-									delete image.metadata[key];
+									delete subject[property][key];
 
-									await window.DB.put('Image', image);
+									await window.DB.put(subjectType, subject);
 								},
-								[imageId, key]
+								[subjectType, subjectId, property, key]
 							);
 							return;
 						}
@@ -335,25 +343,25 @@ const _test = base.extend<
 											confidence: value.confidence,
 											value: original.metadata[key]?.value,
 										}
-									: { value: JSON.stringify(value) };
+									: { confidence: 1, value: JSON.stringify(value) };
 
-						const updated: IDBDatabaseType['Image']['value'] = {
+						const updated: IDBDatabaseType['Image'|'Observation']['value'] = {
 							...original,
-							metadata: {
-								...original.metadata,
+							[property]: {
+								...original[property],
 								[key]: {
-									alternatives: {},
-									confidence: 1,
+									alternatives: [],
+									confidences: { [newValue.value]: newValue.confidence },
 									...newValue,
 								},
 							},
 						};
 
 						await page.evaluate(
-							async ([updated]) => {
-								await window.DB.put('Image', updated);
+							async ([subjectType, updated]) => {
+								await window.DB.put(subjectType, updated);
 							},
-							[updated]
+							[subjectType, updated]
 						);
 					},
 				},

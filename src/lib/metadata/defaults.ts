@@ -242,7 +242,7 @@ if (import.meta.vitest) {
 						confirmed: false,
 						manuallyModified: false,
 						isDefault: false,
-						alternatives: {},
+						alternatives: [],
 					},
 				})
 			);
@@ -268,7 +268,7 @@ if (import.meta.vitest) {
 						confirmed: false,
 						manuallyModified: false,
 						isDefault: true,
-						alternatives: {},
+						alternatives: [],
 					},
 				})
 			);
@@ -296,7 +296,7 @@ if (import.meta.vitest) {
 						confirmed: false,
 						manuallyModified: false,
 						isDefault: true,
-						alternatives: {},
+						alternatives: [],
 					},
 				})
 			);
@@ -410,7 +410,7 @@ if (import.meta.vitest) {
 							confirmed: false,
 							manuallyModified: false,
 							isDefault: false,
-							alternatives: {},
+							alternatives: [],
 						},
 					},
 					'proto'

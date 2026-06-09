@@ -43,7 +43,7 @@
 	import type { Attachment } from 'svelte/attachments';
 
 	import { Combobox, mergeProps } from 'bits-ui';
-	import { Debounced } from 'runed';
+	import { Debounced, watch } from 'runed';
 
 	import Logo from './Logo.svelte';
 	import { scrollfader } from './scrollfader.js';
@@ -96,15 +96,23 @@
 			});
 	});
 
+	// Only re-sort items when we open the combobox again,
+	// to prevent jumps while changing the selection
+	// svelte-ignore state_referenced_locally
+	let sortedItems = $state(items.toSorted(sorter));
+	watch([() => open, () => sorter], () => {
+		sortedItems = items.toSorted(sorter);
+	});
+
 	const filteredItems = $derived.by(() => {
 		if (searchValue === '') {
-			return [...items.toSorted(sorter)].map((item) => ({
+			return sortedItems.map((item) => ({
 				...item,
 				matchedFrom: item.label,
 			}));
 		}
 
-		return items
+		return sortedItems
 			.map((item) => ({
 				...item,
 				matchedFrom: searcher(searchValue, item),
@@ -118,12 +126,16 @@
 	}
 
 	function handleOpenChange(newOpen: boolean) {
+		// FIXME: does not clear the stored search value
+		// repro: type something in, close the combobox, re-open it:
+		// it remembers the search instead of clearing
 		if (!newOpen) searchValue = '';
 	}
 
 	const mergedRootProps = $derived(mergeProps(restProps, { onOpenChange: handleOpenChange }));
 	const mergedInputProps = $derived(
 		mergeProps(inputProps, {
+			placeholder: label,
 			oninput: handleInput,
 			onfocus: () => (open = true),
 			defaultValue: label,
@@ -180,10 +192,10 @@
 		<IconSearch />
 	</div> -->
 	<Combobox.Input {...mergedInputProps}>
-		{#snippet child({ props: { value: inputValue, ...props } })}
-			{@const effectiveValue = value ? (open ? inputValue : label) : ''}
+		{#snippet child({ props })}
+			{@const effectiveValue = value ? (open ? searchValue : label) : ''}
 			{#if searchbox}
-				{@render searchbox({ value: effectiveValue, ...props, focusSetter })}
+				{@render searchbox({ ...props, value: effectiveValue, focusSetter })}
 			{:else}
 				<input {...props} value={effectiveValue} {@attach focusSetter} />
 			{/if}
@@ -194,7 +206,13 @@
 		<Combobox.Content {...contentProps} sideOffset={8}>
 			<div class="viewport" data-testid={viewportTestId}>
 				<div class="items">
-					<VirtualList items={filteredItems} empty="Aucun résultat :/">
+					<VirtualList
+						// FIXME: doesnt seem to work that well
+						// Used to reset scroll every time the filtered items change
+						scroll={{ y: searchValue.length * 0 }}
+						items={filteredItems}
+						empty="Aucun résultat :/"
+					>
 						{#snippet item(item)}
 							<Combobox.Item
 								value={item.key}

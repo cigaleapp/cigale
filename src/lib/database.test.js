@@ -137,7 +137,8 @@ describe('MetadataValue', () => {
 			Schemas.MetadataValue.assert({
 				value: val,
 				confidence: 0.5,
-				alternatives: {},
+				alternatives: [],
+				confidences: {}
 			});
 
 		test('invalid', () => {

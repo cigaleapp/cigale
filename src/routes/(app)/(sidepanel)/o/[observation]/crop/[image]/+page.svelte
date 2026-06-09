@@ -291,7 +291,7 @@
 			confidence: 1,
 			manuallyModified: true,
 			value: FULL_IMAGE_CROPBOX,
-			alternatives: {},
+			confidences: {},
 			confirmed: true,
 		};
 
@@ -505,7 +505,7 @@
 				value: toCenteredCoords(newBoundingBox),
 				confidence: 1,
 				// Put the neural-network-inferred (initial) value in the alternatives as a backup
-				alternatives: initialCrops[imageId] ? [initialCrops[imageId]] : [],
+				confidences: initialCrops[imageId] ? [initialCrops[imageId]] : [],
 				manuallyModified: true,
 			});
 		} else if (
@@ -532,7 +532,7 @@
 				value: toCenteredCoords(newBoundingBox),
 				confidence: 1,
 				manuallyModified: true,
-				alternatives: [],
+				confidences: [],
 			});
 		} else {
 			// We're creating a >1st cropbox
@@ -562,7 +562,8 @@
 						confidence: 1,
 						manuallyModified: true,
 						confirmed: true,
-						alternatives: {},
+						alternatives: [],
+						confidences: {},
 					},
 				},
 			});

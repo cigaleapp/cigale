@@ -153,7 +153,8 @@ export async function importResultsZip(file, id) {
 				value: serializeMetadataValue(v.value),
 				confidence: v.confidence,
 				manuallyModified: v.manuallyModified,
-				alternatives: v.alternatives,
+				alternatives: v.alternatives.map(serializeMetadataValue),
+				confidences: v.confidences
 			})),
 		});
 
@@ -186,7 +187,8 @@ export async function importResultsZip(file, id) {
 				value: serializeMetadataValue(v.value),
 				confidence: v.confidence,
 				manuallyModified: v.manuallyModified,
-				alternatives: v.alternatives,
+				alternatives: v.alternatives.map(serializeMetadataValue),
+				confidences: v.confidences
 			})),
 		});
 

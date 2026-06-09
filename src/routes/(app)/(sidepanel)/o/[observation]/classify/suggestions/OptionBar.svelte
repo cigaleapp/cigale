@@ -16,7 +16,7 @@
 	import OverflowableText from '$lib/OverflowableText.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { undo } from '$lib/undo.svelte.js';
-	import { compareBy, entries, mapKeys, nonnull } from '$lib/utils.js';
+	import { compareBy, mapKeys, nonnull } from '$lib/utils.js';
 
 	interface Props {
 		observation: Observation;
@@ -42,7 +42,7 @@
 		if (!current) return {};
 		if (!option) return {};
 		return {
-			...mapKeys(current.alternatives, (k) => JSON.parse(k).toString() as string),
+			...mapKeys(current.confidences, (k) => JSON.parse(k).toString() as string),
 			[option.key]: current.confidence,
 		};
 	});
@@ -68,10 +68,6 @@
 		if (!observation) throw new Error('Image not found');
 		if (!focusedMetadata) throw new Error('No metadata focused');
 
-		const newAlternative = current
-			? { value: current.value, confidence: current.confidence }
-			: undefined;
-
 		await storeMetadataValue({
 			db: await openDatabase(),
 			sessionId: uiState.currentSessionId,
@@ -82,13 +78,6 @@
 			confidence: confidences[option.key] ?? 1,
 			manuallyModified,
 			confirmed,
-			alternatives: [
-				...(newAlternative ? [newAlternative] : []),
-				...entries(confidences).map(([value, confidence]) => ({
-					value,
-					confidence,
-				})),
-			],
 		});
 
 		if (pushToUndoStack && current) {

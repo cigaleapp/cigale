@@ -23,20 +23,13 @@
 		metadataValueValidatorNumeric,
 		metadataValueValidatorString,
 	} from './metadata/constraints.js';
+	import { serializeMetadataValue } from './metadata/index.js';
 	import MetadataInput from './MetadataInput.svelte';
 	import OverflowableText from './OverflowableText.svelte';
 	import { splitMetadataId } from './schemas/metadata.js';
 	import { isDebugMode } from './settings.svelte.js';
 	import { tooltip } from './tooltips.js';
-	import {
-		corsfixIfLocalhost,
-		mapKeys,
-		orEmpty,
-		orEmpty2,
-		pick,
-		safeJSONParse,
-		switchValue,
-	} from './utils.js';
+	import { corsfixIfLocalhost, orEmpty, pick, safeJSONParse, switchValue, compareBy } from './utils.js';
 	import WorldMap from './WorldMap.svelte';
 
 	type Props = {
@@ -56,8 +49,7 @@
 			data: {
 				value: undefined | RuntimeValue<T>;
 				unit?: undefined | typeof NumericUnit.infer;
-				/** Keys are **serialized** metadata values! not bare string */
-				alternatives?: Record<string, number>;
+				alternatives?: RuntimeValue<T>[];
 				nodes: {
 					metadata: HTMLElement | undefined;
 				};
@@ -83,7 +75,7 @@
 	}: Props = $props();
 
 	/** If we have addToAlternativesBySelect, the alternatives are already shown for enum metadata */
-	const showAlternatives = $derived(
+	const showSuggestions = $derived(
 		inputProps.addToAlternativesBySelect ? definition.type !== 'enum' : true
 	);
 
@@ -134,6 +126,11 @@
 
 	const optional = $derived(requiredness === 'all' && !definition.required);
 	const required = $derived(requiredness !== 'none' && definition.required);
+	const suggestions = $derived(
+		Object.entries(value?.confidences??{}).filter(([jsonValue]) => jsonValue !== serializeMetadataValue(value?.value))
+		.sort(compareBy(([, score]) => -score))
+		.slice(0, 3)
+	)
 
 	let element = $state<HTMLElement>();
 </script>
@@ -183,20 +180,18 @@
 		</div>
 	{/if}
 
-	{#if showAlternatives && value && Object.keys(value.alternatives).length > 0}
+	{#if showSuggestions && value && suggestions.length > 0}
 		<section class="alternatives">
-			<div class="title">Alternatives</div>
+			<div class="title">Suggestions</div>
 			<ul class="options">
 				<!-- TODO add expand button to show all alternatives -->
-				{#each Object.entries(value.alternatives)
-					.sort(([, a], [, b]) => b - a)
-					.slice(0, 3) as [jsonValue, confidence] (jsonValue)}
+				{#each suggestions as [jsonValue, confidence] (jsonValue)}
 					{@const stringValue = safeJSONParse(jsonValue)?.toString()}
 					<li>
 						<div class="value">
 							<LoadingText
 								value={async () =>
-									metadataOption(databaseHandle(), definition.id, stringValue)}
+									metadataOption(databaseHandle(), definition.id, stringValue).catch(() => null)}
 							>
 								{#snippet loaded(option)}
 									{option?.label ?? stringValue}
@@ -210,7 +205,7 @@
 								value = {
 									value: JSON.parse(jsonValue),
 									confidence,
-									alternatives: value?.alternatives ?? {},
+									confidences: value?.confidences ?? {},
 								};
 								await onchange({
 									value: value?.value,
@@ -316,9 +311,13 @@
 		unit={value?.unit}
 		{validationErrors}
 		{isCompactEnum}
-		alternatives={value?.alternatives
-			? mapKeys(value.alternatives, (key) => safeJSONParse(key)?.toString())
-			: undefined}
+		confidences={value
+			? {
+					[serializeMetadataValue(value.value)]: value.confidence,
+					...value.confidences,
+				}
+			: {}}
+		alternatives={value?.alternatives ?? []}
 		onblur={async (val, unit, alternatives) => {
 			// We eagerly update value.unit because otherwise it gets updated after the DB changes
 			// the validator would update separately to the unit+value change
@@ -328,22 +327,12 @@
 			await onchange({
 				value: val,
 				unit,
-				alternatives: mapKeys(alternatives ?? {}, (key) => JSON.stringify(key)),
+				alternatives,
 				nodes: { metadata: element },
 			});
 
 			validation = val !== undefined ? valueValidator?.(val) : undefined;
 		}}
-		confidences={Object.fromEntries([
-			...Object.entries(value?.alternatives ?? {}).map(([key, value]) => [
-				safeJSONParse(key)?.toString(),
-				value,
-			]),
-			...orEmpty2(value, ({ value, confidence }) => [
-				safeJSONParse(value)?.toString(),
-				confidence,
-			]),
-		])}
 	/>
 {/snippet}
 

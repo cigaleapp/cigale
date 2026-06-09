@@ -177,25 +177,25 @@ test('selecting multiple images', issue(1054), async ({ page, app }) => {
 	    - img "Image 3 de la sélection"
 	    - heading "3 observations" [level=2]
 	    - text: Espèce
-	    - combobox: Entomobrya muscorum
+	    - combobox "Entomobrya muscorum"
 	    - code: /\\d+%/
 	    - img
 	    - button "Supprimer cette valeur":
 	      - img
-	    - text: Alternatives
+	    - text: Suggestions
 	    - list:
 	      - listitem:
+	        - text: Orchesella cincta
+	        - code: /\\d+%/
+	        - button:
+	          - img
+	      - listitem:
+	        - text: Allacma fusca
+	        - code: /\\d+%/
+	        - button:
+	          - img
+	      - listitem:
 	        - text: Dicyrtomina saundersi
-	        - code: /\\d+%/
-	        - button:
-	          - img
-	      - listitem:
-	        - text: Tomocerus vulgaris
-	        - code: /\\d+%/
-	        - button:
-	          - img
-	      - listitem:
-	        - text: Sminthurus viridis
 	        - code: /\\d+%/
 	        - button:
 	          - img
@@ -204,12 +204,12 @@ test('selecting multiple images', issue(1054), async ({ page, app }) => {
 	      - text: Taxonomie
 	      - paragraph: Classification taxonomique de l'espèce
 	      - text: Genre
-	      - combobox: Entomobrya
+	      - combobox "Entomobrya"
 	      - code: /\\d+%/
 	      - img
 	      - button "Supprimer cette valeur":
 	        - img
-	      - text: Alternatives
+	      - text: Suggestions
 	      - list:
 	        - listitem:
 	          - text: Dicyrtomina
@@ -217,23 +217,28 @@ test('selecting multiple images', issue(1054), async ({ page, app }) => {
 	          - button:
 	            - img
 	        - listitem:
-	          - text: Tomocerus
+	          - text: Orchesella
 	          - code: /\\d+%/
 	          - button:
 	            - img
 	        - listitem:
-	          - text: Entomobrya
+	          - text: Allacma
 	          - code: /\\d+%/
 	          - button:
 	            - img
 	      - text: Famille
-	      - combobox: Entomobryidae
+	      - combobox "Entomobryidae"
 	      - code: /\\d+%/
 	      - img
 	      - button "Supprimer cette valeur":
 	        - img
-	      - text: Alternatives
+	      - text: Suggestions
 	      - list:
+	        - listitem:
+	          - text: Sminthuridae
+	          - code: /\\d+%/
+	          - button:
+	            - img
 	        - listitem:
 	          - text: Dicyrtomidae
 	          - code: /\\d+%/
@@ -244,26 +249,16 @@ test('selecting multiple images', issue(1054), async ({ page, app }) => {
 	          - code: /\\d+%/
 	          - button:
 	            - img
-	        - listitem:
-	          - text: Entomobryidae
-	          - code: /\\d+%/
-	          - button:
-	            - img
 	      - text: Ordre
-	      - combobox: Entomobryomorpha
+	      - combobox "Entomobryomorpha"
 	      - code: /\\d+%/
 	      - img
 	      - button "Supprimer cette valeur":
 	        - img
-	      - text: Alternatives
+	      - text: Suggestions
 	      - list:
 	        - listitem:
 	          - text: Symphypleona
-	          - code: /\\d+%/
-	          - button:
-	            - img
-	        - listitem:
-	          - text: Entomobryomorpha
 	          - code: /\\d+%/
 	          - button:
 	            - img
@@ -272,18 +267,23 @@ test('selecting multiple images', issue(1054), async ({ page, app }) => {
 	          - code: 5%
 	          - button:
 	            - img
+	        - listitem:
+	          - text: Neelipleona
+	          - code: 0.8%
+	          - button:
+	            - img
 	      - text: Classe
-	      - combobox: Collembola
+	      - combobox "Collembola"
 	      - code: /\\d+%/
 	      - button "Supprimer cette valeur":
 	        - img
 	      - text: Phylum
-	      - combobox: Arthropoda
+	      - combobox "Arthropoda"
 	      - code: /\\d+%/
 	      - button "Supprimer cette valeur":
 	        - img
 	      - text: Règne
-	      - combobox: Animalia
+	      - combobox "Animalia"
 	      - code: /\\d+%/
 	      - button "Supprimer cette valeur":
 	        - img
@@ -365,16 +365,16 @@ test('selecting multiple images', issue(1054), async ({ page, app }) => {
 	    - group:
 	      - img
 	      - text: Andrènes
-	    - button /^Regrouper /:
+	    - button "Regrouper Ctrl + G":
 	      - img
 	      - text: ""
-	    - button /^Séparer /:
+	    - button "Séparer Ctrl + Shift + G":
 	      - img
 	      - text: ""
-	    - button /^Ouvrir en plein écran / [disabled]:
+	    - button "Ouvrir en plein écran Ctrl + ⏎" [disabled]:
 	      - img
 	      - text: ""
-	    - button /^Supprimer 3 images /:
+	    - button "Supprimer 3 images Suppr":
 	      - img
 	      - text: ""
 	`);
