@@ -37,6 +37,12 @@ beforeEach(async () => {
 	const db = await openDatabase();
 	await db.clear('Metadata');
 	await db.clear('MetadataOption');
+	await db.put('Protocol', {
+		id: 'mockproto',
+		metadata: ['mockproto__genus', 'mockproto__difficulty'],
+		// TODO: test with imported metadata too
+		importedMetadata: [],
+	});
 });
 
 describe('complex case with multiple metadata in the cascades', () => {
