@@ -2753,3 +2753,7 @@ msgstr "Copier"
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/CandidatesListXper3.svelte
 msgid "Exporter la liste des candidats restants vers Xper3"
 msgstr "Exporter la liste des candidats restants vers Xper3"
+
+#: src/lib/Xper3Logo.svelte
+msgid "Artboard1"
+msgstr "Artboard1"
