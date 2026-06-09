@@ -10,13 +10,7 @@
 	"source": "https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/idmybee.cigaleprotocol.json",
 	"authors": [],
 	"sessionMetadata": {},
-	"imports": [
-		{
-			"from": "io.github.cigaleapp.arthropods.example",
-			"metadataGroups": ["taxonomy"],
-			"metadata": ["crop", "conservation_status", "identification_difficulty"]
-		}
-	],
+	"imports": [],
 	"metadataOrder": [
 		"morphogroup",
 		"io.github.cigaleapp.arthropods.example__prospection_duration",
@@ -210,7 +204,7 @@
 			"required": true,
 			"description": "",
 			"mergeMethod": "max",
-			"infer": { "neural": [] },
+			"classification": true,
 			"options": [
 				{
 					"key": "1357691",
@@ -223,6 +217,7 @@
 					"description": "Andrena aeneiventris se reconnaît à la combinaison de poils squameux sur le scutum, à la petite taille du corps et à l'éclat bronzé du tégument tergal. Elle ne peut être confondue qu'avec A. hedikae qui peut être séparée par la ponctuation tergale qui est dense et distincte, en particulier latéralement sur T2-3. En revanche, chez A. aeneiventris, les tergites ne sont que faiblement ponctués, avec de faibles ponctuations qui se fondent dans la chagrination sous-jacente.",
 					"learnMore": "https://gbif.org/species/1357691",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 0,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1YOIIwWgwCEcLUFY8V0wDG5OoVJfjgDx4&sz=w1000",
 						"https://drive.google.com/thumbnail?id=17E5d9S1hpybmQ5J_ZnyjLSCAhcEcLCpY&sz=w1000"
@@ -496,6 +491,7 @@
 					"key": "1357907",
 					"label": "Andrena afrensis",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 144,
 					"description": "<b> Attention, cette espèce n'a été codée que sur la base de la littérature, nous vous conseillons donc de ne vous fier à cette identification qu'après le recoupement avec d'autres ressources taxonomiques. </b> <br>\nAndrena afrensis femelle peut être placée dans le sous-genre \"étendu\" Plastandrena grâce à la combinaison des caractères suivants : triangle du propodéum avec des rugosités, éperon tibial postérieur élargi à sa base, pas de ride latérale sur le pronotum, propodéum non brillant et fortement ponctué. Les poils entourant la plaque pygidiale sont sombre au centre et blancs sur les côtés et les faces latérales du propodéum présentent des rugosités importantes, ce qui place cette espèce dans l'ancien sous-genre Agandrena, avec A. agilissima et A. asperrima. Andrena asperrima peut être séparée grâce à sa ponctuation sur les tergites qui est extrêmement dense, avec des points qui se touchent presque et des interstices surélevés, alors que chez A. afrensis, la ponctuation des tergites est plus éparse, sans interstices surélevés. Andrena agilissima est morphologiquement extrêmement similaire mais ses tergites ont des reflets bleu-métallique tandis que ceux de A. afrensis sont entièrement noirs, sans reflets.",
 					"synonyms": ["Andrena (Plastandrena) afrensis"],
 					"images": [
@@ -693,6 +689,7 @@
 					"key": "10365481",
 					"label": "Andrena afzeliella",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 166,
 					"description": "",
 					"synonyms": ["Andrena (Taeniandrena) afzeliella"],
 					"images": [],
@@ -984,6 +981,7 @@
 					"description": "**Ordre : Hymenoptera**  \n**Sous-ordre : Apocrita**  \n**Infra-ordre :**   \n**Super famille : Apoidea**  \n**Famille : Andrenidae**  \n**Sous-famille : Andreninae**  \n**Tribu :**   \n**Genre : _Andrena_**  \n**Espèce : _Andrena agilissima_**\n\n**Identification** : L’Andrène agile (_Andrena agilissima_) est une abeille robuste noire et blanche. Son abdomen est noir a reflets bleus, avec des touffes de poils sur les côtés des derniers tergites. Le thorax possède peu de poils sur le dessus et quelques poils blancs sur les côtés. Les ailes sont très enfumées et avec des reflets bleus. Elle possède une pilosité blanche sur la face.  \nLa brosse de récolte de la femelle est constituée de poils blancs.\n\n**Taille** : 15 mm environ.\n\n**Période de vol** : D’avril à juin.\n\n**Fleurs visitées** : Brassicacées.\n\n**Nidification** : Cette espèce préfère nicher dans les parois verticales.\n\n**Espèces semblables** :  \n_Andrena afrensis_ lui ressemble beaucoup, la cuticule de l’abdomen est moins lisse et moins bleue, et les touffes de poils sur les côtés des derniers segments abdominaux sont plus petites.  \n_Andrena asperrima_ lui ressemble également beaucoup, la cuticule de l’abdomen est aussi plus rugueuse, avec une forte ponctuation sur T1.  \n_Andrena albopunctata_ a les poils du thorax et de la face noirs, les touffes latérales des tergites dessinent des taches bien nettes.  \n_Andrena morio_ a les poils de la face et de la patte 3 (pour la femelle) noirs.  \n_Andrena pilipes_ a les poils du thorax et de la face noirs.  \n_Andrena nigrospina_ n’a pas les touffes de poils blanches sur les côtés des tergites et les poils de sa face sont moins blancs.  \n_Andrena bicolorana_ n’a pas les ailes enfumées et le thorax possède de longs poils blancs.  \n_Andrena cineraria_ a les poils de la corbeille entièrement noirs (femelle), le thorax est souvent plus velu et les ailes pas ou très peu enfumées.  \n_Andrena proxima_ n’a pas les ailes enfumées.  \n_Andrena vaga_ a le thorax bien velu et les ailes hyalines.\n\n**Sources** :  \n[https://www.insecte.org/](https://www.insecte.org/)  \n[http://lejardindelucie.blogspot.com/](http://lejardindelucie.blogspot.com/)  \n[http://www.bwars.com/](http://www.bwars.com/)",
 					"learnMore": "https://jessica-joachim.com/insectes/hymenopteres/andrenidae/andrene-agile-andrena-agilissima/",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 139,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1bE0t7f5IuMixF5kIuUdo-Kbjwl01Ht7g&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1pPKNSr29YRr-tnhwIA2sGBpTO25CDbIr&sz=w1000",
@@ -1273,6 +1271,7 @@
 					"description": "**_Andrena albopunctata_** **(Rossi, 1792)**\n\n**Risques de confusions** :  \n  \n**_Andrena afrensis_**, **_Andrena agilissima_** et **_Andrena asperrima_** ont des soies blanches sur le thorax et la face\n\n**Habitat, répartition** : Espèce méditerranéenne.\n\n**Photographies :**  \n© [Marion Metzer](https://www.inaturalist.org/people/marionmetzer) \\- [CC-BY-NC](https://creativecommons.org/licenses/by-nc/4.0/)\n\n**Sources :**\n\n[Inaturalist](https://www.inaturalist.org/taxa/542051-Andrena-albopunctata#taxonomy-tab)\n\n[GBIF](https://www.gbif.org/species/1356996)  \n  \n[The genus](https://jhr.pensoft.net/article/101873/) _[Andrena](https://jhr.pensoft.net/article/101873/)_ [in the Iberian Peninsula](https://jhr.pensoft.net/article/101873/)",
 					"learnMore": "https://www.gbif.org/species/1356996",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 93,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1rzvlK2OdaOLOE0teiEwQvCHNwoOuyyWg&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1YjWh2rKpPUbTL1fvXQd2yI0KVHBLOHIh&sz=w1000",
@@ -1568,6 +1567,7 @@
 					"description": "",
 					"learnMore": "https://gbif.org/species/1357170",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 104,
 					"images": [
 						"https://drive.google.com/thumbnail?id=17pZz7foHuoE8340XUg_Kkw3M-rHnfx3y&sz=w1000"
 					],
@@ -1839,6 +1839,7 @@
 					"key": "1357285",
 					"label": "Andrena allosa",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 40,
 					"description": "",
 					"synonyms": ["Andrena (Euandrena) allosa"],
 					"images": [],
@@ -2136,6 +2137,7 @@
 					"key": "1357344",
 					"label": "Andrena alutacea",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 119,
 					"description": "",
 					"synonyms": ["Andrena (Micrandrena) alutacea"],
 					"images": [],
@@ -2405,6 +2407,7 @@
 					"key": "9911520",
 					"label": "Andrena amieti",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 52,
 					"description": "<b> Attention, cette espèce n'a été codée que sur la base de la littérature, nous vous conseillons donc de ne vous fier à cette identification qu'après le recoupement avec d'autres ressources taxonomiques. </b> <br> \nAndrena amieti peut être reconnue comme une Euandrena en raison des fovéas faciales qui sont étroites et en forme de goutte, se rétrécissant encore plus ventralement, combinées aux scopae tibiales à poils simples. Les Euandrena sont très difficiles à identifier et il convient d'être prudent, idéalement en consultant des spécimens déterminés avec certitude ou munis d'un code-barres ; consulter également la clé d'identification de Praz et al. (2019). Andrena amieti est la plus proche d'A. bicolor Fabricius et d'A. allosa Warncke en raison des poils sombres composant la frange apicale de T5 et encadrant la plaque pygidiale et de la présence de poils sombres latéralement sur le mesepisternum. Elle diffère d'A. bicolor par la présence de longs poils noirs sur le scutum et généralement sur le scutellum (A. bicolor a tout au plus des poils noirs courts occasionnels sur le scutum). Le propodeum d'A. amieti présente également de longs poils noirs, alors qu'ils sont généralement entièrement clairs chez A. bicolor. Andrena amieti peut être séparée de A. allosa par le clypéus et l'espace malaire plus courts (clypéus allongé, nettement saillant et espace malaire aussi long que la largeur basale de A3 chez A. allosa).",
 					"synonyms": ["Andrena (Euandrena) amieti"],
 					"images": [
@@ -2622,6 +2625,7 @@
 					"key": "1357429",
 					"label": "Andrena ampla",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 121,
 					"description": "Sa petite taille, sa couleur noire, son triangle propodéal avec des fortes rugosités, son scutum avec une ponctuation forte et dense ainsi que son clypéus avec des stries latérales permettent de placer Andrena ampla dans le groupe proxima (anciennement sous-genre Proxiandrena, maintenant intégré dans le sous-genre Micrandrena étendu). Il est nécessaire de séparer A. ampla des espèces très similaires A. alutacea et A. proxima. Chez A. alutacea, T3-4 sont chagrinés sans reflets brillants évidents, les tergites sont généralement non ponctuées ou avec une faible ponctuation latéralement, alors que chez A. ampla les tergites ont des reflets brillants et une ponctuation visible sur les disques de T3-4 au moins. Andrena proxima n'a pas de ponctuation claire sur les disques de T2-4 et la pilosité du scutum est composée entièrement de poils clair en vue latérale. Chez A. ampla, la pilosité du scutum est composée des poils clairs plus longs mélangés à des poils noirs plus courts. Chez les spécimen frais, les bandes tergales de A. proxima sont jaunâtres alors qu'ils sont blancs chez A. ampla.  En général, l’identification se fait mieux avec un accès à du matériel de référence déterminé avec confiance, particulièrement lorsqu’on examine des spécimens provenant de zones de contact connues entre ces trois taxons (principalement autour de la Suisse).",
 					"synonyms": ["Andrena (Micrandrena) ampla"],
 					"images": [
@@ -2921,6 +2925,7 @@
 					"description": "Andrena angustior peut être reconnue au sein d'une Euandrena élargie grâce à la combinaison de fovéas en forme de goutte qui se rétrécissent ventralement et d'une scopa composée de poils simples (non plumeux). En raison de ses marges tergales larges et impressionnées, de son clypéus avec une impression longitudinale centrale et de la morphologie de la tête du mâle, elle est la plus proche d'A. fulvata et d'A. lavandulae (=A. impressa) qui étaient historiquement considérées comme des sous-espèces d'A. angustior. Andrena angustior peut être séparée de ces deux taxons par la structure des marges tergales qui sont larges, déprimées, avec une surface lisse et brillante. Chez A. fulvata, les marges tergales sont fortement chagrinée et mattes, et chez A. lavandulae, les marges tergales sont chagrinée et seulement faiblement brillantes. Ce taxon peut également être séparé par les poils de la plaque pygidiale qui sont noirs, alors qu'ils sont bruns chez A. angustior.",
 					"learnMore": "https://gbif.org/species/1357490",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 46,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1ICM-W2Wm7XPs7VlprN2aWWctKwVQMn5z&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1bpzMbWFNBWD9msXwjeksy305b3ZjxeHv&sz=w1000"
@@ -3193,6 +3198,7 @@
 					"key": "1358360",
 					"label": "Andrena anthrisci",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 122,
 					"description": "Andrena anthrisci peut être reconnu comme une Micrandrena en raison de sa petite taille, de sa couleur noire et du triangle propodéal avec des rugosités. Les marges tergales sont déprimées, et les tergites n'ont pas de gradulus (plus clairement visible latéralement sur T2-3), la plaçant proche de A. semilaevis, A. omnilaevis, et A. pirinia.  Andrena omnilaevis est confinée au nord-ouest de l’Ibérie où elle ne se trouve pas en sympatrie avec les autres taxons. De plus, elle a des tergites entièrement brillants alors qu'A. anthrisci et les autres taxons ont au moins un certain degré de chagrination sur les disques tergaux. Il faut faire attention lors de la séparation d’A. semilaevis, qui présente une marge de T2 fortement déprimée et brillante (chez A. anthrisci la marge de T2 est faiblement déprimée et chagrinée), et les franges latérales qui dépassent des marges tergales sont plus longues et projetées latéralement à un angle de 45°, particulièrement net sur T2 (chez A. anthrisci les franges latérales qui dépassent des marges sont plus courtes et parallèles au profil métasomal). Enfin, A. pirinia n’est connue que dans les montagnes du sud de la Bulgarie et est proche d’A. anthrisci au niveau des marges des tergites chagrinées. Cependant, le clypéus est plus densément ponctué (distance moyenne entre les points 0,5-1 fois le diamètre d'un point), chez A. anthrisci, il est moins fortement et plus irrégulièrement ponctué (distance moyenne entre les points 1-2 fois le diamètre d'un point). Les fovéas sont comparativement plus larges, occupant 1/2 de l’espace entre l’ocelle latéral et l’œil composé (comparativement plus étroit, occupant 1/3 de cet espace chez A. anthrisci), le scutum est plus finement et régulièrement ponctué, distance moyenne entre les points 1 fois le diamètre d'un point (ponctuation plus grossière et irrégulière chez A. anthrisci, distance moyenne entre les points 1-2 fois le diamètre d'un point), et les disques des tergites ont peu de ponctuations, fines et dispersées (T2 latéralement, T3-4 largement ponctués, points séparés par 1-2 fois le diamètre d'un point chez A. anthrisci).",
 					"synonyms": ["Andrena (Micrandrena) anthrisci"],
 					"images": [
@@ -3463,6 +3469,7 @@
 					"key": "1357581",
 					"label": "Andrena antigana",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 156,
 					"description": "Andrena antigana peut être rapidement placée dans le sous-genre Simandrena grâce aux corbeilles complètes du propodéum entourant les faces latérales du propodéum glabres. Le scutum est densément chagriné et complètement imponctué, la plaçant proche de A. cilissaeiformis (non-présente en France) et A. vetula. Elle peut être séparée des deux taxons grâce à la marge externe de la fovéa (la marge la plus proche de l’œil composé) qui a un coude visible aux 2/3 vers le haut. La marge extérieure est droite chez A. cilissaeiformis et A. vetula.",
 					"synonyms": ["Andrena (Simandrena) antigana"],
 					"images": [],
@@ -3723,6 +3730,7 @@
 					"key": "11463831",
 					"label": "Andrena antonellae",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 167,
 					"description": "",
 					"synonyms": ["Andrena (Taeniandrena) antonellae"],
 					"images": [
@@ -4022,6 +4030,7 @@
 					"description": "",
 					"learnMore": "https://gbif.org/species/1357628",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 3,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1F25pjwk8NYy2jwUtp_2DxKERZTvyQE5J&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1fx_qpLSG3ERNWPimOo3rB_Udch-4pqSF&sz=w1000",
@@ -4240,6 +4249,7 @@
 					"description": "Andrena argentata peut être identifiée comme une Leucandrena grâce à la combinaison d'un appendice étroit du labre, d'un clypéus faiblement bombé, d'un pronotum à ride latérale (faible), d'un métasoma bandé et d'une plaque pygidiale avec une zone centrale surélevée. Son tégument tergal sombre, son appendice arrondi du labre et ses fovéas comparativement étroites qui occupent la moitié de l'espace entre l'œil composé et les ocelles latéraux la rapproche le plus de A. barbilabris, mais elle peut en être séparée par la taille plus petite de son corps, ses bandes de poils tergales comparativement plus fortes et son scutum partiellement brillant (entièrement chagriné chez A. barbilabris).",
 					"learnMore": "https://gbif.org/species/1357709",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 79,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1Td9UUGuIvbQWCylMv9modMT3wCyWsWsB&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1pG_Wcx_gIaS7HgYkfTj1puDLnrqLhbyG&sz=w1000"
@@ -4527,6 +4537,7 @@
 					"key": "1357848",
 					"label": "Andrena asperrima",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 145,
 					"description": "Andrena asperrima femelle peut être placée dans le sous-genre \"étendu\" Plastandrena grâce à la combinaison des caractères suivants : triangle du propodéum avec des rugosités, éperon tibial postérieur élargi à sa base, pas de ride latérale sur le pronotum, propodéum non brillant et fortement ponctué. Les poils entourant la plaque pygidiale sont sombre au centre et blancs sur les côtés et les faces latérales du propodéum présentent des rugosités importantes, ce qui place cette espèce dans l'ancien sous-genre Agandrena, avec A. agilissima et A. afrensis. Andrena asperrima peut être séparée grâce à sa ponctuation sur les tergites qui est extrêmement dense, avec des points qui se touchent presque et des interstices surélevés, alors que chez A. afrensis, la ponctuation des tergites est plus éparse, sans interstices surélevés.",
 					"synonyms": ["Andrena (Plastandrena) asperrima"],
 					"images": [
@@ -4787,6 +4798,7 @@
 					"key": "1357890",
 					"label": "Andrena assimilis",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 95,
 					"description": "Andrena assimilis peut être reconnue comme une Melandrena en raison de la grande taille de son corps, de son tégument noir, de sa longue distance ocello-occipitale (plus de deux fois le diamètre d'un ocelle latéral), de sa pilosité noire et brune et de l'absence de caractères morphologiques distinctifs (triangle propodéal simple, éperons tibiaux postérieurs non élargis et pronotum dépourvu de ride latérale). Sa pilosité mésosomale brune combinée à sa pilosité faciale noire et à son scopa la rapproche d'A. limata et d'A. thoracica. Elle peut être séparée par la structure des tergites, car les disques tergaux sont chagrinés et obscurément ponctués, alors que chez A. limata et A. thoracica les disques tergaux sont brillants et fortement et densément ponctués.",
 					"synonyms": ["Andrena (Melandrena) assimilis"],
 					"images": [
@@ -5067,6 +5079,7 @@
 					"key": "1357871",
 					"label": "Andrena avara",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 15,
 					"description": "<b> Attention, cette espèce n'a été codée que sur la base de la littérature, nous vous conseillons donc de ne vous fier à cette identification qu'après le recoupement avec d'autres ressources taxonomiques. </b> <br>",
 					"synonyms": ["Andrena (Avandrena) avara"],
 					"images": [
@@ -5260,6 +5273,7 @@
 					"key": "1358155",
 					"label": "Andrena barbareae",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 88,
 					"description": "",
 					"synonyms": ["Andrena (Melandrena) barbareae"],
 					"images": [
@@ -5542,6 +5556,7 @@
 					"description": "Andrena barbilabris peut être identifiée comme une Leucandrena grâce à la combinaison d'un appendice étroit du labre, d'un clypéus faiblement bombé, d'un pronotum à ride latérale (faible), d'un métasoma bandé et d'une plaque pygidiale avec une zone centrale surélevée. Son tégument tergal sombre, son processus arrondi du labrum et ses fovéas comparativement étroites qui occupent la moitié de l'espace entre l'œil composé et les ocelles latéraux la placent le plus près de A. argentata, mais elle peut être séparée par la taille plus grande du corps, les bandes de poils comparativement plus faibles et le scutum entièrement chagriné (au moins partiellement brillant chez A. argentata).",
 					"learnMore": "https://gbif.org/species/1358165",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 80,
 					"images": [
 						"https://drive.google.com/thumbnail?id=17EsWgun3vDu1d4rWJvQeNMD8Kvt75L_K&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1MPzQmy7Lxm2hWrMwEdyaS56XQOsJYPW4&sz=w1000"
@@ -5856,6 +5871,7 @@
 					"description": "Andrena bicolor peut être reconnue comme une Euandrena grâce aux fovéas étroites en forme de goutte qui se rétrécissent ventralement, et grâce aux poils simples des scopae. Il n'est pas possible de résumer son identification ici, en raison de l'incroyable variabilité morphologique de ce taxon et du grand nombre d'espèces cryptiques dans la faune européenne. Il faut utiliser des clés locales détaillées qui comprennent et prennent en compte les faunes locales et leurs variations. Andrena bicolor est l'Euandrena européenne la plus commune et la plus répandue et devrait être considérée comme le taxon « par défaut ». Le clypéus n'a pas de ligne longitudinale (groupe angustior), la pilosité est typiquement noire et brun-orange, la pilosité brun-orange se limitant au mésosoma, aux scopae tibiales et à de faibles bandes de poils tergales. Les tergites présentent typiquement une faible ponctuation, mais celle-ci est variable.",
 					"learnMore": "https://gbif.org/species/1356887",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 41,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1Ryt9IBrZbEVuqALNOFLAR7mO_wDIg7ZS&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1IYLItVgT0-7-QLpy-BgQBY8jR2UPNVNE&sz=w1000"
@@ -6154,6 +6170,7 @@
 					"key": "1356918",
 					"label": "Andrena bicolorata",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 101,
 					"description": "**_Andrena bicolorata_** **(Rossi, 1790)**\n\n**Risques de confusions** :\n\n\\- **_Andrena vaga_** a la pilosité antérieure du fémur 3 et du flocculus blanche, elle possède des touffes de poils blancs sur les côtés des tergites, le disque de son thorax est habituellement densément velu, récolte le pollen des saules, sa face possède au moins quelques soies blanche, ses fovéas larges et non creusées.\n\n\\- **_Andrena cineraria_** et **_Andrena barbareae_** possèdent une bande transversale de poils noirs sur le thorax\n\n\\- **_Andrena morio_** peut avoir les soies du thorax assez claires mais elles sont limitées à la moitié antérieure de ce dernier et ses ailes sont fortement enfumées.\n\n**Habitat, répartition** : Espèce distribuée dans le bassin méditerranéen. En France, en région méditerranéenne, vers l’ouest remonte la vallée de la Garonne.\n\n**Biologie** : Cette espèce récolte le pollen des Brassicaceae\n\n**Photographies :**\n\n© [Marc Thibault](https://www.inaturalist.org/people/marcthibault) \\- [CC-BY-NC](https://creativecommons.org/licenses/by-nc/4.0/) \\- Photo principale\n\n© [Claudia Fernández Bagan](https://www.inaturalist.org/people/claudiafb) \\- [CC-BY-NC](https://creativecommons.org/licenses/by-nc/4.0/) \\- Face\n\n**Sources :**\n\n[Inaturalist](https://www.inaturalist.org/taxa/573448-Andrena-bicolorata)\n\n[GBIF](https://www.gbif.org/species/1356918)\n\n[The genus](https://jhr.pensoft.net/article/101873/) _[Andrena](https://jhr.pensoft.net/article/101873/)_ [in the Iberian Peninsula](https://jhr.pensoft.net/article/101873/)",
 					"synonyms": ["Andrena (Melandrena) bicolorata"],
 					"images": [
@@ -6463,6 +6480,7 @@
 					"description": "❝\n\n_Cette grande andrène vole en deux générations, la première apparaissant dès le mois de mars_\n\n**Ordre : Hymenoptera**  \n**Sous-ordre : Apocrita**  \n**Infra-ordre :**   \n**Super famille : Apoidea**  \n**Famille : Andrenidae**  \n**Sous-famille : Andreninae**  \n**Tribu :**   \n**Genre : _Andrena_**  \n**Espèce : _Andrena bimaculata_**\n\n#### Identification\n\n_Andrena bimaculata_ a un corps à cuticule très sombre (parfois rougeâtre sur les côtés de T1 et T2 et l’apex des tergites) et à pilosité claire. Cette dernière est clairsemée sur l’abdomen, avec une fine bande apicale sur les tergites. Le tibia et le tarse 3 ont une cuticule noire. Les ailes sont hyalines à 3 cellules cubitales. L’enclos propodéal a une sculpture rugueuse, faite de carènes reliées entre elles entourant des zones brillantes.  \nLe **mâle** a les poils de la face noirs, 13 segments antennaires et 7 tergites.  \nLa **femelle** a 12 segments antennaires et 6 tergites. La pilosité de sa face est noire et brune. Elle possède une scopa bicolore et la frange anale est noire.\n\n#### Taille\n\n13-14 mm.\n\n#### Habitat\n\nLandes et zones côtières.\n\n#### Répartition géographique\n\nIncomplète\n\n#### Période de vol\n\nIl y a deux générations, de mars à mai puis de juin à août.\n\n#### Plantes butinées\n\nPolylectique, apprécie les saules et les ajoncs au printemps, les Rosacées, les ombellifères et les armoises en été.\n\n#### Nid\n\nIl est creusé dans le sol. L’espèce niche isolément ou en petites agrégations.\n\n#### Parasites\n\n- **Hyménoptère Apidae** : _Nomada fulvicornis_  \n- **Strepsiptera Stylopidae** : _Stylops bimaculatae_\n\n#### Espèces semblables\n\nLa plupart des espèces de genre sont très complexes à identifier. Celle-ci a été déterminée sur insecte.org. La liste suivante est loin d’être complète et suffisante.  \n- **_Andrena tibialis_** serait la plus proche mais ses tibias et tarses 3 ont la cuticule orange et sa pilosité abdominale tire plus sur le gris.  \n- _**Andrena nigroaenea**_ n’a pas le propodeum rugueux.\n\n#### Sources\n\n- [Le Monde des insectes](https://www.insecte.org/)  \n- [Catalogue et clé des sous-genres et espèces du genre _Andrena_ de Belgique et du nord de la France (Hymenoptera, Apoidea)](http://www.atlashymenoptera.net/biblio/01500/Patiny_&_Terzo_2010_Andrena_Belgique_et_N_France_full.pdf)  \n- [Andrena bimaculata (Large Gorse Mining Bee) | Flickr](https://www.flickr.com/photos/63075200@N07/albums/72157639946944453/)  \n- [Atlas Hymenoptera](http://www.atlashymenoptera.net/default.aspx)  \n- [BWARS](https://www.bwars.com/)  \n- [GBIF](https://www.gbif.org/)",
 					"learnMore": "https://jessica-joachim.com/insectes/hymenopteres/andrenidae/andrena-bimaculata/",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 140,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1q9UMsk8y6fxTuYUTygz-QgFrtqP-KU_-&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1bCvKWKxdkqRLlu8UMyjkFZ1gC4_C4IUF&sz=w1000",
@@ -6776,6 +6794,7 @@
 					"description": "<b> Attention, cette espèce n'a été codée que sur la base de la littérature, nous vous conseillons donc de ne vous fier à cette identification qu'après le recoupement avec d'autres ressources taxonomiques. </b> <br>",
 					"learnMore": "https://gbif.org/species/1357378",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 134,
 					"images": [],
 					"x-credits": {},
 					"narrowerWeights": {
@@ -6961,6 +6980,7 @@
 					"key": "1357209",
 					"label": "Andrena brumanensis",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 37,
 					"description": "<b> Attention, cette espèce n'a été codée que sur la base de la littérature, nous vous conseillons donc de ne vous fier à cette identification qu'après le recoupement avec d'autres ressources taxonomiques. </b> <br> Andrena brumanensis se reconnaît à la combinaison d'un corps de petite taille, d'épines surélevées sur la face postérieure du fémur postérieur et d'un appendice du labre très court et très large. Elle est extrêmement similaire à A. ventricosa et A. rotundata, et du matériel comparatif déterminé avec certitude est essentiel pour permettre la séparation. Andrena brumanensis a la ponctuation du scutum relativement clairsemée avec de légers interstices visibles, alors que chez A. ventricosa la ponctuation du scutum est plus dense et plus régulière, sans interstices évidents. Andrena rotundata présente une ponctuation du scutum similaire, mais peut être séparée par le vertex qui est plus large (la distance ocello-occipitale dépasse le diamètre d'un ocelle latéral) et plus densément et grossièrement ponctué, alors que chez A. brumanensis le vertex est plus étroit (inférieur à la largeur d'un ocelle latéral) et la ponctuation est plus faible et plus obscure.  En Europe, A. rotundata ne se rencontre qu'en Sardaigne et en Sicile, la confusion est donc peu probable en dehors de ces deux régions. Ce taxon peut également être distingué par les poils de la plaque pygidiale qui sont noirs, alors qu'ils sont bruns chez A. angustior.",
 					"synonyms": ["Andrena (Cryptandrena) brumanensis"],
 					"images": [
@@ -7154,6 +7174,7 @@
 					"description": "<b> Attention, cette espèce n'a été codée que sur la base de la littérature, nous vous conseillons donc de ne vous fier à cette identification qu'après le recoupement avec d'autres ressources taxonomiques. </b> <br> Andrena bucephala peut être identifiée comme une Hoplandrena en raison de son corps mince avec un premier segment tergal fortement rétréci, de longues antennes, d'un clypéus bombé et fortement ponctué, et d'un pronotum faiblement caréné. Les disques tergaux sont presque glabres, alors que chez A. scotica et A. trimmerana les disques tergaux ont des poils longs et abondants. Les poils des scopae tibiales sont entièrement dorés clairs (dorsalement foncés chez A. scotica, A. trimmerana, A. nuptialis, A. rosae) et le clypéus est dépourvu d'une ligne centrale développée, non ponctuée comme chez A. ferox.",
 					"learnMore": "https://gbif.org/species/1357239",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 61,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1gbWbrx54tc6EvCtpOBwKmH4erCm9Eyo4&sz=w1000"
 					],
@@ -7347,6 +7368,7 @@
 					"key": "1358167",
 					"label": "Andrena chrysopus",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 49,
 					"description": "<b> Attention, cette espèce n'a été codée que sur la base de la littérature, nous vous conseillons donc de ne vous fier à cette identification qu'après le recoupement avec d'autres ressources taxonomiques. </b> <br>",
 					"synonyms": ["Andrena (Euandrena) chrysopus"],
 					"images": [],
@@ -7544,6 +7566,7 @@
 					"description": "",
 					"learnMore": "https://gbif.org/species/1358209",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 89,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1pX44YD_2XjpTHhSwtj76w8aocHppyXfG&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1YH5cDsdK70IkE92GSz0-xQoGvkjHqQ7b&sz=w1000"
@@ -7816,6 +7839,7 @@
 					"description": "Andrena chrysosceles femelle peut être reconnue comme une Notandrena grâce à sa ride latérale sur le pronotum, sa tête courte et large avec une glossa courte, et son triangle du propodéum avec des rides légères. Elle fait partie du groupe des espèces non métalliques initialement placées dans Notandrena s. str. Andrena chrysosceles peut être identifiée grâce à son scutum fortement chagriné, mat et avec une ponctuation légère et éparse, combiné à des tarses et fémurs postérieurs orange ; aucune autre Notandrena ne présente cette combinaison de caractères.",
 					"learnMore": "https://gbif.org/species/1358259",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 130,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1iEqQK-RlTKHkSB2yhMHGi30k-hLvtPiX&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1kisBwV51Rg8kE5tNMv7yDPyAXpXCNU21&sz=w1000"
@@ -8115,6 +8139,7 @@
 					"description": "**Identification** : _Andrena cineraria_ est de couleur noire et blanche. Le thorax a une pilosité blanche dans sa partie avant et arrière, et une bande centrale de poils noirs. La face présente des poils blancs. La cuticule de l’abdomen est noir bleuté. Elle possède 3 cellules cubitales.  \nLa femelle a les poils de la 3ème paire de pattes noirs.\n\n**Taille** : 10 à 14 mm pour la femelle, 7 à 12 mm pour le mâle.\n\n**Habitat** : Milieux ouverts et ensoleillés.\n\n**Répartition géographique** : Elle est présente dans toute l’Europe.\n\n**Période d’observation** : De mars à octobre.\n\n**Reproduction** : Elle niche en solitaire dans un terrier creusé dans le sable. On observe souvent des bourgades, mais chaque femelle a son propre nid, dans lequel se trouve une dizaine de cellules. Elle pond un œuf par cellule, dans lesquelles elle met du pollen pour nourrir les futures larves.\n\n**Espèces semblables** :  \n**Pour les femelles** :  \n_Andrena vaga_ a le thorax entièrement recouvert de pilosité claire.  \nLe trio _Andrena afrensis_, _agilissima_ et _asperrima_ a les ailes enfumées, le thorax n’est pas aussi poilu et les pattes 3 ont des poils blancs.  \n_Andrena pilipes/nigrospina_ a les poils du corps d’un gris plus sombre.  \n_Andrena albopunctata_ ales poils du thorax plus sombres, elle possède des touffes de poils clairs sur les côtés des tergites.  \n_Andrena combinata_ a moins de poils blancs.  \n_Andrena morio_ a moins de poils clairs sur le thorax et les ailes enfumées.  \n_Andrena barbareae_ ne se rencontre que dans les Alpes et les Pyrénées à l’est de l’Andorre.  \n_Andrena bicolorata_ a les poils de la face noirs.\n\n**Sources** :  \n[https://www.insecte.org/](https://www.insecte.org/)  \n[https://fr.wikipedia.org/wiki/Wikip%C3%A9dia:Accueil\\_principal](https://fr.wikipedia.org/wiki/Wikip%C3%A9dia:Accueil_principal)  \n[http://www.atlashymenoptera.net/pagetaxon.asp?tx\\_id=6146](http://www.atlashymenoptera.net/pagetaxon.asp?tx_id=6146)  \n[https://www.quelestcetanimal.com/](https://www.quelestcetanimal.com/)",
 					"learnMore": "https://jessica-joachim.com/insectes/hymenopteres/andrenidae/andrena-cineraria/",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 90,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1eT7a4JxC6FmRCvn-Thzmdoyrww040ASn&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1odHEvpRcN_fnPmHxOlWH848E26WmWAMt&sz=w1000",
@@ -8373,6 +8398,7 @@
 					"key": "1357484",
 					"label": "Andrena cinerea",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 25,
 					"description": "Andrena cinerea peut être reconnue comme une Chlorandrena en raison de la présence d'épines sur la face postérieure du fémur postérieur et des poils plumeux des scopae. Elle est proches des espèces ressemblant à A. humilis car les fovéas ne sont pas fortement rétrécies en dessous (groupe taraxaci), ni ne divergent fortement du bord interne de l'œil composé (groupe livens). Il est difficile de les distinguer d'A. humilis en l'absence de matériel de référence fiable. En plus de la taille plus petite de leur corps (<10 mm), A. cinerea a le T2 fortement chagriné, sans interstices brillants, alors que chez A. humilis le T2 est moins fortement chagriné, et quelques zones faiblement brillantes peuvent être observées entre les ponctuations.  En Méditerranée orientale, A. cinerea est similaire à A. panurgimorpha (non-présente en France) et A. cinereophila (non-présente en France). Chez A. panurgimorpha, le scutum présente une zone centrale brillante, alors que chez A. cinerea le scutum est entièrement chagriné et terne. Chez A. cinereophila, le nervulus est antéfurcal, alors qu'il est interfurcal chez A. cinerea.",
 					"synonyms": ["Andrena (Chlorandrena) cinerea"],
 					"images": [
@@ -8670,6 +8696,7 @@
 					"description": "**_Andrena clarkella_** **(Kirby, 1802)**\n\nAndrène à pattes rouges\n\n**Risques de confusions** :\n\n**Pour la femelle**\n\n\\- **_Andrena bicolor_** lui ressemble beaucoup, mais la cuticule de son tibia et basitarse 3 est noire (attention car la scopa est orange)\n\n\\- **_Andrena haemorrhoa_** a une coloration similaire et possède elle aussi les tibias et tarses 3 oranges, mais l’apex de son abdomen a des soies rousses et elle possède des poils pâles sur la face\n\n\\- **_Andrena thoracica_**, **_Andrena limata_** et **_Andrena assimilis_** ont la patte 3 entièrement noire\n\n\\- **_Andrena nitida_** a le basitarse 3 noir, la scopa noire dessus, blanche dessous et de longs poils blancs sous le fémur 3, des poils clairs sur la face et sur les côtés des tergites\n\nLe mâle, qui est plutôt brun et ne ressemble pas à la femelle, nécessite un examen approfondi pour être séparé avec certitude des espèces proches.\n\n**Taille** : 12 à 14mm\n\n**Habitat, répartition** : Fréquente divers habitats présentant de grands peuplements de _Salix._  \nEn France, surtout répartie dans le nord et les Alpes\n\nDistribuée en Europe centrale et Europe du nord, jusqu'en Russie et en Turquie. En Amérique du Nord, on la trouve de l’Alaska à l’Ontario et au sud jusqu’au Colorado.\n\n**Biologie** : Cette espèce est précoce et vole de février à avril. Elle ne collecte le pollen que des saules (_Salix_), mais peut se nourrir éventuellement sur d'autres plantes. Le nid est une galerie creusée dans le sol. La femelle remplit les cellules de pollen pour les larves. Elles nichent en agrégations.\n\n**Photographies :**\n\n© [pavlozaltowski](https://www.inaturalist.org/people/pavlozaltowski) \\- [CC-BY-NC](https://creativecommons.org/licenses/by-nc/4.0/) \\- Vue dorsale\n\n© [Til Mann](https://www.inaturalist.org/people/adlerauge) \\- [CC-BY-NC](https://creativecommons.org/licenses/by-nc/4.0/) \\- Vue de profil\n\n**Sources :**\n\n[Inaturalist](https://www.inaturalist.org/taxa/198998-Andrena-clarkella)\n\n[GBIF](https://www.gbif.org/species/1357338)\n\n[BWARS](https://bwars.com/bee/andrenidae/andrena-clarkella)\n\n[Catalogue et clé des sous-genres et espèces du genre](https://quelestcetanimal-lagalerie.com/wp-content/uploads/2012/11/Cle_des_Andrena_du_nord_de_la_France.pdf) _[Andrena](https://quelestcetanimal-lagalerie.com/wp-content/uploads/2012/11/Cle_des_Andrena_du_nord_de_la_France.pdf)_ [de Belgique et du nord de la France](https://quelestcetanimal-lagalerie.com/wp-content/uploads/2012/11/Cle_des_Andrena_du_nord_de_la_France.pdf)\n\n[The genus](https://jhr.pensoft.net/article/101873/) _[Andrena](https://jhr.pensoft.net/article/101873/)_ [in the Iberian Peninsula](https://jhr.pensoft.net/article/101873/)",
 					"learnMore": "https://www.gbif.org/species/1357338",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 4,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1Lb7-rYoTRBIXlk7CJ15UfB_u0rR6GNtD&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1W-Uw1YJpIi5R88ACCO3T5FtNpLpXxzpK&sz=w1000",
@@ -8967,6 +8994,7 @@
 					"key": "1357128",
 					"label": "Andrena clypella",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 26,
 					"description": "Les femelles peuvent être rapidement placées dans le sous-genre Chlorandrena en raison de la présence d'une rangée transverse de dents en forme d'épines sur la face postérieure du fémur postérieur, combinée à une ponctuation en forme de cratères sur les tergites. Elle peut être placée dans le groupe humilis en raison de la forme des fovéae faciales qui ne se rétrécissent pas ventralement et ne s'écartent pas dorsalement du bord interne de l'œil composé. Andrena clypella se distingue de tous les membres européens du groupe humilis par son scutellum fortement poli et brillant et ses tergites qui ont une très faible chagrination, alors que les espèces apparentées ont des tergites avec une sculpture claire et qui sont tout au plus faiblement brillants.",
 					"synonyms": ["Andrena (Chlorandrena) clypella"],
 					"images": [
@@ -9252,6 +9280,7 @@
 					"description": "Cette espèce est la seule représentante européenne du sous-genre asiatique Oreomelissa. Les femelles peuvent être confondues avec des espèces du sous-genre Micrandrena en raison de leur petite taille et de leur couleur noire. On peut cependant toujours les reconnaître par la combinaison de leurs fovéas profondément impressionnées et comparativement longues, s’étendant dorsalement au niveau des ocelles latéraux, et de la structure du triangle propodeal, qui n’est pas délimité latéralement par des carènes surélevées et a un réseau de rugosités à l'intérieur. Le triangle propodeal ressemble donc à certaines anciennes espèces de Fumandrena (aujourd’hui Micrandrena), mais celles-ci ont des fovéas nettement plus étroites que la largeur d’un flagelle, alors que chez A. coitana les fovéas sont clairement au moins aussi larges qu’un flagelle. Andrena coitana est également semblable à A. (Tarsandrena) tarsata, mais a les tibias postérieurs foncés (orange chez A. tarsata), et les scopae ont de longs poils lâches, et sont bicolores, ventralement pâles et dorsalement foncés (poils courts et étroitement regroupés, unicolores pâles dorés chez A. tarsata).",
 					"learnMore": "https://gbif.org/species/1357215",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 138,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1aj30tdarBjeXfFIoNol3IJwXu5StUypg&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1QmGzBR3HGbwWOHRg3bxpCzsaQtTC4aRl&sz=w1000"
@@ -9530,6 +9559,7 @@
 					"description": "Andrena colletiformis peut être identifiée comme une Brachyandrena en raison du triangle propodéal fortement rugueux qui est délimité latéralement par de fortes carènes, de la présence d'une paire de petites fovéas allongées latéralement sur T2, et d'un scutum et de tergites fortement et densément ponctués. Andrena colletiformis forme une paire d'espèces avec A. miegiella, et peut être séparée par la présence d'une nette échancrure au niveau de la marge antérieure de l'appendice du labre (le labre forme une pointe apicale chez A. miegiella).",
 					"learnMore": "https://gbif.org/species/1358261",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 18,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1MJpqvza3qy0Bx8HAzGl7jVZwFSfu3_Ga&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1RIN77RMuWGxVode8xffM7_XwXXeUtXId&sz=w1000"
@@ -9838,6 +9868,7 @@
 					"description": "La femelle peut facilement être placée dans le sous-genre Simandrena grâce aux corbeilles complètes du propodéum entourant les faces latérales du propodéum glabres. Andrena combinata est reconnaissable à ses tergites brillantes avec une ponctuation dense et régulière sur tout le disque (distance moyenne entre les points <0,5 fois le diamètre d'un point) avec un bord apical étroit non ponctué. Ceci la place à proximité d'A. lepida (répandue dans toute l’Europe), d'A. mehelyi (distribution peu claire, mais en Europe probablement de l’est de l’Autriche à la Grèce) et de l’A. kocoureki (actuellement connue seulement du sud-ouest de la Bulgarie).",
 					"learnMore": "https://gbif.org/species/1358177",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 150,
 					"images": [
 						"https://drive.google.com/thumbnail?id=18oAnLpRtp897GwOlNSgbfktPJo2oRpPQ&sz=w1000"
 					],
@@ -10115,6 +10146,7 @@
 					"description": "",
 					"learnMore": "https://gbif.org/species/9818799",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 151,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1Njwr2GEOa9CrnERAZjrpy2EHfDCnuBbl&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1k9Nod3RrDoDwkOddtXMV1CI36RSlQb6B&sz=w1000"
@@ -10395,6 +10427,7 @@
 					"key": "1357880",
 					"label": "Andrena congruens",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 152,
 					"description": "",
 					"synonyms": ["Andrena (Simandrena) congruens"],
 					"images": [
@@ -10679,6 +10712,7 @@
 					"description": "Andrena curvungula peut être identifiée comme une Lepidandrena en raison des poils squameux courts sur le scutum et le scutellum, de la présence d'une carène transverse portant des soies courtes en forme d'épines sur la face postérieure du fémur postérieur, et des tergites densément ponctués. La combinaison de tergites sombres, de poils squameux bruns sur le scutum et de la surface lisse et brillante des galéas la rapproche d'A. paucisquama et d'A. pandellei. Elle peut être séparée de A. paucisquama par les poils du scutum denses qui masquent la surface sous-jacente (ne masquant pas la surface sous-jacente chez A. paucisquama), et l'appendice échancré du labre (appendice du labre trapézoïdal, sans échancrure médiane chez A. paucisquama). A. curvungula peut être séparée d'A. pandellei par les poils bruns du scutum (gris-brun chez A. pandellei), et la forme du cinquième (dernier) segment tarsal de la patte arrière qui est allongé et fortement courbé (pas allongé ni fortement courbé chez A. pandellei, matériel comparatif requis).",
 					"learnMore": "https://gbif.org/species/1357234",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 73,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1vQvFjoN_2yLdPTBHJ5F5t3UmL8noDNbN&sz=w1000",
 						"https://drive.google.com/thumbnail?id=16mKigEVUdD_-1QcCntphClyga90qhICr&sz=w1000"
@@ -10964,6 +10998,7 @@
 					"description": "Andrena decipiens peut être reconnue comme une Holandrena en raison du propodeum caractéristique qui n'est pas divisé en une aire horizontale et une aire verticale, et qui est au contraire arrondi, avec le triangle propodéal court, large, avec la surface interne finement rugueuse, les tergites densément et clairement ponctués, et le mesepisternum aréolé en forme de nid d'abeille. Les ponctuations de T1 sont normales (pas densément et grossièrement ponctuées comme chez A. fimbriata (non-présente en France)), la distance ocello-occipitale est d'environ 1,5 fois le diamètre d'un ocelle latéral (2,5-3 fois le diamètre d'un ocelle latéral chez A. variabilis), les poils du scutum ne sont pas raccourcis et épaissis (poils raccourcis et épaissis chez A. forsterella (non-présente en France)), et le clypéus est bombé et modérément ponctué (aplati et très fortement ponctué chez A. wilhelmi (non-présente en France)), ce qui la rapproche le plus d'A. labialis et d'A. flavilabris.  Andrena decipiens peut être séparée d'A. labialis par les fovéas faciales qui ne se rétrécissent pas fortement dorsalement (clairement rétrécies dorsalement chez A. labialis), la plus grande distance ocello-occipitale (une fois le diamètre d'un ocelle latéral chez A. labialis), et les bandes tergales complètes (bandes tergales clairement interrompues médialement chez A. labialis, bien qu'il faille se méfier des spécimens abrasés).  La séparation avec A. flavilabris est plus difficile et doit être basée sur la phénologie, A. flavilabris volant au printemps et A. decipiens en été. Les Andrena decipiens ont une pubescence plus brillante, en particulier sur la frange terminale qui est brun noir foncé chez A. flavilabris. Les bandes de poils tergales sont également plus larges et plus prononcées chez A. decipiens, mais ce caractère ne doit être utilisé qu'en comparaison directe avec du matériel déterminé avec certitude.",
 					"learnMore": "https://gbif.org/species/1356936",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 57,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1Fwyhn7S1JWk88TWLR7pefygCeOZA5KSf&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1Ge5g9LMMrCcIh8HiuNr6xUwrfFfwYYWe&sz=w1000"
@@ -11278,6 +11313,7 @@
 					"description": "Andrena denticulata femelle peut être reconnue comme une Cnemidandrena en raison de la présence d'une ride latérale sur le pronotum latéralement, de ses tergites chagrinées, de ses bandes tergales longues et épaisses, de ses larges fovéas faciales, de sa plaque pygidiale avec une zone centrale distinctement délimitée et surélevée, et de l'absence d'autres caractères distinctifs. Elle peut être séparée d'Andrena s. str. par sa période de vol estivale, Andrena s. str. volant typiquement au printemps. Elle peut être séparée de toutes les autres espèces de Cnemiandrena par la pilosité du scutum, qui est brune avec de courts poils noirs entremêlés médialement (brune unicolore chez les autres espèces de Cnemidandrena).",
 					"learnMore": "https://gbif.org/species/1357548",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 35,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1PNzSKTFrzYkwCcidJ6AQpqIrTglfF6_2&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1TbfdD7eRfPhiaAqdwHuNZTqhfjtHgKZT&sz=w1000"
@@ -11571,6 +11607,7 @@
 					"description": "",
 					"learnMore": "https://gbif.org/species/1357737",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 103,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1wjiZtrAPLAYPP4nrMDEA0o6YCvv93MjR&sz=w1000",
 						"https://drive.google.com/thumbnail?id=15blOsxRck6RuFJzjwxJAVsgCn5k5gPFv&sz=w1000"
@@ -11845,6 +11882,7 @@
 					"key": "1357787",
 					"label": "Andrena djelfensis",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 123,
 					"description": "Andrena djelfensis peut être reconnue comme une Micrandrena grâce à sa petite taille, sa couleur noire, ses fovéas extrêmement étroites (ne s’élargissant pas ou se rétrécissant sur leur longueur) et de son triangle propodéal finement délimité avec une rugosité interne. Ces caractères la placent dans l’ancien sous-genre Fumandrena qui a maintenant été fusionné au sous-genre Micrandrena, et est donc plus similaire à A. fabrella et A. fumida (non-présente en France). Andrena djelfensis peut être séparée de A. fabrella par les tergites non ponctués (tergites clairement ponctués chez A. fabrella), et de A. fumida par les poils simples des scopae (plumeux chez A. fumida), le triangle propodéal avec une rugosité interne fine (triangle propodeal sans rugosité interne, entièrement granuleux chez A. fumida), et le clypéus faiblement aplati avec une grosse ponctuation éparse (clypéus en dôme, chagriné, avec une ponctuation plus petite, obscure chez A. fumida).",
 					"synonyms": ["Andrena (Micrandrena) djelfensis"],
 					"images": [
@@ -12130,6 +12168,7 @@
 					"description": "**Ordre : Hymenoptera**  \n**Sous-ordre : Apocrita**  \n**Infra-ordre :**   \n**Super famille : Apoidea**  \n**Famille : Andrenidae**  \n**Sous-famille : Andreninae**  \n**Tribu :**   \n**Genre : _Andrena_**  \n**Espèce : _Andrena dorsata_**\n\n**Identification** : _Andrena dorsata_ est une abeille commune avec une pilosité orangée sur le thorax. Son abdomen est noir avec de fines et nettes bandes pâles à l’apex des tergites, les deux premières interrompues. L’apex du tibia 3 est élargi chez les femelles et le basitarse 3 est orange. Elle possède 3 cellules cubitales. Les mâles perdent leur coloration très vite. Ils ressemblent à de petites femelles et ont les tibias postérieurs foncés et les tarses 3 1,5 fois plus longs que les tibias 3.\n\n**Taille** : 9 à 10 mm.\n\n**Habitat** : Jachères, jardins, prairies, talus, lisières des bois…\n\n**Répartition géographique** : Répandue en Europe centrale et méridionale.\n\n**Période de vol** : Il y a deux générations, une première en mars-mai puis une seconde en juillet-septembre.\n\n**Plants visitées** : Polylectique, c’est à dire qu’elle n’a pas de préférences particulières.\n\n**Nidification** : Elle niche en solitaire dans un trou dans le sol, sur des pelouses rases ou des parcelles de sol nu.\n\n**Espèces semblables** :  \nLe tibia 3 épaissi de la femelle et le tarse 3 plus long que le tibia 3 du mâle sont de bons indicateurs (mais je ne suis pas certaine qu’ils suffisent à eux seul).  \n**_Andrena propinqua_** lui ressemble beaucoup mais elle a le basitarse III noir et seule la première bande des tergites est interrompue.  \n**_Andrena barbilabris_** a une tête un peu plus petite par rapport à son corps, la pilosité de la tête semble de même couleur que celle du thorax.  \n**_Andrena flavipes_** a les bandes du gastre continues, le dessus du thorax possède moins de poils roux.  \n**_Andrena gravida_** a les bandes du gastre continues.  \n**_Andrena helvola_** a la pilosité du scutellum d’un roux plus vif, elle possède de longs poils roux sur le tergite 1 et 2, les bandes du gastre semblent moins nettes.  \n**_Halictus rubicundus_** a la nervure basale en “S”, le tibia 3 est entièrement orange, le scape est plus long.\n\n**Sources** :  \n[Insecte.org](https://www.insecte.org/)  \n[Atlas Hymenoptera](http://www.atlashymenoptera.net/default.asp)  \n[BWARS](https://www.bwars.com/)  \n[NatureSpot](https://www.naturespot.org.uk/)  \n[Nature Guide UK](https://sites.google.com/site/natureguideuk/home?authuser=0)",
 					"learnMore": "https://jessica-joachim.com/insectes/hymenopteres/andrenidae/andrena-dorsata/",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 153,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1swbeQ2ozMFU1rTzIZKN7Tt6iRfupSl4R&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1ciq-sQHmSaa6UWTLVgeHIAzOtAR2unqM&sz=w1000",
@@ -12431,6 +12470,7 @@
 					"key": "1357476",
 					"label": "Andrena fabrella",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 124,
 					"description": "Andrena fabrella peut être reconnue comme une Micrandrena grâce à sa petite taille, sa couleur noire, ses fovéas extrêmement étroites (ne s’élargissant pas ou se rétrécissant sur leur longueur) et de son triangle propodéal finement délimité avec une rugosité interne. Ces caractères la placent dans l’ancien sous-genre Fumandrena qui a maintenant été fusionné au sous-genre Micrandrena, et est donc plus similaire à A. djelfensis et A. fumida (non-présente en France). A. fabrellla peut être séparée de ces deux espèces grâce à ses tergites brillantes et fortement ponctués (chagrinés et mats en comparaison chez les deux autres espèces).",
 					"synonyms": ["Andrena (Micrandrena) fabrella"],
 					"images": [
@@ -12709,6 +12749,7 @@
 					"description": "Andrena falsifica peut être reconnue comme une Micrandrena en raison de sa petite taille, de sa couleur noire et du triangle porpodéal avec des rugosités.  La marge de T1 est épaissie et élargie, sans ponctuation, ce qui fait d'A. falsifica une espèce unique dans la faune européenne. De manière plus générale, on la confond souvent avec A. subopaca mais elle présente un disque de T2 clairement ponctué (non ponctué chez A. subopaca). Les ponctuations claires sur les disques tergaux permettent une séparation de plusieurs micrandrènes typiquement tempérées telles que A. minutula et A. minutuloides, mais il faut toujours se référer à la marge épaissie.",
 					"learnMore": "https://gbif.org/species/1356971",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 105,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1Tzbf0fwxXVtBmmM3SZTNsR-3jcflv5Og&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1Ki5uPooCBNnhmGGp-cxjwMiASQaXK34_&sz=w1000"
@@ -12987,6 +13028,7 @@
 					"key": "1357035",
 					"label": "Andrena farinosa",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 67,
 					"description": "Andrena farinosa était auparavant placée dans le groupe polyphylétique Poliandrena. Morphologiquement, elle est similaire au groupe d'espèces apparentées mais n'est en fait pas apparentée phylogénétiquement. Elle partage plusieurs caractéristiques similaires telles que le large clypéus avec une large marge apicale semi-circulaire légèrement relevé et les larges fovéas faciales, ainsi que l'absence générale de caractéristiques distinctives qui ont conduit à regrouper des lignées non apparentées. Elle diffère le plus clairement du groupe apparenté par la structure du triangle propodéal qui est latéralement finement mais clairement délimité par des carènes latérales, alors qu'il n'est pas défini dans le groupe apparenté. Elle est le plus proche d'A. oviventris mais ce taxon a de courts poils squameux bruns sur le scutum, alors qu'A. farinosa a des poils plus longs, non squameux, de couleur marron clair. Plus généralement, A. farinosa se reconnaît à sa pilosité tergale, les disques tergaux étant couverts de courts poils blancs qui donnent l'impression d'être recouverts de farine, d'où son nom scientifique. Cette pilosité devient plus dense sur les bords des tergites pour former des bandes de poils. Ce caractère est unique parmi les Andrena européens.",
 					"synonyms": ["Andrena (incertae sedis) farinosa"],
 					"images": [
@@ -13250,6 +13292,7 @@
 					"key": "1357315",
 					"label": "Andrena ferox",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 62,
 					"description": "Andrena ferox peut être identifiée comme une Hoplandrena en raison de son corps mince avec un premier segment tergal fortement rétréci, de ses longues antennes, de son clypéus bombé et fortement ponctué, et de son pronotum faiblement caréné. Elle peut être séparée de toutes les espèces de Hoplandrena par la présence d'une ligne centrale longitudinale, brillante et non ponctuée au centre du clypéus. Ce caractère est unique parmi les Hoplandrena européennes.",
 					"synonyms": ["Andrena (Hoplandrena) ferox"],
 					"images": [
@@ -13529,6 +13572,7 @@
 					"key": "1357107",
 					"label": "Andrena ferrugineicrus",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 176,
 					"description": "Andrena ferrugineicrus peut être placée dans le sous-genre Truncandrena grâce à son clypéus en forme de dôme, son pronotum sans ride latérale, son propodéum lisse avec un triangle propodéal finement délimité, ses tergites lisses et principalement imponctués, sa plaque pygidiale sans partie centrale développée, et des scopae avec les poils ventraux balayés vers la marge dorsale, le scopa apparaissant donc comme un triangle isocèle en vue latérale. Les tergites n'ont pas de reflets métalliques (cela exclut A. doursana citreola (non-présente en France) qui a des tergites avec des refets métalliques verts), il n'y a pas de ligne longitudinale centrale lisse et imponctuée sur le clypéus (cela exclut A. medeninensis donata (non-présente en France) qui a une ligne brillante et imponctuée au centre du clypéus), il n’y a pas de poils longs sur les disques des tergites (cela exclut A. schmiedeknechti (non-présente en France) qui a des disques avec des poils longs), les tarses sont orange clair et la pilosité mésosomale est rouge orangé (sauf A. truncatilabris et A. villipes, basitarse foncé et pilosité mésosomale brunâtre pâle). A. ferrugineicrus n’est pas présente à l’est de la Sicile et ne doit donc pas être confondu avec la faune orientale de Truncandrena.",
 					"synonyms": ["Andrena (Truncandrena) ferrugineicrus"],
 					"images": [
@@ -13800,6 +13844,7 @@
 					"key": "9328031",
 					"label": "Andrena flavilabris",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 60,
 					"description": "Andrena flavilabris peut être identifiée comme une Holandrena en raison du propodeum caractéristique qui n'est pas divisé en une aire horizontale et une aire verticale, et qui est au contraire arrondi, avec le triangle propodéal court, large, avec la surface interne finement rugueuse, les tergites densément et clairement ponctués, et le mesepisternum aréolé en forme de nid d'abeille.  Les ponctuations de T1 sont normales (pas densément et grossièrement ponctuées comme chez A. fimbriata (non-présente en France)), la distance ocello-occipitale est d'environ 1,5 fois le diamètre d'un ocelle latéral (2,5-3 fois le diamètre d'un ocelle latéral chez A. variabilis), les poils du scutum ne sont pas raccourcis et épaissis (poils raccourcis et épaissis chez A. forsterella Osytshnjuk, 1978 (non-présente en France), et le clypéus est bombé et modérément ponctué (aplati et très fortement ponctué chez A. wilhelmi (non-présente en France), ce qui le rapproche d'A. labialis et d'A. decipiens.  Andrena flavilabris peut être séparée d'A. labialis par les sillons faciaux qui ne se rétrécissent pas fortement dorsalement (clairement rétrécis dorsalement chez A. labialis), la plus grande distance ocello-occipitale (une fois le diamètre d'un ocelle latéral chez A. labialis), et les bandes tergales complètes (bandes tergales clairement interrompues médialement chez A. labialis, bien qu'il faille se méfier des spécimens abrasés).  La séparation avec A. decipiens est plus difficile et doit être guidée par la phénologie, A. flavilabris volant au printemps et A. decipiens en été. Andrena decipiens a une pilosité plus brillante, en particulier sur la frange terminale qui est brun noir foncé chez A. flavilabris. Les bandes de poils tergales sont également plus larges et plus prononcées chez A. decipiens, mais ce caractère ne doit être utilisé qu'en comparaison directe avec du matériel déterminé avec certitude.",
 					"synonyms": ["Andrena (Holandrena) flavilabris"],
 					"images": [
@@ -14107,6 +14152,7 @@
 					"description": "**_Andrena flavipes_** **(Panzer, 1799)**  \nAndrène à pattes jaunes\n\n**Risques de confusions** :  \n  \nLes individus frais (femelles) sont relativement faciles à reconnaître, mais lorsqu’elles perdent une partie de leur pilosité les risques de confusions avec d’autres espèces sont bien plus importants.  \n  \n\\- **_Andrena gravida_** lui ressemble mais les bandes pileuses de son gastre sont blanchâtres, ainsi que la pilosité de la face et des côtés du thorax, contrastant avec la pilosité du dessus du thorax qui est brune.\n\n\\- **_Andrena denticulata_** est une espèce estivale qui lui ressemble, mais la pilosité du dessus de son thorax est sombre.\n\n\\- **_Andrena fuscipes_** est une espèce inféodées aux callunes et volant à partir du mois d'août. Sa scopa est bicolore, brune et blanche.\n\n**Taille** : 9 à 13mm\n\n**Habitat, répartition** : Fréquente divers milieux ouverts comme les prairies, friches et les lisières.  \n  \nElle est répandue en Europe de l’ouest, Europe centrale et au Proche-Orient. En France, partout.\n\n**Biologie** : Elle récolte le pollen d’un très grand nombre de plantes, de plus de 18 familles différentes. Le nid est creusé dans le sol, souvent sur une pente ou un décrochement. Elle forme souvent des agrégations assez populeuses.  \n  \nL’espèce est bivoltine et vole entre mi-mars et fin août.\n\n**Photographies :**  \n© [Julia Moning](https://www.inaturalist.org/people/birdingjulia) \\- [CC-BY](https://creativecommons.org/licenses/by/4.0/)\n\n**Sources :**\n\n[Inaturalist](https://www.inaturalist.org/taxa/124358-Andrena-flavipes)\n\n[GBIF](https://www.gbif.org/fr/species/1357156)  \n[Atlas de la Faune de Suisse](https://species.infofauna.ch/groupe/1/portrait/370)  \n[Catalogue et clé des sous-genres et espèces du genre](https://quelestcetanimal-lagalerie.com/wp-content/uploads/2012/11/Cle_des_Andrena_du_nord_de_la_France.pdf) _[Andrena](https://quelestcetanimal-lagalerie.com/wp-content/uploads/2012/11/Cle_des_Andrena_du_nord_de_la_France.pdf)_ [de Belgique et du nord de la France](https://quelestcetanimal-lagalerie.com/wp-content/uploads/2012/11/Cle_des_Andrena_du_nord_de_la_France.pdf)\n\n[The genus](https://jhr.pensoft.net/article/101873/) _[Andrena](https://jhr.pensoft.net/article/101873/)_ [in the Iberian Peninsula](https://jhr.pensoft.net/article/101873/)",
 					"learnMore": "https://www.gbif.org/fr/species/1357156",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 91,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1DBWQc0waYtl1WIl1Abf2DfxqIfy5BU46&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1OuzTn05NbiY1DzDQMqBbU_VICH0NZ-Hf&sz=w1000",
@@ -14422,6 +14468,7 @@
 					"description": "#### **Fabricius, 1793**\n\n❝\n\n_Cette andrène est très spécialisée puisqu’elle ne récolte le pollen que des bryones pour nourrir ses larves_\n\n**rdre : Hymenoptera**  \n**Sous-ordre : **Apocrita****  \n**Infra-ordre : **Aculeata****  \n**Super famille : ********Apoidea**********  \n**Famille : ************Andrenidae**************  \n**Sous-famille : ************Andreninae**************  \n**Tribu :**  \n**Genre :** _****_**_Andrena_**_****_  \n**Espèce :** _**Andrena florea**_\n\n#### Difficulté de détermination\n\n#### Statut de conservation\n\nDonnées insuffisantes\n\n#### Identification\n\n- tête et thorax à pilosité brun jaune  \n- face ventrale à pilosité jaunâtre pâle  \n- tergites noirs et brillants  \n- tergites 1 et 2 en partie rouges  \n- apex des tergites 3 et 4 à transparence rougeâtre  \n- tarses et tibias 3 sombres\n\n**Femelle**  \n- 12 segments antennaires  \n- 6 tergites  \n- brosse de récolte à la patte 3 (scopa)  \n- scopa brun noir dessus, blanchâtre dessous\n\n**Mâle**  \n- 13 segments antennaires  \n- segment antennaire 3 nettement plus long que le 4  \n- 7 tergites\n\n#### Taille\n\n**Femelle** : 11 à 14,5 mm  \n**Mâle** : 9 à 12,5 mm\n\n#### Habitat\n\nJardins, lisières, haies, landes\n\n#### Répartition géographique\n\nSemble largement répartie en France  \nGrande partie de l’Europe, du Danemark et des Pays-Bas au sud de l’Espagne et à l’est de la Russie. Au Royaume-Uni, sud-est de l’Angleterre. Afrique du Nord.  \n[Cartes INPN et GBIF](https://inpn.mnhn.fr/espece/cd_nom/239348/tab/carte)\n\n#### Période d’observation\n\n#### Biologie\n\nNiche dans les sols sablonneux, souvent en bourgade. Les nids font 10cm de profondeur et comportent plusieurs cellules latérales.\n\n#### Pollen récolté\n\n_Bryonia alba, Bryonia dioica_ (mais peut butiner d’autres plantes pour se nourrir)\n\n#### Espèces semblables\n\nA priori, une andrène avec ce look (notamment les premiers tergites oranges) et butinant de la bryone est très probablement une _A. florea_. Il existe deux espèces proches visuellement : **_Andrena rosae_** et **_Andrena trimmerana_**, dont le mâle a le 3ème segment antennaire plus court ou au plus aussi long que le 4ème (nettement plus long que le 4ème chez A. florea).\n\n#### Sources\n\n- [Le Monde des insectes](https://www.insecte.org/)  \n- [INPN](https://inpn.mnhn.fr/espece/cd_nom/239348)  \n- [Steven Falk, Flickr](https://www.flickr.com/photos/63075200@N07/albums/72157641468603195/)  \n- [BWARS](https://bwars.com/bee/andrenidae/andrena-florea)  \n- [Andrena florea et la bryone / Insectes n° 150](https://www.insectes.xyz/pdf/i150-gadoum-didier.pdf)",
 					"learnMore": "https://jessica-joachim.com/insectes/hymenopteres/andrenidae/andrene-de-la-bryone-andrena-florea/",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 68,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1pwuj1pUb6YFwjqKrjOAt3PYDm0PfRNy6&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1oNmtXrXiN1pikLiHjeigxj7pAJjEcdFm&sz=w1000",
@@ -14736,6 +14783,7 @@
 					"key": "1357061",
 					"label": "Andrena florentina",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 102,
 					"description": "Les femelles d’Andrena florentina peuvent être identifiées par la forme distinctive des fovéas, qui sont longues et fortement retrécies au milieu. Cela les place près de A. bicolorata, les deux taxons qui constituaient le sous-genre maintenant disparu Hyperandrena, qui a été récemment placé dans le sous-genre Melandrena élargi. Andrena florentina peut être séparée par la pilosité du mésosome brune (grise chez A. bicolorata) et les scopae tibiaux bicolores, noirs dorsalement et orange ventralement (scopae uniformément noirs chez A. bicolorata).",
 					"synonyms": ["Andrena (Melandrena) florentina"],
 					"images": [
@@ -15022,6 +15070,7 @@
 					"description": "",
 					"learnMore": "https://gbif.org/species/1357362",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 117,
 					"images": [
 						"https://drive.google.com/thumbnail?id=17PcB_trWjujMnWgEM7xKBmVXVkXcoo_P&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1dUT5uh9eL69Bu3OW4IujFq_kuu4lr1Wz&sz=w1000"
@@ -15289,6 +15338,7 @@
 					"key": "1357406",
 					"label": "Andrena florivaga",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 77,
 					"description": "Les femelles d'Andrena florivaga peuvent être reconnues comme Lepidandrena en raison de la présence d'une rangée d'épines fines sur la face postérieure des fémurs postérieurs et des tergites densément, finement et régulièrement ponctués (sans ponctuations en cratère). Elle diffère de presque toutes les Lepidandrena européennes par l'absence de poils squameux sur le scutum, qui présente à la place des poils simples. Les galéas sont également fortement chagrinées et mattes ; cette combinaison de poils scutaux simples et de galéas chaginées la rapproche uniquement d'A. mocsaryi Schmiedeknecht (non-présente en France). Les deux espèces peuvent être séparées par la forme de l'appendice du labre qui est large et à trois côtés chez A. florivaga, nettement plus large que la longueur de A5 (appendice du labre petit et seulement aussi large que la longueur de A5 chez A. mocsaryi), et par le clypéus bombé qui est principalement brillant entre les ponctuations (moins fortement bombé et uniformément vert brillant et terne chez A. mocsaryi).",
 					"synonyms": ["Andrena (Lepidandrena) florivaga"],
 					"images": [
@@ -15561,6 +15611,7 @@
 					"key": "1357493",
 					"label": "Andrena freygessneri",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 36,
 					"description": "",
 					"synonyms": ["Andrena (Cnemidandrena) freygessneri"],
 					"images": [
@@ -15843,6 +15894,7 @@
 					"description": "Les femelles peuvent être reconnues comme Andrena s. str. en raison de la présence d'une ride latérale sur le pronotum, d'une glossa courte, de larges fovéas faciales, d'un flocculus fortement développé et d'une période de vol printanière. Les tergites ont une pubescence réduite, reflétant sa période de vol plus tardive par rapport aux autres membres du sous-genre ; A. fucata est la dernière à émerger de ce groupe, sortant vers la fin du printemps. Les femelles se reconnaissent au scopa bicolore (ventralement blanc, dorsalement brun, excluant A. helvola qui a des poils uniformément dorés et la forme claire d'A. varians qui a des poils noirs dorsalement), à l'absence de marges tergales très élargies (occupant moins de la moitié du disque tergal, excluant A. synadelpha), des poils faciaux pâles (excluant A. lapponica et la forme sombre d'A. varians), et des poils faibles et clairsemés sur les disques tergaux (excluant les espèces plus hirsutes, y compris les deux formes d'A. varians qui ont une touffe de poils claire et forte sur T2).",
 					"learnMore": "https://gbif.org/species/1357543",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 5,
 					"images": [
 						"https://drive.google.com/thumbnail?id=16GhlHdc56eodBmYQ4w9E6HB5tyXs38kG&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1H2uF_QTi0VMwg3kqjooYp0SwH3_bhwWx&sz=w1000"
@@ -16139,6 +16191,7 @@
 					"description": "**Identification** : L’Andrène fauve _Andrena fulva_ possède 3 cellules submarginales  \nLa femelle possède 12 articles antennaires, une longue pilosité rousse sur tout le corps, mais les poils de la face ventrale, de la face et des pattes sont noirs.  \nLe mâle possède 13 articles antennaires, d’épaisses mandibules fortement courbes, une pilosité roussâtre sur le thorax, plus dense à la base de ce dernier. La pilosité abdominale est longue et roussâtre. Les poils de la face sont beigeâtre clair. La face ventrale possède des poils noirs. Il possède une dent à la base des mandibules. La cuticule du clypéus est entièrement sombre. Le 3ème segment antennaire est 2 fois plus long que le 4ème.\n\n**Taille** : 11 à 14 mm pour la femelle, 8 à 12mm pour le mâle.\n\n**Habitat** : Surtout dans les jardins, parcs et bois clairs, mais aussi dans les gravières et les pelouses sèches.\n\n**Répartition géographique** : Elle est commune en Europe moyenne.\n\n**Période de vol** : De mars à mai.\n\n**Reproduction** : Elle niche dans le sol, parfois en “colonies” importantes, mais les nids sont toujours individuels. L’entrée du terrier est visible surtout grâce au petit monticule de terre à son entrée. Un nid contient généralement 4 ou 5 cellules, et une abeille peut construire 3 nids.\n\n**Régime** : Elle butine les Groseilliers (_Ribes_), les Myrtilliers (_Vaccinium_), les Cerisiers (_Cerasus_), les Saules (_Salix_), les Hêtres (_Fagus sylvatica_), les Prunelliers (_Prunus spinosa_), les Renoncules (_Ranunculus sp._), les Alliaires officinales (_Alliaria petiolata_), les Aubépines (_Crataegus monogyna_), les Houx (_Ilex aquifolium_), les Erable (_Acer sp._), les Chênes (_Quercus sp._), les Pruniers (_Prunus domestica_), les Viornes lantane (_Viburnum lantana_).\n\n**Espèces semblables** : C’est un genre très compliqué, les différenciations suivantes ne sont pas exhaustives. Je demande toujours confirmation sur le site insecte.org pour les _Andrena_.  \nPour les mâles : Un bon nombre de mâles n’ont pas de dent basale. _Andrena praecox_ et _Andrena_ _apicata_ ont le segment antennaire 3 (=A3) tout au plus 1,5 fois plus long que le A4.  \nPour les femelles : La couleur est assez caractéristique. Elles font plus penser à des _Bombus_, mais chez ces derniers la nervure basale est droite, et leur longueur est très importante le long de la cellule discoïdale 1 et très courte le long de la cellule cubitale (rapport de 4 ou 5 sur 1).\n\n**Sources** :  \n[https://www.insecte.org/](https://www.insecte.org/)  \n[http://www.atlashymenoptera.net/biblio/Patiny\\_&\\_Terzo\\_2010\\_Andrena\\_Belgique\\_et\\_N\\_France\\_full.pdf](http://www.atlashymenoptera.net/biblio/Patiny_&_Terzo_2010_Andrena_Belgique_et_N_France_full.pdf)  \n[http://www.atlashymenoptera.net/page.asp?id=161](http://www.atlashymenoptera.net/page.asp?id=161)  \n[http://www.bwars.com/](http://www.bwars.com/)  \nGuide des abeilles, bourdons, guêpes et fourmis d’Europe, Les guides du naturaliste.",
 					"learnMore": "https://jessica-joachim.com/insectes/hymenopteres/andrenidae/andrene-fauve-andrena-fulva/",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 6,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1JJsOwctlSSGkWi2BIsUVUDskT2FeJi6T&sz=w1000",
 						"https://drive.google.com/thumbnail?id=117_aCRE1D8lQ__jdrh3wrrLvWV4Egq-g&sz=w1000",
@@ -16417,6 +16470,7 @@
 					"description": "#### **Christ, 1791**\n\n❝\n\n_Cette andrène est assez difficile à reconnaitre. La coloration de la troisième paire de pattes et de la frange anale de l’abdomen permet de réduire les choix dans l’identification_\n\n**rdre : Hymenoptera**  \n**Sous-ordre : **Apocrita****  \n**Infra-ordre : **Aculeata****  \n**Super famille : ********Apoidea**********  \n**Famille : ************Andrenidae**************  \n**Sous-famille : ************Andreninae**************  \n**Tribu :**  \n**Genre :** _****_**_Andrena_**_****_  \n**Espèce :** _**Andrena fulvago**_\n\n#### Difficulté de détermination\n\n#### Statut de conservation\n\nDonnées insuffisantes\n\n#### Identification\n\n**Femelle**  \n- 12 segments antennaires  \n- 6 tergites  \n- soies brunes sur le thorax  \n- tibia et tarse 3 oranges  \n- tergites brillants à franges de soies peu marquées  \n- scopa orange à soies plumeuses  \n- frange anale rousse\n\n**Mâle**  \n- 12 segments antennaires  \n- 6 tergites  \n- tibias et tarses 3 oranges\n\n#### Taille\n\n9 à 10mm\n\n#### Habitat\n\nPrairies ouvertes\n\n#### Répartition géographique\n\nSemble assez largement répartie en France  \nEurope centrale et du sud  \n[Cartes INPN et GBIF](https://inpn.mnhn.fr/espece/cd_nom/239352/tab/carte?lg=fr)\n\n#### Période de vol\n\n#### Biologie\n\nComme toutes les Andrènes, elle creuse un terrier dans le sol où elle déposera du pollen qui nourrira sa larve.\n\n#### Pollen collecté\n\nAsteraceae, mais peut butiner d’autres plantes pour se nourrir\n\n#### Parasites\n\n- **Hyménoptère Apidae** : _Nomada facilis_\n\n#### Espèces semblables\n\nCelle-ci a été identifiée sur insecte.org en probable, mais pas certaine. L’espèce la plus proche, présentant les mêmes caractères (couleur de la scopa et de la patte 3, soies des tergites…) est _**Andrena hesperia**_. Cette dernière a le dessus du thorax chagriné.\n\n#### Sources\n\n- [Le Monde des insectes](https://www.insecte.org/forum/viewtopic.php?t=261819)  \n- [Steven Falk Flickr](https://www.flickr.com/photos/63075200@N07/albums/72157640845935815/)  \n- [BWARS](https://bwars.com/bee/andrenidae/andrena-fulvago)  \n- [Atlashymenoptera](http://www.atlashymenoptera.net/page.aspx?id=267)  \n- [INPN](https://inpn.mnhn.fr/espece/cd_nom/239352)",
 					"learnMore": "https://jessica-joachim.com/insectes/hymenopteres/andrenidae/andrena-fulvago/",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 30,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1flYEIWRE0i5J1AEI9ku7N1rSBhaM9loz&sz=w1000",
 						"https://drive.google.com/thumbnail?id=14AImvue9n7RpT3rktqx1_XQ98ZFLMMwF&sz=w1000",
@@ -16710,6 +16764,7 @@
 					"key": "1357663",
 					"label": "Andrena fulvata",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 47,
 					"description": "Les femelles peuvent être reconnues comme Euandrena en raison de leurs fovéas en forme de goutte qui se rétrécissent ventralement et de leurs poils scopaux simples (non plumeux, comme chez Chrysandrena). Elles étaient auparavant placées dans le sous-genre Ptilandrena, principalement sur la base de la morphologie des mâles, mais ceci n'est pas soutenu par des preuves génétiques. Les femelles devraient être identifiées comme faisant partie du groupe d'A. angustior, A. fulvata, et A. lavandulae (=A. impressa) qui ont des marges tergales larges et parfois déprimées et un clypéus avec une impression centrale longitudinale (souvent subtile). Andrena fulvata se rencontre en sympatrie avec A. angustior dans le nord-ouest de l'Europe et peut être séparée de cette dernière par la structure des marges tergales, qui sont fortement chagrinées et mattes, alors qu'elles sont lisses et brillantes chez A. angustior. Andrena fulvata ne semble pas être en sympatrie avec A. lavandulae, son aire de répartition se limitant au sud-est de la France, mais les deux taxons peuvent également être séparés par la structure des marges tergales, car chez A. lavandulae les marges tergales sont moins fortement chagrinée, donc faiblement brillantes. De manière plus évidente, les poils encadrant la plaque pygidiale sont brun doré chez A. fulvata et noirs chez A. lavandulae.",
 					"synonyms": ["Andrena (Euandrena) fulvata"],
 					"images": [
@@ -16906,6 +16961,7 @@
 					"key": "11036408",
 					"label": "Andrena fulvicornis",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 131,
 					"description": "",
 					"synonyms": ["Andrena (Notandrena) fulvicornis"],
 					"images": [
@@ -17198,6 +17254,7 @@
 					"description": "",
 					"learnMore": "https://gbif.org/species/1357732",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 48,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1EmyX752lDFYqHJUS-KviBaGcyXfWzVaC&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1AHKrYZ7aRStW720EpksJRA_x1xcRq1Qt&sz=w1000"
@@ -17482,6 +17539,7 @@
 					"description": "**_Andrena fuscipes_** **(Kirby, 1802)**\n\n**Risques de confusions** :\n\n\\- **_Andrena simillima_** est une espèce très semblable, très rare (presque pas d’observations en France). C’est une espèce un peu plus grande (10 à 11mm), avec le clypéus mat (brillant sur une large zone médio apicale chez _A. fuscipes_). Elle est également plus hirsute, les soies du dessus du thorax étant plus denses et d’un roux un peu plus vif, les bandes pileuses de l’abdomen sont plutôt blanchâtres et semblent également plus larges, avec des soies plus courtes à la base, pouvant recouvrir presque entièrement le tergite. Elle n’est pas spécialisée sur les Callunes (mais peut les butiner).  \n  \n\\- **_Andrena flavipes_** butine une très large variété de plantes, sa scopa est entièrement orange.\n\n\\- **_Andrena gravida_** a les bandes pileuses de son gastre blanchâtres, ainsi que la pilosité de la face et des côtés du thorax, contrastant avec la pilosité du dessus du thorax qui est brune. Elle vole jusqu'à fin juin.\n\n\\- **_Andrena denticulata_** a la pilosité du dessus du thorax noire\n\n**Taille** : 8 à 11mm\n\n**Habitat, répartition** : Elle fréquente les landes.  \n  \nL’espèce est distribuée en Europe de l’ouest et dans le sud et le centre de la Scandinavie.\n\n**Biologie** : Elle ne récolte le pollen que des _Calluna_ et vole de juillet à septembre. Elle nidifie dans des sols sableux.\n\n**Photographies :**  \n© [eudemis](https://www.inaturalist.org/people/eudemis) \\- [CC-BY-NC](https://creativecommons.org/licenses/by-nc/4.0/) \\- Photo principale  \n  \n© [Stella Mielke](https://www.inaturalist.org/people/stella_miel) \\- [CC-BY-NC](https://creativecommons.org/licenses/by-nc/4.0/) \\- Vue de profil  \n  \n© [rbeunen](https://www.inaturalist.org/people/rbeunen) \\- [CC-BY-NC-SA](https://creativecommons.org/licenses/by-nc-sa/4.0/) \\- Nervation\n\n**Sources :**\n\n[Inaturalist](https://www.inaturalist.org/taxa/154664-Andrena-fuscipes)\n\n[GBIF](https://www.gbif.org/fr/species/1357812)\n\n[Atlas de la faune de Suisse](https://species.infofauna.ch/groupe/1/portrait/401)\n\n[Catalogue et clé des sous-genres et espèces du genre](https://quelestcetanimal-lagalerie.com/wp-content/uploads/2012/11/Cle_des_Andrena_du_nord_de_la_France.pdf) _[Andrena](https://quelestcetanimal-lagalerie.com/wp-content/uploads/2012/11/Cle_des_Andrena_du_nord_de_la_France.pdf)_ [de Belgique et du nord de la France](https://quelestcetanimal-lagalerie.com/wp-content/uploads/2012/11/Cle_des_Andrena_du_nord_de_la_France.pdf)",
 					"learnMore": "https://www.gbif.org/fr/species/1357812",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 32,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1eoHAPoPba6YdEo5Vt4yMsWbqoSzgnrMg&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1qxU02Qcz9yEv_iYQkIXS-dXnu__2kkbn&sz=w1000",
@@ -17822,6 +17880,7 @@
 					"description": "Ce taxon est le seul représentant du sous-genre Melanapis et peut être reconnu par la combinaison d'un triangle propodéal aréolé en nid d'abeille, d'un éperon tibial postérieur élargi à la base, d'un pronotum avec une ride latérale, de tergites finement et densément mais aussi faiblement et superficiellement ponctués, et d'un propodéum impuncté. Ceci exclut tous les membres similaires des Plastandrena et Scitandrena.",
 					"learnMore": "https://gbif.org/species/1357838",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 87,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1e_irxLbf2wCZq_q9z29a4nn7j4U6q3eS&sz=w1000",
 						"https://drive.google.com/thumbnail?id=17sLPnfgB8sEGfFJSzE9qW_U6beTuwllZ&sz=w1000"
@@ -18114,6 +18173,7 @@
 					"description": "",
 					"learnMore": "https://gbif.org/species/1358024",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 161,
 					"images": [],
 					"x-credits": {},
 					"narrowerWeights": {
@@ -18397,6 +18457,7 @@
 					"key": "1357636",
 					"label": "Andrena granulosa",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 50,
 					"description": "Les femelles peuvent être reconnues comme Euandrena grâce à leurs fovéas en forme de goutte qui se rétrécissent fortement ventralement et aux poils simples des scopae tibiales (plumeuses chez Chrysandrena). Elles devraient être identifiées grâce à leurs tergites, les marges apicales de T1-4 étant largement éclaircies, de la couleur de l'ivoire. Cela les rapproche d'A. vulpecula, dont la séparation est difficile chez les femelles et nécessite du matériel déterminé avec certitude, idéalement avec un code-barres ou associé à des mâles sympatriques. La séparation est détaillée par la clé de Praz et al. (2019) : Disques tergaux en moyenne plus grossièrement et densément ponctués, intervalles sur le disque de T2 égaux à 1,5-2 fois le diamètre d'un point. Surface des disques tergaux fortement convexe, marge apicale fortement impressionnée. Fovéas relativement longues, commençant au-dessous du milieu des insertions antennaires ... granulosa Disques tergaux en moyenne plus finement et faiblement ponctués, intervalles sur le disque T2 égaux à 3-4 fois le diamètre d'un point, ou plus. Surface des disques tergaux presque plate, bords apicaux moins fortement impressionnés. Fovéas relativement courtes, commençant bien au-dessus du milieu des insertions antennaires ... vulpecula",
 					"synonyms": ["Andrena (Euandrena) granulosa"],
 					"images": [
@@ -18598,6 +18659,7 @@
 					"key": "1358314",
 					"label": "Andrena gravida",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 92,
 					"description": "**_Andrena gravida_** **(Imhoff, 1832)**\n\n**Risques de confusions** :\n\n\\- **_Andrena flavipes_** a les bandes pileuses de l'abdomen jaunâtres, ainsi que la pilosité de la face et des côtés du thorax, contrastant moins avec le dessus du thorax qui est brun\n\n\\- **_Andrena fuscipes_** est une espèce inféodées aux callunes et volant à partir du mois d'août, elle n'a pas la pilosité des côtés du thorax blanche, elle est orangée et ne contraste pas avec le dessus du thorax\n\n\\- **_Andrena vetula_** possède des bandes pileuses blanches et entières sur le gastre, mais le dessus de son thorax ne possède pas de poils roux\n\n**Taille** : 10 à 14mm\n\n**Habitat, répartition** : On la trouve dans différents milieux ouverts.\n\nL’espèce est répartie en Europe de l’ouest, absente d’Europe du nord.\n\n**Biologie** : Les nids sont creusés dans le sol, la plupart du temps en petites agrégations. L’espèce vole de mi-mars à début juin.\n\n**Photographies :**  \n© [Julia Moning](https://www.inaturalist.org/people/birdingjulia) \\- [CC-BY](https://creativecommons.org/licenses/by/4.0/) \\- Photo principale\n\n© [Brenda Black](https://www.inaturalist.org/people/spiphany) \\- [CC-BY](https://creativecommons.org/licenses/by/4.0/) \\- Photo dans la bulle\n\n**Sources :**\n\n[Inaturalist](https://www.inaturalist.org/taxa/484512-Andrena-gravida)  \n  \n[GBIF](https://www.gbif.org/species/1358314)  \n[Atlas de la faune de Suisse](https://species.infofauna.ch/groupe/1/conservation/372)\n\n[Catalogue et clé des sous-genres et espèces du genre](https://quelestcetanimal-lagalerie.com/wp-content/uploads/2012/11/Cle_des_Andrena_du_nord_de_la_France.pdf) _[Andrena](https://quelestcetanimal-lagalerie.com/wp-content/uploads/2012/11/Cle_des_Andrena_du_nord_de_la_France.pdf)_ [de Belgique et du nord de la France](https://quelestcetanimal-lagalerie.com/wp-content/uploads/2012/11/Cle_des_Andrena_du_nord_de_la_France.pdf)\n\n[The genus](https://jhr.pensoft.net/article/101873/) _[Andrena](https://jhr.pensoft.net/article/101873/)_ [in the Iberian Peninsula](https://jhr.pensoft.net/article/101873/)",
 					"synonyms": ["Andrena (Melandrena) gravida"],
 					"images": [
@@ -18894,6 +18956,7 @@
 					"key": "10703062",
 					"label": "Andrena gredana",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 168,
 					"description": "<b> Attention, cette espèce n'a été codée que sur la base de la littérature, nous vous conseillons donc de ne vous fier à cette identification qu'après le recoupement avec d'autres ressources taxonomiques. </b> <br>",
 					"synonyms": ["Andrena (Taeniandrena) gredana"],
 					"images": [],
@@ -19084,6 +19147,7 @@
 					"key": "1358357",
 					"label": "Andrena griseobalteata",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 135,
 					"description": "Andrena griseobalteata femelle peut être reconnue comme une Notandrena grâce à sa tête courte et large, son angle huméral marqué sur le pronotum, sa ponctuation dense et régulière sur les tergites et le manque d'autres caractères distinctifs. La ponctuation du scutum est extrêmement dense (distance moyenne entre les points de 0,5 fois le diamètre d'un point), ce qui la place proche de A. ungeri Mavromoustakis, 1952 (non-présente en France). Les deux espèces peuvent être facilement séparées : A. griseobalteata est bien plus grande (10-11 mm vs 7-8 mm), les tarses sont orange clair (noirs chez A. ungeri), et la ponctuation des tergites est comparativement plus grande et plus grossière.",
 					"synonyms": ["Andrena (Notandrena) griseobalteata"],
 					"images": [
@@ -19375,6 +19439,7 @@
 					"description": "**Ordre : Hymenoptera**  \n**Sous-ordre : Apocrita**  \n**Infra-ordre :**   \n**Super famille : Apoidea**  \n**Famille : Andrenidae**  \n**Sous-famille : Andreninae**  \n**Tribu :**   \n**Genre : _Andrena_**  \n**Espèce : _Andrena haemorrhoa_**\n\n**Identification** : _Andrena haemorrhoa_ est une des rare andrènes qui s’identifie assez facilement. Son thorax recouvert de poils roux combiné à la touffe rousse de l’apex de l’abdomen permettent de l’identifier. On peut également noter l’abdomen noir possédant seulement quelques poils pâles sur les côtés, la pilosité blanche sur la face et les côtés du thorax et le tibia 3 orangé.  \nLes mâles ont des poils roux sur la tête.\n\n**Taille** : 7 à 10 mm.\n\n**Habitat** : Elle fréquente une grande diversité de milieux, des pelouses sèches aux prairies grasses, en passant par les bords de chemins et les jardins.\n\n**Répartition géographique** : Europe septentrionale et moyenne.\n\n**Période de vol** : D’avril à juin.\n\n**Plantes visitées** : Elle butine un grand nombre de plante, et est une pollinisatrice très efficace notamment dans les vergers et pour certaines espèces menacées d’orchidées.\n\n**Nidification** : Elle niche isolément ou en petites bourgades dans le sol dans des endroits très diversifiés.\n\n**Parasite** : _Nomada ruficornis_.\n\n**Espèces semblables** :  \nElle est caractéristique avec son thorax roux et surtout la touffe de poils de même couleur à l’extrémité de l’abdomen. Il existe plusieurs autres espèces avec un thorax roux mais aucune avec en plus un abdomen noir à touffe rousse à l’apex (_Andrena hattorfiana_ a aussi une touffe de poils roux à l’apex de l’abdomen mais le thorax est glabre).\n\n**Sources** :  \n[Insecte.org](https://www.insecte.org/)  \nAbeilles sauvages, Nicolas Vereecken et Bernhard Jacobi  \nGuide des abeilles, bourdons, guêpes et fourmis d’Europe",
 					"learnMore": "https://jessica-joachim.com/insectes/hymenopteres/andrenidae/andrene-a-cul-rouge-andrena-haemorrhoa/",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 173,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1Mwa9kSC0XjkZIuqQXE7KdXCcEOJ5UKFe&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1F6f3kqha4bq9rLf5I1RHyQMSUV2rnCrz&sz=w1000",
@@ -19681,6 +19746,7 @@
 					"description": "#### Fabricius, 1775\n\n❝\n\n_Cette grande Andrène ne récolte le pollen que des scabieuses et des knauties, ce qui facilite son identification_\n\n**Ordre : Hymenoptera**  \n**Sous-ordre : Apocrita**  \n**Infra-ordre :**  \n**Super famille : ******Apoidea********  \n**Famille : ********Andrenidae**********  \n**Sous-famille : ************Andreninae**************  \n**Tribu : Abraxini**  \n**Genre :** _****_**_Andrena_**_****_  \n**Espèce :** _**Andrena hattorfiana**_\n\n#### Difficulté de détermination\n\n#### Statut de conservation\n\n**Quasi menacé** à l’échelle européenne  \nEspèce déterminante ZNIEFF en Alsace et en Ile-de-France\n\n#### Identification\n\n**Femelle**  \n- pilosité du corps discrète  \n- gastre entièrement noir ou taché de roux sur les premiers tergites  \n- bandes de poils étroites à la marge postérieure des tergites  \n- pilosité rousse à l’apex de l’abdomen  \n- 12 segments antennaires  \n- 6 tergites\n\n**Mâle**  \n- abdomen noir, parfois apex des segments 1 à 3 taché de rouge  \n- face blanche à deux petites taches noires  \n- 13 segments antennaires  \n- 7 tergites\n\n#### Taille\n\n13 à 18mm de long\n\n#### Habitat\n\nPrairies ouvertes, là où poussent les scabieuses et les knauties\n\n#### Répartition géographique\n\nLargement répartie en France  \nDu sud de la Fennoscandie à l’Espagne jusqu’à l’est du Caucase  \n[Carte INPN et GBIF](https://inpn.mnhn.fr/espece/cd_nom/239363/tab/carte)\n\n#### Période de vol\n\n#### Fleurs visitées\n\nOligolectique sur _Knautia_ et _Scabiosa_\n\n#### Biologie\n\nElle niche dans le sol, seule ou en petit groupes, dans des sites ouverts et cachés par la végétation basse\n\n#### Parasite\n\n**_Nomada armata_**\n\n#### Espèces semblables\n\nCette andrène est assez facilement reconnaissable. Sa grande taille, sa coloration sombre aux ailes enfumées, les soies rousses sur les derniers tergites et le fait qu’elle ne butine que les knauties et les scabieuses (récoltant leur pollen qui est bien rose) font d’elle une des rares andrènes reconnaissables au premier coup d’œil. En tout cas pour les femelles récoltant du pollen.\n\n#### Sources\n\n- [Steven Falk | Flickr](https://www.flickr.com/photos/63075200@N07/)  \n- [Bees Wasps & Ants Recording Society | BWARS](https://bwars.com/)  \n- [Atlas Hymenoptera](http://www.atlashymenoptera.net/default.aspx)",
 					"learnMore": "https://jessica-joachim.com/insectes/hymenopteres/andrenidae/andrene-de-la-scabieuse-andrena-hattorfiana/",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 20,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1ZNuVCZ-C-hH04RffihgeecMm9ku7xaqP&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1fXIYQ1Nz2mjE55vh61AMMCSBTUY57Wq-&sz=w1000",
@@ -19970,6 +20036,7 @@
 					"key": "1357073",
 					"label": "Andrena hedikae",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 2,
 					"description": "Andrena hedikae est reconnaissable à la combinaison de poils squameux sur le scutum, à la petite taille du corps et à la brillance bronzée du tégument tergal. Elle ne peut être confondue qu'avec A. aeneiventris qui peut être séparée par la ponctuation tergale qui est obscure et faible, se fondant dans la chagrination sous-jacente, alors que chez A. hedikae, la ponctuation tergale est dense et distincte, en particulier latéralement sur T2-3.",
 					"synonyms": ["Andrena (Aenandrena) hedikae"],
 					"images": [
@@ -20257,6 +20324,7 @@
 					"description": "**_Andrena helvola_** **(Linnaeus, 1758)**\n\n**Risques de confusions** :  \n  \n**_Andrena synadelpha_** et **_Andrena varians_** sont semblable mais leur scopa est bicolore, à poils clairs et foncés, et leur face est souvent en grande partie couverte de poils sombres\n\n**Taille** : 10 à 12mm\n\n**Habitat, répartition** : Lisières de forêts, bois clairs, clairières.\n\nDistribuée de la France à la moitié sud de la Scandinavie, du Royaume-Uni à la Russie européenne.\n\n**Biologie** : Elle est polylectique et récolte le pollen d’un très grand nombre de familles de plantes. Le nid est creusé dans un sol sablonneux ou limoneux. Elle vole d’avril à juin.\n\n**Photographies :**  \n© [Rasmus Allesoee](https://www.inaturalist.org/people/rasmuscool99) \\- [CC-BY-NC](https://creativecommons.org/licenses/by-nc/4.0/) \\- Photo principale  \n  \n© [naturalist\\_ua](https://www.inaturalist.org/people/naturalist_ua) \\- [CC-BY-NC](https://creativecommons.org/licenses/by-nc/4.0/) \\- Photo de profil\n\n**Sources :**  \n[Inaturalist](https://www.inaturalist.org/taxa/484513-Andrena-helvola/browse_photos)  \n  \n[GBIF](https://www.gbif.org/fr/species/1357179)  \n[Atlas de la faune de Suisse](https://species.infofauna.ch/groupe/1/chorologie/412)  \n[Catalogue et clé des sous-genres et espèces du genre](https://quelestcetanimal-lagalerie.com/wp-content/uploads/2012/11/Cle_des_Andrena_du_nord_de_la_France.pdf) _[Andrena](https://quelestcetanimal-lagalerie.com/wp-content/uploads/2012/11/Cle_des_Andrena_du_nord_de_la_France.pdf)_ [de Belgique et du nord de la France](https://quelestcetanimal-lagalerie.com/wp-content/uploads/2012/11/Cle_des_Andrena_du_nord_de_la_France.pdf)",
 					"learnMore": "https://www.gbif.org/fr/species/1357179",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 7,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1HEl_gpgaNVo8Ci6rievpolUCaf4a3ITl&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1FRtN7isLmEsUdI6zkqUt4HN05Fo9w1BJ&sz=w1000",
@@ -20547,6 +20615,7 @@
 					"key": "1357279",
 					"label": "Andrena hesperia",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 31,
 					"description": "",
 					"synonyms": ["Andrena (Chrysandrena) hesperia"],
 					"images": [
@@ -20862,6 +20931,7 @@
 					"description": "",
 					"learnMore": "https://gbif.org/species/1357477",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 21,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1lrCz_i6Rsotb8ypuLHCsrnWSZatuOd90&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1_uuCCJq9gEsiRCiAR9r4zGIV4zKpjUXp&sz=w1000"
@@ -21151,6 +21221,7 @@
 					"description": "",
 					"learnMore": "https://gbif.org/species/1357585",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 69,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1jnevmp3gh5JdC6c4TfCCivnuPryFYjWw&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1TWFv5P9MA8j7DhFkXhwtOjUEd1WVRzMj&sz=w1000"
@@ -21420,6 +21491,7 @@
 					"key": "1357601",
 					"label": "Andrena hystrix",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 1,
 					"description": "",
 					"synonyms": ["Andrena (Aenandrena) hystrix"],
 					"images": [
@@ -21711,6 +21783,7 @@
 					"description": "Reconnaître A. impunctata au niveau du sous-genre est un défi car les Graecandrena sont largement définis sur la base des caractères mâles (par exemple la capsule génitale). Les femelles ont une morphologie intermédiaire entre les sous-genres non apparentés Aciandrena et Micrandrena, et devraient être directement comparées à eux en raison de leur petite taille et de leur tégument sombre. Le triangle propodéal est partiellement rugueux à la base, alors que les Aciandrena ont un triangle propodéal entièrement granuleux et que la plupart des Micrandrena ont un triangle propodéal entièrement rugueux. Il est plus utile de reconnaître directement les caractères spécifiques de l'espèce A. impunctata dans le sexe femelle plutôt que d'essayer de reconnaître le sous-genre. Spécifiquement, A. impunctata peut être reconnue grâce à la combinaison de fovéas faciales étroites (occupant 1/3 de l'espace entre l'œil composé et l'ocelle latéral, plus étroit que la largeur d'un flagelle) qui se rétrécissent légèrement plus loin ventralement, les stries longitudinales du frons qui se poursuivent ventralement à travers les zones paraoculaires jusqu'aux marges dorsolatérales du clypéus, et le clypéus qui est largement aplati et régulièrement ponctué, les ponctuations étant séparées par 1 à 2 diamètres de ponctuation, avec une impression longitudinale distincte médialement. Cette combinaison de caractères est unique chez les Andrena.",
 					"learnMore": "https://gbif.org/species/1358228",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 55,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1j5XorIs0fYjIl9FFopknFfQosTIaBZiv&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1zZhtUX8kLDWWIZ28KVKkoVoGJlE-LZEQ&sz=w1000"
@@ -21974,6 +22047,7 @@
 					"key": "1357894",
 					"label": "Andrena intermedia",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 162,
 					"description": "",
 					"synonyms": ["Andrena (Taeniandrena) intermedia"],
 					"images": [
@@ -22289,6 +22363,7 @@
 					"description": "",
 					"learnMore": "https://gbif.org/species/1357222",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 58,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1VSwcKGkMDt3lOqrHHBR_AjV5mC4tahi2&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1fIQIgHTufzc1GjpxJQyf5TSdcAcnXOnH&sz=w1000"
@@ -22564,6 +22639,7 @@
 					"description": "",
 					"learnMore": "https://gbif.org/species/1357207",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 146,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1epimr-ApqtWH_GMR5QW2kdHCdmuVbZmY&sz=w1000",
 						"https://drive.google.com/thumbnail?id=16CvY4bq3IRlpEBXIPe8hy2J9AYQml0V9&sz=w1000"
@@ -22851,6 +22927,7 @@
 					"description": "**Identification** : _Andrena lagopus_ ne possède que 2 cellules cubitales.  \nLa femelle a le thorax recouvert de poils roux. Sa brosse de récolte est beige. Son abdomen est noir, l’extrémité des tergites possède une rangée de poils blancs.  \nLe mâle possède également des poils roux sur le thorax.\n\n**Taille** : De 8 à 10 mm.\n\n**Comportement** : Elle butine les crucifères (_Brassicaceae)_ comme la moutarde, le colza, la barbarée commune (_Barbarea vulgaris_)\n\n**Période d’observation** : D’avril à juin.\n\n**Reproduction** : Elle niche dans des zones à faible végétation, dans un trou creusé au sol.\n\n**Espèces semblables** :  \nC’est la seule _Andrena_ à ne posséder que 2 cellules cubitales.  \nLes _Megachilidae_ ont la brosse de récolte sous l’abdomen (femelles).  \nLes _Colletidae_, _Halicitidae_, et _Melita_ ont 3 cellules cubitales.\n\n**Sources** :  \n[https://www.insecte.org/](https://www.insecte.org/)  \n[http://www.naturspaziergang.de/](http://www.naturspaziergang.de/)  \n[https://www.wildbiene.com/standard/content.php?am=11&as=0&am\\_a=](https://www.wildbiene.com/standard/content.php?am=11&as=0&am_a=)",
 					"learnMore": "https://jessica-joachim.com/insectes/hymenopteres/andrenidae/andrena-lagopus/",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 17,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1OWS-u4q2-EQS5b33FtFLuewaJlsdGyCm&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1suSLDyQvNgPYWoyHjT29sjQlNTTQl04k&sz=w1000",
@@ -23132,6 +23209,7 @@
 					"description": "",
 					"learnMore": "https://gbif.org/species/1357056",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 8,
 					"images": [
 						"https://drive.google.com/thumbnail?id=11gyfknLj6wjFVbcdJbP-i4B6cqfc5Pwo&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1RlAZIxLeHHzjWVVuD1OFNv3P4Mp3XYIG&sz=w1000"
@@ -23338,6 +23416,7 @@
 					"description": "La femelle peut être reconnue comme une Taeniandrena grâce à son clypéus fortement aplati. La forme de la plaque pygidienne est unique, celle-ci étant fortement et largement échancrée au centre, apparaissant ainsi « entaillée ».",
 					"learnMore": "https://gbif.org/species/1357026",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 163,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1Ek7g95G3ovp0W0KWNyAfljpnXYXVk7I4&sz=w1000",
 						"https://drive.google.com/thumbnail?id=13H7N1okuVuBICU5Fdonh3P3MIDfdHAkI&sz=w1000"
@@ -23617,6 +23696,7 @@
 					"key": "12057027",
 					"label": "Andrena lavandulae",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 53,
 					"description": "Andrena lavandulae peut être identifiée parmi le sous-genre Euandrena élargi grâce à la combinaison de fovéas en forme de goutte qui se rétrécissent ventralement et de scopae composées de poils simples (non plumeux). En raison de ses marges tergales larges et impressionnées, de son clypéus avec une empreinte longitudinale centrale et de la morphologie de la tête du mâle, elle est la plus proche d'A. angustior et d'A. fulvata qui ont été historiquement regroupées en tant que sous-espèces d'A. angustior.  Andrena lavandulae peut être séparée d'A. fulvata par la structure des marges tergales, car chez A. fulvata les marges tergales sont fortement chagrinées et mattes, alors que chez A. lavandulae les marges tergales sont moins fortement chagrinées, donc faiblement brillantes. De manière plus évidente, les poils encadrant la plaque pygidiale sont brun doré chez A. fulvata et noirs chez A. lavandulae. De plus, les deux taxons ne semblent pas se rencontrer en sympatrie, A. lavandulae atteignant le sud-ouest de la France et A. fulvata le sud-est de la France.  Andrena lavandulae se rencontre en sympatrie avec A. angustior dans les Pyrénées et en Ibérie. Chez A. angustior, les marges tergales sont larges et déprimées, avec une surface lisse et brillante, alors qu'elles sont légèrement chagrinées et peu brillantes chez A. lanvandulae. Plus nettement, les poils encadrant la plaque pygidiale sont brun doré chez A. angustior et noirs chez A. lavandulae.",
 					"synonyms": ["Andrena (Euandrena) lavandulae"],
 					"images": [
@@ -23892,6 +23972,7 @@
 					"key": "1358383",
 					"label": "Andrena lepida",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 154,
 					"description": "",
 					"synonyms": ["Andrena (Simandrena) lepida"],
 					"images": [
@@ -24212,6 +24293,7 @@
 					"key": "1358354",
 					"label": "Andrena leptopyga",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 84,
 					"description": "Les femelles peuvent être identifiées comme Leucandrena en raison de leur flocculus fortement développé, de la plaque pygidiale avec une zone centrale développée clairement surélevée, du pronotum avec un angle huméral fort, des fovéas faciales larges qui occupent plus de ½ de l'espace entre l'œil composé et l'ocelle latéral, et des tergites sans longs poils sur les disques tergaux (avec seulement des poils épars et des bandes de poils apicaux denses). La séparation d'Andrena s. str. n'est pas toujours simple au niveau du sous-genre, mais le contexte écologique doit être pris en compte, car A. leptopyga se trouve dans des habitats méditerranéens chauds dans le sud-ouest de l'Europe, et n'est généralement pas rencontrée avec les espèces d'Andrena s. str. qui se trouvent dans des habitats tempérés, dans le sud-ouest de l'Europe, principalement dans les montagnes. Andrena leptopyga doit être reconnue grâce à son clypéus bombé qui est essentiellement impuncté, la surface sous-jacente est fortement microréticulée et terne avec seulement une étroite bande brillante sur son bord apical. Les tergites ont également des bandes de poils pâles apicales denses et étroites qui contrastent avec les poils sombres de la frange terminale et ceux qui entourent la plaque pygidiale. Elle est similaire à A. mistrensis Grünwaldt, 2005 (non-présente en France), mais cette espèce ne se trouve que dans le sud-est de l'Europe et les deux espèces ne sont donc jamais trouvées ensemble.",
 					"synonyms": ["Andrena (Leucandrena) leptopyga"],
 					"images": [
@@ -24513,6 +24595,7 @@
 					"description": "Les femelles peuvent être reconnues comme des Chlorandrena grâce à la présence d'une rangée transverse de dents en forme d'épines sur la face postérieure du fémur postérieur et de poils scopaux légèrement plumeux sur les tibias. Au sein des Chlorandrena, elle est immédiatement reconnaissable aux poils courts et presque squameux de couleur brun clair du scutum et du scutellum. Elle ne partage ce caractère qu'avec A. boyerella Dours, 1872 qui, en Europe, n'est connue que de la Sicile. Les deux espèces ne se rencontrent donc pas en sympatrie. Andrena leucolippa se reconnaît aussi à la combinaison de sa longue distance ocello-occipitale (3 fois le diamètre d'un ocelle latéral), de ses tergites brillants et régulièrement ponctués, de ses ponctuations non cratériformes et de ses marges tergales étroitement mais nettement éclaircies de jaune hyalin.",
 					"learnMore": "https://gbif.org/species/1358283",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 27,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1Cjx245pFIzoIkSKIyRNxzw2OT6sXDaqw&sz=w1000"
 					],
@@ -24821,6 +24904,7 @@
 					"description": "A. limata peut être reconnue comme une Melandrena en raison de la taille relativement grande de son corps, de ses scopae tibiaux noirs, de sa longue distance ocello-occipitale (plus de deux fois le diamètre d'un ocelle latéral), de son pronotum sans angle huméral, de son triangle propodéal rugueux (mais non aréolé), de son éperon tibial postérieur droit et de ses larges fovéas faciales (occupant plus de ½ de l'espace entre l'œil composé et l'ocelle latéral), ainsi que de l'absence d'autres caractéristiques distinctives. En raison de la pilosité brune du mésosoma et des tergites brillants et clairement ponctués, elle peut être comparée à A. nitida et A. thoracica (Andrena assimilis Radoszkowski, 1876 a des tergites chagrinés et obscurément ponctués). La séparation d'avec A. nitida devrait être directe, car A. nitida est beaucoup plus pâle, présente des poils pâles sur la face et les scopae tibiaux sont bicolores, dorsalement sombres et ventralement blanc-pâle, alors que chez A. limata les poils faciaux sont sombres et les scopae tibiaux sont uniformément sombres. Cependant, en raison des variations morphologiques, cette séparation n'est pas toujours évidente.  La séparation avec A. thoracica est très problématique dans certaines parties de l'Europe. En Europe centrale, A. thoracica présente des poils sombres latéralement sur le mesepisternum et les éperons tibiaux postérieurs sont noirs, tandis qu'A. limata présente des poils pâles sur le mesepisternum et les éperons tibiaux postérieurs sont jaune-orange clair. Cependant, dans certaines parties du sud de l'Europe, en particulier dans le sud-ouest, les couleurs d'A. thoracica et d'A. limata convergent. Les deux taxons ne sont donc séparables que par la densité de la ponctuation de T1 qui est beaucoup plus dense chez A. limata (distance entre deux points en moyenne <1 fois le diamètre d'un point), alors que chez A. thoracica la ponctuation est plus éparse (distance entre deux points en moyenne >1 fois le diamètre d'un point). Ces distances sont variables dans l'aire de répartition des deux espèces, mais au sein des faunes, elles se conforment à ce modèle relatif. Il convient d'être extrêmement prudent lors de la séparation de ces deux taxons dans le sud de l'Europe.",
 					"learnMore": "https://gbif.org/species/1358095",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 96,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1B2gpxvC_dvPvyB7dELxQLX7wYou-jvti&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1uUc5tVDp9uFbv-xULV3McE2XDD0IcJG4&sz=w1000"
@@ -25115,6 +25199,7 @@
 					"key": "1358080",
 					"label": "Andrena limbata",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 70,
 					"description": "Les femelles étaient auparavant placées dans le groupe Poliandrena, aujourd'hui disparu. Elles font partie du sous-genre monotypique Limbandrena et se reconnaissent à la combinaison de caractères : poils bruns squameux sur le scutum, le scutellum et le métanotum, longue distance ocello-occipitale égale à trois fois le diamètre d'un ocelle latéral, face postérieure du fémur postérieur dépourvue de carène transverse et de rangée transversale de dents ou d'épines surélevées, surfaces dorsales du propodéum faiblement et peu ponctuées, délimitation latérale nette et rugosité interne fine du propodéum, surfaces dorsolatérales du propodéum faiblement et superficiellement ponctuées, triangle propodéal latéralement bien délimité et intérieurement finement rugueux, pronotum présentant tout au plus un faible angle latéral, tête plus ou moins carrée qui n'est que 1,1 fois plus large que longue, et éperon tibial postérieur simple qui n'est pas élargi basalement ou médialement. Elle ressemble superficiellement à certains membres du sous-genre Lepidandrena en raison des poils squameux du scutum, mais l'absence de fines épines sur la face postérieure du fémur postérieur et la plus grande distance ocello-occipitale permettent de les séparer facilement.",
 					"synonyms": ["Andrena (incertae sedis) limbata"],
 					"images": [
@@ -25311,6 +25396,7 @@
 					"key": "1358020",
 					"label": "Andrena livens",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 22,
 					"description": "",
 					"synonyms": ["Andrena (Chlorandrena) livens"],
 					"images": [
@@ -25620,6 +25706,7 @@
 					"description": "**_Andrena marginata_** **(Fabricius, 1776)**\n\n**Risques de confusions** :\n\n\\- **_Andrena pellucens_** est proche mais elle possède une échancrure orange sur la tache noire de T1 et ses deux derniers tergites sont noirs. Elle n'est pas aussi spécialisée dans sa récolte de pollen et visite plusieurs familles de plantes, notamment les Asteraceae et les Colchicaceae\n\n\\- **_Andrena rosae_** a au plus les tergites 1 à 3 rouges, la génération d'été récolte le pollen des Apiaceae\n\n\\- **_Andrena florea_** a au moins les 3 derniers tergites noirs et elle est inféodée aux Bryones\n\n\\- **_Andrena hattorfiana_**, qui butine les scabieuses, est en principe entièrement noire, mais certains individus ont les tergites 1 et 2 tachés de rouge (mais l'abdomen n'est pas aussi largement rouge que chez _A. marginata_)\n\n\\- **_Andrena potentillae_** est très petite (5 à 7mm), vole en mars-avril et est spécialisée sur les potentilles.\n\n\\- Les **_Sphecodes_**, qui font partie de la famille des Halictidae, ont la tête et le thorax noirs et nettement moins velus. Ce sont des espèces coucous, qui ne possèdent pas de brosse de récolte.\n\n**Taille** : 9 à 10mm\n\n**Habitat, répartition** : Elle fréquente une grande diversité de milieux pourvu que ses plantes de prédilections y poussent.  \n  \nDistribuée en Europe, du sud de la Scandinavie à l’Espagne, du Royaume-Uni à la Russie Européenne.\n\n**Biologie** : Elle récolte le pollen des Caprifoliaceae (succise, knautie, scabieuse). Elle niche dans des sols sableux ou limoneux et vole de juillet à septembre.\n\n**Photographies :**  \n© [Brenda Black](https://www.inaturalist.org/people/spiphany) \\- [CC-BY](https://creativecommons.org/licenses/by/4.0/) \\- Photo principale  \n  \n© [aga-ma](https://www.inaturalist.org/people/aga-ma) \\- [CC-BY-NC](https://creativecommons.org/licenses/by-nc/4.0/) \\- Abdomen\n\n**Sources :**\n\n[Inaturalist](https://www.inaturalist.org/taxa/484519-Andrena-marginata)\n\n[GBIF](https://www.gbif.org/fr/species/1357540)\n\n[Atlas de la faune Suisse](https://species.infofauna.ch/groupe/1/portrait/442)  \n  \n[Catalogue et clé des sous-genres et espèces du genre](https://quelestcetanimal-lagalerie.com/wp-content/uploads/2012/11/Cle_des_Andrena_du_nord_de_la_France.pdf) _[Andrena](https://quelestcetanimal-lagalerie.com/wp-content/uploads/2012/11/Cle_des_Andrena_du_nord_de_la_France.pdf)_ [de Belgique et du nord de la France](https://quelestcetanimal-lagalerie.com/wp-content/uploads/2012/11/Cle_des_Andrena_du_nord_de_la_France.pdf)",
 					"learnMore": "https://www.gbif.org/fr/species/1357540",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 85,
 					"images": [
 						"https://drive.google.com/thumbnail?id=14NwO4FP_uWmAl8tHCPTawoYz2XIv7nB4&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1kaI9vvc0kjmoUXOCZ5nVoWcATTRo277e&sz=w1000",
@@ -25934,6 +26021,7 @@
 					"key": "1357154",
 					"label": "Andrena miegiella",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 19,
 					"description": "Andrena miegiella peut être reconnue comme une Brachyandrena en raison du triangle propodéal fortement rugueux qui est délimité latéralement par de fortes carènes, de la présence d'une paire de petites fovéas allongées latéralement sur T2, et d'un scutum et de tergites fortement et densément ponctués. Andrena miegiella forme une paire d'espèces avec A. colletiformis, et peut être séparée par la forme de l'appendice du labre qui forme une pointe apicale (présence d'une échancrure au milieu de la marge antérieure chez A. colletiformis).",
 					"synonyms": ["Andrena (Brachyandrena) miegiella"],
 					"images": [
@@ -26218,6 +26306,7 @@
 					"description": "",
 					"learnMore": "https://gbif.org/species/1357013",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 106,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1KKQCxL0BHM_QLsy047dGVblCaVPE7Irw&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1peE1QKf61uwu-377Vjpl5vE-AW7bbl3b&sz=w1000"
@@ -26486,6 +26575,7 @@
 					"description": "",
 					"learnMore": "https://gbif.org/species/1356982",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 107,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1-CN2zJtd_iCcK7Mm6CnysFJRsspHx04r&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1L6fSs5nBMMTK_oXMlI-KfIVjO7zWK4q-&sz=w1000"
@@ -26774,6 +26864,7 @@
 					"description": "",
 					"learnMore": "https://gbif.org/species/1356909",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 9,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1SFQ2SnFrMX6wvCnDaPuk5wdjNWnDlH_H&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1X9Ph2WhSzk_i1I3K_61dE-6F9yJ4-LzZ&sz=w1000"
@@ -27068,6 +27159,7 @@
 					"key": "1358329",
 					"label": "Andrena montana",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 42,
 					"description": "<b> Attention, cette espèce n'a été codée que sur la base de la littérature, nous vous conseillons donc de ne vous fier à cette identification qu'après le recoupement avec d'autres ressources taxonomiques. </b> <br>",
 					"synonyms": ["Andrena (Euandrena) montana"],
 					"images": [
@@ -27293,6 +27385,7 @@
 					"description": "",
 					"learnMore": "https://gbif.org/species/1358237",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 94,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1zeSg3AqNcg7RwKr6YBi_w1avV3NoUZkD&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1-F_LsAMr1TKNX4hmzRjBw_MtgqOONndl&sz=w1000"
@@ -27573,6 +27666,7 @@
 					"key": "1358192",
 					"label": "Andrena mucida",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 39,
 					"description": "",
 					"synonyms": ["Andrena (Didonia) mucida"],
 					"images": [
@@ -27790,6 +27884,7 @@
 					"description": "Andrena nana femelle devrait être reconnue comme Micrandrena grâce à sa petite taille, sa couleur noire et son triangle propodéal latéralement délimité par des carènes, avec la surface interne marquées par des carènes surélevées. Andrena nana possède une combinaison de caractères unique : les tergites sont brillants sous la ponctuation et les fovéas sont fortement rétrécies ventralement, jusqu'à la moitié de leur largeur au niveau dorsal, ce qui empêche toute confusion possible avec d'autres Micrandrena européennes.",
 					"learnMore": "https://gbif.org/species/1358011",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 118,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1MHGw0WYjn_vm8vghS1-oXtV1DPuRH8on&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1zgxXistc1h_CCPE1QYSbXirU805hUtMr&sz=w1000"
@@ -28087,6 +28182,7 @@
 					"key": "1357958",
 					"label": "Andrena nanula",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 108,
 					"description": "",
 					"synonyms": ["Andrena (Micrandrena) nanula"],
 					"images": [
@@ -28376,6 +28472,7 @@
 					"description": "",
 					"learnMore": "https://gbif.org/species/1357734",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 33,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1bbbranywPSzqRHli5BAGGWJLJTSXCi3F&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1WFD-k_qty0EE49Wsc-PjM4QXPDJAnoz5&sz=w1000"
@@ -28656,6 +28753,7 @@
 					"description": "**Ordre : Hymenoptera**  \n**Sous-ordre : Apocrita**  \n**Infra-ordre :**   \n**Super famille : Apoidea**  \n**Famille : Andrenidae**  \n**Sous-famille : Andreninae**  \n**Tribu :**   \n**Genre : _Andrena_**  \n**Espèce : _Andrena nigroaenea_**\n\n**Identification** : _Andrena nigroaenea_ a une pilosité brune rousse courte et régulière sur les disques des tergites, un peu plus nette à l’apex de ceux-ci. L’extrémité de l’abdomen est noire. Le thorax a une pilosité blond foncé.  \nLa femelle a généralement les poils de la face noirs, mais possède parfois aussi des poils clairs. La brosse de récolte est de couleur blond foncé.  \nLe mâle a de longs poils fauves sur la face.\n\n**Taille** : 10 à 15 mm.\n\n**Habitat** : De préférence dans les zones à sol sec et sablonneux.\n\n**Période de vol** : De fin mars à juin.\n\n**Plantes butinées** : Polylectique. Le mâle est le seul pollinisateur de l’Ophrys araignée (Ophrys aranifera) et de l’Ophrys des lupercales (Ophrys lupercalis).\n\n**Nidification** : Solitaire, dans le sol nu ou à végétation rase.\n\n**Parasite** : _Nomada goodeniana, Nomada marshamella et Nomada succincta_ en cleptoparasite.\n\n**Espèces semblables** :  \nA compléter, genre compliqué et individu confirmé sur insecte.org.  \nPour les femelles, celles (que j’ai trouvé en parcourant la galerie sur ce même site) qui ont aussi une brosse tibiale entièrement orange :  \n_Andrena flavipes_ a les bandes de pilosité postérieures des tergites qui sont mieux délimitée.  \n_Andrena_ _tibialis_ a les poils de la face et des côtés du thorax plutôt crème.  \n[_Andrena bicolor_](https://jessica-joachim.com/insectes/hymenopteres/andrena-bicolor/) est plus élancée et a un pelage plus hirsute.\n\n**Sources** :  \n[https://www.insecte.org/](https://www.insecte.org/)  \n[http://www.atlashymenoptera.net/default.asp](http://www.atlashymenoptera.net/default.asp)  \n[http://www.bwars.com/](http://www.bwars.com/)  \n[https://www.naturespot.org.uk/](https://www.naturespot.org.uk/)  \nAbeilles sauvages, Nicolas Vereecken et Bernhard Jacobi",
 					"learnMore": "https://jessica-joachim.com/insectes/hymenopteres/andrenidae/andrena-nigroaenea/",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 97,
 					"images": [
 						"https://drive.google.com/thumbnail?id=13FEoCyPYpkaWpepVlabJ8ZFNtQ2fR6ez&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1PocBQD4wa-9tlnZ-iBq3gH9i6GhtRSJd&sz=w1000",
@@ -28938,6 +29036,7 @@
 					"key": "1357635",
 					"label": "Andrena nigroolivacea",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 23,
 					"description": "Les femelles peuvent facilement être reconnues comme des Chlorandrena en raison de la présence d'une rangée transverse de dents en forme d'épines sur la face postérieure du fémur postérieur, combinée à une ponctuation en cratère sur les tergites et à des scopae tibiales à poils plumeux. Au sein des Chlorandrena, les fovéas faciales dorsales divergent fortement du bord interne des yeux composés, ce qui place l'espèce dans le groupe livens. Elle est immédiatement reconnaissable grâce aux reflets bleu-vert métalliques présents sur le scutum, le scutellum et les tergites, car tous les autres membres du groupe livens ont des tergites sombres. Plus généralement, le fait que les tergites soient entièrement et uniformément bleu-vert métallique terne est unique parmi les Chlorandrena européennes.",
 					"synonyms": ["Andrena (Chlorandrena) nigroolivacea"],
 					"images": [
@@ -29224,6 +29323,7 @@
 					"key": "318750100",
 					"label": "Andrena nigropilosa",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 177,
 					"description": "<b> Attention, cette espèce n'a été codée que sur la base de la littérature, nous vous conseillons donc de ne vous fier à cette identification qu'après le recoupement avec d'autres ressources taxonomiques. </b> <br>",
 					"synonyms": ["Andrena (Truncandrena) nigropilosa"],
 					"images": [
@@ -29410,18 +29510,19 @@
 						"forme_des_foveas_au_milieu": "fovasnonrt_1738780949142_3244",
 						"corbeilles_du_propodeum": "corbeilles_1738837562663_8904",
 						"type_de_pilosite_des_scopas": "pilositmaj_1738784759008_2070",
-						"genus": "323335883",
-						"family": "323335880",
-						"order": "323335842",
-						"class": "323335841",
-						"phylum": "323335840",
-						"kingdom": "323335839"
+						"genus": "324045037",
+						"family": "324045034",
+						"order": "324044996",
+						"class": "324044995",
+						"phylum": "324044994",
+						"kingdom": "324044993"
 					}
 				},
 				{
 					"key": "1357722",
 					"label": "Andrena nigrospina",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 141,
 					"description": "**Ordre : Hymenoptera**  \n**Sous-ordre : Apocrita**  \n**Infra-ordre :**   \n**Super famille : Apoidea**  \n**Famille : Andrenidae**  \n**Sous-famille : Andreninae**  \n**Tribu :**   \n**Genre : _Andrena_**  \n**Espèce : _Andrena nigrospina_**\n\n**Identification** : _Andrena nigrospina_ est pratiquement toute noire. Les poils de son thorax et du dessus des tergites 1 et 2 sont gris, et la brosse de récolte de la femelle est blanche. Ses ailes sont légèrement enfumées.\n\n**Période de vol** : Mai-juin.\n\n**Nid** : Dans un trou au sol.\n\n**Espèces semblables** :  \n**_Andrena pilipes_** est très semblable avec sa brosse tibiale blanche mais les poils du thorax et des tergites 1 et 2 (dessus) sont noirs.  \n**_Andrena afrensis_**, **_A. agilissima_** et **_A. asperrima_** ont les ailes plus fortement enfumées, avec des reflets violets marqués.  \n**_Andrena morio_** a une brosse tibiale noire.  \n**_Andrena albopuncta_** a de nettes touffes de poils blancs sur les côtés de l’abdomen.  \n**_Andrena cineraria_** a la scopae noire et plus de poils blancs sur le thorax.\n\n**Sources** :  \n[Insecte.org](https://www.insecte.org/)",
 					"synonyms": ["Andrena (Plastandrena) nigrospina"],
 					"images": [
@@ -29720,6 +29821,7 @@
 					"description": "❝\n\nCette grosse andrène a un thorax vivement roux, contrastant avec son abdomen noir luisant\n\n**Ordre : Hymenoptera  \nSous-ordre : Apocrita  \nInfra-ordre :  \nSuper famille : Apoidea  \nFamille : Andrenidae  \nSous-famille : Andreninae  \nTribu :  \nGenre : _Andrena_  \nEspèce : _Andrena nitida_**\n\n#### Identification\n\n_Andrena nitida_ est une grande abeille au thorax à pilosité orange vif dessus (palissant avec l’âge), blanche sur les côtés, contrastant avec le reste du corps noir. Elle possède 3 cellules cubitales.  \nLa **femelle** possède 12 segments antennaires et 6 tergites. Sa tête est noire avec quelques soies claires sur la face. Les tergites sont brillants et peu velus, mis à part des touffes latérales de poils blancs sur T1 à T3. La scopae est noire dessus, blanche dessous. Les fémurs 3 possèdent de longs poils blancs.  \nLe **mâle** possède 13 segments antennaires, le 3ème à peu près de même longueur que le 4ème, et 7 tergites. La pilosité de sa tête est en grande partie claire, bien fournie sur la face. Les tergites 2 et 3 possèdent une bande clairsemée de poils blancs. La pilosité des pattes est brun clair.\n\n#### Étymologie\n\n- Le nom de genre _Andrena_ vient du grec anthrêné qui signifie frelon.  \n- Le nom d’espèce “_nitida_” vient du latin _nitidus_ et signifie brillant, en référence à son abdomen bien luisant.\n\n#### Taille\n\n10 à 14 mm pour le mâle, 12 à 16 mm pour la femelle.\n\n#### Habitat\n\nPrairies.\n\n#### Répartition géographique\n\n#### Période de vol\n\nDe fin mars à mi-juillet.\n\n#### Nid\n\nAu sol dans les prairies, généralement bien dispersés.\n\n#### Plantes butinées\n\nPolylectique.\n\n#### Parasite\n\n- **Diptère Anthomyiidae** : _Leucophora_ sp.  \n- **Diptère Bombyliidae** : _Bombylius major_.  \n- **Hyménoptère Apidae** : _Nomada goodeniana_, probablement d’autres espèces de _Nomada_.  \n- **Strepsiptera Stylopidae** : _Stylops melittae‎_\n\n#### ‎Espèces semblables\n\n**Pour la femelle** :  \nIl existe d’autres espèces avec un thorax roux contrastant avec le reste du corps, mais la pilosité abdominale ou la couleur de la scopae sont différentes, ainsi que les poils de la face qui sont noir chez certaines espèces. La pilosité du gastre serait typique.\n\n#### Sources\n\n- [Le Monde des insectes](https://www.insecte.org/)  \n- [Steven Falk | Flickr](https://www.flickr.com/photos/63075200@N07/)  \n- [BWARS](https://www.bwars.com/)  \n- [Atlas Hymenoptera](http://www.atlashymenoptera.net/default.aspx)  \n- [Inventaire analytique des andrènes (_Andrena_) de la Manche (Hymenoptera Andrenidae)](https://manche-nature.fr/wp-content/uploads/2017/12/Argiope80-81_Andrena_2013.pdf)  \n- [Wildbienen-Spezies](https://www.wildbienen.de/wbspeabc.htm)  \n- [Le blog de jean-yves cordier](https://www.lavieb-aile.com/)  \n- [Wikipédia](https://fr.wikipedia.org/wiki/Wikip%C3%A9dia:Accueil_principal)  \n- [GBIF](https://www.gbif.org/)",
 					"learnMore": "https://jessica-joachim.com/insectes/hymenopteres/andrenidae/andrena-nitida/",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 98,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1MQbmQHElWIrWca2o-iPEXF-sXSzHmtOl&sz=w1000",
 						"https://jessica-joachim.com/wp-content/uploads/2022/05/Andrena-nitida-1.jpg",
@@ -29995,6 +30097,7 @@
 					"description": "",
 					"learnMore": "https://gbif.org/species/1357495",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 132,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1rmAoOjVFiTlM69eFmF0W_f4_QmyAezSU&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1W3u_KwwiHWLyO6qrBBAMvfLeF2nBgwE-&sz=w1000"
@@ -30260,6 +30363,7 @@
 					"key": "1357480",
 					"label": "Andrena nitidula",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 125,
 					"description": "",
 					"synonyms": ["Andrena (Micrandrena) nitidula"],
 					"images": [
@@ -30565,6 +30669,7 @@
 					"description": "",
 					"learnMore": "https://gbif.org/species/1357466",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 109,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1ovUO2_9gtKNSPuaqDDvbMSOFAoRmJq-A&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1pVZQbQYizvkmd1PXh1CZ__VUTcNtKufl&sz=w1000"
@@ -30857,6 +30962,7 @@
 					"key": "1357276",
 					"label": "Andrena nuptialis",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 63,
 					"description": "Les femelles peuvent être identifiées comme Hoplandrena grâce au clypéus bombé et densément ponctué, au long A3 (dépassant la longueur de A4+5), au pronotum avec un angle huméral, au propodeum avec un triangle propodéal large et non ponctué, non délimité latéralement par des carènes, aux parties dorsolatérales contrastées du propodeum qui sont arrondies et couvertes d'un fin réseau de réticulation en relief. Andrena nuptialis peut être séparée des autres espèces de Hoplandrena par les tibias et les tarses sombres, A3 dépassant clairement la longueur de A4+5, le scutum est chagriné mais médialement il a une petite zone circulaire avec une réduction du chagrin, donc faiblement brillant, et le corps est recouvert de poils bruns (pas noirs). Cette combinaison de caractères est unique - voir aussi la clé dans Wood et al. (2022).",
 					"synonyms": ["Andrena (Hoplandrena) nuptialis"],
 					"images": [
@@ -31144,6 +31250,7 @@
 					"description": "",
 					"learnMore": "https://gbif.org/species/1357262",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 10,
 					"images": [
 						"https://drive.google.com/thumbnail?id=11KFvxPmKXZpe3UAcB5Y8oDi29xsGLWYk&sz=w1000",
 						"https://drive.google.com/thumbnail?id=12j8GgNa1EtFwIJ_HMgI7LHUlYaivXV__&sz=w1000"
@@ -31438,6 +31545,7 @@
 					"key": "1357001",
 					"label": "Andrena orbitalis",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 149,
 					"description": "<b> Attention, cette espèce n'a été codée que sur la base de la littérature, nous vous conseillons donc de ne vous fier à cette identification qu'après le recoupement avec d'autres ressources taxonomiques. </b> <br>",
 					"synonyms": ["Andrena (Rufandrena) orbitalis"],
 					"images": [
@@ -31628,6 +31736,7 @@
 					"key": "9650311",
 					"label": "Andrena ovata",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 169,
 					"description": "",
 					"synonyms": ["Andrena (Taeniandrena) ovata"],
 					"images": [
@@ -31945,6 +32054,7 @@
 					"description": "",
 					"learnMore": "https://gbif.org/species/1358376",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 164,
 					"images": [
 						"https://drive.google.com/thumbnail?id=14rqdM6CJTgGT4V4Ip6YgpXd555zX6KMZ&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1fWRnncO2KfJyRLOCpI7_E3axSJCaNC1J&sz=w1000"
@@ -32238,6 +32348,7 @@
 					"key": "1358362",
 					"label": "Andrena oviventris",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 71,
 					"description": "Andrena oviventris était autrefois regroupée dans le groupe Poliandrena, aujourd'hui disparu. Elle présente un ensemble de caractères subtils qui rendent sa reconnaissance difficile sans expérience. Grâce à la combinaison d'un bord antérieur du clypéus légèrement relevé, de larges fovéas occupant au moins ½ de l'espace entre l'ocelle latéral et le bord interne de l'œil composé, d'un angle huméral faible mais distinct, d'une face postérieure du fémur postérieur non modifiée (sans dents, carènes ou épines), d'un éperon tibial postérieur simple (non élargi basalement ou médialement), d'un tégument sombre, elle se rapproche des membres du groupe de parenté qui étaient également placés dans le Poliandrena. Andrena oviventris peut être séparée par la structure du propodéum qui a un triangle propodéal large et bien défini (marges latérales s'étendant presque jusqu'aux bords latéraux du métanotum) qui est défini par des carènes en relief ; la surface interne est couverte de carènes irrégulières en relief d'une largeur similaire, paraissant donc homogène et cohérente, alors que dans le groupe relata le triangle propodéal ne présente pas ces caractères. Ceci place A. oviventris à proximité de A. farinosa Pérez, 1895 dont elle peut être facilement séparée par les disques tergaux glabres, les disques tergaux de A. farinosa étant au contraire couverts de très courts poils blanchâtres qui forment une pilosité veloutée. Voir aussi la clé dans Wood (2023).",
 					"synonyms": ["Andrena (incertae sedis) oviventris"],
 					"images": [
@@ -32503,6 +32614,7 @@
 					"key": "1358276",
 					"label": "Andrena pallitarsis",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 133,
 					"description": "",
 					"synonyms": ["Andrena (Notandrena) pallitarsis"],
 					"images": [
@@ -32786,6 +32898,7 @@
 					"description": "Andrena pandellei peut être identifiée comme une Lepidandrena en raison des poils squameux courts sur le scutum et le scutellum, de la présence d'une carène transverse portant des soies courtes en forme d'épines sur la face postérieure du fémur postérieur, et des tergites densément ponctués. La combinaison de tergites sombres, de poils squameux bruns sur le scutum et de la surface lisse et brillante des galéas la rapproche de A. paucisquama et A. curvungula. Elle peut être séparée de A. paucisquama par les poils du scutum denses qui masquent la surface sous-jacente (ne masquent pas la surface sous-jacente chez A. paucisquama), et le appendice échancré du labre (appendice du labre trapézoïdal, sans échancrure médiane chez A. paucisquama). Elle peut être séparée d'A. curvungula par les poils du scutum gris-brun (bruns chez A. curvungula), et la forme du cinquième (dernier) segment tarsal de la patte arrière qui est comparativement court et peu courbé (allongé et fortement courbé chez A. curvungula, matériel comparatif requis).",
 					"learnMore": "https://gbif.org/species/1358227",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 74,
 					"images": [
 						"https://drive.google.com/thumbnail?id=17hHhKQc4NKw6tl5988XExtFOBAftXJVo&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1Z7qMuzQyens8IpYFA5gm2NsNU8HoG4EU&sz=w1000"
@@ -33080,6 +33193,7 @@
 					"key": "1358152",
 					"label": "Andrena panurgina",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 16,
 					"description": "",
 					"synonyms": ["Andrena (Avandrena) panurgina"],
 					"images": [
@@ -33352,6 +33466,7 @@
 					"description": "<b> Attention, cette espèce n'a été codée que sur la base de la littérature, nous vous conseillons donc de ne vous fier à cette identification qu'après le recoupement avec d'autres ressources taxonomiques. </b> <br>",
 					"learnMore": "https://gbif.org/species/1358031",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 81,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1j8u6LKv03mtzLiMbulxDD6BS3ppN9LSn&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1ARSALuy3KjgyE5-jQ2eHbb9gBTvXloJE&sz=w1000"
@@ -33551,6 +33666,7 @@
 					"key": "1357976",
 					"label": "Andrena paucisquama",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 75,
 					"description": "Andrena paucisquama peut être identifiée comme une Lepidandrena en raison des poils squameux courts sur le scutum et le scutellum, de la présence d'une carène transverse portant des soies épineuses courtes sur la face postérieure du fémur postérieur, et des tergites densément ponctués. La combinaison de tergites sombres, de poils squameux bruns sur le scutum et de la surface lisse et brillante des galéas la rapproche d'A. curvungula et d'A. pandellei. A. paucisquama peut être séparée de ces deux espèces par les poils du scutum clairsemés qui ne masquent pas la surface sous-jacente en vue dorsale (poils du scutum denses et masquant la surface sous-jacente chez les deux autres taxons), et par l'appendice trapézoïdal du labre, dont le bord apical est échancré (appendice du labre clairement échancré chez les deux autres taxons).",
 					"synonyms": ["Andrena (Lepidandrena) paucisquama"],
 					"images": [
@@ -33831,6 +33947,7 @@
 					"key": "9160722",
 					"label": "Andrena pauxilla",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 110,
 					"description": "<b> Attention, cette espèce n'a été codée que sur la base de la littérature, nous vous conseillons donc de ne vous fier à cette identification qu'après le recoupement avec d'autres ressources taxonomiques. </b> <br>",
 					"synonyms": ["Andrena (Micrandrena) pauxilla"],
 					"images": [
@@ -34040,6 +34157,7 @@
 					"description": "**_Andrena pellucens_** **(Pérez, 1895)**\n\n**Risques de confusions** :  \n  \n\\- **_Andrena marginata_** est proche, mais elle ne possède pas d'échancrure au bord postérieur de la tache noire de T1, ses deux derniers tergites sont oranges et elle récolte le pollen des Caprifoliaceae (succise, knautie, scabieuse)\n\n\\- **_Andrena rosae_** a au plus les tergites 1 à 3 rouges, la génération d'été récolte le pollen des Apiaceae\n\n\\- **_Andrena florea_** a au moins les 3 derniers tergites noirs et elle est inféodée aux Bryones\n\n\\- Les **_Sphecodes_**, qui font partie de la famille des Halictidae, ont la tête et le thorax noirs et nettement moins velus. Ce sont des espèces coucous, qui ne possèdent pas de brosse de récolte.\n\n**Taille** : 9 à 10mm\n\n**Habitat, répartition** :  \n  \nElle est distribuée en Europe du sud et du sud-est. En France, dans les Pyrénées-Orientales et en Provence.\n\n**Biologie** : Elle récolte le pollen d’Asteraceae et de Colchicaceae, probablement également d’autres familles de plantes. Elle nidifie au sol, en grandes agrégations, et vole en septembre-octobre.\n\n**Photographies :**  \n© [jordi\\_compte](https://www.inaturalist.org/people/jordi_compte) \\- [CC-BY-NC](https://creativecommons.org/licenses/by-nc/4.0/)\n\n**Sources :**\n\n[Inaturalist](https://www.inaturalist.org/taxa/433165-Andrena-pellucens#map-tab)\n\n[GB](https://www.gbif.org/species/1357918)[IF](https://www.gbif.org/species/1357918)\n\n[Atlas de la faune de Suisse](https://species.infofauna.ch/groupe/1/portrait/402)  \n[The genus](https://jhr.pensoft.net/article/101873/) _[Andrena](https://jhr.pensoft.net/article/101873/)_ [in the Iberian Peninsula](https://jhr.pensoft.net/article/101873/)",
 					"learnMore": "https://www.inaturalist.org/people/jordi_compte",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 86,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1jkcDyZnUKkUpet7YuucEpSPlc6l28dLs&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1-mJ54hC_m-WGuQ5wzTs6entYxG0qB_db&sz=w1000",
@@ -34351,6 +34469,7 @@
 					"description": "Andrena pilipes peut être placée dans le sous-genre Plastandrena grâce à l’éperon interne du tibia postérieur qui est fortement élargi à sa base, combiné avec le triangle du propodéum avec des rugosités en forme de nids d'abeilles, un pronotum arrondi, des parties dorsolatérales propodéum avec des rugosités, et sans reflets métalliques. On peut la reconnaître par l’absence de rugosités marquées sur les faces latérales du propodéum, la couleur sombre (sans marques rouges), et la pilosité majoritairement noire du corps, avec des poils blancs principalement limités aux scopae. Cela la place proche de seulement A. nigrospina; les deux espèces ne peuvent pas être séparées morphologiquement pour les femelles. Il faut se référer à 1) la date de vol et l’état physique du spécimen (frais ou dégradé), avec A. pilipes volant en deux générations entre mars-mai et juin-août et A. nigrospina volant en une seule génération à partir de mai-juin, 2) l’association avec des mâles capturés en même temps, ou 3) les données génétiques. Andrena pilipes est également dominante dans le sud de l’Europe où A. nigrospina est rare et limitée aux zones à microclimat frais. De même, A. pilipes est rare ou absent en Europe du Nord.",
 					"learnMore": "https://gbif.org/species/1357721",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 142,
 					"images": [
 						"https://drive.google.com/thumbnail?id=16_dIcKqBVFDKYWb1qiuA80LsxharnFab&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1wu2CibMgzYNrF1nQ1slTemqHCw7K1qr-&sz=w1000"
@@ -34649,6 +34768,7 @@
 					"description": "Andrena polita femelle peut être classée dans le sous-genre Ulandrena grâce à son éperon tibial postérieur élargit au 1/3, combiné à l'absence de dents transverses ou de carène sur la face postérieure des fémurs postérieurs.  Anciennement l’espèce type du sous-genre Poliandrena, A. polita fait maintenant partie du sous-genre Ulandrena, mais avec quelques différences dans la forme de la capsule génitale mâle. Andrena polita peut être reconnue comme faisant partie du groupe polita grâce à la ponctuation de T1 qui présente une ligne médiane longitudinale non ponctuée, contrastant avec le reste du disque finement, densément et uniformément ponctué. Cela la place proche d’A. kriechbaumeri Schmiedeknecht, 1883 et d’A. westensis Warncke, 1965 (toutes deux non-présentes en France). La séparation de A. kriechbaumeri est simple, car cette espèce a le nervulus très fortement postfurcal, alors qu’il n’est que faiblement postfurcal chez A. polita. La séparation de A. westensis est extrêmement difficile si on utilise uniquement les caractères morphologiques; il est préférable d’utiliser 1) les mâles associés et 2) le contexte phénologique et distributionnel. Andrena polita est une espèce européenne de prairies chaudes largement distribuée, volant en juin-août alors qu’A. westensis est une espèce de buisson méditerranéen dans la partie sud de la péninsule balkanique (Albanie et Grèce) à partir de mars-mai.",
 					"learnMore": "https://gbif.org/species/1357535",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 179,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1WuuRppVD6FIuYVpLA9X4i4gkEKs6PIKo&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1qoa-fIOn3deAWYHSUE9XoJwpLyogBPF5&sz=w1000"
@@ -34950,6 +35070,7 @@
 					"description": "",
 					"learnMore": "https://gbif.org/species/1357487",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 147,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1xCQEy-ClC7VVJ4mWD0EvzsYE3HuFtn8P&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1DjglFemJaiLRwiqYOWHdCQ2iAvP1Z67h&sz=w1000"
@@ -35249,6 +35370,7 @@
 					"description": "",
 					"learnMore": "https://gbif.org/species/1357456",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 11,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1Qu47WAiobfuIXhtoNoc5eB5H-0neM6B9&sz=w1000",
 						"https://drive.google.com/thumbnail?id=16EZIFOqWcHProOUKdzXAHyLJmWGdewkh&sz=w1000"
@@ -35533,6 +35655,7 @@
 					"key": "6096951",
 					"label": "Andrena propinqua",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 155,
 					"description": "",
 					"synonyms": ["Andrena (Simandrena) propinqua"],
 					"images": [
@@ -35854,6 +35977,7 @@
 					"description": "",
 					"learnMore": "https://gbif.org/species/1357354",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 120,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1wVNgu1gPopMTSb3bfqwc8jGECeEZ9n-9&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1gOv6SfpXpCXx-I6sJvuu-Z7DyFm0wWcG&sz=w1000"
@@ -36156,6 +36280,7 @@
 					"key": "1357738",
 					"label": "Andrena puella",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 126,
 					"description": "<b> Attention, cette espèce n'a été codée que sur la base de la littérature, nous vous conseillons donc de ne vous fier à cette identification qu'après le recoupement avec d'autres ressources taxonomiques. </b> <br>",
 					"synonyms": ["Andrena (Micrandrena) puella"],
 					"images": [],
@@ -36349,6 +36474,7 @@
 					"key": "1357043",
 					"label": "Andrena pusilla",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 111,
 					"description": "",
 					"synonyms": ["Andrena (Micrandrena) pusilla"],
 					"images": [
@@ -36634,6 +36760,7 @@
 					"key": "1358367",
 					"label": "Andrena ranunculi",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 136,
 					"description": "Andrena ranunculi a été précédemment placée dans le sous-genre Carandrena, mais celui-ci a maintenant été intégré dans le sous-genre Notandrena. Les femelles peuvent être reconnues par la combinaison d’une tête large, d’un pronotum avec un fort angle huméral, la face, le scutum latéralement et les tergites ont de faibles reflets vert métallique, et les tergites ont une ponctuation faible, éparse et obscure. En raison de sa plus grande taille, A. ranunculi est proche de A. aerinifrons Dours, 1873 (non-présente en France), et on peut la reconnaître parmi les espèces à faible ponctuation sur les tergites (ancien Carandrena) grâce à la structure des poils des scopae : la scopa tibiale ventralement et la scopa fémorale sont clairement composées de poils relativement courts et fortement plumeux. Aucune autre espèce de Notandrena ne présente ce type de pilosité.",
 					"synonyms": ["Andrena (Notandrena) ranunculi"],
 					"images": [
@@ -36925,6 +37052,7 @@
 					"key": "1358353",
 					"label": "Andrena ranunculorum",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 72,
 					"description": "",
 					"synonyms": ["Andrena (incertae sedis) ranunculorum"],
 					"images": [
@@ -37210,6 +37338,7 @@
 					"key": "1358231",
 					"label": "Andrena rhenana",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 24,
 					"description": "",
 					"synonyms": ["Andrena (Chlorandrena) rhenana"],
 					"images": [
@@ -37477,6 +37606,7 @@
 					"key": "1358157",
 					"label": "Andrena rogenhoferi",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 12,
 					"description": "Andrena rogenhoferi peut être reconnue comme une Andrena s. str. en raison de la présence d'une forte ride latérale sur le pronotum, d'une pilosité épaisse sur tous les tergites, de larges fovéas faciales qui occupent presque tout l'espace entre l'œil composé et l'ocelle latéral, d'un flocculus fortement développé, d'un scopa tibial lâche sur le tibia postérieur qui ne s'élargit pas sensiblement à l'extrémité (contrairement au sous-genre Cnemidandrena), et d'un triangle propodéal faiblement différencié. Andrena rogenhoferi est limitée à la Suisse et aux pays voisins immédiats, et peut être immédiatement reconnue grâce à son patron de couleur distinct avec des poils noirs sur la tête et le mésosoma et des poils rouge-orange sur le métasoma. Ce motif de couleur est unique et A. rogenhoferi ne peut être confondue avec aucune autre espèce de ce sous-genre.",
 					"synonyms": ["Andrena (Andrena s.str.) rogenhoferi"],
 					"images": [
@@ -37702,6 +37832,7 @@
 					"description": "Les femelles devraient être reconnues comme faisant partie du sous-genre Hoplandrena par la structure du propodéum qui présente un triangle propodéal large, lisse et non poncté qui contraste avec le reste du propodéum qui est clairement mais superficiellement ponctué, un clypéus fortement et densément ponctué, et de larges fovéas faciales. Andrena rosae est similaire à A. trimmerana et A. scotica, mais n'a pas de longs poils sur les tergites, ceux-ci étant presque glabres. Les scopas des tibias sont bicolores, ventralement blanc et dorsalement brun foncé, à l'exception d'A. bucephala et d'A. ferox qui ont des poils scopaux dorés unicolores sur les tibias postérieurs.",
 					"learnMore": "https://gbif.org/species/1358094",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 64,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1JK5gutG4FJJfWZ2KN9f-iwey_SBpL9tq&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1Fj9ovmuFLJEdzO3UrzSnepTxBD5-GSxC&sz=w1000"
@@ -38002,6 +38133,7 @@
 					"description": "",
 					"learnMore": "https://gbif.org/species/1357952",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 43,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1UeZO_lUj3BhPvEgaPhxYFjtOd3KyaDPW&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1dk_lMmra9qP1p6WAH7SD5VdCfi2Qjub8&sz=w1000"
@@ -38283,6 +38415,7 @@
 					"key": "1357877",
 					"label": "Andrena rufizona",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 76,
 					"description": "",
 					"synonyms": ["Andrena (Lepidandrena) rufizona"],
 					"images": [
@@ -38570,6 +38703,7 @@
 					"key": "1357835",
 					"label": "Andrena rufula",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 44,
 					"description": "",
 					"synonyms": ["Andrena (Euandrena) rufula"],
 					"images": [
@@ -38862,6 +38996,7 @@
 					"key": "1357793",
 					"label": "Andrena rugulosa",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 112,
 					"description": "<b> Attention, cette espèce n'a été codée que sur la base de la littérature, nous vous conseillons donc de ne vous fier à cette identification qu'après le recoupement avec d'autres ressources taxonomiques. </b> <br> Andrena rugulosa peut être reconnue comme une Micrandrena en raison de sa petite taille, de sa couleur noire et de son triangle du propodéum avec des rugosités. Elle peut être reconnue grâce à une face relativement longue pour un Micrandrena qui est seulement 1,1 fois plus large que long, combinée avec des fovéas faciales longues et relativement étroites (occupant 1/3 à 1⁄4 de l’espace entre l’œil composé et l'ocelle latéral, plus étroites que la largeur d’un flagelle, ne se rétrécissant pas davantage ventralement), des disques tergaux très faiblement ponctués, et de l'appendice du labre étroit, triangulaire-arrondi. La distance ocello-occipitale est également courte (égale à la largeur d'un ocelle latéral), ce qui permet une séparation avec A. illyrica Warncke, 1975 (non-présente en France) dont la distance ocello-ocipital est supérieure à 2 fois le diamètre d’un ocelle latéral. Andrena rugulosa a sa limite occidentale en Suisse et à l’extrême est de la France ; les spécimens morphologiquement similaires de la Sierra Nevada dans le sud de l’Espagne appartient à l'espèce Andrena ortizi, 2023 qui est endémique à cette montagne.",
 					"synonyms": ["Andrena (Micrandrena) rugulosa"],
 					"images": [
@@ -39062,6 +39197,7 @@
 					"key": "1357727",
 					"label": "Andrena russula",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 170,
 					"description": "",
 					"synonyms": ["Andrena (Taeniandrena) russula"],
 					"images": [
@@ -39343,6 +39479,7 @@
 					"description": "Les femelles peuvent être identifiée comme Lepidandrena grâce à la présence d'une rangée de fines épines sur une carène transverse faiblement mais distinctement surélevée sur la face postérieure du fémur postérieur, combinée également à la présence de courts poils squameux sur le scutum et le scutellum, les poils simples des scopae tibiales, et les tergites uniformément et densément ponctués qui ne présentent pas de ponctuation en cratère. Elle peut être facilement séparée de toutes les autres Lepiandrena par la combinaison de poils squameux noirs, de tergites presque entièrement marqués de rouge et de tibias postérieurs sombres (d'autres espèces ont soit des tergites sombres, soit sans poils squameux sur le scutum, soit des tibias postérieurs orangés).",
 					"learnMore": "https://gbif.org/species/1357554",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 78,
 					"images": [
 						"https://drive.google.com/thumbnail?id=18NkHHkOCEgLV4Ay5uIJYCfHqsd8uuP1G&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1aBxSe8qjCQBtI7KKWjECX0DReYvFLExL&sz=w1000"
@@ -39628,6 +39765,7 @@
 					"description": "Les femelles peuvent être placées dans le sous-genre Suandrena grâce à l’éperon tibial postérieur qui est fortement élargi à sa base, au triangle du propodéum finement délimité, aréolé finement rugueux et de la réticulation fine du mésépisternum et des parties dorsolatérale du propodéum. Au sein des Suandrena, elle peut être reconnue par la combinaison de poils foncés entourant la plaque pygidienne, de tergites partiellement rouges, de T2-4 avec des bandes tergales épaisses ininterrompues et du clypéus avec une ponctuation éparse, avec une large ligne centrale non ponctuée et une surface sous-jacente lisse et brillante.",
 					"learnMore": "https://gbif.org/species/1357430",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 160,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1ANe62ziH9ULlHC3mDTnI1oZ8nJqMEfyB&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1fBCMDx398GcW5Ep6rd_JiaFQbLqT1xBI&sz=w1000"
@@ -39908,6 +40046,7 @@
 					"key": "1357416",
 					"label": "Andrena saxonica",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 113,
 					"description": "Andrena saxonica femelle peut être reconnue comme Micrandrena grâce à sa petite taille, sa couleur noire et son triangle propodéal avec des rugosités. Elle peut être identifiée grâce à son clypéu qui est fortement aplati et avec une ponctuation éparse (distance entre les points en moyenne > à 2 fois le diamètre d'un point), son scutum présente une ponctuation dense mais fine, l'appendice du labre possède une échancrure au niveau de la marge antérieure, les marges des tergites ne sont pas significativement déprimées et les tergites sont fortement chagrinés et mats, essentiellement non ponctués. Bien que ces caractères permettent la reconnaissance, compte tenu de la complexité du sous-genre Micrandrena, il est préférable d’utiliser une clé d’identification jusqu’à ce que ces caractères aient été appris et appréciés. Le contexte écologique devrait également être utilisé, car A. saxonica est spécialiste d’Ornithogalum et sera donc trouvée dans les habitats boisés ou en bordure de bois où ce genre de plante peut être trouvé en floraison. Dans le sud de l’Europe, cela se fera généralement dans les régions montagneuses.",
 					"synonyms": ["Andrena (Micrandrena) saxonica"],
 					"images": [
@@ -40181,6 +40320,7 @@
 					"description": "Les femelles sont superficiellement similaires aux membres du sous-genre Holandrena dans lequel elles étaient auparavant regroupées, mais A. schencki ne présente pas de ponctuation sur les parties dorsolatérales du propodéum et les éperons internes du tibia postérieur sont droits (non élargis basalement). C’est le seul membre du sous-genre Opandrena en Europe, de sorte que les spécimens sont mieux diagnostiqués directement au niveau de l’espèce. Les femelles peuvent être reconnues par les T1-2 marqués en rouge, les éperons tibiaux postérieurs droits, les parties dorsolatérales de propodeum réticulées, sans ponctuation nette, le pronotum avec un fort angle huméral, le clypéus arrondi et en forme de dôme, entièrement et densément recouvert d'une ponctuation régulière (distance moyenne entre les points <0,5 fois le diamètre d'un point), le scutum avec une ponctuation très dense et régulières (distance moyenne entre les points <0,5 fois le diamètre d'un point), les scopae tibiales avec des poils simples, et le triangle du propodéum finement délimité latéralement avec des carènes surélevés, surface interne non fortement différenciée des parties dorsolatérales du propodéum. Aucune autre espèce européenne d’Andrena ne présente cette combinaison de caractères.",
 					"learnMore": "https://gbif.org/species/1357402",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 137,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1KABFB7W4k8xJWh2evxX6dMswesQLRia4&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1CRnJEJjlIdNrM_mFl70WVv315vRQbvd3&sz=w1000"
@@ -40454,6 +40594,7 @@
 					"key": "6096950",
 					"label": "Andrena scotica",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 66,
 					"description": "",
 					"synonyms": ["Andrena (Hoplandrena) scotica"],
 					"images": [
@@ -40732,6 +40873,7 @@
 					"description": "",
 					"learnMore": "https://gbif.org/species/1357074",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 127,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1nd_51-M60p-DsP8i8GjrLv1vFPEzaNDQ&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1YoY8pequU6Ig7IPKf-dcRxp0ig8GzrkL&sz=w1000"
@@ -41011,6 +41153,7 @@
 					"key": "1357012",
 					"label": "Andrena senecionis",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 28,
 					"description": "Andrena senecionis peut être rapidement reconnue comme une Chlorandrena en raison de la présence d'une rangée transverse de dents en forme d'épines sur la face postérieure du fémur postérieur, combinée à des poils scopaux plumeux sur les tibias et à des ponctions en cratère sur les tergites. Les fovéas faciales sont ostensiblement rétrécies ventralement, ce qui le place dans le groupe taraxaci. Elle est immédiatement reconnaissable grâce à la combinaison des fovéas faciales claires qui sont remplies de poils jaunes clairs et des marges tergales qui sont jaunes-hyalines éclaircies.",
 					"synonyms": ["Andrena (Chlorandrena) senecionis"],
 					"images": [
@@ -41301,6 +41444,7 @@
 					"key": "1356955",
 					"label": "Andrena sericata",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 82,
 					"description": "",
 					"synonyms": ["Andrena (Leucandrena) sericata"],
 					"images": [
@@ -41572,6 +41716,7 @@
 					"key": "1358236",
 					"label": "Andrena simillima",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 34,
 					"description": "",
 					"synonyms": ["Andrena (Cnemidandrena) simillima"],
 					"images": [
@@ -41868,6 +42013,7 @@
 					"key": "1358222",
 					"label": "Andrena simontornyella",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 114,
 					"description": "",
 					"synonyms": ["Andrena (Micrandrena) simontornyella"],
 					"images": [
@@ -42142,6 +42288,7 @@
 					"key": "1358083",
 					"label": "Andrena solenopalpa",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 54,
 					"description": "",
 					"synonyms": ["Andrena (Euandrena) solenopalpa"],
 					"images": [],
@@ -42413,6 +42560,7 @@
 					"key": "1357881",
 					"label": "Andrena spreta",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 128,
 					"description": "",
 					"synonyms": ["Andrena (Micrandrena) spreta"],
 					"images": [
@@ -42711,6 +42859,7 @@
 					"key": "1357839",
 					"label": "Andrena stabiana",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 29,
 					"description": "<b> Attention, cette espèce n'a été codée que sur la base de la littérature, nous vous conseillons donc de ne vous fier à cette identification qu'après le recoupement avec d'autres ressources taxonomiques. </b> <br>",
 					"synonyms": ["Andrena (Chlorandrena) stabiana"],
 					"images": [
@@ -42901,6 +43050,7 @@
 					"key": "8221007",
 					"label": "Andrena strohmella",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 115,
 					"description": "",
 					"synonyms": ["Andrena (Micrandrena) strohmella"],
 					"images": [
@@ -43202,6 +43352,7 @@
 					"description": "",
 					"learnMore": "https://gbif.org/species/1357479",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 116,
 					"images": [
 						"https://drive.google.com/thumbnail?id=16-TKMaUk16CHVVixL2W1qdVgJDUPArxZ&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1gUmOCOxr7JwDb9Eg1uRnWhCnFk21JhiV&sz=w1000"
@@ -43474,6 +43625,7 @@
 					"key": "1357318",
 					"label": "Andrena suerinensis",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 159,
 					"description": "Les femelles peuvent être placées dans le sous-genre Suandrena grâce à l’éperon tibial postérieur qui est fortement élargi à sa base, la carène transverse sur la face postérieure du fémur postérieur, le tégument tergal avec des reflets bleu clair mat, et le triangle du propodéum aréolé finement rugueux. En dehors de l'Ibérie, A. suerinensis est la seule espèce de Suandrena présente, donc une confusion avec une autre espèce n’est possible qu’en Ibérie où A. gades Wood & Ortiz-Sánchez et A. cyanomicans Pérez, 1895 sont présents. La séparation chez les femelle est difficile, donc l’association avec les mâles distincts devrait être faite. Le triangle du propodéum est relativement grossièrement sculpté, alors que chez A. gades le triangle du propodéum est très faiblement défini. C’est un caractère difficile à apprécier, donc le contexte écologique doit être utilisé; A. gades n’est connu que dans la région de Cadix, et on sait qu’elle n’est active qu’en décembre. Andrena cyanomicans est plus répandu dans le sud, le centre et l’est de l’Espagne, mais elle ne peut être séparée d’A. suerinensis de manière claire chez les femelles. Un caractère potentiel est la forme de l'appendice du labre qui est pointu chez A. suerinensis et apicalement tronqué dans A. cyanomicans, mais il n’est pas clair si c’est un caractère robuste. Les mâles capturés en même temps devraient être utilisés pour l’identification dans tous les cas.",
 					"synonyms": ["Andrena (Suandrena) suerinensis"],
 					"images": [
@@ -43759,6 +43911,7 @@
 					"key": "1357261",
 					"label": "Andrena symphyti",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 51,
 					"description": "",
 					"synonyms": ["Andrena (Euandrena) symphyti"],
 					"images": [
@@ -44034,6 +44187,7 @@
 					"description": "",
 					"learnMore": "https://gbif.org/species/1357230",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 13,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1S6ej_LWTVQPCenKOqetnixD93ZrRdlMy&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1EzVyYQc4XuUZF1IyYJli23qlmVZGSqb1&sz=w1000"
@@ -44241,6 +44395,7 @@
 					"description": "",
 					"learnMore": "https://gbif.org/species/1357017",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 172,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1OElGWsHdvGycjx_ZcZtN37FShvKt6gDY&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1Vdxx4svxy9BpxuYINMONrUDQL90EZQYI&sz=w1000"
@@ -44531,6 +44686,7 @@
 					"key": "1356913",
 					"label": "Andrena tenuistriata",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 129,
 					"description": "",
 					"synonyms": ["Andrena (Micrandrena) tenuistriata"],
 					"images": [
@@ -44837,6 +44993,7 @@
 					"key": "1358333",
 					"label": "Andrena thomsonii",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 157,
 					"description": "",
 					"synonyms": ["Andrena (Simandrena) thomsonii"],
 					"images": [
@@ -45110,6 +45267,7 @@
 					"description": "#### **Fabricius, 1775**\n\n❝\n\n_Cette espèce est l’unique pollinisatrice de l’Ophrys des Olonnes (Ophrys suboccidentalis subsp. olonae). Elle se reconnait à sa coloration entièrement noire, sauf le dessus du thorax qui est roux_\n\n**rdre : Hymenoptera**  \n**Sous-ordre : **Apocrita****  \n**Infra-ordre : **Aculeata****  \n**Super famille : ********Apoidea**********  \n**Famille : ************Andrenidae**************  \n**Sous-famille : ************Andreninae**************  \n**Tribu :**  \n**Genre :** _****_**_Andrena_**_****_  \n**Espèce :** _**Andrena thoracica**_\n\n#### Difficulté de détermination\n\n#### Statut de conservation\n\nNon évalué  \nEspèce déterminante ZNIEFF\n\n#### Identification\n\n- thorax à soies rousses  \n- côtés du thorax à soies noires  \n- abdomen entièrement noir  \n- pattes noires  \n- épine tibiale généralement noire\n\n**Femelle**  \n- scopa noire  \n- 12 segments antennaires  \n- 6 segments abdominaux\n\n**Mâle**  \n- pas de scopa  \n- 13 segments antennaires  \n- 7 segments abdominaux\n\n#### Taille\n\n**Femelle** : 14 à 16mm\n\n#### Habitat\n\nLandes, falaises côtières et autres milieux sablonneux\n\n#### Répartition géographique\n\nEurasie  \nSemble assez largement répartie en France sauf dans le nord et l’est  \n[Cartes INPN et GBIF](https://inpn.mnhn.fr/espece/cd_nom/239453/tab/carte)\n\n#### Période d’observation\n\nDeux générations\n\n#### Plantes visitées\n\nPolylectique\n\n#### Parasite\n\n- **Hyménoptère Apidae** : _Nomada goodeniana, Nomada fulvicornis_\n\n#### Espèces semblables\n\n- **_Andrena limata_** est très similaire. Son épine tibiale est rousse et les côtés de son thorax possèdent des soies rousses  \n- **_Andrena gallica_** (= _**Andrena assimilis**_) a des poils clairs sur la face, son épine tibiale est rousse  \n- **_Andrena bicolor_** a des soies rousses à l’apex des premiers tergites, sa scopa est rousse  \n- **_Andrena clarkella_** a le tibia et le basitarse 3 orangés.  \n- **_Andrena nitida_** a des poils clairs sur les côtés des tergites, et les poils de sa face sont en grande partie clairs  \n- **_Andrena haemorrhoa_** a l’apex de l’abdomen roux et des poils pâles sur la face\n\n#### Sources\n\n- [INPN](https://inpn.mnhn.fr/espece/cd_nom/239453)  \n- [Andrena Belgique](http://www.atlashymenoptera.net/page.aspx?id=267)  \n- [BWARS](https://bwars.com/bee/andrenidae/andrena-thoracica)  \n- [Wikipédia](https://fr.wikipedia.org/wiki/Andrena_thoracica)  \n- [Steven Falk – Flickr](https://www.flickr.com/photos/63075200@N07/albums/72157639924359703/)",
 					"learnMore": "https://jessica-joachim.com/insectes/hymenopteres/andrenidae/andrena-thoracica/",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 99,
 					"images": [
 						"https://drive.google.com/thumbnail?id=198ZLlMlW2BLgYXlfwW7syZwt1nHVD3VA&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1qhELiFMIWLpScFKbgMKHJBxDz-GKjr8m&sz=w1000",
@@ -45399,6 +45557,7 @@
 					"description": "",
 					"learnMore": "https://gbif.org/species/1358210",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 143,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1GD7yrbVd8CGu0UzN0ZJGHiBS_QmVM3wR&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1_wihSbT7G-DTJgk0XvP00IM7ywOH4YYU&sz=w1000"
@@ -45693,6 +45852,7 @@
 					"description": "",
 					"learnMore": "https://gbif.org/species/1357930",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 65,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1hQQmW2wwTzoyTIFWFV5lFNBgsJ2WwCr-&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1bifJ_28KiBTyYPFPvuURSlYfLY1ES1FY&sz=w1000"
@@ -46003,6 +46163,7 @@
 					"description": "",
 					"learnMore": "https://gbif.org/species/1357802",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 174,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1fONZEWg0VEHZ6RvrBoAdvx7SLCOQJGuL&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1Dw6GoR9iKEbNl5ncfGQi2s2bJQ7f1mps&sz=w1000"
@@ -46281,6 +46442,7 @@
 					"description": "",
 					"learnMore": "https://gbif.org/species/1357788",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 175,
 					"images": [
 						"https://drive.google.com/thumbnail?id=10UvJiTvhAFKZNPLeLC0EqU1w8eaMmCyt&sz=w1000"
 					],
@@ -46571,6 +46733,7 @@
 					"key": "1357486",
 					"label": "Andrena vaga",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 100,
 					"description": "**_Andrena vaga_** **(Panzer, 1799)**\n\n**Risques de confusions** :\n\n\\- **_Andrena bicolorata_** a la pilosité antérieure du fémur 3 et du flocculus noire, pas de touffes de poils blancs sur les côtés des tergites, elle a rapidement une zone dégarnie de poils sur le disque du thorax, récolte le pollen des Brassicaceae, les soies de sa face sont noires, ses fovéas étroites et creusées.\n\n\\- **_Andrena cineraria_** et **_Andrena barbareae_** possèdent une bande transversale de poils noirs sur le thorax\n\n\\- **_Andrena morio_** peut avoir les soies du thorax assez claires mais elles sont limitées à la moitié antérieure de ce dernier et ses ailes sont fortement enfumées.\n\n**Taille** : 13 à 15mm\n\n**Habitat, répartition** : On la trouve dans les milieux thermophiles où l'on trouve de grandes zones de sol meuble, sableux ou limoneux.\n\nDistribués en Europe de l’ouest, Europe centrale et Russie.\n\n**Biologie** : Elle niche au sol, dans des zones de sol nu ou à faible couvert végétal. Elle récolte le pollen des saules pour ses larves. L’espèce vole de mars à mai.\n\n**Photographies :**\n\n© [Francis Birlenbach](https://www.inaturalist.org/people/francisbirlenbach) \\- [CC-BY-NC](https://creativecommons.org/licenses/by-nc/4.0/) \\- Photo principale\n\n© [Kevin Gruau](https://www.inaturalist.org/people/yaka_s) \\- [CC-BY-NC](https://creativecommons.org/licenses/by-nc/4.0/) \\- Face (soies)  \n  \n© [Marian Harrer](https://www.inaturalist.org/people/marianharrer) \\- [CC-BY-NC](https://creativecommons.org/licenses/by-nc/4.0/) \\- Face (fovéas)  \n  \n© [Соколков Юрий Павлович](https://www.inaturalist.org/people/sokolkov2002) \\- [CC-BY-NC](https://creativecommons.org/licenses/by-nc/4.0/) \\- Nervation\n\n**Sources :**\n\n[Inaturalist](https://www.inaturalist.org/taxa/355696-Andrena-vaga)\n\n[GBIF](https://www.gbif.org/species/1357486)  \n[Atlas de la Faune de Suisse](https://species.infofauna.ch/groupe/1/portrait/384)  \n[Catalogue et clé des sous-genres et espèces du genre](https://quelestcetanimal-lagalerie.com/wp-content/uploads/2012/11/Cle_des_Andrena_du_nord_de_la_France.pdf) _[Andrena](https://quelestcetanimal-lagalerie.com/wp-content/uploads/2012/11/Cle_des_Andrena_du_nord_de_la_France.pdf)_ [de Belgique et du nord de la France](https://quelestcetanimal-lagalerie.com/wp-content/uploads/2012/11/Cle_des_Andrena_du_nord_de_la_France.pdf)",
 					"synonyms": ["Andrena (Melandrena) vaga"],
 					"images": [
@@ -46864,6 +47027,7 @@
 					"description": "",
 					"learnMore": "https://gbif.org/species/1357412",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 59,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1eWLJT4JniS9TIrnn5J3YmShrot6PDgSv&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1KetlPfBGP4yurk3KiI9_QRV1oH1o1CQf&sz=w1000"
@@ -47170,6 +47334,7 @@
 					"description": "",
 					"learnMore": "https://gbif.org/species/1357397",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 14,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1pWwUoB0i-0KNRZUS5hPUTVcB8O9mCgLj&sz=w1000"
 					],
@@ -47386,6 +47551,7 @@
 					"description": "",
 					"learnMore": "https://gbif.org/species/1357310",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 83,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1J5l1MWF5SMPzfBvC9U0b07gbPU1Pz19r&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1f8oxWvniVrIve7sARWm5VYwSNFJM3Hl9&sz=w1000"
@@ -47682,6 +47848,7 @@
 					"key": "1357295",
 					"label": "Andrena ventricosa",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 38,
 					"description": "Les femelles peuvent être placées dans le sous-genre Cryptandrena en raison de la présence d'une rangée de dents en forme d'épines sur la face postérieure du fémur postérieur combinée à un appendice du labre très large (3 fois plus large que long) et aux poils simples des scopae sur les tibias. Ceci la rapproche de seulement deux autres espèces, A. brumanensis Friese, 1899 (largement répandue) et A. rotundata Pérez, 1895 (Sardaigne et Sicile seulement). La séparation de ces deux espèces est extrêmement difficile et nécessite l'accès à du matériel de référence déterminé avec certitude ou l'association avec des mâles collectés simultanément, bien que cela ne soit pas garanti car du sud-est de la France vers l'est, A. ventricosa et A. brumanensis peuvent être trouvées en sympatrie. Le meilleur caractère permettant la séparation est la densité de la ponctuation sur le scutum. Chez A. ventricosa la distance entre les points est <0,5-0,5 fois le diamètre d'un point, alors que chez les deux autres espèces la ponctuation est légèrement plus espacée, la distance entre les points étant 0,5-1 fois le diamètre d'un point.",
 					"synonyms": ["Andrena (Cryptandrena) ventricosa"],
 					"images": [
@@ -47956,6 +48123,7 @@
 					"key": "1357235",
 					"label": "Andrena verticalis",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 56,
 					"description": "Andrena verticalis est aberrante au sein des Graecandrena, et il est donc préférable de procéder à une identification directe plutôt qu'à une identification par sous-genre. L'espèce peut être reconnue par la combinaison d'un corps de petite taille, d'un tégument noir, de fovéas faciales étroits, d'un triangle propodéal principalement lisse avec seulement de courtes rugosités dans la partie basale (le triangle propodéal n'est pas délimité latéralement par des carènes avec une surface interne couverte de carènes surélevées comme chez Micrandrena), et d'un clypéus fortement aplati. Cette combinaison de caractères est unique dans la faune européenne.",
 					"synonyms": ["Andrena (Graecandrena) verticalis"],
 					"images": [
@@ -48248,6 +48416,7 @@
 					"description": "Andrena vetula peut être rapidement placée dans le sous-genre Simandrena grâce aux corbeilles complètes du propodéum entourant les faces latérales du propodéum glabres. Le scutum est densément chagriné et complètement imponctué, le plaçant près de A. clissaeiformis (non-présente en France) et d’A. antigana.  Elle peut être séparée d'A. antigana grâce à la marge externe de la fovéa (la marge la plus proche de l’œil composé) qui est droite, sans coude visible.  Elle peut être séparée de A. clissaeiformis car T2 est essentiellement imponctué (finement et densément ponctué chez A. clissaeiformis) et A3 est nettement plus long que A4+5 (A3 aussi long que A4+5 chez A. clissaeiformis).",
 					"learnMore": "https://gbif.org/species/1357220",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 158,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1y56yww1VkB5i_Hl-aGA-BMOurutIyKqC&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1GqDhfG-RWNfx9QYhd8CkI1uHDKK17nGf&sz=w1000"
@@ -48503,6 +48672,7 @@
 					"key": "1357176",
 					"label": "Andrena villipes",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 178,
 					"description": "Andrena villipes peut être classée dans le sous-genre Truncandrena grâce au triangle de propodéum lisse et finement granulé qui contraste avec les parties dorsolatérales du propodéum également granulées, mais portant de fines et dispersées ponctuations portant des poils. Elle se distingue également par son pronotum arrondi, son espace malaire linéaire et sa grande taille du corps. Les scopae tibiales sont lâches, le visage est médianement recouvert de poils blancs, avec des poils noirs le long des marges internes des yeux composés, et les dessous des antennes sont clairement colorés en orange clair. Cela place cette espèce très proche d'A. ghisbaini Wood, 2023, qui n’est connue que de la région de la Sierra de las Nieves, dans le sud de l’Espagne, tandis que A. villipes est largement distribuée à travers l'Iberia jusqu'au sud de la France. Les deux espèces peuvent être séparées par la taille plus petite de A. villipes (12-13 mm contre 15-16 mm), par les poils scopaux uniformément orange (dorsalement noirs, ventralement orange chez A. ghisbaini), par la face comparativement plus courte, avec la marge apicale du clypéus légèrement projetée sous une ligne tracée entre les bords inférieurs des yeux composés (avec le clypéus plus allongé, se projetant clairement sous cette ligne chez A. ghisbaini), et par les ponctuations faibles du clypéus, qui sont obscures et superficielles (plus marquées, formant une ligne médiane non ponctuée longitudinale qui s’élargit apicalement chez A. ghisbaini).",
 					"synonyms": ["Andrena (Truncandrena) villipes"],
 					"images": [
@@ -48787,6 +48957,7 @@
 					"description": "",
 					"learnMore": "https://gbif.org/species/1357099",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 148,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1ZT7pkBUB0dTJWqayvg2Rvq-jIvzzHa8y&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1jZDQ4D4PAffK-sw_6wFfgp8Cn9Ie_HmF&sz=w1000"
@@ -49070,6 +49241,7 @@
 					"key": "11863371",
 					"label": "Andrena vocifera",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 171,
 					"description": "",
 					"synonyms": ["Andrena (Taeniandrena) vocifera"],
 					"images": [],
@@ -49351,6 +49523,7 @@
 					"key": "1356976",
 					"label": "Andrena vulpecula",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 45,
 					"description": "",
 					"synonyms": ["Andrena (Euandrena) vulpecula"],
 					"images": [
@@ -49666,6 +49839,7 @@
 					"description": "Les femelles peuvent être placées dans le sous-genre Taeniandrena grâce à leur clypeus fortement aplati. Le sous-genre Taeniandrena contient une grande diversité cryptique, et donc il faut faire très attention lors de l’identification morphologique des membres de ce groupe.  Andrena wilkella peut être identifiée grâce à la ponctuation du premier tergite, avec une ponctuation dense (distance moyenne entre les points égale à 1 fois le diamètre d'un point) médiane sur le disque. Cette ponctuation est clairement visibles par rapport à la chagrination sous-jacente. Les bandes tergales sont également relativement étroites, et largement interrompues sur T2-3. La frange terminale est également orange vif. En fin de compte, loin des régions bien étudiées du nord et du centre de l’Europe, une identification fiable nécessite des spécimens barcode.",
 					"learnMore": "https://gbif.org/species/1358128",
 					"x-generator": "xper3",
+					"x-xper3-declaration-index": 165,
 					"images": [
 						"https://drive.google.com/thumbnail?id=1fRcbQUSeUgi2JgfW1JoNmw-Agny8N6U3&sz=w1000",
 						"https://drive.google.com/thumbnail?id=1TTG-cZMRJ-wB7u6vmnx-bmn4xITBdcah&sz=w1000"
