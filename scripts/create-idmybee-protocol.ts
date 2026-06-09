@@ -7,7 +7,9 @@ import { version as oldVersion } from '../protocols/idmybee.cigaleprotocol.json'
 const here = import.meta.dirname;
 
 const descriptors = Object.fromEntries(
-	Object.entries(backbone.metadata).filter(([, m]) => 'group' in m && m.group === 'andrena')
+	Object.entries(backbone.metadata)
+		.filter(([, m]) => 'group' in m && m.group === 'andrena')
+		.map(([id, metadata]) => [id.replace(`${backbone.id}__`, ''), metadata])
 );
 
 await Bun.write(
@@ -39,9 +41,7 @@ await Bun.write(
 		],
 		metadataOrder: [
 			'morphogroup',
-			...Object.keys(descriptors)
-				.map((d) => d.replace(`${backbone.id}__`, ''))
-				.filter((d) => d !== 'morphogroup'),
+			...Object.keys(descriptors).filter((d) => d !== 'morphogroup'),
 		],
 		metadataGroups: {
 			andrena: {

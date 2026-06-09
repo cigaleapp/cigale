@@ -5,7 +5,7 @@
 	"summary": "Identification d'Andrènes par élimination",
 	"logo": "https://cigaleapp.github.io/cigale/logos/idmybee.png",
 	"description": "Un protocole pour identifier des abeilles genre Andrena via des descripteurs, avec pré-élimination par classification par inférence de Morphogroupes",
-	"version": 3,
+	"version": 4,
 	"updates": "automatic",
 	"source": "https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/idmybee.cigaleprotocol.json",
 	"authors": [],
@@ -50112,7 +50112,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__morphogroup": {
+		"morphogroup": {
 			"label": "Morphogroupe",
 			"group": "andrena",
 			"description": "",
@@ -50265,7 +50265,7 @@
 				{ "key": "viridescens", "label": "Viridescens" }
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__pilosite_occipitale": {
+		"pilosite_occipitale": {
 			"label": "Pilosité occipitale",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -50304,7 +50304,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__forme_de_la_tete": {
+		"forme_de_la_tete": {
 			"label": "Forme de la tête",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -50343,7 +50343,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__couleur_de_la_pilosite_de_la_face": {
+		"couleur_de_la_pilosite_de_la_face": {
 			"label": "Couleur de la pilosité de la face",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -50382,7 +50382,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__pilosite_pale_de_la_face": {
+		"pilosite_pale_de_la_face": {
 			"label": "Pilosité pâle de la face",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -50413,7 +50413,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__distance_occello_occipitale": {
+		"distance_occello_occipitale": {
 			"label": "Distance occello-occipitale",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -50468,7 +50468,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__couleur_de_la_face_ventrale_du_flagelle_antennaire": {
+		"couleur_de_la_face_ventrale_du_flagelle_antennaire": {
 			"label": "Couleur de la face ventrale du flagelle antennaire",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -50507,7 +50507,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__taille_du_3eme_segment_antennaire": {
+		"taille_du_3eme_segment_antennaire": {
 			"label": "Taille du 3ème segment antennaire",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -50546,7 +50546,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__depression_des_foveas": {
+		"depression_des_foveas": {
 			"label": "Dépression des fovéas",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -50577,7 +50577,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__largeur_des_foveas_dorsalement": {
+		"largeur_des_foveas_dorsalement": {
 			"label": "Largeur des fovéas dorsalement",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -50624,7 +50624,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__forme_des_foveas": {
+		"forme_des_foveas": {
 			"label": "Forme des fovéas",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -50671,7 +50671,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__divergeance_des_foveas": {
+		"divergeance_des_foveas": {
 			"label": "Divergeance des fovéas",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -50702,7 +50702,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__forme_des_foveas_au_milieu": {
+		"forme_des_foveas_au_milieu": {
 			"label": "Forme des fovéas au milieu",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -50733,7 +50733,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__longueur_des_foveas": {
+		"longueur_des_foveas": {
 			"label": "Longueur des fovéas",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -50764,7 +50764,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__stries_longitudinales_du_clypeus": {
+		"stries_longitudinales_du_clypeus": {
 			"label": "Stries longitudinales du clypéus",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -50795,7 +50795,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__ligne_centrale_du_clypeus": {
+		"ligne_centrale_du_clypeus": {
 			"label": "Ligne centrale du clypéus",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -50834,7 +50834,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__aspect_de_la_ligne_centrale_du_clypeus": {
+		"aspect_de_la_ligne_centrale_du_clypeus": {
 			"label": "Aspect de la ligne centrale du clypéus",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -50873,7 +50873,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__cretes_transverses_du_clypeus": {
+		"cretes_transverses_du_clypeus": {
 			"label": "Crêtes transverses du clypéus",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -50904,7 +50904,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__densite_de_la_ponctuation_du_clypeus": {
+		"densite_de_la_ponctuation_du_clypeus": {
 			"label": "Densité de la ponctuation du clypéus",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -50951,7 +50951,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__aspect_de_la_ponctuation_du_clypeus": {
+		"aspect_de_la_ponctuation_du_clypeus": {
 			"label": "Aspect de la ponctuation du clypéus",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -50990,7 +50990,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__forme_du_clypeus": {
+		"forme_du_clypeus": {
 			"label": "Forme du clypéus",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -51037,7 +51037,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__aspect_du_clypeus": {
+		"aspect_du_clypeus": {
 			"label": "Aspect du clypéus",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -51068,7 +51068,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__forme_du_bord_anterieur_du_clypeus": {
+		"forme_du_bord_anterieur_du_clypeus": {
 			"label": "Forme du bord antérieur du clypeus",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -51099,7 +51099,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__taille_de_lappendice_du_labre": {
+		"taille_de_lappendice_du_labre": {
 			"label": "Taille de l'appendice du labre",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -51144,7 +51144,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__forme_de_lappendice_du_labre": {
+		"forme_de_lappendice_du_labre": {
 			"label": "Forme de l'appendice du labre",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -51191,7 +51191,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__reflets_de_la_tete_et_du_mesosome": {
+		"reflets_de_la_tete_et_du_mesosome": {
 			"label": "Reflets de la tête et du mésosome",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -51222,7 +51222,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__ride_du_pronotum": {
+		"ride_du_pronotum": {
 			"label": "Ride du pronotum",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -51253,7 +51253,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__angle_humeral_du_pronotum": {
+		"angle_humeral_du_pronotum": {
 			"label": "Angle huméral du pronotum",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -51284,7 +51284,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__pilosite_des_mesopleures": {
+		"pilosite_des_mesopleures": {
 			"label": "Pilosité des mésopleures",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -51323,7 +51323,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__forme_de_la_pilosite_du_scutum": {
+		"forme_de_la_pilosite_du_scutum": {
 			"label": "Forme de la pilosité du scutum",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -51370,7 +51370,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__couleur_de_la_pilosite_du_scutum": {
+		"couleur_de_la_pilosite_du_scutum": {
 			"label": "Couleur de la pilosité du scutum",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -51457,7 +51457,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__epaisseur_de_la_pilosite_squameuse_du_scutum": {
+		"epaisseur_de_la_pilosite_squameuse_du_scutum": {
 			"label": "Épaisseur de la pilosité squameuse du scutum",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -51488,7 +51488,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__aspect_du_scutum": {
+		"aspect_du_scutum": {
 			"label": "Aspect du scutum",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -51533,7 +51533,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__regularite_de_la_ponctuation_du_scutum": {
+		"regularite_de_la_ponctuation_du_scutum": {
 			"label": "Régularité de la ponctuation du scutum",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -51570,7 +51570,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__densite_de_la_ponctuation_du_scutum": {
+		"densite_de_la_ponctuation_du_scutum": {
 			"label": "Densité de la ponctuation du scutum",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -51617,7 +51617,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__intensite_de_la_ponctuation_du_scutum": {
+		"intensite_de_la_ponctuation_du_scutum": {
 			"label": "Intensité de la ponctuation du scutum",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -51648,7 +51648,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__aspect_du_scutellum": {
+		"aspect_du_scutellum": {
 			"label": "Aspect du scutellum",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -51687,7 +51687,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__excavation_ventrale_du_mesepisternum": {
+		"excavation_ventrale_du_mesepisternum": {
 			"label": "Excavation ventrale du mésepisternum",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -51718,7 +51718,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__aspect_du_mesepisternum_et_des_aires_laterales_du_propodeum": {
+		"aspect_du_mesepisternum_et_des_aires_laterales_du_propodeum": {
 			"label": "Aspect du mésepisternum et des aires latérales du propodéum",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -51751,7 +51751,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__carene_du_triangle_du_propodeum": {
+		"carene_du_triangle_du_propodeum": {
 			"label": "Carène du triangle du propodéum",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -51806,7 +51806,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__aspect_de_la_surface_interne_du_triangle_du_propdeum": {
+		"aspect_de_la_surface_interne_du_triangle_du_propdeum": {
 			"label": "Aspect de la surface interne du triangle du propdéum",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -51853,7 +51853,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__rugosites_de_la_surface_interne_du_triangle_du_propdeum": {
+		"rugosites_de_la_surface_interne_du_triangle_du_propdeum": {
 			"label": "Rugosités de la surface interne du triangle du propdéum",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -51884,7 +51884,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__ponctuation_du_propodeum": {
+		"ponctuation_du_propodeum": {
 			"label": "Ponctuation du propodéum",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -51915,7 +51915,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__cretes_des_faces_laterales_du_propodeum": {
+		"cretes_des_faces_laterales_du_propodeum": {
 			"label": "Crètes des faces latérales du propodéum",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -51954,7 +51954,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__corbeilles_du_propodeum": {
+		"corbeilles_du_propodeum": {
 			"label": "Corbeilles du propodéum",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -51985,7 +51985,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__separation_des_aires_horizontales_et_verticales_du_propodeum": {
+		"separation_des_aires_horizontales_et_verticales_du_propodeum": {
 			"label": "Séparation des aires horizontales et verticales du propodéum",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -52016,7 +52016,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__couleur_des_tergites": {
+		"couleur_des_tergites": {
 			"label": "Couleur des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -52055,7 +52055,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__couleur_rouge_des_tergites": {
+		"couleur_rouge_des_tergites": {
 			"label": "Couleur rouge des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -52094,7 +52094,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__couleur_des_marges_des_tergites": {
+		"couleur_des_marges_des_tergites": {
 			"label": "Couleur des marges des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -52133,7 +52133,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__aspect_du_disque_des_tergites": {
+		"aspect_du_disque_des_tergites": {
 			"label": "Aspect du disque des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -52172,7 +52172,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__densite_de_la_ponctuation_du_disque_des_tergites": {
+		"densite_de_la_ponctuation_du_disque_des_tergites": {
 			"label": "Densité de la ponctuation du disque des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -52235,7 +52235,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__aspect_de_la_ponctuation_du_disque_des_tergites": {
+		"aspect_de_la_ponctuation_du_disque_des_tergites": {
 			"label": "Aspect de la ponctuation du disque des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -52272,7 +52272,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__repartition_de_la_ponctuation_du_disque_des_tergites": {
+		"repartition_de_la_ponctuation_du_disque_des_tergites": {
 			"label": "Répartition de la ponctuation du disque des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -52311,7 +52311,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__pilosite_du_disque_des_tergites": {
+		"pilosite_du_disque_des_tergites": {
 			"label": "Pilosité du disque des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -52358,7 +52358,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__couleur_de_la_pilosite_des_tergites_1_2": {
+		"couleur_de_la_pilosite_des_tergites_1_2": {
 			"label": "Couleur de la pilosité des tergites 1-2",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -52425,7 +52425,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__couleur_de_la_pilosite_des_tergites_3_4": {
+		"couleur_de_la_pilosite_des_tergites_3_4": {
 			"label": "Couleur de la pilosité des tergites 3-4",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -52456,7 +52456,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__bandes_de_poils_des_tergites": {
+		"bandes_de_poils_des_tergites": {
 			"label": "Bandes de poils des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -52495,7 +52495,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__densite_des_bandes_de_poils_des_tergites": {
+		"densite_des_bandes_de_poils_des_tergites": {
 			"label": "Densité des bandes de poils des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -52526,7 +52526,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__continuite_des_bandes_de_poils_des_tergites": {
+		"continuite_des_bandes_de_poils_des_tergites": {
 			"label": "Continuité des bandes de poils des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -52581,7 +52581,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__couleur_des_bandes_de_poils_des_tergites": {
+		"couleur_des_bandes_de_poils_des_tergites": {
 			"label": "Couleur des bandes de poils des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -52620,7 +52620,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__presence_de_gradulus_sur_les_tergites_2_3": {
+		"presence_de_gradulus_sur_les_tergites_2_3": {
 			"label": "Présence de gradulus sur les tergites 2-3",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -52651,7 +52651,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__depression_de_la_marge_des_tergites": {
+		"depression_de_la_marge_des_tergites": {
 			"label": "Dépression de la marge des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -52682,7 +52682,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__aspect_de_la_marge_des_tergites": {
+		"aspect_de_la_marge_des_tergites": {
 			"label": "Aspect de la marge des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -52713,7 +52713,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__largeur_des_marges": {
+		"largeur_des_marges": {
 			"label": "Largeur des marges",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -52744,7 +52744,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__densite_de_la_ponctuation_du_tergite_1": {
+		"densite_de_la_ponctuation_du_tergite_1": {
 			"label": "Densité de la ponctuation du tergite 1",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -52799,7 +52799,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__taille_de_la_ponctuation_du_tergite_1": {
+		"taille_de_la_ponctuation_du_tergite_1": {
 			"label": "Taille de la ponctuation du tergite 1",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -52838,7 +52838,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__microponctuation_du_tergite_1": {
+		"microponctuation_du_tergite_1": {
 			"label": "Microponctuation du tergite 1",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -52869,7 +52869,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__aspect_du_disque_du_tergite_1": {
+		"aspect_du_disque_du_tergite_1": {
 			"label": "Aspect du disque du tergite 1",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -52908,7 +52908,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__ponctuation_de_la_marge_du_tergite_1": {
+		"ponctuation_de_la_marge_du_tergite_1": {
 			"label": "Ponctuation de la marge du tergite 1",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -52939,7 +52939,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__forme_de_la_plaque_pygidiale": {
+		"forme_de_la_plaque_pygidiale": {
 			"label": "Forme de la plaque pygidiale",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -52970,7 +52970,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__couleur_de_la_frange_terminale": {
+		"couleur_de_la_frange_terminale": {
 			"label": "Couleur de la frange terminale",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -53053,7 +53053,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__face_posterieure_du_femur_3": {
+		"face_posterieure_du_femur_3": {
 			"label": "Face postérieure du fémur 3",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -53092,7 +53092,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__forme_des_tibias_3": {
+		"forme_des_tibias_3": {
 			"label": "Forme des tibias 3",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -53123,7 +53123,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__couleur_de_la_cuticule_du_tibia_3": {
+		"couleur_de_la_cuticule_du_tibia_3": {
 			"label": "Couleur de la cuticule du tibia 3",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -53168,7 +53168,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__couleur_des_basitarses_3": {
+		"couleur_des_basitarses_3": {
 			"label": "Couleur des basitarses 3",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -53211,7 +53211,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__type_de_pilosite_des_scopas": {
+		"type_de_pilosite_des_scopas": {
 			"label": "Type de pilosité des scopas",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -53250,7 +53250,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__couleur_de_la_scopa_des_tibias_3": {
+		"couleur_de_la_scopa_des_tibias_3": {
 			"label": "Couleur de la scopa des tibias 3",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -53321,7 +53321,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__couleur_de_la_scopa_bicolore_des_tibias_3": {
+		"couleur_de_la_scopa_bicolore_des_tibias_3": {
 			"label": "Couleur de la scopa bicolore des tibias 3",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -53374,7 +53374,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__taille_des_poils_de_la_scopa_des_tibias_3": {
+		"taille_des_poils_de_la_scopa_des_tibias_3": {
 			"label": "Taille des poils de la scopa des tibias 3",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -53413,7 +53413,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__forme_de_leperon_interne_du_tibia_3": {
+		"forme_de_leperon_interne_du_tibia_3": {
 			"label": "Forme de l'éperon interne du tibia 3",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -53452,7 +53452,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__longueur_de_la_face": {
+		"longueur_de_la_face": {
 			"label": "Longueur de la face",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -53483,7 +53483,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__taille_du_2eme_segment_antennaire": {
+		"taille_du_2eme_segment_antennaire": {
 			"label": "Taille du 2ème segment antennaire",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -53514,7 +53514,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__taille_des_segments_antennaires_4_a_11": {
+		"taille_des_segments_antennaires_4_a_11": {
 			"label": "Taille des segments antennaires 4 à 11",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -53545,7 +53545,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__taille_du_5eme_segment_antennaire": {
+		"taille_du_5eme_segment_antennaire": {
 			"label": "Taille du 5ème segment antennaire",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -53576,7 +53576,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__retrecissement_des_foveas": {
+		"retrecissement_des_foveas": {
 			"label": "Rétrécissement des fovéas",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -53607,7 +53607,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__taille_des_foveas": {
+		"taille_des_foveas": {
 			"label": "Taille des fovéas",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -53634,7 +53634,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__pilosite_des_foveas": {
+		"pilosite_des_foveas": {
 			"label": "Pilosité des fovéas",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -53665,7 +53665,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__delimitation_des_foveas": {
+		"delimitation_des_foveas": {
 			"label": "Délimitation des fovéas",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -53696,7 +53696,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__densite_de_la_ponctuation_du_clypeus_lateralement": {
+		"densite_de_la_ponctuation_du_clypeus_lateralement": {
 			"label": "Densité de la ponctuation du clypéus latéralement",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -53727,7 +53727,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__forme_et_aspect_du_clypeus": {
+		"forme_et_aspect_du_clypeus": {
 			"label": "Forme et aspect du clypéus",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -53758,7 +53758,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__taille_de_la_ponctuation_et_aspect_clypeus": {
+		"taille_de_la_ponctuation_et_aspect_clypeus": {
 			"label": "Taille de la ponctuation et aspect clypéus",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -53789,7 +53789,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__striation_des_zones_paraoculaires": {
+		"striation_des_zones_paraoculaires": {
 			"label": "Striation des zones paraoculaires",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -53820,7 +53820,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__taille_de_lespace_malaire": {
+		"taille_de_lespace_malaire": {
 			"label": "Taille de l'espace malaire",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -53847,7 +53847,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__forme_et_apex_de_lappendice_du_labre": {
+		"forme_et_apex_de_lappendice_du_labre": {
 			"label": "Forme et apex de l'appendice du labre",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -53874,7 +53874,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__largeur_de_lappendice_du_labre": {
+		"largeur_de_lappendice_du_labre": {
 			"label": "Largeur de l'appendice du labre",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -53901,7 +53901,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__aspect_des_galeas": {
+		"aspect_des_galeas": {
 			"label": "Aspect des galéas",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -53932,7 +53932,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__pilosite_du_mesosome": {
+		"pilosite_du_mesosome": {
 			"label": "Pilosité du mésosome",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -53963,7 +53963,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__couleur_de_la_pilosite_du_mesosome": {
+		"couleur_de_la_pilosite_du_mesosome": {
 			"label": "Couleur de la pilosité du mésosome",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -53994,7 +53994,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__ligne_mediane_du_scutum": {
+		"ligne_mediane_du_scutum": {
 			"label": "Ligne médiane du scutum",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -54025,7 +54025,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__longueur_de_la_pilosite_du_scutum": {
+		"longueur_de_la_pilosite_du_scutum": {
 			"label": "Longueur de la pilosité du scutum",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -54052,7 +54052,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__taille_de_la_pilosite_des_mesopleures": {
+		"taille_de_la_pilosite_des_mesopleures": {
 			"label": "Taille de la pilosité des mésopleures",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -54081,7 +54081,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__pilosite_du_mesepisternum": {
+		"pilosite_du_mesepisternum": {
 			"label": "Pilosité du mésepisternum",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -54112,7 +54112,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__largeur_du_triangle_du_propdeum": {
+		"largeur_du_triangle_du_propdeum": {
 			"label": "Largeur du triangle du propdéum",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -54143,7 +54143,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__rides_de_la_partie_anterieure_du_propodeum": {
+		"rides_de_la_partie_anterieure_du_propodeum": {
 			"label": "Rides de la partie antérieure du propodéum",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -54172,7 +54172,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__taille_de_la_ponctuation_des_tergites": {
+		"taille_de_la_ponctuation_des_tergites": {
 			"label": "Taille de la ponctuation des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -54203,7 +54203,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__pilosite_caracteristique_des_tergites": {
+		"pilosite_caracteristique_des_tergites": {
 			"label": "Pilosité caractéristique des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -54234,7 +54234,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__depression_a_la_base_des_tergites": {
+		"depression_a_la_base_des_tergites": {
 			"label": "Dépression à la base des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -54265,7 +54265,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__longueur_des_bandes_de_poils_des_tergites": {
+		"longueur_des_bandes_de_poils_des_tergites": {
 			"label": "Longueur des bandes de poils des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -54296,7 +54296,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__difference_daspect_des_tergites": {
+		"difference_daspect_des_tergites": {
 			"label": "Différence d'aspect des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -54327,7 +54327,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__aspect_des_tergites_lateralement": {
+		"aspect_des_tergites_lateralement": {
 			"label": "Aspect des tergites latéralement",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -54358,7 +54358,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__diagnose_a_granulosavulpecula": {
+		"diagnose_a_granulosavulpecula": {
 			"label": "Diagnose A. granulosa/vulpecula",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -54389,7 +54389,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__diagnose_a_allosaamietibicolor": {
+		"diagnose_a_allosaamietibicolor": {
 			"label": "Diagnose A. allosa/amieti/bicolor",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -54418,7 +54418,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__diagnose_a_rosaetrimmeranascotica": {
+		"diagnose_a_rosaetrimmeranascotica": {
 			"label": "Diagnose A. rosae/trimmerana/scotica",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -54449,7 +54449,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__diagnose_a_intermediagelriae": {
+		"diagnose_a_intermediagelriae": {
 			"label": "Diagnose A. intermedia/gelriae",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -54478,7 +54478,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__repartition_de_la_ponctuation_des_tergites": {
+		"repartition_de_la_ponctuation_des_tergites": {
 			"label": "Répartition de la ponctuation des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -54515,7 +54515,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__ponctuation_des_tergites_2_3": {
+		"ponctuation_des_tergites_2_3": {
 			"label": "Ponctuation des tergites 2-3",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -54546,7 +54546,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__aspect_de_la_marge_des_tergites_2_4": {
+		"aspect_de_la_marge_des_tergites_2_4": {
 			"label": "Aspect de la marge des tergites 2-4",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -54577,7 +54577,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__pilosite_squameuse_des_tergites": {
+		"pilosite_squameuse_des_tergites": {
 			"label": "Pilosité squameuse des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -54608,7 +54608,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__taille_des_tergites": {
+		"taille_des_tergites": {
 			"label": "Taille des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -54639,7 +54639,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__diagnose_a_fulva": {
+		"diagnose_a_fulva": {
 			"label": "Diagnose A. fulva",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -54670,7 +54670,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__epaisseur_des_bandes_de_poils_des_tergites": {
+		"epaisseur_des_bandes_de_poils_des_tergites": {
 			"label": "Epaisseur des bandes de poils des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -54701,7 +54701,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__longueur_des_bandes_de_poils_a_lapex_des_tergites": {
+		"longueur_des_bandes_de_poils_a_lapex_des_tergites": {
 			"label": "Longueur des bandes de poils à l'apex des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -54730,7 +54730,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__pilosite_laterale_des_disques_des_tergites": {
+		"pilosite_laterale_des_disques_des_tergites": {
 			"label": "Pilosité latérale des disques des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -54759,7 +54759,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__largeur_des_bandes_de_poils_a_lapex_des_tergites": {
+		"largeur_des_bandes_de_poils_a_lapex_des_tergites": {
 			"label": "Largeur des bandes de poils à l'apex des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -54788,7 +54788,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__couleur_de_la_pilosite_des_tergites_1_4": {
+		"couleur_de_la_pilosite_des_tergites_1_4": {
 			"label": "Couleur de la pilosité des tergites 1-4",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -54819,7 +54819,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__depressions_de_la_marge_des_tergites": {
+		"depressions_de_la_marge_des_tergites": {
 			"label": "Dépressions de la marge des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -54850,7 +54850,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__impressions_longitudinales_du_tergite_1": {
+		"impressions_longitudinales_du_tergite_1": {
 			"label": "Impressions longitudinales du tergite 1",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -54881,7 +54881,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__taille_de_la_pilosite_des_tergites_1_2": {
+		"taille_de_la_pilosite_des_tergites_1_2": {
 			"label": "Taille de la pilosité des tergites 1-2",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -54912,7 +54912,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__projections_laterales_du_tergite_1": {
+		"projections_laterales_du_tergite_1": {
 			"label": "Projections latérales du tergite 1",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -54943,7 +54943,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__aspect_du_tergite_2": {
+		"aspect_du_tergite_2": {
 			"label": "Aspect du tergite 2",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -54974,7 +54974,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__pilosite_de_la_marge_du_tergite_2": {
+		"pilosite_de_la_marge_du_tergite_2": {
 			"label": "Pilosité de la marge du tergite 2",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -55005,7 +55005,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__largeur_de_la_marge_du_tergite_2": {
+		"largeur_de_la_marge_du_tergite_2": {
 			"label": "Largeur de la marge du tergite 2",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -55036,7 +55036,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__foveas_laterales_du_tergite_2": {
+		"foveas_laterales_du_tergite_2": {
 			"label": "Fovéas latérales du tergite 2",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -55067,7 +55067,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__aspect_du_metasome_et_du_tergite_4": {
+		"aspect_du_metasome_et_du_tergite_4": {
 			"label": "Aspect du métasome et du tergite 4",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -55099,7 +55099,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__echancrure_de_la_plaque_pygidiale": {
+		"echancrure_de_la_plaque_pygidiale": {
 			"label": "Echancrure de la plaque pygidiale",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -55130,7 +55130,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__largeur_de_la_plaque_pygidiale": {
+		"largeur_de_la_plaque_pygidiale": {
 			"label": "Largeur de la plaque pygidiale",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -55159,7 +55159,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__couleur_de_la_pilosite_bordant_la_plaque_pygidiale": {
+		"couleur_de_la_pilosite_bordant_la_plaque_pygidiale": {
 			"label": "Couleur de la pilosité bordant la plaque pygidiale",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -55190,7 +55190,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__couleur_de_la_pilosite_des_sternites": {
+		"couleur_de_la_pilosite_des_sternites": {
 			"label": "Couleur de la pilosité des sternites",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -55221,7 +55221,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__nombre_de_cellules_cubitales": {
+		"nombre_de_cellules_cubitales": {
 			"label": "Nombre de cellules cubitales",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -55252,7 +55252,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__ailes_enfumees_ou_transparentes": {
+		"ailes_enfumees_ou_transparentes": {
 			"label": "Ailes enfumées ou transparentes",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -55283,7 +55283,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__premiere_nervure_recurrente": {
+		"premiere_nervure_recurrente": {
 			"label": "Première nervure récurrente",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -55312,7 +55312,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__taille_des_epines_du_femur_3": {
+		"taille_des_epines_du_femur_3": {
 			"label": "Taille des épines du fémur 3",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -55343,7 +55343,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__comparaison_de_la_pilosite_des_tibia_3": {
+		"comparaison_de_la_pilosite_des_tibia_3": {
 			"label": "Comparaison de la pilosité des tibia 3",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -55374,7 +55374,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__forme_des_basitarses_3": {
+		"forme_des_basitarses_3": {
 			"label": "Forme des basitarses 3",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -55405,7 +55405,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__couleur_de_la_plaque_basitibiale": {
+		"couleur_de_la_plaque_basitibiale": {
 			"label": "Couleur de la plaque basitibiale",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -55434,7 +55434,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__taille_de_la_plaque_basitibiale": {
+		"taille_de_la_plaque_basitibiale": {
 			"label": "Taille de la plaque basitibiale",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -55465,7 +55465,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__taille_du_5eme_segment_du_metatarse": {
+		"taille_du_5eme_segment_du_metatarse": {
 			"label": "Taille du 5ème segment du métatarse",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -55496,7 +55496,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__diagnose_a_distinguendapuella": {
+		"diagnose_a_distinguendapuella": {
 			"label": "Diagnose A. distinguenda/puella",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -55523,7 +55523,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__diagnose_a_wilkella": {
+		"diagnose_a_wilkella": {
 			"label": "Diagnose A. wilkella",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -55554,7 +55554,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__diagnose_a_rugulosaalfkenella": {
+		"diagnose_a_rugulosaalfkenella": {
 			"label": "Diagnose A. rugulosa/alfkenella",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -55581,7 +55581,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__identification_rapide": {
+		"identification_rapide": {
 			"label": "Identification rapide",
 			"group": "andrena",
 			"mergeMethod": "none",
@@ -55632,7 +55632,7 @@
 				}
 			]
 		},
-		"io.github.cigaleapp.arthropods.example__taille": {
+		"taille": {
 			"label": "Taille",
 			"group": "andrena",
 			"mergeMethod": "none",
