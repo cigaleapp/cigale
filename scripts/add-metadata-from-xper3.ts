@@ -81,7 +81,7 @@ async function augment(protocolPath: string, protocol: typeof ExportedProtocol.i
 		.then((res) => res.text())
 		.then((text) =>
 			text
-				.split('\n')
+				.split(/\r?\n/)
 				.filter((line) => line.trim())
 				.map(formatMorphogroupKey)
 		);
@@ -418,42 +418,41 @@ async function augment(protocolPath: string, protocol: typeof ExportedProtocol.i
 			}
 		}
 
-		const speciesToMorphogroup = Object.fromEntries(
-			await fetch(
-				'https://huggingface.co/edgaremy/andrena-classifier/resolve/main/morphogroup_to_species.csv?download=true'
-			)
-				.then((res) => res.text())
-				.then((text) =>
+		const speciesToMorphogroups = await fetch(
+			'https://huggingface.co/edgaremy/andrena-classifier/resolve/main/species_to_morphogroups.csv?download=true'
+		)
+			.then((res) => res.text())
+			.then((text) =>
+				Object.fromEntries(
 					text
-						.split('\n')
+						.split(/\r?\n/)
 						.filter((line) => line.trim())
 						.filter((_, i) => i > 0)
 						.flatMap((line) => {
-							const [[morphogroup], species] = line
+							const [genus, subname, ...morphogroups] = line
 								.split(',')
-								.map((cell) => cell.trim().split('|'));
+								.filter(Boolean);
 
-							return species
-								.map((name) => [
-									protocol.metadata[`${protocol.id}__species`].options!.find(
-										(o) => o.label.split(' ').at(1) === name
-									)?.key,
-									formatMorphogroupKey(morphogroup),
-								])
-								.filter(([key]) => key !== undefined);
+							const key = protocol.metadata[`${protocol.id}__species`].options!.find(
+								(o) => o.label === `${genus} ${subname}`
+							)?.key;
+
+							if (!key) return [];
+
+							return [[key, morphogroups.map(formatMorphogroupKey)]];
 						})
 				)
-		);
+			);
 
 		for (const [oidx, speciesOption] of protocol.metadata[
 			`${protocol.id}__species`
 		].options!.entries()) {
-			const morphogroup = speciesToMorphogroup[speciesOption.key];
+			const morphogroups = speciesToMorphogroups[speciesOption.key];
 
-			if (morphogroup) {
+			if (morphogroups) {
 				protocol.metadata[`${protocol.id}__species`].options![oidx].cascade = {
 					...speciesOption.cascade,
-					morphogroup,
+					morphogroup: morphogroups,
 				};
 			}
 		}
