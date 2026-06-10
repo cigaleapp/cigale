@@ -8,8 +8,11 @@
 	import { tick } from 'svelte';
 	import { SvelteMap } from 'svelte/reactivity';
 
+	import IconCroppedOnly from '~icons/ri/crop-line';
 	import IconDownloadAsZip from '~icons/ri/file-zip-line';
 	import IconDownloadAsFolder from '~icons/ri/folder-download-line';
+	import IconMetadataOnly from '~icons/ri/list-view';
+	import IconFullExport from '~icons/ri/multi-image-line';
 	import IconExpand from '~icons/ri/skip-left-line';
 	import IconCollapse from '~icons/ri/skip-right-line';
 	import { asset } from '$app/paths';
@@ -325,16 +328,23 @@
 						<Field label="Inclure">
 							<EnumButtons
 								bind:value={include}
+								cards
 								options={[
-									{ key: 'metadataonly', label: 'Métadonnées seulement' },
+									{
+										key: 'metadataonly',
+										label: 'Métadonnées seulement',
+										icon: IconMetadataOnly,
+									},
 									{
 										key: 'croppedonly',
 										label: 'Métadonnées et images recadrées',
+										icon: IconCroppedOnly,
 									},
 									{
 										key: 'full',
 										label: 'Tout',
 										subtext: 'Permet de ré-importer ultérieurement',
+										icon: IconFullExport,
 									},
 								]}
 							/>

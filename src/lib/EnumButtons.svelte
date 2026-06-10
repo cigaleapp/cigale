@@ -8,6 +8,7 @@
 		label: MaybeLoading<string>;
 		subtext?: MaybeLoading<string>;
 		disabled?: boolean | string;
+		icon?: import('svelte').Component;
 	} & AdditionalItemData;
 
 	/* eslint-disable no-unused-vars */
@@ -69,7 +70,7 @@
 		<legend id="{id}-label">{label}</legend>
 	{/if}
 	{#each options as option (option.key)}
-		{@const { key, label, disabled } = option}
+		{@const { key, label, disabled, icon: Icon } = option}
 		<label class="radio" class:card={cards}>
 			<input
 				disabled={Boolean(disabled)}
@@ -106,13 +107,18 @@
 					selected: multiple ? values.includes(key) : key === value,
 				})}
 			{:else}
-				<div class="text">
-					<LoadingText value={label} />
-					{#if 'subtext' in option}
-						<p class="subtext">
-							<LoadingText value={option.subtext} />
-						</p>
+				<div class="with-icon">
+					{#if Icon}
+						<div class="icon"><Icon /></div>
 					{/if}
+					<div class="text">
+						<LoadingText value={label} />
+						{#if 'subtext' in option}
+							<p class="subtext">
+								<LoadingText value={option.subtext} />
+							</p>
+						{/if}
+					</div>
 				</div>
 			{/if}
 		</label>
@@ -184,12 +190,27 @@
 		align-items: center;
 	}
 
+	.with-icon {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+	}
+
+	.with-icon .icon {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
 	.text {
 		max-width: 67ch;
 	}
 
 	.subtext {
 		color: var(--gay);
+	}
+
+	.with-icon:not(:has(.icon)) .subtext {
 		padding-left: 1.2em;
 	}
 
