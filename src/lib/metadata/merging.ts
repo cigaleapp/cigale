@@ -2,7 +2,7 @@ import type { RuntimeValuesPerType } from './types.js';
 import type * as DB from '$lib/database';
 
 import { type RuntimeValue } from '$lib/schemas/metadata.js';
-import { avg, mapValues, nonnull, unique } from '$lib/utils.js';
+import { avg, compareBy, mapValues, nonnull, unique } from '$lib/utils.js';
 
 import { serializeMetadataValue } from './serializing.js';
 import { switchOnMetadataType } from './types.js';
@@ -163,15 +163,13 @@ function mergeMetadata(
 					options,
 				}),
 			});
+		// TODO rename these strategies to "confidence", it's the same thing
+		// the max vs min tiebreaker (mergeByMajority strategy) makes no sense, esp when values are not numerical
 		case 'max':
 		case 'min':
 			return mergeFullValue({
 				confidences: max,
-				value: mergeByMajority(
-					definition.type,
-					values,
-					definition.mergeMethod === 'max' ? max : min
-				),
+				value: mergeByMajority(definition.type, values),
 			});
 		case 'median':
 			return mergeFullValue({
@@ -201,17 +199,9 @@ function mergeMetadata(
  */
 function mergeByMajority<Type extends DB.MetadataType, Value extends RuntimeValue<Type>>(
 	_type: Type,
-	values: Array<{ value: Value; confidence: number }>,
-	strategy: (values: Value[]) => Value
+	values: Array<{ value: Value; confidence: number }>
 ): Value {
-	const bestConfidence = Math.max(...values.map((v) => v.confidence));
-	const bestValues = values.filter((v) => v.confidence === bestConfidence);
-	try {
-		return strategy(bestValues.map((v) => v.value));
-	} catch (error) {
-		console.error(error);
-		return bestValues[0].value;
-	}
+	return values.toSorted(compareBy((v) => v.confidence)).at(-1)!.value;
 }
 
 /**
@@ -322,8 +312,4 @@ function median(values: number[]) {
 
 function max(values: number[]) {
 	return Math.max(...values);
-}
-
-function min(values: number[]) {
-	return Math.min(...values);
 }
