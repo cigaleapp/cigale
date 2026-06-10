@@ -75,6 +75,11 @@ beforeEach(async () => {
 	await db.clear('Session');
 	await db.clear('Metadata');
 	await db.clear('MetadataOption');
+	await db.put('Protocol', {
+		id: PROTOCOL_ID,
+		metadata: ['species', 'genus', 'location'].map(nsId),
+		importedMetadata: [],
+	});
 });
 
 // ─── storeMetadataValue ──────────────────────────────────────────────
@@ -128,6 +133,7 @@ describe('storeMetadataValue', () => {
 	test('stores metadata value on an observation', async () => {
 		const metadataId = nsId('species');
 		await db.add('Metadata', mockMetadata('species', 'string'));
+		await db.add('Image', mockImage('1'));
 		await db.add('Observation', mockObservation('o1', ['1']));
 
 		await storeMetadataValue({
