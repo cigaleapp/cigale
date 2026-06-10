@@ -131,6 +131,9 @@ for (const offline of [false, true]) {
 					},
 					'metadata.csv': {
 						text(txt) {
+							const UTF8_BOM = '\xEF\xBB\xBF';
+							if (txt.startsWith(UTF8_BOM)) txt = txt.replace(UTF8_BOM, '');
+
 							const lines = txt.split('\n');
 							assert(lines).toHaveLength(2);
 							assert
