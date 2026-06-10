@@ -1,3 +1,5 @@
+import { ms } from 'convert';
+
 import {
 	chooseInDropdown,
 	confirmDeletionModal,
@@ -56,12 +58,16 @@ export async function newSession(page, { name, protocol, models, goto = 'import'
 		// XXX: Sometimes clicking the open button does nothing for some reason
 		// Can't reproduce outside of the testing environment though
 		while (page.url().includes('/sessions/')) {
-			await page
-				.getByRole('button', {
-					name: 'Ouvrir la session',
-					exact: true,
-				})
-				.click();
+			if (!page.url().includes('/sessions/')) {
+				break;
+			}
+
+			const open = page.getByRole('button', {
+				name: 'Ouvrir la session',
+				exact: true,
+			});
+
+			if (await open.isVisible()) await open.click({ timeout: ms('3s') }).catch(() => {});
 
 			await page.waitForTimeout(500);
 		}
