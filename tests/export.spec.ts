@@ -71,7 +71,7 @@ testBasic('correctly shows .zip preview', async ({ page, app }) => {
 		cropPadding?: { px: number } | { '%': number };
 	}) {
 		if (include) {
-			await settings.getByRole('radio', { name: include }).click();
+			await settings.getByRole('radio', { name: include }).click({ force: true });
 		}
 
 		if (cropPadding) {

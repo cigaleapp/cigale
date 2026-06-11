@@ -110,7 +110,8 @@ describe('operations', () => {
 				metadata: {
 					proto__water: {
 						value: '"bucket"',
-						alternatives: {
+						alternatives: [],
+						confidences: {
 							'"release!!!!"': 0.3,
 						},
 					},
@@ -129,7 +130,8 @@ describe('operations', () => {
 				metadata: {
 					proto__water: {
 						value: '"bucket"',
-						alternatives: {
+						alternatives: [],
+						confidences: {
 							'"release!!!!"': 0.3,
 						},
 					},
@@ -154,7 +156,8 @@ describe('operations', () => {
 						confirmed: false,
 						manuallyModified: false,
 						isDefault: false,
-						alternatives: {
+						alternatives: [],
+						confidences: {
 							'"release!!!!"': 0.3,
 						},
 					},
@@ -206,7 +209,7 @@ describe('operations', () => {
 			metadata: {
 				proto__water: {
 					value: '"bucket"',
-					alternatives: {
+					confidences: {
 						'"release!!!!"': 0.3,
 					},
 				},
@@ -224,7 +227,7 @@ describe('operations', () => {
 			metadata: {
 				proto__water: {
 					value: '"ogjroe"',
-					alternatives: {
+					confidences: {
 						'"release!!!!"': 0.3,
 					},
 				},
@@ -247,7 +250,8 @@ describe('operations', () => {
 					confirmed: false,
 					manuallyModified: false,
 					isDefault: false,
-					alternatives: {
+					alternatives: [],
+					confidences: {
 						'"release!!!!"': 0.3,
 					},
 				},
@@ -269,7 +273,7 @@ describe('operations', () => {
 			metadata: {
 				proto__water: {
 					value: '"bucket"',
-					alternatives: {
+					confidences: {
 						'"release!!!!"': 0.3,
 					},
 				},
@@ -287,7 +291,7 @@ describe('operations', () => {
 			metadata: {
 				proto__water: {
 					value: '"ogjroe"',
-					alternatives: {
+					confidences: {
 						'"release!!!!"': 0.3,
 					},
 				},
@@ -401,7 +405,8 @@ describe('wrangler', () => {
 		metadata: {
 			proto__water: {
 				value: '"bucket"',
-				alternatives: {
+				alternatives: [],
+				confidences: {
 					'"release!!!!"': 0.3,
 				},
 			},
@@ -668,7 +673,7 @@ describe('wrangler', () => {
 					metadata: {
 						proto__water: {
 							value: '"bucket"',
-							alternatives: {
+							confidences: {
 								'"release!!!!"': 0.3,
 							},
 						},
@@ -689,7 +694,8 @@ describe('wrangler', () => {
 								confirmed: false,
 								manuallyModified: false,
 								isDefault: false,
-								alternatives: {
+								alternatives: [],
+								confidences: {
 									'"release!!!!"': 0.3,
 								},
 							},
@@ -707,7 +713,8 @@ describe('wrangler', () => {
 								confirmed: false,
 								manuallyModified: false,
 								isDefault: false,
-								alternatives: {
+								alternatives: [],
+								confidences: {
 									'"release!!!!"': 0.3,
 								},
 							},
@@ -731,7 +738,8 @@ describe('wrangler', () => {
 							confirmed: false,
 							manuallyModified: false,
 							isDefault: false,
-							alternatives: {
+							alternatives: [],
+							confidences: {
 								'"release!!!!"': 0.3,
 							},
 						},
@@ -743,7 +751,8 @@ describe('wrangler', () => {
 					metadata: {
 						proto__water: {
 							value: '"bucket"',
-							alternatives: {
+							alternatives: [],
+							confidences: {
 								'"release!!!!"': 0.3,
 							},
 						},

@@ -481,3 +481,12 @@ export async function scrollAndClick(locator, { scroll = 'down', force = false }
 	await scrollIntoViewVirtualized(locator, scroll);
 	await locator.click({ force });
 }
+
+/**
+ * @template {FixturePaths.Any} Path
+ * @param {Path} pathname
+ * @returns {FixturePaths.Absolute<Path>}
+ */
+export function absoluteFixturePath(pathname) {
+	return `${FixturePaths.root}/${pathname}`;
+}

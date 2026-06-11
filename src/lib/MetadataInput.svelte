@@ -31,6 +31,7 @@
 	import Lightbox from './Lightbox.svelte';
 	import LoadingText, { Loading } from './LoadingText.svelte';
 	import MetadataTypeswitch from './metadata/MetadataTypeswitch.svelte';
+	import { serializeMetadataValue } from './metadata/serializing.js';
 	import { metadataOptionsOf } from './metadata/storage.js';
 	import MetadataCombobox from './MetadataCombobox.svelte';
 	import { sendNotification } from './notifications.js';
@@ -57,7 +58,8 @@
 		definition: Metadata;
 		value: undefined | RuntimeValue;
 		/** Shows up as additinal selected values if addToAlternativesBySelect is true */
-		alternatives?: Record<string, number>;
+		alternatives?: RuntimeValue[];
+		confidences?: Record<string, number>;
 		unit: typeof NumericUnit.infer | undefined;
 		onblur: (
 			// eslint-disable-next-line no-unused-vars
@@ -66,7 +68,7 @@
 			unit?: typeof NumericUnit.infer | undefined,
 			/** See addToAlternativesBySelect */
 			// eslint-disable-next-line no-unused-vars
-			alternatives?: Record<string, number>
+			alternatives?: RuntimeValue[]
 		) => void | Promise<void>;
 		validationErrors: ArkErrors | undefined;
 		id: string;
@@ -74,7 +76,6 @@
 		options?: MetadataEnumVariant[] | undefined;
 		// eslint-disable-next-line no-unused-vars
 		optionIsDisabled?: (option: MetadataEnumVariant) => boolean | string;
-		confidences?: Record<string, number>;
 		isCompactEnum?: boolean;
 		/** Remove metadata by de-selecting enum options, false by default */
 		removeByDeselect?: boolean;
@@ -95,7 +96,7 @@
 
 	let {
 		value,
-		alternatives = {},
+		alternatives = [],
 		unit: valueUnit = $bindable(),
 		confidences = {},
 		validationErrors,
@@ -171,6 +172,10 @@
 	});
 
 	let comboboxFocuser = $state<ComponentProps<typeof MetadataCombobox>['focuser']>();
+
+	function deserializeValueIfNeeded(value: undefined | RuntimeValue | string) {
+		return safeJSONParse(value?.toString())?.toString() ?? value;
+	}
 </script>
 
 <div
@@ -187,15 +192,11 @@
 					multiple={addToAlternativesBySelect}
 					deselectable={removeByDeselect}
 					value={value?.toString()}
-					values={value ? [value.toString(), ...Object.keys(alternatives)] : []}
+					values={value ? [value.toString(), ...alternatives.map(String)] : []}
 					onchange={async (value, values) => {
 						if (values && addToAlternativesBySelect) {
 							const [value, ...alternatives] = values;
-							await onblur(
-								value,
-								undefined,
-								Object.fromEntries(alternatives.map((alt) => [alt, 1]))
-							);
+							await onblur(value, undefined, alternatives);
 						} else {
 							await onblur(value);
 						}
@@ -277,7 +278,7 @@
 										option,
 										disabled,
 										selected,
-										confidence: confidences[option.key],
+										confidence: confidences[serializeMetadataValue(option.key)],
 									})}
 								</div>
 							{/if}
@@ -290,25 +291,19 @@
 					{options}
 					{optionIsDisabled}
 					{confidences}
+					{alternatives}
 					multiple={addToAlternativesBySelect}
 					bind:focuser={comboboxFocuser}
 					metadata={definition}
 					type="single"
 					disabled={disabled ?? false}
-					value={safeJSONParse(value?.toString())?.toString() ?? value}
-					{alternatives}
-					onValueChange={async (value, values) => {
+					value={deserializeValueIfNeeded(value)}
+					onValueChange={async (picked, selection) => {
 						if (addToAlternativesBySelect) {
-							const [val, ...alternatives] = values;
-							await onblur(
-								val,
-								undefined,
-								Object.fromEntries(
-									alternatives.map((alt) => [JSON.stringify(alt), 1])
-								)
-							);
+							const [value, ...alternatives] = selection;
+							await onblur(value, undefined, alternatives);
 						} else {
-							await onblur(value);
+							await onblur(picked);
 						}
 
 						if (!addToAlternativesBySelect) comboboxFocuser?.('blur');

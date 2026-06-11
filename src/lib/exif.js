@@ -91,7 +91,7 @@ export async function processExifData(sessionId, imageFileId, imageBytes, file) 
 /**
  * @param {ArrayBuffer | Buffer} buffer buffer of the image to extract EXIF data from
  * @param {ExifExtractionPlanItem[]} extractionPlan
- * @returns {Promise<Record<string, { value: unknown; confidence: number; alternatives: Record<string, unknown> }>>}
+ * @returns {Promise<Record<string, { value: unknown; confidence: number; alternatives: unknown[] }>>}
  */
 export async function extractMetadata(buffer, extractionPlan) {
 	const exif = exifParser.create(buffer).enableImageSize(false).parse();
@@ -114,7 +114,7 @@ export async function extractMetadata(buffer, extractionPlan) {
 
 				return {
 					confidence: 1,
-					alternatives: {},
+					alternatives: [],
 					value: {
 						longitude: coerceExifValue(exif.tags[infer.longitude.exif], 'float'),
 						latitude: coerceExifValue(exif.tags[infer.latitude.exif], 'float'),
@@ -132,7 +132,7 @@ export async function extractMetadata(buffer, extractionPlan) {
 
 				return {
 					confidence: 1,
-					alternatives: {},
+					alternatives: [],
 					value: coerceExifValue(exif.tags[infer.exif], type),
 				};
 			}

@@ -2,6 +2,7 @@
 	import type * as DB from '$lib/database.js';
 	import type { TypedMetadataValue } from '$lib/metadata/types.js';
 	import type { NamespacedMetadataID } from '$lib/schemas/common.js';
+	import type { RuntimeValue } from '$lib/schemas/metadata.js';
 
 	import { dequal } from 'dequal';
 	import { debounce } from 'es-toolkit';
@@ -16,6 +17,7 @@
 	import { databaseHandle, tables } from '$lib/idb.svelte.js';
 	import IfInViewport from '$lib/IfInViewport.svelte';
 	import Metadata from '$lib/Metadata.svelte';
+	import { serializeMetadataValue } from '$lib/metadata/serializing.js';
 	import { deleteMetadataValue, storeMetadataValue } from '$lib/metadata/storage.js';
 	import OverflowableText from '$lib/OverflowableText.svelte';
 	import RadialProgress from '$lib/RadialProgress.svelte';
@@ -52,29 +54,27 @@
 
 	const observation = $derived(tables.Observation.getFromState(page.params.observation ?? ''));
 
-	const selected = $derived(
-		options[definition.id]?.get(metadataValues[definition.id]?.value ?? '')?.label ?? ''
-	);
+	const metadataValue = $derived(metadataValues[definition.id]);
 
-	const moreSelections = $derived(
-		Object.values(metadataValues[definition.id]?.alternatives ?? {}).filter(
-			(confidence) => confidence >= 1
-		).length
-	);
+	const selected = $derived(options[definition.id]?.get(metadataValue?.value ?? '')?.label ?? '');
+
+	const moreSelections = $derived(metadataValue?.alternatives.length);
 
 	async function onChange({
 		value,
 		alternatives,
 	}: {
 		value: string | undefined;
-		alternatives: Record<NamespacedMetadataID, string> | undefined;
+		alternatives: RuntimeValue<'enum'>[] | undefined;
 	}) {
 		if (!observation) return;
 		if (
 			metadataValues[definition.id]?.value === value &&
 			dequal(
-				new Set(Object.keys(metadataValues[definition.id]?.alternatives ?? {})),
-				new Set(Object.keys(alternatives ?? {}))
+				new Set(
+					(metadataValues[definition.id]?.alternatives ?? []).map(serializeMetadataValue)
+				),
+				new Set((alternatives ?? []).map(serializeMetadataValue))
 			)
 		)
 			return;
@@ -110,7 +110,9 @@
 		}
 	}
 
-	const debouncedOnChange = debounce(onChange, onchangeDelay);
+	const debouncedOnChange = $derived(debounce(onChange, onchangeDelay));
+
+	const image = $derived(definition.images?.[0]);
 </script>
 
 {#if collapsible}
@@ -129,7 +131,9 @@
 			<div class="icon">
 				<IconExpand />
 			</div>
-			<img loading="lazy" src={corsfixIfLocalhost(definition.images?.[0])} alt="" />
+			{#if image}
+				<img loading="lazy" src={corsfixIfLocalhost(image)} alt="" />
+			{/if}
 			<span class="label">{definition.label}</span>
 			<div class="selected">
 				<OverflowableText text={selected} />
@@ -188,14 +192,7 @@
 		}}
 		requiredness="none"
 		{definition}
-		value={{
-			...metadataValues[definition.id],
-			alternatives: Object.fromEntries(
-				Object.entries(metadataValues[definition.id]?.alternatives ?? {}).filter(
-					([, confidence]) => confidence >= 1
-				)
-			),
-		}}
+		value={metadataValue}
 		onchange={debouncedOnChange}
 		// TODO: flush debouncedOnChange when mouse quits the metadata component?
 	>

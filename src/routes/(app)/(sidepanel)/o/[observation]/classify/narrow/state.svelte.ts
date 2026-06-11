@@ -10,7 +10,7 @@ import { tables } from '$lib/idb.svelte.js';
 import { observationMetadata } from '$lib/observations.js';
 import { isNamespacedToProtocol } from '$lib/schemas/metadata.js';
 import { uiState } from '$lib/state.svelte.js';
-import { entries, safeJSONParse, transformObject } from '$lib/utils.js';
+import { entries, transformObject } from '$lib/utils.js';
 
 import { computeDescriptors, getAllCandidates, matches } from './candidates.js';
 
@@ -85,15 +85,9 @@ export class NarrowingState {
 
 	choices = $derived(
 		new Map(
-			entries(this.metadataValues ?? {}).map(([id, { value, alternatives }]) => [
-				id,
-				new Set<string>([
-					value.toString(),
-					...Object.entries(alternatives ?? {})
-						.filter(([, confidence]) => confidence >= 1)
-						.map(([key]) => safeJSONParse(key).toString()),
-				]),
-			])
+			entries(this.metadataValues ?? {}).map(
+				([id, v]) => [id, new Set([v.value, ...v.alternatives].map(String))] as const
+			)
 		)
 	);
 

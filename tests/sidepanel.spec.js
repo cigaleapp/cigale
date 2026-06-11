@@ -257,30 +257,46 @@ testBasic('can update a enum-type metadata with cascades', async ({ page, app })
 		.click();
 	await expect(app.metadata.section('Espèce')).toMatchAriaSnapshot(`
 	  - text: Espèce
-	  - combobox: Dicyrtomina saundersi
+	  - combobox "Dicyrtomina saundersi"
 	  - button "Supprimer cette valeur":
 	    - img
+	  - text: Suggestions
+	  - list:
+	    - listitem:
+	      - text: Entomobrya muscorum
+	      - code: /\\d+%/
+	      - button:
+	        - img
+	    - listitem:
+	      - text: Allacma fusca
+	      - code: 9%
+	      - button:
+	        - img
+	    - listitem:
+	      - text: Pogonognathellus longicornis
+	      - code: 5%
+	      - button:
+	        - img
 	`);
 
 	// Check the cascades
 	await expect(nthCombobox(2)).toMatchAriaSnapshot(`
-	  - combobox: Dicyrtomina
+	  - combobox "Dicyrtomina"
 	`);
 	await expect(nthCombobox(3)).toMatchAriaSnapshot(`
-	  - combobox: Dicyrtomidae
+	  - combobox "Dicyrtomidae"
 	`);
 	await expect(nthCombobox(4)).toMatchAriaSnapshot(`
-	  - combobox: Symphypleona
+	  - combobox "Symphypleona"
 	`);
-	// 4th combobox is the location input
+	await expect(nthCombobox(5)).toMatchAriaSnapshot(`
+	  - combobox "Collembola"
+	`);
 	await expect(nthCombobox(6)).toMatchAriaSnapshot(`
-	  - combobox: Arthropoda
+	  - combobox "Arthropoda"
 	`);
 	await expect(nthCombobox(7)).toMatchAriaSnapshot(`
-	  - combobox: Animalia
-	`);
-	await expect(nthCombobox(8)).toMatchAriaSnapshot(`
-	  - combobox
+	  - combobox "Animalia"
 	`);
 
 	// Unselect and reselect
@@ -317,21 +333,21 @@ test.describe('can search in a enum-type metadata combobox', () => {
 		await page.getByTestId('sidepanel').getByRole('combobox').first().fill('Dicyrt');
 
 		await assert(page.getByTestId('metadata-combobox-viewport')).toMatchAriaSnapshot(`
-		  - option "Dicyrtomina signata 0.3%":
-		    - text: ""
-		    - code: 0.3%
-		  - option "Dicyrtomina minuta 1%":
-		    - text: ""
-		    - code: 1%
 		  - option /Dicyrtomina saundersi \\d+%/:
 		    - text: ""
 		    - code: /\\d+%/
 		  - option "Dicyrtomina ornata 4%":
 		    - text: ""
 		    - code: 4%
+		  - option "Dicyrtomina minuta 1%":
+		    - text: ""
+		    - code: 1%
 		  - option "Dicyrtoma fusca 0.4%":
 		    - text: ""
 		    - code: 0.4%
+		  - option "Dicyrtomina signata 0.3%":
+		    - text: ""
+		    - code: 0.3%
 		  - option "Dicyrtomina flavosignata 0.2%":
 		    - text: ""
 		    - code: 0.2%
@@ -373,22 +389,22 @@ test.describe('can search in a enum-type metadata combobox', () => {
 		await initialize({ page, app });
 		await page.getByTestId('sidepanel').getByRole('combobox').first().fill('desoria');
 		await assert(page.getByTestId('metadata-combobox-viewport')).toMatchAriaSnapshot(`
-		  - option "Isotomurus palustris AKA Desoria riparia 0.1%":
-		    - text: ""
-		    - code: 0.1%
 		  - option "Isotomurus maculatus AKA Desoria riparia 1%":
 		    - text: ""
 		    - code: 1%
+		  - option "Isotoma riparia AKA Desoria riparia 0.4%":
+		    - text: ""
+		    - code: 0.4%
+		  - option "Isotomurus palustris AKA Desoria riparia 0.1%":
+		    - text: ""
+		    - code: 0.1%
+		  - option "Vertagopus asiaticus AKA Desoria cylindrica 0.1%":
+		    - text: ""
+		    - code: 0.1%
 		  - option "Parisotoma notabilis AKA Desoria monticola 0.1%":
 		    - text: ""
 		    - code: 0.1%
 		  - option "Isotoma viridis AKA Desoria fusia 0.1%":
-		    - text: ""
-		    - code: 0.1%
-		  - option "Isotoma riparia AKA Desoria riparia 0.4%":
-		    - text: ""
-		    - code: 0.4%
-		  - option "Vertagopus asiaticus AKA Desoria cylindrica 0.1%":
 		    - text: ""
 		    - code: 0.1%
 		  - heading "Entomobrya muscorum" [level=2]

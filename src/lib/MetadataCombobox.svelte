@@ -1,23 +1,34 @@
-<script module>
-	/**
-	 * @typedef {object} Props
-	 * @property {string|undefined} value
-	 * @property {boolean} [multiple]
-	 * @property {(newValue: string, newValues: string[]) => void} onValueChange
-	 * @property {Pick<import('./database.js').Metadata, "id">} metadata
-	 * @property {import('./database.js').MetadataEnumVariant[] | undefined} options
-	 * @property {WithoutChildrenOrChild<import('bits-ui').Combobox.InputProps>} [inputProps]
-	 * @property {WithoutChildrenOrChild<import('bits-ui').Combobox.ContentProps>} [contentProps]
-	 * @property {string} [id]
-	 * @property {Record<string, number>} [confidences]
-	 * @property {Record<string, number>} [alternatives] to show as additionally selected when multiple=true
-	 * @property {undefined | ((action: 'focus' | 'blur' | 'toggle') => void)} [focuser]
-	 * @property {(option: import('./database.js').MetadataEnumVariant) => boolean|string} [optionIsDisabled]
-	 * @property {import('svelte').ComponentProps<typeof import('$lib/MetadataInput.svelte').default>["enumOptionsExtraContent"]} [enumOptionsExtraContent]
-	 */
+<script lang="ts" module>
+	export interface Props {
+		value: string | undefined;
+		multiple?: boolean;
+		// eslint-disable-next-line no-unused-vars
+		onValueChange: (newValue: string, newValues: string[]) => void;
+		metadata: Pick<import('./database.js').Metadata, 'id'>;
+		options: import('./database.js').MetadataEnumVariant[] | undefined;
+		inputProps?: WithoutChildrenOrChild<import('bits-ui').Combobox.InputProps>;
+		contentProps?: WithoutChildrenOrChild<import('bits-ui').Combobox.ContentProps>;
+		id?: string;
+		confidences?: Record<string, number>;
+		/** to show as additionally selected when multiple=true */
+		alternatives?: string[];
+		// eslint-disable-next-line no-unused-vars
+		focuser?: undefined | ((action: 'focus' | 'blur' | 'toggle') => void);
+		optionIsDisabled?: (
+			// eslint-disable-next-line no-unused-vars
+			option: import('./database.js').MetadataEnumVariant
+		) => boolean | string;
+		enumOptionsExtraContent?: import('svelte').ComponentProps<
+			typeof import('$lib/MetadataInput.svelte').default
+		>['enumOptionsExtraContent'];
+	}
 </script>
 
-<script>
+<script lang="ts">
+	import type { NamespacedMetadataID } from './schemas/common.js';
+	import type * as DB from '$lib/database.js';
+	import type { WithoutChildrenOrChild } from 'bits-ui';
+
 	import Icon from '@iconify/svelte';
 
 	import IconCheck from '~icons/ri/check-line';
@@ -31,22 +42,12 @@
 	import { databaseHandle } from './idb.svelte.js';
 	import LearnMoreLink from './LearnMoreLink.svelte';
 	import Markdown from './Markdown.svelte';
-	import { metadataOptionsOf } from './metadata/index.js';
+	import { metadataOptionsOf, serializeMetadataValue } from './metadata/index.js';
 	import MetadataCascadesTable from './MetadataCascadesTable.svelte';
 	import { namespaceOfMetadataId } from './schemas/metadata.js';
 	import { uiState } from './state.svelte';
 	import { cancellable, compareBy, readableOn } from './utils.js';
 
-	/**
-	 * @import {WithoutChildrenOrChild} from 'bits-ui';
-	 * @import {CascadeLabelsCache} from './cascades.js';
-	 * @import {NamespacedMetadataId} from './metadata/namespacing.js';
-	 * @import * as DB from './database.js';
-	 */
-
-	/**
-	 * @type {Props & Omit<import('bits-ui').Combobox.RootProps, keyof Props>}
-	 */
 	let {
 		options: precomputedOptions,
 		metadata,
@@ -61,7 +62,7 @@
 		contentProps,
 		enumOptionsExtraContent,
 		...restProps
-	} = $props();
+	}: Props & Omit<import('bits-ui').Combobox.RootProps, keyof Props> = $props();
 
 	const protocolId = $derived(namespaceOfMetadataId(metadata.id));
 
@@ -74,11 +75,7 @@
 
 	const loadingOptions = $derived(!precomputedOptions && options.length === 0);
 	const optionsLoader = cancellable(
-		async (
-			signal,
-			/** @type {NamespacedMetadataId} */ metadataId,
-			/** @type {boolean} */ precomputed
-		) => {
+		async (signal, metadataId: NamespacedMetadataID, precomputed: boolean) => {
 			if (precomputed) return;
 			if (!uiState.currentProtocolId) return;
 			console.info('Fetching options for metadata', metadataId);
@@ -101,38 +98,37 @@
 
 	const hasImages = $derived(options.some((opt) => opt.image));
 
-	/**
-	 * @param {DB.MetadataEnumVariant} a
-	 * @param {DB.MetadataEnumVariant} b
-	 */
-	function compareByConfidence(a, b) {
-		if (!(a.key in confidences)) return 1;
-		if (!(b.key in confidences)) return -1;
-
-		return confidences[b.key] - confidences[a.key];
-	}
-
-	/**
-	 * @param {string} search
-	 * @param {DB.MetadataEnumVariant} item
-	 */
-	function nameMatches(search, item) {
+	function nameMatches(search: string, item: DB.MetadataEnumVariant) {
 		return [item.label, ...(item.synonyms ?? [])].find((val) =>
 			val.toLowerCase().includes(search.toLowerCase())
 		);
 	}
+
+	const confidenceOf = $derived((key: string) => confidences[serializeMetadataValue(key)]);
+
+	function isSelected({ key }: (typeof options)[number]) {
+		return [value, ...(multiple ? alternatives : [])].includes(key);
+	}
+
+	const sorter = $derived(
+		compareBy<DB.MetadataEnumVariant>((opt) => {
+			if (isSelected(opt)) return Number.NEGATIVE_INFINITY;
+			if (optionIsDisabled(opt)) return Number.POSITIVE_INFINITY;
+			return -(confidenceOf(opt.key) ?? 0);
+		})
+	);
 </script>
 
 <div class="metadata-combobox" class:wide-docs={hasImages} class:multiple>
 	<Combobox
-		// Put disabled options last
-		items={options.toSorted(compareBy((opt) => (optionIsDisabled(opt) ? 1 : -1)))}
+		// Put selected options first, and disabled options last
+		items={options}
 		{value}
-		values={multiple ? [value, ...Object.keys(alternatives)] : undefined}
+		values={multiple ? [value, ...alternatives].filter((v) => v !== undefined) : undefined}
 		{multiple}
 		bind:open
 		bind:focuser
-		sorter={compareByConfidence}
+		{sorter}
 		searcher={nameMatches}
 		viewport-testid="metadata-combobox-viewport"
 		{inputProps}
@@ -178,7 +174,7 @@
 
 					{#if showConfidences}
 						<div class="confidence">
-							<ConfidencePercentage value={confidences[item.key]} />
+							<ConfidencePercentage value={confidenceOf(item.key)} />
 						</div>
 					{/if}
 
@@ -188,7 +184,7 @@
 								option: item,
 								disabled: optionIsDisabled(item),
 								selected,
-								confidence: confidences[item.key],
+								confidence: confidenceOf(item.key),
 							})}
 						</div>
 					{/if}

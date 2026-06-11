@@ -1,4 +1,4 @@
-import type { RuntimeValue } from '$lib/schemas/metadata';
+import type { TypedMetadataValue } from './types.js';
 
 import * as dates from 'date-fns';
 
@@ -40,11 +40,16 @@ if (import.meta.vitest) {
 /**
  * Serialize a full metadata value (including confidence, alternatives, etc)
  */
-export function serializeMetadataFullValue<T extends { value: RuntimeValue }>({
+export function serializeMetadataFullValue<T extends TypedMetadataValue>({
 	value,
+	alternatives,
 	...rest
-}: T): T & { value: string } {
-	return { ...rest, value: serializeMetadataValue(value) };
+}: T): T & { alternatives: string[]; value: string } {
+	return {
+		...rest,
+		alternatives: alternatives.map(serializeMetadataValue),
+		value: serializeMetadataValue(value),
+	};
 }
 
 /**

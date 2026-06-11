@@ -66,7 +66,7 @@
 				value: value.value,
 				manuallyModified: true,
 				confirmed: status === 'confirmed',
-				alternatives: value.alternatives,
+				confidences: value.confidences,
 				confidence: value.confidence,
 			});
 		},

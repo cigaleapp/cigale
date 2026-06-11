@@ -433,7 +433,11 @@ export default class Provider implements Account {
 					const option = await this.#parseEnumCell(def, value);
 					if (!option) continue;
 
-					metadataValues[def.id] = { value: option.key, alternatives: {} };
+					metadataValues[def.id] = {
+						value: option.key,
+						confidences: {},
+						alternatives: [],
+					};
 					break;
 				}
 				case 'file': {
@@ -448,7 +452,8 @@ export default class Provider implements Account {
 
 					metadataValues[def.id] = {
 						value: this.#compositeFileId(project, row, file),
-						alternatives: {},
+						alternatives: [],
+						confidences: {},
 					};
 					break;
 				}
@@ -458,7 +463,8 @@ export default class Provider implements Account {
 
 					metadataValues[def.id] = {
 						value: parsed instanceof Date ? parsed.toISOString() : parsed,
-						alternatives: {},
+						alternatives: [],
+						confidences: {},
 					};
 					break;
 				}

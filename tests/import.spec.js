@@ -69,13 +69,13 @@ test.describe('correct results.zip', () => {
 		      - img
 		      - textbox "Nom de l'observation":
 		        - /placeholder: ""
-		        - text: ""
+		        - text: cyan
 		    - text: Espèce
-		    - combobox: Allacma fusca
+		    - combobox "Allacma fusca"
 		    - code: /\\d+%/
 		    - button "Supprimer cette valeur":
 		      - img
-		    - text: Alternatives
+		    - text: Suggestions
 		    - list:
 		      - listitem:
 		        - text: Sminthurus viridis
@@ -97,11 +97,11 @@ test.describe('correct results.zip', () => {
 		      - text: Taxonomie
 		      - paragraph: Classification taxonomique de l'espèce
 		      - text: Genre
-		      - combobox: Allacma
+		      - combobox "Allacma"
 		      - code: /\\d+%/
 		      - button "Supprimer cette valeur":
 		        - img
-		      - text: Alternatives
+		      - text: Suggestions
 		      - list:
 		        - listitem:
 		          - text: Bourletiella
@@ -119,11 +119,11 @@ test.describe('correct results.zip', () => {
 		          - button:
 		            - img
 		      - text: Famille
-		      - combobox: Sminthuridae
+		      - combobox "Sminthuridae"
 		      - code: /\\d+%/
 		      - button "Supprimer cette valeur":
 		        - img
-		      - text: Alternatives
+		      - text: Suggestions
 		      - list:
 		        - listitem:
 		          - text: Entomobryidae
@@ -141,11 +141,11 @@ test.describe('correct results.zip', () => {
 		          - button:
 		            - img
 		      - text: Ordre
-		      - combobox: Symphypleona
+		      - combobox "Symphypleona"
 		      - code: /\\d+%/
 		      - button "Supprimer cette valeur":
 		        - img
-		      - text: Alternatives
+		      - text: Suggestions
 		      - list:
 		        - listitem:
 		          - text: Entomobryomorpha
@@ -163,17 +163,17 @@ test.describe('correct results.zip', () => {
 		          - button:
 		            - img
 		      - text: Classe
-		      - combobox: Collembola
+		      - combobox "Collembola"
 		      - code: /\\d+%/
 		      - button "Supprimer cette valeur":
 		        - img
 		      - text: Phylum
-		      - combobox: Arthropoda
+		      - combobox "Arthropoda"
 		      - code: /\\d+%/
 		      - button "Supprimer cette valeur":
 		        - img
 		      - text: Règne
-		      - combobox: Animalia
+		      - combobox "Animalia"
 		      - code: /\\d+%/
 		      - button "Supprimer cette valeur":
 		        - img
@@ -252,16 +252,19 @@ test.describe('correct results.zip', () => {
 		      - radio "LC Préoccupation mineure (“Least Concern”)"
 		      - text: LC
 		      - paragraph: Préoccupation mineure (“Least Concern”)
-		    - button /^Regrouper /:
+		    - group:
+		      - img
+		      - text: Andrènes
+		    - button "Regrouper Ctrl + G":
 		      - img
 		      - text: ""
-		    - button /^Séparer /:
+		    - button "Séparer Ctrl + Shift + G":
 		      - img
 		      - text: ""
-		    - button /^Ouvrir en plein écran /:
+		    - button "Ouvrir en plein écran Ctrl + ⏎":
 		      - img
 		      - text: ""
-		    - button /^Supprimer 1 images /:
+		    - button "Supprimer 1 images Suppr":
 		      - img
 		      - text: ""
 		`);

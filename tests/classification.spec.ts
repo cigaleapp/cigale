@@ -272,12 +272,12 @@ test.describe('full-screen classification view', pr(1071), () => {
 						.getByRole('button', { name: 'Retour' })
 						.click();
 
-					await app.path.wait('/classify');
+					await app.path.wait('/classify/');
 				});
 
 				test('with the keyboard', async ({ page, app }) => {
 					await page.keyboard.press('Escape');
-					await app.path.wait('/classify');
+					await app.path.wait('/classify/');
 				});
 			});
 
@@ -460,9 +460,9 @@ test.describe('full-screen classification view', pr(1071), () => {
 
 		await page.getByRole('button', { name: 'Option suivante' }).click();
 
-		await expect(page.getByTestId('focused-option').getByText('16%')).toBeVisible();
+		await expect(page.getByTestId('focused-option').getByText('18%')).toBeVisible();
 		await expect(page.getByTestId('focused-option').getByRole('combobox')).toHaveValue(
-			'Tomocerus vulgaris'
+			'Allacma fusca'
 		);
 
 		// Can flip through the observation's images
@@ -531,6 +531,18 @@ test.describe('narrowing view', pr(1570), () => {
 			classify: 'Aucune inférence',
 		});
 
+		// TODO: also test cases where morphogroup is set
+
+		for (const image of await app.db.image.list()) {
+			await app.db.metadata.set(image.id, 'morphogroup', null);
+		}
+
+		for (const obs of await app.db.observation.list()) {
+			await app.db.metadata.set(obs.id, 'morphogroup', null);
+		}
+
+		await app.db.refresh();
+
 		await app.tabs.go('classify');
 		await page.getByRole('article', { name: 'with-exif-gps' }).click();
 		await page.getByRole('button', { name: 'Ouvrir en plein écran' }).click();
@@ -542,7 +554,7 @@ test.describe('narrowing view', pr(1570), () => {
 	// TODO: more E2E testing
 	test.describe('describe tab', () => {
 		testBasic('can choose choices', async ({ page, app }) => {
-			await expectCandidatesCount(page, 182, { timeout: ms('10s') });
+			await expectCandidatesCount(page, 180, { timeout: ms('10s') });
 
 			async function choose(
 				metadata: string,
@@ -574,12 +586,12 @@ test.describe('narrowing view', pr(1570), () => {
 
 			await choose('Pilosité occipitale', 'Pilosité majoritairement claire');
 
-			await expectCandidatesCount(page, 156);
+			await expectCandidatesCount(page, 154);
 			// await expectRemainingCandidate('')
 
 			await choose('Forme de la tête', 'Plus large que haute');
 
-			await expectCandidatesCount(page, 128);
+			await expectCandidatesCount(page, 126);
 
 			await expectMetadataValues(app, {
 				pilosite_occipitale: 'pilositmaj_1738780459445_3719',
@@ -607,7 +619,7 @@ test.describe('narrowing view', pr(1570), () => {
 			await page.getByRole('tab', { name: 'Décrire' }).click();
 			await app.path.wait('/(app)/(sidepanel)/o/[observation]/classify/narrow/describe');
 
-			await expectCandidatesCount(page, 136);
+			await expectCandidatesCount(page, 134);
 
 			await choose(
 				'Couleur de la face ventrale du flagelle antennaire',
@@ -651,7 +663,7 @@ test.describe('narrowing view', pr(1570), () => {
 				taille_du_3eme_segment_antennaire: 'a3pluscour_1738780689285_1923',
 			});
 
-			await expectCandidatesCount(page, 25);
+			await expectCandidatesCount(page, 23);
 
 			// Use reset button
 
@@ -666,7 +678,7 @@ test.describe('narrowing view', pr(1570), () => {
 				taille_du_3eme_segment_antennaire: null,
 			});
 
-			await expectCandidatesCount(page, 182);
+			await expectCandidatesCount(page, 180);
 		});
 
 		testBasic('can search through metadata', async ({ page, app }) => {

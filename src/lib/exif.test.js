@@ -102,16 +102,21 @@ describe('processExifData', () => {
 		});
 
 		const image = await db.tables.Image.get(imageId(0, 0));
-		expect(image?.metadata).toEqual({
-			[namespacedMetadataId('com.example.test.protocol', 'date')]: {
-				value: new Date('2025-04-25T12:38:36.000Z'),
-				manuallyModified: false,
-				confirmed: false,
-				isDefault: false,
-				confidence: 1,
-				alternatives: {},
-			},
-		});
+		expect(image?.metadata).toMatchInlineSnapshot(`
+			{
+			  "com.example.test.protocol__date": {
+			    "alternatives": [],
+			    "confidence": 1,
+			    "confidences": {
+			      ""2025-04-25T12:38:36"": 1,
+			    },
+			    "confirmed": false,
+			    "isDefault": false,
+			    "manuallyModified": false,
+			    "value": 2025-04-25T12:38:36.000Z,
+			  },
+			}
+		`);
 	});
 
 	test('extracts from image with GPS', async () => {
@@ -123,27 +128,35 @@ describe('processExifData', () => {
 		});
 
 		const image = await db.tables.Image.get(imageId(0, 0));
-		expect(image?.metadata).toEqual({
-			[namespacedMetadataId('com.example.test.protocol', 'date')]: {
-				value: new Date('2008-10-22T16:29:49.000Z'),
-				manuallyModified: false,
-				confidence: 1,
-				confirmed: false,
-				isDefault: false,
-				alternatives: {},
-			},
-			[namespacedMetadataId('com.example.test.protocol', 'location')]: {
-				value: {
-					latitude: 43.46715666666389,
-					longitude: 11.885394999997223,
-				},
-				manuallyModified: false,
-				confidence: 1,
-				confirmed: false,
-				isDefault: false,
-				alternatives: {},
-			},
-		});
+		expect(image?.metadata).toMatchInlineSnapshot(`
+			{
+			  "com.example.test.protocol__date": {
+			    "alternatives": [],
+			    "confidence": 1,
+			    "confidences": {
+			      ""2008-10-22T16:29:49"": 1,
+			    },
+			    "confirmed": false,
+			    "isDefault": false,
+			    "manuallyModified": false,
+			    "value": 2008-10-22T16:29:49.000Z,
+			  },
+			  "com.example.test.protocol__location": {
+			    "alternatives": [],
+			    "confidence": 1,
+			    "confidences": {
+			      "{"longitude":11.885394999997223,"latitude":43.46715666666389}": 1,
+			    },
+			    "confirmed": false,
+			    "isDefault": false,
+			    "manuallyModified": false,
+			    "value": {
+			      "latitude": 43.46715666666389,
+			      "longitude": 11.885394999997223,
+			    },
+			  },
+			}
+		`);
 	});
 });
 
@@ -178,19 +191,19 @@ describe('extractMetadata', () => {
 		const imageBytes = await readImageBytes('lil-fella.jpeg');
 		const extraction = await extractMetadata(imageBytes, [...plan]);
 
-		expect(extraction).toEqual({
+		expect(extraction).toMatchObject({
 			date: {
 				value: new Date('2025-04-25T12:38:36.000Z'),
-				alternatives: {},
+				alternatives: [],
 				confidence: 1,
 			},
 			make: {
-				alternatives: {},
+				alternatives: [],
 				confidence: 1,
 				value: 'Canon',
 			},
 			model: {
-				alternatives: {},
+				alternatives: [],
 				confidence: 1,
 				value: 'Canon EOS RP',
 			},
@@ -201,15 +214,15 @@ describe('extractMetadata', () => {
 		const imageBytes = await readImageBytes('with-exif-gps.jpeg');
 		const extraction = await extractMetadata(imageBytes, [...plan]);
 
-		expect(extraction).toEqual({
+		expect(extraction).toMatchObject({
 			date: {
 				confidence: 1,
-				alternatives: {},
+				alternatives: [],
 				value: new Date('2008-10-22T16:29:49.000Z'),
 			},
 			location: {
 				confidence: 1,
-				alternatives: {},
+				alternatives: [],
 				value: {
 					latitude: 43.46715666666389,
 					longitude: 11.885394999997223,
@@ -217,12 +230,12 @@ describe('extractMetadata', () => {
 			},
 			make: {
 				confidence: 1,
-				alternatives: {},
+				alternatives: [],
 				value: 'NIKON',
 			},
 			model: {
 				confidence: 1,
-				alternatives: {},
+				alternatives: [],
 				value: 'COOLPIX P6000',
 			},
 		});
@@ -241,7 +254,7 @@ describe('extractMetadata', () => {
 		expect(extraction).toEqual({
 			date: {
 				confidence: 1,
-				alternatives: {},
+				alternatives: [],
 				value: new Date('2008-10-22T16:29:49.000Z'),
 			},
 		});

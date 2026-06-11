@@ -123,7 +123,7 @@ describe('complex case with multiple metadata in the cascades', () => {
 			metadataId: species,
 			value: species40.key,
 			confidence: 0.4,
-			alternatives: [
+			confidences: [
 				{ value: species41.key, confidence: 0.3 },
 				{ value: species42.key, confidence: 0.2 },
 				{ value: species44.key, confidence: 0.1 },
@@ -135,7 +135,7 @@ describe('complex case with multiple metadata in the cascades', () => {
 				metadataId: 'mockproto__genus',
 				value: '1',
 				confidence: 0.7,
-				alternatives: [
+				confidences: [
 					{
 						confidence: 0.2,
 						value: '2',
@@ -150,7 +150,7 @@ describe('complex case with multiple metadata in the cascades', () => {
 				metadataId: 'mockproto__difficulty',
 				value: '3',
 				confidence: 0.2,
-				alternatives: [
+				confidences: [
 					{
 						confidence: 0.1,
 						value: '1',
@@ -217,7 +217,7 @@ describe('without any cascades', () => {
 			metadataId: species,
 			value: '1',
 			confidence: 0.4,
-			alternatives: [
+			confidences: [
 				{ value: 2, confidence: 0.3 },
 				{ value: 3, confidence: 0.2 },
 				{ value: 4, confidence: 0.1 },

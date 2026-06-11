@@ -8,7 +8,10 @@ export const METADATA_ZERO_VALUE = {
 	value: null,
 	manuallyModified: false,
 	confidence: 0,
-	alternatives: {},
+	confidences: {},
+	alternatives: [],
+	confirmed: false,
+	isDefault: false,
 } as const satisfies DB.MetadataValue;
 
 export * from './display.js';

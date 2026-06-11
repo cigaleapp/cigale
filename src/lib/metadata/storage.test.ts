@@ -169,33 +169,6 @@ describe('storeMetadataValue', () => {
 		});
 	});
 
-	test('stores alternatives and excludes the main value from them', async () => {
-		const metadataId = nsId('species');
-		await db.add('Metadata', mockMetadata('species', 'enum'));
-		await db.add('Image', mockImage('1'));
-
-		await storeMetadataValue({
-			db,
-			subjectId: '1',
-			metadataId,
-			value: 'a',
-			confidence: 0.6,
-			alternatives: [
-				{ value: 'a', confidence: 0.6 },
-				{ value: 'b', confidence: 0.3 },
-				{ value: 'c', confidence: 0.1 },
-			],
-			sessionId: SESSION_ID,
-		});
-
-		const img = await db.get('Image', '1');
-		const stored = img?.metadata[metadataId];
-		// The main value "a" should NOT appear in alternatives
-		expect(stored?.alternatives).not.toHaveProperty('"a"');
-		expect(stored?.alternatives).toHaveProperty('"b"');
-		expect(stored?.alternatives).toHaveProperty('"c"');
-	});
-
 	test('caps confidence > 1 to 1', async () => {
 		const metadataId = nsId('species');
 		await db.add('Metadata', mockMetadata('species', 'string'));
@@ -224,12 +197,12 @@ describe('storeMetadataValue', () => {
 			subjectId: '1',
 			metadataId,
 			value: 'a',
-			alternatives: [{ value: 'b', confidence: 2.5 }],
+			confidences: [{ value: 'b', confidence: 2.5 }],
 			sessionId: SESSION_ID,
 		});
 
 		const img = await db.get('Image', '1');
-		expect(img?.metadata[metadataId]?.alternatives['"b"']).toBe(1);
+		expect(img?.metadata[metadataId]?.confidences['"b"']).toBe(1);
 	});
 
 	test('throws if metadataId is not namespaced', async () => {
@@ -614,7 +587,7 @@ describe('deleteMetadataValue', () => {
 					confidence: 1,
 					confirmed: false,
 					manuallyModified: false,
-					alternatives: {},
+					confidences: {},
 				},
 			},
 		});
@@ -640,7 +613,7 @@ describe('deleteMetadataValue', () => {
 					confidence: 1,
 					confirmed: false,
 					manuallyModified: false,
-					alternatives: {},
+					confidences: {},
 				},
 			},
 		});
@@ -666,7 +639,7 @@ describe('deleteMetadataValue', () => {
 					confidence: 1,
 					confirmed: false,
 					manuallyModified: false,
-					alternatives: {},
+					confidences: {},
 				},
 			},
 		});
@@ -689,7 +662,7 @@ describe('deleteMetadataValue', () => {
 			confidence: 1,
 			confirmed: false,
 			manuallyModified: false,
-			alternatives: {},
+			alternatives: [],
 		};
 
 		await db.add('Image', {
@@ -729,7 +702,7 @@ describe('deleteMetadataValue', () => {
 			confidence: 1,
 			confirmed: false,
 			manuallyModified: false,
-			alternatives: {},
+			alternatives: [],
 		};
 
 		await db.add('Image', {
@@ -775,7 +748,7 @@ describe('deleteMetadataValue', () => {
 			confidence: 1,
 			confirmed: false,
 			manuallyModified: false,
-			alternatives: {},
+			alternatives: [],
 		};
 
 		await db.add('Image', {

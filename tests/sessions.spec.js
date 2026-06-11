@@ -94,109 +94,41 @@ test('import into new session', async ({ page, app }) => {
 	await page.getByText('cyan', { exact: true }).click();
 	await assert(page.getByTestId('sidepanel').locator('> *').nth(2)).toMatchAriaSnapshot(`
 	  - text: Espèce
-	  - combobox: Allacma fusca
+	  - combobox "Allacma fusca"
 	  - code: /\\d+%/
 	  - button "Supprimer cette valeur":
 	    - img
-	  - text: Alternatives
-	  - list:
-	    - listitem:
-	      - text: Sminthurus viridis
-	      - code: /\\d+%/
-	      - button:
-	        - img
-	    - listitem:
-	      - text: Bourletiella hortensis
-	      - code: /\\d+%/
-	      - button:
-	        - img
-	    - listitem:
-	      - text: Sminthurides aquaticus
-	      - code: 4%
-	      - button:
-	        - img
 	  - group:
 	    - img
 	    - text: Taxonomie
 	    - paragraph: Classification taxonomique de l'espèce
 	    - text: Genre
-	    - combobox: Allacma
+	    - combobox "Allacma"
 	    - code: /\\d+%/
 	    - button "Supprimer cette valeur":
 	      - img
-	    - text: Alternatives
-	    - list:
-	      - listitem:
-	        - text: Bourletiella
-	        - code: /\\d+%/
-	        - button:
-	          - img
-	      - listitem:
-	        - text: Sminthurus
-	        - code: /\\d+%/
-	        - button:
-	          - img
-	      - listitem:
-	        - text: Willowsia
-	        - code: 7%
-	        - button:
-	          - img
 	    - text: Famille
-	    - combobox: Sminthuridae
+	    - combobox "Sminthuridae"
 	    - code: /\\d+%/
 	    - button "Supprimer cette valeur":
 	      - img
-	    - text: Alternatives
-	    - list:
-	      - listitem:
-	        - text: Entomobryidae
-	        - code: /\\d+%/
-	        - button:
-	          - img
-	      - listitem:
-	        - text: Bourletiellidae
-	        - code: /\\d+%/
-	        - button:
-	          - img
-	      - listitem:
-	        - text: Isotomidae
-	        - code: 6%
-	        - button:
-	          - img
 	    - text: Ordre
-	    - combobox: Symphypleona
+	    - combobox "Symphypleona"
 	    - code: /\\d+%/
 	    - button "Supprimer cette valeur":
 	      - img
-	    - text: Alternatives
-	    - list:
-	      - listitem:
-	        - text: Entomobryomorpha
-	        - code: /\\d+%/
-	        - button:
-	          - img
-	      - listitem:
-	        - text: Poduromorpha
-	        - code: 5%
-	        - button:
-	          - img
-	      - listitem:
-	        - text: Neelipleona
-	        - code: 0.8%
-	        - button:
-	          - img
 	    - text: Classe
-	    - combobox: Collembola
+	    - combobox "Collembola"
 	    - code: /\\d+%/
 	    - button "Supprimer cette valeur":
 	      - img
 	    - text: Phylum
-	    - combobox: Arthropoda
+	    - combobox "Arthropoda"
 	    - code: /\\d+%/
 	    - button "Supprimer cette valeur":
 	      - img
 	    - text: Règne
-	    - combobox: Animalia
+	    - combobox "Animalia"
 	    - code: /\\d+%/
 	    - button "Supprimer cette valeur":
 	      - img
@@ -275,6 +207,9 @@ test('import into new session', async ({ page, app }) => {
 	    - radio "LC Préoccupation mineure (“Least Concern”)"
 	    - text: LC
 	    - paragraph: Préoccupation mineure (“Least Concern”)
+	  - group:
+	    - img
+	    - text: Andrènes
 	`);
 
 	await page.getByTestId('goto-current-session').click();

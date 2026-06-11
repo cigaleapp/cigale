@@ -177,14 +177,14 @@ swarp.classify(async ({ imageId, metadataIds, taskSettings, inferenceSessionId }
 		throw new Error("Le modèle de classification n'a retourné aucun résultat");
 	}
 
-	const [firstChoice, ...alternatives] = results;
+	const [firstChoice, ...otherChoices] = results;
 
 	await storeMetadataValue({
 		db,
 		abortSignal: tools.abortSignal,
 		metadataId: metadataIds.target,
 		subjectId: imageId,
-		alternatives,
+		confidences: otherChoices,
 		...firstChoice,
 	});
 
