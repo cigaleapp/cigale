@@ -45,6 +45,9 @@ jobs:
             echo significant=true >> $GITHUB_OUTPUT
           fi
 
+      - name: Pull before pushing
+        run: git pull
+
       - if: steps.changes.outputs.significant == 'true'
         name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@04702edda442b2e678b25b537cec683a1493fcb9 # v7
