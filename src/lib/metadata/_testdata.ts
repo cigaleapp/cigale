@@ -122,7 +122,7 @@ export const items: Array<{ id: string; metadata: DB.MetadataValues }> = [
 				confirmed: false,
 				confidence: 1,
 				confidences: {},
-				alternatives: []
+				alternatives: [],
 			} satisfies DB.MetadataValue,
 		])
 	),

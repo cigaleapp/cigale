@@ -29,7 +29,14 @@
 	import { splitMetadataId } from './schemas/metadata.js';
 	import { isDebugMode } from './settings.svelte.js';
 	import { tooltip } from './tooltips.js';
-	import { corsfixIfLocalhost, orEmpty, pick, safeJSONParse, switchValue, compareBy } from './utils.js';
+	import {
+		compareBy,
+		corsfixIfLocalhost,
+		orEmpty,
+		pick,
+		safeJSONParse,
+		switchValue,
+	} from './utils.js';
 	import WorldMap from './WorldMap.svelte';
 
 	type Props = {
@@ -127,10 +134,11 @@
 	const optional = $derived(requiredness === 'all' && !definition.required);
 	const required = $derived(requiredness !== 'none' && definition.required);
 	const suggestions = $derived(
-		Object.entries(value?.confidences??{}).filter(([jsonValue]) => jsonValue !== serializeMetadataValue(value?.value))
-		.sort(compareBy(([, score]) => -score))
-		.slice(0, 3)
-	)
+		Object.entries(value?.confidences ?? {})
+			.filter(([jsonValue]) => jsonValue !== serializeMetadataValue(value?.value))
+			.sort(compareBy(([, score]) => -score))
+			.slice(0, 3)
+	);
 
 	let element = $state<HTMLElement>();
 </script>
@@ -191,7 +199,11 @@
 						<div class="value">
 							<LoadingText
 								value={async () =>
-									metadataOption(databaseHandle(), definition.id, stringValue).catch(() => null)}
+									metadataOption(
+										databaseHandle(),
+										definition.id,
+										stringValue
+									).catch(() => null)}
 							>
 								{#snippet loaded(option)}
 									{option?.label ?? stringValue}

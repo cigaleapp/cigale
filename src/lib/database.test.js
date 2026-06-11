@@ -138,7 +138,7 @@ describe('MetadataValue', () => {
 				value: val,
 				confidence: 0.5,
 				alternatives: [],
-				confidences: {}
+				confidences: {},
 			});
 
 		test('invalid', () => {

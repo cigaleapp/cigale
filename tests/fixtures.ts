@@ -307,9 +307,9 @@ const _test = base.extend<
 							);
 						}
 
-						const isObservation = "metadataOverrides" in original
-						const subjectType = isObservation  ? "Observation" : "Image"
-						const property = isObservation ? "metadataOverrides" : "metadata"
+						const isObservation = 'metadataOverrides' in original;
+						const subjectType = isObservation ? 'Observation' : 'Image';
+						const property = isObservation ? 'metadataOverrides' : 'metadata';
 
 						if (!key.includes('__')) {
 							key = `${lightProtocol.id}__${key}`;
@@ -320,7 +320,9 @@ const _test = base.extend<
 								async ([subjectType, subjectId, property, key]) => {
 									const subject = await window.DB.get(subjectType, subjectId);
 									if (!subject) {
-										throw new Error(`Could not find ${subjectType} with ID ${subjectId}`);
+										throw new Error(
+											`Could not find ${subjectType} with ID ${subjectId}`
+										);
 									}
 
 									delete subject[property][key];
@@ -345,7 +347,7 @@ const _test = base.extend<
 										}
 									: { confidence: 1, value: JSON.stringify(value) };
 
-						const updated: IDBDatabaseType['Image'|'Observation']['value'] = {
+						const updated: IDBDatabaseType['Image' | 'Observation']['value'] = {
 							...original,
 							[property]: {
 								...original[property],

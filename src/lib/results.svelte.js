@@ -154,7 +154,7 @@ export async function importResultsZip(file, id) {
 				confidence: v.confidence,
 				manuallyModified: v.manuallyModified,
 				alternatives: v.alternatives.map(serializeMetadataValue),
-				confidences: v.confidences
+				confidences: v.confidences,
 			})),
 		});
 
@@ -188,7 +188,7 @@ export async function importResultsZip(file, id) {
 				confidence: v.confidence,
 				manuallyModified: v.manuallyModified,
 				alternatives: v.alternatives.map(serializeMetadataValue),
-				confidences: v.confidences
+				confidences: v.confidences,
 			})),
 		});
 

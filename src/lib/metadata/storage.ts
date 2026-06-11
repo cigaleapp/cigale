@@ -227,7 +227,6 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 		confidence = 1;
 	}
 
-
 	abortSignal?.throwIfAborted();
 	const newValue = {
 		value: serializeMetadataValue(value),
@@ -252,7 +251,6 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 					})
 				),
 	};
-
 
 	newValue.confidences[serializeMetadataValue(value)] = confidence;
 
