@@ -1,11 +1,14 @@
 <script lang="ts">
+	import type { UpdateBundleMetadata } from '$lib/schemas/update-bundle.js';
 	import type { Component } from 'svelte';
 
 	import { UAParser } from 'ua-parser-js';
 
 	import IconIncrease from '~icons/ri/add-line';
 	import IconMore from '~icons/ri/arrow-right-s-line';
+	import IconUpdate from '~icons/ri/arrow-up-circle-line';
 	import IconCheck from '~icons/ri/check-line';
+	import IconUpdateOK from '~icons/ri/checkbox-circle-line';
 	import Cross from '~icons/ri/close-circle-line';
 	import IconDebugMode from '~icons/ri/code-line';
 	import IconWarning from '~icons/ri/error-warning-line';
@@ -23,13 +26,16 @@
 	import { formatBytesSize, plural } from '$lib/i18n.js';
 	import { tables } from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
+	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 	import { IsMobile } from '$lib/mobile.svelte.js';
 	import { globalModals } from '$lib/modals.svelte.js';
 	import { askForNotificationPermission, hasNotificationsEnabled } from '$lib/notifications.js';
 	import OverflowableText from '$lib/OverflowableText.svelte';
 	import { goto } from '$lib/paths.js';
 	import { getSettings, setSetting } from '$lib/settings.svelte';
-	import { orEmpty, switchValue } from '$lib/utils.js';
+	import { toasts } from '$lib/toasts.svelte.js';
+	import * as updater from '$lib/update-bundles.js';
+	import { orEmpty, platform, switchValue } from '$lib/utils.js';
 	import { getTheme } from '$routes/+layout.svelte';
 
 	import ModalChromePersistentStorage, {
@@ -94,8 +100,20 @@
 		})();
 	});
 
+	let updating = $state(false);
+	let checkedForUpdates = $state(false);
+	let updateBundle = $state<(typeof UpdateBundleMetadata)['infer']>();
 	$effect(() => {
-		callout = !storageIsPersistent || lowOnStorage;
+		void (async () => {
+			updateBundle = await updater.check();
+		})();
+	});
+
+	// Persistent storage is almost impossible to enable on Chrome
+	const chromium = $derived(new UAParser().getEngine().name === 'Blink');
+
+	$effect(() => {
+		callout = Boolean((!storageIsPersistent && !chromium) || lowOnStorage || updateBundle);
 	});
 </script>
 
@@ -287,9 +305,10 @@
 						await goto('/(app)/storage');
 					},
 				},
-				...orEmpty(!storageIsPersistent, {
+				...orEmpty(!storageIsPersistent && !chromium, {
 					type: 'clickable' as const,
 					label: 'Stockage non persistant',
+					warning: true,
 					data: {
 						icon: IconWarning,
 						subtext: '',
@@ -306,6 +325,62 @@
 				}),
 				{
 					type: 'clickable' as const,
+					closeOnSelect: false,
+					key: 'updates',
+					label: updateBundle
+						? 'Mettre à jour'
+						: checkedForUpdates
+							? 'À jour'
+							: 'Vérifier les mises à jour',
+					data: {
+						icon: checkedForUpdates && !updateBundle ? IconUpdateOK : IconUpdate,
+						subtext:
+							!updateBundle || !updater.compatible(updateBundle)
+								? ''
+								: switchValue(platform(), {
+										web: '',
+										android: 'Play Store',
+										ios: 'App Store',
+									}),
+					},
+					async onclick() {
+						if (!updateBundle) {
+							updating = true;
+							updateBundle = await updater.check();
+							checkedForUpdates = true;
+
+							if (!updateBundle) {
+								updating = false;
+								return;
+							}
+						}
+
+						if (!updater.compatible(updateBundle)) {
+							// TODO: once we're on the stores, open the relevant store page here
+							window.open('https://apk.cigale.gwen.works');
+							return;
+						}
+
+						try {
+							updating = true;
+							const downloaded = await updater.download(updateBundle);
+							if (!downloaded) {
+								toasts.error(
+									'Impossible de télécharger la mise à jour. Veuillez rééssayer plus tard.'
+								);
+								return;
+							}
+
+							await updater
+								.install(downloaded)
+								.catch(() => toasts.error("Impossible d'installer la mise à jour"));
+						} finally {
+							updating = false;
+						}
+					},
+				},
+				{
+					type: 'clickable' as const,
 					data: { icon: undefined, subtext: `Version ${version}` },
 					label: 'À propos',
 					async onclick() {
@@ -317,9 +392,11 @@
 	]}
 >
 	{#snippet item({ icon: Icon, subtext }, { label, selected, key, type })}
-		<div class="settings-item" class:warning={Icon === IconWarning}>
+		<div class="settings-item" class:highlighted={Icon === IconUpdate && callout}>
 			<div class="icon">
-				{#if Icon}
+				{#if key === 'updates' && updating}
+					<LoadingSpinner --size="1.2em" />
+				{:else if Icon}
 					<Icon />
 				{:else if selected}
 					<IconCheck />
@@ -413,10 +490,8 @@
 			max-width: 300px;
 		}
 
-		&.warning {
-			color: var(--fg-warning);
-			/* TODO */
-			/* background-color: var(--bg-warning); */
+		&.highlighted {
+			color: var(--fg-primary);
 		}
 
 		.icon {

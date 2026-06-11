@@ -26,8 +26,6 @@ import { clamp, fetchHttpRequest, profiler, progressSplitter, switchValue } from
 import { PROCEDURES } from '$worker/procedures.js';
 import WebWorker from '$worker/start.js?worker';
 
-import { askForPersistentStorageOnChrome } from './ModalChromePersistentStorage.svelte';
-
 export const ssr = false;
 
 export const trailingSlash = 'always';
@@ -181,19 +179,17 @@ export async function load({ url }) {
 
 	console.timeEnd('background things');
 
-	if (!storageIsPersistent) {
+	// Enabling persistent storage is almost impossible on chrome-based browsers
+	const chromium = new UAParser().getEngine().name === 'Blink';
+
+	if (!storageIsPersistent && !chromium) {
 		toasts.warn(
 			"Le stockage de votre navigateur n'est pas persistant, les données pourraient être perdues en cas de manque d'espace de stockage.",
 			{
 				data: {},
 				labels: { action: 'Activer' },
 				async action() {
-					const isChrome = new UAParser().getBrowser().name === 'Chrome';
-					if (isChrome) {
-						askForPersistentStorageOnChrome();
-					} else {
-						await navigator.storage.persist?.();
-					}
+					await navigator.storage.persist?.();
 				},
 			}
 		);
