@@ -7,6 +7,7 @@ on:
       - main
 
 permissions:
+  contents: read
   issues: write
 
 jobs:
@@ -19,46 +20,57 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Count files
+      - name: Count converted files
         id: count
         shell: bash
         run: |
           JS=0
           TS=0
 
+          JS_FILES=""
+          TS_FILES=""
+
           while IFS= read -r file; do
+            REL="${file#./}"
+
             case "$file" in
               *.svelte.ts)
                 TS=$((TS+1))
+                TS_FILES+="$REL"$'\n'
                 ;;
 
               *.svelte.js)
                 JS=$((JS+1))
+                JS_FILES+="$REL"$'\n'
                 ;;
 
               *.svelte)
                 if grep -Eq '<script[^>]*lang=["'\'']ts["'\'']' "$file"; then
                   TS=$((TS+1))
+                  TS_FILES+="$REL"$'\n'
                 else
                   JS=$((JS+1))
+                  JS_FILES+="$REL"$'\n'
                 fi
                 ;;
 
               *.ts)
                 TS=$((TS+1))
+                TS_FILES+="$REL"$'\n'
                 ;;
 
               *.js)
                 JS=$((JS+1))
+                JS_FILES+="$REL"$'\n'
                 ;;
             esac
           done < <(
             find . \
               -type d \( \
-                -name node_modules -o \
                 -name .git -o \
-                -name build -o \
-                -name dist \
+                -name node_modules -o \
+                -name dist -o \
+                -name build \
               \) -prune -o \
               -type f \
               \( \
@@ -70,24 +82,45 @@ jobs:
               \) -print
           )
 
-          TOTAL=$((JS+TS))
+          TOTAL=$((JS + TS))
 
-          PERCENT=$(awk "BEGIN { printf \"%.1f\", ($TS/$TOTAL)*100 }")
+          if [ "$TOTAL" -eq 0 ]; then
+            PERCENT="0.0"
+          else
+            PERCENT=$(awk "BEGIN { printf \"%.1f\", ($TS/$TOTAL)*100 }")
+          fi
 
-          echo "js=$JS" >> "$GITHUB_OUTPUT"
-          echo "ts=$TS" >> "$GITHUB_OUTPUT"
-          echo "total=$TOTAL" >> "$GITHUB_OUTPUT"
-          echo "percent=$PERCENT" >> "$GITHUB_OUTPUT"
+          {
+            echo "js=$JS"
+            echo "ts=$TS"
+            echo "total=$TOTAL"
+            echo "percent=$PERCENT"
+
+            echo "js_files<<EOF"
+            printf "%s" "$JS_FILES"
+            echo
+            echo "EOF"
+
+            echo "ts_files<<EOF"
+            printf "%s" "$TS_FILES"
+            echo
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Update issue
         uses: actions/github-script@v8
         env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+          ISSUE_NUMBER: ${{ env.ISSUE_NUMBER }}
+
           JS: ${{ steps.count.outputs.js }}
           TS: ${{ steps.count.outputs.ts }}
           TOTAL: ${{ steps.count.outputs.total }}
           PERCENT: ${{ steps.count.outputs.percent }}
-          ISSUE_NUMBER: ${{ env.ISSUE_NUMBER }}
-          GITHUB_TOKEN: ${{ github.token }}
+
+          JS_FILES: ${{ steps.count.outputs.js_files }}
+          TS_FILES: ${{ steps.count.outputs.ts_files }}
         with:
           script: |
             const issue_number = Number(process.env.ISSUE_NUMBER);
@@ -97,6 +130,9 @@ jobs:
               repo: context.repo.repo,
               issue_number
             });
+
+            const jsFiles = (process.env.JS_FILES || "").trim();
+            const tsFiles = (process.env.TS_FILES || "").trim();
 
             const section = `
             <!-- ts-progress:start -->
@@ -110,12 +146,31 @@ jobs:
 
             **Progress:** ${process.env.TS}/${process.env.TOTAL} (${process.env.PERCENT}%)
 
+            <details>
+            <summary>JavaScript files (${process.env.JS})</summary>
+
+            \`\`\`text
+            ${jsFiles}
+            \`\`\`
+
+            </details>
+
+            <details>
+            <summary>TypeScript files (${process.env.TS})</summary>
+
+            \`\`\`text
+            ${tsFiles}
+            \`\`\`
+
+            </details>
+
             <!-- ts-progress:end -->
             `.trim();
 
             let body = issue.body || "";
 
-            const regex = /<!-- ts-progress:start -->[\s\S]*?<!-- ts-progress:end -->/;
+            const regex =
+              /<!-- ts-progress:start -->[\s\S]*?<!-- ts-progress:end -->/;
 
             if (regex.test(body)) {
               body = body.replace(regex, section);
