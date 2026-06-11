@@ -90,10 +90,6 @@ msgstr "Activer/Désactiver le debug mode"
 msgid "Aides à l'identification"
 msgstr "Aides à l'identification"
 
-#: src/lib/Metadata.svelte
-msgid "Alternatives"
-msgstr "Alternatives"
-
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
 #: src/routes/(app)/(sidepanel)/crop/+page.svelte
 msgid "Analyse…"
@@ -2300,6 +2296,7 @@ msgid_plural "# observations"
 msgstr[0] "# observation"
 msgstr[1] "# observations"
 
+#: src/lib/Metadata.svelte
 #: src/routes/(app)/(sidepanel)/o/[observation]/+layout@(app).svelte
 msgid "Suggestions"
 msgstr "Suggestions"
