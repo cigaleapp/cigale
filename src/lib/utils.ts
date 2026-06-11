@@ -8,7 +8,7 @@ export function mapValues<K extends string, VIn, VOut>(
 	subject: Record<K, VIn>,
 	mapper: (value: VIn) => VOut
 ): Record<K, VOut> {
-	// @ts-expect-error
+	// @ts-expect-error can't preserve types through Object.(from)Entries
 	return Object.fromEntries(Object.entries(subject).map(([key, value]) => [key, mapper(value)]));
 }
 
@@ -24,7 +24,7 @@ export function mapKeys<KIn extends string, KOut extends string, V>(
 	subject: Record<KIn, V>,
 	mapper: (key: KIn, value: V) => KOut
 ): Record<KOut, V> {
-	// @ts-expect-error
+	// @ts-expect-error can't preserve types through Object.(from)Entries
 	return Object.fromEntries(
 		Object.entries(subject).map(([key, value]) => [mapper(key as KIn, value as V), value])
 	);
@@ -86,7 +86,7 @@ if (import.meta.vitest) {
 }
 
 export function keys<K extends string>(subject: Record<K, unknown>): K[] {
-	// @ts-expect-error
+	// @ts-expect-error can't preserve types through Object.keys
 	return Object.keys(subject);
 }
 
@@ -101,7 +101,7 @@ if (import.meta.vitest) {
 export function fromEntries<K extends string, V>(
 	subject: Array<[K, V] | readonly [K, V]>
 ): Record<K, V> {
-	// @ts-expect-error
+	// @ts-expect-error can't preserve types through Object.fromEntries
 	return Object.fromEntries(subject);
 }
 
@@ -119,7 +119,7 @@ if (import.meta.vitest) {
 }
 
 export function entries<K extends string, V>(subject: Record<K, V>): Array<[K, V]> {
-	// @ts-expect-error
+	// @ts-expect-error can't preserve types though Object.entries
 	return Object.entries(subject);
 }
 
@@ -159,7 +159,7 @@ if (import.meta.vitest) {
  * Checks that a value is included in a list of values
  */
 export function oneOf<T extends string>(value: string, values: T[]): value is T {
-	// @ts-expect-error
+	// @ts-expect-error String#includes:0 is too narrow
 	return values.includes(value);
 }
 
@@ -179,7 +179,7 @@ if (import.meta.vitest) {
 	const { test, expect } = import.meta.vitest;
 	test('hasOnce', () => {
 		expect(hasOnce('a', ['a', 'b', 'c'])).toBe(true);
-		// @ts-expect-error
+		// @ts-expect-error this is expected, we're testing for failure
 		expect(hasOnce('d', ['a', 'b', 'c'])).toBe(false);
 		expect(hasOnce('a', ['a', 'b', 'c', 'a'])).toBe(false);
 	});
@@ -241,7 +241,7 @@ if (import.meta.vitest) {
 		expect(pick({ a: 1, b: 2 }, 'a')).toEqual({ a: 1 });
 		expect(pick({ a: 1, b: 2 }, 'b')).toEqual({ b: 2 });
 		expect(pick({ a: 1, b: 2 }, 'a', 'b')).toEqual({ a: 1, b: 2 });
-		// @ts-expect-error
+		// @ts-expect-error this is expected, we're testing for an edge case
 		expect(pick({ a: 1, b: 2 }, 'c')).toEqual({});
 
 		class Test {
@@ -278,7 +278,7 @@ if (import.meta.vitest) {
 		expect(omit({ a: 1, b: 2 }, 'a')).toEqual({ b: 2 });
 		expect(omit({ a: 1, b: 2 }, 'b')).toEqual({ a: 1 });
 		expect(omit({ a: 1, b: 2 }, 'a', 'b')).toEqual({});
-		// @ts-expect-error
+		// @ts-expect-error this is expected, we're testing for an edge case
 		expect(omit({ a: 1, b: 2 }, 'c')).toEqual({ a: 1, b: 2 });
 	});
 }
@@ -316,6 +316,7 @@ if (import.meta.vitest) {
 		expect(safeJSONStringify(undefined)).toBeUndefined();
 		expect(safeJSONStringify(null)).toBe('null');
 		expect(safeJSONStringify(Symbol('feur'))).toBeUndefined();
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const a: any = { b: 2 };
 		a.a = a;
 		expect(safeJSONStringify(a)).toBeUndefined();
@@ -325,9 +326,8 @@ if (import.meta.vitest) {
 /**
  * See https://github.com/microsoft/TypeScript/issues/19954
  */
-export function sign(value: number): -1 | 0 | 1 {
-	// @ts-expect-error
-	return Math.sign(value);
+export function sign(value: number) {
+	return Math.sign(value) as -1 | 0 | 1;
 }
 
 if (import.meta.vitest) {
@@ -431,7 +431,7 @@ if (import.meta.vitest) {
 }
 
 export function uint8ArrayToArrayBuffer(uint8Array: Uint8Array): ArrayBuffer {
-	// @ts-expect-error
+	// @ts-expect-error TODO fix this one
 	return uint8Array.buffer.slice(
 		uint8Array.byteOffset,
 		uint8Array.byteOffset + uint8Array.byteLength
@@ -946,7 +946,7 @@ export function groupBy<T, K, V = T>(
 	valueMapper?: (item: T) => V
 ): Map<K, V[]> {
 	if ('groupBy' in Map && !valueMapper) {
-		// @ts-expect-error
+		// @ts-expect-error types can't be preserved through Map.groupBy
 		return Map.groupBy(array, key);
 	}
 
@@ -1136,7 +1136,7 @@ export function orEmpty2<T, O>(subject: T, obj: (subject: NonNullable<T>) => O):
  * {} if predicate is falsy, obj if predicate is truthy.
  * Spread into an object literal to conditionally add something to it.
  */
-export function orEmptyObj<T>(predicate: boolean | undefined | null, obj: T): T | {} {
+export function orEmptyObj<T>(predicate: boolean | undefined | null, obj: T): T | object {
 	return predicate ? obj : {};
 }
 
@@ -1151,18 +1151,20 @@ if (import.meta.vitest) {
 	});
 }
 
+/* eslint-disable @typescript-eslint/no-explicit-any  */
+
 export function orEmptyObj2<K extends string, T, O>(
 	key: K,
 	subject: T,
 	obj: (subject: NonNullable<T>) => O
-): T extends null | undefined ? {} : { [key in K]: O } {
+): T extends null | undefined ? object : { [key in K]: O } {
 	if (subject === null) return {} as any;
 	if (subject === undefined) return {} as any;
 	return { [key]: obj(subject as NonNullable<T>) } as any;
 }
 
 export function orEmptyObj3<K extends string, T>(obj: { [key in K]: T }): T extends null | undefined
-	? {}
+	? object
 	: { [key in K]: T } {
 	const key = Object.keys(obj)[0] as K | undefined;
 	if (key === undefined) return {} as any;
@@ -1170,6 +1172,8 @@ export function orEmptyObj3<K extends string, T>(obj: { [key in K]: T }): T exte
 	if (obj[key] === undefined) return {} as any;
 	return obj as any;
 }
+
+/* eslint-enable @typescript-eslint/no-explicit-any  */
 
 export type RemovePrefix<Prefix extends string, T> = T extends `${Prefix}${infer P}` ? P : never;
 export type WithPrefix<Prefix extends string, T> = Extract<T, `${Prefix}${string}`>;
@@ -1313,6 +1317,7 @@ if (import.meta.vitest) {
 	test('switchValue', () => {
 		expect(switchValue('a', { a: 1, b: 2 })).toBe(1);
 		expect(switchValue('b', { a: 1, b: 2 })).toBe(2);
+		// @ts-expect-error this is expected, we're testing for an edge case
 		expect(switchValue('c', { a: 1, b: 2 }, 3)).toBe(3);
 		// @ts-expect-error test that it returns undefined if no fallback is provided
 		expect(switchValue('c', { a: 1, b: 2 })).toBeUndefined();
