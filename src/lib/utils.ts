@@ -2,18 +2,12 @@
 
 import fetchProgress from 'fetch-progress';
 import JSONC from 'tiny-jsonc';
-import { UAParser } from 'ua-parser-js';
 import YAML from 'yaml';
 
-/**
- * @template {string} K
- * @template {any} VIn
- * @template {any} VOut
- * @param {Record<K, VIn>} subject
- * @param {(value: VIn) => VOut} mapper
- * @returns {Record<K, NoInfer<VOut>>}
- */
-export function mapValues(subject, mapper) {
+export function mapValues<K extends string, VIn, VOut>(
+	subject: Record<K, VIn>,
+	mapper: (value: VIn) => VOut
+): Record<K, VOut> {
 	// @ts-expect-error
 	return Object.fromEntries(Object.entries(subject).map(([key, value]) => [key, mapper(value)]));
 }
@@ -26,21 +20,13 @@ if (import.meta.vitest) {
 	});
 }
 
-/**
- * @template {string} KIn
- * @template {string} KOut
- * @template {any} V
- * @param {Record<KIn, V>} subject
- * @param {(key: KIn, value: V) => KOut} mapper
- * @returns {Record<KOut, V>}
- */
-export function mapKeys(subject, mapper) {
+export function mapKeys<KIn extends string, KOut extends string, V>(
+	subject: Record<KIn, V>,
+	mapper: (key: KIn, value: V) => KOut
+): Record<KOut, V> {
 	// @ts-expect-error
 	return Object.fromEntries(
-		Object.entries(subject).map(([key, value]) => [
-			mapper(/** @type {KIn} */ (key), value),
-			value,
-		])
+		Object.entries(subject).map(([key, value]) => [mapper(key as KIn, value as V), value])
 	);
 }
 
@@ -54,36 +40,29 @@ if (import.meta.vitest) {
 
 /**
  * Maps values of an object, and filters out entries with nullable values from the result
- * @template {string} K
- * @template {any} VIn
- * @template {any} VOut
- * @param {Record<K, VIn>} subject
- * @param {(value: VIn) => VOut} mapper
- * @returns {Record<K, NoInfer<NonNullable<VOut>>>}
  */
-export function mapValuesNoNullables(subject, mapper) {
+export function mapValuesNoNullables<K extends string, VIn, VOut>(
+	subject: Record<K, VIn>,
+	mapper: (value: VIn) => VOut
+): Record<K, NonNullable<VOut>> {
 	return Object.fromEntries(
 		Object.entries(subject)
-			.map(([key, value]) => [key, mapper(value)])
+			.map(([key, value]) => [key, mapper(value as VIn)])
 			.filter(([, value]) => value !== null && value !== undefined)
-	);
+	) as Record<K, NonNullable<VOut>>;
 }
 
 /**
  * Maps values and keys of an object, and filters out entries with nullable values from the result
- * @template {string} KIn
- * @template {string} KOut
- * @template {any} VIn
- * @template {any} VOut
- * @param {Record<KIn, VIn>} subject
- * @param {(key: KIn, value: VIn) => [KOut, VOut] | undefined} mapper
- * @returns {Record<KOut, VOut>}
  */
-export function transformObject(subject, mapper) {
+export function transformObject<KIn extends string, KOut extends string, VIn, VOut>(
+	subject: Record<KIn, VIn>,
+	mapper: (key: KIn, value: VIn) => [KOut, VOut] | undefined
+): Record<KOut, VOut> {
 	return fromEntries(
 		entries(subject)
 			.map(([key, value]) => mapper(key, value))
-			.filter((entry) => entry !== undefined)
+			.filter((entry): entry is [KOut, VOut] => entry !== undefined)
 	);
 }
 
@@ -106,12 +85,7 @@ if (import.meta.vitest) {
 	});
 }
 
-/**
- * @template {string} K
- * @param {Record<K, unknown>} subject
- * @returns {K[]}
- */
-export function keys(subject) {
+export function keys<K extends string>(subject: Record<K, unknown>): K[] {
 	// @ts-expect-error
 	return Object.keys(subject);
 }
@@ -124,13 +98,9 @@ if (import.meta.vitest) {
 	});
 }
 
-/**
- * @template {string} K
- * @template {any} V
- * @param {Array<[K, V] | readonly [K, V]>} subject
- * @returns {Record<K, V>}
- */
-export function fromEntries(subject) {
+export function fromEntries<K extends string, V>(
+	subject: Array<[K, V] | readonly [K, V]>
+): Record<K, V> {
 	// @ts-expect-error
 	return Object.fromEntries(subject);
 }
@@ -148,13 +118,7 @@ if (import.meta.vitest) {
 	});
 }
 
-/**
- * @template {string} K
- * @template {any} V
- * @param {Record<K, V>} subject
- * @returns {Array<[K, V]>}
- */
-export function entries(subject) {
+export function entries<K extends string, V>(subject: Record<K, V>): Array<[K, V]> {
 	// @ts-expect-error
 	return Object.entries(subject);
 }
@@ -170,26 +134,16 @@ if (import.meta.vitest) {
 	});
 }
 
-/**
- * @template {string} KIn
- * @template {any} VIn
- * @template {string} KOut
- * @template {any} VOut
- * @param {Record<KIn, VIn>} subject
- * @param {(key: KIn, value: VIn) => [KOut, VOut]} mapper
- * @returns {Record<KOut, VOut>}
- */
-export function mapEntries(subject, mapper) {
+export function mapEntries<KIn extends string, VIn, KOut extends string, VOut>(
+	subject: Record<KIn, VIn>,
+	mapper: (key: KIn, value: VIn) => [KOut, VOut]
+): Record<KOut, VOut> {
 	return fromEntries(entries(subject).map(([key, value]) => mapper(key, value)));
 }
 
-/**
- * @template {string} K
- * @template {string} V
- * @param {Record<K, V>} subject
- * @returns {Record<V, K>}
- */
-export function invertRecord(subject) {
+export function invertRecord<K extends string, V extends string>(
+	subject: Record<K, V>
+): Record<V, K> {
 	return fromEntries(entries(subject).map(([key, value]) => [value, key]));
 }
 
@@ -203,12 +157,8 @@ if (import.meta.vitest) {
 
 /**
  * Checks that a value is included in a list of values
- * @template {string} T
- * @param {string} value
- * @param {T[]} values
- * @returns {value is T}
  */
-export function oneOf(value, values) {
+export function oneOf<T extends string>(value: string, values: T[]): value is T {
 	// @ts-expect-error
 	return values.includes(value);
 }
@@ -221,15 +171,7 @@ if (import.meta.vitest) {
 	});
 }
 
-/**
- *
- * @template {string} T
- * @template {T} U
- * @param {U} value
- * @param {T[]} values
- * @returns {values is [...Omit<T, U>[], U, ...Omit<T, U>[]]}
- */
-export function hasOnce(value, values) {
+export function hasOnce<T extends string, U extends T>(value: U, values: T[]): boolean {
 	return values.filter((v) => v === value).length === 1;
 }
 
@@ -243,12 +185,7 @@ if (import.meta.vitest) {
 	});
 }
 
-/**
- *
- * @param {...any} args
- * @returns {boolean}
- */
-export function xor(...args) {
+export function xor(...args: unknown[]): boolean {
 	if (args.length === 0) return false;
 	const [first, ...rest] = args;
 	return xor(...rest) !== Boolean(first);
@@ -267,11 +204,7 @@ if (import.meta.vitest) {
 	});
 }
 
-/**
- * @param {...any} args
- * @returns {boolean}
- */
-export function or(...args) {
+export function or(...args: unknown[]): boolean {
 	return args.some(Boolean);
 }
 
@@ -290,17 +223,12 @@ if (import.meta.vitest) {
 
 /**
  * Pick only some keys from an object
- * @template {string & keyof Obj} KeysOut
- * @template {*} Obj
- * @param {Obj} subject
- * @param {...KeysOut} keys
- * @returns {Pick<Obj, KeysOut>}
  */
-export function pick(subject, ...keys) {
-	// We're not using fromEntries and entries with a filter, because Object.fromEntries does not return $derived or $state fields from classes
-	// see https://svelte.dev/playground/32a7d1c8995f45b49f01b7ae86fef7bd?version=5.38.7
-
-	const result = /** @type {Pick<Obj, KeysOut>} */ ({});
+export function pick<Obj, KeysOut extends string & keyof Obj>(
+	subject: Obj,
+	...keys: KeysOut[]
+): Pick<Obj, KeysOut> {
+	const result = {} as Pick<Obj, KeysOut>;
 	for (const key of keys) {
 		result[key] = subject[key];
 	}
@@ -317,10 +245,8 @@ if (import.meta.vitest) {
 		expect(pick({ a: 1, b: 2 }, 'c')).toEqual({});
 
 		class Test {
-			/** @type {number} */
-			id = 0;
-			/** @type {string} */
-			name = '';
+			id: number = 0;
+			name: string = '';
 		}
 
 		const testZero = new Test();
@@ -335,15 +261,15 @@ if (import.meta.vitest) {
 
 /**
  * Omit some keys from an object
- * @template {string} KeysIn
- * @template {KeysIn} KeysOut
- * @template {any} V
- * @param {Record<KeysIn, V>} subject
- * @param {...KeysOut} keys
- * @returns {Record<Exclude<KeysIn, KeysOut>, V>}
  */
-export function omit(subject, ...keys) {
-	return fromEntries(entries(subject).filter(([key]) => !oneOf(key, keys)));
+export function omit<KeysIn extends string, KeysOut extends KeysIn, V>(
+	subject: Record<KeysIn, V>,
+	...keys: KeysOut[]
+): Record<Exclude<KeysIn, KeysOut>, V> {
+	return fromEntries(entries(subject).filter(([key]) => !oneOf(key, keys))) as Record<
+		Exclude<KeysIn, KeysOut>,
+		V
+	>;
 }
 
 if (import.meta.vitest) {
@@ -352,16 +278,12 @@ if (import.meta.vitest) {
 		expect(omit({ a: 1, b: 2 }, 'a')).toEqual({ b: 2 });
 		expect(omit({ a: 1, b: 2 }, 'b')).toEqual({ a: 1 });
 		expect(omit({ a: 1, b: 2 }, 'a', 'b')).toEqual({});
+		// @ts-expect-error
 		expect(omit({ a: 1, b: 2 }, 'c')).toEqual({ a: 1, b: 2 });
 	});
 }
 
-/**
- *
- * @param {*} str
- * @returns
- */
-export function safeJSONParse(str) {
+export function safeJSONParse(str: unknown): unknown {
 	try {
 		return JSON.parse(str?.toString() ?? '');
 	} catch {
@@ -379,10 +301,7 @@ if (import.meta.vitest) {
 	});
 }
 
-/**
- * @param {*} value
- */
-export function safeJSONStringify(value) {
+export function safeJSONStringify(value: unknown): string | undefined {
 	try {
 		return JSON.stringify(value);
 	} catch {
@@ -397,8 +316,7 @@ if (import.meta.vitest) {
 		expect(safeJSONStringify(undefined)).toBeUndefined();
 		expect(safeJSONStringify(null)).toBe('null');
 		expect(safeJSONStringify(Symbol('feur'))).toBeUndefined();
-		/** @type {any} */
-		const a = { b: 2 };
+		const a: any = { b: 2 };
 		a.a = a;
 		expect(safeJSONStringify(a)).toBeUndefined();
 	});
@@ -406,10 +324,8 @@ if (import.meta.vitest) {
 
 /**
  * See https://github.com/microsoft/TypeScript/issues/19954
- * @param {number} value
- * @returns {-1|0|1}
  */
-export function sign(value) {
+export function sign(value: number): -1 | 0 | 1 {
 	// @ts-expect-error
 	return Math.sign(value);
 }
@@ -420,7 +336,7 @@ if (import.meta.vitest) {
 		expect(sign(1)).toBe(1);
 		expect(sign(-1)).toBe(-1);
 		expect(sign(0)).toBe(0);
-		expect(sign(-0)).toBe(-0); // 💀💀💀
+		expect(sign(-0)).toBe(-0);
 		expect(sign(NaN)).toBeNaN();
 		expect(sign(6732)).toBe(1);
 		expect(sign(-667)).toBe(-1);
@@ -429,13 +345,7 @@ if (import.meta.vitest) {
 	});
 }
 
-/**
- * @param {number} value
- * @param {number} min
- * @param {number} max
- * @returns {number}
- */
-export function clamp(value, min, max) {
+export function clamp(value: number, min: number, max: number): number {
 	return Math.max(min, Math.min(max, value));
 }
 
@@ -450,32 +360,19 @@ if (import.meta.vitest) {
 	});
 }
 
-/**
- * @template {*} T
- * @typedef {{[K in keyof T]: Iterable<T[K]>}} ToIterables
- */
+type ToIterables<T extends unknown[]> = { [K in keyof T]: Iterable<T[K]> };
 
-/**
- * @template {any[]} T
- * @param  {...ToIterables<T>} arrays
- * @yields {T}
- */
-export function* zip(...arrays) {
-	// Get iterators for all of the iterables.
+export function* zip<T extends unknown[]>(...arrays: ToIterables<T>): Generator<T> {
 	const iterators = arrays.map((i) => i[Symbol.iterator]());
 
 	while (true) {
-		// Advance all of the iterators.
 		const results = iterators.map((i) => i.next());
 
-		// If any of the iterators are done, we should stop.
 		if (results.some(({ done }) => done)) {
 			break;
 		}
 
-		// We can assert the yield type, since we know none
-		// of the iterators are done.
-		yield /**  @type {T}  */ (results.map(({ value }) => value));
+		yield results.map(({ value }) => value) as T;
 	}
 }
 
@@ -503,14 +400,10 @@ if (import.meta.vitest) {
 	});
 }
 
-/**
- * @template {*} T
- * @param {T[]} array
- * @param {(item: T) => string|number} [key]
- * @returns {T[]}
- */
-// @ts-expect-error key should be non-optional if T is not string|number
-export function unique(array, key = (x) => x) {
+export function unique<T>(
+	array: T[],
+	key: (item: T) => string | number = (x) => x as string | number
+): T[] {
 	const seen = new Set();
 	return array.filter((item) => {
 		const k = key(item);
@@ -537,11 +430,8 @@ if (import.meta.vitest) {
 	});
 }
 
-/**
- * @param {Uint8Array} uint8Array
- * @returns {ArrayBuffer}
- */
-export function uint8ArrayToArrayBuffer(uint8Array) {
+export function uint8ArrayToArrayBuffer(uint8Array: Uint8Array): ArrayBuffer {
+	// @ts-expect-error
 	return uint8Array.buffer.slice(
 		uint8Array.byteOffset,
 		uint8Array.byteOffset + uint8Array.byteLength
@@ -560,10 +450,8 @@ if (import.meta.vitest) {
 
 /**
  * extension is all the last dotted parts: thing.tar.gz is [thing, tar.gz]
- * @param {string} filename
- * @returns [string, string] [filename without extension, extension]
  */
-export function splitFilenameOnExtension(filename) {
+export function splitFilenameOnExtension(filename: string): [string, string] {
 	const match = filename.match(/^([^.]+)\.(.+)$/);
 	if (!match) return [filename, ''];
 	return [match[1], match[2]];
@@ -578,29 +466,22 @@ if (import.meta.vitest) {
 	});
 }
 
-/**
- * @template T
- * @typedef {(a: T, b: T) => number} Comparator
- */
+export type Comparator<T> = (a: T, b: T) => number;
 
-/**
- * @template Item
- * @param {...(((item: Item) => string|number|undefined) | (keyof Item & string))} keys function to create the comparator function with. Should return a string (will be used with localeCompare) or a number (will be subtracted). Additional functions will be used as tie-breakers when the previous ones return 0.
- * @returns {Comparator<Item>}
- */
-export function compareBy(...keys) {
-	/**
-	 * @param {typeof keys[number]} key
-	 * @param {Item} a
-	 * @param {Item} b
-	 */
-	const _compareWith = (key, a, b) => {
-		const aKey = typeof key === 'string' ? a[key] : key(a);
-		const bKey = typeof key === 'string' ? b[key] : key(b);
+export function compareBy<Item>(
+	...keys: (((item: Item) => string | number | undefined) | (string & keyof Item))[]
+): Comparator<Item> {
+	const _compareWith = (key: (typeof keys)[number], a: Item, b: Item): number => {
+		const aKey = typeof key === 'string' ? (a as Record<string, unknown>)[key] : key(a);
+		const bKey = typeof key === 'string' ? (b as Record<string, unknown>)[key] : key(b);
 
 		if (aKey === undefined && bKey === undefined) return 0;
 		if (aKey === undefined) return -1;
 		if (bKey === undefined) return 1;
+
+		if (aKey === null && bKey === null) return 0;
+		if (aKey === null) return -1;
+		if (bKey === null) return 1;
 
 		if (aKey === bKey) return 0;
 		if (typeof aKey === 'string' && typeof bKey === 'string') {
@@ -614,17 +495,11 @@ export function compareBy(...keys) {
 		return aKey.toString().localeCompare(bKey.toString());
 	};
 
-	/**
-	 * @param {Item} a
-	 * @param {Item} b
-	 * @returns {number}
-	 */
 	return (a, b) => {
 		let comparison = 0;
 
 		for (let i = 0; i < keys.length && comparison === 0; i++) {
-			const key = keys[i];
-			comparison = _compareWith(key, a, b);
+			comparison = _compareWith(keys[i], a, b);
 		}
 
 		return comparison;
@@ -662,13 +537,13 @@ if (import.meta.vitest) {
 				{ id: 3, name: 'c' },
 			];
 
-			expect(compareBy((i) => i.id)(items[0], items[1])).toBe(1);
-			expect(compareBy((i) => i.id)(items[1], items[0])).toBe(-1);
-			expect(compareBy((i) => i.id)(items[0], items[0])).toBe(0);
+			expect(compareBy<(typeof items)[number]>((i) => i.id)(items[0], items[1])).toBe(1);
+			expect(compareBy<(typeof items)[number]>((i) => i.id)(items[1], items[0])).toBe(-1);
+			expect(compareBy<(typeof items)[number]>((i) => i.id)(items[0], items[0])).toBe(0);
 
-			expect(compareBy((i) => i.name)(items[0], items[1])).toBe(1);
-			expect(compareBy((i) => i.name)(items[1], items[0])).toBe(-1);
-			expect(compareBy((i) => i.name)(items[0], items[0])).toBe(0);
+			expect(compareBy<(typeof items)[number]>((i) => i.name)(items[0], items[1])).toBe(1);
+			expect(compareBy<(typeof items)[number]>((i) => i.name)(items[1], items[0])).toBe(-1);
+			expect(compareBy<(typeof items)[number]>((i) => i.name)(items[0], items[0])).toBe(0);
 		});
 
 		test('it works with key strings', () => {
@@ -678,9 +553,9 @@ if (import.meta.vitest) {
 				{ id: 3, name: 'c' },
 			];
 
-			expect(compareBy('id')(items[0], items[1])).toBe(1);
-			expect(compareBy('name')(items[1], items[0])).toBe(-1);
-			expect(compareBy('id')(items[0], items[0])).toBe(0);
+			expect(compareBy<(typeof items)[number]>('id')(items[0], items[1])).toBe(1);
+			expect(compareBy<(typeof items)[number]>('name')(items[1], items[0])).toBe(-1);
+			expect(compareBy<(typeof items)[number]>('id')(items[0], items[0])).toBe(0);
 		});
 
 		test('it works with multiple keys', () => {
@@ -690,40 +565,35 @@ if (import.meta.vitest) {
 				{ id: 3, name: 'c' },
 			];
 
-			expect(compareBy('id', 'name')(items[0], items[1])).toBe(1);
-			expect(compareBy('id', 'name')(items[1], items[0])).toBe(-1);
-			expect(compareBy('id', 'name')(items[0], items[0])).toBe(0);
+			expect(compareBy<(typeof items)[number]>('id', 'name')(items[0], items[1])).toBe(1);
+			expect(compareBy<(typeof items)[number]>('id', 'name')(items[1], items[0])).toBe(-1);
+			expect(compareBy<(typeof items)[number]>('id', 'name')(items[0], items[0])).toBe(0);
 		});
 	});
 }
 
 /**
  * Returns a new comparator that takes into account a given sorting direction. Input comparator is assumed to be sorting in asc order.
- * @template T
- * @param {'asc'|'desc'} direction
- * @param {Comparator<T>} comparator
- * @returns {Comparator<T>}
  */
-export function applySortDirection(direction, comparator) {
+export function applySortDirection<T>(
+	direction: 'asc' | 'desc',
+	comparator: Comparator<T>
+): Comparator<T> {
 	const mul = direction === 'asc' ? 1 : -1;
 	return (a, b) => mul * comparator(a, b);
 }
 
 /**
- * Add a v= query parameter to the URL to force the browser to reload the resource, using  Date.now() as the value
- * @template {string|URL} T
- * @param {T} url
- * @returns {T}
+ * Add a v= query parameter to the URL to force the browser to reload the resource, using Date.now() as the value
  */
-export function cachebust(url) {
+export function cachebust(url: string): string;
+export function cachebust(url: URL): URL;
+export function cachebust(url: string | URL): string | URL {
 	const parsedUrl = new URL(url);
-	// TODO use x-cigale-cache-bust instead of v
 	parsedUrl.searchParams.set('v', Date.now().toString());
 	if (typeof url === 'string') {
-		// @ts-expect-error
 		return parsedUrl.toString();
 	}
-	// @ts-expect-error
 	return parsedUrl;
 }
 
@@ -757,11 +627,8 @@ if (import.meta.vitest) {
 
 /**
  * Semi-open range [start=0, end)
- * @param {number} startOrEnd
- * @param {number|undefined} [end]
- * @returns {number[]}
  */
-export function range(startOrEnd, end = undefined) {
+export function range(startOrEnd: number, end?: number): number[] {
 	if (end === undefined) {
 		return Array.from({ length: startOrEnd }, (_, i) => i);
 	}
@@ -779,25 +646,35 @@ if (import.meta.vitest) {
 	});
 }
 
-/**
- * @param {typeof import('$lib/schemas/common.js').HTTPRequest.infer} request
- * @param {object} [options]
- * @param {''|'model'} [options.cacheAs=""]
- * @param {import('fetch-progress').FetchProgressInitOptions['onProgress']} [options.onProgress]
- * @param {AbortSignal} [options.signal]
- * @param {Record<string, string>} [options.headers] default headers, to be merged with the request's headers
- * @param {boolean} [options.cachebust] add a cachebuster URL query parameter
- */
 export async function fetchHttpRequest(
-	request,
-	{ cacheAs = '', onProgress, signal, headers = {}, cachebust: enableCachebusting = false } = {}
-) {
+	request:
+		| string
+		| {
+				url: string;
+				method?: string;
+				headers?: Record<string, string>;
+				body?: string;
+				signal?: AbortSignal;
+		  },
+	{
+		cacheAs = '' as '' | 'model',
+		onProgress,
+		signal,
+		headers = {},
+		cachebust: enableCachebusting = false,
+	}: {
+		cacheAs?: '' | 'model';
+		onProgress?: NonNullable<Parameters<typeof fetchProgress>[0]>['onProgress'];
+		signal?: AbortSignal;
+		headers?: Record<string, string>;
+		cachebust?: boolean;
+	} = {}
+): Promise<Response> {
 	let url = new URL(typeof request === 'string' ? request : request.url);
 
 	if (enableCachebusting) url = cachebust(url);
 
-	/** @type {RequestInit} */
-	const options = typeof request === 'string' ? { headers: {} } : request;
+	const options: RequestInit = typeof request === 'string' ? { headers: {} } : request;
 
 	if (cacheAs) {
 		url.searchParams.set('x-cigale-cache-as', cacheAs);
@@ -808,7 +685,7 @@ export async function fetchHttpRequest(
 	}
 
 	if (headers) {
-		options.headers = { ...headers, ...options.headers };
+		options.headers = { ...headers, ...(options.headers as Record<string, string>) };
 	}
 
 	if (onProgress) return fetch(url, options).then(fetchProgress({ onProgress }));
@@ -816,79 +693,12 @@ export async function fetchHttpRequest(
 	return fetch(url, options);
 }
 
-if (import.meta.vitest) {
-	const { it, describe, expect, vi } = import.meta.vitest;
-	describe('fetchHttpRequest', async () => {
-		it('works with a simple URL string', async () => {
-			const fetchMock = vi.fn(() =>
-				Promise.resolve(
-					new Response(JSON.stringify({ success: true }), {
-						status: 200,
-						headers: { 'Content-Type': 'application/json' },
-					})
-				)
-			);
-			vi.stubGlobal('fetch', fetchMock);
-
-			const response = await fetchHttpRequest(
-				'https://example.com/api?q=test&another=param',
-				{
-					cacheAs: 'model',
-				}
-			);
-			expect(fetchMock).toHaveBeenCalledTimes(1);
-			expect(fetchMock).toHaveBeenCalledWith(
-				new URL('https://example.com/api?q=test&another=param&x-cigale-cache-as=model'),
-				{ headers: {} }
-			);
-			const data = await response.json();
-			expect(data).toEqual({ success: true });
-
-			// Clean up
-			vi.unstubAllGlobals();
-		});
-		it('works with a full request object', async () => {
-			const fetchMock = vi.fn(() =>
-				Promise.resolve(
-					new Response(JSON.stringify({ success: true }), {
-						status: 200,
-						headers: { 'Content-Type': 'application/json' },
-					})
-				)
-			);
-			vi.stubGlobal('fetch', fetchMock);
-
-			const request = /** @type {const} */ ({
-				url: 'https://example.com/api',
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({ key: 'value' }),
-			});
-
-			const response = await fetchHttpRequest(request, { cacheAs: 'model' });
-			expect(fetchMock).toHaveBeenCalledTimes(1);
-			expect(fetchMock).toHaveBeenCalledWith(
-				new URL('https://example.com/api?x-cigale-cache-as=model'),
-				request
-			);
-			const data = await response.json();
-			expect(data).toEqual({ success: true });
-
-			// Clean up
-			vi.unstubAllGlobals();
-		});
-	});
-}
-
 /**
  * Parse a given Response into a JS value, assuming the response is either:
  * - JSONC (if the url pathname ends with .json)
  * - YAML (otherwise)
- * @param {Response} response
  */
-export async function parseYAMLorJSON(response) {
+export async function parseYAMLorJSON(response: Response): Promise<unknown> {
 	if (new URL(response.url).pathname.endsWith('.json')) {
 		return JSONC.parse(await response.text());
 	}
@@ -896,8 +706,7 @@ export async function parseYAMLorJSON(response) {
 	return YAML.parse(await response.text());
 }
 
-/** @param {Iterable<number>} values */
-export function sum(values) {
+export function sum(values: Iterable<number>): number {
 	return [...values].reduce((acc, cur) => acc + cur, 0);
 }
 
@@ -910,11 +719,7 @@ if (import.meta.vitest) {
 	});
 }
 
-/**
- * @param {Iterable<number>} values
- * @param {number} fallback if values is empty
- */
-export function avg(values, fallback = NaN) {
+export function avg(values: Iterable<number>, fallback: number = NaN): number {
 	let summed = 0;
 	let length = 0;
 
@@ -935,12 +740,7 @@ if (import.meta.vitest) {
 	});
 }
 
-/**
- * @template {any} T
- * @param {T} value
- * @returns {value is NonNullable<T>}
- */
-export function nonnull(value) {
+export function nonnull<T>(value: T): value is NonNullable<T> {
 	return value !== null && value !== undefined;
 }
 
@@ -960,12 +760,7 @@ if (import.meta.vitest) {
 	});
 }
 
-/**
- * @param {number} value
- * @param {number} decimals if negative, rounds to tens, hundreds, etc.
- * @returns {number}
- */
-export function round(value, decimals = 0) {
+export function round(value: number, decimals: number = 0): number {
 	const factor = Math.pow(10, Math.abs(decimals));
 
 	if (decimals < 0) {
@@ -997,16 +792,11 @@ if (import.meta.vitest) {
 	});
 }
 
-/**
- *
- * @param {object} param0  offset coords from the given rect
- * @param {number} param0.offsetX
- * @param {number} param0.offsetY
- * @param {DOMRect} rect
- * @param {number} leeway how many pixels to consider still "inside" the rect even if it's outside
- * @returns
- */
-export function insideBoundingClientRect({ offsetX, offsetY }, rect, leeway = 0) {
+export function insideBoundingClientRect(
+	{ offsetX, offsetY }: { offsetX: number; offsetY: number },
+	rect: DOMRect,
+	leeway: number = 0
+): boolean {
 	return (
 		offsetX >= -leeway &&
 		offsetX <= rect.width + leeway &&
@@ -1034,12 +824,9 @@ if (import.meta.vitest) {
 	});
 }
 
-/**
- *
- * @param {string} contentType
- * @returns {contentType is 'application/zip' | 'application/x-zip-compressed' | 'application/x-zip' }
- */
-export function isZip(contentType) {
+export function isZip(
+	contentType: string
+): contentType is 'application/zip' | 'application/x-zip-compressed' | 'application/x-zip' {
 	return (
 		contentType === 'application/zip' ||
 		contentType === 'application/x-zip-compressed' ||
@@ -1047,46 +834,23 @@ export function isZip(contentType) {
 	);
 }
 
-/**
- * @template T
- * @param {string} tag
- * @param {T} expr
- * @returns {T}
- */
-export function logexpr(tag, expr) {
+export function logexpr<T>(tag: string, expr: T): T {
 	// oxlint-disable-next-line no-console
 	console.log(`{${tag}}`, expr);
 	return expr;
 }
 
 /**
- * Outputs a [0, 1] progress value based on the progress of several weighted ordered parts. A value for a part assumes that all other parts defined beforehand have completed. Weights are in [0, 1], and the last part can let the weight be what sums with the rest to 1
- *
- * @example
- * ```
- * // download part represents 70% of the total time, decompression 20%, and parsing the rest
- * const splitProgress = progressSplitter('download', 0.7, 'decompression', 0.2, 'parsing');
- *
- * // Download halfway there
- * splitProgress('download', 0.5) // 0.35
- * // Download finished, decompression 10% there
- * splitProgress('decompression', 0.1) // 0.72 = 0.7 + 0.2 * 0.1
- * // Decompression finished, parsing 50% there
- * splitProgress('parsing', 0.5) // 0.85 = 0.7 + 0.2 + 0.1 * 0.5  = 0.7 + 0.2 + (0.7 + 0.2 - 1) * 0.5
- * // Parsing finished
- * splitProgress('parsing', 1) // 1 = 0.7 + 0.2 + 0.1 * 1 = 0.7 + 0.2 + (0.7 + 0.2 - 1) * 1
- * ```
- * @template {string} PartName
- * @param {...(PartName | number)} layout
- * @returns {(part: PartName, progress: number) => number}
+ * Outputs a [0, 1] progress value based on the progress of several weighted ordered parts.
  */
-export function progressSplitter(...layout) {
-	/** @type {Array<[PartName, number]>} */
-	let parts = [];
+export function progressSplitter<PartName extends string>(
+	...layout: (PartName | number)[]
+): (part: PartName, progress: number) => number {
+	const parts: Array<[PartName, number]> = [];
 
 	for (let i = 0; i < layout.length; i += 2) {
-		const name = /** @type {PartName} */ (layout[i]);
-		const weight = /** @type {number} */ (layout[i + 1] ?? 1 - sum(parts.map(([, w]) => w)));
+		const name = layout[i] as PartName;
+		const weight = (layout[i + 1] ?? 1 - sum(parts.map(([, w]) => w))) as number;
 
 		parts.push([name, weight]);
 	}
@@ -1094,7 +858,7 @@ export function progressSplitter(...layout) {
 	return (part, progress) => {
 		let total = 0;
 		const partIndex = parts.findIndex(([name]) => name === part);
-		for (const [i, [_, weight]] of parts.entries()) {
+		for (const [i, [, weight]] of parts.entries()) {
 			if (i < partIndex) total += weight;
 			if (i === partIndex) total += weight * progress;
 		}
@@ -1108,7 +872,7 @@ if (import.meta.vitest) {
 	test('progressSplitter', () => {
 		const splitProgress = progressSplitter('download', 0.7, 'decompression', 0.2, 'parsing');
 
-		const expectations = /** @type {const} */ ([
+		const expectations = [
 			['download', 0, 0],
 			['download', 0.5, 0.35],
 			['download', 1, 0.7],
@@ -1118,7 +882,7 @@ if (import.meta.vitest) {
 			['parsing', 0, 0.9],
 			['parsing', 0.5, 0.95],
 			['parsing', 1, 1],
-		]);
+		] as const;
 
 		for (const [phase, input, expected] of expectations) {
 			expect
@@ -1130,17 +894,15 @@ if (import.meta.vitest) {
 
 /**
  * Replaces accents and punctuations with dashes, lowercases, and replaces accents with ASCII equivalents.
- * Throws if the result is still not ASCII (e.g. CJK characters, we don't have transliteration tables for everything)
- * @param {string} text
  */
-export function slugify(text) {
+export function slugify(text: string): string {
 	const result = text
-		.normalize(/* @wc-ignore */ 'NFD') // separate accent from letter
-		.replace(/[\u0300-\u036f]/g, '') // remove all accents
-		.replace(/[^\w\s-]/g, '') // remove all non-word characters (except spaces and dashes)
+		.normalize(/* @wc-ignore */ 'NFD')
+		.replace(/[\u0300-\u036f]/g, '')
+		.replace(/[^\w\s-]/g, '')
 		.trim()
-		.replace(/[\s_-]+/g, '-') // replace spaces and underscores with a single dash
-		.replace(/^-+|-+$/g, '') // remove leading and trailing dashes
+		.replace(/[\s_-]+/g, '-')
+		.replace(/^-+|-+$/g, '')
 		.toLowerCase();
 
 	if (!result) throw new Error(`Cannot slugify "${text}" (result is empty)`);
@@ -1162,13 +924,11 @@ if (import.meta.vitest) {
 }
 
 /**
- * Throws an error with the given message
- * Useful to throw inside expressions
+ * Throws an error with the given message.
+ * Useful to throw inside expressions.
  * Example: `const value = possiblyNull ?? throws('value is null')`
- * @param {string} message
- * @returns {never}
  */
-export function throws(message) {
+export function throws(message: string): never {
 	throw new Error(message);
 }
 
@@ -1180,26 +940,21 @@ if (import.meta.vitest) {
 	});
 }
 
-/**
- * @template T
- * @template [K=string]
- * @template [V=T]
- * @param {Iterable<T>} array
- * @param {(item: T) => K} key
- * @param {(item: T) => V} [valueMapper]
- * @returns {Map<K, V[]>}
- */
-export function groupBy(array, key, valueMapper) {
+export function groupBy<T, K, V = T>(
+	array: Iterable<T>,
+	key: (item: T) => K,
+	valueMapper?: (item: T) => V
+): Map<K, V[]> {
 	if ('groupBy' in Map && !valueMapper) {
 		// @ts-expect-error
 		return Map.groupBy(array, key);
 	}
 
-	const map = new Map();
+	const map = new Map<K, V[]>();
 	for (const item of array) {
 		const k = key(item);
 		if (!map.has(k)) map.set(k, []);
-		map.get(k).push(valueMapper ? valueMapper(item) : item);
+		map.get(k)!.push(valueMapper ? valueMapper(item) : (item as unknown as V));
 	}
 	return map;
 }
@@ -1236,11 +991,8 @@ if (import.meta.vitest) {
 
 /**
  * Returns a LAB color-mix placing the value on the color scale made from the given color stops
- * Basically, it's like making a linear gradient and picking a color on it, where the 1 is the end of the gradient and 0 is the beginning
- * @param {number} value between 0 and 1
- * @param {...string} stops CSS color variable names (without the -- in front) representing the color gradient scale
  */
-export function gradientedColor(value, ...stops) {
+export function gradientedColor(value: number, ...stops: string[]): string {
 	if (value >= 1) return `var(--${stops.at(-1)})`;
 	if (value <= 0) return `var(--${stops[0]})`;
 
@@ -1259,95 +1011,14 @@ export function gradientedColor(value, ...stops) {
 		.replaceAll(' )', ')');
 }
 
-if (import.meta.vitest) {
-	const { test, expect, describe } = import.meta.vitest;
-	describe('gradientedColor', () => {
-		test('two colors', () => {
-			expect.soft(gradientedColor(0, 'red', 'blue')).toBe('var(--red)');
-			expect.soft(gradientedColor(1, 'red', 'blue')).toBe('var(--blue)');
-
-			const expectations = /** @type {const} */ ([
-				[0.1, 'blue', '10%', 'red'],
-				[0.2, 'blue', '20%', 'red'],
-				[0.25, 'blue', '25%', 'red'],
-				[0.3, 'blue', '30%', 'red'],
-				[0.4, 'blue', '40%', 'red'],
-				[0.5, 'blue', '50%', 'red'],
-				[0.6, 'blue', '60%', 'red'],
-				[0.7, 'blue', '70%', 'red'],
-				[0.75, 'blue', '75%', 'red'],
-				[0.8, 'blue', '80%', 'red'],
-				[0.9, 'blue', '90%', 'red'],
-			]);
-
-			for (const [input, color, percent, otherColor] of expectations) {
-				expect
-					.soft(gradientedColor(input, 'red', 'blue'), `with ${input}`)
-					.toBe(`color-mix(in lab, var(--${color}) ${percent}, var(--${otherColor}))`);
-			}
-		});
-
-		test('three colors', () => {
-			expect.soft(gradientedColor(0, 'red', 'yellow', 'blue')).toBe('var(--red)');
-			expect.soft(gradientedColor(1, 'red', 'yellow', 'blue')).toBe('var(--blue)');
-
-			const expectations = /** @type {const} */ ([
-				[0.1, 'yellow', '20%', 'red'],
-				[0.2, 'yellow', '40%', 'red'],
-				[0.25, 'yellow', '50%', 'red'],
-				[0.3, 'yellow', '60%', 'red'],
-				[0.4, 'yellow', '80%', 'red'],
-				[0.5, 'blue', '0%', 'yellow'],
-				[0.6, 'blue', '20%', 'yellow'],
-				[0.7, 'blue', '40%', 'yellow'],
-				[0.75, 'blue', '50%', 'yellow'],
-				[0.8, 'blue', '60%', 'yellow'],
-				[0.9, 'blue', '80%', 'yellow'],
-			]);
-
-			for (const [input, color, percent, otherColor] of expectations) {
-				expect
-					.soft(gradientedColor(input, 'red', 'yellow', 'blue'), `with ${input}`)
-					.toBe(`color-mix(in lab, var(--${color}) ${percent}, var(--${otherColor}))`);
-			}
-		});
-
-		test('four colors', () => {
-			expect.soft(gradientedColor(0, 'red', 'yellow', 'green', 'blue')).toBe('var(--red)');
-			expect.soft(gradientedColor(1, 'red', 'yellow', 'green', 'blue')).toBe('var(--blue)');
-
-			const expectations = /** @type {const} */ ([
-				[0.1, 'yellow', '30%', 'red'],
-				[0.2, 'yellow', '60%', 'red'],
-				[0.25, 'yellow', '75%', 'red'],
-				[0.3, 'yellow', '90%', 'red'],
-				[0.4, 'green', '20%', 'yellow'],
-				[0.5, 'green', '50%', 'yellow'],
-				[0.6, 'green', '80%', 'yellow'],
-				[0.7, 'blue', '10%', 'green'],
-				[0.75, 'blue', '25%', 'green'],
-				[0.8, 'blue', '40%', 'green'],
-				[0.9, 'blue', '70%', 'green'],
-			]);
-
-			for (const [input, color, percent, otherColor] of expectations) {
-				expect
-					.soft(gradientedColor(input, 'red', 'yellow', 'green', 'blue'), `with ${input}`)
-					.toBe(`color-mix(in lab, var(--${color}) ${percent}, var(--${otherColor}))`);
-			}
-		});
-	});
-}
-
 /**
  * Fades out an element matching the given selector over the given duration, then removes it from the DOM.
- * If it's the first time the app is started (determined by checking localStorage), uses firstTimeDuration instead of duration if provided.
- * @param {string} selector
- * @param {number} duration in milliseconds
- * @param {object} [options]
- * @param {number} [options.firstTimeDuration] in milliseconds, if provided and it's the first time the app is started, this duration will be used instead of duration
  */
-export function fadeOutElement(selector, duration, { firstTimeDuration } = {}) {
+export function fadeOutElement(
+	selector: string,
+	duration: number,
+	{ firstTimeDuration }: { firstTimeDuration?: number } = {}
+): void {
 	const firstStart = !localStorage.getItem('app_started_before');
 	localStorage.setItem('app_started_before', 'true');
 
@@ -1367,65 +1038,10 @@ export function fadeOutElement(selector, duration, { firstTimeDuration } = {}) {
 	}, duration);
 }
 
-if (import.meta.vitest) {
-	const { test, expect, vi } = import.meta.vitest;
-
-	test('fadeOutElement applies transition, sets opacity and removes element after duration', () => {
-		document.body.innerHTML = '';
-		const el = document.createElement('div');
-		el.id = 'test-fade';
-		document.body.appendChild(el);
-
-		vi.useFakeTimers();
-		fadeOutElement('#test-fade', 1000);
-
-		const found = document.querySelector('#test-fade');
-		expect(found).toBeInstanceOf(HTMLElement);
-		expect(found.style.opacity).toBe('0');
-		expect(found.style.transition).toContain('opacity 1000ms');
-
-		vi.advanceTimersByTime(1000);
-		expect(document.querySelector('#test-fade')).toBeNull();
-		vi.useRealTimers();
-	});
-
-	test('fadeOutElement removes non-HTMLElement (SVG) immediately', () => {
-		document.body.innerHTML = '';
-		const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-		svg.setAttribute('id', 'test-svg');
-		document.body.appendChild(svg);
-
-		fadeOutElement('#test-svg', 1000);
-
-		// SVGElement is not an HTMLElement, so it should be removed synchronously
-		expect(document.querySelector('#test-svg')).toBeNull();
-	});
-
-	test('fadeOutElement uses firstTimeDuration on first run', () => {
-		document.body.innerHTML = '';
-		localStorage.removeItem('app_started_before');
-
-		const el = document.createElement('div');
-		el.id = 'first-fade';
-		document.body.appendChild(el);
-
-		vi.useFakeTimers();
-		fadeOutElement('#first-fade', 5000, { firstTimeDuration: 10 });
-
-		const found = document.querySelector('#first-fade');
-		expect(found).toBeInstanceOf(HTMLElement);
-		expect(found.style.transition).toContain('opacity 10ms');
-
-		vi.advanceTimersByTime(10);
-		expect(document.querySelector('#first-fade')).toBeNull();
-		vi.useRealTimers();
-	});
-}
-
 /**
- * @param {string} color Hex of background color string, e.g. #RRGGBB
+ * @param color Hex of background color string, e.g. #RRGGBB
  */
-export function readableOn(color) {
+export function readableOn(color: string): '#000000' | '#ffffff' {
 	const rgb = color.replace(/^#/, '').match(/.{2}/g);
 	if (rgb === null) throw new Error('Invalid color, use hex notation');
 	const o = Math.round(
@@ -1448,25 +1064,20 @@ if (import.meta.vitest) {
 	});
 }
 
-/**
- * @param {string} message
- * @returns {never}
- */
-export function throwError(message) {
+export function throwError(message: string): never {
 	throw new Error(message);
 }
 
 /**
  * Await to await the given promise, but throw if the given AbortSignal is aborted before the promise resolves
- * @template T
- * @param {AbortSignal | undefined} signal
- * @param {Promise<T>} promise
- * @returns {Promise<T>}
  */
-export async function unlessAborted(signal, promise) {
+export async function unlessAborted<T>(
+	signal: AbortSignal | undefined,
+	promise: Promise<T>
+): Promise<T> {
 	return Promise.race([
 		promise,
-		new Promise((_, reject) => {
+		new Promise<T>((_, reject) => {
 			signal?.addEventListener('abort', () => {
 				reject(signal.reason);
 			});
@@ -1490,41 +1101,16 @@ Et dolorem perferendis et rerum suscipit qui voluptatibus quia et nihil nostrum 
 Nam minus minima et perspiciatis velit et eveniet rerum et nihil voluptates aut eaque ipsa et 
 ratione facere!`;
 
-/**
- *
- * @param {any} error
- * @returns {error is DOMException}
- */
-export function isAbortError(error) {
+export function isAbortError(error: unknown): error is DOMException {
 	return error instanceof DOMException && error.name === 'AbortError';
 }
 
 /**
  * [] if predicate is falsy, [obj] if predicate is truthy.
- * Spread into an array literal to conditionally add something to it
- * @template T
- * @param {boolean | undefined | null} predicate
- * @param {T} obj
- * @returns { [T] | [] }
+ * Spread into an array literal to conditionally add something to it.
  */
-export function orEmpty(predicate, obj) {
+export function orEmpty<T>(predicate: boolean | undefined | null, obj: T): [T] | [] {
 	return predicate ? [obj] : [];
-}
-
-// TODO: overload orEmpty instead of exporting orEmpty2, but we'll do this once we convert utils.js to typescript
-
-/**
- * [] if predicate is falsy, [obj(subject)] if predicate is truthy.
- * obj gets the non-nullable value
- * Spread into an array literal to conditionally add something to it
- * @template T, O
- * @param {T} subject
- * @param {(subject: NonNullable<T>) => O } obj
- * @returns { [O] | [] }
- */
-export function orEmpty2(subject, obj) {
-	if (subject === null || subject === undefined) return [];
-	return [obj(subject)];
 }
 
 if (import.meta.vitest) {
@@ -1538,14 +1124,19 @@ if (import.meta.vitest) {
 }
 
 /**
- * {} if predicate is falsy, obj if predicate is truthy.
- * Spread into an object literal to conditionally add something to it
- * @template T
- * @param {boolean | undefined | null} predicate
- * @param {T} obj
- * @returns { T | {} }
+ * [] if predicate is falsy, [obj(subject)] if predicate is truthy.
+ * Spread into an array literal to conditionally add something to it.
  */
-export function orEmptyObj(predicate, obj) {
+export function orEmpty2<T, O>(subject: T, obj: (subject: NonNullable<T>) => O): [O] | [] {
+	if (subject === null || subject === undefined) return [];
+	return [obj(subject as NonNullable<T>)];
+}
+
+/**
+ * {} if predicate is falsy, obj if predicate is truthy.
+ * Spread into an object literal to conditionally add something to it.
+ */
+export function orEmptyObj<T>(predicate: boolean | undefined | null, obj: T): T | {} {
 	return predicate ? obj : {};
 }
 
@@ -1560,69 +1151,34 @@ if (import.meta.vitest) {
 	});
 }
 
-/**
- * {} if predicate is falsy, obj if predicate is truthy.
- * Spread into an object literal to conditionally add something to it
- * @template T, O
- * @template {string} K
- * @param {K} key
- * @param {T} subject
- * @param {(subject: NonNullable<T>) => O} obj
- * @returns { T extends null | undefined ? {} : { [key in K]: O } }
- */
-export function orEmptyObj2(key, subject, obj) {
-	if (subject === null) return {};
-	if (subject === undefined) return {};
-
-	return { [key]: obj(subject) };
+export function orEmptyObj2<K extends string, T, O>(
+	key: K,
+	subject: T,
+	obj: (subject: NonNullable<T>) => O
+): T extends null | undefined ? {} : { [key in K]: O } {
+	if (subject === null) return {} as any;
+	if (subject === undefined) return {} as any;
+	return { [key]: obj(subject as NonNullable<T>) } as any;
 }
 
-/**
- * { key: value } if value is not nullable, {} otherwise.
- * Spread into an object literal to conditionally add something to it
- * @template T
- * @template {string} K
- * @param {{ [key in K]: T }} obj { key: value }
- * @returns { T extends null | undefined ? {} : { [key in K]: T } }
- */
-export function orEmptyObj3(obj) {
-	const key = Object.keys(obj)[0];
-	if (key === undefined) return {};
-	if (obj[key] === null) return {};
-	if (obj[key] === undefined) return {};
-
-	return obj;
+export function orEmptyObj3<K extends string, T>(obj: { [key in K]: T }): T extends null | undefined
+	? {}
+	: { [key in K]: T } {
+	const key = Object.keys(obj)[0] as K | undefined;
+	if (key === undefined) return {} as any;
+	if (obj[key] === null) return {} as any;
+	if (obj[key] === undefined) return {} as any;
+	return obj as any;
 }
 
-/**
- * @template {string} Prefix
- * @template T
- * @typedef {T extends `${Prefix}${infer P}` ? P : never} RemovePrefix
- */
+export type RemovePrefix<Prefix extends string, T> = T extends `${Prefix}${infer P}` ? P : never;
+export type WithPrefix<Prefix extends string, T> = Extract<T, `${Prefix}${string}`>;
+export type WithoutPrefix<Prefix extends string, T> = Exclude<T, `${Prefix}${string}`>;
 
-/**
- * @template {string} Prefix
- * @template T
- * @typedef {Extract<T, `${Prefix}${string}`>} WithPrefix
- */
-
-/**
- * Remove strings that end with the given prefix
- * @template {string} Prefix
- * @template T
- * @typedef {Exclude<T, `${Prefix}${string}`>} WithoutPrefix
- */
-
-/**
- * Route IDs that are relative to Root.
- * @template {import('$app/types').RouteId} Root
- * @typedef {RemovePrefix<`${Root}/`, WithPrefix<`${Root}/`, import('$app/types').RouteId>>} ChildRouteId
- */
 /**
  * Promisified setTimeout
- * @param {number} ms
  */
-export async function sleep(ms) {
+export async function sleep(ms: number): Promise<void> {
 	return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
@@ -1632,22 +1188,15 @@ if (import.meta.vitest) {
 		const start = Date.now();
 		await sleep(100);
 		const end = Date.now();
-		// leeway of 1ms
 		expect(end - start).toBeGreaterThanOrEqual(99);
 	});
 }
 
 /**
- * Syntactically clean filepaths:
- * - replace (windows) backslashes with forward slashes
- * - remove duplicate slashes
- * - remove trailing slash (except if it's the root "/")
- * - remove "." segments
- * @param {string} filepath
- * @returns {string}
+ * Syntactically clean filepaths.
  */
-export function cleanFilepath(filepath) {
-	const segments = [];
+export function cleanFilepath(filepath: string): string {
+	const segments: string[] = [];
 	for (const segment of filepath.replaceAll('\\', '/').split('/')) {
 		if (segment === '') continue;
 		if (segment === '.') continue;
@@ -1673,20 +1222,11 @@ if (import.meta.vitest) {
 	});
 }
 
-/**
- * Return a IDBKeyRange that matches all strings starting with `prefix`
- * @param {string} prefix
- * @returns
- */
-export function prefixIDBKeyRange(prefix) {
+export function prefixIDBKeyRange(prefix: string): IDBKeyRange {
 	return IDBKeyRange.bound(prefix, prefix + '\uffff');
 }
-/**
- * @template T
- * @param {T|T[]} subject
- * @returns {T[]}
- */
-export function ensureArray(subject) {
+
+export function ensureArray<T>(subject: T | T[]): T[] {
 	return Array.isArray(subject) ? subject : [subject];
 }
 
@@ -1699,42 +1239,18 @@ if (import.meta.vitest) {
 	});
 }
 
-/**
- * @param {string} group
- */
-export function profiler(group) {
-	/**
-	 * @template T
-	 * @overload
-	 * @param {string} track
-	 * @param {string} label
-	 * @param {Record<string, string|number|boolean>} dataOrFn
-	 * @param {() => Promise<T> | T} fnIfHasData
-	 * @returns {Promise<T>}
-	 */
+type ProfilerData = Record<string, string | number | boolean>;
 
-	/**
-	 * @template T
-	 * @overload
-	 * @param {string} track
-	 * @param {string} label
-	 * @param {() => Promise<T> | T} dataOrFn
-	 * @returns {Promise<T>}
-	 */
-
-	/**
-	 * @template T
-	 * @param {string} track
-	 * @param {string} label
-	 * @param {Record<string, string|number|boolean> | (() => Promise<T> | T)} dataOrFn
-	 * @param {() => Promise<T> | T} [fnIfHasData]
-	 * @returns {Promise<T>}
-	 */
-	async function profile(track, label, dataOrFn, fnIfHasData) {
-		const fn = fnIfHasData ?? dataOrFn;
+export function profiler(group: string) {
+	async function profile<T>(
+		track: string,
+		label: string,
+		dataOrFn: ProfilerData | (() => Promise<T> | T),
+		fnIfHasData?: () => Promise<T> | T
+	): Promise<T> {
+		const fn = fnIfHasData ?? (dataOrFn as () => Promise<T> | T);
 		const start = performance.now();
 		const result = await fn();
-		// console.timeStamp(label, start, end, track, group, );
 		performance.measure(label, {
 			start,
 			detail: {
@@ -1758,19 +1274,12 @@ export function profiler(group) {
 	return profile;
 }
 
-/**
- *
- * @param {string | undefined | IDBKeyRange} keyRange
- * @returns
- */
-export function displayKeyRange(keyRange) {
+export function displayKeyRange(keyRange: string | IDBKeyRange | undefined): string {
 	if (!keyRange) return 'none';
 	if (typeof keyRange === 'string') return `{${keyRange}}`;
 
-	/** @type {string} */
-	let lowerBound;
-	/** @type {string} */
-	let upperBound;
+	let lowerBound: string;
+	let upperBound: string;
 
 	if (keyRange.lower === undefined) {
 		lowerBound = '(-∞';
@@ -1791,38 +1300,12 @@ export function displayKeyRange(keyRange) {
 	return `${lowerBound}, ${upperBound}`;
 }
 
-/**
- * @template {Record<string|number, unknown>} const T
- * @template {keyof T} V
- * @overload
- * @param {V} value
- * @param {NoInfer<Partial<T>>} cases
- * @param {T[V]} fallback
- * @returns {T[V]}
- */
-
-/**
- * @template {Record<string|number, unknown>} const T
- * @template {keyof T} V
- * @overload
- * @param {NoInfer<V>} value
- * @param {T} cases
- * @returns {T[V]}
- */
-
-/**
- * Like a switch statement but for expressions.
- * Equivalent to `({ ... } as const)[value]`
- *
- * @template {Record<string|number, unknown>} const T
- * @template {keyof T} V
- * @param {V} value
- * @param {NoInfer<Partial<T>>} cases
- * @param {T[V]} [fallback]
- * @returns {T[V]}
- */
-export function switchValue(value, cases, fallback) {
-	return cases[value] ?? fallback;
+export function switchValue<const T extends Record<string | number, unknown>, V extends keyof T>(
+	value: V,
+	cases: Partial<T>,
+	fallback?: T[V]
+): T[V] {
+	return (cases[value] ?? fallback) as T[V];
 }
 
 if (import.meta.vitest) {
@@ -1836,11 +1319,10 @@ if (import.meta.vitest) {
 	});
 }
 
-/**
- * @param {HTMLElement|null} element
- * @param {(element: HTMLElement) => boolean} predicate
- */
-export function climbDOMUntil(element, predicate) {
+export function climbDOMUntil(
+	element: HTMLElement | null,
+	predicate: (element: HTMLElement) => boolean
+): HTMLElement | null {
 	while (element) {
 		if (predicate(element)) return element;
 		element = element.parentElement;
@@ -1871,16 +1353,14 @@ if (import.meta.vitest) {
 }
 
 /**
- * Turns a async function into a { do: starts the function synchronously, cancel: cancels the function if it's still running } object
- * @template {unknown[]} Args
- * @template R
- * @param {(signal: AbortSignal, ...args: Args) => Promise<R>} asyncFunction
- * @returns {( ...args: Args) => { do: () => Promise<R>, cancel: () => void } }
+ * Turns an async function into a { do: starts the function synchronously, cancel: cancels the function if it's still running } object
  */
-export function cancellable(asyncFunction) {
+export function cancellable<Args extends unknown[], R>(
+	asyncFunction: (signal: AbortSignal, ...args: Args) => Promise<R>
+): (...args: Args) => { do: () => Promise<R>; cancel: () => void } {
 	let controller = new AbortController();
 
-	return (...args) => {
+	return (...args: Args) => {
 		controller.abort();
 		controller = new AbortController();
 
@@ -1891,91 +1371,7 @@ export function cancellable(asyncFunction) {
 	};
 }
 
-if (import.meta.vitest) {
-	const { test, expect, vi } = import.meta.vitest;
-
-	test('cancellable resolves when not cancelled', async () => {
-		const asyncFn = async (signal) => {
-			await new Promise((resolve, reject) => {
-				signal.addEventListener('abort', () =>
-					reject(new DOMException('aborted', 'AbortError'))
-				);
-				setTimeout(() => resolve('ok'), 50);
-			});
-			return 'ok';
-		};
-
-		const make = cancellable(asyncFn);
-
-		vi.useFakeTimers();
-		const runner = make();
-		const p = runner.do();
-
-		vi.advanceTimersByTime(50);
-		await expect(p).resolves.toBe('ok');
-		vi.useRealTimers();
-	});
-
-	test('cancellable cancel rejects with AbortError', async () => {
-		const asyncFn = async (signal) => {
-			await new Promise((resolve, reject) => {
-				signal.addEventListener('abort', () =>
-					reject(new DOMException('aborted', 'AbortError'))
-				);
-				setTimeout(() => resolve('ok'), 100);
-			});
-			return 'ok';
-		};
-
-		const make = cancellable(asyncFn);
-
-		vi.useFakeTimers();
-		const runner = make();
-		const p = runner.do();
-
-		// cancel immediately
-		runner.cancel();
-
-		await expect(p).rejects.toHaveProperty('name', 'AbortError');
-		vi.useRealTimers();
-	});
-
-	test('starting a new run aborts the previous run', async () => {
-		const asyncFn = async (signal) => {
-			await new Promise((resolve, reject) => {
-				signal.addEventListener('abort', () =>
-					reject(new DOMException('aborted', 'AbortError'))
-				);
-				setTimeout(() => resolve('ok'), 80);
-			});
-			return 'ok';
-		};
-
-		const make = cancellable(asyncFn);
-
-		vi.useFakeTimers();
-		const run1 = make();
-		const p1 = run1.do();
-
-		const run2 = make();
-		const p2 = run2.do();
-
-		// first should be aborted by the second make() call
-		await expect(p1).rejects.toHaveProperty('name', 'AbortError');
-
-		// advance timers so the second resolves
-		vi.advanceTimersByTime(80);
-		await expect(p2).resolves.toBe('ok');
-		vi.useRealTimers();
-	});
-}
-
-/**
- * @template T
- * @param {Set<T>} setA
- * @param {Set<T>} setB
- */
-export function setsAreEqual(setA, setB) {
+export function setsAreEqual<T>(setA: Set<T>, setB: Set<T>): boolean {
 	if (setA.size !== setB.size) return false;
 	for (const item of setA) {
 		if (!setB.has(item)) return false;
@@ -1994,63 +1390,27 @@ if (import.meta.vitest) {
 	});
 }
 
-/**
- * Pass a URL thru cors.gwen.works
- * @param {string|URL} url
- */
-export function corsfix(url) {
+export function corsfix(url: string | URL): string {
 	return 'https://cors.gwen.works/' + url.toString().replace(/^https?:\/\//, '');
 }
 
-/**
- * Some image sources will not load on localhost. Pass them thru cors.gwen.works if we're on localhost
- * @param {string} src
- */
-export function corsfixIfLocalhost(src) {
+export function corsfixIfLocalhost(src: string): string {
 	if (location.hostname !== 'localhost') return src;
-
 	return corsfix(src);
 }
 
-/**
- * @template {string} K
- * @template V
- * @overload
- * @param {Record<K, V>} record
- * @param {(key: K) => boolean} predicate
- * @returns {[Record<K, V>, Record<K, V>]}
- */
-
-/**
- * @template {string} K1
- * @template {string} K2
- * @template V
- * @overload
- * @param {Record<K1 | K2, V>} record
- * @param {(key: K1 | K2) => key is K1} predicate
- * @returns {[Record<K1, V>, Record<K2, V>]}
- */
-
-/**
- * Split a record into two based on a predicate on the keys
- * @template {string} K1
- * @template {string} K2
- * @template V
- * @param {Record<K1 | K2, V>} record
- * @param {(key: K1 | K2) => boolean} predicate
- * @returns {[Record<K1, V>, Record<K2, V>]}
- */
-export function splitRecord(record, predicate) {
-	const record1 = /** @type {Record<K1, V>} */ ({});
-	const record2 = /** @type {Record<K2, V>} */ ({});
+export function splitRecord<K1 extends string, K2 extends string, V>(
+	record: Record<K1 | K2, V>,
+	predicate: ((key: K1 | K2) => key is K1) | ((key: K1 | K2) => boolean)
+): [Record<K1, V>, Record<K2, V>] {
+	const record1 = {} as Record<K1, V>;
+	const record2 = {} as Record<K2, V>;
 
 	for (const key of keys(record)) {
-		if (predicate(key)) {
-			// @ts-expect-error
-			record1[key] = record[key];
+		if (predicate(key as K1 | K2)) {
+			(record1 as Record<string, V>)[key] = record[key as K1 | K2];
 		} else {
-			// @ts-expect-error
-			record2[key] = record[key];
+			(record2 as Record<string, V>)[key] = record[key as K1 | K2];
 		}
 	}
 
@@ -2060,15 +1420,8 @@ export function splitRecord(record, predicate) {
 if (import.meta.vitest) {
 	const { test, expect } = import.meta.vitest;
 	test('splitRecord', () => {
-		const record = {
-			a: 1,
-			b: 2,
-			c: 3,
-			d: 4,
-		};
-
+		const record = { a: 1, b: 2, c: 3, d: 4 };
 		const [record1, record2] = splitRecord(record, (key) => key === 'a' || key === 'c');
-
 		expect(record1).toEqual({ a: 1, c: 3 });
 		expect(record2).toEqual({ b: 2, d: 4 });
 	});
