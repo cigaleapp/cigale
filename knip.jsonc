@@ -2,7 +2,7 @@
 	"$schema": "./node_modules/knip/schema.json",
 	"ignore": [
 		"src/lib/schemas/*",
-		"src/lib/utils.js",
+		"src/lib/utils.ts",
 		"src/lib/exiffields.js",
 		"src/lib/Checkbox.svelte",
 		"src/lib/FloatingButton.svelte",
