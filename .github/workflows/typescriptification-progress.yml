@@ -1,0 +1,131 @@
+name: Update TypeScriptification Progress
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  issues: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    env:
+      ISSUE_NUMBER: 190
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Count files
+        id: count
+        shell: bash
+        run: |
+          JS=0
+          TS=0
+
+          while IFS= read -r file; do
+            case "$file" in
+              *.svelte.ts)
+                TS=$((TS+1))
+                ;;
+
+              *.svelte.js)
+                JS=$((JS+1))
+                ;;
+
+              *.svelte)
+                if grep -Eq '<script[^>]*lang=["'\'']ts["'\'']' "$file"; then
+                  TS=$((TS+1))
+                else
+                  JS=$((JS+1))
+                fi
+                ;;
+
+              *.ts)
+                TS=$((TS+1))
+                ;;
+
+              *.js)
+                JS=$((JS+1))
+                ;;
+            esac
+          done < <(
+            find . \
+              -type d \( \
+                -name node_modules -o \
+                -name .git -o \
+                -name build -o \
+                -name dist \
+              \) -prune -o \
+              -type f \
+              \( \
+                -name "*.js" -o \
+                -name "*.ts" -o \
+                -name "*.svelte" -o \
+                -name "*.svelte.js" -o \
+                -name "*.svelte.ts" \
+              \) -print
+          )
+
+          TOTAL=$((JS+TS))
+
+          PERCENT=$(awk "BEGIN { printf \"%.1f\", ($TS/$TOTAL)*100 }")
+
+          echo "js=$JS" >> "$GITHUB_OUTPUT"
+          echo "ts=$TS" >> "$GITHUB_OUTPUT"
+          echo "total=$TOTAL" >> "$GITHUB_OUTPUT"
+          echo "percent=$PERCENT" >> "$GITHUB_OUTPUT"
+
+      - name: Update issue
+        uses: actions/github-script@v8
+        env:
+          JS: ${{ steps.count.outputs.js }}
+          TS: ${{ steps.count.outputs.ts }}
+          TOTAL: ${{ steps.count.outputs.total }}
+          PERCENT: ${{ steps.count.outputs.percent }}
+          ISSUE_NUMBER: ${{ env.ISSUE_NUMBER }}
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          script: |
+            const issue_number = Number(process.env.ISSUE_NUMBER);
+
+            const { data: issue } = await github.rest.issues.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number
+            });
+
+            const section = `
+            <!-- ts-progress:start -->
+            ## TypeScript Migration Progress
+
+            | Type | Count |
+            |------|------:|
+            | JavaScript | ${process.env.JS} |
+            | TypeScript | ${process.env.TS} |
+            | Total | ${process.env.TOTAL} |
+
+            **Progress:** ${process.env.TS}/${process.env.TOTAL} (${process.env.PERCENT}%)
+
+            <!-- ts-progress:end -->
+            `.trim();
+
+            let body = issue.body || "";
+
+            const regex = /<!-- ts-progress:start -->[\s\S]*?<!-- ts-progress:end -->/;
+
+            if (regex.test(body)) {
+              body = body.replace(regex, section);
+            } else {
+              body += "\n\n" + section;
+            }
+
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number,
+              body
+            });
