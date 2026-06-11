@@ -49,8 +49,8 @@
 
 <AsyncEach {cache} items={sessions} key={(s, i) => s.id + i}>
 	{#snippet children(session)}
-		{@const protocol = tables.Protocol.getFromState(session.protocol)}
-		{@const props = card(session)}
+		{const protocol = tables.Protocol.getFromState(session.protocol)}
+		{const props = card(session)}
 		<Card {...props} --card-border={props.highlighted ? 'var(--bg-primary)' : ''}>
 			<div class="content">
 				{#if session.downloaded}

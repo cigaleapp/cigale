@@ -197,7 +197,7 @@
 		{/snippet}
 
 		{#snippet highlight(o)}
-			{@const image = o.image ?? o.images?.at(0)}
+			{const image = o.image ?? o.images?.at(0)}
 
 			{#if image}
 				<img src={image} alt="" />

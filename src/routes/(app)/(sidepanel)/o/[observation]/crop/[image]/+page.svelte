@@ -1001,10 +1001,10 @@
 		<section class="boxes">
 			<ul>
 				{#each images.filter(({ id }) => id in boundingBoxes) as image, i (image.id)}
-					{@const box = boundingBoxes[image.id]}
-					{@const initBox = initialCrops[image.id]}
-					{@const [w, h] = roundedPixelDimensions(box)}
-					{@const isFocused = focusedImageId === image.id}
+					{const box = boundingBoxes[image.id]}
+					{const initBox = initialCrops[image.id]}
+					{const [w, h] = roundedPixelDimensions(box)}
+					{const isFocused = focusedImageId === image.id}
 					<li
 						class:unfocused={focusedImageId && focusedImageId !== image.id}
 						class:selected={selectedBox.imageId === image.id}

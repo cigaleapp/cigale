@@ -160,7 +160,7 @@
 			<!-- TODO allow modifying -->
 			<dl class="cascades">
 				{#each cascades as { metadataId, metadata, option, value } (metadataId)}
-					{@const shortId = removeNamespaceFromMetadataId(metadataId)}
+					{const shortId = removeNamespaceFromMetadataId(metadataId)}
 					<div class="row">
 						<dt>
 							{metadata?.label || shortId}
@@ -204,7 +204,7 @@
 			<ul class="reverse-cascades">
 				<VirtualList items={reverseCascades}>
 					{#snippet item({ metadataId, metadata, option, value })}
-						{@const shortId = removeNamespaceFromMetadataId(metadataId)}
+						{const shortId = removeNamespaceFromMetadataId(metadataId)}
 						<li>
 							Si
 							{metadata?.label || shortId} =

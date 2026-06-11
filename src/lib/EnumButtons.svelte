@@ -69,7 +69,7 @@
 		<legend id="{id}-label">{label}</legend>
 	{/if}
 	{#each options as option (option.key)}
-		{@const { key, label, disabled } = option}
+		{const { key, label, disabled } = option}
 		<label class="radio" class:card={cards}>
 			<input
 				disabled={Boolean(disabled)}

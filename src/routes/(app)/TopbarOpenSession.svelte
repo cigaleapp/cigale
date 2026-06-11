@@ -37,7 +37,7 @@
 
 	<div class="actions">
 		{#if showingEta}
-			{@const [quantity, unit] = formatDistanceToNowShortParts(locale(), Date.now() + eta)}
+			{const [quantity, unit] = formatDistanceToNowShortParts(locale(), Date.now() + eta)}
 
 			<div
 				class="eta"

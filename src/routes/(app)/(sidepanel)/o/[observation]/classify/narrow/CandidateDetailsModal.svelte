@@ -69,7 +69,7 @@
 				</Carousel>
 			</section>
 			{#await cascadeLabels( { db, protocolId: uiState.currentProtocolId, option: candidate } ) then cascades}
-				{@const [chosen, others] = splitRecord(cascades, (metadataId) =>
+				{const [chosen, others] = splitRecord(cascades, (metadataId) =>
 					choices.has(metadataId)
 				)}
 				<section

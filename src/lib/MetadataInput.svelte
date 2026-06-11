@@ -230,7 +230,7 @@
 							}))}
 				>
 					{#snippet children(option)}
-						{@const { label, icon, color, description, images, disabled, selected } =
+						{const { label, icon, color, description, images, disabled, selected } =
 							option}
 						<div class="with-image" class:disabled>
 							{#if images && images.length > 0}
@@ -343,7 +343,7 @@
 			/>
 		{/snippet}
 		{#snippet numeric(val, { range: intervalInBaseUnit, unit: baseUnit })}
-			{@const interval = intervalInBaseUnit
+			{const interval = intervalInBaseUnit
 				? mapValues(pick(intervalInBaseUnit, 'min', 'max'), (v) =>
 						valueUnit && baseUnit && v !== undefined
 							? Number(convert(v, baseUnit).to(valueUnit))
@@ -408,7 +408,7 @@
 				>
 					{#snippet trigger(props)}
 						{#if selectedUnit}
-							{@const { symbol, name } = displayUnit(selectedUnit)}
+							{const { symbol, name } = displayUnit(selectedUnit)}
 							<ButtonIcon help="Utiliser une autre unité" {...props}>
 								{symbol || name}
 							</ButtonIcon>
@@ -507,7 +507,7 @@
 			/>
 		{/snippet}
 		{#snippet file(currentFileId)}
-			{@const { accept, size } = definition as typeof MetadataFile.infer}
+			{const { accept, size } = definition as typeof MetadataFile.infer}
 			<div class="file-input">
 				{#await idb.get('MetadataValueFile', currentFileId ?? '')}
 					<div class="current">
@@ -623,7 +623,7 @@
 						</div>
 					</div>
 					{#if fileObject}
-						{@const file = new File([fileObject.bytes], fileObject.filename, {
+						{const file = new File([fileObject.bytes], fileObject.filename, {
 							type: fileObject.contentType,
 							lastModified: new Date(fileObject.lastModifiedAt).getTime(),
 						})}

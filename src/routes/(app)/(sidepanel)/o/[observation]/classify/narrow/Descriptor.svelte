@@ -214,8 +214,8 @@
 				}}
 			>
 				{#snippet children(countAfter)}
-					{@const countBefore = narrowingState.remainingCandidateIds.size}
-					{@const ratio = countAfter / countBefore}
+					{const countBefore = narrowingState.remainingCandidateIds.size}
+					{const ratio = countAfter / countBefore}
 					<div
 						class="narrowing-power"
 						use:tooltip={'Candidats restants après ce choix'}

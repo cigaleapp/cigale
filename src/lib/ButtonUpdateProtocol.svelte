@@ -69,7 +69,7 @@
 				</Btn>
 			{/if}
 		{:then { upToDate, newVersion }}
-			{@const onclick = async () => {
+			{const onclick = async () => {
 				if (upToDate) {
 					checkagain = Date.now();
 				} else {
@@ -88,7 +88,7 @@
 				}
 			}}
 
-			{@const help = upToDate
+			{const help = upToDate
 				? `Le protocole est à jour (v${newVersion}). Cliquer pour vérifier à nouveau`
 				: `Une mise à jour vers la v${newVersion} est disponible`}
 
@@ -142,7 +142,7 @@
 				</Btn>
 			{/if}
 		{:catch e}
-			{@const onclick = () => {
+			{const onclick = () => {
 				checkagain = Date.now();
 			}}
 

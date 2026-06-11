@@ -132,7 +132,7 @@
 {#snippet content()}
 	<div class="images">
 		{#each images as { src, box, dimensions }, i (i)}
-			{@const alt = singleObservationSelected
+			{const alt = singleObservationSelected
 				? `Image ${i + 1} de l'observation ${singleObservationSelected.label}`
 				: `Image ${i + 1} de la sélection`}
 

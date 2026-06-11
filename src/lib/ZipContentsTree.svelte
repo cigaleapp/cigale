@@ -99,7 +99,7 @@
 </ul>
 
 {#snippet tree(children: TreeNodeMaybeLoading, parents: Array<MaybeLoading<string>> = [])}
-	{@const hasOnlyLeaves =
+	{const hasOnlyLeaves =
 		Array.isArray(children) &&
 		children.every((child) => !loaded(child) || !('children' in child))}
 
@@ -138,7 +138,7 @@
 						<LoadingText value={Loading} mask={{ words: 6 }} />
 					</div>
 				{:else if 'folder' in child}
-					{@const Icon = child.icon ?? IconFolder}
+					{const Icon = child.icon ?? IconFolder}
 					<Icon />
 					<div class="text">
 						{#if editable && loaded(child.folder)}
@@ -173,7 +173,7 @@
 						</Badge>
 					{/if}
 				{:else}
-					{@const Icon = iconOfNode(child)}
+					{const Icon = iconOfNode(child)}
 					<Icon />
 					<div class="text">
 						<span class="filename">

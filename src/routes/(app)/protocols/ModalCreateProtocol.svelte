@@ -53,7 +53,7 @@
 			}}
 		/>
 		{#snippet error()}
-			{@const existingProtocol = tables.Protocol.getFromState(newProtocol.id)}
+			{const existingProtocol = tables.Protocol.getFromState(newProtocol.id)}
 			{#if newProtocol.id && !ID.allows(newProtocol.id)}
 				L'identifiant ne doit comporter que des lettres, chiffres, <code>.</code> ou
 				<code>_</code>

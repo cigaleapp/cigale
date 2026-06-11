@@ -219,7 +219,7 @@
 		]}
 	>
 		{#snippet children({ key, label, subtext })}
-			{@const colors = [
+			{const colors = [
 				[44, 19, 116],
 				[148, 0, 0],
 			]}
@@ -229,7 +229,7 @@
 			</div>
 			<div class="color-values radio-card-examples">
 				{#each colors as color (color.join(''))}
-					{@const [r, g, b] = color.map((c) =>
+					{const [r, g, b] = color.map((c) =>
 						c === 0 ? 0 : key === 'normalized' ? (c / 255).toFixed(2) : c
 					)}
 					<div class="example">

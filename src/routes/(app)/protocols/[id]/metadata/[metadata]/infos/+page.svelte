@@ -163,7 +163,7 @@
 			})}
 		>
 			{#snippet children({ key, label, subtext })}
-				{@const Icon = IconMergeMethod(key)}
+				{const Icon = IconMergeMethod(key)}
 				<div class="datatype-option">
 					<Icon />
 					<span class="text">{label}</span>
