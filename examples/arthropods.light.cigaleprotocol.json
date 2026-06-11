@@ -3,11 +3,11 @@
 	"id": "io.github.cigaleapp.arthropods.example.light",
 	"name": "Example: arthropodes (lightweight)",
 	"summary": "Version légère de Exemple: arthropodes",
-	"learnMore": "https://github.com/cigaleapp/cigale/tree/8c786f582e25995237a751e7bacef9c97e7859bd/scripts/README.md#protocoles-arthropodsexamplelight",
-	"version": 101,
+	"learnMore": "https://github.com/cigaleapp/cigale/tree/4b076b9d119fcd4b97f28deaaea0b654daf8c7d8/scripts/README.md#protocoles-arthropodsexamplelight",
+	"version": 102,
 	"updates": "automatic",
 	"source": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.light.cigaleprotocol.json",
-	"description": "Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification\n\nClés d'identification d'abeilles fournies par IDmyBee.com, extraites depuis [IDMYBEE - Andrena sur Xper3](https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html).\n\nClés d'identification d'abeilles fournies par IDmyBee.com, extraites depuis [IDMYBEE - Andrena sur Xper3](https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html).\n\nClés d'identification d'abeilles fournies par IDmyBee.com, extraites depuis [IDMYBEE - Andrena sur Xper3](https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html).\n\nClés d'identification d'abeilles fournies par IDmyBee.com, extraites depuis [IDMYBEE - Andrena sur Xper3](https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html).",
+	"description": "Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification\n\nClés d'identification d'abeilles fournies par IDmyBee.com, extraites depuis [IDMYBEE - Andrena sur Xper3](https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html).",
 	"authors": [
 		{
 			"name": "GBIF Contributors",
@@ -26,15 +26,6 @@
 		},
 		{
 			"name": "Léo Chekir"
-		},
-		{
-			"name": "IDmyBee.com"
-		},
-		{
-			"name": "IDmyBee.com"
-		},
-		{
-			"name": "IDmyBee.com"
 		},
 		{
 			"name": "IDmyBee.com"
@@ -1478,6 +1469,7 @@
 			"description": "",
 			"required": true,
 			"groupable": true,
+			"classification": true,
 			"mergeMethod": "max",
 			"options": [
 				{
@@ -1863,7 +1855,6 @@
 					"description": "",
 					"learnMore": "https://gbif.org/species/2120806",
 					"cascade": {
-						"morphogroup": "marginata",
 						"genus": "2120412",
 						"family": "7216",
 						"order": "11776269",
@@ -2159,7 +2150,6 @@
 					"description": "",
 					"learnMore": "https://gbif.org/species/2121271",
 					"cascade": {
-						"morphogroup": "denticulata",
 						"genus": "2121254",
 						"family": "7215",
 						"order": "10802062",
@@ -4370,13 +4360,13 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": ["gpe_hedikae"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"morphogroup": ["gpe_hedikae"]
+						"kingdom": "1"
 					}
 				},
 				{
@@ -7616,13 +7606,13 @@
 						"corbeilles_du_propodeum": "corbeilles_1738837562663_8904",
 						"type_de_pilosite_des_scopas": "pilositmaj_1738784759008_2070",
 						"carene_du_triangle_du_propodeum": "maldfinisa_1738782338204_3844",
+						"morphogroup": ["gpe_minutula"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"morphogroup": ["gpe_minutula"]
+						"kingdom": "1"
 					}
 				},
 				{
@@ -8732,13 +8722,13 @@
 							"clairement_1738782331321_8886",
 							"dlimitlatr_1738782333562_1312"
 						],
+						"morphogroup": ["gpe_colletiformis"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"morphogroup": ["gpe_colletiformis"]
+						"kingdom": "1"
 					}
 				},
 				{
@@ -9595,13 +9585,13 @@
 							"clairement_1738782331321_8886",
 							"dlimitlatr_1738782333562_1312"
 						],
+						"morphogroup": ["gpe_humilis"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"morphogroup": ["gpe_humilis"]
+						"kingdom": "1"
 					}
 				},
 				{
@@ -10157,7 +10147,8 @@
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1"
+						"kingdom": "1",
+						"conservation_status": "lc"
 					}
 				},
 				{
@@ -10716,13 +10707,13 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3sansgr_1738783084860_3752",
 						"carene_du_triangle_du_propodeum": "dlimitlatr_1738782333562_1312",
+						"morphogroup": ["gpe_humilis"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"morphogroup": ["gpe_humilis"]
+						"kingdom": "1"
 					}
 				},
 				{
@@ -11494,13 +11485,14 @@
 						"couleur_de_la_pilosite_de_la_face": "pilositmaj_1738780527522_4455",
 						"corbeilles_du_propodeum": "corbeilles_1738837562663_8904",
 						"type_de_pilosite_des_scopas": "pilsoitmaj_1738784763230_1485",
+						"morphogroup": ["gpe_humilis"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
 						"kingdom": "1",
-						"morphogroup": ["gpe_humilis"]
+						"conservation_status": "lc"
 					}
 				},
 				{
@@ -13240,13 +13232,13 @@
 						"couleur_de_la_frange_terminale": "foncenoir_1738784408817_6055",
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3sansgr_1738783084860_3752",
 						"carene_du_triangle_du_propodeum": "dlimitlatr_1738782340396_2673",
+						"morphogroup": ["denticulata"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"morphogroup": ["denticulata"]
+						"kingdom": "1"
 					}
 				},
 				{
@@ -13522,7 +13514,8 @@
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1"
+						"kingdom": "1",
+						"conservation_status": "nt"
 					}
 				},
 				{
@@ -13708,13 +13701,13 @@
 						"corbeilles_du_propodeum": "corbeilles_1738837562663_8904",
 						"type_de_pilosite_des_scopas": "pilositmaj_1738784759008_2070",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": ["gpe_schencki", "gpe_argentata"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"morphogroup": ["gpe_schencki", "gpe_argentata"]
+						"kingdom": "1"
 					}
 				},
 				{
@@ -13984,13 +13977,13 @@
 							"t2_3sansgr_1738783084860_3752"
 						],
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": ["gpe_minutula"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"morphogroup": ["gpe_minutula"]
+						"kingdom": "1"
 					}
 				},
 				{
@@ -14491,13 +14484,14 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "dlimitlatr_1738782333562_1312",
+						"morphogroup": ["gpe_angustior"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
 						"kingdom": "1",
-						"morphogroup": ["gpe_angustior"]
+						"conservation_status": "nt"
 					}
 				},
 				{
@@ -15004,13 +14998,14 @@
 						],
 						"corbeilles_du_propodeum": "corbeilles_1738837562663_8904",
 						"type_de_pilosite_des_scopas": "pilositmaj_1738784759008_2070",
+						"morphogroup": ["montana"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
 						"kingdom": "1",
-						"morphogroup": ["montana"]
+						"conservation_status": "lc"
 					}
 				},
 				{
@@ -16361,7 +16356,8 @@
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1"
+						"kingdom": "1",
+						"conservation_status": "lc"
 					}
 				},
 				{
@@ -17028,13 +17024,13 @@
 						"corbeilles_du_propodeum": "corbeilles_1738837562663_8904",
 						"type_de_pilosite_des_scopas": "pilositmaj_1738784759008_2070",
 						"diagnose_a_granulosavulpecula": "margesdest_1763132638723_1356",
+						"morphogroup": ["gpe_angustior"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"morphogroup": ["gpe_angustior"]
+						"kingdom": "1"
 					}
 				},
 				{
@@ -17521,13 +17517,13 @@
 						"forme_de_lappendice_du_labre": "enformedet_1738837442835_2826",
 						"corbeilles_du_propodeum": "corbeilles_1738837562663_8904",
 						"type_de_pilosite_des_scopas": "pilositmaj_1738784759008_2070",
+						"morphogroup": ["gpe_angustior"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"morphogroup": ["gpe_angustior"]
+						"kingdom": "1"
 					}
 				},
 				{
@@ -17798,13 +17794,13 @@
 						"couleur_de_la_frange_terminale": "foncenoir_1738784408817_6055",
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "maldfinisa_1738782338204_3844",
+						"morphogroup": ["gpe_angustior"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"morphogroup": ["gpe_angustior"]
+						"kingdom": "1"
 					}
 				},
 				{
@@ -18076,7 +18072,8 @@
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1"
+						"kingdom": "1",
+						"conservation_status": "lc"
 					}
 				},
 				{
@@ -18337,13 +18334,13 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "maldfinisa_1738782338204_3844",
+						"morphogroup": ["gpe_minutula"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"morphogroup": ["gpe_minutula"]
+						"kingdom": "1"
 					}
 				},
 				{
@@ -18623,13 +18620,13 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "maldfinisa_1738782338204_3844",
+						"morphogroup": ["gpe_minutula"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"morphogroup": ["gpe_minutula"]
+						"kingdom": "1"
 					}
 				},
 				{
@@ -19777,13 +19774,13 @@
 							"dlimitlatr_1738782333562_1312",
 							"maldfinisa_1738782338204_3844"
 						],
+						"morphogroup": ["gpe_flavipes"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"morphogroup": ["gpe_flavipes"]
+						"kingdom": "1"
 					}
 				},
 				{
@@ -21687,7 +21684,8 @@
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1"
+						"kingdom": "1",
+						"conservation_status": "lc"
 					}
 				},
 				{
@@ -22268,13 +22266,13 @@
 						"pilosite_des_mesopleures": "longue_1738781774174_4840",
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3sansgr_1738783084860_3752",
 						"carene_du_triangle_du_propodeum": "maldlimitc_1738782336008_1135",
+						"morphogroup": ["gpe_wilkella-argentata"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"morphogroup": ["gpe_wilkella-argentata"]
+						"kingdom": "1"
 					}
 				},
 				{
@@ -22733,13 +22731,13 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": ["gpe_curvungula"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"morphogroup": ["gpe_curvungula"]
+						"kingdom": "1"
 					}
 				},
 				{
@@ -23020,13 +23018,13 @@
 							"dlimitlatr_1738782333562_1312",
 							"maldfinisa_1738782338204_3844"
 						],
+						"morphogroup": ["ranunculorum"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"morphogroup": ["ranunculorum"]
+						"kingdom": "1"
 					}
 				},
 				{
@@ -25770,13 +25768,13 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "dlimitlatr_1738782333562_1312",
+						"morphogroup": ["sericata"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"morphogroup": ["sericata"]
+						"kingdom": "1"
 					}
 				},
 				{
@@ -26366,13 +26364,13 @@
 							"maldfinisa_1738782338204_3844",
 							"dlimitlatr_1738782333562_1312"
 						],
+						"morphogroup": ["gpe_barbilabris"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"morphogroup": ["gpe_barbilabris"]
+						"kingdom": "1"
 					}
 				},
 				{
@@ -26670,13 +26668,13 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3sansgr_1738783084860_3752",
 						"carene_du_triangle_du_propodeum": "maldfinisa_1738782338204_3844",
+						"morphogroup": ["marginata"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"morphogroup": ["marginata"]
+						"kingdom": "1"
 					}
 				},
 				{
@@ -27503,7 +27501,8 @@
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1"
+						"kingdom": "1",
+						"conservation_status": "lc"
 					}
 				},
 				{
@@ -31653,13 +31652,13 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3sansgr_1738783084860_3752",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": ["gpe_minutula"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"morphogroup": ["gpe_minutula"]
+						"kingdom": "1"
 					}
 				},
 				{
@@ -33540,13 +33539,14 @@
 						"type_de_pilosite_des_scopas": "pilositmaj_1738784759008_2070",
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3sansgr_1738783084860_3752",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": ["gpe_minutula"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
 						"kingdom": "1",
-						"morphogroup": ["gpe_minutula"]
+						"conservation_status": "lc"
 					}
 				},
 				{
@@ -33827,13 +33827,13 @@
 							"clairement_1738782331321_8886",
 							"maldfinisa_1738782338204_3844"
 						],
+						"morphogroup": ["gpe_minutula"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"morphogroup": ["gpe_minutula"]
+						"kingdom": "1"
 					}
 				},
 				{
@@ -34029,13 +34029,13 @@
 						"corbeilles_du_propodeum": "corbeilles_1738837562663_8904",
 						"type_de_pilosite_des_scopas": "pilositmaj_1738784759008_2070",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": ["gpe_minutula"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"morphogroup": ["gpe_minutula"]
+						"kingdom": "1"
 					}
 				},
 				{
@@ -34573,13 +34573,13 @@
 							"clairement_1738782331321_8886",
 							"maldfinisa_1738782338204_3844"
 						],
+						"morphogroup": ["gpe_minutula"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"morphogroup": ["gpe_minutula"]
+						"kingdom": "1"
 					}
 				},
 				{
@@ -35418,13 +35418,13 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": ["gpe_minutula"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"morphogroup": ["gpe_minutula"]
+						"kingdom": "1"
 					}
 				},
 				{
@@ -35719,13 +35719,13 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3sansgr_1738783084860_3752",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": ["gpe_minutula"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"morphogroup": ["gpe_minutula"]
+						"kingdom": "1"
 					}
 				},
 				{
@@ -35990,13 +35990,13 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": ["gpe_proxima"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"morphogroup": ["gpe_proxima"]
+						"kingdom": "1"
 					}
 				},
 				{
@@ -36859,14 +36859,14 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3sansgr_1738783084860_3752",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": ["gpe_minutula"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
 						"kingdom": "1",
-						"conservation_status": "lc",
-						"morphogroup": ["gpe_minutula"]
+						"conservation_status": "lc"
 					}
 				},
 				{
@@ -37124,13 +37124,13 @@
 						"couleur_de_la_frange_terminale": "brunclair_1738784410899_2134",
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": ["gpe_minutula"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"morphogroup": ["gpe_minutula"]
+						"kingdom": "1"
 					}
 				},
 				{
@@ -37401,13 +37401,13 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": ["gpe_minutula"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"morphogroup": ["gpe_minutula"]
+						"kingdom": "1"
 					}
 				},
 				{
@@ -37699,13 +37699,14 @@
 							"maldlimitc_1738782336008_1135",
 							"maldfinisa_1738782338204_3844"
 						],
+						"morphogroup": ["gpe_minutula"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
 						"kingdom": "1",
-						"morphogroup": ["gpe_minutula"]
+						"conservation_status": "lc"
 					}
 				},
 				{
@@ -37894,13 +37895,13 @@
 						"type_de_pilosite_des_scopas": "pilositmaj_1738784759008_2070",
 						"distance_occello_occipitale": "distanceoc_1738780597330_2186",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": ["gpe_minutula"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"morphogroup": ["gpe_minutula"]
+						"kingdom": "1"
 					}
 				},
 				{
@@ -38476,13 +38477,13 @@
 							"clairement_1738782331321_8886",
 							"dlimitlatr_1738782333562_1312"
 						],
+						"morphogroup": ["gpe_minutula"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"morphogroup": ["gpe_minutula"]
+						"kingdom": "1"
 					}
 				},
 				{
@@ -39362,13 +39363,13 @@
 							"dlimitlatr_1738782333562_1312",
 							"maldfinisa_1738782338204_3844"
 						],
+						"morphogroup": ["gpe_minutula"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"morphogroup": ["gpe_minutula"]
+						"kingdom": "1"
 					}
 				},
 				{
@@ -39908,13 +39909,13 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": ["gpe_wilkella"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"morphogroup": ["gpe_wilkella"]
+						"kingdom": "1"
 					}
 				},
 				{
@@ -40378,13 +40379,13 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "dlimitlatr_1738782333562_1312",
+						"morphogroup": ["gpe_wilkella"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"morphogroup": ["gpe_wilkella"]
+						"kingdom": "1"
 					}
 				},
 				{
@@ -40671,13 +40672,13 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "dlimitlatr_1738782333562_1312",
+						"morphogroup": ["gpe_minutula"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"morphogroup": ["gpe_minutula"]
+						"kingdom": "1"
 					}
 				},
 				{
@@ -42858,7 +42859,8 @@
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1"
+						"kingdom": "1",
+						"conservation_status": "lc"
 					}
 				},
 				{
@@ -44442,13 +44444,13 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3sansgr_1738783084860_3752",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": ["gpe_argentata"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"morphogroup": ["gpe_argentata"]
+						"kingdom": "1"
 					}
 				},
 				{
@@ -45633,13 +45635,13 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": ["gpe_wilkella-argentata"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"morphogroup": ["gpe_wilkella-argentata"]
+						"kingdom": "1"
 					}
 				},
 				{
@@ -47016,13 +47018,14 @@
 						"couleur_de_la_frange_terminale": "foncenoir_1738784408817_6055",
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "clairement_1738782331321_8886",
+						"morphogroup": ["gpe_praecox"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
 						"kingdom": "1",
-						"morphogroup": ["gpe_praecox"]
+						"conservation_status": "lc"
 					}
 				},
 				{
@@ -49315,13 +49318,13 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "maldfinisa_1738782338204_3844",
+						"morphogroup": ["gpe_wilkella"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"morphogroup": ["gpe_wilkella"]
+						"kingdom": "1"
 					}
 				},
 				{
@@ -49507,13 +49510,14 @@
 						"corbeilles_du_propodeum": "corbeilles_1738837562663_8904",
 						"type_de_pilosite_des_scopas": "pilositmaj_1738784759008_2070",
 						"couleur_de_la_frange_terminale": "orange_1738784415091_836",
+						"morphogroup": ["gpe_wilkella"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
 						"kingdom": "1",
-						"morphogroup": ["gpe_wilkella"]
+						"conservation_status": "lc"
 					}
 				},
 				{
@@ -49802,13 +49806,14 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3avecde_1738783082767_9191",
 						"carene_du_triangle_du_propodeum": "maldfinisa_1738782338204_3844",
+						"morphogroup": ["gpe_wilkella"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
 						"kingdom": "1",
-						"morphogroup": ["gpe_wilkella"]
+						"conservation_status": "lc"
 					}
 				},
 				{
@@ -50364,13 +50369,14 @@
 							"dlimitlatr_1738782333562_1312",
 							"maldlimitc_1738782336008_1135"
 						],
+						"morphogroup": ["gpe_wilkella"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
 						"kingdom": "1",
-						"morphogroup": ["gpe_wilkella"]
+						"conservation_status": "lc"
 					}
 				},
 				{
@@ -51220,13 +51226,13 @@
 						],
 						"presence_de_gradulus_sur_les_tergites_2_3": "t2_3sansgr_1738783084860_3752",
 						"carene_du_triangle_du_propodeum": "maldfinisa_1738782338204_3844",
+						"morphogroup": ["gpe_nigropilosa"],
 						"genus": "1345710",
 						"family": "7901",
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"morphogroup": ["gpe_nigropilosa"]
+						"kingdom": "1"
 					}
 				},
 				{
@@ -51985,13 +51991,13 @@
 						"forme_des_foveas_au_milieu": "fovasnonrt_1738780949142_3244",
 						"corbeilles_du_propodeum": "corbeilles_1738837562663_8904",
 						"type_de_pilosite_des_scopas": "pilositmaj_1738784759008_2070",
+						"morphogroup": ["gpe_nigropilosa"],
 						"genus": "324045037",
 						"family": "324045034",
 						"order": "324044996",
 						"class": "324044995",
 						"phylum": "324044994",
-						"kingdom": "324044993",
-						"morphogroup": ["gpe_nigropilosa"]
+						"kingdom": "324044993"
 					}
 				},
 				{
@@ -52933,7 +52939,7 @@
 			"label": "Pilosité occipitale",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c156",
 			"required": false,
 			"description": "Attention, critère parfois difficile à appréhender",
@@ -52972,7 +52978,7 @@
 			"label": "Forme de la tête",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c157",
 			"required": false,
 			"description": "",
@@ -53011,7 +53017,7 @@
 			"label": "Couleur de la pilosité de la face",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c158",
 			"required": false,
 			"description": "Attention au spécimens usés dont la couleur et la densité de la pilosité peuvent être altéré",
@@ -53050,7 +53056,7 @@
 			"label": "Pilosité pâle de la face",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c159",
 			"required": false,
 			"description": "Attention au spécimens usés dont la couleur et la densité de la pilosité peuvent être altéré",
@@ -53081,7 +53087,7 @@
 			"label": "Distance occello-occipitale",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c160",
 			"required": false,
 			"description": "La distance ocello-occipitale est la distance entre un ocelle latéral et l'arrière de la tête appelée occiput.",
@@ -53136,7 +53142,7 @@
 			"label": "Couleur de la face ventrale du flagelle antennaire",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c162",
 			"required": false,
 			"description": "",
@@ -53175,7 +53181,7 @@
 			"label": "Taille du 3ème segment antennaire",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c163",
 			"required": false,
 			"description": "",
@@ -53214,7 +53220,7 @@
 			"label": "Dépression des fovéas",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c167",
 			"required": false,
 			"description": "",
@@ -53245,7 +53251,7 @@
 			"label": "Largeur des fovéas dorsalement",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c168",
 			"required": false,
 			"description": "",
@@ -53292,7 +53298,7 @@
 			"label": "Forme des fovéas",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c169",
 			"required": false,
 			"description": "",
@@ -53339,7 +53345,7 @@
 			"label": "Divergeance des fovéas",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c170",
 			"required": false,
 			"description": "",
@@ -53370,7 +53376,7 @@
 			"label": "Forme des fovéas au milieu",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c171",
 			"required": false,
 			"description": "Attention, parfois difficile à voir avec la pilosité autour des antennes",
@@ -53401,7 +53407,7 @@
 			"label": "Longueur des fovéas",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c172",
 			"required": false,
 			"description": "",
@@ -53432,7 +53438,7 @@
 			"label": "Stries longitudinales du clypéus",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c177",
 			"required": false,
 			"description": "Parfois subtil, essayez de jouer avec la lumière",
@@ -53463,7 +53469,7 @@
 			"label": "Ligne centrale du clypéus",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c178",
 			"required": false,
 			"description": "",
@@ -53502,7 +53508,7 @@
 			"label": "Aspect de la ligne centrale du clypéus",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c179",
 			"required": false,
 			"description": "Il faut essayer de jouer avec la lumière pour percevoir le relief de cette ligne centrale",
@@ -53541,7 +53547,7 @@
 			"label": "Crêtes transverses du clypéus",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c180",
 			"required": false,
 			"description": "Parfois subtil, essayez de jouer avec la lumière",
@@ -53572,7 +53578,7 @@
 			"label": "Densité de la ponctuation du clypéus",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c181",
 			"required": false,
 			"description": "",
@@ -53619,7 +53625,7 @@
 			"label": "Aspect de la ponctuation du clypéus",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c182",
 			"required": false,
 			"description": "",
@@ -53658,7 +53664,7 @@
 			"label": "Forme du clypéus",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c184",
 			"required": false,
 			"description": "",
@@ -53705,7 +53711,7 @@
 			"label": "Aspect du clypéus",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c186",
 			"required": false,
 			"description": "",
@@ -53736,7 +53742,7 @@
 			"label": "Forme du bord antérieur du clypeus",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c188",
 			"required": false,
 			"description": "",
@@ -53767,7 +53773,7 @@
 			"label": "Taille de l'appendice du labre",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c191",
 			"required": false,
 			"description": "",
@@ -53812,7 +53818,7 @@
 			"label": "Forme de l'appendice du labre",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c192",
 			"required": false,
 			"description": "",
@@ -53859,7 +53865,7 @@
 			"label": "Reflets de la tête et du mésosome",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c197",
 			"required": false,
 			"description": "",
@@ -53890,7 +53896,7 @@
 			"label": "Ride du pronotum",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c198",
 			"required": false,
 			"description": "Attention, critère parfois difficile à appréhender",
@@ -53921,7 +53927,7 @@
 			"label": "Angle huméral du pronotum",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c199",
 			"required": false,
 			"description": "Attention, critère parfois difficile à appréhender",
@@ -53952,7 +53958,7 @@
 			"label": "Pilosité des mésopleures",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c200",
 			"required": false,
 			"description": "Attention au spécimens usés dont la couleur et la densité de la pilosité peuvent être altéré",
@@ -53991,7 +53997,7 @@
 			"label": "Forme de la pilosité du scutum",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c201",
 			"required": false,
 			"description": "Attention au spécimens usés dont la couleur et la densité de la pilosité peuvent être altéré",
@@ -54038,7 +54044,7 @@
 			"label": "Couleur de la pilosité du scutum",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c202",
 			"required": false,
 			"description": "Attention au spécimens usés dont la couleur et la densité de la pilosité peuvent être altéré",
@@ -54125,7 +54131,7 @@
 			"label": "Épaisseur de la pilosité squameuse du scutum",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c203",
 			"required": false,
 			"description": "Attention au spécimens usés dont la couleur et la densité de la pilosité peuvent être altéré",
@@ -54156,7 +54162,7 @@
 			"label": "Aspect du scutum",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c206",
 			"required": false,
 			"description": "",
@@ -54201,7 +54207,7 @@
 			"label": "Régularité de la ponctuation du scutum",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c207",
 			"required": false,
 			"description": "",
@@ -54238,7 +54244,7 @@
 			"label": "Densité de la ponctuation du scutum",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c208",
 			"required": false,
 			"description": "",
@@ -54285,7 +54291,7 @@
 			"label": "Intensité de la ponctuation du scutum",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c209",
 			"required": false,
 			"description": "",
@@ -54316,7 +54322,7 @@
 			"label": "Aspect du scutellum",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c213",
 			"required": false,
 			"description": "",
@@ -54355,7 +54361,7 @@
 			"label": "Excavation ventrale du mésepisternum",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c214",
 			"required": false,
 			"description": "",
@@ -54386,7 +54392,7 @@
 			"label": "Aspect du mésepisternum et des aires latérales du propodéum",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c216",
 			"required": false,
 			"description": "",
@@ -54419,7 +54425,7 @@
 			"label": "Carène du triangle du propodéum",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c217",
 			"required": false,
 			"description": "Attention, critère parfois difficile à appréhender",
@@ -54474,7 +54480,7 @@
 			"label": "Aspect de la surface interne du triangle du propdéum",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c218",
 			"required": false,
 			"description": "",
@@ -54521,7 +54527,7 @@
 			"label": "Rugosités de la surface interne du triangle du propdéum",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c219",
 			"required": false,
 			"description": "",
@@ -54552,7 +54558,7 @@
 			"label": "Ponctuation du propodéum",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c220",
 			"required": false,
 			"description": "Nous parlons ici de l'aspect du propodéum dans la partie dorsolatérale, c'est à dire la zone adjacente au triangle du propodéum",
@@ -54583,7 +54589,7 @@
 			"label": "Crètes des faces latérales du propodéum",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c221",
 			"required": false,
 			"description": "",
@@ -54622,7 +54628,7 @@
 			"label": "Corbeilles du propodéum",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c222",
 			"required": false,
 			"description": "",
@@ -54653,7 +54659,7 @@
 			"label": "Séparation des aires horizontales et verticales du propodéum",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c223",
 			"required": false,
 			"description": "",
@@ -54684,7 +54690,7 @@
 			"label": "Couleur des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c226",
 			"required": false,
 			"description": "",
@@ -54723,7 +54729,7 @@
 			"label": "Couleur rouge des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c227",
 			"required": false,
 			"description": "",
@@ -54762,7 +54768,7 @@
 			"label": "Couleur des marges des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c228",
 			"required": false,
 			"description": "",
@@ -54801,7 +54807,7 @@
 			"label": "Aspect du disque des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c229",
 			"required": false,
 			"description": "On considère ici tous les tergites excepté le premier",
@@ -54840,7 +54846,7 @@
 			"label": "Densité de la ponctuation du disque des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c230",
 			"required": false,
 			"description": "On considère ici tous les tergites excepté le premier",
@@ -54903,7 +54909,7 @@
 			"label": "Aspect de la ponctuation du disque des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c231",
 			"required": false,
 			"description": "On considère ici tous les tergites excepté le premier",
@@ -54940,7 +54946,7 @@
 			"label": "Répartition de la ponctuation du disque des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c232",
 			"required": false,
 			"description": "",
@@ -54979,7 +54985,7 @@
 			"label": "Pilosité du disque des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c233",
 			"required": false,
 			"description": "Attention au spécimens usés dont la couleur et la densité de la pilosité peuvent être altéré",
@@ -55026,7 +55032,7 @@
 			"label": "Couleur de la pilosité des tergites 1-2",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c234",
 			"required": false,
 			"description": "Attention au spécimens usés dont la couleur et la densité de la pilosité peuvent être altéré",
@@ -55093,7 +55099,7 @@
 			"label": "Couleur de la pilosité des tergites 3-4",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c235",
 			"required": false,
 			"description": "Attention au spécimens usés dont la couleur et la densité de la pilosité peuvent être altéré",
@@ -55124,7 +55130,7 @@
 			"label": "Bandes de poils des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c236",
 			"required": false,
 			"description": "Attention au spécimens usés dont la couleur et la densité de la pilosité peuvent être altéré",
@@ -55163,7 +55169,7 @@
 			"label": "Densité des bandes de poils des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c237",
 			"required": false,
 			"description": "Attention au spécimens usés dont la couleur et la densité de la pilosité peuvent être altéré",
@@ -55194,7 +55200,7 @@
 			"label": "Continuité des bandes de poils des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c238",
 			"required": false,
 			"description": "Attention au spécimens usés dont la couleur et la densité de la pilosité peuvent être altéré",
@@ -55249,7 +55255,7 @@
 			"label": "Couleur des bandes de poils des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c239",
 			"required": false,
 			"description": "Attention au spécimens usés dont la couleur et la densité de la pilosité peuvent être altéré",
@@ -55288,7 +55294,7 @@
 			"label": "Présence de gradulus sur les tergites 2-3",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c240",
 			"required": false,
 			"description": "",
@@ -55319,7 +55325,7 @@
 			"label": "Dépression de la marge des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c241",
 			"required": false,
 			"description": "",
@@ -55350,7 +55356,7 @@
 			"label": "Aspect de la marge des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c242",
 			"required": false,
 			"description": "",
@@ -55381,7 +55387,7 @@
 			"label": "Largeur des marges",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c243",
 			"required": false,
 			"description": "Attention, la base du tergite peut être cachée par la marge du tergite précédent",
@@ -55412,7 +55418,7 @@
 			"label": "Densité de la ponctuation du tergite 1",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c266",
 			"required": false,
 			"description": "",
@@ -55467,7 +55473,7 @@
 			"label": "Taille de la ponctuation du tergite 1",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c267",
 			"required": false,
 			"description": "",
@@ -55506,7 +55512,7 @@
 			"label": "Microponctuation du tergite 1",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c268",
 			"required": false,
 			"description": "",
@@ -55537,7 +55543,7 @@
 			"label": "Aspect du disque du tergite 1",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c269",
 			"required": false,
 			"description": "",
@@ -55576,7 +55582,7 @@
 			"label": "Ponctuation de la marge du tergite 1",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c270",
 			"required": false,
 			"description": "",
@@ -55607,7 +55613,7 @@
 			"label": "Forme de la plaque pygidiale",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c279",
 			"required": false,
 			"description": "",
@@ -55638,7 +55644,7 @@
 			"label": "Couleur de la frange terminale",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c283",
 			"required": false,
 			"description": "Attention au spécimens usés dont la couleur et la densité de la pilosité peuvent être altéré",
@@ -55721,7 +55727,7 @@
 			"label": "Face postérieure du fémur 3",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c288",
 			"required": false,
 			"description": "Attention, critère parfois difficile à appréhender",
@@ -55760,7 +55766,7 @@
 			"label": "Forme des tibias 3",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c290",
 			"required": false,
 			"description": "",
@@ -55791,7 +55797,7 @@
 			"label": "Couleur de la cuticule du tibia 3",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c291",
 			"required": false,
 			"description": "",
@@ -55836,7 +55842,7 @@
 			"label": "Couleur des basitarses 3",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c292",
 			"required": false,
 			"description": "",
@@ -55879,7 +55885,7 @@
 			"label": "Type de pilosité des scopas",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c293",
 			"required": false,
 			"description": "",
@@ -55918,7 +55924,7 @@
 			"label": "Couleur de la scopa des tibias 3",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c294",
 			"required": false,
 			"description": "",
@@ -55989,7 +55995,7 @@
 			"label": "Couleur de la scopa bicolore des tibias 3",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c295",
 			"required": false,
 			"description": "",
@@ -56042,7 +56048,7 @@
 			"label": "Taille des poils de la scopa des tibias 3",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c296",
 			"required": false,
 			"description": "",
@@ -56081,7 +56087,7 @@
 			"label": "Forme de l'éperon interne du tibia 3",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c297",
 			"required": false,
 			"description": "Attention, critère parfois difficile à appréhender",
@@ -56120,7 +56126,7 @@
 			"label": "Longueur de la face",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c161",
 			"required": false,
 			"description": "",
@@ -56151,7 +56157,7 @@
 			"label": "Taille du 2ème segment antennaire",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c164",
 			"required": false,
 			"description": "",
@@ -56182,7 +56188,7 @@
 			"label": "Taille des segments antennaires 4 à 11",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c165",
 			"required": false,
 			"description": "",
@@ -56213,7 +56219,7 @@
 			"label": "Taille du 5ème segment antennaire",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c166",
 			"required": false,
 			"description": "",
@@ -56244,7 +56250,7 @@
 			"label": "Rétrécissement des fovéas",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c173",
 			"required": false,
 			"description": "",
@@ -56275,7 +56281,7 @@
 			"label": "Taille des fovéas",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c174",
 			"required": false,
 			"description": "",
@@ -56302,7 +56308,7 @@
 			"label": "Pilosité des fovéas",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c175",
 			"required": false,
 			"description": "",
@@ -56333,7 +56339,7 @@
 			"label": "Délimitation des fovéas",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c176",
 			"required": false,
 			"description": "",
@@ -56364,7 +56370,7 @@
 			"label": "Densité de la ponctuation du clypéus latéralement",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c183",
 			"required": false,
 			"description": "",
@@ -56395,7 +56401,7 @@
 			"label": "Forme et aspect du clypéus",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c185",
 			"required": false,
 			"description": "",
@@ -56426,7 +56432,7 @@
 			"label": "Taille de la ponctuation et aspect clypéus",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c187",
 			"required": false,
 			"description": "",
@@ -56457,7 +56463,7 @@
 			"label": "Striation des zones paraoculaires",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c189",
 			"required": false,
 			"description": "",
@@ -56488,7 +56494,7 @@
 			"label": "Taille de l'espace malaire",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c190",
 			"required": false,
 			"description": "",
@@ -56515,7 +56521,7 @@
 			"label": "Forme et apex de l'appendice du labre",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c194",
 			"required": false,
 			"description": "",
@@ -56542,7 +56548,7 @@
 			"label": "Largeur de l'appendice du labre",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c195",
 			"required": false,
 			"description": "",
@@ -56569,7 +56575,7 @@
 			"label": "Aspect des galéas",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c196",
 			"required": false,
 			"description": "",
@@ -56600,7 +56606,7 @@
 			"label": "Pilosité du mésosome",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c204",
 			"required": false,
 			"description": "Attention au spécimens usés dont la couleur et la densité de la pilosité peuvent être altéré",
@@ -56631,7 +56637,7 @@
 			"label": "Couleur de la pilosité du mésosome",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c205",
 			"required": false,
 			"description": "Attention au spécimens usés dont la couleur et la densité de la pilosité peuvent être altéré",
@@ -56662,7 +56668,7 @@
 			"label": "Ligne médiane du scutum",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c210",
 			"required": false,
 			"description": "",
@@ -56693,7 +56699,7 @@
 			"label": "Longueur de la pilosité du scutum",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c211",
 			"required": false,
 			"description": "",
@@ -56720,7 +56726,7 @@
 			"label": "Taille de la pilosité des mésopleures",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c212",
 			"required": false,
 			"description": "",
@@ -56749,7 +56755,7 @@
 			"label": "Pilosité du mésepisternum",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c215",
 			"required": false,
 			"description": "Attention au spécimens usés dont la couleur et la densité de la pilosité peuvent être altéré",
@@ -56780,7 +56786,7 @@
 			"label": "Largeur du triangle du propdéum",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c224",
 			"required": false,
 			"description": "",
@@ -56811,7 +56817,7 @@
 			"label": "Rides de la partie antérieure du propodéum",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c225",
 			"required": false,
 			"description": "",
@@ -56840,7 +56846,7 @@
 			"label": "Taille de la ponctuation des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c306",
 			"required": false,
 			"description": "",
@@ -56871,7 +56877,7 @@
 			"label": "Pilosité caractéristique des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c307",
 			"required": false,
 			"description": "",
@@ -56902,7 +56908,7 @@
 			"label": "Dépression à la base des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c308",
 			"required": false,
 			"description": "",
@@ -56933,7 +56939,7 @@
 			"label": "Longueur des bandes de poils des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c309",
 			"required": false,
 			"description": "",
@@ -56964,7 +56970,7 @@
 			"label": "Différence d'aspect des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c310",
 			"required": false,
 			"description": "",
@@ -56995,7 +57001,7 @@
 			"label": "Aspect des tergites latéralement",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c311",
 			"required": false,
 			"description": "",
@@ -57026,7 +57032,7 @@
 			"label": "Diagnose A. granulosa/vulpecula",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c312",
 			"required": false,
 			"description": "",
@@ -57057,7 +57063,7 @@
 			"label": "Diagnose A. allosa/amieti/bicolor",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c313",
 			"required": false,
 			"description": "",
@@ -57086,7 +57092,7 @@
 			"label": "Diagnose A. rosae/trimmerana/scotica",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c314",
 			"required": false,
 			"description": "",
@@ -57117,7 +57123,7 @@
 			"label": "Diagnose A. intermedia/gelriae",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c315",
 			"required": false,
 			"description": "",
@@ -57146,7 +57152,7 @@
 			"label": "Répartition de la ponctuation des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c316",
 			"required": false,
 			"description": "",
@@ -57183,7 +57189,7 @@
 			"label": "Ponctuation des tergites 2-3",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c318",
 			"required": false,
 			"description": "",
@@ -57214,7 +57220,7 @@
 			"label": "Aspect de la marge des tergites 2-4",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c319",
 			"required": false,
 			"description": "",
@@ -57245,7 +57251,7 @@
 			"label": "Pilosité squameuse des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c320",
 			"required": false,
 			"description": "",
@@ -57276,7 +57282,7 @@
 			"label": "Taille des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c321",
 			"required": false,
 			"description": "",
@@ -57307,7 +57313,7 @@
 			"label": "Diagnose A. fulva",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c322",
 			"required": false,
 			"description": "",
@@ -57338,7 +57344,7 @@
 			"label": "Epaisseur des bandes de poils des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c323",
 			"required": false,
 			"description": "",
@@ -57369,7 +57375,7 @@
 			"label": "Longueur des bandes de poils à l'apex des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c324",
 			"required": false,
 			"description": "",
@@ -57398,7 +57404,7 @@
 			"label": "Pilosité latérale des disques des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c325",
 			"required": false,
 			"description": "",
@@ -57427,7 +57433,7 @@
 			"label": "Largeur des bandes de poils à l'apex des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c326",
 			"required": false,
 			"description": "",
@@ -57456,7 +57462,7 @@
 			"label": "Couleur de la pilosité des tergites 1-4",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c327",
 			"required": false,
 			"description": "",
@@ -57487,7 +57493,7 @@
 			"label": "Dépressions de la marge des tergites",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c328",
 			"required": false,
 			"description": "",
@@ -57518,7 +57524,7 @@
 			"label": "Impressions longitudinales du tergite 1",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c271",
 			"required": false,
 			"description": "",
@@ -57549,7 +57555,7 @@
 			"label": "Taille de la pilosité des tergites 1-2",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c272",
 			"required": false,
 			"description": "",
@@ -57580,7 +57586,7 @@
 			"label": "Projections latérales du tergite 1",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c273",
 			"required": false,
 			"description": "",
@@ -57611,7 +57617,7 @@
 			"label": "Aspect du tergite 2",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c274",
 			"required": false,
 			"description": "",
@@ -57642,7 +57648,7 @@
 			"label": "Pilosité de la marge du tergite 2",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c275",
 			"required": false,
 			"description": "",
@@ -57673,7 +57679,7 @@
 			"label": "Largeur de la marge du tergite 2",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c276",
 			"required": false,
 			"description": "",
@@ -57704,7 +57710,7 @@
 			"label": "Fovéas latérales du tergite 2",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c277",
 			"required": false,
 			"description": "",
@@ -57735,7 +57741,7 @@
 			"label": "Aspect du métasome et du tergite 4",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c278",
 			"required": false,
 			"description": "",
@@ -57767,7 +57773,7 @@
 			"label": "Echancrure de la plaque pygidiale",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c280",
 			"required": false,
 			"description": "",
@@ -57798,7 +57804,7 @@
 			"label": "Largeur de la plaque pygidiale",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c281",
 			"required": false,
 			"description": "",
@@ -57827,7 +57833,7 @@
 			"label": "Couleur de la pilosité bordant la plaque pygidiale",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c282",
 			"required": false,
 			"description": "",
@@ -57858,7 +57864,7 @@
 			"label": "Couleur de la pilosité des sternites",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c284",
 			"required": false,
 			"description": "",
@@ -57889,7 +57895,7 @@
 			"label": "Nombre de cellules cubitales",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c285",
 			"required": false,
 			"description": "",
@@ -57920,7 +57926,7 @@
 			"label": "Ailes enfumées ou transparentes",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c286",
 			"required": false,
 			"description": "",
@@ -57951,7 +57957,7 @@
 			"label": "Première nervure récurrente",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c287",
 			"required": false,
 			"description": "Les cellules cubitales sont celles qui se trouvent antérieurement à la première nervure récurrente. Elles sont généralement au nombre de 3 sauf chez <i> Andrena lagopus </i>",
@@ -57980,7 +57986,7 @@
 			"label": "Taille des épines du fémur 3",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c289",
 			"required": false,
 			"description": "",
@@ -58011,7 +58017,7 @@
 			"label": "Comparaison de la pilosité des tibia 3",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c298",
 			"required": false,
 			"description": "",
@@ -58042,7 +58048,7 @@
 			"label": "Forme des basitarses 3",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c299",
 			"required": false,
 			"description": "",
@@ -58073,7 +58079,7 @@
 			"label": "Couleur de la plaque basitibiale",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c300",
 			"required": false,
 			"description": "",
@@ -58102,7 +58108,7 @@
 			"label": "Taille de la plaque basitibiale",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c301",
 			"required": false,
 			"description": "",
@@ -58133,7 +58139,7 @@
 			"label": "Taille du 5ème segment du métatarse",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c302",
 			"required": false,
 			"description": "Il s'agit du 5ème segment des tarses de la patte arrière, basitarse compris.",
@@ -58164,7 +58170,7 @@
 			"label": "Diagnose A. distinguenda/puella",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c303",
 			"required": false,
 			"description": "",
@@ -58191,7 +58197,7 @@
 			"label": "Diagnose A. wilkella",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c304",
 			"required": false,
 			"description": "",
@@ -58222,7 +58228,7 @@
 			"label": "Diagnose A. rugulosa/alfkenella",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c305",
 			"required": false,
 			"description": "",
@@ -58249,7 +58255,7 @@
 			"label": "Identification rapide",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c515",
 			"required": false,
 			"description": "Ce descripteur répertorie les critères qui conduisent à des espèces facilement reconnaissables.\nVeuillez l'utiliser uniquement si vous êtes déjà un peu familier avec les critères.\nSi vous ne voyez aucune des caractéristiques énumérées, veuillez sélectionner \"aucune de ces caractéristiques\".",
@@ -58300,7 +58306,7 @@
 			"label": "Taille",
 			"group": "andrena",
 			"mergeMethod": "none",
-			"learnMore": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
+			"learnMore": "https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html",
 			"x-xper3-id": "c516",
 			"required": false,
 			"description": "",
