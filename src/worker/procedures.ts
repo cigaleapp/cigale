@@ -1,6 +1,4 @@
-/**
- * @import { ProceduresMap } from 'swarpc';
- */
+import type { ProceduresMap } from 'swarpc';
 
 import { type } from 'arktype';
 
@@ -12,11 +10,9 @@ export const LOCAL_STORAGE = type({
 	databaseRevision: 'string.integer.parse',
 });
 
-/**
- * @typedef {typeof LOCAL_STORAGE['infer']} LocalStorage
- */
+export type LocalStorage = (typeof LOCAL_STORAGE)['infer'];
 
-export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
+export const PROCEDURES = {
 	wakeup: {
 		input: type('undefined'),
 		progress: type('undefined'),
@@ -169,4 +165,4 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 				.array(),
 		}),
 	},
-});
+} as const satisfies ProceduresMap;
