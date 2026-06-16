@@ -67,7 +67,7 @@
 	"devDependencies": {
 		"@actions/core": "^3.0.1",
 		"@capacitor/assets": "^3.0.5",
-		"@capacitor/cli": "^8.3.4",
+		"@capacitor/cli": "^8.4.0",
 		"@date-fns/tz": "^1.5.0",
 		"@electron-forge/cli": "^7.11.2",
 		"@electron-forge/maker-deb": "^7.11.2",
@@ -145,9 +145,9 @@
 		"yauzl-promise": "^4.0.0"
 	},
 	"dependencies": {
-		"@capacitor/android": "^8.3.4",
+		"@capacitor/android": "^8.4.0",
 		"@capacitor/app": "^8.1.0",
-		"@capacitor/core": "^8.3.4",
+		"@capacitor/core": "^8.4.0",
 		"@capacitor/file-viewer": "^2.0.1",
 		"@capacitor/filesystem": "^8.1.2",
 		"@capacitor/local-notifications": "^8.2.0",
