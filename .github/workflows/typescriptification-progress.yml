@@ -2,11 +2,6 @@ name: Update TypeScriptification Progress
 
 on:
   workflow_dispatch:
-  pull_request:
-    branches:
-      - typescriptify
-      - '*-typescriptify'
-      - typescriptify-*
   push:
     branches:
       - main
@@ -21,9 +16,6 @@ jobs:
 
     env:
       ISSUE_NUMBER: 190
-      PR_NUMBER: ${{ github.event.pull_request.number }}
-
-    name: Update ${{ github.event.pull_request && 'PR' || 'Issue' }}
 
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
@@ -115,13 +107,12 @@ jobs:
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
 
-      - name: Update ${{ env.PR_NUMBER && 'PR' || 'issue' }}
+      - name: Update issue
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
           ISSUE_NUMBER: ${{ env.ISSUE_NUMBER }}
-          PR_NUMBER: ${{ env.PR_NUMBER }}
 
           JS: ${{ steps.count.outputs.js }}
           TS: ${{ steps.count.outputs.ts }}
@@ -132,9 +123,13 @@ jobs:
           TS_FILES: ${{ steps.count.outputs.ts_files }}
         with:
           script: |
-            const is_pr = Boolean(process.env.PR_NUMBER);
-            const pr_number = is_pr ? Number(process.env.PR_NUMBER) : null;
             const issue_number = Number(process.env.ISSUE_NUMBER);
+
+            const { data: issue } = await github.rest.issues.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number
+            });
 
             const jsFiles = (process.env.JS_FILES || "").trim();
             const tsFiles = (process.env.TS_FILES || "").trim();
@@ -172,45 +167,20 @@ jobs:
             <!-- ts-progress:end -->
             `.trim();
 
-            function update_body(existing) {
-              let body = existing || "";
+            let body = issue.body || "";
 
-              const regex =
-                /<!-- ts-progress:start -->[\s\S]*?<!-- ts-progress:end -->/;
+            const regex =
+              /<!-- ts-progress:start -->[\s\S]*?<!-- ts-progress:end -->/;
 
-              if (regex.test(body)) {
-                body = body.replace(regex, section);
-              } else {
-                body += "\n\n" + section;
-              }
-
-              return body
-            }
-
-            if (is_pr) {
-
-              const { data: issue } = await github.rest.issues.get({
-                ...context.repo,
-                issue_number
-              });
-
-              await github.rest.issues.update({
-                ...context.repo
-                issue_number,
-                body: update_body(issue.body)
-              });
-
+            if (regex.test(body)) {
+              body = body.replace(regex, section);
             } else {
-
-              const { data: pr } = await github.rest.pulls.get({
-                ...context.repo,
-                pull_number: pr_number,
-              })
-
-              await github.rest.pulls.update({
-                ...context.repo,
-                pull_number: pr_number,
-                body: update_body(pr.body)
-              })
-
+              body += "\n\n" + section;
             }
+
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number,
+              body
+            });
