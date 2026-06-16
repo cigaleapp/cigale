@@ -71,30 +71,36 @@ The app is [continuously]() deployed from the main branch of the github reposito
 ```mermaid
 flowchart TB
 
-shell[app.html] -->|Svelte loads the app's code, a basic loading spinner is shown| clientinit[src/hooks.client.ts] 
-	init[src/routes/+layout.svelte] 
-	startup["src/routes/(app)/+layout.js"]
-	layout["src/routes/(app)/+layout.svelte"]
-	page["src/routes/(app)/.../+page.svelte (depending on the URL)"] -->|Page-specific content| done[Done!]
+shell[app.html] 
+clientinit[src/hooks.client.ts] 
+init[src/routes/+layout.svelte] 
+startup["src/routes/(app)/+layout.js"]
+layout["src/routes/(app)/+layout.svelte"]
+page["src/routes/(app)/.../+page.svelte (depending on the URL)"]
+done[Done!]
 
-shell -->|PWA manifest, website icon, etc.| static[static/manifest.json static/favicon.png, etc] --> clientinit
-shell -->|Offline handling, requests caching| sw[Service worker] --> clientinit
+shell -->|Svelte loads the app's code, a basic loading spinner is shown| --> clientinit
+shell --> static[static/manifest.json static/favicon.png, etc] -->|PWA manifest, website icon, etc.| clientinit
+shell --> sw[src/service-worker.js] -->|Offline handling, requests caching| clientinit
 
 clientinit -->|Mobile app auto-updater| init
 
-init -->|Deeplinking for the mobile app| deeplinks[assetlinks.json] --> startup
-init -->|"CSS Variables (colors, font sets, etc)"| globalcss[src/routes/style.css] --> startup
+init --> deeplinks[assetlinks.json] -->|Deeplinking for the mobile app| startup
+init --> globalcss[src/routes/style.css] -->|"CSS Variables (colors, font sets, etc)"| startup
 
-startup -->|Database| idb[src/lib/idb.svelte.js] --> layout
-startup -->|UI State| uistate[src/lib/state.svelte.js]  --> layout
-startup -->|"Web Workers (sw&rpc nodes)"| swarpc[src/lib/workers/start.js] -->|Web Workers also start their own database client| idb --> layout
-startup -->|Built-in protocols| protocols[protocols/*.yaml, examples/arthropods.cigaleprotocol.json] --> layout
-startup -->|Translations| i18n[src/locales/*.po] --> layout
+startup --> idb[src/lib/idb.svelte.js] -->|Database| layout
+startup --> uistate[src/lib/state.svelte.js]  -->|UI State| layout
+startup --> swarpc[src/lib/workers/start.js] -->|"Web Workers (sw&rpc nodes)"| idb -->|Web Workers also start their own database client| layout
+startup --> protocols[protocols/*.yaml, examples/arthropods.cigaleprotocol.json] -->|Built-in protocols| layout
+startup --> i18n[src/locales/*.po] -->|Translations| layout
 
-layout -->|Navigation bar| navbar["src/routes/(app)/Navbar.svelte"] --> page
-layout -->|Keyboard shortcuts| kbd[src/lib/KeyboardShortcuts.svelte]  --> page
-layout -->|Processing queue| queue[src/lib/queue.svelte.js] --> page
-layout -->|Toasts manager| toasts[src/lib/toasts.svelte.js] --> page
+layout --> navbar["src/routes/(app)/Navbar.svelte"] -->|Navigation bar| page
+layout --> kbd[src/lib/KeyboardShortcuts.svelte]  -->|Keyboard shortcuts| page
+layout --> queue[src/lib/queue.svelte.js] -->|Processing queue| page
+layout --> toasts[src/lib/toasts.svelte.js] -->|Toasts manager| page
+
+
+page -->|Page-specific content| done
 ```
 
 ### Creating a session
