@@ -133,11 +133,12 @@ jobs:
       - name: Compute bucket from run number
         id: bucket
         run: |
-          bucket=$(( RUN_NUMBER % 4 ))
+          bucket=$(( (RUN_NUMBER * 100 + RUN_ATTEMPT) % 4 ))
           echo "Computed bucket: $bucket"
           echo "bucket=$bucket" >> "$GITHUB_OUTPUT"
         env:
           RUN_NUMBER: ${{ github.run_number }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
 
   e2e:
     needs: [build-debug, json-schema, lint, test, e2e-concurrency]
