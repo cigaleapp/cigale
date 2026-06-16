@@ -52,6 +52,7 @@ The app is [continuously]() deployed from the main branch of the github reposito
 - `src/app.d.ts`: Additional type declarations, for example to declare additional properties & methods on the `Window` global object.
 - `src/app.html`: The HTML shell for the web application: this is what the user's browser intially receives. It contains placeholders that, at build time, are replaced with `<script>` tags that load the app's code.
 - `src/hooks.server.js`: Code that runs before every page, at build-time. Mostly used by Wuchale to replace hard-coded text with calls to its functions that allow the shown text to change depending on the selected language.
+- `src/hooks.client.ts`: Code that runs before the app starts, at run time. On the mobile app, used to check for new update bundles, download them and apply update bundles if the app is in the background. 
 - `src/service-worker.js`: A [service worker](https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorker), that intercepts all requests the app makes and allows for aggressive caching of, for example, the app's source code. This is also where all web requests are handled if the app is launched while offline.
 - `static/`: various files that are meant to be available as-is on `https://cigaleapp.github.io/cigale`. Mostly logos, fonts and JSON Schemas for protocol definition files, JSON analysis files in ZIP result exports, etc.
 - `tests/*.spec.{ts,js}`: Playwright tests
@@ -70,13 +71,16 @@ The app is [continuously]() deployed from the main branch of the github reposito
 ```mermaid
 flowchart TB
 
-shell[app.html] -->|Svelte loads the app's code, a basic loading spinner is shown| init[src/routes/+layout.svelte] 
+shell[app.html] -->|Svelte loads the app's code, a basic loading spinner is shown| clientinit[src/hooks.client.ts] 
+	init[src/routes/+layout.svelte] 
 	startup["src/routes/(app)/+layout.js"]
 	layout["src/routes/(app)/+layout.svelte"]
 	page["src/routes/(app)/.../+page.svelte (depending on the URL)"] -->|Page-specific content| done[Done!]
 
-shell -->|PWA manifest, website icon, etc.| static[static/manifest.json static/favicon.png, etc] --> init
-shell -->|Offline handling, requests caching| sw[Service worker] --> init
+shell -->|PWA manifest, website icon, etc.| static[static/manifest.json static/favicon.png, etc] --> clientinit
+shell -->|Offline handling, requests caching| sw[Service worker] --> clientinit
+
+clientinit -->|Mobile app auto-updater| init
 
 init -->|Deeplinking for the mobile app| deeplinks[assetlinks.json] --> startup
 init -->|"CSS Variables (colors, font sets, etc)"| globalcss[src/routes/style.css] --> startup
