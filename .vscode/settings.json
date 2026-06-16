@@ -14,6 +14,10 @@
 	},
 	"githubIssues.queries": [
 		{
+			"label": "Get that bag <3",
+			"query": "repo:${owner}/${repository} state:open project:cigaleapp/9"
+		},
+		{
 			"label": "InsectDetective",
 			"query": "repo:${owner}/${repository} state:open milestone:InsectDetective"
 		},
