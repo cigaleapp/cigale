@@ -42,7 +42,7 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
       - name: Build & package app
-        run: bun run prebuild; bunx electron-forge make
+        run: bun run prebuild; bunx --bun electron-forge make
         env: { ELECTRON_BUILD: '1' }
       - name: see output
         uses: jaywcjlove/github-action-folder-tree@8888262a56c33d3849154fa1fb7355c2465da30c # main
