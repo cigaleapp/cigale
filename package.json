@@ -49,7 +49,7 @@
 		"prepare": "bun run codegen",
 		"dependencies": "bun run scripts/if-local-dev.ts \"bun cap sync\"",
 		"precheck": "svelte-kit sync",
-		"check": "svelte-check --tsconfig ./jsconfig.json",
+		"check": "svelte-check",
 		"preknip": "svelte-kit sync && bun wuchale",
 		"knip": "knip",
 		"format": "prettier --write .",
