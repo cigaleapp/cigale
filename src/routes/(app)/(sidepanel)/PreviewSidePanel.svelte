@@ -1,7 +1,9 @@
 <script lang="ts">
-	/**
-	 * @import { TopLeftBoundingBox } from '$lib/BoundingBoxes.svelte.js';
-	 */
+	import type { TopLeftBoundingBox } from '$lib/BoundingBoxes.svelte.js';
+	import type * as DB from '$lib/database.js';
+	import type { RuntimeValue } from '$lib/schemas/metadata.js';
+	import type { NumericUnit } from '$lib/schemas/units.js';
+
 	import { dequal } from 'dequal/lite';
 
 	import IconShowPanel from '~icons/ri/arrow-up-s-line';
@@ -31,24 +33,39 @@
 
 	import BottombarContent from '../BottombarContent.svelte';
 
-	/**
-	 * @import * as DB from '$lib/database.js';
-	 */
+	interface Props {
+		/** source **href**s of the images/observations we're modifying the metadata on */
+		images: Array<{
+			src: string;
+			box?: undefined | TopLeftBoundingBox;
+			id: string;
+			dimensions: { width: number; height: number };
+		}>;
+		/** callback to call when the user wants to merge images or observations into a single one. If not set, the merge button is not shown. */
+		onmerge: (() => void) | undefined;
+		/** callback to call when the user wants to delete the images or observations */
+		ondelete: () => void;
+		/** callback to call when the user wants to split the selected observation(s). If not set, the split button is not shown. */
+		onsplit: (() => void) | undefined;
+		/** callback to call when the user wants to import additional images. If not set, the import button is not shown. */
+		onimport: (() => void) | undefined;
+		/** whether the user is allowed to split the selected observation(s) */
+		cansplit: boolean;
+		/** callback to call when a metadata's value is modified */
+		onmetadatachange: (
+			// eslint-disable-next-line no-unused-vars
+			key: string,
+			// eslint-disable-next-line no-unused-vars
+			value: undefined | RuntimeValue,
+			// eslint-disable-next-line no-unused-vars
+			unit: undefined | typeof NumericUnit.infer
+		) => void | Promise<void>;
+		/** whether the user is allowed to merge images or observations */
+		canmerge: boolean;
+		/** values of the metadata we're viewing. */
+		metadata: Record<string, DB.MetadataValue & { merged: boolean }>;
+	}
 
-	/**
-	 * @typedef {object} Props
-	 * @property {Array<{ src: string; box?: undefined | TopLeftBoundingBox, id: string, dimensions: {width: number, height: number} }>} images source **href**s of the images/observations we're modifying the metadata on
-	 * @property {(() => void) | undefined} [onmerge] callback to call when the user wants to merge images or observations into a single one. If not set, the merge button is not shown.
-	 * @property {() => void} ondelete callback to call when the user wants to delete the images or observations
-	 * @property {(() => void) | undefined} [onsplit] callback to call when the user wants to split the selected observation(s). If not set, the split button is not shown.
-	 * @property {(() => void) | undefined} [onimport] callback to call when the user wants to import additional images. If not set, the import button is not shown.
-	 * @property {boolean} [cansplit=false] whether the user is allowed to split the selected observation(s)
-	 * @property {(key: string, value: undefined | import('$lib/schemas/metadata').RuntimeValue, unit: undefined | typeof import('$lib/schemas/units').NumericUnit.infer) => void|Promise<void>} onmetadatachange callback to call when a metadata's value is modified
-	 * @property {boolean} [canmerge=false] whether the user is allowed to merge images or observations
-	 * @property {Record<string, import('$lib/database').MetadataValue & { merged: boolean } >} metadata values of the metadata we're viewing.
-	 */
-
-	/** @type {Props} */
 	let {
 		images,
 		onmerge,
@@ -59,7 +76,7 @@
 		onmetadatachange,
 		canmerge,
 		metadata,
-	} = $props();
+	}: Props = $props();
 
 	const mobile = new IsMobile();
 	let collapsed = $derived(mobile.current);
@@ -103,13 +120,11 @@
 		},
 	});
 
-	/**
-	 * @param {{ width: number, height: number }} dimensions
-	 * @param {undefined | TopLeftBoundingBox} box
-	 * @returns {[number, number]}
-	 */
-	function applyBox(dimensions, box) {
-		const apply = (/** @type {number} */ orig, /** @type {number|undefined} */ axis) =>
+	function applyBox(
+		dimensions: { width: number; height: number },
+		box: undefined | TopLeftBoundingBox
+	): [number, number] {
+		const apply = (orig: number, axis: number | undefined) =>
 			axis ? Math.round(orig * axis) : orig;
 
 		return [apply(dimensions.width, box?.width), apply(dimensions.height, box?.height)];
