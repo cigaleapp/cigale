@@ -136,6 +136,7 @@ if (import.meta.vitest) {
  * @returns {Language}
  */
 export function localeFromNavigator() {
+	if (!navigator.language) return "fr"
 	const locale = navigator.language.split('-')[0];
 	return locale === 'fr' ? 'fr' : 'en';
 }
