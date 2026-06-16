@@ -3,6 +3,8 @@
 /// <reference lib="esnext" />
 /// <reference lib="webworker" />
 
+import type { PROCEDURES } from './procedures.js';
+
 import * as ort from 'onnxruntime-web';
 
 import { FULL_IMAGE_CROPBOX } from '$lib/BoundingBoxes.svelte.js';
@@ -13,26 +15,24 @@ import { getMetadataValue, storeMetadataValue } from '$lib/metadata/index.js';
 
 import { openDatabase, swarp } from './index.js';
 
-/**
- * @typedef {object} InferenceSession
- * @property {import('onnxruntime-web').InferenceSession} onnx
- * @property {string} id
- * @property {string} task
- * @property {string[]} [classmapping]
- */
+interface InferenceSession {
+	onnx: import('onnxruntime-web').InferenceSession;
+	id: string;
+	task: string;
+	classmapping?: string[];
+}
+
+type InferenceTask = (typeof PROCEDURES.loadModel.input.infer)['task'];
 
 /**
- * @typedef {typeof import('./procedures.js').PROCEDURES.loadModel.input.infer['task']} InferenceTask
+ * Keyed by inferenceSessionId
  */
+const inferenceSessions = new Map<string, InferenceSession>();
 
 /**
- * @type {Map<string, InferenceSession>} keyed by inferenceSessionId
+ * Map from task to latest inferenceSessionId
  */
-let inferenceSessions = new Map();
-/**
- * @type {Map<InferenceTask, string>} map from task to latest inferenceSessionId
- */
-let latestSessionIdByTask = new Map();
+const latestSessionIdByTask = new Map<InferenceTask, string>();
 
 swarp.loadModel(async ({ task, model, classmapping, inferenceSessionId: id, webgpu }) => {
 	// If the worker already has a session with this id, treat the request as a no-op.
@@ -49,8 +49,7 @@ swarp.loadModel(async ({ task, model, classmapping, inferenceSessionId: id, webg
 
 	if (!onnx) throw new Error('Impossible de charger le modèle ONNX');
 
-	/** @type {InferenceSession} */
-	const session = { id, task, onnx };
+	const session: InferenceSession = { id, task, onnx };
 
 	if (classmapping) {
 		session.classmapping = classmapping.split(/\r?\n/).filter(Boolean);
@@ -154,9 +153,7 @@ swarp.classify(async ({ imageId, metadataIds, taskSettings, inferenceSessionId }
 	});
 
 	const scores = await classify(
-		/** @type {Pick<import('$lib/schemas/neural.js').NeuralInference, 'input' | 'output'>} */ (
-			taskSettings
-		),
+		taskSettings as Pick<import('$lib/schemas/neural.js').NeuralInference, 'input' | 'output'>,
 		img,
 		onnx,
 		tools.abortSignal

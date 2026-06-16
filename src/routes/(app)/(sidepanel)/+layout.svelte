@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { fade } from 'svelte/transition';
 
 	import { page } from '$app/state';
@@ -38,8 +38,7 @@
 	}
 
 	async function splitSelection() {
-		/** @type {string[]} */
-		const toselect = [];
+		const toselect = [] as string[];
 
 		const protocol = uiState.currentProtocol;
 		if (!protocol) throw new Error('No protocol selected');

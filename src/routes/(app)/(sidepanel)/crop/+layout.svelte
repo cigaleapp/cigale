@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { watch } from 'runed';
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
@@ -16,12 +16,10 @@
 	let modelLoaded = $state(false);
 	// let modelLoadingError = $state();
 	let modelAbortController = new AbortController();
-	let cropModelLoadPromise = undefined;
+	let cropModelLoadPromise: Promise<void> | undefined = undefined;
 	let requestedCropModel = -1;
-	/**
-	 * @param {number} selectedModel
-	 */
-	async function loadCropperModel(selectedModel) {
+
+	async function loadCropperModel(selectedModel: number) {
 		// Prevent multiple loads
 		if (!uiState.currentProtocol) return;
 		if (!uiState.cropInferenceAvailable) return;

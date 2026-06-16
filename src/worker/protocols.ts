@@ -3,6 +3,8 @@
 /// <reference lib="esnext" />
 /// <reference lib="webworker" />
 
+import type { PROCEDURES } from './procedures.js';
+
 import JSONC from 'tiny-jsonc';
 import YAML from 'yaml';
 
@@ -10,43 +12,32 @@ import { resolveProtocolImports } from '$lib/metadata/imports.js';
 import { compareProtocolWithUpstream } from '$lib/protocols.js';
 import { metadataOptionId, namespacedMetadataId } from '$lib/schemas/metadata.js';
 import { ExportedProtocol } from '$lib/schemas/protocols.js';
-import {
-	entries,
-	keys,
-	omit,
-	orEmptyObj,
-	orEmptyObj2,
-	orEmptyObj3,
-	pick,
-	prefixIDBKeyRange,
-} from '$lib/utils.js';
+import { entries, keys, omit, orEmptyObj, pick, prefixIDBKeyRange } from '$lib/utils.js';
 
 import { openDatabase, swarp } from './index.js';
 
 swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
-	// ri: icons to preload from Iconify API. See MetadataEnumVariant's "icon" field.
-	/** @type {Set<string>} */
-	const iconsToPreload = new Set();
+	// ri:* icons to preload from Iconify API. See MetadataEnumVariant's "icon" field.
+	const iconsToPreload = new Set<string>();
 
 	let total = 1;
 	let done = 0;
 
-	/**
-	 * @param {typeof import('./procedures.js').PROCEDURES.importProtocol.progress.infer.phase} phase
-	 * @param {string} [detail]
-	 */
-	const onLoadingState = (phase, detail) => {
+	function onLoadingState(
+		phase: typeof PROCEDURES.importProtocol.progress.infer.phase,
+		detail?: string
+	) {
 		onProgress({
 			done,
 			total,
 			phase,
-			...orEmptyObj(Boolean(detail), { detail }),
+			...orEmptyObj(Boolean(detail), { detail: detail! }),
 		});
-	};
+	}
 
 	onLoadingState('parsing');
 	console.time('Parsing protocol');
-	let parsed = isJSON ? JSONC.parse(contents) : YAML.parse(contents);
+	const parsed = isJSON ? JSONC.parse(contents) : YAML.parse(contents);
 	console.timeEnd('Parsing protocol');
 
 	console.info(`Importing protocol ${parsed.id}`);

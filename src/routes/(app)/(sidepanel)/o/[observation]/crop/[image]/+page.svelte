@@ -1,8 +1,8 @@
-<script>
-	/**
-	 * @import * as DB from '$lib/database.js';
-	 * @import { Rect, CenteredBoundingBox } from '$lib/BoundingBoxes.svelte.js';
-	 */
+<script lang="ts">
+	import type { CenteredBoundingBox, Rect } from '$lib/BoundingBoxes.svelte.js';
+	import type * as DB from '$lib/database.js';
+	import type { RuntimeValue } from '$lib/schemas/metadata';
+
 	import * as dates from 'date-fns';
 	import { watch } from 'runed';
 
@@ -72,10 +72,6 @@
 
 	import TopbarExtras from '../../TopbarExtras.svelte';
 
-	/**
-	 * @import { RuntimeValue } from '$lib/schemas/metadata';
-	 */
-
 	const { data, params } = $props();
 	const { sortedFileIds } = $derived(data);
 
@@ -94,20 +90,20 @@
 	// Controls visibility of the checkmark little centered overlay
 	let showConfirmedOverlay = $state(async () => {});
 
-	/** @type {typeof tools[number]['name']} */
-	let activeToolName = $state('Glisser-recadrer');
-	/**
-	 * @typedef {object} Tool
-	 * @property {string} name
-	 * @property {string} help
-	 * @property {import('svelte').Component} icon
-	 * @property {string} shortcut
-	 * @property {boolean} transformable if true, the bounding box's sides or corners can be dragged
-	 * @property {'clickanddrag'|'2point'|'4point'|'off'} createMode
-	 * @property {boolean} movable if true, the bounding box can be moved by dragging in its inside
-	 * @property {string} [cursor]
-	 */
-	const tools = /** @type {const} @satisfies {Tool[]} */ ([
+	let activeToolName = $state<(typeof tools)[number]['name']>('Glisser-recadrer');
+
+	interface Tool {
+		name: string;
+		help: string;
+		icon: import('svelte').Component;
+		shortcut: string;
+		transformable: boolean;
+		createMode: 'clickanddrag' | '2point' | '4point' | 'off';
+		movable: boolean;
+		cursor?: string;
+	}
+
+	const tools = [
 		{
 			name: 'Glisser-recadrer',
 			help: 'Cliquer et glisser pour créer une boîte de recadrage',
@@ -158,7 +154,7 @@
 			movable: false,
 			cursor: 'grab',
 		},
-	]);
+	] as const satisfies Tool[];
 
 	const creationTools = $derived(tools.filter(({ createMode }) => createMode !== 'off'));
 
@@ -172,10 +168,7 @@
 			: ''
 	);
 
-	/**
-	 * @type {Record<string, RuntimeValue<'boundingbox'>>}
-	 */
-	const boundingBoxes = $derived(
+	const boundingBoxes = $derived<Record<string, RuntimeValue<'boundingbox'>>>(
 		Object.fromEntries(
 			images
 				.map(({ id, metadata }) => [id, metadata[uiState.cropMetadataId]?.value])
@@ -207,8 +200,9 @@
 		return sortedFileIds.find((fileId) => !hasConfirmedCrop(fileId));
 	});
 
-	/** @type {Record<string, undefined | { value: RuntimeValue<'boundingbox'>, confidence: number }>} */
-	const initialCrops = $derived(
+	const initialCrops = $derived<
+		Record<string, undefined | { value: RuntimeValue<'boundingbox'>; confidence: number }>
+	>(
 		Object.fromEntries(
 			images.map((image) => {
 				if (!image.metadata[uiState.cropMetadataId]) {
@@ -242,10 +236,7 @@
 		)
 	);
 
-	/**
-	 * @param {string|undefined} fileId
-	 */
-	async function goToFile(fileId) {
+	async function goToFile(fileId: string | undefined) {
 		if (!fileId) return;
 		await goto('/(app)/(sidepanel)/o/[observation]/crop/[image]', {
 			// Changing files might mean changing observations, so we can't keep the same
@@ -254,36 +245,23 @@
 		});
 	}
 
-	/**
-	 * @param {string} imageFileId
-	 */
-	function hasCrop(imageFileId) {
+	function hasCrop(imageFileId: string) {
 		return imagesOfImageFile(imageFileId).every(
 			(image) => uiState.cropMetadataId in image.metadata
 		);
 	}
 
-	/**
-	 * @param {string|undefined} imageFileId
-	 */
-	function hasConfirmedCrop(imageFileId) {
+	function hasConfirmedCrop(imageFileId: string | undefined) {
 		if (!imageFileId) return false;
 		return imagesOfImageFile(imageFileId).every(imageHasConfirmedCrop);
 	}
 
-	/**
-	 * @param {DB.Image} image
-	 */
-	function imageHasConfirmedCrop(image) {
+	function imageHasConfirmedCrop(image: DB.Image) {
 		const value = uiState.cropMetadataValueOf(image);
 		return value?.confirmed;
 	}
 
-	/**
-	 * @param {DB.Image} image
-	 * @param {boolean} confirmed
-	 */
-	async function changeCropConfirmedStatus(image, confirmed) {
+	async function changeCropConfirmedStatus(image: DB.Image, confirmed: boolean) {
 		if (!uiState.currentSessionId) return;
 		if (!uiState.cropMetadataId) return;
 
@@ -306,19 +284,13 @@
 		});
 	}
 
-	/**
-	 * @param {boolean} confirmed
-	 */
-	async function changeAllConfirmedStatuses(confirmed) {
+	async function changeAllConfirmedStatuses(confirmed: boolean) {
 		for (const image of images) {
 			await changeCropConfirmedStatus(image, confirmed);
 		}
 	}
 
-	/**
-	 * @param {string} imageId
-	 */
-	async function revertToInferredCrop(imageId) {
+	async function revertToInferredCrop(imageId: string) {
 		const initialCrop = initialCrops[imageId];
 		// On subsequent crops, the user's crop will be the main value and the neural network's crop will be in the alternatives.
 		if (!initialCrop) {
@@ -400,11 +372,13 @@
 	});
 
 	/**
-	 * @param {string} imageId
-	 * @param {object} [options]
-	 * @param {boolean} [options.skipUndo] whether to skip pushing this operation to the undo stack
+	 * @param options
+	 * @param options.skipUndo whether to skip pushing this operation to the undo stack
 	 */
-	async function deleteBoundingBox(imageId, { skipUndo = false } = {}) {
+	async function deleteBoundingBox(
+		imageId: string,
+		{ skipUndo = false }: { skipUndo?: boolean } = {}
+	) {
 		if (!skipUndo) {
 			undo.push('crop/box/delete', {
 				imageId,
@@ -427,18 +401,18 @@
 	}
 
 	/**
-	 * @param {string|null} imageId ID of the image we're confirming a new crop for. Null if we're creating a new cropbox.
-	 * @param {Rect|undefined} newBoundingBox
-	 * @param {boolean} [flashConfirmedOverlay=true] flash the confirmed overlay when appropriate
-	 * @param {boolean} [pushToUndoStack=true] whether to push this change to the undo stack
-	 * @returns {Promise<string|null>} the ID of the image we just modified/created
+	 * @param  imageId ID of the image we're confirming a new crop for. Null if we're creating a new cropbox.
+	 * @param  newBoundingBox
+	 * @param  flashConfirmedOverlay flash the confirmed overlay when appropriate
+	 * @param  pushToUndoStack whether to push this change to the undo stack
+	 * @returns  the ID of the image we just modified/created
 	 */
 	async function onCropChange(
-		imageId,
-		newBoundingBox,
+		imageId: string | null,
+		newBoundingBox: Rect | undefined,
 		flashConfirmedOverlay = true,
 		pushToUndoStack = true
-	) {
+	): Promise<string | null> {
 		if (!uiState.currentSessionId) return null;
 
 		const image = imageId ? images.find((img) => img.id === imageId) : undefined;
@@ -607,10 +581,9 @@
 	}
 
 	/**
-	 * @param {CenteredBoundingBox} box
-	 * @returns {[number, number]} pixel dimensions of the box
+	 * @returns  pixel dimensions of the box
 	 */
-	function roundedPixelDimensions(box) {
+	function roundedPixelDimensions(box: CenteredBoundingBox): [number, number] {
 		if (!firstImage) return [0, 0];
 		const scaler = coordsScaler({
 			x: firstImage.dimensions.width,
@@ -625,15 +598,12 @@
 		uiState.imageOpenedInCropper = fileId;
 	});
 
-	/**
-	 * @typedef {object} SelectedBox
-	 * @property {string|null} imageId
-	 * @property {boolean} manual was selected manually instead of by modifying/creating a new box
-	 */
-	/** The imageID of the currently selected bounding box.
-	 * @type {SelectedBox}
-	 */
-	let selectedBox = $state({
+	interface SelectedBox {
+		imageId: string | null;
+		manual: boolean;
+	}
+
+	let selectedBox = $state<SelectedBox>({
 		imageId: null,
 		manual: false,
 	});
