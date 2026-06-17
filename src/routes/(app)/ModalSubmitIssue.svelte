@@ -2,6 +2,8 @@
 	import type { MetadataError } from '$lib/database';
 	import type { IssueCreatorRequest } from '$lib/schemas/issue-creator';
 
+	import { Capacitor } from '@capacitor/core';
+	import { CapacitorShake } from '@capgo/capacitor-shake';
 	import { UAParser } from 'ua-parser-js';
 	import xss from 'xss';
 
@@ -39,6 +41,22 @@
 			help: type === 'bug' ? 'Signaler un bug' : 'Proposer une fonctionnalité',
 			do: () => open?.(),
 		},
+	});
+
+	let shakeListener = $state<Awaited<ReturnType<(typeof CapacitorShake)['addListener']>>>();
+	$effect(() => {
+		if (type !== 'bug') return;
+		if (!Capacitor.isNativePlatform()) return;
+
+		void (async () => {
+			shakeListener = await CapacitorShake.addListener('shake', () => {
+				open?.();
+			});
+		})();
+
+		return () => {
+			void shakeListener?.remove();
+		};
 	});
 
 	const collectedMetadata = $derived.by(() => {
