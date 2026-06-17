@@ -163,7 +163,7 @@
 		"@wuchale/svelte": "^0.19.4",
 		"arktype": "^2.2.0",
 		"arrival-time": "^1.0.6",
-		"baseline-browser-mapping": "^2.10.34",
+		"baseline-browser-mapping": "^2.10.35",
 		"bits-ui": "^1.8.0",
 		"caniuse-lite": "^1.0.30001797",
 		"convert": "^7.0.0",
