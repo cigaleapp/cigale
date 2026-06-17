@@ -1,0 +1,7 @@
+android-native-changes:
+  - changed-files:
+      - any-glob-to-any-file: [android/*]
+  - head-branch:
+      - renovate/capacitor-.*
+      - renovate/capawesome-.*
+      - renovate/capgo-.*
