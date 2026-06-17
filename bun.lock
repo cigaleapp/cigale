@@ -16,7 +16,7 @@
         "@capawesome/capacitor-file-picker": "^8.0.2",
         "@capgo/capacitor-shake": "^8.0.29",
         "@capgo/inappbrowser": "^8.6.14",
-        "@formatjs/intl-durationformat": "^0.10.13",
+        "@formatjs/intl-durationformat": "^0.10.14",
         "@iconify/svelte": "^5.2.1",
         "@sveltejs/svelte-virtual-list": "^3.0.1",
         "@viselect/vanilla": "^3.9.0",
