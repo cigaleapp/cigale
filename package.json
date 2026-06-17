@@ -40,7 +40,7 @@
 		}
 	],
 	"scripts": {
-		"dev": "vite dev",
+		"dev": "bun --bun vite dev",
 		"dev:native": "electron-forge start",
 		"codegen": "bun run scripts/download-google-fonts.js && bun run scripts/generate-json-schemas.js && bun run scripts/codegen-filepath-types.ts && bun run scripts/generate-assetlinks.ts",
 		"prebuild": "bun run codegen && bun wuchale --clean --sync",
