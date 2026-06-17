@@ -133,7 +133,7 @@ jobs:
       - name: Compute bucket from run number
         id: bucket
         run: |
-          bucket=$(( (RUN_NUMBER * 100 + RUN_ATTEMPT) % 4 ))
+          bucket=$(( (RUN_NUMBER + RUN_ATTEMPT) % 4 ))
           echo "Computed bucket: $bucket"
           echo "bucket=$bucket" >> "$GITHUB_OUTPUT"
         env:
