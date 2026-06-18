@@ -76,5 +76,8 @@ export function compatible(bundle: (typeof UpdateBundleMetadata)['infer']) {
 		`Checking update bundle native code version compatibility: ${bundle.android_native_code_version} (online) vs ${import.meta.env.androidNativeCodeVersion} (installed)`
 	);
 
-	return bundle.android_native_code_version.trim() === import.meta.env.androidNativeCodeVersion.trim();
+	return (
+		bundle.android_native_code_version.trim() ===
+		import.meta.env.androidNativeCodeVersion.trim()
+	);
 }

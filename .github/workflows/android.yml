@@ -31,7 +31,7 @@ on:
       push-update:
         type: boolean
         default: false
-        description: Publish built app as the mobile app's update bundle 
+        description: Publish built app as the mobile app's update bundle
 
     outputs:
       artifact:
@@ -243,7 +243,7 @@ jobs:
           --json | jq -r .checksum > checksum.txt
 
       - name: Create update.json
-        run:  |
+        run: |
           cat <<EOF > update.json
             {
               "version": "$VERSION_NAME",
@@ -255,7 +255,7 @@ jobs:
             }
           EOF
 
-      - name: Verify update.json shape 
+      - name: Verify update.json shape
         run: |
           bun - <<'EOS'
             import { readFileSync } from 'node:fs'

@@ -65,7 +65,7 @@ jobs:
     runs-on: ubuntu-latest
     # Ugly in Github list of environments cuz it causes text wrapping
     # name: Deploy to ${{ inputs.subdomain }}.${{ inputs.domain }}${{ inputs.path }}
-    name: ${{ inputs.job }} 
+    name: ${{ inputs.job }}
     environment:
       name: '${{ github.event.pull_request.number || github.ref_name }}: ${{ inputs.environment }}'
       url: https://${{ inputs.subdomain }}.${{ inputs.domain }}${{ inputs.path }}${{ inputs.environment-url-append }}
@@ -123,7 +123,7 @@ jobs:
           echo Setting up SSH connection to server...
           ssh -vT dev-deployments "echo OK"
       - name: Transfer to server over SSH
-        env: 
+        env:
           CLEAR: ${{ inputs.clear }}
         run: |
           set -x

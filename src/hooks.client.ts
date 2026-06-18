@@ -16,12 +16,12 @@ export const init: ClientInit = async () => {
 
 	App.addListener('appStateChange', async (state) => {
 		if (state.isActive) {
-			console.info("Checking for new update bundles…")
+			console.info('Checking for new update bundles…');
 			const update = await updater.check();
 
 			if (!update) return;
 
-			console.info("New update bundle found!")
+			console.info('New update bundle found!');
 
 			if (!updater.compatible(update)) {
 				console.warn(
