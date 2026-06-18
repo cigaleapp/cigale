@@ -118,13 +118,14 @@ jobs:
         run: |
           set -x
           path="www/${{ inputs.subdomain }}${{ inputs.path }}"
+          rsync_flags="-avz --progress"
 
           # Clean directory
           ssh dev-deployments "rm -rf $path"
           ssh dev-deployments "mkdir -p $path"
 
           # Upload
-          rsync -avz --delete --progress to-upload/ "dev-deployments:$path"
+          rsync $rsync_flags to-upload/ "dev-deployments:$path"
 
       - name: Wait for it to be live
         if: inputs.live-check
