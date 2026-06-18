@@ -1,0 +1,80 @@
+name: Number change
+description: Check if a number in source code changed in the PR
+
+inputs:
+  lhs:
+    description: Regex pattern for the left-hand side of the assignment (the line contents before the number, for example "export const databaseRevision ="). You don't have to specify whitespace at the end of your LHS pattern
+    required: true
+  file:
+    description: File to search for the variable in
+    required: true
+
+outputs:
+  increased:
+    description: The number increased between the base and head of the PR
+    value: ${{ steps.check.outputs.increased }}
+  decreased:
+    description: The number decreased between the base and head of the PR
+    value: ${{ steps.check.outputs.decreased }}
+  changed:
+    description: The number changed (increased or decreased) between the base and head of the PR
+    value: ${{ steps.check.outputs.changed }}
+
+runs:
+  using: composite
+  steps:
+    - name: Check
+      id: check
+      shell: bash
+      run: |
+        current_value=$(sed -nE 's/^${{ inputs.lhs }}[[:space:]]*([0-9]+).*$/\1/p' ${{ inputs.file }})
+        if [ -z "$current_value" ]; then
+          echo "Could not read current value from ${{ inputs.file }}"
+          exit 1
+        fi
+
+        null_sha="0000000000000000000000000000000000000000"
+
+        if [ "${{ github.event_name }}" = "pull_request" ]; then
+          previous_sha="${{ github.event.pull_request.base.sha }}"
+        else
+          previous_sha="${{ github.event.before }}"
+        fi
+
+        if [ "$previous_sha" = "$null_sha" ]; then
+          echo "No previous commit available (new branch/repository history edge case), skipping comparison."
+          exit 0
+        fi
+
+        previous_value=$(
+          git show "$previous_sha:${{ inputs.file }}" \
+            | sed -nE 's/^${{ inputs.lhs }}[[:space:]]*([0-9]+).*$/\1/p'
+        )
+        if [ -z "$previous_value" ]; then
+          echo "Could not read previous value from ${{ inputs.file }} at $previous_sha"
+          exit 1
+        fi
+
+        if ! [[ "$previous_value" =~ ^[0-9]+$ && "$current_value" =~ ^[0-9]+$ ]]; then
+          echo "values must be integers. Got previous='$previous_value', current='$current_value'."
+          exit 1
+        fi
+
+        echo "Previous value: $previous_value"
+        echo "Current value: $current_value"
+
+        if [ "$current_value" -lt "$previous_value" ]; then
+          echo "changed=true" >> $GITHUB_OUTPUT
+          echo "decreased=true" >> $GITHUB_OUTPUT
+          echo "increased=false" >> $GITHUB_OUTPUT
+        elif [ "$current_value" -gt "$previous_value" ]; then
+          echo "changed=true" >> $GITHUB_OUTPUT
+          echo "decreased=false" >> $GITHUB_OUTPUT
+          echo "increased=true" >> $GITHUB_OUTPUT
+        else
+          echo "changed=false" >> $GITHUB_OUTPUT
+          echo "decreased=false" >> $GITHUB_OUTPUT
+          echo "increased=false" >> $GITHUB_OUTPUT
+        fi
+
+        cat $GITHUB_OUTPUT

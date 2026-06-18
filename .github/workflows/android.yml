@@ -20,10 +20,6 @@ on:
         required: true
         type: string
         description: The name of the artifact (contents of the built app, i.e. contents of ./public/) to use
-      version:
-        required: true
-        type: string
-        description: Version name to set for the Android app
       diawi-comment:
         required: true
         type: string
@@ -32,6 +28,10 @@ on:
         required: false
         type: string
         description: The app's name
+      push-update:
+        type: boolean
+        default: false
+        description: Publish built app as the mobile app's update bundle 
 
     outputs:
       artifact:
@@ -65,6 +65,7 @@ env:
   PR_NUMBER: ${{ github.event.number }}
   BUILD_COMMIT: ${{ github.sha }}
   FLAVOR: ${{ inputs.flavor }}
+  VERSION_NAME: 0.0.${{ github.run_number }}
 
 jobs:
   apk:
@@ -74,6 +75,7 @@ jobs:
       STRINGS_FILE: ./android/app/src/main/res/values/strings.xml
     outputs:
       artifact: ${{ steps.artifact.outputs.name }}
+      update-artifact: update-bundle
     steps:
       - name: Checkout
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
@@ -143,7 +145,7 @@ jobs:
           mkdir -p $(dirname $file)
           echo "" > $file
           echo "VERSION_CODE=${{ github.run_number }}" >> $file
-          echo "VERSION_NAME=${{ inputs.version }}" >> $file
+          echo "VERSION_NAME=$VERSION_NAME" >> $file
 
       - name: Set website_host string for PR domain
         if: github.event_name == 'pull_request'
@@ -168,8 +170,18 @@ jobs:
       - name: Move APK file
         run: mv ./android/app/build/outputs/apk/${{ inputs.flavor }}/release/app-${{ inputs.flavor }}-release-signed.apk ./app.apk
 
+      - name: Set PACKAGE_ID
+        id: id
+        run: |
+          if [ "${{ inputs.flavor }}" = "play" ]; then
+            echo "package_id=io.github.cigaleapp" >> $GITHUB_OUTPUT
+          else
+            echo "package_id=io.github.cigaleapp.${FLAVOR}" >> $GITHUB_OUTPUT
+          fi
+
       - name: Check that assetlinks fingerprint matches the APK's
         run: |
+          package_id=${{ steps.id.outputs.package_id }}
           apksigner_output=$(apksigner verify --print-certs ./app.apk)
           echo "apksigner output:"
           echo "$apksigner_output"
@@ -185,12 +197,7 @@ jobs:
             )
 
           echo "APK fingerprint: $apk_fingerprint"
-
-          if [ "$FLAVOR" = "play" ]; then
-            package_id="io.github.cigaleapp"
-          else
-            package_id="io.github.cigaleapp.${FLAVOR}"
-          fi
+          echo "Package ID: $package_id"
 
           echo "Searching for fingerprint in assetlinks.json for target.package_name=$package_id"
 
@@ -228,6 +235,43 @@ jobs:
         id: datetime
         run: echo "now=$(date)" >> $GITHUB_OUTPUT
 
+      - name: Create update bundle
+        run: bunx @capgo/cli bundle zip ${{ steps.id.outputs.package_id }}
+          --path ./public
+          --bundle $VERSION_NAME
+          --name update.zip
+          --json | jq -r .checksum > checksum.txt
+
+      - name: Create update.json
+        run:  |
+          cat <<EOF > update.json
+            {
+              "version": "$VERSION_NAME",
+              "sha": "${{ github.sha }}",
+              "android_native_code_version": "$(cat android/.native-code-version)",
+              "checksum": "$(cat checksum.txt)",
+              "built_at": "${{ steps.datetime.outputs.now }}",
+              "build_logs": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}"
+            }
+          EOF
+
+      - name: Verify update.json shape 
+        run: |
+          bun - <<'EOS'
+            import { readFileSync } from 'node:fs'
+            import { UpdateBundleMetadata } from './src/lib/schemas/update-bundle.js'
+
+            UpdateBundleMetadata.assert(JSON.parse(readFileSync('update.json')))
+          EOS
+
+      - name: Save update bundle
+        uses: actions/upload-artifact@v7
+        with:
+          name: update-bundle
+          path: |
+            ./update.zip
+            ./update.json
+
       - name: Add link to artifact download
         if: github.event_name == 'pull_request'
         uses: nefrob/pr-description@4dcc9f3ad5ec06b2a197c5f8f93db5e69d2fdca7 # v1.2.0
@@ -244,6 +288,23 @@ jobs:
 
             ([wait](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs/${{ github.job }}?pr=${{ github.event.pull_request.number }}) a bit for a QR code and Diawi link)
             <!-- /apk -->
+
+  update-bundle:
+    if: inputs.push-update
+    needs: apk
+    name: Upload update bundle
+    uses: ./.github/workflows/dev-deploy.yml
+    secrets:
+      DEV_DEPLOYMENTS_HOST_KEY: ${{ secrets.DEV_DEPLOYMENTS_HOST_KEY }}
+      DEV_DEPLOYMENTS_SSH_PRIVATE_KEY: ${{ secrets.DEV_DEPLOYMENTS_SSH_PRIVATE_KEY }}
+    with:
+      artifact: ${{ needs.apk.outputs.update-artifact }}
+      live-check: false
+      environment: Update bundle
+      job: Deploy update bundle
+      subdomain: apk
+      clear: false
+      path: /
 
   diawi:
     name: Upload to Diawi
@@ -306,3 +367,4 @@ jobs:
       subdomain: pr-${{ github.event.number }}-reports
       path: /android
       file: problems-report.html
+      job: Deploy problems report

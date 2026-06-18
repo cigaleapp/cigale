@@ -10,6 +10,9 @@
 		/** Additional data associated with the item */
 		data: D;
 		key?: string | number;
+		// TODO: support on desktop too
+		/** Show the item with warning styling. **Note:** Only supported on mobile for now. */
+		warning?: boolean;
 	};
 
 	export type SelectableItem<SD> = Omit<Item<SD>, 'type' | 'key'> & {
@@ -139,6 +142,7 @@
 	)}
 
 	<BottomDrawer
+		--drawer-outer-padding="0"
 		bind:open
 		{title}
 		maxHeight={Math.min(
@@ -174,6 +178,7 @@
 				<button
 					style:height="{heights.item.height}px"
 					class="bottom-drawer-item"
+					class:warning={i.warning}
 					onclick={async () => {
 						i.onclick();
 
@@ -373,7 +378,7 @@
 	}
 
 	.bottom-drawer-item {
-		/* padding: 0.5em; */
+		padding: 0.75em;
 		width: 100%;
 		text-align: left;
 		background: none;
@@ -385,6 +390,11 @@
 
 		&:focus {
 			background: var(--bg-primary-translucent);
+		}
+
+		&.warning {
+			color: var(--fg-warning);
+			background: var(--bg-warning);
 		}
 	}
 

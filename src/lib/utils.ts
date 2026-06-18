@@ -1,5 +1,6 @@
 // @wc-ignore-file
 
+import { Capacitor } from '@capacitor/core';
 import fetchProgress from 'fetch-progress';
 import JSONC from 'tiny-jsonc';
 import YAML from 'yaml';
@@ -1433,3 +1434,7 @@ if (import.meta.vitest) {
 }
 
 export const UTF8_BOM = '\xEF\xBB\xBF';
+
+export function platform() {
+	return Capacitor.getPlatform() as 'web' | 'android' | 'ios';
+}

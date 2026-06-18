@@ -1,5 +1,6 @@
 /// <reference types="vitest" />
 import { execSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
 
 import { sveltekit } from '@sveltejs/kit/vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
@@ -74,6 +75,11 @@ export default defineConfig({
 		'import.meta.env.previewingPrNumber': prNumber ?? 'null',
 		'import.meta.env.builtinProtocols': JSON.stringify(env.BUILTIN_PROTOCOLS),
 		'import.meta.env.webOrigin': JSON.stringify(env.WEB_ORIGIN),
+		'import.meta.env.androidNativeCodeVersion': JSON.stringify(
+			readFileSync('android/.native-code-version', {
+				encoding: 'utf8',
+			})
+		),
 	},
 	worker: {
 		format: 'es',

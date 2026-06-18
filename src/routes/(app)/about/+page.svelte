@@ -1,6 +1,10 @@
 <script lang="ts">
+	import type { BundleInfo } from '@capgo/capacitor-updater';
+	import type { UpdateBundleMetadata } from '$lib/schemas/update-bundle.js';
+
 	import { App } from '@capacitor/app';
 	import { Capacitor } from '@capacitor/core';
+	import { CapacitorUpdater } from '@capgo/capacitor-updater';
 	import JSONC from 'tiny-jsonc';
 	import { UAParser } from 'ua-parser-js';
 
@@ -14,6 +18,8 @@
 	import Logo from '$lib/Logo.svelte';
 	import OverflowableText from '$lib/OverflowableText.svelte';
 	import { seo } from '$lib/seo.svelte';
+	import { isDebugMode } from '$lib/settings.svelte.js';
+	import { safeJSONParse } from '$lib/utils.js';
 
 	import TopbarBackToHome from '../TopbarBackToHome.svelte';
 
@@ -77,6 +83,18 @@
 				...info,
 			};
 		});
+	});
+
+	let updateBundle = $state<BundleInfo | null>(null);
+	let updateMetadata = $state<(typeof UpdateBundleMetadata)['infer'] | null>(null);
+
+	$effect(() => {
+		updateBundle =
+			(safeJSONParse(localStorage.getItem('updateBundle')) as BundleInfo | null) ?? null;
+		updateMetadata =
+			(safeJSONParse(localStorage.getItem('updateMetadata')) as
+				| (typeof UpdateBundleMetadata)['infer']
+				| null) ?? null;
 	});
 
 	let logoDrawPercent = $state(0);
@@ -203,6 +221,32 @@
 				<dt>Build de l'app</dt>
 				<dd>{capacitorInfo.build}</dd>
 			{/if}
+			{#if capacitorInfo || isDebugMode()}
+				<dt>Code natif</dt>
+				<dd>{import.meta.env.androidNativeCodeVersion}</dd>
+			{/if}
+
+			<dt>Update bundle</dt>
+			<dd>
+				<dl>
+					{#if Capacitor.isNativePlatform()}
+						{#await CapacitorUpdater.current() then { bundle }}
+							<dt>ID</dt>
+							<dd>{bundle.id}</dd>
+						{/await}
+					{/if}
+					{#if updateBundle}
+						<dt>Version</dt>
+						<dd>{updateBundle.version}</dd>
+						<dt>Checksum</dt>
+						<dd>{updateBundle.checksum}</dd>
+					{/if}
+					{#if updateMetadata}
+						<dt>Commit</dt>
+						<dd>{updateMetadata.sha}</dd>
+					{/if}
+				</dl>
+			</dd>
 		</dl>
 	</dd>
 	<dt>Parallélisme</dt>
