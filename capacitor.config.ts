@@ -1,3 +1,6 @@
+/// <reference types="@capacitor/splash-screen" />
+/// <reference types="@capgo/capacitor-updater" />
+
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
@@ -9,6 +12,9 @@ const config: CapacitorConfig = {
 			// Hidden in load() in file://./src/routes/(app)/+layout.js
 			// See https://capacitorjs.com/docs/apis/splash-screen#hiding-the-splash-screen
 			launchAutoHide: false,
+		},
+		CapacitorUpdater: {
+			autoUpdate: 'atBackground',
 		},
 	},
 	android: {

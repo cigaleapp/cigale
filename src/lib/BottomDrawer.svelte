@@ -1,3 +1,12 @@
+<!-- 
+ @component
+
+ CSS Variables:
+
+- `--drawer-outer-padding`: Outer padding for the drawer content
+
+  -->
+
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 
@@ -58,7 +67,7 @@
 
 	[data-bottomsheet-wrapper] :global(.bottom-sheet-content) {
 		width: 100%;
-		padding: 0.75rem;
+		padding: var(--drawer-outer-padding, 0.75rem);
 	}
 
 	.title {

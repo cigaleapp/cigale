@@ -37,4 +37,10 @@
 		--size: 1.5em;
 		--stroke-width: 4.2rem;
 	}
+
+	.actions {
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
+	}
 </style>

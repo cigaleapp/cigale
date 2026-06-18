@@ -2,6 +2,7 @@ name: Checks
 
 on:
   pull_request:
+    types: [synchronize, closed, converted_to_draft, ready_for_review, unlabeled, labeled]
   push:
     branches: [main]
 
@@ -16,53 +17,22 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+      - name: Checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
         with:
           fetch-depth: 0
-      - name: Check database revision monotonicity
-        run: |
-          current_revision=$(sed -nE 's/^export const databaseRevision[[:space:]]*=[[:space:]]*([0-9]+);?$/\1/p' src/lib/idb.svelte.js)
-          if [ -z "$current_revision" ]; then
-            echo "Could not read current databaseRevision from src/lib/idb.svelte.js"
-            exit 1
-          fi
-
-          null_sha="0000000000000000000000000000000000000000"
-
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            previous_sha="${{ github.event.pull_request.base.sha }}"
-          else
-            previous_sha="${{ github.event.before }}"
-          fi
-
-          if [ "$previous_sha" = "$null_sha" ]; then
-            echo "No previous commit available (new branch/repository history edge case), skipping comparison."
+      - uses: ./.github/actions/number-change
+        id: change
+        with:
+          file: src/lib/idb.svelte.js
+          lhs: export const databaseRevision =
+      - run: |
+          if [[ ${{ steps.change.outputs.increased }} = "false" ]]; then
             exit 0
-          fi
-
-          previous_revision=$(
-            git show "$previous_sha:src/lib/idb.svelte.js" \
-              | sed -nE 's/^export const databaseRevision[[:space:]]*=[[:space:]]*([0-9]+);?$/\1/p'
-          )
-          if [ -z "$previous_revision" ]; then
-            echo "Could not read previous databaseRevision from src/lib/idb.svelte.js at $previous_sha"
+          else
+            echo Database revision was decreased
             exit 1
           fi
-
-          if ! [[ "$previous_revision" =~ ^[0-9]+$ && "$current_revision" =~ ^[0-9]+$ ]]; then
-            echo "databaseRevision values must be integers. Got previous='$previous_revision', current='$current_revision'."
-            exit 1
-          fi
-
-          echo "Previous databaseRevision: $previous_revision"
-          echo "Current databaseRevision: $current_revision"
-
-          if [ "$current_revision" -lt "$previous_revision" ]; then
-            echo "databaseRevision decreased from $previous_revision to $current_revision."
-            exit 1
-          fi
-
-          echo "databaseRevision did not decrease."
 
   lint:
     name: Lint
@@ -178,6 +148,32 @@ jobs:
     with:
       artifact: ${{ needs.build-github-pages.outputs.artifact }}
 
+  check-native-version:
+    if: contains(github.event.pull_request.labels.*.name, 'android-native-changes')
+    name: Ensure native code version bump
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        with:
+          fetch-depth: 0
+
+      - name: Get native code version change
+        id: version
+        uses: ./.github/actions/number-change
+        with:
+          file: android/.native-code-version
+          lhs: ''
+
+      - name: Verify that it changed
+        run: |
+          if [[ "${{ steps.version.outputs.changed }}" == "true" ]]; then
+            exit 0
+          else
+            echo "android/.native-code-version didn't change!!"
+            exit 1
+          fi
+
   dont-merge-comment:
     name: Check for presence of "do not merge" comment
     runs-on: ubuntu-latest
@@ -209,6 +205,7 @@ jobs:
       - preview
       - bundlesize
       - dont-merge-comment
+      - check-native-version
     runs-on: ubuntu-latest
     steps:
       - if: contains(needs.*.result, 'failure')
@@ -230,9 +227,9 @@ jobs:
       DEV_DEPLOYMENTS_SSH_PRIVATE_KEY: ${{ secrets.DEV_DEPLOYMENTS_SSH_PRIVATE_KEY }}
       DEV_DEPLOYMENTS_HOST_KEY: ${{ secrets.DEV_DEPLOYMENTS_HOST_KEY }}
     with:
+      push-update: true
       flavor: nightly
       artifact: ${{ needs.build.outputs.artifact }}
-      version: NIGHTLY/${{ github.sha }}
       app-name: Cigale Dev
       diawi-comment: |
         This is a nightly build from the ${{ github.ref_name }} branch.
@@ -276,6 +273,7 @@ jobs:
     uses: ./.github/workflows/dev-deploy.yml
     secrets: inherit
     with:
+      clear: false
       environment: APK Download Page
       artifact: apk-webpage
       path: /

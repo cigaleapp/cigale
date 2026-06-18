@@ -17,11 +17,13 @@
 	import { formatBytesSize } from '$lib/i18n.js';
 	import { list, listByIndex } from '$lib/idb.svelte.js';
 	import LoadingText, { Loading } from '$lib/LoadingText.svelte';
+	import { IsMobile } from '$lib/mobile.svelte.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { deleteSession } from '$lib/sessions.js';
 	import { tooltip } from '$lib/tooltips.js';
 	import { sum } from '$lib/utils.js';
 
+	import TopbarBackToHome from '../TopbarBackToHome.svelte';
 	import Table from './Table.svelte';
 
 	$effect(() => {
@@ -39,11 +41,17 @@
 		const imagePreviewFiles = await listByIndex('ImagePreviewFile', 'sessionId', sessionId);
 		return sum([...imageFiles, ...imagePreviewFiles].map((f) => f.bytes.byteLength));
 	}
+
+	const mobile = new IsMobile();
 </script>
+
+<TopbarBackToHome>Stockage</TopbarBackToHome>
 
 <main>
 	<header>
-		<h1>Stockage</h1>
+		{#if !mobile.current}
+			<h1>Stockage</h1>
+		{/if}
 		{#if estimate?.quota && estimate.usage}
 			<section class="quota">
 				<ProgressBar alwaysActive progress={estimate.usage / estimate.quota} />
