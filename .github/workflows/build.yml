@@ -45,6 +45,7 @@ jobs:
             protocols/insecta.cigaleprotocol.yaml
             protocols/entomoscope.cigaleprotocol.yaml
             examples/arthropods.cigaleprotocol.json
+            protocols/idmybee.cigaleprotocol.json
         run: |
           builtins_list=""
           changes=""
