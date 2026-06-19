@@ -10,7 +10,6 @@ import {
 	entries,
 	expectZipFiles,
 	exportResults,
-	firstObservationCard,
 	goToSessionPage,
 	importPhotos,
 	newSession,
@@ -36,7 +35,7 @@ test('correctly applies crop padding', issue(463), async ({ page, app }) => {
 	await app.tabs.go('crop');
 	// Reduce flakiness
 	await page.waitForTimeout(1_000);
-	await firstObservationCard(page).click();
+	await app.gallery.card(0).click();
 	await page.getByRole('button', { name: "Choisir l'outil 2 points" }).click();
 	// TODO fix coordinates for WebKit, current snapshots is off-center
 	await page.mouse.click(275, 282);

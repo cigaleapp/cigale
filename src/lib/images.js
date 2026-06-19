@@ -7,6 +7,7 @@ import { errorMessage, humanFormatName } from './i18n.js';
 import * as db from './idb.svelte.js';
 import { tables } from './idb.svelte.js';
 import { imageLimits } from './inference_utils.js';
+import { removeImagesFromObservation } from './observations.js';
 import { RAW_IMAGE_MEDIA_TYPES } from './raw.js';
 import { clamp, unique } from './utils.js';
 
@@ -64,7 +65,7 @@ if (import.meta.vitest) {
 /**
  * @param {string} id
  */
-export function isValidImageId(id) {
+function isValidImageId(id) {
 	return /^[0-9A-Z]{26}_\d+$/.test(id);
 }
 
@@ -161,7 +162,7 @@ export function imageBufferWasSaved(image) {
 
 /**
  *
- * @param {string} id ImageFile ID or Image ID
+ * @param {string} id ImageFile ID
  * @param {IDBTransactionWithAtLeast<["Image", "ImageFile", "ImagePreviewFile"]>} [tx]
  * @param {boolean} [notFoundOk=true]
  */
@@ -170,29 +171,26 @@ export async function deleteImageFile(id, tx, notFoundOk = true) {
 		['Image', 'ImageFile', 'ImagePreviewFile', 'Observation'],
 		{ tx, session: uiState.currentSession?.id },
 		async (tx) => {
-			const observations = await tx.objectStore('Observation').getAll();
-			// Store there cuz imagesOfImageFile() reads from reactive state.
-			const imagesOfFile = imagesOfImageFile(id);
 			try {
+				const imagesOfFile = await tx.objectStore('Image').index('fileId').getAll(id);
+
 				tx.objectStore('ImageFile').delete(id);
 				tx.objectStore('ImagePreviewFile').delete(id);
 
 				for (const image of imagesOfFile) {
 					tx.objectStore('Image').delete(image.id);
 
-					for (const observation of observations) {
-						const remainingImages = observation.images.filter(
-							(imageId) => imageId !== image.id
-						);
+					const observations = await tx
+						.objectStore('Observation')
+						.index('images')
+						.getAll(image.id);
 
-						if (remainingImages.length === 0) {
-							tx.objectStore('Observation').delete(observation.id);
-						} else if (remainingImages.length < observation.images.length) {
-							tx.objectStore('Observation').put({
-								...observation,
-								images: remainingImages,
-							});
-						}
+					for (const obs of observations) {
+						await removeImagesFromObservation({
+							tx,
+							observation: obs.id,
+							images: [image.id],
+						});
 					}
 				}
 			} catch (error) {
@@ -213,6 +211,47 @@ export async function deleteImageFile(id, tx, notFoundOk = true) {
 		URL.revokeObjectURL(previewURL);
 		uiState.previewURLs.delete(id);
 	}
+}
+
+/**
+ * Delete an image and clean up dangling image files afterwards
+ * @param {string} id Image ID
+ * @param {IDBTransactionWithAtLeast<["Image", "ImageFile", "ImagePreviewFile"]>} [tx]
+ * @param {boolean} [notFoundOk=true]
+ */
+export async function deleteImage(id, tx, notFoundOk = true) {
+	await db.openTransaction(
+		['Image', 'ImageFile', 'ImagePreviewFile', 'Observation'],
+		{ tx, session: uiState.currentSessionId },
+		async (tx) => {
+			try {
+				await tx.objectStore('Image').delete(id);
+
+				const otherImages = await tx
+					.objectStore('Image')
+					.index('fileId')
+					.count(imageIdToFileId(id));
+
+				if (otherImages === 0) {
+					console.debug(`Deleting image ${id}: image file ${imageIdToFileId(id)} is now empty, deleting it too`)
+					await deleteImageFile(imageIdToFileId(id), tx, notFoundOk);
+				}
+
+				const observations = await tx.objectStore('Observation').index('images').getAll(id);
+
+				for (const observation of observations) {
+					await removeImagesFromObservation({
+						tx,
+						observation: observation.id,
+						images: [id],
+					});
+				}
+			} catch (e) {
+				if (notFoundOk) return;
+				throw e;
+			}
+		}
+	);
 }
 
 /**
@@ -359,23 +398,6 @@ if (import.meta.vitest) {
 
 		_tablesState.Image = images;
 		expect(imagesOfImageFile('1')).toEqual([img1, img2]);
-	});
-}
-
-/**
- *
- * @param {Array<Pick<Image, "fileId">>} images
- * @returns {string[]}
- */
-export function imageFileIds(images) {
-	return unique(images.map((image) => image.fileId).filter((id) => id !== null));
-}
-
-if (import.meta.vitest) {
-	const { test, expect } = import.meta.vitest;
-	test('imageFileIds', () => {
-		const images = [sampleImage('1', '1'), sampleImage('2', '1'), sampleImage('3', '2')];
-		expect(imageFileIds(images)).toEqual(['1', '2']);
 	});
 }
 

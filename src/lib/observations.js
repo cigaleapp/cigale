@@ -2,7 +2,7 @@ import { generateId } from '$lib/database.js';
 
 import * as db from './idb.svelte.js';
 import { tables } from './idb.svelte.js';
-import { deleteImageFile, imageFileIds } from './images.js';
+import { deleteImage } from './images.js';
 import {
 	mergeMetadataFromImagesAndObservations,
 	serializeMetadataFullValue,
@@ -89,18 +89,48 @@ export async function deleteObservation(
 
 			tx.objectStore('Observation').delete(id);
 
-			const images = await tx
-				.objectStore('Image')
-				.getAll()
-				.then((images) => images.filter((i) => observation.images.includes(i.id)));
-
 			if (recursive) {
-				for (const fileId of imageFileIds(images)) {
-					await deleteImageFile(fileId, tx, notFoundOk);
+				console.debug(`Deleting images of observation ${id}: `, observation.images)
+				for (const imageId of observation.images) {
+					await deleteImage(imageId, tx, notFoundOk);
 				}
 			}
 
 			uiState.erroredImages.delete(id);
+		}
+	);
+}
+
+/**
+ *  If removing images causes the observation to be empty, it is deleted
+ * @param {object} options
+ * @param {string} options.observation observation ID
+ * @param {string[]} options.images image IDs to remove from the observation
+ * @param {import('./idb.svelte.js').IDBTransactionWithAtLeast<["Observation"]>} [options.tx] re-use an ongoing transaction
+ */
+export async function removeImagesFromObservation({
+	observation: observationId,
+	images: imageIds,
+	tx,
+}) {
+	await db.openTransaction(
+		['Observation'],
+		{ tx, session: uiState.currentSessionId },
+		async (tx) => {
+			const observation = await tx.objectStore('Observation').get(observationId);
+			if (!observation) throw new Error(`Observation ${observationId} not found`)
+			const remaining = observation.images.filter((id) => !imageIds.includes(id));
+
+			if (remaining.length === 0) {
+				console.debug(`Removing ${imageIds} from ${observationId}: observation would be empty, deleting it`)
+				await tx.objectStore('Observation').delete(observationId);
+			} else {
+				console.debug(`Removing ${imageIds} from ${observationId}: ${remaining} remains`)
+				await tx.objectStore('Observation').put({
+					...observation,
+					images: remaining,
+				});
+			}
 		}
 	);
 }

@@ -13,13 +13,7 @@
 	import CardImage from '$lib/CardImage.svelte';
 	import CardObservation from '$lib/CardObservation.svelte';
 	import { tables } from '$lib/idb.svelte';
-	import {
-		deleteImageFile,
-		imageBufferWasSaved,
-		imageIdToFileId,
-		imageIsClassified,
-		isValidImageId,
-	} from '$lib/images';
+	import { deleteImage, imageBufferWasSaved, imageIsClassified } from '$lib/images';
 	import { inferenceModelId, loadModel } from '$lib/inference.js';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
 	import Logo from '$lib/Logo.svelte';
@@ -287,8 +281,8 @@
 						ondelete={async () => {
 							const imageIds = tables.Observation.getFromState(id)?.images ?? [id];
 							imageIds.forEach((id) => cancelTask(id, 'Cancelled by user'));
-							if (isValidImageId(id)) await deleteImageFile(imageIdToFileId(id));
 							await deleteObservation(id, { notFoundOk: true, recursive: true });
+							await deleteImage(id, undefined, true);
 						}}
 					/>
 				{:else if image}

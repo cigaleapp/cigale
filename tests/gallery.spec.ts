@@ -7,8 +7,9 @@ import type { Locator } from '@playwright/test';
 import { addDays } from 'date-fns';
 
 import lightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
-import { assert, test } from './fixtures.js';
-import { chooseFirstSession, chooseInDropdown } from './utils/index.js';
+import { issue } from './annotations.js';
+import { assert, expect, test, testBasic } from './fixtures.js';
+import { chooseFirstSession, chooseInDropdown, setInferenceModels } from './utils/index.js';
 
 const photos = [
 	'lil-fella.jpeg',
@@ -122,6 +123,59 @@ test.describe('grouping', () => {
 		await assert(leaf).toBeVisible();
 	});
 });
+
+testBasic(
+	'deleting an observation does not delete ImageFiles that appear in other observations',
+	issue(1744),
+	async ({ page, app }) => {
+		await app.settings.set({ showTechnicalMetadata: true });
+		await setInferenceModels(page, {
+			crop: 'Aucune inférence',
+			classify: 'Aucune inférence',
+		});
+
+		await app.tabs.go('crop');
+		await app.gallery.card('leaf.jpeg').click();
+		await app.path.wait('/(app)/(sidepanel)/o/[observation]/crop/[image]');
+
+		let boxCoords = [0, 0, 0, 0];
+		page.on('dialog', async (dialog) => {
+			await dialog.accept(boxCoords.join(' '));
+		});
+
+		boxCoords = [0.1, 0.1, 0.5, 0.5];
+		await page.keyboard.press('x');
+		await page.keyboard.press('b');
+		await app.wait('500ms');
+
+		boxCoords = [0.3, 0.6, 0.25, 0.125];
+		await page.keyboard.press('x');
+		await page.keyboard.press('b');
+		await app.wait('500ms');
+
+		assert(await app.db.count('Image')).toBe(6);
+		await page.keyboard.press('Escape');
+
+		await app.path.wait('/(app)/(sidepanel)/crop');
+		await app.tabs.go('classify');
+
+		await app.gallery.select('leaf#0', 'cyan');
+		await page.keyboard.press('ControlOrMeta+G');
+
+		await app.gallery.select('leaf#1', 'with-exif-gps');
+		await page.keyboard.press('ControlOrMeta+G');
+
+		await app.gallery.select('leaf#0');
+		await page.keyboard.press('Delete');
+
+		await app.wait('500ms');
+		expect(await app.db.count('Observation')).toBe(3);
+		// we had 4, added two more, then deleted a obs with 2 in it
+		expect(await app.db.count('Image')).toBe(4 + 2 - 2);
+		expect(await app.db.count('ImageFile')).toBe(3);
+		expect(await app.db.image.byFilename('leaf.jpeg')).not.toBeUndefined();
+	}
+);
 
 function testCardsOrder<Label extends Exclude<keyof SortFieldByLabel, 'ID'>>(
 	field: SortSelector<Label>['field'],

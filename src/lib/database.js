@@ -105,9 +105,9 @@ const MetadataValueFile = table(
 	})
 );
 
-const Image = table(['id', 'addedAt', 'sessionId'], ImageSchema);
+const Image = table(['id', 'addedAt', 'sessionId', 'fileId'], ImageSchema);
 
-const Observation = table(['id', 'addedAt', 'sessionId'], ObservationSchema);
+const Observation = table(['id', 'addedAt', 'sessionId', 'images[]'], ObservationSchema);
 
 const Session = table(['id', 'remoteId'], SessionSchema);
 

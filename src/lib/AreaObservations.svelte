@@ -28,7 +28,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	import { DragSelect } from './dragselect.svelte.js';
 	import { galleryItemsGrouper, galleryItemsSorter } from './gallery.js';
 	import { openTransaction } from './idb.svelte.js';
-	import { deleteImageFile } from './images.js';
+	import { deleteImage } from './images.js';
 	import { defineKeyboardShortcuts } from './keyboard.svelte.js';
 	import Logo from './Logo.svelte';
 	import { mutationobserver, resizeobserver } from './mutations.js';
@@ -356,7 +356,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 														notFoundOk: true,
 														recursive: true,
 													});
-													await deleteImageFile(id, tx, true);
+													await deleteImage(id, tx, true);
 												}
 											}
 										);

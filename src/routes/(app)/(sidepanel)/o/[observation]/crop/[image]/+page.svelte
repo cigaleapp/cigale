@@ -726,7 +726,7 @@
 				},
 			])
 		),
-		'd e v +': {
+		'x b': {
 			help: 'Entrer des coordonnées de boîte',
 			async do() {
 				const [x, y, w, h] = (

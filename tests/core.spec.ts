@@ -16,7 +16,6 @@ import {
 	clickInDropdown,
 	expectZipFiles,
 	exportResults,
-	firstObservationCard,
 	importPhotos,
 	mockProtocolSourceURL,
 	mockUrl,
@@ -107,7 +106,7 @@ for (const offline of [false, true]) {
 			await app.loading.wait();
 
 			// Check for classification results in sidepanel
-			await firstObservationCard(page).click();
+			await app.gallery.card(0).click();
 			await assert(page.getByText('Espèce', { exact: true })).toBeVisible();
 
 			// Export results

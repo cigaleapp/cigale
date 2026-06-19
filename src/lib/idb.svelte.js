@@ -16,7 +16,7 @@ export const previewingPrNumber =
 	import.meta.env.previewingPrNumber === 'null' ? null : import.meta.env.previewingPrNumber;
 
 export const databaseName = previewingPrNumber ? `previews/pr-${previewingPrNumber}` : 'database';
-export const databaseRevision = 9;
+export const databaseRevision = 10;
 
 const profile = profiler('Database');
 
@@ -575,6 +575,11 @@ export async function openDatabase() {
 				await mutateRows('Observation', migrateAlternativesIn('metadataOverrides'));
 				await mutateRows('Image', migrateAlternativesIn('metadata'));
 				await mutateRows('Session', migrateAlternativesIn('metadata'));
+			}
+
+			if (oldVersion === 9) {
+				rebuildIndexes('Image');
+				rebuildIndexes('Observation');
 			}
 
 			for (const [tableName, schema] of tablesByName) {

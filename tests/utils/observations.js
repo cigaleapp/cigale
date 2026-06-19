@@ -5,28 +5,29 @@
 import { throwError } from './core.js';
 
 /**
- *
- * @param {Page} page
- * @returns
+ * number: target n-th card (0-based);
+ * string: target by title. Equivalent to title#0;
+ * string#number: target n-th card within those that have the specified title
+ * @typedef {number | `${string}#${number}` | string } GalleryCardSpecifier
  */
-export function firstObservationCard(page) {
-	return page.getByTestId('observations-area').getByRole('article').first();
-}
 
 /**
  * @param {Page} page
- * @param {string} label
+ * @param {GalleryCardSpecifier} specifier
  */
-export function observationCard(page, label) {
-	return page
-		.getByTestId('observations-area')
-		.getByRole('article')
-		.filter({
-			has: page.getByRole('heading', {
-				name: label,
-			}),
-		})
-		.first();
+export function galleryCard(page, specifier) {
+	let cards = page.getByTestId('observations-area').getByRole('article');
+
+	if (typeof specifier === 'number') {
+		return cards.nth(specifier);
+	}
+
+	if (typeof specifier === 'string' && specifier.match(/^.+#\d+$/)) {
+		const [title, nth] = specifier.split('#');
+		return cards.filter({ has: page.getByRole('heading', { name: title }) }).nth(Number(nth));
+	}
+
+	return galleryCard(page, `${specifier}#0`);
 }
 
 /**

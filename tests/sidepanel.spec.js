@@ -6,7 +6,6 @@ import { assert, expect, test, testBasic, testKitchensink } from './fixtures.js'
 import {
 	changeSessionProtocol,
 	chooseFirstSession,
-	firstObservationCard,
 	goToProtocolManagement,
 	importPhotos,
 	importProtocol,
@@ -63,7 +62,7 @@ testKitchensink(
 		await initialize({ page, app, protocol: 'kitchensink' });
 
 		await app.tabs.go('import');
-		await firstObservationCard(page).click();
+		await app.gallery.card(0).click();
 		await assert(page.getByTestId('sidepanel')).toBeVisible();
 
 		// Set to True on image itself
@@ -83,7 +82,7 @@ testKitchensink(
 
 		// Set to False on observation
 		await app.tabs.go('classify', { force: true });
-		await firstObservationCard(page).click();
+		await app.gallery.card(0).click();
 		await app.metadata.switch('bool').click();
 		await app.metadata.switch('bool').click();
 		await app.metadata.switch('bool').click();
@@ -94,7 +93,7 @@ testKitchensink(
 
 		// Expect image to be still True
 		await app.tabs.go('import');
-		await firstObservationCard(page).click();
+		await app.gallery.card(0).click();
 		await assert(app.metadata.section('bool')).toMatchAriaSnapshot(`
 		  - text: bool
 		  - switch [checked]:
@@ -639,7 +638,7 @@ test('displays metadata groups', async ({ page, app }) => {
 
 	await page.waitForTimeout(500);
 
-	await firstObservationCard(page).click();
+	await app.gallery.card(0).click();
 
 	await expect(page.getByTestId('sidepanel').locator('.metadata')).toHaveText([
 		'Ungrouped key 2',
