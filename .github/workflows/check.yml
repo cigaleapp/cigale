@@ -27,7 +27,7 @@ jobs:
           file: src/lib/idb.svelte.js
           lhs: export const databaseRevision =
       - run: |
-          if [[ ${{ steps.change.outputs.increased }} = "false" ]]; then
+          if [[ "${{ steps.change.outputs.decreased }}" = "false" ]]; then
             exit 0
           else
             echo Database revision was decreased
