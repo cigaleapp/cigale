@@ -107,7 +107,24 @@ jobs:
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
 
-      - name: Update issue
+      - name: Update repo's custom property
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_CUSTOM_PROPERTIES_MANAGER }}
+
+          PERCENT: ${{ steps.count.outputs.percent }}
+
+        with:
+          script: |
+            await github.rest.repos.createOrUpdateCustomPropertiesValues({
+              ...context.repo,
+              properties: [{
+                property_name: "Typescriptification",
+                value: process.env.PERCENT + "%"
+              }]
+            })
+
+      - name: Update issue 
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
         env:
           GITHUB_TOKEN: ${{ github.token }}
