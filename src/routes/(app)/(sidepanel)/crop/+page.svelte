@@ -10,7 +10,6 @@
 	import { deleteImageFile, imageIsAnalyzed } from '$lib/images';
 	import Logo from '$lib/Logo.svelte';
 	import { mergeMetadataValues } from '$lib/metadata/index.js';
-	import { deleteObservation } from '$lib/observations.js';
 	import { goto } from '$lib/paths.js';
 	import { cancelTask, detectMore } from '$lib/queue.svelte.js';
 	import { seo } from '$lib/seo.svelte';
@@ -77,7 +76,6 @@
 				ondelete={async () => {
 					cancelTask(fileId, 'Cancelled by user');
 					uiState.processing.removeFile(fileId);
-					await deleteObservation(fileId);
 					await deleteImageFile(fileId);
 				}}
 				onclick={async (_e, set) => {

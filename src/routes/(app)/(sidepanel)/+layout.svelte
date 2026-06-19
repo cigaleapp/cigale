@@ -6,7 +6,7 @@
 	import { promptForFiles } from '$lib/files';
 	import * as db from '$lib/idb.svelte';
 	import { openTransaction, tables } from '$lib/idb.svelte';
-	import { deleteImageFile, imageFileId, imageIdToFileId } from '$lib/images';
+	import { deleteImage, deleteImageFile, imageFileId } from '$lib/images';
 	import { ACCEPTED_IMPORT_TYPES } from '$lib/import.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import {
@@ -74,7 +74,7 @@
 					cancelTask(id, 'Cancelled by user');
 					await deleteObservation(id, { tx, notFoundOk: true, recursive: true });
 					await deleteImageFile(id, tx, true);
-					await deleteImageFile(imageIdToFileId(id), tx, true);
+					await deleteImage(id, tx, true);
 				}
 			}
 		);

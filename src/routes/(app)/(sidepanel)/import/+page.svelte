@@ -7,11 +7,10 @@
 	import Dropzone from '$lib/Dropzone.svelte';
 	import { promptForFiles } from '$lib/files';
 	import { tables } from '$lib/idb.svelte';
-	import { deleteImageFile } from '$lib/images';
+	import { deleteImage } from '$lib/images';
 	import { ACCEPTED_IMPORT_TYPES } from '$lib/import.svelte';
 	import Logo from '$lib/Logo.svelte';
 	import { IsMobile } from '$lib/mobile.svelte.js';
-	import { deleteObservation } from '$lib/observations';
 	import { cancelTask, importMore } from '$lib/queue.svelte.js';
 	import { uiState } from '$lib/state.svelte.js';
 	import { unique } from '$lib/utils';
@@ -70,7 +69,7 @@
 						ondelete={async () => {
 							cancelTask(id, 'Cancelled by user');
 							uiState.processing.removeFile(id);
-							await deleteImageFile(id);
+							await deleteImage(id);
 						}}
 					/>
 				{:else}
@@ -83,11 +82,9 @@
 						tooltip={error}
 						image={undefined}
 						dimensions={undefined}
-						ondelete={async () => {
+						ondelete={() => {
 							cancelTask(id, 'Cancelled by user');
 							uiState.processing.removeFile(id);
-							await deleteObservation(id);
-							await deleteImageFile(id);
 						}}
 					/>
 				{/if}
