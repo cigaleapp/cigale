@@ -1,9 +1,5 @@
 import { assert, test } from '../fixtures.js';
-import {
-	chooseInDropdown,
-	importPhotos,
-	newSession,
-} from '../utils/index.js';
+import { chooseInDropdown, importPhotos, newSession } from '../utils/index.js';
 
 test.describe('screenshots', { tag: '@real-protocol' }, () => {
 	test.skip(

@@ -90,7 +90,7 @@ export async function deleteObservation(
 			tx.objectStore('Observation').delete(id);
 
 			if (recursive) {
-				console.debug(`Deleting images of observation ${id}: `, observation.images)
+				console.debug(`Deleting images of observation ${id}: `, observation.images);
 				for (const imageId of observation.images) {
 					await deleteImage(imageId, tx, notFoundOk);
 				}
@@ -118,14 +118,16 @@ export async function removeImagesFromObservation({
 		{ tx, session: uiState.currentSessionId },
 		async (tx) => {
 			const observation = await tx.objectStore('Observation').get(observationId);
-			if (!observation) throw new Error(`Observation ${observationId} not found`)
+			if (!observation) throw new Error(`Observation ${observationId} not found`);
 			const remaining = observation.images.filter((id) => !imageIds.includes(id));
 
 			if (remaining.length === 0) {
-				console.debug(`Removing ${imageIds} from ${observationId}: observation would be empty, deleting it`)
+				console.debug(
+					`Removing ${imageIds} from ${observationId}: observation would be empty, deleting it`
+				);
 				await tx.objectStore('Observation').delete(observationId);
 			} else {
-				console.debug(`Removing ${imageIds} from ${observationId}: ${remaining} remains`)
+				console.debug(`Removing ${imageIds} from ${observationId}: ${remaining} remains`);
 				await tx.objectStore('Observation').put({
 					...observation,
 					images: remaining,

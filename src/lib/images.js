@@ -233,7 +233,9 @@ export async function deleteImage(id, tx, notFoundOk = true) {
 					.count(imageIdToFileId(id));
 
 				if (otherImages === 0) {
-					console.debug(`Deleting image ${id}: image file ${imageIdToFileId(id)} is now empty, deleting it too`)
+					console.debug(
+						`Deleting image ${id}: image file ${imageIdToFileId(id)} is now empty, deleting it too`
+					);
 					await deleteImageFile(imageIdToFileId(id), tx, notFoundOk);
 				}
 

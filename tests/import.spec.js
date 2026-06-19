@@ -7,12 +7,12 @@ import {
 	chooseFirstSession,
 	expectZipFiles,
 	exportResults,
+	galleryCard,
 	importPhotos,
 	importResults,
 	loadingText,
 	mockUrl,
 	newSession,
-	galleryCard,
 	setInferenceModels,
 } from './utils/index.js';
 
@@ -389,9 +389,7 @@ test('cannot import an extremely large image', issue(412, 414), async ({ page, a
 	await app.tabs.go('import');
 	await importPhotos({ page }, '20K-gray.jpeg');
 	await app.loading.wait();
-	await assert(app.gallery.card(0)).toHaveTooltip(
-		/L'image est trop grande pour être traitée/
-	);
+	await assert(app.gallery.card(0)).toHaveTooltip(/L'image est trop grande pour être traitée/);
 });
 
 test.fixme('can cancel import', issue(430), async ({ page, app }) => {
