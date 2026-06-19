@@ -193,7 +193,6 @@ msgstr "Loading…"
 msgid "Choisir le protocole"
 msgstr "Choose protocol"
 
-#: src/routes/(app)/+layout.ts
 #: src/routes/(app)/about/+page.svelte
 msgid "Chrome"
 msgstr "Chrome"
@@ -1030,6 +1029,7 @@ msgstr "Protocol download URL"
 msgid "Version actuelle"
 msgstr "Current version"
 
+#: src/routes/(app)/about/+page.svelte
 #: src/routes/(app)/protocols/[id]/versioning/+page.svelte
 msgid "Version"
 msgstr "Version"
@@ -2704,6 +2704,7 @@ msgid "Sans stockage persistant, Chrome peut supprimer les données de l'applica
 msgstr ""
 
 #: src/routes/(app)/storage/+page.svelte
+#: src/routes/(app)/storage/+page.svelte
 msgid "Stockage"
 msgstr ""
 
@@ -2753,4 +2754,37 @@ msgstr ""
 
 #: src/lib/Xper3Logo.svelte
 msgid "Artboard1"
+msgstr ""
+
+#: src/routes/(app)/+layout.ts
+#: src/routes/(app)/Settings.svelte
+msgid "Blink"
+msgstr ""
+
+#: src/routes/(app)/Settings.svelte
+msgid "Impossible de télécharger la mise à jour. Veuillez rééssayer plus tard."
+msgstr ""
+
+#: src/routes/(app)/Settings.svelte
+msgid "Impossible d'installer la mise à jour"
+msgstr ""
+
+#: src/routes/(app)/about/+page.svelte
+msgid "Code natif"
+msgstr ""
+
+#: src/routes/(app)/about/+page.svelte
+msgid "Update bundle"
+msgstr ""
+
+#: src/routes/(app)/about/+page.svelte
+msgid "ID"
+msgstr ""
+
+#: src/routes/(app)/about/+page.svelte
+msgid "Checksum"
+msgstr ""
+
+#: src/routes/(app)/about/+page.svelte
+msgid "Commit"
 msgstr ""
