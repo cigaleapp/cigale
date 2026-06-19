@@ -1,6 +1,6 @@
 import { mkdir, rm } from 'node:fs/promises';
 import type { TempFilesFixture } from './fixtures/tempfiles.js';
-import type { NavigationTab, PredownloadedModel } from './utils/index.js';
+import type { GalleryCardSpecifier, NavigationTab, PredownloadedModel } from './utils/index.js';
 import type { Locator } from '@playwright/test';
 import type { MetadataValue, Settings } from '$lib/database';
 import type { IDBDatabaseType } from '$lib/idb.svelte';
@@ -23,6 +23,7 @@ import {
 	confirmDeletionModal,
 	dumpDatabase,
 	expectTooltipContent,
+	galleryCard,
 	getDatabaseRowByField,
 	getDatabaseRowById,
 	getPredownloadedModel,
@@ -157,6 +158,15 @@ export type AppFixture = {
 		waitIn(area: Locator, timeout?: number): Promise<void>;
 	};
 	sidepanel: Locator;
+	gallery: {
+		area: Locator;
+		/** Get a gallery card in the observations area. */
+		card: (specifier: GalleryCardSpecifier) => Locator;
+		/** Select cards. Clears any previous selection. Use continueSelecting to select without clearing */
+		select: (...specifiers: GalleryCardSpecifier[]) => Promise<void>;
+		/** Add to selected cards. Previously selected cards remain selected */
+		selectMore: (...specifiers: GalleryCardSpecifier[]) => Promise<void>;
+	};
 };
 
 const _test = base.extend<
@@ -400,6 +410,22 @@ const _test = base.extend<
 			loading: {
 				wait: async (timeout) => waitForLoadingEnd(page, timeout),
 				waitIn: async (area, timeout) => waitForLoadingEnd(area, timeout),
+			},
+			gallery: {
+				area: page.getByTestId('observations-area'),
+				card: (specifier) => galleryCard(page, specifier),
+				async selectMore(...specifiers) {
+					await page.keyboard.down('ControlOrMeta');
+					for (const specifier of specifiers) {
+						await this.card(specifier).click();
+					}
+					await page.keyboard.up('ControlOrMeta');
+				},
+				async select(...specifiers) {
+					const [first, ...rest] = specifiers;
+					await this.card(first).click();
+					await this.selectMore(...rest);
+				},
 			},
 		});
 	},

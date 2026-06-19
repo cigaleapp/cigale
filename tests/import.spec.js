@@ -7,13 +7,12 @@ import {
 	chooseFirstSession,
 	expectZipFiles,
 	exportResults,
-	firstObservationCard,
 	importPhotos,
 	importResults,
 	loadingText,
 	mockUrl,
 	newSession,
-	observationCard,
+	galleryCard,
 	setInferenceModels,
 } from './utils/index.js';
 
@@ -340,14 +339,14 @@ test('can import a RAW image', issue(413), async ({ page, app, browserName }) =>
 	await importPhotos({ page }, 'IMG_6173.CR2');
 	await app.loading.wait(ms('20s'));
 
-	await expect(firstObservationCard(page)).toHaveAccessibleName('IMG_6173.CR2.jpeg');
+	await expect(app.gallery.card(0)).toHaveAccessibleName('IMG_6173.CR2.jpeg');
 
 	await app.tabs.go('crop');
 	await app.loading.wait();
 
 	await app.tabs.go('classify');
 	await app.loading.wait();
-	await firstObservationCard(page).click();
+	await app.gallery.card(0).click();
 
 	await expect(app.metadata.combobox('Espèce')).toHaveValue('Pogonognathellus longicornis');
 	// TODO: use a test raw photo that has GPS data
@@ -390,7 +389,7 @@ test('cannot import an extremely large image', issue(412, 414), async ({ page, a
 	await app.tabs.go('import');
 	await importPhotos({ page }, '20K-gray.jpeg');
 	await app.loading.wait();
-	await assert(firstObservationCard(page)).toHaveTooltip(
+	await assert(app.gallery.card(0)).toHaveTooltip(
 		/L'image est trop grande pour être traitée/
 	);
 });
@@ -404,7 +403,7 @@ test.fixme('can cancel import', issue(430), async ({ page, app }) => {
 		'leaf.jpeg',
 		'with-exif-gps.jpeg',
 	]);
-	await assert(firstObservationCard(page)).toHaveText(loadingText, {
+	await assert(app.gallery.card(0)).toHaveText(loadingText, {
 		timeout: 10_000,
 	});
 	await page
@@ -442,13 +441,13 @@ testBasic(
 		await setInferenceModels(page, { classify: 'Aucune inférence' });
 		await app.tabs.go('classify');
 		await app.tabs.go('import');
-		await observationCard(page, 'cyan.jpeg').click();
+		await app.gallery.card('cyan.jpeg').click();
 		await page
 			.getByTestId('sidepanel')
 			.getByRole('button', { name: /^Supprimer 1 images? / })
 			.click();
 		await app.tabs.go('classify');
-		await assert(observationCard(page, 'cyan')).not.toBeVisible();
+		await assert(app.gallery.card('cyan')).not.toBeVisible();
 	}
 );
 
@@ -476,7 +475,7 @@ test('can extract EXIF date from an image', async ({ page, app }) => {
 	await app.tabs.go('import');
 	await importPhotos({ page }, 'lil-fella.jpeg');
 	await app.loading.wait();
-	await firstObservationCard(page).click();
+	await app.gallery.card(0).click();
 	await assert(app.metadata.textbox('Date')).toHaveValue('2025-04-25');
 
 	const metadataValues = await app.db.metadata.values({ image: 'lil-fella.jpeg' });
@@ -516,7 +515,7 @@ test('can extract EXIF GPS data from an image', async ({ page, context, app }) =
 	await app.tabs.go('import');
 	await importPhotos({ page }, 'with-exif-gps.jpeg');
 	await app.loading.wait();
-	await firstObservationCard(page).click();
+	await app.gallery.card(0).click();
 	await assert(app.metadata.textbox('Date')).toHaveValue('2008-10-22');
 	await assert(app.metadata.combobox('Localisation')).toHaveValue(
 		'Via Madonna Laura, Arezzo, Toscane, 52100, Italie'

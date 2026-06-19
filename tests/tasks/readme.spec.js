@@ -1,7 +1,6 @@
 import { assert, test } from '../fixtures.js';
 import {
 	chooseInDropdown,
-	firstObservationCard,
 	importPhotos,
 	newSession,
 } from '../utils/index.js';
@@ -15,10 +14,10 @@ test.describe('screenshots', { tag: '@real-protocol' }, () => {
 	for (const language of /** @type {const} */ (['en', 'fr'])) {
 		test.describe(language, () => {
 			/**
-			 * @param {import('@playwright/test').Page} page
+			 * @param {import('../fixtures.js').AppFixture} app
 			 */
-			async function waitForAnalysis(page) {
-				await assert(firstObservationCard(page)).not.toHaveText(new RegExp('Analyse…'), {
+			async function waitForAnalysis(app) {
+				await assert(app.gallery.card(0)).not.toHaveText(new RegExp('Analyse…'), {
 					timeout: 20_000,
 				});
 			}
@@ -61,10 +60,10 @@ test.describe('screenshots', { tag: '@real-protocol' }, () => {
 				await newSession(page);
 				await app.tabs.go('import');
 				await importPhotos({ page }, 'lil-fella.jpeg');
-				await waitForAnalysis(page);
+				await waitForAnalysis(app);
 
 				await app.tabs.go('crop');
-				await firstObservationCard(page).click();
+				await app.gallery.card(0).click();
 				await assert(page).toHaveScreenshot();
 			});
 

@@ -6,7 +6,6 @@ import { expect, test } from './fixtures.js';
 import sidecarExample from './fixtures/real/entomoscope/20260209141830.json' with { type: 'json' };
 import { expectZipFiles } from './utils/core.js';
 import { goToProtocolManagement } from './utils/navigation.js';
-import { firstObservationCard } from './utils/observations.js';
 import { importPhotos } from './utils/photos.js';
 import { importProtocol } from './utils/protocols.js';
 import { exportResults } from './utils/results.js';
@@ -46,7 +45,7 @@ test('Entomoscope @real-protocol', async ({ app, page, browserName }) => {
 	// FIXME: loading ends a bit early on the card
 	await app.wait(5000);
 
-	await firstObservationCard(page).click();
+	await app.gallery.card(0).click();
 
 	await expect(app.metadata.textbox('Altitude')).toHaveValue('0');
 	await expect(app.metadata.textbox('Luminosité')).toHaveValue(/^831\.9\d+/);
@@ -67,7 +66,7 @@ test('Entomoscope @real-protocol', async ({ app, page, browserName }) => {
 	);
 
 	await app.tabs.go('crop');
-	await firstObservationCard(page).click();
+	await app.gallery.card(0).click();
 	await app.path.wait('/(app)/(sidepanel)/o/[observation]/crop/[image]');
 
 	const box = (no: number) => page.getByRole('listitem', { name: `Boîte #${no}`, exact: true });

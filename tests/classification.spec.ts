@@ -8,7 +8,6 @@ import { issue, pr } from './annotations.js';
 import { assert, expect, test, testBasic } from './fixtures.js';
 import {
 	chooseFirstSession,
-	firstObservationCard,
 	imagesByName,
 	importPhotos,
 	newSession,
@@ -23,18 +22,18 @@ test('allows cancelling classification of an observation', issue(430), async ({ 
 	await newSession(page);
 	await app.tabs.go('import');
 	await importPhotos({ page }, 'lil-fella.jpeg');
-	await assert(firstObservationCard(page)).not.toHaveText(/Analyse…|En attente/, {
+	await assert(app.gallery.card(0)).not.toHaveText(/Analyse…|En attente/, {
 		timeout: 10_000,
 	});
 	await app.tabs.go('crop');
 	await app.loading.wait();
 	await app.tabs.go('classify');
-	await assert(firstObservationCard(page)).toHaveText(/Analyse…|En attente/, {
+	await assert(app.gallery.card(0)).toHaveText(/Analyse…|En attente/, {
 		timeout: 10_000,
 	});
 	await page.waitForTimeout(1_000);
-	await firstObservationCard(page).getByRole('button', { name: 'Supprimer' }).click();
-	await assert(firstObservationCard(page)).not.toBeVisible({
+	await app.gallery.card(0).getByRole('button', { name: 'Supprimer' }).click();
+	await assert(app.gallery.card(0)).not.toBeVisible({
 		timeout: 5_000,
 	});
 	assert(await app.db.observation.byLabel('lil-fella')).toBeUndefined();
@@ -84,7 +83,7 @@ test.describe('full-screen classification view', pr(1071), () => {
 		await app.db.metadata.set(cyan.id, 'shoot_date', '2023-01-03T12:00:00Z');
 		await app.db.refresh();
 
-		await firstObservationCard(page).dblclick();
+		await app.gallery.card(0).dblclick();
 		await app.path.wait(`/o/${lilFella.id}/classify/suggestions/`);
 	});
 

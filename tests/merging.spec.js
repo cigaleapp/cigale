@@ -1,6 +1,6 @@
 import { issue } from './annotations.js';
 import { assert, expect, test } from './fixtures.js';
-import { chooseFirstSession, observationCard, setInferenceModels } from './utils/index.js';
+import { chooseFirstSession, setInferenceModels } from './utils/index.js';
 
 test.use({ storageState: 'tests/fixtures/storage-states/basic.json' });
 
@@ -13,15 +13,14 @@ test.beforeEach(async ({ page, app }) => {
 
 test('allows merging and unrolling two observations', async ({ page, app }) => {
 	const src = {
-		lilfella: await observationImage(page, 'lil-fella').getAttribute('src'),
-		cyan: await observationImage(page, 'cyan').getAttribute('src'),
+		lilfella: await observationImage(app, 'lil-fella').getAttribute('src'),
+		cyan: await observationImage(app, 'cyan').getAttribute('src'),
 	};
 	if (!src.lilfella) throw new Error('Could not get lil-fella image src');
 	if (!src.cyan) throw new Error('Could not get cyan image src');
 
 	await assert(page.getByTestId('observations-area').locator('article')).toHaveCount(4);
-	await selectObservation(page, 'lil-fella');
-	await selectObservation(page, 'cyan');
+	await app.gallery.select('lil-fella', 'cyan');
 
 	await page.getByTestId('sidepanel').getByRole('button', { name: 'Regrouper' }).click();
 
@@ -39,38 +38,34 @@ test('allows merging and unrolling two observations', async ({ page, app }) => {
 	]);
 
 	await assert(page.getByTestId('observations-area').locator('article')).toHaveCount(3);
-	await assert(observationCard(page, 'lil-fella')).toMatchAriaSnapshot(`
+	await assert(app.gallery.card('lil-fella')).toMatchAriaSnapshot(`
 		  - article:
 		    - img "lil-fella"
 		    - img
 		    - heading "lil-fella" [level=2]
 		    - button "2"
 		`);
-	await expect(observationImage(page, 'lil-fella')).toHaveAttribute('src', src.lilfella);
+	await expect(observationImage(app, 'lil-fella')).toHaveAttribute('src', src.lilfella);
 
-	await observationCard(page, 'lil-fella').getByRole('button', { name: '2' }).click();
+	await app.gallery.card('lil-fella').getByRole('button', { name: '2' }).click();
 
 	await assert(page.getByTestId('observations-area').locator('article')).toHaveCount(5);
-	await assert(observationCard(page, 'cyan.jpeg')).toBeVisible();
-	await assert(observationImage(page, 'cyan.jpeg')).toHaveAttribute('src', src.cyan);
-	await assert(observationCard(page, 'lil-fella.jpeg')).toBeVisible();
-	await assert
-		.soft(observationImage(page, 'lil-fella.jpeg'))
-		.toHaveAttribute('src', src.lilfella);
-	await assert(observationCard(page, 'lil-fella')).toBeVisible();
+	await assert(app.gallery.card('cyan.jpeg')).toBeVisible();
+	await assert(observationImage(app, 'cyan.jpeg')).toHaveAttribute('src', src.cyan);
+	await assert(app.gallery.card('lil-fella.jpeg')).toBeVisible();
+	await assert.soft(observationImage(app, 'lil-fella.jpeg')).toHaveAttribute('src', src.lilfella);
+	await assert(app.gallery.card('lil-fella')).toBeVisible();
 
-	await observationCard(page, 'lil-fella').getByRole('button', { name: '2' }).click();
+	await app.gallery.card('lil-fella').getByRole('button', { name: '2' }).click();
 
 	await assert(page.getByTestId('observations-area').locator('article')).toHaveCount(3);
-	await assert(observationCard(page, 'cyan.jpeg')).not.toBeVisible();
-	await assert(observationCard(page, 'lil-fella.jpeg')).not.toBeVisible();
+	await assert(app.gallery.card('cyan.jpeg')).not.toBeVisible();
+	await assert(app.gallery.card('lil-fella.jpeg')).not.toBeVisible();
 });
 
 test('allows merging three observations', async ({ page, app }) => {
-	await selectObservation(page, 'leaf');
-	await selectObservation(page, 'lil-fella');
-	await selectObservation(page, 'cyan');
-	const leafImageSrc = await observationImage(page, 'leaf').getAttribute('src');
+	await app.gallery.select('leaf', 'lil-fella', 'cyan');
+	const leafImageSrc = await observationImage(app, 'leaf').getAttribute('src');
 	if (!leafImageSrc) throw new Error('Could not get leaf image src');
 
 	await page.getByTestId('sidepanel').getByRole('button', { name: 'Regrouper' }).click();
@@ -92,24 +87,23 @@ test('allows merging three observations', async ({ page, app }) => {
 	]);
 
 	await assert(page.getByTestId('observations-area').locator('article')).toHaveCount(2);
-	await assert(observationCard(page, 'leaf')).toMatchAriaSnapshot(`
+	await assert(app.gallery.card('leaf')).toMatchAriaSnapshot(`
 		  - article:
 		    - img "leaf"
 		    - img
 		    - heading "leaf" [level=2]
 		    - button "3"
 		`);
-	await assert(observationImage(page, 'leaf')).toHaveAttribute('src', leafImageSrc);
+	await assert(observationImage(app, 'leaf')).toHaveAttribute('src', leafImageSrc);
 });
 
 test('allows merging a second time into the same observation', async ({ page, app }) => {
-	await selectObservation(page, 'lil-fella');
-	await selectObservation(page, 'cyan');
+	await app.gallery.select('lil-fella', 'cyan');
 	await page.getByTestId('sidepanel').getByRole('button', { name: 'Regrouper' }).click();
-	await selectObservation(page, 'leaf');
+	await app.gallery.selectMore('leaf');
 	await page.getByTestId('sidepanel').getByRole('button', { name: 'Regrouper' }).click();
 	await assert(page.getByTestId('observations-area').locator('article')).toHaveCount(2);
-	await assert(observationCard(page, 'lil-fella')).toMatchAriaSnapshot(`
+	await assert(app.gallery.card('lil-fella')).toMatchAriaSnapshot(`
 	  - article:
 	    - img "lil-fella"
 	    - img
@@ -133,17 +127,16 @@ test('allows merging a second time into the same observation', async ({ page, ap
 	]);
 });
 
-test('can split merged observations', async ({ page }) => {
-	await selectObservation(page, 'lil-fella');
-	await selectObservation(page, 'cyan');
+test('can split merged observations', async ({ page, app }) => {
+	await app.gallery.select('lil-fella', 'cyan');
 	await page.getByTestId('sidepanel').getByRole('button', { name: 'Regrouper' }).click();
 	await assert(page.getByTestId('observations-area').locator('article')).toHaveCount(3);
 	await page.getByTestId('sidepanel').getByRole('button', { name: 'Séparer' }).click();
 
 	await assert(page.getByTestId('observations-area').locator('article')).toHaveCount(4);
-	await assert(observationCard(page, 'lil-fella')).toBeVisible();
-	await assert(observationCard(page, 'cyan')).toBeVisible();
-	await assert(observationCard(page, 'leaf')).toBeVisible();
+	await assert(app.gallery.card('lil-fella')).toBeVisible();
+	await assert(app.gallery.card('cyan')).toBeVisible();
+	await assert(app.gallery.card('leaf')).toBeVisible();
 });
 
 test('selecting multiple images', issue(1054), async ({ page, app }) => {
@@ -161,13 +154,11 @@ test('selecting multiple images', issue(1054), async ({ page, app }) => {
 	await page.getByRole('article', { name: 'cyan' }).click();
 
 	// Select multiple observations
-	for (const observation of ['cyan', 'leaf', 'lil-fella']) {
-		await selectObservation(page, observation);
-		await page.waitForTimeout(500);
-		// TODO: reintroduce when we don't have the ugly workaround that creates "cannot load protocol" error toasts at startup
-		// see https://github.com/cigaleapp/cigale/blob/8d458fdd9b3743bcc5e3fbc9fb3ee279aa9826f4/tests/fixtures.ts#L419
-		// await assert(app.toasts.byType('error')).not.toBeVisible();
-	}
+	await app.gallery.select('cyan', 'leaf', 'lil-fella');
+	await app.wait('500ms');
+	// TODO: reintroduce when we don't have the ugly workaround that creates "cannot load protocol" error toasts at startup
+	// see https://github.com/cigaleapp/cigale/blob/8d458fdd9b3743bcc5e3fbc9fb3ee279aa9826f4/tests/fixtures.ts#L419
+	// await assert(app.toasts.byType('error')).not.toBeVisible();
 
 	// Assert sidepanel content
 	await assert(page.getByTestId('sidepanel')).toMatchAriaSnapshot(`
@@ -382,21 +373,10 @@ test('selecting multiple images', issue(1054), async ({ page, app }) => {
 
 /**
  *
- * @param {import('@playwright/test').Page} page
- * @param {string} title
- */
-async function selectObservation(page, title) {
-	await page.keyboard.down('Control');
-	await observationCard(page, title).click();
-	await page.keyboard.up('Control');
-}
-
-/**
- *
- * @param {import('@playwright/test').Page} page
+ * @param {import('./fixtures.js').AppFixture} app
  * @param {string} observationTitle
  * @returns
  */
-function observationImage(page, observationTitle) {
-	return observationCard(page, observationTitle).locator('img:not([data-is-blur="true"])');
+function observationImage(app, observationTitle) {
+	return app.gallery.card(observationTitle).locator('img:not([data-is-blur="true"])');
 }

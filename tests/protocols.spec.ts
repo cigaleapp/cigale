@@ -10,7 +10,6 @@ import { assert, expect, test } from './fixtures.js';
 import {
 	expectZipFiles,
 	exportResults,
-	firstObservationCard,
 	goToProtocolManagement,
 	goToSessionPage,
 	importPhotos,
@@ -627,7 +626,7 @@ location:
 	await importPhotos({ page }, ['cyan.jpeg', sidecars.xml, sidecars.json, sidecars.yaml]);
 	await page.waitForTimeout(1_000);
 
-	await firstObservationCard(page).click();
+	await app.gallery.card(0).click();
 
 	await expect(app.metadata.switch('bool')).toBeChecked();
 	await expect(app.metadata.textbox('date')).toHaveValue('2026-01-01');

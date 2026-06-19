@@ -55,7 +55,7 @@ export async function setInferenceModels(
 /**
  * Reads a predownloaded model and optional classmapping from disk.
  */
-type PredownloadedModel = {
+export type PredownloadedModel = {
 	model: Buffer<ArrayBufferLike>;
 	classmapping: Buffer<ArrayBufferLike> | undefined;
 	filename: string;
