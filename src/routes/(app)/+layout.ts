@@ -113,6 +113,7 @@ export async function load({ url }) {
 		localStorage: {
 			databaseName,
 			databaseRevision: databaseRevision.toString(),
+			playwright_mock_opfs: localStorage.getItem('playwright_mock_opfs') ?? 'false' as const,
 		} satisfies (typeof import('$worker/procedures').LOCAL_STORAGE)['inferIn'],
 		hooks: {
 			success({ procedure, data, duration }) {

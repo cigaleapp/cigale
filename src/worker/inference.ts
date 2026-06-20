@@ -16,6 +16,7 @@ import { ModelOutputEnum } from '$lib/schemas/neural.js';
 import { compareBy, throwError } from '$lib/utils.js';
 
 import { openDatabase, swarp } from './index.js';
+import { resolveObjectWithBytes } from '$lib/storage/utils.js';
 
 interface InferenceSession {
 	onnx: import('onnxruntime-web').InferenceSession;
@@ -88,7 +89,7 @@ swarp.inferBoundingBoxes(async ({ fileId, taskSettings }, _, tools) => {
 	const db = await openDatabase();
 	tools.abortSignal?.throwIfAborted();
 
-	const file = await db.get('ImageFile', fileId);
+	const file = await resolveObjectWithBytes(db, 'ImageFile', fileId);
 	if (!file) {
 		throw new Error(`Fichier avec l'ID ${fileId} non trouvé`);
 	}
@@ -136,7 +137,7 @@ swarp.classify(async ({ imageId, metadataIds, taskSettings, inferenceSessionId }
 
 	tools.abortSignal?.throwIfAborted();
 	if (!image.fileId) throw new Error(`Image ${imageId} has no ImageFile`);
-	const file = await db.get('ImageFile', image.fileId);
+	const file = await resolveObjectWithBytes(db, 'ImageFile', image.fileId);
 	if (!file) {
 		throw new Error(`Fichier avec l'ID ${image.fileId} non trouvé`);
 	}
