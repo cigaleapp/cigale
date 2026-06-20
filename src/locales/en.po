@@ -2891,3 +2891,37 @@ msgstr ""
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
 msgid "Affectée par <0>Autres métadonnées qui change {0} à {1}</0>"
 msgstr ""
+
+#: src/routes/(app)/Settings.svelte
+msgid "Relancer l'app après un changement du parallélisme"
+msgstr ""
+
+#: src/lib/exif.ts
+#: src/lib/exif.ts
+msgid "GPSLatitude"
+msgstr ""
+
+#: src/lib/exif.ts
+msgid "GPSLatitudeRef"
+msgstr ""
+
+#: src/lib/exif.ts
+#: src/lib/exif.ts
+msgid "GPSLongitude"
+msgstr ""
+
+#: src/lib/exif.ts
+msgid "GPSLongitudeRef"
+msgstr ""
+
+#. 0.0: metadata.label; 0.1: data.option.label
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
+msgid "Affectée par <0>Autres métadonnées qui change {0} à {1}</0><<<<<<< Updated upstream"
+msgstr "<<<<<<< Updated upstream"
+
+#~ msgid "GPSLongitudeRef>>>>>>> Stashed changes"
+#~ msgstr ">>>>>>> Stashed changes"
+
+#: src/lib/images.js
+msgid "No current session"
+msgstr ""

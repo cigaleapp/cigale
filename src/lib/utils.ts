@@ -1440,3 +1440,23 @@ export function platform() {
 }
 
 export type MaybeArray<T> = T | T[];
+/**
+ * Read contents of given {@link ArrayBuffer} as a {@link Uint8Array}
+ */
+export function* arrayBufferContents(buf: ArrayBuffer): Iterable<number> {
+	const data = new DataView(buf);
+
+	for (let offset = 0; offset < buf.byteLength; offset++) {
+		yield data.getUint8(offset);
+	}
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+
+	test('arrayBufferContents', () => {
+		const buf = new Uint8Array([6, 7, 6, 7, 12, 13]).buffer;
+
+		expect([...arrayBufferContents(buf)]).toStrictEqual([6, 7, 6, 7, 12, 13]);
+	});
+}

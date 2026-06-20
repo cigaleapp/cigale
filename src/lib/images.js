@@ -9,7 +9,8 @@ import { tables } from './idb.svelte.js';
 import { imageLimits } from './inference_utils.js';
 import { removeImagesFromObservation } from './observations.js';
 import { RAW_IMAGE_MEDIA_TYPES } from './raw.js';
-import { clamp, unique } from './utils.js';
+import { accessBytes, createBytes, storeBytes } from './storage/utils.js';
+import { clamp, throwError, unique } from './utils.js';
 
 /**
  * @import { Image, Protocol } from './database.js';
@@ -268,10 +269,11 @@ export async function deleteImage(id, tx, notFoundOk = true) {
  * @param {number} param0.height the height of the image
  * @param {IDBTransactionWithAtLeast<['Image', 'ImageFile', 'ImagePreviewFile']>} [param0.tx] transaction to use
  * @param {string} [param0.sessionId] session ID to associate the image with
+ * @returns the actual filename used (can differ from the one given due to duplicates handling)
  */
 export async function storeImageBytes({
 	id,
-	sessionId,
+	sessionId: sessionIdOverride,
 	originalBytes,
 	resizedBytes,
 	contentType,
@@ -280,22 +282,33 @@ export async function storeImageBytes({
 	height,
 	tx,
 }) {
+	const sessionId =
+		sessionIdOverride ?? uiState.currentSessionId ?? throwError('No current session');
+
+	const file = await createBytes('ImageFile', {
+		filename,
+		sessionId,
+		bytes: originalBytes,
+	});
+
+	const previewfile = await createBytes('ImagePreviewFile', {
+		filename,
+		sessionId,
+		bytes: resizedBytes,
+	});
+
 	await db.openTransaction(['ImageFile', 'ImagePreviewFile'], { tx }, async (tx) => {
-		tx.objectStore('ImageFile').put({
+		await tx.objectStore('ImageFile').put({
 			id,
-			bytes: originalBytes,
 			contentType,
-			filename,
 			dimensions: { width, height },
-			sessionId: sessionId ?? uiState.currentSessionId,
+			...file,
 		});
-		tx.objectStore('ImagePreviewFile').put({
+		await tx.objectStore('ImagePreviewFile').put({
 			id,
-			bytes: resizedBytes,
 			contentType,
-			filename,
 			dimensions: { width, height },
-			sessionId: sessionId ?? uiState.currentSessionId,
+			...previewfile,
 		});
 		const preview = new Blob([resizedBytes], { type: contentType });
 		uiState.setPreviewURL(id, URL.createObjectURL(preview));
@@ -310,7 +323,9 @@ export async function storeImageBytes({
 export async function loadPreviewImage(id, scope = 'session') {
 	const file = await db.get('ImagePreviewFile', id);
 	if (!file) return;
-	const blob = new Blob([file.bytes], { type: file.contentType });
+	console.debug(`loading preview image ${id}`, file)
+	const bytes = await accessBytes('ImagePreviewFile', file);
+	const blob = new Blob([bytes], { type: file.contentType });
 	uiState.setPreviewURL(id, URL.createObjectURL(blob), scope === 'global');
 }
 
