@@ -9,6 +9,8 @@ import type { Toast } from '$lib/toasts.svelte.js';
 
 import 'urlpattern-polyfill';
 
+import type { ONNXModelsFixture } from './fixtures/onnxmodels.js';
+
 import { defineNetworkFixture } from '@msw/playwright';
 import { test as base, expect as baseExpect } from '@playwright/test';
 import { ms } from 'convert';
@@ -18,9 +20,11 @@ import { safeJSONParse } from '$lib/utils';
 import _fullProtocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
 import lightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import { FixturePaths } from './filepaths.js';
+import { onnxmodels } from './fixtures/onnxmodels.js';
 import { tempfiles } from './fixtures/tempfiles.js';
 import {
 	confirmDeletionModal,
+	DontWait,
 	dumpDatabase,
 	expectTooltipContent,
 	galleryCard,
@@ -155,6 +159,8 @@ export type AppFixture = {
 	};
 	loading: {
 		wait(timeout?: number): Promise<void>;
+		/** Don't wait for loading text to appear, only wait for it to disappear */
+		maybeWait(timeout?: number): Promise<void>;
 		waitIn(area: Locator, timeout?: number): Promise<void>;
 	};
 	sidepanel: Locator;
@@ -174,6 +180,7 @@ const _test = base.extend<
 		forEachTest: void;
 		app: AppFixture;
 		tempfiles: TempFilesFixture;
+		onnxmodels: ONNXModelsFixture;
 		networkHandlers: Array<import('msw').AnyHandler>;
 		network: import('@msw/playwright').NetworkFixture;
 		storageState:
@@ -202,6 +209,7 @@ const _test = base.extend<
 		},
 		{ auto: true },
 	],
+	onnxmodels,
 	app: async ({ page }, use) => {
 		await use({
 			async wait(duration) {
@@ -389,6 +397,7 @@ const _test = base.extend<
 				byType: (type) => toast(page, null, { type }),
 			},
 			settings: {
+				open: async () => page.getByTestId('app-nav').getByLabel("Réglages").click(),
 				set: async (values) => setSettings({ page }, values),
 				get: async <Key extends keyof Settings>(...maybeKey: [] | [Key]) => {
 					const settings = await getSettings({ page });
@@ -410,6 +419,11 @@ const _test = base.extend<
 			loading: {
 				wait: async (timeout) => waitForLoadingEnd(page, timeout),
 				waitIn: async (area, timeout) => waitForLoadingEnd(area, timeout),
+				maybeWait: async (timeout) =>
+					waitForLoadingEnd(page, {
+						begin: DontWait,
+						...(timeout ? { finish: timeout } : {}),
+					}),
 			},
 			gallery: {
 				area: page.getByTestId('observations-area'),

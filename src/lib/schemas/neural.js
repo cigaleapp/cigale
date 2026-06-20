@@ -2,6 +2,7 @@ import { type } from 'arktype';
 
 import { entries } from '../utils.js';
 import { HTTPRequest } from './common.js';
+import { JsonataExpression } from './expressions.js';
 
 export const MODEL_DETECTION_OUTPUT_SHAPES = {
 	cx: { help: 'Coordonée X du point central' },
@@ -43,7 +44,9 @@ export const ModelInput = type({
 });
 
 export const ModelOutputCommon = type({
-	'name?': ['string', '@', "Nom de l'output du modèle à utiliser. output0 par défaut"],
+	name: type('string ', '@', "Nom de l'output du modèle à utiliser. output0 par défaut").default(
+		'output0'
+	),
 });
 
 export const ModelOutputBoundingBox = ModelOutputCommon.and({
@@ -57,7 +60,18 @@ export const ModelOutputBoundingBox = ModelOutputCommon.and({
 	),
 });
 
-const ModelSettingsCommon = type({
+export const ModelOutputEnum = ModelOutputCommon.and({
+	'select?': JsonataExpression(
+		type({
+			neurons: type({ score: '0 <= number <= 1', key: 'string' }).array(),
+		}),
+		type('string[]')
+	).describe(
+		'Given the 100 highest-score options (sorted with highest-score first), choose which options to select for the metadata value. If more than one is returned, the first element will be the value and the other elements will be alternatives. By default, the highest-score option only will be selected'
+	),
+});
+
+export const ModelSettingsCommon = type({
 	model: HTTPRequest.describe(
 		'Lien vers le modèle de classification utilisé pour inférer les métadonnées. Au format ONNX (.onnx) seulement, pour le moment.'
 	),
@@ -74,7 +88,7 @@ export const NeuralBoundingBoxInference = ModelSettingsCommon.and({
 });
 
 export const NeuralEnumInference = ModelSettingsCommon.and({
-	'output?': ModelOutputCommon,
+	'output?': ModelOutputEnum,
 	classmapping: HTTPRequest.describe(
 		"Fichier texte contenant une clé d'option de la métadonnée par ligne, dans le même ordre que les neurones de sortie du modèle."
 	).or(

@@ -6,11 +6,15 @@ import { nanoid } from 'nanoid';
 import { ResultsPaths } from '../filepaths.js';
 
 export class TempFilesFixture {
-	private files: Array<{ filename: string; content: string; cleanup: () => void }> = [];
+	private files: Array<{ filename: string; content: string | Buffer; cleanup: () => void }> = [];
 	private directory: string = ResultsPaths.root;
 
 	constructor() {
 		this.files = [];
+	}
+
+	get root() {
+		return this.directory;
 	}
 
 	/**
@@ -26,7 +30,7 @@ export class TempFilesFixture {
 	 * @param name name template for the file. the string "XXXX" will be replaced with a random ID
 	 * @param content
 	 */
-	new(name: `${string}XXXX${string}`, content: string) {
+	new(name: `${string}XXXX${string}`, content: string | Buffer) {
 		const inside = this.directory; // capture current value, useful esp. for the cleanup function
 		const filename = name.replace('XXXX', nanoid());
 		writeFileSync(path.join(inside, filename), content);
