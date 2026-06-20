@@ -8,6 +8,12 @@ import { NodeProvenance } from '$lib/file-tree.js';
 export const LOCAL_STORAGE = type({
 	databaseName: 'string',
 	databaseRevision: 'string.integer.parse',
+	/**
+	 * If true, the app knows it should provide a mock impl. for navigator.storage.getDirectory().
+	 * Used for Playwright tests running under Webkit until
+	 * https://github.com/microsoft/playwright/issues/18235 is fixed
+	 */
+	playwright_mock_opfs: '"true" | "false" = "false"',
 });
 
 export type LocalStorage = (typeof LOCAL_STORAGE)['infer'];
