@@ -397,7 +397,7 @@ const _test = base.extend<
 				byType: (type) => toast(page, null, { type }),
 			},
 			settings: {
-				open: async () => page.getByTestId('app-nav').getByLabel("Réglages").click(),
+				open: async () => page.getByTestId('app-nav').getByLabel('Réglages').click(),
 				set: async (values) => setSettings({ page }, values),
 				get: async <Key extends keyof Settings>(...maybeKey: [] | [Key]) => {
 					const settings = await getSettings({ page });
