@@ -208,6 +208,8 @@ jobs:
       - check-native-version
     runs-on: ubuntu-latest
     steps:
+      - if: needs.test.outputs.coverage-check == 'fail'
+        run: echo "Coverage comparison did not pass the check"; exit 1
       - if: contains(needs.*.result, 'failure')
         run: echo "Some tests failed :'("; exit 1
       - if: ${{ !contains(needs.*.result, 'failure') }}
