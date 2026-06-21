@@ -13,6 +13,11 @@ on:
       compare-coverage:
         type: boolean
         default: true
+        description: Compare coverage with the main branch. If it decreased too much, the job is still successful but the coverage-check output will be set accordingly
+    outputs:
+      coverage-check:
+        description: Can be either "pass" or "fail". If compare-coverage is false, itll be "pass"
+        value: ${{ jobs.compare-coverage.outputs.result || 'pass' }}
 
 env:
   ELECTRON_SKIP_BINARY_DOWNLOAD: 'true'
@@ -111,6 +116,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: [test, get-base-branch-coverage]
     if: inputs.compare-coverage
+    outputs:
+      result: ${{ steps.check.outputs.result }}
     steps:
       - name: Set threshold
         id: params
@@ -162,10 +169,12 @@ jobs:
           message: |
             ${{ steps.diff.outputs.emoji }} Coverage is **${{ steps.diff.outputs.trend }}** by **${{ steps.diff.outputs.diff }}%** (from ${{ steps.diff.outputs.base }}% to ${{ steps.diff.outputs.head }}%)
       - name: Fail if coverage decreased too much
+        id: check
         run: |
           if [ "${{ steps.diff.outputs.trend }}" = "down" ] && (( $(echo "${{ steps.diff.outputs.diff }} < ${{ steps.params.outputs.threshold }}" | bc -l) )); then
             echo "Coverage decreased by ${{ steps.diff.outputs.diff }}%, which is more than the allowed threshold of ${{ steps.params.outputs.threshold }}%."
-            exit 1
+            echo result=fail >> $GITHUB_OUTPUT
           else
             echo "Coverage difference is within the allowed threshold."
+            echo result=pass >> $GITHUB_OUTPUT
           fi
