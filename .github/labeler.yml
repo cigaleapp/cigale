@@ -5,3 +5,11 @@ android-native-changes:
       - renovate/capacitor-.*
       - renovate/capawesome-.*
       - renovate/capgo-.*
+
+ios-native-changes:
+  - changed-files:
+      - any-glob-to-any-file: [ios/*]
+  - head-branch:
+      - renovate/capacitor-.*
+      - renovate/capawesome-.*
+      - renovate/capgo-.*
