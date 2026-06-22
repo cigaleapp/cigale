@@ -46,7 +46,7 @@
 		"prebuild": "bun run codegen && bun wuchale --clean --sync",
 		"build": "bun --bun vite build",
 		"preview": "bun --bun vite preview",
-		"prepare": "bun run codegen",
+		"prepare": "bun run codegen && bun run scripts/renovate-upgrades-postinstall.ts",
 		"dependencies": "bun run scripts/if-local-dev.ts \"bun cap sync\"",
 		"precheck": "svelte-kit sync",
 		"check": "svelte-check",
