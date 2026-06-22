@@ -1,11 +1,11 @@
+import { execFileSync } from 'node:child_process';
 import { writeFileSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
 import { type } from 'arktype';
-import { x } from 'tinyexec';
 
-import { emitCheckrun } from './utils.js';
+import { emitCheckrun, sh } from './utils.js';
 
 const BEAMUP_ORIGIN = 'https://beamup.cigale.gwen.works';
 
@@ -166,7 +166,7 @@ const protocol = {
 	id: 'io.github.cigaleapp.arthropods.example',
 	name: 'Example: arthropodes',
 	summary: 'Protocole de base pour arthropodes',
-	learnMore: `https://github.com/cigaleapp/cigale/tree/${await x('git', ['rev-parse', 'HEAD']).then((result) => result.stdout.trim())}/scripts/README.md#protocoles-arthropodsexample`,
+	learnMore: `https://github.com/cigaleapp/cigale/tree/${sh('git rev-parse HEAD')}/scripts/README.md#protocoles-arthropodsexample`,
 	version: (oldProtocol?.version ?? 0) + 1,
 	updates: 'automatic',
 	source: 'https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json',

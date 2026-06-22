@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { mkdir } from 'node:fs/promises';
 import path from 'node:path';
@@ -10,11 +11,10 @@ import { Jimp } from 'jimp';
 import { JSDOM } from 'jsdom';
 import odt from 'odt2html';
 import { pdfToPng } from 'pdf-to-png-converter';
-import { x } from 'tinyexec';
 import Turndown from 'turndown';
 
 import keys from '../google-drive-key.json' with { type: 'json' };
-import { emitCheckrun, range, unique, updateCheckrunProgress } from './utils.js';
+import { emitCheckrun, range, sh, unique, updateCheckrunProgress } from './utils.js';
 
 await emitCheckrun('protocols', 'in_progress', 'Google Slides', 'Starting…');
 
@@ -385,7 +385,7 @@ console.info(
 	`Formatting protocols ${cc.blue}${cc.dim}$${cc.reset} ${cc.blue}bun run format ${Object.keys(protocols).join(' ')}${cc.reset}`
 );
 
-await x('npm', ['run', 'format', ...Object.keys(protocols)]);
+sh('npm', 'run', 'format', ...Object.keys(protocols).join(' '));
 
 await emitCheckrun('protocols', 'in_progress', null, `Described ${files.length} species`);
 

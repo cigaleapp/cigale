@@ -1,3 +1,5 @@
+import { execFileSync, execSync } from 'node:child_process';
+
 import { Estimation as ETA } from 'arrival-time';
 import { formatDistanceToNowStrict, isValid as isValidDate } from 'date-fns';
 import { Octokit } from 'octokit';
@@ -220,4 +222,25 @@ export function unique<T>(arr: T[]): T[] {
 	}
 
 	return result;
+}
+
+/**
+ * Start the cmdline with "$ " to log the commandline
+ */
+export function sh(...cmd: string[]): string {
+	if (cmd[0].startsWith('$ ')) {
+		console.info(cmd.join(' '));
+		cmd[0] = cmd[0].replace(/^\$ /, '');
+	}
+
+	if (cmd.length === 1) return execSync(cmd[0], { encoding: 'utf8' }).trim();
+
+	const [program, ...args] = cmd;
+	return execFileSync(program, args, { encoding: 'utf8' }).trim();
+}
+
+export function shLines(...cmd: string[]): string[] {
+	return sh(...cmd)
+		.split(/\r?\n/)
+		.map((line) => line.trim());
 }

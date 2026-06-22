@@ -21,7 +21,6 @@ on:
       - renovate/google-auth-library-*
       - renovate/rss-parser-*
       - renovate/jsdom-*
-      - renovate/tinyexec-*
       - renovate/pdf-to-png-converter-*
       - renovate/odt2html-*
       - renovate/turndown-*

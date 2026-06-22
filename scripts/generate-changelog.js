@@ -1,7 +1,11 @@
+/// <reference types="@types/nodes" />
+
+import { execFileSync } from 'node:child_process';
 import { writeFile } from 'node:fs/promises';
 
 import * as date from 'date-fns';
-import { x } from 'tinyexec';
+
+import { sh } from './utils.ts';
 
 const upTo = process.argv[2];
 
@@ -9,11 +13,12 @@ console.info(
 	`Generating user-facing changelog up to ${date.parse(upTo, 'yyyy-MM-dd', new Date())}`
 );
 
-const gitlog = await x('git', [
+const gitlog = sh(
+	'git',
 	'log',
 	`--since=${upTo}`,
-	`--until=${date.format(Date.now(), 'yyyy-MM-dd')}`,
-]).then((result) => result.stdout);
+	`--until=${date.format(Date.now(), 'yyyy-MM-dd')}`
+);
 
 const commits = gitlog
 	.split(/\n\ncommit [0-9a-f]{40}/m)
