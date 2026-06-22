@@ -160,7 +160,7 @@
 		"@capgo/capacitor-updater": "^8.49.1",
 		"@capgo/inappbrowser": "^8.6.14",
 		"@formatjs/intl-durationformat": "^0.10.14",
-		"@iconify/svelte": "^5.2.1",
+		"@iconify/svelte": "^5.2.2",
 		"@sveltejs/svelte-virtual-list": "^3.0.1",
 		"@viselect/vanilla": "^3.9.0",
 		"@wuchale/svelte": "^0.19.4",

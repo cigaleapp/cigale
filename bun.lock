@@ -19,7 +19,7 @@
         "@capgo/capacitor-updater": "^8.49.1",
         "@capgo/inappbrowser": "^8.6.14",
         "@formatjs/intl-durationformat": "^0.10.14",
-        "@iconify/svelte": "^5.2.1",
+        "@iconify/svelte": "^5.2.2",
         "@sveltejs/svelte-virtual-list": "^3.0.1",
         "@viselect/vanilla": "^3.9.0",
         "@wuchale/svelte": "^0.19.4",
@@ -544,7 +544,7 @@
 
     "@iconify-json/ri": ["@iconify-json/ri@1.2.10", "", { "dependencies": { "@iconify/types": "*" } }, "sha512-WWMhoncVVM+Xmu9T5fgu2lhYRrKTEWhKk3Com0KiM111EeEsRLiASjpsFKnC/SrB6covhUp95r2mH8tGxhgd5Q=="],
 
-    "@iconify/svelte": ["@iconify/svelte@5.2.1", "", { "dependencies": { "@iconify/types": "^2.0.0" }, "peerDependencies": { "svelte": ">5.0.0" } }, "sha512-zHmsIPmnIhGd5gc95bNN5FL+GifwMZv7M2rlZEpa7IXYGFJm/XGHdWf6PWQa6OBoC+R69WyiPO9NAj5wjfjbow=="],
+    "@iconify/svelte": ["@iconify/svelte@5.2.2", "", { "dependencies": { "@iconify/types": "^2.0.0" }, "peerDependencies": { "svelte": ">5.0.0" } }, "sha512-XMXxD3nzH7yB68C3K4sNwzrJ1TBscODR0ZqCeNf0KGuEMCTSuCo0jHNDZ0o0iRXTylO41NSz/DWam/4atLG1yw=="],
 
     "@iconify/types": ["@iconify/types@2.0.0", "", {}, "sha512-+wluvCrRhXrhyOmRDJ3q8mux9JkKy5SJ/v8ol2tu4FVjyYvtEzkc/3pK15ET6RKg4b4w4BmTk1+gsCUhf21Ykg=="],
 
