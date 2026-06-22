@@ -1,6 +1,6 @@
 /// <reference types="@types/node" />
 
-import { readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 
 import { sh, shLines } from './utils.ts';
 
@@ -14,6 +14,7 @@ if (!branches.some((b) => branch.startsWith(b))) {
 	process.exit(0);
 }
 
+mkdirSync('android/app/src/main/assets', { recursive: true }); // bruh
 sh('$ bun cap update');
 
 const changed = shLines('gh pr diff --name-only');
