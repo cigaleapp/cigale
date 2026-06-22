@@ -7,20 +7,45 @@ All notable changes to this project will be documented in this file, on a monthl
 ### Improvements
 
 - Add explanation for quota in /storage
+- Add export to xper3 button in narrow classifier
+- Add icons to export options
+- Add infer.neural.output.select to change selected values after inference
+- Allow explicitly marking which metadata are to be used for classification
 - Enable persistent storage, add storage manager
+- Handle empty session metadata forms
+- Handle non-browser environments in localeFromNavigator()
+- Improve warning styling for bottom drawer submenu items
+- Serve live updates for the android application (Closes #1756)
+- Shake to report bug (#1784)
+- Use Xper3 logo for open candidate list export modal button
 - Warn if low on storage quota
 
 ### Bug Fixes
 
+- Add UTF8 BOM to CSV file in export
+- Add missing mobile top bar on storage management page
+- Fix alignment of mobile topbar actions
+- Fix classifier confirmation progress bar
 - Fix cors proxy usage (#1707)
+- Fix merge of enum metadata values with non-numeric option keys
+- Handle imported metadata in cascades
+- Rework imagefile/image/observation deletion
 
 ### Data Updates
 
 - Add IDmyBee protocol
+- Add missing crop metadata for IDmyBee protocol
 - Bump protocol version of protocols/insecta.cigaleprotocol.yaml [ci skip]
+- Cleanup IDmyBee protocol & handle version bumping
+- Collapse Andrena group in IDmyBee protocol
 - Fix IDmyBee protocol
+- Fix morphogroup cascades
+- Fix some species from Google Drive folder were not added
+- Regenerate IDmyBee protocol
 - Regenerate example protocols
+- Remove IDmyBee from built-in protocols
 - Remove andrena metadata group from entomoscope & insecta protocols
+- Remove incorrect namespace from metadata IDs in IDmyBee protocol
 
 ### Translation Updates
 
