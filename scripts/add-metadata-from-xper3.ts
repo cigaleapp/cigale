@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import type { ExportedProtocol } from '../src/lib/schemas/protocols.js';
 
@@ -121,6 +122,11 @@ async function augment(protocolPath: string, protocol: typeof ExportedProtocol.i
 						name: 'ConvNextV2 Tiny',
 						model: 'https://huggingface.co/edgaremy/andrena-classifier/resolve/main/convnextv2_tiny.andrena-grouped.onnx?download=true',
 						classmapping: morphogroupClassmappingSanitized,
+						output: {
+							select: readFileSync(path.join(here, 'idmybee-selector.jsonata'), {
+								encoding: 'utf8',
+							}),
+						},
 						input: {
 							height: 384,
 							width: 384,

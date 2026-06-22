@@ -1,0 +1,114 @@
+(
+	$findindex := function($subject, $predicate) {
+		$reduce(
+			$subject,
+			function ($acc, $cur) {
+				$acc.ok ? {
+					"index": $acc.index + 1,
+					"ok": $predicate($cur, $acc.index+1)
+				} : $acc
+			},
+			{
+				"index": 0,
+				"ok": $predicate($subject[0], 0)
+			}
+		).index - 1
+	};
+
+	$takewhile := function($subject, $predicate) {
+		$subject[[0..$findindex($subject, $predicate)]]
+	};
+
+	/* Number of images in the training dataset for each morphogroup */
+	$groupsizes := {
+		"albopunctata"        : 89,
+		"binominata"          : 32,
+		"chrysopus"           : 90,
+		"clarkella"           : 3657,
+		"denticulata"         : 3753,
+		"farinosa"            : 19,
+		"ferrugineicrus"      : 29,
+		"florentina"          : 9,
+		"fulva"               : 4505,
+		"fuscosa"             : 36,
+		"gpe agilissima"      : 408,
+		"gpe angustior"       : 4084,
+		"gpe argentata"       : 237,
+		"gpe barbilabris"     : 3056,
+		"gpe cineraria"       : 3979,
+		"gpe colletiformis"   : 141,
+		"gpe curvungula"      : 149,
+		"gpe flavipes"        : 4207,
+		"gpe fulvago"         : 220,
+		"gpe fuscipes"        : 1113,
+		"gpe hedikae"         : 6,
+		"gpe helvola"         : 480,
+		"gpe humilis"         : 117,
+		"gpe labiata"         : 2240,
+		"gpe minutula"        : 289,
+		"gpe nigropilosa"     : 118,
+		"gpe pilipes"         : 241,
+		"gpe praecox"         : 3102,
+		"gpe proxima"         : 1037,
+		"gpe ruficrus"        : 221,
+		"gpe savignyi"        : 56,
+		"gpe schencki"        : 45,
+		"gpe scotica"         : 2161,
+		"gpe thoracica"       : 332,
+		"gpe trimmerana"      : 39,
+		"gpe wilkella"        : 2669,
+		"gpe wilkella-argent" : 2834,
+		"haemorrhoa"          : 3813,
+		"hattorfiana"         : 3466,
+		"hystrix"             : 3,
+		"lagopus"             : 150,
+		"leucolippa"          : 58,
+		"limbata"             : 52,
+		"marginata"           : 285,
+		"morio"               : 52,
+		"nigroolivacea"       : 11,
+		"nitida"              : 3858,
+		"nycthemera"          : 55,
+		"panurgina"           : 8,
+		"paucisquama"         : 1,
+		"pellucens"           : 101,
+		"rogenhoferi"         : 68,
+		"rufizona"            : 18,
+		"sardoa"              : 65,
+		"solenopalpa"         : 12,
+		"symphyti"            : 7,
+		"tarsata"             : 52,
+		"tibialis"            : 848,
+		"vaga"                : 3428,
+		"ventralis"           : 1248,
+		"vetula"              : 7,
+		"viridescens"         : 165
+	};
+
+
+	/* Weight according to group sizes */
+	$weighted := neurons.{
+		"key": key,
+		"score": (
+			$size := $lookup($groupsizes, key);
+
+			score * (
+				$size < 100
+				? 1 + ((100 - $size) / 200)
+				: 1
+			)
+		)
+	}^(>score);
+
+
+	/* Filter on score differences */
+	$takewhile($weighted, function($current, $i) {
+			$i = 0
+			? true
+			: $current.score < 10 * $weighted[$i-1].score
+	})
+
+
+	/* Output keys */
+	.key[]
+)
