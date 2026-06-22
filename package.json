@@ -129,7 +129,7 @@
 		"oxlint": "^1.69.0",
 		"pdf-to-png-converter": "^4.1.0",
 		"playwright-performance-metrics": "^1.2.5",
-		"postcss-preset-env": "^11.3.0",
+		"postcss-preset-env": "^11.3.1",
 		"prettier": "^3.8.4",
 		"prettier-plugin-svelte": "^4.1.0",
 		"svelte": "^5.56.3",
