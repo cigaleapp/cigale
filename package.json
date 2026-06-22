@@ -168,7 +168,7 @@
 		"arrival-time": "^1.0.6",
 		"baseline-browser-mapping": "^2.10.35",
 		"bits-ui": "^1.8.0",
-		"caniuse-lite": "^1.0.30001797",
+		"caniuse-lite": "^1.0.30001799",
 		"convert": "^7.0.0",
 		"date-fns": "^4.4.0",
 		"dequal": "^2.0.3",
