@@ -320,7 +320,7 @@ jobs:
           name: ${{ needs.apk.outputs.artifact }}
 
       - name: Upload to Diawi
-        uses: rnkdsh/action-upload-diawi@4e1421305be7cfc510d05f47850262eeaf345108 # v1.5.12
+        uses: rnkdsh/action-upload-diawi@76778fcd1f9f589efaaa62f63d5f03430bbb1306 # v1.5.13
         id: diawi
         with:
           token: ${{ secrets.DIAWI_TOKEN }}
