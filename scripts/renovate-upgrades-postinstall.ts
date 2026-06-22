@@ -9,7 +9,8 @@
 import { execSync } from 'node:child_process';
 import { readFileSync, writeFileSync } from 'node:fs';
 
-const branch = execSync('git branch --show', { encoding: 'utf8' }).trim();
+const branch =
+	process.env.GITHUB_HEAD_REF || execSync('git branch --show', { encoding: 'utf8' }).trim();
 
 const branches = ['renovate/capacitor-', 'renovate/capgo-', 'renovate/capawesome-'];
 
