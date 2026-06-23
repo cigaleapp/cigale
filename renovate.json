@@ -2,6 +2,7 @@
 	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
 	"extends": ["github>gwennlbh/renovate"],
 	"prConcurrentLimit": 8,
+	"gitIgnoredAuthors": ["41898282+github-actions[bot]@users.noreply.github.com"],
 	"packageRules": [
 		{
 			"description": "Auto-merge updates to linters and formatters",
@@ -34,14 +35,5 @@
 			"automerge": false,
 			"prPriority": -1
 		}
-	],
-	"bun": {
-		"managerFilePatterns": [
-			"{android,ios}/.native-code-version",
-			"src/locales/*.po",
-			"android/app/capacitor.build.gradle",
-			"android/capacitor.settings.gradle",
-			"ios/App/CapApp-SPM/Package.swift"
-		]
-	}
+	]
 }
