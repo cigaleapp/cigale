@@ -5,7 +5,7 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { sh } from './utils.ts';
 
 const { GITHUB_REPOSITORY, GITHUB_REF_NAME, PR_NUMBER, GITHUB_HEAD_REF } = process.env;
-console.info(process.env)
+console.info(process.env);
 
 const repo = GITHUB_REPOSITORY as `${string}/${string}`;
 const branch = GITHUB_HEAD_REF || sh('git branch --show-current');
