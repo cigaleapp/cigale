@@ -1,4 +1,4 @@
-/// <reference types="@types/nodes" />
+/// <reference types="@types/node" />
 
 import { execFileSync } from 'node:child_process';
 import { writeFile } from 'node:fs/promises';
