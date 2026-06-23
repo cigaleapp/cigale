@@ -385,7 +385,7 @@ console.info(
 	`Formatting protocols ${cc.blue}${cc.dim}$${cc.reset} ${cc.blue}bun run format ${Object.keys(protocols).join(' ')}${cc.reset}`
 );
 
-sh('npm', 'run', 'format', ...Object.keys(protocols).join(' '));
+sh('npm', 'run', 'format', ...Object.keys(protocols));
 
 await emitCheckrun('protocols', 'in_progress', null, `Described ${files.length} species`);
 
