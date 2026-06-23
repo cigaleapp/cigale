@@ -35,6 +35,7 @@ All notable changes to this project will be documented in this file, on a monthl
 
 - Add IDmyBee protocol
 - Add missing crop metadata for IDmyBee protocol
+- Add weighted selection for morphogroup inference
 - Bump protocol version of protocols/insecta.cigaleprotocol.yaml [ci skip]
 - Cleanup IDmyBee protocol & handle version bumping
 - Collapse Andrena group in IDmyBee protocol
