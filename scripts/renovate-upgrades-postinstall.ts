@@ -14,8 +14,13 @@ if (!branches.some((b) => branch.startsWith(b))) {
 	process.exit(0);
 }
 
-mkdirSync('android/app/src/main/assets', { recursive: true }); // bruh
-sh('$ bun cap update');
+// Can't use bun cap update because generated files are missing without first build.
+// So we shim an empty built webapp (just index.html) and run cap sync instead
+
+mkdirSync('public');
+writeFileSync('public/index.html', 'bonjour :)');
+
+sh('$ bun cap sync');
 
 const changed = shLines('gh pr diff --name-only');
 
