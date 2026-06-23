@@ -238,9 +238,3 @@ export function sh(...cmd: string[]): string {
 	const [program, ...args] = cmd;
 	return execFileSync(program, args, { encoding: 'utf8' }).trim();
 }
-
-export function shLines(...cmd: string[]): string[] {
-	return sh(...cmd)
-		.split(/\r?\n/)
-		.map((line) => line.trim());
-}
