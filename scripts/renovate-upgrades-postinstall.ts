@@ -4,11 +4,11 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 
 import { sh } from './utils.ts';
 
-const { GITHUB_REPOSITORY, GITHUB_REF_NAME, GITHUB_HEAD_REF } = process.env;
+const { GITHUB_REPOSITORY, GITHUB_REF_NAME, PR_NUMBER, GITHUB_HEAD_REF } = process.env;
 
 const repo = GITHUB_REPOSITORY as `${string}/${string}`;
 const branch = GITHUB_HEAD_REF || sh('git branch --show-current');
-const number = Number(GITHUB_REF_NAME?.replace(/^\/merge$/, '') ?? '');
+const number = Number(PR_NUMBER ?? GITHUB_REF_NAME?.replace('/merge', '') ?? '');
 
 console.info(`Current branch is ${branch}`);
 console.info(`Current PR is #${number}`);
