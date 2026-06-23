@@ -34,5 +34,14 @@
 			"automerge": false,
 			"prPriority": -1
 		}
-	]
+	],
+	"bun": {
+		"managerFilePatterns": [
+			"{android,ios}/.native-code-version",
+			"src/locales/*.po",
+			"android/app/capacitor.build.gradle",
+			"android/capacitor.settings.gradle",
+			"ios/App/CapApp-SPM/Package.swift"
+		]
+	}
 }
