@@ -10,7 +10,7 @@ jobs:
     name: Smoke test
     runs-on: ubuntu-latest
     steps:
-      - run: echo smoke 
+      - run: echo smoke
   capacitor:
     name: Capacitor-related tasks
     runs-on: ubuntu-latest
@@ -26,7 +26,7 @@ jobs:
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
-        
+
       - if: ${{ !contains(github.event.pull_request.changed_files, 'android/.native-code-version') }}
         name: Bump native code version
         run: |
