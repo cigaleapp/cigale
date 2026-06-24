@@ -585,12 +585,12 @@ test.describe('narrowing view', pr(1570), () => {
 
 			await choose('Pilosité occipitale', 'Pilosité majoritairement claire');
 
-			await expectCandidatesCount(page, 154);
+			await expectCandidatesCount(page, 151);
 			// await expectRemainingCandidate('')
 
 			await choose('Forme de la tête', 'Plus large que haute');
 
-			await expectCandidatesCount(page, 126);
+			await expectCandidatesCount(page, 122);
 
 			await expectMetadataValues(app, {
 				pilosite_occipitale: 'pilositmaj_1738780459445_3719',
@@ -618,7 +618,7 @@ test.describe('narrowing view', pr(1570), () => {
 			await page.getByRole('tab', { name: 'Décrire' }).click();
 			await app.path.wait('/(app)/(sidepanel)/o/[observation]/classify/narrow/describe');
 
-			await expectCandidatesCount(page, 134);
+			await expectCandidatesCount(page, 132);
 
 			await choose(
 				'Couleur de la face ventrale du flagelle antennaire',
@@ -662,7 +662,7 @@ test.describe('narrowing view', pr(1570), () => {
 				taille_du_3eme_segment_antennaire: 'a3pluscour_1738780689285_1923',
 			});
 
-			await expectCandidatesCount(page, 23);
+			await expectCandidatesCount(page, 12);
 
 			// Use reset button
 
@@ -777,7 +777,7 @@ test.describe('narrowing view', pr(1570), () => {
 				forme_du_bord_anterieur_du_clypeus: 'bordantrie_1738781485238_2295',
 				forme_de_la_pilosite_du_scutum: 'piliforme_1738781807041_8905',
 				diagnose_a_fulva: 'thoraxetab_1763132717229_3725',
-				divergeance_des_foveas: 'nedivergea_1738780918546_5646',
+				divergence_des_foveas: 'nedivergea_1738780918546_5646',
 				stries_longitudinales_du_clypeus: 'absentes_1738781134029_8838',
 				pilosite_du_disque_des_tergites: 'disquesgla_1738782842914_8746',
 				aspect_du_disque_des_tergites: 'fortementc_1738782710184_1247',
