@@ -29,6 +29,7 @@ await Bun.write(
 		source: 'https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/idmybee.cigaleprotocol.json',
 		authors: [],
 		sessionMetadata: {},
+		exports: backbone.exports,
 		// TODO: use this once #1696 is merged
 		imports: [
 			// {
