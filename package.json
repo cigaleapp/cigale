@@ -114,7 +114,7 @@
 		"eslint-plugin-oxlint": "^1.69.0",
 		"eslint-plugin-svelte": "^3.19.0",
 		"fake-indexeddb": "^6.2.5",
-		"fast-xml-parser": "^5.8.0",
+		"fast-xml-parser": "^5.9.3",
 		"gitmoji-cli": "^9.7.0",
 		"globals": "^17.6.0",
 		"google-auth-library": "^10.7.0",
