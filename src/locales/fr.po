@@ -26,10 +26,6 @@ msgstr "<0/> Importer"
 msgid "<0/> Importer d'autres images"
 msgstr "<0/> Importer d'autres images"
 
-#: src/routes/(app)/PrepareForOffline.svelte
-msgid "<0/> OK!"
-msgstr "<0/> OK!"
-
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 msgid "<0/> Regrouper"
 msgstr "<0/> Regrouper"
@@ -112,7 +108,6 @@ msgstr "Arbre taxonomique"
 msgid "Aucun fichier d'analyse trouvé dans l'export {0}"
 msgstr "Aucun fichier d'analyse trouvé dans l'export {0}"
 
-#: src/lib/InputSelectProtocol.svelte
 #: src/lib/import.svelte.js
 #: src/lib/import.svelte.js
 msgid "Aucun protocole sélectionné"
@@ -183,7 +178,6 @@ msgid "Chargement du protocole intégré"
 msgstr "Chargement du protocole intégré"
 
 #: src/lib/CardMedia.svelte
-#: src/lib/MetadataInput.svelte
 #: src/routes/(app)/+layout.ts
 #: src/routes/(app)/DeploymentDetails.svelte
 msgid "Chargement…"
@@ -255,6 +249,7 @@ msgstr "Décrémenter"
 msgid "Démarrer"
 msgstr "Démarrer"
 
+#. 0.0: previewingPrNumber
 #: src/routes/(app)/DeploymentDetails.svelte
 msgid "Déploiement de preview pour la <0>PR #{0}</0>"
 msgstr "Déploiement de preview pour la <0>PR #{0}</0>"
@@ -450,11 +445,6 @@ msgstr "Markdown invalide: {0}"
 msgid "Mettre à jour"
 msgstr "Mettre à jour"
 
-#: src/lib/ButtonUpdateProtocol.svelte
-msgctxt "Upgrading a protocol. The <0 /> is an icon arrow"
-msgid "Mise à jour…"
-msgstr "Mise à jour…"
-
 #: src/routes/(app)/DeploymentDetails.svelte
 msgid "Nettoyer la base de données"
 msgstr "Nettoyer la base de données"
@@ -475,10 +465,6 @@ msgstr "Non"
 #: src/lib/observations.js
 msgid "Nouvelle observation"
 msgstr "Nouvelle observation"
-
-#: src/lib/MetadataInput.svelte
-msgid "Oui"
-msgstr "Oui"
 
 #: src/lib/ModalConfirmDeletion.svelte
 msgid "Oui, supprimer"
@@ -566,7 +552,6 @@ msgid "Supprime toutes les données pour ce déploiement de preview"
 msgstr "Supprime toutes les données pour ce déploiement de preview"
 
 #: src/lib/AreaObservations.svelte
-#: src/lib/ModalConfirmDeletion.svelte
 #: src/routes/(app)/storage/Table.svelte
 msgid "Supprimer"
 msgstr "Supprimer"
@@ -968,6 +953,7 @@ msgid "Informations sur le protocole"
 msgstr "Informations sur le protocole"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/suggestions/+page.svelte
+#: src/routes/(app)/ModalSubmitIssue.svelte
 #: src/routes/(app)/protocols/[id]/infos/+page.svelte
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/infos/+page.svelte
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
@@ -1543,18 +1529,10 @@ msgstr "ID de la session"
 msgid "Session not found"
 msgstr "Session not found"
 
-#: src/lib/ModalConfirmDeletion.svelte
-msgid "Afin de confirmer la suppression, veuillez taper <0/> ci-dessous:"
-msgstr "Afin de confirmer la suppression, veuillez taper <0/> ci-dessous:"
-
 #. 0: typeToConfirm
 #: src/lib/ModalConfirmDeletion.svelte
 msgid "Taper “{0}”"
 msgstr "Taper “{0}”"
-
-#: src/lib/ModalConfirmDeletion.svelte
-msgid "La suppression entraînera: <0/> Il est impossible de revenir en arrière. <1/>"
-msgstr "La suppression entraînera: <0/> Il est impossible de revenir en arrière. <1/>"
 
 #: src/routes/(app)/protocols/ModalDeleteProtocol.svelte
 msgid "L'impossibilité d'utiliser 1 session"
@@ -1597,10 +1575,6 @@ msgstr "Signaler un bug"
 #: src/routes/(app)/ModalSubmitIssue.svelte
 msgid "Proposer une fonctionnalité"
 msgstr "Proposer une fonctionnalité"
-
-#: src/routes/(app)/ModalSubmitIssue.svelte
-msgid "Description <0/>"
-msgstr "Description <0/>"
 
 #: src/routes/(app)/ModalSubmitIssue.svelte
 #: src/routes/(app)/ModalSubmitIssue.svelte
@@ -1829,10 +1803,6 @@ msgstr "Supprimer cette valeur"
 msgid "Aucune session active. Impossible d'enregistrer le fichier."
 msgstr "Aucune session active. Impossible d'enregistrer le fichier."
 
-#: src/lib/MetadataInput.svelte
-msgid "Modifier"
-msgstr "Modifier"
-
 #: src/lib/import.svelte.js
 msgid "Aucun session active"
 msgstr "Aucun session active"
@@ -1842,7 +1812,6 @@ msgstr "Aucun session active"
 msgid "Erreur lors du traitement du/des fichiers annexes associés à {0}"
 msgstr "Erreur lors du traitement du/des fichiers annexes associés à {0}"
 
-#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 msgid "Aucune sélection"
 msgstr "Aucune sélection"
@@ -2129,10 +2098,6 @@ msgstr "{0} est en cours de développement pour les appareils mobiles. En attend
 #: src/routes/(app)/TopbarBackToHome.svelte
 msgid "Retour"
 msgstr "Retour"
-
-#: src/lib/MobileWIPOverlay.svelte
-msgid "Suivez l'avancement de son développement sur Github: c'est <0>l'issue <0/></0>."
-msgstr "Suivez l'avancement de son développement sur Github: c'est <0>l'issue <0/></0>."
 
 #: src/routes/(app)/Navigation.svelte
 msgid "Session"
@@ -2788,3 +2753,57 @@ msgstr "Checksum"
 #: src/routes/(app)/about/+page.svelte
 msgid "Commit"
 msgstr "Commit"
+
+#. 0: label
+#: src/lib/gallery.ts
+msgid "{0}: confiance à 75%-100%"
+msgstr "{0}: confiance à 75%-100%"
+
+#. 0: label
+#: src/lib/gallery.ts
+msgid "{0}: confiance à 50%-75%"
+msgstr "{0}: confiance à 50%-75%"
+
+#. 0: label
+#: src/lib/gallery.ts
+msgid "{0}: confiance à 25%-50%"
+msgstr "{0}: confiance à 25%-50%"
+
+#. 0: label
+#: src/lib/gallery.ts
+msgid "{0}: confiance à 0%-25%"
+msgstr "{0}: confiance à 0%-25%"
+
+#. 0: p.id; 1: p.name; 2: p.version ?? '<none>'
+#: src/lib/protocols.js
+msgid "{0} ({1}, v{2})"
+msgstr "{0} ({1}, v{2})"
+
+#. 0: uiState.currentProtocol.id; 1: uiState.currentProtocol.version
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid "{0} v{1}"
+msgstr "{0} v{1}"
+
+#. 0: updates.length; 1: updates.map((u) => `"${u.name}"`).join(', ')
+#: src/routes/(app)/+layout.ts
+msgid "{0} protocoles ont été mis à jour: {1}"
+msgstr "{0} protocoles ont été mis à jour: {1}"
+
+#. 0.0.0: issueNumber
+#: src/lib/MobileWIPOverlay.svelte
+msgid "Suivez l'avancement de son développement sur Github: c'est <0>l'issue <0>#{0}</0></0>."
+msgstr "Suivez l'avancement de son développement sur Github: c'est <0>l'issue <0>#{0}</0></0>."
+
+#: src/lib/ModalConfirmDeletion.svelte
+msgid "La suppression entraînera: <0/> Il est impossible de revenir en arrière. <1><0>Afin de confirmer la suppression, veuillez taper <0/> ci-dessous:</0> <1/></1>"
+msgstr "La suppression entraînera: <0/> Il est impossible de revenir en arrière. <1><0>Afin de confirmer la suppression, veuillez taper <0/> ci-dessous:</0> <1/></1>"
+
+#. 0: file.name
+#: src/lib/MetadataInput.svelte
+msgid "{0} enregistré"
+msgstr "{0} enregistré"
+
+#. 0: e.kind; 1: metadata?.label || metadataId; 2: e.message
+#: src/lib/CardObservation.svelte
+msgid "{0} sur {1}: {2}"
+msgstr "{0} sur {1}: {2}"
