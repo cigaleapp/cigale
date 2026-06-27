@@ -1171,10 +1171,6 @@ msgstr "Lien vers une image"
 msgid "Cascades"
 msgstr "Cascades"
 
-#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
-msgid "Affecte <0>Change la valeur d'autres métadonnées quand {0} = {1}</0>"
-msgstr "Affecte <0>Change la valeur d'autres métadonnées quand {0} = {1}</0>"
-
 #. 0: option.label || option.key
 #. 0: option.label || option.key
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
@@ -1185,10 +1181,6 @@ msgstr "Voir {0}"
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
 msgid "Aucune cascade"
 msgstr "Aucune cascade"
-
-#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
-msgid "Affectée par <0>Autres métadonnées qui change {0} à {1}</0>"
-msgstr "Affectée par <0>Autres métadonnées qui change {0} à {1}</0>"
 
 #. 0: metadata?.label || shortId
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
@@ -1977,10 +1969,6 @@ msgstr "Un numéro de séquence, dont l'unicité est guarantie à travers toutes
 msgid "*Pour l'instant, CIGALE ne prend pas avantage des réseaux capables de traiter des images par batch, donc il n'enverra toujours qu'une image à la fois au modèle. <0/> Cela pourrait changer dans le futur, donc il est toujours utile de configurer correctement la disposition des pixels."
 msgstr "*Pour l'instant, CIGALE ne prend pas avantage des réseaux capables de traiter des images par batch, donc il n'enverra toujours qu'une image à la fois au modèle. <0/> Cela pourrait changer dans le futur, donc il est toujours utile de configurer correctement la disposition des pixels."
 
-#: src/routes/(app)/protocols/[id]/metadata/[metadata]/infos/+page.svelte
-msgid "Méthode de fusion <0>Comment fusionner les valeurs de cette métadonnée lors du regroupement de plusieurs observations en une seule</0>"
-msgstr "Méthode de fusion <0>Comment fusionner les valeurs de cette métadonnée lors du regroupement de plusieurs observations en une seule</0>"
-
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
 msgid "Autres noms possibles pour cette option. Permet de trouver l'option en cherchant avec un synonyme."
 msgstr "Autres noms possibles pour cette option. Permet de trouver l'option en cherchant avec un synonyme."
@@ -2459,11 +2447,6 @@ msgstr "Image de {0}"
 msgid "Trop de candidats à afficher"
 msgstr "Trop de candidats à afficher"
 
-#. 0: loadingOptions; 1: definitions.length
-#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/OptionsLoader.svelte
-msgid "<0/> Chargement des options... <1/> {0} / {1}"
-msgstr "<0/> Chargement des options... <1/> {0} / {1}"
-
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/+layout.ts
 msgid "Métadonnée de classification introuvable. Le protocole de la session n'en définit peut-être pas."
 msgstr "Métadonnée de classification introuvable. Le protocole de la session n'en définit peut-être pas."
@@ -2550,10 +2533,6 @@ msgstr "Choix <0/>"
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/Candidate.svelte
 msgid "Éliminé"
 msgstr "Éliminé"
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/CandidateDetailsModal.svelte
-msgid "Candidat éliminé"
-msgstr "Candidat éliminé"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/CandidateDetailsModal.svelte
 msgid "Choix effectués"
@@ -2665,10 +2644,6 @@ msgstr "Liste des candidats restants"
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/CandidatesListXper3.svelte
 msgid "Liste compatible avec un import dans Xper3"
 msgstr "Liste compatible avec un import dans Xper3"
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/CandidatesListXper3.svelte
-msgid "Copié!"
-msgstr "Copié!"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/CandidatesListXper3.svelte
 msgid "Copier"
@@ -2857,3 +2832,34 @@ msgstr "{0} suivante"
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/WithExpandButton.svelte
 msgid "{0}: var(--offset);"
 msgstr "{0}: var(--offset);"
+
+#. 0: img.filename; 1: i + 1; 2: images.length
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/Subject.svelte
+msgid "{0} ({1} sur {2})"
+msgstr "{0} ({1} sur {2})"
+
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/infos/+page.svelte
+msgid "Méthode de fusion"
+msgstr "Méthode de fusion"
+
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/infos/+page.svelte
+msgid "Comment fusionner les valeurs de cette métadonnée lors du regroupement de plusieurs observations en une seule"
+msgstr "Comment fusionner les valeurs de cette métadonnée lors du regroupement de plusieurs observations en une seule"
+
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
+msgid "Affecte"
+msgstr "Affecte"
+
+#. 0: data.metadata.label; 1: data.option .label
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
+msgid "Change la valeur d'autres métadonnées quand {0} = {1}"
+msgstr "Change la valeur d'autres métadonnées quand {0} = {1}"
+
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
+msgid "Affectée par"
+msgstr "Affectée par"
+
+#. 0: metadata.label; 1: data.option.label
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
+msgid "Autres métadonnées qui change {0} à {1}"
+msgstr "Autres métadonnées qui change {0} à {1}"
