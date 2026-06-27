@@ -163,7 +163,7 @@
 		"@iconify/svelte": "^5.2.2",
 		"@sveltejs/svelte-virtual-list": "^3.0.1",
 		"@viselect/vanilla": "^3.9.0",
-		"@wuchale/svelte": "^0.19.4",
+		"@wuchale/svelte": "^0.20.0",
 		"arktype": "^2.2.0",
 		"arrival-time": "^1.0.6",
 		"baseline-browser-mapping": "^2.10.37",
@@ -207,7 +207,7 @@
 		"unplugin-icons": "^23.0.1",
 		"update-electron-app": "^3.2.0",
 		"word-diff": "^1.0.1",
-		"wuchale": "^0.23.4",
+		"wuchale": "^0.24.2",
 		"xss": "^1.0.15",
 		"yaml": "^2.9.0"
 	},
