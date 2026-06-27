@@ -18,10 +18,6 @@ msgstr "<0/> Chargement…"
 msgid "<0/> Créer"
 msgstr "<0/> Créer"
 
-#: src/routes/(app)/protocols/+page.svelte
-msgid "<0/> Importer"
-msgstr "<0/> Importer"
-
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 msgid "<0/> Importer d'autres images"
 msgstr "<0/> Importer d'autres images"
@@ -383,6 +379,7 @@ msgstr "Image suivante"
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
 #: src/routes/(app)/(sidepanel)/crop/+page.svelte
 #: src/routes/(app)/Navigation.svelte
+#: src/routes/(app)/protocols/+page.svelte
 #: src/routes/(app)/protocols/import/[...url]/+page.svelte
 msgid "Importer"
 msgstr "Importer"
@@ -657,10 +654,6 @@ msgstr "Êtes-vous sûr·e?"
 msgid "“Projet long” de l'<0>INP-ENSEEIHT</0>"
 msgstr "“Projet long” de l'<0>INP-ENSEEIHT</0>"
 
-#: src/routes/(app)/about/+page.svelte
-msgid "(aucun)"
-msgstr "(aucun)"
-
 #: src/routes/(app)/(sidepanel)/+layout.svelte
 msgid "Mettre en erreur la sélection"
 msgstr "Mettre en erreur la sélection"
@@ -700,10 +693,6 @@ msgstr "https://www.romanshamin.me/"
 #: src/routes/(app)/about/+page.svelte
 msgid "https://evilmartians.com"
 msgstr "https://evilmartians.com"
-
-#: src/routes/(app)/about/+page.svelte
-msgid "par <0>Roman Shamin</0>, chez <1>Evil Martians</1>"
-msgstr "par <0>Roman Shamin</0>, chez <1>Evil Martians</1>"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "https://doughkan.com/"
@@ -779,6 +768,7 @@ msgstr "<0/> Retour"
 msgid "L'interface de modification de protocole n'est pas encore peaufinée. Certaines choses ne sont pas encore modifiables ici. Pour les changer, exportez les protocoles, modifiez l'export (fichier JSON) et ré-importez-le"
 msgstr "L'interface de modification de protocole n'est pas encore peaufinée. Certaines choses ne sont pas encore modifiables ici. Pour les changer, exportez les protocoles, modifiez l'export (fichier JSON) et ré-importez-le"
 
+#: src/routes/(app)/(sidepanel)/o/[observation]/+layout@(app).svelte
 #: src/routes/(app)/protocols/[id]/+layout.svelte
 msgid "Beta"
 msgstr "Beta"
@@ -1272,10 +1262,6 @@ msgid_plural "# observations"
 msgstr[0] "1 observation"
 msgstr[1] "# observations"
 
-#: src/routes/(app)/about/+page.svelte
-msgid "<0>Remix Icon</0> par <1>Jimmy Cheung</1> et <2>Wendy Gao</2>"
-msgstr "<0>Remix Icon</0> par <1>Jimmy Cheung</1> et <2>Wendy Gao</2>"
-
 #. 0: version
 #: src/lib/ButtonUpdateProtocol.svelte
 msgid "Protocole mis à jour vers la v{0}"
@@ -1297,14 +1283,12 @@ msgstr[1] "# éléments"
 msgid "Non versionné"
 msgstr "Non versionné"
 
-#: src/routes/(app)/protocols/ModalCreateProtocol.svelte
-msgid "L'identifiant ne doit comporter que des lettres, chiffres, <0/> ou <1/>"
-msgstr "L'identifiant ne doit comporter que des lettres, chiffres, <0/> ou <1/>"
-
+#. 1.0: newVersion
 #: src/routes/(app)/protocols/[id]/versioning/+page.svelte
 msgid "<0/> Dernière version en ligne: <1>v{0}</1> <2>Réétablir</2>"
 msgstr "<0/> Dernière version en ligne: <1>v{0}</1> <2>Réétablir</2>"
 
+#. 1.0: version + 1
 #: src/routes/(app)/protocols/[id]/versioning/+page.svelte
 msgid "<0/> Le protocole local a des modifications non publiées, voir ci-dessous <1>Passer à la v{0}</1>"
 msgstr "<0/> Le protocole local a des modifications non publiées, voir ci-dessous <1>Passer à la v{0}</1>"
@@ -1496,7 +1480,6 @@ msgstr[0] "# image"
 msgstr[1] "# images"
 
 #: src/routes/(app)/sessions/+page.svelte
-#: src/routes/(app)/sessions/+page.svelte
 msgid "Gérer"
 msgstr "Gérer"
 
@@ -1622,10 +1605,6 @@ msgstr "Aucune session active à exporter."
 msgid "Aucune session active à prévisualiser."
 msgstr "Aucune session active à prévisualiser."
 
-#: src/routes/(app)/results/+page.svelte
-msgid "<0/> une fois dézippé"
-msgstr "<0/> une fois dézippé"
-
 #: src/lib/inference.js
 #: src/lib/inference.js
 msgid "Bearer token"
@@ -1713,14 +1692,6 @@ msgstr "Session active introuvable"
 #: src/routes/(app)/results/+page.svelte
 msgid "Fichiers sauvegardés dans {0}"
 msgstr "Fichiers sauvegardés dans {0}"
-
-#: src/routes/(app)/results/+page.svelte
-msgid "<0/> Archive ZIP <1/>"
-msgstr "<0/> Archive ZIP <1/>"
-
-#: src/routes/(app)/results/+page.svelte
-msgid "<0/> Dossier <1/>"
-msgstr "<0/> Dossier <1/>"
 
 #: src/routes/(app)/ModalSubmitIssue.svelte
 msgid "User Agent"
@@ -1839,10 +1810,6 @@ msgid "Inclure"
 msgstr "Inclure"
 
 #: src/routes/(app)/results/+page.svelte
-msgid "Marge de recadrage <0/>"
-msgstr "Marge de recadrage <0/>"
-
-#: src/routes/(app)/results/+page.svelte
 msgid "Pour chaque image, relativement à ses dimensions"
 msgstr "Pour chaque image, relativement à ses dimensions"
 
@@ -1880,7 +1847,9 @@ msgid "Comptes"
 msgstr "Comptes"
 
 #. 0: provider.displayName
+#. 0: provider.displayName
 #: src/routes/(app)/accounts/+page.svelte
+#: src/routes/(app)/accounts/RowAccount.svelte
 msgid "Logo de {0}"
 msgstr "Logo de {0}"
 
@@ -1987,10 +1956,6 @@ msgstr "École"
 #: src/lib/undo.svelte.js
 msgid "No handler for undo operation crop/box/create"
 msgstr "No handler for undo operation crop/box/create"
-
-#: src/routes/(app)/protocols/ModalCreateProtocol.svelte
-msgid "Identifiant du protocole <0>Doit être unique. Il est conseillé de le baser sur un nom de domaine web que vous contrôlez; celui d'un site web permettant de télécharger le protocole, par exemple</0>"
-msgstr "Identifiant du protocole <0>Doit être unique. Il est conseillé de le baser sur un nom de domaine web que vous contrôlez; celui d'un site web permettant de télécharger le protocole, par exemple</0>"
 
 #: src/routes/(app)/protocols/import/[...url]/+page.svelte
 msgid "Ce lien permet d'importer un protocole venant d'Internet, à l'adresse suivante:"
@@ -2265,10 +2230,6 @@ msgstr[1] "# observations"
 #: src/routes/(app)/(sidepanel)/o/[observation]/+layout@(app).svelte
 msgid "Suggestions"
 msgstr "Suggestions"
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/+layout@(app).svelte
-msgid "Élimination <0>Beta</0>"
-msgstr "Élimination <0>Beta</0>"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/Subject.svelte
 msgid "Agrandir/Réduire l'image"
@@ -2807,3 +2768,92 @@ msgstr "{0} enregistré"
 #: src/lib/CardObservation.svelte
 msgid "{0} sur {1}: {2}"
 msgstr "{0} sur {1}: {2}"
+
+#: src/routes/(app)/protocols/ModalCreateProtocol.svelte
+msgid "Identifiant du protocole"
+msgstr "Identifiant du protocole"
+
+#: src/routes/(app)/protocols/ModalCreateProtocol.svelte
+msgid "Doit être unique. Il est conseillé de le baser sur un nom de domaine web que vous contrôlez; celui d'un site web permettant de télécharger le protocole, par exemple"
+msgstr "Doit être unique. Il est conseillé de le baser sur un nom de domaine web que vous contrôlez; celui d'un site web permettant de télécharger le protocole, par exemple"
+
+#. 0: account.username; 1: provider.displayName
+#: src/routes/(app)/sessions/+page.svelte
+msgid "{0} sur {1}"
+msgstr "{0} sur {1}"
+
+#: src/routes/(app)/about/+page.svelte
+msgid "Roman Shamin"
+msgstr "Roman Shamin"
+
+#: src/routes/(app)/about/+page.svelte
+msgid "Evil Martians"
+msgstr "Evil Martians"
+
+#: src/routes/(app)/about/+page.svelte
+msgid "par"
+msgstr "par"
+
+#: src/routes/(app)/about/+page.svelte
+msgid "et"
+msgstr "et"
+
+#: src/routes/(app)/about/+page.svelte
+msgid "Remix Icon"
+msgstr "Remix Icon"
+
+#: src/routes/(app)/about/+page.svelte
+msgid "Jimmy Cheung"
+msgstr "Jimmy Cheung"
+
+#: src/routes/(app)/about/+page.svelte
+msgid "Wendy Gao"
+msgstr "Wendy Gao"
+
+#: src/routes/(app)/results/+page.svelte
+msgid "Marge de recadrage"
+msgstr "Marge de recadrage"
+
+#: src/routes/(app)/results/+page.svelte
+msgid "une fois dézippé"
+msgstr "une fois dézippé"
+
+#: src/routes/(app)/results/+page.svelte
+msgid "<0/> Dossier <1></1>"
+msgstr "<0/> Dossier <1></1>"
+
+#: src/routes/(app)/results/+page.svelte
+msgid "<0/> Archive ZIP <1></1>"
+msgstr "<0/> Archive ZIP <1></1>"
+
+#. 0: account.username
+#: src/routes/(app)/accounts/RowAccount.svelte
+msgid "Photo de {0}"
+msgstr "Photo de {0}"
+
+#: src/routes/(app)/accounts/RowAccount.svelte
+msgid "Type de compte inconnu"
+msgstr "Type de compte inconnu"
+
+#: src/routes/(app)/accounts/RowAccount.svelte
+msgid "Déconnecter"
+msgstr "Déconnecter"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/+layout@(app).svelte
+msgid "Élimination"
+msgstr "Élimination"
+
+#. 0: labels.item
+#: src/routes/(app)/(sidepanel)/o/[observation]/TopbarExtras.svelte
+msgid "{0} précédente"
+msgstr "{0} précédente"
+
+#. 0: labels.item
+#: src/routes/(app)/(sidepanel)/o/[observation]/TopbarExtras.svelte
+msgid "{0} suivante"
+msgstr "{0} suivante"
+
+#. 0: corner
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/WithExpandButton.svelte
+msgid "{0}: var(--offset);"
+msgstr "{0}: var(--offset);"
