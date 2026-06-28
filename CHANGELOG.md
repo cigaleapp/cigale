@@ -39,6 +39,7 @@ All notable changes to this project will be documented in this file, on a monthl
 - Bump protocol version of protocols/insecta.cigaleprotocol.yaml [ci skip]
 - Cleanup IDmyBee protocol & handle version bumping
 - Collapse Andrena group in IDmyBee protocol
+- Configure IDmyBee export filepaths
 - Fix IDmyBee protocol
 - Fix morphogroup cascades
 - Fix some species from Google Drive folder were not added
