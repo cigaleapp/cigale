@@ -26,21 +26,38 @@ export class DragSelect {
 	shiftSelectionAnchor;
 
 	/**
-	 * @param {string[]} newSelection
+	 *
+	 * @param {(element: HTMLElement, index: number, array: HTMLElement[]) => boolean} predicate
 	 */
-	setSelection(newSelection) {
+	selectMatching(predicate) {
 		if (!this.#instance) return;
 		// Tell DragSelect that the set of selected items changed
 		// Since we store the selection as an array of ids, we
 		// find the corresponding elements in the imagesContainer by [data-id]
-		const elements = newSelection
-			.map((id) => this.imagesContainer?.querySelector(`[data-selectable][data-id="${id}"]`))
-			.filter((el) => el !== null && el !== undefined);
+		const elements = [...(this.imagesContainer?.querySelectorAll('[data-selectable]') ?? [])]
+			.filter((el) => el !== null && el !== undefined)
+			.filter((el) => el instanceof HTMLElement)
+			.filter(predicate);
 
 		this.#instance.clearSelection(true, true);
 		const result = /** @type {HTMLElement[]} */ (this.#instance.select(elements, true));
 		this.selection = result.map((e) => e.dataset.id).filter((id) => id !== undefined);
 		return result;
+	}
+
+	selectAll() {
+		this.selectMatching(() => true);
+	}
+
+	selectNone() {
+		this.selectMatching(() => false);
+	}
+
+	/**
+	 * @param {string[]} newSelection
+	 */
+	setSelection(newSelection) {
+		this.selectMatching((e) => newSelection.includes(e.dataset.id ?? ''));
 	}
 
 	refreshSelectables() {

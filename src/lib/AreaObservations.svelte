@@ -143,7 +143,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 			help: 'Tout sélectionner',
 			when: ({ target }) => !(target instanceof HTMLInputElement),
 			do: () => {
-				dragselect?.setSelection(items.map((img) => img.id));
+				dragselect?.selectAll();
 			},
 		},
 		// And Ctrl-D to deselect all
@@ -151,8 +151,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 			help: 'Tout désélectionner',
 			when: ({ target }) => !(target instanceof HTMLInputElement),
 			do: () => {
-				uiState.selection = [];
-				dragselect?.setSelection([]);
+				dragselect?.selectNone();
 			},
 		},
 	});
