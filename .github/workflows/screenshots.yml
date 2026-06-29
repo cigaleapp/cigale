@@ -12,7 +12,7 @@ jobs:
   update-readme-snapshots:
     runs-on: ubuntu-latest
     container:
-      image: gwennlbh/playwright-bun:v1.60.0
+      image: gwennlbh/playwright-bun:v1.61.0
       options: --user 1001
 
     env:
