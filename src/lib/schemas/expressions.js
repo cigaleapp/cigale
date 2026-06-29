@@ -348,15 +348,15 @@ export const HELPERS = /** @type {const} */ ({
 		documentation: 'Vérifie si un array contient un élément donné',
 		usage: [[JSON.stringify(['abc', 'def', 'ghi']), '"ghi"'], true],
 		/**
-		 * 
-		 * @param {unknown[]} haystack 
-		 * @param {unknown} needle 
-		 * @returns 
+		 *
+		 * @param {unknown[]} haystack
+		 * @param {unknown} needle
+		 * @returns
 		 */
 		implementationJsonata(haystack, needle) {
-			return haystack.some(element => element === needle)
-		}
-	}
+			return haystack.some((element) => element === needle);
+		},
+	},
 });
 
 export const HANDLEBARS_HELPERS = transformObject(
