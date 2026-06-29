@@ -1912,9 +1912,6 @@ msgstr "Metadata in JSON format"
 msgid "Metadata in CSV format"
 msgstr "Metadata in CSV format"
 
-#~ msgid "Expliquer comment reproduire votre bug, étape par étape, et ce à quoi vous vous attendiez"
-#~ msgstr "Expliquer comment reproduire votre bug, étape par étape, et ce à quoi vous vous attendiez"
-
 #. 0: label
 #: src/lib/gallery.ts
 msgid "Avec {0}"
