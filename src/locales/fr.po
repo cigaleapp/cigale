@@ -943,7 +943,6 @@ msgid "Informations sur le protocole"
 msgstr "Informations sur le protocole"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/suggestions/+page.svelte
-#: src/routes/(app)/ModalSubmitIssue.svelte
 #: src/routes/(app)/protocols/[id]/infos/+page.svelte
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/infos/+page.svelte
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
@@ -1913,9 +1912,8 @@ msgstr "Metadata in JSON format"
 msgid "Metadata in CSV format"
 msgstr "Metadata in CSV format"
 
-#: src/routes/(app)/ModalSubmitIssue.svelte
-msgid "Expliquer comment reproduire votre bug, étape par étape, et ce à quoi vous vous attendiez"
-msgstr "Expliquer comment reproduire votre bug, étape par étape, et ce à quoi vous vous attendiez"
+#~ msgid "Expliquer comment reproduire votre bug, étape par étape, et ce à quoi vous vous attendiez"
+#~ msgstr "Expliquer comment reproduire votre bug, étape par étape, et ce à quoi vous vous attendiez"
 
 #. 0: label
 #: src/lib/gallery.ts

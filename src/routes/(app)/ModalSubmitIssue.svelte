@@ -149,16 +149,7 @@
 			}
 		}}
 	>
-		<Field>
-			{#snippet label()}
-				Description
-				{#if type === 'bug'}
-					<p>
-						Expliquer comment reproduire votre bug, étape par étape, et ce à quoi vous
-						vous attendiez
-					</p>
-				{/if}
-			{/snippet}
+		<Field label={type === 'bug' ? 'Reproduction' : 'Description'}>
 			<textarea bind:value={body} rows="6"></textarea>
 		</Field>
 		<Field label="Titre">
