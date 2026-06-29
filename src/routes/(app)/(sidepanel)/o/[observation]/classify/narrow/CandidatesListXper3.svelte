@@ -12,10 +12,10 @@
 	let copied = $state(false);
 
 	const listText = $derived(
-			narrowingState.remainingCandidates
-				.filter((candidate) => 'x-xper3-declaration-index' in candidate)
-				.map((candidate) => candidate['x-xper3-declaration-index'])
-				.join(', ')
+		narrowingState.remainingCandidates
+			.filter((candidate) => 'x-xper3-declaration-index' in candidate)
+			.map((candidate) => candidate['x-xper3-declaration-index'])
+			.join(', ')
 	);
 
 	watch(
