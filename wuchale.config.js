@@ -85,6 +85,13 @@ export default defineConfig({
 					return false;
 				}
 
+				// Composite exif fields (exiv2 keys)
+
+				const exiv2key =
+					/^(Exif|Xmp|Iftp)\.(Image|Photo|Iop|GPSInfo|MpfInfo|Thumbnail)\.(\w+)$/;
+
+				if (exiv2key.test(msg)) return false;
+
 				// Table names
 				if (Object.keys(Tables).includes(msg)) return false;
 			},

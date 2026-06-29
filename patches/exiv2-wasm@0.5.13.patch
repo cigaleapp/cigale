@@ -1,0 +1,78 @@
+diff --git a/node_modules/exiv2-wasm/.bun-tag-8522ab7569860c91 b/.bun-tag-8522ab7569860c91
+new file mode 100644
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+diff --git a/node_modules/exiv2-wasm/.bun-tag-91827725a042ac8c b/.bun-tag-91827725a042ac8c
+new file mode 100644
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+diff --git a/node_modules/exiv2-wasm/.bun-tag-d351d06babeb314 b/.bun-tag-d351d06babeb314
+new file mode 100644
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+diff --git a/dist/index.d.ts b/dist/index.d.ts
+index cf9a0a53b4527d7ed824cbf67ec701f16e5e4d6e..ec104e3f9abfed23b6969204c911717d91b35bcf 100644
+--- a/dist/index.d.ts
++++ b/dist/index.d.ts
+@@ -1,15 +1,16 @@
+ // dist/index.d.ts — Types for all entry points
+ export interface Exiv2Metadata {
+-  exif?: Record<string, unknown>;
+-  iptc?: Record<string, unknown>;
+-  xmp?: Record<string, unknown>;
++  exif?: Record<Extract<Exiv2Key, `Exif.${string}`>, unknown>;
++  iptc?: Record<Extract<Exiv2Key, `Iptc.${string}`>, unknown>;
++  xmp?: Record<Extract<Exiv2Key, `Xmp.${string}`>, unknown>;
+ }
++
+ export interface Exiv2Module {
+   read(input: Uint8Array): Exiv2Metadata;
+-  readTagText(input: Uint8Array, key: string): string | undefined;
+-  readTagBytes(input: Uint8Array, key: string): Uint8Array | undefined;
+-  writeString(input: Uint8Array, key: string, value: string): Uint8Array;
+-  writeBytes(input: Uint8Array, key: string, value: Uint8Array): Uint8Array;
++  readTagText(input: Uint8Array, key: Exiv2Key): string | undefined;
++  readTagBytes(input: Uint8Array, key: Exiv2Key): Uint8Array | undefined;
++  writeString(input: Uint8Array, key: Exiv2Key, value: string): Uint8Array;
++  writeBytes(input: Uint8Array, key: Exiv2Key, value: Uint8Array): Uint8Array;
+   locateFile?: (path: string) => string;
+   calledRun?: boolean;
+ }
+@@ -24,3 +25,7 @@ export default createExiv2Module;
+ declare global {
+   function createExiv2Module(options?: CreateOptions): Promise<Exiv2Module>;
+ }
++
++export type ExifIFD = "Image" | "Photo" | "Iop" | "GPSInfo" | "MpfInfo"
++
++export type Exiv2Key = `Iptc.${string}.${string}` | `Xmp.${string}.${string}` | `Exif.${ExifIFD | "Thumbnail"}.${string}`
+diff --git a/dist/index.js b/dist/index.js
+index 3911acf85bc3f0d37514bdd0a58977f025afa5b5..ba8814c128f39035bf747e580aeeb94731f9f408 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -7,8 +7,8 @@ function urlDir(metaUrl) {
+   
+   async function importFactory(here) {
+     // 🔧 반드시 dist/를 붙여서 시도 (CDN +esm에서도 안전)
+-    const esmUrl = new URL('./dist/exiv2.esm.js', here).toString();
+-    const umdUrl = new URL('./dist/exiv2.js', here).toString();
++    const esmUrl = new URL('./exiv2.esm.js', here).toString();
++    const umdUrl = new URL('./exiv2.js', here).toString();
+   
+     // 1) 진짜 ESM 우선
+     try {
+@@ -22,7 +22,7 @@ function urlDir(metaUrl) {
+       await new Promise((res, rej) => {
+         const s = document.createElement('script');
+         s.src = umdUrl; s.async = true;
+-        s.onload = res; s.onerror = () => rej(new Error('[exiv2-wasm] failed to load ' + umdUrl));
++        s.onload = res; s.onerror = () => rej(new Error('[exiv2-wasm] failed to load ' + umdUrl + ' from ' + here));
+         document.head.appendChild(s);
+       });
+       if (typeof globalThis.createExiv2Module === 'function') return globalThis.createExiv2Module;
+@@ -39,7 +39,7 @@ function urlDir(metaUrl) {
+     const locateFile = (p) =>
+       typeof userLocate === 'function'
+         ? userLocate(p)
+-        : (p.endsWith('.wasm') ? new URL(`./dist/${p}`, here).toString() : p);
++        : (p.endsWith('.wasm') ? new URL(`./${p}`, here).toString() : p);
+   
+     const factory = await importFactory(here);
+     return factory({ ...options, locateFile });

@@ -1,13 +1,14 @@
 import 'fake-indexeddb/auto';
 
 import { readFileSync } from 'node:fs';
+import type * as DB from './database.js';
 
-import exif from 'exif-parser';
 import { beforeEach, describe, expect, test } from 'vitest';
 
 import {
 	addExifMetadata,
 	coerceExifValue,
+	extractExifData,
 	extractMetadata,
 	processExifData,
 	serializeExifValue,
@@ -16,12 +17,7 @@ import * as db from './idb.svelte.js';
 import { imageId } from './images.js';
 import { namespacedMetadataId } from './schemas/metadata.js';
 
-/**
- * Read a file from ./tests/fixtures
- * @param {string} filename
- * @returns {Promise<Buffer>} the contents
- */
-async function readImageBytes(filename) {
+function readImageBytes(filename: string) {
 	return readFileSync(`./tests/fixtures/${filename}`);
 }
 
@@ -29,13 +25,13 @@ describe('processExifData', () => {
 	beforeEach(async () => {
 		db.nukeDatabase();
 
-		const metadataField = /** @type {const} */ ({
+		const metadataField = {
 			description: '',
 			mergeMethod: 'none',
 			required: false,
 			learnMore: 'https://example.com',
 			label: '',
-		});
+		} as const;
 
 		await db.tables.Metadata.set({
 			...metadataField,
@@ -94,11 +90,16 @@ describe('processExifData', () => {
 	});
 
 	test('extracts from image without GPS', async () => {
-		const imageBytes = await readImageBytes('lil-fella.jpeg');
+		const imageBytes = readImageBytes('lil-fella.jpeg');
 
-		await processExifData('testing', 'quoicoubaka', imageBytes, {
-			type: 'image/jpeg',
-			name: 'test.jpg',
+		await processExifData({
+			sessionId: 'testing',
+			imageFileId: 'quoicoubaka',
+			exifData: await extractExifData(imageBytes),
+			file: {
+				type: 'image/jpeg',
+				name: 'test.jpg',
+			},
 		});
 
 		const image = await db.tables.Image.get(imageId(0, 0));
@@ -120,11 +121,16 @@ describe('processExifData', () => {
 	});
 
 	test('extracts from image with GPS', async () => {
-		const imageBytes = await readImageBytes('with-exif-gps.jpeg');
+		const imageBytes = readImageBytes('with-exif-gps.jpeg');
 
-		await processExifData('testing', 'quoicoubaka', imageBytes, {
-			type: 'image/jpeg',
-			name: 'test.jpg',
+		await processExifData({
+			sessionId: 'testing',
+			imageFileId: 'quoicoubaka',
+			exifData: await extractExifData(imageBytes),
+			file: {
+				type: 'image/jpeg',
+				name: 'test.jpg',
+			},
 		});
 
 		const image = await db.tables.Image.get(imageId(0, 0));
@@ -161,7 +167,7 @@ describe('processExifData', () => {
 });
 
 describe('extractMetadata', () => {
-	const plan = /** @type {const} */ ([
+	const plan = [
 		{
 			key: 'date',
 			infer: { exif: 'DateTimeOriginal' },
@@ -185,42 +191,49 @@ describe('extractMetadata', () => {
 			infer: { exif: 'Model' },
 			type: 'string',
 		},
-	]);
+	] as const;
 
 	test('extracts from image without GPS', async () => {
-		const imageBytes = await readImageBytes('lil-fella.jpeg');
-		const extraction = await extractMetadata(imageBytes, [...plan]);
+		const imageBytes = readImageBytes('lil-fella.jpeg');
+		const exif = await extractExifData(imageBytes);
+		const extraction = await extractMetadata(exif, [...plan]);
 
-		expect(extraction).toMatchObject({
-			date: {
+		expect(extraction).toMatchObject([
+			{
+				metadataId: 'date',
 				value: new Date('2025-04-25T12:38:36.000Z'),
 				alternatives: [],
 				confidence: 1,
 			},
-			make: {
+			{
+				metadataId: 'make',
 				alternatives: [],
 				confidence: 1,
 				value: 'Canon',
 			},
-			model: {
+			{
+				metadataId: 'model',
 				alternatives: [],
 				confidence: 1,
 				value: 'Canon EOS RP',
 			},
-		});
+		]);
 	});
 
 	test('extracts from image with GPS', async () => {
-		const imageBytes = await readImageBytes('with-exif-gps.jpeg');
-		const extraction = await extractMetadata(imageBytes, [...plan]);
+		const imageBytes = readImageBytes('with-exif-gps.jpeg');
+		const exif = await extractExifData(imageBytes);
+		const extraction = await extractMetadata(exif, [...plan]);
 
-		expect(extraction).toMatchObject({
-			date: {
+		expect(extraction).toMatchObject([
+			{
+				metadataId: 'date',
 				confidence: 1,
 				alternatives: [],
 				value: new Date('2008-10-22T16:29:49.000Z'),
 			},
-			location: {
+			{
+				metadataId: 'location',
 				confidence: 1,
 				alternatives: [],
 				value: {
@@ -228,22 +241,25 @@ describe('extractMetadata', () => {
 					longitude: 11.885394999997223,
 				},
 			},
-			make: {
+			{
+				metadataId: 'make',
 				confidence: 1,
 				alternatives: [],
 				value: 'NIKON',
 			},
-			model: {
+			{
+				metadataId: 'model',
 				confidence: 1,
 				alternatives: [],
 				value: 'COOLPIX P6000',
 			},
-		});
+		]);
 	});
 
 	test('does not extract GPS even if possible if not in extraction plan', async () => {
-		const imageBytes = await readImageBytes('with-exif-gps.jpeg');
-		const extraction = await extractMetadata(imageBytes, [
+		const imageBytes = readImageBytes('with-exif-gps.jpeg');
+		const exif = await extractExifData(imageBytes);
+		const extraction = await extractMetadata(exif, [
 			{
 				key: 'date',
 				infer: { exif: 'DateTimeOriginal' },
@@ -251,13 +267,14 @@ describe('extractMetadata', () => {
 			},
 		]);
 
-		expect(extraction).toEqual({
-			date: {
+		expect(extraction).toEqual([
+			{
 				confidence: 1,
 				alternatives: [],
 				value: new Date('2008-10-22T16:29:49.000Z'),
+				metadataId: 'date',
 			},
-		});
+		]);
 	});
 });
 
@@ -279,7 +296,7 @@ describe('coerceExifValue', () => {
 		});
 		test('malformed date', () => {
 			expect(() => coerceExifValue('test', 'date')).toThrowErrorMatchingInlineSnapshot(
-				`[Error: Date value must be a number, was string]`
+				`[Error: Date value "test" is not a valid date string]`
 			);
 		});
 	});
@@ -334,8 +351,8 @@ describe('serializeExifValue', () => {
 	test('from undefined', () => {
 		expect(serializeExifValue(undefined)).toEqual('undefined');
 	});
-	test('leaves arrays intact', () => {
-		expect(serializeExifValue([1, '2', true])).toEqual([1, '2', true]);
+	test('from array', () => {
+		expect(serializeExifValue([1, '2', true])).toEqual(['1', '2', 'true']);
 	});
 	test('from object', () => {
 		// FIXME: end of formatted string is locale-dependent
@@ -346,46 +363,46 @@ describe('serializeExifValue', () => {
 });
 
 describe('addExifMetadata', () => {
-	/**
-	 * @type {Array<import('./database.js').Metadata>}
-	 */
-	const metadataDefs = [
+	const metadataDefs: DB.Metadata[] = [
 		{
 			id: 'proto__gps',
-			type: /** @type {const} */ ('location'),
+			type: 'location' as const,
 			description: 'GPS',
 			label: '',
-			mergeMethod: /** @type {const} */ ('none'),
+			mergeMethod: 'none' as const,
 			required: false,
 			sortable: false,
 			groupable: false,
-			infer: /** @type {const} */ ({
+			images: [],
+			infer: {
 				latitude: { exif: 'GPSLatitude' },
 				longitude: { exif: 'GPSLongitude' },
-			}),
+			} as const,
 		},
 		{
 			id: 'proto__date',
-			type: /** @type {const} */ ('date'),
+			type: 'date' as const,
 			description: 'Date',
 			label: '',
-			mergeMethod: /** @type {const} */ ('none'),
+			mergeMethod: 'none' as const,
 			required: false,
 			sortable: false,
 			groupable: false,
-			infer: /** @type {const} */ ({
+			images: [],
+			infer: /** @type {const} */ {
 				exif: 'DateTimeOriginal',
-			}),
+			},
 		},
 		{
 			id: 'proto__non_exif',
-			type: /** @type {const} */ ('string'),
+			type: 'string' as const,
 			description: 'Not a EXIF-infered field',
 			label: '',
-			mergeMethod: /** @type {const} */ ('none'),
+			mergeMethod: 'none' as const,
 			required: false,
 			sortable: false,
 			groupable: false,
+			images: [],
 		},
 	];
 	const metadataValues = {
@@ -414,33 +431,41 @@ describe('addExifMetadata', () => {
 
 	// FIXME kinda slow, idk why
 	test('without prior GPS location', async () => {
-		const imageBytes = await readImageBytes('cyan.jpeg');
+		const before = readImageBytes('cyan.jpeg');
 
-		const resultBytes = addExifMetadata(imageBytes, metadataDefs, metadataValues);
+		expect(await extractExifData(before)).not.toHaveProperty('GPSLatitude');
 
-		const { tags } = exif.create(resultBytes.buffer).enableImageSize(false).parse();
+		const after = await addExifMetadata(before, metadataDefs, metadataValues);
 
-		expect(tags).toEqual({
-			GPSLatitude: 43.46715555555556,
+		expect(await extractExifData(after)).toMatchObject({
+			DateTimeOriginal: '2023:10:01 12:00:00',
+			GPSLatitude: '43/1 28/1 176/100',
 			GPSLatitudeRef: 'N',
-			GPSLongitude: 11.885394444444444,
+			GPSLongitude: '11/1 53/1 742/100',
 			GPSLongitudeRef: 'E',
-			DateTimeOriginal: 1696161600,
+			GPSTag: '58',
 		});
 	});
 
 	test('with prior GPS location', async () => {
-		const imageBytes = await readImageBytes('with-exif-gps.jpeg');
-		const resultBytes = addExifMetadata(imageBytes, metadataDefs, metadataValues);
+		const before = readImageBytes('with-exif-gps.jpeg');
 
-		const { tags } = exif.create(resultBytes.buffer).enableImageSize(false).parse();
+		expect(await extractExifData(before)).toMatchObject({
+			GPSLatitude: 'feur',
+		});
 
-		expect(tags).toEqual({
-			GPSLatitude: 43.46715555555556,
+		const after = await addExifMetadata(before, metadataDefs, metadataValues);
+
+		expect(await extractExifData(after)).toMatchObject({
+			DateTimeOriginal: '2023:10:01 12:00:00',
+			GPSLatitude: '43/1 28/1 176/100',
 			GPSLatitudeRef: 'N',
-			GPSLongitude: 11.885394444444444,
+			GPSLongitude: '11/1 53/1 742/100',
 			GPSLongitudeRef: 'E',
-			DateTimeOriginal: 1696161600,
+			// Verify that it keeps existing data
+			ColorSpace: '1',
+			ComponentsConfiguration: '1 2 3 0',
+			Compression: '6',
 		});
 	});
 });

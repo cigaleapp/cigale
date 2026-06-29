@@ -4,7 +4,7 @@
 import * as dates from 'date-fns';
 
 import { toRelativeCoords } from '$lib/BoundingBoxes.svelte.js';
-import { processExifData } from '$lib/exif.js';
+import { eraseExifOrientation, extractExifData, processExifData } from '$lib/exif.js';
 import { databaseHandle, tables } from '$lib/idb.svelte.js';
 import {
 	errorMessageImageTooLarge,
@@ -75,6 +75,12 @@ export async function processImageFile({ file, id: fileId, sidecars }) {
 		});
 	}
 
+	const exifData = await extractExifData(originalBytes);
+
+	originalBytes = await eraseExifOrientation(originalBytes);
+
+	transcoded = new File([originalBytes], file.name, { type: file.type });
+
 	const [[width, height], resizedBytes] = await resizeToMaxSize({ source: transcoded });
 
 	await storeImageBytes({
@@ -124,7 +130,12 @@ export async function processImageFile({ file, id: fileId, sidecars }) {
 		});
 	}
 
-	await processExifData(uiState.currentSession.id, fileId, originalBytes, file).catch((error) => {
+	await processExifData({
+		sessionId: uiState.currentSession.id,
+		imageFileId: fileId,
+		exifData,
+		file,
+	}).catch((error) => {
 		console.error(error);
 		toasts.error(`Erreur lors de l'extraction des métadonnées EXIF pour ${file.name}`);
 	});

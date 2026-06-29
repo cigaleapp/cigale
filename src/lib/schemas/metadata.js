@@ -1,9 +1,9 @@
 import { ArkErrors, scope, type } from 'arktype';
 
 import { parseISOSafe } from '../date.js';
-import { EXIF_FIELDS } from '../exiffields.js';
+import { FIELDS } from '../exiffields.js';
 import { boundingBoxResolver } from '../inference_utils.js';
-import { ensureArray, entries, keys, mapValues, transformObject, unique } from '../utils.js';
+import { ensureArray, entries, mapValues, transformObject, unique } from '../utils.js';
 import {
 	ColorHex,
 	FilepathTemplate,
@@ -290,7 +290,7 @@ export const MetadataEnumVariant = type({
 	_narrowableIn: type('string[]').default(() => []),
 });
 
-export const EXIFField = type.enumerated(...keys(EXIF_FIELDS));
+export const EXIFField = type.enumerated(...FIELDS.map((field) => field.key));
 
 export const EXIFInference = EXIFField.describe('Inférer depuis un champ EXIF', 'self');
 

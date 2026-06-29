@@ -4,6 +4,7 @@ import * as ort from 'onnxruntime-web';
 
 import { coordsScaler, toTopLeftCoords } from './BoundingBoxes.svelte.js';
 
+// TODO: rename to IMAGE_LIMITS 
 /**
  * @satisfies {import('@jimp/js-jpeg').DecodeJpegOptions}
  */

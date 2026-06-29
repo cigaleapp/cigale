@@ -4,9 +4,9 @@ import type { EXIFField } from './database.js';
 import type { RuntimeValue } from './schemas/metadata.js';
 
 import LibRaw from 'libraw-wasm';
-import { GPSHelper } from 'piexifjs';
 
 import { coerceExifValue } from './exif.js';
+import { dmsRationalToDeg } from './gps.js';
 import { openDatabase, tables } from './idb.svelte.js';
 import { storeMetadataValue } from './metadata/storage.js';
 
@@ -235,16 +235,26 @@ export function findRawMetadataFieldByExifTag(
 		// XXX: Find out if there's a way to get the LatitudeRef
 		case 'GPSLatitude': {
 			if (!metadata.gps_data) return undefined;
-			return GPSHelper.dmsRationalToDeg(
-				metadata.gps_data.latitude.map((v) => [v, 1] as const),
+			const [deg, min, secs] = metadata.gps_data.latitude;
+			return dmsRationalToDeg(
+				[
+					[deg, 1],
+					[min, 1],
+					[secs, 1],
+				] as const,
 				'N'
 			);
 		}
 		// XXX: Find out if there's a way to get the LongitudeRef
 		case 'GPSLongitude': {
 			if (!metadata.gps_data) return undefined;
-			return GPSHelper.dmsRationalToDeg(
-				metadata.gps_data.longitude.map((v) => [v, 1] as const),
+			const [deg, min, secs] = metadata.gps_data.longitude;
+			return dmsRationalToDeg(
+				[
+					[deg, 1],
+					[min, 1],
+					[secs, 1],
+				] as const,
 				'E'
 			);
 		}

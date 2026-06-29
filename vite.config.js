@@ -21,7 +21,7 @@ const env = arkenv(
 			.array()
 			.default(() => []),
 		VITEST: 'boolean = false',
-		DEBUG: 'boolean = false',
+		DEBUG: type('boolean | string').pipe(Boolean).default(false),
 		/** Required for mobile app, since window.location.origin returns localhost */
 		WEB_ORIGIN: 'string.url = "https://cigaleapp.github.io"',
 		BUILTIN_PROTOCOLS: type('string.url')
@@ -86,9 +86,9 @@ export default defineConfig({
 		plugins: () => [svelte()],
 	},
 	resolve: env.VITEST ? { conditions: ['browser'] } : {},
-	assetsInclude: ['**/*.wasm'],
+	assetsInclude: ['**/*.wasm', '**/exiv2.js'],
 	optimizeDeps: {
-		exclude: ['onnxruntime-web', 'turbo_exif', 'fetch-progress', 'libraw-wasm'],
+		exclude: ['onnxruntime-web', 'fetch-progress', 'libraw-wasm', 'exiv2-wasm'],
 	},
 	build: {
 		minify: !env.DEBUG,

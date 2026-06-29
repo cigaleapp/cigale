@@ -176,7 +176,7 @@ swarp.generateResultsExport(
 
 				try {
 					if (contentType === 'image/jpeg') {
-						croppedBytes = addExifMetadata(
+						croppedBytes = await addExifMetadata(
 							cropped,
 							Object.values(metadataDefinitions),
 							metadata
@@ -187,7 +187,7 @@ swarp.generateResultsExport(
 
 					if (include === 'full') {
 						if (contentType === 'image/jpeg') {
-							originalBytes = addExifMetadata(
+							originalBytes = await addExifMetadata(
 								original,
 								Object.values(metadataDefinitions),
 								metadata

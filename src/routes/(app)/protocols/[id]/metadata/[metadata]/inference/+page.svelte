@@ -4,7 +4,7 @@
 
 	import { invalidateAll } from '$app/navigation';
 	import EnumButtons from '$lib/EnumButtons.svelte';
-	import { EXIF_FIELDS } from '$lib/exiffields';
+	import { FIELDS } from '$lib/exiffields';
 	import FieldUrl from '$lib/FieldURL.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import { EXIFField } from '$lib/schemas/metadata.js';
@@ -100,8 +100,8 @@
 							}}
 						/>
 						<datalist id="exif-fields">
-							{#each keys(EXIF_FIELDS) as field (field)}
-								<option value={field}>{EXIF_FIELDS[field]}</option>
+							{#each FIELDS as field (field.key)}
+								<option title={field.description} value={field.key}>{field.key}</option>
 							{/each}
 						</datalist></label
 					>

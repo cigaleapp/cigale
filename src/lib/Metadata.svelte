@@ -198,15 +198,18 @@
 					<li>
 						<div class="value">
 							<LoadingText
-								value={async () =>
-									metadataOption(
+								value={async () => {
+									const option = await metadataOption(
 										databaseHandle(),
 										definition.id,
-										stringValue
-									).catch(() => null)}
+										stringValue ?? ''
+									).catch(() => null);
+
+									return option?.label ?? stringValue;
+								}}
 							>
-								{#snippet loaded(option)}
-									{option?.label ?? stringValue}
+								{#snippet loaded(label)}
+									{label}
 								{/snippet}
 							</LoadingText>
 						</div>
