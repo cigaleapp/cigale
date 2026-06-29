@@ -3,8 +3,8 @@
 	"id": "io.github.cigaleapp.arthropods.example.light",
 	"name": "Example: arthropodes (lightweight)",
 	"summary": "Version légère de Exemple: arthropodes",
-	"learnMore": "https://github.com/cigaleapp/cigale/tree/dc03fb6231a9eef0c6636a070b99e0a7271e5587/scripts/README.md#protocoles-arthropodsexamplelight",
-	"version": 106,
+	"learnMore": "https://github.com/cigaleapp/cigale/tree/a50a1aaa880fd3f35292292e393382f0a6aad0cc/scripts/README.md#protocoles-arthropodsexamplelight",
+	"version": 107,
 	"updates": "automatic",
 	"source": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.light.cigaleprotocol.json",
 	"description": "Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification\n\nClés d'identification d'abeilles fournies par IDmyBee.com, extraites depuis [IDMYBEE - Andrena sur Xper3](https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html).",
@@ -392,10 +392,10 @@
 					"learnMore": "https://gbif.org/species/1"
 				},
 				{
-					"key": "325321022",
+					"key": "326151443",
 					"label": "Animalia",
 					"description": "",
-					"learnMore": "https://gbif.org/species/325321022"
+					"learnMore": "https://gbif.org/species/326151443"
 				}
 			],
 			"label": "Règne",
@@ -419,12 +419,12 @@
 					}
 				},
 				{
-					"key": "325321023",
+					"key": "326151444",
 					"label": "Arthropoda",
 					"description": "",
-					"learnMore": "https://gbif.org/species/325321023",
+					"learnMore": "https://gbif.org/species/326151444",
 					"cascade": {
-						"kingdom": "325321022"
+						"kingdom": "326151443"
 					}
 				}
 			],
@@ -460,13 +460,13 @@
 					}
 				},
 				{
-					"key": "325321024",
+					"key": "326151445",
 					"label": "Insecta",
 					"description": "",
-					"learnMore": "https://gbif.org/species/325321024",
+					"learnMore": "https://gbif.org/species/326151445",
 					"cascade": {
-						"phylum": "325321023",
-						"kingdom": "325321022"
+						"phylum": "326151444",
+						"kingdom": "326151443"
 					}
 				}
 			],
@@ -504,14 +504,14 @@
 					}
 				},
 				{
-					"key": "325321025",
+					"key": "326151446",
 					"label": "Hymenoptera",
 					"description": "",
-					"learnMore": "https://gbif.org/species/325321025",
+					"learnMore": "https://gbif.org/species/326151446",
 					"cascade": {
-						"class": "325321024",
-						"phylum": "325321023",
-						"kingdom": "325321022"
+						"class": "326151445",
+						"phylum": "326151444",
+						"kingdom": "326151443"
 					}
 				},
 				{
@@ -584,15 +584,15 @@
 					}
 				},
 				{
-					"key": "325321063",
+					"key": "326151484",
 					"label": "Andrenidae",
 					"description": "",
-					"learnMore": "https://gbif.org/species/325321063",
+					"learnMore": "https://gbif.org/species/326151484",
 					"cascade": {
-						"order": "325321025",
-						"class": "325321024",
-						"phylum": "325321023",
-						"kingdom": "325321022"
+						"order": "326151446",
+						"class": "326151445",
+						"phylum": "326151444",
+						"kingdom": "326151443"
 					}
 				},
 				{
@@ -814,16 +814,16 @@
 					}
 				},
 				{
-					"key": "325321066",
+					"key": "326151487",
 					"label": "Andrena",
 					"description": "",
-					"learnMore": "https://gbif.org/species/325321066",
+					"learnMore": "https://gbif.org/species/326151487",
 					"cascade": {
-						"family": "325321063",
-						"order": "325321025",
-						"class": "325321024",
-						"phylum": "325321023",
-						"kingdom": "325321022"
+						"family": "326151484",
+						"order": "326151446",
+						"class": "326151445",
+						"phylum": "326151444",
+						"kingdom": "326151443"
 					}
 				},
 				{
@@ -53079,12 +53079,12 @@
 							"foncsnoir_1738784728418_9571"
 						],
 						"morphogroup": ["gpe_nigropilosa"],
-						"genus": "325321066",
-						"family": "325321063",
-						"order": "325321025",
-						"class": "325321024",
-						"phylum": "325321023",
-						"kingdom": "325321022"
+						"genus": "326151487",
+						"family": "326151484",
+						"order": "326151446",
+						"class": "326151445",
+						"phylum": "326151444",
+						"kingdom": "326151443"
 					}
 				},
 				{
@@ -53762,7 +53762,7 @@
 							"viridescens"
 						],
 						"output": {
-							"select": "(\n\t$findindex := function($subject, $predicate) {\n\t\t$reduce(\n\t\t\t$subject,\n\t\t\tfunction ($acc, $cur) {\n\t\t\t\t$acc.ok ? {\n\t\t\t\t\t\"index\": $acc.index + 1,\n\t\t\t\t\t\"ok\": $predicate($cur, $acc.index+1)\n\t\t\t\t} : $acc\n\t\t\t},\n\t\t\t{\n\t\t\t\t\"index\": 0,\n\t\t\t\t\"ok\": $predicate($subject[0], 0)\n\t\t\t}\n\t\t).index - 1\n\t};\n\n\t$takewhile := function($subject, $predicate) {\n\t\t$subject[[0..$findindex($subject, $predicate)]]\n\t};\n\n\t/* Number of images in the training dataset for each morphogroup */\n\t$groupsizes := {\n\t\t\"albopunctata\"        : 89,\n\t\t\"binominata\"          : 32,\n\t\t\"chrysopus\"           : 90,\n\t\t\"clarkella\"           : 3657,\n\t\t\"denticulata\"         : 3753,\n\t\t\"farinosa\"            : 19,\n\t\t\"ferrugineicrus\"      : 29,\n\t\t\"florentina\"          : 9,\n\t\t\"fulva\"               : 4505,\n\t\t\"fuscosa\"             : 36,\n\t\t\"gpe agilissima\"      : 408,\n\t\t\"gpe angustior\"       : 4084,\n\t\t\"gpe argentata\"       : 237,\n\t\t\"gpe barbilabris\"     : 3056,\n\t\t\"gpe cineraria\"       : 3979,\n\t\t\"gpe colletiformis\"   : 141,\n\t\t\"gpe curvungula\"      : 149,\n\t\t\"gpe flavipes\"        : 4207,\n\t\t\"gpe fulvago\"         : 220,\n\t\t\"gpe fuscipes\"        : 1113,\n\t\t\"gpe hedikae\"         : 6,\n\t\t\"gpe helvola\"         : 480,\n\t\t\"gpe humilis\"         : 117,\n\t\t\"gpe labiata\"         : 2240,\n\t\t\"gpe minutula\"        : 289,\n\t\t\"gpe nigropilosa\"     : 118,\n\t\t\"gpe pilipes\"         : 241,\n\t\t\"gpe praecox\"         : 3102,\n\t\t\"gpe proxima\"         : 1037,\n\t\t\"gpe ruficrus\"        : 221,\n\t\t\"gpe savignyi\"        : 56,\n\t\t\"gpe schencki\"        : 45,\n\t\t\"gpe scotica\"         : 2161,\n\t\t\"gpe thoracica\"       : 332,\n\t\t\"gpe trimmerana\"      : 39,\n\t\t\"gpe wilkella\"        : 2669,\n\t\t\"gpe wilkella-argent\" : 2834,\n\t\t\"haemorrhoa\"          : 3813,\n\t\t\"hattorfiana\"         : 3466,\n\t\t\"hystrix\"             : 3,\n\t\t\"lagopus\"             : 150,\n\t\t\"leucolippa\"          : 58,\n\t\t\"limbata\"             : 52,\n\t\t\"marginata\"           : 285,\n\t\t\"morio\"               : 52,\n\t\t\"nigroolivacea\"       : 11,\n\t\t\"nitida\"              : 3858,\n\t\t\"nycthemera\"          : 55,\n\t\t\"panurgina\"           : 8,\n\t\t\"paucisquama\"         : 1,\n\t\t\"pellucens\"           : 101,\n\t\t\"rogenhoferi\"         : 68,\n\t\t\"rufizona\"            : 18,\n\t\t\"sardoa\"              : 65,\n\t\t\"solenopalpa\"         : 12,\n\t\t\"symphyti\"            : 7,\n\t\t\"tarsata\"             : 52,\n\t\t\"tibialis\"            : 848,\n\t\t\"vaga\"                : 3428,\n\t\t\"ventralis\"           : 1248,\n\t\t\"vetula\"              : 7,\n\t\t\"viridescens\"         : 165\n\t};\n\n\n\t/* Weight according to group sizes */\n\t$weighted := neurons.{\n\t\t\"key\": key,\n\t\t\"score\": (\n\t\t\t$size := $lookup($groupsizes, key);\n\n\t\t\tscore * (\n\t\t\t\t$size < 100\n\t\t\t\t? 1 + ((100 - $size) / 200)\n\t\t\t\t: 1\n\t\t\t)\n\t\t)\n\t}^(>score);\n\n\n\t/* Filter on score differences */\n\t$takewhile($weighted, function($current, $i) {\n\t\t\t$i = 0\n\t\t\t? true\n\t\t\t: $current.score < 10 * $weighted[$i-1].score\n\t})\n\n\n\t/* Output keys */\n\t.key[]\n)\n"
+							"select": "(\n\t$plausible := neurons[score >= 0.01].key[];\n\n\t$includes($plausible, \"gpe wilkella-argentata\")\n\t? $append($plausible, [\"gpe wilkella\", \"gpe argentata\"])\n\t: $plausible\n)\n"
 						},
 						"input": {
 							"height": 384,
