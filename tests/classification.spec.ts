@@ -871,11 +871,11 @@ test.describe('narrowing view', pr(1570), () => {
 			const modal = app.modals.byTitle('Liste des candidats restants');
 			await expect(modal).toBeVisible();
 
-			// Ensure textarea contains a bracketed, comma-separated list like [1, 2, 3]
+			// Ensure textarea contains a comma-separated list like 1, 2, 3
 			// const listValue = await modal.locator('textarea').inputValue();
 			// expect(listValue).toMatch(/^\[\d+(,\s*\d+)*\]$/);
 			await expect(modal.getByRole('textbox')).toHaveValue(
-				'[158, 156, 32, 153, 152, 150, 157, 154, 155, 151]'
+				'158, 156, 32, 153, 152, 150, 157, 154, 155, 151'
 			);
 		});
 	});
