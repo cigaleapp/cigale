@@ -24,6 +24,7 @@ All notable changes to this project will be documented in this file, on a monthl
 
 - Add UTF8 BOM to CSV file in export
 - Add missing mobile top bar on storage management page
+- Fix Ctrl-A not working (Fixes #1825)
 - Fix alignment of mobile topbar actions
 - Fix classifier confirmation progress bar
 - Fix cors proxy usage (#1707)
@@ -37,6 +38,7 @@ All notable changes to this project will be documented in this file, on a monthl
 - Add missing crop metadata for IDmyBee protocol
 - Add weighted selection for morphogroup inference
 - Bump protocol version of protocols/insecta.cigaleprotocol.yaml [ci skip]
+- Change select expression for IDmyBee morphogroup inference
 - Cleanup IDmyBee protocol & handle version bumping
 - Collapse Andrena group in IDmyBee protocol
 - Configure IDmyBee export filepaths
