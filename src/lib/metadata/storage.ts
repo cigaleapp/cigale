@@ -352,6 +352,14 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 		for (const cascade of cascades) {
 			abortSignal?.throwIfAborted();
 
+			const found = await db.get('Metadata', cascade.metadataId);
+			if (!found) {
+				console.warn(
+					`Cascading metadata ${metadataId} @ ${value} -> ${cascade.metadataId} (NOT FOUND!!!!) = ${cascade.value}: skipping`
+				);
+				continue;
+			}
+
 			console.info(
 				`Cascading metadata ${metadataId} @ ${value} -> ${cascade.metadataId}  = ${cascade.value}`
 			);
