@@ -149,7 +149,7 @@
 			}
 		}}
 	>
-		<Field label={type === 'bug' ? 'Reproduction' : 'Description'}>
+		<Field label={type === 'bug' ? 'Comment reproduire le bug?' : 'Description'}>
 			<textarea bind:value={body} rows="6"></textarea>
 		</Field>
 		<Field label="Titre">

@@ -266,7 +266,9 @@ testBasic('can send a bug report', async ({ page, app, context }) => {
 	await page.getByTestId('open-bug-report').click();
 
 	await assert(report).toBeVisible();
-	await report.getByRole('textbox', { name: 'Description' }).fill('This is a test bug report.');
+	await report
+		.getByRole('textbox', { name: 'Comment reproduire le bug?' })
+		.fill('This is a test bug report.');
 	await report.getByRole('textbox', { name: 'Titre' }).fill('Test Bug Report');
 	await report.getByRole('button', { name: 'Envoyer' }).click();
 
