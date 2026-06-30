@@ -104,6 +104,7 @@ msgstr "Arbre taxonomique"
 msgid "Aucun fichier d'analyse trouvé dans l'export {0}"
 msgstr "Aucun fichier d'analyse trouvé dans l'export {0}"
 
+#: src/lib/InputSelectProtocol.svelte
 #: src/lib/import.svelte.js
 #: src/lib/import.svelte.js
 msgid "Aucun protocole sélectionné"
@@ -174,6 +175,7 @@ msgid "Chargement du protocole intégré"
 msgstr "Chargement du protocole intégré"
 
 #: src/lib/CardMedia.svelte
+#: src/lib/MetadataInput.svelte
 #: src/routes/(app)/+layout.ts
 #: src/routes/(app)/DeploymentDetails.svelte
 msgid "Chargement…"
@@ -379,7 +381,6 @@ msgstr "Image suivante"
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
 #: src/routes/(app)/(sidepanel)/crop/+page.svelte
 #: src/routes/(app)/Navigation.svelte
-#: src/routes/(app)/protocols/+page.svelte
 #: src/routes/(app)/protocols/import/[...url]/+page.svelte
 msgid "Importer"
 msgstr "Importer"
@@ -549,6 +550,7 @@ msgid "Supprime toutes les données pour ce déploiement de preview"
 msgstr "Supprime toutes les données pour ce déploiement de preview"
 
 #: src/lib/AreaObservations.svelte
+#: src/lib/ModalConfirmDeletion.svelte
 #: src/routes/(app)/storage/Table.svelte
 msgid "Supprimer"
 msgstr "Supprimer"
@@ -1471,6 +1473,7 @@ msgstr[0] "# image"
 msgstr[1] "# images"
 
 #: src/routes/(app)/sessions/+page.svelte
+#: src/routes/(app)/sessions/+page.svelte
 msgid "Gérer"
 msgstr "Gérer"
 
@@ -1774,6 +1777,7 @@ msgstr "Aucun session active"
 msgid "Erreur lors du traitement du/des fichiers annexes associés à {0}"
 msgstr "Erreur lors du traitement du/des fichiers annexes associés à {0}"
 
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 msgid "Aucune sélection"
 msgstr "Aucune sélection"
@@ -2725,10 +2729,6 @@ msgstr "{0} protocoles ont été mis à jour: {1}"
 msgid "Suivez l'avancement de son développement sur Github: c'est <0>l'issue <0>#{0}</0></0>."
 msgstr "Suivez l'avancement de son développement sur Github: c'est <0>l'issue <0>#{0}</0></0>."
 
-#: src/lib/ModalConfirmDeletion.svelte
-msgid "La suppression entraînera: <0/> Il est impossible de revenir en arrière. <1><0>Afin de confirmer la suppression, veuillez taper <0/> ci-dessous:</0> <1/></1>"
-msgstr "La suppression entraînera: <0/> Il est impossible de revenir en arrière. <1><0>Afin de confirmer la suppression, veuillez taper <0/> ci-dessous:</0> <1/></1>"
-
 #. 0: file.name
 #: src/lib/MetadataInput.svelte
 msgid "{0} enregistré"
@@ -2738,14 +2738,6 @@ msgstr "{0} enregistré"
 #: src/lib/CardObservation.svelte
 msgid "{0} sur {1}: {2}"
 msgstr "{0} sur {1}: {2}"
-
-#: src/routes/(app)/protocols/ModalCreateProtocol.svelte
-msgid "Identifiant du protocole"
-msgstr "Identifiant du protocole"
-
-#: src/routes/(app)/protocols/ModalCreateProtocol.svelte
-msgid "Doit être unique. Il est conseillé de le baser sur un nom de domaine web que vous contrôlez; celui d'un site web permettant de télécharger le protocole, par exemple"
-msgstr "Doit être unique. Il est conseillé de le baser sur un nom de domaine web que vous contrôlez; celui d'un site web permettant de télécharger le protocole, par exemple"
 
 #. 0: account.username; 1: provider.displayName
 #: src/routes/(app)/sessions/+page.svelte
@@ -2858,3 +2850,44 @@ msgstr "Affectée par"
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
 msgid "Autres métadonnées qui change {0} à {1}"
 msgstr "Autres métadonnées qui change {0} à {1}"
+
+#: src/lib/ButtonUpdateProtocol.svelte
+msgctxt "Upgrading a protocol. The <0 /> is an icon arrow"
+msgid "Mise à jour…"
+msgstr "Mise à jour…"
+
+#: src/lib/ModalConfirmDeletion.svelte
+msgid "Afin de confirmer la suppression, veuillez taper <0/> ci-dessous:"
+msgstr "Afin de confirmer la suppression, veuillez taper <0/> ci-dessous:"
+
+#: src/lib/ModalConfirmDeletion.svelte
+msgid "La suppression entraînera: <0/> Il est impossible de revenir en arrière. <1/>"
+msgstr "La suppression entraînera: <0/> Il est impossible de revenir en arrière. <1/>"
+
+#: src/lib/MetadataInput.svelte
+msgid "Oui"
+msgstr "Oui"
+
+#: src/lib/MetadataInput.svelte
+msgid "Modifier"
+msgstr "Modifier"
+
+#: src/routes/(app)/PrepareForOffline.svelte
+msgid "<0/> OK!"
+msgstr "<0/> OK!"
+
+#: src/routes/(app)/protocols/ModalCreateProtocol.svelte
+msgid "Identifiant du protocole <0>Doit être unique. Il est conseillé de le baser sur un nom de domaine web que vous contrôlez; celui d'un site web permettant de télécharger le protocole, par exemple</0>"
+msgstr "Identifiant du protocole <0>Doit être unique. Il est conseillé de le baser sur un nom de domaine web que vous contrôlez; celui d'un site web permettant de télécharger le protocole, par exemple</0>"
+
+#: src/routes/(app)/protocols/ModalCreateProtocol.svelte
+msgid "L'identifiant ne doit comporter que des lettres, chiffres, <0>.</0> ou <1>_</1>"
+msgstr "L'identifiant ne doit comporter que des lettres, chiffres, <0>.</0> ou <1>_</1>"
+
+#: src/routes/(app)/protocols/+page.svelte
+msgid "<0/> Importer"
+msgstr "<0/> Importer"
+
+#: src/routes/(app)/about/+page.svelte
+msgid "(aucun)"
+msgstr "(aucun)"
