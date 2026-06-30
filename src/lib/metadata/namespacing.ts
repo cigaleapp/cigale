@@ -15,18 +15,30 @@ export function protocolMetadataValues(
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	values: { [x: string]: any }
 ) {
-	const resolveImport = (key: NamespacedMetadataID) =>
-		protocol.importedMetadata?.find((imp) => [imp.target, imp.source].includes(key));
-
 	return fromEntries(
 		protocol.metadata
 			.filter((key) => {
 				const isSessionMetadata = protocol.sessionMetadata.includes(key);
-				const isSessionwideImport = resolveImport(key)?.sessionwide;
+				const isSessionwideImport = protocol.importedMetadata.some(
+					(imp) => [imp.source, imp.target].includes(key) && imp.sessionwide
+				);
 
 				return Boolean(isSessionMetadata || isSessionwideImport) === (area === 'session');
 			})
-			.map((key) => resolveImport(key)?.source ?? key)
+			.map((key) => resolveMetadataImport(protocol, key))
 			.map((key) => [removeNamespaceFromMetadataId(key), values[key] ?? METADATA_ZERO_VALUE])
+	);
+}
+
+/**
+ * Resolves the actual ID (namespaced key) of a metadata from a protocol
+ */
+export function resolveMetadataImport(
+	protocol: Pick<DB.Protocol, 'importedMetadata'>,
+	metadataId: NamespacedMetadataID
+): NamespacedMetadataID {
+	return (
+		protocol.importedMetadata?.find((imp) => [imp.target, imp.source].includes(metadataId))
+			?.source ?? metadataId
 	);
 }
