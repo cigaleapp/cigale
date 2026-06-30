@@ -13,9 +13,10 @@
 	import IconInferenceEnabled from '~icons/ri/sparkling-line';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import DropdownMenu from '$lib/DropdownMenu.svelte';
-	import { tables } from '$lib/idb.svelte';
-	import { metadataDefinitionComparator } from '$lib/protocols';
-	import { namespaceOfMetadataId, removeNamespaceFromMetadataId } from '$lib/schemas/metadata';
+	import { tables } from '$lib/idb.svelte.js';
+	import { resolveMetadataImport } from '$lib/metadata/namespacing.js';
+	import { metadataDefinitionComparator } from '$lib/protocols.js';
+	import { namespaceOfMetadataId, removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';
 	import {
 		GROUP_FIELDS,
 		GROUPING_TOLERANCES,
@@ -23,9 +24,9 @@
 		SORT_FIELDS,
 		sortOrGroupFieldNeedsMetadata,
 		SortSettings,
-	} from '$lib/schemas/sessions';
-	import { uiState } from '$lib/state.svelte';
-	import { entries, orEmpty } from '$lib/utils';
+	} from '$lib/schemas/sessions.js';
+	import { uiState } from '$lib/state.svelte.js';
+	import { entries, nonnull, orEmpty } from '$lib/utils.js';
 
 	interface Props {
 		tab: 'crop' | 'classify' | 'import';
@@ -58,14 +59,20 @@
 		};
 	}
 
+	const protocol = $derived(uiState.currentProtocol);
+
 	const compareMetadataDefs = $derived(
-		metadataDefinitionComparator(uiState.currentProtocol ?? { metadataOrder: undefined })
+		metadataDefinitionComparator(protocol ?? { metadataOrder: undefined })
 	);
 
 	const metadataOfProtocol = $derived(
-		tables.Metadata.state
-			.filter((m) => namespaceOfMetadataId(m.id) === uiState.currentProtocolId)
-			.sort(compareMetadataDefs)
+		protocol
+			? protocol.metadata
+					.map((key) => resolveMetadataImport(protocol, key))
+					.map((id) => tables.Metadata.getFromState(id))
+					.filter(nonnull)
+					.sort(compareMetadataDefs)
+			: []
 	);
 
 	const sortableMetadata = $derived(metadataOfProtocol.filter((m) => m.sortable));
