@@ -176,6 +176,11 @@ export async function processRawMetadata(
 					continue;
 				}
 
+				// Skip if both are 0
+				if (!latitude && !longitude) {
+					continue;
+				}
+
 				value = {
 					latitude: coerceExifValue(latitude, 'float'),
 					longitude: coerceExifValue(longitude, 'float'),
