@@ -29,7 +29,16 @@ await Bun.write(
 		source: 'https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/idmybee.cigaleprotocol.json',
 		authors: [],
 		sessionMetadata: {},
-		exports: backbone.exports,
+		exports: {
+			images: {
+				cropped: 'cropped/{{ observation.number }}_{{ image.filename }}',
+				original: 'original/{{ observation.number }}_{{ image.filename }}',
+			},
+			metadata: {
+				json: 'analysis.json',
+				csv: 'metadata.csv',
+			},
+		},
 		// TODO: use this once #1696 is merged
 		imports: [
 			// {
@@ -39,6 +48,10 @@ await Bun.write(
 			// 	],
 			// 	metadata: ['crop', 'conservation_status', 'identification_difficulty'],
 			// },
+			{
+				from: 'io.github.cigaleapp.arthropods.example',
+				metadata: ['shoot_location', 'shoot_date'],
+			},
 		],
 		metadataOrder: [
 			'morphogroup',

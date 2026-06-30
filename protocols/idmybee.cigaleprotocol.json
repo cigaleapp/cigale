@@ -5,20 +5,24 @@
 	"summary": "Identification d'Andrènes par élimination",
 	"logo": "https://cigaleapp.github.io/cigale/logos/idmybee.png",
 	"description": "Un protocole pour identifier des abeilles genre Andrena via des descripteurs, avec pré-élimination par classification par inférence de Morphogroupes",
-	"version": 7,
+	"version": 8,
 	"updates": "automatic",
 	"source": "https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/idmybee.cigaleprotocol.json",
 	"authors": [],
 	"sessionMetadata": {},
 	"exports": {
 		"images": {
-			"mtime": "io.github.cigaleapp.arthropods.example__shoot_date",
-			"cropped": "Cropped/{{ fallback image.protocolMetadata.species.valueLabel \"(Unknown)\" }}_obs{{ observation.number }}_{{ sequence }}.{{ extension image.filename }}",
-			"original": "Original/{{ fallback image.protocolMetadata.species.valueLabel \"(Unknown)\" }}_obs{{ observation.number }}_{{ sequence }}.{{ extension image.filename }}"
+			"cropped": "cropped/{{ observation.number }}_{{ image.filename }}",
+			"original": "original/{{ observation.number }}_{{ image.filename }}"
 		},
 		"metadata": { "json": "analysis.json", "csv": "metadata.csv" }
 	},
-	"imports": [],
+	"imports": [
+		{
+			"from": "io.github.cigaleapp.arthropods.example",
+			"metadata": ["shoot_location", "shoot_date"]
+		}
+	],
 	"metadataOrder": [
 		"morphogroup",
 		"pilosite_occipitale",
