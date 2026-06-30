@@ -163,7 +163,7 @@
 		"@iconify/svelte": "^5.2.2",
 		"@sveltejs/svelte-virtual-list": "^3.0.1",
 		"@viselect/vanilla": "^3.9.0",
-		"@wuchale/svelte": "^0.20.0",
+		"@wuchale/svelte": "^0.20.3",
 		"arktype": "^2.2.0",
 		"arrival-time": "^1.0.6",
 		"baseline-browser-mapping": "^2.10.37",

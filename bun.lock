@@ -22,7 +22,7 @@
         "@iconify/svelte": "^5.2.2",
         "@sveltejs/svelte-virtual-list": "^3.0.1",
         "@viselect/vanilla": "^3.9.0",
-        "@wuchale/svelte": "^0.20.0",
+        "@wuchale/svelte": "^0.20.3",
         "arktype": "^2.2.0",
         "arrival-time": "^1.0.6",
         "baseline-browser-mapping": "^2.10.37",
@@ -1212,7 +1212,7 @@
 
     "@webassemblyjs/wast-printer": ["@webassemblyjs/wast-printer@1.14.1", "", { "dependencies": { "@webassemblyjs/ast": "1.14.1", "@xtuc/long": "4.2.2" } }, "sha512-kPSSXE6De1XOR820C90RIo2ogvZG+c3KiHzqUoO/F34Y2shGzesfqv7o57xrxovZJH/MetF5UjroJ/R/3isoiw=="],
 
-    "@wuchale/svelte": ["@wuchale/svelte@0.20.1", "", { "dependencies": { "wuchale": "^0.25.0" }, "peerDependencies": { "svelte": "^5" } }, "sha512-tQahJv3ItdcUraIcFVbFxQygEo31pMR9cYs3kzbKkWzVbwce8ibjZkKDimAJkuk+FlEmvxg++gpis9DZc7Z/9Q=="],
+    "@wuchale/svelte": ["@wuchale/svelte@0.20.3", "", { "dependencies": { "wuchale": "^0.25.4" }, "peerDependencies": { "svelte": "^5" } }, "sha512-plNo7TXFzKw4bechnCG5pbBcFc2zz1OAK0dQzlcm+4kLrv1J+NoqMsGLiINCv4V3TFjx26EXm/g0aLQw37BC4A=="],
 
     "@xml-tools/parser": ["@xml-tools/parser@1.0.11", "", { "dependencies": { "chevrotain": "7.1.1" } }, "sha512-aKqQ077XnR+oQtHJlrAflaZaL7qZsulWc/i/ZEooar5JiWj1eLt0+Wg28cpa+XLney107wXqneC+oG1IZvxkTA=="],
 
@@ -3724,7 +3724,7 @@
 
     "@typescript-eslint/visitor-keys/@typescript-eslint/types": ["@typescript-eslint/types@8.61.1", "", {}, "sha512-G+CRlPqLv7Bz1IZVs03x5K59F1veqL0EJUROAdGhKsEq8qOiRiZbI+HUojPq5l0fEGOKModD9br6lObhB8zkoA=="],
 
-    "@wuchale/svelte/wuchale": ["wuchale@0.25.2", "", { "dependencies": { "@sveltejs/acorn-typescript": "^1.0.10", "acorn": "^8.17.0", "chokidar": "^5.0.0", "magic-string": "^0.30.21", "picomatch": "^4.0.4", "pofile": "^1.1.4", "tinyglobby": "^0.2.17" }, "bin": { "wuchale": "dist/cli/index.js" } }, "sha512-7x4LXyMnP3t7EYTIla4ZcGtBvE1/fRv2dB5eLrwXmxuNmV5w8cB+QgMB5B3O0z6vbM3ZXFVhfOokKxvC/dbC9w=="],
+    "@wuchale/svelte/wuchale": ["wuchale@0.25.4", "", { "dependencies": { "@sveltejs/acorn-typescript": "^1.0.10", "acorn": "^8.17.0", "chokidar": "^5.0.0", "magic-string": "^0.30.21", "picomatch": "^4.0.4", "pofile": "^1.1.4", "tinyglobby": "^0.2.17" }, "bin": { "wuchale": "dist/cli/index.js" } }, "sha512-QYfFwq9utRxZbAU1N4JN4L1+cNLQNlN6iTsX7d5uENBWcTdS/p1wWRPxwhsSdXeZoUqmlfS3O2V17zHcd0gvvA=="],
 
     "aggregate-error/indent-string": ["indent-string@4.0.0", "", {}, "sha512-EdDDZu4A2OyIK7Lr/2zG+w5jmbuk1DVBnEwREQvBzspBJkCEbRa8GxU1lghYcaGJCnRWibjDXlq779X1/y5xwg=="],
 
