@@ -770,7 +770,6 @@ msgstr "<0/> Retour"
 msgid "L'interface de modification de protocole n'est pas encore peaufinée. Certaines choses ne sont pas encore modifiables ici. Pour les changer, exportez les protocoles, modifiez l'export (fichier JSON) et ré-importez-le"
 msgstr "L'interface de modification de protocole n'est pas encore peaufinée. Certaines choses ne sont pas encore modifiables ici. Pour les changer, exportez les protocoles, modifiez l'export (fichier JSON) et ré-importez-le"
 
-#: src/routes/(app)/(sidepanel)/o/[observation]/+layout@(app).svelte
 #: src/routes/(app)/protocols/[id]/+layout.svelte
 msgid "Beta"
 msgstr "Beta"
@@ -2772,22 +2771,6 @@ msgstr "Jimmy Cheung"
 msgid "Wendy Gao"
 msgstr "Wendy Gao"
 
-#: src/routes/(app)/results/+page.svelte
-msgid "Marge de recadrage"
-msgstr "Marge de recadrage"
-
-#: src/routes/(app)/results/+page.svelte
-msgid "une fois dézippé"
-msgstr "une fois dézippé"
-
-#: src/routes/(app)/results/+page.svelte
-msgid "<0/> Dossier <1></1>"
-msgstr "<0/> Dossier <1></1>"
-
-#: src/routes/(app)/results/+page.svelte
-msgid "<0/> Archive ZIP <1></1>"
-msgstr "<0/> Archive ZIP <1></1>"
-
 #. 0: account.username
 #: src/routes/(app)/accounts/RowAccount.svelte
 msgid "Photo de {0}"
@@ -2800,10 +2783,6 @@ msgstr "Type de compte inconnu"
 #: src/routes/(app)/accounts/RowAccount.svelte
 msgid "Déconnecter"
 msgstr "Déconnecter"
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/+layout@(app).svelte
-msgid "Élimination"
-msgstr "Élimination"
 
 #. 0: labels.item
 #: src/routes/(app)/(sidepanel)/o/[observation]/TopbarExtras.svelte
@@ -2824,32 +2803,6 @@ msgstr "{0}: var(--offset);"
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/Subject.svelte
 msgid "{0} ({1} sur {2})"
 msgstr "{0} ({1} sur {2})"
-
-#: src/routes/(app)/protocols/[id]/metadata/[metadata]/infos/+page.svelte
-msgid "Méthode de fusion"
-msgstr "Méthode de fusion"
-
-#: src/routes/(app)/protocols/[id]/metadata/[metadata]/infos/+page.svelte
-msgid "Comment fusionner les valeurs de cette métadonnée lors du regroupement de plusieurs observations en une seule"
-msgstr "Comment fusionner les valeurs de cette métadonnée lors du regroupement de plusieurs observations en une seule"
-
-#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
-msgid "Affecte"
-msgstr "Affecte"
-
-#. 0: data.metadata.label; 1: data.option .label
-#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
-msgid "Change la valeur d'autres métadonnées quand {0} = {1}"
-msgstr "Change la valeur d'autres métadonnées quand {0} = {1}"
-
-#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
-msgid "Affectée par"
-msgstr "Affectée par"
-
-#. 0: metadata.label; 1: data.option.label
-#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
-msgid "Autres métadonnées qui change {0} à {1}"
-msgstr "Autres métadonnées qui change {0} à {1}"
 
 #: src/lib/ButtonUpdateProtocol.svelte
 msgctxt "Upgrading a protocol. The <0 /> is an icon arrow"
@@ -2891,3 +2844,50 @@ msgstr "<0/> Importer"
 #: src/routes/(app)/about/+page.svelte
 msgid "(aucun)"
 msgstr "(aucun)"
+
+#: src/routes/(app)/results/+page.svelte
+msgid "Marge de recadrage <0/>"
+msgstr "Marge de recadrage <0/>"
+
+#: src/routes/(app)/results/+page.svelte
+msgid "<0/> une fois dézippé"
+msgstr "<0/> une fois dézippé"
+
+#: src/routes/(app)/results/+page.svelte
+msgid "<0/> Dossier <1/>"
+msgstr "<0/> Dossier <1/>"
+
+#: src/routes/(app)/results/+page.svelte
+msgid "<0/> Archive ZIP <1><0/></1>"
+msgstr "<0/> Archive ZIP <1><0/></1>"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/+layout@(app).svelte
+msgid "Élimination <0>Beta</0>"
+msgstr "Élimination <0>Beta</0>"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/CandidatesListXper3.svelte
+msgid "Copié!"
+msgstr "Copié!"
+
+#. 0: loadingOptions; 1: definitions.length
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/OptionsLoader.svelte
+msgid "<0/> Chargement des options... <1/> {0} / {1}"
+msgstr "<0/> Chargement des options... <1/> {0} / {1}"
+
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/infos/+page.svelte
+msgid "Méthode de fusion <0>Comment fusionner les valeurs de cette métadonnée lors du regroupement de plusieurs observations en une seule</0>"
+msgstr "Méthode de fusion <0>Comment fusionner les valeurs de cette métadonnée lors du regroupement de plusieurs observations en une seule</0>"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/CandidateDetailsModal.svelte
+msgid "Candidat éliminé"
+msgstr "Candidat éliminé"
+
+#. 0.0: data.metadata.label; 0.1: data.option .label
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
+msgid "Affecte <0>Change la valeur d'autres métadonnées quand {0} = {1}</0>"
+msgstr "Affecte <0>Change la valeur d'autres métadonnées quand {0} = {1}</0>"
+
+#. 0.0: metadata.label; 0.1: data.option.label
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
+msgid "Affectée par <0>Autres métadonnées qui change {0} à {1}</0>"
+msgstr "Affectée par <0>Autres métadonnées qui change {0} à {1}</0>"

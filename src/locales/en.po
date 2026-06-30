@@ -770,7 +770,6 @@ msgstr "<0/> Back"
 msgid "L'interface de modification de protocole n'est pas encore peaufinée. Certaines choses ne sont pas encore modifiables ici. Pour les changer, exportez les protocoles, modifiez l'export (fichier JSON) et ré-importez-le"
 msgstr "The protocol editing UI is still rough around the edges. Some things cannot be edited there. To modify them, export the protocol, edit the JSON file and import it back"
 
-#: src/routes/(app)/(sidepanel)/o/[observation]/+layout@(app).svelte
 #: src/routes/(app)/protocols/[id]/+layout.svelte
 msgid "Beta"
 msgstr "Beta"
@@ -2772,22 +2771,6 @@ msgstr ""
 msgid "Wendy Gao"
 msgstr ""
 
-#: src/routes/(app)/results/+page.svelte
-msgid "Marge de recadrage"
-msgstr ""
-
-#: src/routes/(app)/results/+page.svelte
-msgid "une fois dézippé"
-msgstr ""
-
-#: src/routes/(app)/results/+page.svelte
-msgid "<0/> Dossier <1></1>"
-msgstr ""
-
-#: src/routes/(app)/results/+page.svelte
-msgid "<0/> Archive ZIP <1></1>"
-msgstr ""
-
 #. 0: account.username
 #: src/routes/(app)/accounts/RowAccount.svelte
 msgid "Photo de {0}"
@@ -2799,10 +2782,6 @@ msgstr ""
 
 #: src/routes/(app)/accounts/RowAccount.svelte
 msgid "Déconnecter"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/+layout@(app).svelte
-msgid "Élimination"
 msgstr ""
 
 #. 0: labels.item
@@ -2823,32 +2802,6 @@ msgstr ""
 #. 0: img.filename; 1: i + 1; 2: images.length
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/Subject.svelte
 msgid "{0} ({1} sur {2})"
-msgstr ""
-
-#: src/routes/(app)/protocols/[id]/metadata/[metadata]/infos/+page.svelte
-msgid "Méthode de fusion"
-msgstr ""
-
-#: src/routes/(app)/protocols/[id]/metadata/[metadata]/infos/+page.svelte
-msgid "Comment fusionner les valeurs de cette métadonnée lors du regroupement de plusieurs observations en une seule"
-msgstr ""
-
-#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
-msgid "Affecte"
-msgstr ""
-
-#. 0: data.metadata.label; 1: data.option .label
-#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
-msgid "Change la valeur d'autres métadonnées quand {0} = {1}"
-msgstr ""
-
-#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
-msgid "Affectée par"
-msgstr ""
-
-#. 0: metadata.label; 1: data.option.label
-#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
-msgid "Autres métadonnées qui change {0} à {1}"
 msgstr ""
 
 #: src/lib/ButtonUpdateProtocol.svelte
@@ -2890,4 +2843,51 @@ msgstr ""
 
 #: src/routes/(app)/about/+page.svelte
 msgid "(aucun)"
+msgstr ""
+
+#: src/routes/(app)/results/+page.svelte
+msgid "Marge de recadrage <0/>"
+msgstr ""
+
+#: src/routes/(app)/results/+page.svelte
+msgid "<0/> une fois dézippé"
+msgstr ""
+
+#: src/routes/(app)/results/+page.svelte
+msgid "<0/> Dossier <1/>"
+msgstr ""
+
+#: src/routes/(app)/results/+page.svelte
+msgid "<0/> Archive ZIP <1><0/></1>"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/+layout@(app).svelte
+msgid "Élimination <0>Beta</0>"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/CandidatesListXper3.svelte
+msgid "Copié!"
+msgstr ""
+
+#. 0: loadingOptions; 1: definitions.length
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/OptionsLoader.svelte
+msgid "<0/> Chargement des options... <1/> {0} / {1}"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/infos/+page.svelte
+msgid "Méthode de fusion <0>Comment fusionner les valeurs de cette métadonnée lors du regroupement de plusieurs observations en une seule</0>"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/CandidateDetailsModal.svelte
+msgid "Candidat éliminé"
+msgstr ""
+
+#. 0.0: data.metadata.label; 0.1: data.option .label
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
+msgid "Affecte <0>Change la valeur d'autres métadonnées quand {0} = {1}</0>"
+msgstr ""
+
+#. 0.0: metadata.label; 0.1: data.option.label
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
+msgid "Affectée par <0>Autres métadonnées qui change {0} à {1}</0>"
 msgstr ""
