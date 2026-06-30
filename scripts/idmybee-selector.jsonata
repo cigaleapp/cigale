@@ -1,7 +1,7 @@
 (
 	$plausible := neurons[score >= 0.01].key[];
 
-	$includes($plausible, "gpe wilkella-argentata")
+	"gpe wilkella-argentata" in $plausible
 	? $append($plausible, ["gpe wilkella", "gpe argentata"])
 	: $plausible
 )
