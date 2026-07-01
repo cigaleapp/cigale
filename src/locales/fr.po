@@ -289,6 +289,7 @@ msgid "Erreur"
 msgstr "Erreur"
 
 #: src/lib/exif.js
+#: src/lib/exif.ts
 #: src/lib/i18n.js
 #: src/lib/i18n.js
 #: src/lib/i18n.js
@@ -398,7 +399,9 @@ msgid "Importer le protocole distant ?"
 msgstr "Importer le protocole distant ?"
 
 #. 0: file.name; 1: e?.toString() ?? 'Erreur inattendue'
+#. 0: file.name; 1: e?.toString() ?? 'Erreur inattendue'
 #: src/lib/exif.js
+#: src/lib/exif.ts
 msgid "Impossible d'extraire les métadonnées EXIF de {0}: {1}"
 msgstr "Impossible d'extraire les métadonnées EXIF de {0}: {1}"
 
@@ -2891,3 +2894,25 @@ msgstr "Affecte <0>Change la valeur d'autres métadonnées quand {0} = {1}</0>"
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
 msgid "Affectée par <0>Autres métadonnées qui change {0} à {1}</0>"
 msgstr "Affectée par <0>Autres métadonnées qui change {0} à {1}</0>"
+
+#: src/routes/(app)/Settings.svelte
+msgid "Relancer l'app après un changement du parallélisme"
+msgstr "Relancer l'app après un changement du parallélisme"
+
+#: src/lib/exif.ts
+#: src/lib/exif.ts
+msgid "GPSLatitude"
+msgstr "GPSLatitude"
+
+#: src/lib/exif.ts
+msgid "GPSLatitudeRef"
+msgstr "GPSLatitudeRef"
+
+#: src/lib/exif.ts
+#: src/lib/exif.ts
+msgid "GPSLongitude"
+msgstr "GPSLongitude"
+
+#: src/lib/exif.ts
+msgid "GPSLongitudeRef"
+msgstr "GPSLongitudeRef"
