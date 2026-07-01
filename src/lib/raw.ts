@@ -8,7 +8,9 @@ import { GPSHelper } from 'piexifjs';
 
 import { coerceExifValue } from './exif.js';
 import { openDatabase, tables } from './idb.svelte.js';
+import { resolveMetadataImport } from './metadata/namespacing.js';
 import { storeMetadataValue } from './metadata/storage.js';
+import { InferenceConfigs } from './schemas/metadata.js';
 
 export const RAW_IMAGE_FILE_EXTENSIONS = [
 	'.3fr',
@@ -147,27 +149,25 @@ export async function processRawMetadata(
 		throw new Error(`Protocol with id ${session.protocol} not found`);
 	}
 
-	const metadataDefs = await tables.Metadata.list().then((defs) =>
-		defs.filter(
-			(
-				def
-			): def is typeof def & {
-				infer:
-					| { exif: EXIFField }
-					| { latitude: { exif: EXIFField }; longitude: { exif: EXIFField } };
-			} =>
-				protocol.metadata.includes(def.id) && def.infer !== undefined && 'exif' in def.infer
-		)
+	const metadataDefs = await tables.Metadata.getMany(
+		protocol.metadata.map((key) => resolveMetadataImport(protocol, key))
 	);
 
-	const images = await tables.Image.list('sessionId', sessionId).then((imgs) =>
-		imgs.filter((img) => img.fileId === imageFileId)
-	);
+	const images = await tables.Image.list('fileId', imageFileId);
 
 	for (const { id: subjectId } of images) {
 		for (const { id: metadataId, infer, type } of metadataDefs) {
 			let value: RuntimeValue;
+			if (!infer) continue;
+
 			if ('latitude' in infer && 'longitude' in infer) {
+				if (!InferenceConfigs.exif.allows(infer.latitude)) continue;
+				if (!InferenceConfigs.exif.allows(infer.longitude)) continue;
+
+				console.debug(
+					`Inferring EXIF from RAW photo: ${infer.latitude.exif} & ${infer.longitude.exif} -> ${metadataId}`
+				);
+
 				const latitude = findRawMetadataFieldByExifTag(metadata, infer.latitude.exif);
 				const longitude = findRawMetadataFieldByExifTag(metadata, infer.longitude.exif);
 
@@ -186,6 +186,10 @@ export async function processRawMetadata(
 					longitude: coerceExifValue(longitude, 'float'),
 				};
 			} else {
+				if (!InferenceConfigs.exif.allows(infer)) continue;
+
+				console.debug(`Inferring EXIF from RAW photo: ${infer.exif} -> ${metadataId}`);
+
 				const rawValue = findRawMetadataFieldByExifTag(metadata, infer.exif);
 
 				// Skip if the raw metadata field is not present

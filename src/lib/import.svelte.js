@@ -15,6 +15,7 @@ import {
 import { uiState } from '$lib/state.svelte.js';
 import { toasts } from '$lib/toasts.svelte.js';
 
+import { setExifFields } from './exif.js';
 import { imageLimits } from './inference_utils.js';
 import { serializeMetadataValues } from './metadata/index.js';
 import { newObservation } from './observations.js';
@@ -73,6 +74,11 @@ export async function processImageFile({ file, id: fileId, sidecars }) {
 		transcoded = new File([originalBytes], `${file.name}.jpeg`, {
 			type: 'image/jpeg',
 		});
+	}
+
+	if (transcoded.type === 'image/jpeg') {
+		originalBytes = setExifFields(originalBytes, { Orientation: 1 }).buffer;
+		transcoded = new File([originalBytes], transcoded.name, { type: transcoded.type });
 	}
 
 	const [[width, height], resizedBytes] = await resizeToMaxSize({ source: transcoded });

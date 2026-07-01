@@ -1440,3 +1440,23 @@ export function platform() {
 }
 
 export type MaybeArray<T> = T | T[];
+
+/**
+ * Turns a {@link Uint8Array} into a string
+ */
+export function byteString(bytes: Uint8Array): string {
+	// Build bytesstr in chunks, since String.fromCharCode is limited in characters size (see https://stackoverflow.com/q/76857530 and https://stackoverflow.com/a/22747272)
+	const chunksize = 32_000;
+	let bytesstr = '';
+
+	for (let i = 0; i < bytes.byteLength; i += chunksize) {
+		const chunk = bytes.slice(i, i + chunksize);
+		bytesstr += String.fromCharCode(...chunk);
+	}
+
+	return bytesstr;
+}
+
+export function byteStringToArray(bytestring: string): Uint8Array<ArrayBuffer> {
+	return new Uint8Array(Array.from(bytestring).map((c) => c.charCodeAt(0)));
+}

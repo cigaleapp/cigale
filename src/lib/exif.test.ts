@@ -1,6 +1,7 @@
 import 'fake-indexeddb/auto';
 
 import { readFileSync } from 'node:fs';
+import type * as DB from './database.js';
 
 import exif from 'exif-parser';
 import { beforeEach, describe, expect, test } from 'vitest';
@@ -18,10 +19,9 @@ import { namespacedMetadataId } from './schemas/metadata.js';
 
 /**
  * Read a file from ./tests/fixtures
- * @param {string} filename
- * @returns {Promise<Buffer>} the contents
+ * @returns the contents
  */
-async function readImageBytes(filename) {
+async function readImageBytes(filename: string): Promise<Buffer> {
 	return readFileSync(`./tests/fixtures/${filename}`);
 }
 
@@ -29,13 +29,13 @@ describe('processExifData', () => {
 	beforeEach(async () => {
 		db.nukeDatabase();
 
-		const metadataField = /** @type {const} */ ({
+		const metadataField = {
 			description: '',
 			mergeMethod: 'none',
 			required: false,
 			learnMore: 'https://example.com',
 			label: '',
-		});
+		} as const;
 
 		await db.tables.Metadata.set({
 			...metadataField,
@@ -161,31 +161,31 @@ describe('processExifData', () => {
 });
 
 describe('extractMetadata', () => {
-	const plan = /** @type {const} */ ([
+	const plan = [
 		{
-			key: 'date',
-			infer: { exif: 'DateTimeOriginal' },
+			id: 'date',
 			type: 'date',
+			infer: { exif: 'DateTimeOriginal' },
 		},
 		{
-			key: 'location',
+			id: 'location',
+			type: 'location',
 			infer: {
 				latitude: { exif: 'GPSLatitude' },
 				longitude: { exif: 'GPSLongitude' },
 			},
-			type: 'location',
 		},
 		{
-			key: 'make',
+			id: 'make',
+			type: 'string',
 			infer: { exif: 'Make' },
-			type: 'string',
 		},
 		{
-			key: 'model',
-			infer: { exif: 'Model' },
+			id: 'model',
 			type: 'string',
+			infer: { exif: 'Model' },
 		},
-	]);
+	] as const satisfies Array<Pick<DB.Metadata, 'type' | 'infer'> & { id: string }>;
 
 	test('extracts from image without GPS', async () => {
 		const imageBytes = await readImageBytes('lil-fella.jpeg');
@@ -245,7 +245,7 @@ describe('extractMetadata', () => {
 		const imageBytes = await readImageBytes('with-exif-gps.jpeg');
 		const extraction = await extractMetadata(imageBytes, [
 			{
-				key: 'date',
+				id: 'date',
 				infer: { exif: 'DateTimeOriginal' },
 				type: 'date',
 			},
@@ -323,7 +323,7 @@ describe('serializeExifValue', () => {
 		expect(serializeExifValue('test')).toEqual('test');
 	});
 	test('from number', () => {
-		expect(serializeExifValue(123)).toEqual('123');
+		expect(serializeExifValue(123)).toStrictEqual([123]);
 	});
 	test('from boolean', () => {
 		expect(serializeExifValue(true)).toEqual('true');
@@ -346,48 +346,49 @@ describe('serializeExifValue', () => {
 });
 
 describe('addExifMetadata', () => {
-	/**
-	 * @type {Array<import('./database.js').Metadata>}
-	 */
-	const metadataDefs = [
+	const metadataDefs: Array<DB.Metadata> = [
 		{
 			id: 'proto__gps',
-			type: /** @type {const} */ ('location'),
+			type: 'location',
 			description: 'GPS',
 			label: '',
-			mergeMethod: /** @type {const} */ ('none'),
+			mergeMethod: 'none',
 			required: false,
 			sortable: false,
 			groupable: false,
-			infer: /** @type {const} */ ({
+			images: [],
+			infer: {
 				latitude: { exif: 'GPSLatitude' },
 				longitude: { exif: 'GPSLongitude' },
-			}),
+			},
 		},
 		{
 			id: 'proto__date',
-			type: /** @type {const} */ ('date'),
+			type: 'date',
 			description: 'Date',
 			label: '',
-			mergeMethod: /** @type {const} */ ('none'),
+			mergeMethod: 'none',
 			required: false,
 			sortable: false,
 			groupable: false,
-			infer: /** @type {const} */ ({
+			images: [],
+			infer: {
 				exif: 'DateTimeOriginal',
-			}),
+			},
 		},
 		{
 			id: 'proto__non_exif',
-			type: /** @type {const} */ ('string'),
+			type: 'string',
 			description: 'Not a EXIF-infered field',
 			label: '',
-			mergeMethod: /** @type {const} */ ('none'),
+			mergeMethod: 'none',
 			required: false,
 			sortable: false,
 			groupable: false,
+			images: [],
 		},
 	];
+
 	const metadataValues = {
 		proto__gps: {
 			value: {
@@ -435,12 +436,14 @@ describe('addExifMetadata', () => {
 
 		const { tags } = exif.create(resultBytes.buffer).enableImageSize(false).parse();
 
-		expect(tags).toEqual({
+		expect(tags).toMatchObject({
 			GPSLatitude: 43.46715555555556,
 			GPSLatitudeRef: 'N',
 			GPSLongitude: 11.885394444444444,
 			GPSLongitudeRef: 'E',
 			DateTimeOriginal: 1696161600,
+			// It keeps existing metadata
+			FocalLengthIn35mmFormat: 28,
 		});
 	});
 });
