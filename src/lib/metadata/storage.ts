@@ -277,9 +277,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 	const image = await db.get('Image', subjectId);
 	const observation = await db.get('Observation', subjectId);
 	const session = await db.get('Session', subjectId);
-	const imagesFromImageFile = await db
-		.getAll('Image')
-		.then((imgs) => imgs.filter(({ fileId }) => fileId === subjectId));
+	const imagesFromImageFile = await db.getAllFromIndex('Image', 'fileId', subjectId);
 
 	abortSignal?.throwIfAborted();
 	if (session) {
@@ -332,6 +330,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 				manuallyModified,
 				clearErrors,
 				abortSignal,
+				updateReactiveState: false
 			});
 		}
 	} else {
@@ -382,7 +381,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 
 	// Only refresh table state if asked
 	if (sessionId && updateReactiveState) {
-		await refreshTables(sessionId, session ? 'Session' : image ? 'Image' : 'Observation');
+		await refreshTables(sessionId, session ? 'Session' : (image||imagesFromImageFile.length) ? 'Image' : 'Observation');
 	}
 }
 
