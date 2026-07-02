@@ -1,7 +1,7 @@
 (
 	$plausible := neurons[score >= 0.01].key[];
 
-	"gpe wilkella-argentata" in $plausible
-	? $append($plausible, ["gpe wilkella", "gpe argentata"])
+	"gpe_wilkella-argentata" in $plausible
+	? $append($plausible, ["gpe_wilkella", "gpe_argentata"])
 	: $plausible
 )
