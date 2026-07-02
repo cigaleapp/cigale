@@ -67,7 +67,8 @@ const ImageFile = table(
 	type({
 		/** ID of the associated Image object */
 		id: ID,
-		bytes: 'ArrayBuffer',
+		/** @deprecated use $lib/storage/backend.ts:binaryStorage instead */
+		bytes: 'ArrayBuffer | "migrated"',
 		filename: 'string',
 		contentType: MIMEType,
 		dimensions: Dimensions,
@@ -80,7 +81,8 @@ const ImagePreviewFile = table(
 	type({
 		/** ID of the associated Image object */
 		id: ID,
-		bytes: 'ArrayBuffer',
+		/** @deprecated use $lib/storage/backend.ts:binaryStorage instead */
+		bytes: 'ArrayBuffer | "migrated"',
 		filename: 'string',
 		contentType: MIMEType,
 		dimensions: Dimensions,
@@ -97,7 +99,8 @@ const MetadataValueFile = table(
 		// see https://stackoverflow.com/a/46331687/9943464
 		// bug confirmed via Playwright testing
 		// file: 'File',
-		bytes: 'ArrayBuffer',
+		/** @deprecated use $lib/storage/backend.ts:binaryStorage instead */
+		bytes: 'ArrayBuffer | "migrated"',
 		filename: 'string',
 		contentType: MIMEType,
 		size: ['number', '@', 'in bytes'],
@@ -119,6 +122,7 @@ const MetadataOption = table(
 		metadataId: NamespacedMetadataID,
 	})
 );
+
 const Protocol = table('id', ProtocolSchema);
 
 const Settings = table(
@@ -249,7 +253,22 @@ export const NO_REACTIVE_STATE_TABLES = /** @type {const} */ ([
 /**
  * @satisfies {Array<keyof typeof Tables>}
  */
-const SESSION_DEPENDENT_REACTIVE_TABLES = /** @type {const} */ (['Image', 'Observation']);
+const SESSION_DEPENDENT_TABLES = /** @type {const} */ ([
+	'ImageFile',
+	'ImagePreviewFile',
+	'MetadataValueFile',
+	'Image',
+	'Observation',
+]);
+
+/**
+ * @satisfies {Array<keyof typeof Tables>}
+ */
+export const BINARY_CONTENT_TABLES = /** @type {const} */ ([
+	'ImageFile',
+	'ImagePreviewFile',
+	'MetadataValueFile',
+]);
 
 /**
  *
@@ -258,16 +277,19 @@ const SESSION_DEPENDENT_REACTIVE_TABLES = /** @type {const} */ (['Image', 'Obser
  * @returns {name is Exclude<TableName, typeof NO_REACTIVE_STATE_TABLES[number]>}
  */
 export function isReactiveTable(name) {
-	return NO_REACTIVE_STATE_TABLES.every((n) => n !== name);
+	return !(/** @type {Array<keyof typeof Tables>} */ (NO_REACTIVE_STATE_TABLES).includes(name));
 }
 
 /**
  * @template {keyof typeof Tables} TableName
  * @param {TableName} name
- * @returns {name is typeof SESSION_DEPENDENT_REACTIVE_TABLES[number]}
+ * @returns {boolean}
  */
 export function isSessionDependentReactiveTable(name) {
-	return SESSION_DEPENDENT_REACTIVE_TABLES.some((n) => n === name);
+	return (
+		isReactiveTable(name) &&
+		/** @type {Array<keyof typeof Tables>} */ (SESSION_DEPENDENT_TABLES).includes(name)
+	);
 }
 
 export const Tables = {

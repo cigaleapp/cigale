@@ -2891,3 +2891,37 @@ msgstr "Affecte <0>Change la valeur d'autres métadonnées quand {0} = {1}</0>"
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
 msgid "Affectée par <0>Autres métadonnées qui change {0} à {1}</0>"
 msgstr "Affectée par <0>Autres métadonnées qui change {0} à {1}</0>"
+
+#: src/routes/(app)/Settings.svelte
+msgid "Relancer l'app après un changement du parallélisme"
+msgstr "Relancer l'app après un changement du parallélisme"
+
+#: src/lib/exif.ts
+#: src/lib/exif.ts
+msgid "GPSLatitude"
+msgstr "GPSLatitude"
+
+#: src/lib/exif.ts
+msgid "GPSLatitudeRef"
+msgstr "GPSLatitudeRef"
+
+#: src/lib/exif.ts
+#: src/lib/exif.ts
+msgid "GPSLongitude"
+msgstr "GPSLongitude"
+
+#: src/lib/exif.ts
+msgid "GPSLongitudeRef"
+msgstr "GPSLongitudeRef"
+
+#. 0.0: metadata.label; 0.1: data.option.label
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
+msgid "Affectée par <0>Autres métadonnées qui change {0} à {1}</0><<<<<<< Updated upstream"
+msgstr "Affectée par <0>Autres métadonnées qui change {0} à {1}</0><<<<<<< Updated upstream"
+
+#~ msgid "GPSLongitudeRef>>>>>>> Stashed changes"
+#~ msgstr "GPSLongitudeRef>>>>>>> Stashed changes"
+
+#: src/lib/images.js
+msgid "No current session"
+msgstr "No current session"
