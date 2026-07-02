@@ -1,0 +1,1 @@
+import{st as e}from"./B0C3TRpP.js";var t=class extends e{async getPluginVersion(){return{version:`web`}}};export{t as CapacitorShakeWeb};

@@ -1,0 +1,1 @@
+import{h as e,n as t}from"./CiMgp2HY.js";import"./BnexvCiz.js";async function n(...n){await t(e(...n))}export{n as t};

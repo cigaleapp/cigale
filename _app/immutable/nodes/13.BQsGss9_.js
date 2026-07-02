@@ -1,0 +1,1 @@
+import{Qt as e}from"../chunks/8ajlCgvq.js";import{h as t}from"../chunks/CiMgp2HY.js";import{n}from"../chunks/DH_rR1LL.js";var r=e({load:()=>i});async function i({url:e}){let r=new URL(t(`/sessions/`),e.origin);r.search=e.search,n(307,r)}export{r as universal};

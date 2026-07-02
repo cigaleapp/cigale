@@ -1,0 +1,1 @@
+import{Qt as e}from"../chunks/8ajlCgvq.js";import"../chunks/xihTtKlq.js";import{t}from"../chunks/DQx2EwLw.js";import"../chunks/D8l8JiT02.js";var n=e({load:()=>r});async function r({params:e}){await t(`/(app)/(sidepanel)/o/[observation]/classify/narrow/describe`,e)}function i(e){}export{i as component,n as universal};
