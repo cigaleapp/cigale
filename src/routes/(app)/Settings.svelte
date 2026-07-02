@@ -16,6 +16,7 @@
 	import IconAccounts from '~icons/ri/group-line';
 	import Moon from '~icons/ri/moon-line';
 	import IconNotifications from '~icons/ri/notification-line';
+	import IconReload from '~icons/ri/refresh-line';
 	import Gears from '~icons/ri/settings-3-line';
 	import IconDecrease from '~icons/ri/subtract-line';
 	import Sun from '~icons/ri/sun-line';
@@ -83,6 +84,9 @@
 
 	const mobileOnly = <T,>(item: T) => orEmpty(mobile.current, item);
 	const desktopOnly = <T,>(item: T) => orEmpty(!mobile.current, item);
+
+	let initialParallelism = $state(getSettings().parallelism);
+	let parallelismSettingIsDirty = $derived(getSettings().parallelism !== initialParallelism);
 
 	let estimate = $state<StorageEstimate>();
 	$effect(() => {
@@ -435,6 +439,14 @@
 						}}
 					>
 						<IconIncrease />
+					</ButtonIcon>
+					<ButtonIcon
+						disabled={!parallelismSettingIsDirty}
+						help="Relancer l'app après un changement du parallélisme"
+						onclick={() => {
+							window.location.reload();
+						}}
+						><IconReload />
 					</ButtonIcon>
 				</div>
 			{:else}
