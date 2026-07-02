@@ -585,12 +585,12 @@ test.describe('narrowing view', pr(1570), () => {
 
 			await choose('Pilosité occipitale', 'Pilosité majoritairement claire');
 
-			await expectCandidatesCount(page, 151);
+			await expectCandidatesCount(page, 154);
 			// await expectRemainingCandidate('')
 
 			await choose('Forme de la tête', 'Plus large que haute');
 
-			await expectCandidatesCount(page, 122);
+			await expectCandidatesCount(page, 123);
 
 			await expectMetadataValues(app, {
 				pilosite_occipitale: 'pilositmaj_1738780459445_3719',
@@ -618,7 +618,7 @@ test.describe('narrowing view', pr(1570), () => {
 			await page.getByRole('tab', { name: 'Décrire' }).click();
 			await app.path.wait('/(app)/(sidepanel)/o/[observation]/classify/narrow/describe');
 
-			await expectCandidatesCount(page, 132);
+			await expectCandidatesCount(page, 133);
 
 			await choose(
 				'Couleur de la face ventrale du flagelle antennaire',
