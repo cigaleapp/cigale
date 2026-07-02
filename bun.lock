@@ -19,7 +19,7 @@
         "@capgo/capacitor-shake": "^8.0.29",
         "@capgo/capacitor-updater": "^8.49.1",
         "@capgo/inappbrowser": "^8.6.14",
-        "@formatjs/intl-durationformat": "^0.10.14",
+        "@formatjs/intl-durationformat": "^0.10.15",
         "@iconify/svelte": "^5.2.2",
         "@sveltejs/svelte-virtual-list": "^3.0.1",
         "@ungap/set-methods": "^0.1.1",
@@ -528,7 +528,7 @@
 
     "@formatjs/fast-memoize": ["@formatjs/fast-memoize@3.1.6", "", {}, "sha512-H5aexk1Le7T9TPmscacZ+1pR6CTa2n1wq+HDVGXhH8TzUlQQpeXzZs91dRtmFHrbeNbjPFPfQujUqm7MHgVoXQ=="],
 
-    "@formatjs/intl-durationformat": ["@formatjs/intl-durationformat@0.10.14", "", { "dependencies": { "@formatjs/bigdecimal": "0.2.6", "@formatjs/intl-localematcher": "0.8.10" } }, "sha512-qVrbKGJZwoGFLmQyMBn4Pk44WCpBKINwLf+isrEd4RpvKs5nChRofHanWJqSu8TjuKJjk1qJjDIFkA/hJX/a9Q=="],
+    "@formatjs/intl-durationformat": ["@formatjs/intl-durationformat@0.10.15", "", { "dependencies": { "@formatjs/bigdecimal": "0.2.6", "@formatjs/intl-localematcher": "0.8.10" } }, "sha512-3W636wOl2pOVKR2+aFC+2BMOHA/FYsHZfKTr/cT1OG0YIXI2hhGrBH2+EFmqEzzClRi5BlPvwE6LlLN2dikdDQ=="],
 
     "@formatjs/intl-localematcher": ["@formatjs/intl-localematcher@0.8.10", "", { "dependencies": { "@formatjs/fast-memoize": "3.1.6" } }, "sha512-P/IC3qws3jH+1fEs+o0RIFgXKRaQlFehjS5W0FPAqdo6hgzawLl+eD0q0JjheQ3XtoOe5n8WSYfX06KQZI/QJA=="],
 
