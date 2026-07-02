@@ -157,7 +157,7 @@
 		"@capacitor/share": "^8.0.1",
 		"@capacitor/splash-screen": "^8.0.1",
 		"@capawesome/capacitor-file-picker": "^8.0.2",
-		"@capgo/capacitor-shake": "^8.0.29",
+		"@capgo/capacitor-shake": "^8.0.36",
 		"@capgo/capacitor-updater": "^8.49.1",
 		"@capgo/inappbrowser": "^8.6.14",
 		"@formatjs/intl-durationformat": "^0.10.14",
