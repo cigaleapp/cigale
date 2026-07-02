@@ -6,6 +6,7 @@ import { format as formatDate, formatISO, parse as parseDate } from 'date-fns';
 import Handlebars from 'handlebars';
 import jsonata from 'jsonata';
 
+import { errorMessage } from '../i18n.js';
 import {
 	mapValues,
 	safeJSONStringify,
@@ -487,7 +488,33 @@ export const JsonataExpression = (Input, Output) =>
 						expr.assign(key, value);
 					}
 
-					let raw = await expr.evaluate(Input.assert(data));
+					/** @type {unknown} */
+					let raw;
+
+					try {
+						raw = await expr.evaluate(Input.assert(data));
+					} catch (error) {
+						console.error(
+							`Error while running jsonata expression ${safeJSONStringify(t)}:`,
+							{ expr, template: t, data, context, error }
+						);
+
+						// No, there's no JsonataError subclass...
+						const details =
+							typeof error === 'object' &&
+							error &&
+							'message' in error &&
+							'token' in error
+								? `${error.message}: ${error.token}`
+								: errorMessage(error);
+
+						throw new Error(
+							`Erreur lors de l'exécution de l'expression Jsonata ${t}: ${details}`,
+							{
+								cause: error,
+							}
+						);
+					}
 
 					// Jsonata can produce null-prototype objects, which causes issues with .toString() & others
 					if (raw && typeof raw === 'object' && Object.getPrototypeOf(raw) === null) {
@@ -501,7 +528,10 @@ export const JsonataExpression = (Input, Output) =>
 							`Validation error on output of jsonata expression ${safeJSONStringify(t)}: ${out.summary}`,
 							{ raw, out }
 						);
-						throw out;
+						throw new Error(
+							`Résultat (${safeJSONStringify(raw)}) de l'expression Jsonata ${t}, non conforme`,
+							{ cause: out }
+						);
 					}
 
 					return out;
@@ -509,7 +539,7 @@ export const JsonataExpression = (Input, Output) =>
 			};
 		} catch (cause) {
 			throw new Error(
-				`Invalid Jsonata expression ${safeJSONStringify(t)}: ${cause.message}`,
+				`Invalid Jsonata expression ${safeJSONStringify(t)}: ${errorMessage(cause)}`,
 				{ cause }
 			);
 		}

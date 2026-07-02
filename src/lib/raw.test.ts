@@ -159,7 +159,7 @@ describe('processRawMetadata', () => {
 			({ protocol: 'proto-4' }) as Awaited<ReturnType<SessionGet>>;
 		tables.Protocol.get = async () =>
 			({ id: 'proto-4', metadata: ['m1'] }) as unknown as Awaited<ReturnType<ProtocolGet>>;
-		tables.Metadata.list = async () =>
+		tables.Metadata.getMany = async () =>
 			[
 				{ id: 'm1', infer: { exif: 'Make' }, type: 'string' } as unknown as Awaited<
 					ReturnType<MetadataList>

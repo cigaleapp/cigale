@@ -1,28 +1,24 @@
+import type * as DB from './database.js';
+import type { ExifFieldKey } from './exiffields.js';
+
 import { match, type } from 'arktype';
 import * as dates from 'date-fns';
 import * as exifParser from 'exif-parser';
 import piexif from 'piexifjs';
 
 import { Schemas } from './database.js';
-import { EXIF_GPS_FIELDS } from './exiffields.js';
+import { EXIF_FIELDS } from './exiffields.js';
 import * as db from './idb.svelte.js';
-import { storeMetadataValue } from './metadata/index.js';
-import { ensureNamespacedMetadataId } from './schemas/metadata.js';
+import { resolveMetadataImport, storeMetadataValue } from './metadata/index.js';
 import { toasts } from './toasts.svelte.js';
+import { byteString, byteStringToArray } from './utils.js';
 
-/**
- * @import { MetadataType } from './database.js';
- * @import { RuntimeValue, EXIFInference } from './schemas/metadata.js';
- */
-
-/**
- *
- * @param {string} sessionId
- * @param {string} imageFileId
- * @param {ArrayBuffer|Buffer} imageBytes
- * @param {{ type: string; name: string }} file
- */
-export async function processExifData(sessionId, imageFileId, imageBytes, file) {
+export async function processExifData(
+	sessionId: string,
+	imageFileId: string,
+	imageBytes: ArrayBuffer | Buffer,
+	file: { type: string; name: string }
+) {
 	const session = await db.tables.Session.get(sessionId);
 	if (!session) {
 		throw new Error(`Session ${sessionId} introuvable`);
@@ -32,27 +28,15 @@ export async function processExifData(sessionId, imageFileId, imageBytes, file) 
 	if (!protocol) {
 		throw new Error(`Protocole ${session.protocol} introuvable`);
 	}
-	const metadataOfProtocol = await db.tables.Metadata.list().then((defs) =>
-		defs.filter((def) => protocol.metadata.includes(def.id))
+	const metadataOfProtocol = await db.tables.Metadata.getMany(
+		protocol.metadata.map((key) => resolveMetadataImport(protocol, key))
 	);
+
 	const metadataFromExif = await extractMetadata(
 		// 2^16 + 100 of margin
 		// see https://www.npmjs.com/package/exif-parser#creating-a-parser
-		imageBytes.slice(0, 65_635),
-		(metadataOfProtocol ?? [])
-			.map(({ infer, type, id }) =>
-				match
-					.case(
-						[
-							{ exif: 'string' },
-							'|',
-							{ latitude: { exif: 'string' }, longitude: { exif: 'string' } },
-						],
-						(infer) => /** @type {ExifExtractionPlanItem} */ ({ key: id, infer, type })
-					)
-					.default(() => undefined)(infer)
-			)
-			.filter((entry) => entry !== undefined)
+		imageBytes.slice(0, 2 ** 16 + 100),
+		metadataOfProtocol ?? []
 	).catch((e) => {
 		console.warn(e);
 		if (file.type === 'image/jpeg') {
@@ -73,7 +57,7 @@ export async function processExifData(sessionId, imageFileId, imageBytes, file) 
 				db: db.databaseHandle(),
 				subjectId,
 				sessionId: session.id,
-				metadataId: ensureNamespacedMetadataId(key, protocol.id),
+				metadataId: key,
 				value,
 				confidence,
 			});
@@ -81,19 +65,12 @@ export async function processExifData(sessionId, imageFileId, imageBytes, file) 
 	}
 }
 
-/**
- * @typedef {object} ExifExtractionPlanItem
- * @property {string} key key in the output object
- * @property {{ exif: EXIFInference } | { latitude: { exif: EXIFInference }, longitude: { exif: EXIFInference } }} infer how to extract the value
- * @property {MetadataType} type type to coerce the extracted value to
- */
+type ExifExtractionPlanItem = Pick<DB.Metadata, 'id' | 'infer' | 'type'>;
 
-/**
- * @param {ArrayBuffer | Buffer} buffer buffer of the image to extract EXIF data from
- * @param {ExifExtractionPlanItem[]} extractionPlan
- * @returns {Promise<Record<string, { value: unknown; confidence: number; alternatives: unknown[] }>>}
- */
-export async function extractMetadata(buffer, extractionPlan) {
+export async function extractMetadata(
+	buffer: ArrayBuffer | Buffer,
+	extractionPlan: ExifExtractionPlanItem[]
+): Promise<Record<string, { value: unknown; confidence: number; alternatives: unknown[] }>> {
 	const exif = exifParser.create(buffer).enableImageSize(false).parse();
 
 	if (!exif) return {};
@@ -141,8 +118,8 @@ export async function extractMetadata(buffer, extractionPlan) {
 
 	return Object.fromEntries(
 		extractionPlan
-			.map(({ key: id, ...option }) => {
-				return /** @type {const} */ ([id, extract(option)]);
+			.map(({ id, ...option }) => {
+				return /** @type {const} */ [id, extract(option)];
 			})
 			.filter(
 				([, extracted]) =>
@@ -155,14 +132,10 @@ export async function extractMetadata(buffer, extractionPlan) {
 	);
 }
 
-/**
- *
- * @template {import('./database.js').MetadataType} T
- * @param {unknown} value
- * @param {T} coerceTo
- * @returns {import('./schemas/metadata.js').RuntimeValue<T>}
- */
-export function coerceExifValue(value, coerceTo) {
+export function coerceExifValue<T extends DB.MetadataType>(
+	value: unknown,
+	coerceTo: T
+): import('./schemas/metadata.js').RuntimeValue<T> {
 	switch (coerceTo) {
 		case 'string':
 			return value?.toString() ?? '';
@@ -171,7 +144,7 @@ export function coerceExifValue(value, coerceTo) {
 			return Boolean(value);
 
 		case 'date':
-			if (value instanceof Date) return new Date(value.getTime() * 1e3);
+			if (value instanceof Date) return value;
 			if (typeof value !== 'number')
 				throw new Error(`Date value must be a number, was ${typeof value}`);
 			if (Number.isNaN(value)) throw new Error('Date value is invalid');
@@ -195,13 +168,12 @@ export function coerceExifValue(value, coerceTo) {
 
 /**
  * Serialize a value to a string for EXIF writing
- * @param {unknown} value
- * @returns {string|any[]}
  */
-export function serializeExifValue(value) {
+export function serializeExifValue(value: unknown): string | unknown[] {
 	if (value instanceof Date) return dates.format(value, 'yyyy:MM:dd HH:mm:ss');
 	// Let multivalued exif entries through
 	if (Array.isArray(value)) return value;
+	if (typeof value === 'number') return [value];
 	if (value === undefined) return 'undefined';
 	if (value === null) return 'null';
 	if (typeof value === 'object' && value !== null) {
@@ -212,14 +184,11 @@ export function serializeExifValue(value) {
 	return value?.toString() ?? '';
 }
 
-/**
- * Append EXIF metadata to the image's bytes
- * @param {ArrayBuffer|Buffer} bytes
- * @param {import('./database.js').Metadata[]} metadataDefs
- * @param {import('./database.js').MetadataValues} metadataValues
- * @returns {Uint8Array} the image with EXIF metadata added
- */
-export function addExifMetadata(bytes, metadataDefs, metadataValues) {
+export function addExifMetadata(
+	bytes: ArrayBuffer | Buffer,
+	metadataDefs: DB.Metadata[],
+	metadataValues: DB.MetadataValues
+): Uint8Array {
 	const ExifMetadata = Schemas.Metadata.and({
 		infer: [
 			{ exif: 'string' },
@@ -228,14 +197,7 @@ export function addExifMetadata(bytes, metadataDefs, metadataValues) {
 		],
 	});
 
-	const exifDict = { GPS: {}, Exif: {} };
-	const setExifKey = (key, value) => {
-		// @wc-ignore
-		const category = Object.keys(EXIF_GPS_FIELDS).includes(key) ? 'GPS' : 'Exif';
-		const serialized = serializeExifValue(value);
-		if (serialized === undefined) return;
-		exifDict[category][piexif[`${category}IFD`][key]] = serialized;
-	};
+	const changes: Partial<Record<ExifFieldKey, unknown>> = {};
 
 	for (const def of metadataDefs.map((m) => ExifMetadata(m))) {
 		if (def instanceof type.errors) continue;
@@ -250,32 +212,54 @@ export function addExifMetadata(bytes, metadataDefs, metadataValues) {
 		) {
 			// XXX harcoded BS :/
 			if (def.infer.latitude.exif === 'GPSLatitude') {
-				setExifKey('GPSLatitudeRef', value.latitude >= 0 ? 'N' : 'S');
-				setExifKey('GPSLatitude', piexif.GPSHelper.degToDmsRational(value.latitude));
+				changes['GPSLatitudeRef'] = value.latitude >= 0 ? 'N' : 'S';
+				changes['GPSLatitude'] = piexif.GPSHelper.degToDmsRational(value.latitude);
 			} else {
-				setExifKey(def.infer.latitude.exif, value.latitude);
+				changes[def.infer.latitude.exif] = value.latitude;
 			}
 
 			// XXX harcoded BS :/
 			if (def.infer.longitude.exif === 'GPSLongitude') {
-				setExifKey('GPSLongitudeRef', value.longitude >= 0 ? 'E' : 'W');
-				setExifKey('GPSLongitude', piexif.GPSHelper.degToDmsRational(value.longitude));
+				changes['GPSLongitudeRef'] = value.longitude >= 0 ? 'E' : 'W';
+				changes['GPSLongitude'] = piexif.GPSHelper.degToDmsRational(value.longitude);
 			} else {
-				setExifKey(def.infer.longitude.exif, value.longitude);
+				changes[def.infer.longitude.exif] = value.longitude;
 			}
 		} else {
-			setExifKey(def.infer.exif, value);
+			changes[def.infer.exif] = value;
 		}
 	}
 
-	// Piexif wants bytes _as a string_. why??? idk. but it seems like npm has no decent EXIF libraries that both support browsers and writing exif data.
-	let bytesstr = '';
-	// Build bytesstr in chunks, since String.fromCharCode is limited in characters size (see https://stackoverflow.com/q/76857530 and https://stackoverflow.com/a/22747272)
-	let chunksize = 32_000;
-	for (let i = 0; i < bytes.byteLength; i += chunksize) {
-		const chunk = bytes.slice(i, i + chunksize);
-		bytesstr += String.fromCharCode(...new Uint8Array(chunk));
+	return setExifFields(bytes, changes);
+}
+
+export function setExifFields(bytes: ArrayBuffer, changes: Partial<Record<ExifFieldKey, unknown>>) {
+	const bytestring = byteString(new Uint8Array(bytes));
+
+	const exifDict = piexif.load(bytestring);
+
+	// Prevent any write if no exif data changed
+	let dirty = false;
+
+	for (const [key, value] of Object.entries(changes)) {
+		const field = EXIF_FIELDS[key];
+
+		const [category] =
+			Object.entries(exifDict).find(([, tags]) => tags && field in tags) ??
+			Object.entries(piexif.TAGS).find(([cat, tags]) => cat !== 'Image' && field in tags) ??
+			[];
+
+		if (!category) continue;
+
+		const serialized = serializeExifValue(value);
+		if (serialized === undefined) continue;
+		if (serialized === exifDict[category][field]) continue;
+		exifDict[category][field] = serialized;
+		dirty = true;
 	}
-	const outputstr = piexif.insert(piexif.dump(exifDict), bytesstr);
-	return new Uint8Array(Array.from(outputstr).map((c) => c.charCodeAt(0)));
+
+	if (!dirty) return new Uint8Array(bytes);
+
+	const outputstr = piexif.insert(piexif.dump(exifDict), bytestring);
+	return byteStringToArray(outputstr);
 }

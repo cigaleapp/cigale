@@ -253,6 +253,7 @@ class ProcessingQueue {
 
 			uiState.processing.removeFile(this.taskSubjectId(task));
 		} catch (error) {
+			console.error(`While doing ${this.taskId(task)}: `, { error, task });
 			uiState.erroredImages.set(this.taskSubjectId(task), errorMessage(error));
 		} finally {
 			uiState.loadingImages.delete(this.taskSubjectId(task));

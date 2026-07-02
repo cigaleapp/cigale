@@ -88,7 +88,7 @@ jobs:
 
   build-debug:
     # Run on PRs (only if not in draft) or on other events
-    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
+    if: github.event_name != 'pull_request' || !github.event.pull_request.draft || contains(github.event.pull_request.labels.*.name, 'unminified-preview')
     name: Build (debug)
     uses: ./.github/workflows/build.yml
     with:
@@ -130,12 +130,12 @@ jobs:
 
   preview:
     if: github.event_name == 'pull_request'
-    needs: [build, json-schema]
+    needs: [build, build-debug, json-schema]
     name: PR Preview
     uses: ./.github/workflows/preview.yml
     secrets: inherit
     with:
-      artifact: ${{ needs.build.outputs.artifact }}
+      artifact: ${{ contains(github.event.pull_request.labels.*.name, 'unminified-preview') && needs.build-debug.outputs.artifact || needs.build.outputs.artifact }}
 
   deploy:
     if: github.event_name == 'push' && github.ref_name == 'main'

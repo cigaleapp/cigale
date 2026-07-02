@@ -123,7 +123,7 @@ export const PROCEDURES = {
 				event: '"writeFile"',
 				data: {
 					filepath: 'string',
-					contents: type.or('string', ['instanceof', Uint8Array]),
+					content: type.or('string', ['instanceof', Uint8Array]),
 				},
 			}
 		),

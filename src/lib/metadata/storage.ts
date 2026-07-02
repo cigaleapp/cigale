@@ -277,9 +277,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 	const image = await db.get('Image', subjectId);
 	const observation = await db.get('Observation', subjectId);
 	const session = await db.get('Session', subjectId);
-	const imagesFromImageFile = await db
-		.getAll('Image')
-		.then((imgs) => imgs.filter(({ fileId }) => fileId === subjectId));
+	const imagesFromImageFile = await db.getAllFromIndex('Image', 'fileId', subjectId);
 
 	abortSignal?.throwIfAborted();
 	if (session) {
@@ -290,7 +288,8 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 		} else {
 			session.metadata = { [metadataId]: newValue };
 		}
-		db.put('Session', session);
+
+		await db.put('Session', session);
 	} else if (image) {
 		processConfidences(newValue, image.metadata[metadataId]);
 
@@ -298,7 +297,8 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 		if (clearErrors && image.metadataErrors?.[metadataId]) {
 			delete image.metadataErrors[metadataId];
 		}
-		db.put('Image', image);
+
+		await db.put('Image', image);
 	} else if (observation) {
 		processConfidences(
 			newValue,
@@ -317,7 +317,8 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 		if (clearErrors && observation.metadataErrors?.[metadataId]) {
 			delete observation.metadataErrors[metadataId];
 		}
-		db.put('Observation', observation);
+
+		await db.put('Observation', observation);
 	} else if (imagesFromImageFile.length > 0) {
 		for (const { id } of imagesFromImageFile) {
 			await storeMetadataValue({
@@ -332,6 +333,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 				manuallyModified,
 				clearErrors,
 				abortSignal,
+				updateReactiveState: false,
 			});
 		}
 	} else {
@@ -351,6 +353,14 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 
 		for (const cascade of cascades) {
 			abortSignal?.throwIfAborted();
+
+			const found = await db.get('Metadata', cascade.metadataId);
+			if (!found) {
+				console.warn(
+					`Cascading metadata ${metadataId} @ ${value} -> ${cascade.metadataId} (NOT FOUND!!!!) = ${cascade.value}: skipping`
+				);
+				continue;
+			}
 
 			console.info(
 				`Cascading metadata ${metadataId} @ ${value} -> ${cascade.metadataId}  = ${cascade.value}`
@@ -374,7 +384,10 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 
 	// Only refresh table state if asked
 	if (sessionId && updateReactiveState) {
-		await refreshTables(sessionId, session ? 'Session' : image ? 'Image' : 'Observation');
+		await refreshTables(
+			sessionId,
+			session ? 'Session' : image || imagesFromImageFile.length ? 'Image' : 'Observation'
+		);
 	}
 }
 

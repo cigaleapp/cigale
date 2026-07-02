@@ -94,6 +94,8 @@ export async function expectTooltipContent(page, locator, content, { timeout } =
 			timeout ? { timeout } : {}
 		);
 	}
+
+	return locator.getAttribute('data-tooltip-content')
 }
 
 /**

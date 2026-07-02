@@ -28,6 +28,7 @@ import WebWorker from '$worker/start.js?worker';
 
 // Polyfills
 import '@ungap/set-methods';
+import '@andy0130tw/es-arraybuffer-base64/auto';
 
 export const ssr = false;
 
