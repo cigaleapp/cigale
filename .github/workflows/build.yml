@@ -17,6 +17,11 @@ on:
         type: boolean
         default: false
         description: Build for Github Pages (sets SVELTE_FALLBACK_PAGE to 404.html and BASE_PATH to the repo name, which is required for correct routing on Github Pages)
+    secrets:
+      CIGALE_GITHUB_APP_CLIENT_ID:
+        required: true
+      CIGALE_GITHUB_APP_PUBLIC_CLIENT_SECRET:
+        required: true
     outputs:
       artifact:
         description: The build artifact name

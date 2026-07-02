@@ -206,10 +206,18 @@ const Account = table(
 		profileURL: 'string.url.parse',
 		addedAt: ['string.date.iso.parse', '=', () => new Date().toISOString()],
 	}).and(
-		type.or({
-			type: '"kobotoolbox"',
-			token: 'string',
-		})
+		type.or(
+			{
+				type: '"kobotoolbox"',
+				token: 'string',
+			},
+			{
+				type: '"github"',
+				token: 'string',
+				tokenExpiresAt: 'string.date.iso',
+				refreshToken: 'string',
+			}
+		)
 	)
 );
 

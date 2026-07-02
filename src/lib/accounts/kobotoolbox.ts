@@ -17,24 +17,24 @@ import { SessionRemoteID } from '$lib/schemas/sessions.js';
 import { corsfix, ensureArray, mapValues } from '$lib/utils.js';
 
 export default class Provider implements Account {
-	static id = 'kobotoolbox' as const;
+	static id = 'kobotoolbox' as const
+	id: string | undefined;
 	static servers = [
 		{ domain: 'kf.kobotoolbox.org', name: 'Global' },
 		{ domain: 'eu.kobotoolbox.org', name: 'Europe' },
 	] as const;
 	static auth = 'token' as const satisfies AuthenticationMethod;
 	static capabilities = ['sessions'] as const;
-	static displayName = 'KoboToolbox';
+	static displayName = 'KoboToolbox'
+	displayName: string;
 	static logoURL = new URL('https://avatars.githubusercontent.com/u/5543677?s=280&v=4');
 
 	#token: string;
-	username: string;
-	displayName: string;
+	username: string;;
 	avatarURL: URL | undefined;
 	domain: (typeof Provider.servers)[number]['domain'];
 	db: DatabaseHandle;
-	/** Database ID of the account */
-	id: string | undefined;
+	/** Database ID of the account */;
 
 	get v2domain(): string {
 		return this.domain;
@@ -51,6 +51,12 @@ export default class Provider implements Account {
 
 	static tokenPageURL(server: string): URL {
 		return new URL('/token/', 'https://' + server);
+	}
+
+	static authorizeURL(): URL {
+		throw new Error(
+			'KoboToolbox authentication is done via personal access tokens, not OAuth. Use Provider.tokenPageURL(server) to get the URL where users can create tokens.'
+		);
 	}
 
 	static domainOfProfileURL(
@@ -124,7 +130,7 @@ export default class Provider implements Account {
 	static fromDatabase(
 		db: DatabaseHandle,
 		account: Pick<
-			DB.Account,
+			Extract<DB.Account, { type: 'kobotoolbox' }>,
 			'token' | 'profileURL' | 'username' | 'type' | 'displayName' | 'avatarURL' | 'id'
 		>
 	) {
@@ -158,6 +164,7 @@ export default class Provider implements Account {
 
 		return {
 			type: 'kobotoolbox' as const,
+			id: `${server}:${me.extra_details__uid}`,
 			token,
 			username: me.username,
 			displayName:
@@ -373,6 +380,10 @@ export default class Provider implements Account {
 
 	async upload(): Promise<{ remoteID?: SessionRemoteID; page?: URL }> {
 		throw new Error('Not implemented');
+	}
+
+	async withToken(closure: (token: string) => Promise<void>) {
+		await closure(this.#token);
 	}
 
 	#compositeFileId(

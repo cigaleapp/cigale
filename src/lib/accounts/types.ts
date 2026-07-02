@@ -7,8 +7,14 @@ export type AuthenticationMethod = 'oauth' | 'token' | 'password';
 export type LoginData<S extends string = string> = {
 	server: S;
 	token?: string;
-	password?: { username: string; password: string };
-	oauth?: { authorize: URL; identity: URL; token: URL };
+	username?: string;
+	password?: string;
+	/** PKCE flow */
+	oauth?: {
+		authorizationCode: string;
+		state: string;
+		codeVerifier: string;
+	};
 };
 
 export interface Account {
@@ -104,6 +110,11 @@ export interface Account {
 		protocol: DB.Protocol,
 		session: SessionRemoteID
 	): AsyncIterable<Omit<(typeof DB.Tables.MetadataValueFile)['inferIn'], 'sessionId'>>;
+
+	/**
+	 * Run a closure with a token, that is guaranteed to be valid.
+	 */
+	withToken(closure: (token: string) => Promise<void>): Promise<void>;
 }
 
 export interface AccountConstructor<
@@ -116,9 +127,11 @@ export interface AccountConstructor<
 	id: string;
 	logoURL: URL;
 	displayName: string;
-	capabilities: readonly ('sessions' | 'images' | 'upload')[];
+	capabilities: readonly ('sessions' | 'images' | 'upload' | 'report')[];
 	auth: Auth;
-	servers: readonly { domain: Server; name?: string }[];
+	servers?: readonly { domain: Server; name?: string }[];
+
+	authorizeURL(): URL;
 
 	/** Returns the error message, or undefined if everything is a-ok */
 	checkAuth(data: LoginData<Server>): Promise<undefined | string>;
@@ -127,5 +140,5 @@ export interface AccountConstructor<
 	login(
 		db: DatabaseHandle,
 		data: LoginData<Server>
-	): Promise<Omit<(typeof DB.Schemas.Account)['inferIn'], 'id'>>;
+	): Promise<Omit<(typeof DB.Schemas.Account)['inferIn'], 'addedAt'>>;
 }

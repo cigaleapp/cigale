@@ -24,6 +24,8 @@ const env = arkenv(
 		DEBUG: 'boolean = false',
 		/** Required for mobile app, since window.location.origin returns localhost */
 		WEB_ORIGIN: 'string.url = "https://cigaleapp.github.io"',
+		CIGALE_GITHUB_APP_CLIENT_ID: 'string = ""',
+		CIGALE_GITHUB_APP_PUBLIC_CLIENT_SECRET: 'string = ""',
 		BUILTIN_PROTOCOLS: type('string.url')
 			.array()
 			.default(() => [
@@ -79,6 +81,10 @@ export default defineConfig({
 			readFileSync('android/.native-code-version', {
 				encoding: 'utf8',
 			})
+		),
+		'import.meta.env.cigaleGithubAppClientId': JSON.stringify(env.CIGALE_GITHUB_APP_CLIENT_ID),
+		'import.meta.env.cigaleGithubAppPublicClientSecret': JSON.stringify(
+			env.CIGALE_GITHUB_APP_PUBLIC_CLIENT_SECRET
 		),
 	},
 	worker: {

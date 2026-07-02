@@ -2891,3 +2891,97 @@ msgstr "Affecte <0>Change la valeur d'autres métadonnées quand {0} = {1}</0>"
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
 msgid "Affectée par <0>Autres métadonnées qui change {0} à {1}</0>"
 msgstr "Affectée par <0>Autres métadonnées qui change {0} à {1}</0>"
+
+#: src/routes/(app)/Settings.svelte
+msgid "Relancer l'app après un changement du parallélisme"
+msgstr "Relancer l'app après un changement du parallélisme"
+
+#: src/lib/exif.ts
+#: src/lib/exif.ts
+msgid "GPSLatitude"
+msgstr "GPSLatitude"
+
+#: src/lib/exif.ts
+msgid "GPSLatitudeRef"
+msgstr "GPSLatitudeRef"
+
+#: src/lib/exif.ts
+#: src/lib/exif.ts
+msgid "GPSLongitude"
+msgstr "GPSLongitude"
+
+#: src/lib/exif.ts
+msgid "GPSLongitudeRef"
+msgstr "GPSLongitudeRef"
+
+#. 0.0: metadata.label; 0.1: data.option.label
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
+msgid "Affectée par <0>Autres métadonnées qui change {0} à {1}</0><<<<<<< Updated upstream"
+msgstr "Affectée par <0>Autres métadonnées qui change {0} à {1}</0><<<<<<< Updated upstream"
+
+#~ msgid "GPSLongitudeRef>>>>>>> Stashed changes"
+#~ msgstr "GPSLongitudeRef>>>>>>> Stashed changes"
+
+#~ msgid "No current session"
+#~ msgstr "No current session"
+
+#~ msgid "No current session>>>>>>> Stashed changes"
+#~ msgstr "No current session>>>>>>> Stashed changes"
+
+#: src/lib/ModalConfirmDeletion.svelte
+msgid "La suppression entraînera: <0/> Il est impossible de revenir en arrière. <1><0>Afin de confirmer la suppression, veuillez taper <0/> ci-dessous:</0> <1/></1>"
+msgstr "La suppression entraînera: <0/> Il est impossible de revenir en arrière. <1><0>Afin de confirmer la suppression, veuillez taper <0/> ci-dessous:</0> <1/></1>"
+
+#: src/routes/(app)/protocols/ModalCreateProtocol.svelte
+msgid "Identifiant du protocole"
+msgstr "Identifiant du protocole"
+
+#: src/routes/(app)/protocols/ModalCreateProtocol.svelte
+msgid "Doit être unique. Il est conseillé de le baser sur un nom de domaine web que vous contrôlez; celui d'un site web permettant de télécharger le protocole, par exemple"
+msgstr "Doit être unique. Il est conseillé de le baser sur un nom de domaine web que vous contrôlez; celui d'un site web permettant de télécharger le protocole, par exemple"
+
+#: src/routes/(app)/results/+page.svelte
+msgid "Marge de recadrage"
+msgstr "Marge de recadrage"
+
+#: src/routes/(app)/results/+page.svelte
+msgid "une fois dézippé"
+msgstr "une fois dézippé"
+
+#: src/routes/(app)/results/+page.svelte
+msgid "<0/> Dossier <1></1>"
+msgstr "<0/> Dossier <1></1>"
+
+#: src/routes/(app)/results/+page.svelte
+msgid "<0/> Archive ZIP <1></1>"
+msgstr "<0/> Archive ZIP <1></1>"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/+layout@(app).svelte
+msgid "Élimination"
+msgstr "Élimination"
+
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/infos/+page.svelte
+msgid "Méthode de fusion"
+msgstr "Méthode de fusion"
+
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/infos/+page.svelte
+msgid "Comment fusionner les valeurs de cette métadonnée lors du regroupement de plusieurs observations en une seule"
+msgstr "Comment fusionner les valeurs de cette métadonnée lors du regroupement de plusieurs observations en une seule"
+
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
+msgid "Affecte"
+msgstr "Affecte"
+
+#. 0: data.metadata.label; 1: data.option .label
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
+msgid "Change la valeur d'autres métadonnées quand {0} = {1}"
+msgstr "Change la valeur d'autres métadonnées quand {0} = {1}"
+
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
+msgid "Affectée par"
+msgstr "Affectée par"
+
+#. 0: metadata.label; 1: data.option.label
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
+msgid "Autres métadonnées qui change {0} à {1}"
+msgstr "Autres métadonnées qui change {0} à {1}"

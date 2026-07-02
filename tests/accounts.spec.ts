@@ -244,7 +244,7 @@ async function registerKobotoolboxAccount({
 		await afterTokenFill(modal);
 	} else {
 		await expect(modal.getByText('Token valide')).toBeVisible();
-		await modal.getByRole('button', { name: 'Se connecter' }).click();
+		await modal.getByRole('button', { name: 'Ajouter' }).click();
 		await expect(main.getByText('Gwenn Le Bihan')).toBeVisible();
 	}
 }
