@@ -57,6 +57,8 @@
 		switch (page.route.id) {
 			case '/(app)/(sidepanel)/o/[observation]/classify':
 			case '/(app)/(sidepanel)/o/[observation]/classify/suggestions':
+			case '/(app)/(sidepanel)/o/[observation]/classify/narrow':
+			case '/(app)/(sidepanel)/o/[observation]/classify/narrow/choices':
 			case '/(app)/(sidepanel)/o/[observation]/classify/narrow/describe':
 			case '/(app)/(sidepanel)/o/[observation]/classify/narrow/candidates': {
 				await goto('/(app)/(sidepanel)/classify');
