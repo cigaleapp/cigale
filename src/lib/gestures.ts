@@ -98,11 +98,14 @@ export function onSwipe(
 			});
 
 			if (Math.abs(distance) < threshold) {
-				console.debug(`[onSwipe] ignored swipe ${direction} because of distance threshold: |${distance}| < ${threshold}`, minDistance)
-				return
+				console.debug(
+					`[onSwipe] ignored swipe ${direction} because of distance threshold: |${distance}| < ${threshold}`,
+					minDistance
+				);
+				return;
 			}
 
-			if (!acceptedDirections.has(direction)) return
+			if (!acceptedDirections.has(direction)) return;
 
 			callback({ element, direction, axis, distance });
 		};

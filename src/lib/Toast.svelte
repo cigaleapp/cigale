@@ -86,7 +86,6 @@
 		async ({ element, axis, distance }) => {
 			const duration = 250; /* ms */
 
-
 			element.style.transitionProperty = 'translate, opacity';
 			element.style.transitionDuration = `${duration}ms`;
 

@@ -27,7 +27,7 @@ import { PROCEDURES } from '$worker/procedures.js';
 import WebWorker from '$worker/start.js?worker';
 
 // Polyfills
-import '@ungap/set-methods'
+import '@ungap/set-methods';
 
 export const ssr = false;
 
