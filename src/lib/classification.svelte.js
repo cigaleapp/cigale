@@ -3,6 +3,7 @@ import { RequestCancelledError } from 'swarpc';
 import { databaseHandle, tables } from './idb.svelte.js';
 import { inferenceModelId } from './inference.js';
 import { storeMetadataErrors } from './metadata/storage.js';
+import { metadataDefinitionComparator } from './protocols.js';
 import { uiState } from './state.svelte.js';
 import { safeJSONStringify } from './utils.js';
 
@@ -18,7 +19,11 @@ export async function classifyImage(swarpc, id, cancellers) {
 	}
 
 	// Get all classification metadata for the current protocol
-	const allClassificationMetadata = uiState.enabledClassificationMetadata;
+	const allClassificationMetadata = uiState.enabledClassificationMetadata
+		// Sort them to have a consistent metadata inference order,
+		// which matters when there are conflicting cascades
+		.toSorted(metadataDefinitionComparator(uiState.currentProtocol));
+
 	if (allClassificationMetadata.length === 0) {
 		console.warn(
 			'No metadata with neural inference defined, not analyzing image. Configure neural inference on enum metadata (set metadata.<your metadata id>.infer.neural) if this was not intentional.'
@@ -27,7 +32,9 @@ export async function classifyImage(swarpc, id, cancellers) {
 	}
 
 	// Classify with all metadata
-	const promises = allClassificationMetadata.map(async (metadata) => {
+	// Do it sequentially to avoid race conditions when storing metadata
+	// see flakiness in e.g. https://github.com/cigaleapp/cigale/actions/runs/28614994005/job/84858867027#step:11:39
+	for (const metadata of allClassificationMetadata) {
 		const modelIndex = uiState.selectedClassificationModels[metadata.id] ?? 0;
 		const allModels = uiState.allClassificationModels[metadata.id];
 
@@ -90,8 +97,7 @@ export async function classifyImage(swarpc, id, cancellers) {
 				}
 			);
 		}
-	});
+	}
 
-	await Promise.all(promises);
 	await tables.Image.refresh(uiState.currentSessionId);
 }

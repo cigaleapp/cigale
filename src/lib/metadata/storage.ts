@@ -288,7 +288,8 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 		} else {
 			session.metadata = { [metadataId]: newValue };
 		}
-		db.put('Session', session);
+
+		await db.put('Session', session);
 	} else if (image) {
 		processConfidences(newValue, image.metadata[metadataId]);
 
@@ -296,7 +297,8 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 		if (clearErrors && image.metadataErrors?.[metadataId]) {
 			delete image.metadataErrors[metadataId];
 		}
-		db.put('Image', image);
+
+		await db.put('Image', image);
 	} else if (observation) {
 		processConfidences(
 			newValue,
@@ -315,7 +317,8 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 		if (clearErrors && observation.metadataErrors?.[metadataId]) {
 			delete observation.metadataErrors[metadataId];
 		}
-		db.put('Observation', observation);
+
+		await db.put('Observation', observation);
 	} else if (imagesFromImageFile.length > 0) {
 		for (const { id } of imagesFromImageFile) {
 			await storeMetadataValue({
@@ -330,7 +333,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 				manuallyModified,
 				clearErrors,
 				abortSignal,
-				updateReactiveState: false
+				updateReactiveState: false,
 			});
 		}
 	} else {
@@ -381,7 +384,10 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 
 	// Only refresh table state if asked
 	if (sessionId && updateReactiveState) {
-		await refreshTables(sessionId, session ? 'Session' : (image||imagesFromImageFile.length) ? 'Image' : 'Observation');
+		await refreshTables(
+			sessionId,
+			session ? 'Session' : image || imagesFromImageFile.length ? 'Image' : 'Observation'
+		);
 	}
 }
 
