@@ -180,7 +180,7 @@ const Settings = table(
 		showInputHints: 'boolean',
 		showTechnicalMetadata: 'boolean',
 		cropAutoNext: 'boolean = false',
-		// TODO: revert back to smart default (before <commit hash>)
+		// TODO: revert back to smart default (before https://github.com/cigaleapp/cigale/commit/81af290cb3b50f6d62ec5274b109958b84f769fb)
 		// for now this causes too many OOM crashes...
 		parallelism: 'number = 1',
 		gallerySort: type({
