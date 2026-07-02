@@ -179,4 +179,4 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@04702edda442b2e678b25b537cec683a1493fcb9 # v7
         with:
           commit_message: 🍱 Regenerate example protocols
-          file_pattern: examples/*.cigaleprotocol.json protocols/*.cigaleprotocol.{json,yaml} examples/*.cigaleprotocol.images/*
+          file_pattern: '*/*.cigaleprotocol.{json,yaml} examples/*.cigaleprotocol.images/*'
