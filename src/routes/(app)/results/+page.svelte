@@ -133,7 +133,7 @@
 							break;
 						case 'writeFile': {
 							if (!directoryHandle) return;
-							await writeToFilesystem(directoryHandle, data.filepath, data.contents);
+							await writeToFilesystem(directoryHandle, data.filepath, data.content);
 							break;
 						}
 						case 'warning': {
