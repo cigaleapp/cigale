@@ -20,8 +20,8 @@
 	import { IsMobile } from '$lib/mobile.svelte.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { deleteSession } from '$lib/sessions.js';
+	import { byteSizeOfObject } from '$lib/storage/utils.js';
 	import { tooltip } from '$lib/tooltips.js';
-	import { sum } from '$lib/utils.js';
 
 	import TopbarBackToHome from '../TopbarBackToHome.svelte';
 	import Table from './Table.svelte';
@@ -37,9 +37,23 @@
 	}
 
 	async function sizeOfSession(sessionId: string) {
-		const imageFiles = await listByIndex('ImageFile', 'sessionId', sessionId);
-		const imagePreviewFiles = await listByIndex('ImagePreviewFile', 'sessionId', sessionId);
-		return sum([...imageFiles, ...imagePreviewFiles].map((f) => f.bytes.byteLength));
+		let total = 0;
+
+		// TODO: decide what we do when binaryStorage.backend === "local", since that doesn't count towards the storage quota
+
+		for (const file of await listByIndex('ImageFile', 'sessionId', sessionId)) {
+			total += await byteSizeOfObject('ImageFile', file);
+		}
+
+		for (const file of await listByIndex('ImagePreviewFile', 'sessionId', sessionId)) {
+			total += await byteSizeOfObject('ImagePreviewFile', file);
+		}
+
+		for (const file of await listByIndex('MetadataValueFile', 'sessionId', sessionId)) {
+			total += await byteSizeOfObject('MetadataValueFile', file);
+		}
+
+		return total;
 	}
 
 	const mobile = new IsMobile();
