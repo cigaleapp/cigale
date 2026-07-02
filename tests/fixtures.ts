@@ -168,6 +168,8 @@ export type AppFixture = {
 		area: Locator;
 		/** Get a gallery card in the observations area. */
 		card: (specifier: GalleryCardSpecifier) => Locator;
+		/** Get all cards in the observations area. */
+		cards: () => AsyncIterable<Locator>;
 		/** Select cards. Clears any previous selection. Use continueSelecting to select without clearing */
 		select: (...specifiers: GalleryCardSpecifier[]) => Promise<void>;
 		/** Add to selected cards. Previously selected cards remain selected */
@@ -428,6 +430,13 @@ const _test = base.extend<
 			gallery: {
 				area: page.getByTestId('observations-area'),
 				card: (specifier) => galleryCard(page, specifier),
+				async *cards() {
+					const cardsCount = await galleryCard(page, null).count();
+
+					for (let i = 0; i < cardsCount; i++) {
+						yield galleryCard(page, '#' + i);
+					}
+				},
 				async selectMore(...specifiers) {
 					await page.keyboard.down('ControlOrMeta');
 					for (const specifier of specifiers) {
@@ -582,16 +591,32 @@ const _test = base.extend<
 export const assert = baseExpect.extend({
 	async toHaveTooltip(
 		locator: Locator,
-		expected: string | RegExp,
+		/** null to expect no tooltip on the element */
+		expected: string | RegExp | null,
 		options?: { timeout?: number }
 	) {
 		const assertionName = 'toHaveTooltip';
+
+		/**
+		 * Used when expected=null and we failed (we got a tooltip)
+		 * since in that case, expectTooltipContent() does not throw
+		 *
+		 * We do it like this instead of handling it in expectTooltipContent,
+		 * so that we still get the timeout behavior (ie checking that there's really no tooltip,
+		 * even if it takes a little while to show up)
+		 */
+		let tooltipTextActual = '';
 
 		let pass: boolean;
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		let matcherResult: any;
 		try {
-			await expectTooltipContent(locator.page(), locator, expected, options);
+			tooltipTextActual = await expectTooltipContent(
+				locator.page(),
+				locator,
+				expected === null ? /.*/ : expected,
+				options
+			);
 			pass = true;
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (e: any) {
@@ -599,6 +624,7 @@ export const assert = baseExpect.extend({
 			pass = false;
 		}
 
+		if (expected === null) pass = !pass;
 		if (this.isNot) pass = !pass;
 
 		const message = () =>
@@ -607,8 +633,10 @@ export const assert = baseExpect.extend({
 			}) +
 			'\n\n' +
 			`Locator: ${locator}\n` +
-			`Expected: ${this.isNot ? 'not' : ''} tooltip with ${this.utils.printExpected(expected)}\n` +
-			(matcherResult ? `Received: ${this.utils.printReceived(matcherResult.actual)}` : '');
+			`Expected: ${this.isNot ? 'not' : ''} ${expected === null ? 'no tooltip' : `tooltip with ${this.utils.printExpected(expected)}`}\n` +
+			(matcherResult || tooltipTextActual
+				? `Received: ${this.utils.printReceived(tooltipTextActual || matcherResult.actual)}`
+				: '');
 
 		return {
 			message,

@@ -1,5 +1,5 @@
 /**
- * @import { Page } from '@playwright/test';
+ * @import { Page, Locator } from '@playwright/test';
  */
 
 import { throwError } from './core.js';
@@ -13,10 +13,20 @@ import { throwError } from './core.js';
 
 /**
  * @param {Page} page
- * @param {GalleryCardSpecifier} specifier
+ * @param {GalleryCardSpecifier | null} specifier if null is given, matches all cards and ignores {@link otherSpecifiers}
+ * @param {...GalleryCardSpecifier} otherSpecifiers an .or() is put between Locators.
+ * @returns {Locator}
  */
-export function galleryCard(page, specifier) {
+export function galleryCard(page, specifier, ...otherSpecifiers) {
 	let cards = page.getByTestId('observations-area').getByRole('article');
+
+	if (specifier === null) {
+		return cards;
+	}
+
+	if (otherSpecifiers.length > 0) {
+		return galleryCard(page, specifier).or(galleryCard(page, ...otherSpecifiers));
+	}
 
 	if (typeof specifier === 'number') {
 		return cards.nth(specifier);

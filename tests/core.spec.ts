@@ -70,6 +70,13 @@ for (const offline of [false, true]) {
 			await app.tabs.go('crop');
 			await app.loading.wait();
 
+			// Make sure theres no errors
+			for await (const card of app.gallery.cards()) {
+				// Should have no tooltip at all (works cuz debug mode is off, otherwise there'd be a debug info tooltip when no error)
+				await expect(card).toHaveTooltip(null);
+				await expect(card).not.toHaveText(/Erreur/);
+			}
+
 			// Check for inferred bounding box
 			const boundingBoxStyle = Object.fromEntries(
 				await page
@@ -104,6 +111,13 @@ for (const offline of [false, true]) {
 			await app.tabs.go('classify');
 			// Wait for inference
 			await app.loading.wait();
+
+			// Make sure theres no errors
+			for await (const card of app.gallery.cards()) {
+				// Should have no tooltip at all (works cuz debug mode is off, otherwise there'd be a debug info tooltip when no error)
+				await expect(card).toHaveTooltip(null);
+				await expect(card).not.toHaveText(/Erreur/);
+			}
 
 			// Check for classification results in sidepanel
 			await app.gallery.card(0).click();
