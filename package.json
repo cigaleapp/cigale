@@ -162,6 +162,7 @@
 		"@formatjs/intl-durationformat": "^0.10.14",
 		"@iconify/svelte": "^5.2.2",
 		"@sveltejs/svelte-virtual-list": "^3.0.1",
+		"@ungap/set-methods": "^0.1.1",
 		"@viselect/vanilla": "^3.9.0",
 		"@wuchale/svelte": "^0.20.3",
 		"arktype": "^2.2.0",
