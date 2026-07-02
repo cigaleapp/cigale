@@ -1,19 +1,60 @@
+import type { MaybeArray } from './utils.js';
 import type { Attachment } from 'svelte/attachments';
+
+import { ensureArray, switchValue } from './utils.js';
+
+type Axis = 'horizontal' | 'vertical';
+type Direction = 'up' | 'left' | 'right' | 'down';
 
 /**
  * Calls the callback when an upward swipe is detected on the attached node.
  */
 export function onSwipe(
-	// TODO: other directions
-	direction: 'up',
-	callback: () => void,
-	{ minDistance = 30 }: { minDistance?: number } = {}
+	/** Swipe directions to react to */
+	direction: MaybeArray<Direction | 'horizontal' | 'vertical' | 'any'>,
+	callback: (data: {
+		/** The HTML element onSwipe has been attached to */
+		element: HTMLElement;
+		/** The direction of the swipe */
+		direction: Direction;
+		/** horizontal if direction is left or right, vertical otherwise */
+		axis: Axis;
+		/** deltaX (positive if right) or deltaY (positive if down) */
+		distance: number;
+	}) => void,
+	{
+		minDistance = {},
+	}: {
+		/** Use a number directly to specify the same value on both axes. Minimum distance to accept the swipe. If the number is <1, it's interpreted as a %age of the elements width/height (depending on the swiped direction's axis), if it's >=1 it's interpreted as a pixel length. Defaults to 30 on each axis. */
+		minDistance?: number | Partial<Record<Axis, number>>;
+	} = {}
 ): Attachment<HTMLElement> {
-	if (direction !== 'up') {
-		throw new Error(`Unsupported swipe direction: ${direction}`);
-	}
+	const thresholds = {
+		vertical: typeof minDistance === 'number' ? minDistance : (minDistance.vertical ?? 30),
+		horizontal: typeof minDistance === 'number' ? minDistance : (minDistance.horizontal ?? 30),
+	};
 
-	return (node) => {
+	const acceptedDirections = new Set<Direction>(
+		ensureArray(direction)
+			.map((dir) =>
+				switchValue(dir, {
+					up: ['up'],
+					down: ['down'],
+					left: ['left'],
+					right: ['right'],
+					horizontal: ['left', 'right'],
+					vertical: ['up', 'down'],
+					any: ['up', 'down', 'left', 'right'],
+				})
+			)
+			.flat()
+	);
+
+	return (element) => {
+		const { width, height } = element.getBoundingClientRect();
+		if (thresholds.horizontal < 1) thresholds.horizontal *= width;
+		if (thresholds.vertical < 1) thresholds.horizontal *= height;
+
 		let touchStartX: number | undefined;
 		let touchStartY: number | undefined;
 
@@ -38,10 +79,32 @@ export function onSwipe(
 			touchStartY = undefined;
 
 			const mostlyVertical = Math.abs(deltaY) > Math.abs(deltaX);
-			const isSwipeUp = deltaY < -minDistance;
-			if (mostlyVertical && isSwipeUp) {
-				callback();
+			const mostlyHorizontal = Math.abs(deltaX) > Math.abs(deltaY);
+
+			const axis = mostlyVertical ? 'vertical' : mostlyHorizontal ? 'horizontal' : undefined;
+
+			if (!axis) return;
+
+			const threshold = thresholds[axis];
+
+			const distance = switchValue(axis, {
+				vertical: deltaY,
+				horizontal: deltaX,
+			});
+
+			const direction = switchValue(axis, {
+				vertical: distance > 0 ? 'down' : 'up',
+				horizontal: distance > 0 ? 'right' : 'left',
+			});
+
+			if (Math.abs(distance) < threshold) {
+				console.debug(`[onSwipe] ignored swipe ${direction} because of distance threshold: |${distance}| < ${threshold}`, minDistance)
+				return
 			}
+
+			if (!acceptedDirections.has(direction)) return
+
+			callback({ element, direction, axis, distance });
 		};
 
 		const onTouchCancel = () => {
@@ -49,14 +112,14 @@ export function onSwipe(
 			touchStartY = undefined;
 		};
 
-		node.addEventListener('touchstart', onTouchStart, { passive: true });
-		node.addEventListener('touchend', onTouchEnd, { passive: true });
-		node.addEventListener('touchcancel', onTouchCancel, { passive: true });
+		element.addEventListener('touchstart', onTouchStart, { passive: true });
+		element.addEventListener('touchend', onTouchEnd, { passive: true });
+		element.addEventListener('touchcancel', onTouchCancel, { passive: true });
 
 		return () => {
-			node.removeEventListener('touchstart', onTouchStart);
-			node.removeEventListener('touchend', onTouchEnd);
-			node.removeEventListener('touchcancel', onTouchCancel);
+			element.removeEventListener('touchstart', onTouchStart);
+			element.removeEventListener('touchend', onTouchEnd);
+			element.removeEventListener('touchcancel', onTouchCancel);
 		};
 	};
 }

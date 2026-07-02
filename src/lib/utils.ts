@@ -1438,3 +1438,5 @@ export const UTF8_BOM = '\xEF\xBB\xBF';
 export function platform() {
 	return Capacitor.getPlatform() as 'web' | 'android' | 'ios';
 }
+
+export type MaybeArray<T> = T | T[];

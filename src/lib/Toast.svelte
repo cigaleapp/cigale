@@ -52,6 +52,8 @@
 	import IconClose from '~icons/ri/close-line';
 
 	import ButtonInk from './ButtonInk.svelte';
+	import { onSwipe } from './gestures.js';
+	import { sleep, switchValue } from './utils.js';
 
 	/**
 	 * @typedef Toast
@@ -79,6 +81,31 @@
 	style:--fg="var(--fg-{toastTheme(type)})"
 	in:slide={{ axis: 'y', duration: 200 }}
 	out:fade={{ duration: 200 }}
+	{@attach onSwipe(
+		['left', 'right', 'down'],
+		async ({ element, axis, distance }) => {
+			const duration = 250; /* ms */
+
+
+			element.style.transitionProperty = 'translate, opacity';
+			element.style.transitionDuration = `${duration}ms`;
+
+			element.style.opacity = '0';
+			element.style.translate = switchValue(axis, {
+				vertical: `0 ${distance}px`,
+				horizontal: `${distance}px 0`,
+			});
+
+			await sleep(250);
+
+			ondismiss();
+		},
+		{
+			minDistance: {
+				horizontal: 0.25,
+			},
+		}
+	)}
 >
 	<div class="icon">
 		{#await toastIcon(type) then Icon}
