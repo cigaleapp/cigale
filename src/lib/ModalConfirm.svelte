@@ -51,7 +51,15 @@
 	});
 </script>
 
-<Modal {...modalProps} bind:close bind:open>
+<Modal
+	{...modalProps}
+	bind:close
+	bind:open
+	onclose={() => {
+		modalProps.onclose?.();
+		closed(false);
+	}}
+>
 	{@render children?.({ error })}
 	{#snippet footer()}
 		{#if error}
