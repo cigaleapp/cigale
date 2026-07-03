@@ -14,3 +14,7 @@ insert_final_newline = true
 [*.{yml,yaml}]
 indent_size = 2
 indent_style = space
+
+[AndroidManifest.xml]
+indent_size = 2
+indent_style = space
