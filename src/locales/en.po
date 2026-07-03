@@ -288,7 +288,6 @@ msgstr "Learn more"
 msgid "Erreur"
 msgstr "Error"
 
-#: src/lib/exif.js
 #: src/lib/exif.ts
 #: src/lib/i18n.js
 #: src/lib/i18n.js
@@ -399,8 +398,6 @@ msgid "Importer le protocole distant ?"
 msgstr "Import remote protocol ?"
 
 #. 0: file.name; 1: e?.toString() ?? 'Erreur inattendue'
-#. 0: file.name; 1: e?.toString() ?? 'Erreur inattendue'
-#: src/lib/exif.js
 #: src/lib/exif.ts
 msgid "Impossible d'extraire les métadonnées EXIF de {0}: {1}"
 msgstr "Cannot extract EXIF metadata for {0}: {1}"
@@ -2915,4 +2912,12 @@ msgstr ""
 
 #: src/lib/exif.ts
 msgid "GPSLongitudeRef"
+msgstr ""
+
+#: src/lib/zip.ts
+msgid "Hello there :)"
+msgstr ""
+
+#: src/lib/zip.ts
+msgid "Héllo !! Do accents work?"
 msgstr ""
