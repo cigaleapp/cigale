@@ -376,7 +376,7 @@
 			</nav>
 		{/if}
 	</header>
-{:else}
+{:else if !progressbarOnly}
 	<!-- 
 Tab bar is only when a session is active
  -->
