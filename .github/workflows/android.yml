@@ -167,6 +167,13 @@ jobs:
           --androidreleasetype APK
           --flavor ${{ inputs.flavor }}
 
+      - if: ${{ !cancelled() }}
+        name: Save problems report webpage
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: android-problems-report
+          path: ./android/build/reports/problems/problems-report.html
+
       - name: Move APK file
         run: mv ./android/app/build/outputs/apk/${{ inputs.flavor }}/release/app-${{ inputs.flavor }}-release-signed.apk ./app.apk
 
@@ -215,11 +222,6 @@ jobs:
             exit 1
           fi
 
-      - name: Save problems report webpage
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
-        with:
-          name: android-problems-report
-          path: ./android/build/reports/problems/problems-report.html
 
       - name: Set artifact name
         id: artifact
@@ -357,6 +359,7 @@ jobs:
             <!-- /apk -->
 
   report:
+    if: ${{ !cancelled() }}
     name: Upload problems report
     needs: apk
     uses: ./.github/workflows/dev-deploy.yml
