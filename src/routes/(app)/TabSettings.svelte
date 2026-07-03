@@ -6,6 +6,7 @@
 
 	import IconSelect from '~icons/ri/arrow-down-s-line';
 	import IconSubmenu from '~icons/ri/arrow-right-s-line';
+	import IconCamera from '~icons/ri/camera-line';
 	import IconCheck from '~icons/ri/check-line';
 	import IconInferenceDisabled from '~icons/ri/forbid-2-line';
 	import IconSortAsc from '~icons/ri/sort-asc';
@@ -15,6 +16,7 @@
 	import DropdownMenu from '$lib/DropdownMenu.svelte';
 	import { tables } from '$lib/idb.svelte.js';
 	import { resolveMetadataImport } from '$lib/metadata/namespacing.js';
+	import { goto } from '$lib/paths.js';
 	import { metadataDefinitionComparator } from '$lib/protocols.js';
 	import { removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';
 	import {
@@ -122,6 +124,12 @@
 			await tables.Session.update(uiState.currentSession.id, 'group', value);
 		}
 	}
+
+	type ItemExtras = {
+		direction: 'asc' | 'desc' | null;
+		neural?: boolean;
+		icon?: string | import('svelte').Component;
+	};
 </script>
 
 <div class="inference">
@@ -129,15 +137,26 @@
 		title={label}
 		testid="{tab}-settings"
 		items={[
+			...orEmpty(tab === 'import', {
+				label: '',
+				items: [
+					{
+						type: 'clickable' as const,
+						label: 'Prendre des photos',
+						data: {
+							direction: null,
+							icon: IconCamera,
+						} as ItemExtras,
+						async onclick() {
+							await goto('/(app)/capture');
+						},
+					},
+				],
+			}),
 			{
 				testid: `${tab}-settings-sort`,
 				label: 'Trier par…',
 				items: entries(SORT_FIELDS).map(([key, { label }]) => {
-					type Extras = {
-						direction: 'asc' | 'desc' | null;
-						neural?: boolean;
-						icon?: string;
-					};
 					const direction = currentSettings?.sort.direction ?? null;
 					const field = currentSettings?.sort.field;
 					const metadata = currentSettings?.sort.metadata;
@@ -147,7 +166,7 @@
 					if (needsMetadata) {
 						return {
 							type: 'submenu',
-							data: { direction: null } as Extras,
+							data: { direction: null } as ItemExtras,
 							label,
 							selected,
 							submenu: {
@@ -182,7 +201,7 @@
 						key,
 						label,
 						selected,
-						data: { direction } as Extras,
+						data: { direction } as ItemExtras,
 						type: 'selectable',
 						closeOnSelect: false,
 						async onclick() {
@@ -378,7 +397,9 @@
 				</div>
 			{/snippet}
 
-			{#if selected && direction === 'asc'}
+			{#if icon && typeof icon !== 'string'}
+				{@render stateIcon(icon)}
+			{:else if selected && direction === 'asc'}
 				{@render stateIcon(IconSortAsc)}
 			{:else if selected && direction === 'desc'}
 				{@render stateIcon(IconSortDesc)}
@@ -392,7 +413,7 @@
 				{@render stateIcon(null)}
 			{/if}
 			<div class="label">
-				{#if icon}
+				{#if icon && typeof icon === 'string'}
 					<code>{icon}</code>
 				{/if}
 				{label}

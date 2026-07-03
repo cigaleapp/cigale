@@ -7,6 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: src/lib/LoadingScreen.svelte
 #: src/lib/SessionMetadataForm.svelte
 #: src/routes/(app)/PrepareForOffline.svelte
 #: src/routes/(app)/sessions/Cards.svelte
@@ -18,9 +19,8 @@ msgstr "<0/> Chargement…"
 msgid "<0/> Créer"
 msgstr "<0/> Créer"
 
-#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
-msgid "<0/> Importer d'autres images"
-msgstr "<0/> Importer d'autres images"
+#~ msgid "<0/> Importer d'autres images"
+#~ msgstr "<0/> Importer d'autres images"
 
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 msgid "<0/> Regrouper"
@@ -36,6 +36,7 @@ msgstr "<0/> Rééssayer"
 
 #: src/lib/CardMedia.svelte
 #: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
+#: src/routes/(app)/capture/gallery/+page.svelte
 #: src/routes/(app)/protocols/RowProtocol.svelte
 #: src/routes/(app)/protocols/[id]/+layout.svelte
 msgid "<0/> Supprimer"
@@ -206,9 +207,8 @@ msgstr "Classifier <0/>"
 msgid "Classifier les images"
 msgstr "Classifier les images"
 
-#: src/routes/(app)/(sidepanel)/import/+page.svelte
-msgid "Cliquer ou déposer des images, ou un export de résultats (.zip)"
-msgstr "Cliquer ou déposer des images, ou un export de résultats (.zip)"
+#~ msgid "Cliquer ou déposer des images, ou un export de résultats (.zip)"
+#~ msgstr "Cliquer ou déposer des images, ou un export de résultats (.zip)"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Code source"
@@ -1173,8 +1173,10 @@ msgstr "Cascades"
 
 #. 0: option.label || option.key
 #. 0: option.label || option.key
+#. 0: entry.name
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
+#: src/routes/(app)/storage/Table.svelte
 msgid "Voir {0}"
 msgstr "Voir {0}"
 
@@ -2921,3 +2923,146 @@ msgstr "Hello there :)"
 #: src/lib/zip.ts
 msgid "Héllo !! Do accents work?"
 msgstr "Héllo !! Do accents work?"
+
+#: src/lib/LoadingScreen.svelte
+msgid "<0/> Rien à voir ici"
+msgstr "<0/> Rien à voir ici"
+
+#: src/routes/(app)/capture/+page.svelte
+#: src/routes/(app)/storage/+page.svelte
+msgid "Photos en attente"
+msgstr "Photos en attente"
+
+#: src/routes/(app)/capture/+page.svelte
+msgid "Le stockage n'est pas encore prêt, veuillez rééssayer"
+msgstr "Le stockage n'est pas encore prêt, veuillez rééssayer"
+
+#: src/routes/(app)/capture/+page.svelte
+msgid "Ne pas quitter"
+msgstr "Ne pas quitter"
+
+#: src/routes/(app)/capture/+page.svelte
+#: src/routes/(app)/capture/+page.svelte
+msgid "Quitter"
+msgstr "Quitter"
+
+#: src/routes/(app)/capture/+page.svelte
+msgid "Voir les photos prises"
+msgstr "Voir les photos prises"
+
+#: src/routes/(app)/capture/+page.svelte
+msgid "Prendre une photo"
+msgstr "Prendre une photo"
+
+#~ msgid "<0/> Terminé"
+#~ msgstr "<0/> Terminé"
+
+#. 0: pendingStorage?.count ?? 0
+#: src/routes/(app)/capture/+page.svelte
+msgid "Il y a {0} photos en attente qui seront supprimées si tu quitte"
+msgstr "Il y a {0} photos en attente qui seront supprimées si tu quitte"
+
+#~ msgid "Prendre des photos"
+#~ msgstr "Prendre des photos"
+
+#~ msgid "<0/> OK"
+#~ msgstr "<0/> OK"
+
+#: src/routes/(app)/capture/+page.svelte
+msgid "Plus d'options"
+msgstr "Plus d'options"
+
+#: src/routes/(app)/capture/+page.svelte
+msgid "Options"
+msgstr "Options"
+
+#: src/routes/(app)/capture/gallery/+page.svelte
+msgid "Retour à la caméra"
+msgstr "Retour à la caméra"
+
+#~ msgid "<0/> Photos capturées"
+#~ msgstr "<0/> Photos capturées"
+
+#: src/routes/(app)/capture/gallery/+page.svelte
+msgid "Plus"
+msgstr "Plus"
+
+#~ msgid "<0/> Photos capturées <1/>"
+#~ msgstr "<0/> Photos capturées <1/>"
+
+#: src/routes/(app)/capture/gallery/+page.svelte
+msgid "# photo capturée"
+msgid_plural "# photos capturées"
+msgstr[0] "# photo capturée"
+msgstr[1] "# photos capturées"
+
+#: src/routes/(app)/capture/gallery/+page.svelte
+msgid "Photos capturées"
+msgstr "Photos capturées"
+
+#~ msgid "Importation"
+#~ msgstr "Importation"
+
+#: src/lib/exif.ts
+msgid "Impossible de modifier les données EXIF"
+msgstr "Impossible de modifier les données EXIF"
+
+#~ msgid "Cliquer ou déposer des images, ou un export de résultats (.zip), ou"
+#~ msgstr "Cliquer ou déposer des images, ou un export de résultats (.zip), ou"
+
+#: src/routes/(app)/(sidepanel)/import/+page.svelte
+msgid "<0/> Prendre des photos"
+msgstr "<0/> Prendre des photos"
+
+#: src/routes/(app)/(sidepanel)/import/+page.svelte
+msgid "Glisser et déposer des images, ou un export de résultats (.zip). Ou sinon:"
+msgstr "Glisser et déposer des images, ou un export de résultats (.zip). Ou sinon:"
+
+#: src/routes/(app)/(sidepanel)/import/+page.svelte
+msgid "<0/> Choisir des fichiers"
+msgstr "<0/> Choisir des fichiers"
+
+#~ msgid "Passer le flash {0}"
+#~ msgstr "Passer le flash {0}"
+
+#: src/routes/(app)/capture/+page.svelte
+msgid "Ce mode de flash n'est pas supporté"
+msgstr "Ce mode de flash n'est pas supporté"
+
+#~ msgid "Flash: {0}"
+#~ msgstr "Flash: {0}"
+
+#: src/routes/(app)/capture/+page.svelte
+msgid "<0/> Fini"
+msgstr "<0/> Fini"
+
+#~ msgid "Fini"
+#~ msgstr "Fini"
+
+#~ msgid "Cette session n'existe pas"
+#~ msgstr "Cette session n'existe pas"
+
+#~ msgid "Voir {0}]"
+#~ msgstr "Voir {0}]"
+
+#. 0: sessionId
+#: src/routes/(app)/storage/+page.svelte
+msgid "{0} · Session supprimée"
+msgstr "{0} · Session supprimée"
+
+#~ msgid "<0/> Fichiers"
+#~ msgstr "<0/> Fichiers"
+
+#~ msgid "<0/> Appareil"
+#~ msgstr "<0/> Appareil"
+
+#~ msgid "<0/> Autres images"
+#~ msgstr "<0/> Autres images"
+
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
+msgid "<0/> Appareil photo"
+msgstr "<0/> Appareil photo"
+
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
+msgid "<0/> Plus d'images"
+msgstr "<0/> Plus d'images"

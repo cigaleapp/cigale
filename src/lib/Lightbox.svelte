@@ -74,7 +74,6 @@
 		z-index: 1000;
 		opacity: 0;
 		transition: opacity 0.2s;
-		overflow: hidden;
 
 		.contents {
 			transition: scale 0.2s;
@@ -83,6 +82,7 @@
 		&[open] {
 			opacity: 1;
 			pointer-events: auto;
+			overflow: hidden;
 
 			.contents {
 				scale: 1;

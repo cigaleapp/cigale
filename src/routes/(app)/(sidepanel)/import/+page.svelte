@@ -1,7 +1,10 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
 
+	import IconCamera from '~icons/ri/camera-line';
+	import IconImport from '~icons/ri/upload-2-line';
 	import AreaObservations from '$lib/AreaObservations.svelte';
+	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import CardImage from '$lib/CardImage.svelte';
 	import CardMedia from '$lib/CardMedia.svelte';
 	import Dropzone from '$lib/Dropzone.svelte';
@@ -11,6 +14,7 @@
 	import { ACCEPTED_IMPORT_TYPES } from '$lib/import.svelte';
 	import Logo from '$lib/Logo.svelte';
 	import { IsMobile } from '$lib/mobile.svelte.js';
+	import { goto } from '$lib/paths.js';
 	import { cancelTask, importMore } from '$lib/queue.svelte.js';
 	import { uiState } from '$lib/state.svelte.js';
 	import { unique } from '$lib/utils';
@@ -48,7 +52,7 @@
 
 <Dropzone
 	filetypes={ACCEPTED_IMPORT_TYPES}
-	clickable={allImages.length === 0}
+	clickable={false}
 	onfiles={({ files }) => importMore(files)}
 >
 	<main class="observations" class:empty in:fade={{ duration: 100 }}>
@@ -93,7 +97,21 @@
 		{#if empty}
 			<div class="empty-state">
 				<Logo variant="empty" />
-				<p>Cliquer ou déposer des images, ou un export de résultats (.zip)</p>
+				<p>Glisser et déposer des images, ou un export de résultats (.zip). Ou sinon:</p>
+				<ButtonSecondary
+					onclick={async () => {
+						importMore(
+							await promptForFiles({ accept: ACCEPTED_IMPORT_TYPES, multiple: true })
+						);
+					}}
+				>
+					<IconImport />
+					Choisir des fichiers
+				</ButtonSecondary>
+				<ButtonSecondary onclick={async () => goto('/(app)/capture')}>
+					<IconCamera />
+					Prendre des photos
+				</ButtonSecondary>
 			</div>
 		{/if}
 	</main>

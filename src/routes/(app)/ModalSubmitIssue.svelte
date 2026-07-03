@@ -24,13 +24,15 @@
 
 	interface Props {
 		type: 'bug' | 'feature';
+		open?: (() => void) | undefined;
+		/** Show a trigger button (in that case, binding to open is not even needed) */
+		trigger?: boolean;
 	}
 
-	const { type }: Props = $props();
+	let { type, open = $bindable(undefined), trigger: showTrigger = true }: Props = $props();
 
 	let body = $state('');
 	let title = $state('');
-	let open: undefined | (() => void) = $state();
 	let close: undefined | (() => void) = $state();
 	let submitting = $state(false);
 
@@ -169,13 +171,15 @@
 	</form>
 </Modal>
 
-<ButtonIcon
-	onclick={() => open?.()}
-	help={type === 'bug' ? 'Signaler un bug' : 'Proposer une fonctionnalité'}
-	data-testid={type === 'bug' ? 'open-bug-report' : 'open-feature-request'}
->
-	<OpenIcon />
-</ButtonIcon>
+{#if showTrigger}
+	<ButtonIcon
+		onclick={() => open?.()}
+		help={type === 'bug' ? 'Signaler un bug' : 'Proposer une fonctionnalité'}
+		data-testid={type === 'bug' ? 'open-bug-report' : 'open-feature-request'}
+	>
+		<OpenIcon />
+	</ButtonIcon>
+{/if}
 
 <style>
 	form {

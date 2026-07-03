@@ -17,8 +17,10 @@
 	import { loadPreviewImage } from '$lib/images';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import KeyboardShortcuts from '$lib/KeyboardShortcuts.svelte';
+	import { IsMobile } from '$lib/mobile.svelte.js';
 	import Modal from '$lib/Modal.svelte';
 	import { globalModals } from '$lib/modals.svelte.js';
+	import { routeIsIn } from '$lib/paths.js';
 	import { initializeProcessingQueue } from '$lib/queue.svelte';
 	import { switchSession } from '$lib/sessions';
 	import { getColorScheme, isDebugMode, setSetting } from '$lib/settings.svelte';
@@ -34,12 +36,14 @@
 	const { children, data } = $props();
 	const { swarpc, parallelism } = $derived(data);
 
+	const mobile = new IsMobile();
+
 	initializeProcessingQueue({ swarpc, cancellers, parallelism });
 
 	const navbarAppearance = $derived.by<NavbarAppearance>(() => {
-		if (page.route.id?.startsWith('/(app)/(sidepanel)/o/[observation]')) return 'hidden';
-		if (page.route.id?.startsWith('/(app)/protocols/[id]')) return 'hidden';
-		if (page.route.id === '/(app)/capture') return 'hidden';
+		if (routeIsIn('/(app)/(sidepanel)/o/[observation]')) return 'hidden';
+		if (routeIsIn('/(app)/protocols/[id]')) return 'hidden';
+		if (routeIsIn('/(app)/capture')) return 'hidden';
 
 		return 'full';
 	});
@@ -185,13 +189,15 @@
 </Modal>
 
 <div class="layout" id="app-layout">
-	<Navigation
-		progressbarOnly={navbarAppearance === 'hidden'}
-		progress={uiState.processing.progress}
-		eta={uiState.eta}
-	/>
+	{#if !mobile.current}
+		<Navigation
+			progressbarOnly={navbarAppearance === 'hidden'}
+			progress={uiState.processing.progress}
+			eta={uiState.eta}
+		/>
+	{/if}
 
-	<div id="portal-target-mobile-bottombar"></div>
+	<div id="portal-target-mobile-topbar"></div>
 
 	<ToastsArea />
 
@@ -204,7 +210,15 @@
 		{@render children?.()}
 	</div>
 
-	<div id="portal-target-mobile-topbar"></div>
+	<div id="portal-target-mobile-bottombar"></div>
+
+	{#if mobile.current}
+		<Navigation
+			progressbarOnly={navbarAppearance === 'hidden'}
+			progress={uiState.processing.progress}
+			eta={uiState.eta}
+		/>
+	{/if}
 </div>
 
 <style>
@@ -229,10 +243,6 @@
 		display: flex;
 		flex-direction: column;
 		height: 100svh;
-
-		@media (max-width: 600px) {
-			flex-direction: column-reverse;
-		}
 	}
 
 	.debug-ui-state {

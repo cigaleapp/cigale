@@ -1,0 +1,18 @@
+diff --git a/android/build.gradle b/android/build.gradle
+index 21d75344471c8a74859736c76927bf90a5c5885c..0ec4e52bff10f1cd0d17391f0b5087de0bfa5746 100644
+--- a/android/build.gradle
++++ b/android/build.gradle
+@@ -36,7 +36,7 @@ android {
+     buildTypes {
+         release {
+             minifyEnabled = false
+-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
++            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+         }
+     }
+ 
+@@ -61,4 +61,3 @@ dependencies {
+     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
+     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
+ }
+-

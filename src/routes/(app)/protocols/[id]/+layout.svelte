@@ -22,7 +22,7 @@
 	import { databaseHandle, dependencyURI, tables } from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import MetadataBadges from '$lib/MetadataBadges.svelte';
-	import { resolve } from '$lib/paths';
+	import { resolve, routeIsIn } from '$lib/paths';
 	import { goto } from '$lib/paths.js';
 	import { exportProtocol } from '$lib/protocols';
 	import { namespacedMetadataId, removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';
@@ -51,7 +51,7 @@
 	/**
 	 * Available route IDs relative to here.
 	 * @import { ChildRouteId, WithoutPrefix  } from '$lib/utils';
-	 * @typedef {WithoutPrefix<"metadata/[metadata]", ChildRouteId<"/(app)/protocols/[id]">>} ProtocolRouteIds
+	 * @typedef {WithoutPrefix<"metadata/[metadata]", WithPrefix<"/(app)/protocols/[id]">>} ProtocolRouteIds
 	 */
 
 	/**
@@ -333,7 +333,7 @@
 			</ButtonIcon>
 		</div>
 	</aside>
-	<div class="main" class:padded={!page.route.id?.startsWith('/(app)/protocols/[id]/metadata/')}>
+	<div class="main" class:padded={!routeIsIn('/(app)/protocols/[id]/metadata')}>
 		{@render children()}
 	</div>
 </div>
@@ -349,7 +349,7 @@
 		this={path ? 'a' : 'span'}
 		href={path || undefined}
 		class="navlink"
-		class:active={route && page.route.id?.startsWith(`/(app)/protocols/[id]/${route}`)}
+		class:active={route && routeIsIn(`/(app)/protocols/[id]/${route}`)}
 		use:tooltip={collapsedSidebar
 			? {
 					text: name,

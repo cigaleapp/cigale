@@ -28,6 +28,7 @@ Available CSS variables:
 	 * @property {boolean} [aria-pressed]
 	 * @property {boolean |"always"} [loading] show a loading state while the onlick handler is running. set to "always" to always show the loading state.
 	 * @property {boolean} [danger=false] use a red color scheme for dangerous actions
+	 * @property {boolean} [subtle=false] disable the border except on hover/focus
 	 * @property {boolean} [submits=false] if true, the button acts as a submit button in a form context
 	 * @property {string} [aria-label] accessible label for the button
 	 */
@@ -44,6 +45,7 @@ Available CSS variables:
 		onclick,
 		disabled = false,
 		danger = false,
+		subtle = false,
 		help,
 		keyboard,
 		submits,
@@ -76,6 +78,7 @@ Available CSS variables:
 		disabled={disabled || isLoading}
 		class:tight
 		class:danger
+		class:subtle
 		{...aria}
 		onclick={async (e) => {
 			if (!onclick) return;
@@ -171,6 +174,10 @@ Available CSS variables:
 		background-color: var(--bg-hover, var(--bg-primary-translucent));
 		color: var(--fg-hover, var(--fg-primary));
 		border-color: var(--fg-hover, var(--bg-primary));
+	}
+
+	button.subtle:not(:hover, :focus-visible) {
+		border-color: transparent;
 	}
 
 	.loading-spinner {

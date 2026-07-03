@@ -13,6 +13,11 @@
 		// TODO: support on desktop too
 		/** Show the item with warning styling. **Note:** Only supported on mobile for now. */
 		warning?: boolean;
+		// TODO: support on desktop too
+		/** Show the item with danger styling. **Note:** Only supported on mobile for now. */
+		danger?: boolean;
+		/** Show left of the label */
+		icon?: import('svelte').Component;
 	};
 
 	export type SelectableItem<SD> = Omit<Item<SD>, 'type' | 'key'> & {
@@ -46,6 +51,7 @@
 </script>
 
 <script lang="ts" generics="D = never, SD = never">
+	import type { Props as BottomDrawerProps } from './BottomDrawer.svelte';
 	import type { Snippet } from 'svelte';
 
 	import { DropdownMenu } from 'bits-ui';
@@ -59,6 +65,9 @@
 	interface Props {
 		/** Shown on mobile (when it's a drawer) and in place of the first item group's label if not set */
 		title?: string;
+
+		/** Only useful on mobile. Tells where the bottom sheet should come from. Defaults to bottom */
+		position?: BottomDrawerProps['position'];
 
 		items: ItemsGroup<D, SD>[];
 		item?: Snippet<[AnyItem<D, SD>['data'], AnyItem<D, SD> & { selected: boolean }]>;
@@ -75,6 +84,7 @@
 		testid,
 		scrollable = false,
 		title,
+		position = 'bottom',
 		...rest
 	}: Props = $props();
 
@@ -144,6 +154,7 @@
 	<BottomDrawer
 		--drawer-outer-padding="0"
 		bind:open
+		{position}
 		{title}
 		maxHeight={Math.min(
 			estimatedHeight,
@@ -179,6 +190,7 @@
 					style:height="{heights.item.height}px"
 					class="bottom-drawer-item"
 					class:warning={i.warning}
+					class:danger={i.danger}
 					onclick={async () => {
 						i.onclick();
 
@@ -187,16 +199,23 @@
 						}
 					}}
 				>
-					{#if i.type === 'clickable'}
-						{#if item}
-							{@render item(i.data, { selected: false, ...i })}
-						{:else}
-							{i.label}
-						{/if}
-					{:else if item}
-						{@render item(i.data, i)}
+					{#if item}
+						{@render item(
+							i.data,
+							i.type === 'clickable' ? { selected: false, ...i } : i
+						)}
 					{:else}
-						{i.label}
+						<div class="label-and-icon">
+							<!-- To align items when some have icons and some don't -->
+							{#if groups.some((group) => group.items.some((i) => i.icon))}
+								<div class="icon">
+									{#if i.icon}
+										<i.icon />
+									{/if}
+								</div>
+							{/if}
+							{i.label}
+						</div>
 					{/if}
 				</button>
 			{/snippet}
@@ -378,7 +397,8 @@
 	}
 
 	.bottom-drawer-item {
-		padding: 0.75em;
+		/** No vertical padding cuz height is locked, we center it vertically instead */
+		padding: 0 0.75em;
 		width: 100%;
 		text-align: left;
 		background: none;
@@ -396,6 +416,10 @@
 			color: var(--fg-warning);
 			background: var(--bg-warning);
 		}
+
+		&.danger {
+			color: var(--fg-error);
+		}
 	}
 
 	.bottom-drawer-heading {
@@ -404,5 +428,21 @@
 		font-size: 0.9rem;
 		font-style: italic;
 		color: var(--gay);
+	}
+
+	.label-and-icon {
+		display: flex;
+		gap: 0.5em;
+		align-items: center;
+		padding: 0.25em;
+
+		.icon {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			/* Makes space even if icon is empty */
+			width: 1.25em;
+			height: 1.25em;
+		}
 	}
 </style>

@@ -85,6 +85,7 @@
 	}
 
 	:global(body) {
+		color: var(--fg-neutral);
 		display: flex;
 		flex-direction: column;
 		height: 100vh;
@@ -95,9 +96,13 @@
 		}
 	}
 
-	:global(body, input, textarea, button, dialog) {
-		background-color: var(--bg-neutral);
+	:global(input, textarea, button, dialog) {
 		color: var(--fg-neutral);
+		background-color: var(--bg-neutral);
+	}
+
+	:global(body:not([data-transparent='true'])) {
+		background-color: var(--bg-neutral);
 	}
 
 	:global(::placeholder) {

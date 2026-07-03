@@ -1,6 +1,7 @@
 // @wc-ignore-file
 
 import { Capacitor } from '@capacitor/core';
+import { ms } from 'convert';
 import fetchProgress from 'fetch-progress';
 import JSONC from 'tiny-jsonc';
 import YAML from 'yaml';
@@ -1459,4 +1460,24 @@ export function byteString(bytes: Uint8Array): string {
 
 export function byteStringToArray(bytestring: string): Uint8Array<ArrayBuffer> {
 	return new Uint8Array(Array.from(bytestring).map((c) => c.charCodeAt(0)));
+}
+
+export function cycleValues<T extends string>(
+	values: readonly T[] | T[],
+	current: NoInfer<T>
+): NoInfer<T> {
+	return values[(values.indexOf(current) + 1) % values.length];
+}
+
+/**
+ * Identical to setTimeout(), but without the annoying NodeJS.Timeout | number return type,
+ * a more comfortable parameters order and optional units for specifying delay
+ * @param delay
+ * @param callback
+ */
+// TODO: use everywhere
+export function afterDelay(delay: number | `${number}${'ms' | 's'}`, callback: () => void): number {
+	const milliseconds = typeof delay === 'number' ? delay : ms(delay);
+	const ref = setTimeout(callback, milliseconds);
+	return ref as unknown as number;
 }

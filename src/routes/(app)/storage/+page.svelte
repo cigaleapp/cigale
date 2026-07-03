@@ -2,10 +2,12 @@
 	let estimating = $state(false);
 	let estimate = $state<StorageEstimate>();
 
-	export async function reestimateStorage() {
+	export async function estimateStorageQuotaUsage() {
 		estimating = true;
 		try {
-			estimate = await navigator.storage.estimate();
+			// storage can be undefined if we're running on a non-secure origin
+			// which can happen when accessing a network-local dev server for example
+			estimate = await navigator.storage?.estimate();
 		} finally {
 			estimating = false;
 		}
@@ -15,19 +17,21 @@
 <script lang="ts">
 	import IconInfo from '~icons/ri/information-line';
 	import { formatBytesSize } from '$lib/i18n.js';
-	import { list, listByIndex } from '$lib/idb.svelte.js';
+	import { list, listByIndex, tables } from '$lib/idb.svelte.js';
 	import LoadingText, { Loading } from '$lib/LoadingText.svelte';
 	import { IsMobile } from '$lib/mobile.svelte.js';
+	import { goto } from '$lib/paths.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
-	import { deleteSession } from '$lib/sessions.js';
+	import { deleteSession, switchSession } from '$lib/sessions.js';
 	import { tooltip } from '$lib/tooltips.js';
 	import { sum } from '$lib/utils.js';
+	import { PendingStorage } from '$routes/(app)/capture/pendingstorage.svelte.js';
 
 	import TopbarBackToHome from '../TopbarBackToHome.svelte';
 	import Table from './Table.svelte';
 
 	$effect(() => {
-		void reestimateStorage();
+		void estimateStorageQuotaUsage();
 	});
 
 	async function cacheEntrySize(key: Request) {
@@ -90,14 +94,71 @@
 				return sessions.map((session) => ({
 					name: session.name,
 					key: session.id,
-					origin: '',
-					originTooltip: '',
+					origin: session.id,
+					originTooltip: 'ID de la session',
+					async open() {
+						await switchSession(session.id);
+						await goto('/(app)/sessions/[id]', session);
+					},
 				}));
 			}}
 			deleteEntry={async (entry) => {
 				await deleteSession(entry.key);
 			}}
 			entrySize={async (entry) => sizeOfSession(entry.key)}
+		/>
+	</section>
+
+	<section class="pending-photos">
+		<h2>Photos en attente</h2>
+
+		<!-- TODO: make Table take async iterators for listEntries instead of async functions -->
+		<Table
+			listEntries={async () => {
+				const entries = [];
+				for await (const sessionId of PendingStorage.sessions()) {
+					const storage = await PendingStorage.open(sessionId);
+					if (storage.count === 0) continue;
+
+					const session = await tables.Session.get(sessionId);
+
+					if (session) {
+						entries.push({
+							name: session.name,
+							key: sessionId,
+							origin: sessionId,
+							originTooltip: 'ID de la session',
+							async open() {
+								await switchSession(session.id);
+								await goto('/(app)/capture/gallery');
+							},
+						});
+					} else {
+						entries.push({
+							name: '???',
+							key: sessionId,
+							origin: `${sessionId} · Session supprimée`,
+							originTooltip: '',
+						});
+					}
+				}
+
+				return entries;
+			}}
+			deleteEntry={async (entry) => {
+				const storage = await PendingStorage.open(entry.key);
+				await storage.clear();
+			}}
+			entrySize={async (entry) => {
+				let total = 0;
+				const storage = await PendingStorage.open(entry.key);
+
+				for await (const file of storage.files()) {
+					total += file.size;
+				}
+
+				return total;
+			}}
 		/>
 	</section>
 
@@ -131,6 +192,7 @@
 
 		<Table
 			listEntries={async () => {
+				if (!caches) return [];
 				const names = await caches.keys();
 				return names
 					.filter((cache) => !['cache-dev', 'cache-models'].includes(cache))
@@ -159,6 +221,7 @@
 	{#snippet cacheTable(cacheName: string)}
 		<Table
 			listEntries={async () => {
+				if (!caches) return [];
 				const cache = await caches.open(cacheName);
 				const keys = await cache.keys();
 
@@ -174,7 +237,7 @@
 				const cache = await caches.open(cacheName);
 				await cache.delete(entry.request);
 			}}
-			entrySize={async (entry) => cacheEntrySize(entry.key)}
+			entrySize={async (entry) => cacheEntrySize(entry.request)}
 		/>
 	{/snippet}
 </main>

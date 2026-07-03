@@ -5,34 +5,49 @@
 
 - `--drawer-outer-padding`: Outer padding for the drawer content
 
-  -->
+-->
 
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import type { BottomSheetSettings } from 'svelte-bottom-sheet';
 
 	import { BottomSheet } from 'svelte-bottom-sheet';
+
+	interface Props {
+		open: boolean;
+		children: Snippet;
+		maxHeight?: number;
+		title?: string;
+		position: BottomSheetSettings['position'];
+	}
 
 	let {
 		open = $bindable(false),
 		title = '',
 		children,
 		maxHeight = 0.7,
-	}: { open: boolean; children: Snippet; maxHeight?: number; title?: string } = $props();
+		position = 'bottom',
+	}: Props = $props();
 </script>
 
 <div data-bottomsheet-wrapper>
-	<BottomSheet settings={{ maxHeight }} bind:isSheetOpen={open}>
+	<BottomSheet settings={{ maxHeight, position }} bind:isSheetOpen={open}>
 		<BottomSheet.Overlay>
 			<BottomSheet.Sheet>
 				<BottomSheet.Handle>
 					<div class="handle"></div>
-					{#if title}
-						<p class="title">
+					{#if title && position === 'bottom'}
+						<p class="title bottom">
 							{title}
 						</p>
 					{/if}
 				</BottomSheet.Handle>
 				<BottomSheet.Content>
+					{#if title && position === 'top'}
+						<p class="title top">
+							{title}
+						</p>
+					{/if}
 					{@render children()}
 				</BottomSheet.Content>
 			</BottomSheet.Sheet>
@@ -74,6 +89,10 @@
 		font-size: 0.95rem;
 		text-align: center;
 		color: var(--gay);
+
+		&.top {
+			margin: 1rem 0;
+		}
 	}
 
 	.handle {

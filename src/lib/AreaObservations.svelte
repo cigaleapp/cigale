@@ -43,7 +43,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	/**
 	 * @import { Session } from '$lib/schemas/sessions';
 	 * @import { GalleryItem } from '$lib/gallery';
-	 * @typedef {Exclude<keyof typeof Session.infer['sort'], 'global'>} Zone
+	 * @typedef {Exclude<keyof typeof Session.infer['sort'], 'global'> | 'pending'} Zone
 	 * @typedef {GalleryItem<ItemData>} Item
 	 */
 
@@ -184,6 +184,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	let grouper = $state();
 
 	const groupingSettings = $derived(
+		// @ts-expect-error zone=pending will make this undefined so itll fallback, this is the expected behavior
 		uiState.currentSession?.group[zone] ??
 			uiState.currentSession?.group.global ??
 			/** @type {const} */ ({ field: 'none', tolerances: { dates: 'day', decimal: 'unit' } })

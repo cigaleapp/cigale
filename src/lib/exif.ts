@@ -8,6 +8,7 @@ import piexif from 'piexifjs';
 
 import { Schemas } from './database.js';
 import { EXIF_FIELDS } from './exiffields.js';
+import { errorMessage } from './i18n.js';
 import * as db from './idb.svelte.js';
 import { resolveMetadataImport, storeMetadataValue } from './metadata/index.js';
 import { toasts } from './toasts.svelte.js';
@@ -236,30 +237,37 @@ export function addExifMetadata(
 export function setExifFields(bytes: ArrayBuffer, changes: Partial<Record<ExifFieldKey, unknown>>) {
 	const bytestring = byteString(new Uint8Array(bytes));
 
-	const exifDict = piexif.load(bytestring);
+	try {
+		const exifDict = piexif.load(bytestring);
 
-	// Prevent any write if no exif data changed
-	let dirty = false;
+		// Prevent any write if no exif data changed
+		let dirty = false;
 
-	for (const [key, value] of Object.entries(changes)) {
-		const field = EXIF_FIELDS[key];
+		for (const [key, value] of Object.entries(changes)) {
+			const field = EXIF_FIELDS[key];
 
-		const [category] =
-			Object.entries(exifDict).find(([, tags]) => tags && field in tags) ??
-			Object.entries(piexif.TAGS).find(([cat, tags]) => cat !== 'Image' && field in tags) ??
-			[];
+			const [category] =
+				Object.entries(exifDict).find(([, tags]) => tags && field in tags) ??
+				Object.entries(piexif.TAGS).find(
+					([cat, tags]) => cat !== 'Image' && field in tags
+				) ??
+				[];
 
-		if (!category) continue;
+			if (!category) continue;
 
-		const serialized = serializeExifValue(value);
-		if (serialized === undefined) continue;
-		if (serialized === exifDict[category][field]) continue;
-		exifDict[category][field] = serialized;
-		dirty = true;
+			const serialized = serializeExifValue(value);
+			if (serialized === undefined) continue;
+			if (serialized === exifDict[category][field]) continue;
+			exifDict[category][field] = serialized;
+			dirty = true;
+		}
+
+		if (!dirty) return new Uint8Array(bytes);
+
+		const outputstr = piexif.insert(piexif.dump(exifDict), bytestring);
+		return byteStringToArray(outputstr);
+	} catch (error) {
+		toasts.warn(errorMessage(error, 'Impossible de modifier les données EXIF'));
+		return bytes;
 	}
-
-	if (!dirty) return new Uint8Array(bytes);
-
-	const outputstr = piexif.insert(piexif.dump(exifDict), bytestring);
-	return byteStringToArray(outputstr);
 }

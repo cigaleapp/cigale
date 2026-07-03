@@ -15,7 +15,7 @@
 	 * @property {string} title
 	 * @property {number} [stacksize=1] - number of images in this observation
 	 * @property {string | undefined} image - image url
-	 * @property {Status} [status="ok"] - status of the image processing
+	 * @property {Status} [status] - status of the image processing
 	 * @property {string} [statusText] - text to show when status is not `"ok"`
 	 * @property {string} [loadingStatusText] statusText override when status == "loading"
 	 * @property {boolean} [selectable=true] - whether this image can be selected
