@@ -23,13 +23,13 @@
 	import { switchSession } from '$lib/sessions';
 	import { getColorScheme, isDebugMode, setSetting } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
-	import Toast from '$lib/Toast.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import { undo } from '$lib/undo.svelte';
 	import { nonnull, pick } from '$lib/utils';
 
 	import Navigation from './Navigation.svelte';
 	import PrepareForOffline from './PrepareForOffline.svelte';
+	import ToastsArea from './ToastsArea.svelte';
 
 	const { children, data } = $props();
 	const { swarpc, parallelism } = $derived(data);
@@ -39,6 +39,7 @@
 	const navbarAppearance = $derived.by<NavbarAppearance>(() => {
 		if (page.route.id?.startsWith('/(app)/(sidepanel)/o/[observation]')) return 'hidden';
 		if (page.route.id?.startsWith('/(app)/protocols/[id]')) return 'hidden';
+		if (page.route.id === '/(app)/capture') return 'hidden';
 
 		return 'full';
 	});
@@ -192,27 +193,13 @@
 
 	<div id="portal-target-mobile-bottombar"></div>
 
-	<section class="toasts" data-testid="toasts-area">
-		{#each toasts.items('default') as toast (toast.id)}
-			<Toast
-				{...toast}
-				action={toast.labels.action}
-				dismiss={toast.labels.close}
-				onaction={toast.callbacks.action instanceof URL
-					? toast.callbacks.action
-					: async () => toast.callbacks.action?.(toast)}
-				ondismiss={async () => {
-					await toast.callbacks.closed?.(toast);
-					toasts.remove(toast.id);
-				}}
-			/>
-		{/each}
-	</section>
+	<ToastsArea />
 
 	<div
 		class="contents"
 		class:padded={!page.route.id?.includes('/(sidepanel)') &&
-			!page.route.id?.includes('protocols/[id]/')}
+			!page.route.id?.includes('protocols/[id]/') &&
+			page.route.id !== '/(app)/capture'}
 	>
 		{@render children?.()}
 	</div>
@@ -221,22 +208,9 @@
 </div>
 
 <style>
-	.toasts {
-		position: fixed;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 1em;
-		bottom: 1em;
-		left: 0;
-		right: 0;
-		z-index: 1000;
-	}
-
 	.contents {
 		display: flex;
 		flex-direction: column;
-		gap: 1em;
 		height: 100%;
 		width: 100%;
 		flex-grow: 1;
@@ -248,6 +222,7 @@
 
 	.contents.padded {
 		padding: 1.2em;
+		gap: 1em;
 	}
 
 	.layout {
