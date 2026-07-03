@@ -147,6 +147,7 @@
 	},
 	"dependencies": {
 		"@andy0130tw/es-arraybuffer-base64": "^1.1.2-browser.0",
+		"@capacitor-community/camera-preview": "^8.0.1",
 		"@capacitor/android": "^8.4.0",
 		"@capacitor/app": "^8.1.0",
 		"@capacitor/core": "^8.4.0",
@@ -162,6 +163,7 @@
 		"@capgo/inappbrowser": "^8.6.14",
 		"@formatjs/intl-durationformat": "^0.10.14",
 		"@iconify/svelte": "^5.2.2",
+		"@layflags/rolling-number": "^1.0.0",
 		"@sveltejs/svelte-virtual-list": "^3.0.1",
 		"@ungap/set-methods": "^0.1.1",
 		"@viselect/vanilla": "^3.9.0",
