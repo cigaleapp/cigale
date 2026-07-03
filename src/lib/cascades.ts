@@ -1,3 +1,8 @@
+import type * as DB from './database.js';
+import type { DatabaseHandle } from './idb.svelte.js';
+import type { NamespacedMetadataID } from './schemas/common.js';
+import type { RuntimeValue } from './schemas/metadata.js';
+
 import { Tables } from './database.js';
 import { resolveMetadataImport } from './metadata/imports.js';
 import { metadataOption } from './metadata/storage.js';
@@ -9,14 +14,6 @@ import {
 	parseMetadataOptionId,
 } from './schemas/metadata.js';
 import { ensureArray, entries, groupBy, nonnull, sum } from './utils.js';
-
-/**
- * @import * as DB from './database.js'
- * @import { RuntimeValue } from './metadata/index.js'
- * @import { DatabaseHandle } from './idb.svelte.js'
- * @import { MetadataEnumVariant } from './database.js'
- * @import { NamespacedMetadataID } from './schemas/common.js';
- */
 
 /**
  * Get all metadata the given MetadataValue cascades into
@@ -58,12 +55,6 @@ import { ensureArray, entries, groupBy, nonnull, sum } from './utils.js';
  * ]
  * ```
  *
- * @param {object} param0
- * @param {import('./idb.svelte.js').DatabaseHandle} param0.db
- * @param {string} param0.metadataId
- * @param {number} param0.confidence
- * @param {RuntimeValue} param0.value
- * @param { DB.MetadataValue["confidences"] | Array<{ value: RuntimeValue, confidence: number }> } param0.confidences
  */
 export async function computeCascades({
 	db,
@@ -71,6 +62,14 @@ export async function computeCascades({
 	confidence,
 	value,
 	confidences: _confidences,
+}: {
+	db: DatabaseHandle;
+	metadataId: string;
+	confidence: number;
+	value: RuntimeValue;
+	confidences:
+		| DB.MetadataValue['confidences']
+		| Array<{ value: RuntimeValue; confidence: number }>;
 }) {
 	const protocolId = namespaceOfMetadataId(metadataId);
 	if (!protocolId) {
@@ -84,7 +83,7 @@ export async function computeCascades({
 
 	const confidences = !Array.isArray(_confidences)
 		? Object.entries(_confidences).map(([value, confidence]) => ({
-				value: /** @type {RuntimeValue} */ (JSON.parse(value)),
+				value: /** @type {RuntimeValue} */ JSON.parse(value),
 				confidence,
 			}))
 		: _confidences;
@@ -128,11 +127,10 @@ export async function computeCascades({
 						protocolId
 					)
 				),
-			([optionId, confidences]) =>
-				/** @type {const} */ ({
-					value: parseMetadataOptionId(optionId).key,
-					confidence: sum(confidences),
-				})
+			([optionId, confidences]) => /** @type {const} */ ({
+				value: parseMetadataOptionId(optionId).key,
+				confidence: sum(confidences),
+			})
 		);
 
 		// Return a list of data ready for storeMetadataValue() for every cascaded metadata
@@ -151,24 +149,32 @@ export async function computeCascades({
 	});
 }
 
-/**
- * @typedef {Record<string, Record<string, { value: string; metadata: string; depth: number, color?: string, icon?: string }>>} CascadeLabelsCache
- */
+export type CascadeLabelsCache = Record<
+	string,
+	Record<
+		string,
+		{ value: string; metadata: string; depth: number; color?: string; icon?: string }
+	>
+>;
 
 /**
  * Resolve (NOT recursively anymore, see #1571) cascades for the given metadata value, return labels to display
- *
- * @param {object} param0
- * @param {DB.MetadataEnumVariant | typeof DB.Schemas.MetadataEnumVariant['inferIn'] | undefined} param0.option the currently selected option
- * @param {DatabaseHandle} param0.db
- * @param {string | undefined} param0.protocolId
  */
-export async function cascadeLabels({ protocolId, option, db }) {
+export async function cascadeLabels({
+	protocolId,
+	/** The currently selected option */
+	option,
+	db,
+}: {
+	option: DB.MetadataEnumVariant | (typeof DB.Schemas.MetadataEnumVariant)['inferIn'] | undefined;
+	db: DatabaseHandle;
+	protocolId: string | undefined;
+}) {
 	if (!protocolId) return {};
 	if (!option) return {};
 
 	/** @type {Record<NamespacedMetadataID, DB.MetadataEnumVariant[]>} */
-	const labels = {};
+	const labels: Record<NamespacedMetadataID, DB.MetadataEnumVariant[]> = {};
 
 	for (const [metadataId, values] of Object.entries(option.cascade ?? {})) {
 		const id = namespacedMetadataId(protocolId, metadataId);

@@ -1,3 +1,6 @@
+import type { PROCEDURES } from '$worker/procedures.js';
+import type { CancelablePromise, SwarpcClient } from 'swarpc';
+
 import { RequestCancelledError } from 'swarpc';
 
 import { databaseHandle, tables } from './idb.svelte.js';
@@ -9,11 +12,12 @@ import { safeJSONStringify } from './utils.js';
 
 /**
  * Classifies an image using the current protocol with all configured classification models.
- * @param {import('swarpc').SwarpcClient<typeof import('$worker/procedures.js').PROCEDURES>} swarpc
- * @param {string} id
- * @param {Map<string, import("swarpc").CancelablePromise["cancel"]>} [cancellers]
  */
-export async function classifyImage(swarpc, id, cancellers) {
+export async function classifyImage(
+	swarpc: SwarpcClient<typeof PROCEDURES>,
+	id: string,
+	cancellers: Map<string, CancelablePromise['cancel']>
+) {
 	if (!uiState.currentProtocol) {
 		throw new Error('Aucun protocole sélectionné');
 	}

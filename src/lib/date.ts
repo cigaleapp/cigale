@@ -4,7 +4,7 @@ import { intervalToDuration, isValid, parse } from 'date-fns';
 
 /**
  * Returns a parsed date or undefined if a parse error occurs or the date is invalid
- * @param {string} maybeDatestring a date string in the following formats:
+ * @param maybeDatestring a date string in the following formats:
  * - YYYY-MM-DD
  * - YYYY-MM-DDTHH:mm:ss
  * - YYYY-MM-DDTHH:mm:ssZ
@@ -12,7 +12,7 @@ import { intervalToDuration, isValid, parse } from 'date-fns';
  *
  * We don't accept any other [valid, but insane ISO datestring](https://bsky.app/profile/gwen.works/post/3ljvdiur2lc2s)
  */
-export function parseISOSafe(maybeDatestring) {
+export function parseISOSafe(maybeDatestring: string) {
 	return tryParse(
 		maybeDatestring,
 		'yyyy-MM-dd',
@@ -44,11 +44,8 @@ if (import.meta.vitest) {
 /**
  * Returns a parsed date or undefined if a parse error occurs or the date is invalid,
  * trying the given formats in order
- * @param {string} maybeDatestring
- * @param  {...string} formats
- * @returns {Date|undefined}
  */
-function tryParse(maybeDatestring, ...formats) {
+function tryParse(maybeDatestring: string, ...formats: string[]): Date | undefined {
 	for (const format of formats) {
 		try {
 			const date = parse(maybeDatestring, format, new Date());
@@ -84,11 +81,9 @@ if (import.meta.vitest) {
 /**
  * Formats a date as a distance to now, but in a short format (e.g. "5m" instead of "5 minutes ago")
  * Uses Intl.DurationFormat#formatToParts under the hood
- * @param {string} locale
- * @param {Date|number} date
- * @returns {string[]} array of non-whitespace-only parts. In practice, this is a alternating array of numbers and unit strings, in descending order of magnitude (e.g. ["1", "d", "5", "hr"] for "1 day and 5 hours ago"). Useful if you have not much space and wanna cut it to e.g. only "1d" instead of "1d 5hr".
+ * @returns array of non-whitespace-only parts. In practice, this is a alternating array of numbers and unit strings, in descending order of magnitude (e.g. ["1", "d", "5", "hr"] for "1 day and 5 hours ago"). Useful if you have not much space and wanna cut it to e.g. only "1d" instead of "1d 5hr".
  */
-export function formatDistanceToNowShortParts(locale, date) {
+export function formatDistanceToNowShortParts(locale: string, date: Date | number): string[] {
 	return new DurationFormat(locale, { style: 'narrow' })
 		.formatToParts(
 			intervalToDuration({

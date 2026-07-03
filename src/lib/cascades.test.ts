@@ -1,36 +1,37 @@
 import 'fake-indexeddb/auto';
 
+import type * as DB from './database.js';
+import type { NamespacedMetadataID } from './schemas/common.js';
+
 import { beforeEach, describe, expect, test } from 'vitest';
 
 import { cascadeLabels, computeCascades } from './cascades.js';
+import { Schemas } from './database.js';
 import { openDatabase } from './idb.svelte.js';
 import { metadataOptionId, namespacedMetadataId } from './schemas/metadata.js';
 
-/**
- * @param {string} id
- * @param {import('$lib/database').MetadataType} [type="enum"]
- * @returns {typeof import('$lib/database').Tables.Metadata.infer}
- */
-const mockMetadata = (id, type = 'enum') => ({
-	description: '',
-	id: namespacedMetadataId('mockproto', id),
-	label: '',
-	mergeMethod: 'none',
-	required: false,
-	type,
-});
+const mockMetadata = (id: string, type: DB.MetadataType = 'enum') =>
+	Schemas.Metadata.in.assert({
+		description: '',
+		id: namespacedMetadataId('mockproto', id),
+		label: '',
+		mergeMethod: 'none',
+		required: false,
+		type,
+		images: [],
+		sortable: false,
+		groupable: false,
+	});
 
-/**
- * @param {string} metadataId
- * @param {number} i
- * @returns {  typeof import('$lib/database').Tables.MetadataOption.infer } */
-const mockOption = (metadataId, i) => ({
-	metadataId,
-	id: metadataOptionId(metadataId, i.toString()),
-	description: '',
-	key: i.toString(),
-	label: `Option ${i}`,
-	synonyms: [],
+const mockOption = (metadataId: string, i: number) => ({
+	metadataId: namespacedMetadataId('mockproto', metadataId),
+	id: metadataOptionId(namespacedMetadataId('mockproto', metadataId), i.toString()),
+	...Schemas.MetadataEnumVariant.in.assert({
+		description: '',
+		key: i.toString(),
+		label: `Option ${i}`,
+		synonyms: [],
+	}),
 });
 
 beforeEach(async () => {
@@ -42,6 +43,9 @@ beforeEach(async () => {
 		metadata: ['mockproto__genus', 'mockproto__difficulty'],
 		// TODO: test with imported metadata too
 		importedMetadata: [],
+		name: '',
+		description: '',
+		authors: [],
 	});
 });
 
@@ -236,7 +240,6 @@ describe('without any cascades', () => {
 		const result = await cascadeLabels({
 			db,
 			protocolId: 'mockproto',
-			cache: {},
 			option: species41,
 		});
 
