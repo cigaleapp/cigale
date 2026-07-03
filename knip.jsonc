@@ -3,7 +3,6 @@
 	"ignore": [
 		"src/lib/schemas/*",
 		"src/lib/utils.ts",
-		"src/lib/exiffields.js",
 		"src/lib/Checkbox.svelte",
 		"src/lib/FloatingButton.svelte",
 		"src/lib/UnsavedChangesIndicator.svelte",
@@ -24,7 +23,6 @@
 	"entry": [
 		"scripts/issue-creator-server.ts",
 		"scripts/issue-creator-discord-bot.ts",
-		"scripts/generate-logo-assets.ts",
 		// TODO add to a CI workflow
 		"scripts/generate-contributing-tables.js",
 		"src/electron/main.{d.ts,js}",

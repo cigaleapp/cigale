@@ -25,7 +25,7 @@ const _rect = type({
 
 const _anyBoundingBox = type.or(centeredBoundingBox, topLeftBoundingBox);
 
-export type AnyBoundingBox = typeof _anyBoundingBox.infer;
+type AnyBoundingBox = typeof _anyBoundingBox.infer;
 export type TopLeftBoundingBox = typeof topLeftBoundingBox.infer;
 export type CenteredBoundingBox = typeof centeredBoundingBox.infer;
 export type Rect = typeof _rect.infer;

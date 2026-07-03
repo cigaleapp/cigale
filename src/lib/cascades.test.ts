@@ -1,7 +1,6 @@
 import 'fake-indexeddb/auto';
 
 import type * as DB from './database.js';
-import type { NamespacedMetadataID } from './schemas/common.js';
 
 import { beforeEach, describe, expect, test } from 'vitest';
 

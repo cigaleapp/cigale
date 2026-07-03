@@ -149,14 +149,6 @@ export async function computeCascades({
 	});
 }
 
-export type CascadeLabelsCache = Record<
-	string,
-	Record<
-		string,
-		{ value: string; metadata: string; depth: number; color?: string; icon?: string }
-	>
->;
-
 /**
  * Resolve (NOT recursively anymore, see #1571) cascades for the given metadata value, return labels to display
  */
