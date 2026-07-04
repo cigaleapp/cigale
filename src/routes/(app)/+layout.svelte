@@ -133,7 +133,7 @@
 	});
 
 	onMount(() => {
-		navigator.serviceWorker.ready.then((registration) => {
+		navigator.serviceWorker?.ready.then((registration) => {
 			const installedVersion = localStorage.getItem('sw-version');
 
 			if (installedVersion !== version) {
