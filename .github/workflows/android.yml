@@ -32,6 +32,9 @@ on:
         type: boolean
         default: false
         description: Publish built app as the mobile app's update bundle
+      live-reload:
+        type: boolean
+        description: Enable Live Reload. See https://capacitorjs.com/docs/guides/live-reload
 
     outputs:
       artifact:
@@ -66,6 +69,7 @@ env:
   BUILD_COMMIT: ${{ github.sha }}
   FLAVOR: ${{ inputs.flavor }}
   VERSION_NAME: 0.0.${{ github.run_number }}
+  CAPACITOR_LIVE_RELOAD: ${{ inputs.live-reload }}
 
 jobs:
   apk:

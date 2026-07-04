@@ -53,6 +53,11 @@ jobs:
       artifact: ${{ inputs.artifact}}
       app-name: Cigale (PR ${{ github.event.number }})
       push-update: false
+      # APK with Live Reload that requests on the local network (needs a dev server up)
+      # Always disabled: ~capacitor-no-live-reload
+      # Always enabled: ~capacitor-live-reload
+      # Otherwise: if PR is a draft
+      live-reload: ${{ !contains(github.event.pull_request.labels.*.name, 'capacitor-no-live-reload') && (contains(github.event.pull_request.labels.*.name, 'capacitor-live-reload') || github.event.pull_request.draft) }}
       diawi-comment: |
         This is a PR preview build.
 
