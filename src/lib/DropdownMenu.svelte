@@ -399,7 +399,8 @@
 	}
 
 	.bottom-drawer-heading {
-		margin: 1em 0 0.5em;
+		padding-top: 0.5em;
+		margin-left: 0.75em;
 		font-size: 0.9rem;
 		font-style: italic;
 		color: var(--gay);
