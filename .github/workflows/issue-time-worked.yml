@@ -1,0 +1,27 @@
+name: Issue Time Worked
+
+on:
+  workflow_dispatch:
+  push:
+    paths: [.github/workflows/issue-time-worked.yml]
+  schedule:
+    - cron: '2 0 * * *'
+
+jobs:
+  compute:
+    name: Compute
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: .bun-version
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Run script
+        run: bun scripts/github-issue-set-time-worked.ts
+        env:
+          WAKATIME_API_KEY: ${{ secrets.GWENNLBH_WAKATIME_API_KEY }}
+          WAKATIME_PROJECT: cigale
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_REPO: ${{ github.repository }}
