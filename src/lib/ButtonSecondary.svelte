@@ -24,7 +24,7 @@ Available CSS variables:
 	 * @property {boolean} [tight=false] limit the height of the button
 	 * @property {Parameters<typeof tooltip>[1]} [help]
 	 * @property {string} [keyboard] keyboard shortcut hint to display
-	 * @property {import('$e2e/testids.js').PlaywrightTestId|undefined} [testid] add a data-testid attribute to the button
+	 * @property {import('$e2e/testids.js').PlaywrightTestId|undefined} [testid] add a attribute for Playwright getByTestId to the button
 	 * @property {boolean} [aria-pressed]
 	 * @property {string} [aria-label]
 	 * @property {boolean |"always"} [loading] show a loading state while the onlick handler is running. set to "always" to always show the loading state.

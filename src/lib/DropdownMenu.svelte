@@ -45,13 +45,14 @@
 
 	export type ItemsGroup<D, SD> = {
 		label?: string;
-		testid?: string;
+		testid?: PlaywrightTestId;
 		items: AnyItem<D, SD>[];
 	};
 </script>
 
 <script lang="ts" generics="D = never, SD = never">
 	import type { Props as BottomDrawerProps } from './BottomDrawer.svelte';
+	import type { PlaywrightTestId, PlaywrightTestIdBaseForDropdownMenu } from '$e2e/testids.js';
 	import type { Snippet } from 'svelte';
 
 	import { DropdownMenu } from 'bits-ui';
@@ -73,7 +74,7 @@
 		item?: Snippet<[AnyItem<D, SD>['data'], AnyItem<D, SD> & { selected: boolean }]>;
 		/** IMPORTANT: Don't put just onclick on the button, spread the entire object */
 		trigger: Snippet<[{ open: boolean; onclick: () => void } & Record<string, unknown>]>;
-		testid?: string | undefined;
+		testid?: PlaywrightTestIdBaseForDropdownMenu | undefined;
 		scrollable?: boolean;
 	}
 
@@ -88,10 +89,10 @@
 		...rest
 	}: Props = $props();
 
-	function testids(testid: string | undefined) {
+	function testids(testid: PlaywrightTestIdBaseForDropdownMenu | undefined) {
 		return {
-			trigger: testid ? `${testid}-open` : undefined,
-			content: testid ? `${testid}-options` : undefined,
+			trigger: testid ? (`${testid}-open` as const) : undefined,
+			content: testid ? (`${testid}-options` as const) : undefined,
 		};
 	}
 
@@ -239,10 +240,10 @@
 		</DropdownMenu.Trigger>
 
 		<DropdownMenu.Portal>
-			<DropdownMenu.Content data-testid={testids(testid).content} preventScroll={!scrollable}>
+			<DropdownMenu.Content pw-testid={testids(testid).content} preventScroll={!scrollable}>
 				{#each groups as group (group.label)}
 					{#if group.items.length > 0}
-						<DropdownMenu.Group data-testid={group.testid}>
+						<DropdownMenu.Group pw-testid={group.testid}>
 							{#if group.label || (groups.length === 1 && title)}
 								<DropdownMenu.GroupHeading
 									>{group.label || title}</DropdownMenu.GroupHeading
@@ -281,7 +282,7 @@
 								{:else if i.type === 'submenu'}
 									<DropdownMenu.Sub>
 										<DropdownMenu.SubTrigger
-											data-testid={testids(i.testid).trigger}
+											pw-testid={testids(i.testid).trigger}
 										>
 											{#if item}
 												{@render item(i.data, { selected: false, ...i })}
@@ -290,7 +291,7 @@
 											{/if}
 										</DropdownMenu.SubTrigger>
 										<DropdownMenu.SubContent
-											data-testid={testids(i.testid).content}
+											pw-testid={testids(i.testid).content}
 										>
 											<DropdownMenu.Group>
 												{#if i.submenu.label}

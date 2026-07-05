@@ -143,7 +143,7 @@ export async function deleteSession(page, name) {
 export async function chooseFirstSession(page) {
 	await goHome(page);
 	await goToTab(page, 'sessions');
-	await page.locator('main article:not([data-testid=new-session-card])').first().click();
+	await page.locator('main article:not([pw-testid=new-session-card])').first().click();
 	await waitForRoute(page, '/import');
 }
 

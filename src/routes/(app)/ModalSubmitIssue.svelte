@@ -175,7 +175,7 @@
 	<ButtonIcon
 		onclick={() => open?.()}
 		help={type === 'bug' ? 'Signaler un bug' : 'Proposer une fonctionnalité'}
-		data-testid={type === 'bug' ? 'open-bug-report' : 'open-feature-request'}
+		pw-testid={type === 'bug' ? 'open-bug-report' : 'open-feature-request'}
 	>
 		<OpenIcon />
 	</ButtonIcon>

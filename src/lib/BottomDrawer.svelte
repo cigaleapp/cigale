@@ -7,19 +7,21 @@
 
 -->
 
-<script lang="ts">
-	import type { Snippet } from 'svelte';
-	import type { BottomSheetSettings } from 'svelte-bottom-sheet';
-
-	import { BottomSheet } from 'svelte-bottom-sheet';
-
-	interface Props {
+<script lang="ts" module>
+	export interface Props {
 		open: boolean;
 		children: Snippet;
 		maxHeight?: number;
 		title?: string;
 		position: BottomSheetSettings['position'];
 	}
+</script>
+
+<script lang="ts">
+	import type { Snippet } from 'svelte';
+	import type { BottomSheetSettings } from 'svelte-bottom-sheet';
+
+	import { BottomSheet } from 'svelte-bottom-sheet';
 
 	let {
 		open = $bindable(false),

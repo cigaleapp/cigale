@@ -233,7 +233,7 @@
 							selected,
 							submenu: {
 								label: 'Métadonnée',
-								testid: `${tab}-settings-group-by-${key}-metadata`,
+								testid: `${tab}-settings-group-by-${key}-metadata` as const,
 								empty: 'Le protocole ne définit aucune métadonnée groupable.',
 								items: groupableMetadata.map((m) => ({
 									type: 'selectable',
@@ -274,7 +274,7 @@
 			},
 			...orEmpty(GROUP_FIELDS[currentSettings?.group.field ?? 'none'].needsTolerance, {
 				label: 'Précision des groupes',
-				testid: `${tab}-settings-group-tolerances`,
+				testid: `${tab}-settings-group-tolerances` as const,
 				items: entries(GROUPING_TOLERANCES)
 					.filter(([, { affectedTypes }]) => {
 						if (!currentSettings?.group.metadata) return false;
@@ -312,7 +312,7 @@
 			}),
 			...orEmpty(tab !== 'classify' && uiState.currentProtocol && models.length > 0, {
 				label: "Modèle d'inférence",
-				testid: `${tab}-settings-inference-model`,
+				testid: `${tab}-settings-inference-model` as const,
 				items: [
 					selectableModel(-1, 'Aucune inférence'),
 					...models.map((model, i) =>
@@ -326,7 +326,7 @@
 					uiState.allClassificationMetadata.length > 0,
 				{
 					label: "Modèle d'inférence",
-					testid: `${tab}-settings-inference-model`,
+					testid: `${tab}-settings-inference-model` as const,
 					items: uiState.allClassificationMetadata.map((metadata) => {
 						const metadataLabel =
 							metadata.label || removeNamespaceFromMetadataId(metadata.id);
