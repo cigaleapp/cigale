@@ -1,5 +1,4 @@
 import type { TempFilesFixture } from './fixtures/tempfiles.js';
-import type { PredownloadedModel } from './utils/index.js';
 
 import 'urlpattern-polyfill';
 
@@ -9,20 +8,12 @@ import type { ONNXModelsFixture } from './fixtures/onnxmodels.js';
 import { defineNetworkFixture } from '@msw/playwright';
 import { test as base } from '@playwright/test';
 
-import _fullProtocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
 import lightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import { FixturePaths } from './filepaths.js';
 import { app } from './fixtures/app.js';
 import { forEachTest, forEachWorker } from './fixtures/foreachtest.js';
 import { onnxmodels } from './fixtures/onnxmodels.js';
 import { tempfiles } from './fixtures/tempfiles.js';
-import { getPredownloadedModel } from './utils/index.js';
-
-const fullProtocol = _fullProtocol;
-
-let arthropodaClassifierModel: PredownloadedModel | null = null;
-let collembolaClassifierModel: PredownloadedModel | null = null;
-let arthropodaDetectionModel: PredownloadedModel | null = null;
 
 const _test = base.extend<
 	{
