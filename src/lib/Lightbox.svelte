@@ -74,6 +74,7 @@
 		z-index: 1000;
 		opacity: 0;
 		transition: opacity 0.2s;
+		overflow: hidden;
 
 		.contents {
 			transition: scale 0.2s;
@@ -112,6 +113,15 @@
 		right: 0.5em;
 		--fg: white;
 		font-size: 1.5em;
+	}
+
+	.contents {
+		position: fixed;
+		inset: 0;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
 	}
 
 	button {
