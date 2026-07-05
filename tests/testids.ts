@@ -17,6 +17,8 @@ export type PlaywrightTestId =
 	| 'mobile-goto-results'
 	| 'toasts-area'
 	| 'crop-subject-image'
+	| 'actions-top'
+	| 'floating-messages'
 	| 'current'
 	| 'descriptors'
 	| 'remaining-candidates'

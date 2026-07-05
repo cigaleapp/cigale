@@ -3066,3 +3066,9 @@ msgstr "<0/> Camera"
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 msgid "<0/> Plus d'images"
 msgstr "<0/> More images"
+
+#: src/routes/(app)/capture/+page.svelte
+msgid "Voir la photo prise"
+msgid_plural "Voir les # photos prises"
+msgstr[0] "See the photo you took"
+msgstr[1] "See the # photos you took"

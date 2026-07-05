@@ -26,7 +26,7 @@
 
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import DropdownMenu from '$lib/DropdownMenu.svelte';
-	import { percent } from '$lib/i18n.js';
+	import { percent, plural } from '$lib/i18n.js';
 	import LoadingScreen from '$lib/LoadingScreen.svelte';
 	import ModalConfirm from '$lib/ModalConfirm.svelte';
 	import { uiState } from '$lib/state.svelte.js';
@@ -144,7 +144,7 @@
 	async function finish() {
 		const allOk = await pendingStorage?.flush({
 			onProgress({ done, total }) {
-				setFloatingMessage(`Importation: ${done}/${total} (${percent(done / total)})`);
+				setFloatingMessage(`Import: ${done}/${total} (${percent(done / total)})`);
 			},
 		});
 
@@ -166,7 +166,7 @@
 </ModalConfirm>
 
 <main data-snapping={snapping} data-transparent={transparentDocument}>
-	<header class="actions">
+	<header class="actions" pw-testid="actions-top">
 		<section class="left">
 			<DropdownMenu
 				title="Options"
@@ -302,7 +302,7 @@
 		}}
 	></div>
 
-	<section class="floating-messages">
+	<section class="floating-messages" pw-testid="floating-messages">
 		{#if floatingMessage}
 			<p transition:fade={{ duration: 500 }}>
 				{floatingMessage}
@@ -313,9 +313,13 @@
 	<footer class="actions">
 		<section class="left">
 			<ButtonSecondary
-				help="Voir les photos prises"
 				subtle
 				onclick={async () => goto('/(app)/capture/gallery')}
+				aria-label={plural(pendingStorage?.count ?? 0, [
+					'Voir la photo prise',
+					'Voir les # photos prises',
+				])}
+				help="Voir les photos prises"
 			>
 				<IconGallery />
 				<span class="photo-count">

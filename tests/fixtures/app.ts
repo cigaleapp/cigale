@@ -144,8 +144,8 @@ export type AppFixture = {
 	sidepanel: Locator;
 	gallery: {
 		area: Locator;
-		/** Get a gallery card in the observations area. */
-		card: (specifier: GalleryCardSpecifier) => Locator;
+		/** Get a gallery card in the observations area. Use null to get a locator for all cards */
+		card: (specifier: GalleryCardSpecifier | null) => Locator;
 		/** Get all cards in the observations area. */
 		cards: () => AsyncIterable<Locator>;
 		/** Select cards. Clears any previous selection. Use continueSelecting to select without clearing */

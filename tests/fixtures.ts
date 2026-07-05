@@ -64,6 +64,8 @@ const _test = base.extend<
 	forEachTest: [forEachTest, { auto: true }],
 });
 
+// TODO: use worker-scoped fixtures instead of storageState ??
+
 /**
  * Default test has a "empty" storage state, that has the protocol already imported but no sessions
  */
@@ -86,3 +88,5 @@ export const testKitchensink = _test.extend({
 });
 
 export { lightProtocol as exampleProtocol };
+
+export { assert, expect } from './assertions.js';
