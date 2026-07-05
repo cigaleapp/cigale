@@ -3,7 +3,7 @@
 	import { toasts } from '$lib/toasts.svelte.js';
 </script>
 
-<section class="toasts" data-testid="toasts-area">
+<section class="toasts" pw-testid="toasts-area">
 	{#each toasts.items('default') as toast (toast.id)}
 		<Toast
 			{...toast}

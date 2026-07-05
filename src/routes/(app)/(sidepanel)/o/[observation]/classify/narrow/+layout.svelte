@@ -341,7 +341,7 @@
 				<p>Choisir un groupe de métadonnées avec lequel classifier par élimination</p>
 				<NarrowableGroupPicker />
 			{:else}
-				<div class="progress" data-testid="remaining-candidates">
+				<div class="progress" pw-testid="remaining-candidates">
 					<ProgressBar progress={narrowingState.candidatesRatio} />
 					<div class="remaining-count">
 						{plural(narrowingState.remainingCandidateIds.size, [

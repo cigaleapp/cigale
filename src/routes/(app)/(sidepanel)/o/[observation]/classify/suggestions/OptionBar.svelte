@@ -131,7 +131,7 @@
 </script>
 
 <div class="bar" data-layout={layout}>
-	<div class="current" style:grid-area="current" data-testid="current">
+	<div class="current" style:grid-area="current" pw-testid="current">
 		<ButtonSecondary
 			onclick={() => focusOptionCombobox('focus')}
 			help={{

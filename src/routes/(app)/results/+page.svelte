@@ -300,7 +300,7 @@
 		</section>
 	</section>
 
-	<section class="export" data-testid="export-results" class:collapsed={collapsedExportPanel}>
+	<section class="export" pw-testid="export-results" class:collapsed={collapsedExportPanel}>
 		<header>
 			<div class="actions">
 				<ButtonIcon
@@ -434,7 +434,7 @@
 				</div>
 			</div>
 
-			<div class="tree loading" data-testid="zip-preview">
+			<div class="tree loading" pw-testid="zip-preview">
 				<Field label="Contenu de l'export">
 					<ZipContentsTree
 						tree={preview ?? [

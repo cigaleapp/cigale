@@ -126,6 +126,11 @@ export default defineConfig({
 
 		// Ensure no TZ issues for assertions that depend on time
 		timezoneId: 'Etc/UTC',
+
+		// To enable strong typing within Svelte components, we currently can't use data-* attributes
+		// See https://github.com/sveltejs/svelte/issues/14859
+		// So we use a nonstandard attribute instead
+		testIdAttribute: 'pw-testid',
 	},
 
 	/* Configure projects for major browsers */

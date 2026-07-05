@@ -303,7 +303,7 @@
 		<div class="sidepanel mobile">{@render content()}</div>
 	</BottomDrawer>
 {:else}
-	<aside data-testid="sidepanel" class="sidepanel" class:collapsed>
+	<aside pw-testid="sidepanel" class="sidepanel" class:collapsed>
 		{@render content()}
 	</aside>
 {/if}

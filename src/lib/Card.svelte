@@ -24,6 +24,8 @@ Available CSS variables:
 </script>
 
 <script lang="ts">
+	import type { PlaywrightTestId } from '$e2e/testids.js';
+
 	import LoadingSpinner from './LoadingSpinner.svelte';
 	import { tooltip } from './tooltips.js';
 
@@ -34,7 +36,7 @@ Available CSS variables:
 		ondoubleclick?: () => void;
 		tag?: 'article' | 'li' | 'div';
 		tooltip?: string;
-		testid?: string;
+		testid?: PlaywrightTestId;
 		loading?: boolean | string;
 		alwaysLoading?: boolean;
 	}
@@ -61,7 +63,7 @@ Available CSS variables:
 <svelte:element
 	this={tag}
 	class:clickable
-	data-testid={testid}
+	pw-testid={testid}
 	use:tooltip={clickable && tooltipText ? tooltipText : undefined}
 	class="card"
 	ondblclick={ondoubleclick}

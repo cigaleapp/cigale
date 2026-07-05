@@ -278,7 +278,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 
 <section
 	class="images"
-	data-testid="observations-area"
+	pw-testid="observations-area"
 	bind:this={imagesContainer}
 	use:resizeobserver={{
 		onresize() {

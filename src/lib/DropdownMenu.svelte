@@ -204,7 +204,7 @@
 	</BottomDrawer>
 {:else}
 	<DropdownMenu.Root {open}>
-		<DropdownMenu.Trigger {...rest} data-testid={testids(testid).trigger}>
+		<DropdownMenu.Trigger {...rest} pw-testid={testids(testid).trigger}>
 			{#snippet child({ props })}
 				{@render trigger(
 					{

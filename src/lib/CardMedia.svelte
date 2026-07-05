@@ -214,7 +214,7 @@
 						{#each boundingBoxes as bounding, index (index)}
 							<!-- TODO …and use it here to compute box dimensions, taking into account image's original dimensions (% -> px) then making it relative to the actual <img> tag dims (px -> %)  (2/2) -->
 							<div
-								data-testid="card-observation-bounding-box"
+								pw-testid="card-observation-bounding-box"
 								class="bb"
 								style="left: {bounding.x * 100}%; top: {bounding.y *
 									80}%; width: {bounding.width * 100}%; height: {80 *
