@@ -53,13 +53,12 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	 * @property {Item[]} items
 	 * @property {import('svelte').Snippet<[ItemData, Item]>} item
 	 * @property {string} [highlight] id of the item to highlight (and scroll to)
-	 * @property {(e: MouseEvent|TouchEvent|null) => void} [onemptyclick] callback when the user clicks on the empty area
 	 * @property {Zone} zone the zone where the area is, used to get grouping & sorting settings
 	 * @property {[string, Item[]] | undefined} [unroll] [observation id, inner items] unroll inner cards. Only relevant for items that have multiple cards (i.e. with a stack size > 1)
 	 */
 
 	/** @type {Props } */
-	let { items, item, onemptyclick, zone, highlight, unroll = ['', []] } = $props();
+	let { items, item, zone, highlight, unroll = ['', []] } = $props();
 
 	const mobile = new IsMobile();
 
@@ -100,8 +99,6 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 						dragselect?.setSelection([]);
 						e.preventDefault();
 						e.stopPropagation();
-					} else {
-						onemptyclick?.(e);
 					}
 				};
 			}
@@ -115,9 +112,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		if (!imagesContainer) return;
 
 		dragselect?.destroy();
-		dragselect = new DragSelect(imagesContainer, uiState.selection, {
-			ondeadclick: onemptyclick,
-		});
+		dragselect = new DragSelect(imagesContainer, uiState.selection);
 		dragselect.setSelection(uiState.selection);
 		uiState.setSelection = (newSelection) => {
 			if (!dragselect) {
