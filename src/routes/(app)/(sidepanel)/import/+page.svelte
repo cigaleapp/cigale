@@ -13,13 +13,10 @@
 	import { deleteImage } from '$lib/images';
 	import { ACCEPTED_IMPORT_TYPES } from '$lib/import.svelte';
 	import Logo from '$lib/Logo.svelte';
-	import { IsMobile } from '$lib/mobile.svelte.js';
 	import { goto } from '$lib/paths.js';
 	import { cancelTask, importMore } from '$lib/queue.svelte.js';
 	import { uiState } from '$lib/state.svelte.js';
 	import { unique } from '$lib/utils';
-
-	const mobile = new IsMobile();
 
 	const allImages = $derived([
 		...unique(
@@ -56,15 +53,7 @@
 	onfiles={({ files }) => importMore(files)}
 >
 	<main class="observations" class:empty in:fade={{ duration: 100 }}>
-		<AreaObservations
-			items={allImages}
-			zone="import"
-			onemptyclick={async () => {
-				if (mobile.current) return;
-				if (uiState.selection.length > 0) return;
-				importMore(await promptForFiles({ accept: ACCEPTED_IMPORT_TYPES, multiple: true }));
-			}}
-		>
+		<AreaObservations items={allImages} zone="import">
 			{#snippet item(image, { id, name })}
 				{#if image}
 					<CardImage
