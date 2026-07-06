@@ -15,7 +15,7 @@ import {
 const env = arkenv({
 	WAKATIME_API_KEY: '/^waka_.+$/',
 	WAKATIME_PROJECT: 'string',
-	TIMESPENT_ISSUE_FIELD_ID: 'string = "IFN_kgDOApvTqg"',
+	TIMESPENT_ISSUE_FIELD_ID: 'string = "IFT_kgDOAp1Gyg"',
 	N_MOST_RECENT_PRS: 'number = 100',
 	GITHUB_REPO: [
 		'/^.+?\\/.+?$/',
@@ -27,7 +27,7 @@ const env = arkenv({
 	],
 });
 
-const { repository } = await fetch('https://api.github.com/graphql', {
+const result: GithubResponse = await fetch('https://api.github.com/graphql', {
 	method: 'POST',
 	headers: {
 		Authorization: `Bearer ${execSync('gh auth token')}`,
@@ -48,6 +48,18 @@ repository(owner: $owner, name: $repo) {
 					id
 					number
 					title
+					issueFieldValues(first: 20) {
+						nodes {
+							...on IssueFieldTextValue {
+								value
+								field {
+									...on IssueFieldText {
+										id
+									}
+								}
+							}
+						}
+					}
 				}
 			}
 		}
@@ -57,9 +69,14 @@ repository(owner: $owner, name: $repo) {
 }
 		`,
 	}),
-})
-	.then((r) => r.json())
-	.then((d: GithubResponse) => d.data);
+}).then((r) => r.json());
+
+if (Object.keys(result).toString() !== 'data') {
+	console.dir(result, { depth: null });
+	process.exit(1);
+}
+
+const { repository } = result.data;
 
 const issues: Record<number, { prs: PR[] } & Issue> = {};
 
@@ -70,7 +87,7 @@ for (const pr of repository.pullRequests.nodes) {
 	}
 }
 
-const times: Array<{ issue: Issue; hours: number }> = [];
+const times: Array<{ issue: Issue; time: string }> = [];
 
 for (const [issueno, { prs, ...issue }] of Object.entries(issues)) {
 	const start = new Date(Math.min(...prs.map((branch) => parseISO(branch.createdAt).valueOf())));
@@ -98,41 +115,76 @@ for (const [issueno, { prs, ...issue }] of Object.entries(issues)) {
 				.reduce((a, b) => a + b, 0)
 		);
 
-	const hours = seconds / 3600;
+	const duration = intervalToDuration({
+		start: new Date(0),
+		end: new Date(0 + seconds * 1e3),
+	});
 
-	const display = formatDuration(
-		intervalToDuration({
-			start: new Date(0),
-			end: new Date(0 + seconds * 1e3),
-		}),
-		{
-			format: ['days', 'hours', 'minutes'],
-		}
+	let { years = 0, months = 0, weeks = 0, days = 0, hours = 0, minutes = 0 } = duration;
+
+	if (!minutes) continue;
+
+	// imagine mdr
+	if (years > 0) months += 12 * years;
+	if (months > 0) weeks += 4 * months;
+	if (weeks > 0) days += 7 * weeks;
+
+	const rounded = {
+		days: round(days + hours / 24, 2),
+		hours: round(hours + minutes / 60, 1),
+		minutes: round(minutes),
+	};
+
+	const [unit, value] = Object.entries(rounded).find(([, value]) => value >= 1)!;
+
+	const display = `${value} ${unit === "minutes" ? "mins" : unit}`;
+
+	console.info(
+		`\nIssue #${issueno} (${issue.title}) = ${display} [${formatDuration(duration)}]:`
 	);
-
-	console.info('');
-	console.info(`Issue #${issueno} (${issue.title}) = ${Math.round(hours)} h:`);
 	for (const [i, pr] of prs.entries()) {
-		const last = i === prs.length - 1;
-		console.info(`  ${pr.headRefName} (#${pr.number}) ${last ? `= ${display}` : '+'}`);
+		console.info(`${i > 0 ? '+' : ''} ${pr.headRefName} (#${pr.number})`);
 	}
+
+	times.push({ issue, time: display });
 }
 
 // Chunk requests by n mutations...
 const chunksize = 20;
 
-for (let i = 0; i < times.length; i += chunksize) {
-	const chunk = times.slice(i, i + chunksize);
+const toUpdate = times.filter(
+	({ time, issue }) =>
+		time !==
+		issue.issueFieldValues.nodes.find((f) => f?.field?.id === env.TIMESPENT_ISSUE_FIELD_ID)
+			?.value
+);
+
+console.info('\n\n');
+console.info('Issues that will be updated:');
+for (const { issue, time } of toUpdate) {
+	const current = issue.issueFieldValues.nodes.find(
+		(node) => node?.field?.id === env.TIMESPENT_ISSUE_FIELD_ID
+	)?.value;
+
+	let diff = '';
+	if (current) {
+	}
+
+	console.info(`#${issue.number} = ${time} (${issue.title})`);
+}
+
+for (let i = 0; i < toUpdate.length; i += chunksize) {
+	const chunk = toUpdate.slice(i, i + chunksize);
 
 	const query = `
 mutation {
 	${chunk
 		.map(
-			({ hours, issue }) =>
+			({ time: hours, issue }) =>
 				`issue${issue.number}: setIssueFieldValue(input: { 
 			issueId: ${JSON.stringify(issue.id)},
 			issueFields: [{
-				numberValue: ${JSON.stringify(hours)},
+				textValue: ${JSON.stringify(hours)},
 				fieldId: ${JSON.stringify(env.TIMESPENT_ISSUE_FIELD_ID)}
 			}]
 		}) { clientMutationId }`
@@ -159,20 +211,23 @@ mutation {
 type GithubResponse = {
 	data: {
 		repository: {
-			pullRequests: {
-				nodes: Array<{
+			pullRequests: Connection<{
+				number: number;
+				headRefName: string;
+				createdAt: string;
+				closingIssuesReferences: Connection<{
+					id: string;
 					number: number;
-					headRefName: string;
-					createdAt: string;
-					closingIssuesReferences: {
-						nodes: Array<{
-							id: string;
-							number: number;
-							title: string;
-						}>;
-					};
+					title: string;
+					issueFieldValues: Connection<
+						| undefined
+						| {
+								value: string;
+								field: { id: string };
+						  }
+					>;
 				}>;
-			};
+			}>;
 		};
 	};
 };
@@ -187,3 +242,9 @@ type WakatimeSummaries = {
 		}>;
 	}>;
 };
+
+type Connection<T> = { nodes: T[] };
+
+function round(value: number, places = 0) {
+	return Math.round(value * 10 ** places) / 10 ** places;
+}
