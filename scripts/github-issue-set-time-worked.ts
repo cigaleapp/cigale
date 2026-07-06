@@ -16,7 +16,8 @@ const env = arkenv({
 	WAKATIME_API_KEY: '/^waka_.+$/',
 	WAKATIME_PROJECT: 'string',
 	TIMESPENT_ISSUE_FIELD_ID: 'string = "IFT_kgDOAp1Gyg"',
-	N_MOST_RECENT_PRS: 'number = 100',
+	N_MOST_RECENT_ISSUES: 'number = 100',
+	BACKFILL: 'boolean = false',
 	GITHUB_REPO: [
 		'/^.+?\\/.+?$/',
 		'=>',
@@ -27,39 +28,55 @@ const env = arkenv({
 	],
 });
 
-const result: GithubResponse = await fetch('https://api.github.com/graphql', {
-	method: 'POST',
-	headers: {
-		Authorization: `Bearer ${execSync('gh auth token')}`,
-	},
-	body: JSON.stringify({
-		variables: { ...env.GITHUB_REPO, n: env.N_MOST_RECENT_PRS },
-		query: `
-query($owner: String!, $repo: String!, $n: Int!) { 
+let pageInfo = { endCursor: undefined as string | undefined, hasNextPage: true };
+
+while (pageInfo.hasNextPage) {
+	pageInfo = await run(pageInfo.endCursor);
+
+	if (!env.BACKFILL) break;
+}
+
+async function run(cursor?: string) {
+	const result: GithubResponse = await fetch('https://api.github.com/graphql', {
+		method: 'POST',
+		headers: {
+			Authorization: `Bearer ${execSync('gh auth token')}`,
+		},
+		body: JSON.stringify({
+			variables: {
+				...env.GITHUB_REPO,
+				n: env.N_MOST_RECENT_ISSUES,
+				cursor,
+			},
+			query: `
+query($owner: String!, $repo: String!, $n: Int!, $cursor: String) { 
 
 repository(owner: $owner, name: $repo) { 
-	pullRequests(orderBy: { field: UPDATED_AT, direction: DESC }, first: $n) {
+	issues(orderBy: { field: CREATED_AT, direction: DESC }, first: $n, after: $cursor) {
+		pageInfo { hasNextPage endCursor }
 		nodes {
+			id
 			number
-			headRefName
-			createdAt
-			closingIssuesReferences(first: 50) {
+			title
+			issueFieldValues(first: 20) {
+				pageInfo { hasNextPage endCursor }
 				nodes {
-					id
-					number
-					title
-					issueFieldValues(first: 20) {
-						nodes {
-							...on IssueFieldTextValue {
-								value
-								field {
-									...on IssueFieldText {
-										id
-									}
-								}
+					...on IssueFieldTextValue {
+						value
+						field {
+							...on IssueFieldText {
+								id
 							}
 						}
 					}
+				}
+			}
+			closedByPullRequestsReferences(first: 50) {
+				pageInfo { hasNextPage endCursor }
+				nodes {
+					number
+					headRefName
+					createdAt
 				}
 			}
 		}
@@ -68,108 +85,42 @@ repository(owner: $owner, name: $repo) {
 
 }
 		`,
-	}),
-}).then((r) => r.json());
+		}),
+	}).then((r) => r.json());
 
-if (Object.keys(result).toString() !== 'data') {
-	console.dir(result, { depth: null });
-	process.exit(1);
-}
-
-const { repository } = result.data;
-
-const issues: Record<number, { prs: PR[] } & Issue> = {};
-
-for (const pr of repository.pullRequests.nodes) {
-	for (const issue of pr.closingIssuesReferences.nodes) {
-		issues[issue.number] ??= { prs: [], ...issue };
-		issues[issue.number].prs.push(pr);
+	if (Object.keys(result).toString() !== 'data') {
+		console.dir(result, { depth: null });
+		process.exit(1);
 	}
-}
 
-const times: Array<{ issue: Issue; time: string }> = [];
+	const { repository } = result.data;
 
-for (const [issueno, { prs, ...issue }] of Object.entries(issues)) {
-	const start = new Date(Math.min(...prs.map((branch) => parseISO(branch.createdAt).valueOf())));
+	const times: Array<{ issue: Issue; time: string }> = [];
 
-	const end = new Date(Math.max(...prs.map((branch) => parseISO(branch.createdAt).valueOf())));
+	for (const issue of repository.issues.nodes) {
+		await analyzeIssue(issue, times);
+	}
 
-	const seconds = await fetch(
-		'https://wakatime.com/api/v1/users/current/summaries?' +
-			new URLSearchParams({
-				start: formatISO(subMonths(start, 2), { representation: 'date' }),
-				end: formatISO(addMonths(end, 1), { representation: 'date' }),
-				project: env.WAKATIME_PROJECT,
-				branches: prs.map((b) => b.headRefName).join(','),
-			}),
-		{
-			headers: {
-				Authorization: `Basic ${env.WAKATIME_API_KEY}`,
-			},
-		}
-	)
-		.then((r) => r.json())
-		.then((d: WakatimeSummaries) =>
-			d.data
-				.flatMap((day) => day.branches.flatMap((branch) => branch.total_seconds))
-				.reduce((a, b) => a + b, 0)
-		);
+	// Chunk requests by n mutations...
+	const chunksize = 20;
 
-	const duration = intervalToDuration({
-		start: new Date(0),
-		end: new Date(0 + seconds * 1e3),
-	});
-
-	// eslint-disable-next-line prefer-const
-	let { years = 0, months = 0, weeks = 0, days = 0, hours = 0, minutes = 0 } = duration;
-
-	if (!minutes) continue;
-
-	// imagine mdr
-	if (years > 0) months += 12 * years;
-	if (months > 0) weeks += 4 * months;
-	if (weeks > 0) days += 7 * weeks;
-
-	const rounded = {
-		days: round(days + hours / 24, 2),
-		hours: round(hours + minutes / 60, 1),
-		minutes: round(minutes),
-	};
-
-	const [unit, value] = Object.entries(rounded).find(([, value]) => value >= 1)!;
-
-	const display = `${value} ${unit === 'minutes' ? 'mins' : unit}`;
-
-	console.info(
-		`\nIssue #${issueno} (${issue.title}) = ${display} [${formatDuration(duration)}]:`
+	const toUpdate = times.filter(
+		({ time, issue }) =>
+			time !==
+			issue.issueFieldValues.nodes.find((f) => f?.field?.id === env.TIMESPENT_ISSUE_FIELD_ID)
+				?.value
 	);
-	for (const [i, pr] of prs.entries()) {
-		console.info(`${i > 0 ? '+' : ''} ${pr.headRefName} (#${pr.number})`);
+
+	console.info('\n\n');
+	console.info('Issues that will be updated:');
+	for (const { issue, time } of toUpdate) {
+		console.info(`#${issue.number} = ${time} (${issue.title})`);
 	}
 
-	times.push({ issue, time: display });
-}
+	for (let i = 0; i < toUpdate.length; i += chunksize) {
+		const chunk = toUpdate.slice(i, i + chunksize);
 
-// Chunk requests by n mutations...
-const chunksize = 20;
-
-const toUpdate = times.filter(
-	({ time, issue }) =>
-		time !==
-		issue.issueFieldValues.nodes.find((f) => f?.field?.id === env.TIMESPENT_ISSUE_FIELD_ID)
-			?.value
-);
-
-console.info('\n\n');
-console.info('Issues that will be updated:');
-for (const { issue, time } of toUpdate) {
-	console.info(`#${issue.number} = ${time} (${issue.title})`);
-}
-
-for (let i = 0; i < toUpdate.length; i += chunksize) {
-	const chunk = toUpdate.slice(i, i + chunksize);
-
-	const query = `
+		const query = `
 mutation {
 	${chunk
 		.map(
@@ -186,47 +137,126 @@ mutation {
 }	
 `;
 
-	const result = await fetch('https://api.github.com/graphql', {
-		method: 'POST',
-		body: JSON.stringify({ query }),
-		headers: {
-			Authorization: `Bearer ${execSync('gh auth token')}`,
-		},
-	}).then((r) => r.json());
+		const result = await fetch('https://api.github.com/graphql', {
+			method: 'POST',
+			body: JSON.stringify({ query }),
+			headers: {
+				Authorization: `Bearer ${execSync('gh auth token')}`,
+			},
+		}).then((r) => r.json());
 
-	if (Object.keys(result).toString() !== 'data') {
-		console.dir(result, { depth: null });
-	} else {
-		console.info(`OK: ${chunk.map(({ issue }) => '#' + issue.number).join(', ')}`);
+		if (Object.keys(result).toString() !== 'data') {
+			console.dir(result, { depth: null });
+		} else {
+			console.info(`OK: ${chunk.map(({ issue }) => '#' + issue.number).join(', ')}`);
+		}
+	}
+
+	return repository.issues.pageInfo;
+}
+
+async function analyzeIssue(
+	issue: Issue,
+	times: Array<{ issue: Issue; time: string }>,
+	backoff = 30e3
+) {
+	const prs = issue.closedByPullRequestsReferences.nodes;
+
+	if (!prs.length) return;
+
+	const start = new Date(Math.min(...prs.map((branch) => parseISO(branch.createdAt).valueOf())));
+
+	const end = new Date(Math.max(...prs.map((branch) => parseISO(branch.createdAt).valueOf())));
+
+	const response = await fetch(
+		'https://wakatime.com/api/v1/users/current/summaries?' +
+			new URLSearchParams({
+				start: formatISO(subMonths(start, 2), { representation: 'date' }),
+				end: formatISO(addMonths(end, 1), { representation: 'date' }),
+				project: env.WAKATIME_PROJECT,
+				branches: prs.map((b) => b.headRefName).join(','),
+			}),
+		{
+			headers: {
+				Authorization: `Basic ${env.WAKATIME_API_KEY}`,
+			},
+		}
+	).then((r) => r.text());
+
+	try {
+		const seconds = (JSON.parse(response) as WakatimeSummaries).data
+			.flatMap((day) => day.branches.flatMap((branch) => branch.total_seconds))
+			.reduce((a, b) => a + b, 0);
+
+		const duration = intervalToDuration({
+			start: new Date(0),
+			end: new Date(0 + seconds * 1e3),
+		});
+
+		// eslint-disable-next-line prefer-const
+		let { years = 0, months = 0, weeks = 0, days = 0, hours = 0, minutes = 0 } = duration;
+
+		if (!minutes) return;
+
+		// imagine mdr
+		if (years > 0) months += 12 * years;
+		if (months > 0) weeks += 4 * months;
+		if (weeks > 0) days += 7 * weeks;
+
+		const rounded = {
+			days: round(days + hours / 24, 2),
+			hours: round(hours + minutes / 60, 1),
+			minutes: round(minutes),
+		};
+
+		const [unit, value] = Object.entries(rounded).find(([, value]) => value >= 1)!;
+
+		const display = `${value} ${unit === 'minutes' ? 'mins' : unit}`;
+
+		console.info(
+			`\nIssue #${issue.number} (${issue.title}) = ${display} [${formatDuration(duration)}]:`
+		);
+		for (const [i, pr] of prs.entries()) {
+			console.info(`${i > 0 ? '+' : ''} ${pr.headRefName} (#${pr.number})`);
+		}
+
+		times.push({ issue, time: display });
+	} catch {
+		console.info(`\nIssue #${issue.number} (${issue.title}) = !!!! [error]:`);
+		console.info(response);
+
+		if (response.includes('Too Many Requests')) {
+			await new Promise((resolve) => setTimeout(resolve, backoff));
+			await analyzeIssue(issue, times, backoff * 3);
+		}
 	}
 }
 
 type GithubResponse = {
 	data: {
 		repository: {
-			pullRequests: Connection<{
+			issues: Connection<{
+				id: string;
 				number: number;
-				headRefName: string;
-				createdAt: string;
-				closingIssuesReferences: Connection<{
-					id: string;
+				title: string;
+				issueFieldValues: Connection<
+					| undefined
+					| {
+							value: string;
+							field: { id: string };
+					  }
+				>;
+				closedByPullRequestsReferences: Connection<{
 					number: number;
-					title: string;
-					issueFieldValues: Connection<
-						| undefined
-						| {
-								value: string;
-								field: { id: string };
-						  }
-					>;
+					headRefName: string;
+					createdAt: string;
 				}>;
 			}>;
 		};
 	};
 };
 
-type PR = GithubResponse['data']['repository']['pullRequests']['nodes'][number];
-type Issue = PR['closingIssuesReferences']['nodes'][number];
+type Issue = GithubResponse['data']['repository']['issues']['nodes'][number];
 
 type WakatimeSummaries = {
 	data: Array<{
@@ -236,7 +266,7 @@ type WakatimeSummaries = {
 	}>;
 };
 
-type Connection<T> = { nodes: T[] };
+type Connection<T> = { pageInfo: { hasNextPage: boolean; endCursor: string }; nodes: T[] };
 
 function round(value: number, places = 0) {
 	return Math.round(value * 10 ** places) / 10 ** places;
