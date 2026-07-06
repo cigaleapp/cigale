@@ -16,7 +16,7 @@ export const previewingPrNumber =
 	import.meta.env.previewingPrNumber === 'null' ? null : import.meta.env.previewingPrNumber;
 
 export const databaseName = previewingPrNumber ? `previews/pr-${previewingPrNumber}` : 'database';
-export const databaseRevision = 11;
+export const databaseRevision = 12;
 
 const profile = profiler('Database');
 
@@ -580,6 +580,10 @@ export async function openDatabase() {
 			if (oldVersion === 9) {
 				rebuildIndexes('Image');
 				rebuildIndexes('Observation');
+			}
+
+			if (oldVersion === 11) {
+				rebuildIndexes('Image');
 			}
 
 			for (const [tableName, schema] of tablesByName) {
