@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file, on a monthly basis, with a consistent, simple format: month/year heading > type of change heading > list of changes.
 
+## July 2026
+
+### Improvements
+
+- Add reload button for parallelism setting (See #1524)
+- Improve errors related to execution or validation of Jsonata expressions
+- Swipe-to-dismiss toasts (Closes #1498)
+
+### Bug Fixes
+
+- Fix close button doesnt work in narrowing classifier (Closes #1829)
+- Ignore EXIF orientation (Fixes #1824)
+- Polyfill Uint8Array.{from,to}Base64
+- Polyfill newer Set methods (Closes #1794)
+- Run classification inferences per-subject sequentially
+
+### Data Updates
+
+- Fix wilkella-argentata handling for IDmyBee
+- Regenerate protocols (only Xper3 step)
+- Use new favicon logo
+
+### Translation Updates
+
+- Refresh translation files
+
 ## June 2026
 
 ### Improvements
@@ -14,6 +40,7 @@ All notable changes to this project will be documented in this file, on a monthl
 - Enable persistent storage, add storage manager
 - Handle empty session metadata forms
 - Handle non-browser environments in localeFromNavigator()
+- Ignore unknown metadata when cascading
 - Improve warning styling for bottom drawer submenu items
 - Serve live updates for the android application (Closes #1756)
 - Shake to report bug (#1784)
@@ -29,6 +56,7 @@ All notable changes to this project will be documented in this file, on a monthl
 - Fix classifier confirmation progress bar
 - Fix cors proxy usage (#1707)
 - Fix merge of enum metadata values with non-numeric option keys
+- Fix sortable/groupable imported metadata not showing up
 - Handle imported metadata in cascades
 - Rework imagefile/image/observation deletion
 
@@ -50,6 +78,7 @@ All notable changes to this project will be documented in this file, on a monthl
 - Remove IDmyBee from built-in protocols
 - Remove andrena metadata group from entomoscope & insecta protocols
 - Remove incorrect namespace from metadata IDs in IDmyBee protocol
+- Use original image's filenames for export filenames in IDmyBee
 
 ### Translation Updates
 
