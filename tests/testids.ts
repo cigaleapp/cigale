@@ -31,7 +31,15 @@ export type PlaywrightTestId =
 	| 'card-observation-bounding-box'
 	| 'session-metadata'
 	| DropdownMenu<'protocol'>
-	| TabSettings<'import' | 'crop' | 'classify'>;
+	| TabSettings<'import' | 'crop' | 'classify'>
+	| 'subject'
+	| 'references'
+	| 'panel'
+	| 'layout-switcher'
+	| 'focused-option'
+	| 'cascades'
+	| 'synonyms'
+	| 'description';
 
 type DropdownMenu<T extends string> = `${T}-open` | `${T}-options`;
 type TabSettings<T extends string> =

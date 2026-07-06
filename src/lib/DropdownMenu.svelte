@@ -31,7 +31,7 @@
 		data: D;
 		label: string;
 		selected?: boolean;
-		testid?: string;
+		testid?: PlaywrightTestIdBaseForDropdownMenu;
 		key?: string | number;
 		submenu: {
 			label?: string;
@@ -145,7 +145,7 @@
 	{@render trigger(
 		{
 			open,
-			onclick: () => {
+			onclick() {
 				open = !open;
 			},
 		},
@@ -223,15 +223,18 @@
 		</Submenu>
 	</BottomDrawer>
 {:else}
-	<DropdownMenu.Root {open}>
+	<DropdownMenu.Root bind:open>
 		<DropdownMenu.Trigger {...rest} pw-testid={testids(testid).trigger}>
 			{#snippet child({ props })}
 				{@render trigger(
 					{
 						...props,
 						open,
-						onclick: () => {
-							open = !open;
+						onclick() {
+							console.log('swithcing open state', {
+								open,
+								testid: testids(testid).trigger,
+							});
 						},
 					},
 					{}
@@ -245,9 +248,9 @@
 					{#if group.items.length > 0}
 						<DropdownMenu.Group pw-testid={group.testid}>
 							{#if group.label || (groups.length === 1 && title)}
-								<DropdownMenu.GroupHeading
-									>{group.label || title}</DropdownMenu.GroupHeading
-								>
+								<DropdownMenu.GroupHeading>
+									{group.label || title}
+								</DropdownMenu.GroupHeading>
 							{/if}
 
 							{#each group.items as i (i.label)}

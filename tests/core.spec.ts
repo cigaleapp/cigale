@@ -61,11 +61,7 @@ for (const offline of [false, true]) {
 			await newSession(page);
 			await app.tabs.go('import');
 
-			// Import fixture image
-			await assert(page.getByText(/Cliquer ou déposer/)).toBeVisible();
-			const fileInput = await page.$('input[type="file"]');
-			await fileInput?.setInputFiles('./tests/fixtures/lil-fella.jpeg');
-			await assert(page.getByText('lil-fella.jpeg')).toBeVisible();
+			await importPhotos({ page }, 'lil-fella.jpeg');
 
 			await app.tabs.go('crop');
 			await app.loading.wait();
