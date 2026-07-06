@@ -120,6 +120,7 @@ for (const [issueno, { prs, ...issue }] of Object.entries(issues)) {
 		end: new Date(0 + seconds * 1e3),
 	});
 
+	// eslint-disable-next-line prefer-const
 	let { years = 0, months = 0, weeks = 0, days = 0, hours = 0, minutes = 0 } = duration;
 
 	if (!minutes) continue;
@@ -162,14 +163,6 @@ const toUpdate = times.filter(
 console.info('\n\n');
 console.info('Issues that will be updated:');
 for (const { issue, time } of toUpdate) {
-	const current = issue.issueFieldValues.nodes.find(
-		(node) => node?.field?.id === env.TIMESPENT_ISSUE_FIELD_ID
-	)?.value;
-
-	let diff = '';
-	if (current) {
-	}
-
 	console.info(`#${issue.number} = ${time} (${issue.title})`);
 }
 
