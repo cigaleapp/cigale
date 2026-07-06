@@ -617,18 +617,12 @@ msgstr "of PR"
 msgid "sw&rpc"
 msgstr "sw&rpc"
 
-#. 0: version
-#. 0: version
-#: src/lib/ButtonUpdateProtocol.svelte
-#: src/lib/ButtonUpdateProtocol.svelte
-msgid "v{0}"
-msgstr "v{0}"
+#~ msgid "v{0}"
+#~ msgstr "v{0}"
 
-#. 0: version; 1: newVersion
-#: src/lib/ButtonUpdateProtocol.svelte
-msgctxt "Upgrading a protocol. The <0 /> is an icon arrow"
-msgid "v{0} <0/> v{1}"
-msgstr "v{0} <0/> v{1}"
+#~ msgctxt "Upgrading a protocol. The <0 /> is an icon arrow"
+#~ msgid "v{0} <0/> v{1}"
+#~ msgstr "v{0} <0/> v{1}"
 
 #: src/lib/KeyboardShortcuts.svelte
 msgid "¯\\_(ツ)_/¯"
@@ -1272,10 +1266,8 @@ msgstr[1] "# elements"
 msgid "Non versionné"
 msgstr "Not versioned"
 
-#. 1.0: newVersion
-#: src/routes/(app)/protocols/[id]/versioning/+page.svelte
-msgid "<0/> Dernière version en ligne: <1>v{0}</1> <2>Réétablir</2>"
-msgstr "<0/> Latest published version: <1>v{0}</1> <2>Revert</2>"
+#~ msgid "<0/> Dernière version en ligne: <1>v{0}</1> <2>Réétablir</2>"
+#~ msgstr "<0/> Latest published version: <1>v{0}</1> <2>Revert</2>"
 
 #. 1.0: version + 1
 #: src/routes/(app)/protocols/[id]/versioning/+page.svelte
@@ -2720,10 +2712,8 @@ msgstr ""
 msgid "{0} protocoles ont été mis à jour: {1}"
 msgstr ""
 
-#. 0.0.0: issueNumber
-#: src/lib/MobileWIPOverlay.svelte
-msgid "Suivez l'avancement de son développement sur Github: c'est <0>l'issue <0>#{0}</0></0>."
-msgstr ""
+#~ msgid "Suivez l'avancement de son développement sur Github: c'est <0>l'issue <0>#{0}</0></0>."
+#~ msgstr ""
 
 #. 0: file.name
 #: src/lib/MetadataInput.svelte
@@ -2735,10 +2725,8 @@ msgstr ""
 msgid "{0} sur {1}: {2}"
 msgstr ""
 
-#. 0: account.username; 1: provider.displayName
-#: src/routes/(app)/sessions/+page.svelte
-msgid "{0} sur {1}"
-msgstr ""
+#~ msgid "{0} sur {1}"
+#~ msgstr ""
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Roman Shamin"
@@ -2748,6 +2736,7 @@ msgstr ""
 msgid "Evil Martians"
 msgstr ""
 
+#: src/routes/(app)/about/+page.svelte
 #: src/routes/(app)/about/+page.svelte
 msgid "par"
 msgstr ""
@@ -2781,15 +2770,11 @@ msgstr ""
 msgid "Déconnecter"
 msgstr ""
 
-#. 0: labels.item
-#: src/routes/(app)/(sidepanel)/o/[observation]/TopbarExtras.svelte
-msgid "{0} précédente"
-msgstr ""
+#~ msgid "{0} précédente"
+#~ msgstr ""
 
-#. 0: labels.item
-#: src/routes/(app)/(sidepanel)/o/[observation]/TopbarExtras.svelte
-msgid "{0} suivante"
-msgstr ""
+#~ msgid "{0} suivante"
+#~ msgstr ""
 
 #. 0: corner
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/WithExpandButton.svelte
@@ -2830,9 +2815,8 @@ msgstr ""
 msgid "Identifiant du protocole <0>Doit être unique. Il est conseillé de le baser sur un nom de domaine web que vous contrôlez; celui d'un site web permettant de télécharger le protocole, par exemple</0>"
 msgstr ""
 
-#: src/routes/(app)/protocols/ModalCreateProtocol.svelte
-msgid "L'identifiant ne doit comporter que des lettres, chiffres, <0>.</0> ou <1>_</1>"
-msgstr ""
+#~ msgid "L'identifiant ne doit comporter que des lettres, chiffres, <0>.</0> ou <1>_</1>"
+#~ msgstr ""
 
 #: src/routes/(app)/protocols/+page.svelte
 msgid "<0/> Importer"
@@ -2854,9 +2838,8 @@ msgstr ""
 msgid "<0/> Dossier <1/>"
 msgstr ""
 
-#: src/routes/(app)/results/+page.svelte
-msgid "<0/> Archive ZIP <1><0/></1>"
-msgstr ""
+#~ msgid "<0/> Archive ZIP <1><0/></1>"
+#~ msgstr ""
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/+layout@(app).svelte
 msgid "Élimination <0>Beta</0>"
@@ -3022,3 +3005,23 @@ msgid "Voir la photo prise"
 msgid_plural "Voir les # photos prises"
 msgstr[0] "See the photo you took"
 msgstr[1] "See the # photos you took"
+
+#: src/lib/MobileWIPOverlay.svelte
+msgid "Suivez l'avancement de son développement sur Github: c'est <0>l'issue <0/></0>."
+msgstr ""
+
+#: src/routes/(app)/about/+page.svelte
+msgid ", chez"
+msgstr ""
+
+#: src/routes/(app)/protocols/ModalCreateProtocol.svelte
+msgid "L'identifiant ne doit comporter que des lettres, chiffres, <0/> ou <1/>"
+msgstr ""
+
+#: src/routes/(app)/results/+page.svelte
+msgid "<0/> Archive ZIP <1/>"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/versioning/+page.svelte
+msgid "<0/> Dernière version en ligne: <1/> <2>Réétablir</2>"
+msgstr ""
