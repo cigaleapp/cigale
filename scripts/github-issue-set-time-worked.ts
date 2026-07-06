@@ -137,7 +137,7 @@ for (const [issueno, { prs, ...issue }] of Object.entries(issues)) {
 
 	const [unit, value] = Object.entries(rounded).find(([, value]) => value >= 1)!;
 
-	const display = `${value} ${unit === "minutes" ? "mins" : unit}`;
+	const display = `${value} ${unit === 'minutes' ? 'mins' : unit}`;
 
 	console.info(
 		`\nIssue #${issueno} (${issue.title}) = ${display} [${formatDuration(duration)}]:`
