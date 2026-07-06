@@ -17,28 +17,33 @@
 	import { loadPreviewImage } from '$lib/images';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import KeyboardShortcuts from '$lib/KeyboardShortcuts.svelte';
+	import { IsMobile } from '$lib/mobile.svelte.js';
 	import Modal from '$lib/Modal.svelte';
 	import { globalModals } from '$lib/modals.svelte.js';
+	import { routeIsIn } from '$lib/paths.js';
 	import { initializeProcessingQueue } from '$lib/queue.svelte';
 	import { switchSession } from '$lib/sessions';
 	import { getColorScheme, isDebugMode, setSetting } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
-	import Toast from '$lib/Toast.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import { undo } from '$lib/undo.svelte';
 	import { nonnull, pick } from '$lib/utils';
 
 	import Navigation from './Navigation.svelte';
 	import PrepareForOffline from './PrepareForOffline.svelte';
+	import ToastsArea from './ToastsArea.svelte';
 
 	const { children, data } = $props();
 	const { swarpc, parallelism } = $derived(data);
 
+	const mobile = new IsMobile();
+
 	initializeProcessingQueue({ swarpc, cancellers, parallelism });
 
 	const navbarAppearance = $derived.by<NavbarAppearance>(() => {
-		if (page.route.id?.startsWith('/(app)/(sidepanel)/o/[observation]')) return 'hidden';
-		if (page.route.id?.startsWith('/(app)/protocols/[id]')) return 'hidden';
+		if (routeIsIn('/(app)/(sidepanel)/o/[observation]')) return 'hidden';
+		if (routeIsIn('/(app)/protocols/[id]')) return 'hidden';
+		if (routeIsIn('/(app)/capture')) return 'hidden';
 
 		return 'full';
 	});
@@ -132,7 +137,7 @@
 	});
 
 	onMount(() => {
-		navigator.serviceWorker.ready.then((registration) => {
+		navigator.serviceWorker?.ready.then((registration) => {
 			const installedVersion = localStorage.getItem('sw-version');
 
 			if (installedVersion !== version) {
@@ -184,59 +189,42 @@
 </Modal>
 
 <div class="layout" id="app-layout">
-	<Navigation
-		progressbarOnly={navbarAppearance === 'hidden'}
-		progress={uiState.processing.progress}
-		eta={uiState.eta}
-	/>
+	{#if !mobile.current}
+		<Navigation
+			progressbarOnly={navbarAppearance === 'hidden'}
+			progress={uiState.processing.progress}
+			eta={uiState.eta}
+		/>
+	{/if}
 
-	<div id="portal-target-mobile-bottombar"></div>
+	<div id="portal-target-mobile-topbar"></div>
 
-	<section class="toasts" data-testid="toasts-area">
-		{#each toasts.items('default') as toast (toast.id)}
-			<Toast
-				{...toast}
-				action={toast.labels.action}
-				dismiss={toast.labels.close}
-				onaction={toast.callbacks.action instanceof URL
-					? toast.callbacks.action
-					: async () => toast.callbacks.action?.(toast)}
-				ondismiss={async () => {
-					await toast.callbacks.closed?.(toast);
-					toasts.remove(toast.id);
-				}}
-			/>
-		{/each}
-	</section>
+	<ToastsArea />
 
 	<div
 		class="contents"
 		class:padded={!page.route.id?.includes('/(sidepanel)') &&
-			!page.route.id?.includes('protocols/[id]/')}
+			!page.route.id?.includes('protocols/[id]/') &&
+			page.route.id !== '/(app)/capture'}
 	>
 		{@render children?.()}
 	</div>
 
-	<div id="portal-target-mobile-topbar"></div>
+	<div id="portal-target-mobile-bottombar"></div>
+
+	{#if mobile.current}
+		<Navigation
+			progressbarOnly={navbarAppearance === 'hidden'}
+			progress={uiState.processing.progress}
+			eta={uiState.eta}
+		/>
+	{/if}
 </div>
 
 <style>
-	.toasts {
-		position: fixed;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 1em;
-		bottom: 1em;
-		left: 0;
-		right: 0;
-		z-index: 1000;
-	}
-
 	.contents {
 		display: flex;
 		flex-direction: column;
-		gap: 1em;
 		height: 100%;
 		width: 100%;
 		flex-grow: 1;
@@ -248,16 +236,13 @@
 
 	.contents.padded {
 		padding: 1.2em;
+		gap: 1em;
 	}
 
 	.layout {
 		display: flex;
 		flex-direction: column;
 		height: 100svh;
-
-		@media (max-width: 600px) {
-			flex-direction: column-reverse;
-		}
 	}
 
 	.debug-ui-state {

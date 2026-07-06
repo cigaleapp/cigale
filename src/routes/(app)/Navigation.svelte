@@ -191,10 +191,10 @@
 		</div>
 
 		{#if !progressbarOnly}
-			<nav bind:clientHeight={navHeight} data-testid="app-nav">
+			<nav bind:clientHeight={navHeight} pw-testid="app-nav">
 				<div class="logo">
 					<button
-						data-testid="goto-home"
+						pw-testid="goto-home"
 						use:tooltip={showingEta
 							? `Termine ${formatDistanceToNow(Date.now() + eta, { addSuffix: true, includeSeconds: true })}`
 							: 'Accueil'}
@@ -229,7 +229,7 @@
 							href={resolve('/(app)/sessions/[id]', {
 								id: uiState.currentSession.id,
 							})}
-							data-testid="goto-current-session"
+							pw-testid="goto-current-session"
 							use:tooltip={'Session'}
 						>
 							{uiState.currentSession.name}
@@ -240,7 +240,7 @@
 						<div class="with-inference-indicator">
 							<a
 								href={resolve('/import/')}
-								data-testid="goto-import"
+								pw-testid="goto-import"
 								aria-disabled={!isDebugMode() && importTabDisabled}
 							>
 								Importer
@@ -269,7 +269,7 @@
 											image: uiState.imageOpenedInCropper,
 										})
 									: resolve('/crop/')}
-								data-testid="goto-crop"
+								pw-testid="goto-crop"
 								aria-disabled={!isDebugMode() && cropTabDisabled}
 							>
 								<!-- eslint-enable svelte/no-navigation-without-resolve -->
@@ -292,7 +292,7 @@
 							<a
 								href={resolve('/classify/')}
 								aria-disabled={!isDebugMode() && classifyTabDisabled}
-								data-testid="goto-classify"
+								pw-testid="goto-classify"
 							>
 								Classifier
 								{#if page.route.id === '/(app)/(sidepanel)/classify'}
@@ -313,7 +313,7 @@
 						<a
 							href={resolve('/results/')}
 							aria-disabled={!isDebugMode() && resultsTabDisabled}
-							data-testid="goto-results"
+							pw-testid="goto-results"
 						>
 							Résultats
 							{#if page.route.id === '/(app)/results'}
@@ -323,19 +323,19 @@
 					</div>
 				{:else}
 					<div class="steps" in:fade={{ duration: 100 }}>
-						<a href={resolve('/sessions/')} data-testid="goto-sessions">
+						<a href={resolve('/sessions/')} pw-testid="goto-sessions">
 							Sessions
 							{#if page.route.id === '/(app)/sessions'}
 								<div class="line"></div>
 							{/if}
 						</a>
-						<a href={resolve('/protocols/')} data-testid="goto-protocols">
+						<a href={resolve('/protocols/')} pw-testid="goto-protocols">
 							Protocoles
 							{#if page.route.id === '/(app)/protocols'}
 								<div class="line"></div>
 							{/if}
 						</a>
-						<a href={resolve('/accounts/')} data-testid="goto-accounts">
+						<a href={resolve('/accounts/')} pw-testid="goto-accounts">
 							Comptes
 							{#if page.route.id === '/(app)/accounts'}
 								<div class="line"></div>
@@ -376,7 +376,7 @@
 			</nav>
 		{/if}
 	</header>
-{:else}
+{:else if !progressbarOnly}
 	<!-- 
 Tab bar is only when a session is active
  -->
@@ -385,7 +385,7 @@ Tab bar is only when a session is active
 			<nav>
 				<a
 					href={resolve('/(app)/sessions/[id]', { id: uiState.currentSession.id })}
-					data-testid="mobile-goto-current-session"
+					pw-testid="mobile-goto-current-session"
 					class:active={page.route.id === '/(app)/sessions/[id]'}
 				>
 					{#if page.route.id === '/(app)/sessions/[id]'}
@@ -398,7 +398,7 @@ Tab bar is only when a session is active
 
 				<a
 					href={resolve('/import/')}
-					data-testid="mobile-goto-import"
+					pw-testid="mobile-goto-import"
 					aria-disabled={!isDebugMode() && importTabDisabled}
 					class:active={page.route.id === '/(app)/(sidepanel)/import'}
 				>
@@ -412,7 +412,7 @@ Tab bar is only when a session is active
 
 				<a
 					href={resolve('/crop/')}
-					data-testid="mobile-goto-crop"
+					pw-testid="mobile-goto-crop"
 					aria-disabled={!isDebugMode() && cropTabDisabled}
 					class:active={page.route.id === '/(app)/(sidepanel)/crop'}
 				>
@@ -426,7 +426,7 @@ Tab bar is only when a session is active
 
 				<a
 					href={resolve('/classify/')}
-					data-testid="mobile-goto-classify"
+					pw-testid="mobile-goto-classify"
 					aria-disabled={!isDebugMode() && classifyTabDisabled}
 					class:active={page.route.id === '/(app)/(sidepanel)/classify'}
 				>
@@ -440,7 +440,7 @@ Tab bar is only when a session is active
 
 				<a
 					href={resolve('/results/')}
-					data-testid="mobile-goto-results"
+					pw-testid="mobile-goto-results"
 					aria-disabled={!isDebugMode() && resultsTabDisabled}
 					class:active={page.route.id === '/(app)/results'}
 				>

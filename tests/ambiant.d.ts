@@ -1,3 +1,4 @@
+import type { PlaywrightTestId } from './testids.js';
 import type { IDBDatabaseType } from '$lib/idb.svelte.js';
 import type { UIState } from '$lib/state.svelte.js';
 import type { PROCEDURES } from '$worker/procedures.js';
@@ -32,5 +33,16 @@ declare global {
 	class Profiler {
 		constructor(options?: { sampleInterval?: number; maxBufferSize?: number });
 		stop(): Promise<unknown>;
+	}
+}
+
+// Hack until we have https://github.com/microsoft/playwright/issues/41627
+declare module '@playwright/test' {
+	interface Page {
+		getByTestId(testId: PlaywrightTestId | RegExp): Locator;
+	}
+
+	interface Locator {
+		getByTestId(testId: PlaywrightTestId | RegExp): Locator;
 	}
 }

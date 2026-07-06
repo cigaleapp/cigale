@@ -9,13 +9,15 @@
 
 	type Props = {
 		children: Snippet;
+		/** Show on desktop too */
+		desktop?: boolean;
 	};
 
-	const { children }: Props = $props();
+	const { children, desktop }: Props = $props();
 	const mobile = new IsMobile();
 </script>
 
-{#if mobile.current}
+{#if mobile.current || desktop}
 	<Portal to="#portal-target-mobile-topbar">
 		<div class="with-progressbar">
 			<div class="topbar">

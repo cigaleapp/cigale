@@ -13,6 +13,11 @@
 		// TODO: support on desktop too
 		/** Show the item with warning styling. **Note:** Only supported on mobile for now. */
 		warning?: boolean;
+		// TODO: support on desktop too
+		/** Show the item with danger styling. **Note:** Only supported on mobile for now. */
+		danger?: boolean;
+		/** Show left of the label */
+		icon?: import('svelte').Component;
 	};
 
 	export type SelectableItem<SD> = Omit<Item<SD>, 'type' | 'key'> & {
@@ -26,7 +31,7 @@
 		data: D;
 		label: string;
 		selected?: boolean;
-		testid?: string;
+		testid?: PlaywrightTestIdBaseForDropdownMenu;
 		key?: string | number;
 		submenu: {
 			label?: string;
@@ -40,12 +45,14 @@
 
 	export type ItemsGroup<D, SD> = {
 		label?: string;
-		testid?: string;
+		testid?: PlaywrightTestId;
 		items: AnyItem<D, SD>[];
 	};
 </script>
 
 <script lang="ts" generics="D = never, SD = never">
+	import type { Props as BottomDrawerProps } from './BottomDrawer.svelte';
+	import type { PlaywrightTestId, PlaywrightTestIdBaseForDropdownMenu } from '$e2e/testids.js';
 	import type { Snippet } from 'svelte';
 
 	import { DropdownMenu } from 'bits-ui';
@@ -60,11 +67,14 @@
 		/** Shown on mobile (when it's a drawer) and in place of the first item group's label if not set */
 		title?: string;
 
+		/** Only useful on mobile. Tells where the bottom sheet should come from. Defaults to bottom */
+		position?: BottomDrawerProps['position'];
+
 		items: ItemsGroup<D, SD>[];
 		item?: Snippet<[AnyItem<D, SD>['data'], AnyItem<D, SD> & { selected: boolean }]>;
 		/** IMPORTANT: Don't put just onclick on the button, spread the entire object */
 		trigger: Snippet<[{ open: boolean; onclick: () => void } & Record<string, unknown>]>;
-		testid?: string | undefined;
+		testid?: PlaywrightTestIdBaseForDropdownMenu | undefined;
 		scrollable?: boolean;
 	}
 
@@ -75,13 +85,14 @@
 		testid,
 		scrollable = false,
 		title,
+		position = 'bottom',
 		...rest
 	}: Props = $props();
 
-	function testids(testid: string | undefined) {
+	function testids(testid: PlaywrightTestIdBaseForDropdownMenu | undefined) {
 		return {
-			trigger: testid ? `${testid}-open` : undefined,
-			content: testid ? `${testid}-options` : undefined,
+			trigger: testid ? (`${testid}-open` as const) : undefined,
+			content: testid ? (`${testid}-options` as const) : undefined,
 		};
 	}
 
@@ -134,7 +145,7 @@
 	{@render trigger(
 		{
 			open,
-			onclick: () => {
+			onclick() {
 				open = !open;
 			},
 		},
@@ -144,6 +155,7 @@
 	<BottomDrawer
 		--drawer-outer-padding="0"
 		bind:open
+		{position}
 		{title}
 		maxHeight={Math.min(
 			estimatedHeight,
@@ -179,6 +191,7 @@
 					style:height="{heights.item.height}px"
 					class="bottom-drawer-item"
 					class:warning={i.warning}
+					class:danger={i.danger}
 					onclick={async () => {
 						i.onclick();
 
@@ -187,31 +200,41 @@
 						}
 					}}
 				>
-					{#if i.type === 'clickable'}
-						{#if item}
-							{@render item(i.data, { selected: false, ...i })}
-						{:else}
-							{i.label}
-						{/if}
-					{:else if item}
-						{@render item(i.data, i)}
+					{#if item}
+						{@render item(
+							i.data,
+							i.type === 'clickable' ? { selected: false, ...i } : i
+						)}
 					{:else}
-						{i.label}
+						<div class="label-and-icon">
+							<!-- To align items when some have icons and some don't -->
+							{#if groups.some((group) => group.items.some((i) => i.icon))}
+								<div class="icon">
+									{#if i.icon}
+										<i.icon />
+									{/if}
+								</div>
+							{/if}
+							{i.label}
+						</div>
 					{/if}
 				</button>
 			{/snippet}
 		</Submenu>
 	</BottomDrawer>
 {:else}
-	<DropdownMenu.Root {open}>
-		<DropdownMenu.Trigger {...rest} data-testid={testids(testid).trigger}>
+	<DropdownMenu.Root bind:open>
+		<DropdownMenu.Trigger {...rest} pw-testid={testids(testid).trigger}>
 			{#snippet child({ props })}
 				{@render trigger(
 					{
 						...props,
 						open,
-						onclick: () => {
-							open = !open;
+						onclick() {
+							console.log('swithcing open state', {
+								open,
+								testid: testids(testid).trigger,
+							});
 						},
 					},
 					{}
@@ -220,14 +243,14 @@
 		</DropdownMenu.Trigger>
 
 		<DropdownMenu.Portal>
-			<DropdownMenu.Content data-testid={testids(testid).content} preventScroll={!scrollable}>
+			<DropdownMenu.Content pw-testid={testids(testid).content} preventScroll={!scrollable}>
 				{#each groups as group (group.label)}
 					{#if group.items.length > 0}
-						<DropdownMenu.Group data-testid={group.testid}>
+						<DropdownMenu.Group pw-testid={group.testid}>
 							{#if group.label || (groups.length === 1 && title)}
-								<DropdownMenu.GroupHeading
-									>{group.label || title}</DropdownMenu.GroupHeading
-								>
+								<DropdownMenu.GroupHeading>
+									{group.label || title}
+								</DropdownMenu.GroupHeading>
 							{/if}
 
 							{#each group.items as i (i.label)}
@@ -262,7 +285,7 @@
 								{:else if i.type === 'submenu'}
 									<DropdownMenu.Sub>
 										<DropdownMenu.SubTrigger
-											data-testid={testids(i.testid).trigger}
+											pw-testid={testids(i.testid).trigger}
 										>
 											{#if item}
 												{@render item(i.data, { selected: false, ...i })}
@@ -271,7 +294,7 @@
 											{/if}
 										</DropdownMenu.SubTrigger>
 										<DropdownMenu.SubContent
-											data-testid={testids(i.testid).content}
+											pw-testid={testids(i.testid).content}
 										>
 											<DropdownMenu.Group>
 												{#if i.submenu.label}
@@ -378,7 +401,8 @@
 	}
 
 	.bottom-drawer-item {
-		padding: 0.75em;
+		/** No vertical padding cuz height is locked, we center it vertically instead */
+		padding: 0 0.75em;
 		width: 100%;
 		text-align: left;
 		background: none;
@@ -396,12 +420,33 @@
 			color: var(--fg-warning);
 			background: var(--bg-warning);
 		}
+
+		&.danger {
+			color: var(--fg-error);
+		}
 	}
 
 	.bottom-drawer-heading {
-		margin: 1em 0 0.5em;
+		padding-top: 0.5em;
+		margin-left: 0.75em;
 		font-size: 0.9rem;
 		font-style: italic;
 		color: var(--gay);
+	}
+
+	.label-and-icon {
+		display: flex;
+		gap: 0.5em;
+		align-items: center;
+		padding: 0.25em;
+
+		.icon {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			/* Makes space even if icon is empty */
+			width: 1.25em;
+			height: 1.25em;
+		}
 	}
 </style>

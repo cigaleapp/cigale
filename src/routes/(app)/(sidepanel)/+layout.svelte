@@ -192,7 +192,7 @@
 <TopbarOpenSession />
 
 <div class="main-and-sidepanel" class:has-sidepanel={showSidePanel} in:fade={{ duration: 100 }}>
-	<div class="main" data-testid="app-main">{@render children?.()}</div>
+	<div class="main" pw-testid="app-main">{@render children?.()}</div>
 	{#if showSidePanel}
 		<PreviewSidePanel
 			collapsed={mobile.current}

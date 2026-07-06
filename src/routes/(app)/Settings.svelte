@@ -474,7 +474,7 @@
 			--bg="var(--trigger-bg)"
 			--hover-fg="var(--trigger-hover-fg)"
 			--hover-bg="var(--trigger-hover-bg)"
-			help={open ? 'Fermer' : 'Réglages'}
+			help="Réglages"
 			{...props}
 		>
 			<div class="btn-content">

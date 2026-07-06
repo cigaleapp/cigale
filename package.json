@@ -40,7 +40,7 @@
 		}
 	],
 	"scripts": {
-		"dev": "bun --bun vite dev",
+		"dev": "bun --bun vite dev --host",
 		"dev:native": "electron-forge start",
 		"codegen": "bun run scripts/download-google-fonts.js && bun run scripts/generate-json-schemas.js && bun run scripts/codegen-filepath-types.ts && bun run scripts/generate-assetlinks.ts",
 		"prebuild": "bun run codegen && bun wuchale --clean --sync",
@@ -147,6 +147,7 @@
 	},
 	"dependencies": {
 		"@andy0130tw/es-arraybuffer-base64": "^1.1.2-browser.0",
+		"@capacitor-community/camera-preview": "^8.0.1",
 		"@capacitor/android": "^8.4.0",
 		"@capacitor/app": "^8.1.0",
 		"@capacitor/core": "^8.4.0",
@@ -162,6 +163,7 @@
 		"@capgo/inappbrowser": "^8.6.14",
 		"@formatjs/intl-durationformat": "^0.10.14",
 		"@iconify/svelte": "^5.2.2",
+		"@layflags/rolling-number": "^1.0.0",
 		"@sveltejs/svelte-virtual-list": "^3.0.1",
 		"@ungap/set-methods": "^0.1.1",
 		"@viselect/vanilla": "^3.9.0",
@@ -217,6 +219,8 @@
 		"@capacitor/file-viewer@2.0.1": "patches/@capacitor__file-viewer@2.0.1.patch",
 		"@capacitor/filesystem@8.1.2": "patches/@capacitor__filesystem@8.1.2.patch",
 		"natural-regex@0.5.0": "patches/natural-regex@0.5.0.patch",
-		"@types/piexifjs@1.0.0": "patches/@types%2Fpiexifjs@1.0.0.patch"
+		"@types/piexifjs@1.0.0": "patches/@types%2Fpiexifjs@1.0.0.patch",
+		"svelte-bottom-sheet@2.3.0": "patches/svelte-bottom-sheet@2.3.0.patch",
+		"@capacitor-community/camera-preview@8.0.1": "patches/@capacitor-community%2Fcamera-preview@8.0.1.patch"
 	}
 }

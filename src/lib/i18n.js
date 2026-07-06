@@ -16,7 +16,7 @@ export function plural(num, candidates, rule = (n) => (n === 1 ? 0 : 1)) {
 }
 
 /**
- * Converts a number between 0 and 1 to a percentage string.
+ * Converts a number between 0 and 1 to a percentage string. **Includes** the trailing percent sign
  * @param {number} value Number between 0 and 1
  * @param {number} [decimals=0] Number of decimal places to include in the output
  * @param {object} [options] Additional options

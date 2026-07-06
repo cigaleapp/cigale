@@ -18,7 +18,7 @@
 		suggestions?: (search: string) => Promise<I[]>;
 		// eslint-disable-next-line no-unused-vars
 		sorter?: (a: I, b: I) => number;
-		'viewport-testid'?: string;
+		'viewport-testid'?: PlaywrightTestId;
 		inputProps?: WithoutChildrenOrChild<Combobox.InputProps>;
 		contentProps?: WithoutChildrenOrChild<Combobox.ContentProps>;
 		id?: string;
@@ -38,6 +38,7 @@
 </script>
 
 <script lang="ts" generics="I extends Item, V extends string">
+	import type { PlaywrightTestId } from '$e2e/testids.js';
 	import type { WithoutChildrenOrChild } from 'bits-ui';
 	import type { Snippet } from 'svelte';
 	import type { Attachment } from 'svelte/attachments';
@@ -204,7 +205,7 @@
 	<!-- <Combobox.Trigger>Open</Combobox.Trigger> -->
 	<Combobox.Portal>
 		<Combobox.Content {...contentProps} sideOffset={8}>
-			<div class="viewport" data-testid={viewportTestId}>
+			<div class="viewport" pw-testid={viewportTestId}>
 				<div class="items">
 					<VirtualList
 						// FIXME: doesnt seem to work that well

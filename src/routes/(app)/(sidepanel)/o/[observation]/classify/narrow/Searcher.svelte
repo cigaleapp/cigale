@@ -83,7 +83,7 @@
 {#if shownDefinitions.length > 0 || !query}
 	<div
 		class="scrollable"
-		data-testid="descriptors"
+		pw-testid="descriptors"
 		in:fade={{ duration: 200 }}
 		{@attach scrollController(untrack(() => scroll))}
 	>

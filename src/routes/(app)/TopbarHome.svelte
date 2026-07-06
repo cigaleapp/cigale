@@ -7,18 +7,16 @@
 </script>
 
 <TopbarContent>
-	{#snippet children(props)}
-		<div class="title">
-			<Logo />
-			Cigale
-		</div>
-		<!-- Wrapper is because DropdownMenu creates another 0x0 element wrapper alongside its trigger... -->
-		<div class="actions">
-			<ModalSubmitIssue type="bug" />
+	<div class="title">
+		<Logo />
+		Cigale
+	</div>
+	<!-- Wrapper is because DropdownMenu creates another 0x0 element wrapper alongside its trigger... -->
+	<div class="actions">
+		<ModalSubmitIssue type="bug" />
 
-			<Settings {...props} />
-		</div>
-	{/snippet}
+		<Settings />
+	</div>
 </TopbarContent>
 
 <style>

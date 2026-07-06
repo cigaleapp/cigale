@@ -1,0 +1,13 @@
+diff --git a/dist/BottomSheet/Sheet/Sheet.svelte b/dist/BottomSheet/Sheet/Sheet.svelte
+index f4d6dfde12f4bb28d2a27904d305f1271cb143a9..0004a04fe47c61c0170b5dd5e8cfddc6582899fd 100644
+--- a/dist/BottomSheet/Sheet/Sheet.svelte
++++ b/dist/BottomSheet/Sheet/Sheet.svelte
+@@ -304,7 +304,7 @@
+ 	.position-top {
+ 		display: flex;
+ 		flex-direction: column-reverse;
+-		border-radius: 0 0 1rem rem;
++		border-radius: 0 0 1rem 1rem;
+ 		margin: 0 auto;
+ 		top: 0;
+ 		bottom: unset;

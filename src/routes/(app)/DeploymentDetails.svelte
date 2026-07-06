@@ -31,6 +31,8 @@
 			.then((res) => res.ok)
 			.catch(() => false);
 	}
+
+	const prLink = $derived(`https://github.com/cigaleapp/cigale/pull/${previewingPrNumber}`);
 </script>
 
 {#snippet githubUser(
@@ -54,7 +56,6 @@
 	bind:open
 	title="Déploiement de preview pour la PR #{previewingPrNumber}"
 >
-	{@const prLink = `https://github.com/cigaleapp/cigale/pull/${previewingPrNumber}`}
 	{#await fetch(`https://api.github.com/repos/cigaleapp/cigale/pulls/${previewingPrNumber}`).then( (res) => res.json() )}
 		<p>
 			Déploiement de preview pour la <a href={prLink}>PR #{previewingPrNumber}</a>

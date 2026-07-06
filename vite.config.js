@@ -21,7 +21,7 @@ const env = arkenv(
 			.array()
 			.default(() => []),
 		VITEST: 'boolean = false',
-		DEBUG: 'boolean = false',
+		DEBUG: type('string|boolean').pipe(Boolean).default(false),
 		/** Required for mobile app, since window.location.origin returns localhost */
 		WEB_ORIGIN: 'string.url = "https://cigaleapp.github.io"',
 		BUILTIN_PROTOCOLS: type('string.url')

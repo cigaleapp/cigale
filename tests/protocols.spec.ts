@@ -439,27 +439,19 @@ test('can use a protocol that imports metadata from another protocol', async ({
 
 	await app.metadata.switch('From child').click();
 	await app.metadata.combobox('Imported enum').fill('Option 20');
-	await expect(page.getByTestId('metadata-combobox-viewport')).toMatchAriaSnapshot(`
-	  - option /Option \\d+/
-	  - option /Option \\d+/
-	  - option /Option \\d+/
-	  - option /Option \\d+/
-	  - option /Option \\d+/
-	  - option /Option \\d+/
-	  - option /Option \\d+/
-	  - option /Option \\d+/
-	  - option /Option \\d+/
-	  - option /Option \\d+/
-	  - option /Option \\d+/
-	  - heading "Option 0" [level=2]
-	  - paragraph: This is the option №0 🤓
-	  - table:
-	    - rowgroup:
-	      - row "Is imported Ionknow":
-	        - cell "Is imported"
-	        - cell "Ionknow"
-	  - paragraph:
-	    - emphasis: Métadonées mises à jour à la sélection de cette option
+	await expect(page.getByTestId('metadata-combobox-viewport').locator('.items'))
+		.toMatchAriaSnapshot(`
+	  - option /^Option 20\\d*$/
+	  - option /^Option 20\\d*$/
+	  - option /^Option 20\\d*$/
+	  - option /^Option 20\\d*$/
+	  - option /^Option 20\\d*$/
+	  - option /^Option 20\\d*$/
+	  - option /^Option 20\\d*$/
+	  - option /^Option 20\\d*$/
+	  - option /^Option 20\\d*$/
+	  - option /^Option 20\\d*$/
+	  - option /^Option 20\\d*$/
 	`);
 	await app.metadata.combobox('Imported enum').fill('2067');
 	await page

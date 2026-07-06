@@ -39,7 +39,7 @@ jobs:
   android:
     name: Android app
     uses: ./.github/workflows/android.yml
-    if: contains(github.event.pull_request.labels.*.name, 'mobile') || !startsWith(github.base_ref, 'renovate/')
+    if: contains(github.event.pull_request.labels.*.name, 'mobile') || contains(github.event.pull_request.labels.*.name, 'native-android-changes') || !startsWith(github.base_ref, 'renovate/')
     secrets:
       ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_PR_KEYSTORE_BASE64 }}
       ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_PR_KEYSTORE_PASSWORD }}
@@ -53,6 +53,11 @@ jobs:
       artifact: ${{ inputs.artifact}}
       app-name: Cigale (PR ${{ github.event.number }})
       push-update: false
+      # APK with Live Reload that requests on the local network (needs a dev server up)
+      # Always disabled: ~capacitor-no-live-reload
+      # Always enabled: ~capacitor-live-reload
+      # Otherwise: if PR is a draft
+      live-reload: ${{ !contains(github.event.pull_request.labels.*.name, 'capacitor-no-live-reload') && (contains(github.event.pull_request.labels.*.name, 'capacitor-live-reload') || github.event.pull_request.draft) }}
       diawi-comment: |
         This is a PR preview build.
 

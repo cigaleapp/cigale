@@ -41,8 +41,8 @@ export const ACCEPTED_IMPORT_TYPES = [
 
 /**
  * @param {object} param0
- * @param {File} param0.file
- * @param {string} param0.id
+ * @param {File} param0.file 
+ * @param {string} param0.id new, free ImageFile id to use 
  * @param {File[]} param0.sidecars
  */
 export async function processImageFile({ file, id: fileId, sidecars }) {

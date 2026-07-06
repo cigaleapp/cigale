@@ -72,7 +72,7 @@
 	const _virtualize = $derived(virtualize && groups.length === 0);
 </script>
 
-<div class="liste" data-testid={testid}>
+<div class="liste" pw-testid={testid}>
 	{#snippet metadata(item: (typeof groupedDefinitions)[number])}
 		{@const { group, definitions } = item}
 		<div class="definition-group">

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Expandable } from '../WithExpandButton.svelte';
+	import type { PlaywrightTestId } from '$e2e/testids.js';
 	import type { Attachment } from 'svelte/attachments';
 
 	import { marked } from 'marked';
@@ -64,11 +65,11 @@
 
 	undo.initialize(100);
 
-	function area(areaName: string): Attachment {
+	function area(areaName: PlaywrightTestId): Attachment {
 		return (node) => {
 			if (!(node instanceof HTMLElement)) return;
 			node.style.gridArea = areaName;
-			node.dataset.testid = areaName;
+			node.setAttribute('pw-testid', areaName);
 		};
 	}
 </script>

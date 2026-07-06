@@ -5,7 +5,7 @@ import { nanoid } from 'nanoid';
 import * as yauzl from 'yauzl-promise';
 
 import { FixturePaths } from '../filepaths.js';
-import { goToTab, newSession, setSettings, waitForLoadingEnd } from './index.js';
+import { goToTab, newSession, pickFiles, setSettings, waitForLoadingEnd } from './index.js';
 
 /**
  * @import { Page } from '@playwright/test';
@@ -33,8 +33,8 @@ export async function importResults(page, filepath, { waitForLoading = true } = 
 	// Import fixture zip
 	await expect(page.getByText(/\(.zip\)/)).toBeVisible();
 
-	const fileInput = await page.$("input[type='file']");
-	await fileInput?.setInputFiles(path.join(FixturePaths.root, filepath));
+	// TODO: use drag & drop here so we test that :)
+	await pickFiles(page.getByRole('button', { name: 'Choisir des fichiers' }), filepath);
 
 	if (waitForLoading) await waitForLoadingEnd(page);
 }

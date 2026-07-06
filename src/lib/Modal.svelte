@@ -82,7 +82,6 @@ CSS variables:
 			}, openingDuration);
 		};
 		close = () => {
-			onclose?.();
 			if (toastsPool) {
 				toasts.setCurrentPool('default');
 				toasts.clear();
@@ -115,7 +114,11 @@ CSS variables:
 		{title}
 		maxHeight={0.75}
 		bind:open={
-			() => page.state[stateKey] === true, (isOpen) => pushState('', { [stateKey]: isOpen })
+			() => page.state[stateKey] === true,
+			(isOpen) => {
+				if (!isOpen) onclose?.();
+				pushState('', { [stateKey]: isOpen });
+			}
 		}
 	>
 		<div class="contents">
@@ -144,6 +147,7 @@ CSS variables:
 		onclose={() => {
 			// Update state when dialog is closed via browser-controlled means (e.g. Esc key)
 			pushState('', { [stateKey]: false });
+			onclose?.();
 		}}
 		onmousedown={({ target, currentTarget, offsetX, offsetY }) => {
 			// If we're close enough to the edge of the dialog but still "inside", don't close, because target === currentTarget but it's not the backdrop yet (see #469)

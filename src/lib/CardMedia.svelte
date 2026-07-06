@@ -15,7 +15,7 @@
 	 * @property {string} title
 	 * @property {number} [stacksize=1] - number of images in this observation
 	 * @property {string | undefined} image - image url
-	 * @property {Status} [status="ok"] - status of the image processing
+	 * @property {Status} [status] - status of the image processing
 	 * @property {string} [statusText] - text to show when status is not `"ok"`
 	 * @property {string} [loadingStatusText] statusText override when status == "loading"
 	 * @property {boolean} [selectable=true] - whether this image can be selected
@@ -214,7 +214,7 @@
 						{#each boundingBoxes as bounding, index (index)}
 							<!-- TODO …and use it here to compute box dimensions, taking into account image's original dimensions (% -> px) then making it relative to the actual <img> tag dims (px -> %)  (2/2) -->
 							<div
-								data-testid="card-observation-bounding-box"
+								pw-testid="card-observation-bounding-box"
 								class="bb"
 								style="left: {bounding.x * 100}%; top: {bounding.y *
 									80}%; width: {bounding.width * 100}%; height: {80 *

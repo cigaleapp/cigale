@@ -485,7 +485,9 @@ export async function scrollAndClick(locator, { scroll = 'down', force = false }
 }
 
 /**
- * @template {FixturePaths.Any} Path
+ * Always has slashes
+ * @template {AllowedPath} Path
+ * @template {FixturePaths.Any} [AllowedPath=FixturePaths.Any]
  * @param {Path} pathname
  * @returns {FixturePaths.Absolute<Path>}
  */

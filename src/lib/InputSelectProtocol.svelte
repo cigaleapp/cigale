@@ -1,4 +1,6 @@
-<script>
+<script lang="ts">
+	import type { PlaywrightTestIdBaseForDropdownMenu } from '$e2e/testids.js';
+
 	import IconGoto from '~icons/ri/arrow-right-line';
 	import IconSelected from '~icons/ri/check-line';
 	import IconExpand from '~icons/ri/expand-up-down-line';
@@ -8,15 +10,15 @@
 	import { goto } from '$lib/paths.js';
 	import { tooltip } from '$lib/tooltips.js';
 
-	/**
-	 * @typedef {object} Props
-	 * @property {string} value selected protocol's ID
-	 * @property {(value: string) => Promise<void> | void} [onchange]
-	 * @property {string} [testid]
-	 */
+	type Props = {
+		/** selected protocol's ID */
+		value: string;
+		// eslint-disable-next-line no-unused-vars
+		onchange?: (value: string) => Promise<void> | void;
+		testid?: PlaywrightTestIdBaseForDropdownMenu;
+	};
 
-	/** @type {Props} */
-	let { value = $bindable(), testid, onchange } = $props();
+	let { value = $bindable(), testid, onchange }: Props = $props();
 </script>
 
 <DropdownMenu

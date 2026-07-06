@@ -26,11 +26,21 @@ const chromium = {
 	use: {
 		...devices['Desktop Chrome'],
 		launchOptions: {
-			args: dependsOnTarget({
-				dev: ['--max_old_space_size=2048'],
-				live: [],
-				built: [],
-			}),
+			args: [
+				'--use-fake-ui-for-media-stream',
+				'--use-fake-device-for-media-stream',
+				// i can't get the y4m conversion right... 
+				// default mock video stream is fine anyways
+				// and .y4m files are extremely heavy, so it'd require
+				// having ffmpeg on the CI server to convert a .mp4 to .y4m
+				// '--use-file-for-fake-video-capture=' +
+				// 	absoluteFixtureFilepath('camera/lil-fella.y4m'),
+				...dependsOnTarget({
+					dev: ['--max_old_space_size=2048'],
+					live: [],
+					built: [],
+				}),
+			],
 		},
 		contextOptions: {
 			serviceWorkers: process.env.CI ? 'allow' : 'block',
@@ -126,6 +136,11 @@ export default defineConfig({
 
 		// Ensure no TZ issues for assertions that depend on time
 		timezoneId: 'Etc/UTC',
+
+		// To enable strong typing within Svelte components, we currently can't use data-* attributes
+		// See https://github.com/sveltejs/svelte/issues/14859
+		// So we use a nonstandard attribute instead
+		testIdAttribute: 'pw-testid',
 	},
 
 	/* Configure projects for major browsers */

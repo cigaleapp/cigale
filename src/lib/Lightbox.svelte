@@ -82,6 +82,7 @@
 		&[open] {
 			opacity: 1;
 			pointer-events: auto;
+			overflow: hidden;
 
 			.contents {
 				scale: 1;
@@ -112,6 +113,15 @@
 		right: 0.5em;
 		--fg: white;
 		font-size: 1.5em;
+	}
+
+	.contents {
+		position: fixed;
+		inset: 0;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
 	}
 
 	button {

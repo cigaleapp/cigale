@@ -136,7 +136,7 @@
 </script>
 
 <div class="with-header">
-	<header data-testid="fullscreen-header">
+	<header pw-testid="fullscreen-header">
 		<div class="left-side">
 			<ButtonIcon loading onclick={backToGalleryView} help="Retour" keyboard="Escape">
 				<IconClose />

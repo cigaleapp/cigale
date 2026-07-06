@@ -42,18 +42,14 @@ export async function importPhotos({ page, wait = true, additionalWaitTime = 0 }
 
 		console.debug(`Importing batch ${i + 1}:`, batch);
 
-		// Once we have at least a card, the file input from the dropzone disappears
-		if (i === 0) {
-			const fileInput = await page.$("input[type='file']");
-			await fileInput?.setInputFiles(batch.map(nameToPath));
-		} else {
-			await pickFiles(
-				page.getByRole('button', {
-					name: "Importer d'autres images",
-				}),
-				...batch
-			);
-		}
+		await pickFiles(
+			page.getByRole('button', {
+				// Once we have at least a card, the centered button disappears
+				// and the sidepanel shows
+				name: i === 0 ? 'Choisir des fichiers' : "Plus d'images",
+			}),
+			...batch
+		);
 
 		if (wait) await waitUntilLastAppears(batch);
 	}

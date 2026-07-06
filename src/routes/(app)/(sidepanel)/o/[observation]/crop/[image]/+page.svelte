@@ -877,7 +877,7 @@
 			{/if}
 		</div>
 		<img
-			data-testid="crop-subject-image"
+			pw-testid="crop-subject-image"
 			src={imageSrc}
 			alt=""
 			bind:this={imageElement}

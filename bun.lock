@@ -6,6 +6,7 @@
       "name": "CIGALE",
       "dependencies": {
         "@andy0130tw/es-arraybuffer-base64": "^1.1.2-browser.0",
+        "@capacitor-community/camera-preview": "^8.0.1",
         "@capacitor/android": "^8.4.0",
         "@capacitor/app": "^8.1.0",
         "@capacitor/core": "^8.4.0",
@@ -21,6 +22,7 @@
         "@capgo/inappbrowser": "^8.6.14",
         "@formatjs/intl-durationformat": "^0.10.14",
         "@iconify/svelte": "^5.2.2",
+        "@layflags/rolling-number": "^1.0.0",
         "@sveltejs/svelte-virtual-list": "^3.0.1",
         "@ungap/set-methods": "^0.1.1",
         "@viselect/vanilla": "^3.9.0",
@@ -158,7 +160,9 @@
   "patchedDependencies": {
     "@capacitor/file-viewer@2.0.1": "patches/@capacitor__file-viewer@2.0.1.patch",
     "natural-regex@0.5.0": "patches/natural-regex@0.5.0.patch",
+    "svelte-bottom-sheet@2.3.0": "patches/svelte-bottom-sheet@2.3.0.patch",
     "@types/piexifjs@1.0.0": "patches/@types%2Fpiexifjs@1.0.0.patch",
+    "@capacitor-community/camera-preview@8.0.1": "patches/@capacitor-community%2Fcamera-preview@8.0.1.patch",
     "@capacitor/filesystem@8.1.2": "patches/@capacitor__filesystem@8.1.2.patch",
   },
   "packages": {
@@ -213,6 +217,8 @@
     "@borewit/text-codec": ["@borewit/text-codec@0.2.2", "", {}, "sha512-DDaRehssg1aNrH4+2hnj1B7vnUGEjU6OIlyRdkMd0aUdIUvKXrJfXsy8LVtXAy7DRvYVluWbMspsRhz2lcW0mQ=="],
 
     "@bramus/specificity": ["@bramus/specificity@2.4.2", "", { "dependencies": { "css-tree": "^3.0.0" }, "bin": { "specificity": "bin/cli.js" } }, "sha512-ctxtJ/eA+t+6q2++vj5j7FYX3nRu311q1wfYH3xjlLOsczhlhxAg2FWNUXhpGvAw3BWo1xBcvOV6/YLc2r5FJw=="],
+
+    "@capacitor-community/camera-preview": ["@capacitor-community/camera-preview@8.0.1", "", { "peerDependencies": { "@capacitor/core": ">=8.0.2" } }, "sha512-pEBB+FKXoISMiorn9nKvyd9DPkalopckYxKlHuRBhC6cBLOxgLPnjj9nQO9TYOnWI5nuh973QRZtgN4sOe5Pyw=="],
 
     "@capacitor/android": ["@capacitor/android@8.4.0", "", { "peerDependencies": { "@capacitor/core": "^8.4.0" } }, "sha512-K1ZPkQzvRzPEALz9nBdLx5p5nAPzp5fsTYWk7LRiKZeH/NXqjDvqfTv7lrLgrziQNoDeaL6ijg64oBREzXiV+g=="],
 
@@ -675,6 +681,8 @@
     "@jridgewell/sourcemap-codec": ["@jridgewell/sourcemap-codec@1.5.5", "", {}, "sha512-cYQ9310grqxueWbl+WuIUIaiUaDcj7WOq5fVhEljNVgRfOUhY9fy2zTvfoqWsnebh8Sl70VScFbICvJnLKB0Og=="],
 
     "@jridgewell/trace-mapping": ["@jridgewell/trace-mapping@0.3.31", "", { "dependencies": { "@jridgewell/resolve-uri": "^3.1.0", "@jridgewell/sourcemap-codec": "^1.4.14" } }, "sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw=="],
+
+    "@layflags/rolling-number": ["@layflags/rolling-number@1.0.0", "", {}, "sha512-zT21+3iK82DEW4YbNyVXKS4IdnuIgXCLHUhwQTnc8OS/EeEikUho62eLh3ICf5A72nlRADW50K3N7VAbNiRe5g=="],
 
     "@listr2/prompt-adapter-inquirer": ["@listr2/prompt-adapter-inquirer@2.0.22", "", { "dependencies": { "@inquirer/type": "^1.5.5" }, "peerDependencies": { "@inquirer/prompts": ">= 3 < 8" } }, "sha512-hV36ZoY+xKL6pYOt1nPNnkciFkn89KZwqLhAFzJvYysAvL5uBQdiADZx/8bIDXIukzzwG0QlPYolgMzQUtKgpQ=="],
 

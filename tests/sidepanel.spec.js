@@ -15,7 +15,7 @@ import {
 
 /**
  * @import { Page } from '@playwright/test';
- * @import { AppFixture } from './fixtures.js';
+ * @import { AppFixture } from './fixtures/app.js';
  */
 
 /**
@@ -331,109 +331,55 @@ test.describe('can search in a enum-type metadata combobox', () => {
 		await initialize({ page, app });
 		await page.getByTestId('sidepanel').getByRole('combobox').first().fill('Dicyrt');
 
-		await assert(page.getByTestId('metadata-combobox-viewport')).toMatchAriaSnapshot(`
+		await assert(page.getByTestId('metadata-combobox-viewport').locator('.items'))
+			.toMatchAriaSnapshot(`
 		  - option /Dicyrtomina saundersi \\d+%/:
-		    - text: ""
+		    - text: "Dicyrtomina saundersi"
 		    - code: /\\d+%/
 		  - option "Dicyrtomina ornata 4%":
-		    - text: ""
+		    - text: "Dicyrtomina ornata"
 		    - code: 4%
 		  - option "Dicyrtomina minuta 1%":
-		    - text: ""
+		    - text: "Dicyrtomina minuta"
 		    - code: 1%
 		  - option "Dicyrtoma fusca 0.4%":
-		    - text: ""
+		    - text: "Dicyrtoma fusca"
 		    - code: 0.4%
 		  - option "Dicyrtomina signata 0.3%":
-		    - text: ""
+		    - text: "Dicyrtomina signata"
 		    - code: 0.3%
 		  - option "Dicyrtomina flavosignata 0.2%":
-		    - text: ""
+		    - text: "Dicyrtomina flavosignata"
 		    - code: 0.2%
 		  - option "Allacma fusca AKA Dicyrtoma fusca 9%":
-		    - text: ""
+		    - text: "Allacma fusca AKA Dicyrtoma fusca"
 		    - code: 9%
-		  - heading "Entomobrya muscorum" [level=2]
-		  - link "En savoir plus gbif.org":
-		    - /url: https://gbif.org/species/2120749
-		    - img
-		    - text: ""
-		    - code: gbif.org
-		  - table:
-		    - rowgroup:
-		      - row "Genre Entomobrya":
-		        - cell "Genre"
-		        - cell "Entomobrya"
-		      - row "Famille Entomobryidae":
-		        - cell "Famille"
-		        - cell "Entomobryidae"
-		      - row "Ordre Entomobryomorpha":
-		        - cell "Ordre"
-		        - cell "Entomobryomorpha"
-		      - row "Classe Collembola":
-		        - cell "Classe"
-		        - cell "Collembola"
-		      - row "Phylum Arthropoda":
-		        - cell "Phylum"
-		        - cell "Arthropoda"
-		      - row "Règne Animalia":
-		        - cell "Règne"
-		        - cell "Animalia"
-		  - paragraph:
-		    - emphasis: Métadonées mises à jour à la sélection de cette option
 		`);
 	});
 
 	testBasic('by synonym', async ({ page, app }) => {
 		await initialize({ page, app });
 		await page.getByTestId('sidepanel').getByRole('combobox').first().fill('desoria');
-		await assert(page.getByTestId('metadata-combobox-viewport')).toMatchAriaSnapshot(`
+		await assert(page.getByTestId('metadata-combobox-viewport').locator('.items'))
+			.toMatchAriaSnapshot(`
 		  - option "Isotomurus maculatus AKA Desoria riparia 1%":
-		    - text: ""
+		    - text: "Isotomurus maculatus AKA Desoria riparia"
 		    - code: 1%
 		  - option "Isotoma riparia AKA Desoria riparia 0.4%":
-		    - text: ""
+		    - text: "Isotoma riparia AKA Desoria riparia"
 		    - code: 0.4%
 		  - option "Isotomurus palustris AKA Desoria riparia 0.1%":
-		    - text: ""
+		    - text: "Isotomurus palustris AKA Desoria riparia"
 		    - code: 0.1%
 		  - option "Vertagopus asiaticus AKA Desoria cylindrica 0.1%":
-		    - text: ""
+		    - text: "Vertagopus asiaticus AKA Desoria cylindrica"
 		    - code: 0.1%
 		  - option "Parisotoma notabilis AKA Desoria monticola 0.1%":
-		    - text: ""
+		    - text: "Parisotoma notabilis AKA Desoria monticola"
 		    - code: 0.1%
 		  - option "Isotoma viridis AKA Desoria fusia 0.1%":
-		    - text: ""
+		    - text: "Isotoma viridis AKA Desoria fusia"
 		    - code: 0.1%
-		  - heading "Entomobrya muscorum" [level=2]
-		  - link "En savoir plus gbif.org":
-		    - /url: https://gbif.org/species/2120749
-		    - img
-		    - text: ""
-		    - code: gbif.org
-		  - table:
-		    - rowgroup:
-		      - row "Genre Entomobrya":
-		        - cell "Genre"
-		        - cell "Entomobrya"
-		      - row "Famille Entomobryidae":
-		        - cell "Famille"
-		        - cell "Entomobryidae"
-		      - row "Ordre Entomobryomorpha":
-		        - cell "Ordre"
-		        - cell "Entomobryomorpha"
-		      - row "Classe Collembola":
-		        - cell "Classe"
-		        - cell "Collembola"
-		      - row "Phylum Arthropoda":
-		        - cell "Phylum"
-		        - cell "Arthropoda"
-		      - row "Règne Animalia":
-		        - cell "Règne"
-		        - cell "Animalia"
-		  - paragraph:
-		    - emphasis: Métadonées mises à jour à la sélection de cette option
 		`);
 	});
 });

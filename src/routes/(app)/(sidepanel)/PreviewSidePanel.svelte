@@ -8,6 +8,7 @@
 
 	import IconShowPanel from '~icons/ri/arrow-up-s-line';
 	import IconObservation from '~icons/ri/bug-line';
+	import IconCamera from '~icons/ri/camera-line';
 	import IconDelete from '~icons/ri/delete-bin-line';
 	import IconFullScreen from '~icons/ri/fullscreen-line';
 	import IconSplit from '~icons/ri/function-line';
@@ -240,10 +241,16 @@
 			</div>
 		{/if}
 		{#if onimport}
-			<ButtonSecondary onclick={onimport}>
-				<IconImport />
-				Importer d'autres images
-			</ButtonSecondary>
+			<div class="side-by-side">
+				<ButtonSecondary onclick={onimport}>
+					<IconImport />
+					Plus d'images
+				</ButtonSecondary>
+				<ButtonSecondary onclick={async () => goto('/(app)/capture')}>
+					<IconCamera />
+					Appareil photo
+				</ButtonSecondary>
+			</div>
 		{/if}
 		{#if page.route.id === '/(app)/(sidepanel)/classify' && !mobile.current}
 			<ButtonSecondary
@@ -303,7 +310,7 @@
 		<div class="sidepanel mobile">{@render content()}</div>
 	</BottomDrawer>
 {:else}
-	<aside data-testid="sidepanel" class="sidepanel" class:collapsed>
+	<aside pw-testid="sidepanel" class="sidepanel" class:collapsed>
 		{@render content()}
 	</aside>
 {/if}

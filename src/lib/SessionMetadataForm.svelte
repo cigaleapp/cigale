@@ -69,7 +69,7 @@
 			Aucune métadonnée à renseigner
 		</div>
 	{:else}
-		<form class="metadata" data-testid="session-metadata">
+		<form class="metadata" pw-testid="session-metadata">
 			<MetadataList
 				definitions={metadataDefs}
 				values={session.metadata}
