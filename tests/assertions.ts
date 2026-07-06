@@ -1,6 +1,7 @@
 import type { Locator } from '@playwright/test';
 
 import { expect as baseExpect } from '@playwright/test';
+
 import { expectTooltipContent } from './utils/index.js';
 
 export const assert = baseExpect.extend({

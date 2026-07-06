@@ -226,7 +226,6 @@ jobs:
             exit 1
           fi
 
-
       - name: Set artifact name
         id: artifact
         run: echo "name=apk-${{ github.sha }}-${{ inputs.flavor }}" >> $GITHUB_OUTPUT

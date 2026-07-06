@@ -118,7 +118,6 @@
 		}
 	}
 
-
 	/* .row:not(:focus-within):not(:hover) .delete {
 		opacity: 0;
 	} */

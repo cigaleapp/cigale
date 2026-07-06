@@ -29,7 +29,7 @@ const chromium = {
 			args: [
 				'--use-fake-ui-for-media-stream',
 				'--use-fake-device-for-media-stream',
-				// i can't get the y4m conversion right... 
+				// i can't get the y4m conversion right...
 				// default mock video stream is fine anyways
 				// and .y4m files are extremely heavy, so it'd require
 				// having ffmpeg on the CI server to convert a .mp4 to .y4m
