@@ -19,9 +19,6 @@ msgstr "<0/> Loading…"
 msgid "<0/> Créer"
 msgstr "<0/> Create"
 
-#~ msgid "<0/> Importer d'autres images"
-#~ msgstr "<0/> Import other images"
-
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 msgid "<0/> Regrouper"
 msgstr "<0/> Group"
@@ -206,9 +203,6 @@ msgstr "Classify <0/>"
 #: src/routes/(app)/Navigation.svelte
 msgid "Classifier les images"
 msgstr "Classify images"
-
-#~ msgid "Cliquer ou déposer des images, ou un export de résultats (.zip)"
-#~ msgstr "Click or drop images, or an export of results (.zip)"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Code source"
@@ -529,6 +523,7 @@ msgstr "Group selected images and/or observations into one observation"
 msgid "ResNet50"
 msgstr "ResNet50"
 
+#: src/routes/(app)/Settings.svelte
 #: src/routes/(app)/Settings.svelte
 msgid "Réglages"
 msgstr "Settings"
@@ -2954,19 +2949,10 @@ msgstr "See all photos"
 msgid "Prendre une photo"
 msgstr "Take a photo"
 
-#~ msgid "<0/> Terminé"
-#~ msgstr "<0/> Finished"
-
 #. 0: pendingStorage?.count ?? 0
 #: src/routes/(app)/capture/+page.svelte
 msgid "Il y a {0} photos en attente qui seront supprimées si tu quitte"
 msgstr "{0} pending photos will be deleted if you quit"
-
-#~ msgid "Prendre des photos"
-#~ msgstr "Take photos"
-
-#~ msgid "<0/> OK"
-#~ msgstr ""
 
 #: src/routes/(app)/capture/+page.svelte
 msgid "Plus d'options"
@@ -2980,15 +2966,9 @@ msgstr "Options"
 msgid "Retour à la caméra"
 msgstr "Back to camera"
 
-#~ msgid "<0/> Photos capturées"
-#~ msgstr ""
-
 #: src/routes/(app)/capture/gallery/+page.svelte
 msgid "Plus"
 msgstr "More"
-
-#~ msgid "<0/> Photos capturées <1/>"
-#~ msgstr ""
 
 #: src/routes/(app)/capture/gallery/+page.svelte
 msgid "# photo capturée"
@@ -3000,15 +2980,9 @@ msgstr[1] "# photos taken"
 msgid "Photos capturées"
 msgstr "Photos taken"
 
-#~ msgid "Importation"
-#~ msgstr ""
-
 #: src/lib/exif.ts
 msgid "Impossible de modifier les données EXIF"
 msgstr "Cannot modify EXIF data"
-
-#~ msgid "Cliquer ou déposer des images, ou un export de résultats (.zip), ou"
-#~ msgstr ""
 
 #: src/routes/(app)/(sidepanel)/import/+page.svelte
 msgid "<0/> Prendre des photos"
@@ -3022,42 +2996,18 @@ msgstr "Drag & drop images or a results export (.zip). Or also:"
 msgid "<0/> Choisir des fichiers"
 msgstr "<0/> Choose files"
 
-#~ msgid "Passer le flash {0}"
-#~ msgstr ""
-
 #: src/routes/(app)/capture/+page.svelte
 msgid "Ce mode de flash n'est pas supporté"
 msgstr "This flash mode isn't supported"
-
-#~ msgid "Flash: {0}"
-#~ msgstr ""
 
 #: src/routes/(app)/capture/+page.svelte
 msgid "<0/> Fini"
 msgstr "<0/> Done"
 
-#~ msgid "Fini"
-#~ msgstr ""
-
-#~ msgid "Cette session n'existe pas"
-#~ msgstr ""
-
-#~ msgid "Voir {0}]"
-#~ msgstr ""
-
 #. 0: sessionId
 #: src/routes/(app)/storage/+page.svelte
 msgid "{0} · Session supprimée"
 msgstr "{0} · Session was deleted"
-
-#~ msgid "<0/> Fichiers"
-#~ msgstr ""
-
-#~ msgid "<0/> Appareil"
-#~ msgstr ""
-
-#~ msgid "<0/> Autres images"
-#~ msgstr "<0/> More images"
 
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 msgid "<0/> Appareil photo"
