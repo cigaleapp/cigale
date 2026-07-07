@@ -1,8 +1,11 @@
 import { mkdirSync } from 'node:fs';
 import path from 'node:path';
 import type { Page } from '@playwright/test';
+import type { RemovePrefix } from '$lib/utils.js';
 
 import { expect } from '@playwright/test';
+
+import { collectOPFSState } from '$e2e/utils/opfs.js';
 
 import lightProtocol from '../../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import { FixturePaths } from '../filepaths.js';
@@ -17,14 +20,16 @@ import {
 	newSession,
 } from '../utils/index.js';
 
-setup.use({ storageState: { cookies: [], origins: [] } });
+setup.use({ storageState: { cookies: [], origins: [] }, opfsState: [] });
 
 setup('empty, basic', async ({ page }) => {
 	await goToProtocolManagement(page);
 	await importProtocol(page, 'examples/arthropods.light.cigaleprotocol.json');
 
-	await writeStorageState(page, 'storage-states/empty.json', {
-		builtinProtocols: JSON.stringify([lightProtocol.source]),
+	await writeStates(page, 'empty.json', {
+		localStorage: {
+			builtinProtocols: JSON.stringify([lightProtocol.source]),
+		},
 	});
 
 	await importResults(page, 'exports/correct.zip');
@@ -32,8 +37,10 @@ setup('empty, basic', async ({ page }) => {
 	// Prevent storing current session state in localStorage
 	await goHome(page);
 
-	await writeStorageState(page, 'storage-states/basic.json', {
-		builtinProtocols: JSON.stringify([lightProtocol.source]),
+	await writeStates(page, 'basic.json', {
+		localStorage: {
+			builtinProtocols: JSON.stringify([lightProtocol.source]),
+		},
 	});
 });
 
@@ -66,10 +73,22 @@ setup('kitchensink-protocol', async ({ page, app }) => {
 	// Prevent storing current session state in localStorage
 	await goHome(page);
 
-	await writeStorageState(page, 'storage-states/kitchen-sink.json', {
-		builtinProtocols: JSON.stringify([]),
+	await writeStates(page, 'kitchen-sink.json', {
+		localStorage: {
+			builtinProtocols: JSON.stringify([]),
+		},
 	});
 });
+
+async function writeStates(
+	page: Page,
+	filename: RemovePrefix<'storage-states/', FixturePaths.StorageStates> &
+		RemovePrefix<'opfs-states/', FixturePaths.OPFSStates>,
+	overrides: { localStorage?: Record<string, string> } = {}
+) {
+	await writeStorageState(page, `storage-states/${filename}`, overrides?.localStorage);
+	await collectOPFSState(page, `opfs-states/${filename}`);
+}
 
 async function writeStorageState(
 	page: Page,

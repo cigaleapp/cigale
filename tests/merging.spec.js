@@ -2,7 +2,10 @@ import { issue } from './annotations.js';
 import { assert, expect, test } from './fixtures.js';
 import { chooseFirstSession, setInferenceModels } from './utils/index.js';
 
-test.use({ storageState: 'tests/fixtures/storage-states/basic.json' });
+test.use({
+	storageState: 'tests/fixtures/storage-states/basic.json',
+	opfsState: 'tests/fixtures/opfs-states/basic.json',
+});
 
 test.beforeEach(async ({ page, app }) => {
 	await app.settings.set({ gallerySort: { direction: 'asc', key: 'filename' } });

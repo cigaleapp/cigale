@@ -494,3 +494,12 @@ export async function scrollAndClick(locator, { scroll = 'down', force = false }
 export function absoluteFixturePath(pathname) {
 	return `${FixturePaths.root}/${pathname}`;
 }
+
+/**
+ * @template {FixturePaths.Any} Path
+ * @param {Path} pathname
+ * @returns {string}
+ */
+export function absoluteFixtureFilepath(pathname) {
+	return path.join(path.resolve(import.meta.dirname), '../..', FixturePaths.root, pathname);
+}
