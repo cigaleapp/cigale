@@ -617,13 +617,6 @@ msgstr "pour la PR"
 msgid "sw&rpc"
 msgstr "sw&rpc"
 
-#~ msgid "v{0}"
-#~ msgstr "v{0}"
-
-#~ msgctxt "Upgrading a protocol. The <0 /> is an icon arrow"
-#~ msgid "v{0} <0/> v{1}"
-#~ msgstr "v{0} <0/> v{1}"
-
 #: src/lib/KeyboardShortcuts.svelte
 msgid "¯\\_(ツ)_/¯"
 msgstr "¯\\_(ツ)_/¯"
@@ -1265,9 +1258,6 @@ msgstr[1] "# éléments"
 #: src/lib/ButtonUpdateProtocol.svelte
 msgid "Non versionné"
 msgstr "Non versionné"
-
-#~ msgid "<0/> Dernière version en ligne: <1>v{0}</1> <2>Réétablir</2>"
-#~ msgstr "<0/> Dernière version en ligne: <1>v{0}</1> <2>Réétablir</2>"
 
 #. 1.0: version + 1
 #: src/routes/(app)/protocols/[id]/versioning/+page.svelte
@@ -2712,9 +2702,6 @@ msgstr "{0} v{1}"
 msgid "{0} protocoles ont été mis à jour: {1}"
 msgstr "{0} protocoles ont été mis à jour: {1}"
 
-#~ msgid "Suivez l'avancement de son développement sur Github: c'est <0>l'issue <0>#{0}</0></0>."
-#~ msgstr "Suivez l'avancement de son développement sur Github: c'est <0>l'issue <0>#{0}</0></0>."
-
 #. 0: file.name
 #: src/lib/MetadataInput.svelte
 msgid "{0} enregistré"
@@ -2724,9 +2711,6 @@ msgstr "{0} enregistré"
 #: src/lib/CardObservation.svelte
 msgid "{0} sur {1}: {2}"
 msgstr "{0} sur {1}: {2}"
-
-#~ msgid "{0} sur {1}"
-#~ msgstr "{0} sur {1}"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Roman Shamin"
@@ -2770,12 +2754,6 @@ msgstr "Type de compte inconnu"
 msgid "Déconnecter"
 msgstr "Déconnecter"
 
-#~ msgid "{0} précédente"
-#~ msgstr "{0} précédente"
-
-#~ msgid "{0} suivante"
-#~ msgstr "{0} suivante"
-
 #. 0: corner
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/WithExpandButton.svelte
 msgid "{0}: var(--offset);"
@@ -2815,9 +2793,6 @@ msgstr "<0/> OK!"
 msgid "Identifiant du protocole <0>Doit être unique. Il est conseillé de le baser sur un nom de domaine web que vous contrôlez; celui d'un site web permettant de télécharger le protocole, par exemple</0>"
 msgstr "Identifiant du protocole <0>Doit être unique. Il est conseillé de le baser sur un nom de domaine web que vous contrôlez; celui d'un site web permettant de télécharger le protocole, par exemple</0>"
 
-#~ msgid "L'identifiant ne doit comporter que des lettres, chiffres, <0>.</0> ou <1>_</1>"
-#~ msgstr "L'identifiant ne doit comporter que des lettres, chiffres, <0>.</0> ou <1>_</1>"
-
 #: src/routes/(app)/protocols/+page.svelte
 msgid "<0/> Importer"
 msgstr "<0/> Importer"
@@ -2837,9 +2812,6 @@ msgstr "<0/> une fois dézippé"
 #: src/routes/(app)/results/+page.svelte
 msgid "<0/> Dossier <1/>"
 msgstr "<0/> Dossier <1/>"
-
-#~ msgid "<0/> Archive ZIP <1><0/></1>"
-#~ msgstr "<0/> Archive ZIP <1><0/></1>"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/+layout@(app).svelte
 msgid "Élimination <0>Beta</0>"
