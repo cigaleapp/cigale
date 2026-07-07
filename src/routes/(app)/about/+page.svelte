@@ -93,8 +93,7 @@
 			(safeJSONParse(localStorage.getItem('updateBundle')) as BundleInfo | null) ?? null;
 		updateMetadata =
 			(safeJSONParse(localStorage.getItem('updateMetadata')) as
-				| (typeof UpdateBundleMetadata)['infer']
-				| null) ?? null;
+				(typeof UpdateBundleMetadata)['infer'] | null) ?? null;
 	});
 
 	let logoDrawPercent = $state(0);

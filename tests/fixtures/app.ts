@@ -213,8 +213,7 @@ export async function app({ page }: { page: Page }, use: (fixture: AppFixture) =
 					protocolId = lightProtocol.id,
 				}) {
 					let object:
-						| undefined
-						| IDBDatabaseType['Image' | 'Observation' | 'Session']['value'];
+						undefined | IDBDatabaseType['Image' | 'Observation' | 'Session']['value'];
 
 					if (imageId) {
 						object = await getDatabaseRowById(page, 'Image', imageId);

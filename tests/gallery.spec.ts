@@ -264,11 +264,15 @@ type GroupFieldByLabel = {
 };
 
 type SortFieldNeedsMetadata = {
-	[K in keyof typeof SORT_FIELDS as (typeof SORT_FIELDS)[K]['label']]: (typeof SORT_FIELDS)[K]['needsMetadata'];
+	[
+		K in keyof typeof SORT_FIELDS as (typeof SORT_FIELDS)[K]['label']
+	]: (typeof SORT_FIELDS)[K]['needsMetadata'];
 };
 
 type GroupFieldNeedsMetadata = {
-	[K in keyof typeof GROUP_FIELDS as (typeof GROUP_FIELDS)[K]['label']]: (typeof GROUP_FIELDS)[K]['needsMetadata'];
+	[
+		K in keyof typeof GROUP_FIELDS as (typeof GROUP_FIELDS)[K]['label']
+	]: (typeof GROUP_FIELDS)[K]['needsMetadata'];
 };
 
 type SortSelector<Label extends keyof SortFieldByLabel> = {

@@ -56,8 +56,7 @@
 				onblur={updater((o, { target }) => {
 					if (!(target instanceof HTMLTextAreaElement)) return;
 					o.description = target.value;
-				})}
-			></textarea>
+				})}></textarea>
 		</Field>
 		<FieldUrl
 			label="En savoir plus"

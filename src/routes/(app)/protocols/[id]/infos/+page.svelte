@@ -34,8 +34,7 @@
 				if (!(target instanceof HTMLTextAreaElement)) return;
 				p.description = target.value;
 			})}
-			placeholder="Description du protocole..."
-		></textarea>
+			placeholder="Description du protocole..."></textarea>
 	</Field>
 
 	<FieldUrl

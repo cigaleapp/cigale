@@ -68,8 +68,7 @@ export async function computeCascades({
 	confidence: number;
 	value: RuntimeValue;
 	confidences:
-		| DB.MetadataValue['confidences']
-		| Array<{ value: RuntimeValue; confidence: number }>;
+		DB.MetadataValue['confidences'] | Array<{ value: RuntimeValue; confidence: number }>;
 }) {
 	const protocolId = namespaceOfMetadataId(metadataId);
 	if (!protocolId) {

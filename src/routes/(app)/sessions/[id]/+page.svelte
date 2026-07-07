@@ -52,8 +52,7 @@
 					if (!(target instanceof HTMLTextAreaElement)) return;
 					await tables.Session.update(data.session.id, 'description', target.value);
 					invalidate(dependencyURI('Session', data.session.id));
-				}}
-			></textarea>
+				}}></textarea>
 		</Field>
 
 		<Field composite label="Protocole">

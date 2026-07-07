@@ -48,8 +48,7 @@
 			value={description}
 			onblur={updater((m, { target }) => {
 				m.description = target.value;
-			})}
-		></textarea>
+			})}></textarea>
 	</Field>
 
 	<FieldUrl

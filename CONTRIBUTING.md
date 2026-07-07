@@ -316,7 +316,7 @@ _path: #_
                                 - Type: `boolean`
                                 - <i id="propertiescroppropertiesinferitemspropertiesoutputpropertiesnormalized">path: #/properties/crop/properties/infer/items/properties/output/properties/normalized</i>
                             - <b id="propertiescroppropertiesinferitemspropertiesoutputpropertiesshape">shape</b> `required`
-                                - _Forme de sortie de chaque boîte englobante. Nécéssite obligatoirement d'avoir 'score'; 2 parmi 'cx', 'sx', 'ex', 'w'; et 2 parmi 'cy', 'sy', 'ey', 'h'. Si les boîtes contiennent d'autre valeurs, bien les mentionner avec '*', même quand c'est à la fin de la liste: cela permet de savoir quand on passe à la boîte suivante. Par exemple, [cx, cy, w, h, score, *] correspond à un modèle YOLO11 COCO_
+                                - _Forme de sortie de chaque boîte englobante. Nécéssite obligatoirement d'avoir 'score'; 2 parmi 'cx', 'sx', 'ex', 'w'; et 2 parmi 'cy', 'sy', 'ey', 'h'. Si les boîtes contiennent d'autre valeurs, bien les mentionner avec '\*', même quand c'est à la fin de la liste: cela permet de savoir quand on passe à la boîte suivante. Par exemple, [cx, cy, w, h, score, \*] correspond à un modèle YOLO11 COCO_
                                 - Type: `array`
                                 - <i id="propertiescroppropertiesinferitemspropertiesoutputpropertiesshape">path: #/properties/crop/properties/infer/items/properties/output/properties/shape</i>
                                     - **_Items_**

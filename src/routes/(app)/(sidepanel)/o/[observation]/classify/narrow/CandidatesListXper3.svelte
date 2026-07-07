@@ -36,8 +36,7 @@
 			onfocus={(event) => {
 				event.currentTarget.select();
 			}}
-			value={listText}
-		></textarea>
+			value={listText}></textarea>
 		<ButtonSecondary
 			onclick={async () => {
 				await navigator.clipboard.writeText(listText);

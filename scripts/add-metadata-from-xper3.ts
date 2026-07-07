@@ -766,8 +766,7 @@ function slug(s: string): string {
 // /download URLs are not CORS-enabled
 function googledriveThumbnailUrl(
 	mediaObject:
-		| { $ref: `m${string}` }
-		| SDD['Datasets']['Dataset']['MediaObjects']['MediaObject'][number]
+		{ $ref: `m${string}` } | SDD['Datasets']['Dataset']['MediaObjects']['MediaObject'][number]
 ): string | undefined {
 	const url = ('$ref' in mediaObject ? media.get(mediaObject.$ref) : mediaObject)?.Source?.$href;
 

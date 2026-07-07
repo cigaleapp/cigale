@@ -5,8 +5,7 @@ import { http, HttpResponse } from 'msw';
 import { nanoid } from 'nanoid';
 
 type ModelConfig =
-	| (typeof NeuralEnumInference)['inferIn']
-	| (typeof NeuralBoundingBoxInference)['inferIn'];
+	(typeof NeuralEnumInference)['inferIn'] | (typeof NeuralBoundingBoxInference)['inferIn'];
 
 export type ONNXModelsFixture = {
 	/** Returns a URL string */
