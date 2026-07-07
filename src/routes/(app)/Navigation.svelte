@@ -50,9 +50,6 @@
 	const hasImagesWithCrops = $derived(
 		tables.Image.state.some((image) => uiState.cropMetadataValueOf(image))
 	);
-	const hasImagesWithClassification = $derived(
-		tables.Image.state.some((image) => uiState.classificationMetadataValueOf(image))
-	);
 
 	const isAnalyzingCrops = $derived(
 		uiState.processing.task === 'detection' && uiState.processing.progress < 1
@@ -78,7 +75,9 @@
 	const classifyTabDisabled = $derived(
 		cropTabDisabled || !hasImagesWithCrops || isAnalyzingCrops
 	);
-	const resultsTabDisabled = $derived(classifyTabDisabled || !hasImagesWithClassification);
+	// Never disable it, it's annoying and the fact that you don't go to this tab at first is clear enough
+	// it's called "Results" after all
+	const resultsTabDisabled = false;
 
 	/* eslint-disable svelte/prefer-writable-derived */
 	// The window object is not reactive
