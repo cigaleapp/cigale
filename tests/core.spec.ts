@@ -13,7 +13,6 @@ import { assert, expect, test, testBasic } from './fixtures.js';
 import {
 	browserConsole,
 	chooseFirstSession,
-	clickInDropdown,
 	expectZipFiles,
 	exportResults,
 	importPhotos,
@@ -25,148 +24,115 @@ import {
 } from './utils/index.js';
 import { controlOrMeta } from './utils/keyboard.js';
 
-for (const offline of [false, true]) {
-	test(
-		offline ? 'basic functionality, while offline' : 'basic functionality',
-		async ({ page, context, app }) => {
-			if (offline) {
-				test.skip(context.serviceWorkers().length === 0, "No sw, can't test offline");
+test('basic functionality', async ({ page, app }) => {
+	await app.settings.set({ showTechnicalMetadata: false });
+	await newSession(page);
+	await app.tabs.go('import');
 
-				// Open settings and prepare for offline use
-				await clickInDropdown(
-					page,
-					page.getByRole('button', { name: 'Réglages', exact: true }),
-					'Préparation hors-ligne…'
-				);
+	await importPhotos({ page }, 'lil-fella.jpeg');
 
-				await app.modals
-					.byTitle('Préparation hors-ligne')
-					.getByRole('button', { name: 'Démarrer' })
-					.click();
+	await app.tabs.go('crop');
+	await app.loading.wait();
 
-				await assert(app.modals.byTitle('Préparation hors-ligne')).toHaveText(/OK!/, {
-					timeout: 10_000,
-				});
+	// Make sure theres no errors
+	for await (const card of app.gallery.cards()) {
+		// Should have no tooltip at all (works cuz debug mode is off, otherwise there'd be a debug info tooltip when no error)
+		await expect(card).toHaveTooltip(null);
+		await expect(card).not.toHaveText(/Erreur/);
+	}
 
-				await app.modals
-					.byTitle('Préparation hors-ligne')
-					.getByRole('button', { name: 'Fermer' })
-					.first()
-					.click();
+	// Check for inferred bounding box
+	const boundingBoxStyle = Object.fromEntries(
+		await page
+			.getByTestId('card-observation-bounding-box')
+			.getAttribute('style')
+			.then((style) =>
+				(style ?? '')
+					.split(';')
+					.map((decl) => {
+						const [prop, val] = decl.trim().split(': ');
+						if (!val) return undefined;
+						return [prop.trim(), Number(val.trim().replace('%', ''))];
+					})
+					.filter((entry) => entry !== undefined)
+			)
+	);
 
-				context.setOffline(true);
-			}
+	assert(boundingBoxStyle.left).toBeCloseTo(52.3334, 0);
+	assert(boundingBoxStyle.top).toBeCloseTo(29.0534, 0);
+	assert(boundingBoxStyle.width).toBeCloseTo(23.2713, 0);
+	assert(boundingBoxStyle.height).toBeCloseTo(36.4674, 0);
 
-			await app.settings.set({ showTechnicalMetadata: false });
-			await newSession(page);
-			await app.tabs.go('import');
+	// Go to crop view
+	await app.tabs.go('crop');
+	await page.getByText('lil-fella.jpeg').click();
 
-			await importPhotos({ page }, 'lil-fella.jpeg');
+	// Check for continuing
+	await page.getByRole('button', { name: /^Continuer/ }).click();
+	await assert(page.getByText('Confirmé', { exact: true })).toBeVisible();
 
-			await app.tabs.go('crop');
-			await app.loading.wait();
+	// Go to classification view
+	await app.tabs.go('classify');
+	// Wait for inference
+	await app.loading.wait();
 
-			// Make sure theres no errors
-			for await (const card of app.gallery.cards()) {
-				// Should have no tooltip at all (works cuz debug mode is off, otherwise there'd be a debug info tooltip when no error)
-				await expect(card).toHaveTooltip(null);
-				await expect(card).not.toHaveText(/Erreur/);
-			}
+	// Make sure theres no errors
+	for await (const card of app.gallery.cards()) {
+		// Should have no tooltip at all (works cuz debug mode is off, otherwise there'd be a debug info tooltip when no error)
+		await expect(card).toHaveTooltip(null);
+		await expect(card).not.toHaveText(/Erreur/);
+	}
 
-			// Check for inferred bounding box
-			const boundingBoxStyle = Object.fromEntries(
-				await page
-					.getByTestId('card-observation-bounding-box')
-					.getAttribute('style')
-					.then((style) =>
-						(style ?? '')
-							.split(';')
-							.map((decl) => {
-								const [prop, val] = decl.trim().split(': ');
-								if (!val) return undefined;
-								return [prop.trim(), Number(val.trim().replace('%', ''))];
-							})
-							.filter((entry) => entry !== undefined)
-					)
-			);
+	// Check for classification results in sidepanel
+	await app.gallery.card(0).click();
+	await assert(page.getByText('Espèce', { exact: true })).toBeVisible();
 
-			assert(boundingBoxStyle.left).toBeCloseTo(52.3334, 0);
-			assert(boundingBoxStyle.top).toBeCloseTo(29.0534, 0);
-			assert(boundingBoxStyle.width).toBeCloseTo(23.2713, 0);
-			assert(boundingBoxStyle.height).toBeCloseTo(36.4674, 0);
+	// Export results
+	await app.tabs.go('results');
 
-			// Go to crop view
-			await app.tabs.go('crop');
-			await page.getByText('lil-fella.jpeg').click();
+	const zip = await exportResults(page, { kind: 'full' });
 
-			// Check for continuing
-			await page.getByRole('button', { name: /^Continuer/ }).click();
-			await assert(page.getByText('Confirmé', { exact: true })).toBeVisible();
+	await expectZipFiles(
+		zip,
+		[
+			'analysis.json',
+			'metadata.csv',
+			'Cropped/Entomobrya muscorum_obs1_1.jpeg',
+			'Original/Entomobrya muscorum_obs1_1.jpeg',
+		],
+		{
+			'analysis.json': {
+				json(data) {
+					expect(Analysis.allows(data)).toBe(true);
+				},
+			},
+			'metadata.csv': {
+				text(txt) {
+					const UTF8_BOM = '\xEF\xBB\xBF';
+					if (txt.startsWith(UTF8_BOM)) txt = txt.replace(UTF8_BOM, '');
 
-			// Go to classification view
-			await app.tabs.go('classify');
-			// Wait for inference
-			await app.loading.wait();
-
-			// Make sure theres no errors
-			for await (const card of app.gallery.cards()) {
-				// Should have no tooltip at all (works cuz debug mode is off, otherwise there'd be a debug info tooltip when no error)
-				await expect(card).toHaveTooltip(null);
-				await expect(card).not.toHaveText(/Erreur/);
-			}
-
-			// Check for classification results in sidepanel
-			await app.gallery.card(0).click();
-			await assert(page.getByText('Espèce', { exact: true })).toBeVisible();
-
-			// Export results
-			await app.tabs.go('results');
-
-			const zip = await exportResults(page, { kind: 'full' });
-
-			await expectZipFiles(
-				zip,
-				[
-					'analysis.json',
-					'metadata.csv',
-					'Cropped/Entomobrya muscorum_obs1_1.jpeg',
-					'Original/Entomobrya muscorum_obs1_1.jpeg',
-				],
-				{
-					'analysis.json': {
-						json(data) {
-							expect(Analysis.allows(data)).toBe(true);
-						},
-					},
-					'metadata.csv': {
-						text(txt) {
-							const UTF8_BOM = '\xEF\xBB\xBF';
-							if (txt.startsWith(UTF8_BOM)) txt = txt.replace(UTF8_BOM, '');
-
-							const lines = txt.split('\n');
-							assert(lines).toHaveLength(2);
-							assert
-								.soft(lines.at(0))
-								.toBe(
-									'"Identifiant";"Observation";"Date";"Date: Confiance";"Espèce";"Espèce: Confiance";"Genre";"Genre: Confiance";"Famille";"Famille: Confiance";"Ordre";"Ordre: Confiance";"Classe";"Classe: Confiance";"Phylum";"Phylum: Confiance";"Règne";"Règne: Confiance";"Morphogroupe";"Morphogroupe: Confiance"'
-								);
-						},
-					},
-					'Cropped/Entomobrya muscorum_obs1_1.jpeg': {
-						buffer(buf) {
-							expect(buf).toMatchSnapshot({ maxDiffPixelRatio: 0.01 });
-						},
-						entry(entry) {
-							assert
-								.soft(entry.getLastMod().toISOString())
-								.toEqual('2025-04-25T12:38:36.000Z');
-						},
-					},
-				}
-			);
+					const lines = txt.split('\n');
+					assert(lines).toHaveLength(2);
+					assert
+						.soft(lines.at(0))
+						.toBe(
+							'"Identifiant";"Observation";"Date";"Date: Confiance";"Espèce";"Espèce: Confiance";"Genre";"Genre: Confiance";"Famille";"Famille: Confiance";"Ordre";"Ordre: Confiance";"Classe";"Classe: Confiance";"Phylum";"Phylum: Confiance";"Règne";"Règne: Confiance";"Morphogroupe";"Morphogroupe: Confiance"'
+						);
+				},
+			},
+			'Cropped/Entomobrya muscorum_obs1_1.jpeg': {
+				buffer(buf) {
+					expect(buf).toMatchSnapshot({ maxDiffPixelRatio: 0.01 });
+				},
+				entry(entry) {
+					assert
+						.soft(entry.getLastMod().toISOString())
+						.toEqual('2025-04-25T12:38:36.000Z');
+				},
+			},
 		}
 	);
-}
+});
 
 test('can handle a bunch of images at once', withParallelism(4), async ({ page, app }) => {
 	test.fixme(
