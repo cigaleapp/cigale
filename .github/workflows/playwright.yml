@@ -98,7 +98,7 @@ jobs:
           echo "key=predownloaded-models:$key" >> $GITHUB_OUTPUT
 
       - name: Use cache
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5
         with:
           key: ${{ steps.caching.outputs.key }}
           path: |
