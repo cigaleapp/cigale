@@ -50,6 +50,7 @@
 	} from '$lib/metadata/index.js';
 	import MobileWIPOverlay from '$lib/MobileWIPOverlay.svelte';
 	import { ensureNoEmptyObservations } from '$lib/observations.js';
+	import OverflowableText from '$lib/OverflowableText.svelte';
 	import { goto } from '$lib/paths.js';
 	import SentenceJoin from '$lib/SentenceJoin.svelte';
 	import { seo } from '$lib/seo.svelte';
@@ -992,9 +993,9 @@
 						<div class="text">
 							<p class="index">Boîte #{i + 1}</p>
 							<p class="dimensions">
-								<code use:tooltip={"Dimensions de l'image recadrée (en pixels)"}
-									>{w}×{h}</code
-								>
+								<code>
+									<OverflowableText text="{w}×{h}" />
+								</code>
 								<!-- we have a neural-infered value only, put the confidence next to the value -->
 								{#if initBox && !image.metadata[uiState.cropMetadataId].manuallyModified}
 									<span class="sep">&middot;</span>
@@ -1198,7 +1199,6 @@
 	}
 
 	.boxes {
-		overflow-y: auto;
 		height: 100%;
 	}
 
@@ -1248,10 +1248,20 @@
 		flex-shrink: 0;
 	}
 
+	.boxes li .text {
+		overflow: hidden;
+	}
+
 	.boxes li .dimensions {
 		display: flex;
 		align-items: center;
 		gap: 0.5em;
+		font-size: 0.8em;
+
+		&,
+		code {
+			overflow: hidden;
+		}
 	}
 
 	.boxes li .confidence-icon {
