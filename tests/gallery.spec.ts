@@ -21,7 +21,10 @@ const photos = [
 const orders =
 	lightProtocol.metadata['io.github.cigaleapp.arthropods.example.light__order'].options;
 
-test.use({ storageState: 'tests/fixtures/storage-states/basic.json' });
+test.use({
+	storageState: 'tests/fixtures/storage-states/basic.json',
+	opfsState: 'tests/fixtures/opfs-states/basic.json',
+});
 
 test.beforeEach(async ({ page, app }) => {
 	await chooseFirstSession(page);

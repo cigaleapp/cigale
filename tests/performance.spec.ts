@@ -1,5 +1,5 @@
 import { readFile, writeFile } from 'node:fs/promises';
-import type { AppFixture } from './fixtures.js';
+import type { AppFixture } from './fixtures/app.js';
 import type { Page, PlaywrightWorkerOptions } from '@playwright/test';
 import type { PerformanceMetrics } from 'playwright-performance-metrics';
 
@@ -9,7 +9,7 @@ import { PerformanceMetricsCollector } from 'playwright-performance-metrics';
 import { assert, expect, test } from './fixtures.js';
 import { collectChromeDevtoolsTrace, emulateNetworkProfile } from './utils/performance.js';
 
-test.use({ storageState: { cookies: [], origins: [] } });
+test.use({ storageState: { cookies: [], origins: [] }, opfsState: [] });
 
 benchmark(`startup @blank`, {
 	async prepare({ page }) {

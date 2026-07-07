@@ -338,7 +338,10 @@ testKitchensink(
 
 for (const width of [undefined, 1400, 1600]) {
 	test.describe(`with a ${width ?? 'default'}px-wide window`, () => {
-		test.use({ storageState: 'tests/fixtures/storage-states/kitchen-sink.json' });
+		test.use({
+			storageState: 'tests/fixtures/storage-states/kitchen-sink.json',
+			opfsState: 'tests/fixtures/opfs-states/kitchen-sink.json',
+		});
 
 		test.beforeEach(async ({ page }) => {
 			if (!width) return;
