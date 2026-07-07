@@ -57,7 +57,7 @@ export function CapacitorFilesystemBackend(): BinaryStorageBackend<'capacitor'> 
 			if (content instanceof Blob) {
 				base64 = (await content.bytes()).toBase64();
 			} else if ('text' in content) {
-				base64 = new TextEncoder().encode(content.text).toBase64();
+				base64 = btoa(content.text)
 			} else if ('bytes' in content) {
 				base64 = new Uint8Array(content.bytes).toBase64();
 			} else {
