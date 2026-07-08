@@ -3,6 +3,7 @@
 import { execSync } from 'node:child_process';
 
 import arkenv from 'arkenv';
+import { type } from 'arktype';
 import {
 	addMonths,
 	formatDuration,
@@ -12,12 +13,38 @@ import {
 	subMonths,
 } from 'date-fns';
 
+declare global {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	interface Array<T> {
+		sum(): number;
+	}
+}
+
+Array.prototype.sum = function () {
+	return this.reduce((a, b) => a + b, 0);
+};
+
 const env = arkenv({
 	WAKATIME_API_KEY: '/^waka_.+$/',
 	WAKATIME_PROJECT: 'string',
 	TIMESPENT_ISSUE_FIELD_ID: 'string = "IFT_kgDOAp1Gyg"',
 	N_MOST_RECENT_ISSUES: 'number = 100',
 	BACKFILL: 'boolean = false',
+	/** Extra time to add to a branch based on time spent on another branch on another project */
+	EXTRA_PROJECTS: type.string
+		.pipe((extras) =>
+			Map.groupBy(
+				extras
+					.split(/\r?\n| /)
+					.map((line) => line.trim().split(/@|:/, 3))
+					.map(([branch, otherProject, otherBranch]) => ({
+						branch,
+						other: { project: otherProject, branch: otherBranch },
+					})),
+				({ branch }) => branch
+			)
+		)
+		.default(''),
 	GITHUB_REPO: [
 		'/^.+?\\/.+?$/',
 		'=>',
@@ -155,11 +182,7 @@ mutation {
 	return repository.issues.pageInfo;
 }
 
-async function analyzeIssue(
-	issue: Issue,
-	times: Array<{ issue: Issue; time: string }>,
-	backoff = 30e3
-) {
+async function analyzeIssue(issue: Issue, times: Array<{ issue: Issue; time: string }>) {
 	const prs = issue.closedByPullRequestsReferences.nodes;
 
 	if (!prs.length) return;
@@ -168,25 +191,60 @@ async function analyzeIssue(
 
 	const end = new Date(Math.max(...prs.map((branch) => parseISO(branch.createdAt).valueOf())));
 
-	const response = await fetch(
-		'https://wakatime.com/api/v1/users/current/summaries?' +
-			new URLSearchParams({
-				start: formatISO(subMonths(start, 2), { representation: 'date' }),
-				end: formatISO(addMonths(end, 1), { representation: 'date' }),
-				project: env.WAKATIME_PROJECT,
-				branches: prs.map((b) => b.headRefName).join(','),
-			}),
-		{
-			headers: {
-				Authorization: `Basic ${env.WAKATIME_API_KEY}`,
-			},
-		}
-	).then((r) => r.text());
+	/** Maps a branch to additional seconds from extra projects */
+	const extraSeconds: Record<string, number> = {};
+
+	const extrasOfPRs = prs
+		.flatMap((pr) => env.EXTRA_PROJECTS.get(pr.headRefName))
+		.filter((e) => e !== undefined);
+
+	const extraProjects = Map.groupBy(extrasOfPRs, (extra) => extra.other.project);
+	const extrasPerPR = Map.groupBy(extrasOfPRs, (extra) => extra.branch);
 
 	try {
-		const seconds = (JSON.parse(response) as WakatimeSummaries).data
-			.flatMap((day) => day.branches.flatMap((branch) => branch.total_seconds))
-			.reduce((a, b) => a + b, 0);
+		// One request per project
+		for (const [project, extras] of extraProjects) {
+			// With all branches of the project
+			// for this timeframe
+			// that correspond to PR branches for the issue
+			const response = await requestWakatime({
+				start,
+				end,
+				project,
+				branches: extras.map((extra) => extra.other.branch),
+			});
+
+			// For every PR branch
+			for (const [branch, extras] of extrasPerPR) {
+				// Get all branches from the other project that correspond to the PR branch
+				const extraBranchesForProject = extras
+					.filter((e) => e.other.project === project)
+					.map((e) => e.other.branch);
+
+				// Sum up seconds on branches corresponding to the PR branch
+				const added = response.data
+					.flatMap((day) => day.branches)
+					.filter((b) => extraBranchesForProject.includes(b.name))
+					.map((b) => b.total_seconds)
+					.sum();
+
+				extraSeconds[branch] = (extraSeconds[branch] ?? 0) + added;
+			}
+		}
+
+		const response = await requestWakatime({
+			start,
+			end,
+			project: env.WAKATIME_PROJECT,
+			branches: prs.map((pr) => pr.headRefName),
+		});
+
+		let seconds = response.data
+			.flatMap((day) => day.branches)
+			.map((branch) => branch.total_seconds)
+			.sum();
+
+		seconds += Object.values(extraSeconds).sum();
 
 		const duration = intervalToDuration({
 			start: new Date(0),
@@ -217,19 +275,55 @@ async function analyzeIssue(
 			`\nIssue #${issue.number} (${issue.title}) = ${display} [${formatDuration(duration)}]:`
 		);
 		for (const [i, pr] of prs.entries()) {
-			console.info(`${i > 0 ? '+' : ''} ${pr.headRefName} (#${pr.number})`);
+			console.info(` ${i > 0 ? '+' : ' '} ${pr.headRefName} (#${pr.number})`);
+			const extras = extrasPerPR.get(pr.headRefName);
+			if (extras) {
+				for (const { other } of extras) {
+					console.info(` + ${pr.headRefName} (${other.project}@${other.branch})`);
+				}
+			}
 		}
 
 		times.push({ issue, time: display });
-	} catch {
-		console.info(`\nIssue #${issue.number} (${issue.title}) = !!!! [error]:`);
-		console.info(response);
-
-		if (response.includes('Too Many Requests')) {
-			await new Promise((resolve) => setTimeout(resolve, backoff));
-			await analyzeIssue(issue, times, backoff * 3);
-		}
+	} catch (error) {
+		console.error(`An error occurred during analysis of #${issue.number} (${issue.title}): `);
+		console.error(error);
 	}
+}
+
+async function requestWakatime({
+	backoff = 30e3,
+	...args
+}: {
+	start: Date;
+	end: Date;
+	project: string;
+	branches: string[];
+	backoff?: number;
+}): Promise<WakatimeSummaries> {
+	const { start, end, project, branches } = args;
+
+	const response = await fetch(
+		'https://wakatime.com/api/v1/users/current/summaries?' +
+			new URLSearchParams({
+				start: formatISO(subMonths(start, 2), { representation: 'date' }),
+				end: formatISO(addMonths(end, 1), { representation: 'date' }),
+				project,
+				branches: branches.join(','),
+			}),
+		{
+			headers: {
+				Authorization: `Basic ${env.WAKATIME_API_KEY}`,
+			},
+		}
+	).then((r) => r.text());
+
+	if (response.includes('Too Many Requests')) {
+		await new Promise((resolve) => setTimeout(resolve, backoff));
+		return requestWakatime({ ...args, backoff: backoff * 3 });
+	}
+
+	return JSON.parse(response);
 }
 
 type GithubResponse = {
@@ -262,6 +356,7 @@ type WakatimeSummaries = {
 	data: Array<{
 		branches: Array<{
 			total_seconds: number;
+			name: string;
 		}>;
 	}>;
 };

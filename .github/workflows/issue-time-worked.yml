@@ -25,3 +25,10 @@ jobs:
           WAKATIME_PROJECT: cigale
           GH_TOKEN: ${{ github.token }}
           GITHUB_REPO: ${{ github.repository }}
+          EXTRA_PROJECTS:
+            | # Format is <cigale branch>:<other wakatime project name>@<other wakatime project's branch>
+            generic-binary-storage:idb-opfs@master
+            generic-binary-storage:playwright@storagestate-opfs
+            fix-exif-orientation2:exiv2-wasm@main
+            parallelworkers:swarpc@loadbalancer
+            offthread:swarpc@main
