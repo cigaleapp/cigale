@@ -268,9 +268,9 @@ async function analyzeIssue(issue: Issue, times: Array<{ issue: Issue; time: str
 		if (years > 0) months += 12 * years;
 		if (months > 0) weeks += 4 * months;
 		if (weeks > 0) days += 7 * weeks;
+		if (days > 0) hours += 24 * days;
 
 		const rounded = {
-			days: round(days + hours / 24, 2),
 			hours: round(hours + minutes / 60, 1),
 			minutes: round(minutes),
 		};
