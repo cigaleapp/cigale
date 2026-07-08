@@ -18,7 +18,7 @@ import {
 	mockUrl,
 	setHardwareConcurrency,
 } from '$e2e/utils/index.js';
-import { restoreOPFSState } from '$e2e/utils/opfs.js';
+import { mockOPFSOnWebWorkers, restoreOPFSState } from '$e2e/utils/opfs.js';
 
 import _fullProtocol from '../../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
 import lightProtocol from '../../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
@@ -133,6 +133,7 @@ export async function forEachTest(
 
 	if (!info.tags.includes('@blank')) {
 		await page.goto('./');
+		await mockOPFSOnWebWorkers(page);
 		await app.db.ready();
 	}
 

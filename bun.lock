@@ -56,6 +56,7 @@
         "nanoid": "^5.1.16",
         "natural-regex": "^0.5.0",
         "onnxruntime-web": "1.22.0",
+        "opfs-mock": "^2.7.0",
         "pica-gpu": "^0.2.0",
         "piexifjs": "^1.0.6",
         "runed": "^0.37.1",
@@ -131,6 +132,7 @@
         "google-auth-library": "^10.9.0",
         "google-fonts-helper": "^3.7.4",
         "googleapis": "^173.0.0",
+        "idb-opfs": "^0.4.0",
         "jsdom": "^29.1.1",
         "json-schema-doc-ts": "^2.0.0",
         "jszip": "^3.10.1",
@@ -138,7 +140,6 @@
         "msw": "^2.14.6",
         "octokit": "^5.0.5",
         "odt2html": "^1.0.1",
-        "opfs-mock": "^2.7.0",
         "oxlint": "^1.72.0",
         "pdf-to-png-converter": "^4.1.1",
         "playwright-performance-metrics": "^1.2.5",
@@ -1983,6 +1984,8 @@
     "iconv-lite": ["iconv-lite@0.6.3", "", { "dependencies": { "safer-buffer": ">= 2.1.2 < 3.0.0" } }, "sha512-4fCk79wshMdzMp2rH06qWrJE4iolqLhCUH+OiuIgU++RB0+94NlDL81atO7GX55uUKueo0txHNtvEyI6D7WdMw=="],
 
     "idb": ["idb@8.0.3", "", {}, "sha512-LtwtVyVYO5BqRvcsKuB2iUMnHwPVByPCXFXOpuU96IZPPoPN6xjOGxZQ74pgSVVLQWtUOYgyeL4GE98BY5D3wg=="],
+
+    "idb-opfs": ["idb-opfs@0.4.0", "", { "dependencies": { "idb": "^8.0.3" } }, "sha512-oQruwyWHjJZrdu2sbYb4qrRIwLwSxu25osE34RMVEtlwBTfyI3I52kFWnLb1Y2mvAHFPtAcKvB49zp+XZovinA=="],
 
     "ieee754": ["ieee754@1.2.1", "", {}, "sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA=="],
 
