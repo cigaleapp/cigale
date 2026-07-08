@@ -104,6 +104,7 @@ repository(owner: $owner, name: $repo) {
 					number
 					headRefName
 					createdAt
+					closedAt
 				}
 			}
 		}
@@ -189,7 +190,14 @@ async function analyzeIssue(issue: Issue, times: Array<{ issue: Issue; time: str
 
 	const start = new Date(Math.min(...prs.map((branch) => parseISO(branch.createdAt).valueOf())));
 
-	const end = new Date(Math.max(...prs.map((branch) => parseISO(branch.createdAt).valueOf())));
+	const end = new Date(
+		Math.max(
+			...prs.map((branch) =>
+				// If a PR is not closed, we might be still working on it up to today
+				branch.closedAt ? parseISO(branch.closedAt).valueOf() : Date.now()
+			)
+		)
+	);
 
 	/** Maps a branch to additional seconds from extra projects */
 	const extraSeconds: Record<string, number> = {};
@@ -344,6 +352,7 @@ type GithubResponse = {
 					number: number;
 					headRefName: string;
 					createdAt: string;
+					closedAt: string | null;
 				}>;
 			}>;
 		};
