@@ -5,7 +5,6 @@
 	import IconNext from '~icons/ri/arrow-right-s-fill';
 	import IconClassifyFilled from '~icons/ri/checkbox-multiple-fill';
 	import IconClassify from '~icons/ri/checkbox-multiple-line';
-	import IconDismiss from '~icons/ri/close-line';
 	import IconCropFilled from '~icons/ri/crop-fill';
 	import IconCrop from '~icons/ri/crop-line';
 	import IconManageSessionFilled from '~icons/ri/draft-fill';
@@ -14,20 +13,16 @@
 	import IconResults from '~icons/ri/file-chart-line';
 	import IconImportFilled from '~icons/ri/import-fill';
 	import IconImport from '~icons/ri/import-line';
-	import IconNotificationsOn from '~icons/ri/notification-2-line';
 	import { page } from '$app/state';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import ButtonInk from '$lib/ButtonInk.svelte';
 	import { percent } from '$lib/i18n';
 	import { previewingPrNumber, tables } from '$lib/idb.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import Logo from '$lib/Logo.svelte';
 	import { IsMobile } from '$lib/mobile.svelte.js';
-	import { askForNotificationPermission, hasNotificationsEnabled } from '$lib/notifications.js';
 	import { goto, resolve } from '$lib/paths';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { switchSession } from '$lib/sessions.js';
-	import { getSettings, isDebugMode, setSetting } from '$lib/settings.svelte.js';
+	import { isDebugMode } from '$lib/settings.svelte.js';
 	import { uiState } from '$lib/state.svelte.js';
 	import { tooltip } from '$lib/tooltips.js';
 	import { clamp } from '$lib/utils.js';
@@ -344,27 +339,6 @@
 				{/if}
 
 				<aside class:native={isNativeWindow}>
-					{#if getSettings().notifications === null}
-						<div class="notifications">
-							<ButtonInk
-								help="Activer les notifications pour savoir quand un traitement est terminé."
-								onclick={async () => {
-									await askForNotificationPermission();
-									setSetting('notifications', await hasNotificationsEnabled());
-								}}
-							>
-								<IconNotificationsOn />
-								Activer
-							</ButtonInk>
-							<ButtonIcon
-								onclick={() => setSetting('notifications', false)}
-								help="Ne pas activer les notifications"
-							>
-								<IconDismiss />
-							</ButtonIcon>
-						</div>
-					{/if}
-
 					<ModalSubmitIssue type="bug" />
 					<ModalSubmitIssue type="feature" />
 

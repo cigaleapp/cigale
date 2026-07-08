@@ -130,6 +130,7 @@ const Settings = table(
 	type({
 		id: '"defaults" | "user"',
 		protocols: References,
+		submitIssuesVia: '"form" | "github" = "form"',
 		sessionsDirectory: type({
 			platform: type.enumerated('local', 'kobotoolbox'),
 			account: 'string | undefined',
@@ -152,8 +153,7 @@ const Settings = table(
 			},
 		})),
 		theme: type.enumerated('dark', 'light', 'auto'),
-		// TODO(2025-09-05): remove n===10 after a while
-		gridSize: type.number.pipe((n) => (n === 10 ? 1 : clamp(n, 0.5, 2))),
+		gridSize: type.number.pipe((n) => clamp(n, 0.5, 2)),
 		notifications: 'boolean | null = null',
 		language: type.enumerated('fr', 'en').default(
 			/** @type {() => 'fr' | 'en'} */
