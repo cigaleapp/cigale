@@ -9,6 +9,13 @@ import type { FixturePaths } from '$e2e/filepaths.js';
 
 import { absoluteFixtureFilepath } from './core.js';
 
+/**
+ * Source code of idb-opfs
+ */
+const idbopfs = readFileSync('node_modules/idb-opfs/dist/index.mjs', {
+	encoding: 'utf8',
+});
+
 export type OPFSTestArg = FSEntry[] | FixturePaths.Absolute<FixturePaths.OPFSStates>;
 
 type FSEntry = {
@@ -35,7 +42,7 @@ export async function collectOPFSState(page: Page, destination: FixturePaths.OPF
 			const tree: FSEntry[] = [];
 
 			for await (const [name, entry] of base) {
-				if (entry instanceof FileSystemDirectoryHandle) {
+				if (entry.kind === 'directory') {
 					tree.push(...(await walk(`${path}/${name}`, entry)));
 					continue;
 				}
@@ -70,6 +77,9 @@ export async function collectOPFSState(page: Page, destination: FixturePaths.OPF
 	writeFileSync(dest, JSON.stringify(tree, null, 2));
 }
 
+/**
+ * @returns a function to run once the page starts loading web workers
+ */
 export async function restoreOPFSState(page: Page, input: OPFSTestArg) {
 	// Playwright's Webkit build seems to have OPFS disabled
 	// See https://github.com/microsoft/playwright/issues/18235
@@ -78,24 +88,19 @@ export async function restoreOPFSState(page: Page, input: OPFSTestArg) {
 	const tree: FSEntry[] =
 		typeof input === 'string' ? JSON.parse(readFileSync(input, { encoding: 'utf8' })) : input;
 
-	const opfsMockModule = readFileSync('node_modules/opfs-mock/dist/index.mjs', {
-		encoding: 'utf8',
-	});
-
 	await page.addInitScript(
-		async ({ tree, isWebkit, opfsMockModule }) => {
+		async ({ tree, isWebkit, idbopfs }) => {
+			async function importModuleSource(source: string) {
+				const blob = new Blob([source], { type: 'application/javascript' });
+				const url = URL.createObjectURL(blob);
+				const mod = await import(url);
+				URL.revokeObjectURL(url);
+				return mod;
+			}
+
 			if (isWebkit) {
-				// This one is for web workers to know they have to import opfs-mock too
-				localStorage.setItem('playwright_mock_opfs', 'true');
-				// And we also mock it here because we need it right now, and the app isnt loaded yet
-				console.debug(
-					'restoreOPFSState: mocking OPFS here & setting window.MOCK_OPFS=true'
-				);
-				const moduleUrl = URL.createObjectURL(
-					new Blob([opfsMockModule], { type: 'application/javascript' })
-				);
-				await import(moduleUrl);
-				URL.revokeObjectURL(moduleUrl);
+				const { mockOPFS }: typeof import('idb-opfs') = await importModuleSource(idbopfs);
+				await mockOPFS({ debug: true });
 			}
 
 			const root = await navigator.storage.getDirectory();
@@ -131,7 +136,7 @@ export async function restoreOPFSState(page: Page, input: OPFSTestArg) {
 			for (const entry of tree) {
 				const handle = await _opfsHandleViaAbsolutePath(root, entry);
 
-				if (handle instanceof FileSystemFileHandle) {
+				if (handle.kind === 'file') {
 					const name = entry.filepath.split('/').at(-1);
 					if (!name) throw new Error('File has no name');
 
@@ -148,6 +153,38 @@ export async function restoreOPFSState(page: Page, input: OPFSTestArg) {
 				}
 			}
 		},
-		{ tree, isWebkit, opfsMockModule }
+		{ tree, isWebkit, idbopfs }
 	);
+}
+export async function mockOPFSOnWebWorkers(page: Page) {
+	const isWebkit = page.context().browser()?.browserType().name() === 'webkit';
+
+	if (!isWebkit) return;
+
+	console.debug('Will mock OPFS in web workers');
+
+	// Since opfs-mock is in-memory-backed, the web worker's opfs state is not shared
+	// with the main thread. we need to do a indexeddb-backed opfs state...
+	const mockOpfs = async ({ idbopfs: source }: { idbopfs: string }) => {
+		console.debug('Mocking OPFS in web worker');
+
+		const blob = new Blob([source], { type: 'application/javascript' });
+		const url = URL.createObjectURL(blob);
+		const idbopfs: typeof import('idb-opfs') = await import(url);
+		URL.revokeObjectURL(url);
+
+		await idbopfs.mockOPFS({ debug: true });
+	};
+
+	// Wait for opfs to be mocked on the web worker before continuing
+	await new Promise<void>((resolve, reject) => {
+		page.on(
+			'worker',
+			async (worker) =>
+				await worker.evaluate(mockOpfs, { idbopfs }).then(resolve).catch(reject)
+		);
+	});
+
+	// Also mock on future workers just in case
+	page.on('worker', async (worker) => worker.evaluate(mockOpfs, { idbopfs }));
 }

@@ -59,6 +59,9 @@ const firefox = {
 const webkit = {
 	name: 'webkit',
 	dependencies,
+	// Until we can get rid of the idb-opfs mocking,
+	// it seems like it slows things down considerably
+	timeout: ms('2min'),
 	use: {
 		...devices['Desktop Safari'],
 		launchOptions: {
