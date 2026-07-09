@@ -2,14 +2,21 @@ name: Renovate PRs postupgrade
 
 on:
   pull_request:
-    types: [synchronize, labeled]
-    branches:
-      - renovate/*
+    types: [opened, synchronize, labeled]
+    # The 'branches' option filters on the *base* branch, not the head...
+    # See https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#running-your-pull_request-workflow-based-on-the-head-or-base-branch-of-a-pull-request
 
 jobs:
+  is-renovate:
+    name: Is it a renovate PR?
+    runs-on: ubuntu-latest
+    if: contains(github.head_ref, 'renovate/')
+    steps:
+      - run: echo OK
   capacitor:
     name: Capacitor-related tasks
     runs-on: ubuntu-latest
+    needs: is-renovate
     if: contains(github.event.pull_request.labels.*.name, 'android-native-changes')
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
