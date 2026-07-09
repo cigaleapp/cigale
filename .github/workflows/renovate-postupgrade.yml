@@ -1,8 +1,8 @@
 name: Renovate PRs postupgrade
 
 on:
-  push: 
-    branches: 
+  push:
+    branches:
       - renovate/*
   pull_request:
     branches:
