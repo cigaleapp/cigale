@@ -8,7 +8,7 @@ export default defineConfig({
 	locales: ['fr', 'en'],
 	// Translations are refreshed via a workflow,
 	// see file://./.github/workflows/i18n.yml
-	hmr: Boolean(process.env.CI),
+	dev: false,
 	adapters: {
 		main: svelte({
 			sourceLocale: 'fr',

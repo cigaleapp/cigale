@@ -1,16 +1,34 @@
 import { Capacitor } from '@capacitor/core';
+import { FileViewer } from '@capacitor/file-viewer';
 import { Directory, Encoding, Filesystem } from '@capacitor/filesystem';
 import { FilePicker } from '@capawesome/capacitor-file-picker';
 import YAML from 'yaml';
 
+import { keys } from './utils.js';
+
+export async function openFileFromUrl(url: URL | string) {
+	if (Capacitor.isNativePlatform()) {
+		await FileViewer.openDocumentFromUrl({
+			url: url.toString(),
+		});
+	} else {
+		const a = document.createElement('a');
+		a.href = url.toString();
+		a.download = 'true';
+		a.click();
+	}
+}
+
 /**
  * **WARNING:** On native platforms, binary data is converted to base64 before writing, which can lag the UI for large files.
- * @param {Blob | ArrayBuffer | string} content
- * @param {string} filename
- * @param {string} [contentType] defaults to 'text/plain' for strings and 'application/octet-stream' for blobs
- * @returns {Promise<URL|void>} Saved file's URI on native platforms, void on web
+ * @param contentType defaults to 'text/plain' for strings and 'application/octet-stream' for blobs
+ * @returns Saved file's URI on native platforms, void on web
  */
-export async function downloadAsFile(content, filename, contentType) {
+export async function downloadAsFile(
+	content: Blob | ArrayBuffer | string,
+	filename: string,
+	contentType: string
+): Promise<URL | void> {
 	if (Capacitor.isNativePlatform()) {
 		const permission = await Filesystem.checkPermissions();
 		if (permission.publicStorage !== 'granted') {
@@ -29,7 +47,7 @@ export async function downloadAsFile(content, filename, contentType) {
 		console.info('Saving file to', directory);
 
 		/** @type {Pick<import('@capacitor/filesystem').WriteFileOptions, 'data' | 'encoding'>} */
-		let input;
+		let input: Pick<import('@capacitor/filesystem').WriteFileOptions, 'data' | 'encoding'>;
 
 		if (typeof content === 'string') {
 			input = {
@@ -54,7 +72,7 @@ export async function downloadAsFile(content, filename, contentType) {
 
 		try {
 			return new URL(uri);
-		} catch (err) {
+		} catch (_err) {
 			// Some platforms return URIs that the URL constructor doesn't accept in Node/jsdom.
 			// Fall back to returning the raw string so callers can handle it.
 			return uri;
@@ -82,31 +100,30 @@ export async function downloadAsFile(content, filename, contentType) {
 
 /**
  *
- * @template {string} Keys
- * @param { { [K in Keys]?: unknown } } object the object to serialize
- * @param {readonly Keys[]} ordering an array of keys in target order, for the top-level object
- * @param {'json' | 'yaml'} format
- * @param {string} schema the json schema URL
+ * @param object the object to serialize
+ * @param ordering an array of keys in target order, for the top-level object
+ * @param schema the json schema URL
  */
-export function stringifyWithToplevelOrdering(format, schema, object, ordering) {
+export function stringifyWithToplevelOrdering<Keys extends string>(
+	format: 'json' | 'yaml',
+	schema: string,
+	object: { [K in Keys]?: unknown },
+	ordering: readonly Keys[]
+) {
 	let keysOrder = [...ordering];
 
 	if (format === 'json') {
-		// @ts-expect-error
+		// @ts-expect-error $schema is not in Keys but we add it anyways
 		keysOrder = ['$schema', ...keysOrder];
 	}
 
-	/**
-	 * @param {*} _
-	 * @param {*} value
-	 */
-	const reviver = (_, value) => {
+	const reviver = (_: unknown, value: unknown) => {
 		if (value === null) return value;
 		if (Array.isArray(value)) return value;
 		if (typeof value !== 'object') return value;
 
-		// @ts-expect-error
-		if (Object.keys(value).every((key) => keysOrder.includes(key))) {
+		if (keys(value).every((key) => keysOrder.includes(key))) {
+			// @ts-expect-error key in value thanks to if check above
 			return Object.fromEntries(keysOrder.map((key) => [key, value[key]]));
 		}
 		return value;

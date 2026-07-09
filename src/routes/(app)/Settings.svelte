@@ -369,7 +369,7 @@
 								? 'Disponible'
 								: switchValue(platform(), {
 										web: '',
-										android: 'Play Store',
+										android: 'Nouveau .apk',
 										ios: 'App Store',
 									})
 							: '',
@@ -388,7 +388,7 @@
 
 						if (!updater.compatible(updateBundle)) {
 							// TODO: once we're on the stores, open the relevant store page here
-							window.open('https://apk.cigale.gwen.works', '_blank');
+							window.open('https://cigaleapp.github.io/cigale/apk', '_blank');
 							return;
 						}
 
