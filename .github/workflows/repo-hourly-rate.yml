@@ -1,0 +1,27 @@
+name: Update repo's hourly_rate
+
+on:
+  workflow_dispatch:
+  push:
+    paths: [.github/workflows/repo-hourly-rate.yml]
+  schedule:
+    - cron: '0 0 1 * *'
+
+jobs:
+  compute:
+    runs-on: ubuntu-latest
+    environment:
+      name: Custom properties
+      url: https://github.com/cigaleapp/cigale/custom-properties
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version-file: .bun-version
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Update hourly_rate custom property on the repository
+        run: bun run scripts/github-set-repo-hourly-rate.ts
+        env:
+          GH_TOKEN: ${{ secrets.PAT_CUSTOM_PROPERTIES_MANAGER }}
+          GITHUB_REPO: ${{ github.repository }}
