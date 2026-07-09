@@ -9,11 +9,6 @@ on:
       - renovate/*
 
 jobs:
-  smoke:
-    name: Smoke test
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo smoke
   capacitor:
     name: Capacitor-related tasks
     runs-on: ubuntu-latest
