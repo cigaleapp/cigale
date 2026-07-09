@@ -1,5 +1,5 @@
 import { readFile, writeFile } from 'node:fs/promises';
-import type { AppFixture } from './fixtures.js';
+import type { AppFixture } from './fixtures/app.js';
 import type { Page, PlaywrightWorkerOptions } from '@playwright/test';
 import type { PerformanceMetrics } from 'playwright-performance-metrics';
 
@@ -7,9 +7,10 @@ import { ms } from 'convert';
 import { PerformanceMetricsCollector } from 'playwright-performance-metrics';
 
 import { assert, expect, test } from './fixtures.js';
+import { mockOPFSOnWebWorkers } from './utils/opfs.js';
 import { collectChromeDevtoolsTrace, emulateNetworkProfile } from './utils/performance.js';
 
-test.use({ storageState: { cookies: [], origins: [] } });
+test.use({ storageState: { cookies: [], origins: [] }, opfsState: [] });
 
 benchmark(`startup @blank`, {
 	async prepare({ page }) {
@@ -17,7 +18,8 @@ benchmark(`startup @blank`, {
 			waitUntil: 'commit',
 		});
 	},
-	async run({ app }) {
+	async run({ app, page }) {
+		await mockOPFSOnWebWorkers(page);
 		await app.db.ready();
 		await assert(app.tabs.get('sessions')).toBeVisible({ timeout: ms('1min') });
 	},

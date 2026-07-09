@@ -33,6 +33,7 @@ import {
 	ExportsFilepathTemplateObservation,
 } from '$lib/schemas/protocols';
 import { AnalyzedImage, AnalyzedObservation, toMetadataRecord } from '$lib/schemas/results';
+import { accessBytes, resolveObjectWithBytes } from '$lib/storage/utils.js';
 import { compareBy, entries, nonnull, progressSplitter, sum, UTF8_BOM } from '$lib/utils';
 import { createZipArchive } from '$lib/zip.js';
 
@@ -108,7 +109,7 @@ swarp.generateResultsExport(
 			abortSignal?.throwIfAborted();
 
 			files[path] = {
-				content: new Uint8Array(file.bytes),
+				content: new Uint8Array(await accessBytes('MetadataValueFile', file)),
 				mtime: file.lastModifiedAt ? new Date(file.lastModifiedAt) : undefined,
 			};
 
@@ -144,7 +145,7 @@ swarp.generateResultsExport(
 				const { contentType, filename } = Schemas.Image.assert(image);
 				const cropbox = metadata[cropMetadata.id]?.value;
 				if (!image.fileId) continue;
-				const file = await db.get('ImageFile', image.fileId);
+				const file = await resolveObjectWithBytes(db, 'ImageFile', image.fileId);
 				if (!file) continue;
 
 				abortSignal?.throwIfAborted();
@@ -437,19 +438,21 @@ swarp.estimateResultsZipSize(async ({ sessionId, include, cropPadding }, _, { ab
 	);
 	abortSignal?.throwIfAborted();
 
-	const imageFileStats = await db.getAllFromIndex('ImageFile', 'sessionId', sessionId).then(
-		(images) =>
-			new Map(
-				images.map(({ bytes, dimensions, id }) => [
-					id,
-					{
-						dimensions,
-						fullSize: bytes.byteLength,
-						bytePerPixel: bytes.byteLength / (dimensions.width * dimensions.height),
-					},
-				])
-			)
-	);
+	const imageFileStats = new Map<
+		string,
+		{ dimensions: { width: number; height: number }; fullSize: number; bytesPerPixel: number }
+	>();
+	const files = await db.getAllFromIndex('ImageFile', 'sessionId', sessionId);
+
+	for (const { dimensions, id, ...file } of files) {
+		const bytes = await accessBytes('ImageFile', file);
+		imageFileStats.set(id, {
+			dimensions,
+			fullSize: bytes.byteLength,
+			bytePerPixel: bytes.byteLength / (dimensions.width * dimensions.height),
+		});
+	}
+
 	abortSignal?.throwIfAborted();
 
 	const metadataDefinitions = await db

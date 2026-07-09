@@ -53,6 +53,7 @@
 		safeJSONParse,
 	} from './utils.js';
 	import WorldLocationCombobox from './WorldLocationCombobox.svelte';
+	import { resolveObjectWithBytes } from './storage/utils.js';
 
 	interface Props {
 		definition: Metadata;
@@ -504,7 +505,7 @@
 		{#snippet file(currentFileId)}
 			{@const { accept, size } = definition as typeof MetadataFile.infer}
 			<div class="file-input">
-				{#await idb.get('MetadataValueFile', currentFileId ?? '')}
+				{#await resolveObjectWithBytes(databaseHandle(), 'MetadataValueFile', currentFileId ?? '')}
 					<div class="current">
 						<code class="size">
 							<LoadingText value={Loading} mask={formatBytesSize(100e3)} />

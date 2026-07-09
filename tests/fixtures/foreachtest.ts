@@ -1,5 +1,5 @@
 import { mkdir, rm } from 'node:fs/promises';
-import type { AppFixture } from '$e2e/fixtures/app.js';
+import type { ExtraTestArgs } from '$e2e/fixtures.js';
 import type { PredownloadedModel } from '$e2e/utils/index.js';
 import type { ExportedProtocol } from '$lib/schemas/protocols.js';
 
@@ -18,6 +18,7 @@ import {
 	mockUrl,
 	setHardwareConcurrency,
 } from '$e2e/utils/index.js';
+import { mockOPFSOnWebWorkers, restoreOPFSState } from '$e2e/utils/opfs.js';
 
 import _fullProtocol from '../../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
 import lightProtocol from '../../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
@@ -29,10 +30,14 @@ let collembolaClassifierModel: PredownloadedModel | null = null;
 let arthropodaDetectionModel: PredownloadedModel | null = null;
 
 export async function forEachTest(
-	{ page, context, app }: PlaywrightTestArgs & PlaywrightTestOptions & { app: AppFixture },
+	{ page, context, app, opfsState }: PlaywrightTestArgs & PlaywrightTestOptions & ExtraTestArgs,
 	use: () => Promise<void>,
 	info: TestInfo
 ) {
+	if (opfsState) {
+		await restoreOPFSState(page, opfsState);
+	}
+
 	await context.route('**/*', async (route) => {
 		const request = route.request();
 		if (request.resourceType() !== 'document') {
@@ -128,6 +133,7 @@ export async function forEachTest(
 
 	if (!info.tags.includes('@blank')) {
 		await page.goto('./');
+		await mockOPFSOnWebWorkers(page);
 		await app.db.ready();
 	}
 

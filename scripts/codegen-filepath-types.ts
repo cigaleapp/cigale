@@ -93,6 +93,7 @@ Bun.file(path.join(projectRoot, 'tests', 'filepaths.ts')).write(
 			Exports: 'exports/*.zip',
 			// Static brace expansion here since the files are not checked into git
 			StorageStates: new StaticBraces('storage-states/{empty,basic,kitchen-sink}.json'),
+			OPFSStates: new StaticBraces('opfs-states/{empty,basic,kitchen-sink}.json'),
 			Photos: ['*.{jpeg,jpg,png,cr2,JPEG,JPG,PNG,CR2}', 'real/entomoscope/*.{jpeg,jpg,json}'],
 		})),
 		...(await namespacedDeclarations('ResultsPaths', 'tests/results', {})),

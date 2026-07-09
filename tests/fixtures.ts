@@ -4,6 +4,7 @@ import 'urlpattern-polyfill';
 
 import type { AppFixture } from './fixtures/app.js';
 import type { ONNXModelsFixture } from './fixtures/onnxmodels.js';
+import type { OPFSTestArg } from './utils/opfs.js';
 
 import { defineNetworkFixture } from '@msw/playwright';
 import { test as base } from '@playwright/test';
@@ -15,20 +16,20 @@ import { forEachTest, forEachWorker } from './fixtures/foreachtest.js';
 import { onnxmodels } from './fixtures/onnxmodels.js';
 import { tempfiles } from './fixtures/tempfiles.js';
 
-const _test = base.extend<
-	{
-		forEachTest: void;
-		app: AppFixture;
-		tempfiles: TempFilesFixture;
-		onnxmodels: ONNXModelsFixture;
-		networkHandlers: Array<import('msw').AnyHandler>;
-		network: import('@msw/playwright').NetworkFixture;
-		storageState:
-			| FixturePaths.Absolute<FixturePaths.StorageStates>
-			| Exclude<import('@playwright/test').BrowserContextOptions['storageState'], string>;
-	},
-	{ forEachWorker: void }
->({
+export type ExtraTestArgs = {
+	forEachTest: void;
+	app: AppFixture;
+	tempfiles: TempFilesFixture;
+	onnxmodels: ONNXModelsFixture;
+	networkHandlers: Array<import('msw').AnyHandler>;
+	network: import('@msw/playwright').NetworkFixture;
+	opfsState?: OPFSTestArg;
+	storageState:
+		| FixturePaths.Absolute<FixturePaths.StorageStates>
+		| Exclude<import('@playwright/test').BrowserContextOptions['storageState'], string>;
+};
+
+const _test = base.extend<ExtraTestArgs, { forEachWorker: void }>({
 	tempfiles,
 	async networkHandlers({}, use) {
 		await use([]);
@@ -62,6 +63,7 @@ const _test = base.extend<
  */
 export const test = _test.extend({
 	storageState: 'tests/fixtures/storage-states/empty.json',
+	opfsState: 'tests/fixtures/opfs-states/empty.json',
 });
 
 /**
@@ -69,6 +71,7 @@ export const test = _test.extend({
  */
 export const testBasic = _test.extend({
 	storageState: 'tests/fixtures/storage-states/basic.json',
+	opfsState: 'tests/fixtures/opfs-states/basic.json',
 });
 
 /**
@@ -76,6 +79,7 @@ export const testBasic = _test.extend({
  */
 export const testKitchensink = _test.extend({
 	storageState: 'tests/fixtures/storage-states/kitchen-sink.json',
+	opfsState: 'tests/fixtures/opfs-states/kitchen-sink.json',
 });
 
 export { lightProtocol as exampleProtocol };

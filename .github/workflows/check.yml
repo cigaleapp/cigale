@@ -111,11 +111,24 @@ jobs:
           RUN_ATTEMPT: ${{ github.run_attempt }}
 
   e2e:
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'speedy-e2e') }}
     needs: [build-debug, json-schema, lint, test, e2e-concurrency]
     name: E2E
     concurrency:
       group: playwright-${{ needs.e2e-concurrency.outputs.bucket }}
       queue: max
+    uses: ./.github/workflows/playwright.yml
+    secrets: inherit
+    with:
+      artifact: ${{ needs.build-debug.outputs.artifact }}
+
+  e2e-speedy:
+    if: contains(github.event.pull_request.labels.*.name, 'speedy-e2e')
+    needs: [build-debug]
+    name: E2E (Speedy)
+    concurrency:
+      group: playwright-speedy-${{ github.event.pull_request.number }}
+      queue: single
     uses: ./.github/workflows/playwright.yml
     secrets: inherit
     with:
@@ -208,6 +221,10 @@ jobs:
       - check-native-version
     runs-on: ubuntu-latest
     steps:
+      - if: needs.test.outputs.coverage-check == 'fail'
+        run: echo "Coverage comparison did not pass the check"; exit 1
+      - if: needs.e2e.result != 'success'
+        run: echo "E2E tests (non-speedy) were not successful (skipped/cancelled/failed), cannot merge"; exit 1
       - if: contains(needs.*.result, 'failure')
         run: echo "Some tests failed :'("; exit 1
       - if: ${{ !contains(needs.*.result, 'failure') }}

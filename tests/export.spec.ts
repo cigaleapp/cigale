@@ -43,7 +43,11 @@ test('correctly applies crop padding', issue(463), async ({ page, app }) => {
 
 	await page.getByRole('button', { name: 'Retour' }).click();
 
-	await app.tabs.go('results', { force: true });
+	// XXX: turn on debug mode so that the tab is not disabled
+	await app.settings.set({ showTechnicalMetadata: true });
+	await app.tabs.go('results');
+	await app.settings.set({ showTechnicalMetadata: false });
+
 	const zip = await exportResults(page, { cropPadding: '40px' });
 	await expectZipFiles(zip, ['analysis.json', 'metadata.csv', 'Cropped/(Unknown)_obs1_1.png'], {
 		'Cropped/(Unknown)_obs1_1.png': {
@@ -338,7 +342,10 @@ testKitchensink(
 
 for (const width of [undefined, 1400, 1600]) {
 	test.describe(`with a ${width ?? 'default'}px-wide window`, () => {
-		test.use({ storageState: 'tests/fixtures/storage-states/kitchen-sink.json' });
+		test.use({
+			storageState: 'tests/fixtures/storage-states/kitchen-sink.json',
+			opfsState: 'tests/fixtures/opfs-states/kitchen-sink.json',
+		});
 
 		test.beforeEach(async ({ page }) => {
 			if (!width) return;
