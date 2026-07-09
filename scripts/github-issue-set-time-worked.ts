@@ -76,35 +76,48 @@ async function run(cursor?: string) {
 				cursor,
 			},
 			query: `
+
+fragment issue on Issue {
+	id
+	number
+	title
+	issueFieldValues(first: 20) {
+		pageInfo { hasNextPage endCursor }
+		nodes {
+			...on IssueFieldTextValue {
+				value
+				field {
+					...on IssueFieldText {
+						id
+					}
+				}
+			}
+		}
+	}
+}
+
+
 query($owner: String!, $repo: String!, $n: Int!, $cursor: String) { 
 
 repository(owner: $owner, name: $repo) { 
 	issues(orderBy: { field: CREATED_AT, direction: DESC }, first: $n, after: $cursor) {
 		pageInfo { hasNextPage endCursor }
 		nodes {
-			id
-			number
-			title
-			issueFieldValues(first: 20) {
-				pageInfo { hasNextPage endCursor }
-				nodes {
-					...on IssueFieldTextValue {
-						value
-						field {
-							...on IssueFieldText {
-								id
-							}
-						}
-					}
-				}
-			}
-			closedByPullRequestsReferences(first: 50) {
+			...issue
+
+			closedByPullRequestsReferences(first: 10) {
 				pageInfo { hasNextPage endCursor }
 				nodes {
 					number
 					headRefName
 					createdAt
 					closedAt
+
+					closingIssuesReferences(first: 5) {
+						nodes {
+							...issue
+						}
+					}
 				}
 			}
 		}
@@ -123,7 +136,7 @@ repository(owner: $owner, name: $repo) {
 
 	const { repository } = result.data;
 
-	const times: Array<{ issue: Issue; time: string }> = [];
+	const times: Array<{ issue: IssueFragment; time: string }> = [];
 
 	for (const issue of repository.issues.nodes) {
 		await analyzeIssue(issue, times);
@@ -183,21 +196,23 @@ mutation {
 	return repository.issues.pageInfo;
 }
 
-async function analyzeIssue(issue: Issue, times: Array<{ issue: Issue; time: string }>) {
-	const prs = issue.closedByPullRequestsReferences.nodes;
+async function analyzeIssue(issue: Issue, times: Array<{ issue: IssueFragment; time: string }>) {
+	let prs = issue.closedByPullRequestsReferences.nodes;
 
 	if (!prs.length) return;
 
-	const start = new Date(Math.min(...prs.map((branch) => parseISO(branch.createdAt).valueOf())));
+	const start = new Date(Math.min(...prs.map((pr) => parseISO(pr.createdAt).valueOf())));
 
+	// If a PR is not closed, we might be still working on it up to today
 	const end = new Date(
-		Math.max(
-			...prs.map((branch) =>
-				// If a PR is not closed, we might be still working on it up to today
-				branch.closedAt ? parseISO(branch.closedAt).valueOf() : Date.now()
-			)
-		)
+		Math.max(...prs.map((pr) => (pr.closedAt ? parseISO(pr.closedAt).valueOf() : Date.now())))
 	);
+
+	// Store PRs per branch for display
+	const prsPerBranch = Map.groupBy(prs, (pr) => pr.headRefName);
+
+	// Now that we took into account create/close times for all *PR*, we can dedupe them by branch
+	prs = [...prsPerBranch.values()].map((prsOfBranch) => prsOfBranch[0]);
 
 	/** Maps a branch to additional seconds from extra projects */
 	const extraSeconds: Record<string, number> = {};
@@ -279,20 +294,29 @@ async function analyzeIssue(issue: Issue, times: Array<{ issue: Issue; time: str
 
 		const display = `${value} ${unit === 'minutes' ? 'mins' : unit}`;
 
-		console.info(
-			`\nIssue #${issue.number} (${issue.title}) = ${display} [${formatDuration(duration)}]:`
-		);
-		for (const [i, pr] of prs.entries()) {
-			console.info(` ${i > 0 ? '+' : ' '} ${pr.headRefName} (#${pr.number})`);
-			const extras = extrasPerPR.get(pr.headRefName);
-			if (extras) {
-				for (const { other } of extras) {
-					console.info(` + ${pr.headRefName} (${other.project}@${other.branch})`);
+		const issuesToUpdate = prs.flatMap((pr) => pr.closingIssuesReferences.nodes);
+
+		for (const issue of issuesToUpdate) {
+			console.info(
+				`\nIssue #${issue.number} (${issue.title}) = ${display} [${formatDuration(duration)}]:`
+			);
+			for (const [i, pr] of prs.entries()) {
+				console.info(
+					` ${i > 0 ? '+' : ' '} ${pr.headRefName} (${prsPerBranch
+						.get(pr.headRefName)!
+						.map((pr) => `#${pr.number}`)
+						.join(', ')})`
+				);
+				const extras = extrasPerPR.get(pr.headRefName);
+				if (extras) {
+					for (const { other } of extras) {
+						console.info(` + ${pr.headRefName} (${other.project}@${other.branch})`);
+					}
 				}
 			}
-		}
 
-		times.push({ issue, time: display });
+			times.push({ issue, time: display });
+		}
 	} catch (error) {
 		console.error(`An error occurred during analysis of #${issue.number} (${issue.title}): `);
 		console.error(error);
@@ -317,7 +341,7 @@ async function requestWakatime({
 				start: formatISO(subMonths(start, 2), { representation: 'date' }),
 				end: formatISO(addMonths(end, 1), { representation: 'date' }),
 				project,
-				branches: branches.join(','),
+				branches: [...new Set(branches)].join(','),
 			}),
 		{
 			headers: {
@@ -334,27 +358,36 @@ async function requestWakatime({
 	return JSON.parse(response);
 }
 
+type IssueFragment<T = unknown> = T & {
+	id: string;
+	number: number;
+	title: string;
+	issueFieldValues: Connection<
+		| undefined
+		| {
+				value: string;
+				field: {
+					id: string;
+				};
+		  }
+	>;
+};
+
 type GithubResponse = {
 	data: {
 		repository: {
-			issues: Connection<{
-				id: string;
-				number: number;
-				title: string;
-				issueFieldValues: Connection<
-					| undefined
-					| {
-							value: string;
-							field: { id: string };
-					  }
-				>;
-				closedByPullRequestsReferences: Connection<{
-					number: number;
-					headRefName: string;
-					createdAt: string;
-					closedAt: string | null;
-				}>;
-			}>;
+			issues: Connection<
+				IssueFragment<{
+					closedByPullRequestsReferences: Connection<{
+						number: number;
+						headRefName: string;
+						createdAt: string;
+						closedAt: string | null;
+
+						closingIssuesReferences: Connection<IssueFragment>;
+					}>;
+				}>
+			>;
 		};
 	};
 };
