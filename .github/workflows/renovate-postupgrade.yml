@@ -34,7 +34,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if gh pr diff --name-only | grep "^android/.native-code-version$"; then
+          if gh pr diff ${{ github.event.pull_request.number }} --name-only | grep "^android/.native-code-version$"; then
             echo already bumped
             exit 0
           fi
