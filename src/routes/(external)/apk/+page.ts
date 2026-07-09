@@ -8,8 +8,8 @@ export async function load() {
 		.then((json) => UpdateBundleMetadata(json));
 
 	if (info instanceof ArkErrors) {
-		return {info: undefined};
+		return { info: undefined };
 	}
 
-	return {info};
+	return { info };
 }
