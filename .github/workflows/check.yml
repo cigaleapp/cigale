@@ -264,24 +264,11 @@ jobs:
         with:
           name: ${{ needs.nightly-apk.outputs.artifact }}
 
-      - name: Create a simple index.html
-        run: |
-          mv app.apk cigale.apk
-          echo "<html><body>" > index.html
-          echo "<h1>Latest APK</h1>" >> index.html
-          echo "<p>Built from commit ${{ github.sha }} on branch ${{ github.ref_name }}.</p>" >> index.html
-          echo "<a href=\"app.apk\">Download APK</a>" >> index.html
-          echo "<p>Scan the QR code below to download the APK on your Android device:</p>" >> index.html
-          echo "<img alt=\"QR code\" src=\"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://apk.cigale.gwen.works/cigale.apk\">" >> index.html
-          echo "</body></html>" >> index.html
-
       - name: Save artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: apk-webpage
-          path: |
-            index.html
-            cigale.apk
+          path: cigale.apk
 
   apk-webpage-deploy:
     if: github.event_name == 'push' && github.ref_name == 'main'

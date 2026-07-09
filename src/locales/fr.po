@@ -989,6 +989,7 @@ msgstr "Version actuelle"
 
 #: src/routes/(app)/about/+page.svelte
 #: src/routes/(app)/protocols/[id]/versioning/+page.svelte
+#: src/routes/(external)/apk/+page.svelte
 msgid "Version"
 msgstr "Version"
 
@@ -1684,6 +1685,7 @@ msgstr "Fichier trop volumineux pour être prévisualisé"
 
 #: src/lib/FilePreview.svelte
 #: src/lib/FilePreview.svelte
+#: src/routes/(external)/apk/+page.svelte
 msgid "Télécharger"
 msgstr "Télécharger"
 
@@ -2648,6 +2650,7 @@ msgid "Checksum"
 msgstr "Checksum"
 
 #: src/routes/(app)/about/+page.svelte
+#: src/routes/(external)/apk/+page.svelte
 msgid "Commit"
 msgstr "Commit"
 
@@ -2993,3 +2996,11 @@ msgstr "Pour savoir qui tu es"
 #: src/routes/(app)/ModalSubmitIssue.svelte
 msgid "Prénom/nom/pseudo (optionnel)"
 msgstr "Prénom/nom/pseudo (optionnel)"
+
+#: src/routes/(external)/apk/+page.svelte
+msgid "Télécharger l'app mobile"
+msgstr "Télécharger l'app mobile"
+
+#: src/routes/(external)/apk/+page.svelte
+msgid "Version du code natif"
+msgstr "Version du code natif"
