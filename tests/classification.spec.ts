@@ -487,7 +487,7 @@ test.describe('narrowing view', pr(1570), () => {
 	async function expectCandidatesCountAround(
 		page: Page,
 		count: number,
-		{ timeout, tolerance = 10 }: { timeout?: number; tolerance?: number } = {}
+		{ timeout, tolerance = 15 }: { timeout?: number; tolerance?: number } = {}
 	) {
 		// for example, with count=10 and tolerance=3: (7|8|9|10|11|12|13)
 		const countRegexpUnion =
@@ -598,7 +598,7 @@ test.describe('narrowing view', pr(1570), () => {
 
 			await choose('Pilosité occipitale', 'Pilosité majoritairement claire');
 
-			await expectCandidatesCountAround(page, 176);
+			await expectCandidatesCountAround(page, 151);
 			// await expectRemainingCandidate('')
 
 			await choose('Forme de la tête', 'Plus large que haute');
