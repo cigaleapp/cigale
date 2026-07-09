@@ -82,20 +82,20 @@ jobs:
       update-artifact: update-bundle
     steps:
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
       - name: Setup Bun
-        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
         with:
           bun-version-file: .bun-version
 
       - name: Setup NodeJS
-        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           node-version: 24.18.0
 
       - name: Setup Java
-        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5
+        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.5.0
         with:
           distribution: temurin
           java-version: 21
@@ -104,7 +104,7 @@ jobs:
         run: bun install
 
       - name: Retrieve built app
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: ${{ inputs.artifact }}
 
@@ -115,7 +115,7 @@ jobs:
           depth: 4
 
       - name: Setup Android SDK
-        uses: android-actions/setup-android@40fd30fb8d7440372e1316f5d1809ec01dcd3699 # v4
+        uses: android-actions/setup-android@40fd30fb8d7440372e1316f5d1809ec01dcd3699 # v4.0.1
 
       # Needed for apksigner
       # See https://github.com/android-actions/setup-android/issues/461#issuecomment-2700722085
@@ -136,7 +136,7 @@ jobs:
         run: bun cap sync
 
       - name: Write keystore
-        uses: mobiledevops/secret-to-file-action@be5f14e82c235ccde011f6ab0f6c984b35dc34c6 # v1
+        uses: mobiledevops/secret-to-file-action@be5f14e82c235ccde011f6ab0f6c984b35dc34c6 # v2.0.0
         with:
           base64-encoded-secret: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           filename: keystore.jks
@@ -173,7 +173,7 @@ jobs:
 
       - if: ${{ !cancelled() }}
         name: Save problems report webpage
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: android-problems-report
           path: ./android/build/reports/problems/problems-report.html
@@ -231,7 +231,7 @@ jobs:
         run: echo "name=apk-${{ github.sha }}-${{ inputs.flavor }}" >> $GITHUB_OUTPUT
 
       - name: Save APK file
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: ${{ steps.artifact.outputs.name }}
           path: ./app.apk
@@ -270,7 +270,7 @@ jobs:
           EOS
 
       - name: Save update bundle
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: update-bundle
           path: |
@@ -320,7 +320,7 @@ jobs:
       url: ${{ steps.diawi.outputs.url }}
     steps:
       - name: Retrieve APK file
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: ${{ needs.apk.outputs.artifact }}
 
