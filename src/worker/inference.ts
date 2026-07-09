@@ -13,10 +13,10 @@ import { loadToTensor } from '$lib/inference_utils.js';
 import { classify, infer } from '$lib/inference.js';
 import { getMetadataValue, storeMetadataValue } from '$lib/metadata/index.js';
 import { ModelOutputEnum } from '$lib/schemas/neural.js';
+import { resolveObjectWithBytes } from '$lib/storage/utils.js';
 import { compareBy, throwError } from '$lib/utils.js';
 
 import { openDatabase, swarp } from './index.js';
-import { resolveObjectWithBytes } from '$lib/storage/utils.js';
 
 interface InferenceSession {
 	onnx: import('onnxruntime-web').InferenceSession;

@@ -38,6 +38,7 @@
 	import OverflowableText from './OverflowableText.svelte';
 	import { availableUnitsFor, displayUnit, NumericUnit, unitKind } from './schemas/units.js';
 	import { uiState } from './state.svelte.js';
+	import { resolveObjectWithBytes } from './storage/utils.js';
 	import Switch from './Switch.svelte';
 	import { toasts } from './toasts.svelte.js';
 	import { tooltip } from './tooltips.js';
@@ -53,7 +54,6 @@
 		safeJSONParse,
 	} from './utils.js';
 	import WorldLocationCombobox from './WorldLocationCombobox.svelte';
-	import { resolveObjectWithBytes } from './storage/utils.js';
 
 	interface Props {
 		definition: Metadata;

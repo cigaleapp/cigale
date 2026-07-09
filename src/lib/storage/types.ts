@@ -40,7 +40,7 @@ export interface BinaryStorageBackend<Name extends BinaryStorageName = BinarySto
 	/**
 	 * @returns number of files in the given directory
 	 */
-	count(locator: BinaryStorageLocator<"">): Promise<number>;
+	count(locator: BinaryStorageLocator<''>): Promise<number>;
 }
 
 export type BinaryStorageLocator<Filename extends string = string> = {

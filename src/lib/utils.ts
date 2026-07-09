@@ -1482,7 +1482,6 @@ export function afterDelay(delay: number | `${number}${'ms' | 's'}`, callback: (
 	return ref as unknown as number;
 }
 
-
 /**
  * Read contents of given {@link ArrayBuffer} as a {@link Uint8Array}
  */
@@ -1503,4 +1502,3 @@ if (import.meta.vitest) {
 		expect([...arrayBufferContents(buf)]).toStrictEqual([6, 7, 6, 7, 12, 13]);
 	});
 }
-

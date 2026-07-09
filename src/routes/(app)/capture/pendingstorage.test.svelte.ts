@@ -65,7 +65,11 @@ describe('PendingStorage', () => {
 		vi.resetModules();
 		mockIsNativePlatform.mockReturnValue(false);
 		mockBinaryStorage.count.mockResolvedValue(0);
-		mockBinaryStorage.create.mockResolvedValue({ area: '.pending_captures', sessionId: 'session', name: 'IMG_0001.PNG' });
+		mockBinaryStorage.create.mockResolvedValue({
+			area: '.pending_captures',
+			sessionId: 'session',
+			name: 'IMG_0001.PNG',
+		});
 		mockBinaryStorage.delete.mockResolvedValue(undefined);
 		mockBinaryStorage.list.mockReturnValue(asyncIterable([]));
 		mockBinaryStorage.read.mockResolvedValue({ name: 'IMG_0001.PNG', type: 'image/png' });
@@ -137,7 +141,10 @@ describe('PendingStorage', () => {
 		await storage.save('base64-photo');
 
 		expect(storage.count).toBe(0);
-		expect(mockErrorMessage).toHaveBeenCalledWith(saveError, 'Impossible de sauvgarder la photo');
+		expect(mockErrorMessage).toHaveBeenCalledWith(
+			saveError,
+			'Impossible de sauvgarder la photo'
+		);
 		expect(mockToastError).toHaveBeenCalledWith('Impossible de sauvgarder la photo');
 	});
 
@@ -229,7 +236,7 @@ describe('PendingStorage', () => {
 		await storage.delete('IMG_0001.PNG');
 
 		expect(storage.count).toBe(0);
-		expect(mockErrorMessage).toHaveBeenCalledWith(deleteError,expect.any(String));
+		expect(mockErrorMessage).toHaveBeenCalledWith(deleteError, expect.any(String));
 		expect(mockToastError).toHaveBeenCalledWith(expect.any(String));
 	});
 

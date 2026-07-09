@@ -289,14 +289,14 @@ export async function storeImageBytes({
 		filename,
 		sessionId,
 		bytes: originalBytes,
-		type: contentType
+		type: contentType,
 	});
 
 	const previewfile = await createBytes('ImagePreviewFile', {
 		filename,
 		sessionId,
 		bytes: resizedBytes,
-		type: contentType
+		type: contentType,
 	});
 
 	await db.openTransaction(['ImageFile', 'ImagePreviewFile'], { tx }, async (tx) => {
@@ -325,7 +325,7 @@ export async function storeImageBytes({
 export async function loadPreviewImage(id, scope = 'session') {
 	const file = await db.get('ImagePreviewFile', id);
 	if (!file) return;
-	console.debug(`loading preview image ${id}`, file)
+	console.debug(`loading preview image ${id}`, file);
 	const bytes = await accessBytes('ImagePreviewFile', file);
 	const blob = new Blob([bytes], { type: file.contentType });
 	uiState.setPreviewURL(id, URL.createObjectURL(blob), scope === 'global');
