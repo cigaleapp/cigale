@@ -257,7 +257,7 @@ testBasic('can send a bug report', async ({ page, app, context }) => {
 	expect(IssueCreatorRequest(requestBody)).not.toBeInstanceOf(ArkErrors);
 	expect(requestBody).toEqual({
 		title: 'Test Bug Report',
-		body: 'This is a test bug report.',
+		body: 'From: \n\n\nThis is a test bug report.',
 		type: 'bug',
 		metadata: assert.objectContaining({
 			Route: '/(app)/(sidepanel)/crop' as const satisfies SvelteTypes.RouteId,

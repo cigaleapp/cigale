@@ -68,7 +68,8 @@
 		});
 	});
 
-	const { showTechnicalMetadata, language, parallelism } = $derived(getSettings());
+	const { showTechnicalMetadata, language, parallelism, submitIssuesVia } =
+		$derived(getSettings());
 
 	const theme = getTheme();
 
@@ -270,6 +271,42 @@
 						await setSetting('showTechnicalMetadata', !showTechnicalMetadata);
 					},
 				},
+				...desktopOnly({
+					type: 'submenu',
+					label: 'Signalements',
+					data: {
+						subtext: switchValue(submitIssuesVia, {
+							github: 'Github',
+							form: 'Anonyme',
+						}),
+					},
+					submenu: {
+						items: [
+							{
+								type: 'selectable',
+								key: 'submit-issues-via-github',
+								selected: submitIssuesVia === 'github',
+								label: 'Github (recommandé)',
+								data: {},
+								closeOnSelect: false,
+								async onclick() {
+									setSetting('submitIssuesVia', 'github');
+								},
+							},
+							{
+								type: 'selectable',
+								key: 'submit-issues-via-form',
+								selected: submitIssuesVia === 'form',
+								data: {},
+								closeOnSelect: false,
+								label: 'Anonyme',
+								async onclick() {
+									setSetting('submitIssuesVia', 'form');
+								},
+							},
+						],
+					},
+				}),
 				{
 					type: 'clickable',
 					label: 'Préparation hors-ligne…',

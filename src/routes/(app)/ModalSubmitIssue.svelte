@@ -1,11 +1,9 @@
 <script lang="ts">
-	import type { MetadataError } from '$lib/database';
 	import type { IssueCreatorRequest } from '$lib/schemas/issue-creator';
 
 	import { Capacitor } from '@capacitor/core';
 	import { CapacitorShake } from '@capgo/capacitor-shake';
 	import { UAParser } from 'ua-parser-js';
-	import xss from 'xss';
 
 	import IconBug from '~icons/ri/bug-2-line';
 	import IconIdea from '~icons/ri/lightbulb-line';
@@ -19,6 +17,7 @@
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import Markdown from '$lib/Markdown.svelte';
 	import Modal from '$lib/Modal.svelte';
+	import { getSettings } from '$lib/settings.svelte.js';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 
@@ -29,19 +28,25 @@
 		trigger?: boolean;
 	}
 
-	let { type, open = $bindable(undefined), trigger: showTrigger = true }: Props = $props();
+	let {
+		type,
+		open: submit = $bindable(undefined),
+		trigger: showTrigger = true,
+	}: Props = $props();
 
 	let body = $state('');
 	let title = $state('');
-	let close: undefined | (() => void) = $state();
+	let who = $state('');
+	let close = $state<() => void>();
 	let submitting = $state(false);
+	let openModal = $state<() => void>();
 
 	const OpenIcon = $derived(type === 'bug' ? IconBug : IconIdea);
 
 	defineKeyboardShortcuts('general', {
 		[type === 'bug' ? '$mod+!' : '$mod+*']: {
 			help: type === 'bug' ? 'Signaler un bug' : 'Proposer une fonctionnalité',
-			do: () => open?.(),
+			do: () => submit?.(),
 		},
 	});
 
@@ -52,7 +57,7 @@
 
 		void (async () => {
 			shakeListener = await CapacitorShake.addListener('shake', () => {
-				open?.();
+				submit?.();
 			});
 		})();
 
@@ -68,22 +73,25 @@
 		const pre = (text: string, lang = '') => '\n```' + lang + '\n' + text + '\n```';
 		const jsonText = (obj: unknown) => pre(JSON.stringify(obj, null, 2), 'json');
 
-		const formatErrors = (label: string, errors: Record<string, MetadataError[]>) =>
-			Object.values(errors).flatMap((errs) =>
-				errs.map(
-					(err) =>
-						`<dt>${label}</dt> <dd><code>(${err.kind}, ignored: ${err.ignored})</code> ${err.message} \n\t\t<details><summary>Stack trace</summary><pre>${xss(
-							err.stack
-						)}</pre></details></dd>`
-				)
-			);
-
-		const errors = [
-			...tables.Observation.state.flatMap((obs) =>
-				formatErrors(obs.label, obs.metadataErrors)
-			),
-			...tables.Image.state.flatMap((img) => formatErrors(img.filename, img.metadataErrors)),
-		];
+		// FIXME: disabled for now cuz it makes the URL string for github submissions too long...
+		// we might wanna make it a link to a paste site or sth
+		//
+		// const formatErrors = (label: string, errors: Record<string, MetadataError[]>) =>
+		// 	Object.values(errors).flatMap((errs) =>
+		// 		errs.map(
+		// 			(err) =>
+		// 				`<dt>${label}</dt> <dd><code>(${err.kind}, ignored: ${err.ignored})</code> ${err.message} \n\t\t<details><summary>Stack trace</summary><pre>${xss(
+		// 					err.stack
+		// 				)}</pre></details></dd>`
+		// 		)
+		// 	);
+		//
+		// const errors = [
+		// 	...tables.Observation.state.flatMap((obs) =>
+		// 		formatErrors(obs.label, obs.metadataErrors)
+		// 	),
+		// 	...tables.Image.state.flatMap((img) => formatErrors(img.filename, img.metadataErrors)),
+		// ];
 
 		return {
 			Version: version,
@@ -99,14 +107,40 @@
 			'Loaded objects': (['Observation', 'Image', 'Session', 'Metadata', 'Protocol'] as const)
 				.map((table) => `${tables[table].state.length} ${table.toLowerCase()}s`)
 				.join(', '),
-			'Metadata Errors': `${errors.length}\n` + '<dl>' + errors.join('') + '</dl>\n',
+			// 'Metadata Errors': `${errors.length}\n` + '<dl>' + errors.join('') + '</dl>\n',
 			'Open session': jsonText(uiState.currentSession),
+		};
+	});
+
+	$effect(() => {
+		submit = () => {
+			switch (getSettings().submitIssuesVia) {
+				case 'form': {
+					openModal?.();
+					return;
+				}
+				case 'github': {
+					const a = document.createElement('a');
+					a.target = '_blank';
+					a.href =
+						'https://github.com/cigaleapp/cigale/issues/new?' +
+						new URLSearchParams({
+							// TODO: english version
+							template: 'bug_report_fr.yaml',
+							debuginfo: Object.entries(collectedMetadata)
+								.map(([key, value]) => `- **${key}:** ${value}`)
+								.join('\n'),
+						});
+					a.click();
+					return;
+				}
+			}
 		};
 	});
 </script>
 
 <Modal
-	bind:open
+	bind:open={openModal}
 	bind:close
 	key="modal_submit_issue_{type}"
 	title={type === 'bug' ? 'Signaler un bug' : 'Proposer une fonctionnalité'}
@@ -123,7 +157,7 @@
 				body: JSON.stringify({
 					type,
 					title,
-					body,
+					body: `From: ${who}\n\n\n${body}`,
 					metadata: collectedMetadata,
 				} satisfies (typeof IssueCreatorRequest)['infer']),
 			});
@@ -157,6 +191,9 @@
 		<Field label="Titre">
 			<InlineTextInput required label="Titre" bind:value={title} />
 		</Field>
+		<Field label="Prénom/nom/pseudo (optionnel)">
+			<InlineTextInput label="Pour savoir qui tu es" bind:value={who} />
+		</Field>
 		<details>
 			<summary>Métadonnées envoyées</summary>
 			<Markdown
@@ -173,7 +210,7 @@
 
 {#if showTrigger}
 	<ButtonIcon
-		onclick={() => open?.()}
+		onclick={() => submit?.()}
 		help={type === 'bug' ? 'Signaler un bug' : 'Proposer une fonctionnalité'}
 		pw-testid={type === 'bug' ? 'open-bug-report' : 'open-feature-request'}
 	>
