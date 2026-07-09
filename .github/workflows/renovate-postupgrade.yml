@@ -35,7 +35,7 @@ jobs:
         run: |
           current=$(cat android/.native-code-version)
           echo Native code version is currently $current
-          echo It'll be set to $(( current + 1))
+          echo "It'll be set to $(( current + 1))"
           echo $(( current + 1 )) > android/.native-code-version
 
       - name: Run cap update
