@@ -59,6 +59,13 @@ const query = graphql(`
 							}
 						}
 					}
+
+					milestone {
+						description
+						title
+						id
+						number
+					}
 				}
 			}
 		}
@@ -68,6 +75,26 @@ const query = graphql(`
 let totalPrice = 0;
 let totalHours = 0;
 let chunkIndex = 0;
+
+/**
+ * Milestone.id → totals
+ */
+let perMilestone: Record<
+	string,
+	{
+		price: number;
+		hours: number;
+		milestone: NonNullable<
+			NonNullable<
+				NonNullable<
+					NonNullable<
+						NonNullable<ResultOf<typeof query>['repository']>['issues']
+					>['nodes']
+				>[number]
+			>['milestone']
+		>;
+	}
+> = {};
 
 let pageInfo = { endCursor: null as string | null, hasNextPage: true };
 let chunk: ResultOf<typeof query>;
@@ -86,9 +113,37 @@ while (pageInfo.hasNextPage) {
 	};
 }
 
-const rate = Math.round((totalPrice / totalHours) * 100) / 100;
+const rate = computeRate(totalPrice, totalHours);
 
 console.info(`Final: ${totalPrice}/${totalHours} => ${rate} €/h`);
+console.info(`Per milestone:`);
+for (const { milestone, price, hours } of Object.values(perMilestone)) {
+	console.info(`- ${milestone.title}: ${price}€/${hours}h => ${computeRate(price, hours)} €/h`);
+	// Not available as a gql mutation lol
+	const response = await fetch(
+		`https://api.github.com/repos/${env.GITHUB_REPO.owner}/${env.GITHUB_REPO.repo}/milestones/${milestone.number}`,
+		{
+			method: 'PATCH',
+			headers: { Authorization: `Bearer ${execSync('gh auth token')}` },
+			body: JSON.stringify({
+				description: milestone.description?.includes('[Effective rate:')
+					? milestone.description.replace(
+							/\[Effective rate: .+?\]/,
+							`[Effective rate: ${computeRate(price, hours)} €/h]`
+						)
+					: `${milestone.description ?? ''} [Effective rate: ${computeRate(price, hours)} €/h]`,
+			}),
+		}
+	);
+
+	if (!response.ok) {
+		console.error(await response.text());
+	}
+}
+
+function computeRate(price: number, hours: number) {
+	return Math.round((price / hours) * 100) / 100;
+}
 
 await github(
 	graphql(`
@@ -122,6 +177,12 @@ async function analyze(chunk: ResultOf<typeof query>) {
 
 		totalPrice += price;
 		totalHours += hours;
+
+		if (issue.milestone) {
+			perMilestone[issue.milestone.id] ??= { hours: 0, price: 0, milestone: issue.milestone };
+			perMilestone[issue.milestone.id].hours += hours;
+			perMilestone[issue.milestone.id].price += price;
+		}
 	}
 }
 
