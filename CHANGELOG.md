@@ -7,12 +7,22 @@ All notable changes to this project will be documented in this file, on a monthl
 ### Improvements
 
 - Add reload button for parallelism setting (See #1524)
+- Fix Lightbox content not being horizontally centered
+- Fix border radius for postion=top BottomDrawer
+- Fix missing spacing around bottom drawer group titles
+- Implement camera (active mode) to snap pictures directly!
 - Improve errors related to execution or validation of Jsonata expressions
+- Remove click-on-empty-to-import (Closes #1840) (#1842)
 - Swipe-to-dismiss toasts (Closes #1498)
 
 ### Bug Fixes
 
+- Always enable results tab (Closes #1843)
+- Fix ModalConfirm:show never resolving on mobile when tapping outside to close
 - Fix close button doesnt work in narrowing classifier (Closes #1829)
+- Fix exif data processing
+- Fix horizontal overflow on fullscreen cropper (Closes #1822)
+- Fix mobile tabbar not hidden on navbarAppearance=hidden pages
 - Ignore EXIF orientation (Fixes #1824)
 - Polyfill Uint8Array.{from,to}Base64
 - Polyfill newer Set methods (Closes #1794)
@@ -21,6 +31,7 @@ All notable changes to this project will be documented in this file, on a monthl
 ### Data Updates
 
 - Fix wilkella-argentata handling for IDmyBee
+- Regenerate example protocols
 - Regenerate protocols (only Xper3 step)
 - Use new favicon logo
 
@@ -552,7 +563,7 @@ All notable changes to this project will be documented in this file, on a monthl
 
 ### Improvements
 
-- Add \_obsN in exported images' file names
+- Add _obsN in exported images' file names
 - Add notifications (#775)
 - Add {{numberInObservation}} in export filepath templates
 - Add {{observation.number}} and {{numberInObservation}} to export path templates (#904)
@@ -873,7 +884,7 @@ All notable changes to this project will be documented in this file, on a monthl
 - Add missing manuallyModified prop in results json schema
 - Also delete references to image in observations when deleting image
 - Cachebust protocol update checks and upgrades
-- Fix Digit\* keybinds not triggering with shift-row
+- Fix Digit* keybinds not triggering with shift-row
 - Fix blurfill on CardObservation being short
 - Fix bounding boxes on CardObservation misaligned
 - Fix cannot create new boxes
@@ -1197,8 +1208,8 @@ All notable changes to this project will be documented in this file, on a monthl
 ### Bug Fixes
 
 - Balise Div qui manquait
-- Fix /\_components and preview deployments
-- Fix \_components not updating URL properly after setting props
+- Fix /_components and preview deployments
+- Fix _components not updating URL properly after setting props
 - Fix descending shift-click selections
 - Fix overflow of toasts on long messages
 - Fix title jump when single-image observation gets selected/unselected
