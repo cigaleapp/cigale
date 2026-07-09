@@ -59,15 +59,6 @@
 		})();
 	});
 
-	$effect(() => {
-		window.addEventListener('mouseup', ({ target }) => {
-			if (target === dialogElement) return;
-			// @ts-ignore
-			if (dialogElement?.contains(target)) return;
-			open = false;
-		});
-	});
-
 	const { showTechnicalMetadata, language, parallelism, submitIssuesVia } =
 		$derived(getSettings());
 
@@ -375,14 +366,15 @@
 							: 'Vérifier les mises à jour',
 					data: {
 						icon: checkedForUpdates && !updateBundle ? IconUpdateOK : IconUpdate,
-						subtext:
-							!updateBundle || !updater.compatible(updateBundle)
-								? ''
+						subtext: updateBundle
+							? updater.compatible(updateBundle)
+								? 'Disponible'
 								: switchValue(platform(), {
 										web: '',
 										android: 'Play Store',
 										ios: 'App Store',
-									}),
+									})
+							: '',
 					},
 					async onclick() {
 						if (!updateBundle) {
@@ -398,7 +390,7 @@
 
 						if (!updater.compatible(updateBundle)) {
 							// TODO: once we're on the stores, open the relevant store page here
-							window.open('https://apk.cigale.gwen.works');
+							window.open('https://apk.cigale.gwen.works', '_blank');
 							return;
 						}
 
