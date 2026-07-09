@@ -12,6 +12,8 @@ body:
       label: Reproduction
       description: Comment reproduire le bug? Donnez les étapes
       placeholder: |
+        Par exemple: 
+        
         1. Ouvrir une session
         2. Lancer le recadrage automatique en allant sur l'onglet Recadrer
         3. Ouvrir une photo qui a été inférée, pendant que le recadrage automatique continue
