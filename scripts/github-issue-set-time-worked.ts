@@ -28,6 +28,7 @@ const env = arkenv({
 	WAKATIME_API_KEY: '/^waka_.+$/',
 	WAKATIME_PROJECT: 'string',
 	TIMESPENT_ISSUE_FIELD_ID: 'string = "IFT_kgDOAp1Gyg"',
+	HOURS_SPENT_ISSUE_FIELD_ID: 'string = "IFN_kgDOAp9OqA"',
 	N_MOST_RECENT_ISSUES: 'number = 100',
 	BACKFILL: 'boolean = false',
 	/** Extra time to add to a branch based on time spent on another branch on another project */
@@ -136,7 +137,7 @@ repository(owner: $owner, name: $repo) {
 
 	const { repository } = result.data;
 
-	const times: Array<{ issue: IssueFragment; time: string }> = [];
+	const times: Array<{ issue: IssueFragment; time: string; seconds: number }> = [];
 
 	for (const issue of repository.issues.nodes) {
 		await analyzeIssue(issue, times);
@@ -165,13 +166,19 @@ repository(owner: $owner, name: $repo) {
 mutation {
 	${chunk
 		.map(
-			({ time: hours, issue }) =>
+			({ time: hours, seconds, issue }) =>
 				`issue${issue.number}: setIssueFieldValue(input: { 
 			issueId: ${JSON.stringify(issue.id)},
-			issueFields: [{
-				textValue: ${JSON.stringify(hours)},
-				fieldId: ${JSON.stringify(env.TIMESPENT_ISSUE_FIELD_ID)}
-			}]
+			issueFields: [
+				{
+					textValue: ${JSON.stringify(hours)},
+					fieldId: ${JSON.stringify(env.TIMESPENT_ISSUE_FIELD_ID)}
+				},
+				{
+					numberValue: ${JSON.stringify(seconds / 3600)},
+					fieldId: ${JSON.stringify(env.HOURS_SPENT_ISSUE_FIELD_ID)}
+				}
+			]
 		}) { clientMutationId }`
 		)
 		.join('\n')}	
@@ -196,7 +203,10 @@ mutation {
 	return repository.issues.pageInfo;
 }
 
-async function analyzeIssue(issue: Issue, times: Array<{ issue: IssueFragment; time: string }>) {
+async function analyzeIssue(
+	issue: Issue,
+	times: Array<{ issue: IssueFragment; time: string; seconds: number }>
+) {
 	let prs = issue.closedByPullRequestsReferences.nodes;
 
 	if (!prs.length) return;
@@ -315,7 +325,7 @@ async function analyzeIssue(issue: Issue, times: Array<{ issue: IssueFragment; t
 				}
 			}
 
-			times.push({ issue, time: display });
+			times.push({ issue, time: display, seconds });
 		}
 	} catch (error) {
 		console.error(`An error occurred during analysis of #${issue.number} (${issue.title}): `);
