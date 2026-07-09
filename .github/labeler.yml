@@ -1,6 +1,6 @@
 android-native-changes:
   - changed-files:
-      - any-glob-to-any-file: [android/*,  .github/workflows/android.yml]
+      - any-glob-to-any-file: [android/*, .github/workflows/android.yml]
   - head-branch:
       - renovate/capacitor-.*
       - renovate/capawesome-.*
