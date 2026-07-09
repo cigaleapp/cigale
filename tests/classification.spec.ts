@@ -501,7 +501,7 @@ test.describe('narrowing view', pr(1570), () => {
 		);
 
 		await expect(page.getByTestId('remaining-candidates')).toHaveText(
-			new RegExp(`^\s*${countRegexpUnion} restants\s*$`),
+			new RegExp(`^\\s*${countRegexpUnion} restants\\s*$`),
 			timeout ? { timeout } : {}
 		);
 	}
