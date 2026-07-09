@@ -5,7 +5,11 @@ on:
   push:
     paths: [.github/workflows/issue-time-worked.yml]
   schedule:
-    - cron: '2 0 * * *'
+    # Run at end of work hours for morning & afternoon
+    - cron: '0 12 * * *'
+      timezone: Europe/Paris
+    - cron: '0 19 * * *'
+      timezone: Europe/Paris
 
 jobs:
   compute:
