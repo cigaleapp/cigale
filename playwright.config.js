@@ -58,6 +58,9 @@ const firefox = {
 /** @type {Project} */
 const webkit = {
 	name: 'webkit',
+	// Webkit causes too much issues. See if we can remove this
+	// once https://github.com/microsoft/playwright/issues/18235 is fixed
+	testMatch: /core\.spec\.ts$/,
 	dependencies,
 	// Until we can get rid of the idb-opfs mocking,
 	// it seems like it slows things down considerably
