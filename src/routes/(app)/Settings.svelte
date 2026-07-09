@@ -50,8 +50,6 @@
 
 	let { callout = $bindable() }: Props = $props();
 
-	let dialogElement = $state<HTMLDialogElement>();
-
 	let notificationsEnabled = $state(getSettings().notifications);
 	$effect(() => {
 		void (async () => {
