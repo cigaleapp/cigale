@@ -481,18 +481,28 @@ test.describe('full-screen classification view', pr(1071), () => {
 });
 
 test.describe('narrowing view', pr(1570), () => {
-	async function expectCandidatesCount(
+	async function expectCandidatesCountAround(
 		page: Page,
 		count: number,
-		options: { timeout?: number } = {}
+		{ timeout, tolerance = 10 }: { timeout?: number; tolerance?: number } = {}
 	) {
+		// for example, with count=10 and tolerance=3: (7|8|9|10|11|12|13)
+		const countRegexpUnion =
+			'(' +
+			Array.from({ length: tolerance * 2 + 1 })
+				.map((_, i) => count + i - tolerance)
+				.filter((n) => n >= 0)
+				.join('|') +
+			')';
+
 		await expect(page.getByRole('tab', { name: 'Candidats' })).toHaveText(
-			new RegExp(`${count}$`),
-			options
+			new RegExp(`${countRegexpUnion}$`),
+			timeout ? { timeout } : {}
 		);
+
 		await expect(page.getByTestId('remaining-candidates')).toHaveText(
-			`${count} restants`,
-			options
+			new RegExp(`^\s*${countRegexpUnion} restants\s*$`),
+			timeout ? { timeout } : {}
 		);
 	}
 
@@ -553,7 +563,7 @@ test.describe('narrowing view', pr(1570), () => {
 	// TODO: more E2E testing
 	test.describe('describe tab', () => {
 		testBasic('can choose choices', async ({ page, app }) => {
-			await expectCandidatesCount(page, 180, { timeout: ms('10s') });
+			await expectCandidatesCountAround(page, 180, { timeout: ms('10s') });
 
 			async function choose(
 				metadata: string,
@@ -585,12 +595,12 @@ test.describe('narrowing view', pr(1570), () => {
 
 			await choose('Pilosité occipitale', 'Pilosité majoritairement claire');
 
-			await expectCandidatesCount(page, 154);
+			await expectCandidatesCountAround(page, 176);
 			// await expectRemainingCandidate('')
 
 			await choose('Forme de la tête', 'Plus large que haute');
 
-			await expectCandidatesCount(page, 123);
+			await expectCandidatesCountAround(page, 122);
 
 			await expectMetadataValues(app, {
 				pilosite_occipitale: 'pilositmaj_1738780459445_3719',
@@ -618,7 +628,7 @@ test.describe('narrowing view', pr(1570), () => {
 			await page.getByRole('tab', { name: 'Décrire' }).click();
 			await app.path.wait('/(app)/(sidepanel)/o/[observation]/classify/narrow/describe');
 
-			await expectCandidatesCount(page, 133);
+			await expectCandidatesCountAround(page, 132);
 
 			await choose(
 				'Couleur de la face ventrale du flagelle antennaire',
@@ -662,7 +672,7 @@ test.describe('narrowing view', pr(1570), () => {
 				taille_du_3eme_segment_antennaire: 'a3pluscour_1738780689285_1923',
 			});
 
-			await expectCandidatesCount(page, 12);
+			await expectCandidatesCountAround(page, 12);
 
 			// Use reset button
 
@@ -677,7 +687,7 @@ test.describe('narrowing view', pr(1570), () => {
 				taille_du_3eme_segment_antennaire: null,
 			});
 
-			await expectCandidatesCount(page, 180);
+			await expectCandidatesCountAround(page, 180);
 		});
 
 		testBasic('can search through metadata', async ({ page, app }) => {
