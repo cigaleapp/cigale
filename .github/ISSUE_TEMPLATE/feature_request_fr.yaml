@@ -1,0 +1,29 @@
+name: Signaler un bug
+description: Signalement d'un bug sur l'appli
+
+type: bug
+
+body:
+  - type: textarea
+    id: description
+    validations:
+      required: true
+    attributes:
+      label: Description
+      description: Décrivez votre idée
+
+  - type: upload
+    id: screenshots
+    validations:
+      required: false
+    attributes:
+      label: Schémas / brouillons / etc
+      description: Facultatif
+
+  - type: textarea
+    id: debuginfo
+    validations:
+      required: false
+    attributes:
+      label: Contexte
+      description: _Rempli automatiquement, normalement_

@@ -126,7 +126,7 @@
 						'https://github.com/cigaleapp/cigale/issues/new?' +
 						new URLSearchParams({
 							// TODO: english version
-							template: 'bug_report_fr.yaml',
+							template: type === "bug" ?  'bug_report_fr.yaml' : 'feature_request_fr.yaml',
 							debuginfo: Object.entries(collectedMetadata)
 								.map(([key, value]) => `- **${key}:** ${value}`)
 								.join('\n'),
