@@ -65,7 +65,6 @@
 		"test:update-fixtures": "playwright test tasks/exports.spec.js --update-snapshots -x --headed && playwright test tasks/dbdump.spec.js --update-snapshots -x --headed "
 	},
 	"devDependencies": {
-		"@0no-co/graphqlsp": "^1.17.3",
 		"@actions/core": "^3.0.1",
 		"@capacitor/assets": "^3.0.5",
 		"@capacitor/cli": "^8.4.1",

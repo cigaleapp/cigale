@@ -78,7 +78,6 @@
         "yaml": "^2.9.0",
       },
       "devDependencies": {
-        "@0no-co/graphqlsp": "^1.17.3",
         "@actions/core": "^3.0.1",
         "@capacitor/assets": "^3.0.5",
         "@capacitor/cli": "^8.4.1",
