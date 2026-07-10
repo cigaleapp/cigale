@@ -10,6 +10,7 @@ import postcssPresetEnv from 'postcss-preset-env';
 import icons from 'unplugin-icons/vite';
 import { analyzer } from 'vite-bundle-analyzer';
 import crossOriginIsolation from 'vite-plugin-cross-origin-isolation';
+import mkcert from 'vite-plugin-mkcert';
 import { defineConfig } from 'vitest/config';
 import { wuchale } from 'wuchale/vite';
 
@@ -21,6 +22,7 @@ const env = arkenv(
 			.array()
 			.default(() => []),
 		VITEST: 'boolean = false',
+		HTTPS_DEV: 'boolean = false',
 		DEBUG: type('string|boolean').pipe(Boolean).default(false),
 		/** Required for mobile app, since window.location.origin returns localhost */
 		WEB_ORIGIN: 'string.url = "https://cigaleapp.github.io"',
@@ -67,6 +69,9 @@ export default defineConfig({
 		},
 	},
 	server: {
+		// Custom DNS to network-local IP address
+		// to have network-local https via mkcert
+		allowedHosts: ['stealth.local'],
 		fs: {
 			allow: ['./bun.lock'],
 		},
@@ -118,5 +123,6 @@ export default defineConfig({
 		env.VITEST ? undefined : wuchale(),
 		sveltekit(),
 		crossOriginIsolation(),
+		env.HTTPS_DEV ? mkcert() : undefined,
 	],
 });
