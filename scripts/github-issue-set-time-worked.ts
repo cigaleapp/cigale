@@ -101,7 +101,7 @@ fragment issue on Issue {
 query($owner: String!, $repo: String!, $n: Int!, $cursor: String) { 
 
 repository(owner: $owner, name: $repo) { 
-	issues(orderBy: { field: CREATED_AT, direction: DESC }, first: $n, after: $cursor) {
+	issues(orderBy: { field: UPDATED_AT, direction: DESC }, first: $n, after: $cursor) {
 		pageInfo { hasNextPage endCursor }
 		nodes {
 			...issue
