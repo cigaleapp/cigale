@@ -277,6 +277,7 @@ jobs:
     uses: ./.github/workflows/dev-deploy.yml
     secrets: inherit
     with:
+      live-check: false
       clear: false
       environment: APK Download Page
       artifact: apk-webpage

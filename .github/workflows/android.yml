@@ -179,7 +179,7 @@ jobs:
           path: ./android/build/reports/problems/problems-report.html
 
       - name: Move APK file
-        run: mv ./android/app/build/outputs/apk/${{ inputs.flavor }}/release/app-${{ inputs.flavor }}-release-signed.apk ./app.apk
+        run: mv ./android/app/build/outputs/apk/${{ inputs.flavor }}/release/app-${{ inputs.flavor }}-release-signed.apk ./cigale.apk
 
       - name: Set PACKAGE_ID
         id: id
@@ -193,7 +193,7 @@ jobs:
       - name: Check that assetlinks fingerprint matches the APK's
         run: |
           package_id=${{ steps.id.outputs.package_id }}
-          apksigner_output=$(apksigner verify --print-certs ./app.apk)
+          apksigner_output=$(apksigner verify --print-certs ./cigale.apk)
           echo "apksigner output:"
           echo "$apksigner_output"
 
@@ -234,7 +234,7 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: ${{ steps.artifact.outputs.name }}
-          path: ./app.apk
+          path: ./cigale.apk
 
       - name: Get current datetime
         id: datetime
@@ -329,7 +329,7 @@ jobs:
         id: diawi
         with:
           token: ${{ secrets.DIAWI_TOKEN }}
-          file: ./app.apk
+          file: ./cigale.apk
           # TODO: cigale mailing list ?
           # recipients:
           comment: |
