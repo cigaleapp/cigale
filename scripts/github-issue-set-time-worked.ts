@@ -30,7 +30,7 @@ const env = arkenv({
 	TIMESPENT_ISSUE_FIELD_ID: 'string = "IFT_kgDOAp1Gyg"',
 	HOURS_SPENT_ISSUE_FIELD_ID: 'string = "IFN_kgDOAp9OqA"',
 	/** Run on a single PR's issues */
-	'PR_NUMBER?': 'number',
+	'PR_NUMBER?': ['number | undefined | ""', '=>', (n) => n || undefined],
 	N_MOST_RECENT_ISSUES: 'number = 100',
 	BACKFILL: 'boolean = false',
 	/** Extra time to add to a branch based on time spent on another branch on another project */
