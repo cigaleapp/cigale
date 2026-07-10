@@ -95,7 +95,7 @@ jobs:
 
       - if: matrix.name == 'base'
         name: Set bundle size on repo custom property 
-        uses: ./.github/workflow/custom-property
+        uses: ./.github/actions/custom-property
         with:
           token: ${{ secrets.PAT_CUSTOM_PROPERTIES_MANAGER }}
           name: bundle_size
