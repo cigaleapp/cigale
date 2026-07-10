@@ -61,7 +61,7 @@ const env = arkenv({
 const graphql = (x: string) => x;
 
 if (env.PR_NUMBER) {
-	console.info(`Analyzing only PR #${env.PR_NUMBER}...\n\n`)
+	console.info(`Analyzing only PR #${env.PR_NUMBER}...\n\n`);
 	type Result = {
 		data: {
 			repository: {
@@ -134,7 +134,7 @@ if (env.PR_NUMBER) {
 
 	await updateIssueFields(times);
 
-	process.exit(0)
+	process.exit(0);
 }
 
 let pageInfo = { endCursor: undefined as string | undefined, hasNextPage: true };

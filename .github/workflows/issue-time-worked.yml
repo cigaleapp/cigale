@@ -3,7 +3,7 @@ name: Time spent
 on:
   workflow_dispatch:
   push:
-    paths: 
+    paths:
       - .github/workflows/issue-time-worked.yml
       - scripts/github-issue-set-time-worked.ts
   pull_request:
