@@ -94,13 +94,12 @@ jobs:
           echo "megabytes=$sum" >> $GITHUB_OUTPUT
 
       - if: matrix.name == 'base'
-        name: Set bundle size on repo custom property 
+        name: Set bundle size on repo custom property
         uses: ./.github/actions/custom-property
         with:
           token: ${{ secrets.PAT_CUSTOM_PROPERTIES_MANAGER }}
           name: bundle_size
           value: ${{ steps.total.outputs.megabytes }} MB
-
 
   deploy-breakdown:
     name: Breakdown site

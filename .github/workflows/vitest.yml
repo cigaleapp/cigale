@@ -93,7 +93,7 @@ jobs:
           token: ${{ secrets.PAT_CUSTOM_PROPERTIES_MANAGER }}
           name: coverage
           value: ${{ steps.report.outputs.percentage }}%
-          
+
       - name: Save aside coverage report
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
