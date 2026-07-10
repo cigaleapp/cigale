@@ -9,7 +9,6 @@
 	import { clamp, mapValues, overrideStyle, pick, sign } from '$lib/utils.js';
 
 	import {
-		currentImages,
 		focusedImage,
 		boundingBoxes as getBoundingBoxes,
 		zoom,
@@ -37,8 +36,8 @@
 	$effect(overrideStyle('html, body', 'overscroll-behavior-x', 'none'));
 </script>
 
-<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-<main
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<div
 	class="crop-surface"
 	// The 3 next attributes handle panning only
 	onpointerdown={async (e) => {
@@ -143,7 +142,7 @@
 				})}
 		/>
 	{/if}
-</main>
+</div>
 
 <style>
 	.crop-surface {

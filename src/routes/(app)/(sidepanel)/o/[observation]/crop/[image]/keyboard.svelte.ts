@@ -27,12 +27,14 @@ const boundingBoxes = $derived(getBoundingBoxes());
 const images = $derived(currentImages());
 
 export function setupKeyboardShortcuts({
-	selectedBox,
+	selectedBox: getSelectedBox,
 	showConfirmedOverlay,
 }: {
-	selectedBox: SelectedBox;
+	selectedBox: () => SelectedBox;
 	showConfirmedOverlay: () => Promise<void>;
 }) {
+	const selectedBox = getSelectedBox();
+
 	defineKeyboardShortcuts('cropping', {
 		'$mod+Delete': {
 			help: 'Supprimer l’image',
@@ -165,7 +167,7 @@ export function setupKeyboardShortcuts({
 					imageId: null,
 					newBoundingBox: toTopLeftCoords({ x, y, w, h }),
 					showConfirmedOverlay,
-					selectedBox,
+					selectedBox: getSelectedBox,
 				});
 			},
 		},

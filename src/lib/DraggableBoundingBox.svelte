@@ -22,7 +22,9 @@
 	interface Props {
 		boundingBoxes: Record<string, Rect>;
 		imageElement: HTMLImageElement;
+		// eslint-disable-next-line no-unused-vars
 		onchange: (imageId: string, box: Rect) => void;
+		// eslint-disable-next-line no-unused-vars
 		oncreate: (box: Rect) => Promise<string | null> | string | null;
 		transformable: boolean;
 		cursor?: string;
@@ -144,7 +146,8 @@
 		})
 	);
 
-	const boundingBoxesPixels = $derived(mapValues(boundingBoxes, toPixel));
+	// eslint-disable-next-line no-unused-vars
+	const boundingBoxesPixels = $derived(mapValues(boundingBoxes, toPixel as (box: Rect) => Rect));
 
 	let creatingBoundingBox = $state(false);
 	let newBoundingBox = $derived(
@@ -351,7 +354,7 @@
 			{#snippet point(x: number, y: number)}
 				{Math.round(x)} {Math.round(y)}
 			{/snippet}
-			{#snippet bb({ x, y, width, height })}
+			{#snippet bb({ x, y, width, height }: Rect)}
 				({@render point(x, y)}) × [{@render point(width, height)}]
 			{/snippet}
 			{#each Object.entries(boundingBoxesPixels) as [imageId, box] (imageId)}

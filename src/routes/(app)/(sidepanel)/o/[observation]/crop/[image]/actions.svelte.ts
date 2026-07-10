@@ -103,7 +103,7 @@ export async function onCropChange({
 	imageId: string | null;
 	newBoundingBox: Rect | undefined;
 	showConfirmedOverlay: () => Promise<void>;
-	selectedBox: SelectedBox;
+	selectedBox: () => SelectedBox;
 	flashConfirmedOverlay?: boolean;
 	pushToUndoStack?: boolean;
 }): Promise<string | null> {
@@ -225,6 +225,7 @@ export async function onCropChange({
 			id: newImageId,
 			sessionId: uiState.currentSessionId,
 			filename: firstImage?.filename ?? '',
+			// eslint-disable-next-line svelte/prefer-svelte-reactivity
 			addedAt: dates.formatISO(firstImage?.addedAt ?? new Date()),
 			contentType: firstImage?.contentType ?? '',
 			dimensions: $state.snapshot(firstImage?.dimensions) ?? { width: 0, height: 0 },
@@ -246,8 +247,8 @@ export async function onCropChange({
 	await changeAllConfirmedStatuses(true);
 
 	// Select cropbox
-	if (!selectedBox.manual) {
-		selectedBox.imageId = newImageId || imageId;
+	if (!selectedBox().manual) {
+		selectedBox().imageId = newImageId || imageId;
 	}
 
 	if (willFlashConfirmedOverlay) {
@@ -255,7 +256,7 @@ export async function onCropChange({
 	}
 
 	if (willAutoskip) {
-		(await goToNextUnconfirmedFile()) || (await goto('/(app)/(sidepanel)/classify'));
+		await goToNextUnconfirmedFile({ or: '/classify/' });
 	}
 
 	return newImageId;
@@ -307,7 +308,7 @@ export async function deleteBoundingBox(
 
 export function setupUndoActions(cropChangeDeps: {
 	showConfirmedOverlay: () => Promise<void>;
-	selectedBox: SelectedBox;
+	selectedBox: () => SelectedBox;
 }) {
 	undo.on('crop/box/create', async ({ imageId }) => {
 		if (imageIdToFileId(imageId) !== fileId) return;

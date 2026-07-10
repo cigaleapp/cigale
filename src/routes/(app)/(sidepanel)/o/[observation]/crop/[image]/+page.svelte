@@ -1,5 +1,6 @@
 <script lang="ts" module>
-	// import type {PageData} from './'
+	import type { PageData } from './$types.js';
+
 	import * as idb from '$lib/idb.svelte.js';
 
 	export interface SelectedBox {
@@ -11,7 +12,7 @@
 
 	export const zoomSpeed = () => zoom.scale * 0.1;
 
-	const { sortedFileIds } = $derived<PageData>(page.data);
+	const { sortedFileIds } = $derived(page.data as PageData);
 	const fileId = $derived(page.params.image);
 
 	const images = $derived.by(() => {
@@ -22,7 +23,6 @@
 			idb.tables.Image.state.filter((img) => img.sessionId === uiState.currentSessionId)
 		);
 	});
-
 
 	export function currentImages() {
 		return images;
@@ -104,9 +104,12 @@
 		return sortedFileIds.find((fileId) => !hasConfirmedCrop(fileId));
 	});
 
-	export async function goToNextUnconfirmedFile() {
-		if (!nextUnconfirmedImageId) return false;
-		await goToFile(nextUnconfirmedImageId);
+	export async function goToNextUnconfirmedFile({ or: fallbackRoute }: { or: Pathname }) {
+		if (nextUnconfirmedImageId) {
+			await goToFile(nextUnconfirmedImageId);
+		} else {
+			await goto(fallbackRoute);
+		}
 	}
 
 	export function adjacentFileIds() {
@@ -115,47 +118,19 @@
 </script>
 
 <script lang="ts">
-	import type { CenteredBoundingBox } from '$lib/BoundingBoxes.svelte.js';
+	import type { Pathname } from '$app/types';
 	import type * as DB from '$lib/database.js';
-	import type { RuntimeValue } from '$lib/schemas/metadata';
 
-	import * as dates from 'date-fns';
 	import { watch } from 'runed';
 
-	import IconFourPointCrop from '~icons/ri/apps-2-add-line';
-	import IconUndo from '~icons/ri/arrow-go-back-fill';
-	import IconRedo from '~icons/ri/arrow-go-forward-fill';
-	import IconTwoPointCrop from '~icons/ri/crosshair-2-line';
-	import IconFocus from '~icons/ri/crosshair-line';
-	import IconDelete from '~icons/ri/delete-bin-line';
-	import IconToolMove from '~icons/ri/drag-move-2-fill';
-	import IconToolHand from '~icons/ri/hand';
-	import IconRevert from '~icons/ri/reset-left-fill';
-	import IconToolDragCrop from '~icons/ri/shape-2-line';
-	import IconNeuralNet from '~icons/ri/sparkling-line';
 	import { page } from '$app/state';
-	import {
-		boundingBoxIsNonZero,
-		coordsAreEqual,
-		coordsScaler,
-		FULL_IMAGE_CROPBOX,
-		toCenteredCoords,
-		toTopLeftCoords,
-	} from '$lib/BoundingBoxes.svelte';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import ButtonInk from '$lib/ButtonInk.svelte';
-	import ConfidencePercentage from '$lib/ConfidencePercentage.svelte';
-	import CroppedImg from '$lib/CroppedImg.svelte';
-	import DraggableBoundingBox from '$lib/DraggableBoundingBox.svelte';
 	import { INITIAL_ZOOM_STATE } from '$lib/DraggableBoundingBox.svelte.js';
-	import { percent } from '$lib/i18n';
 	import { imageIdToFileId, imagesOfImageFile } from '$lib/images.js';
 	import { assertIs } from '$lib/metadata/index.js';
 	import MobileWIPOverlay from '$lib/MobileWIPOverlay.svelte';
 	import { goto } from '$lib/paths.js';
 	import { seo } from '$lib/seo.svelte';
 	import { uiState } from '$lib/state.svelte';
-	import { mapValues } from '$lib/utils';
 
 	import TopbarExtras from '../../TopbarExtras.svelte';
 	import { changeAllConfirmedStatuses, setupUndoActions } from './actions.svelte.js';
@@ -164,7 +139,7 @@
 	import { setupKeyboardShortcuts } from './keyboard.svelte.ts';
 	import Toolbar from './Toolbar.svelte';
 
-	const { data, params } = $props();
+	const { params } = $props();
 
 	const firstImage = $derived(images.at(0));
 
@@ -178,9 +153,17 @@
 
 	seo({ title: `Recadrer ${firstImage?.filename ?? '...'}` });
 
-	setupUndoActions({ selectedBox, showConfirmedOverlay });
-	setupKeyboardShortcuts({ selectedBox });
+	setupUndoActions({
+		selectedBox: () => selectedBox,
+		showConfirmedOverlay: async () => showConfirmedOverlay(),
+	});
 
+	setupKeyboardShortcuts({
+		selectedBox: () => selectedBox,
+		showConfirmedOverlay: async () => showConfirmedOverlay(),
+	});
+
+	// TODO: remove, see #1827
 	$effect(() => {
 		uiState.imageOpenedInCropper = fileId;
 	});
@@ -244,7 +227,7 @@
 		},
 	}}
 	navigation={{
-		current: sortedFileIds.indexOf(fileId) + 1,
+		current: sortedFileIds.indexOf(fileId ?? '') + 1,
 		total: sortedFileIds.length,
 		async previous() {
 			await goToFile(prevFileId);
@@ -253,15 +236,15 @@
 			await goToFile(nextFileId);
 		},
 		async nextUnconfirmed() {
-			(await goToNextUnconfirmedFile()) || goto('/(app)/(sidepanel)/classify');
+			await goToNextUnconfirmedFile({ or: '/classify/' });
 		},
 	}}
 />
 
 <div class="layout">
-	<div class="crop-surface">
+	<main class="crop-surface">
 		<CropSurface bind:imageIsLoading {showConfirmedOverlay} {selectedBox} />
-	</div>
+	</main>
 
 	<aside class="toolbar">
 		<Toolbar />
