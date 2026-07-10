@@ -2,12 +2,13 @@ name: Time spent
 
 on:
   workflow_dispatch:
+  pull_request:
+    types: [synchronize, opened, closed]
   push:
+    branches: [main]
     paths:
       - .github/workflows/issue-time-worked.yml
       - scripts/github-issue-set-time-worked.ts
-  pull_request:
-    types: [synchronize, opened, closed]
   schedule:
     # Run at end of work hours for morning & afternoon
     - cron: '0 12 * * *'
