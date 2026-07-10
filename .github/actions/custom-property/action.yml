@@ -1,0 +1,23 @@
+name: Set custom property value
+description: Set the value of a custom property on the repo
+
+inputs:
+  token:
+    description: PAT with correct permissions
+    required: true
+  name:
+    description: Name of the custom property to set
+    required: true
+  value:
+    description: Value to set the custom property to
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Set custom property
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.token }}
+      run: |
+        echo '{"properties": [{"property_name": "${{ inputs.name }}", "value": "${{ inputs.value }}" }]}' | gh api -X PATCH /repos/${{ github.repository }}/properties/values --input -
