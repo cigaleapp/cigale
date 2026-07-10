@@ -79,7 +79,7 @@ let chunkIndex = 0;
 /**
  * Milestone.id → totals
  */
-let perMilestone: Record<
+const perMilestone: Record<
 	string,
 	{
 		price: number;

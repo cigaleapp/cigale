@@ -9,6 +9,9 @@
 		"src/locales/**/*.js",
 		"tests/reporters/pleye.js",
 		"src/**/\\(todo\\)/*",
+		// Imports gitignored graphql-env.d.ts which we don't bother
+		// generating in package's prepare script
+		"scripts/github-compute-hourly-rates.ts",
 	],
 	"ignoreDependencies": [
 		"@iconify-json/.+",
