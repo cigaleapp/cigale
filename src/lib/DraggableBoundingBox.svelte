@@ -1,6 +1,10 @@
-<script>
+<script lang="ts">
+	import type { ZoomState } from './DraggableBoundingBox.svelte.js';
+
 	import { watch } from 'runed';
 	import { tick } from 'svelte';
+
+	import { page } from '$app/state';
 
 	import { coordsScaler, withinBoundingBox } from './BoundingBoxes.svelte.js';
 	import { fittedImageRect, NewBoundingBox } from './DraggableBoundingBox.svelte.js';
@@ -8,36 +12,27 @@
 	import { isDebugMode } from './settings.svelte.js';
 	import { mapValues } from './utils.js';
 
-	/**
-	 * @import { ZoomState } from './DraggableBoundingBox.svelte.js';
-	 */
+	interface Rect {
+		x: number;
+		y: number;
+		width: number;
+		height: number;
+	}
 
-	/**
-	 * @typedef Rect
-	 * @type {object}
-	 * @property {number} x
-	 * @property {number} y
-	 * @property {number} width
-	 * @property {number} height
-	 */
+	interface Props {
+		boundingBoxes: Record<string, Rect>;
+		imageElement: HTMLImageElement;
+		onchange: (imageId: string, box: Rect) => void;
+		oncreate: (box: Rect) => Promise<string | null> | string | null;
+		transformable: boolean;
+		cursor?: string;
+		createMode: 'clickanddrag' | '2point' | '4point' | 'off';
+		movable: boolean;
+		disabled?: boolean;
+		zoom: ZoomState;
+		imageFileID?: string;
+	}
 
-	/**
-	 * @typedef Props
-	 * @type {object}
-	 * @property {Record<string, Rect>} boundingBoxes maps image IDs to bounding boxes with relative, top-left coordinates
-	 * @property {HTMLImageElement} imageElement
-	 * @property {(imageId: string, box: Rect) => void} onchange - called when a bounding box is changed. The imageId is the ID of the associated Image
-	 * @property {(box: Rect) => Promise<string|null> | string|null} oncreate - called when a new bounding box is created. Must return the ID of the new associated Image
-	 * @property {boolean} transformable if true, the bounding boxes' sides or corners can be dragged
-	 * @property {string} [cursor=unset] - CSS cursor to use when hovering over the change area
-	 * @property {'clickanddrag'|'2point'|'4point'|'off'} createMode
-	 * @property {boolean} movable if true, the bounding boxes can be moved by dragging in its inside
-	 * @property {boolean} [disabled=false] - if true, the bounding boxes are inert. Useful while panning
-	 * @property {ZoomState} zoom - current zoom&pan state
-	 * @property {string} [imageFileID] only keep bounding boxes tied to images from this ImageFile
-	 */
-
-	/**  @type {Props} */
 	let {
 		boundingBoxes: boundingBoxesInitial,
 		cursor,
@@ -50,7 +45,7 @@
 		createMode,
 		zoom,
 		imageFileID,
-	} = $props();
+	}: Props = $props();
 
 	// Using a writable $derived here causes the state to not update until onmouseup, idk why
 	let boundingBoxes = $state(boundingBoxesInitial);
@@ -69,9 +64,24 @@
 	let naturalHeight = $state(imageElement.naturalHeight);
 
 	/**
-	 * @type {HTMLDivElement}
+	 * Number of fingers we're currently holding down.
+	 * One day we'll https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent/touches
+	 * on Safari, one day…
 	 */
-	let changeAreaRef = $state();
+	let fingers = $state(0);
+
+	// Pretty much sure that something
+	// has gone wrong in the finger count tracking
+	$effect(() => {
+		if (fingers < 0 || fingers > 4) {
+			console.warn(
+				`Something has gone wrong with the finger count tracking! reset to 0 from ${fingers}`
+			);
+			fingers = 0;
+		}
+	});
+
+	let changeAreaRef = $state<HTMLDivElement>();
 
 	const refreshImageRect = async () => {
 		if (!imageElement) return;
@@ -178,15 +188,13 @@
 			this.bottomleft = value;
 			this.bottomright = value;
 		},
-		/** @param {boolean} value */
-		setAll(value) {
+		setAll(value: boolean) {
 			this.topleft = value;
 			this.topright = value;
 			this.bottomleft = value;
 			this.bottomright = value;
 		},
-		/** @param {boolean} value  */
-		isAll(value) {
+		isAll(value: boolean) {
 			return (
 				this.topleft === value &&
 				this.topright === value &&
@@ -195,10 +203,19 @@
 			);
 		},
 	});
+
+	$effect(() => {
+		if (!fingers) {
+			draggingCorner.setAll(false);
+			creatingBoundingBox = false;
+			newBoundingBox.reset();
+		}
+	});
 </script>
 
 <svelte:window
-	onmousemove={({ target }) => {
+	// Handles cancellation when dragging out of bounds
+	onpointermove={({ target }) => {
 		if (!(target instanceof Element)) return;
 		if (!creatingBoundingBox) return;
 		if (createMode !== 'clickanddrag') return;
@@ -206,6 +223,7 @@
 		if (target.closest('.change-area') !== changeAreaRef) {
 			// Bail out if we were dragging a new bounding box, but we left the image (change area)
 			console.warn('Dragging has gone outside change area, bailing out. Target is', target);
+			fingers = 0;
 			draggingCorner.setAll(false);
 			creatingBoundingBox = false;
 			newBoundingBox.reset();
@@ -224,12 +242,12 @@
 	style:width="{imageRect.width}px"
 	style:height="{imageRect.height}px"
 	style:cursor
-	onmouseup={async ({ button }) => {
+	onpointerup={async () => {
+		fingers--;
 		if (disabled) return;
-		// React to left mouse button only
-		if (button !== 0) return;
 
 		draggingCorner.setAll(false);
+
 		if (creatingBoundingBox && newBoundingBox.ready) {
 			const relativeBoundingBox = fromPixel(newBoundingBox.rect());
 			const imageId = await oncreate?.(relativeBoundingBox);
@@ -241,10 +259,9 @@
 		}
 		draggingImageId = '';
 	}}
-	onmousedown={({ clientX, clientY, currentTarget, button }) => {
+	onpointerdown={({ clientX, clientY, currentTarget }) => {
+		fingers++;
 		if (disabled) return;
-		// React to left mouse button only
-		if (button !== 0) return;
 
 		if (createMode === 'off') return;
 		// Using offset{X,Y} is wrong when pointer is inside the boundingbox, see https://stackoverflow.com/a/35364901
@@ -259,10 +276,12 @@
 		creatingBoundingBox = true;
 		newBoundingBox.registerPoint(x, y);
 	}}
-	onmousemove={({ movementX, movementY, button }) => {
+	// Handles starting an interaction
+	onpointermove={({ movementX, movementY }) => {
+		// Multi-finger gestures are not handled here
+		// but rather at CropSurface, since it's for zooming & panning around
+		if (fingers !== 1) return;
 		if (disabled) return;
-		// React to left mouse button only
-		if (button !== 0) return;
 
 		const { x: dx, y: dy } = fromPixel({ x: movementX, y: movementY, w: 0, h: 0 });
 
@@ -328,15 +347,15 @@
 >
 	{#if isDebugMode()}
 		<code class="debug" style:color="red">
-			{#snippet point(x, y)}
+			{fingers} fingers <br />
+			{#snippet point(x: number, y: number)}
 				{Math.round(x)} {Math.round(y)}
 			{/snippet}
 			{#snippet bb({ x, y, width, height })}
 				({@render point(x, y)}) × [{@render point(width, height)}]
 			{/snippet}
-			bbs <br />
 			{#each Object.entries(boundingBoxesPixels) as [imageId, box] (imageId)}
-				@{imageId} {@render bb(box)}<br />
+				@{imageId.replace(`${page.params.image}_`, '')} {@render bb(box)}<br />
 			{/each}
 			create {newBoundingBox.ready ? 'ready ' : ''}
 			{#if createMode === 'clickanddrag'}
@@ -380,20 +399,24 @@
 			style:top="{box.y}px"
 			style:width="{box.width}px"
 			style:height="{box.height}px"
-			onmousedown={({ button }) => {
-				if (button !== 0) return;
+			onpointerdown={() => {
+				fingers++;
+
 				if (disabled) return;
 				draggingImageId = imageId;
 				if (movable) draggingCorner.setAll(true);
 			}}
 		>
-			{#snippet side(/** @type {'top'|'bottom'|'left'|'right'} */ position)}
+			{#snippet side(
+				/** @type {'top'|'bottom'|'left'|'right'} */ position:
+					'top' | 'bottom' | 'left' | 'right'
+			)}
 				<div
 					class="side {position}"
 					class:draggable={transformable}
 					class:dragging={draggingCorner[position] && draggingImageId === imageId}
-					onmousedown={(e) => {
-						if (e.button !== 0) return;
+					onpointerdown={(e) => {
+						fingers++;
 						if (disabled) return;
 						if (!transformable) return;
 						draggingImageId = imageId;
@@ -407,13 +430,15 @@
 			{@render side('left')}
 			{@render side('right')}
 
-			{#snippet corner(/** @type {`${'top'|'bottom'}${'left'|'right'}`} */ position)}
+			{#snippet corner(
+				/** @type {`${'top'|'bottom'}${'left'|'right'}`} */ position: `${'top' | 'bottom'}${'left' | 'right'}`
+			)}
 				<div
 					class="corner {position}"
 					class:draggable={transformable}
 					class:dragging={draggingCorner[position] && draggingImageId === imageId}
-					onmousedown={(e) => {
-						if (e.button !== 0) return;
+					onpointerdown={(e) => {
+						fingers++;
 						if (disabled) return;
 						if (!transformable) return;
 						draggingImageId = imageId;
@@ -433,6 +458,9 @@
 <style>
 	.change-area {
 		position: absolute;
+		/* After some time, dragging becomes a scroll touch-action by default */
+		/* See https://stackoverflow.com/questions/70482399/pointerevent-stops-firing-after-a-short-time */
+		touch-action: none;
 	}
 
 	.change-area.debug {

@@ -1,10 +1,12 @@
 <script lang="ts">
+	import type { SelectedBox } from './+page.svelte';
+
 	import { page } from '$app/state';
 	import { toTopLeftCoords } from '$lib/BoundingBoxes.svelte.js';
 	import DraggableBoundingBox from '$lib/DraggableBoundingBox.svelte';
 	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 	import { uiState } from '$lib/state.svelte.js';
-	import { clamp, mapValues, pick, sign } from '$lib/utils.js';
+	import { clamp, mapValues, overrideStyle, pick, sign } from '$lib/utils.js';
 
 	import {
 		currentImages,
@@ -31,12 +33,15 @@
 
 	let imageElement = $state<HTMLImageElement>();
 
+	// Disable chrome swipe-to-next/prev page
+	$effect(overrideStyle('html, body', 'overscroll-behavior-x', 'none'));
 </script>
 
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <main
 	class="crop-surface"
-	onmousedown={async (e) => {
+	// The 3 next attributes handle panning only
+	onpointerdown={async (e) => {
 		// Pan on mousewhell button hold or hand tool
 		if (activeTool().name !== 'Main' && e.button !== 1) return;
 
@@ -50,17 +55,18 @@
 			zoomOrigin: $state.snapshot(zoom.origin),
 		};
 	}}
-	onmouseup={async ({ button }) => {
+	onpointerup={async ({ button }) => {
 		// Pan on mousewheel button release or hand tool
 		if (activeTool().name !== 'Main' && button !== 1) return;
 		zoom.panning = false;
 	}}
-	onmousemove={async ({ clientX, clientY }) => {
+	onpointermove={async ({ clientX, clientY }) => {
 		if (!zoom.panning) return;
 
 		zoom.origin.x = zoom.panStart.zoomOrigin.x + (clientX - zoom.panStart.x);
 		zoom.origin.y = zoom.panStart.zoomOrigin.y + (clientY - zoom.panStart.y);
 	}}
+	// Handles zoom
 	onwheel={async (e) => {
 		e.preventDefault();
 		if (!imageElement) return;
@@ -110,7 +116,7 @@
 			{zoom}
 			imageFileID={fileId}
 			boundingBoxes={mapValues(
-				focusedImageId in boundingBoxes
+				focusedImageId && focusedImageId in boundingBoxes
 					? pick(boundingBoxes, focusedImageId)
 					: boundingBoxes,
 				toTopLeftCoords
@@ -146,8 +152,6 @@
 		user-select: none;
 		width: 100%;
 		height: 100%;
-		border-right: 1px solid var(--gray);
-		border-left: 1px solid var(--gray);
 	}
 
 	.behind-image {

@@ -1502,3 +1502,32 @@ if (import.meta.vitest) {
 		expect([...arrayBufferContents(buf)]).toStrictEqual([6, 7, 6, 7, 12, 13]);
 	});
 }
+
+/**
+ * Returns a cleanup function that reverts styles back
+ *
+ * Usage:
+ *
+ * ```js
+ * $effect(overrideStyle("selector", "property-with-dashes", value))
+ * ```
+ *
+ * You can target multiple elements, querySelectorAll is used
+ */
+export function overrideStyle(selector: string, property: string, value: string) {
+	return () => {
+		const targets = [...document.querySelectorAll(selector)].filter(
+			(node) => node instanceof HTMLElement
+		);
+
+		for (const target of targets) {
+			target.style.setProperty(property, value);
+		}
+
+		return () => {
+			for (const target of targets) {
+				target.style.removeProperty(property);
+			}
+		};
+	};
+}
