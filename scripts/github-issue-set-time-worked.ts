@@ -29,6 +29,8 @@ const env = arkenv({
 	WAKATIME_PROJECT: 'string',
 	TIMESPENT_ISSUE_FIELD_ID: 'string = "IFT_kgDOAp1Gyg"',
 	HOURS_SPENT_ISSUE_FIELD_ID: 'string = "IFN_kgDOAp9OqA"',
+	/** Run on a single PR's issues */
+	'PR_NUMBER?': 'number',
 	N_MOST_RECENT_ISSUES: 'number = 100',
 	BACKFILL: 'boolean = false',
 	/** Extra time to add to a branch based on time spent on another branch on another project */
@@ -55,6 +57,85 @@ const env = arkenv({
 		},
 	],
 });
+
+const graphql = (x: string) => x;
+
+if (env.PR_NUMBER) {
+	console.info(`Analyzing only PR #${env.PR_NUMBER}...\n\n`)
+	type Result = {
+		data: {
+			repository: {
+				pullRequest: {
+					number: number;
+					headRefName: string;
+					closedAt: string;
+					createdAt: string;
+					closingIssuesReferences: Connection<IssueFragment>;
+				};
+			};
+		};
+	};
+
+	const result: Result = await fetch('https://api.github.com/graphql', {
+		method: 'POST',
+		headers: { Authorization: `Bearer ${execSync('gh auth token')}` },
+		body: JSON.stringify({
+			variables: { ...env.GITHUB_REPO, number: env.PR_NUMBER },
+			query: graphql(`
+				fragment issue on Issue {
+					id
+					number
+					title
+					issueFieldValues(first: 20) {
+						pageInfo {
+							hasNextPage
+							endCursor
+						}
+						nodes {
+							... on IssueFieldTextValue {
+								value
+								field {
+									... on IssueFieldText {
+										id
+									}
+								}
+							}
+						}
+					}
+				}
+
+				query ($number: Int!, $owner: String!, $repo: String!) {
+					repository(owner: $owner, name: $repo) {
+						pullRequest(number: $number) {
+							number
+							headRefName
+							closedAt
+							createdAt
+							closingIssuesReferences(first: 10) {
+								nodes {
+									...issue
+								}
+							}
+						}
+					}
+				}
+			`),
+		}),
+	}).then((r) => r.json());
+
+	if (Object.keys(result).toString() !== 'data') {
+		throw new Error(JSON.stringify(result));
+	}
+
+	const times: Array<{ issue: IssueFragment; time: string; seconds: number }> = [];
+	for (const issue of result.data.repository.pullRequest.closingIssuesReferences.nodes) {
+		await analyzeIssue(issue, times, [result.data.repository.pullRequest]);
+	}
+
+	await updateIssueFields(times);
+
+	process.exit(0)
+}
 
 let pageInfo = { endCursor: undefined as string | undefined, hasNextPage: true };
 
@@ -143,6 +224,12 @@ repository(owner: $owner, name: $repo) {
 		await analyzeIssue(issue, times);
 	}
 
+	await updateIssueFields(times);
+
+	return repository.issues.pageInfo;
+}
+
+async function updateIssueFields(times: { issue: IssueFragment; time: string; seconds: number }[]) {
 	// Chunk requests by n mutations...
 	const chunksize = 20;
 
@@ -166,8 +253,7 @@ repository(owner: $owner, name: $repo) {
 mutation {
 	${chunk
 		.map(
-			({ time: hours, seconds, issue }) =>
-				`issue${issue.number}: setIssueFieldValue(input: { 
+			({ time: hours, seconds, issue }) => `issue${issue.number}: setIssueFieldValue(input: { 
 			issueId: ${JSON.stringify(issue.id)},
 			issueFields: [
 				{
@@ -199,15 +285,14 @@ mutation {
 			console.info(`OK: ${chunk.map(({ issue }) => '#' + issue.number).join(', ')}`);
 		}
 	}
-
-	return repository.issues.pageInfo;
 }
 
 async function analyzeIssue(
 	issue: Issue,
-	times: Array<{ issue: IssueFragment; time: string; seconds: number }>
+	times: Array<{ issue: IssueFragment; time: string; seconds: number }>,
+	overridePRs?: NonNullable<Issue['closedByPullRequestsReferences']>['nodes']
 ) {
-	let prs = issue.closedByPullRequestsReferences.nodes;
+	let prs = issue.closedByPullRequestsReferences?.nodes ?? overridePRs ?? [];
 
 	if (!prs.length) return;
 
@@ -383,26 +468,24 @@ type IssueFragment<T = unknown> = T & {
 	>;
 };
 
+type Issue = IssueFragment<{
+	closedByPullRequestsReferences?: Connection<{
+		number: number;
+		headRefName: string;
+		createdAt: string;
+		closedAt: string | null;
+
+		closingIssuesReferences: Connection<IssueFragment>;
+	}>;
+}>;
+
 type GithubResponse = {
 	data: {
 		repository: {
-			issues: Connection<
-				IssueFragment<{
-					closedByPullRequestsReferences: Connection<{
-						number: number;
-						headRefName: string;
-						createdAt: string;
-						closedAt: string | null;
-
-						closingIssuesReferences: Connection<IssueFragment>;
-					}>;
-				}>
-			>;
+			issues: Connection<Issue>;
 		};
 	};
 };
-
-type Issue = GithubResponse['data']['repository']['issues']['nodes'][number];
 
 type WakatimeSummaries = {
 	data: Array<{

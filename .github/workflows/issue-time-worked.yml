@@ -1,9 +1,13 @@
-name: Issue Time Worked
+name: Time spent
 
 on:
   workflow_dispatch:
   push:
-    paths: [.github/workflows/issue-time-worked.yml]
+    paths: 
+      - .github/workflows/issue-time-worked.yml
+      - scripts/github-issue-set-time-worked.ts
+  pull_request:
+    types: [synchronize, opened, closed]
   schedule:
     # Run at end of work hours for morning & afternoon
     - cron: '0 12 * * *'
@@ -27,6 +31,7 @@ jobs:
           WAKATIME_PROJECT: cigale
           GH_TOKEN: ${{ github.token }}
           GITHUB_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
           EXTRA_PROJECTS:
             | # Format is <cigale branch>:<other wakatime project name>@<other wakatime project's branch>
             generic-binary-storage:idb-opfs@master
