@@ -9,6 +9,7 @@ import { mapValues, omit, pick, transformObject } from './utils.js';
 
 /**
  * @import * as DB from './database';
+ * @import { NamespacedMetadataID } from './schemas/common.js';
  * @import { TypedMetadataValue } from './metadata/index.js';
  * @import { ZoomState } from './DraggableBoundingBox.svelte.js';
  */
@@ -192,8 +193,8 @@ export class UIState {
 			: undefined
 	);
 
-	/** @type {string} */
-	cropMetadataId = $derived(this.cropMetadata?.id ?? 'crop');
+	/** @type {NamespacedMetadataID} */
+	cropMetadataId = $derived(this.cropMetadata?.id ?? 'backbone__crop');
 
 	/**
 	 * @param {import('./database').Image} image
