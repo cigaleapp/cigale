@@ -24,7 +24,7 @@
 		boundingBoxes: Record<string, Rect>;
 		imageElement: HTMLImageElement;
 		// eslint-disable-next-line no-unused-vars
-		onchange: (imageId: string, box: Rect) => void;
+		onchange: (imageId: string, box: Rect) => Promise<unknown>;
 		// eslint-disable-next-line no-unused-vars
 		oncreate: (box: Rect) => Promise<string | null> | string | null;
 		transformable: boolean;
@@ -68,8 +68,6 @@
 
 	/**
 	 * Number of fingers we're currently holding down.
-	 * One day we'll https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent/touches
-	 * on Safari, one day…
 	 */
 	const fingers = new Fingers();
 
@@ -198,7 +196,7 @@
 	});
 
 	$effect(() => {
-		if (!fingers.any) {
+		if (fingers.none && createMode === 'clickanddrag') {
 			draggingCorner.setAll(false);
 			creatingBoundingBox = false;
 			newBoundingBox.reset();
@@ -249,7 +247,7 @@
 			newBoundingBox.reset();
 			creatingBoundingBox = false;
 		} else {
-			onchange?.(draggingImageId, boundingBoxes[draggingImageId]);
+			await onchange?.(draggingImageId, boundingBoxes[draggingImageId]);
 		}
 		draggingImageId = '';
 	}}
