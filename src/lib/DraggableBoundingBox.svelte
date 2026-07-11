@@ -10,6 +10,7 @@
 	import { fittedImageRect, NewBoundingBox } from './DraggableBoundingBox.svelte.js';
 	import { imageIdToFileId } from './images.js';
 	import { isDebugMode } from './settings.svelte.js';
+	import { Fingers } from './touch.svelte.js';
 	import { mapValues } from './utils.js';
 
 	interface Rect {
@@ -70,18 +71,7 @@
 	 * One day we'll https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent/touches
 	 * on Safari, one day…
 	 */
-	let fingers = $state(0);
-
-	// Pretty much sure that something
-	// has gone wrong in the finger count tracking
-	$effect(() => {
-		if (fingers < 0 || fingers > 4) {
-			console.warn(
-				`Something has gone wrong with the finger count tracking! reset to 0 from ${fingers}`
-			);
-			fingers = 0;
-		}
-	});
+	const fingers = new Fingers();
 
 	let changeAreaRef = $state<HTMLDivElement>();
 
@@ -208,7 +198,7 @@
 	});
 
 	$effect(() => {
-		if (!fingers) {
+		if (!fingers.any) {
 			draggingCorner.setAll(false);
 			creatingBoundingBox = false;
 			newBoundingBox.reset();
@@ -226,7 +216,7 @@
 		if (target.closest('.change-area') !== changeAreaRef) {
 			// Bail out if we were dragging a new bounding box, but we left the image (change area)
 			console.warn('Dragging has gone outside change area, bailing out. Target is', target);
-			fingers = 0;
+			fingers.reset();
 			draggingCorner.setAll(false);
 			creatingBoundingBox = false;
 			newBoundingBox.reset();
@@ -245,9 +235,10 @@
 	style:width="{imageRect.width}px"
 	style:height="{imageRect.height}px"
 	style:cursor
-	onpointerup={async () => {
-		fingers--;
+	onpointerup={async ({ button }) => {
 		if (disabled) return;
+		// Don't react to mousewheel clicks, those pan around
+		if (button === 1) return;
 
 		draggingCorner.setAll(false);
 
@@ -262,9 +253,10 @@
 		}
 		draggingImageId = '';
 	}}
-	onpointerdown={({ clientX, clientY, currentTarget }) => {
-		fingers++;
+	onpointerdown={({ clientX, clientY, currentTarget, button }) => {
 		if (disabled) return;
+		// Don't react to mousewheel clicks, those pan around
+		if (button === 1) return;
 
 		if (createMode === 'off') return;
 		// Using offset{X,Y} is wrong when pointer is inside the boundingbox, see https://stackoverflow.com/a/35364901
@@ -280,11 +272,13 @@
 		newBoundingBox.registerPoint(x, y);
 	}}
 	// Handles starting an interaction
-	onpointermove={({ movementX, movementY }) => {
+	onpointermove={({ movementX, movementY, button }) => {
 		// Multi-finger gestures are not handled here
 		// but rather at CropSurface, since it's for zooming & panning around
-		if (fingers !== 1) return;
+		if (fingers.multiple) return;
 		if (disabled) return;
+		// Don't react to mousewheel clicks, those pan around
+		if (button === 1) return;
 
 		const { x: dx, y: dy } = fromPixel({ x: movementX, y: movementY, w: 0, h: 0 });
 
@@ -350,7 +344,7 @@
 >
 	{#if isDebugMode()}
 		<code class="debug" style:color="red">
-			{fingers} fingers <br />
+			{fingers.count} fingers <br />
 			{#snippet point(x: number, y: number)}
 				{Math.round(x)} {Math.round(y)}
 			{/snippet}
@@ -403,9 +397,8 @@
 			style:width="{box.width}px"
 			style:height="{box.height}px"
 			onpointerdown={() => {
-				fingers++;
-
 				if (disabled) return;
+
 				draggingImageId = imageId;
 				if (movable) draggingCorner.setAll(true);
 			}}
@@ -419,12 +412,15 @@
 					class:draggable={transformable}
 					class:dragging={draggingCorner[position] && draggingImageId === imageId}
 					onpointerdown={(e) => {
-						fingers++;
 						if (disabled) return;
 						if (!transformable) return;
+						// Don't react to mousewheel clicks, those pan around
+						if (e.button === 1) return;
+
 						draggingImageId = imageId;
 						draggingCorner[position] = true;
 						e.stopPropagation();
+						fingers.register(e);
 					}}
 				></div>
 			{/snippet}
@@ -441,12 +437,15 @@
 					class:draggable={transformable}
 					class:dragging={draggingCorner[position] && draggingImageId === imageId}
 					onpointerdown={(e) => {
-						fingers++;
 						if (disabled) return;
 						if (!transformable) return;
+						// Don't react to mousewheel clicks, those pan around
+						if (e.button === 1) return;
+
 						draggingImageId = imageId;
 						draggingCorner[position] = true;
 						e.stopPropagation();
+						fingers.register(e);
 					}}
 				></div>
 			{/snippet}
@@ -468,6 +467,10 @@
 
 	.change-area.debug {
 		outline: 5px dashed red;
+
+		.debug {
+			background: rgba(0 0 0 / 0.66);
+		}
 	}
 
 	.boundingbox {

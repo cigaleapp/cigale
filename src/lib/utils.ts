@@ -1531,3 +1531,13 @@ export function overrideStyle(selector: string, property: string, value: string)
 		};
 	};
 }
+
+export function* iterateDOMList<T>(domlist: {
+	item: (i: number) => T | null;
+	length: number;
+}): Iterable<T> {
+	for (let i = 0; i < domlist.length; i++) {
+		const item = domlist.item(i);
+		if (item) yield item;
+	}
+}
