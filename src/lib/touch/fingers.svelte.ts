@@ -1,4 +1,4 @@
-import { iterateDOMList } from './utils.js';
+import { iterateDOMList } from '../utils.js';
 
 export class Fingers {
 	/**

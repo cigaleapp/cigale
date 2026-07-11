@@ -10,7 +10,7 @@
 	import { fittedImageRect, NewBoundingBox } from './DraggableBoundingBox.svelte.js';
 	import { imageIdToFileId } from './images.js';
 	import { isDebugMode } from './settings.svelte.js';
-	import { Fingers } from './touch.svelte.js';
+	import { Fingers } from './touch/fingers.svelte.js';
 	import { mapValues } from './utils.js';
 
 	interface Rect {
