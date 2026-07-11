@@ -5,7 +5,6 @@
 	import { toTopLeftCoords } from '$lib/BoundingBoxes.svelte.js';
 	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 	import { uiState } from '$lib/state.svelte.js';
-	import { Fingers } from '$lib/touch/fingers.svelte.js';
 	import { Gestures } from '$lib/touch/gestures.svelte.js';
 	import { mapValues, overrideStyle, pick, sign } from '$lib/utils.js';
 
@@ -34,12 +33,11 @@
 	const focusedImageId = $derived(focusedImage()?.id);
 
 	let imageElement = $state<HTMLImageElement>();
-	const fingers = new Fingers();
 
-	function willPanWithMouse(e: PointerEvent) {
+	function willPanWithMouse(e: Pick<PointerEvent, 'button'>) {
 		if (activeTool().name === 'Main') return true;
 		if (e.button === 1) return true;
-		if (fingers.count !== 1) return false;
+		return false;
 	}
 
 	// Disable chrome swipe-to-next/prev page
@@ -100,8 +98,7 @@
 		if (!willPanWithMouse(e)) return;
 		zoom.panning = false;
 	}}
-	onpointermove={async ({ clientX, clientY, ...e }) => {
-		if (!willPanWithMouse(e)) return;
+	onpointermove={async ({ clientX, clientY }) => {
 		if (!zoom.panning) return;
 
 		zoom.origin.x = zoom.panStart.zoomOrigin.x + (clientX - zoom.panStart.x);
