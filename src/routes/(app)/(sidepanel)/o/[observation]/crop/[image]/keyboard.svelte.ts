@@ -88,13 +88,13 @@ export function setupKeyboardShortcuts({
 		'+': {
 			help: 'Zoomer',
 			do: () => {
-				zoom.scale = clamp(1, zoom.scale + 4 * zoomSpeed(), 10);
+				zoom.scale = clamp(1, zoom.scale + 4 * zoomSpeed('keyboard'), 10);
 			},
 		},
 		'-': {
 			help: 'Dézoomer',
 			do: () => {
-				zoom.scale = clamp(1, zoom.scale - 4 * zoomSpeed(), 10);
+				zoom.scale = clamp(1, zoom.scale - 4 * zoomSpeed('keyboard'), 10);
 			},
 		},
 		Digit0: {
@@ -105,10 +105,10 @@ export function setupKeyboardShortcuts({
 			},
 		},
 		'$mod+h': {
-			help: "Maquer/afficher la liste des boîtes",
+			help: 'Maquer/afficher la liste des boîtes',
 			async do() {
-				await toggleSetting("cropperSidebarCollapsed")
-			}
+				await toggleSetting('cropperSidebarCollapsed');
+			},
 		},
 		...fromEntries(
 			tools.map((tool) => [

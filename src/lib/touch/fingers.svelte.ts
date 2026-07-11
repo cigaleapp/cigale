@@ -64,11 +64,11 @@ export class Fingers {
 				}
 			}
 		}
-	}
+	};
 
 	constructor(public inside: HTMLElement = document.body) {
 		$effect(() => {
-			const handler =this.#handle
+			const handler = this.#handle;
 
 			if (this.#supportsTouchEvents()) {
 				// Touchscreens
@@ -79,12 +79,20 @@ export class Fingers {
 				inside.addEventListener('mouseup', handler);
 
 				return () => {
-
-				}
+					inside.removeEventListener('touchstart', handler);
+					inside.removeEventListener('touchend', handler);
+					inside.removeEventListener('mousedown', handler);
+					inside.removeEventListener('mouseup', handler);
+				};
 			} else {
 				// Drawing tablets
 				inside.addEventListener('pointerdown', handler);
 				inside.addEventListener('pointerup', handler);
+
+				return () => {
+					inside.removeEventListener('pointerdown', handler);
+					inside.removeEventListener('pointerup', handler);
+				};
 			}
 		});
 
@@ -116,6 +124,10 @@ export class Fingers {
 
 	get any() {
 		return this.count > 0;
+	}
+
+	get none() {
+		return this.count <= 0;
 	}
 
 	get single() {

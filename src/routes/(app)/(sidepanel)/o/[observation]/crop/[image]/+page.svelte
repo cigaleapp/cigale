@@ -10,7 +10,19 @@
 
 	export const zoom = $state({ ...INITIAL_ZOOM_STATE });
 
-	export const zoomSpeed = () => zoom.scale * 0.1;
+	export function zoomSpeed(by: 'pinch' | 'mousewheel' | 'keyboard', pinchDistance?: number) {
+		switch (by) {
+			case 'mousewheel':
+			case 'keyboard':
+				return zoom.scale * 0.1;
+			case 'pinch':
+				// 2e3 is empirical
+				// FIXME: it might depend on the device, the screen size etc
+				if (pinchDistance) return Math.abs(pinchDistance) / 2e3;
+		}
+
+		return 0.1;
+	}
 
 	const { sortedFileIds } = $derived(page.data as PageData);
 	const fileId = $derived(page.params.image);
@@ -124,7 +136,6 @@
 	import { watch } from 'runed';
 
 	import { page } from '$app/state';
-	import { INITIAL_ZOOM_STATE } from './DraggableBoundingBox.svelte.js';
 	import { imageIdToFileId, imagesOfImageFile } from '$lib/images.js';
 	import { assertIs } from '$lib/metadata/index.js';
 	import MobileWIPOverlay from '$lib/MobileWIPOverlay.svelte';
@@ -137,7 +148,8 @@
 	import { changeAllConfirmedStatuses, setupUndoActions } from './actions.svelte.js';
 	import Boxes from './Boxes.svelte';
 	import CropSurface from './CropSurface.svelte';
-	import { setupKeyboardShortcuts } from './keyboard.svelte.ts';
+	import { INITIAL_ZOOM_STATE } from './DraggableBoundingBox.svelte.js';
+	import { setupKeyboardShortcuts } from './keyboard.svelte.js';
 	import Toolbar from './Toolbar.svelte';
 
 	const { params } = $props();
@@ -244,7 +256,10 @@
 
 <div class="layout">
 	<main class="crop-surface">
-		<CropSurface bind:imageIsLoading {showConfirmedOverlay} {selectedBox} />
+		<!-- TODO: make CropSurface handle its image element resize instead -->
+		{#key getSettings().cropperSidebarCollapsed}
+			<CropSurface bind:imageIsLoading {showConfirmedOverlay} {selectedBox} />
+		{/key}
 	</main>
 
 	<aside class="toolbar">
