@@ -21,7 +21,7 @@ Available CSS variables:
 	 * @property {import('svelte').Snippet<[{loading: boolean}]>} children
 	 * @property {undefined | ((e: MouseEvent, signals: { loadingStarted: () => void, loadingEnded: () => void }) => Promise<void> |void)} onclick
 	 * @property {boolean} [disabled=false]
-	 * @property {boolean} [tight=false] limit the height of the button
+	 * @property {boolean} [tight=false] limit the height of the button. also hides keyboard shortcut hint if itll be displayed in a tooltip
 	 * @property {Parameters<typeof tooltip>[1]} [help]
 	 * @property {string} [keyboard] keyboard shortcut hint to display
 	 * @property {import('$e2e/testids.js').PlaywrightTestId|undefined} [testid] add a attribute for Playwright getByTestId to the button
@@ -57,6 +57,10 @@ Available CSS variables:
 	} = $props();
 
 	let isLoading = $state(false);
+
+	const keyboardHintIsInTooltip = $derived(
+		help && (typeof help === 'string' ? keyboard : 'keyboard' in help)
+	);
 </script>
 
 <!-- 
@@ -109,7 +113,7 @@ Available CSS variables:
 			</div>
 		{/if}
 		{@render children({ loading: isLoading && loading !== false })}
-		{#if keyboard}
+		{#if keyboard && !(tight && keyboardHintIsInTooltip)}
 			<KeyboardHint shortcut={keyboard} />
 		{/if}
 	</button>
