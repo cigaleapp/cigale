@@ -26,7 +26,7 @@
         "@sveltejs/svelte-virtual-list": "^3.0.1",
         "@ungap/set-methods": "^0.1.1",
         "@viselect/vanilla": "^3.9.0",
-        "@wuchale/svelte": "^0.20.4",
+        "@wuchale/svelte": "^0.20.5",
         "arktype": "^2.2.2",
         "arrival-time": "^1.0.6",
         "baseline-browser-mapping": "^2.10.42",
@@ -1195,7 +1195,7 @@
 
     "@webassemblyjs/wast-printer": ["@webassemblyjs/wast-printer@1.14.1", "", { "dependencies": { "@webassemblyjs/ast": "1.14.1", "@xtuc/long": "4.2.2" } }, "sha512-kPSSXE6De1XOR820C90RIo2ogvZG+c3KiHzqUoO/F34Y2shGzesfqv7o57xrxovZJH/MetF5UjroJ/R/3isoiw=="],
 
-    "@wuchale/svelte": ["@wuchale/svelte@0.20.4", "", { "dependencies": { "wuchale": "^0.25.6" }, "peerDependencies": { "svelte": "^5" } }, "sha512-WnwnnM8ACIrMOgBZTBuKMR28At3nlfP9XEN2RnD+VnV90mo/umy+6c7K5gJlAtMIvugu7sh7KPEAqeUuzJQTvA=="],
+    "@wuchale/svelte": ["@wuchale/svelte@0.20.5", "", { "dependencies": { "wuchale": "^0.25.6" }, "peerDependencies": { "svelte": "^5" } }, "sha512-wRu+pKdZxGEBdoxoxjQTacKUoHSYQfB1eV7UVsHlGUW1rG9bf4qhJz4bX8jcZZLCGBmfcjyvQJwdBxJN+nD9Jw=="],
 
     "@xml-tools/parser": ["@xml-tools/parser@1.0.11", "", { "dependencies": { "chevrotain": "7.1.1" } }, "sha512-aKqQ077XnR+oQtHJlrAflaZaL7qZsulWc/i/ZEooar5JiWj1eLt0+Wg28cpa+XLney107wXqneC+oG1IZvxkTA=="],
 
