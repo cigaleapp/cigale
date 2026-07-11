@@ -122,14 +122,11 @@
 			<IconRedo />
 		</button>
 	</div>
-	<!-- svelte-ignore state_referenced_locally -->
 	<div class="toolbar-buttons">
 		{const sidebarCollapsed = $derived(getSettings().cropperSidebarCollapsed)}
-		<!-- Wuchale already adds a $derived(), so don't add one -->
-		<!-- See https://github.com/wuchalejs/wuchale/issues/416 -->
-		{const help = sidebarCollapsed
-			? 'Afficher la liste des boîtes'
-			: 'Masquer la liste des boîtes'}
+		{const help = $derived(
+			sidebarCollapsed ? 'Afficher la liste des boîtes' : 'Masquer la liste des boîtes'
+		)}
 
 		<button
 			aria-label={help}
