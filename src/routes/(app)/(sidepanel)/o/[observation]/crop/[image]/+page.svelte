@@ -130,6 +130,7 @@
 	import MobileWIPOverlay from '$lib/MobileWIPOverlay.svelte';
 	import { goto } from '$lib/paths.js';
 	import { seo } from '$lib/seo.svelte';
+	import { getSettings } from '$lib/settings.svelte.js';
 	import { uiState } from '$lib/state.svelte';
 
 	import TopbarExtras from '../../TopbarExtras.svelte';
@@ -250,7 +251,7 @@
 		<Toolbar />
 	</aside>
 
-	<aside class="info">
+	<aside class="info" class:collapsed={getSettings().cropperSidebarCollapsed}>
 		<Boxes bind:selectedBox />
 	</aside>
 </div>
@@ -265,5 +266,18 @@
 	.crop-surface {
 		width: 100%;
 		overflow: hidden;
+	}
+
+	.info {
+		transition: all 150ms ease;
+		width: 33vw;
+		max-width: 600px;
+		min-width: 450px;
+		overflow: hidden;
+
+		&.collapsed {
+			min-width: 0;
+			max-width: 0;
+		}
 	}
 </style>

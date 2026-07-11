@@ -2,10 +2,13 @@
 	import IconFourPointCrop from '~icons/ri/apps-2-add-line';
 	import IconUndo from '~icons/ri/arrow-go-back-fill';
 	import IconRedo from '~icons/ri/arrow-go-forward-fill';
+	import IconCollapse from '~icons/ri/contract-right-line';
 	import IconTwoPointCrop from '~icons/ri/crosshair-2-line';
 	import IconToolMove from '~icons/ri/drag-move-2-fill';
+	import IconExpand from '~icons/ri/expand-left-line';
 	import IconToolHand from '~icons/ri/hand';
 	import IconToolDragCrop from '~icons/ri/shape-2-line';
+	import { getSettings, toggleSetting } from '$lib/settings.svelte.js';
 	import { tooltip } from '$lib/tooltips.js';
 	import { undo } from '$lib/undo.svelte.js';
 
@@ -86,44 +89,74 @@
 	}
 </script>
 
-<script lang="ts">
-</script>
-
 <div class="toolbar">
-	{#each tools as tool (tool.name)}
+	<div class="toolbar-buttons">
+		{#each tools as tool (tool.name)}
+			<button
+				aria-label="Choisir l'outil {tool.name}"
+				class:active={tool.name === activeToolName}
+				use:tooltip={{
+					text: `${tool.name}: ${tool.help}`,
+					keyboard: tool.shortcut,
+					placement: 'right',
+				}}
+				onclick={() => {
+					activeToolName = tool.name;
+				}}
+			>
+				<tool.icon />
+			</button>
+		{/each}
 		<button
-			aria-label="Choisir l'outil {tool.name}"
-			class:active={tool.name === activeToolName}
+			aria-label="Annuler"
+			use:tooltip={{ text: 'Annuler', keyboard: '$mod+z', placement: 'right' }}
+			onclick={() => undo.pop()}
+		>
+			<IconUndo />
+		</button>
+		<button
+			aria-label="Rétablir"
+			use:tooltip={{ text: 'Rétablir', keyboard: '$mod+Shift+z', placement: 'right' }}
+			onclick={() => undo.rewind()}
+		>
+			<IconRedo />
+		</button>
+	</div>
+	<div class="toolbar-buttons">
+		{const sidebarCollapsed = $derived(getSettings().cropperSidebarCollapsed)}
+		{const help = $derived(
+			sidebarCollapsed ? 'Afficher la liste des boîtes' : 'Masquer la liste des boîtes'
+		)}
+
+		<button
+			aria-label={help}
 			use:tooltip={{
-				text: `${tool.name}: ${tool.help}`,
-				keyboard: tool.shortcut,
+				text: help,
 				placement: 'right',
+				keyboard: '$mod+h',
 			}}
-			onclick={() => {
-				activeToolName = tool.name;
+			onclick={async () => {
+				await toggleSetting('cropperSidebarCollapsed');
 			}}
 		>
-			<tool.icon />
+			{#if sidebarCollapsed}
+				<IconExpand />
+			{:else}
+				<IconCollapse />
+			{/if}
 		</button>
-	{/each}
-	<button
-		aria-label="Annuler"
-		use:tooltip={{ text: 'Annuler', keyboard: '$mod+z', placement: 'right' }}
-		onclick={() => undo.pop()}
-	>
-		<IconUndo />
-	</button>
-	<button
-		aria-label="Rétablir"
-		use:tooltip={{ text: 'Rétablir', keyboard: '$mod+Shift+z', placement: 'right' }}
-		onclick={() => undo.rewind()}
-	>
-		<IconRedo />
-	</button>
+	</div>
 </div>
 
 <style>
 	.toolbar {
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		height: 100%;
+	}
+
+	.toolbar-buttons {
 		--width: 2.5em;
 		display: flex;
 		flex-direction: column;
@@ -131,7 +164,7 @@
 		padding: 0.25em;
 	}
 
-	.toolbar button {
+	.toolbar-buttons button {
 		font-size: 1.2em;
 		width: var(--width);
 		height: var(--width);
@@ -145,11 +178,11 @@
 		border-radius: var(--corner-radius);
 	}
 
-	.toolbar button.active {
+	.toolbar-buttons button.active {
 		color: var(--fg-primary);
 	}
 
-	.toolbar button::after {
+	.toolbar-buttons button::after {
 		content: '';
 		position: absolute;
 		bottom: 5px;
@@ -162,11 +195,11 @@
 		transition: width 0.1s;
 	}
 
-	.toolbar button.active::after {
+	.toolbar-buttons button.active::after {
 		width: 40%;
 	}
 
-	.toolbar button:is(:hover, :focus-visible) {
+	.toolbar-buttons button:is(:hover, :focus-visible) {
 		color: var(--fg-primary);
 		background: var(--bg-primary-translucent);
 	}

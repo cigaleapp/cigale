@@ -85,7 +85,6 @@ export function setupKeyboardShortcuts({
 			when: () => Object.keys(boundingBoxes).length > 0,
 			do: revertAll,
 		},
-
 		'+': {
 			help: 'Zoomer',
 			do: () => {
@@ -104,6 +103,12 @@ export function setupKeyboardShortcuts({
 				zoom.origin = { x: 0, y: 0 };
 				zoom.scale = 1;
 			},
+		},
+		'$mod+h': {
+			help: "Maquer/afficher la liste des boîtes",
+			async do() {
+				await toggleSetting("cropperSidebarCollapsed")
+			}
 		},
 		...fromEntries(
 			tools.map((tool) => [

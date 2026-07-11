@@ -205,7 +205,6 @@
 		display: flex;
 		flex-direction: column;
 		gap: 1em;
-		min-width: 450px;
 		resize: horizontal;
 		/* to make resize work */
 		overflow: hidden;
