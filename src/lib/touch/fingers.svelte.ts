@@ -28,7 +28,7 @@ export class Fingers {
 		return 'ontouchstart' in this.inside;
 	}
 
-	#handle(event: Event) {
+	#handle = (event: Event) => {
 		if (this.#supportsTouchEvents()) {
 			if (event instanceof TouchEvent) {
 				this.touches = [...iterateDOMList(event.touches)];
@@ -68,17 +68,23 @@ export class Fingers {
 
 	constructor(public inside: HTMLElement = document.body) {
 		$effect(() => {
+			const handler =this.#handle
+
 			if (this.#supportsTouchEvents()) {
 				// Touchscreens
-				inside.addEventListener('touchstart', (e) => this.#handle(e));
-				inside.addEventListener('touchend', (e) => this.#handle(e));
+				inside.addEventListener('touchstart', handler);
+				inside.addEventListener('touchend', handler);
 				// Mouses
-				inside.addEventListener('mousedown', (e) => this.#handle(e));
-				inside.addEventListener('mouseup', (e) => this.#handle(e));
+				inside.addEventListener('mousedown', handler);
+				inside.addEventListener('mouseup', handler);
+
+				return () => {
+
+				}
 			} else {
-				// Safari
-				inside.addEventListener('pointerdown', (e) => this.#handle(e));
-				inside.addEventListener('pointerup', (e) => this.#handle(e));
+				// Drawing tablets
+				inside.addEventListener('pointerdown', handler);
+				inside.addEventListener('pointerup', handler);
 			}
 		});
 

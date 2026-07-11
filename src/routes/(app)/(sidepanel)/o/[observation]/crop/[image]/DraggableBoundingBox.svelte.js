@@ -1,6 +1,6 @@
 import { type } from 'arktype';
 
-import { clamp, sign } from './utils.js';
+import { clamp, sign } from '$lib/utils.js';
 
 /**
  * Represents the zoom state of the image.
@@ -62,7 +62,7 @@ export function fittedImageRect(
 
 export class NewBoundingBox {
 	/**
-	 * @type {import('./BoundingBoxes.svelte').Rect}
+	 * @type {import('../../../../../../../lib/BoundingBoxes.svelte.js').Rect}
 	 * Limits for the resulting bounding box. Coordinates will be clamped to these values.
 	 */
 	limits = {
@@ -80,7 +80,7 @@ export class NewBoundingBox {
 		this.createMode = mode;
 	}
 
-	/** @type {import('./BoundingBoxes.svelte').Rect & { dragDirection: {x:-1|0|1, y:-1|0|1} }} */
+	/** @type {import('../../../../../../../lib/BoundingBoxes.svelte.js').Rect & { dragDirection: {x:-1|0|1, y:-1|0|1} }} */
 	clickanddrag = $state({
 		x: 0,
 		y: 0,
@@ -122,8 +122,8 @@ export class NewBoundingBox {
 
 	/**
 	 *
-	 * @param {import('./BoundingBoxes.svelte').Rect} rect
-	 * @returns {import('./BoundingBoxes.svelte').Rect}
+	 * @param {import('../../../../../../../lib/BoundingBoxes.svelte.js').Rect} rect
+	 * @returns {import('../../../../../../../lib/BoundingBoxes.svelte.js').Rect}
 	 */
 	clamp(rect) {
 		return {

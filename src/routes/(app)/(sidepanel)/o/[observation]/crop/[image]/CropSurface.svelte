@@ -3,7 +3,6 @@
 
 	import { page } from '$app/state';
 	import { toTopLeftCoords } from '$lib/BoundingBoxes.svelte.js';
-	import DraggableBoundingBox from '$lib/DraggableBoundingBox.svelte';
 	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 	import { uiState } from '$lib/state.svelte.js';
 	import { clamp, mapValues, overrideStyle, pick, sign } from '$lib/utils.js';
@@ -15,6 +14,7 @@
 		zoomSpeed,
 	} from './+page.svelte';
 	import { onCropChange } from './actions.svelte.js';
+	import DraggableBoundingBox from './DraggableBoundingBox.svelte';
 	import { activeTool } from './Toolbar.svelte';
 
 	interface Props {

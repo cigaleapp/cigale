@@ -124,7 +124,7 @@
 	import { watch } from 'runed';
 
 	import { page } from '$app/state';
-	import { INITIAL_ZOOM_STATE } from '$lib/DraggableBoundingBox.svelte.js';
+	import { INITIAL_ZOOM_STATE } from './DraggableBoundingBox.svelte.js';
 	import { imageIdToFileId, imagesOfImageFile } from '$lib/images.js';
 	import { assertIs } from '$lib/metadata/index.js';
 	import MobileWIPOverlay from '$lib/MobileWIPOverlay.svelte';

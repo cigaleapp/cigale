@@ -5,13 +5,13 @@
 	import { tick } from 'svelte';
 
 	import { page } from '$app/state';
+	import { coordsScaler, withinBoundingBox } from '$lib/BoundingBoxes.svelte.js';
+	import { imageIdToFileId } from '$lib/images.js';
+	import { isDebugMode } from '$lib/settings.svelte.js';
+	import { Fingers } from '$lib/touch/fingers.svelte.js';
+	import { mapValues } from '$lib/utils.js';
 
-	import { coordsScaler, withinBoundingBox } from './BoundingBoxes.svelte.js';
 	import { fittedImageRect, NewBoundingBox } from './DraggableBoundingBox.svelte.js';
-	import { imageIdToFileId } from './images.js';
-	import { isDebugMode } from './settings.svelte.js';
-	import { Fingers } from './touch/fingers.svelte.js';
-	import { mapValues } from './utils.js';
 
 	interface Rect {
 		x: number;

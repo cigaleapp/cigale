@@ -11,7 +11,7 @@ import { mapValues, omit, pick, transformObject } from './utils.js';
  * @import * as DB from './database';
  * @import { NamespacedMetadataID } from './schemas/common.js';
  * @import { TypedMetadataValue } from './metadata/index.js';
- * @import { ZoomState } from './DraggableBoundingBox.svelte.js';
+ * @import { ZoomState } from '../routes/(app)/(sidepanel)/o/[observation]/crop/[image]/DraggableBoundingBox.svelte.js';
  */
 
 /**
@@ -146,7 +146,7 @@ export class UIState {
 	queuedImages = new SvelteSet();
 	/** @type {Keymap} */
 	keybinds = $state({});
-	/** @type {Map<string, import('./DraggableBoundingBox.svelte.js').ZoomState>} */
+	/** @type {Map<string, import('../routes/(app)/(sidepanel)/o/[observation]/crop/[image]/DraggableBoundingBox.svelte.js').ZoomState>} */
 	cropperZoomStates = new SvelteMap();
 	/** @type {undefined | ((newSelection: string[]) => void)} */
 	setSelection = $state(undefined);
