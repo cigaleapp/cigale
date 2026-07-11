@@ -28,6 +28,10 @@ function metadataOptionDatabaseKey(protocolId: string, metadataId: string, optio
 	return `${ensureNamespacedMetadataId(metadataId, protocolId)}:${optionKey}`;
 }
 
+export function metadataIdOfOption(protocol: DB.Protocol, optionDatabaseId: string) {
+	return resolveMetadataImport(protocol, optionDatabaseId.split(':')[0] as NamespacedMetadataID);
+}
+
 /**
  *
  * @param protocolId

@@ -25,6 +25,7 @@
 	} from './metadata/constraints.js';
 	import { serializeMetadataValue } from './metadata/index.js';
 	import MetadataInput from './MetadataInput.svelte';
+	import { IsMobile } from './mobile.svelte.js';
 	import OverflowableText from './OverflowableText.svelte';
 	import { splitMetadataId } from './schemas/metadata.js';
 	import { isDebugMode } from './settings.svelte.js';
@@ -44,6 +45,8 @@
 		options?: MetadataEnumVariant[] | undefined;
 		value: undefined | TypedMetadataValue<NoInfer<T>>;
 		merged?: boolean;
+		/** Control presentation of enum metadata inputs. Auto means use the metadata definition's presentation setting */
+		'enum-presentation': 'auto' | 'dropdown-only';
 		/** Display requiredness indicators */
 		requiredness: 'all' | 'required' | 'none';
 		onvalidation?: (
@@ -78,12 +81,16 @@
 		options = undefined,
 		onchange = async () => {},
 		onvalidation = () => {},
+		'enum-presentation': enumPresentation,
 		...inputProps
 	}: Props = $props();
 
+	const mobile = new IsMobile();
+
 	/** If we have addToAlternativesBySelect, the alternatives are already shown for enum metadata */
 	const showSuggestions = $derived(
-		inputProps.addToAlternativesBySelect ? definition.type !== 'enum' : true
+		!mobile.current &&
+			(inputProps.addToAlternativesBySelect ? definition.type !== 'enum' : true)
 	);
 
 	const valueValidator = $derived.by(() => {
@@ -118,6 +125,7 @@
 
 	const isCompactEnum = $derived(
 		definition.type === 'enum' &&
+			enumPresentation !== 'dropdown-only' &&
 			switchValue(definition.presentation, {
 				auto: definition._optionsCount > 0 && definition._optionsCount <= 10,
 				dropdown: false,
@@ -198,15 +206,21 @@
 					<li>
 						<div class="value">
 							<LoadingText
-								value={async () =>
-									metadataOption(
-										databaseHandle(),
-										definition.id,
-										stringValue
-									).catch(() => null)}
+								value={async () => {
+									if (definition.type === 'enum') {
+										const option = await metadataOption(
+											databaseHandle(),
+											definition.id,
+											stringValue
+										).catch(() => null);
+										return option?.label ?? stringValue;
+									}
+
+									return stringValue;
+								}}
 							>
-								{#snippet loaded(option)}
-									{option?.label ?? stringValue}
+								{#snippet loaded(label)}
+									{label}
 								{/snippet}
 							</LoadingText>
 						</div>
@@ -390,7 +404,7 @@
 
 	.side-image-and-main-area:has(.side-image) {
 		display: grid;
-		--image-size: 8rem;
+		--image-size: var(--metadata-side-image-size, calc(min(10dvw, 8rem)));
 		--gap: 1em;
 		grid-template-columns: var(--image-size) calc(100% - var(--image-size) - var(--gap));
 		gap: var(--gap);
@@ -414,7 +428,7 @@
 		justify-content: space-between;
 		gap: 1em;
 		@media (max-width: 600px) {
-			flex-wrap: wrap;
+			flex-wrap: var(--metadata-first-line-wrap, wrap);
 		}
 	}
 	.value {
@@ -439,12 +453,11 @@
 	.learnmore p {
 		text-wrap: balance;
 		max-width: 67ch;
+		font-size: 0.9rem;
+		color: var(--gay);
 	}
 
 	label {
-		text-transform: uppercase;
-		color: var(--gay);
-		letter-spacing: 0.15em;
 		overflow: hidden;
 		white-space: nowrap;
 		text-overflow: ellipsis;
@@ -468,9 +481,7 @@
 	}
 
 	.alternatives .title {
-		text-transform: uppercase;
 		color: var(--gray);
-		letter-spacing: 0.2ch;
 	}
 
 	.alternatives ul {

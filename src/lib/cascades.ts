@@ -164,11 +164,15 @@ export async function cascadeLabels({
 	if (!protocolId) return {};
 	if (!option) return {};
 
+	const protocol = await db.get('Protocol', protocolId);
+	if (!protocol) return {};
+
 	/** @type {Record<NamespacedMetadataID, DB.MetadataEnumVariant[]>} */
 	const labels: Record<NamespacedMetadataID, DB.MetadataEnumVariant[]> = {};
 
 	for (const [metadataId, values] of Object.entries(option.cascade ?? {})) {
-		const id = namespacedMetadataId(protocolId, metadataId);
+		const id = resolveMetadataImport(protocol, namespacedMetadataId(protocolId, metadataId));
+
 		const options = await Promise.all(
 			ensureArray(values).map(async (key) => metadataOption(db, id, key))
 		);

@@ -1,15 +1,22 @@
 <script lang="ts">
+	import type { Snippet } from 'svelte';
+
 	import { fade } from 'svelte/transition';
 
 	import Logo from './Logo.svelte';
 
 	interface Props {
-		loading?: boolean;
-		failure?: string;
-		empty?: boolean;
+		loading?: boolean | string | undefined;
+		failure?: string | undefined;
+		empty?: boolean | string | undefined;
+		children?: Snippet;
 	}
 
-	const { loading = false, failure = '', empty = false }: Props = $props();
+	const { loading = false, failure = '', empty = '', children }: Props = $props();
+
+	function fallbackString(value: string | boolean, fallback: string): string {
+		return typeof value === 'string' ? value : fallback;
+	}
 </script>
 
 {#if failure}
@@ -20,13 +27,15 @@
 {:else if loading}
 	<div class="loading" in:fade={{ duration: 200 }}>
 		<Logo loading />
-		Chargement…
+		{fallbackString(loading, 'Chargement…')}
 	</div>
 {:else if empty}
 	<div class="empty" in:fade={{ duration: 200 }}>
 		<Logo variant="empty" />
-		Rien à voir ici
+		{fallbackString(empty, 'Rien à voir ici')}
 	</div>
+{:else if children}
+	{@render children()}
 {/if}
 
 <style>
@@ -35,6 +44,7 @@
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
+		text-align: center;
 		gap: 1rem;
 
 		height: 100%;

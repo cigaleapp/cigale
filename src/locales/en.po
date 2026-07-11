@@ -7,7 +7,6 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/lib/LoadingScreen.svelte
 #: src/lib/SessionMetadataForm.svelte
 #: src/routes/(app)/PrepareForOffline.svelte
 #: src/routes/(app)/sessions/Cards.svelte
@@ -85,6 +84,7 @@ msgstr "Identification guides"
 msgid "Analyse…"
 msgstr "Analyzing…"
 
+#: src/lib/MetadataComboboxMobile.svelte
 #: src/lib/ModalConfirmDeletion.svelte
 #: src/lib/toasts.svelte.js
 #: src/lib/undo.svelte.js
@@ -302,11 +302,6 @@ msgstr "Error while extracting EXIF metadata for {0}"
 #: src/routes/(app)/protocols/import/[...url]/+page.svelte
 msgid "Erreur lors de l'import du protocole distant: {0}"
 msgstr "Error while importing remote protocol: {0}"
-
-#. 0: error
-#: src/lib/MetadataCombobox.svelte
-msgid "Erreur lors de la récupération des étiquettes en cascade: {0}"
-msgstr "Error while getting cascaded labels: {0}"
 
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
 #: src/routes/(app)/(sidepanel)/crop/+layout.svelte
@@ -941,6 +936,7 @@ msgstr "Protocol description..."
 msgid "Site du protocole"
 msgstr "Protocol website"
 
+#: src/routes/(app)/about/+page.svelte
 #: src/routes/(app)/protocols/[id]/infos/+page.svelte
 #: src/routes/(app)/protocols/[id]/infos/+page.svelte
 msgid "Nom"
@@ -1105,6 +1101,7 @@ msgstr "Search options"
 msgid "Rechercher…"
 msgstr "Search…"
 
+#: src/lib/MetadataComboboxMobile.svelte
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/+layout.svelte
 msgid "Effacer la recherche"
 msgstr "Clear search"
@@ -1276,14 +1273,6 @@ msgstr "Delete all items from this group"
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
 msgid "Numéro de l'image dans l'observation, commençant à 1."
 msgstr "Number of the image within the observation, beginning at 1."
-
-#: src/lib/MetadataCombobox.svelte
-msgid "Aussi connu sous le nom de"
-msgstr "Also known as"
-
-#: src/lib/MetadataCombobox.svelte
-msgid "AKA"
-msgstr "AKA"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/suggestions/+page.svelte
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
@@ -1507,10 +1496,6 @@ msgstr "Cannot edit the JSON file's path, as CIGALE needs to know where it is in
 #: src/lib/sessions.js
 msgid "La session a été fermée"
 msgstr "Session was closed"
-
-#: src/lib/MetadataCombobox.svelte
-msgid "Métadonées mises à jour à la sélection de cette option"
-msgstr "Metadata updated when selecting this option"
 
 #: src/routes/(app)/ModalSubmitIssue.svelte
 msgid "Signaler un bug"
@@ -2149,10 +2134,6 @@ msgstr ""
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/+layout.ts
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/suggestions/+page.ts
 msgid "Observation introuvable"
-msgstr ""
-
-#: src/lib/MetadataCombobox.svelte
-msgid "Chargement"
 msgstr ""
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/+layout@(app).svelte
@@ -2798,10 +2779,6 @@ msgstr ""
 msgid "Héllo !! Do accents work?"
 msgstr ""
 
-#: src/lib/LoadingScreen.svelte
-msgid "<0/> Rien à voir ici"
-msgstr "<0/> Nothing to see here"
-
 #: src/routes/(app)/capture/+page.svelte
 #: src/routes/(app)/storage/+page.svelte
 msgid "Photos en attente"
@@ -2956,4 +2933,70 @@ msgstr ""
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/CropSurface.svelte
 msgid "coucou toi :) <0/> passes une bonne journée ! 💖💖"
+msgstr ""
+
+#: src/lib/MetadataCascadesTable.svelte
+msgid "Métadonées mises à jour au choix de cette option"
+msgstr ""
+
+#: src/lib/MetadataComboboxDesktop.svelte
+msgid "Chargement"
+msgstr ""
+
+#: src/lib/MetadataComboboxDesktop.svelte
+msgid "Aussi connu sous le nom de"
+msgstr ""
+
+#: src/lib/MetadataComboboxDesktop.svelte
+msgid "AKA"
+msgstr ""
+
+#. 0: error
+#: src/lib/MetadataComboboxDesktop.svelte
+msgid "Erreur lors de la récupération des étiquettes en cascade: {0}"
+msgstr ""
+
+#: src/lib/MetadataComboboxMobile.svelte
+msgid "Aucun·e"
+msgstr ""
+
+#: src/lib/MetadataComboboxMobile.svelte
+msgid "Chercher…"
+msgstr ""
+
+#: src/lib/MetadataComboboxMobile.svelte
+msgid "Sauvegarde…"
+msgstr ""
+
+#: src/lib/MetadataComboboxMobile.svelte
+msgid "OK"
+msgstr ""
+
+#: src/lib/MetadataComboboxMobile.svelte
+msgid "Aucun résultat"
+msgstr ""
+
+#: src/lib/MetadataComboboxMobile.svelte
+msgid "Pas trouvé?<0/> <1>Essayes la barre de recherche</1>"
+msgstr ""
+
+#: src/lib/MetadataComboboxMobile.svelte
+msgid "Description et images de l'option sélectionnée"
+msgstr ""
+
+#. 0: label
+#: src/lib/MetadataComboboxMobile.svelte
+msgid "Aucune description pour {0}."
+msgstr ""
+
+#: src/lib/MetadataComboboxMobile.svelte
+msgid "Aucune option sélectionée"
+msgstr ""
+
+#: src/routes/(app)/about/+page.svelte
+msgid "Rév."
+msgstr ""
+
+#: src/routes/(app)/about/+page.svelte
+msgid "Base de données"
 msgstr ""

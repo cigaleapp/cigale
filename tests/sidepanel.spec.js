@@ -129,31 +129,31 @@ testBasic('can update a enum-type metadata with cascades', async ({ page, app })
 	await expect(page.getByTestId('metadata-combobox-viewport')).toMatchAriaSnapshot(`
 	  - option /Entomobrya muscorum \\d+%/ [selected]:
 	    - img
-	    - text: ""
+	    - text: "Entomobrya muscorum"
 	    - code: /\\d+%/
 	  - option /Dicyrtomina saundersi \\d+%/:
-	    - text: ""
+	    - text: "Dicyrtomina saundersi"
 	    - code: /\\d+%/
 	  - option "Allacma fusca 9%":
-	    - text: ""
+	    - text: "Allacma fusca"
 	    - code: 9%
 	  - option "Pogonognathellus longicornis 5%":
-	    - text: ""
+	    - text: "Pogonognathellus longicornis"
 	    - code: 5%
 	  - option "Dicyrtomina ornata 4%":
-	    - text: ""
+	    - text: "Dicyrtomina ornata"
 	    - code: 4%
 	  - option "Orchesella quinquefasciata 3%":
-	    - text: ""
+	    - text: "Orchesella quinquefasciata"
 	    - code: 3%
 	  - option "Entomobrya nivalis 2%":
-	    - text: ""
+	    - text: "Entomobrya nivalis"
 	    - code: 2%
 	  - option "Entomobrya superba 2%":
-	    - text: ""
+	    - text: "Entomobrya superba"
 	    - code: 2%
 	  - option "Caprainea marginata 2%":
-	    - text: ""
+	    - text: "Caprainea marginata"
 	    - code: 2%
 	  - heading "Entomobrya muscorum" [level=2]
 	  - link "En savoir plus gbif.org":
@@ -161,7 +161,9 @@ testBasic('can update a enum-type metadata with cascades', async ({ page, app })
 	    - img
 	    - text: ""
 	    - code: gbif.org
-	  - table:
+	  - table "Métadonées mises à jour au choix de cette option":
+	    - caption:
+	      - emphasis: Métadonées mises à jour au choix de cette option
 	    - rowgroup:
 	      - row "Genre Entomobrya":
 	        - cell "Genre"
@@ -181,8 +183,6 @@ testBasic('can update a enum-type metadata with cascades', async ({ page, app })
 	      - row "Règne Animalia":
 	        - cell "Règne"
 	        - cell "Animalia"
-	  - paragraph:
-	    - emphasis: Métadonées mises à jour à la sélection de cette option
 	`);
 
 	// Hovering over another option
@@ -193,39 +193,41 @@ testBasic('can update a enum-type metadata with cascades', async ({ page, app })
 	await expect(page.getByTestId('metadata-combobox-viewport')).toMatchAriaSnapshot(`
 	  - option /Entomobrya muscorum \\d+%/ [selected]:
 	    - img
-	    - text: ""
+	    - text: "Entomobrya muscorum"
 	    - code: /\\d+%/
 	  - option /Dicyrtomina saundersi \\d+%/:
-	    - text: ""
+	    - text: "Dicyrtomina saundersi"
 	    - code: /\\d+%/
 	  - option "Allacma fusca 9%":
-	    - text: ""
+	    - text: "Allacma fusca"
 	    - code: 9%
 	  - option "Pogonognathellus longicornis 5%":
-	    - text: ""
+	    - text: "Pogonognathellus longicornis"
 	    - code: 5%
 	  - option "Dicyrtomina ornata 4%":
-	    - text: ""
+	    - text: "Dicyrtomina ornata"
 	    - code: 4%
 	  - option "Orchesella quinquefasciata 3%":
-	    - text: ""
+	    - text: "Orchesella quinquefasciata"
 	    - code: 3%
 	  - option "Entomobrya nivalis 2%":
-	    - text: ""
+	    - text: "Entomobrya nivalis"
 	    - code: 2%
 	  - option "Entomobrya superba 2%":
-	    - text: ""
+	    - text: "Entomobrya superba"
 	    - code: 2%
 	  - option "Caprainea marginata 2%":
-	    - text: ""
+	    - text: "Caprainea marginata"
 	    - code: 2%
 	  - heading "Dicyrtomina saundersi" [level=2]
 	  - link "En savoir plus gbif.org":
 	    - /url: https://gbif.org/species/4536978
 	    - img
-	    - text: ""
+	    - text: "En savoir plus"
 	    - code: gbif.org
-	  - table:
+	  - table "Métadonées mises à jour au choix de cette option":
+	    - caption:
+	      - emphasis: Métadonées mises à jour au choix de cette option
 	    - rowgroup:
 	      - row "Genre Dicyrtomina":
 	        - cell "Genre"
@@ -245,8 +247,6 @@ testBasic('can update a enum-type metadata with cascades', async ({ page, app })
 	      - row "Règne Animalia":
 	        - cell "Règne"
 	        - cell "Animalia"
-	  - paragraph:
-	    - emphasis: Métadonées mises à jour à la sélection de cette option
 	`);
 
 	// Selecting the other option

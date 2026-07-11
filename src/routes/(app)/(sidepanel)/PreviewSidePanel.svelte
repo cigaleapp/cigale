@@ -208,6 +208,7 @@
 					merged={value?.merged}
 					{definition}
 					{value}
+					enum-presentation={mobile.current ? 'dropdown-only' : 'auto'}
 					options={collapsed ? [] : undefined}
 					onchange={async ({ value: v, unit }) => {
 						if (dequal(v, value?.value) && unit === value?.unit) return;
@@ -317,6 +318,8 @@
 
 <style>
 	.sidepanel {
+		--metadata-first-line-wrap: nowrap;
+
 		background-color: var(--bg-neutral);
 		display: grid;
 		height: 100%;
@@ -336,9 +339,6 @@
 		&.mobile {
 			grid-template-rows: max-content auto max-content;
 			gap: 1rem;
-
-			/* XXX: Approximate max height of .actions */
-			padding-bottom: 300px;
 		}
 	}
 
@@ -359,7 +359,7 @@
 		flex-direction: column;
 		overflow-y: auto;
 		overflow-x: hidden;
-		--metadata-list-gap: 1.5em;
+		--metadata-list-gap: 2.5em;
 
 		&.empty {
 			opacity: 0.25;
@@ -371,17 +371,6 @@
 		align-items: center;
 		gap: 0.5em;
 		overflow-x: hidden;
-	}
-
-	.empty-selection {
-		--size: 5rem;
-		margin: auto;
-		max-width: 300px;
-		display: flex;
-		justify-content: center;
-		flex-direction: column;
-		gap: 1em;
-		align-items: center;
 	}
 
 	.images {
@@ -412,7 +401,15 @@
 			right: 0;
 			padding: 0.75em;
 			background: var(--bg-neutral);
+			z-index: 150;
 		}
+	}
+
+	/* set to 99999 by the lib (bruh), it goes over the actions bar */
+	/* but if we set the actions bar to >99999, it'd go above toasts */
+	/* well the bottomdrawer *does* go above toasts for now, but thats sth to fix */
+	:global(.maplibregl-cooperative-gesture-screen) {
+		z-index: 80;
 	}
 
 	.actions .side-by-side {

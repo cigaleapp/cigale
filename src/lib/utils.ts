@@ -1594,3 +1594,25 @@ if (import.meta.vitest) {
 		});
 	});
 }
+
+/**
+ * Returns first key whose value is truthy
+ */
+export function switchConditions<T extends string>(
+	conditions: Record<T, boolean | string | number>
+): T | undefined {
+	return entries(conditions).find(([_, valid]) => valid)?.[0];
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+
+	test('switchConditions', () => {
+		expect(
+			switchConditions({
+				yes: 1 + 1 === 2,
+				'radiohead!!': 2 + 2 === 5,
+			})
+		).toBe('yes');
+	});
+}

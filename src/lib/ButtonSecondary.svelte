@@ -21,7 +21,7 @@ Available CSS variables:
 	 * @property {import('svelte').Snippet<[{loading: boolean}]>} children
 	 * @property {undefined | ((e: MouseEvent, signals: { loadingStarted: () => void, loadingEnded: () => void }) => Promise<void> |void)} onclick
 	 * @property {boolean} [disabled=false]
-	 * @property {boolean} [tight=false] limit the height of the button. also hides keyboard shortcut hint if itll be displayed in a tooltip
+	 * @property {boolean} [tight=false] limit the height of the button. also hides keyboard shortcut hint if itll be displayed in a tooltip, and doesn't auto-append a spinner when loading, and {@link loading} is true
 	 * @property {Parameters<typeof tooltip>[1]} [help]
 	 * @property {string} [keyboard] keyboard shortcut hint to display
 	 * @property {import('$e2e/testids.js').PlaywrightTestId|undefined} [testid] add a attribute for Playwright getByTestId to the button
@@ -107,7 +107,7 @@ Available CSS variables:
 		}}
 		pw-testid={testid || undefined}
 	>
-		{#if isLoading}
+		{#if isLoading && !tight}
 			<div class="loading-spinner">
 				<LoadingSpinner />
 			</div>
