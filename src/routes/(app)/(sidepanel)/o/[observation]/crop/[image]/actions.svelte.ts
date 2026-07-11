@@ -37,6 +37,7 @@ import {
 	boundingBoxes as getBoundingBoxes,
 	goToFile,
 	goToNextUnconfirmedFile,
+	hasConfirmedCrop,
 	hasCrop,
 	imageHasConfirmedCrop,
 } from './+page.svelte';
@@ -176,6 +177,7 @@ export async function onCropChange({
 			// Put the neural-network-inferred (initial) value in the alternatives as a backup
 			confidences: initialCrops[imageId] ? [initialCrops[imageId]] : [],
 			manuallyModified: true,
+			confirmed: true
 		});
 	} else if (
 		currentImages().length === 1 &&
@@ -201,6 +203,7 @@ export async function onCropChange({
 			value: toCenteredCoords(newBoundingBox),
 			confidence: 1,
 			manuallyModified: true,
+			confirmed: true,
 			confidences: [],
 		});
 	} else {
@@ -362,6 +365,9 @@ async function changeCropConfirmedStatus(image: DB.Image, confirmed: boolean) {
 }
 
 export async function changeAllConfirmedStatuses(confirmed: boolean) {
+	// Nothing to do in that case
+	if (confirmed && hasConfirmedCrop(fileId)) return;
+
 	for (const image of currentImages()) {
 		await changeCropConfirmedStatus(image, confirmed);
 	}
