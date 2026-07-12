@@ -205,9 +205,11 @@
 		display: flex;
 		flex-direction: column;
 		gap: 1em;
-		resize: horizontal;
+		height: 100%;
+
 		/* to make resize work */
-		overflow: hidden;
+		resize: horizontal;
+		overflow-x: hidden;
 	}
 
 	.info .top {
@@ -224,7 +226,7 @@
 	}
 
 	.boxes {
-		height: 100%;
+		overflow-y: auto;
 	}
 
 	.boxes ul {
