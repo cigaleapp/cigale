@@ -1,63 +1,9 @@
+import type { Zoom } from './zoom.svelte.js';
+import type { Rect } from '$lib/BoundingBoxes.svelte.js';
+
 import { type } from 'arktype';
 
 import { clamp, sign } from '$lib/utils.js';
-
-/**
- * Represents the zoom state of the image.
- * x & y coordinates are in pixels of the resized, post-object-fit but pre-zoom image
- */
-export type ZoomState = {
-	origin: { x: number; y: number };
-	scale: number;
-	panning: boolean;
-	panStart: {
-		x: number;
-		y: number;
-		zoomOrigin: {
-			x: number;
-			y: number;
-		};
-	};
-};
-
-export const INITIAL_ZOOM_STATE: ZoomState = {
-	origin: { x: 0, y: 0 },
-	scale: 1,
-	panning: false,
-	panStart: { x: 0, y: 0, zoomOrigin: { x: 0, y: 0 } },
-};
-
-export function updateZoomState({
-	element,
-	state: zoom,
-	center,
-	direction,
-	speed,
-}: {
-	element: HTMLImageElement;
-	state: ZoomState;
-	center: { clientX: number; clientY: number };
-	/** Positive to zoom more */
-	direction: -1 | 0 | 1;
-	speed: number;
-}) {
-	// Most logic is thanks to https://stackoverflow.com/a/70251437
-	const imageBounds = element.getBoundingClientRect();
-	const x = (center.clientX - imageBounds.x) / zoom.scale;
-	const y = (center.clientY - imageBounds.y) / zoom.scale;
-
-	zoom.scale += direction * 2 * speed;
-
-	if (zoom.scale > 10) {
-		zoom.scale = 10;
-	} else if (zoom.scale < 1) {
-		zoom.scale = 1;
-		zoom.origin = { x: 0, y: 0 };
-	} else {
-		zoom.origin.x -= direction * speed * (x * 2 - element.offsetWidth);
-		zoom.origin.y -= direction * speed * (y * 2 - element.offsetHeight);
-	}
-}
 
 /**
  * Calculate bounding rect for an image element that has object-fit: contain. The boundingClientRect is not the same as the actual, displayed image. We use both natural{Width,Height} and client{Width,Height} to calculate the displayed image size.
@@ -75,7 +21,7 @@ export function fittedImageRect(
 		HTMLImageElement,
 		`${'natural' | 'client'}${'Width' | 'Height'}` | `client${'Top' | 'Left'}`
 	>,
-	zoomState: ZoomState
+	zoom: Zoom | undefined
 ) {
 	const naturalRatio = naturalWidth / naturalHeight;
 	const clientRatio = clientWidth / clientHeight;
@@ -85,16 +31,16 @@ export function fittedImageRect(
 			? [clientHeight * naturalRatio, clientHeight]
 			: [clientWidth, clientWidth / naturalRatio];
 
-	if (zoomState) {
-		width *= zoomState.scale;
-		height *= zoomState.scale;
+	if (zoom) {
+		width *= zoom.scale;
+		height *= zoom.scale;
 	}
 
 	return {
 		width,
 		height,
-		x: (zoomState?.origin.x ?? 0) + clientLeft + (clientWidth - width) / 2,
-		y: (zoomState?.origin.y ?? 0) + clientTop + (clientHeight - height) / 2,
+		x: (zoom?.origin.x ?? 0) + clientLeft + (clientWidth - width) / 2,
+		y: (zoom?.origin.y ?? 0) + clientTop + (clientHeight - height) / 2,
 	};
 }
 
@@ -109,23 +55,20 @@ export class NewBoundingBox {
 		height: 0,
 	};
 
-	/** @type {'clickanddrag' | '2point' | '4point'|'off'} */
-	createMode = $state('clickanddrag');
+	createMode = $state<'clickanddrag' | '2point' | '4point' | 'off'>('clickanddrag');
 
-	/** @param {'clickanddrag' | '2point' | '4point'|'off'} mode */
-	setCreateMode(mode) {
+	setCreateMode(mode: typeof this.createMode) {
 		this.createMode = mode;
 	}
 
-	clickanddrag: Rect = $state({
+	clickanddrag = $state({
 		x: 0,
 		y: 0,
 		width: 0,
 		height: 0,
-		// -1 or 1
 		dragDirection: {
-			x: 0,
-			y: 0,
+			x: 0 as -1 | 0 | 1,
+			y: 0 as -1 | 0 | 1,
 		},
 	});
 

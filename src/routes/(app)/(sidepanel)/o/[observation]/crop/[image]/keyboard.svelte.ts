@@ -3,7 +3,7 @@ import type { SelectedBox } from './+page.svelte';
 import { toTopLeftCoords } from '$lib/BoundingBoxes.svelte.js';
 import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
 import { toggleSetting } from '$lib/settings.svelte.js';
-import { clamp, fromEntries, range, throwError } from '$lib/utils.js';
+import { fromEntries, range, throwError } from '$lib/utils.js';
 
 import {
 	currentImages,
@@ -11,7 +11,6 @@ import {
 	boundingBoxes as getBoundingBoxes,
 	setFocusedImage,
 	zoom,
-	zoomSpeed,
 } from './+page.svelte';
 import {
 	canRevertCrop,
@@ -88,20 +87,25 @@ export function setupKeyboardShortcuts({
 		'+': {
 			help: 'Zoomer',
 			do: () => {
-				zoom.scale = clamp(1, zoom.scale + 4 * zoomSpeed('keyboard'), 10);
+				zoom.update(null, {
+					via: 'keyboard',
+					key: '+',
+				});
 			},
 		},
 		'-': {
 			help: 'Dézoomer',
 			do: () => {
-				zoom.scale = clamp(1, zoom.scale - 4 * zoomSpeed('keyboard'), 10);
+				zoom.update(null, {
+					via: 'keyboard',
+					key: '-',
+				});
 			},
 		},
 		Digit0: {
 			help: 'Réinitialiser le zoom',
 			do: () => {
-				zoom.origin = { x: 0, y: 0 };
-				zoom.scale = 1;
+				zoom.reset();
 			},
 		},
 		'$mod+h': {

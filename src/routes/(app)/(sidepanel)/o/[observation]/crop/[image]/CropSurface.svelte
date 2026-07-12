@@ -6,17 +6,11 @@
 	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 	import { uiState } from '$lib/state.svelte.js';
 	import { Gestures } from '$lib/touch/gestures.svelte.js';
-	import { mapValues, overrideStyle, pick, sign } from '$lib/utils.js';
+	import { mapValues, overrideStyle, pick } from '$lib/utils.js';
 
-	import {
-		focusedImage,
-		boundingBoxes as getBoundingBoxes,
-		zoom,
-		zoomSpeed,
-	} from './+page.svelte';
+	import { focusedImage, boundingBoxes as getBoundingBoxes, zoom } from './+page.svelte';
 	import { onCropChange } from './actions.svelte.js';
 	import DraggableBoundingBox from './DraggableBoundingBox.svelte';
-	import { updateZoomState } from './DraggableBoundingBox.svelte.js';
 	import { activeTool } from './Toolbar.svelte';
 
 	interface Props {
@@ -51,30 +45,20 @@
 		new Gestures(node, {
 			onpinch(event) {
 				if (!imageElement) return;
-				updateZoomState({
-					element: imageElement,
-					state: zoom,
-					center: { clientX: event.origin.clientX, clientY: event.origin.clientY },
-					direction: sign(event.distance),
-					speed: zoomSpeed('pinch', event.distance),
-				});
+
+				zoom.update(imageElement, { via: 'pinch', event });
 			},
 			onpan(event) {
 				if (!imageElement) return;
-				zoom.panning = true;
 
-				if (event.starting) {
-					zoom.panStart = {
-						x: event.origin.clientX,
-						y: event.origin.clientY,
-						zoomOrigin: $state.snapshot(zoom.origin),
-					};
+				switch (event.kind) {
+					case 'panstart':
+						return zoom.startPanning(event.origin);
+					case 'panmove':
+						return zoom.pan(event.destination);
+					case 'panend':
+						return zoom.stopPanning();
 				}
-
-				zoom.origin.x =
-					zoom.panStart.zoomOrigin.x + (event.destination.clientX - zoom.panStart.x);
-				zoom.origin.y =
-					zoom.panStart.zoomOrigin.y + (event.destination.clientY - zoom.panStart.y);
 			},
 		});
 	}}
@@ -86,36 +70,22 @@
 		// Hide autoscroll indicator on Firefox
 		e.preventDefault();
 
-		zoom.panning = true;
-		zoom.panStart = {
-			x: e.clientX,
-			y: e.clientY,
-			zoomOrigin: $state.snapshot(zoom.origin),
-		};
+		zoom.startPanning(e);
 	}}
 	onpointerup={async (e) => {
 		// Pan on mousewheel button release or hand tool
 		if (!willPanWithMouse(e)) return;
-		zoom.panning = false;
+		zoom.stopPanning();
 	}}
-	onpointermove={async ({ clientX, clientY }) => {
-		if (!zoom.panning) return;
-
-		zoom.origin.x = zoom.panStart.zoomOrigin.x + (clientX - zoom.panStart.x);
-		zoom.origin.y = zoom.panStart.zoomOrigin.y + (clientY - zoom.panStart.y);
+	onpointermove={async (e) => {
+		zoom.pan(e);
 	}}
 	// Handles zoom via mousewheel
-	onwheel={(e) => {
-		e.preventDefault();
+	onwheel={(event) => {
+		event.preventDefault();
 		if (!imageElement) return;
 
-		updateZoomState({
-			element: imageElement,
-			state: zoom,
-			center: e,
-			direction: -sign(e.deltaY),
-			speed: zoomSpeed('mousewheel'),
-		});
+		zoom.update(imageElement, { via: 'wheel', event });
 	}}
 >
 	<div class="behind-image">

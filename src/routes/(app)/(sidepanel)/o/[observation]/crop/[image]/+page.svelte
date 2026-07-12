@@ -8,21 +8,7 @@
 		manual: boolean;
 	}
 
-	export const zoom = $state({ ...INITIAL_ZOOM_STATE });
-
-	export function zoomSpeed(by: 'pinch' | 'mousewheel' | 'keyboard', pinchDistance?: number) {
-		switch (by) {
-			case 'mousewheel':
-			case 'keyboard':
-				return zoom.scale * 0.1;
-			case 'pinch':
-				// 2e3 is empirical
-				// FIXME: it might depend on the device, the screen size etc
-				if (pinchDistance) return Math.abs(pinchDistance) / 2e3;
-		}
-
-		return 0.1;
-	}
+	export const zoom = new Zoom();
 
 	const { sortedFileIds } = $derived(page.data as PageData);
 	const fileId = $derived(page.params.image);
@@ -94,17 +80,20 @@
 	}
 
 	const prevFileId = $derived.by(() => {
+		if (!fileId) return;
 		const idx = sortedFileIds.indexOf(fileId) - 1;
-		if (idx < 0) return undefined;
+		if (idx < 0) return;
 		return sortedFileIds.at(idx);
 	});
 	const nextFileId = $derived.by(() => {
+		if (!fileId) return;
 		const idx = sortedFileIds.indexOf(fileId) + 1;
-		if (idx >= sortedFileIds.length) return undefined;
+		if (idx >= sortedFileIds.length) return;
 		return sortedFileIds.at(idx);
 	});
 
 	const nextUnconfirmedImageId = $derived.by(() => {
+		if (!fileId) return;
 		const forward = sortedFileIds
 			.slice(sortedFileIds.indexOf(fileId) + 1)
 			.filter((fileId) => !hasConfirmedCrop(fileId))
@@ -148,9 +137,9 @@
 	import { changeAllConfirmedStatuses, setupUndoActions } from './actions.svelte.js';
 	import Boxes from './Boxes.svelte';
 	import CropSurface from './CropSurface.svelte';
-	import { INITIAL_ZOOM_STATE } from './DraggableBoundingBox.svelte.js';
 	import { setupKeyboardShortcuts } from './keyboard.svelte.js';
 	import Toolbar from './Toolbar.svelte';
+	import { Zoom } from './zoom.svelte.js';
 
 	const { params } = $props();
 
@@ -196,16 +185,10 @@
 	watch(
 		() => fileId,
 		(newFileId, oldFileId) => {
-			if (oldFileId) uiState.cropperZoomStates.set(oldFileId, $state.snapshot(zoom));
+			if (oldFileId) uiState.cropperZoomStates.set(oldFileId, zoom.capture());
 
-			const newZoom =
-				$state.snapshot(uiState.cropperZoomStates.get(newFileId ?? '')) ??
-				INITIAL_ZOOM_STATE;
-
-			// We cant reassign to zoom since its an exported $state (so cannot declare it with `let` )
-			for (const prop in newZoom) {
-				zoom[prop] = newZoom[prop];
-			}
+			const newState = newFileId && uiState.cropperZoomStates.get(newFileId);
+			if (newState) zoom.restore(newState);
 		}
 	);
 </script>

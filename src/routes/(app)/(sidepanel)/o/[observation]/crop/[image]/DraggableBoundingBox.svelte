@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { ZoomState } from './DraggableBoundingBox.svelte.js';
+	import type { Zoom } from './zoom.svelte.js';
 
 	import { watch } from 'runed';
 	import { tick } from 'svelte';
@@ -32,7 +32,7 @@
 		createMode: 'clickanddrag' | '2point' | '4point' | 'off';
 		movable: boolean;
 		disabled?: boolean;
-		zoom: ZoomState;
+		zoom: Zoom;
 		imageFileID?: string;
 	}
 

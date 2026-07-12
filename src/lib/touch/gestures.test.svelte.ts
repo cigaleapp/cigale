@@ -31,36 +31,6 @@ beforeEach(() => {
 });
 
 describe('Gestures', () => {
-	it('emits a starting pan event on touchstart', async () => {
-		const inside = document.createElement('div');
-		const onpan = vi.fn();
-		let gestures!: Gestures;
-		const cleanup = $effect.root(() => {
-			gestures = new Gestures(inside, { onpan });
-		});
-		await Promise.resolve();
-
-		const touch = createTouch(1, 100, 200);
-		const source = dispatchTouchEvent(inside, 'touchstart', [touch]);
-
-		expect(gestures).toBeDefined();
-		expect(onpan).toHaveBeenCalledTimes(1);
-		expect(onpan).toHaveBeenCalledWith(
-			expect.objectContaining({
-				source,
-				starting: true,
-				starts: [touch],
-				ends: [touch],
-				origin: { clientX: 100, clientY: 200 },
-				destination: { clientX: 100, clientY: 200 },
-				dx: 0,
-				dy: 0,
-			})
-		);
-
-		cleanup();
-	});
-
 	it('classifies a two-finger move with a moving center as pan', async () => {
 		const inside = document.createElement('div');
 		const onpan = vi.fn();
@@ -81,12 +51,16 @@ describe('Gestures', () => {
 		expect(onpan).toHaveBeenCalledTimes(2);
 		expect(onpinch).not.toHaveBeenCalled();
 
-		const moveEvent = onpan.mock.calls.at(1)?.[0];
-		expect(moveEvent).toEqual(
+		const [[panstart], [panmove]] = onpan.mock.calls;
+		expect(panstart).toEqual(
 			expect.objectContaining({
-				starting: false,
-				starts: [startA, startB],
-				ends: [endA, endB],
+				kind: 'panstart',
+				origin: { clientX: 0, clientY: 5 },
+			})
+		);
+		expect(panmove).toEqual(
+			expect.objectContaining({
+				kind: 'panmove',
 				origin: { clientX: 0, clientY: 5 },
 				destination: { clientX: 20, clientY: 5 },
 				dx: 20,
@@ -121,12 +95,8 @@ describe('Gestures', () => {
 		expect(pinchEvent).toEqual(
 			expect.objectContaining({
 				source: expect.any(Event),
-				starts: [startA, startB],
-				ends: [endA, endB],
 				origin: { clientX: 0, clientY: 10 },
 				distance: -10,
-				growing: false,
-				shrinking: true,
 			})
 		);
 
