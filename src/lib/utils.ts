@@ -1520,13 +1520,17 @@ export function overrideStyle(selector: string, property: string, value: string)
 			(node) => node instanceof HTMLElement
 		);
 
+		const original = new Map<HTMLElement, string>();
+
 		for (const target of targets) {
+			original.set(target, target.style.getPropertyValue(property));
 			target.style.setProperty(property, value);
 		}
 
 		return () => {
 			for (const target of targets) {
-				target.style.removeProperty(property);
+				const value = original.get(target);
+				if (value) target.style.setProperty(property, value);
 			}
 		};
 	};
