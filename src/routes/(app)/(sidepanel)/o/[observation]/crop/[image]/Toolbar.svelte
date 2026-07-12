@@ -110,6 +110,7 @@
 		<button
 			aria-label="Annuler"
 			use:tooltip={{ text: 'Annuler', keyboard: '$mod+z', placement: 'right' }}
+			disabled={!undo.canPop}
 			onclick={() => undo.pop()}
 		>
 			<IconUndo />
@@ -117,6 +118,7 @@
 		<button
 			aria-label="Rétablir"
 			use:tooltip={{ text: 'Rétablir', keyboard: '$mod+Shift+z', placement: 'right' }}
+			disabled={!undo.canRewind}
 			onclick={() => undo.rewind()}
 		>
 			<IconRedo />
@@ -176,6 +178,10 @@
 		cursor: pointer;
 		position: relative;
 		border-radius: var(--corner-radius);
+
+		&:disabled {
+			color: var(--gray);
+		}
 	}
 
 	.toolbar-buttons button.active {
