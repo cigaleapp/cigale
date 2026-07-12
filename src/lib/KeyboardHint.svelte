@@ -60,7 +60,7 @@
 			if (part === 'alt') return winmac('Alt', '⌥');
 			if (part === 'win') return winmac('Win', '⌘');
 			if (part === 'delete') return winmac('Suppr', '⌦');
-			if (part === 'space') return '␣';
+			if (part === 'space') return 'Espace';
 			if (part === 'escape') return 'Esc';
 			if (part === 'enter') return '⏎';
 			if (part === 'tab') return '⇆ Tab';
