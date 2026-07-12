@@ -531,11 +531,18 @@ test.describe('Cropper view', () => {
 			expect(await image.evaluate((i) => Number(i.style.scale))).toBeCloseTo(scale, 3);
 
 			if (translateX !== undefined && translateY !== undefined) {
-				await expect(image).toHaveCSS('translate', /.+px .+px/);
+				await expect(image).toHaveCSS('translate', /.+px( .+px)?/);
 
-				expect(
-					await image.evaluate((i) => i.style.translate.split(' ').map(Number.parseFloat))
-				).toEqual([assert.closeTo(translateX, 2), assert.closeTo(translateY, 2)]);
+				const translation = await image.evaluate((i) => {
+					const [x, y] = i.style.translate.split(' ');
+
+					return (y === undefined ? [x, x] : [x, y]).map(Number.parseFloat);
+				});
+
+				expect(translation).toEqual([
+					assert.closeTo(translateX, 2),
+					assert.closeTo(translateY, 2),
+				]);
 			}
 		}
 
@@ -611,6 +618,7 @@ test.describe('Cropper view', () => {
 			await page.keyboard.press(controlOrMeta(page, 'ArrowLeft'));
 			await app.path.wait(`/o/_/crop/${images.withExifGps.fileId}/`);
 
+			await checkImageTransforms(page, 1);
 			await zoomAt(page, 40, 150, 150);
 			await checkImageTransforms(page, 1.44, 102.08, 60.28);
 

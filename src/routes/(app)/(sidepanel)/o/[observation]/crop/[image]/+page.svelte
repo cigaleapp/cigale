@@ -188,7 +188,11 @@
 			if (oldFileId) uiState.cropperZoomStates.set(oldFileId, zoom.capture());
 
 			const newState = newFileId && uiState.cropperZoomStates.get(newFileId);
-			if (newState) zoom.restore(newState);
+			if (newState) {
+				zoom.restore(newState);
+			} else {
+				zoom.reset();
+			}
 		}
 	);
 </script>
