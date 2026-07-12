@@ -1,6 +1,7 @@
 <script lang="ts">
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import { IsMobile } from '$lib/mobile.svelte.js';
+	import { getSettings } from './settings.svelte.js';
 
 	interface Props {
 		back: () => void | Promise<void>;
@@ -12,7 +13,7 @@
 	const mobile = new IsMobile();
 </script>
 
-{#if mobile.current}
+{#if mobile.current && !getSettings().showTechnicalMetadata}
 	<div class="overlay">
 		<p>
 			{feature} est en cours de développement pour les appareils mobiles. En attendant, veuillez
