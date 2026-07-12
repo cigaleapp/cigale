@@ -1,6 +1,7 @@
 <script lang="ts">
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import { IsMobile } from '$lib/mobile.svelte.js';
+
 	import { getSettings } from './settings.svelte.js';
 
 	interface Props {
