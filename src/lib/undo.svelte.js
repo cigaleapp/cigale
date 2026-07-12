@@ -70,13 +70,13 @@ const OPERATION_REWINDERS = {
 
 class UndoStack {
 	/** @type {UndoableOperation[]} */
-	stack = [];
+	stack = $state([]);
 
 	/**
 	 * Stores undone operations for redo functionality
 	 * @type {UndoableOperation[]}
 	 */
-	graveyard = [];
+	graveyard = $state([]);
 
 	/** @type {Partial<{ [K in UndoableOperationName]: UndoHandler<K> }>} */
 	handlers = {};
@@ -119,6 +119,8 @@ class UndoStack {
 		}
 	}
 
+	canPop = $derived(this.stack.length > 0);
+
 	pop() {
 		const operation = this.stack.pop();
 		if (!operation) {
@@ -130,6 +132,8 @@ class UndoStack {
 
 		return this.#handle(operation);
 	}
+
+	canRewind = $derived(this.graveyard.length > 0);
 
 	rewind() {
 		const operation = this.graveyard.pop();

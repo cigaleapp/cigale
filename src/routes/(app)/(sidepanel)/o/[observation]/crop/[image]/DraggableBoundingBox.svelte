@@ -1,43 +1,41 @@
-<script>
+<script lang="ts">
+	import type { Zoom } from './zoom.svelte.js';
+
 	import { watch } from 'runed';
 	import { tick } from 'svelte';
 
-	import { coordsScaler, withinBoundingBox } from './BoundingBoxes.svelte.js';
+	import { page } from '$app/state';
+	import { coordsScaler, withinBoundingBox } from '$lib/BoundingBoxes.svelte.js';
+	import { imageIdToFileId } from '$lib/images.js';
+	import { isDebugMode } from '$lib/settings.svelte.js';
+	import { Fingers } from '$lib/touch/fingers.svelte.js';
+	import { mapValues } from '$lib/utils.js';
+
 	import { fittedImageRect, NewBoundingBox } from './DraggableBoundingBox.svelte.js';
-	import { imageIdToFileId } from './images.js';
-	import { isDebugMode } from './settings.svelte.js';
-	import { mapValues } from './utils.js';
 
-	/**
-	 * @import { ZoomState } from './DraggableBoundingBox.svelte.js';
-	 */
+	interface Rect {
+		x: number;
+		y: number;
+		width: number;
+		height: number;
+	}
 
-	/**
-	 * @typedef Rect
-	 * @type {object}
-	 * @property {number} x
-	 * @property {number} y
-	 * @property {number} width
-	 * @property {number} height
-	 */
+	interface Props {
+		boundingBoxes: Record<string, Rect>;
+		imageElement: HTMLImageElement;
+		// eslint-disable-next-line no-unused-vars
+		onchange: (imageId: string, box: Rect) => Promise<unknown>;
+		// eslint-disable-next-line no-unused-vars
+		oncreate: (box: Rect) => Promise<string | null> | string | null;
+		transformable: boolean;
+		cursor?: string;
+		createMode: 'clickanddrag' | '2point' | '4point' | 'off';
+		movable: boolean;
+		disabled?: boolean;
+		zoom: Zoom;
+		imageFileID?: string;
+	}
 
-	/**
-	 * @typedef Props
-	 * @type {object}
-	 * @property {Record<string, Rect>} boundingBoxes maps image IDs to bounding boxes with relative, top-left coordinates
-	 * @property {HTMLImageElement} imageElement
-	 * @property {(imageId: string, box: Rect) => void} onchange - called when a bounding box is changed. The imageId is the ID of the associated Image
-	 * @property {(box: Rect) => Promise<string|null> | string|null} oncreate - called when a new bounding box is created. Must return the ID of the new associated Image
-	 * @property {boolean} transformable if true, the bounding boxes' sides or corners can be dragged
-	 * @property {string} [cursor=unset] - CSS cursor to use when hovering over the change area
-	 * @property {'clickanddrag'|'2point'|'4point'|'off'} createMode
-	 * @property {boolean} movable if true, the bounding boxes can be moved by dragging in its inside
-	 * @property {boolean} [disabled=false] - if true, the bounding boxes are inert. Useful while panning
-	 * @property {ZoomState} zoom - current zoom&pan state
-	 * @property {string} [imageFileID] only keep bounding boxes tied to images from this ImageFile
-	 */
-
-	/**  @type {Props} */
 	let {
 		boundingBoxes: boundingBoxesInitial,
 		cursor,
@@ -50,7 +48,7 @@
 		createMode,
 		zoom,
 		imageFileID,
-	} = $props();
+	}: Props = $props();
 
 	// Using a writable $derived here causes the state to not update until onmouseup, idk why
 	let boundingBoxes = $state(boundingBoxesInitial);
@@ -69,9 +67,11 @@
 	let naturalHeight = $state(imageElement.naturalHeight);
 
 	/**
-	 * @type {HTMLDivElement}
+	 * Number of fingers we're currently holding down.
 	 */
-	let changeAreaRef = $state();
+	const fingers = new Fingers();
+
+	let changeAreaRef = $state<HTMLDivElement>();
 
 	const refreshImageRect = async () => {
 		if (!imageElement) return;
@@ -134,7 +134,8 @@
 		})
 	);
 
-	const boundingBoxesPixels = $derived(mapValues(boundingBoxes, toPixel));
+	// eslint-disable-next-line no-unused-vars
+	const boundingBoxesPixels = $derived(mapValues(boundingBoxes, toPixel as (box: Rect) => Rect));
 
 	let creatingBoundingBox = $state(false);
 	let newBoundingBox = $derived(
@@ -178,15 +179,13 @@
 			this.bottomleft = value;
 			this.bottomright = value;
 		},
-		/** @param {boolean} value */
-		setAll(value) {
+		setAll(value: boolean) {
 			this.topleft = value;
 			this.topright = value;
 			this.bottomleft = value;
 			this.bottomright = value;
 		},
-		/** @param {boolean} value  */
-		isAll(value) {
+		isAll(value: boolean) {
 			return (
 				this.topleft === value &&
 				this.topright === value &&
@@ -195,10 +194,19 @@
 			);
 		},
 	});
+
+	$effect(() => {
+		if (fingers.none && createMode === 'clickanddrag') {
+			draggingCorner.setAll(false);
+			creatingBoundingBox = false;
+			newBoundingBox.reset();
+		}
+	});
 </script>
 
 <svelte:window
-	onmousemove={({ target }) => {
+	// Handles cancellation when dragging out of bounds
+	onpointermove={({ target }) => {
 		if (!(target instanceof Element)) return;
 		if (!creatingBoundingBox) return;
 		if (createMode !== 'clickanddrag') return;
@@ -206,6 +214,7 @@
 		if (target.closest('.change-area') !== changeAreaRef) {
 			// Bail out if we were dragging a new bounding box, but we left the image (change area)
 			console.warn('Dragging has gone outside change area, bailing out. Target is', target);
+			fingers.reset();
 			draggingCorner.setAll(false);
 			creatingBoundingBox = false;
 			newBoundingBox.reset();
@@ -224,12 +233,13 @@
 	style:width="{imageRect.width}px"
 	style:height="{imageRect.height}px"
 	style:cursor
-	onmouseup={async ({ button }) => {
+	onpointerup={async ({ button }) => {
 		if (disabled) return;
-		// React to left mouse button only
-		if (button !== 0) return;
+		// Don't react to mousewheel clicks, those pan around
+		if (button === 1) return;
 
 		draggingCorner.setAll(false);
+
 		if (creatingBoundingBox && newBoundingBox.ready) {
 			const relativeBoundingBox = fromPixel(newBoundingBox.rect());
 			const imageId = await oncreate?.(relativeBoundingBox);
@@ -237,14 +247,14 @@
 			newBoundingBox.reset();
 			creatingBoundingBox = false;
 		} else {
-			onchange?.(draggingImageId, boundingBoxes[draggingImageId]);
+			await onchange?.(draggingImageId, boundingBoxes[draggingImageId]);
 		}
 		draggingImageId = '';
 	}}
-	onmousedown={({ clientX, clientY, currentTarget, button }) => {
+	onpointerdown={({ clientX, clientY, currentTarget, button }) => {
 		if (disabled) return;
-		// React to left mouse button only
-		if (button !== 0) return;
+		// Don't react to mousewheel clicks, those pan around
+		if (button === 1) return;
 
 		if (createMode === 'off') return;
 		// Using offset{X,Y} is wrong when pointer is inside the boundingbox, see https://stackoverflow.com/a/35364901
@@ -259,10 +269,14 @@
 		creatingBoundingBox = true;
 		newBoundingBox.registerPoint(x, y);
 	}}
-	onmousemove={({ movementX, movementY, button }) => {
+	// Handles starting an interaction
+	onpointermove={({ movementX, movementY, button }) => {
+		// Multi-finger gestures are not handled here
+		// but rather at CropSurface, since it's for zooming & panning around
+		if (fingers.multiple) return;
 		if (disabled) return;
-		// React to left mouse button only
-		if (button !== 0) return;
+		// Don't react to mousewheel clicks, those pan around
+		if (button === 1) return;
 
 		const { x: dx, y: dy } = fromPixel({ x: movementX, y: movementY, w: 0, h: 0 });
 
@@ -328,15 +342,15 @@
 >
 	{#if isDebugMode()}
 		<code class="debug" style:color="red">
-			{#snippet point(x, y)}
+			{fingers.count} fingers <br />
+			{#snippet point(x: number, y: number)}
 				{Math.round(x)} {Math.round(y)}
 			{/snippet}
-			{#snippet bb({ x, y, width, height })}
+			{#snippet bb({ x, y, width, height }: Rect)}
 				({@render point(x, y)}) × [{@render point(width, height)}]
 			{/snippet}
-			bbs <br />
 			{#each Object.entries(boundingBoxesPixels) as [imageId, box] (imageId)}
-				@{imageId} {@render bb(box)}<br />
+				@{imageId.replace(`${page.params.image}_`, '')} {@render bb(box)}<br />
 			{/each}
 			create {newBoundingBox.ready ? 'ready ' : ''}
 			{#if createMode === 'clickanddrag'}
@@ -380,25 +394,31 @@
 			style:top="{box.y}px"
 			style:width="{box.width}px"
 			style:height="{box.height}px"
-			onmousedown={({ button }) => {
-				if (button !== 0) return;
+			onpointerdown={() => {
 				if (disabled) return;
+
 				draggingImageId = imageId;
 				if (movable) draggingCorner.setAll(true);
 			}}
 		>
-			{#snippet side(/** @type {'top'|'bottom'|'left'|'right'} */ position)}
+			{#snippet side(
+				/** @type {'top'|'bottom'|'left'|'right'} */ position:
+					'top' | 'bottom' | 'left' | 'right'
+			)}
 				<div
 					class="side {position}"
 					class:draggable={transformable}
 					class:dragging={draggingCorner[position] && draggingImageId === imageId}
-					onmousedown={(e) => {
-						if (e.button !== 0) return;
+					onpointerdown={(e) => {
 						if (disabled) return;
 						if (!transformable) return;
+						// Don't react to mousewheel clicks, those pan around
+						if (e.button === 1) return;
+
 						draggingImageId = imageId;
 						draggingCorner[position] = true;
 						e.stopPropagation();
+						fingers.register(e);
 					}}
 				></div>
 			{/snippet}
@@ -407,18 +427,23 @@
 			{@render side('left')}
 			{@render side('right')}
 
-			{#snippet corner(/** @type {`${'top'|'bottom'}${'left'|'right'}`} */ position)}
+			{#snippet corner(
+				/** @type {`${'top'|'bottom'}${'left'|'right'}`} */ position: `${'top' | 'bottom'}${'left' | 'right'}`
+			)}
 				<div
 					class="corner {position}"
 					class:draggable={transformable}
 					class:dragging={draggingCorner[position] && draggingImageId === imageId}
-					onmousedown={(e) => {
-						if (e.button !== 0) return;
+					onpointerdown={(e) => {
 						if (disabled) return;
 						if (!transformable) return;
+						// Don't react to mousewheel clicks, those pan around
+						if (e.button === 1) return;
+
 						draggingImageId = imageId;
 						draggingCorner[position] = true;
 						e.stopPropagation();
+						fingers.register(e);
 					}}
 				></div>
 			{/snippet}
@@ -433,10 +458,17 @@
 <style>
 	.change-area {
 		position: absolute;
+		/* After some time, dragging becomes a scroll touch-action by default */
+		/* See https://stackoverflow.com/questions/70482399/pointerevent-stops-firing-after-a-short-time */
+		touch-action: none;
 	}
 
 	.change-area.debug {
 		outline: 5px dashed red;
+
+		.debug {
+			background: rgba(0 0 0 / 0.66);
+		}
 	}
 
 	.boundingbox {

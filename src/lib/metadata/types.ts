@@ -9,8 +9,8 @@ import { ensureArray } from '../utils.js';
 
 export type TypedMetadataValue<Type extends DB.MetadataType = DB.MetadataType> = Omit<
 	DB.MetadataValue,
-	'value'
-> & { value: RuntimeValue<Type> };
+	'value' | 'alternatives'
+> & { value: RuntimeValue<Type>; alternatives: Array<RuntimeValue<Type>> };
 
 export type RuntimeValuesPerType = { [K in DB.MetadataType]: RuntimeValue<K> };
 

@@ -1502,3 +1502,95 @@ if (import.meta.vitest) {
 		expect([...arrayBufferContents(buf)]).toStrictEqual([6, 7, 6, 7, 12, 13]);
 	});
 }
+
+/**
+ * Returns a cleanup function that reverts styles back
+ *
+ * Usage:
+ *
+ * ```js
+ * $effect(overrideStyle("selector", "property-with-dashes", value))
+ * ```
+ *
+ * You can target multiple elements, querySelectorAll is used
+ */
+export function overrideStyle(selector: string, property: string, value: string) {
+	return () => {
+		const targets = [...document.querySelectorAll(selector)].filter(
+			(node) => node instanceof HTMLElement
+		);
+
+		const original = new Map<HTMLElement, string>();
+
+		for (const target of targets) {
+			original.set(target, target.style.getPropertyValue(property));
+			target.style.setProperty(property, value);
+		}
+
+		return () => {
+			for (const target of targets) {
+				const value = original.get(target);
+				if (value) target.style.setProperty(property, value);
+			}
+		};
+	};
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+
+	test('overrideStyle', () => {
+		const bonjour = document.createElement('a');
+		bonjour.classList.add('bonjour');
+		bonjour.style.background = 'blue';
+		document.body.appendChild(bonjour);
+
+		const overrider = overrideStyle('.bonjour', 'background', 'red');
+
+		expect(bonjour.style.background).toBe('blue');
+
+		const cleanup = overrider();
+
+		expect(bonjour.style.background).toBe('red');
+
+		cleanup();
+
+		expect(bonjour.style.background).toBe('blue');
+	});
+}
+
+export function* iterateDOMList<T>(domlist: {
+	item: (i: number) => T | null;
+	length: number;
+}): Iterable<T> {
+	for (let i = 0; i < domlist.length; i++) {
+		const item = domlist.item(i);
+		if (item) yield item;
+	}
+}
+
+if (import.meta.vitest) {
+	const { test, expect, describe } = import.meta.vitest;
+
+	describe('iterateDOMList', () => {
+		const domlist = <T>(arr: T[]) => ({
+			length: arr.length,
+			item(i: number) {
+				return arr[i];
+			},
+		});
+
+		test('empty', () => {
+			expect([...iterateDOMList(domlist([]))]).toStrictEqual([]);
+		});
+
+		test('non-empty', () => {
+			expect([...iterateDOMList(domlist([4, 86, 48, 'feur']))]).toStrictEqual([
+				4,
+				86,
+				48,
+				'feur',
+			]);
+		});
+	});
+}

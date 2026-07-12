@@ -131,6 +131,7 @@ const Settings = table(
 		id: '"defaults" | "user"',
 		protocols: References,
 		submitIssuesVia: '"form" | "github" = "form"',
+		cropperSidebarCollapsed: 'boolean = false',
 		sessionsDirectory: type({
 			platform: type.enumerated('local', 'kobotoolbox'),
 			account: 'string | undefined',

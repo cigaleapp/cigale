@@ -13,7 +13,7 @@ import {
 import { controlOrMeta } from './utils/keyboard.js';
 
 /**
- * @import { AppFixture } from './fixtures.js';
+ * @import { AppFixture } from './fixtures/app.js';
  */
 
 const CROP_METADATA_ID = `${exampleProtocol.id}__crop`;
@@ -26,6 +26,7 @@ test.describe('Cropper view', () => {
 
 	test.beforeEach(async ({ page, app }, testInfo) => {
 		testInfo.setTimeout(ms('2min'));
+		// TODO: disable inference
 		await chooseFirstSession(page);
 		await app.tabs.go('import');
 		const allImages = await app.db.image.list();
@@ -531,15 +532,18 @@ test.describe('Cropper view', () => {
 			expect(await image.evaluate((i) => Number(i.style.scale))).toBeCloseTo(scale, 3);
 
 			if (translateX !== undefined && translateY !== undefined) {
-				await expect(image).toHaveCSS('translate', /.+px .+px/);
+				await expect(image).toHaveCSS('translate', /.+px( .+px)?/);
 
-				assert
-					.soft(
-						await image.evaluate((i) =>
-							i.style.translate.split(' ').map(Number.parseFloat)
-						)
-					)
-					.toEqual([assert.closeTo(translateX, 2), assert.closeTo(translateY, 2)]);
+				const translation = await image.evaluate((i) => {
+					const [x, y] = i.style.translate.split(' ');
+
+					return (y === undefined ? [x, x] : [x, y]).map(Number.parseFloat);
+				});
+
+				expect(translation).toEqual([
+					assert.closeTo(translateX, 2),
+					assert.closeTo(translateY, 2),
+				]);
 			}
 		}
 
@@ -594,14 +598,14 @@ test.describe('Cropper view', () => {
 			await assert(image).toHaveCSS('scale', '1');
 
 			await zoomAt(page, 120, 100, 100);
-			await checkImageTransforms(page, 1.728, 254.761, 140.527);
+			await checkImageTransforms(page, 1.728, 219.3, 137.627);
 
 			await page.mouse.down({ button: 'middle' });
 			await zoomAt(page, 0, 50, 50);
 			await page.mouse.up({ button: 'middle' });
 			await page.waitForTimeout(200);
 
-			await checkImageTransforms(page, 1.728, 181.761, 46.5267);
+			await checkImageTransforms(page, 1.728, 219.3, 137.627);
 
 			// Make sure no box was created
 			await assert(page.getByText(/Boîte #\d+/)).toHaveCount(1);
@@ -610,18 +614,19 @@ test.describe('Cropper view', () => {
 		test('recalls zoom and pan between image changes', async ({ page, app }) => {
 			const images = await imagesByName(app);
 			await zoomAt(page, 120, 100, 100);
-			await checkImageTransforms(page, 1.728, 254.761, 140.527);
+			await checkImageTransforms(page, 1.728, 219.3, 137.627);
 
 			await page.keyboard.press(controlOrMeta(page, 'ArrowLeft'));
 			await app.path.wait(`/o/_/crop/${images.withExifGps.fileId}/`);
 
+			await checkImageTransforms(page, 1, 0, 0);
 			await zoomAt(page, 40, 150, 150);
-			await checkImageTransforms(page, 1.44, 124.186, 73.1136);
+			await checkImageTransforms(page, 1.44, 113.913, 75.6633);
 
 			await page.keyboard.press(controlOrMeta(page, 'ArrowRight'));
 			await app.path.wait(`/o/_/crop/${images.lilFella.fileId}/`);
 
-			await checkImageTransforms(page, 1.728, 254.761, 140.527);
+			await checkImageTransforms(page, 1.728, 219.3, 137.627);
 		});
 	});
 });

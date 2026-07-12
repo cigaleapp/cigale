@@ -1,6 +1,7 @@
 import { describe, expect, it, test } from 'vitest';
 
 import { fittedImageRect, NewBoundingBox } from './DraggableBoundingBox.svelte.js';
+import { Zoom } from './zoom.svelte.js';
 
 describe('fittedImageRect', () => {
 	test('naturalWidth < naturalHeight', () => {
@@ -97,12 +98,12 @@ describe('fittedImageRect', () => {
 				clientTop: 0,
 				clientLeft: 0,
 			},
-			{
+			new Zoom({
 				origin: { x: 0, y: 0 },
 				scale: 2,
 				panning: false,
 				panStart: { x: 0, y: 0, zoomOrigin: { x: 0, y: 0 } },
-			}
+			})
 		);
 		expect(rect).toMatchInlineSnapshot(`
 				{
@@ -124,12 +125,12 @@ describe('fittedImageRect', () => {
 				clientTop: 0,
 				clientLeft: 0,
 			},
-			{
+			new Zoom({
 				origin: { x: 0, y: 0 },
 				scale: 2,
 				panning: false,
 				panStart: { x: 0, y: 0, zoomOrigin: { x: 0, y: 0 } },
-			}
+			})
 		);
 		expect(rect).toMatchInlineSnapshot(`
 				{
@@ -151,12 +152,12 @@ describe('fittedImageRect', () => {
 				clientTop: 10,
 				clientLeft: 20,
 			},
-			{
+			new Zoom({
 				origin: { x: 0, y: 0 },
 				scale: 2,
 				panning: false,
 				panStart: { x: 0, y: 0, zoomOrigin: { x: 0, y: 0 } },
-			}
+			})
 		);
 		expect(rect).toMatchInlineSnapshot(`
 				{

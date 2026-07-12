@@ -1,43 +1,27 @@
+import type { Zoom } from './zoom.svelte.js';
+import type { Rect } from '$lib/BoundingBoxes.svelte.js';
+
 import { type } from 'arktype';
 
-import { clamp, sign } from './utils.js';
-
-/**
- * Represents the zoom state of the image.
- * x & y coordinates are in pixels of the resized, post-object-fit but pre-zoom image
- * @typedef {object} ZoomState
- * @property {object} origin
- * @property {number} origin.x
- * @property {number} origin.y
- * @property {number} scale
- * @property {boolean} panning
- * @property {object} panStart
- * @property {number} panStart.x
- * @property {number} panStart.y
- * @property {object} panStart.zoomOrigin
- * @property {number} panStart.zoomOrigin.x
- * @property {number} panStart.zoomOrigin.y
- */
-
-/**
- * @type {ZoomState}
- */
-export const INITIAL_ZOOM_STATE = {
-	origin: { x: 0, y: 0 },
-	scale: 1,
-	panning: false,
-	panStart: { x: 0, y: 0, zoomOrigin: { x: 0, y: 0 } },
-};
+import { clamp, sign } from '$lib/utils.js';
 
 /**
  * Calculate bounding rect for an image element that has object-fit: contain. The boundingClientRect is not the same as the actual, displayed image. We use both natural{Width,Height} and client{Width,Height} to calculate the displayed image size.
  * You can also provide the zoom state to take it into account.
- * @param {Pick<HTMLImageElement, `${'natural'|'client'}${'Width'|'Height'}` | `client${'Top'|'Left'}`>} imageElement
- * @param {ZoomState} [zoomState] take into account the zoom state of the image
  */
 export function fittedImageRect(
-	{ naturalWidth, naturalHeight, clientWidth, clientHeight, clientTop, clientLeft },
-	zoomState
+	{
+		naturalWidth,
+		naturalHeight,
+		clientWidth,
+		clientHeight,
+		clientTop,
+		clientLeft,
+	}: Pick<
+		HTMLImageElement,
+		`${'natural' | 'client'}${'Width' | 'Height'}` | `client${'Top' | 'Left'}`
+	>,
+	zoom: Zoom | undefined
 ) {
 	const naturalRatio = naturalWidth / naturalHeight;
 	const clientRatio = clientWidth / clientHeight;
@@ -47,54 +31,48 @@ export function fittedImageRect(
 			? [clientHeight * naturalRatio, clientHeight]
 			: [clientWidth, clientWidth / naturalRatio];
 
-	if (zoomState) {
-		width *= zoomState.scale;
-		height *= zoomState.scale;
+	if (zoom) {
+		width *= zoom.scale;
+		height *= zoom.scale;
 	}
 
 	return {
 		width,
 		height,
-		x: (zoomState?.origin.x ?? 0) + clientLeft + (clientWidth - width) / 2,
-		y: (zoomState?.origin.y ?? 0) + clientTop + (clientHeight - height) / 2,
+		x: (zoom?.origin.x ?? 0) + clientLeft + (clientWidth - width) / 2,
+		y: (zoom?.origin.y ?? 0) + clientTop + (clientHeight - height) / 2,
 	};
 }
 
 export class NewBoundingBox {
 	/**
-	 * @type {import('./BoundingBoxes.svelte').Rect}
 	 * Limits for the resulting bounding box. Coordinates will be clamped to these values.
 	 */
-	limits = {
+	limits: Rect = {
 		x: 0,
 		y: 0,
 		width: 0,
 		height: 0,
 	};
 
-	/** @type {'clickanddrag' | '2point' | '4point'|'off'} */
-	createMode = $state('clickanddrag');
+	createMode = $state<'clickanddrag' | '2point' | '4point' | 'off'>('clickanddrag');
 
-	/** @param {'clickanddrag' | '2point' | '4point'|'off'} mode */
-	setCreateMode(mode) {
+	setCreateMode(mode: typeof this.createMode) {
 		this.createMode = mode;
 	}
 
-	/** @type {import('./BoundingBoxes.svelte').Rect & { dragDirection: {x:-1|0|1, y:-1|0|1} }} */
 	clickanddrag = $state({
 		x: 0,
 		y: 0,
 		width: 0,
 		height: 0,
-		// -1 or 1
 		dragDirection: {
-			x: 0,
-			y: 0,
+			x: 0 as -1 | 0 | 1,
+			y: 0 as -1 | 0 | 1,
 		},
 	});
 
-	/** @type {Array<{x: number; y: number}>}  */
-	points = $state([]);
+	points = $state([] as Array<{ x: number; y: number }>);
 
 	/**
 	 * The bounding box has enough data to be created
@@ -120,12 +98,7 @@ export class NewBoundingBox {
 		return false;
 	});
 
-	/**
-	 *
-	 * @param {import('./BoundingBoxes.svelte').Rect} rect
-	 * @returns {import('./BoundingBoxes.svelte').Rect}
-	 */
-	clamp(rect) {
+	clamp(rect: Rect): Rect {
 		return {
 			x: clamp(rect.x, this.limits.x, this.limits.width),
 			y: clamp(rect.y, this.limits.y, this.limits.height),
@@ -163,10 +136,8 @@ export class NewBoundingBox {
 	 * clickanddrag: sets x, y
 	 * 2point: sets x1, y1 then x2, y2
 	 * 4point: sets topleft, topright, bottomright, bottomleft
-	 * @param {number} x
-	 * @param {number} y
 	 */
-	registerPoint(x, y) {
+	registerPoint(x: number, y: number) {
 		if (this.createMode === 'off') {
 			return;
 		}
@@ -179,11 +150,7 @@ export class NewBoundingBox {
 		this.points.push({ x, y });
 	}
 
-	/**
-	 * @param {number} dx (MouseEvent).movementX
-	 * @param {number} dy (MouseEvent).movementY
-	 */
-	registerMovement(dx, dy) {
+	registerMovement(dx: number, dy: number) {
 		if (this.createMode !== 'clickanddrag') return;
 
 		const { width, height } = this.clickanddrag;
@@ -246,12 +213,7 @@ export class NewBoundingBox {
 		this.points = [];
 	}
 
-	/**
-	 *
-	 * @param {object} options
-	 * @param {typeof this.limits} options.limits
-	 */
-	constructor({ limits }) {
+	constructor({ limits }: { limits: Rect }) {
 		this.limits = limits;
 		this.clickanddrag = {
 			x: 0,
