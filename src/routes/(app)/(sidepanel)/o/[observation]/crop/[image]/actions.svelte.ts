@@ -177,7 +177,7 @@ export async function onCropChange({
 			// Put the neural-network-inferred (initial) value in the alternatives as a backup
 			confidences: initialCrops[imageId] ? [initialCrops[imageId]] : [],
 			manuallyModified: true,
-			confirmed: true
+			confirmed: true,
 		});
 	} else if (
 		currentImages().length === 1 &&

@@ -28,7 +28,7 @@ However, just accessing the site won't work: the app depends on Web APIs that on
 You can either:
 
 - Set the environment variable `HTTPS_DEV` to "true" and re-launch the dev server, but HMR (hot module replacement, the fact that the page changes when the code changes without reloading it) will not work
-- Tell your browser to make an exception and treat the `http://192.168.1.N:5173`  origin as a Secure Origin. In Chrome, you can use [the `unsafely-treat-insecure-origin-as-secure`](chrome://flags/#unsafely-treat-insecure-origin-as-secure). Don't forge the port (5173) when entering the origin.
+- Tell your browser to make an exception and treat the `http://192.168.1.N:5173` origin as a Secure Origin. In Chrome, you can use [the `unsafely-treat-insecure-origin-as-secure`](chrome://flags/#unsafely-treat-insecure-origin-as-secure). Don't forge the port (5173) when entering the origin.
 
 The mobile app can be tested without having to go through all of this: Capacitor handles the fact that the network-local IP address is HTTP. Just grab the preview APK from your PR that is a draft or has the `capacitor-live-reload` label set.
 

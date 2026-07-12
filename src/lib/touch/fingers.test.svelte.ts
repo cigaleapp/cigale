@@ -25,8 +25,12 @@ describe('Fingers', () => {
 			fingers = new Fingers(inside);
 		});
 
-		fingers.register(new PointerEvent('pointerdown', { pointerId: 11, clientX: 1, clientY: 2 }));
-		fingers.register(new PointerEvent('pointerdown', { pointerId: 22, clientX: 3, clientY: 4 }));
+		fingers.register(
+			new PointerEvent('pointerdown', { pointerId: 11, clientX: 1, clientY: 2 })
+		);
+		fingers.register(
+			new PointerEvent('pointerdown', { pointerId: 22, clientX: 3, clientY: 4 })
+		);
 
 		expect(fingers.count).toBe(2);
 		expect(fingers.multiple).toBe(true);
