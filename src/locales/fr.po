@@ -32,7 +32,7 @@ msgid "<0/> Rééssayer"
 msgstr "<0/> Rééssayer"
 
 #: src/lib/CardMedia.svelte
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/Boxes.svelte
 #: src/routes/(app)/capture/gallery/+page.svelte
 #: src/routes/(app)/protocols/RowProtocol.svelte
 #: src/routes/(app)/protocols/[id]/+layout.svelte
@@ -88,7 +88,7 @@ msgstr "Analyse…"
 #: src/lib/ModalConfirmDeletion.svelte
 #: src/lib/toasts.svelte.js
 #: src/lib/undo.svelte.js
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/Toolbar.svelte
 #: src/routes/(app)/protocols/ModalCreateProtocol.svelte
 msgid "Annuler"
 msgstr "Annuler"
@@ -1340,7 +1340,7 @@ msgid "Arborescence"
 msgstr "Arborescence"
 
 #: src/lib/undo.svelte.js
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/Toolbar.svelte
 msgid "Rétablir"
 msgstr "Rétablir"
 
@@ -2314,90 +2314,27 @@ msgstr "Candidats <0/>"
 msgid "Recadrer {0}"
 msgstr "Recadrer {0}"
 
-#. 0: imageId
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
-msgid "L'image {0} n'a pas de recadrage alternatif, impossible de revenir au recadrage d'origine"
-msgstr "L'image {0} n'a pas de recadrage alternatif, impossible de revenir au recadrage d'origine"
-
-#. 0: imageId
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
-msgid "Impossible de trouver l'image {0} pour la confirmer"
-msgstr "Impossible de trouver l'image {0} pour la confirmer"
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
-msgid "Supprimer l’image"
-msgstr "Supprimer l’image"
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
-msgid "Activer/désactiver la continuation automatique"
-msgstr "Activer/désactiver la continuation automatique"
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/Boxes.svelte
 msgid "Supprimer la boîte sélectionnée"
 msgstr "Supprimer la boîte sélectionnée"
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
-msgid "Cacher les boîtes non sélectionnées"
-msgstr "Cacher les boîtes non sélectionnées"
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
-msgid "Revenir au recadrage d'origine"
-msgstr "Revenir au recadrage d'origine"
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
-msgid "Revenir au recadrage d'origine pour toutes les boîtes"
-msgstr "Revenir au recadrage d'origine pour toutes les boîtes"
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
-msgid "Zoomer"
-msgstr "Zoomer"
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
-msgid "Dézoomer"
-msgstr "Dézoomer"
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
-msgid "Réinitialiser le zoom"
-msgstr "Réinitialiser le zoom"
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
-msgid "Sélectionner la boîte précédente"
-msgstr "Sélectionner la boîte précédente"
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
-msgid "Sélectionner la boîte suivante"
-msgstr "Sélectionner la boîte suivante"
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
-msgid "Entrer des coordonnées de boîte"
-msgstr "Entrer des coordonnées de boîte"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
 msgid "Le recadrage"
 msgstr "Le recadrage"
 
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
-msgid "Chargement de l'image…"
-msgstr "Chargement de l'image…"
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
-msgid "coucou toi :) <0/> passes une bonne journée ! 💖💖"
-msgstr "coucou toi :) <0/> passes une bonne journée ! 💖💖"
-
 #. 0: tool.name
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/Toolbar.svelte
 msgid "Choisir l'outil {0}"
 msgstr "Choisir l'outil {0}"
 
 #. 0: i + 1
 #. 0: i + 1
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/Boxes.svelte
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/Boxes.svelte
 msgid "Boîte #{0}"
 msgstr "Boîte #{0}"
 
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/Boxes.svelte
 msgid "Sélectionnez une boîte avec 1 à 9 pour la modifier avec des raccourcis clavier"
 msgstr "Sélectionnez une boîte avec 1 à 9 pour la modifier avec des raccourcis clavier"
 
@@ -2457,7 +2394,7 @@ msgstr "Marquer l'{0} comme confirmée et passer à la prochaine non confirmée"
 msgid "Bien joué! Toutes les observations ont été recadrés, classifiées et confirmées… place à l'export des résultats 🥳"
 msgstr "Bien joué! Toutes les observations ont été recadrés, classifiées et confirmées… place à l'export des résultats 🥳"
 
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/Boxes.svelte
 msgid "<0/> Réinitialiser"
 msgstr "<0/> Réinitialiser"
 
@@ -3004,3 +2941,19 @@ msgstr "Télécharger l'app mobile"
 #: src/routes/(external)/apk/+page.svelte
 msgid "Version du code natif"
 msgstr "Version du code natif"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/Toolbar.svelte
+msgid "Afficher la liste des boîtes"
+msgstr "Afficher la liste des boîtes"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/Toolbar.svelte
+msgid "Masquer la liste des boîtes"
+msgstr "Masquer la liste des boîtes"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/CropSurface.svelte
+msgid "Chargement de l'image…"
+msgstr "Chargement de l'image…"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/CropSurface.svelte
+msgid "coucou toi :) <0/> passes une bonne journée ! 💖💖"
+msgstr "coucou toi :) <0/> passes une bonne journée ! 💖💖"
