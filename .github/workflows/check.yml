@@ -2,7 +2,7 @@ name: Checks
 
 on:
   pull_request:
-    types: [synchronize, closed, converted_to_draft, ready_for_review, unlabeled, labeled]
+    types: [opened, synchronize, closed, converted_to_draft, ready_for_review, unlabeled, labeled]
   push:
     branches: [main]
 
