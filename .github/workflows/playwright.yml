@@ -32,6 +32,22 @@ on:
           - DEBUG_WORKERS=true: show logs when web workers are created/closed
         required: false
         default: ''
+    outputs:
+      total:
+        value: ${{ jobs.combine-reports.outputs.total }}
+        description: Total number of tests than ran
+      failed:
+        value: ${{ jobs.combine-reports.outputs.failed }}
+        description: Failed tests count
+      flaky:
+        value: ${{ jobs.combine-reports.outputs.flaky }}
+        description: Flaky tests count
+      successful:
+        value: ${{ jobs.combine-reports.outputs.successful }}
+        description: Successful tests count
+      skipped:
+        value: ${{ jobs.combine-reports.outputs.skipped }}
+        description: Skipped tests count
 
 env:
   ELECTRON_SKIP_BINARY_DOWNLOAD: 'true'
@@ -185,6 +201,12 @@ jobs:
     # run even if tests fail
     if: ${{ !cancelled() }}
     name: Combine reports
+    outputs:
+      successful: ${{ steps.stats.outputs.successful }}
+      total: ${{ steps.stats.outputs.total }}
+      failed: ${{ steps.stats.outputs.failed }}
+      flaky: ${{ steps.stats.outputs.flaky }}
+      skipped: ${{ steps.stats.outputs.skipped }}
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
@@ -233,9 +255,23 @@ jobs:
           EOS
 
       - name: Merge sharded reports into HTML
-        run: bunx playwright merge-reports --reporter html ./playwright-report-shards
+        run: bunx playwright merge-reports --reporter html,json ./playwright-report-shards
         env:
           NODE_OPTIONS: --max-old-space-size=4096
+          PLAYWRIGHT_JSON_OUTPUT_NAME: combined.json
+
+      - name: Get stats
+        id: stats
+        run: |
+          function get {
+            jq .stat combined.json | jq $1
+          }
+
+          echo "total=$(get '.expected + .unexpected')" >> $GITHUB_OUTPUT
+          echo "failed=$(get .unexpected)" >> $GITHUB_OUTPUT
+          echo "flaky=$(get .flaky)" >> $GITHUB_OUTPUT
+          echo "successful=$(get .expected)" >> $GITHUB_OUTPUT
+          echo "skipped=$(get .skipped)" >> $GITHUB_OUTPUT
 
       - name: Put metrics.json alongside report for dev-deployments workflow to pick up
         run: mv metrics.json playwright-report/metrics.json
