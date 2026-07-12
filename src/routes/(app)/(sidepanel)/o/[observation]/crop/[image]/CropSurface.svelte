@@ -43,6 +43,16 @@
 	class="crop-surface"
 	{@attach (node) => {
 		new Gestures(node, {
+			// TODO: disabled cuz it triggers when grabbing a cropbox to move it around
+			// ondoubletap({ fingercount }) {
+			// 	if (fingercount === 2) {
+			// 		undo.pop();
+			// 	}
+
+			// 	if (fingercount === 3) {
+			// 		undo.rewind();
+			// 	}
+			// },
 			onpinch(event) {
 				if (!imageElement) return;
 

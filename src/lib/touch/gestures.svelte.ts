@@ -51,10 +51,19 @@ export class Gestures {
 	 */
 	#startingTouches = new SvelteMap<number, Touch>();
 
+	/**
+	 * Each tap is an array of touches
+	 */
+	#taps = [] as Touch[][];
+
 	#handle = (event: TouchEvent) => {
 		/** Length of the vector between the two points */
 		const distance = (...[p1, p2]: ClientPoint[]) =>
 			Math.hypot(p1.clientX - p2.clientX, p1.clientY - p2.clientY);
+
+		/** Ratio of distance to diagonal of screen */
+		const reldistance = (...[p1, p2]: ClientPoint[]) =>
+			distance(p1, p2) / Math.hypot(screen.width, screen.height);
 
 		/** Center of the given points */
 		const center = (points: ClientPoint[]) => ({
@@ -79,6 +88,22 @@ export class Gestures {
 					kind: 'panend',
 					source: event,
 				});
+			} else {
+				// No panning = no touchmove = its a tap
+				this.#taps.push([...this.#startingTouches.values()]);
+
+				// Handle double taps
+				if (this.#taps.length >= 2) {
+					const [first, second] = this.#taps;
+
+					if (reldistance(center(first), center(second)) < 0.1) {
+						this.handlers?.ondoubletap?.({
+							fingercount: Math.min(...this.#taps.map((tap) => tap.length)),
+							source: event,
+						});
+					}
+
+					this.#taps = [];
 				}
 			}
 
@@ -150,10 +175,18 @@ export class Gestures {
 			this.inside.addEventListener('touchend', handler);
 			this.inside.addEventListener('touchmove', handler);
 
+			// prevent default for two-finger-tap if we have a ondoubletap handler set
+			const preventDefault = (e: Event) => e.preventDefault();
+
+			if (this.handlers.ondoubletap) {
+				this.inside.addEventListener('contextmenu', preventDefault);
+			}
+
 			return () => {
 				this.inside.removeEventListener('touchstart', handler);
 				this.inside.removeEventListener('touchend', handler);
 				this.inside.removeEventListener('touchmove', handler);
+				this.inside.removeEventListener('contextmenu', preventDefault);
 			};
 		});
 	}
