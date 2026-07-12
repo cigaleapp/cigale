@@ -13,3 +13,7 @@ ios-native-changes:
       - renovate/capacitor-.*
       - renovate/capawesome-.*
       - renovate/capgo-.*
+
+notifications-off:
+  - head-branch:
+      - renovate/*

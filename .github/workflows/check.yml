@@ -283,3 +283,62 @@ jobs:
       artifact: apk-webpage
       path: /
       subdomain: apk
+
+  notify:
+    if: always() && !contains(github.event.pull_request.labels.*.name, 'notifications-off') && !github.event.pull_request.draft
+    name: Notify pushbullet channel
+    needs:
+      - lint
+      - test
+      - e2e
+      - is-mergeable
+      - dont-merge-comment
+
+    environment:
+      name: Pushbullet channel
+      url: https://www.pushbullet.com/channel?tag=cigale-pr-notifications
+
+    env:
+      TITLE: '👀 PR #${{ github.event.pull_request.number }} (${{ github.event.pull_request.head.ref }}) checks finished'
+      MESSAGE: ''
+      # https://www.pushbullet.com/channel?tag=cigale-pr-notifications
+      CHANNEL_TAG: cigale-pr-notifications
+
+    runs-on: ubuntu-latest
+    steps:
+      - if: needs.lint.result == 'failure'
+        run: echo "MESSAGE=Linting failed" >> $GITHUB_ENV
+      - if: needs.test.result == 'failure'
+        run: echo "MESSAGE=Unit tests failed" >> $GITHUB_ENV
+      - if: needs.e2e.result == 'failure'
+        run: |
+          echo "MESSAGE=E2E: ${{ needs.e2e.outputs.failed }} failed, ${{ needs.e2e.outputs.flaky }} flaky, ${{ needs.e2e.outputs.total }} total" >> $GITHUB_ENV
+      - if: needs.dont-merge-comment.result == 'failure'
+        run: echo "MESSAGE=Code has don't merge comments" >> $GITHUB_ENV
+      - if: needs.is-mergeable.result == 'success'
+        run: |
+          echo "TITLE=💚 PR #${{ github.event.pull_request.number }} (${{ github.event.pull_request.head.ref }}) is mergeable!" >> $GITHUB_ENV
+      - if: needs.is-mergeable.result != 'success'
+        run: |
+          echo "TITLE=💔 PR #${{ github.event.pull_request.number }} (${{ github.event.pull_request.head.ref }}) cannot be merged :(" >> $GITHUB_ENV
+
+      - run: |
+          URL="${{ github.event.pull_request._links.html.href }}"
+
+          document="$(cat <<EOD
+            {
+              "body": "$MESSAGE",
+              "title": "$TITLE",
+              "type": "link",
+              "url": "$URL",
+              "channel_tag": "$CHANNEL_TAG" 
+            }
+          EOD)"
+
+          echo "Sending $document"
+
+          curl --header 'Access-Token: ${{ secrets.PUSHBULLET_TOKEN }}' \
+            --header 'Content-Type: application/json' \
+            --data-binary "$document" \
+            --request POST \
+            https://api.pushbullet.com/v2/pushes
