@@ -285,7 +285,7 @@ jobs:
       subdomain: apk
 
   notify:
-    if: always() && !contains(github.event.pull_request.labels.*.name, 'notifications-off') && !github.event.pull_request.draft
+    if: github.event_name == 'pull_request' && !contains(github.event.pull_request.labels.*.name, 'notifications-off') && !github.event.pull_request.draft && !cancelled()
     name: Notify pushbullet channel
     needs:
       - lint
