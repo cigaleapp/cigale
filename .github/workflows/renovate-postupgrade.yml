@@ -6,6 +6,10 @@ on:
     # The 'branches' option filters on the *base* branch, not the head...
     # See https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#running-your-pull_request-workflow-based-on-the-head-or-base-branch-of-a-pull-request
 
+concurrency: 
+  group: renovate-postupgrade-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
   is-renovate:
     name: Is it a renovate PR?
