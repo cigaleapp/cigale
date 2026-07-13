@@ -10,23 +10,37 @@ All notable changes to this project will be documented in this file, on a monthl
 - Fix Lightbox content not being horizontally centered
 - Fix border radius for postion=top BottomDrawer
 - Fix missing spacing around bottom drawer group titles
+- Hide keyboard hint from ButtonSecondary[tight] if its also shown in its tooltip
 - Implement camera (active mode) to snap pictures directly!
+- Implement pinch to zoom and swipe to pan
 - Improve errors related to execution or validation of Jsonata expressions
+- Make boxes list in fullscreen cropper collapsible
+- Proper APK download page (#1867)
 - Remove click-on-empty-to-import (Closes #1840) (#1842)
+- Show on toolbar when undo/redo are not possible
+- Support touch screens for box creation & modification
 - Swipe-to-dismiss toasts (Closes #1498)
+- Use space word instead of the spacebar character in keyboard shortcuts (Closes #1876)
 
 ### Bug Fixes
 
 - Always enable results tab (Closes #1843)
+- Fix (probably) overscroll behavior x stuck to none after going to cropper
 - Fix ModalConfirm:show never resolving on mobile when tapping outside to close
+- Fix boxes list wasnt scrollable
 - Fix close button doesnt work in narrowing classifier (Closes #1829)
+- Fix cropper n-point creation tools
 - Fix exif data processing
 - Fix horizontal overflow on fullscreen cropper (Closes #1822)
 - Fix mobile tabbar not hidden on navbarAppearance=hidden pages
+- Fix mousewheel-drag-to-pan wasnt working anymore
+- Fix navigating to image without saved zoom state would not reset zoom
+- Fix update button on settings on mobile app
 - Ignore EXIF orientation (Fixes #1824)
 - Polyfill Uint8Array.{from,to}Base64
 - Polyfill newer Set methods (Closes #1794)
 - Run classification inferences per-subject sequentially
+- Use a different issue template for feature request button when submitting via github
 
 ### Data Updates
 
@@ -49,6 +63,7 @@ All notable changes to this project will be documented in this file, on a monthl
 - Add infer.neural.output.select to change selected values after inference
 - Allow explicitly marking which metadata are to be used for classification
 - Enable persistent storage, add storage manager
+- Generic storage backend: image storage (Closes #1728)
 - Handle empty session metadata forms
 - Handle non-browser environments in localeFromNavigator()
 - Ignore unknown metadata when cascading
