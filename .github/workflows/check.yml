@@ -286,7 +286,7 @@ jobs:
 
   notify:
     if: github.event_name == 'pull_request' && !contains(github.event.pull_request.labels.*.name, 'notifications-off') && !github.event.pull_request.draft && !cancelled()
-    name: Notify pushbullet channel
+    name: Push with Gotify
     needs:
       - lint
       - test
@@ -294,15 +294,9 @@ jobs:
       - is-mergeable
       - dont-merge-comment
 
-    environment:
-      name: Pushbullet channel
-      url: https://www.pushbullet.com/channel?tag=cigale-pr-notifications
-
     env:
       TITLE: '👀 PR #${{ github.event.pull_request.number }} (${{ github.event.pull_request.head.ref }}) checks finished'
       MESSAGE: ''
-      # https://www.pushbullet.com/channel?tag=cigale-pr-notifications
-      CHANNEL_TAG: cigale-pr-notifications
 
     runs-on: ubuntu-latest
     steps:
@@ -322,23 +316,11 @@ jobs:
         run: |
           echo "TITLE=💔 PR #${{ github.event.pull_request.number }} (${{ github.event.pull_request.head.ref }}) cannot be merged :(" >> $GITHUB_ENV
 
-      - run: |
-          URL="${{ github.event.pull_request._links.html.href }}"
-
-          document="$(cat <<EOD
-            {
-              "body": "$MESSAGE",
-              "title": "$TITLE",
-              "type": "link",
-              "url": "$URL",
-              "channel_tag": "$CHANNEL_TAG" 
-            }
-          EOD)"
-
-          echo "Sending $document"
-
-          curl --header 'Access-Token: ${{ secrets.PUSHBULLET_TOKEN }}' \
-            --header 'Content-Type: application/json' \
-            --data-binary "$document" \
-            --request POST \
-            https://api.pushbullet.com/v2/pushes
+      - name: Push notification
+        uses: ./.github/actions/notify
+        if: github.event_name == 'pull_request' && !cancelled() && !contains(github.event.pull_request.labels.*.name, 'notifications-off') && !github.event.pull_request.draft
+        with:
+          api_base_url: ${{ secrets.GOTIFY_API_BASE_URL }}
+          token: ${{ secrets.GOTIFY_APP_TOKEN }}
+          title: ${{ env.TITLE }}
+          message: ${{ env.MESSAGE }}
