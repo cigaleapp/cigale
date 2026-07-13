@@ -52,7 +52,7 @@
 	import IconClose from '~icons/ri/close-line';
 
 	import ButtonInk from './ButtonInk.svelte';
-	import { onSwipe } from './gestures.js';
+	import { onswipe } from './touch/swipes.js';
 	import { sleep, switchValue } from './utils.js';
 
 	/**
@@ -81,7 +81,7 @@
 	style:--fg="var(--fg-{toastTheme(type)})"
 	in:slide={{ axis: 'y', duration: 200 }}
 	out:fade={{ duration: 200 }}
-	{@attach onSwipe(
+	{@attach onswipe(
 		['left', 'right', 'down'],
 		async ({ element, axis, distance }) => {
 			const duration = 250; /* ms */

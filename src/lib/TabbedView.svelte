@@ -3,7 +3,7 @@
 
 	import { fade } from 'svelte/transition';
 
-	import { onSwipe } from './gestures.js';
+	import { onswipe } from './touch/swipes.js';
 
 	type Tab<Key extends TabKey = TabKey> = {
 		key: Key;
@@ -138,7 +138,7 @@
 	<div
 		role="tabpanel"
 		id="{svelteid}-panel"
-		{@attach onSwipe('horizontal', ({ direction }) => {
+		{@attach onswipe('horizontal', ({ direction }) => {
 			if (!swipeable) return;
 			if (direction === 'left') nextSlide();
 			if (direction === 'right') previousSlide();

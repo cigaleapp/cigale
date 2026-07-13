@@ -4,6 +4,7 @@ import { avg, iterateDOMList } from '$lib/utils.js';
 
 export type ClientPoint = { clientX: number; clientY: number };
 
+
 type PanEvent =
 	| {
 			kind: 'panend';
