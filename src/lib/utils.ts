@@ -1229,7 +1229,7 @@ if (import.meta.vitest) {
 }
 
 export function prefixIDBKeyRange(prefix: string): IDBKeyRange {
-	return IDBKeyRange.bound(prefix, prefix + '\uffff');
+	return IDBKeyRange.bound(prefix, prefix + '\uffff', true, false);
 }
 
 export function ensureArray<T>(subject: T | T[]): T[] {

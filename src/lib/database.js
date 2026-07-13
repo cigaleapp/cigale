@@ -1,4 +1,3 @@
-import { Capacitor } from '@capacitor/core';
 import { type } from 'arktype';
 
 import { localeFromNavigator } from './i18n.js';
@@ -28,7 +27,8 @@ import {
 	Protocol as ProtocolSchema,
 } from './schemas/protocols.js';
 import { Session as SessionSchema } from './schemas/sessions.js';
-import { clamp } from './utils.js';
+import { normalizeSearchStrings } from './search.js';
+import { clamp, ensureArray } from './utils.js';
 
 /**
  * Generate an ID for a given table
@@ -116,11 +116,18 @@ const Session = table(['id', 'remoteId'], SessionSchema);
 
 const Metadata = table('id', MetadataSchema.omit('options'));
 const MetadataOption = table(
-	['id', 'kobocollectId', '_narrowableIn[]'],
+	['id', 'kobocollectId', '_narrowableIn[]', '_search[]'],
 	MetadataEnumVariant.and({
 		id: [/\w+__\w+:\w+/, '@', 'ID of the form namespaced_metadata_id:key'],
 		metadataId: NamespacedMetadataID,
-	})
+		/** For search purposes: to search for something, we get all keys of that index and do a fuzzy search on them */
+		_search: ['string[]', '=', () => []],
+	}),
+	{
+		searchIndex({ label, synonyms }) {
+			return [label, ...(synonyms ?? [])];
+		},
+	}
 );
 
 const Protocol = table('id', ProtocolSchema);
@@ -316,14 +323,29 @@ export const Tables = {
  * Indexes with '[]' at the end are multivariate indexes, meaning they index arrays of values instead of single values.
  * @param {Schema} schema
  * @template {import('arktype').Type} Schema
+ * @param {object} [options]
+ * @param {(object: Schema['inferIn']) => undefined | string | Array<string|undefined|null>} [options.searchIndex] Undefined means empty array, string means single-element array. Function to compute a value for a _search column
  * @returns
  */
-function table(keyPaths, schema) {
+function table(keyPaths, schema, options) {
 	const expandedKeyPaths = Array.isArray(keyPaths)
 		? keyPaths.map((keyPath) => keyPath)
 		: [keyPaths];
 
-	return schema.configure({ table: { indexes: expandedKeyPaths } });
+	return schema.configure({
+		table: {
+			indexes: expandedKeyPaths,
+			searchIndex(object) {
+				if (!options?.searchIndex) return [];
+				const result = options.searchIndex(object);
+				if (!result) return [];
+
+				return ensureArray(result)
+					.map((s) => normalizeSearchStrings(s ?? ''))
+					.filter((v) => Boolean(v));
+			},
+		},
+	});
 }
 
 /**

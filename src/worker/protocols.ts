@@ -8,10 +8,12 @@ import type { PROCEDURES } from './procedures.js';
 import JSONC from 'tiny-jsonc';
 import YAML from 'yaml';
 
+import { Tables } from '$lib/database.js';
 import { resolveProtocolImports } from '$lib/metadata/imports.js';
 import { compareProtocolWithUpstream } from '$lib/protocols.js';
 import { metadataOptionId, namespacedMetadataId } from '$lib/schemas/metadata.js';
 import { ExportedProtocol } from '$lib/schemas/protocols.js';
+import { recomputeSearchIndex } from '$lib/search.js';
 import { entries, keys, omit, orEmptyObj, pick, prefixIDBKeyRange } from '$lib/utils.js';
 
 import { openDatabase, swarp } from './index.js';
@@ -180,13 +182,17 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 						.flatMap(([_, groups]) => [...groups])
 				);
 
-				tx.objectStore('MetadataOption').put({
-					id: metadataOptionId(namespacedMetadataId(p.id, id), option.key),
+				const optionId = metadataOptionId(namespacedMetadataId(p.id, id), option.key);
+
+				await tx.objectStore('MetadataOption').put({
+					id: optionId,
 					metadataId: namespacedMetadataId(p.id, id),
 					index: i,
 					_narrowableIn: [...narrowableIn],
 					...option,
 				});
+
+				await recomputeSearchIndex(tx, Tables, 'MetadataOption', optionId);
 
 				if (option.icon) {
 					iconsToPreload.add(option.icon);
