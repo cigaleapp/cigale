@@ -1,4 +1,3 @@
-
 type DropdownMenu<T extends string> = `${T}-open` | `${T}-options`;
 type TabSettings<T extends string> =
 	| DropdownMenu<`${T}-settings`>

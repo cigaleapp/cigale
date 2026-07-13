@@ -163,8 +163,8 @@
 	});
 
 	$effect(() => {
-		window.setSetting = setSetting
-	})
+		window.setSetting = setSetting;
+	});
 </script>
 
 <svelte:head>

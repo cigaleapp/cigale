@@ -21,7 +21,6 @@
 	import { uiState } from './state.svelte';
 	import { cancellable, readableOn } from './utils.js';
 
-
 	let {
 		options: precomputedOptions,
 		metadata,

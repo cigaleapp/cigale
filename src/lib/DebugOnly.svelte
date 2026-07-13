@@ -1,4 +1,3 @@
-
 <script lang="ts">
 	import { isDebugMode } from '$lib/settings.svelte.js';
 

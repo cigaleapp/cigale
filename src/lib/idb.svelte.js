@@ -512,7 +512,7 @@ export async function openDatabase() {
 				const schema = Tables[tableName];
 				if (!schema.meta.table) return;
 				const store = tx.objectStore(tableName);
-				
+
 				// Delete all indexes
 				for (const indexName of store.indexNames) {
 					store.deleteIndex(indexName);
