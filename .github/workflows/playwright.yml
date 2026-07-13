@@ -265,7 +265,7 @@ jobs:
         run: |
           echo JSON reporter contents are:
           cat combined.json
-          
+
           function get {
             jq .stat combined.json | jq $1
           }

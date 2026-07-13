@@ -40,13 +40,13 @@
 	import ButtonInk from './ButtonInk.svelte';
 	import Card from './Card.svelte';
 	import CroppedImg from './CroppedImg.svelte';
-	import { onlongpress } from './touch/longpress.js';
 	import LoadingSpinner from './LoadingSpinner.svelte';
 	import Logo from './Logo.svelte';
 	import { IsMobile } from './mobile.svelte.js';
 	import OverflowableText from './OverflowableText.svelte';
 	import { uiState } from './state.svelte.js';
 	import { tooltip } from './tooltips.js';
+	import { onlongpress } from './touch/longpress.js';
 
 	/** @type {Props & Omit<Record<string, unknown>, keyof Props>}*/
 	let {

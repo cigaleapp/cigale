@@ -12,9 +12,8 @@ inputs:
     required: true
   message:
     required: true
-  
 
-runs: 
+runs:
   using: composite
   steps:
     - shell: bash
@@ -28,7 +27,7 @@ runs:
         JSON)
 
         echo "Sending $json..."
-        
+
         curl -X POST "${{ inputs.api_base_url }}/message"  \
           -H "X-Gotify-Key: ${{ inputs.token }}" \
           -H "Content-Type: application/json" \
