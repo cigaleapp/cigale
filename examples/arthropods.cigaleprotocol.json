@@ -3,8 +3,8 @@
 	"id": "io.github.cigaleapp.arthropods.example",
 	"name": "Example: arthropodes",
 	"summary": "Protocole de base pour arthropodes",
-	"learnMore": "https://github.com/cigaleapp/cigale/tree/1c21ac7b208d26eca219e973e18d75c37454b379/scripts/README.md#protocoles-arthropodsexample",
-	"version": 108,
+	"learnMore": "https://github.com/cigaleapp/cigale/tree/42c56bc160927e328005d72e90d1f074364be268/scripts/README.md#protocoles-arthropodsexample",
+	"version": 109,
 	"updates": "automatic",
 	"source": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json",
 	"description": "Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification\n\nClés d'identification d'abeilles fournies par IDmyBee.com, extraites depuis [IDMYBEE - Andrena sur Xper3](https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html).",
@@ -46737,7 +46737,7 @@
 				{
 					"key": "9317084",
 					"label": "Gymnosoma",
-					"description": "**Identification** : Ces mouches se reconnaissent à leur abdomen sphérique, orange et orné de points noirs pouvant se rejoindre. Leurs soies sont réduites. Leurs antennes sont grandes.  \nLes mâles possèdent une pruinosité dorée sur le thorax qui dépasse la suture.  \nChez les femelles, il n’y a pas ou peu de pruinosité dorée.  \nOn ne peut aller jusqu’à l’espèce sur photo.\n\n**Larves** : Elles sont parasites de punaises _Pentatomidae_.\n\n**Régime** : Nectar pour les adultes, dans les punaises pour les larves.\n\n**Espèces semblables** : Le genre genre _Cistogaster_ a aussi un abdomen très rond mais il a des antennes beaucoup plus petites.\n\n**Sources** :  \n[http://www.insecte.org/](http://www.insecte.org/)",
+					"description": "**Identification** : Ces mouches se reconnaissent à leur abdomen sphérique, orange et orné de points noirs pouvant se rejoindre. Leurs soies sont réduites. Leurs antennes sont grandes.  \nLes mâles possèdent une pruinosité dorée sur le thorax qui dépasse la suture.  \nChez les femelles, il n’y a pas ou peu de pruinosité dorée.  \nOn ne peut aller jusqu’à l’espèce sur photo.\n\n**Larves** : Elles sont parasites de punaises _Pentatomidae_.\n\n**Régime** : Nectar pour les adultes, dans les punaises pour les larves.\n\n**Risques de confusions** : Le genre genre _Cistogaster_ a aussi un abdomen très rond mais il a des antennes beaucoup plus petites.\n\n**Sources** :  \n[http://www.insecte.org/](http://www.insecte.org/)",
 					"learnMore": "https://jessica-joachim.com/insectes/dipteres/tachinidae/gymnosoma-genre/",
 					"cascade": {
 						"family": "6918",
@@ -117806,8 +117806,7 @@
 						"order": "1470",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"conservation_status": "lc"
+						"kingdom": "1"
 					}
 				},
 				{
@@ -123282,8 +123281,7 @@
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"conservation_status": "lc"
+						"kingdom": "1"
 					}
 				},
 				{
@@ -127773,8 +127771,7 @@
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"conservation_status": "lc"
+						"kingdom": "1"
 					}
 				},
 				{
@@ -136910,8 +136907,7 @@
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"conservation_status": "lc"
+						"kingdom": "1"
 					}
 				},
 				{
@@ -138910,8 +138906,7 @@
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"conservation_status": "vu"
+						"kingdom": "1"
 					}
 				},
 				{
@@ -153143,8 +153138,7 @@
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"conservation_status": "lc"
+						"kingdom": "1"
 					}
 				},
 				{
@@ -155416,8 +155410,7 @@
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"conservation_status": "lc"
+						"kingdom": "1"
 					},
 					"links": {
 						"jordi_compte": "https://www.inaturalist.org/people/jordi_compte",
@@ -162249,8 +162242,7 @@
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"conservation_status": "lc"
+						"kingdom": "1"
 					}
 				},
 				{
@@ -175909,8 +175901,7 @@
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"conservation_status": "lc"
+						"kingdom": "1"
 					}
 				},
 				{
@@ -191594,8 +191585,7 @@
 						"order": "637",
 						"class": "229",
 						"phylum": "54",
-						"kingdom": "1",
-						"conservation_status": "lc"
+						"kingdom": "1"
 					}
 				},
 				{
@@ -198670,8 +198660,7 @@
 						"order": "797",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"conservation_status": "lc"
+						"kingdom": "1"
 					}
 				},
 				{
@@ -199373,7 +199362,7 @@
 						"class": "216",
 						"phylum": "54",
 						"kingdom": "1",
-						"conservation_status": "lc"
+						"conservation_status": "nt"
 					}
 				},
 				{
@@ -199444,7 +199433,7 @@
 						"class": "216",
 						"phylum": "54",
 						"kingdom": "1",
-						"conservation_status": "lc"
+						"conservation_status": "nt"
 					}
 				},
 				{
@@ -219283,7 +219272,7 @@
 						"class": "216",
 						"phylum": "54",
 						"kingdom": "1",
-						"conservation_status": "nt"
+						"conservation_status": "vu"
 					}
 				},
 				{
@@ -225750,7 +225739,8 @@
 						"order": "1470",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1"
+						"kingdom": "1",
+						"conservation_status": "lc"
 					}
 				},
 				{
@@ -238404,7 +238394,7 @@
 						"class": "216",
 						"phylum": "54",
 						"kingdom": "1",
-						"conservation_status": "lc"
+						"conservation_status": "nt"
 					}
 				},
 				{
@@ -249275,7 +249265,7 @@
 						"class": "216",
 						"phylum": "54",
 						"kingdom": "1",
-						"conservation_status": "lc"
+						"conservation_status": "nt"
 					}
 				},
 				{
@@ -277275,7 +277265,7 @@
 						"class": "216",
 						"phylum": "54",
 						"kingdom": "1",
-						"conservation_status": "nt"
+						"conservation_status": "lc"
 					}
 				},
 				{
@@ -277298,7 +277288,7 @@
 						"class": "216",
 						"phylum": "54",
 						"kingdom": "1",
-						"conservation_status": "lc"
+						"conservation_status": "nt"
 					}
 				},
 				{
@@ -281143,7 +281133,7 @@
 						"class": "216",
 						"phylum": "54",
 						"kingdom": "1",
-						"conservation_status": "vu"
+						"conservation_status": "nt"
 					}
 				},
 				{
@@ -281282,7 +281272,7 @@
 						"class": "216",
 						"phylum": "54",
 						"kingdom": "1",
-						"conservation_status": "nt"
+						"conservation_status": "lc"
 					}
 				},
 				{
@@ -281672,7 +281662,7 @@
 						"class": "216",
 						"phylum": "54",
 						"kingdom": "1",
-						"conservation_status": "vu"
+						"conservation_status": "lc"
 					}
 				},
 				{
@@ -281708,7 +281698,7 @@
 						"class": "216",
 						"phylum": "54",
 						"kingdom": "1",
-						"conservation_status": "nt"
+						"conservation_status": "lc"
 					}
 				},
 				{
@@ -315319,7 +315309,7 @@
 						"class": "216",
 						"phylum": "54",
 						"kingdom": "1",
-						"conservation_status": "lc"
+						"conservation_status": "nt"
 					}
 				},
 				{
@@ -354426,8 +354416,7 @@
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"conservation_status": "lc"
+						"kingdom": "1"
 					}
 				},
 				{
@@ -379062,7 +379051,7 @@
 						"class": "216",
 						"phylum": "54",
 						"kingdom": "1",
-						"conservation_status": "lc"
+						"conservation_status": "nt"
 					}
 				},
 				{
@@ -437928,8 +437917,7 @@
 						"order": "797",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"conservation_status": "lc"
+						"kingdom": "1"
 					}
 				},
 				{
@@ -438061,7 +438049,7 @@
 						"class": "216",
 						"phylum": "54",
 						"kingdom": "1",
-						"conservation_status": "nt"
+						"conservation_status": "lc"
 					}
 				},
 				{
@@ -475319,8 +475307,7 @@
 						"order": "1470",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"conservation_status": "lc"
+						"kingdom": "1"
 					}
 				},
 				{
@@ -486506,8 +486493,7 @@
 						"order": "1470",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"conservation_status": "lc"
+						"kingdom": "1"
 					}
 				},
 				{

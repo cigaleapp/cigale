@@ -3,8 +3,8 @@
 	"id": "io.github.cigaleapp.arthropods.example.light",
 	"name": "Example: arthropodes (lightweight)",
 	"summary": "Version légère de Exemple: arthropodes",
-	"learnMore": "https://github.com/cigaleapp/cigale/tree/1c21ac7b208d26eca219e973e18d75c37454b379/scripts/README.md#protocoles-arthropodsexamplelight",
-	"version": 108,
+	"learnMore": "https://github.com/cigaleapp/cigale/tree/42c56bc160927e328005d72e90d1f074364be268/scripts/README.md#protocoles-arthropodsexamplelight",
+	"version": 109,
 	"updates": "automatic",
 	"source": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.light.cigaleprotocol.json",
 	"description": "Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification\n\nClés d'identification d'abeilles fournies par IDmyBee.com, extraites depuis [IDMYBEE - Andrena sur Xper3](https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html).",
@@ -5425,8 +5425,7 @@
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"conservation_status": "lc"
+						"kingdom": "1"
 					}
 				},
 				{
@@ -16434,8 +16433,7 @@
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"conservation_status": "lc"
+						"kingdom": "1"
 					}
 				},
 				{
@@ -20401,8 +20399,7 @@
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"conservation_status": "lc"
+						"kingdom": "1"
 					}
 				},
 				{
@@ -27476,8 +27473,7 @@
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"conservation_status": "lc"
+						"kingdom": "1"
 					}
 				},
 				{
@@ -38887,8 +38883,7 @@
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"conservation_status": "lc"
+						"kingdom": "1"
 					}
 				},
 				{
@@ -48526,8 +48521,7 @@
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"conservation_status": "vu"
+						"kingdom": "1"
 					}
 				},
 				{
@@ -49406,8 +49400,7 @@
 						"order": "1457",
 						"class": "216",
 						"phylum": "54",
-						"kingdom": "1",
-						"conservation_status": "lc"
+						"kingdom": "1"
 					}
 				},
 				{
