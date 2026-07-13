@@ -221,6 +221,7 @@ export const ExportedProtocol = Protocol.omit(
 	'importedMetadata'
 )
 	.in.and({
+		'$schema?': 'string',
 		imports: ProtocolImport.array().default(() => []),
 		'metadataGroups?': type.Record(
 			ID,
