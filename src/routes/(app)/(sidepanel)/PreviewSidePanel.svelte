@@ -19,7 +19,6 @@
 	import BottomDrawer from '$lib/BottomDrawer.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import CroppedImg from '$lib/CroppedImg.svelte';
-	import { onswipe } from '$lib/touch/swipes.js';
 	import { plural } from '$lib/i18n.js';
 	import { tables } from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
@@ -31,6 +30,7 @@
 	import { goto } from '$lib/paths.js';
 	import { metadataDefinitionComparator } from '$lib/protocols.js';
 	import { uiState } from '$lib/state.svelte.js';
+	import { onswipe } from '$lib/touch/swipes.js';
 
 	import BottombarContent from '../BottombarContent.svelte';
 
