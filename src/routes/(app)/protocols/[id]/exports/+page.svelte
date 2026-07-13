@@ -110,7 +110,7 @@
 		{/each}
 	</dl>
 
-	{#if getSettings().showTechnicalMetadata}
+	{#if getSettings().debugMode}
 		<pre class="debug">{JSON.stringify(
 				tables.Protocol.state.find((p) => p.id === data.protocol.id)?.exports,
 				null,

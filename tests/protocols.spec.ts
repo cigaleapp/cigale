@@ -364,7 +364,7 @@ test('can use a protocol that imports metadata from another protocol', async ({
 
 	await goToSessionPage(page);
 
-	await app.settings.set({ showTechnicalMetadata: false });
+	await app.settings.set({ debugMode: false });
 
 	await expect(page.getByTestId('session-metadata')).toMatchAriaSnapshot(`
 	  - text: Imported session metadata
@@ -492,7 +492,7 @@ test('can use a protocol that imports metadata from another protocol', async ({
 test('can infer metadata from a sidecar file', async ({ page, context, app, tempfiles }) => {
 	await goToProtocolManagement(page);
 
-	await app.settings.set({ showTechnicalMetadata: false });
+	await app.settings.set({ debugMode: false });
 
 	const locationDisplayName =
 		'Околтын, Akaltyn, Oltinsoy District, Province de Sourkhan-Daria, Ouzbékistan';

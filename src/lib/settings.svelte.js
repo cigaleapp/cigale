@@ -89,7 +89,7 @@ export async function toggleSetting(key) {
 }
 
 export function isDebugMode() {
-	return getSettings().showTechnicalMetadata;
+	return getSettings().debugMode;
 }
 
 export function locale() {

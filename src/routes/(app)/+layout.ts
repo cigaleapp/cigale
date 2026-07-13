@@ -214,7 +214,7 @@ async function initializeSettings() {
 			gridSize: 1,
 			language: 'fr',
 			showInputHints: true,
-			showTechnicalMetadata: dev,
+			debugMode: dev,
 			cropAutoNext: false,
 			gallerySort: { key: 'date', direction: 'asc' },
 		});

@@ -132,7 +132,7 @@ test.describe('Cropper view', () => {
 
 	test.describe('autoskip enabled', () => {
 		test.beforeEach(async ({ app }) => {
-			await app.settings.set({ cropAutoNext: true, showTechnicalMetadata: true });
+			await app.settings.set({ cropAutoNext: true, debugMode: true });
 		});
 
 		test('should skip on confirm button click', async ({ page, app }) => {
@@ -341,7 +341,7 @@ test.describe('Cropper view', () => {
 			});
 
 			test('dragging outside the crop surface cancels', issue(431), async ({ page, app }) => {
-				await app.settings.set({ showTechnicalMetadata: true });
+				await app.settings.set({ debugMode: true });
 				await makeBox(page, 10, 10, 50, -30);
 				await assert(page.locator('.change-area .debug')).toHaveText(
 					/create {2}\(0 0\) × \[0 0\]/

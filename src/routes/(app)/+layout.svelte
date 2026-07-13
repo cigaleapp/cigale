@@ -94,7 +94,7 @@
 		'i d e v': {
 			help: 'Activer/Désactiver le debug mode',
 			do: async () => {
-				await setSetting('showTechnicalMetadata', isDebugMode() ? false : true);
+				await setSetting('debugMode', isDebugMode() ? false : true);
 			},
 		},
 	});

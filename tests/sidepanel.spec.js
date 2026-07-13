@@ -26,7 +26,7 @@ import {
  * @param {"example" | "kitchensink"} [param0.protocol]
  */
 async function initialize({ page, app, protocol = 'example' }) {
-	await app.settings.set({ showTechnicalMetadata: false });
+	await app.settings.set({ debugMode: false });
 	await chooseFirstSession(page);
 	if (protocol === 'kitchensink') await changeSessionProtocol(page, 'Kitchen sink');
 	if (protocol !== 'kitchensink')
@@ -500,7 +500,7 @@ testKitchensink('can update a string-type metadata', async ({ page, app }) => {
 });
 
 test('displays metadata groups', async ({ page, app }) => {
-	await app.settings.set({ showTechnicalMetadata: false });
+	await app.settings.set({ debugMode: false });
 	await goToProtocolManagement(page);
 	await importProtocol(page, {
 		id: 'com.example.metadatagroups',

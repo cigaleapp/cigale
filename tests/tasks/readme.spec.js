@@ -28,7 +28,7 @@ test.describe('screenshots', { tag: '@real-protocol' }, () => {
 
 				await page.setViewportSize({ width: (16 / 9) * 720, height: 720 });
 
-				await app.settings.set({ showTechnicalMetadata: false });
+				await app.settings.set({ debugMode: false });
 
 				await chooseInDropdown(
 					page,
