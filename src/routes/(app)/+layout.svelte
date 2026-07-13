@@ -161,6 +161,10 @@
 			});
 		});
 	});
+
+	$effect(() => {
+		window.setSetting = setSetting
+	})
 </script>
 
 <svelte:head>
