@@ -263,6 +263,9 @@ jobs:
       - name: Get stats
         id: stats
         run: |
+          echo JSON reporter contents are:
+          cat combined.json
+          
           function get {
             jq .stat combined.json | jq $1
           }
@@ -272,6 +275,8 @@ jobs:
           echo "flaky=$(get .flaky)" >> $GITHUB_OUTPUT
           echo "successful=$(get .expected)" >> $GITHUB_OUTPUT
           echo "skipped=$(get .skipped)" >> $GITHUB_OUTPUT
+
+          echo Output is now $GITHUB_OUTPUT
 
       - name: Put metrics.json alongside report for dev-deployments workflow to pick up
         run: mv metrics.json playwright-report/metrics.json
