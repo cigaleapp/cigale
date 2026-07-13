@@ -27,7 +27,7 @@
 	import { exportProtocol } from '$lib/protocols';
 	import { namespacedMetadataId, removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';
 	import { seo } from '$lib/seo.svelte.js';
-	import { uiState } from '$lib/state.svelte';
+	import { uiState } from '$lib/uistate.svelte.js';
 	import { toasts } from '$lib/toasts.svelte';
 	import { tooltip } from '$lib/tooltips.js';
 	import { slugify } from '$lib/utils';

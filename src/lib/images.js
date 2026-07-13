@@ -1,6 +1,6 @@
 import { ulid } from 'ulid';
 
-import { uiState } from '$lib/state.svelte';
+import { uiState } from '$lib/uistate.svelte.js';
 
 import { toTopLeftCoords } from './BoundingBoxes.svelte.js';
 import { errorMessage, humanFormatName } from './i18n.js';

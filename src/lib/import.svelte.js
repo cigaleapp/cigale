@@ -12,7 +12,7 @@ import {
 	resizeToMaxSize,
 	storeImageBytes,
 } from '$lib/images.js';
-import { uiState } from '$lib/state.svelte.js';
+import { uiState } from '$lib/uistate.svelte.js';
 import { toasts } from '$lib/toasts.svelte.js';
 
 import { setExifFields } from './exif.js';

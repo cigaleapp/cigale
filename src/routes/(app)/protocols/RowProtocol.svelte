@@ -13,7 +13,7 @@
 	import { goto, resolve } from '$lib/paths';
 	import { getSettings, setSetting } from '$lib/settings.svelte';
 	import { shareUrl } from '$lib/share.js';
-	import { uiState } from '$lib/state.svelte';
+	import { uiState } from '$lib/uistate.svelte.js';
 	import Switch from '$lib/Switch.svelte';
 
 	interface Props extends Partial<Protocol> {

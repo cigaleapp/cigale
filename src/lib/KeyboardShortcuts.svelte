@@ -10,7 +10,7 @@
 	import { entries } from './utils.js';
 
 	/**
-	 * @import { Keybind, Keymap } from '$lib/state.svelte.js'
+	 * @import { Keybind, Keymap } from '$lib/uistate.svelte.js'
 	 */
 
 	/**

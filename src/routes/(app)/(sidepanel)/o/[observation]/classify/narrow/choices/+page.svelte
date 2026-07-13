@@ -11,7 +11,7 @@
 	import { goto } from '$lib/paths.js';
 	import { ensureNamespacedMetadataId, namespaceOfMetadataId } from '$lib/schemas/metadata.js';
 	import { isDebugMode } from '$lib/settings.svelte.js';
-	import { uiState } from '$lib/state.svelte.js';
+	import { uiState } from '$lib/uistate.svelte.js';
 	import { compareBy, mapKeys } from '$lib/utils.js';
 
 	import { narrowingState } from '../+layout.svelte';

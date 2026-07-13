@@ -7,7 +7,7 @@ import {
 	mergeMetadataFromImagesAndObservations,
 	serializeMetadataFullValue,
 } from './metadata/index.js';
-import { uiState } from './state.svelte.js';
+import { uiState } from './uistate.svelte.js';
 import { compareBy, mapValues, nonnull, transformObject } from './utils.js';
 
 /**

@@ -2,7 +2,7 @@
 	import { toTopLeftCoords } from './BoundingBoxes.svelte';
 	import CardMedia from './CardMedia.svelte';
 	import { isDebugMode } from './settings.svelte.js';
-	import { uiState } from './state.svelte.js';
+	import { uiState } from './uistate.svelte.js';
 
 	/**
 	 * @import * as DB from '$lib/database.js';

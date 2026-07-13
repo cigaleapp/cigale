@@ -26,7 +26,7 @@ import { hasRuntimeType } from '$lib/metadata/types.js';
 import { ensureNoEmptyObservations } from '$lib/observations.js';
 import { goto } from '$lib/paths.js';
 import { getSettings } from '$lib/settings.svelte.js';
-import { uiState } from '$lib/state.svelte.js';
+import { uiState } from '$lib/uistate.svelte.js';
 import { toasts } from '$lib/toasts.svelte.js';
 import { undo } from '$lib/undo.svelte.js';
 import { nonnull } from '$lib/utils.js';

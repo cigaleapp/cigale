@@ -6,7 +6,6 @@
 
 	import { dequal } from 'dequal/lite';
 
-	import IconShowPanel from '~icons/ri/arrow-up-s-line';
 	import IconObservation from '~icons/ri/bug-line';
 	import IconCamera from '~icons/ri/camera-line';
 	import IconDelete from '~icons/ri/delete-bin-line';
@@ -29,10 +28,7 @@
 	import OverflowableText from '$lib/OverflowableText.svelte';
 	import { goto } from '$lib/paths.js';
 	import { metadataDefinitionComparator } from '$lib/protocols.js';
-	import { uiState } from '$lib/state.svelte.js';
-	import { onswipe } from '$lib/touch/swipes.js';
-
-	import BottombarContent from '../BottombarContent.svelte';
+	import { uiState } from '$lib/uistate.svelte.js';
 
 	interface Props {
 		/** source **href**s of the images/observations we're modifying the metadata on */

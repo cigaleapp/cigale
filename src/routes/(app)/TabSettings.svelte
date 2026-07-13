@@ -27,7 +27,7 @@
 		sortOrGroupFieldNeedsMetadata,
 		SortSettings,
 	} from '$lib/schemas/sessions.js';
-	import { uiState } from '$lib/state.svelte.js';
+	import { uiState } from '$lib/uistate.svelte.js';
 	import { entries, nonnull, orEmpty } from '$lib/utils.js';
 
 	interface Props {

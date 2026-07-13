@@ -14,7 +14,7 @@
 	import { storeMetadataValue } from '$lib/metadata/index.js';
 	import MetadataCombobox from '$lib/MetadataCombobox.svelte';
 	import OverflowableText from '$lib/OverflowableText.svelte';
-	import { uiState } from '$lib/state.svelte';
+	import { uiState } from '$lib/uistate.svelte.js';
 	import { undo } from '$lib/undo.svelte.js';
 	import { compareBy, mapKeys, nonnull } from '$lib/utils.js';
 

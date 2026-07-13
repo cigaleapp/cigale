@@ -7,7 +7,7 @@ import { databaseHandle, tables } from './idb.svelte.js';
 import { inferenceModelId } from './inference.js';
 import { storeMetadataErrors } from './metadata/storage.js';
 import { metadataDefinitionComparator } from './protocols.js';
-import { uiState } from './state.svelte.js';
+import { uiState } from './uistate.svelte.js';
 import { safeJSONStringify } from './utils.js';
 
 /**

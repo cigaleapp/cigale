@@ -5,7 +5,7 @@ import { inferBoundingBoxes, processImageFile } from './import.svelte.js';
 import { sendNotification } from './notifications.js';
 import { importResultsZip } from './results.svelte.js';
 import { isSidecar } from './sidecars.js';
-import { uiState } from './state.svelte.js';
+import { uiState } from './uistate.svelte.js';
 import { isZip, range } from './utils.js';
 
 /**

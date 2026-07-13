@@ -7,7 +7,7 @@ import { serializeMetadataValue } from './metadata/index.js';
 import { Analysis } from './schemas/exports.js';
 import { ANALYSIS_JSON_ZIP_FILEPATH } from './schemas/protocols.js';
 import { switchSession } from './sessions.js';
-import { uiState } from './state.svelte.js';
+import { uiState } from './uistate.svelte.js';
 import { toasts } from './toasts.svelte.js';
 import { entries, mapValues, pick, safeJSONParse, uint8ArrayToArrayBuffer } from './utils.js';
 

@@ -3,7 +3,7 @@ import * as idb from '$lib/idb.svelte.js';
 import { imageIdToFileId } from './images.js';
 import { clearMetadataOptionsCache } from './metadata/storage.js';
 import { withQueue } from './queue.svelte.js';
-import { uiState } from './state.svelte.js';
+import { uiState } from './uistate.svelte.js';
 import { undo } from './undo.svelte.js';
 
 /**

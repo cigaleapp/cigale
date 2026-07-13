@@ -22,7 +22,7 @@
 	import OverflowableText from '$lib/OverflowableText.svelte';
 	import { goto } from '$lib/paths.js';
 	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
-	import { uiState } from '$lib/state.svelte.js';
+	import { uiState } from '$lib/uistate.svelte.js';
 	import ModalSubmitIssue from '$routes/(app)/ModalSubmitIssue.svelte';
 
 	const { children } = $props();

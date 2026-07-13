@@ -1,6 +1,6 @@
 import { onDestroy, onMount } from 'svelte';
 
-import { uiState } from './state.svelte.js';
+import { uiState } from './uistate.svelte.js';
 import { entries, keys } from './utils.js';
 
 const GROUPS = {
@@ -19,7 +19,7 @@ const GROUPS = {
  *
  * This function will _not_ override any keybind that already has an existing key shortcut defined.
  * @param {keyof typeof GROUPS} group used to group keybinds together in help dialogs, applied to all keybinds defined here, unless they override it themselves
- * @param {import("./state.svelte").Keymap<keyof typeof GROUPS>} shortcuts
+ * @param {import("./uistate.svelte.js").Keymap<keyof typeof GROUPS>} shortcuts
  * WARNING: If you rename this function, update `heuristic` in `wuchale.config.js`
  */
 export function defineKeyboardShortcuts(group, shortcuts) {

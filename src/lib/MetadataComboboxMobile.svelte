@@ -35,7 +35,7 @@
 	import { scrollfader } from './scrollfader.js';
 	import { makeSearcher } from './search.js';
 	import { isDebugMode } from './settings.svelte.js';
-	import { uiState } from './state.svelte.js';
+	import { uiState } from './uistate.svelte.js';
 	import TabbedView from './TabbedView.svelte';
 	import {
 		compareBy,

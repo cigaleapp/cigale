@@ -24,7 +24,7 @@
 	import { percent } from '$lib/i18n.js';
 	import OverflowableText from '$lib/OverflowableText.svelte';
 	import SentenceJoin from '$lib/SentenceJoin.svelte';
-	import { uiState } from '$lib/state.svelte.js';
+	import { uiState } from '$lib/uistate.svelte.js';
 	import Tooltip from '$lib/Tooltip.svelte';
 	import { mapValues } from '$lib/utils.js';
 

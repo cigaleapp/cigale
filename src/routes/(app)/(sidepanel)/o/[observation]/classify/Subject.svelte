@@ -10,7 +10,7 @@
 	import Carousel from '$lib/Carousel.svelte';
 	import CroppedImg from '$lib/CroppedImg.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
-	import { uiState } from '$lib/state.svelte';
+	import { uiState } from '$lib/uistate.svelte.js';
 
 	import WithExpandButton from './WithExpandButton.svelte';
 

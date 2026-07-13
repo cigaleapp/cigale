@@ -6,7 +6,7 @@
 	import Carousel from '$lib/Carousel.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import Logo from '$lib/Logo.svelte';
-	import { uiState } from '$lib/state.svelte';
+	import { uiState } from '$lib/uistate.svelte.js';
 	import { corsfixIfLocalhost } from '$lib/utils.js';
 
 	import WithExpandButton from '../WithExpandButton.svelte';
