@@ -296,7 +296,7 @@ jobs:
 
     env:
       TITLE: '👀 PR #${{ github.event.pull_request.number }} (${{ github.event.pull_request.head.ref }}) checks finished'
-      MESSAGE: ''
+      MESSAGE: 'No further information available'
 
     runs-on: ubuntu-latest
     steps:
