@@ -1229,7 +1229,7 @@ if (import.meta.vitest) {
 }
 
 export function prefixIDBKeyRange(prefix: string): IDBKeyRange {
-	return IDBKeyRange.bound(prefix, prefix + '\uffff');
+	return IDBKeyRange.bound(prefix, prefix + '\uffff', true, false);
 }
 
 export function ensureArray<T>(subject: T | T[]): T[] {
@@ -1592,5 +1592,27 @@ if (import.meta.vitest) {
 				'feur',
 			]);
 		});
+	});
+}
+
+/**
+ * Returns first key whose value is truthy
+ */
+export function switchConditions<T extends string>(
+	conditions: Record<T, boolean | string | number>
+): T | undefined {
+	return entries(conditions).find(([_, valid]) => valid)?.[0];
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+
+	test('switchConditions', () => {
+		expect(
+			switchConditions({
+				yes: 1 + 1 === 2,
+				'radiohead!!': 2 + 2 === 5,
+			})
+		).toBe('yes');
 	});
 }

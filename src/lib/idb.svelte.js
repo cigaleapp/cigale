@@ -9,6 +9,7 @@ import {
 	isSessionDependentReactiveTable,
 	Tables,
 } from './database.js';
+import { recomputeSearchIndex } from './search.js';
 import { displayKeyRange, profiler, safeJSONStringify } from './utils.js';
 
 /** @type {number | null} */
@@ -16,7 +17,7 @@ export const previewingPrNumber =
 	import.meta.env.previewingPrNumber === 'null' ? null : import.meta.env.previewingPrNumber;
 
 export const databaseName = previewingPrNumber ? `previews/pr-${previewingPrNumber}` : 'database';
-export const databaseRevision = 12;
+export const databaseRevision = 13;
 
 const profile = profiler('Database');
 
@@ -511,14 +512,17 @@ export async function openDatabase() {
 				const schema = Tables[tableName];
 				if (!schema.meta.table) return;
 				const store = tx.objectStore(tableName);
+				
 				// Delete all indexes
 				for (const indexName of store.indexNames) {
 					store.deleteIndex(indexName);
 				}
+
 				// Recreate indexes
 				for (const index of schema.meta.table.indexes.slice(1)) {
 					const multiEntry = index.endsWith('[]');
 					const indexName = multiEntry ? index.slice(0, -2) : index;
+
 					store.createIndex(indexName, indexName, { multiEntry });
 				}
 			};
@@ -578,12 +582,17 @@ export async function openDatabase() {
 			}
 
 			if (oldVersion === 9) {
-				rebuildIndexes('Image');
-				rebuildIndexes('Observation');
+				await rebuildIndexes('Image');
+				await rebuildIndexes('Observation');
 			}
 
 			if (oldVersion === 11) {
-				rebuildIndexes('Image');
+				await rebuildIndexes('Image');
+			}
+
+			if (oldVersion === 12) {
+				await recomputeSearchIndex(tx, Tables, 'MetadataOption', null);
+				await rebuildIndexes('MetadataOption');
 			}
 
 			for (const [tableName, schema] of tablesByName) {
@@ -624,8 +633,8 @@ export function nukeDatabase() {
 /**
  * @typedef {{
  *   [Name in keyof typeof Tables]: {
- *      value: (typeof Tables[Name])['inferIn']
- *      key: string,
+ *     value: (typeof Tables[Name])['inferIn']
+ *     key: string,
  *     indexes: {
  *        [IndexName in string]: string;
  *     }

@@ -17,12 +17,15 @@
 		ordering?: string[];
 		/** Don't show images */
 		compact?: boolean;
+		/** Show a small explainer before the table */
+		explain?: boolean;
 	}
 
 	const {
 		cascades: labels,
 		ordering = uiState.currentProtocol?.metadataOrder ?? [],
 		compact = false,
+		explain = false,
 		crossout = () => false,
 	}: Props = $props();
 
@@ -52,6 +55,9 @@
 </script>
 
 <table class="cascades">
+	{#if explain && entries.length > 0}
+		<caption><em>Métadonées mises à jour au choix de cette option</em></caption>
+	{/if}
 	<tbody>
 		<!-- Cascade's recursion tree is displayed reversed because deeply recursive cascades are mainly meant for taxonomic stuff -- it's the childmost metadata that set their parent, so, in the resulting recursion tree, the parentmost metadata end up childmost (eg. species have cascades that sets genus, genus sets family, etc. so family is deeper in the recursion tree than genus, whereas in a taxonomic tree it's the opposite) -->
 		{#each entries as [metadataId, options] (metadataId)}
@@ -98,6 +104,10 @@
 		border-collapse: collapse;
 		table-layout: fixed;
 		width: 100%;
+	}
+
+	caption {
+		margin-bottom: 1em;
 	}
 
 	.cascades td {

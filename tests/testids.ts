@@ -1,3 +1,23 @@
+
+type DropdownMenu<T extends string> = `${T}-open` | `${T}-options`;
+type TabSettings<T extends string> =
+	| DropdownMenu<`${T}-settings`>
+	| `${T}-settings-${
+			| `inference-model`
+			| `sort`
+			| `group-tolerances`
+			| `group-by-${
+					| 'metadataValue'
+					| 'metadataPresence'
+					| 'metadataConfidence'
+					| 'none'}-metadata`}`;
+
+type hasOptions<T> = T extends `${infer Id}-options` ? Id : never;
+type candidates = hasOptions<PlaywrightTestId>;
+type hasOpen<T extends string> = `${T}-open` extends PlaywrightTestId ? T : never;
+
+export type PlaywrightTestIdBaseForDropdownMenu = hasOpen<candidates>;
+
 export type PlaywrightTestId =
 	| 'sidepanel'
 	| 'app-nav'
@@ -39,23 +59,5 @@ export type PlaywrightTestId =
 	| 'focused-option'
 	| 'cascades'
 	| 'synonyms'
-	| 'description';
-
-type DropdownMenu<T extends string> = `${T}-open` | `${T}-options`;
-type TabSettings<T extends string> =
-	| DropdownMenu<`${T}-settings`>
-	| `${T}-settings-${
-			| `inference-model`
-			| `sort`
-			| `group-tolerances`
-			| `group-by-${
-					| 'metadataValue'
-					| 'metadataPresence'
-					| 'metadataConfidence'
-					| 'none'}-metadata`}`;
-
-type hasOptions<T> = T extends `${infer Id}-options` ? Id : never;
-type candidates = hasOptions<PlaywrightTestId>;
-type hasOpen<T extends string> = `${T}-open` extends PlaywrightTestId ? T : never;
-
-export type PlaywrightTestIdBaseForDropdownMenu = hasOpen<candidates>;
+	| 'description'
+	| 'metadata-combobox-viewport';

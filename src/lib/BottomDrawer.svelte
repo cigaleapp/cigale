@@ -13,7 +13,7 @@
 		children: Snippet;
 		maxHeight?: number;
 		title?: string;
-		position: BottomSheetSettings['position'];
+		position?: BottomSheetSettings['position'];
 	}
 </script>
 
@@ -23,6 +23,8 @@
 
 	import { BottomSheet } from 'svelte-bottom-sheet';
 
+	import { mutationobserver } from './mutations.js';
+
 	let {
 		open = $bindable(false),
 		title = '',
@@ -30,10 +32,31 @@
 		maxHeight = 0.7,
 		position = 'bottom',
 	}: Props = $props();
+
+	let disableGestures = $state(false);
 </script>
 
-<div data-bottomsheet-wrapper>
-	<BottomSheet settings={{ maxHeight, position }} bind:isSheetOpen={open}>
+<div
+	data-bottomsheet-wrapper
+	use:mutationobserver={{
+		subtree: true,
+		attributes: true,
+		attributeFilter: ['open'],
+		onattributes(event) {
+			if (!(event.target instanceof HTMLDialogElement)) return;
+			disableGestures = event.target.open;
+		},
+	}}
+>
+	<BottomSheet
+		settings={{
+			maxHeight,
+			position,
+			disableClosing: disableGestures,
+			disableDragging: disableGestures,
+		}}
+		bind:isSheetOpen={open}
+	>
 		<BottomSheet.Overlay>
 			<BottomSheet.Sheet>
 				<BottomSheet.Handle>
@@ -72,6 +95,7 @@
 
 	[data-bottomsheet-wrapper] :global(.handle-container) {
 		background-color: var(--bg-neutral);
+		z-index: 200;
 
 		&:has(.title) {
 			border-bottom: 1px solid rgb(from var(--gray) r g b / 50%);

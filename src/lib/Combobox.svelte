@@ -202,7 +202,6 @@
 			{/if}
 		{/snippet}
 	</Combobox.Input>
-	<!-- <Combobox.Trigger>Open</Combobox.Trigger> -->
 	<Combobox.Portal>
 		<Combobox.Content {...contentProps} sideOffset={8}>
 			<div class="viewport" pw-testid={viewportTestId}>

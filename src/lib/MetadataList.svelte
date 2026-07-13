@@ -75,7 +75,15 @@
 <div class="liste" pw-testid={testid}>
 	{#snippet metadata(item: (typeof groupedDefinitions)[number])}
 		{@const { group, definitions } = item}
-		<div class="definition-group">
+		<div
+			class="definition-group"
+			// Don't wrap first-line if group only has typically short inputs (enum or checkbox)
+			style:--metadata-first-line-wrap={definitions.every((def) =>
+				['enum', 'boolean'].includes(def.type)
+			)
+				? 'nowrap'
+				: 'wrap'}
+		>
 			{#if group}
 				<details open={!group.collapsed}>
 					<summary>
@@ -129,6 +137,10 @@
 		gap: var(--metadata-list-gap, 1.5em);
 	}
 
+	.definition-group .grouped-metadata {
+		gap: calc(max(1em, var(--metadata-list-gap, 1.5em) * 0.75));
+	}
+
 	.liste {
 		scrollbar-color: var(--gray) transparent;
 		scrollbar-gutter: stable;
@@ -144,9 +156,10 @@
 		margin-left: 10px;
 	}
 
-	details summary + p {
+	details .description {
 		margin-top: -0.5em;
 		margin-bottom: 1em;
+		color: var(--gay);
 	}
 
 	details:open .icon {

@@ -133,7 +133,7 @@
 <div class="bar" data-layout={layout}>
 	<div class="current" style:grid-area="current" pw-testid="current">
 		<ButtonSecondary
-			onclick={() => focusOptionCombobox('focus')}
+			onclick={() => focusOptionCombobox?.('focus')}
 			help={{
 				text: 'Voir toutes les options',
 				keyboard: '$mod+F',
@@ -244,11 +244,5 @@
 		:global(button) {
 			width: 100%;
 		}
-	}
-
-	.current :global(input) {
-		font-size: 1em;
-		background: transparent;
-		/* width: 150px; */
 	}
 </style>

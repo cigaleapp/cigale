@@ -1,7 +1,7 @@
 import type { MaybeArray } from './utils.js';
 import type { Attachment } from 'svelte/attachments';
 
-import { ensureArray, switchValue } from './utils.js';
+import { ensureArray, overrideStyle, switchValue } from './utils.js';
 
 type Axis = 'horizontal' | 'vertical';
 type Direction = 'up' | 'left' | 'right' | 'down';
@@ -51,6 +51,12 @@ export function onSwipe(
 	);
 
 	return (element) => {
+		const cleanupOverscrollOverride = overrideStyle(
+			'body, html',
+			'overscroll-behavior-x',
+			'none'
+		);
+
 		const { width, height } = element.getBoundingClientRect();
 		if (thresholds.horizontal < 1) thresholds.horizontal *= width;
 		if (thresholds.vertical < 1) thresholds.horizontal *= height;
@@ -123,6 +129,7 @@ export function onSwipe(
 			element.removeEventListener('touchstart', onTouchStart);
 			element.removeEventListener('touchend', onTouchEnd);
 			element.removeEventListener('touchcancel', onTouchCancel);
+			cleanupOverscrollOverride();
 		};
 	};
 }

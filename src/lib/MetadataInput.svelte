@@ -1,9 +1,10 @@
 <script lang="ts">
 	import type { Metadata, MetadataEnumVariant } from './database.js';
 	import type { MaybeLoading } from './LoadingText.svelte';
+	import type { Props as MetadataComboboxProps } from './MetadataCombobox.svelte';
 	import type { NamespacedMetadataID } from './schemas/common.js';
 	import type { MetadataFile, RuntimeValue } from './schemas/metadata.js';
-	import type { ComponentProps, Snippet } from 'svelte';
+	import type { ComponentProps } from 'svelte';
 
 	import Icon from '@iconify/svelte';
 	import { ArkErrors, type } from 'arktype';
@@ -83,16 +84,7 @@
 		/** Add to alternatives by selecting other options, instead of changing the selected one. false by default */
 		addToAlternativesBySelect?: boolean;
 		/** Add content to enum options. Must be non-interactive. */
-		enumOptionsExtraContent?: Snippet<
-			[
-				{
-					option: MetadataEnumVariant;
-					disabled: boolean | string;
-					selected: boolean;
-					confidence: number | undefined;
-				},
-			]
-		>;
+		enumOptionsExtraContent?: MetadataComboboxProps['enumOptionsExtraContent'];
 	}
 
 	let {
@@ -299,6 +291,10 @@
 					type="single"
 					disabled={disabled ?? false}
 					value={deserializeValueIfNeeded(value)}
+					// If we have less than like, 10 options, don't show selected +suggestions first, as in that case we can easily see all options at once anyways and it allows sorting by the metadata definition's order, which will be prettier (e.g. conservation status' color gradient)
+					sorter={(options ?? []).length <= 10
+						? compareBy((opt) => opt.index)
+						: undefined}
 					onValueChange={async (picked, selection) => {
 						if (addToAlternativesBySelect) {
 							const [value, ...alternatives] = selection;
@@ -346,138 +342,148 @@
 							: v
 					)
 				: undefined}
-			<div class="underscored">
-				<input
-					{id}
-					{disabled}
-					type="text"
-					inputmode="numeric"
-					{...interval}
-					onblur={async ({ currentTarget }) => {
-						if (!(currentTarget instanceof HTMLInputElement)) return;
-						const newValue = currentTarget.value;
-						if (!newValue) {
-							await onblur(undefined);
-							return;
-						}
+			<div class="value-and-unit">
+				<div class="underscored">
+					<input
+						{id}
+						{disabled}
+						type="text"
+						inputmode="numeric"
+						{...interval}
+						onblur={async ({ currentTarget }) => {
+							if (!(currentTarget instanceof HTMLInputElement)) return;
+							const newValue = currentTarget.value;
+							if (!newValue) {
+								await onblur(undefined);
+								return;
+							}
 
-						let parsedValue: number | undefined =
-							definition.type === 'integer'
-								? Number.parseInt(newValue, 10)
-								: Number.parseFloat(newValue);
+							let parsedValue: number | undefined =
+								definition.type === 'integer'
+									? Number.parseInt(newValue, 10)
+									: Number.parseFloat(newValue);
 
-						if (Number.isNaN(parsedValue)) {
-							parsedValue = undefined;
-						}
+							if (Number.isNaN(parsedValue)) {
+								parsedValue = undefined;
+							}
 
-						await onblur(parsedValue, selectedUnit);
-					}}
-					value={temporaryValue ?? val?.toString() ?? ''}
-				/>
-			</div>
-
-			{#if baseUnit}
-				<DropdownMenu
-					scrollable
-					items={[
-						{
-							label: 'Unité',
-							items: availableUnitsFor(baseUnit).map((u) => {
-								const { symbol, name } = displayUnit(u);
-
-								return {
-									data: { symbol, name },
-									key: symbol || name,
-									type: 'selectable',
-									label: name || symbol,
-									selected: u === selectedUnit,
-									async onclick() {
-										if (val === undefined) return;
-										const converted = convert(val, valueUnit ?? baseUnit).to(u);
-										await onblur(converted, u);
-										valueUnit = u;
-									},
-								};
-							}),
-						},
-					]}
-				>
-					{#snippet trigger(props)}
-						{#if selectedUnit}
-							{@const { symbol, name } = displayUnit(selectedUnit)}
-							<ButtonIcon help="Utiliser une autre unité" {...props}>
-								{symbol || name}
-							</ButtonIcon>
-						{/if}
-					{/snippet}
-
-					{#snippet item({ name, symbol }, { selected })}
-						<div class="unit">
-							<span class="symbol">{symbol}</span>
-							<span class="name">{name}</span>
-							<div class="icon">
-								{#if selected}
-									<IconCheck />
-								{/if}
-							</div>
-						</div>
-					{/snippet}
-				</DropdownMenu>
-			{/if}
-
-			{#if interval?.min !== undefined && interval?.max !== undefined}
-				<div class="range-input">
-					<InputRange
-						min={interval.min}
-						max={interval.max}
-						granularity={definition.type === 'integer' ? 1 : 1e-6}
-						ticks={selectedUnit && unitKind(selectedUnit) === MeasureKind.Angle
-							? // Every 45deg from -360 to 360
-								Array.from({ length: (360 * 2) / 45 }).map((_, i) => i * 45 - 360)
-							: 1}
-						value={val}
-						onvalue={(v) => {
-							temporaryValue = v;
+							await onblur(parsedValue, selectedUnit);
 						}}
-						onblur={async () => {
-							await onblur(temporaryValue, valueUnit);
-						}}
+						value={temporaryValue ?? val?.toString() ?? ''}
 					/>
 				</div>
-			{/if}
 
-			<div class="increment-decrement-buttons">
-				<button
-					class="decrement"
-					aria-label="Décrémenter"
-					onclick={async () => {
-						if (value !== undefined && typeof value !== 'number') return;
-						if (temporaryValue !== undefined && typeof temporaryValue !== 'number')
-							return;
-						temporaryValue = round((temporaryValue ?? value ?? 0) - 1, 5);
-						await debouncedOnblur();
-					}}
-				>
-					<IconDecrement />
-				</button>
-				<button
-					class="increment"
-					aria-label="Incrémenter"
-					onclick={async () => {
-						if (value !== undefined && typeof value !== 'number') return;
-						if (temporaryValue !== undefined && typeof temporaryValue !== 'number')
-							return;
-						temporaryValue = round((temporaryValue ?? value ?? 0) + 1, 5);
-						await debouncedOnblur();
-					}}
-				>
-					<IconIncrement />
-				</button>
+				{#if baseUnit}
+					<DropdownMenu
+						scrollable
+						items={[
+							{
+								label: 'Unité',
+								items: availableUnitsFor(baseUnit).map((u) => {
+									const { symbol, name } = displayUnit(u);
+
+									return {
+										data: { symbol, name },
+										key: symbol || name,
+										type: 'selectable',
+										label: name || symbol,
+										selected: u === selectedUnit,
+										async onclick() {
+											if (val === undefined) return;
+											const converted = convert(
+												val,
+												valueUnit ?? baseUnit
+											).to(u);
+											await onblur(converted, u);
+											valueUnit = u;
+										},
+									};
+								}),
+							},
+						]}
+					>
+						{#snippet trigger(props)}
+							{#if selectedUnit}
+								{@const { symbol, name } = displayUnit(selectedUnit)}
+								<ButtonIcon help="Utiliser une autre unité" {...props}>
+									{symbol || name}
+								</ButtonIcon>
+							{/if}
+						{/snippet}
+
+						{#snippet item({ name, symbol }, { selected })}
+							<div class="unit">
+								<span class="symbol">{symbol}</span>
+								<span class="name">{name}</span>
+								<div class="icon">
+									{#if selected}
+										<IconCheck />
+									{/if}
+								</div>
+							</div>
+						{/snippet}
+					</DropdownMenu>
+				{/if}
+			</div>
+
+			<div class="controls">
+				{#if interval?.min !== undefined && interval?.max !== undefined}
+					<div class="range-input">
+						<InputRange
+							min={interval.min}
+							max={interval.max}
+							granularity={definition.type === 'integer' ? 1 : 1e-6}
+							ticks={selectedUnit && unitKind(selectedUnit) === MeasureKind.Angle
+								? // Every 45deg from -360 to 360
+									Array.from({ length: (360 * 2) / 45 }).map(
+										(_, i) => i * 45 - 360
+									)
+								: 1}
+							value={val}
+							onvalue={(v) => {
+								temporaryValue = v;
+							}}
+							onblur={async () => {
+								await onblur(temporaryValue, valueUnit);
+							}}
+						/>
+					</div>
+				{/if}
+
+				<div class="increment-decrement-buttons">
+					<button
+						class="decrement"
+						aria-label="Décrémenter"
+						onclick={async () => {
+							if (value !== undefined && typeof value !== 'number') return;
+							if (temporaryValue !== undefined && typeof temporaryValue !== 'number')
+								return;
+							temporaryValue = round((temporaryValue ?? value ?? 0) - 1, 5);
+							await debouncedOnblur();
+						}}
+					>
+						<IconDecrement />
+					</button>
+					<button
+						class="increment"
+						aria-label="Incrémenter"
+						onclick={async () => {
+							if (value !== undefined && typeof value !== 'number') return;
+							if (temporaryValue !== undefined && typeof temporaryValue !== 'number')
+								return;
+							temporaryValue = round((temporaryValue ?? value ?? 0) + 1, 5);
+							await debouncedOnblur();
+						}}
+					>
+						<IconIncrement />
+					</button>
+				</div>
 			</div>
 		{/snippet}
 		{#snippet date(value)}
 			<!-- TODO use bits-ui datepicker -->
 			<input
+				class="underscored"
 				type="date"
 				{id}
 				{disabled}
@@ -731,7 +737,7 @@
 			max-width: 30vw;
 		}
 
-		&:not(:has(.underscored)) {
+		&:not(:has(.underscored)):not(:has(.no-underscore)) {
 			border-bottom: 2px dashed var(--fg-neutral);
 
 			&:focus-within {
@@ -741,6 +747,14 @@
 			&.has-validation-errors {
 				border-color: var(--fg-error);
 			}
+		}
+	}
+
+	.metadata-input:is([data-type='integer'], [data-type='float']) {
+		.value-and-unit,
+		.controls {
+			display: flex;
+			align-items: center;
 		}
 	}
 

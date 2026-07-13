@@ -15,6 +15,7 @@
 	import IconNeutral from '~icons/ri/quote-text';
 	import { version } from '$app/environment';
 	import lockfile from '$lib/../../bun.lock?raw';
+	import { databaseName, databaseRevision } from '$lib/idb.svelte.js';
 	import Logo from '$lib/Logo.svelte';
 	import OverflowableText from '$lib/OverflowableText.svelte';
 	import { seo } from '$lib/seo.svelte';
@@ -170,6 +171,15 @@
 		<dl>
 			<dt>Appli</dt>
 			<dd>{version}</dd>
+			<dt>Base de données</dt>
+			<dd>
+				<dl>
+					<dt>Rév.</dt>
+					<dd>{databaseRevision}</dd>
+					<dt>Nom</dt>
+					<dd>{databaseName}</dd>
+				</dl>
+			</dd>
 			{#if electronVersions}
 				<dt>Node.js</dt>
 				<dd><code>{electronVersions.node}</code></dd>
