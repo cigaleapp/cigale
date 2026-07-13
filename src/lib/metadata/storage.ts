@@ -252,7 +252,13 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 				),
 	};
 
-	newValue.confidences[serializeMetadataValue(value)] = confidence;
+	// Keep neural inference's score in confidences map if we're
+	// storing a user override
+	if (newValue.manuallyModified && confidence === 1) {
+		newValue.confidences[serializeMetadataValue(value)] ??= confidence;
+	} else {
+		newValue.confidences[serializeMetadataValue(value)] = confidence;
+	}
 
 	/**
 	 * Updates newValue.confidences to take into account the old confidences (if clearConfidences is false)
