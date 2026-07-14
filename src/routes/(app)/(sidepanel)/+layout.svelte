@@ -18,7 +18,7 @@
 	import { deleteObservation, mergeToObservation, newObservation } from '$lib/observations';
 	import { cancelTask, importMore } from '$lib/queue.svelte.js';
 	import { seo } from '$lib/seo.svelte';
-	import { uiState } from '$lib/state.svelte';
+	import { uiState } from '$lib/uistate.svelte.js';
 	import { toasts } from '$lib/toasts.svelte';
 
 	import TopbarOpenSession from '../TopbarOpenSession.svelte';

@@ -13,7 +13,7 @@
 	import { goto } from '$lib/paths.js';
 	import { cancelTask, detectMore } from '$lib/queue.svelte.js';
 	import { seo } from '$lib/seo.svelte';
-	import { uiState } from '$lib/state.svelte.js';
+	import { uiState } from '$lib/uistate.svelte.js';
 	import { avg, groupBy, nonnull } from '$lib/utils.js';
 
 	seo({ title: 'Recadrer' });

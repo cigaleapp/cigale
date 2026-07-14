@@ -12,7 +12,7 @@
 	import Lightbox from '$lib/Lightbox.svelte';
 	import LoadingScreen from '$lib/LoadingScreen.svelte';
 	import { goto } from '$lib/paths.js';
-	import { uiState } from '$lib/state.svelte.js';
+	import { uiState } from '$lib/uistate.svelte.js';
 	import TopbarContent from '$routes/(app)/TopbarContent.svelte';
 
 	import { PendingStorage } from '../pendingstorage.svelte.js';

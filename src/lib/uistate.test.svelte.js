@@ -3,7 +3,7 @@ import 'fake-indexeddb/auto';
 import { beforeEach, describe, expect, it, test } from 'vitest';
 
 import { _tablesState, nukeDatabase } from './idb.svelte.js';
-import { UIState } from './state.svelte.js';
+import { UIState } from './uistate.svelte.js';
 import { keys } from './utils.js';
 
 beforeEach(() => {

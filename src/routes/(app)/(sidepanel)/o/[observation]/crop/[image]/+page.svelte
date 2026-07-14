@@ -131,7 +131,7 @@
 	import { goto } from '$lib/paths.js';
 	import { seo } from '$lib/seo.svelte';
 	import { getSettings } from '$lib/settings.svelte.js';
-	import { uiState } from '$lib/state.svelte';
+	import { uiState } from '$lib/uistate.svelte.js';
 
 	import TopbarExtras from '../../TopbarExtras.svelte';
 	import { changeAllConfirmedStatuses, setupUndoActions } from './actions.svelte.js';

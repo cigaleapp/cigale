@@ -14,7 +14,7 @@
 	import { storeMetadataValue } from '$lib/metadata/storage.js';
 	import MetadataCascadesTable from '$lib/MetadataCascadesTable.svelte';
 	import Modal from '$lib/Modal.svelte';
-	import { uiState } from '$lib/state.svelte.js';
+	import { uiState } from '$lib/uistate.svelte.js';
 	import { splitRecord } from '$lib/utils.js';
 
 	import { narrowingState } from './+layout.svelte';

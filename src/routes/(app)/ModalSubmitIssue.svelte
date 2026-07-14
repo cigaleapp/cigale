@@ -18,7 +18,7 @@
 	import Markdown from '$lib/Markdown.svelte';
 	import Modal from '$lib/Modal.svelte';
 	import { getSettings } from '$lib/settings.svelte.js';
-	import { uiState } from '$lib/state.svelte';
+	import { uiState } from '$lib/uistate.svelte.js';
 	import { toasts } from '$lib/toasts.svelte';
 
 	interface Props {

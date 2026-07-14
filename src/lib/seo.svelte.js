@@ -1,4 +1,4 @@
-import { uiState } from './state.svelte';
+import { uiState } from './uistate.svelte.js';
 
 /**
  *

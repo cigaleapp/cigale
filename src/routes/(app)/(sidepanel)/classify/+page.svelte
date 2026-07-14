@@ -22,7 +22,7 @@
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { cancelTask, classifyMore } from '$lib/queue.svelte.js';
 	import { seo } from '$lib/seo.svelte';
-	import { uiState } from '$lib/state.svelte';
+	import { uiState } from '$lib/uistate.svelte.js';
 	import { toasts } from '$lib/toasts.svelte';
 	import { isAbortError, nonnull } from '$lib/utils.js';
 

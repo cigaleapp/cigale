@@ -18,7 +18,7 @@
 	import { metadataOptionsOf, serializeMetadataValue } from './metadata/index.js';
 	import MetadataCascadesTable from './MetadataCascadesTable.svelte';
 	import { namespaceOfMetadataId } from './schemas/metadata.js';
-	import { uiState } from './state.svelte';
+	import { uiState } from './uistate.svelte.js';
 	import { cancellable, readableOn } from './utils.js';
 
 	let {

@@ -15,7 +15,7 @@
 	import Logo from '$lib/Logo.svelte';
 	import { goto } from '$lib/paths.js';
 	import { cancelTask, importMore } from '$lib/queue.svelte.js';
-	import { uiState } from '$lib/state.svelte.js';
+	import { uiState } from '$lib/uistate.svelte.js';
 	import { unique } from '$lib/utils';
 
 	const allImages = $derived([

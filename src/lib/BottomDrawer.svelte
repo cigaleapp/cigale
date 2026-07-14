@@ -14,6 +14,9 @@
 		maxHeight?: number;
 		title?: string;
 		position?: BottomSheetSettings['position'];
+		trigger?: Snippet;
+		/** The trigger will be the bottom bar. The value of this prop is the text shown. */
+		'trigger-from-bottombar'?: string;
 	}
 </script>
 
@@ -23,7 +26,11 @@
 
 	import { BottomSheet } from 'svelte-bottom-sheet';
 
+	import IconShowPanel from '~icons/ri/arrow-up-s-line';
+	import BottombarContent from '$routes/(app)/BottombarContent.svelte';
+
 	import { mutationobserver } from './mutations.js';
+	import { onswipe } from './touch/swipes.js';
 
 	let {
 		open = $bindable(false),
@@ -31,10 +38,29 @@
 		children,
 		maxHeight = 0.7,
 		position = 'bottom',
+		trigger,
+		'trigger-from-bottombar': triggerFromBottombar,
 	}: Props = $props();
 
 	let disableGestures = $state(false);
 </script>
+
+{#if triggerFromBottombar}
+	<BottombarContent>
+		<button
+			class="open-drawer"
+			{@attach onswipe('up', () => {
+				open = true;
+			})}
+			onclick={() => {
+				open = true;
+			}}
+		>
+			{triggerFromBottombar}
+			<IconShowPanel />
+		</button>
+	</BottombarContent>
+{/if}
 
 <div
 	data-bottomsheet-wrapper
@@ -57,6 +83,11 @@
 		}}
 		bind:isSheetOpen={open}
 	>
+		{#if trigger}
+			<BottomSheet.Trigger>
+				{@render trigger()}
+			</BottomSheet.Trigger>
+		{/if}
 		<BottomSheet.Overlay>
 			<BottomSheet.Sheet>
 				<BottomSheet.Handle>
@@ -127,5 +158,14 @@
 		border-radius: 9999px;
 		background-color: var(--gray);
 		margin: 0.5em auto;
+	}
+
+	button.open-drawer {
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
+		justify-content: space-between;
+		width: 100%;
+		font-size: 1rem;
 	}
 </style>

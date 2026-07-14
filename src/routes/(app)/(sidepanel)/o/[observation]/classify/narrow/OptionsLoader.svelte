@@ -17,7 +17,7 @@
 	import { databaseHandle } from '$lib/idb.svelte.js';
 	import Logo from '$lib/Logo.svelte';
 	import { metadataOptionsOf } from '$lib/metadata/storage.js';
-	import { uiState } from '$lib/state.svelte.js';
+	import { uiState } from '$lib/uistate.svelte.js';
 	import { cancellable } from '$lib/utils.js';
 
 	import { narrowingState } from './+layout.svelte';

@@ -15,7 +15,7 @@
 	import { goto } from '$app/navigation';
 	import { match, resolve } from '$app/paths';
 	import { Theme } from '$lib/colorscheme.svelte';
-	import { uiState } from '$lib/state.svelte';
+	import { uiState } from '$lib/uistate.svelte.js';
 	import { fadeOutElement } from '$lib/utils';
 
 	const { children } = $props();

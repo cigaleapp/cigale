@@ -8,7 +8,7 @@ import { isMetadataInProtocol } from './schemas/protocols.js';
 import { mapValues, omit, pick, transformObject } from './utils.js';
 
 /**
- * @import * as DB from './database';
+ * @import * as DB from './database.js';
  * @import { NamespacedMetadataID } from './schemas/common.js';
  * @import { TypedMetadataValue } from './metadata/index.js';
  */
@@ -170,12 +170,12 @@ export class UIState {
 		this._currentSessionId = id;
 	}
 
-	/** @type {import('./database').Session | undefined}  */
+	/** @type {import('./database.js').Session | undefined}  */
 	currentSession = $derived(tables.Session.state.find((s) => s.id === this.currentSessionId));
 
 	currentProtocolId = $derived(this.currentSession?.protocol);
 
-	/** @type {import('./database').Protocol | undefined} */
+	/** @type {import('./database.js').Protocol | undefined} */
 	currentProtocol = $derived(tables.Protocol.state.find((p) => p.id === this.currentProtocolId));
 
 	classificationMetadata = $derived(
@@ -196,16 +196,16 @@ export class UIState {
 	cropMetadataId = $derived(this.cropMetadata?.id ?? 'backbone__crop');
 
 	/**
-	 * @param {import('./database').Image} image
-	 * @returns {import('./metadata').TypedMetadataValue<'boundingbox'>|undefined}
+	 * @param {import('./database.js').Image} image
+	 * @returns {import('./metadata/index.js').TypedMetadataValue<'boundingbox'>|undefined}
 	 */
 	cropMetadataValueOf(image) {
 		return getMetadataValue(image, 'boundingbox', this.cropMetadataId);
 	}
 
 	/**
-	 * @param {import('./database').Image} image
-	 * @returns {import('./metadata').TypedMetadataValue<'enum'>|undefined}
+	 * @param {import('./database.js').Image} image
+	 * @returns {import('./metadata/index.js').TypedMetadataValue<'enum'>|undefined}
 	 */
 
 	classificationMetadataValueOf(image) {
@@ -275,7 +275,7 @@ export class UIState {
 
 	/**
 	 * Classification metadata with an enabled neural model selection.
-	 * @type {import('./database').Metadata[]}
+	 * @type {import('./database.js').Metadata[]}
 	 */
 	enabledClassificationMetadata = $derived.by(() => {
 		return this.allClassificationMetadata.filter(
@@ -285,7 +285,7 @@ export class UIState {
 
 	/**
 	 * All metadata with neural enum inference (not just the first one)
-	 * @type {import('./database').Metadata[]}
+	 * @type {import('./database.js').Metadata[]}
 	 */
 	allClassificationMetadata = $derived.by(() => {
 		const protocol = this.currentProtocol;
@@ -299,7 +299,7 @@ export class UIState {
 
 	/**
 	 * Maps metadata IDs to their neural inference models
-	 * @type {import('./database').Metadata['id'] extends string ? Record<import('./database').Metadata['id'], typeof import('$lib/schemas/neural.js').NeuralEnumInference.infer[]> : never}
+	 * @type {import('./database.js').Metadata['id'] extends string ? Record<import('./database.js').Metadata['id'], typeof import('$lib/schemas/neural.js').NeuralEnumInference.infer[]> : never}
 	 */
 	allClassificationModels = $derived.by(() => {
 		/** @type {Record<string, any>} */
@@ -315,7 +315,7 @@ export class UIState {
 
 	/**
 	 * Maps metadata IDs to their selected model indices
-	 * @type {import('./database').Metadata['id'] extends string ? Record<import('./database').Metadata['id'], number> : never}
+	 * @type {import('./database.js').Metadata['id'] extends string ? Record<import('./database.js').Metadata['id'], number> : never}
 	 */
 	selectedClassificationModels = $derived.by(() => {
 		/** @type {Record<string, number>} */

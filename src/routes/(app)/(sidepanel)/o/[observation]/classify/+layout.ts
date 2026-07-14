@@ -4,7 +4,7 @@ import { galleryEffectiveSorter } from '$lib/gallery.js';
 import { listByIndex, tables } from '$lib/idb.svelte.js';
 import { observationMetadata } from '$lib/observations.js';
 import { defaultClassificationMetadata } from '$lib/protocols.js';
-import { uiState } from '$lib/state.svelte.js';
+import { uiState } from '$lib/uistate.svelte.js';
 import { unique } from '$lib/utils.js';
 
 // Some stuff is loaded here to prevent loading it on every navigation within the fullscreen classifier

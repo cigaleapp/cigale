@@ -29,7 +29,7 @@
 	import { percent, plural } from '$lib/i18n.js';
 	import LoadingScreen from '$lib/LoadingScreen.svelte';
 	import ModalConfirm from '$lib/ModalConfirm.svelte';
-	import { uiState } from '$lib/state.svelte.js';
+	import { uiState } from '$lib/uistate.svelte.js';
 	import { cycleValues, orEmpty, switchValue } from '$lib/utils.js';
 
 	import ModalSubmitIssue from '../ModalSubmitIssue.svelte';

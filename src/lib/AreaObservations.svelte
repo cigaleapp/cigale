@@ -21,7 +21,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	import IconExpand from '~icons/ri/arrow-right-s-line';
 	import IconTrash from '~icons/ri/delete-bin-line';
 	import { IsMobile } from '$lib/mobile.svelte.js';
-	import { uiState } from '$lib/state.svelte.js';
+	import { uiState } from '$lib/uistate.svelte.js';
 
 	import ButtonIcon from './ButtonIcon.svelte';
 	import ButtonInk from './ButtonInk.svelte';

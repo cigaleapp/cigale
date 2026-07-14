@@ -4,7 +4,7 @@ import { error } from '@sveltejs/kit';
 
 import { databaseHandle, dependencyURI, tables } from '$lib/idb.svelte.js';
 import { metadataOptionsOf } from '$lib/metadata/index.js';
-import { uiState } from '$lib/state.svelte.js';
+import { uiState } from '$lib/uistate.svelte.js';
 
 /**
  * To avoid re-fetching options of the focused metadata every time

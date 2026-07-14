@@ -5,7 +5,7 @@
 
 	import { tables } from './idb.svelte.js';
 	import OverflowableText from './OverflowableText.svelte';
-	import { uiState } from './state.svelte.js';
+	import { uiState } from './uistate.svelte.js';
 	import { compareBy, readableOn } from './utils.js';
 
 	interface Props {

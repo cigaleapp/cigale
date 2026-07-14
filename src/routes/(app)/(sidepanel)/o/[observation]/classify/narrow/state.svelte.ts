@@ -9,7 +9,7 @@ import { page } from '$app/state';
 import { tables } from '$lib/idb.svelte.js';
 import { observationMetadata } from '$lib/observations.js';
 import { isNamespacedToProtocol } from '$lib/schemas/metadata.js';
-import { uiState } from '$lib/state.svelte.js';
+import { uiState } from '$lib/uistate.svelte.js';
 import { entries, transformObject } from '$lib/utils.js';
 
 import { computeDescriptors, getAllCandidates, matches } from './candidates.js';

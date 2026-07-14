@@ -5,7 +5,7 @@
 	import { plural } from '$lib/i18n.js';
 	import { tables } from '$lib/idb.svelte.js';
 	import { isNamespacedToProtocol } from '$lib/schemas/metadata.js';
-	import { uiState } from '$lib/state.svelte.js';
+	import { uiState } from '$lib/uistate.svelte.js';
 	import { compareBy } from '$lib/utils.js';
 
 	const narrowableGroups = $derived(

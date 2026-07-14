@@ -21,7 +21,7 @@
 	import { namespaceOfMetadataId } from '$lib/schemas/metadata.js';
 	import { scrollfader } from '$lib/scrollfader';
 	import { isDebugMode } from '$lib/settings.svelte.js';
-	import { uiState } from '$lib/state.svelte.js';
+	import { uiState } from '$lib/uistate.svelte.js';
 	import { undo } from '$lib/undo.svelte';
 
 	import { fullscreenState } from '../../+layout@(app).svelte';

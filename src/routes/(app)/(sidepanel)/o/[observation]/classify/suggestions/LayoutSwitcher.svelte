@@ -3,7 +3,7 @@
 	import { tables } from '$lib/idb.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import { FULLSCREEN_CLASSIFY_LAYOUTS as LAYOUTS } from '$lib/schemas/sessions';
-	import { uiState } from '$lib/state.svelte';
+	import { uiState } from '$lib/uistate.svelte.js';
 	import { tooltip } from '$lib/tooltips';
 	import { sleep } from '$lib/utils';
 

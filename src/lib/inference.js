@@ -217,7 +217,7 @@ export function modelUrl(model) {
  * @param {AbortSignal} [taskSettings.abortSignal]
  * @param {ArrayBuffer[]} buffers
  * @param {import('onnxruntime-web').InferenceSession} session
- * @param {typeof import('./state.svelte.js').uiState} [uiState]
+ * @param {typeof import('./uistate.svelte.js').uiState} [uiState]
  * @param {boolean} sequence
  * @param {boolean} webgpu
  * @returns {Promise<[BB[][], number[][], number, ort.Tensor[]]>}

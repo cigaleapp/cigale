@@ -1,7 +1,7 @@
 import { galleryEffectiveSorter } from '$lib/gallery.js';
 import { tables } from '$lib/idb.svelte.js';
 import { imageIdToFileId } from '$lib/images';
-import { uiState } from '$lib/state.svelte.js';
+import { uiState } from '$lib/uistate.svelte.js';
 
 // Note: we make sure not to depend on the route parameters or the image data here.
 // This is because the gallery's ordering might change mid-cropping

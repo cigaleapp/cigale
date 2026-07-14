@@ -28,7 +28,7 @@
 	import { seo } from '$lib/seo.svelte';
 	import { switchSession } from '$lib/sessions.js';
 	import { getSettings, isDebugMode, setSetting } from '$lib/settings.svelte.js';
-	import { uiState } from '$lib/state.svelte.js';
+	import { uiState } from '$lib/uistate.svelte.js';
 	import { nonnull } from '$lib/utils.js';
 
 	import TopbarHome from '../TopbarHome.svelte';
