@@ -12,8 +12,8 @@ import {
 	resizeToMaxSize,
 	storeImageBytes,
 } from '$lib/images.js';
-import { uiState } from '$lib/uistate.svelte.js';
 import { toasts } from '$lib/toasts.svelte.js';
+import { uiState } from '$lib/uistate.svelte.js';
 
 import { setExifFields } from './exif.js';
 import { imageLimits } from './inference_utils.js';

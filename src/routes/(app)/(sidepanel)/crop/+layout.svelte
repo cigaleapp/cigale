@@ -6,8 +6,8 @@
 	import { loadModel } from '$lib/inference.js';
 	import Logo from '$lib/Logo.svelte';
 	import ProgressBar from '$lib/ProgressBar.svelte';
-	import { uiState } from '$lib/uistate.svelte.js';
 	import { toasts } from '$lib/toasts.svelte';
+	import { uiState } from '$lib/uistate.svelte.js';
 	import { isAbortError } from '$lib/utils.js';
 
 	const { data, children } = $props();

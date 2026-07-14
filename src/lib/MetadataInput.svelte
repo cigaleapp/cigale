@@ -38,11 +38,11 @@
 	import { sendNotification } from './notifications.js';
 	import OverflowableText from './OverflowableText.svelte';
 	import { availableUnitsFor, displayUnit, NumericUnit, unitKind } from './schemas/units.js';
-	import { uiState } from './uistate.svelte.js';
 	import { resolveObjectWithBytes } from './storage/utils.js';
 	import Switch from './Switch.svelte';
 	import { toasts } from './toasts.svelte.js';
 	import { tooltip } from './tooltips.js';
+	import { uiState } from './uistate.svelte.js';
 	import {
 		cancellable,
 		compareBy,

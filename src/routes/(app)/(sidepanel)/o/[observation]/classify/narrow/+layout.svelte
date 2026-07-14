@@ -26,9 +26,9 @@
 	import { goto } from '$lib/paths.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
-	import { uiState } from '$lib/uistate.svelte.js';
 	import { toasts } from '$lib/toasts.svelte.js';
 	import { tooltip } from '$lib/tooltips.js';
+	import { uiState } from '$lib/uistate.svelte.js';
 	import { compareBy, transformObject } from '$lib/utils.js';
 	import VirtualList from '$lib/VirtualList.svelte';
 

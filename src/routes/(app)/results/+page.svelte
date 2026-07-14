@@ -36,10 +36,10 @@
 	import { sendNotification } from '$lib/notifications.js';
 	import { ensureNoLoneImages } from '$lib/observations.js';
 	import SessionMetadataForm from '$lib/SessionMetadataForm.svelte';
-	import { uiState } from '$lib/uistate.svelte.js';
 	import { toasts } from '$lib/toasts.svelte.js';
 	import Tooltip from '$lib/Tooltip.svelte';
 	import { tooltip } from '$lib/tooltips.js';
+	import { uiState } from '$lib/uistate.svelte.js';
 	import { entries } from '$lib/utils.js';
 	import ZipContentsTree from '$lib/ZipContentsTree.svelte';
 

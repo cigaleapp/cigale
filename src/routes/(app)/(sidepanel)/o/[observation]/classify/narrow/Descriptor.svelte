@@ -21,8 +21,8 @@
 	import { deleteMetadataValue, storeMetadataValue } from '$lib/metadata/storage.js';
 	import OverflowableText from '$lib/OverflowableText.svelte';
 	import RadialProgress from '$lib/RadialProgress.svelte';
-	import { uiState } from '$lib/uistate.svelte.js';
 	import { tooltip } from '$lib/tooltips.js';
+	import { uiState } from '$lib/uistate.svelte.js';
 	import { corsfixIfLocalhost } from '$lib/utils.js';
 
 	import { narrowingState } from './+layout.svelte';

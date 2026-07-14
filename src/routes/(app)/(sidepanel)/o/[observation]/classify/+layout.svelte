@@ -7,8 +7,8 @@
 	import { observationMetadata } from '$lib/observations.js';
 	import { goto } from '$lib/paths.js';
 	import { defaultClassificationMetadata } from '$lib/protocols.js';
-	import { uiState } from '$lib/uistate.svelte.js';
 	import { toasts } from '$lib/toasts.svelte.js';
+	import { uiState } from '$lib/uistate.svelte.js';
 	import { compareBy } from '$lib/utils.js';
 
 	import TopbarExtras from '../TopbarExtras.svelte';

@@ -24,8 +24,8 @@
 	import { initializeProcessingQueue } from '$lib/queue.svelte';
 	import { switchSession } from '$lib/sessions';
 	import { getColorScheme, isDebugMode, setSetting } from '$lib/settings.svelte';
-	import { uiState } from '$lib/uistate.svelte.js';
 	import { toasts } from '$lib/toasts.svelte';
+	import { uiState } from '$lib/uistate.svelte.js';
 	import { undo } from '$lib/undo.svelte';
 	import { nonnull, pick } from '$lib/utils';
 

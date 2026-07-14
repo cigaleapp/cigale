@@ -23,8 +23,8 @@
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { switchSession } from '$lib/sessions.js';
 	import { isDebugMode } from '$lib/settings.svelte.js';
-	import { uiState } from '$lib/uistate.svelte.js';
 	import { tooltip } from '$lib/tooltips.js';
+	import { uiState } from '$lib/uistate.svelte.js';
 	import { clamp } from '$lib/utils.js';
 
 	import DeploymentDetails from './DeploymentDetails.svelte';

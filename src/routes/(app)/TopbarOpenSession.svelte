@@ -10,8 +10,8 @@
 	import { goto } from '$lib/paths.js';
 	import { switchSession } from '$lib/sessions.js';
 	import { locale } from '$lib/settings.svelte.js';
-	import { uiState } from '$lib/uistate.svelte.js';
 	import { tooltip } from '$lib/tooltips.js';
+	import { uiState } from '$lib/uistate.svelte.js';
 
 	import ModalSubmitIssue from './ModalSubmitIssue.svelte';
 	import TabSettings from './TabSettings.svelte';

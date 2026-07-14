@@ -44,9 +44,9 @@
 	import Logo from './Logo.svelte';
 	import { IsMobile } from './mobile.svelte.js';
 	import OverflowableText from './OverflowableText.svelte';
-	import { uiState } from './uistate.svelte.js';
 	import { tooltip } from './tooltips.js';
 	import { onlongpress } from './touch/longpress.js';
+	import { uiState } from './uistate.svelte.js';
 
 	/** @type {Props & Omit<Record<string, unknown>, keyof Props>}*/
 	let {

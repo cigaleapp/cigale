@@ -4,8 +4,8 @@
 	import { page } from '$app/state';
 	import { toTopLeftCoords } from '$lib/BoundingBoxes.svelte.js';
 	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
-	import { uiState } from '$lib/uistate.svelte.js';
 	import { Gestures } from '$lib/touch/gestures.svelte.js';
+	import { uiState } from '$lib/uistate.svelte.js';
 	import { mapValues, overrideStyle, pick } from '$lib/utils.js';
 
 	import { focusedImage, boundingBoxes as getBoundingBoxes, zoom } from './+page.svelte';
