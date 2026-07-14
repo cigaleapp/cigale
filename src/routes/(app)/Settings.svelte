@@ -57,8 +57,7 @@
 		})();
 	});
 
-	const { debugMode, language, parallelism, submitIssuesVia } =
-		$derived(getSettings());
+	const { debugMode, language, parallelism, submitIssuesVia } = $derived(getSettings());
 
 	const theme = getTheme();
 
