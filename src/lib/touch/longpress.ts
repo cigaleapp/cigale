@@ -1,20 +1,27 @@
 import type { Attachment } from 'svelte/attachments';
 
-export function onlongpress(timeout: number, callback: () => void): Attachment<HTMLElement> {
+export function onlongpress(
+	timeout: number,
+	callback: (e: PointerEvent) => void
+): Attachment<HTMLElement> {
 	return (node) => {
-		let pressTimer: ReturnType<typeof setTimeout> | null = null;
+		let pressTimer: number | NodeJS.Timeout | null = null;
+		let event: PointerEvent | null = null;
 
 		const ondown = () => {
 			pressTimer = setTimeout(() => {
-				callback();
+				if (event) callback(event);
 			}, timeout);
 		};
 
-		const onup = () => {
+		const onup = (e: PointerEvent) => {
 			if (pressTimer) {
 				clearTimeout(pressTimer);
 				pressTimer = null;
+				event = null;
 			}
+
+			event = e;
 		};
 
 		node.addEventListener('pointerdown', ondown);

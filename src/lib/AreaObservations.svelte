@@ -92,8 +92,9 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 			// Set the handler on imagesContainer
 			if (imagesContainer) {
 				imagesContainer.onclick = (e) => {
-					console.debug('click on images container', e.target);
+					if (e.currentTarget !== e.target) return;
 					if (e.target?.dataset?.startsSelection === undefined) return;
+					console.debug('click on images container', e.target);
 					if (uiState.selection.length > 0) {
 						uiState.selection = [];
 						dragselect?.setSelection([]);

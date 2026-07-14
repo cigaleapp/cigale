@@ -112,7 +112,9 @@
 		if (!uiState?.setSelection) return;
 		e.preventDefault();
 	}}
-	{@attach onlongpress(250, () => {
+	{@attach onlongpress(250, (e) => {
+		e.preventDefault()
+		
 		if (!selectable) return;
 		if (!mobile.current) return;
 		if (!uiState) return;
