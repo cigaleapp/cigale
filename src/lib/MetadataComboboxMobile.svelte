@@ -526,6 +526,7 @@
 		}
 	}
 
+	@media (prefers-reduced-motion: no-preference) {
 		dialog > *:not(.selected) {
 			transition:
 				max-height,
@@ -536,6 +537,7 @@
 		.expand-selected section.selected {
 			max-height: 100lvh;
 		}
+	}
 
 	.expand-selected :is(dialog > *:not(.selected)) {
 		max-height: 0;
