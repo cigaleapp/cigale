@@ -263,12 +263,12 @@ jobs:
       - name: Get stats
         id: stats
         run: |
-          echo JSON reporter contents are:
-          cat combined.json
-
           function get {
             jq .stat combined.json | jq $1
           }
+
+          echo JSON reporter stat object is:
+          get .
 
           echo "total=$(get '.expected + .unexpected')" >> $GITHUB_OUTPUT
           echo "failed=$(get .unexpected)" >> $GITHUB_OUTPUT
