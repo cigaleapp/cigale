@@ -320,7 +320,7 @@ jobs:
 
       - name: Push notification
         uses: ./.github/actions/notify
-        if: github.event_name == 'pull_request' && !cancelled() && !contains(github.event.pull_request.labels.*.name, 'notifications-off') && !github.event.pull_request.draft
+        if: github.event_name == 'pull_request' && always() && !contains(github.event.pull_request.labels.*.name, 'notifications-off') && !github.event.pull_request.draft
         with:
           api_base_url: ${{ secrets.GOTIFY_API_BASE_URL }}
           token: ${{ secrets.GOTIFY_APP_TOKEN }}
