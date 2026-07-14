@@ -359,7 +359,7 @@ test.describe('full-screen classification view', pr(1071), () => {
 
 		// Confirming lil-fella
 
-		await page.getByRole('button', { name: 'Continuer' }).click();
+		await page.getByRole('button', { name: 'Suivante', exact: true }).click();
 		await expect(confirmedCropOverlay(page)).toBeVisible();
 
 		await expect(
@@ -430,7 +430,7 @@ test.describe('full-screen classification view', pr(1071), () => {
 
 		// Now that all other observations are classified, confirming should work
 
-		await page.getByRole('button', { name: 'Continuer' }).click();
+		await page.getByRole('button', { name: 'Suivante', exact: true }).click();
 		await expect(confirmedCropOverlay(page)).toBeVisible();
 		await app.path.wait('/results/');
 

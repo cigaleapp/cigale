@@ -25,6 +25,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 
 	import ButtonIcon from './ButtonIcon.svelte';
 	import ButtonInk from './ButtonInk.svelte';
+	import DebugOnly from './DebugOnly.svelte';
 	import { DragSelect } from './dragselect.svelte.js';
 	import { galleryItemsGrouper, galleryItemsSorter } from './gallery.js';
 	import { openTransaction } from './idb.svelte.js';
@@ -395,21 +396,16 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 
 	{#if isDebugMode() && items.length > 0}
 		<div class="debug">
-			{#snippet displayIter(set)}
-				{'{'}
-				{[...$state.snapshot(set)]
-					.map((item) => (item.length > 10 ? '…' : '') + item.slice(-10))
-					.join(' ')}
-				}
-			{/snippet}
-			<code>
-				session {uiState.currentSessionId} <br />
-				selection {@render displayIter(uiState.selection)} <br />
-				queued {@render displayIter(uiState.queuedImages)} <br />
-				loading {@render displayIter(uiState.loadingImages)} <br />
-				errored {@render displayIter(uiState.erroredImages.keys())} <br />
-				preview urls {@render displayIter(uiState.previewURLs.keys())} <br />
-			</code>
+			<DebugOnly
+				data={{
+					session: uiState.selection,
+					selection: uiState.selection.slice(0, 10),
+					queued: [...uiState.queuedImages].slice(0, 10),
+					loading: [...uiState.loadingImages].slice(0, 10),
+					errored: [...uiState.erroredImages.keys()].slice(0, 10),
+					preview_urls: [...uiState.previewURLs.keys()].slice(0, 10),
+				}}
+			/>
 		</div>
 	{/if}
 </section>
@@ -546,6 +542,5 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		width: 100%;
 		flex-grow: 1;
 		margin-top: 2rem;
-		font-size: 0.75rem;
 	}
 </style>

@@ -124,21 +124,33 @@
 
 	import { watch } from 'runed';
 
+	import IconDelete from '~icons/ri/delete-bin-line';
+	import IconReset from '~icons/ri/reset-left-fill';
 	import { page } from '$app/state';
+	import BottomDrawer from '$lib/BottomDrawer.svelte';
+	import { plural } from '$lib/i18n.js';
 	import { imageIdToFileId, imagesOfImageFile } from '$lib/images.js';
 	import { assertIs } from '$lib/metadata/index.js';
+	import { IsMobile } from '$lib/mobile.svelte.js';
 	import { goto } from '$lib/paths.js';
 	import { seo } from '$lib/seo.svelte';
-	import { getSettings } from '$lib/settings.svelte.js';
+	import { getSettings, isDebugMode, toggleSetting } from '$lib/settings.svelte.js';
 	import { uiState } from '$lib/uistate.svelte.js';
 
 	import TopbarExtras from '../../TopbarExtras.svelte';
-	import { changeAllConfirmedStatuses, setupUndoActions } from './actions.svelte.js';
+	import {
+		changeAllConfirmedStatuses,
+		deleteImageFileAndGotoNext,
+		revertAll,
+		setupUndoActions,
+	} from './actions.svelte.js';
 	import Boxes from './Boxes.svelte';
 	import CropSurface from './CropSurface.svelte';
 	import { setupKeyboardShortcuts } from './keyboard.svelte.js';
 	import Toolbar from './Toolbar.svelte';
 	import { Zoom } from './zoom.svelte.js';
+
+	const mobile = new IsMobile();
 
 	const firstImage = $derived(images.at(0));
 
@@ -149,6 +161,8 @@
 		imageId: null,
 		manual: false,
 	});
+
+	const boxesCount = $derived(Object.keys(boundingBoxes()).length);
 
 	seo({ title: `Recadrer ${firstImage?.filename ?? '...'}` });
 
@@ -224,6 +238,43 @@
 			await goToNextUnconfirmedFile({ or: '/classify/' });
 		},
 	}}
+	moreMenu={[
+		{
+			label: '',
+			items: [
+				{
+					type: 'clickable',
+					label: "Boîtes d'origine",
+					icon: IconReset,
+					data: {},
+					async onclick() {
+						await revertAll();
+					},
+				},
+				{
+					type: 'clickable',
+					label: "Supprimer l'image",
+					data: {},
+					danger: true,
+					icon: IconDelete,
+					async onclick() {
+						await deleteImageFileAndGotoNext();
+					},
+				},
+				{
+					type: 'selectable',
+					key: 'debugmode',
+					label: 'Mode debug',
+					data: {},
+					selected: isDebugMode(),
+					closeOnSelect: false,
+					async onclick() {
+						await toggleSetting('debugMode');
+					},
+				},
+			],
+		},
+	]}
 />
 
 <div class="layout">
@@ -238,20 +289,38 @@
 		<Toolbar />
 	</aside>
 
-	<aside class="info" class:collapsed={getSettings().cropperSidebarCollapsed}>
-		<Boxes bind:selectedBox />
-	</aside>
+	{#if !mobile.current}
+		<aside class="info" class:collapsed={getSettings().cropperSidebarCollapsed}>
+			<Boxes bind:selectedBox />
+		</aside>
+	{:else}
+		<BottomDrawer
+			--drawer-outer-padding="0"
+			trigger-from-bottombar={plural(boxesCount, [
+				'# boîte de recadrage',
+				'# boîtes de recadrages',
+			])}
+		>
+			<Boxes bind:selectedBox />
+		</BottomDrawer>
+	{/if}
 </div>
 
 <style>
 	.layout {
 		display: flex;
 		height: 100%;
+		width: 100lvw;
 		overflow: hidden;
+
+		@media (max-width: 600px) {
+			flex-direction: column;
+		}
 	}
 
 	.crop-surface {
 		width: 100%;
+		height: 100%;
 		overflow: hidden;
 	}
 

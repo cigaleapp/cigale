@@ -464,7 +464,8 @@
 	}
 
 	.change-area.debug {
-		outline: 5px dashed red;
+		outline: 2px dashed red;
+		font-size: 0.7rem;
 
 		.debug {
 			background: rgba(0 0 0 / 0.66);

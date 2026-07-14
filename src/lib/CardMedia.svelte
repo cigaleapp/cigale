@@ -87,11 +87,13 @@
 	});
 
 	let longpressCooldown = $state(false);
+
 	const selectByClicking = $derived(
 		!longpressCooldown &&
 			mobile.current &&
 			uiState?.setSelection &&
-			uiState.selection.length > 0
+			// FIXME: sometimes we have empty strings in the selection lol
+			uiState.selection.filter(Boolean).length > 0
 	);
 </script>
 
@@ -113,11 +115,12 @@
 		e.preventDefault();
 	}}
 	{@attach onlongpress(250, (e) => {
-		e.preventDefault()
-		
 		if (!selectable) return;
 		if (!mobile.current) return;
 		if (!uiState) return;
+
+		e.preventDefault();
+
 		uiState.toggleSelection(id);
 
 		longpressCooldown = true;
@@ -132,6 +135,7 @@
 			tag="div"
 			{ondoubleclick}
 			onclick={(e) => {
+				console.log('cardclick', e);
 				if (selectByClicking) {
 					// Add to selection instead
 					e.preventDefault();

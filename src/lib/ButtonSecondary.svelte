@@ -36,6 +36,7 @@ Available CSS variables:
 </script>
 
 <script>
+	import { hasPhysicalKeyboard } from './keyboard.svelte';
 	import KeyboardHint from './KeyboardHint.svelte';
 	import LoadingSpinner from './LoadingSpinner.svelte';
 	import { tooltip } from './tooltips.js';
@@ -113,7 +114,7 @@ Available CSS variables:
 			</div>
 		{/if}
 		{@render children({ loading: isLoading && loading !== false })}
-		{#if keyboard && !(tight && keyboardHintIsInTooltip)}
+		{#if keyboard && !(tight && keyboardHintIsInTooltip) && hasPhysicalKeyboard()}
 			<KeyboardHint shortcut={keyboard} />
 		{/if}
 	</button>

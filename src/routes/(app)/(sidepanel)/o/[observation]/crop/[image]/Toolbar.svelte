@@ -8,6 +8,7 @@
 	import IconExpand from '~icons/ri/expand-left-line';
 	import IconToolHand from '~icons/ri/hand';
 	import IconToolDragCrop from '~icons/ri/shape-2-line';
+	import { IsMobile } from '$lib/mobile.svelte';
 	import { getSettings, toggleSetting } from '$lib/settings.svelte.js';
 	import { tooltip } from '$lib/tooltips.js';
 	import { undo } from '$lib/undo.svelte.js';
@@ -89,6 +90,12 @@
 	}
 </script>
 
+<script lang="ts">
+	const mobile = new IsMobile();
+
+	const tooltipPlacement = $derived(mobile.current ? 'top' : 'left');
+</script>
+
 <div class="toolbar">
 	<div class="toolbar-buttons">
 		{#each tools as tool (tool.name)}
@@ -98,7 +105,7 @@
 				use:tooltip={{
 					text: `${tool.name}: ${tool.help}`,
 					keyboard: tool.shortcut,
-					placement: 'right',
+					placement: tooltipPlacement,
 				}}
 				onclick={() => {
 					activeToolName = tool.name;
@@ -109,7 +116,11 @@
 		{/each}
 		<button
 			aria-label="Annuler"
-			use:tooltip={{ text: 'Annuler', keyboard: '$mod+z', placement: 'right' }}
+			use:tooltip={{
+				text: 'Annuler',
+				keyboard: '$mod+z',
+				placement: tooltipPlacement,
+			}}
 			disabled={!undo.canPop}
 			onclick={() => undo.pop()}
 		>
@@ -117,7 +128,11 @@
 		</button>
 		<button
 			aria-label="Rétablir"
-			use:tooltip={{ text: 'Rétablir', keyboard: '$mod+Shift+z', placement: 'right' }}
+			use:tooltip={{
+				text: 'Rétablir',
+				keyboard: '$mod+Shift+z',
+				placement: tooltipPlacement,
+			}}
 			disabled={!undo.canRewind}
 			onclick={() => undo.rewind()}
 		>
@@ -130,46 +145,57 @@
 			sidebarCollapsed ? 'Afficher la liste des boîtes' : 'Masquer la liste des boîtes'
 		)}
 
-		<button
-			aria-label={help}
-			use:tooltip={{
-				text: help,
-				placement: 'right',
-				keyboard: '$mod+h',
-			}}
-			onclick={async () => {
-				await toggleSetting('cropperSidebarCollapsed');
-			}}
-		>
-			{#if sidebarCollapsed}
-				<IconExpand />
-			{:else}
-				<IconCollapse />
-			{/if}
-		</button>
+		{#if !mobile.current}
+			<button
+				aria-label={help}
+				use:tooltip={{
+					text: help,
+					placement: tooltipPlacement,
+					keyboard: '$mod+h',
+				}}
+				onclick={async () => {
+					await toggleSetting('cropperSidebarCollapsed');
+				}}
+			>
+				{#if sidebarCollapsed}
+					<IconExpand />
+				{:else}
+					<IconCollapse />
+				{/if}
+			</button>
+		{/if}
 	</div>
 </div>
 
 <style>
 	.toolbar {
+		--direction: column;
 		display: flex;
-		flex-direction: column;
+		flex-direction: var(--direction);
 		justify-content: space-between;
 		height: 100%;
+		--button-size: 2.5em;
+
+		@media (max-width: 600px) {
+			--direction: row;
+			width: 100%;
+			height: unset;
+			justify-content: center;
+			padding: 0.5em;
+			--button-size: 2.75em;
+		}
 	}
 
 	.toolbar-buttons {
-		--width: 2.5em;
 		display: flex;
-		flex-direction: column;
+		flex-direction: var(--direction);
 		align-items: center;
 		padding: 0.25em;
 	}
 
 	.toolbar-buttons button {
-		font-size: 1.2em;
-		width: var(--width);
-		height: var(--width);
+		width: var(--button-size);
+		height: var(--button-size);
 		display: flex;
 		justify-content: center;
 		align-items: center;
@@ -178,6 +204,11 @@
 		cursor: pointer;
 		position: relative;
 		border-radius: var(--corner-radius);
+		font-size: 1.2em;
+
+		@media (max-width: 600px) {
+			font-size: 1.1em;
+		}
 
 		&:disabled {
 			color: var(--gray);

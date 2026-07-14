@@ -249,7 +249,7 @@
 				</ButtonSecondary>
 			</div>
 		{/if}
-		{#if page.route.id === '/(app)/(sidepanel)/classify'}
+		{#if page.route.id === '/(app)/(sidepanel)/classify' && !mobile.current}
 			<ButtonSecondary
 				disabled={!singleObservationSelected}
 				loading

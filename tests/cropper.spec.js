@@ -100,7 +100,7 @@ test.describe('Cropper view', () => {
 			await page.getByText('leaf.jpeg', { exact: true }).click();
 			await app.path.wait(`/o/_/crop/${image.fileId}/`);
 			await page.waitForTimeout(1000);
-			await page.getByRole('button', { name: 'Continuer' }).click();
+			await page.getByRole('button', { name: 'Suivante', exact: true }).click();
 			await app.path.wait(`/o/_/crop/${image.fileId}/`);
 			await assert(page.getByText('leaf.jpeg', { exact: true })).not.toBeVisible();
 		});
@@ -140,7 +140,7 @@ test.describe('Cropper view', () => {
 			await page.getByText('leaf.jpeg', { exact: true }).click();
 			await app.path.wait(`/o/_/crop/${images.leaf.fileId}/`);
 			await page.waitForTimeout(1000);
-			await page.getByRole('button', { name: 'Continuer' }).click();
+			await page.getByRole('button', { name: 'Suivante', exact: true }).click();
 			await app.path.wait(`/o/_/crop/${images.withExifGps.fileId}/`);
 			await assert(page.getByText('with-exif-gps.jpeg', { exact: true })).toBeVisible();
 		});
@@ -182,7 +182,7 @@ test.describe('Cropper view', () => {
 
 			await page.getByText('with-exif-gps.jpeg', { exact: true }).click();
 			await app.path.wait(`/o/_/crop/${image.fileId}/`);
-			await page.getByRole('button', { name: 'Continuer' }).click();
+			await page.getByRole('button', { name: 'Suivante', exact: true }).click();
 			await page.waitForTimeout(1000);
 			assert(new URL(page.url()).pathname).toMatch(/^\/classify\/?$/);
 		});
