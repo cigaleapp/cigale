@@ -284,23 +284,10 @@
 {/snippet}
 
 {#if mobile.current}
-	<BottombarContent>
-		<button
-			class="open-drawer"
-			{@attach onswipe('up', () => {
-				collapsed = false;
-			})}
-			onclick={() => {
-				collapsed = false;
-			}}
-		>
-			{selectionTitle}
-			<IconShowPanel />
-		</button>
-	</BottombarContent>
 	<BottomDrawer
 		maxHeight={0.95}
 		title={selectionTitle}
+		trigger-from-bottombar={selectionTitle}
 		bind:open={
 			() => !collapsed,
 			(open) => {
@@ -417,14 +404,5 @@
 		align-items: center;
 		gap: 0.75em;
 		width: 100%;
-	}
-
-	button.open-drawer {
-		display: flex;
-		align-items: center;
-		gap: 0.5em;
-		justify-content: space-between;
-		width: 100%;
-		font-size: 1rem;
 	}
 </style>
