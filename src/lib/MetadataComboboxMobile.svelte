@@ -403,12 +403,12 @@
 						})),
 					]}
 				>
-					{#snippet tab(attrs, key)}
+					{#snippet tab(attrs, key, { shown })}
 						<button
 							class="tab-icon"
 							{...attrs}
 							onclick={() => {
-								if (key === 'details' && selected) {
+								if (key === 'details' && shown) {
 									expanded = !expanded;
 									return;
 								}

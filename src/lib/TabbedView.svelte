@@ -16,7 +16,7 @@
 	};
 
 	type Snip<Key extends TabKey, Extra extends unknown[] = []> = Snippet<
-		[...Extra, Key, { selected: boolean; index: number; tab: Tab<Key> }]
+		[...Extra, Key, { shown: boolean; index: number; tab: Tab<Key> }]
 	>;
 
 	type Props = {
@@ -123,7 +123,7 @@
 						{@render tabSnippet(btnattrs, tab.key, {
 							index: i,
 							tab,
-							selected: tab.key === currently,
+							shown: tab.key === currently,
 						})}
 					{:else}
 						<button {...btnattrs}>
@@ -157,7 +157,7 @@
 					{@render contentSnippet(tab.key, {
 						index: i,
 						tab,
-						selected: tab.key === currently,
+						shown: tab.key === currently,
 					})}
 				{/key}
 			</div>
