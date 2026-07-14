@@ -131,7 +131,7 @@ testBasic(
 	'deleting an observation does not delete ImageFiles that appear in other observations',
 	issue(1744),
 	async ({ page, app }) => {
-		await app.settings.set({ showTechnicalMetadata: true });
+		await app.settings.set({ debugMode: true });
 		await setInferenceModels(page, {
 			crop: 'Aucune inférence',
 			classify: 'Aucune inférence',

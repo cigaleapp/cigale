@@ -537,7 +537,7 @@ test.describe('narrowing view', pr(1570), () => {
 	}
 
 	test.beforeEach(async ({ page, app }) => {
-		await app.settings.set({ showTechnicalMetadata: false });
+		await app.settings.set({ debugMode: false });
 		await chooseFirstSession(page);
 		await setInferenceModels(page, {
 			classify: 'Aucune inférence',

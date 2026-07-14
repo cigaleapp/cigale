@@ -21,7 +21,7 @@ import {
 
 test('correctly applies crop padding', issue(463), async ({ page, app }) => {
 	// Disable inference to go faster
-	await app.settings.set({ showTechnicalMetadata: false });
+	await app.settings.set({ debugMode: false });
 	await newSession(page, {
 		models: {
 			crop: 'Aucune inférence',
@@ -44,9 +44,9 @@ test('correctly applies crop padding', issue(463), async ({ page, app }) => {
 	await page.getByRole('button', { name: 'Retour' }).click();
 
 	// XXX: turn on debug mode so that the tab is not disabled
-	await app.settings.set({ showTechnicalMetadata: true });
+	await app.settings.set({ debugMode: true });
 	await app.tabs.go('results');
-	await app.settings.set({ showTechnicalMetadata: false });
+	await app.settings.set({ debugMode: false });
 
 	const zip = await exportResults(page, { cropPadding: '40px' });
 	await expectZipFiles(zip, ['analysis.json', 'metadata.csv', 'Cropped/(Unknown)_obs1_1.png'], {
@@ -57,7 +57,7 @@ test('correctly applies crop padding', issue(463), async ({ page, app }) => {
 });
 
 testBasic('correctly shows .zip preview', async ({ page, app }) => {
-	await app.settings.set({ showTechnicalMetadata: false });
+	await app.settings.set({ debugMode: false });
 	await chooseFirstSession(page);
 
 	await app.tabs.go('results');

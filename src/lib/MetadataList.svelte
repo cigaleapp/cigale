@@ -34,7 +34,7 @@
 		scroll = $bindable({ y: 0 }),
 	}: Props = $props();
 
-	const { showTechnicalMetadata } = $derived(getSettings());
+	const { debugMode } = $derived(getSettings());
 
 	const compareDefinitions = $derived(metadataDefinitionComparator({ metadataOrder: ordering }));
 
@@ -101,7 +101,7 @@
 
 			{#snippet defs()}
 				{#each definitions as def (def.id)}
-					{#if def.label || showTechnicalMetadata}
+					{#if def.label || debugMode}
 						{@render children(def, values[def.id], {
 							collapsed: group?.collapsed ?? false,
 						})}

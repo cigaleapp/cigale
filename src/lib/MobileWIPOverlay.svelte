@@ -14,7 +14,7 @@
 	const mobile = new IsMobile();
 </script>
 
-{#if mobile.current && !getSettings().showTechnicalMetadata}
+{#if mobile.current && !getSettings().debugMode}
 	<div class="overlay">
 		<p>
 			{feature} est en cours de développement pour les appareils mobiles. En attendant, veuillez

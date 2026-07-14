@@ -57,7 +57,7 @@
 		})();
 	});
 
-	const { showTechnicalMetadata, language, parallelism, submitIssuesVia } =
+	const { debugMode, language, parallelism, submitIssuesVia } =
 		$derived(getSettings());
 
 	const theme = getTheme();
@@ -250,14 +250,14 @@
 					type: 'selectable',
 					key: 'debug-mode',
 					label: 'Mode debug',
-					selected: showTechnicalMetadata,
+					selected: debugMode,
 					closeOnSelect: false,
 					data: {
 						icon: IconDebugMode,
 						subtext: '',
 					},
 					async onclick() {
-						await setSetting('showTechnicalMetadata', !showTechnicalMetadata);
+						await setSetting('debugMode', !debugMode);
 					},
 				},
 				...desktopOnly({

@@ -17,7 +17,7 @@ test('Entomoscope @real-protocol', async ({ app, page, browserName }) => {
 	test.fixme(browserName === 'webkit', 'Flaky test on WebKit');
 	test.setTimeout(ms('5m'));
 
-	await app.settings.set({ showTechnicalMetadata: false });
+	await app.settings.set({ debugMode: false });
 	await goToProtocolManagement(page);
 	await importProtocol(page, 'protocols/entomoscope.cigaleprotocol.yaml', (p) => {
 		p.exports = {

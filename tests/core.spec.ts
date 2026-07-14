@@ -25,7 +25,7 @@ import {
 import { controlOrMeta } from './utils/keyboard.js';
 
 test('basic functionality', async ({ page, app }) => {
-	await app.settings.set({ showTechnicalMetadata: false });
+	await app.settings.set({ debugMode: false });
 	await newSession(page);
 	await app.tabs.go('import');
 
@@ -146,7 +146,7 @@ test('can handle a bunch of images at once', withParallelism(4), async ({ page, 
 	test.setTimeout(3 * timeouts.finish);
 
 	await app.settings.set({
-		showTechnicalMetadata: false,
+		debugMode: false,
 	});
 	await newSession(page);
 	await app.tabs.go('import');
@@ -181,7 +181,7 @@ test('can handle a bunch of images at once', withParallelism(4), async ({ page, 
 });
 
 test('can import a protocol via /protocols/import/url', async ({ page, app, context }) => {
-	await app.settings.set({ showTechnicalMetadata: false });
+	await app.settings.set({ debugMode: false });
 	const protocolUrl = 'https://example.com/kitchensink.yaml';
 	await mockProtocolSourceURL(page, context, protocolUrl, {
 		body: await readFile(

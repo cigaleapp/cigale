@@ -8,7 +8,7 @@ test(
 	'honors infer.neural.output.select for enum metadata',
 	pr(1751),
 	async ({ page, app, onnxmodels }) => {
-		await app.settings.set({ showTechnicalMetadata: true });
+		await app.settings.set({ debugMode: true });
 		await app.tabs.go('protocols');
 		await importProtocol(page, {
 			id: 'testing',

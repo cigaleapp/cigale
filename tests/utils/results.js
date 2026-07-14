@@ -23,7 +23,7 @@ export async function importResults(page, filepath, { waitForLoading = true } = 
 			page,
 		},
 		{
-			showTechnicalMetadata: false,
+			debugMode: false,
 		}
 	);
 

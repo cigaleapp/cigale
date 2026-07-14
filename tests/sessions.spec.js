@@ -66,7 +66,7 @@ test.describe('isolation', () => {
 });
 
 test('import into new session', async ({ page, app }) => {
-	await app.settings.set({ showTechnicalMetadata: false });
+	await app.settings.set({ debugMode: false });
 	const picker = page.waitForEvent('filechooser');
 	await page.getByRole('button', { name: 'Importer .zip' }).click();
 	await picker.then((picker) => {
@@ -289,7 +289,7 @@ test('changing session info saves in the database', async ({ page, app }) => {
 });
 
 test('can change protocol of session', async ({ page, app }) => {
-	await app.settings.set({ showTechnicalMetadata: false });
+	await app.settings.set({ debugMode: false });
 	await goToProtocolManagement(page);
 	await importProtocol(page, 'examples/kitchensink.cigaleprotocol.yaml');
 	await newSession(page, { name: 'Test' });
@@ -400,7 +400,7 @@ test('can change protocol of session', async ({ page, app }) => {
 testKitchensink('session metadata form has default values @no-builtins', async ({ page, app }) => {
 	// test.skip(browserName === 'webkit', 'Does not work on Webkit for some reason');
 
-	await app.settings.set({ showTechnicalMetadata: false });
+	await app.settings.set({ debugMode: false });
 	await newSession(page, { name: 'Test', goto: '', protocol: 'Kitchen sink' });
 
 	const session = await app.db.session.byName('Test');
@@ -443,7 +443,7 @@ testKitchensink('session metadata form has default values @no-builtins', async (
 });
 
 testKitchensink('can set file-type metadata @no-builtins', async ({ page, app }) => {
-	await app.settings.set({ showTechnicalMetadata: false });
+	await app.settings.set({ debugMode: false });
 	await newSession(page, { name: 'Test', protocol: 'Kitchen sink' });
 	await goToSessionPage(page);
 
@@ -532,7 +532,7 @@ testKitchensink('can set file-type metadata @no-builtins', async ({ page, app })
 });
 
 testKitchensink('can convert between units', async ({ page, app }) => {
-	await app.settings.set({ showTechnicalMetadata: false });
+	await app.settings.set({ debugMode: false });
 	await page.getByRole('button', { name: 'Gérer', exact: true }).click();
 	await app.path.wait('/(app)/sessions/[id]');
 	const section = app.metadata.section('Has no default');
