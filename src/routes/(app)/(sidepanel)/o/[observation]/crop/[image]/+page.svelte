@@ -127,7 +127,6 @@
 	import { page } from '$app/state';
 	import { imageIdToFileId, imagesOfImageFile } from '$lib/images.js';
 	import { assertIs } from '$lib/metadata/index.js';
-	import MobileWIPOverlay from '$lib/MobileWIPOverlay.svelte';
 	import { goto } from '$lib/paths.js';
 	import { seo } from '$lib/seo.svelte';
 	import { getSettings } from '$lib/settings.svelte.js';
@@ -140,8 +139,6 @@
 	import { setupKeyboardShortcuts } from './keyboard.svelte.js';
 	import Toolbar from './Toolbar.svelte';
 	import { Zoom } from './zoom.svelte.js';
-
-	const { params } = $props();
 
 	const firstImage = $derived(images.at(0));
 
@@ -196,18 +193,6 @@
 		}
 	);
 </script>
-
-<MobileWIPOverlay
-	feature="Le recadrage"
-	issue={1518}
-	back={async () => {
-		if (params.observation) {
-			await goto('/(app)/(sidepanel)/o/[observation]/classify', params);
-		} else {
-			await goto('/crop/');
-		}
-	}}
-/>
 
 <TopbarExtras
 	bind:flashConfirmedOverlay={showConfirmedOverlay}
