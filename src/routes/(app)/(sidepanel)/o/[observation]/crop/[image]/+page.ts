@@ -2,6 +2,7 @@ import { galleryEffectiveSorter } from '$lib/gallery.js';
 import { tables } from '$lib/idb.svelte.js';
 import { imageIdToFileId } from '$lib/images';
 import { uiState } from '$lib/uistate.svelte.js';
+import { unique } from '$lib/utils.js';
 
 // Note: we make sure not to depend on the route parameters or the image data here.
 // This is because the gallery's ordering might change mid-cropping
@@ -47,6 +48,6 @@ export async function load({ parent }) {
 	}
 
 	return {
-		sortedFileIds: images.map((image) => image.fileId ?? imageIdToFileId(image.id)),
+		sortedFileIds: unique(images.map((image) => image.fileId ?? imageIdToFileId(image.id))),
 	};
 }
