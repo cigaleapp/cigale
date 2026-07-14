@@ -526,17 +526,24 @@
 		}
 	}
 
+		dialog > *:not(.selected) {
+			transition:
+				max-height,
+				min-height 100ms,
+				opacity 200ms;
+		}
+
+		.expand-selected section.selected {
+			max-height: 100lvh;
+		}
+
 	.expand-selected :is(dialog > *:not(.selected)) {
 		max-height: 0;
 		min-height: 0;
 		overflow: hidden;
 		padding-block: 0;
 		border: none;
-	}
-
-	header,
-	section.suggestions {
-		transition: max-height 200ms;
+		opacity: 0;
 	}
 
 	dialog[open] {
@@ -581,6 +588,7 @@
 		gap: 0.5em;
 		border-bottom: 1px solid var(--gray);
 		max-height: 50lvh;
+		min-height: 50lvh;
 		padding: 1em;
 	}
 
@@ -677,10 +685,6 @@
 			width: 100%;
 			object-fit: cover;
 		}
-	}
-
-	.expand-selected section.selected {
-		max-height: 100lvh;
 	}
 
 	section.selected {
