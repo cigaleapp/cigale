@@ -528,6 +528,7 @@
 
 	.expand-selected :is(dialog > *:not(.selected)) {
 		max-height: 0;
+		min-height: 0;
 		overflow: hidden;
 		padding-block: 0;
 		border: none;
@@ -556,6 +557,10 @@
 		display: grid;
 		gap: 0.5em;
 		grid-template-columns: max-content auto max-content;
+
+		/* for animation when details are expanded */
+		max-height: 4rem;
+		min-height: 1rem;
 	}
 
 	search {
