@@ -5,7 +5,7 @@
 	/**
 	 * @typedef Props
 	 * @type {object}
-	 * @property {(e: MouseEvent, set: (props: { status?: Status, loadingStatusText?: string }) => void) => void} [onclick]
+	 * @property {(e: MouseEvent | TouchEvent, set: (props: { status?: Status, loadingStatusText?: string }) => void) => void} [onclick]
 	 * @property {() => void} [onstacksizeclick]
 	 * @property {() => void} [ondoubleclick]
 	 * @property {() => void} [ondelete]
@@ -114,43 +114,37 @@
 		if (!uiState?.setSelection) return;
 		e.preventDefault();
 	}}
-	{@attach onlongpress(250, (e) => {
-		if (!selectable) return;
-		if (!mobile.current) return;
-		if (!uiState) return;
+	{@attach onlongpress(250, {
+		short(e) {
+			if (selectByClicking) {
+				// Add to selection instead
+				e.preventDefault();
+				uiState?.toggleSelection(id);
+				return;
+			}
 
-		e.preventDefault();
+			if (loading || errored) return;
+			onclick?.(e, (newProps) => {
+				if (newProps.status) status = newProps.status;
+				if (newProps.loadingStatusText) loadingStatusText = newProps.loadingStatusText;
+			});
+		},
+		long() {
+			if (!selectable) return;
+			if (!mobile.current) return;
+			if (!uiState) return;
 
-		uiState.toggleSelection(id);
+			uiState.toggleSelection(id);
 
-		longpressCooldown = true;
-		setTimeout(() => {
-			longpressCooldown = false;
-		}, 500);
+			longpressCooldown = true;
+			setTimeout(() => {
+				longpressCooldown = false;
+			}, 500);
+		},
 	})}
 >
 	<div class="main-card">
-		<!-- use () => {} instead of undefined so that the hover/focus styles still apply -->
-		<Card
-			tag="div"
-			{ondoubleclick}
-			onclick={(e) => {
-				console.log('cardclick', e);
-				if (selectByClicking) {
-					// Add to selection instead
-					e.preventDefault();
-					uiState?.toggleSelection(id);
-					return;
-				}
-
-				if (loading || errored) return;
-				if (!(e instanceof MouseEvent)) return;
-				onclick?.(e, (newProps) => {
-					if (newProps.status) status = newProps.status;
-					if (newProps.loadingStatusText) loadingStatusText = newProps.loadingStatusText;
-				});
-			}}
-		>
+		<Card tag="div" {ondoubleclick}>
 			<div class="inner">
 				{#if status !== 'ok'}
 					<div class="loading-overlay">

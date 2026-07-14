@@ -398,7 +398,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		<div class="debug">
 			<DebugOnly
 				data={{
-					session: uiState.selection,
+					session: uiState.currentSessionId,
 					selection: uiState.selection.slice(0, 10),
 					queued: [...uiState.queuedImages].slice(0, 10),
 					loading: [...uiState.loadingImages].slice(0, 10),

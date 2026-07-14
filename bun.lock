@@ -32,6 +32,7 @@
         "baseline-browser-mapping": "^2.10.42",
         "bits-ui": "^1.8.0",
         "caniuse-lite": "^1.0.30001802",
+        "clicked": "^4.0.3",
         "convert": "^7.0.0",
         "date-fns": "^4.4.0",
         "dequal": "^2.0.3",
@@ -1420,6 +1421,8 @@
     "cli-truncate": ["cli-truncate@6.0.0", "", { "dependencies": { "slice-ansi": "^9.0.0", "string-width": "^8.2.0" } }, "sha512-3+YKIUFsohD9MIoOFPFBldjAlnfCmCDcqe6aYGFqlDTRKg80p4wg35L+j83QQ63iOlKRccEkbn8IuM++HsgEjA=="],
 
     "cli-width": ["cli-width@3.0.0", "", {}, "sha512-FxqpkPPwu1HjuN93Omfm4h8uIanXofW0RxVEW3k5RKx+mJJYSthzNhp32Kzxxy3YAEZ/Dc/EWN1vZRY0+kOhbw=="],
+
+    "clicked": ["clicked@4.0.3", "", {}, "sha512-gsAXR5OHhjhFGLegYhI9D1Ac58/dAqDxyipXXsASmeIGAus1eKsKEq/7rsFiatoHQrTwDD9ttrIo7jtSQbsb+g=="],
 
     "cliui": ["cliui@8.0.1", "", { "dependencies": { "string-width": "^4.2.0", "strip-ansi": "^6.0.1", "wrap-ansi": "^7.0.0" } }, "sha512-BSeNnyus75C4//NQ9gQt1/csTXyo/8Sb+afLAkzAptFuMsod9HFokGNudZpi/oQV73hnVK+sR+5PVRMd+Dr7YQ=="],
 
