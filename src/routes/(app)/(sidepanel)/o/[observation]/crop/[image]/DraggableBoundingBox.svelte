@@ -386,6 +386,8 @@
 	{/if}
 	{#each Object.entries(boundingBoxesPixels).filter(([imageId]) => imageIdToFileId(imageId) === imageFileID) as [imageId, box] (imageId)}
 		<div
+			// TODO: dont animate when creating
+			// transition:fade={{ duration: 100 }}
 			class="boundingbox"
 			data-image={imageId}
 			class:movable

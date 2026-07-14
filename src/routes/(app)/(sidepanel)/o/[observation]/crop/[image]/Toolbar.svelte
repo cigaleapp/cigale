@@ -13,9 +13,13 @@
 	import { tooltip } from '$lib/tooltips.js';
 	import { undo } from '$lib/undo.svelte.js';
 
+	type ToolName = (typeof tools)[number]['name'];
+
 	export interface Tool {
 		name: string;
 		help: string;
+		/** Override help for mobile devices */
+		mobileHelp?: string;
 		icon: import('svelte').Component;
 		shortcut: string;
 		transformable: boolean;
@@ -28,6 +32,8 @@
 		{
 			name: 'Glisser-recadrer',
 			help: 'Cliquer et glisser pour créer une boîte de recadrage',
+			mobileHelp:
+				'Glisser pour créer une boîte de recadrage. Utiliser deux doigts pour se déplacer',
 			icon: IconToolDragCrop,
 			shortcut: 'r',
 			transformable: true,
@@ -68,6 +74,7 @@
 		{
 			name: 'Main',
 			help: "Cliquer et glisser pour se déplacer dans l'image",
+			mobileHelp: "Se déplacer dans l'image avec le doigt",
 			icon: IconToolHand,
 			shortcut: 'h',
 			transformable: false,
@@ -77,9 +84,11 @@
 		},
 	] as const satisfies Tool[];
 
-	let activeToolName = $state<(typeof tools)[number]['name']>('Glisser-recadrer');
+	// Using $derived would require having access to props in <script module>, so no can do
+	// eslint-disable-next-line svelte/prefer-writable-derived
+	let activeToolName = $state<ToolName>();
 
-	export function switchTool(name: typeof activeToolName) {
+	export function switchTool(name: ToolName) {
 		activeToolName = name;
 	}
 
@@ -91,6 +100,16 @@
 </script>
 
 <script lang="ts">
+	interface Props {
+		initialTool: ToolName;
+	}
+
+	const { initialTool }: Props = $props();
+
+	$effect(() => {
+		activeToolName = initialTool;
+	});
+
 	const mobile = new IsMobile();
 
 	const tooltipPlacement = $derived(mobile.current ? 'top' : 'left');
@@ -102,11 +121,13 @@
 			<button
 				aria-label="Choisir l'outil {tool.name}"
 				class:active={tool.name === activeToolName}
-				use:tooltip={{
-					text: `${tool.name}: ${tool.help}`,
-					keyboard: tool.shortcut,
-					placement: tooltipPlacement,
-				}}
+				use:tooltip={mobile.current
+					? undefined
+					: {
+							text: `${tool.name}: ${tool.help}`,
+							keyboard: tool.shortcut,
+							placement: tooltipPlacement,
+						}}
 				onclick={() => {
 					activeToolName = tool.name;
 				}}
@@ -181,8 +202,13 @@
 			width: 100%;
 			height: unset;
 			justify-content: center;
-			padding: 0.5em;
+			padding: 0 0.25em;
 			--button-size: 2.75em;
+			--active-marker: var(--fg-primary);
+
+			overflow: hidden;
+			color: white;
+			color-scheme: dark;
 		}
 	}
 
@@ -228,7 +254,7 @@
 		width: 0;
 		height: 3px;
 		border-radius: 1000000px;
-		background: var(--bg-primary);
+		background: var(--active-marker, var(--bg-primary));
 		transition: width 0.1s;
 	}
 
@@ -236,8 +262,10 @@
 		width: 40%;
 	}
 
-	.toolbar-buttons button:is(:hover, :focus-visible) {
-		color: var(--fg-primary);
-		background: var(--bg-primary-translucent);
+	@media (min-width: 600px) {
+		.toolbar-buttons button:is(:hover, :focus-visible) {
+			color: var(--fg-primary);
+			background: var(--bg-primary-translucent);
+		}
 	}
 </style>

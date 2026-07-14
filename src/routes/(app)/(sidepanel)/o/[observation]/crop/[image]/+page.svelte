@@ -26,6 +26,17 @@
 		return images;
 	}
 
+	let hideAllBoxes = $state(false);
+
+	export function setHideAll(value: boolean) {
+		hideAllBoxes = value;
+		focusedImageId = null;
+	}
+
+	export function getHideAll() {
+		return hideAllBoxes;
+	}
+
 	let focusedImageId = $derived.by(() => {
 		if (!page.params.observation) return;
 
@@ -40,8 +51,12 @@
 
 	export function setFocusedImage(imageId: string | null) {
 		focusedImageId = imageId ?? undefined;
+		hideAllBoxes = false;
 	}
 
+	/**
+	 * Keys are Image table IDs
+	 */
 	export function boundingBoxes() {
 		return Object.fromEntries(
 			images
@@ -128,7 +143,6 @@
 	import IconReset from '~icons/ri/reset-left-fill';
 	import { page } from '$app/state';
 	import BottomDrawer from '$lib/BottomDrawer.svelte';
-	import { plural } from '$lib/i18n.js';
 	import { imageIdToFileId, imagesOfImageFile } from '$lib/images.js';
 	import { assertIs } from '$lib/metadata/index.js';
 	import { IsMobile } from '$lib/mobile.svelte.js';
@@ -146,6 +160,8 @@
 	} from './actions.svelte.js';
 	import Boxes from './Boxes.svelte';
 	import CropSurface from './CropSurface.svelte';
+	import FocusSwitcher from './FocusSwitcher.svelte';
+	import ImmersiveActions from './ImmersiveActions.svelte';
 	import { setupKeyboardShortcuts } from './keyboard.svelte.js';
 	import Toolbar from './Toolbar.svelte';
 	import { Zoom } from './zoom.svelte.js';
@@ -206,6 +222,8 @@
 			}
 		}
 	);
+
+	let openBoxesList = $state(false);
 </script>
 
 <TopbarExtras
@@ -244,8 +262,17 @@
 			items: [
 				{
 					type: 'clickable',
-					label: "Boîtes d'origine",
+					label: 'Liste des boîtes',
+					data: {},
+					onclick() {
+						openBoxesList = true;
+					},
+				},
+				{
+					type: 'clickable',
+					label: "Revenir aux boîtes d'origine",
 					icon: IconReset,
+					danger: true,
 					data: {},
 					async onclick() {
 						await revertAll();
@@ -279,6 +306,12 @@
 
 <div class="layout">
 	<main class="crop-surface">
+		{#if mobile.current}
+			<div class="immersive-actions">
+				<ImmersiveActions />
+			</div>
+		{/if}
+
 		<!-- TODO: make CropSurface handle its image element resize instead -->
 		{#key getSettings().cropperSidebarCollapsed}
 			<CropSurface bind:imageIsLoading {showConfirmedOverlay} {selectedBox} />
@@ -286,7 +319,13 @@
 	</main>
 
 	<aside class="toolbar">
-		<Toolbar />
+		{#if mobile.current}
+			<div class="focus-switcher">
+				<FocusSwitcher bind:selectedBox {imageIsLoading} />
+			</div>
+		{/if}
+
+		<Toolbar intialTool={mobile.current && boxesCount > 0 ? 'Main' : 'Glisser-recadrer'} />
 	</aside>
 
 	{#if !mobile.current}
@@ -294,13 +333,7 @@
 			<Boxes bind:selectedBox />
 		</aside>
 	{:else}
-		<BottomDrawer
-			--drawer-outer-padding="0"
-			trigger-from-bottombar={plural(boxesCount, [
-				'# boîte de recadrage',
-				'# boîtes de recadrages',
-			])}
-		>
+		<BottomDrawer --drawer-outer-padding="0" bind:open={openBoxesList}>
 			<Boxes bind:selectedBox />
 		</BottomDrawer>
 	{/if}
@@ -312,9 +345,29 @@
 		height: 100%;
 		width: 100lvw;
 		overflow: hidden;
+		background: #000;
 
 		@media (max-width: 600px) {
 			flex-direction: column;
+		}
+	}
+
+	.toolbar {
+		position: relative;
+
+		@media (max-width: 600px) {
+			position: fixed;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			padding-bottom: 0.5rem;
+		}
+
+		.focus-switcher {
+			position: absolute;
+			bottom: 5rem;
+			left: 0;
+			right: 0;
 		}
 	}
 
@@ -322,6 +375,18 @@
 		width: 100%;
 		height: 100%;
 		overflow: hidden;
+	}
+
+	.crop-surface {
+		position: relative;
+
+		.immersive-actions {
+			position: absolute;
+			z-index: 10;
+			top: 1rem;
+			left: 1rem;
+			right: 1rem;
+		}
 	}
 
 	.info {

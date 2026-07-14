@@ -3,6 +3,10 @@
 		currentImages().every(({ metadata }) => !metadata[uiState.cropMetadataId]?.manuallyModified)
 	);
 
+	export function boxesListHintShown() {
+		return showBoxesListHint
+	}
+
 	export function setBoxesListHintShown(shown: boolean) {
 		showBoxesListHint = shown;
 	}
