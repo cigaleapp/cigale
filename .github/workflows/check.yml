@@ -297,6 +297,7 @@ jobs:
     env:
       TITLE: '👀 PR #${{ github.event.pull_request.number }} (${{ github.event.pull_request.head.ref }}) checks finished'
       MESSAGE: 'No further information available'
+      URL: ${{ github.event.pull_request._links.html.href }}
 
     runs-on: ubuntu-latest
     steps:
@@ -309,6 +310,7 @@ jobs:
       - if: needs.e2e.result == 'failure'
         run: |
           echo "MESSAGE=E2E: ${{ needs.e2e.outputs.failed }} failed, ${{ needs.e2e.outputs.flaky }} flaky, ${{ needs.e2e.outputs.total }} total" >> $GITHUB_ENV
+          echo "URL=https://pleye.gwen.works/${{ github.repo }}/branches/${{ github.event.pull_request.head.ref }}" >> $GITHUB_ENV
       - if: needs.dont-merge-comment.result == 'failure'
         run: echo "MESSAGE=Code has don't merge comments" >> $GITHUB_ENV
       - if: needs.is-mergeable.result == 'success'
@@ -326,3 +328,4 @@ jobs:
           token: ${{ secrets.GOTIFY_APP_TOKEN }}
           title: ${{ env.TITLE }}
           message: ${{ env.MESSAGE }}
+          url: ${{ env.URL }}

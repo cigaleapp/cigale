@@ -12,6 +12,9 @@ inputs:
     required: true
   message:
     required: true
+  url:
+    description: Where to go when clicking the notification
+    required: true
 
 runs:
   using: composite
@@ -22,7 +25,14 @@ runs:
           {
             "title": "${{ inputs.title }}",
             "message": "${{ inputs.message }}",
-            "priority": 4
+            "priority": 4,
+            "extras": {
+              "client::notification": {
+                "click": {
+                  "url": "${{ inputs.url }}"
+                }
+              }
+            }
           }
         JSON)
 
