@@ -176,7 +176,7 @@ jobs:
     uses: ./.github/workflows/deploy.yml
     with:
       artifact: ${{ needs.build-github-pages.outputs.artifact }}
-      notify: ${{ includes(github.event.head_commit.message, '/notify') || includes(github.event.head_commit.message, '🚑') || includes(github.event.head_commit.message, ':ambulance:') }}
+      notify: ${{ contains(github.event.head_commit.message, '/notify') || contains(github.event.head_commit.message, '🚑') || contains(github.event.head_commit.message, ':ambulance:') }}
 
   check-native-version:
     if: contains(github.event.pull_request.labels.*.name, 'android-native-changes')
