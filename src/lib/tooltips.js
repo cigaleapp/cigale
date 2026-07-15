@@ -1,6 +1,7 @@
 import tippy from 'sveltejs-tippy';
 import xss from 'xss';
 
+import { hasPhysicalKeyboard } from './keyboard.svelte';
 import { APPLE_GLYPHS, displayPattern } from './KeyboardHint.svelte';
 import { omit } from './utils.js';
 
@@ -34,7 +35,7 @@ function props(parameters) {
 					},
 				}) +
 				// XXX: needs :global styling from KeyboardHint.svelte
-				(parameters.keyboard
+				(parameters.keyboard && hasPhysicalKeyboard()
 					? ' <kbd class=hint>' +
 						displayPattern(parameters.keyboard)
 							.entries()

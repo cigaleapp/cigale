@@ -28,43 +28,45 @@ export class Fingers {
 		return 'ontouchstart' in this.inside;
 	}
 
-	#handle = (event: Event) => {
-		if (this.#supportsTouchEvents()) {
-			if (event instanceof TouchEvent) {
-				this.touches = [...iterateDOMList(event.touches)];
-			}
+	get #handle() {
+		return (event: Event) => {
+			if (this.#supportsTouchEvents()) {
+				if (event instanceof TouchEvent) {
+					this.touches = [...iterateDOMList(event.touches)];
+				}
 
-			// Mouse support too, cuz touch{start,end} only works
-			// for touchscreens obviously
-			if (event instanceof MouseEvent) {
-				switch (event.type as `mouse${'up' | 'down'}`) {
-					case 'mousedown': {
-						this.touches = [event];
-						break;
+				// Mouse support too, cuz touch{start,end} only works
+				// for touchscreens obviously
+				if (event instanceof MouseEvent) {
+					switch (event.type as `mouse${'up' | 'down'}`) {
+						case 'mousedown': {
+							this.touches = [event];
+							break;
+						}
+						case 'mouseup': {
+							this.touches = [];
+						}
 					}
-					case 'mouseup': {
-						this.touches = [];
+				}
+			} else {
+				// Do dumb manual tracking too cuz TouchEvent is not supported
+				// on Safari yet
+				// See https://developer.mozilla.org/en-US/docs/Web/API/Element/touchstart_event#browser_compatibility
+				if (event instanceof PointerEvent) {
+					switch (event.type as `pointer${'up' | 'down'}`) {
+						case 'pointerdown': {
+							this.touches.push(event);
+							break;
+						}
+						case 'pointerup': {
+							this.#removeTouch(event);
+							break;
+						}
 					}
 				}
 			}
-		} else {
-			// Do dumb manual tracking too cuz TouchEvent is not supported
-			// on Safari yet
-			// See https://developer.mozilla.org/en-US/docs/Web/API/Element/touchstart_event#browser_compatibility
-			if (event instanceof PointerEvent) {
-				switch (event.type as `pointer${'up' | 'down'}`) {
-					case 'pointerdown': {
-						this.touches.push(event);
-						break;
-					}
-					case 'pointerup': {
-						this.#removeTouch(event);
-						break;
-					}
-				}
-			}
-		}
-	};
+		};
+	}
 
 	constructor(public inside: HTMLElement = document.body) {
 		$effect(() => {

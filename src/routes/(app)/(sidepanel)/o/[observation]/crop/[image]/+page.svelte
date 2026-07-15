@@ -26,6 +26,17 @@
 		return images;
 	}
 
+	let hideAllBoxes = $state(false);
+
+	export function setHideAll(value: boolean) {
+		hideAllBoxes = value;
+		focusedImageId = null;
+	}
+
+	export function getHideAll() {
+		return hideAllBoxes;
+	}
+
 	let focusedImageId = $derived.by(() => {
 		if (!page.params.observation) return;
 
@@ -40,8 +51,12 @@
 
 	export function setFocusedImage(imageId: string | null) {
 		focusedImageId = imageId ?? undefined;
+		hideAllBoxes = false;
 	}
 
+	/**
+	 * Keys are Image table IDs
+	 */
 	export function boundingBoxes() {
 		return Object.fromEntries(
 			images
@@ -124,24 +139,34 @@
 
 	import { watch } from 'runed';
 
+	import IconDelete from '~icons/ri/delete-bin-line';
+	import IconReset from '~icons/ri/reset-left-fill';
 	import { page } from '$app/state';
+	import BottomDrawer from '$lib/BottomDrawer.svelte';
 	import { imageIdToFileId, imagesOfImageFile } from '$lib/images.js';
 	import { assertIs } from '$lib/metadata/index.js';
-	import MobileWIPOverlay from '$lib/MobileWIPOverlay.svelte';
+	import { IsMobile } from '$lib/mobile.svelte.js';
 	import { goto } from '$lib/paths.js';
 	import { seo } from '$lib/seo.svelte';
-	import { getSettings } from '$lib/settings.svelte.js';
+	import { getSettings, isDebugMode, toggleSetting } from '$lib/settings.svelte.js';
 	import { uiState } from '$lib/uistate.svelte.js';
 
 	import TopbarExtras from '../../TopbarExtras.svelte';
-	import { changeAllConfirmedStatuses, setupUndoActions } from './actions.svelte.js';
+	import {
+		changeAllConfirmedStatuses,
+		deleteImageFileAndGotoNext,
+		revertAll,
+		setupUndoActions,
+	} from './actions.svelte.js';
 	import Boxes from './Boxes.svelte';
 	import CropSurface from './CropSurface.svelte';
+	import FocusSwitcher from './FocusSwitcher.svelte';
+	import ImmersiveActions from './ImmersiveActions.svelte';
 	import { setupKeyboardShortcuts } from './keyboard.svelte.js';
 	import Toolbar from './Toolbar.svelte';
 	import { Zoom } from './zoom.svelte.js';
 
-	const { params } = $props();
+	const mobile = new IsMobile();
 
 	const firstImage = $derived(images.at(0));
 
@@ -152,6 +177,8 @@
 		imageId: null,
 		manual: false,
 	});
+
+	const boxesCount = $derived(Object.keys(boundingBoxes()).length);
 
 	seo({ title: `Recadrer ${firstImage?.filename ?? '...'}` });
 
@@ -195,19 +222,9 @@
 			}
 		}
 	);
-</script>
 
-<MobileWIPOverlay
-	feature="Le recadrage"
-	issue={1518}
-	back={async () => {
-		if (params.observation) {
-			await goto('/(app)/(sidepanel)/o/[observation]/classify', params);
-		} else {
-			await goto('/crop/');
-		}
-	}}
-/>
+	let openBoxesList = $state(false);
+</script>
 
 <TopbarExtras
 	bind:flashConfirmedOverlay={showConfirmedOverlay}
@@ -239,10 +256,62 @@
 			await goToNextUnconfirmedFile({ or: '/classify/' });
 		},
 	}}
+	moreMenu={[
+		{
+			label: '',
+			items: [
+				{
+					type: 'clickable',
+					label: 'Liste des boîtes',
+					data: {},
+					onclick() {
+						openBoxesList = true;
+					},
+				},
+				{
+					type: 'clickable',
+					label: "Revenir aux boîtes d'origine",
+					icon: IconReset,
+					danger: true,
+					data: {},
+					async onclick() {
+						await revertAll();
+					},
+				},
+				{
+					type: 'clickable',
+					label: "Supprimer l'image",
+					data: {},
+					danger: true,
+					icon: IconDelete,
+					async onclick() {
+						await deleteImageFileAndGotoNext();
+					},
+				},
+				{
+					type: 'selectable',
+					key: 'debugmode',
+					label: 'Mode debug',
+					data: {},
+					selected: isDebugMode(),
+					closeOnSelect: false,
+					async onclick() {
+						await toggleSetting('debugMode');
+					},
+				},
+			],
+		},
+	]}
 />
 
 <div class="layout">
 	<main class="crop-surface">
+		{#if mobile.current}
+			<div class="immersive-actions">
+				<ImmersiveActions />
+			</div>
+		{/if}
+
 		<!-- TODO: make CropSurface handle its image element resize instead -->
 		{#key getSettings().cropperSidebarCollapsed}
 			<CropSurface bind:imageIsLoading {showConfirmedOverlay} {selectedBox} />
@@ -250,24 +319,74 @@
 	</main>
 
 	<aside class="toolbar">
-		<Toolbar />
+		{#if mobile.current}
+			<div class="focus-switcher">
+				<FocusSwitcher bind:selectedBox {imageIsLoading} />
+			</div>
+		{/if}
+
+		<Toolbar intialTool={mobile.current && boxesCount > 0 ? 'Main' : 'Glisser-recadrer'} />
 	</aside>
 
-	<aside class="info" class:collapsed={getSettings().cropperSidebarCollapsed}>
-		<Boxes bind:selectedBox />
-	</aside>
+	{#if !mobile.current}
+		<aside class="info" class:collapsed={getSettings().cropperSidebarCollapsed}>
+			<Boxes bind:selectedBox />
+		</aside>
+	{:else}
+		<BottomDrawer --drawer-outer-padding="0" bind:open={openBoxesList}>
+			<Boxes bind:selectedBox />
+		</BottomDrawer>
+	{/if}
 </div>
 
 <style>
 	.layout {
 		display: flex;
 		height: 100%;
+		width: 100lvw;
 		overflow: hidden;
+		background: #000;
+
+		@media (max-width: 600px) {
+			flex-direction: column;
+		}
+	}
+
+	.toolbar {
+		position: relative;
+
+		@media (max-width: 600px) {
+			position: fixed;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			padding-bottom: 0.5rem;
+		}
+
+		.focus-switcher {
+			position: absolute;
+			bottom: 5rem;
+			left: 0;
+			right: 0;
+		}
 	}
 
 	.crop-surface {
 		width: 100%;
+		height: 100%;
 		overflow: hidden;
+	}
+
+	.crop-surface {
+		position: relative;
+
+		.immersive-actions {
+			position: absolute;
+			z-index: 10;
+			top: 1rem;
+			left: 1rem;
+			right: 1rem;
+		}
 	}
 
 	.info {

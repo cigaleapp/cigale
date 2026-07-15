@@ -176,6 +176,7 @@
 		"baseline-browser-mapping": "^2.10.42",
 		"bits-ui": "^1.8.0",
 		"caniuse-lite": "^1.0.30001802",
+		"clicked": "^4.0.3",
 		"convert": "^7.0.0",
 		"date-fns": "^4.4.0",
 		"dequal": "^2.0.3",

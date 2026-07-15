@@ -3,6 +3,10 @@
 		currentImages().every(({ metadata }) => !metadata[uiState.cropMetadataId]?.manuallyModified)
 	);
 
+	export function boxesListHintShown() {
+		return showBoxesListHint
+	}
+
 	export function setBoxesListHintShown(shown: boolean) {
 		showBoxesListHint = shown;
 	}
@@ -22,6 +26,7 @@
 	import ConfidencePercentage from '$lib/ConfidencePercentage.svelte';
 	import CroppedImg from '$lib/CroppedImg.svelte';
 	import { percent } from '$lib/i18n.js';
+	import { IsMobile } from '$lib/mobile.svelte';
 	import OverflowableText from '$lib/OverflowableText.svelte';
 	import SentenceJoin from '$lib/SentenceJoin.svelte';
 	import Tooltip from '$lib/Tooltip.svelte';
@@ -51,6 +56,8 @@
 
 	let { selectedBox = $bindable() }: Props = $props();
 
+	const mobile = new IsMobile();
+
 	const initialCrops = $derived(getInitialCrops());
 	const boundingBoxes = $derived(getBoundingBoxes());
 	const images = $derived(currentImages());
@@ -73,34 +80,36 @@
 </script>
 
 <div class="info">
-	<section class="top">
-		<section class="preactions">
-			<ButtonInk
-				dangerous
-				onclick={deleteImageFileAndGotoNext}
-				help={{
-					text: 'Supprimer cette image et passer à la suivante',
-					keyboard: '$mod+Delete',
-				}}
-			>
-				<IconDelete />
-				Supprimer
-			</ButtonInk>
+	{#if !mobile.current}
+		<section class="top">
+			<div class="preactions">
+				<ButtonInk
+					dangerous
+					onclick={deleteImageFileAndGotoNext}
+					help={{
+						text: 'Supprimer cette image et passer à la suivante',
+						keyboard: '$mod+Delete',
+					}}
+				>
+					<IconDelete />
+					Supprimer
+				</ButtonInk>
 
-			<ButtonInk
-				help={{
-					text: "Revenir au recadrage d'origine pour toutes les boîtes",
+				<ButtonInk
+					help={{
+						text: "Revenir au recadrage d'origine pour toutes les boîtes",
 
-					keyboard: '$mod+U',
-				}}
-				onclick={revertAll}
-				disabled={!canRevertAll()}
-			>
-				<IconRevert />
-				Réinitialiser
-			</ButtonInk>
+						keyboard: '$mod+U',
+					}}
+					onclick={revertAll}
+					disabled={!canRevertAll()}
+				>
+					<IconRevert />
+					Réinitialiser
+				</ButtonInk>
+			</div>
 		</section>
-	</section>
+	{/if}
 	<section class="boxes">
 		<ul>
 			{#each images.filter(({ id }) => id in boundingBoxes) as image, i (image.id)}
@@ -130,7 +139,10 @@
 							<!-- we have a neural-infered value only, put the confidence next to the value -->
 							{#if initBox && !image.metadata[uiState.cropMetadataId].manuallyModified}
 								<span class="sep">&middot;</span>
-								<ConfidencePercentage value={initBox.confidence}>
+								<ConfidencePercentage
+									compact={mobile.current}
+									value={initBox.confidence}
+								>
 									<div class="confidence-icon">
 										<IconNeuralNet />
 									</div>
@@ -188,10 +200,12 @@
 							{/snippet}
 						</SentenceJoin>
 					</p>
-					<p>
-						Sélectionnez une boîte avec 1 à 9 pour la modifier avec des raccourcis
-						clavier
-					</p>
+					{#if !mobile.current}
+						<p>
+							Sélectionnez une boîte avec 1 à 9 pour la modifier avec des raccourcis
+							clavier
+						</p>
+					{/if}
 				</li>
 			{/if}
 		</ul>
@@ -210,6 +224,10 @@
 		/* to make resize work */
 		resize: horizontal;
 		overflow-x: hidden;
+
+		@media (max-width: 600px) {
+			padding: 1em;
+		}
 	}
 
 	.info .top {
@@ -292,8 +310,8 @@
 	}
 
 	.boxes li .confidence-icon {
-		font-size: 0.8rem;
-		margin-right: 0.5em;
+		font-size: 0.7rem;
+		margin-right: 0.25em;
 		display: flex;
 		align-items: center;
 	}

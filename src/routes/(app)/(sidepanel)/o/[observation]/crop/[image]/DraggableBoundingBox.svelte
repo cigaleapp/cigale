@@ -386,6 +386,8 @@
 	{/if}
 	{#each Object.entries(boundingBoxesPixels).filter(([imageId]) => imageIdToFileId(imageId) === imageFileID) as [imageId, box] (imageId)}
 		<div
+			// TODO: dont animate when creating
+			// transition:fade={{ duration: 100 }}
 			class="boundingbox"
 			data-image={imageId}
 			class:movable
@@ -464,7 +466,8 @@
 	}
 
 	.change-area.debug {
-		outline: 5px dashed red;
+		outline: 2px dashed red;
+		font-size: 0.7rem;
 
 		.debug {
 			background: rgba(0 0 0 / 0.66);

@@ -1,16 +1,22 @@
 <script lang="ts">
-	import { Portal } from 'bits-ui';
+	import type * as DropdownMenuTypes from '$lib/DropdownMenu.svelte';
 
-	// TODO: ask for a dashed circle icon at https://github.com/Remix-Design/RemixIcon/issues for IconUnconfirmed
+	import { Portal } from 'bits-ui';
 
 	import IconPrev from '~icons/ri/arrow-left-s-line';
 	import IconNext from '~icons/ri/arrow-right-s-line';
 	import IconUnconfirmed from '~icons/ri/loader-line';
+	import IconMore from '~icons/ri/more-2-fill';
 	import IconConfirmed from '~icons/ri/verified-badge-line';
+	// TODO: ask for a dashed circle icon at https://github.com/Remix-Design/RemixIcon/issues for IconUnconfirmed
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import ConfirmedOverlay from '$lib/ConfirmedOverlay.svelte';
+	import DropdownMenu from '$lib/DropdownMenu.svelte';
+	import { percent } from '$lib/i18n';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
+	import { IsMobile } from '$lib/mobile.svelte';
+	import { globalModals } from '$lib/modals.svelte';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 
 	import { topbarExtrasPortalId } from './+layout@(app).svelte';
@@ -40,6 +46,8 @@
 			// eslint-disable-next-line no-unused-vars
 			mark: (status: 'unconfirmed' | 'confirmed') => Promise<void>;
 		};
+		/** Only shown on mobile. Always in the menu: Report a bug (at the bottom) */
+		moreMenu?: DropdownMenuTypes.ItemsGroup<{}, {}>[];
 	}
 
 	let {
@@ -49,7 +57,32 @@
 		keyboardShortcutsCategory,
 		currentIsConfirmed,
 		flashConfirmedOverlay = $bindable(),
+		moreMenu: _moreMenu = [],
 	}: Props = $props();
+
+	const mobile = new IsMobile();
+
+	const moreMenu = $derived.by(() => {
+		const others = _moreMenu ?? [];
+		let last = others.pop() ?? { label: '', items: [] };
+
+		return [
+			...others,
+			{
+				...last,
+				items: [
+					...last.items,
+					{
+						type: 'clickable',
+						label: 'Signaler un bug',
+						onclick() {
+							globalModals.modal_submit_report_bug.open?.();
+						},
+					},
+				],
+			},
+		];
+	});
 
 	async function confirmAndNext() {
 		if (!currentIsConfirmed) {
@@ -118,35 +151,6 @@
 
 {#if portalOnline}
 	<Portal to="#{topbarExtrasPortalId}">
-		<div class="confirmation" class:confirmed={currentIsConfirmed}>
-			{#if currentIsConfirmed}
-				<ButtonIcon
-					help="Marquer comme non-confirmée"
-					keyboard="$mod+ArrowDown"
-					onclick={async () => progress.mark('unconfirmed')}
-					loading
-				>
-					<IconConfirmed />
-				</ButtonIcon>
-			{:else}
-				<ButtonIcon
-					help="Marquer comme confirmée"
-					keyboard="$mod+ArrowUp"
-					onclick={async () => progress.mark('confirmed')}
-					loading
-				>
-					<IconUnconfirmed />
-				</ButtonIcon>
-			{/if}
-		</div>
-
-		<div class="progress">
-			<ProgressBar
-				progress={[progress.treated / progress.total, progress.confirmed / progress.total]}
-				phases={[labels.treated, labels.confirmed]}
-			/>
-		</div>
-
 		<nav>
 			<div class="image-switcher">
 				<ButtonIcon
@@ -175,6 +179,51 @@
 			</div>
 		</nav>
 
+		<div class="confirmation" class:confirmed={currentIsConfirmed}>
+			{const alt = $derived(
+				currentIsConfirmed ? <T,>(value: T, _: T) => value : <T,>(_: T, value: T) => value
+			)}
+
+			<ButtonIcon
+				help={alt('Marquer comme non-confirmée', 'Marquer comme confirmée')}
+				keyboard={alt('$mod+ArrowDown', '$mod+ArrowUp')}
+				onclick={async () => progress.mark(alt('unconfirmed', 'confirmed'))}
+				loading
+			>
+				{const Icon = $derived(alt(IconConfirmed, IconUnconfirmed))}
+				<Icon />
+			</ButtonIcon>
+		</div>
+
+		{#if !mobile.current}
+			<div class="progress">
+				<ProgressBar
+					progress={[
+						progress.treated / progress.total,
+						progress.confirmed / progress.total,
+					]}
+					phases={[labels.treated, labels.confirmed]}
+				/>
+			</div>
+		{/if}
+
+		{#if mobile.current}
+			<div class="more">
+				<DropdownMenu
+					items={moreMenu}
+					title="Progression: {percent(
+						progress.treated / progress.total
+					)} traitées, {percent(progress.confirmed / progress.total)} confirmées"
+				>
+					{#snippet trigger(props)}
+						<ButtonIcon {...props}>
+							<IconMore />
+						</ButtonIcon>
+					{/snippet}
+				</DropdownMenu>
+			</div>
+		{/if}
+
 		<div class="continue">
 			<ButtonSecondary
 				tight
@@ -183,7 +232,7 @@
 				onclick={async () => confirmAndNext()}
 				loading
 			>
-				Continuer
+				Suivante
 			</ButtonSecondary>
 		</div>
 	</Portal>
@@ -205,6 +254,10 @@
 		justify-content: space-between;
 		align-items: center;
 		margin-left: 1em;
+
+		@media (max-width: 600px) {
+			margin-left: 0;
+		}
 	}
 
 	.image-switcher {
@@ -218,10 +271,22 @@
 			gap: 0.2em;
 			font-family: var(--font-mono);
 		}
+
+		@media (max-width: 600px) {
+			margin-right: auto;
+			gap: 0.25em;
+			.numbers {
+				gap: 0;
+			}
+		}
 	}
 
 	.confirmation {
 		display: inline-flex;
+
+		@media (max-width: 600px) {
+			margin-left: auto;
+		}
 
 		&.confirmed {
 			--fg: var(--fg-success);

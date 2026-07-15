@@ -58,6 +58,8 @@
 	import { DropdownMenu } from 'bits-ui';
 	import { watch } from 'runed';
 
+	import IconSelected from '~icons/ri/check-line';
+
 	import BottomDrawer from './BottomDrawer.svelte';
 	import { IsMobile } from './mobile.svelte.js';
 	import Submenu from './Submenu.svelte';
@@ -208,10 +210,12 @@
 					{:else}
 						<div class="label-and-icon">
 							<!-- To align items when some have icons and some don't -->
-							{#if groups.some((group) => group.items.some((i) => i.icon))}
+							{#if groups.some( (group) => group.items.some((i) => i.icon || i.type === 'selectable') )}
 								<div class="icon">
 									{#if i.icon}
 										<i.icon />
+									{:else if i.type === 'selectable' && i.selected}
+										<IconSelected />
 									{/if}
 								</div>
 							{/if}

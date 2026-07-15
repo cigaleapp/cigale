@@ -1,3 +1,4 @@
+import { Capacitor } from '@capacitor/core';
 import { onDestroy, onMount } from 'svelte';
 
 import { uiState } from './uistate.svelte.js';
@@ -41,4 +42,10 @@ export function defineKeyboardShortcuts(group, shortcuts) {
 			delete uiState.keybinds[key];
 		}
 	});
+}
+
+export function hasPhysicalKeyboard() {
+	// TODO: find a way to do it for realsies?
+	// for now, assume yes on web and no on mobile...
+	return !Capacitor.isNativePlatform();
 }

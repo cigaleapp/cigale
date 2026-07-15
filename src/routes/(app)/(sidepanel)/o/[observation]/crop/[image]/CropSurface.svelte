@@ -8,7 +8,12 @@
 	import { uiState } from '$lib/uistate.svelte.js';
 	import { mapValues, overrideStyle, pick } from '$lib/utils.js';
 
-	import { focusedImage, boundingBoxes as getBoundingBoxes, zoom } from './+page.svelte';
+	import {
+		focusedImage,
+		boundingBoxes as getBoundingBoxes,
+		getHideAll,
+		zoom,
+	} from './+page.svelte';
 	import { onCropChange } from './actions.svelte.js';
 	import DraggableBoundingBox from './DraggableBoundingBox.svelte';
 	import { activeTool } from './Toolbar.svelte';
@@ -25,6 +30,7 @@
 	const imageSrc = $derived(uiState.getPreviewURL(fileId));
 	const boundingBoxes = $derived(getBoundingBoxes());
 	const focusedImageId = $derived(focusedImage()?.id);
+	const hidingAll = $derived(getHideAll());
 
 	let imageElement = $state<HTMLImageElement>();
 
@@ -121,16 +127,18 @@
 			imageIsLoading = false;
 		}}
 	/>
-	{#if imageElement && fileId}
+	{#if imageElement && fileId && !imageIsLoading}
 		<DraggableBoundingBox
 			{...activeTool()}
 			{imageElement}
 			{zoom}
 			imageFileID={fileId}
 			boundingBoxes={mapValues(
-				focusedImageId && focusedImageId in boundingBoxes
-					? pick(boundingBoxes, focusedImageId)
-					: boundingBoxes,
+				hidingAll
+					? []
+					: focusedImageId && focusedImageId in boundingBoxes
+						? pick(boundingBoxes, focusedImageId)
+						: boundingBoxes,
 				toTopLeftCoords
 			)}
 			disabled={zoom.panning}

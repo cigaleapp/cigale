@@ -27,8 +27,8 @@ import { PROCEDURES } from '$worker/procedures.js';
 import WebWorker from '$worker/start.js?worker';
 
 // Polyfills
-import '@ungap/set-methods';
 import '@andy0130tw/es-arraybuffer-base64/auto';
+import '@ungap/set-methods';
 
 export const ssr = false;
 
@@ -185,10 +185,10 @@ export async function load({ url }) {
 
 	console.timeEnd('background things');
 
-	// Enabling persistent storage is almost impossible on chrome-based browsers
-	const chromium = new UAParser().getEngine().name === 'Blink';
+	// Enabling persistent storage is almost impossible on non-firefox
+	const firefox = new UAParser().getEngine().name === 'Gecko';
 
-	if (!storageIsPersistent && !chromium) {
+	if (!storageIsPersistent && firefox) {
 		toasts.warn(
 			"Le stockage de votre navigateur n'est pas persistant, les données pourraient être perdues en cas de manque d'espace de stockage.",
 			{

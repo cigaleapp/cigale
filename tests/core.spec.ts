@@ -68,7 +68,7 @@ test('basic functionality', async ({ page, app }) => {
 	await page.getByText('lil-fella.jpeg').click();
 
 	// Check for continuing
-	await page.getByRole('button', { name: /^Continuer/ }).click();
+	await page.getByRole('button', { name: 'Suivante', exact: true }).click();
 	await assert(page.getByText('Confirmé', { exact: true })).toBeVisible();
 
 	// Go to classification view

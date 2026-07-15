@@ -9,13 +9,16 @@
 
 <script lang="ts" module>
 	export interface Props {
-		open: boolean;
+		open?: boolean;
 		children: Snippet;
 		maxHeight?: number;
 		title?: string;
 		position?: BottomSheetSettings['position'];
 		trigger?: Snippet;
-		/** The trigger will be the bottom bar. The value of this prop is the text shown. */
+		/**
+		 * The trigger will be the bottom bar. The value of this prop is the text shown.
+		 * Also sets the title (if it hasnt been manually set)
+		 */
 		'trigger-from-bottombar'?: string;
 	}
 </script>
@@ -34,12 +37,12 @@
 
 	let {
 		open = $bindable(false),
-		title = '',
 		children,
 		maxHeight = 0.7,
 		position = 'bottom',
 		trigger,
 		'trigger-from-bottombar': triggerFromBottombar,
+		title = triggerFromBottombar ?? '',
 	}: Props = $props();
 
 	let disableGestures = $state(false);
@@ -113,11 +116,17 @@
 
 <style>
 	[data-bottomsheet-wrapper] {
-		z-index: 1000;
+		z-index: 998;
+		display: contents;
+	}
+
+	[data-bottomsheet-wrapper] :global(.bottom-sheet-overlay) {
+		z-index: 999;
 	}
 
 	[data-bottomsheet-wrapper] :global(.bottom-sheet) {
 		transition: max-height 0.01s ease !important;
+		z-index: 1000;
 	}
 
 	[data-bottomsheet-wrapper] :global(.bottom-sheet) {

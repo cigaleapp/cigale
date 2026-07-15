@@ -30,7 +30,7 @@ test('fill exports/*.zip', async ({ page, app }) => {
 
 	await app.tabs.go('crop');
 	await page.getByText('lil-fella.jpeg').click();
-	await page.getByRole('button', { name: 'Continuer' }).click();
+	await page.getByRole('button', { name: 'Suivante', exact: true }).click();
 	await app.wait('1s');
 	await page.getByRole('button', { name: 'Retour' }).click();
 

@@ -17,6 +17,7 @@
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import Markdown from '$lib/Markdown.svelte';
 	import Modal from '$lib/Modal.svelte';
+	import { globalModals } from '$lib/modals.svelte';
 	import { getSettings } from '$lib/settings.svelte.js';
 	import { toasts } from '$lib/toasts.svelte';
 	import { uiState } from '$lib/uistate.svelte.js';
@@ -43,6 +44,20 @@
 	let openModal = $state<() => void>();
 
 	const OpenIcon = $derived(type === 'bug' ? IconBug : IconIdea);
+
+	$effect(() => {
+		switch (type) {
+			case 'bug': {
+				globalModals.modal_submit_report_bug = { open: submit };
+				break;
+			}
+
+			case 'feature': {
+				globalModals.modal_submit_feature_request = { open: submit };
+				break;
+			}
+		}
+	});
 
 	defineKeyboardShortcuts('general', {
 		[type === 'bug' ? '$mod+!' : '$mod+*']: {
