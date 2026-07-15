@@ -106,7 +106,7 @@ export const Session = type({
 	remoteId: SessionRemoteID.default(''),
 	/** When the session is hosted on a remote server */
 	'account?': ID,
-	name: 'string',
+	name: 'string.trim',
 	// Date is not compatible with JSON Schemas, use a datestring instead
 	createdAt: 'string.date.iso',
 	openedAt: 'string.date.iso',
