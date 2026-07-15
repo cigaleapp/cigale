@@ -356,7 +356,6 @@ export async function listByIndex(tableName, indexName, keyRange = undefined) {
 	);
 }
 
-
 /**
  * @template {keyof typeof Tables} TableName
  * @param {TableName} tableName
@@ -373,16 +372,14 @@ export async function countByIndex(tableName, indexName, keyRange = undefined) {
 			const db = await openDatabase();
 			const validator = Tables[tableName];
 			// @ts-ignore
-			return await db
-				.countFromIndex(
-					tableName,
-					indexName,
-					typeof keyRange === 'string' ? IDBKeyRange.only(keyRange) : keyRange
-				)
+			return await db.countFromIndex(
+				tableName,
+				indexName,
+				typeof keyRange === 'string' ? IDBKeyRange.only(keyRange) : keyRange
+			);
 		}
 	);
 }
-
 
 /**
  * Delete an entry from a table by key
