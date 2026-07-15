@@ -4,7 +4,7 @@
 	);
 
 	export function boxesListHintShown() {
-		return showBoxesListHint
+		return showBoxesListHint;
 	}
 
 	export function setBoxesListHintShown(shown: boolean) {
