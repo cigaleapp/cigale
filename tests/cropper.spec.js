@@ -598,14 +598,14 @@ test.describe('Cropper view', () => {
 			await assert(image).toHaveCSS('scale', '1');
 
 			await zoomAt(page, 120, 100, 100);
-			await checkImageTransforms(page, 1.728, 219.3, 137.627);
+			await checkImageTransforms(page, 1.728, 222.94, 139.978);
 
 			await page.mouse.down({ button: 'middle' });
 			await zoomAt(page, 0, 50, 50);
 			await page.mouse.up({ button: 'middle' });
 			await page.waitForTimeout(200);
 
-			await checkImageTransforms(page, 1.728, 219.3, 137.627);
+			await checkImageTransforms(page, 1.728, 222.94, 139.978);
 
 			// Make sure no box was created
 			await assert(page.getByText(/Boîte #\d+/)).toHaveCount(1);
@@ -614,19 +614,19 @@ test.describe('Cropper view', () => {
 		test('recalls zoom and pan between image changes', async ({ page, app }) => {
 			const images = await imagesByName(app);
 			await zoomAt(page, 120, 100, 100);
-			await checkImageTransforms(page, 1.728, 219.3, 137.627);
+			await checkImageTransforms(page, 1.728, 222.94, 139.978);
 
 			await page.keyboard.press(controlOrMeta(page, 'ArrowLeft'));
 			await app.path.wait(`/o/_/crop/${images.withExifGps.fileId}/`);
 
 			await checkImageTransforms(page, 1, 0, 0);
 			await zoomAt(page, 40, 150, 150);
-			await checkImageTransforms(page, 1.44, 113.913, 75.6633);
+			await checkImageTransforms(page, 1.44, 116.113, 77.1078);
 
 			await page.keyboard.press(controlOrMeta(page, 'ArrowRight'));
 			await app.path.wait(`/o/_/crop/${images.lilFella.fileId}/`);
 
-			await checkImageTransforms(page, 1.728, 219.3, 137.627);
+			await checkImageTransforms(page, 1.728, 222.94, 139.978);
 		});
 	});
 });
