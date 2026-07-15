@@ -3000,3 +3000,11 @@ msgstr ""
 #: src/routes/(app)/about/+page.svelte
 msgid "Base de données"
 msgstr ""
+
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid "Update Bundle"
+msgstr ""
+
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid "Native Code"
+msgstr ""
