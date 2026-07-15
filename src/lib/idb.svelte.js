@@ -356,6 +356,34 @@ export async function listByIndex(tableName, indexName, keyRange = undefined) {
 	);
 }
 
+
+/**
+ * @template {keyof typeof Tables} TableName
+ * @param {TableName} tableName
+ * @param {import('idb').IndexNames<IDBDatabaseType, TableName>} indexName
+ * @param {IDBKeyRange | string} [keyRange]
+ * @returns {Promise<Array<typeof Tables[TableName]['infer']>>}
+ */
+export async function countByIndex(tableName, indexName, keyRange = undefined) {
+	return profile(
+		tableName,
+		'countByIndex',
+		{ Index: indexName, 'Key range': displayKeyRange(keyRange) },
+		async () => {
+			const db = await openDatabase();
+			const validator = Tables[tableName];
+			// @ts-ignore
+			return await db
+				.countFromIndex(
+					tableName,
+					indexName,
+					typeof keyRange === 'string' ? IDBKeyRange.only(keyRange) : keyRange
+				)
+		}
+	);
+}
+
+
 /**
  * Delete an entry from a table by key
  * @param {TableName} table

@@ -17,7 +17,7 @@
 	import DropdownMenu from '$lib/DropdownMenu.svelte';
 	import { promptForFiles } from '$lib/files';
 	import { plural } from '$lib/i18n.js';
-	import { databaseHandle, listByIndex, tables } from '$lib/idb.svelte.js';
+	import { countByIndex, databaseHandle, listByIndex, tables } from '$lib/idb.svelte.js';
 	import { loadPreviewImage } from '$lib/images.js';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
 	import LoadingText from '$lib/LoadingText.svelte';
@@ -228,7 +228,13 @@
 						loading: 'Ouverture…',
 						async onclick() {
 							await switchSession(session.id);
-							await goto('/(app)/(sidepanel)/import');
+							// Get number of images in the session to decide which tab to open on
+							const imagesCount = await countByIndex('Image', 'sessionId', id);
+							if (imagesCount > 0) {
+								await goto('/(app)/(sidepanel)/import');
+							} else {
+								await goto('/(app)/(sidepanel)/sessions/[id]', id);
+							}
 						},
 					})}
 					thumbnails={async function* ({ id }) {
