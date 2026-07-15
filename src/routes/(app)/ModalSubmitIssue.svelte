@@ -20,6 +20,7 @@
 	import { getSettings } from '$lib/settings.svelte.js';
 	import { toasts } from '$lib/toasts.svelte';
 	import { uiState } from '$lib/uistate.svelte.js';
+	import { safeJSONParse } from '$lib/utils';
 
 	interface Props {
 		type: 'bug' | 'feature';
@@ -97,9 +98,12 @@
 			Version: version,
 			'User Agent': navigator.userAgent,
 			Route: page.route.id ?? '',
+			Platform: Capacitor.getPlatform(),
 			OS: ua.os.toString(),
 			Browser: ua.browser.toString(),
 			Device: ua.device.toString(),
+			'Update Bundle': `${(safeJSONParse(localStorage.getItem('updateBundle')) ?? null)?.version} (${(safeJSONParse(localStorage.getItem('updateMetadata')) ?? null)?.sha})`,
+			'Native Code': `v${import.meta.env.androidNativeCodeVersion}`,
 			Protocol: uiState.currentProtocol
 				? `${uiState.currentProtocol.id} v${uiState.currentProtocol.version}`
 				: '_None_',
