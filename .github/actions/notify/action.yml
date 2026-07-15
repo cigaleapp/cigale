@@ -46,5 +46,6 @@ runs:
         curl -X POST "https://ntfy.envs.net/cigale"  \
           -H "Title: ${{ inputs.title }}" \
           -H "Click: ${{ inputs.url }}" \
+          -H "Priority: Urgent" \
           -H "Icon: https://raw.githubusercontent.com/cigaleapp/cigale/main/static/favicon-96x96.png" \
           -d "${{ inputs.message }}"
