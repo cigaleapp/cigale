@@ -11,6 +11,22 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  notify-start:
+    if: contains(github.event.pull_request.labels.*.name, 'notifications-noisy')
+    name: Send push notification on workflow started
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Push notification
+        uses: ./.github/actions/notify
+        with:
+          api_base_url: ${{ secrets.GOTIFY_API_BASE_URL }}
+          token: ${{ secrets.GOTIFY_APP_TOKEN }}
+          title: "🛫 PR #${{ github.event.pull_request.number }} (${{ github.event.pull_request.head.ref }}) is starting mergeability checks"
+          message: Checks started
+          url: https://${{ github.server }}/${{ github.repo }}/pull/${{ github.event.pull_request.number }}
+  
   db-revision:
     name: Database revision is not decreased
     runs-on: ubuntu-latest
