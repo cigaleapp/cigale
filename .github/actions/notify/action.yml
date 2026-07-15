@@ -1,5 +1,5 @@
 name: Notify
-description: Send a push notification with Gotify
+description: Send a push notification with Gotify / ntfy.sh
 
 inputs:
   api_base_url:
@@ -42,3 +42,9 @@ runs:
           -H "X-Gotify-Key: ${{ inputs.token }}" \
           -H "Content-Type: application/json" \
           -d "$json"
+          
+        curl -X POST "https://ntfy.envs.net/cigale"  \
+          -H "Title: ${{ inputs.title }}" \
+          -H "Click: ${{ inputs.url }}" \
+          -H "Icon: https://raw.githubusercontent.com/cigaleapp/cigale/main/static/favicon-96x96.png" \
+          -d "${{ inputs.message }}"

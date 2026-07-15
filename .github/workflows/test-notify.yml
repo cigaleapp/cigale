@@ -1,0 +1,28 @@
+on:
+  workflow_dispatch:
+    inputs:
+      title:
+        type: string
+        default: Test
+      message:
+        type: string
+        default: Example body
+      url:
+        type: string
+        default: https://example.com
+
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Push notification
+        uses: ./.github/actions/notify
+        with:
+          api_base_url: ${{ secrets.GOTIFY_API_BASE_URL }}
+          token: ${{ secrets.GOTIFY_APP_TOKEN }}
+          title: ${{ inputs.title }}
+          message: ${{ inputs.message }}
+          url: ${{ inputs.url }}
