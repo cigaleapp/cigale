@@ -1932,6 +1932,7 @@ msgstr ""
 
 #: src/lib/idb.svelte.js
 #: src/lib/idb.svelte.js
+#: src/lib/idb.svelte.js
 msgid "Key range"
 msgstr ""
 
