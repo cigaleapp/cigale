@@ -23,10 +23,10 @@ jobs:
         with:
           api_base_url: ${{ secrets.GOTIFY_API_BASE_URL }}
           token: ${{ secrets.GOTIFY_APP_TOKEN }}
-          title: "🛫 PR #${{ github.event.pull_request.number }} (${{ github.event.pull_request.head.ref }}) is starting mergeability checks"
+          title: '🛫 PR #${{ github.event.pull_request.number }} (${{ github.event.pull_request.head.ref }}) is starting mergeability checks'
           message: Checks started
           url: https://${{ github.server }}/${{ github.repo }}/pull/${{ github.event.pull_request.number }}
-  
+
   db-revision:
     name: Database revision is not decreased
     runs-on: ubuntu-latest
