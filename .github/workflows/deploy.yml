@@ -48,7 +48,6 @@ jobs:
             _nodemodules
             playwright.json
 
-            
       - name: Wait for it to be live
         env:
           URL: https://cigaleapp.github.io/cigale/
