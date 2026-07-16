@@ -23,7 +23,7 @@ jobs:
         with:
           title: '🛫 PR #${{ github.event.pull_request.number }} (${{ github.event.pull_request.head.ref }}) is starting mergeability checks'
           message: Checks started
-          url: https://${{ github.server }}/${{ github.repo }}/pull/${{ github.event.pull_request.number }}
+          url: https://${{ github.server }}/${{ github.repository }}/pull/${{ github.event.pull_request.number }}
 
   db-revision:
     name: Database revision is not decreased
@@ -318,14 +318,26 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - if: needs.is-mergeable.result != 'success'
+        run: |
+          failed_jobs=$(
+            gh run view ${{ github.run_id }} --json jobs --jq '[.jobs[] | select(.conclusion == "failure").name] | join(", ")'
+          )
+          echo "MESSAGE=Failures: $failed_jobs" >> $GITHUB_ENV
       - if: needs.lint.result == 'failure'
-        run: echo "MESSAGE=Linting failed" >> $GITHUB_ENV
+        run: |
+          echo "MESSAGE=Linting failed" >> $GITHUB_ENV
+          url=$(gh run view ${{ github.run_id }} --json  jobs --jq '[.jobs[] | select(.name == "Lint").url][0] // "$URL"')
+          echo "URL=$url" >> $GITHUB_ENV
       - if: needs.test.result == 'failure'
-        run: echo "MESSAGE=Unit tests failed" >> $GITHUB_ENV
+        run: |
+          echo "MESSAGE=Unit tests failed" >> $GITHUB_ENV
+          url=$(gh run view ${{ github.run_id }} --json  jobs --jq '[.jobs[] | select(.name == "Unit tests / Test").url][0] // "$URL"')
+          echo "URL=$url" >> $GITHUB_ENV
       - if: needs.e2e.result == 'failure'
         run: |
           echo "MESSAGE=E2E: ${{ needs.e2e.outputs.failed }} failed, ${{ needs.e2e.outputs.flaky }} flaky, ${{ needs.e2e.outputs.total }} total" >> $GITHUB_ENV
-          echo "URL=https://pleye.gwen.works/${{ github.repo }}/branches/${{ github.event.pull_request.head.ref }}" >> $GITHUB_ENV
+          echo "URL=https://pleye.gwen.works/${{ github.repository }}/branches/${{ github.event.pull_request.head.ref }}" >> $GITHUB_ENV
       - if: needs.dont-merge-comment.result == 'failure'
         run: echo "MESSAGE=Code has don't merge comments" >> $GITHUB_ENV
       - if: needs.is-mergeable.result == 'success'
@@ -334,7 +346,6 @@ jobs:
       - if: needs.is-mergeable.result != 'success'
         run: |
           echo "TITLE=💔 PR #${{ github.event.pull_request.number }} (${{ github.event.pull_request.head.ref }}) cannot be merged :(" >> $GITHUB_ENV
-
       - name: Push notification
         uses: ./.github/actions/notify
         if: github.event_name == 'pull_request' && always() && !contains(github.event.pull_request.labels.*.name, 'notifications-off') && !github.event.pull_request.draft

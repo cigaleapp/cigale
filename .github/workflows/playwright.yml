@@ -264,7 +264,7 @@ jobs:
         id: stats
         run: |
           function get {
-            jq .stat combined.json | jq $1
+            jq .stats combined.json | jq $1
           }
 
           echo JSON reporter stat object is:
