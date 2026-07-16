@@ -1990,12 +1990,6 @@ msgstr "Error: "
 msgid "<0/> Importer .zip"
 msgstr "<0/> Importer .zip"
 
-#. 0: feature
-#: src/lib/MobileWIPOverlay.svelte
-msgid "{0} est en cours de développement pour les appareils mobiles. En attendant, veuillez utiliser un ordinateur pour y accéder."
-msgstr "{0} est en cours de développement pour les appareils mobiles. En attendant, veuillez utiliser un ordinateur pour y accéder."
-
-#: src/lib/MobileWIPOverlay.svelte
 #: src/routes/(app)/(sidepanel)/o/[observation]/+layout@(app).svelte
 #: src/routes/(app)/(sidepanel)/o/[observation]/+layout@(app).svelte
 #: src/routes/(app)/TopbarBackToHome.svelte
@@ -2172,10 +2166,6 @@ msgstr "Agrandir/Réduire l'image"
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/Subject.svelte
 msgid "Voir l'image entière/recadrée"
 msgstr "Voir l'image entière/recadrée"
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/classify/suggestions/+page.svelte
-msgid "La classification plein-écran"
-msgstr "La classification plein-écran"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/suggestions/+page.svelte
 msgid "Métadonnées associées"
@@ -2850,12 +2840,12 @@ msgstr "Aucun résultat"
 msgid "Pas trouvé?<0/> <1>Essayes la barre de recherche</1>"
 msgstr "Pas trouvé?<0/> <1>Essayes la barre de recherche</1>"
 
-#: src/lib/MetadataComboboxMobile.svelte
+#: src/lib/MetadataOptionCarousel.svelte
 msgid "Description et images de l'option sélectionnée"
 msgstr "Description et images de l'option sélectionnée"
 
 #. 0: label
-#: src/lib/MetadataComboboxMobile.svelte
+#: src/lib/MetadataOptionCarousel.svelte
 msgid "Aucune description pour {0}."
 msgstr "Aucune description pour {0}."
 
@@ -2928,10 +2918,6 @@ msgstr "Oui"
 #: src/lib/MetadataInput.svelte
 msgid "Modifier"
 msgstr "Modifier"
-
-#: src/lib/MobileWIPOverlay.svelte
-msgid "Suivez l'avancement de son développement sur Github: c'est <0>l'issue <0/></0>."
-msgstr "Suivez l'avancement de son développement sur Github: c'est <0>l'issue <0/></0>."
 
 #: src/lib/ModalConfirmDeletion.svelte
 msgid "Afin de confirmer la suppression, veuillez taper <0/> ci-dessous:"
@@ -3023,3 +3009,7 @@ msgstr "Affecte <0>Change la valeur d'autres métadonnées quand {0} = {1}</0>"
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
 msgid "Affectée par <0>Autres métadonnées qui change {0} à {1}</0>"
 msgstr "Affectée par <0>Autres métadonnées qui change {0} à {1}</0>"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/TopbarExtras.svelte
+msgid "Mode debug"
+msgstr "Mode debug"

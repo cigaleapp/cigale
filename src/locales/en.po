@@ -1,15 +1,11 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2026-07-16 01:43+0000\n"
-"Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"Source-Language: fr\n"
 "Language: en\n"
-"Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
+"MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=n != 1;\n"
-"MIME-Version: 1.0\n"
-"X-Generator: Weblate 5.12.2\n"
-"Source-Language: fr\n"
 
 #: src/lib/SessionMetadataForm.svelte
 #: src/routes/(app)/PrepareForOffline.svelte
@@ -1748,9 +1744,7 @@ msgstr "Loading protocol {0}"
 #. 0: filename
 #: src/routes/(app)/+layout.ts
 msgid "Impossible de charger le protocole {0}. Vérifiez votre connexion Internet ou essayez de recharger la page."
-msgstr ""
-"Could not load protocol {0}. Check your interner connection or try reloading "
-"the page."
+msgstr "Could not load protocol {0}. Check your interner connection or try reloading the page."
 
 #: src/routes/(app)/results/+page.svelte
 msgid "Vérifier les métadonnées"
@@ -1906,9 +1900,7 @@ msgstr ""
 
 #: src/routes/(app)/protocols/import/[...url]/+page.svelte
 msgid "Ce lien permet d'importer un protocole venant d'Internet, à l'adresse suivante:"
-msgstr ""
-"This link allows importing a protocol from the Internet, available at the "
-"URL below:"
+msgstr "This link allows importing a protocol from the Internet, available at the URL below:"
 
 #: src/routes/(app)/protocols/import/[...url]/+page.svelte
 msgid "Importation en cours..."
@@ -1920,8 +1912,7 @@ msgstr ""
 
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
 msgid "Un numéro de séquence, dont l'unicité est guarantie à travers toutes les images de l'export"
-msgstr ""
-"A sequence number, guaranteed to be unique across all of the export's images"
+msgstr "A sequence number, guaranteed to be unique across all of the export's images"
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelConfig.svelte
 msgid "*Pour l'instant, CIGALE ne prend pas avantage des réseaux capables de traiter des images par batch, donc il n'enverra toujours qu'une image à la fois au modèle. <0/> Cela pourrait changer dans le futur, donc il est toujours utile de configurer correctement la disposition des pixels."
@@ -1999,12 +1990,6 @@ msgstr ""
 msgid "<0/> Importer .zip"
 msgstr "<0/> Import .zip"
 
-#. 0: feature
-#: src/lib/MobileWIPOverlay.svelte
-msgid "{0} est en cours de développement pour les appareils mobiles. En attendant, veuillez utiliser un ordinateur pour y accéder."
-msgstr ""
-
-#: src/lib/MobileWIPOverlay.svelte
 #: src/routes/(app)/(sidepanel)/o/[observation]/+layout@(app).svelte
 #: src/routes/(app)/(sidepanel)/o/[observation]/+layout@(app).svelte
 #: src/routes/(app)/TopbarBackToHome.svelte
@@ -2183,10 +2168,6 @@ msgid "Voir l'image entière/recadrée"
 msgstr "View full/cropped image"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/suggestions/+page.svelte
-msgid "La classification plein-écran"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/classify/suggestions/+page.svelte
 msgid "Métadonnées associées"
 msgstr "Associated metadata"
 
@@ -2334,9 +2315,7 @@ msgstr "Too much candidates to display"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/+layout.ts
 msgid "Métadonnée de classification introuvable. Le protocole de la session n'en définit peut-être pas."
-msgstr ""
-"Classification metadata not found. The session's protocol may have not "
-"defined one."
+msgstr "Classification metadata not found. The session's protocol may have not defined one."
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/TopbarExtras.svelte
 msgid "Confirmer et passer à la prochaine non confirmée"
@@ -2371,9 +2350,7 @@ msgstr "Mark {0} as confirmed and go to next unconfirmed"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/+layout.svelte
 msgid "Bien joué! Toutes les observations ont été recadrés, classifiées et confirmées… place à l'export des résultats 🥳"
-msgstr ""
-"Well done! All observations have been cropped, classified and confirmed… now "
-"let the results export begin 🥳"
+msgstr "Well done! All observations have been cropped, classified and confirmed… now let the results export begin 🥳"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/Boxes.svelte
 msgid "<0/> Réinitialiser"
@@ -2463,9 +2440,7 @@ msgstr "<0/> Manage protocols"
 
 #: src/routes/(app)/+layout.ts
 msgid "Le stockage de votre navigateur n'est pas persistant, les données pourraient être perdues en cas de manque d'espace de stockage."
-msgstr ""
-"Your browser's storage is not persistent, data could be lost if you run low "
-"on disk space."
+msgstr "Your browser's storage is not persistent, data could be lost if you run low on disk space."
 
 #: src/routes/(app)/+layout.ts
 msgid "Activer"
@@ -2481,8 +2456,7 @@ msgstr "Enable notifications"
 
 #: src/routes/(app)/ModalChromePersistentStorage.svelte
 msgid "Sur Chrome, pour activer le stockage persistant, il faut activer les notifications."
-msgstr ""
-"On Chrome, to enable persistent storage, you have to enable notifications."
+msgstr "On Chrome, to enable persistent storage, you have to enable notifications."
 
 #: src/routes/(app)/ModalChromePersistentStorage.svelte
 msgid "Vous pourrez les désactiver en suite, l'acceptation des notifications sert à Chrome de signal pour prouver que le site vous ait suffisamment utile pour activer le stockage persistent."
@@ -2866,12 +2840,12 @@ msgstr ""
 msgid "Pas trouvé?<0/> <1>Essayes la barre de recherche</1>"
 msgstr ""
 
-#: src/lib/MetadataComboboxMobile.svelte
+#: src/lib/MetadataOptionCarousel.svelte
 msgid "Description et images de l'option sélectionnée"
 msgstr ""
 
 #. 0: label
-#: src/lib/MetadataComboboxMobile.svelte
+#: src/lib/MetadataOptionCarousel.svelte
 msgid "Aucune description pour {0}."
 msgstr ""
 
@@ -2943,10 +2917,6 @@ msgstr ""
 
 #: src/lib/MetadataInput.svelte
 msgid "Modifier"
-msgstr ""
-
-#: src/lib/MobileWIPOverlay.svelte
-msgid "Suivez l'avancement de son développement sur Github: c'est <0>l'issue <0/></0>."
 msgstr ""
 
 #: src/lib/ModalConfirmDeletion.svelte
@@ -3038,4 +3008,8 @@ msgstr ""
 #. 0.0: metadata.label; 0.1: data.option.label
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
 msgid "Affectée par <0>Autres métadonnées qui change {0} à {1}</0>"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/TopbarExtras.svelte
+msgid "Mode debug"
 msgstr ""
