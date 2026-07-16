@@ -48,23 +48,6 @@ jobs:
             _nodemodules
             playwright.json
 
-      - name: Wait for it to be live
-        env:
-          URL: https://cigaleapp.github.io/cigale/
-        run: |
-          string="<!-- COMMIT: ${{ github.sha }} -->"
-
-          echo "Checking if '$string' is in reponse at $URL"
-          touch index.html
-          curl -fsSL $URL > index.html || echo curl error
-          while ! grep -F "$string" index.html; do
-            echo "Deployment not live yet, waiting..."
-            sleep 5
-            rm index.html
-            touch index.html
-            curl -fsSL $URL > index.html || echo curl error
-          done
-
       - name: Push notification
         uses: ./.github/actions/notify
         if: inputs.notify
