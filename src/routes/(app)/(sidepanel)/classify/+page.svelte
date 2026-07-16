@@ -25,6 +25,7 @@
 	import { toasts } from '$lib/toasts.svelte';
 	import { uiState } from '$lib/uistate.svelte.js';
 	import { isAbortError, nonnull } from '$lib/utils.js';
+	import { IsMobile } from '$lib/mobile.svelte.js';
 
 	type Item = GalleryItem<{
 		image: DB.Image | undefined;
@@ -35,6 +36,9 @@
 	seo({ title: 'Classification' });
 
 	const { data } = $props();
+
+	const mobile = new IsMobile()
+	const isdesktop = $derived(!mobile.current)
 
 	const items: Item[] = $derived(
 		tables.Observation.state.map((obs) => ({
@@ -266,8 +270,21 @@
 						onstacksizeclick={() => {
 							unrolledObservation = unrolledObservation === id ? '' : id;
 						}}
-						ondoubleclick={() => {
-							goto('/(app)/(sidepanel)/o/[observation]/classify', {
+						onclick={async (_e, set) => {
+							// Only open via simple click on mobile,
+							// on desktop dbl click opens, since single click
+							// is used to initiate selections
+							// On mobile, selections can only be initiated via
+							// long presses anyway.
+							if (isdesktop) return;
+							set({ status: 'loading', loadingStatusText: 'Ouverture…' });
+							await goto('/(app)/(sidepanel)/o/[observation]/classify', {
+								observation: observation.id,
+							});
+						}}
+						ondoubleclick={async (_e, set) => {
+							set({ status: 'loading', loadingStatusText: 'Ouverture…' });
+							await goto('/(app)/(sidepanel)/o/[observation]/classify', {
 								observation: observation.id,
 							});
 						}}

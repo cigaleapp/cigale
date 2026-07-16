@@ -207,7 +207,11 @@
 		<ButtonIcon
 			tight
 			help="Annuler"
-			onclick={() => {
+			onclick={(e) => {
+				// Useful the entire dialog is inside a <button> with its onclick
+				// set to open the combobox, as in that case it'd close then
+				// open again immediately lol
+				e.stopPropagation();
 				dialogElement?.close();
 			}}
 		>
@@ -243,7 +247,7 @@
 			<ButtonPrimary
 				tight
 				loading
-				onclick={async () => {
+				onclick={async (e) => {
 					await onValueChange(selected[0], selected);
 					dialogElement?.close();
 				}}
@@ -277,7 +281,7 @@
 		>
 			{#snippet suggestion(option: DB.MetadataEnumVariant)}
 				{const { images, label, key, icon, color } = $derived(option)}
-				{const disabled = $derived(optionIsDisabled(option))}
+				{const disabled = $derived(optionIsDisabled?.(option))}
 				{const image = $derived(images?.at(0))}
 				{const confidence = $derived(confidenceOf(key))}
 
@@ -406,7 +410,7 @@
 		white-space: nowrap;
 		font-size: 1em;
 		text-align: left;
-		background: var(--bg2-neutral);
+		background: var(--metadata-combobox-trigger-bg, var(--bg2-neutral));
 		border-radius: var(--corner-radius);
 		padding: 0.5em 0.75em;
 

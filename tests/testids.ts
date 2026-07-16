@@ -59,4 +59,5 @@ export type PlaywrightTestId =
 	| 'cascades'
 	| 'synonyms'
 	| 'description'
-	| 'metadata-combobox-viewport';
+	| 'metadata-combobox-viewport'
+	| 'mobile-option-details';

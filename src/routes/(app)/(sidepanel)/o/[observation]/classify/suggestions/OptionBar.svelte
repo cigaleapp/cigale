@@ -13,6 +13,7 @@
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import { storeMetadataValue } from '$lib/metadata/index.js';
 	import MetadataCombobox from '$lib/MetadataCombobox.svelte';
+	import { IsMobile } from '$lib/mobile.svelte';
 	import OverflowableText from '$lib/OverflowableText.svelte';
 	import { uiState } from '$lib/uistate.svelte.js';
 	import { undo } from '$lib/undo.svelte.js';
@@ -31,6 +32,9 @@
 		options,
 		currentMetadataValue: current,
 	}: Props = $props();
+
+	const mobile = new IsMobile();
+	const isdesktop = $derived(!mobile.current);
 
 	const layout = $derived(uiState.currentSession?.fullscreenClassifier.layout ?? 'top-bottom');
 
@@ -133,29 +137,41 @@
 <div class="bar" data-layout={layout}>
 	<div class="current" style:grid-area="current" pw-testid="current">
 		<ButtonSecondary
+			tight={!isdesktop}
 			onclick={() => focusOptionCombobox?.('focus')}
 			help={{
 				text: 'Voir toutes les options',
 				keyboard: '$mod+F',
 			}}
 		>
-			<MetadataCombobox
-				{confidences}
-				options={undefined}
-				metadata={focusedMetadata}
-				type="single"
-				value={option?.key ?? ''}
-				bind:focuser={focusOptionCombobox}
-				onValueChange={async (newKey) => {
-					if (!newKey) return;
-					await setOption({ key: newKey }, confidences, { manuallyModified: true });
-				}}
-			/>
-			<ConfidencePercentage value={current?.confidence} />
-			<IconExpand />
+			<div class="button-contents">
+				<MetadataCombobox
+					{confidences}
+					options={undefined}
+					metadata={focusedMetadata}
+					type="single"
+					value={option?.key ?? ''}
+					bind:focuser={focusOptionCombobox}
+					onValueChange={async (newKey) => {
+						if (!newKey) return;
+						await setOption({ key: newKey }, confidences, { manuallyModified: true });
+					}}
+				/>
+				<ConfidencePercentage compact={!isdesktop} value={current?.confidence} />
+				<IconExpand />
+			</div>
 		</ButtonSecondary>
 	</div>
-	<div class="others">
+
+	{#if isdesktop}
+		<div class="others">
+			{@render prevAndNext()}
+		</div>
+	{:else}
+		{@render prevAndNext()}
+	{/if}
+
+	{#snippet prevAndNext()}
 		<div class="prev">
 			<ButtonSecondary
 				aria-label="Option précédente"
@@ -168,11 +184,13 @@
 			>
 				<div class="button-contents prev">
 					<IconPrevious />
-					<OverflowableText no-tooltip text="Précédente" />
-					<ConfidencePercentage
-						tooltip={() => ''}
-						value={prevOption ? confidences[prevOption.key] : undefined}
-					/>
+					{#if isdesktop}
+						<OverflowableText no-tooltip text="Précédente" />
+						<ConfidencePercentage
+							tooltip={() => ''}
+							value={prevOption ? confidences[prevOption.key] : undefined}
+						/>
+					{/if}
 				</div>
 			</ButtonSecondary>
 		</div>
@@ -189,15 +207,17 @@
 			>
 				<div class="button-contents">
 					<IconNext />
-					<OverflowableText no-tooltip text="Suivante" />
-					<ConfidencePercentage
-						tooltip={() => ''}
-						value={nextOption ? confidences[nextOption.key] : undefined}
-					/>
+					{#if isdesktop}
+						<OverflowableText no-tooltip text="Suivante" />
+						<ConfidencePercentage
+							tooltip={() => ''}
+							value={nextOption ? confidences[nextOption.key] : undefined}
+						/>
+					{/if}
 				</div>
 			</ButtonSecondary>
 		</div>
-	</div>
+	{/snippet}
 </div>
 
 <style>
@@ -207,8 +227,36 @@
 		justify-content: center;
 		gap: 1em;
 
-		&[data-layout='left-right'] {
-			flex-direction: column;
+		@media (min-width: 600px) {
+			&[data-layout='left-right'] {
+				flex-direction: column;
+			}
+		}
+
+		@media (max-width: 600px) {
+			display: grid;
+			grid-template-areas: 'prev current next';
+			/*XXX: 50px = also width of buttons */
+			grid-template-columns: 50px 1fr 50px;
+			gap: 0.5em;
+
+			.button-contents {
+				justify-content: center;
+			}
+
+			.prev {
+				grid-area: prev;
+			}
+
+			.next {
+				grid-area: next;
+			}
+
+			.current {
+				grid-area: current;
+				font-weight: normal;
+				text-align: left;
+			}
 		}
 	}
 
@@ -226,22 +274,32 @@
 	}
 
 	.current {
-		width: 100%;
+		--metadata-combobox-trigger-bg: transparent;
 	}
 
 	.button-contents {
 		display: flex;
 		align-items: center;
 		gap: 0.5em;
+
 		width: 100%;
 		/* XXX: To match up height with the combobox "button" */
 		padding: 0.13em 0;
 		justify-content: space-between;
+
+		text-align: left;
+		font-weight: normal;
 	}
 
-	.prev,
-	.next {
-		:global(button) {
+	@media (min-width: 600px) {
+		.prev,
+		.next {
+			:global(button) {
+				width: 100%;
+			}
+		}
+
+		.current {
 			width: 100%;
 		}
 	}

@@ -140,7 +140,7 @@
 	}
 
 	.tab-icon {
-		font-size: 1.2rem;
+		font-size: 1.2em;
 		color: currentColor;
 
 		&,

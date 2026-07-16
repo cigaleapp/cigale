@@ -15,7 +15,8 @@
 	import LearnMoreLink from '$lib/LearnMoreLink.svelte';
 	import { getMetadataValue } from '$lib/metadata/index.js';
 	import MetadataCascadesTable from '$lib/MetadataCascadesTable.svelte';
-	import MobileWIPOverlay from '$lib/MobileWIPOverlay.svelte';
+	import MetadataOptionCarousel from '$lib/MetadataOptionCarousel.svelte';
+	import { IsMobile } from '$lib/mobile.svelte';
 	import { observationMetadata } from '$lib/observations';
 	import { goto } from '$lib/paths.js';
 	import { namespaceOfMetadataId } from '$lib/schemas/metadata.js';
@@ -38,6 +39,10 @@
 		metadataDefinitions,
 		allOptions: options,
 	} = $derived(data);
+
+	const mobile = new IsMobile();
+	const ismobile = $derived(mobile.current);
+	const isdesktop = $derived(!mobile.current);
 
 	const layout = $derived(uiState.currentSession?.fullscreenClassifier.layout ?? 'top-bottom');
 
@@ -74,20 +79,14 @@
 	}
 </script>
 
-<MobileWIPOverlay
-	feature="La classification plein-écran"
-	issue={1519}
-	back={async () => {
-		await goto('/classify/');
-	}}
-/>
-
 <main data-layout={layout} data-expand={expand} data-layout-transitions={layoutTransitions}>
-	<div class="references" {@attach area('references')} in:fade={{ duration: 200 }}>
-		{#if option}
-			<References {option} bind:expand />
-		{/if}
-	</div>
+	{#if isdesktop}
+		<div class="references" {@attach area('references')} in:fade={{ duration: 200 }}>
+			{#if option}
+				<References {option} bind:expand />
+			{/if}
+		</div>
+	{/if}
 	<div class="subject" {@attach area('subject')} in:fade={{ duration: 200 }}>
 		{#if observation}
 			<Subject
@@ -99,13 +98,15 @@
 		{/if}
 	</div>
 	<div class="panel" {@attach area('panel')}>
-		<div class="layout-switcher" {@attach area('layout-switcher')}>
-			<LayoutSwitcher
-				toggleLayoutTransitions={(enable) => {
-					layoutTransitions = enable;
-				}}
-			/>
-		</div>
+		{#if isdesktop}
+			<div class="layout-switcher" {@attach area('layout-switcher')}>
+				<LayoutSwitcher
+					toggleLayoutTransitions={(enable) => {
+						layoutTransitions = enable;
+					}}
+				/>
+			</div>
+		{/if}
 
 		<div class="focused-option" {@attach area('focused-option')} in:fade={{ duration: 200 }}>
 			{#if observation && focusedMetadata}
@@ -114,68 +115,83 @@
 		</div>
 
 		{#if option && focusedMetadata}
-			<div
-				class="cascades"
-				{@attach area('cascades')}
-				{@attach scrollfader}
-				in:fade={{ duration: 200 }}
-			>
-				<Field
-					composite
-					label="Métadonnées associées"
-					Icon={IconCascades}
-					indent-icon={false}
+			{#if ismobile}
+				<div class="details" {@attach area('mobile-option-details')}>
+					<MetadataOptionCarousel
+						{option}
+						debugdata={option}
+						bind:expanded={
+							() => expand === 'mobile-option-details',
+							(expanded) => {
+								expand = expanded ? 'mobile-option-details' : 'none';
+							}
+						}
+					/>
+				</div>
+			{:else}
+				<div
+					class="cascades"
+					{@attach area('cascades')}
+					{@attach scrollfader}
+					in:fade={{ duration: 200 }}
 				>
-					{#await openDatabase() then db}
-						{#await cascadeLabels( { db, protocolId: namespaceOfMetadataId(focusedMetadata.id), option } ) then cascades}
-							<MetadataCascadesTable compact {cascades} />
+					<Field
+						composite
+						label="Métadonnées associées"
+						Icon={IconCascades}
+						indent-icon={false}
+					>
+						{#await openDatabase() then db}
+							{#await cascadeLabels( { db, protocolId: namespaceOfMetadataId(focusedMetadata.id), option } ) then cascades}
+								<MetadataCascadesTable compact {cascades} />
+							{/await}
 						{/await}
-					{/await}
-				</Field>
-			</div>
+					</Field>
+				</div>
 
-			<div
-				class="synonyms"
-				{@attach area('synonyms')}
-				{@attach scrollfader}
-				in:fade={{ duration: 200 }}
-			>
-				<Field composite label="Synonymes" Icon={IconSynonyms} indent-icon={false}>
-					{#if option.synonyms && option.synonyms.length === 0}
-						<p>Aucun synonyme défini.</p>
-					{:else}
-						<ul>
-							{#each option.synonyms as synonym (synonym)}
-								<li>{synonym}</li>
-							{/each}
-						</ul>
-					{/if}
-				</Field>
-			</div>
-
-			<div
-				class="description"
-				{@attach area('description')}
-				{@attach scrollfader}
-				in:fade={{ duration: 200 }}
-			>
-				<Field composite label="Description" Icon={IconDescription} indent-icon={false}>
-					{#await marked(option.description ?? '') then html}
-						{@html html}
-					{:catch error}
-						{#if isDebugMode()}
-							<p class="error">Markdown invalide: {error}</p>
+				<div
+					class="synonyms"
+					{@attach area('synonyms')}
+					{@attach scrollfader}
+					in:fade={{ duration: 200 }}
+				>
+					<Field composite label="Synonymes" Icon={IconSynonyms} indent-icon={false}>
+						{#if option.synonyms && option.synonyms.length === 0}
+							<p>Aucun synonyme défini.</p>
+						{:else}
+							<ul>
+								{#each option.synonyms as synonym (synonym)}
+									<li>{synonym}</li>
+								{/each}
+							</ul>
 						{/if}
-						{option.description}
-					{/await}
+					</Field>
+				</div>
 
-					{#if option.learnMore}
-						<div class="learn-more">
-							<LearnMoreLink href={option.learnMore} />
-						</div>
-					{/if}
-				</Field>
-			</div>
+				<div
+					class="description"
+					{@attach area('description')}
+					{@attach scrollfader}
+					in:fade={{ duration: 200 }}
+				>
+					<Field composite label="Description" Icon={IconDescription} indent-icon={false}>
+						{#await marked(option.description ?? '') then html}
+							{@html html}
+						{:catch error}
+							{#if isDebugMode()}
+								<p class="error">Markdown invalide: {error}</p>
+							{/if}
+							{option.description}
+						{/await}
+
+						{#if option.learnMore}
+							<div class="learn-more">
+								<LearnMoreLink href={option.learnMore} />
+							</div>
+						{/if}
+					</Field>
+				</div>
+			{/if}
 		{/if}
 	</div>
 </main>
@@ -185,6 +201,45 @@
 		display: grid;
 		height: 100%;
 		overflow: hidden;
+
+		@media (max-width: 600px) {
+			display: flex;
+			flex-direction: column;
+			
+			.panel, .bar, .details {
+				transition: max-height 200ms;
+			}
+
+			.panel {
+				height: 100%;
+				display: flex;
+				flex-direction: column;
+				font-size: 0.9em;
+			}
+
+			.details {
+				flex-grow: 1;
+			}
+
+			.button-contents {
+				padding: 0;
+			}
+
+			&:not([data-expand='subject']) .subject {
+				max-height: 40dvh;
+			}
+
+			&[data-expand='subject'] .subject {
+				min-height: 80dvh;
+			}
+
+			&[data-expand='mobile-option-details'] {
+				.subject, .focused-option {
+					max-height: 0px;
+					overflow: hidden;
+				}
+			}
+		}
 	}
 
 	main[data-layout-transitions='true'] {
@@ -229,136 +284,134 @@
 		transition: opacity 0.4s;
 	}
 
-	main[data-layout='top-bottom'] {
-		grid-template-areas: 'subject panel' 'references panel';
-		grid-template-columns: 50% 50%;
-		grid-template-rows: 50% 50%;
+	@media (min-width: 600px) {
+		main[data-layout='top-bottom'] {
+			grid-template-areas: 'subject panel' 'references panel';
+			grid-template-columns: 50% 50%;
+			grid-template-rows: 50% 50%;
 
-		&[data-expand='subject'] {
-			grid-template-columns: 90dvw 1fr;
-			grid-template-rows: 90dvh 1fr;
+			&[data-expand='subject'] {
+				grid-template-columns: 90dvw 1fr;
+				grid-template-rows: 90dvh 1fr;
+			}
+
+			&[data-expand='references'] {
+				grid-template-columns: 90dvw 1fr;
+				grid-template-rows: 1fr 90dvh;
+			}
+
+			.subject,
+			.references {
+				border-right: 1px solid var(--gray);
+			}
+
+			.references {
+				border-top: 1px solid var(--gray);
+				height: calc(100% - 1px);
+			}
 		}
 
-		&[data-expand='references'] {
-			grid-template-columns: 90dvw 1fr;
-			grid-template-rows: 1fr 90dvh;
+		main[data-layout='left-right'] {
+			grid-template-areas: 'references subject' 'panel panel';
+			grid-template-columns: 50% 50%;
+			grid-template-rows: 50% 50%;
+
+			&[data-expand='subject'] {
+				grid-template-columns: 1fr 90dvw;
+				grid-template-rows: 90dvh 1fr;
+			}
+
+			&[data-expand='references'] {
+				grid-template-columns: 90dvw 1fr;
+				grid-template-rows: 90dvh 1fr;
+			}
+
+			.subject,
+			.references {
+				border-bottom: 1px solid var(--gray);
+			}
+
+			.references {
+				border-right: 1px solid var(--gray);
+				width: calc(100% - 1px);
+			}
 		}
 
-		.subject,
+		main[data-layout='left-right'] .panel {
+			grid-template-columns: min(max(33%, 260px), 400px) auto min(33%, 500px);
+			grid-template-rows: min-content 1fr 1fr;
+			row-gap: 0.5em;
+			grid-template-areas:
+				'. . layout-switcher'
+				'cascades description focused-option'
+				'synonyms description focused-option';
+
+			.layout-switcher {
+				z-index: 10;
+				position: absolute;
+				left: 50%;
+				top: 53%;
+				translate: -50% -50%;
+			}
+		}
+
+		main[data-layout='top-bottom'] .panel {
+			grid-template-columns: 1fr 1fr;
+			grid-template-rows: min-content 1.5fr min-content min-content;
+			grid-template-areas:
+				'focused-option focused-option'
+				'description description'
+				'cascades synonyms';
+
+			.layout-switcher {
+				z-index: 10;
+				position: absolute;
+				left: 50%;
+				top: 53%;
+				translate: -50% -50%;
+			}
+		}
+
 		.references {
-			border-right: 1px solid var(--gray);
+			height: 100%;
 		}
 
-		.references {
-			border-top: 1px solid var(--gray);
-			height: calc(100% - 1px);
-		}
-	}
-
-	main[data-layout='left-right'] {
-		grid-template-areas: 'references subject' 'panel panel';
-		grid-template-columns: 50% 50%;
-		grid-template-rows: 50% 50%;
-
-		&[data-expand='subject'] {
-			grid-template-columns: 1fr 90dvw;
-			grid-template-rows: 90dvh 1fr;
-		}
-
-		&[data-expand='references'] {
-			grid-template-columns: 90dvw 1fr;
-			grid-template-rows: 90dvh 1fr;
-		}
-
-		.subject,
-		.references {
-			border-bottom: 1px solid var(--gray);
-		}
-
-		.references {
-			border-right: 1px solid var(--gray);
-			width: calc(100% - 1px);
-		}
-	}
-
-	main[data-layout='left-right'] .panel {
-		grid-template-columns: min(max(33%, 260px), 400px) auto min(33%, 500px);
-		grid-template-rows: min-content 1fr 1fr;
-		row-gap: 0.5em;
-		grid-template-areas:
-			'. . layout-switcher'
-			'cascades description focused-option'
-			'synonyms description focused-option';
-
-		.layout-switcher {
-			z-index: 10;
-			position: absolute;
-			left: 50%;
-			top: 53%;
-			translate: -50% -50%;
-		}
-	}
-
-	main[data-layout='top-bottom'] .panel {
-		grid-template-columns: 1fr 1fr;
-		grid-template-rows: min-content 1.5fr min-content min-content;
-		grid-template-areas:
-			'focused-option focused-option'
-			'description description'
-			'cascades synonyms';
-
-		.layout-switcher {
-			z-index: 10;
-			position: absolute;
-			left: 50%;
-			top: 53%;
-			translate: -50% -50%;
-		}
-	}
-
-	.references {
-		height: 100%;
-	}
-
-	.subject {
-		height: 100%;
-		overflow: hidden;
-	}
-
-	.panel {
-		display: grid;
-		gap: 2em;
-		padding: 1em;
-	}
-
-	.panel {
-		> div {
+		.subject {
+			height: 100%;
 			overflow: hidden;
 		}
-		> .description,
-		> .cascades,
-		> .synonyms {
-			overflow-y: auto;
+
+		.panel {
+			display: grid;
+			gap: 2em;
+			padding: 1em;
 		}
-		> .focused-option {
-			overflow: visible;
+
+		.panel {
+			> div {
+				overflow: hidden;
+			}
+			> .description,
+			> .cascades,
+			> .synonyms {
+				overflow-y: auto;
+			}
+			> .focused-option {
+				overflow: visible;
+			}
 		}
-	}
 
-	.panel .synonyms,
-	.panel .cascades {
-		max-height: 15rem;
+		.panel .synonyms,
+		.panel .cascades {
+			max-height: 15rem;
 
-		ul {
-			padding-left: 0;
+			ul {
+				padding-left: 0;
+			}
 		}
-	}
 
-	.panel .nav {
-		align-self: flex-end;
-	}
-
-	.panel .description .learn-more {
-		margin-top: 1.5em;
+		.panel .description .learn-more {
+			margin-top: 1.5em;
+		}
 	}
 </style>

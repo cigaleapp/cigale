@@ -1,37 +1,48 @@
-<script module>
-	/**
-	 * @typedef {'queued' | 'loading' | 'ok' | 'errored'} Status
-	 */
-	/**
-	 * @typedef Props
-	 * @type {object}
-	 * @property {(e: MouseEvent | TouchEvent, set: (props: { status?: Status, loadingStatusText?: string }) => void) => void} [onclick]
-	 * @property {() => void} [onstacksizeclick]
-	 * @property {() => void} [ondoubleclick]
-	 * @property {() => void} [ondelete]
-	 * @property {() => void} [onretry]
-	 * @property {string | undefined} [tooltip] tooltip to show
-	 * @property {string} id
-	 * @property {string} title
-	 * @property {number} [stacksize=1] - number of images in this observation
-	 * @property {string | undefined} image - image url
-	 * @property {Status} [status] - status of the image processing
-	 * @property {string} [statusText] - text to show when status is not `"ok"`
-	 * @property {string} [loadingStatusText] statusText override when status == "loading"
-	 * @property {boolean} [selectable=true] - whether this image can be selected
-	 * @property {boolean} [selected=false]
-	 * @property {boolean} [highlighted] - whether this image is highlighted. selected implies highlighted.
-	 * @property {{ width: number, height: number } | undefined} dimensions - original dimensions of the image
-	 * @property {"show-all" | "apply-first" | "none"} [boxes] what to do with the images' bounding boxes. Either display them all, or crop to the first one.
-	 * @property {object[]} [boundingBoxes] - array of bounding boxes. Values are between 0 and 1 (relative to the width/height of the image)
-	 * @property {number} boundingBoxes.x
-	 * @property {number} boundingBoxes.y
-	 * @property {number} boundingBoxes.width
-	 * @property {number} boundingBoxes.height
-	 */
+<script lang="ts" module>
+	type Status = 'queued' | 'loading' | 'ok' | 'errored';
+
+	type EventHandler = (
+		e: MouseEvent | TouchEvent,
+		set: (props: { status?: Status; loadingStatusText?: string }) => void
+	) => Promise<void>;
+
+	type Props = {
+		onclick?: EventHandler;
+		onstacksizeclick?: EventHandler;
+		ondoubleclick?: EventHandler;
+		ondelete?: EventHandler;
+		onretry?: EventHandler;
+		/** tooltip to show */
+		tooltip?: string | undefined;
+		id: string;
+		title: string;
+		/**number of images in this observation */
+		stacksize?: number;
+		/**image url */
+		image: string | undefined;
+		/** status of the image processing */
+		status: Status;
+		/** text to show when status is not `"ok"` */
+		statusText: string;
+		/** statusText override when status == "loading" */
+		loadingStatusText: string;
+		/** whether this image can be selected */
+		selectable: boolean;
+		selected: boolean;
+		/** whether this image is highlighted. selected implies highlighted. */
+		highlighted: boolean;
+		/** original dimensions of the image */
+		dimensions: { width: number; height: number | undefined };
+		/**  what to do with the images' bounding boxes. Either display them all, or crop to the first one. */
+		boxes: 'show-all' | 'apply-first' | 'none';
+		/** array of bounding boxes. Values are between 0 and 1 (relative to the width/height of the image) */
+		boundingBoxes: TopLeftBoundingBox[];
+	};
 </script>
 
-<script>
+<script lang="ts">
+	import type { TopLeftBoundingBox } from './BoundingBoxes.svelte';
+
 	import IconRetry from '~icons/ri/arrow-go-back-fill';
 	import IconDelete from '~icons/ri/delete-bin-line';
 	import IconImage from '~icons/ri/image-2-line';
@@ -48,7 +59,6 @@
 	import { onlongpress } from './touch/longpress.js';
 	import { uiState } from './uistate.svelte.js';
 
-	/** @type {Props & Omit<Record<string, unknown>, keyof Props>}*/
 	let {
 		onclick,
 		ondoubleclick,
@@ -70,7 +80,15 @@
 		tooltip: tooltipText,
 		id,
 		...rest
-	} = $props();
+	}: Props & Omit<Record<string, unknown>, keyof Props> = $props();
+
+	const handlers = $derived({
+		onclick,
+		ondoubleclick,
+		onstacksizeclick,
+		ondelete,
+		onretry,
+	});
 
 	const mobile = new IsMobile();
 
@@ -95,6 +113,16 @@
 			// FIXME: sometimes we have empty strings in the selection lol
 			uiState.selection.filter(Boolean).length > 0
 	);
+
+	function callEventHandler(
+		name: Extract<keyof Props, `on${string}`>,
+		event: MouseEvent | TouchEvent
+	) {
+		handlers[name]?.(event, (newProps) => {
+			if (newProps.status) status = newProps.status;
+			if (newProps.loadingStatusText) loadingStatusText = newProps.loadingStatusText;
+		});
+	}
 </script>
 
 <article
@@ -124,10 +152,7 @@
 			}
 
 			if (loading || errored) return;
-			onclick?.(e, (newProps) => {
-				if (newProps.status) status = newProps.status;
-				if (newProps.loadingStatusText) loadingStatusText = newProps.loadingStatusText;
-			});
+			callEventHandler('onclick', e);
 		},
 		long() {
 			if (!selectable) return;
@@ -144,7 +169,7 @@
 	})}
 >
 	<div class="main-card">
-		<Card tag="div" {ondoubleclick}>
+		<Card tag="div" ondoubleclick={(e) => callEventHandler('ondoubleclick', e)}>
 			<div class="inner">
 				{#if status !== 'ok'}
 					<div class="loading-overlay">
@@ -169,7 +194,7 @@
 										dangerous
 										onclick={(e) => {
 											e.stopPropagation();
-											ondelete();
+											callEventHandler('ondelete', e);
 										}}
 									>
 										<IconDelete />
@@ -180,7 +205,7 @@
 									<ButtonInk
 										onclick={(e) => {
 											e.stopPropagation();
-											onretry();
+											callEventHandler('onretry', e);
 										}}
 									>
 										<IconRetry />
@@ -235,9 +260,9 @@
 						disabled={loading}
 						class="stack-count"
 						use:tooltip={`Cette observation regroupe ${stacksize} images. Cliquez pour les voir toutes.`}
-						onclick={(/** @type {MouseEvent} */ e) => {
+						onclick={(e: MouseEvent) => {
 							e.stopPropagation();
-							onstacksizeclick?.();
+							callEventHandler('onstacksizeclick', e);
 						}}
 					>
 						{stacksize}

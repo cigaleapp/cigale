@@ -1,5 +1,5 @@
 <script lang="ts" module>
-	export type Expandable = 'references' | 'subject' | 'none';
+	export type Expandable = 'references' | 'subject' | 'none' | 'mobile-option-details';
 </script>
 
 <script lang="ts">
