@@ -174,6 +174,7 @@
 		display: flex;
 		flex-wrap: nowrap;
 		overflow-x: auto;
+		font-size: 0.8rem;
 	}
 
 	.tabbedview.hide-tablist [role='tablist'] {

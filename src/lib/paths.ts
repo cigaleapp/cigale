@@ -26,3 +26,10 @@ export function routeIsIn(baseRouteId: RouteId, routeId: RouteId | null = page.r
 	if (!routeId) return false;
 	return routeId.startsWith(baseRouteId);
 }
+
+export function switchRouteId<Cases extends Partial<Record<RouteId, unknown>> & { else: unknown }>(
+	cases: Cases
+): Cases[keyof Cases] {
+	if (!page.route.id) return cases.else;
+	return cases[page.route.id] ?? cases.else;
+}

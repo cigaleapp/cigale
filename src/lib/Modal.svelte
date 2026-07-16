@@ -112,6 +112,7 @@ CSS variables:
 {#if mobile.current}
 	<BottomDrawer
 		{title}
+		{footer}
 		maxHeight={0.75}
 		bind:open={
 			() => page.state[stateKey] === true,
@@ -129,12 +130,6 @@ CSS variables:
 			<section class="toasts">
 				<ModalToasts pool={toastsPool} />
 			</section>
-		{/if}
-
-		{#if footer}
-			<footer>
-				{@render footer({ close })}
-			</footer>
 		{/if}
 	</BottomDrawer>
 {:else}

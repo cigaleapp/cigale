@@ -1,11 +1,13 @@
 <script lang="ts">
 	import type * as DB from '$lib/database.js';
 
+	import IconEliminate from '~icons/ri/filter-line';
+	import IconSuggestions from '~icons/ri/list-check-3';
 	import { page } from '$app/state';
 	import { databaseHandle, tables } from '$lib/idb.svelte.js';
 	import { storeMetadataValue } from '$lib/metadata/storage.js';
 	import { observationMetadata } from '$lib/observations.js';
-	import { goto } from '$lib/paths.js';
+	import { goto, switchRouteId } from '$lib/paths.js';
 	import { defaultClassificationMetadata } from '$lib/protocols.js';
 	import { toasts } from '$lib/toasts.svelte.js';
 	import { uiState } from '$lib/uistate.svelte.js';
@@ -98,6 +100,39 @@
 			}
 		},
 	}}
+	moreMenu={[
+		{
+			label: '',
+			items: switchRouteId({
+				'/(app)/(sidepanel)/o/[observation]/classify/suggestions': [
+					{
+						type: 'clickable',
+						label: 'Mode élimination (beta)',
+						icon: IconEliminate,
+						async onclick() {
+							await goto(
+								'/(app)/(sidepanel)/o/[observation]/classify/narrow',
+								page.params
+							);
+						},
+					},
+				],
+				else: [
+					{
+						type: 'clickable',
+						label: 'Mode suggestions',
+						icon: IconSuggestions,
+						async onclick() {
+							await goto(
+								'/(app)/(sidepanel)/o/[observation]/classify/suggestions',
+								page.params
+							);
+						},
+					},
+				],
+			}),
+		},
+	]}
 />
 
 {@render children()}

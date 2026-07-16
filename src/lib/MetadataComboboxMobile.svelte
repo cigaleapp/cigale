@@ -6,36 +6,25 @@
 	import { SvelteMap } from 'svelte/reactivity';
 	import { fade } from 'svelte/transition';
 
-	import IconDescription from '~icons/ri/align-left';
-	import IconCollapse from '~icons/ri/arrow-down-s-line';
 	import IconClose from '~icons/ri/arrow-left-s-line';
-	import IconExpand from '~icons/ri/arrow-up-s-line';
-	import IconDebug from '~icons/ri/bug-2-line';
 	import IconSelected from '~icons/ri/check-line';
 	import IconClear from '~icons/ri/close-line';
-	import IconImage from '~icons/ri/image-line';
 	import IconSearch from '~icons/ri/search-line';
 	import * as DB from '$lib/database.js';
 	import DebugOnly from '$lib/DebugOnly.svelte';
 
 	import ButtonIcon from './ButtonIcon.svelte';
 	import ButtonPrimary from './ButtonPrimary.svelte';
-	import { cascadeLabels } from './cascades.js';
 	import ConfidencePercentage from './ConfidencePercentage.svelte';
 	import { errorMessage } from './i18n.js';
 	import { databaseHandle } from './idb.svelte.js';
-	import LearnMoreLink from './LearnMoreLink.svelte';
 	import LoadingScreen from './LoadingScreen.svelte';
-	import Markdown from './Markdown.svelte';
 	import { resolveMetadataImport } from './metadata/namespacing.js';
 	import { serializeMetadataValue } from './metadata/serializing.js';
 	import { metadataIdOfOption, metadataOption } from './metadata/storage.js';
-	import MetadataCascadesTable from './MetadataCascadesTable.svelte';
+	import MetadataOptionCarousel from './MetadataOptionCarousel.svelte';
 	import OverflowableText from './OverflowableText.svelte';
-	import { scrollfader } from './scrollfader.js';
 	import { makeSearcher } from './search.js';
-	import { isDebugMode } from './settings.svelte.js';
-	import TabbedView from './TabbedView.svelte';
 	import { uiState } from './uistate.svelte.js';
 	import {
 		compareBy,
@@ -218,7 +207,11 @@
 		<ButtonIcon
 			tight
 			help="Annuler"
-			onclick={() => {
+			onclick={(e) => {
+				// Useful the entire dialog is inside a <button> with its onclick
+				// set to open the combobox, as in that case it'd close then
+				// open again immediately lol
+				e.stopPropagation();
 				dialogElement?.close();
 			}}
 		>
@@ -236,7 +229,7 @@
 					};
 				}}
 				oninput={() => {
-					resetSuggestionsScroll();
+					resetSuggestionsScroll?.();
 				}}
 			/>
 		</search>
@@ -288,7 +281,7 @@
 		>
 			{#snippet suggestion(option: DB.MetadataEnumVariant)}
 				{const { images, label, key, icon, color } = $derived(option)}
-				{const disabled = $derived(optionIsDisabled(option))}
+				{const disabled = $derived(optionIsDisabled?.(option))}
 				{const image = $derived(images?.at(0))}
 				{const confidence = $derived(confidenceOf(key))}
 
@@ -331,7 +324,7 @@
 								{typeof disabled === 'string' ? disabled : 'Désactivé'}
 							</div>
 						{:else}
-							<DebugOnly data={key} />
+							<DebugOnly inline data={key} />
 						{/if}
 					</div>
 
@@ -387,92 +380,20 @@
 		</section>
 		<section class="selected" in:fade={{ duration: 200 }}>
 			{#if shown}
-				{const { images = [], label, description, learnMore, key } = $derived(shown)}
-
-				<TabbedView
-					swipeable
-					aria-label="Description et images de l'option sélectionnée"
-					initially={images.length ? 'image_0' : 'details'}
-					tabs={[
-						{ key: 'debug', name: 'Debug', scrollable: true, hidden: !isDebugMode() },
-						{ key: 'details', name: 'Détails', scrollable: true, rerender: key },
-						...images.map((_, i) => ({
-							key: `image_${i}` as const,
-							name: `Image ${i + 1}`,
-							rerender: key,
-						})),
-					]}
-				>
-					{#snippet tab(attrs, key, { shown })}
-						<button
-							class="tab-icon"
-							{...attrs}
-							onclick={() => {
-								if (key === 'details' && shown) {
-									expanded = !expanded;
-									return;
-								}
-
-								attrs.onclick?.();
-							}}
-						>
-							{#if key === 'debug'}
-								<IconDebug />
-							{:else if key === 'details'}
-								<IconDescription />
-
-								<div class="subicon">
-									{#if expanded}
-										<IconCollapse />
-									{:else}
-										<IconExpand />
-									{/if}
-								</div>
-							{:else}
-								<IconImage />
-							{/if}
-						</button>
-					{/snippet}
-
-					{#snippet content(key)}
-						{#if key === 'debug'}
-							<DebugOnly
-								data={{
-									selected,
-									multiple,
-									value,
-									alternatives,
-									loaded: Array.from(optionsByKey.keys()),
-									confidences: Object.entries(confidences ?? {})
-										.sort(compareBy(([, confidence]) => -confidence))
-										.map(([key, val]) => `${key} @ ${val}`),
-								}}
-							/>
-						{:else if key === 'details'}
-							<div class="details" {@attach scrollfader}>
-								{#if description}
-									<Markdown source={description} />
-								{:else}
-									<p class="empty">
-										<em>Aucune description pour {label}.</em>
-									</p>
-								{/if}
-								{#if learnMore}
-									<LearnMoreLink href={learnMore} />
-								{/if}
-								{#await cascadeLabels( { protocolId: uiState.currentProtocolId, db: databaseHandle(), option: shown } ) then cascades}
-									<MetadataCascadesTable explain compact {cascades} />
-								{/await}
-							</div>
-						{:else}
-							{const i = Number.parseInt(key.replace(/^image_/, ''))}
-							{const image = images[i]}
-							{#if image}
-								<img src={corsfixIfLocalhost(image)} />
-							{/if}
-						{/if}
-					{/snippet}
-				</TabbedView>
+				<MetadataOptionCarousel
+					bind:expanded
+					option={shown}
+					debugdata={{
+						selected,
+						multiple,
+						value,
+						alternatives,
+						loaded: Array.from(optionsByKey.keys()),
+						confidences: Object.entries(confidences ?? {})
+							.sort(compareBy(([, confidence]) => -confidence))
+							.map(([key, val]) => `${key} @ ${val}`),
+					}}
+				/>
 			{:else}
 				<LoadingScreen empty="Aucune option sélectionée" />
 			{/if}
@@ -489,9 +410,9 @@
 		white-space: nowrap;
 		font-size: 1em;
 		text-align: left;
-		background: var(--bg2-neutral);
+		background: var(--metadata-combobox-trigger-bg, var(--bg2-neutral));
 		border-radius: var(--corner-radius);
-		padding: 0.5em 0.75em;
+		padding: var(--metadata-combobox-trigger-padding, 0.5em 0.75em);
 
 		&.empty {
 			color: var(--gay);
@@ -568,8 +489,8 @@
 		grid-template-columns: max-content auto max-content;
 
 		/* for animation when details are expanded */
-		max-height: 4rem;
-		min-height: 1rem;
+		max-height: 5rem;
+		min-height: 3.5rem;
 	}
 
 	search {
@@ -692,51 +613,6 @@
 	section.selected {
 		max-height: 50lvh;
 		width: 100lvw;
-		flex-grow: 1;
-		display: flex;
-		overflow: hidden;
-		flex-direction: column;
-		background: var(--bg-neutral);
-		z-index: 10;
-
-		transition: max-height 200ms;
-
-		.details {
-			padding: 1em;
-			display: flex;
-			flex-direction: column;
-			gap: 1.75em;
-		}
-
-		.empty {
-			color: var(--gay);
-		}
-
-		.image {
-			max-height: 25lvh;
-		}
-
-		img {
-			object-fit: contain;
-			width: 100%;
-			height: 100%;
-			background: black;
-		}
-
-		.tab-icon {
-			font-size: 1.2rem;
-			color: currentColor;
-
-			&,
-			.subicon {
-				display: flex;
-				justify-content: center;
-				align-items: center;
-			}
-
-			.subicon {
-				font-size: 1rem;
-			}
-		}
+		height: 100%;
 	}
 </style>

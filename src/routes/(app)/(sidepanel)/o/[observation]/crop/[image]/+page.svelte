@@ -148,7 +148,7 @@
 	import { IsMobile } from '$lib/mobile.svelte.js';
 	import { goto } from '$lib/paths.js';
 	import { seo } from '$lib/seo.svelte';
-	import { getSettings, isDebugMode, toggleSetting } from '$lib/settings.svelte.js';
+	import { getSettings } from '$lib/settings.svelte.js';
 	import { uiState } from '$lib/uistate.svelte.js';
 
 	import TopbarExtras from '../../TopbarExtras.svelte';
@@ -286,17 +286,6 @@
 					icon: IconDelete,
 					async onclick() {
 						await deleteImageFileAndGotoNext();
-					},
-				},
-				{
-					type: 'selectable',
-					key: 'debugmode',
-					label: 'Mode debug',
-					data: {},
-					selected: isDebugMode(),
-					closeOnSelect: false,
-					async onclick() {
-						await toggleSetting('debugMode');
 					},
 				},
 			],

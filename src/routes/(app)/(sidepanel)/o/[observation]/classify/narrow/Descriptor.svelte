@@ -197,49 +197,54 @@
 		// TODO: flush debouncedOnChange when mouse quits the metadata component?
 	>
 		{#snippet enumOptionsExtraContent({ option: { key }, selected })}
-			<IfInViewport
-				computation={() => {
-					const choices = structuredClone(narrowingState.choices);
-					// eslint-disable-next-line svelte/prefer-svelte-reactivity
-					choices.set(definition.id, (choices.get(definition.id) ?? new Set()).add(key));
+			<div class="narrowing-power-wrapper">
+				<IfInViewport
+					computation={() => {
+						const choices = structuredClone(narrowingState.choices);
+						choices.set(
+							definition.id,
+							// eslint-disable-next-line svelte/prefer-svelte-reactivity
+							(choices.get(definition.id) ?? new Set()).add(key)
+						);
 
-					return matches({
-						descriptors: narrowingState.descriptors,
-						within: narrowingState.remainingCandidateIds,
-						choices,
-					}).size;
-				}}
-			>
-				{#snippet children(countAfter)}
-					{@const countBefore = narrowingState.remainingCandidateIds.size}
-					{@const ratio = countAfter / countBefore}
-					<div
-						class="narrowing-power"
-						use:tooltip={'Candidats restants après ce choix'}
-						in:fade={{ duration: 100 }}
-					>
-						{#if !selected && ratio > 0 && ratio < 1}
-							<div class="ratio" transition:fade={{ duration: 100 }}>
-								<RadialProgress progress={1 - ratio} />
-							</div>
-						{/if}
-						{#if !selected}
-							<span
-								transition:fade={{ duration: 100 }}
-								class="filter-count"
-								style:width="{narrowingState.allCandidateIds.size.toString()
-									.length + 1}ch"
-							>
-								{#if countAfter > countBefore}
-									+{countAfter - countBefore}
-								{:else}
-									{countAfter}
-								{/if}
-							</span>
-						{/if}
-					</div>
-				{/snippet}
-			</IfInViewport>
+						return matches({
+							descriptors: narrowingState.descriptors,
+							within: narrowingState.remainingCandidateIds,
+							choices,
+						}).size;
+					}}
+				>
+					{#snippet children(countAfter)}
+						{@const countBefore = narrowingState.remainingCandidateIds.size}
+						{@const ratio = countAfter / countBefore}
+						<div
+							class="narrowing-power"
+							use:tooltip={'Candidats restants après ce choix'}
+							in:fade={{ duration: 100 }}
+						>
+							{#if !selected && ratio > 0 && ratio < 1}
+								<div class="ratio" transition:fade={{ duration: 100 }}>
+									<RadialProgress progress={1 - ratio} />
+								</div>
+							{/if}
+							{#if !selected}
+								<span
+									transition:fade={{ duration: 100 }}
+									class="filter-count"
+									style:width="{narrowingState.allCandidateIds.size.toString()
+										.length + 1}ch"
+								>
+									{#if countAfter > countBefore}
+										+{countAfter - countBefore}
+									{:else}
+										{countAfter}
+									{/if}
+								</span>
+							{/if}
+						</div>
+					{/snippet}
+				</IfInViewport>
+			</div>
 		{/snippet}
 	</Metadata>
 {/snippet}
@@ -284,17 +289,24 @@
 		}
 
 		img {
-			width: 2.5em;
-			height: 2.5em;
+			--size: calc(min(2.5em, 25dvw));
+			width: var(--size);
+			height: var(--size);
 			object-fit: contain;
 			border-radius: var(--corner-radius);
 			overflow: hidden;
 		}
 	}
 
+	.narrowing-power-wrapper {
+		/* Ensures constant width to not have text jump around by wrapping changing once the value loads in */
+		width: 5ch;
+	}
+
 	.narrowing-power {
 		display: flex;
 		align-items: center;
+		justify-content: end;
 		gap: 0.5em;
 		z-index: 10;
 	}

@@ -65,12 +65,21 @@
 		&:focus-visible {
 			background-color: var(--bg-primary-translucent);
 		}
+
+		@media (max-width: 600px) {
+			flex-direction: column;
+		}
 	}
 
 	.image {
-		width: 10rem;
-		height: 10rem;
+		width: var(--size);
+		height: var(--size);
 		flex-shrink: 0;
+		--size: 10rem;
+
+		@media (max-width: 600px) {
+			width: 100%;
+		}
 	}
 
 	.image.empty {
