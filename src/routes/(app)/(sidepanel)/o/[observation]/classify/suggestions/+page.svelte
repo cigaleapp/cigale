@@ -235,10 +235,6 @@
 				flex-grow: 1;
 			}
 
-			.button-contents {
-				padding: 0;
-			}
-
 			&[data-expand='subject'] {
 				grid-template-rows: 100% 0%;
 			}

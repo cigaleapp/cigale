@@ -123,6 +123,7 @@
 
 	.scrollable {
 		overflow-y: scroll;
+		overflow-x: hidden;
 		height: 100%;
 		scrollbar-gutter: stable;
 	}

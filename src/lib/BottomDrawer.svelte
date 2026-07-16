@@ -15,6 +15,7 @@
 		title?: string;
 		position?: BottomSheetSettings['position'];
 		trigger?: Snippet;
+		footer: Snippet<[{ close: () => void }]>;
 		/**
 		 * The trigger will be the bottom bar. The value of this prop is the text shown.
 		 * Also sets the title (if it hasnt been manually set)
@@ -43,6 +44,7 @@
 		trigger,
 		'trigger-from-bottombar': triggerFromBottombar,
 		title = triggerFromBottombar ?? '',
+		footer,
 	}: Props = $props();
 
 	let disableGestures = $state(false);
@@ -108,6 +110,18 @@
 						</p>
 					{/if}
 					{@render children()}
+					{#if footer}
+						{let footerHeight = $state(0)}
+						<footer bind:clientHeight={footerHeight}>
+							{@render footer({
+								close() {
+									open = false;
+								},
+							})}
+						</footer>
+
+						<div class="footer-spacer" style:height="{footerHeight}px"></div>
+					{/if}
 				</BottomSheet.Content>
 			</BottomSheet.Sheet>
 		</BottomSheet.Overlay>
@@ -118,6 +132,7 @@
 	[data-bottomsheet-wrapper] {
 		z-index: 998;
 		display: contents;
+		--content-border-color: rgba(from var(--gray) r g b / 50%);
 	}
 
 	[data-bottomsheet-wrapper] :global(.bottom-sheet-overlay) {
@@ -138,7 +153,7 @@
 		z-index: 200;
 
 		&:has(.title) {
-			border-bottom: 1px solid rgb(from var(--gray) r g b / 50%);
+			border-bottom: 1px solid var(--content-border-color);
 		}
 	}
 
@@ -149,6 +164,25 @@
 	[data-bottomsheet-wrapper] :global(.bottom-sheet-content) {
 		width: 100%;
 		padding: var(--drawer-outer-padding, 0.75rem);
+		position: relative;
+
+		footer {
+			position: fixed;
+			bottom: 0;
+			inset-inline: 0;
+		}
+	}
+
+	footer {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-wrap: wrap;
+		z-index: 10;
+		gap: 1em;
+		padding: 1em;
+		background: var(--bg-neutral);
+		border-top: 1px solid var(--content-border-color);
 	}
 
 	.title {

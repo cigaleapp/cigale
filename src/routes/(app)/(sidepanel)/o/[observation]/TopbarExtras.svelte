@@ -20,6 +20,7 @@
 	import ProgressBar from '$lib/ProgressBar.svelte';
 
 	import { topbarExtrasPortalId } from './+layout@(app).svelte';
+	import { isDebugMode, toggleSetting } from '$lib/settings.svelte';
 
 	interface Props {
 		keyboardShortcutsCategory: 'classification' | 'cropping';
@@ -46,7 +47,7 @@
 			// eslint-disable-next-line no-unused-vars
 			mark: (status: 'unconfirmed' | 'confirmed') => Promise<void>;
 		};
-		/** Only shown on mobile. Always in the menu: Report a bug (at the bottom) */
+		/** Only shown on mobile. Always in the menu: Report a bug & toggle debug mode (at the bottom) */
 		moreMenu?: DropdownMenuTypes.ItemsGroup<{}, {}>[];
 	}
 
@@ -72,6 +73,17 @@
 				...last,
 				items: [
 					...last.items,
+					{
+						type: 'selectable',
+						key: 'debugmode',
+						label: 'Mode debug',
+						data: {},
+						selected: isDebugMode(),
+						closeOnSelect: false,
+						async onclick() {
+							await toggleSetting('debugMode');
+						},
+					},
 					{
 						type: 'clickable',
 						label: 'Signaler un bug',

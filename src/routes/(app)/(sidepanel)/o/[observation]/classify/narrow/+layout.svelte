@@ -7,6 +7,8 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
 
+	import IconCollapse from '~icons/ri/arrow-down-s-line';
+	import IconExpand from '~icons/ri/arrow-up-s-line';
 	import IconRemove from '~icons/ri/close-line';
 	import IconRestart from '~icons/ri/restart-line';
 	import IconSearch from '~icons/ri/search-line';
@@ -22,6 +24,7 @@
 	import Logo from '$lib/Logo.svelte';
 	import { deleteMetadataValue, storeMetadataValue } from '$lib/metadata/storage.js';
 	import MetadataInput from '$lib/MetadataInput.svelte';
+	import { IsMobile } from '$lib/mobile.svelte';
 	import OverflowableText from '$lib/OverflowableText.svelte';
 	import { goto } from '$lib/paths.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
@@ -43,6 +46,10 @@
 
 	const { children } = $props();
 
+	const mobile = new IsMobile();
+	const ismobile = $derived(mobile.current);
+	const isdesktop = $derived(!mobile.current);
+
 	const observation = $derived(narrowingState.observation);
 
 	const images = $derived(
@@ -51,7 +58,7 @@
 
 	const narrowableGroup = $derived(narrowingState.narrowableGroup);
 
-	let expandedSubject = $state(false);
+	let expand = $state<'subject' | 'main' | 'none'>('none');
 
 	const definitions = $derived(narrowingState.definitions);
 
@@ -146,16 +153,20 @@
 <CandidateDetailsModal bind:open={narrowingState.openCandidateDetails} />
 
 <OptionsLoader>
-	<div class="layout" class:expanded-subject={expandedSubject}>
+	<div
+		class="layout"
+		class:expanded-subject={expand === 'subject'}
+		class:expanded-main={expand === 'main'}
+	>
 		<aside>
 			<section class="photo">
 				<Subject
 					buttons="top-left"
 					{images}
 					bind:expand={
-						() => (expandedSubject ? 'subject' : 'none'),
+						() => (expand === 'subject' ? 'subject' : 'none'),
 						(value) => {
-							expandedSubject = value === 'subject';
+							expand = value === 'subject' ? 'subject' : 'none';
 						}
 					}
 					bind:currentImage={
@@ -170,6 +181,26 @@
 			</section>
 			{#if focusedMetadata && focusedMetadataValue}
 				<section class="focused" aria-labelledby="narrower-focused-metadata">
+					{#if ismobile}
+						<div class="expand-main">
+							<ButtonIcon
+								help={expand === 'main' ? 'Réduire' : 'Afficher en grand'}
+								onclick={() => {
+									if (expand === 'main') {
+										expand = 'none';
+									} else {
+										expand = 'main';
+									}
+								}}
+							>
+								{#if expand}
+									<IconExpand />
+								{:else}
+									<IconCollapse />
+								{/if}
+							</ButtonIcon>
+						</div>
+					{/if}
 					<div class="metadata" id="narrower-focused-metadata">
 						<OverflowableText text={focusedMetadata.label} />
 					</div>
@@ -223,116 +254,118 @@
 				</section>
 			{/if}
 
-			<section class="explainer">
-				<h2>Candidats</h2>
+			{#if isdesktop}
+				<section class="explainer">
+					<h2>Candidats</h2>
 
-				<div class="actions">
-					<CandidatesListXper3 />
+					<div class="actions">
+						<CandidatesListXper3 />
 
-					<SegmentedGroup
-						options={['all', 'remaining', 'eliminated']}
-						bind:current={candidatesTab}
-					>
-						{#snippet option_all()}
-							Tous
-						{/snippet}
-						{#snippet option_remaining()}
-							Restants
-						{/snippet}
-						{#snippet option_eliminated()}
-							Éliminés
-						{/snippet}
-					</SegmentedGroup>
-				</div>
-			</section>
-
-			<section class="candidates">
-				<VirtualList
-					empty="Aucun candidat à afficher"
-					items={shownCandidates.toSorted(
-						compareBy((c) =>
-							distanceToChoices({
-								descriptors: narrowingState.descriptors,
-								candidate: c.key,
-								choices: narrowingState.choices,
-							})
-						)
-					)}
-				>
-					{#snippet item(option)}
-						{@const { images, label, key } = option}
-						{@const distance = distanceToChoices({
-							descriptors: narrowingState.descriptors,
-							candidate: option.key,
-							choices: narrowingState.choices,
-						})}
-						{@const closeness = 1 - distance / narrowingState.choices.size}
-						{@const crossout =
-							!narrowingState.remainingCandidateIds.has(key) &&
-							candidatesTab !== 'eliminated'}
-						<button
-							class="candidate"
-							style:--closeness={candidatesTab === 'remaining' ? 0 : closeness}
-							onclick={() => narrowingState.openCandidateDetails?.(option)}
+						<SegmentedGroup
+							options={['all', 'remaining', 'eliminated']}
+							bind:current={candidatesTab}
 						>
-							<div class="image">
-								{#if images && images.length > 0}
-									<img src={images[0]} alt="" />
-								{:else}
-									?
-								{/if}
-							</div>
-							<span class="label">
-								{#if crossout}
-									<s>{label}</s>
-								{:else}
-									{label}
-								{/if}
-							</span>
-							{#if !Number.isNaN(closeness) && candidatesTab !== 'remaining'}
-								<code
-									class="closeness"
-									use:tooltip={'Correspondance avec les choix effectués'}
-								>
-									{percent(closeness, 0, { pad: 'nbsp' })}
-								</code>
-							{/if}
-						</button>
-					{/snippet}
-				</VirtualList>
-			</section>
-			<section class="actions">
-				<div class="settings">
-					<NarrowableGroupPicker />
-				</div>
-				<ButtonInk
-					loading="Recommencer"
-					onclick={async () => {
-						if (!observation) return;
-						const obs = await tables.Observation.raw.get(observation.id);
-						if (!obs) return;
-						narrowingState.choicesHistory = [];
-						// Wipe all metadata values that are in the current metadata group
-						await tables.Observation.update(
-							observation.id,
-							'metadataOverrides',
-							transformObject(obs.metadataOverrides, (id, value) => {
-								const def = definitions.find((d) => d.id === id);
-								if (!def) return [id, value];
-								if (def.group !== narrowingState.narrowableGroup)
-									return [id, value];
+							{#snippet option_all()}
+								Tous
+							{/snippet}
+							{#snippet option_remaining()}
+								Restants
+							{/snippet}
+							{#snippet option_eliminated()}
+								Éliminés
+							{/snippet}
+						</SegmentedGroup>
+					</div>
+				</section>
 
-								return undefined;
-							})
-						);
+				<section class="candidates">
+					<VirtualList
+						empty="Aucun candidat à afficher"
+						items={shownCandidates.toSorted(
+							compareBy((c) =>
+								distanceToChoices({
+									descriptors: narrowingState.descriptors,
+									candidate: c.key,
+									choices: narrowingState.choices,
+								})
+							)
+						)}
+					>
+						{#snippet item(option)}
+							{@const { images, label, key } = option}
+							{@const distance = distanceToChoices({
+								descriptors: narrowingState.descriptors,
+								candidate: option.key,
+								choices: narrowingState.choices,
+							})}
+							{@const closeness = 1 - distance / narrowingState.choices.size}
+							{@const crossout =
+								!narrowingState.remainingCandidateIds.has(key) &&
+								candidatesTab !== 'eliminated'}
+							<button
+								class="candidate"
+								style:--closeness={candidatesTab === 'remaining' ? 0 : closeness}
+								onclick={() => narrowingState.openCandidateDetails?.(option)}
+							>
+								<div class="image">
+									{#if images && images.length > 0}
+										<img src={images[0]} alt="" />
+									{:else}
+										?
+									{/if}
+								</div>
+								<span class="label">
+									{#if crossout}
+										<s>{label}</s>
+									{:else}
+										{label}
+									{/if}
+								</span>
+								{#if !Number.isNaN(closeness) && candidatesTab !== 'remaining'}
+									<code
+										class="closeness"
+										use:tooltip={'Correspondance avec les choix effectués'}
+									>
+										{percent(closeness, 0, { pad: 'nbsp' })}
+									</code>
+								{/if}
+							</button>
+						{/snippet}
+					</VirtualList>
+				</section>
+				<section class="actions">
+					<div class="settings">
+						<NarrowableGroupPicker />
+					</div>
+					<ButtonInk
+						loading="Recommencer"
+						onclick={async () => {
+							if (!observation) return;
+							const obs = await tables.Observation.raw.get(observation.id);
+							if (!obs) return;
+							narrowingState.choicesHistory = [];
+							// Wipe all metadata values that are in the current metadata group
+							await tables.Observation.update(
+								observation.id,
+								'metadataOverrides',
+								transformObject(obs.metadataOverrides, (id, value) => {
+									const def = definitions.find((d) => d.id === id);
+									if (!def) return [id, value];
+									if (def.group !== narrowingState.narrowableGroup)
+										return [id, value];
 
-						narrowingState.resetScrollAndSearch();
-					}}
-				>
-					<IconRestart />
-					Recommencer
-				</ButtonInk>
-			</section>
+									return undefined;
+								})
+							);
+
+							narrowingState.resetScrollAndSearch();
+						}}
+					>
+						<IconRestart />
+						Recommencer
+					</ButtonInk>
+				</section>
+			{/if}
 		</aside>
 
 		<div class="content-and-footer" class:no-narrowable-group={!narrowableGroup}>
@@ -424,9 +457,11 @@
 								}}
 							>
 								Choix
-								<code class="candidates-count">
-									{Object.keys(metadataValues).length}
-								</code>
+								{#if isdesktop}
+									<code class="candidates-count">
+										{Object.keys(metadataValues).length}
+									</code>
+								{/if}
 							</div>
 						{/snippet}
 						{#snippet option_candidates({ disabled })}
@@ -437,9 +472,11 @@
 									: { text: 'Voir les candidats possibles', keyboard: 'tab' }}
 							>
 								Candidats
-								<code class="candidates-count">
-									{narrowingState.remainingCandidateIds.size}
-								</code>
+								{#if isdesktop}
+									<code class="candidates-count">
+										{narrowingState.remainingCandidateIds.size}
+									</code>
+								{/if}
 							</div>
 						{/snippet}
 					</SegmentedGroup>
@@ -459,6 +496,44 @@
 		display: flex;
 		height: 100%;
 		/* overflow: hidden; */
+
+		@media (max-width: 600px) {
+			display: grid;
+			grid-template-rows: 40% 60%;
+			width: 100%;
+
+			&.expanded-subject {
+				grid-template-rows: 100% 0%;
+			}
+
+			&.expanded-main {
+				grid-template-rows: 0% 100%;
+			}
+
+			aside {
+				width: 100%;
+				height: 100%;
+				display: flex;
+
+				.photo {
+					max-height: 100%;
+					min-height: 0;
+				}
+			}
+
+			.content-and-footer {
+				width: 100%;
+			}
+
+			footer {
+				padding: 0.25em 0.5em;
+
+				&,
+				search {
+					font-size: 0.9rem;
+				}
+			}
+		}
 	}
 
 	aside {
@@ -501,6 +576,10 @@
 		padding: 0 0.5em;
 		padding-top: 1em;
 
+		@media (max-width: 600px) {
+			max-width: 100dvw;
+		}
+
 		&,
 		> * {
 			display: flex;
@@ -525,6 +604,10 @@
 			flex-shrink: 0;
 			margin-left: auto;
 			width: 20ch;
+
+			@media (max-width: 600px) {
+				width: 50dvw;
+			}
 		}
 	}
 

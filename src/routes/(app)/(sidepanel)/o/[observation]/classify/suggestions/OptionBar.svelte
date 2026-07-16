@@ -240,10 +240,6 @@
 			grid-template-columns: 50px 1fr 50px;
 			gap: 0.5em;
 
-			.button-contents {
-				justify-content: center;
-			}
-
 			.prev {
 				grid-area: prev;
 			}
@@ -275,6 +271,7 @@
 
 	.current {
 		--metadata-combobox-trigger-bg: transparent;
+		--metadata-combobox-trigger-padding: 0.5em 0;
 	}
 
 	.button-contents {
@@ -283,12 +280,32 @@
 		gap: 0.5em;
 
 		width: 100%;
-		/* XXX: To match up height with the combobox "button" */
-		padding: 0.13em 0;
-		justify-content: space-between;
 
 		text-align: left;
 		font-weight: normal;
+
+		@media (max-width: 600px) {
+			padding: 0 0.5em;
+		}
+	}
+
+	/* XXX: To match up height with the combobox "button" */
+	:is(.prev, .next) .button-contents {
+		padding: 0.13em 0;
+
+		@media (max-width: 600px) {
+			padding-block: 0.12em;
+		}
+	}
+
+	@media (max-width: 600px) {
+		.current .button-contents {
+			justify-content: space-between;
+		}
+
+		:is(.prev, .next) .button-contents {
+			justify-content: center;
+		}
 	}
 
 	@media (min-width: 600px) {

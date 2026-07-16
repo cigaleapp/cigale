@@ -412,7 +412,7 @@
 		text-align: left;
 		background: var(--metadata-combobox-trigger-bg, var(--bg2-neutral));
 		border-radius: var(--corner-radius);
-		padding: 0.5em 0.75em;
+		padding: var(--metadata-combobox-trigger-padding, 0.5em 0.75em);
 
 		&.empty {
 			color: var(--gay);

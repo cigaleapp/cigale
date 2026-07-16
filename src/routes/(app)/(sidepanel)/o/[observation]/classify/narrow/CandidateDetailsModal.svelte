@@ -13,6 +13,7 @@
 	import Markdown from '$lib/Markdown.svelte';
 	import { storeMetadataValue } from '$lib/metadata/storage.js';
 	import MetadataCascadesTable from '$lib/MetadataCascadesTable.svelte';
+	import { IsMobile } from '$lib/mobile.svelte';
 	import Modal from '$lib/Modal.svelte';
 	import { uiState } from '$lib/uistate.svelte.js';
 	import { splitRecord } from '$lib/utils.js';
@@ -26,6 +27,9 @@
 	}
 
 	let { open = $bindable() }: Props = $props();
+
+	const mobile = new IsMobile();
+	const ismobile = $derived(mobile.current);
 
 	const db = $derived(page.data.db);
 
@@ -86,6 +90,7 @@
 					</h2>
 
 					<MetadataCascadesTable
+						compact={ismobile}
 						cascades={chosen}
 						crossout={(metadataId, key) =>
 							choices.get(metadataId) && !choices.get(metadataId)!.has(key)}
@@ -94,7 +99,7 @@
 				<section class="cascade-others">
 					<h2>Autres descripteurs</h2>
 
-					<MetadataCascadesTable cascades={others} />
+					<MetadataCascadesTable compact={ismobile} cascades={others} />
 				</section>
 			{/await}
 			<section class="description">
@@ -124,6 +129,8 @@
 	.content {
 		/* display :flex;
 		flex-direction: column; */
+		--pad: 1em;
+		--drawer-outer-padding: var(--pad);
 		display: grid;
 		gap: 2em;
 		grid-template-columns: 1fr 1fr;
@@ -133,9 +140,31 @@
 			'cascade-chosen cascade-chosen'
 			'cascade-others cascade-others';
 
+		@media (max-width: 600px) {
+			overflow-x: hidden;
+			width: 100%;
+			grid-template-columns: 1fr;
+			grid-template-areas:
+				'eliminated-why'
+				'images'
+				'description'
+				'cascade-chosen'
+				'cascade-others';
+
+			> * {
+				flex-shrink: 1;
+				max-width: calc(100dvw - 2 * var(--pad));
+			}
+		}
+
 		.images {
 			grid-area: images;
 			max-width: 40vw;
+			
+			@media (max-width: 600px) {
+				width: 100%;
+				max-width: unset;
+			}
 		}
 
 		.images img {
@@ -146,18 +175,31 @@
 
 		.description {
 			grid-area: description;
+
+			@media (max-width: 600px) {
+				width: 100%;
+			}
 		}
 
 		.cascade-chosen {
 			grid-area: cascade-chosen;
+			@media (max-width: 600px) {
+				width: 100%;
+			}
 		}
 
 		.cascade-others {
 			grid-area: cascade-others;
+			@media (max-width: 600px) {
+				width: 100%;
+			}
 		}
 
 		.eliminated-why {
 			grid-area: eliminated-why;
+			@media (max-width: 600px) {
+				width: 100%;
+			}
 		}
 	}
 
