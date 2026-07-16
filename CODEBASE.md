@@ -2,8 +2,6 @@
 
 Cigale is a local-only web-app, so one of the most important things is that there's no server-side.
 
-
-
 ## Tech stack
 
 - A mix of [Typescript](https://typescript.com) and [plain JS with JSDoc](https://jsdoc.app/): new files should be written in Typescript. The project originally started with plain JS because it was a student group project and I didn't want everyone to have to learn yet another thing on top of Svelte. The conversion of the source code to Typescript is done gradually. Unfortunately, [automating the conversion doesn't seem feasible](https://github.com/cigaleapp/cigale/pull/984#pullrequestreview-3601220496).
@@ -65,6 +63,8 @@ Some are project-specific, and others are widely-used in web development but are
 	<dd>Capture view with "active" timers to help users keep track of time between manually taken photos</dd>
 	<dt>Passive mode</dt>
 	<dd>Capture view with "passive" timers that allows automatic capture of photos at regular time intervals</dd>
+	<dt>Storage backend</dt>
+	<dd>The app has multiple ways to store files (namely the photos we're working with), depending on the platform: via OPFS, via the native filesystem on the Capacitor app, directly in IndexedDB (the original way we did it, now deprecated), and possibly more such as network-based storage in the future. These all implement a common interface that is used to retrieve and store bytes</dd>
 	<dt>Lightbox</dt>
 	<dd>The UI that pops up when clicking on an image to view it in fullscreen</dd>
 	<dt>Toast</dt>
@@ -74,6 +74,11 @@ Some are project-specific, and others are widely-used in web development but are
 	<dt>E2E,</dt>
 	<dt>E2E test</dt>
 	<dd>A end-to-end test, most likely done with Playwright.</dd>
+	<dt>Fixture</dt>
+	<dd>A asset or file only used for (most often E2E) tests. Example data, most of the time. For example, sample photos or .zip result exports used to test functionality of the app with.</dd>
+	<dd>Fixtures can also refer to <a href="https://playwright.dev/docs/test-fixtures">Playwright's fixtures</a>, which allows extending it with additional features such as creating temporary files during tests, doing common app actions (such as changing tabs, selecting a photo, importing photos, etc) without repeating the same instructions everywhere</dd>
+	<dt>Transaction</dt>
+	<dd>A IndexedDB transaction</dd>
 </dl>
 
 ## Deployment
