@@ -241,11 +241,13 @@
 		}
 	}
 
-	main[data-layout-transitions='true'] {
-		transition:
-			grid-template-rows 0.2s,
-			grid-template-columns 0.2s,
-			grid-template-areas 0.2s;
+	@media (prefers-reduced-motion: no-preference) {
+		main[data-layout-transitions='true'] {
+			transition:
+				grid-template-rows 0.2s,
+				grid-template-columns 0.2s,
+				grid-template-areas 0.2s;
+		}
 	}
 
 	/* We want the layout switcher to transition IN but NOT transition out */
