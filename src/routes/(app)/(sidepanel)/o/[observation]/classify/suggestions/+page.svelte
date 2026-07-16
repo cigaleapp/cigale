@@ -206,6 +206,7 @@
 			display: grid;
 			grid-template-areas: 'subject' 'panel';
 			grid-template-rows: 40% 60%;
+			transition-duration: 100ms;
 
 			.panel {
 				height: 100%;
@@ -216,6 +217,18 @@
 
 			.focused-option {
 				transition: max-height 200ms;
+			}
+
+			.panel {
+				position: relative;
+				/*XXX: compensate the fact that focused-option is out of the flex flow*/
+				padding-top: 2rem;
+
+				.focused-option {
+					position: absolute;
+					inset-inline: 0.5rem;
+					top: -1rem;
+				}
 			}
 
 			.details {
@@ -279,9 +292,16 @@
 		}
 	}
 
+	main[data-expand='mobile-option-details'] {
+		.focused-option {
+			opacity: 0.25;
+		}
+	}
+
 	.panel,
 	.subject,
-	.references {
+	.references,
+	.focused-option {
 		transition: opacity 0.4s;
 	}
 
