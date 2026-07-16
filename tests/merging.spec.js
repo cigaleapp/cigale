@@ -362,7 +362,7 @@ test('selecting multiple images', issue(1054), async ({ page, app }) => {
 	    - button "Regrouper Ctrl + G":
 	      - img
 	      - text: ""
-	    - button "Séparer Ctrl + Shift + G":
+	    - button "Séparer Ctrl + Maj + G":
 	      - img
 	      - text: ""
 	    - button "Ouvrir en plein écran Ctrl + ⏎" [disabled]:

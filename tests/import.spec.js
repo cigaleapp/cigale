@@ -257,7 +257,7 @@ test.describe('correct results.zip', () => {
 		    - button "Regrouper Ctrl + G":
 		      - img
 		      - text: ""
-		    - button "Séparer Ctrl + Shift + G":
+		    - button "Séparer Ctrl + Maj + G":
 		      - img
 		      - text: ""
 		    - button "Ouvrir en plein écran Ctrl + ⏎":
