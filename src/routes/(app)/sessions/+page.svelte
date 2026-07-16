@@ -237,7 +237,7 @@
 							if (imagesCount > 0) {
 								await goto('/(app)/(sidepanel)/import');
 							} else {
-								await goto('/(app)/(sidepanel)/sessions/[id]', session.id);
+								await goto('/(app)/sessions/[id]', session);
 							}
 						},
 					})}

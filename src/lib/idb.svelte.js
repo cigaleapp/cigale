@@ -361,7 +361,7 @@ export async function listByIndex(tableName, indexName, keyRange = undefined) {
  * @param {TableName} tableName
  * @param {import('idb').IndexNames<IDBDatabaseType, TableName>} indexName
  * @param {IDBKeyRange | string} [keyRange]
- * @returns {Promise<Array<typeof Tables[TableName]['infer']>>}
+ * @returns {Promise<number>}
  */
 export async function countByIndex(tableName, indexName, keyRange = undefined) {
 	return profile(
