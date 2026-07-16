@@ -79,6 +79,9 @@ Some are project-specific, and others are widely-used in web development but are
 	<dd>Fixtures can also refer to <a href="https://playwright.dev/docs/test-fixtures">Playwright's fixtures</a>, which allows extending it with additional features such as creating temporary files during tests, doing common app actions (such as changing tabs, selecting a photo, importing photos, etc) without repeating the same instructions everywhere</dd>
 	<dt>Transaction</dt>
 	<dd>A IndexedDB transaction</dd>
+	<dt>Workflow,</dt>
+	<dt>Job</dt>
+	<dd>Refers to Github Actions workflows and/or jobs, especially when it's in commit mesages, issues or PRs</dd>
 </dl>
 
 ## Deployment
