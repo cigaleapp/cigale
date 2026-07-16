@@ -313,6 +313,7 @@ jobs:
       TITLE: '👀 PR #${{ github.event.pull_request.number }} (${{ github.event.pull_request.head.ref }}) checks finished'
       MESSAGE: 'No further information available'
       URL: ${{ github.event.pull_request._links.html.href }}
+      GH_TOKEN: ${{ github.token }}
 
     runs-on: ubuntu-latest
     steps:
