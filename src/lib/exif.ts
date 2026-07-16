@@ -109,7 +109,7 @@ export async function processExifData({
 				if (!('exif' in def.infer)) continue;
 				if (!def.infer.exif) continue;
 
-				coerced = coerceExifValue(def.type, fields[def.infer.exif]);
+				coerced = coerceExifValue(def.type, fields[def.infer.exif], def.infer.exif);
 
 				if (!coerced) {
 					console.warn(
@@ -190,7 +190,8 @@ async function parseExif(buffer: ArrayBuffer | Buffer, contentType: string) {
 
 export function coerceExifValue<T extends DB.MetadataType>(
 	coerceTo: T,
-	value: unknown
+	value: unknown,
+	field?: ExifFieldKey
 ): import('./schemas/metadata.js').RuntimeValue<T> | undefined {
 	if (value === undefined) return undefined;
 	if (value === null) return undefined;
@@ -238,10 +239,20 @@ export function coerceExifValue<T extends DB.MetadataType>(
 		case 'float': {
 			if (type(['number', 'number']).array().allows(value)) {
 				const [[num, denom]] = value;
-				return num / denom;
+				const coerced = num / denom;
+
+				if (field === 'Temperature') {
+					return avoidSentinelTemperature(coerced);
+				}
 			}
 
-			return Number(value);
+			const coerced = Number(value);
+
+			if (field === 'Temperature') {
+				return avoidSentinelTemperature(coerced);
+			}
+
+			return coerced;
 		}
 
 		case 'location': {
@@ -258,7 +269,7 @@ export function coerceExifValue<T extends DB.MetadataType>(
 					);
 				}
 
-				return coerceExifValue('float', coord);
+				return coerceExifValue('float', coord, field);
 			}
 
 			const lng = coerceCoordinate(value.longitude, value.longitudeRef, 'E');
@@ -377,4 +388,22 @@ export function setExifFields(bytes: ArrayBuffer, changes: Partial<Record<ExifFi
 		toasts.warn(errorMessage(error, 'Impossible de modifier les données EXIF'));
 		return new Uint8Array(buffer);
 	}
+}
+
+/**
+ * aperture value = 2 log_2(f number)
+ * @see https://www.uniquephoto.com/community/qa/what-is-aperture-value-in-exif-and-how-does-it-relate-to-the-f-number
+ */
+export function apertureValueToFNumber(aperture: number): number {
+	return 2 ** (aperture / 2);
+}
+
+// son son son sahur 🫩
+// See https://gist.github.com/gwennlbh/b907a5fc4e139f12ddb2c677984a4a83#file-img_6072-cr2-json-L190-L195
+function avoidSentinelTemperature(value: number | undefined): number | undefined {
+	if (value === -1000) {
+		console.debug(`Avoiding sentinel value -1000°C for temperature`);
+		return undefined;
+	}
+	return value;
 }

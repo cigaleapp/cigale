@@ -54,9 +54,10 @@ describe('findRawMetadataFieldByExifTag', () => {
 
 		expect(findRawMetadataFieldByExifTag(mockMetadata, 'Make')).toBe('Canon');
 		expect(findRawMetadataFieldByExifTag(mockMetadata, 'Model')).toBe('EOS 500D');
-		expect(findRawMetadataFieldByExifTag(mockMetadata, 'ISOSpeed')).toBe(3200);
-		expect(findRawMetadataFieldByExifTag(mockMetadata, 'ShutterSpeedValue')).toBe(
-			0.009999999776482582
+		expect(findRawMetadataFieldByExifTag(mockMetadata, 'ISOSpeedRatings')).toBe(3200);
+		expect(findRawMetadataFieldByExifTag(mockMetadata, 'ShutterSpeedValue')).toBeCloseTo(
+			6.64385,
+			4
 		);
 		expect(findRawMetadataFieldByExifTag(mockMetadata, 'ApertureValue')).toBe(5);
 		expect(findRawMetadataFieldByExifTag(mockMetadata, 'FocalLength')).toBe(70);
