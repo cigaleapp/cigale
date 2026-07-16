@@ -1,11 +1,15 @@
 msgid ""
 msgstr ""
-"Plural-Forms: nplurals=2; plural=n != 1;\n"
-"Source-Language: fr\n"
+"PO-Revision-Date: 2026-07-16 01:43+0000\n"
+"Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
 "Language: en\n"
-"MIME-Version: 1.0\n"
+"Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"MIME-Version: 1.0\n"
+"X-Generator: Weblate 5.12.2\n"
+"Source-Language: fr\n"
 
 #: src/lib/SessionMetadataForm.svelte
 #: src/routes/(app)/PrepareForOffline.svelte
@@ -1658,22 +1662,22 @@ msgstr ""
 
 #: src/routes/(app)/ModalSubmitIssue.svelte
 msgid "Métadonnées envoyées"
-msgstr ""
+msgstr "Sent metadata"
 
 #: src/lib/FilePreview.svelte
 #: src/lib/MetadataInput.svelte
 msgid "Aucun fichier"
-msgstr ""
+msgstr "No files"
 
 #: src/lib/FilePreview.svelte
 msgid "Fichier trop volumineux pour être prévisualisé"
-msgstr ""
+msgstr "FIle too large to be previewed"
 
 #: src/lib/FilePreview.svelte
 #: src/lib/FilePreview.svelte
 #: src/routes/(external)/apk/+page.svelte
 msgid "Télécharger"
-msgstr ""
+msgstr "Download"
 
 #: src/lib/FilePreview.svelte
 msgid "Your browser does not support the audio element."
@@ -1685,15 +1689,15 @@ msgstr ""
 
 #: src/lib/FilePreview.svelte
 msgid "Contenu copié !"
-msgstr ""
+msgstr "Content copied!"
 
 #: src/lib/FilePreview.svelte
 msgid "Copier le contenu"
-msgstr ""
+msgstr "Copy content"
 
 #: src/lib/FilePreview.svelte
 msgid "Afficher en plein écran"
-msgstr ""
+msgstr "Open in full screen"
 
 #. 0: error.message
 #: src/lib/FilePreview.svelte
@@ -1712,75 +1716,77 @@ msgstr ""
 
 #: src/lib/Metadata.svelte
 msgid "Supprimer cette valeur"
-msgstr ""
+msgstr "Delete this value"
 
 #: src/lib/MetadataInput.svelte
 msgid "Aucune session active. Impossible d'enregistrer le fichier."
-msgstr ""
+msgstr "No session is active. Unable to save the file."
 
 #: src/lib/import.svelte.js
 msgid "Aucun session active"
-msgstr ""
+msgstr "No session is active"
 
 #. 0: file.name
 #: src/lib/import.svelte.js
 msgid "Erreur lors du traitement du/des fichiers annexes associés à {0}"
-msgstr ""
+msgstr "Error while processing sidecar file(s) associated with {0}"
 
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 msgid "Aucune sélection"
-msgstr ""
+msgstr "No selection"
 
 #: src/lib/MetadataInput.svelte
 msgid "Utiliser une autre unité"
-msgstr ""
+msgstr "Use another unit"
 
 #. 0: filename
 #: src/routes/(app)/+layout.ts
 msgid "Chargement du protocole {0}"
-msgstr ""
+msgstr "Loading protocol {0}"
 
 #. 0: filename
 #: src/routes/(app)/+layout.ts
 msgid "Impossible de charger le protocole {0}. Vérifiez votre connexion Internet ou essayez de recharger la page."
 msgstr ""
+"Could not load protocol {0}. Check your interner connection or try reloading "
+"the page."
 
 #: src/routes/(app)/results/+page.svelte
 msgid "Vérifier les métadonnées"
-msgstr ""
+msgstr "Check your metadata"
 
 #: src/routes/(app)/results/+page.svelte
 msgid "Inclure"
-msgstr ""
+msgstr "Include"
 
 #: src/routes/(app)/results/+page.svelte
 msgid "Pour chaque image, relativement à ses dimensions"
-msgstr ""
+msgstr "For each image, relative to its dimensions"
 
 #: src/routes/(app)/results/+page.svelte
 msgid "Contenu de l'export"
-msgstr ""
+msgstr "Export contents"
 
 #: src/lib/Metadata.svelte
 msgid "(Optionnel)"
-msgstr ""
+msgstr "(Optional)"
 
 #: src/routes/(app)/results/+page.svelte
 msgid "Métadonnées incorrectes"
-msgstr ""
+msgstr "Incorrect metadata"
 
 #: src/routes/(app)/results/+page.svelte
 msgid "Exporter quand même"
-msgstr ""
+msgstr "Export anyway"
 
 #: src/routes/(app)/results/+page.svelte
 msgid "Corriger"
-msgstr ""
+msgstr "Fix"
 
 #: src/routes/(app)/results/+page.svelte
 msgid "Certaines métadonnées sont incorrectes <0/>"
-msgstr ""
+msgstr "Some metadata are incorrect <0/>"
 
 #: src/routes/(app)/Navigation.svelte
 msgid "Comptes <0/>"
@@ -1796,55 +1802,55 @@ msgstr "Accounts"
 #: src/routes/(app)/accounts/+page.svelte
 #: src/routes/(app)/accounts/RowAccount.svelte
 msgid "Logo de {0}"
-msgstr ""
+msgstr "{0}'s logo"
 
 #. 0: submittedBy
 #: src/routes/(app)/sessions/+page.svelte
 msgid "· par {0}"
-msgstr ""
+msgstr "· by {0}"
 
 #. 0: providers.get(directory.platform)!.displayName
 #: src/routes/(app)/sessions/+page.svelte
 msgid "Voir sur {0}"
-msgstr ""
+msgstr "See on {0}"
 
 #: src/routes/(app)/sessions/Cards.svelte
 msgid "<0/> Aucune session"
-msgstr ""
+msgstr "<0/> No session"
 
 #: src/routes/(app)/accounts/+page.svelte
 msgid "Pour ouvrir ou publier des sessions en ligne"
-msgstr ""
+msgstr "To open or publish sessions online"
 
 #: src/routes/(app)/sessions/+page.svelte
 msgid "Supprimer toutes les sessions"
-msgstr ""
+msgstr "Delete all sessions"
 
 #: src/routes/(app)/sessions/+page.svelte
 msgid "Sur l'appareil"
-msgstr ""
+msgstr "On device"
 
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"
-msgstr ""
+msgstr "Images import finished"
 
 #: src/lib/queue.svelte.js
 msgid "Détection terminée"
-msgstr ""
+msgstr "Detection finished"
 
 #: src/lib/queue.svelte.js
 msgid "Classification terminée"
-msgstr ""
+msgstr "Classification finished"
 
 #. 0: file.name
 #: src/lib/results.svelte.js
 msgid "Import de {0}"
-msgstr ""
+msgstr "Import of {0}"
 
 #. 0: file.name
 #: src/lib/results.svelte.js
 msgid "Importée depuis {0}"
-msgstr ""
+msgstr "Imported from {0}"
 
 #: src/lib/file-tree.js
 #: src/lib/file-tree.js
@@ -1869,7 +1875,7 @@ msgstr ""
 #. 0: label
 #: src/lib/gallery.ts
 msgid "Avec {0}"
-msgstr ""
+msgstr "With {0}"
 
 #. 0: label
 #. 0: label
@@ -1878,7 +1884,7 @@ msgstr ""
 #: src/lib/gallery.ts
 #: src/lib/gallery.ts
 msgid "Sans {0}"
-msgstr ""
+msgstr "Without {0}"
 
 #: src/lib/i18n.js
 #: src/lib/i18n.js
@@ -1901,10 +1907,12 @@ msgstr ""
 #: src/routes/(app)/protocols/import/[...url]/+page.svelte
 msgid "Ce lien permet d'importer un protocole venant d'Internet, à l'adresse suivante:"
 msgstr ""
+"This link allows importing a protocol from the Internet, available at the "
+"URL below:"
 
 #: src/routes/(app)/protocols/import/[...url]/+page.svelte
 msgid "Importation en cours..."
-msgstr ""
+msgstr "Importing…"
 
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
 msgid "Pour les images recadrées et originales, il y a des variables dans le chemin, par exemple <0/>. Un fichier sera créé par image exportée. On peut aussi utiliser quelques fonctions \"helper\", qui s'appliquent à une expression"
@@ -1913,6 +1921,7 @@ msgstr ""
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
 msgid "Un numéro de séquence, dont l'unicité est guarantie à travers toutes les images de l'export"
 msgstr ""
+"A sequence number, guaranteed to be unique across all of the export's images"
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelConfig.svelte
 msgid "*Pour l'instant, CIGALE ne prend pas avantage des réseaux capables de traiter des images par batch, donc il n'enverra toujours qu'une image à la fois au modèle. <0/> Cela pourrait changer dans le futur, donc il est toujours utile de configurer correctement la disposition des pixels."
@@ -1958,15 +1967,15 @@ msgstr ""
 
 #: src/routes/(app)/+layout.ts
 msgid "Initialisation des workers…"
-msgstr ""
+msgstr "Initializing workers…"
 
 #: src/routes/(app)/+layout.ts
 msgid "Workers"
-msgstr ""
+msgstr "Worker"
 
 #: src/routes/(app)/+layout.ts
 msgid "App"
-msgstr ""
+msgstr "App"
 
 #: src/routes/(app)/+layout.ts
 msgid "Initialize database"
@@ -1979,7 +1988,7 @@ msgstr ""
 #. 0: updates[0].name; 1: updates[0].version
 #: src/routes/(app)/+layout.ts
 msgid "Protocole \"{0}\" mis à jour à la v{1}"
-msgstr ""
+msgstr "Protocol \"{0}\" updated to v{1}"
 
 #: src/lib/i18n.js
 #: src/lib/i18n.js
@@ -1988,7 +1997,7 @@ msgstr ""
 
 #: src/routes/(app)/sessions/+page.svelte
 msgid "<0/> Importer .zip"
-msgstr ""
+msgstr "<0/> Import .zip"
 
 #. 0: feature
 #: src/lib/MobileWIPOverlay.svelte
@@ -2000,61 +2009,61 @@ msgstr ""
 #: src/routes/(app)/(sidepanel)/o/[observation]/+layout@(app).svelte
 #: src/routes/(app)/TopbarBackToHome.svelte
 msgid "Retour"
-msgstr ""
+msgstr "Back"
 
 #: src/routes/(app)/Navigation.svelte
 msgid "Session"
-msgstr ""
+msgstr "Session"
 
 #: src/routes/(app)/Navigation.svelte
 msgid "Classifier"
-msgstr ""
+msgstr "Classify"
 
 #: src/routes/(app)/Navigation.svelte
 msgid "Résultats"
-msgstr ""
+msgstr "Results"
 
 #: src/routes/(app)/Settings.svelte
 msgid "# installé"
 msgid_plural "# installés"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "# installed"
+msgstr[1] "# installed"
 
 #: src/routes/(app)/Settings.svelte
 msgid "# connecté"
 msgid_plural "# connectés"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "# registered"
+msgstr[1] "# registered"
 
 #: src/routes/(app)/TopbarHome.svelte
 msgid "<0/> Cigale"
-msgstr ""
+msgstr "<0/> Cigale"
 
 #: src/routes/(app)/TopbarOpenSession.svelte
 msgid "Fermer la session"
-msgstr ""
+msgstr "Close session"
 
 #: src/routes/(app)/accounts/+page.svelte
 msgid "<0/> Aucun compte"
-msgstr ""
+msgstr "<0/> No accounts"
 
 #. 0: adding?.displayName
 #: src/routes/(app)/accounts/ModalAddAccount.svelte
 msgid "Ajouter un compte {0}"
-msgstr ""
+msgstr "Add a {0} account"
 
 #: src/routes/(app)/accounts/ModalAddAccount.svelte
 msgid "Se connecter"
-msgstr ""
+msgstr "Log in"
 
 #: src/routes/(app)/accounts/ModalAddAccount.svelte
 msgid "Connecte-toi sur <0/>"
-msgstr ""
+msgstr "Log in on <0/>"
 
 #. 0: '{}'
 #: src/routes/(app)/accounts/ModalAddAccount.svelte
 msgid "Copie-colle <0>ton token</0> (c'est la partie entre les {0})"
-msgstr ""
+msgstr "Copy/paste <0>your token</0> (it's the part between the {0}s)"
 
 #: src/routes/(app)/accounts/ModalAddAccount.svelte
 msgid "Token"
@@ -2062,81 +2071,81 @@ msgstr ""
 
 #: src/routes/(app)/accounts/ModalAddAccount.svelte
 msgid "<0/> Token valide"
-msgstr ""
+msgstr "<0/> Valid token"
 
 #: src/routes/(app)/accounts/ModalAddAccount.svelte
 msgid "<0/> Token invalide"
-msgstr ""
+msgstr "<0/> Invalid token"
 
 #. 0: loginData.server
 #: src/routes/(app)/accounts/ModalAddAccount.svelte
 msgid "Se connecter à {0}"
-msgstr ""
+msgstr "Login to {0}"
 
 #. 0: '{}'
 #: src/routes/(app)/accounts/ModalAddAccount.svelte
 msgid "Copie-colle ton token (partie entre les {0})"
-msgstr ""
+msgstr "Copy/paste your token (the part between the {0}s)"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Plateforme"
-msgstr ""
+msgstr "Platform"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Nom de l'app"
-msgstr ""
+msgstr "App name"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "ID de l'app"
-msgstr ""
+msgstr "App ID"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Version de l'app"
-msgstr ""
+msgstr "App version"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Build de l'app"
-msgstr ""
+msgstr "App build no."
 
 #: src/lib/notifications.js
 msgid "Vous avez refusé les notifications."
-msgstr ""
+msgstr "You did not accept notifications."
 
 #: src/lib/notifications.js
 #: src/lib/notifications.js
 #: src/lib/notifications.js
 msgid "Notification"
-msgstr ""
+msgstr "Notification"
 
 #: src/lib/notifications.js
 #: src/lib/notifications.js
 msgid "Votre navigateur ne supporte pas les notifications système."
-msgstr ""
+msgstr "Your browser does not support system notifications."
 
 #: src/lib/notifications.js
 msgid "Impossible d'envoyer la notification système."
-msgstr ""
+msgstr "Could not send system notification."
 
 #: src/lib/share.ts
 msgid "Lien copié dans le presse-papiers : "
-msgstr ""
+msgstr "Link copied to clipboard: "
 
 #: src/routes/(app)/protocols/RowProtocol.svelte
 msgid "Partager"
-msgstr ""
+msgstr "Share"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Navigateur"
-msgstr ""
+msgstr "Browser"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Appareil"
-msgstr ""
+msgstr "Device"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/+layout.ts
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/suggestions/+page.ts
 msgid "Observation introuvable"
-msgstr ""
+msgstr "Observation not found"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/+layout@(app).svelte
 msgid "Recadrer l'image"
@@ -2144,26 +2153,26 @@ msgstr "Crop image"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/+layout@(app).svelte
 msgid "Voir les suggestions de classification"
-msgstr ""
+msgstr "See classification suggestions"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/+layout@(app).svelte
 msgid "Classifier par élimination"
-msgstr ""
+msgstr "Classify by elimination"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/+layout@(app).svelte
 msgid "Modifier le nom de l'observation"
-msgstr ""
+msgstr "Edit observation name"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/+layout@(app).svelte
 msgid "# observation"
 msgid_plural "# observations"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "# observation"
+msgstr[1] "# observations"
 
 #: src/lib/Metadata.svelte
 #: src/routes/(app)/(sidepanel)/o/[observation]/+layout@(app).svelte
 msgid "Suggestions"
-msgstr ""
+msgstr "Suggestions"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/Subject.svelte
 msgid "Agrandir/Réduire l'image"
@@ -2234,60 +2243,60 @@ msgstr "No reference image for <0/> <1/>"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/NarrowableGroupPicker.svelte
 msgid "Éliminer avec"
-msgstr ""
+msgstr "Narrow by"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/NarrowableGroupPicker.svelte
 msgid "# métadonnée"
 msgid_plural "# métadonnées"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "# metadata"
+msgstr[1] "# metadata"
 
 #. 0: maximumListableCandidates.toLocaleString()
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/+layout.svelte
 msgid "Impossible de lister les candidats, il y en a plus de {0}"
-msgstr ""
+msgstr "Could not list candidates, there are more than {0}"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/+layout.svelte
 msgid "Entrer dans la barre de recherche"
-msgstr ""
+msgstr "Focus search bar"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/+layout.svelte
 msgid "Enlever ce choix"
-msgstr ""
+msgstr "Remove this choice"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/+layout.svelte
 msgid "<0/> Recommencer"
-msgstr ""
+msgstr "<0/> Restart"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/+layout.svelte
 msgid "Choisir un groupe de métadonnées avec lequel classifier par élimination"
-msgstr ""
+msgstr "Choose a metadata group to narrow by"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/+layout.svelte
 msgid "# restant"
 msgid_plural "# restants"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "# remaining"
+msgstr[1] "# remaining"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/+layout.svelte
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/+layout.svelte
 msgid "Rechercher"
-msgstr ""
+msgstr "Search"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/+layout.svelte
 msgid "# résultat"
 msgid_plural "# résultats"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "# result"
+msgstr[1] "# results"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/+layout.svelte
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/candidates/+page.svelte
 msgid "Décrire"
-msgstr ""
+msgstr "Describe"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/+layout.svelte
 msgid "Candidats <0/>"
-msgstr ""
+msgstr "Candidates <0/>"
 
 #. 0: firstImage?.filename ?? '...'
 #: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
@@ -2312,161 +2321,168 @@ msgstr "Box #{0}"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/Boxes.svelte
 msgid "Sélectionnez une boîte avec 1 à 9 pour la modifier avec des raccourcis clavier"
-msgstr ""
+msgstr "Select a box with 1 thru 9 to edit it with keyboard shortcuts"
 
 #. 0: candidate.label
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/Candidate.svelte
 msgid "Image de {0}"
-msgstr ""
+msgstr "{0}'s image"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/candidates/+page.svelte
 msgid "Trop de candidats à afficher"
-msgstr ""
+msgstr "Too much candidates to display"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/+layout.ts
 msgid "Métadonnée de classification introuvable. Le protocole de la session n'en définit peut-être pas."
 msgstr ""
+"Classification metadata not found. The session's protocol may have not "
+"defined one."
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/TopbarExtras.svelte
 msgid "Confirmer et passer à la prochaine non confirmée"
-msgstr ""
+msgstr "Confirm and go to next unconfirmed"
 
 #. 0: labels.item.toLowerCase()
 #: src/routes/(app)/(sidepanel)/o/[observation]/TopbarExtras.svelte
 msgid "Aller à l'{0} prochaine"
-msgstr ""
+msgstr "Go to next {0}"
 
 #. 0: labels.item.toLowerCase()
 #. 0: labels.item.toLowerCase()
 #: src/routes/(app)/(sidepanel)/o/[observation]/TopbarExtras.svelte
 #: src/routes/(app)/(sidepanel)/o/[observation]/TopbarExtras.svelte
 msgid "Aller à l'{0} précédente"
-msgstr ""
+msgstr "Go to previous {0}"
 
 #. 0: labels.item.toLowerCase()
 #: src/routes/(app)/(sidepanel)/o/[observation]/TopbarExtras.svelte
 msgid "Marquer l'{0} comme confirmée"
-msgstr ""
+msgstr "Mark {0} as confirmed"
 
 #. 0: labels.item.toLowerCase()
 #: src/routes/(app)/(sidepanel)/o/[observation]/TopbarExtras.svelte
 msgid "Marquer l'{0} comme non confirmée"
-msgstr ""
+msgstr "Mark {0} as not confirmed"
 
 #. 0: labels.item.toLowerCase()
 #: src/routes/(app)/(sidepanel)/o/[observation]/TopbarExtras.svelte
 msgid "Marquer l'{0} comme confirmée et passer à la prochaine non confirmée"
-msgstr ""
+msgstr "Mark {0} as confirmed and go to next unconfirmed"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/+layout.svelte
 msgid "Bien joué! Toutes les observations ont été recadrés, classifiées et confirmées… place à l'export des résultats 🥳"
 msgstr ""
+"Well done! All observations have been cropped, classified and confirmed… now "
+"let the results export begin 🥳"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/Boxes.svelte
 msgid "<0/> Réinitialiser"
-msgstr ""
+msgstr "<0/> Reset"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/+layout.svelte
 msgid "Basculer entre les onglets Décrire, Choix et Candidats"
-msgstr ""
+msgstr "Switch between Describe, Choices and Candidates tabs"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/+layout.svelte
 msgid "Candidats"
-msgstr ""
+msgstr "Candidates"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/+layout.svelte
 msgid "Tous"
-msgstr ""
+msgstr "All"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/+layout.svelte
 msgid "Restants"
-msgstr ""
+msgstr "Remaining"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/+layout.svelte
 msgid "Éliminés"
-msgstr ""
+msgstr "Eliminated"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/+layout.svelte
 msgid "Aucun candidat à afficher"
-msgstr ""
+msgstr "No candidates"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/+layout.svelte
 msgid "Recommencer"
-msgstr ""
+msgstr "Restart"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/+layout.svelte
 msgid "Choix <0/>"
-msgstr ""
+msgstr "Choices <0/>"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/Candidate.svelte
 msgid "Éliminé"
-msgstr ""
+msgstr "Eliminated"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/CandidateDetailsModal.svelte
 msgid "Choix effectués"
-msgstr ""
+msgstr "Choices made"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/CandidateDetailsModal.svelte
 msgid "Autres descripteurs"
-msgstr ""
+msgstr "Other descriptors"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/CandidateDetailsModal.svelte
 msgid "Choisir ce candidat"
-msgstr ""
+msgstr "Choose this candidate"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/Descriptor.svelte
 msgid "Supprimer ce choix"
-msgstr ""
+msgstr "Delete this choice"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/OptionsLoader.svelte
 msgid "<0/> Chargement des descripteurs..."
-msgstr ""
+msgstr "<0/> Loading descriptors…"
 
 #. 0: query
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/Searcher.svelte
 msgid "<0/> Aucun résultat pour “{0}” <1/> <2>Tout afficher</2>"
-msgstr ""
+msgstr "<0/> No results for “{0}” <1/> <2>Show all</2>"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/choices/+page.svelte
 msgid "Aucun choix effectué pour le moment"
-msgstr ""
+msgstr "No choices made yet"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/choices/+page.svelte
 msgid "Décrire l'observation"
-msgstr ""
+msgstr "Describe observation"
 
 #. 0: file.name
 #: src/lib/import.svelte.js
 msgid "Erreur lors de l'extraction des métadonnées du fichier RAW {0}"
-msgstr ""
+msgstr "Could not extract metadata from RAW file {0}"
 
 #: src/lib/ModalPickProtocol.svelte
 msgid "Choisir un protocole pour la session"
-msgstr ""
+msgstr "Choose a protocol for the session"
 
 #: src/lib/ModalPickProtocol.svelte
 msgid "<0/> Gérer les protocoles"
-msgstr ""
+msgstr "<0/> Manage protocols"
 
 #: src/routes/(app)/+layout.ts
 msgid "Le stockage de votre navigateur n'est pas persistant, les données pourraient être perdues en cas de manque d'espace de stockage."
 msgstr ""
+"Your browser's storage is not persistent, data could be lost if you run low "
+"on disk space."
 
 #: src/routes/(app)/+layout.ts
 msgid "Activer"
-msgstr ""
+msgstr "Enable"
 
 #: src/routes/(app)/ModalChromePersistentStorage.svelte
 msgid "Activer le stockage persistant sur Chrome"
-msgstr ""
+msgstr "Enable persistent storage on Chrome"
 
 #: src/routes/(app)/ModalChromePersistentStorage.svelte
 msgid "Activer les notifications"
-msgstr ""
+msgstr "Enable notifications"
 
 #: src/routes/(app)/ModalChromePersistentStorage.svelte
 msgid "Sur Chrome, pour activer le stockage persistant, il faut activer les notifications."
 msgstr ""
+"On Chrome, to enable persistent storage, you have to enable notifications."
 
 #: src/routes/(app)/ModalChromePersistentStorage.svelte
 msgid "Vous pourrez les désactiver en suite, l'acceptation des notifications sert à Chrome de signal pour prouver que le site vous ait suffisamment utile pour activer le stockage persistent."
