@@ -48,7 +48,7 @@
 				expand = expand === 'subject' ? 'none' : 'subject';
 			},
 		},
-		Z: {
+		C: {
 			help: "Voir l'image entière/recadrée",
 			do() {
 				transitionCrop = true;

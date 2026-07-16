@@ -124,10 +124,12 @@
 		},
 		'$mod+ArrowUp': {
 			help: `Marquer l'${labels.item.toLowerCase()} comme confirmée`,
+			alternatives: ['z', 'w'],
 			do: async () => progress.mark('confirmed'),
 		},
 		'$mod+ArrowDown': {
 			help: `Marquer l'${labels.item.toLowerCase()} comme non confirmée`,
+			alternatives: ['s'],
 			do: async () => progress.mark('unconfirmed'),
 		},
 	});
