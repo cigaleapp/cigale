@@ -2,40 +2,7 @@
 
 Cigale is a local-only web-app, so one of the most important things is that there's no server-side.
 
-## Project-specific terms
 
-To easily and precisely refer to some features, we have a few words that don't appear in the user interface but can appear in technical documentation, code comments, commit messages, issues & pull requests, etc.
-
-<dl>
-	<dt>Fullscreen cropper,</dt>
-	<dt>Cropper</dt>
-	<dd>Refers to the full-screen (image by image) crop view that you get by opening an image from the "crop" tab inside of a session</dd>
-	<dt>Fullscreen classification,</dt>
-	<dt>Classifier,</dt>
-	<dt>Suggestions classifier</dt>
-	<dd>Refers to the full-screen (image by image) classification view that you get by opening an image from the "classify" tab inside of a session</dd>
-	<dt>Narrowing classifier</dt>
-	<dd>Refers to the full-screen (image by image) classification view's "Elimination" mode that you get by opening an image from the "classify" tab inside of a session, then switch to "Elimination" in the top bar</dd>
-	<dt>Fullscreen importer,</dt>
-	<dt>Importer</dt>
-	<dd>Refers to the fullscreen (image by image) import view that you get by opening an image from the "import" tab inside of a session (note: not yet implemented, see #1932)</dd>
-	<dt>Fullscreen view</dt>
-	<dd>Any of Importer, Cropper, Suggestions classifer or Narrowing classifier.</dd>
-	<dt>Capture</dt>
-	<dd>View that allows users to take photos with their smartphone camera directly from within the app. Accessed by buttons with a camera icon that mention something akin to "Open camera" or "Take photos"</dd>
-	<dt>Capture gallery</dt>
-	<dd>View that allows users to review the photos they took with the Capture view before importing them</dd>
-	<dt>Metadata value</dt>
-	<dd>A rich metadata value, carrying not only the value itself but surrounding information, such as the confidence, alternative values and their confidences, whether the value was manually modified by the user, whether the value is a default value, etc.</dd>
-	<dt>Runtime metadata value,</dt>
-	<dt>Runtime value</dt>
-	<dd>The actual value itself of a Metadata value</dd>
-	<dt>Serialized metadata value</dt>
-	<dd>A Runtime metadata value, that has been serialized to a JSON string. Serialization is needed to store alternative values' confidences: it's an object with keys being the serialized values and values being the confidence scores.
-	</dd>
-	<dt>PreviewSidepanel</dt>
-	<dd>The UI component visible to the right (on desktop) of the cards in import, crop and classify tabs</dd>
-</dl>
 
 ## Tech stack
 
@@ -53,6 +20,61 @@ To easily and precisely refer to some features, we have a few words that don't a
 - a [CORS](https://developer.mozilla.org/en-US/docs/Glossary/CORS) proxy: Some APIs (namely Kobocollect's) do not enable cross-origin requests, so we have to pretend that we aren't requesting from another website. This is done by running a small proxy server that takes in a URL, does the request, and returns the response back to the web app. Currently, this is done with a [CORS Anywhere]() server running on https://cors.gwen.works (my personal VPS)
 
 Some additional but less important developer tooling is also used: a formatter to keep the code pretty, a linter to prevent silly mistakes from finding their way on production.
+
+## Technical terms
+
+To quickly and precisely refer to some features or parts of the UI, we have a few words that don't appear in the user interface but can appear in technical documentation, code comments, commit messages, issues & pull requests, etc.
+
+Some are project-specific, and others are widely-used in web development but are still listed here in case you don't know them.
+
+<dl>
+	<dt>Fullscreen cropper,</dt>
+	<dt>Cropper</dt>
+	<dd>Refers to the full-screen (image by image) crop view that you get by opening an image from the "crop" tab inside of a session</dd>
+	<dt>Fullscreen classification,</dt>
+	<dt>Classifier,</dt>
+	<dt>Suggestions classifier</dt>
+	<dd>Refers to the full-screen (image by image) classification view that you get by opening an image from the "classify" tab inside of a session</dd>
+	<dt>Narrowing classifier</dt>
+	<dd>Refers to the full-screen (image by image) classification view's "Elimination" mode that you get by opening an image from the "classify" tab inside of a session, then switch to "Elimination" in the top bar</dd>
+	<dt>Fullscreen importer,</dt>
+	<dt>Importer</dt>
+	<dd>Refers to the fullscreen (image by image) import view that you get by opening an image from the "import" tab inside of a session (note: not yet implemented, see #1932)</dd>
+	<dt>Fullscreen view</dt>
+	<dd>Any of Importer, Cropper, Suggestions classifer or Narrowing classifier.</dd>
+	<dt>Capture mode,</dt>
+	<dt>Capture</dt>
+	<dd>View that allows users to take photos with their smartphone camera directly from within the app. Accessed by buttons with a camera icon that mention something akin to "Open camera" or "Take photos"</dd>
+	<dt>Capture gallery</dt>
+	<dd>View that allows users to review the photos they took with the Capture view before importing them</dd>
+	<dt>Metadata value</dt>
+	<dd>A rich metadata value, carrying not only the value itself but surrounding information, such as the confidence, alternative values and their confidences, whether the value was manually modified by the user, whether the value is a default value, etc.</dd>
+	<dt>Runtime metadata value,</dt>
+	<dt>Runtime value</dt>
+	<dd>The actual value itself of a Metadata value</dd>
+	<dt>Serialized metadata value</dt>
+	<dd>A Runtime metadata value, that has been serialized to a JSON string. Serialization is needed to store alternative values' confidences: it's an object with keys being the serialized values and values being the confidence scores.
+	</dd>
+	<dt>PreviewSidepanel</dt>
+	<dd>The UI component visible to the right (on desktop) of the cards in import, crop and classify tabs</dd>
+	<dt>Area observation,</dt>
+	<dt>AreaObservation,</dt>
+	<dt>Observations area</dt>
+	<dd>The gallery-like grid of images cards, visible for example on import, crop and classify tabs</dd>
+	<dt>Active mode</dt>
+	<dd>Capture view with "active" timers to help users keep track of time between manually taken photos</dd>
+	<dt>Passive mode</dt>
+	<dd>Capture view with "passive" timers that allows automatic capture of photos at regular time intervals</dd>
+	<dt>Lightbox</dt>
+	<dd>The UI that pops up when clicking on an image to view it in fullscreen</dd>
+	<dt>Toast</dt>
+	<dd>Notification-like alerts that pop up on the bottom-(right) side of the app, to inform users of an error, a successful operation or warn/inform them about something. For example, when the app has been updated, there's a toast that says "App updated"</dd>
+	<dt>Update bundle</dt>
+	<dd>A .zip file that can be used to update the mobile native app, as long as only the web code changes (no native code changes or new/removed/updated Capacitor plugins)</dd>
+	<dt>E2E,</dt>
+	<dt>E2E test</dt>
+	<dd>A end-to-end test, most likely done with Playwright.</dd>
+</dl>
 
 ## Deployment
 
