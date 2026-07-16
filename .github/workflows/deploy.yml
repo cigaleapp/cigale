@@ -52,8 +52,6 @@ jobs:
         uses: ./.github/actions/notify
         if: inputs.notify
         with:
-          api_base_url: ${{ secrets.GOTIFY_API_BASE_URL }}
-          token: ${{ secrets.GOTIFY_APP_TOKEN }}
           title: 🚀 Deployed commit to prod
           message: ${{ github.event.head_commit.message }}
           url: https://cigaleapp.github.io/cigale/

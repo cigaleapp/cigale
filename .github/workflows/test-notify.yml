@@ -20,8 +20,6 @@ jobs:
       - name: Push notification
         uses: ./.github/actions/notify
         with:
-          api_base_url: ${{ secrets.GOTIFY_API_BASE_URL }}
-          token: ${{ secrets.GOTIFY_APP_TOKEN }}
           title: ${{ inputs.title }}
           message: ${{ inputs.message }}
           url: ${{ inputs.url }}

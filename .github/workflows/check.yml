@@ -21,8 +21,6 @@ jobs:
       - name: Push notification
         uses: ./.github/actions/notify
         with:
-          api_base_url: ${{ secrets.GOTIFY_API_BASE_URL }}
-          token: ${{ secrets.GOTIFY_APP_TOKEN }}
           title: '🛫 PR #${{ github.event.pull_request.number }} (${{ github.event.pull_request.head.ref }}) is starting mergeability checks'
           message: Checks started
           url: https://${{ github.server }}/${{ github.repo }}/pull/${{ github.event.pull_request.number }}
@@ -341,8 +339,6 @@ jobs:
         uses: ./.github/actions/notify
         if: github.event_name == 'pull_request' && always() && !contains(github.event.pull_request.labels.*.name, 'notifications-off') && !github.event.pull_request.draft
         with:
-          api_base_url: ${{ secrets.GOTIFY_API_BASE_URL }}
-          token: ${{ secrets.GOTIFY_APP_TOKEN }}
           title: ${{ env.TITLE }}
           message: ${{ env.MESSAGE }}
           url: ${{ env.URL }}

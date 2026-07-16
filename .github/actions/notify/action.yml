@@ -1,13 +1,7 @@
 name: Notify
-description: Send a push notification with Gotify / ntfy.sh
+description: Send a push notification with ntfy.sh
 
 inputs:
-  api_base_url:
-    required: true
-    description: Base URL of the API where Gotify is. appending "/message" to this should give a valid URL to the endpoint
-  token:
-    required: true
-    description: App token, from the "apps" section of the dashboard
   title:
     required: true
   message:
@@ -21,28 +15,6 @@ runs:
   steps:
     - shell: bash
       run: |
-        json=$(cat <<'JSON'
-          {
-            "title": "${{ inputs.title }}",
-            "message": "${{ inputs.message }}",
-            "priority": 4,
-            "extras": {
-              "client::notification": {
-                "click": {
-                  "url": "${{ inputs.url }}"
-                }
-              }
-            }
-          }
-        JSON)
-
-        echo "Sending $json..."
-
-        curl -X POST "${{ inputs.api_base_url }}/message"  \
-          -H "X-Gotify-Key: ${{ inputs.token }}" \
-          -H "Content-Type: application/json" \
-          -d "$json"
-          
         curl -X POST "https://ntfy.envs.net/cigale"  \
           -H "Title: ${{ inputs.title }}" \
           -H "Click: ${{ inputs.url }}" \
