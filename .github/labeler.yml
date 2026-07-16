@@ -17,3 +17,13 @@ ios-native-changes:
 notifications-off:
   - head-branch:
       - renovate/*
+
+bypass:e2e:
+  - head-branch:
+      - renovate/eslint-*
+      - renovate/oxlint-*
+      - renovate/knip-*
+      - renovate/prettier-*
+      - renovate/lint-staged-*
+      - renovate/svelte-check-*
+      - renovate/typescript-eslint-*
