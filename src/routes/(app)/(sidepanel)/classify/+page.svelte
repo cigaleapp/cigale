@@ -17,6 +17,7 @@
 	import { inferenceModelId, loadModel } from '$lib/inference.js';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
 	import Logo from '$lib/Logo.svelte';
+	import { IsMobile } from '$lib/mobile.svelte.js';
 	import { deleteObservation, ensureNoLoneImages, observationMetadata } from '$lib/observations';
 	import { goto } from '$lib/paths.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
@@ -25,7 +26,6 @@
 	import { toasts } from '$lib/toasts.svelte';
 	import { uiState } from '$lib/uistate.svelte.js';
 	import { isAbortError, nonnull } from '$lib/utils.js';
-	import { IsMobile } from '$lib/mobile.svelte.js';
 
 	type Item = GalleryItem<{
 		image: DB.Image | undefined;
@@ -37,8 +37,8 @@
 
 	const { data } = $props();
 
-	const mobile = new IsMobile()
-	const isdesktop = $derived(!mobile.current)
+	const mobile = new IsMobile();
+	const isdesktop = $derived(!mobile.current);
 
 	const items: Item[] = $derived(
 		tables.Observation.state.map((obs) => ({

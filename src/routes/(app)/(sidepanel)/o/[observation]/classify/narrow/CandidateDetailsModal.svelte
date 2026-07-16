@@ -160,7 +160,7 @@
 		.images {
 			grid-area: images;
 			max-width: 40vw;
-			
+
 			@media (max-width: 600px) {
 				width: 100%;
 				max-width: unset;

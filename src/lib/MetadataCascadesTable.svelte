@@ -79,8 +79,7 @@
 							<OverflowableText text={metadata.label} />
 						{/if}
 					</td>
-					<td class:crossout={crossout(metadataId, key)}
-					>
+					<td class:crossout={crossout(metadataId, key)}>
 						{#if icon || color}
 							<div
 								class="icon"

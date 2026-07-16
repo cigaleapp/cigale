@@ -18,9 +18,9 @@
 	import { IsMobile } from '$lib/mobile.svelte';
 	import { globalModals } from '$lib/modals.svelte';
 	import ProgressBar from '$lib/ProgressBar.svelte';
+	import { isDebugMode, toggleSetting } from '$lib/settings.svelte';
 
 	import { topbarExtrasPortalId } from './+layout@(app).svelte';
-	import { isDebugMode, toggleSetting } from '$lib/settings.svelte';
 
 	interface Props {
 		keyboardShortcutsCategory: 'classification' | 'cropping';
