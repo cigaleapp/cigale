@@ -121,7 +121,7 @@ test.describe('Cropper view', () => {
 			await app.path.wait(`/o/_/crop/${image.fileId}/`);
 
 			const { cropAutoNext: _, ...othersBefore } = await app.settings.get();
-			await page.keyboard.press('a');
+			await page.keyboard.press(controlOrMeta(page, 'Shift+a'));
 			await page.waitForTimeout(500);
 			const { cropAutoNext, ...othersAfter } = await app.settings.get();
 
@@ -161,7 +161,7 @@ test.describe('Cropper view', () => {
 			await app.path.wait(`/o/_/crop/${image.fileId}/`);
 
 			const { cropAutoNext: _, ...othersBefore } = await app.settings.get();
-			await page.keyboard.press('a');
+			await page.keyboard.press(controlOrMeta(page, 'Shift+a'));
 			await page.waitForTimeout(500);
 			const { cropAutoNext, ...othersAfter } = await app.settings.get();
 
