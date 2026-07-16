@@ -345,9 +345,9 @@
 		height: 100%;
 		width: 100lvw;
 		overflow: hidden;
-		background: #000;
 
 		@media (max-width: 600px) {
+			background: black;
 			flex-direction: column;
 		}
 	}
