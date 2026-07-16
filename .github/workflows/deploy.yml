@@ -56,13 +56,13 @@ jobs:
 
           echo "Checking if '$string' is in reponse at $URL"
           touch index.html
-          curl -fsSL $URL > index.html 
+          curl -fsSL $URL > index.html || echo curl error
           while ! grep -F "$string" index.html; do
             echo "Deployment not live yet, waiting..."
             sleep 5
             rm index.html
             touch index.html
-            curl -fsSL $URL > index.html
+            curl -fsSL $URL > index.html || echo curl error
           done
 
       - name: Push notification
