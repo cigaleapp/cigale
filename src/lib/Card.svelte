@@ -33,6 +33,7 @@ Available CSS variables:
 		children?: import('svelte').Snippet;
 		// eslint-disable-next-line no-unused-vars
 		onclick?: (e: MouseEvent, mutator: Mutator) => void | Promise<void>;
+		// eslint-disable-next-line no-unused-vars
 		ondoubleclick?: (e: MouseEvent) => void;
 		tag?: 'article' | 'li' | 'div';
 		tooltip?: string;

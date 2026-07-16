@@ -201,9 +201,9 @@
 				<IfInViewport
 					computation={() => {
 						const choices = structuredClone(narrowingState.choices);
-						// eslint-disable-next-line svelte/prefer-svelte-reactivity
 						choices.set(
 							definition.id,
+							// eslint-disable-next-line svelte/prefer-svelte-reactivity
 							(choices.get(definition.id) ?? new Set()).add(key)
 						);
 

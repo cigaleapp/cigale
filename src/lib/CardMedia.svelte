@@ -2,7 +2,9 @@
 	type Status = 'queued' | 'loading' | 'ok' | 'errored';
 
 	type EventHandler = (
+		// eslint-disable-next-line no-unused-vars
 		e: MouseEvent | TouchEvent,
+		// eslint-disable-next-line no-unused-vars
 		set: (props: { status?: Status; loadingStatusText?: string }) => void
 	) => Promise<void>;
 

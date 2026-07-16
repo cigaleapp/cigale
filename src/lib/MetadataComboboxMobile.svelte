@@ -247,7 +247,7 @@
 			<ButtonPrimary
 				tight
 				loading
-				onclick={async (e) => {
+				onclick={async () => {
 					await onValueChange(selected[0], selected);
 					dialogElement?.close();
 				}}

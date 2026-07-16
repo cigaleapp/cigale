@@ -16,7 +16,7 @@
 	import { isDebugMode } from '$lib/settings.svelte.js';
 	import TabbedView from '$lib/TabbedView.svelte';
 	import { uiState } from '$lib/uistate.svelte.js';
-	import { compareBy, corsfixIfLocalhost } from '$lib/utils.js';
+	import { corsfixIfLocalhost } from '$lib/utils.js';
 
 	interface Props {
 		option: DB.MetadataEnumVariant;

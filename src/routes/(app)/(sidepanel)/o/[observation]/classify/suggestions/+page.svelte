@@ -18,7 +18,6 @@
 	import MetadataOptionCarousel from '$lib/MetadataOptionCarousel.svelte';
 	import { IsMobile } from '$lib/mobile.svelte';
 	import { observationMetadata } from '$lib/observations';
-	import { goto } from '$lib/paths.js';
 	import { namespaceOfMetadataId } from '$lib/schemas/metadata.js';
 	import { scrollfader } from '$lib/scrollfader';
 	import { isDebugMode } from '$lib/settings.svelte.js';
