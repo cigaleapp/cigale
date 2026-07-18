@@ -246,7 +246,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 		isDefault,
 		alternatives: alternatives.map(serializeMetadataValue),
 		confidences: !Array.isArray(confidences)
-			? confidences
+			? { ...confidences } // handle $state wrapped values
 			: Object.fromEntries(
 					confidences.map(({ value, confidence }) => {
 						if (confidence > 1) {

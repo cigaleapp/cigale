@@ -171,7 +171,7 @@ test('selecting multiple images', issue(1054), async ({ page, app }) => {
 	    - img "Image 3 de la sélection"
 	    - heading "3 observations" [level=2]
 	    - text: Espèce
-	    - combobox "Entomobrya muscorum"
+	    - combobox "Espèce": Entomobrya muscorum
 	    - code: /\\d+%/
 	    - img
 	    - button "Supprimer cette valeur":
@@ -198,7 +198,7 @@ test('selecting multiple images', issue(1054), async ({ page, app }) => {
 	      - text: Taxonomie
 	      - paragraph: Classification taxonomique de l'espèce
 	      - text: Genre
-	      - combobox "Entomobrya"
+	      - combobox "Genre": Entomobrya
 	      - code: /\\d+%/
 	      - img
 	      - button "Supprimer cette valeur":
@@ -221,7 +221,7 @@ test('selecting multiple images', issue(1054), async ({ page, app }) => {
 	          - button:
 	            - img
 	      - text: Famille
-	      - combobox "Entomobryidae"
+	      - combobox "Famille": Entomobryidae
 	      - code: /\\d+%/
 	      - img
 	      - button "Supprimer cette valeur":
@@ -244,7 +244,7 @@ test('selecting multiple images', issue(1054), async ({ page, app }) => {
 	          - button:
 	            - img
 	      - text: Ordre
-	      - combobox "Entomobryomorpha"
+	      - combobox "Ordre": Entomobryomorpha
 	      - code: /\\d+%/
 	      - img
 	      - button "Supprimer cette valeur":
@@ -267,17 +267,17 @@ test('selecting multiple images', issue(1054), async ({ page, app }) => {
 	          - button:
 	            - img
 	      - text: Classe
-	      - combobox "Collembola"
+	      - combobox "Classe": Collembola
 	      - code: /\\d+%/
 	      - button "Supprimer cette valeur":
 	        - img
 	      - text: Phylum
-	      - combobox "Arthropoda"
+	      - combobox "Phylum": Arthropoda
 	      - code: /\\d+%/
 	      - button "Supprimer cette valeur":
 	        - img
 	      - text: Règne
-	      - combobox "Animalia"
+	      - combobox "Règne": Animalia
 	      - code: /\\d+%/
 	      - button "Supprimer cette valeur":
 	        - img
@@ -376,7 +376,7 @@ test('selecting multiple images', issue(1054), async ({ page, app }) => {
 
 /**
  *
- * @param {import('./fixtures.js').AppFixture} app
+ * @param {import('./fixtures/app.js').AppFixture} app
  * @param {string} observationTitle
  * @returns
  */

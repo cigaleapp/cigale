@@ -28,7 +28,7 @@ type SearchableTableName = {
 /**
  * Loads all indices and returns a function that can be used to search
  */
-export async function makeSearcher<TableName extends SearchableTableName>({
+export function makeSearcher<TableName extends SearchableTableName>({
 	db,
 	tables,
 	table,

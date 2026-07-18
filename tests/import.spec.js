@@ -70,7 +70,7 @@ test.describe('correct results.zip', () => {
 		        - /placeholder: ""
 		        - text: cyan
 		    - text: Espèce
-		    - combobox "Allacma fusca"
+		    - combobox "Espèce": Allacma fusca
 		    - code: /\\d+%/
 		    - button "Supprimer cette valeur":
 		      - img
@@ -96,7 +96,7 @@ test.describe('correct results.zip', () => {
 		      - text: Taxonomie
 		      - paragraph: Classification taxonomique de l'espèce
 		      - text: Genre
-		      - combobox "Allacma"
+		      - combobox "Genre": Allacma
 		      - code: /\\d+%/
 		      - button "Supprimer cette valeur":
 		        - img
@@ -118,7 +118,7 @@ test.describe('correct results.zip', () => {
 		          - button:
 		            - img
 		      - text: Famille
-		      - combobox "Sminthuridae"
+		      - combobox "Famille": Sminthuridae
 		      - code: /\\d+%/
 		      - button "Supprimer cette valeur":
 		        - img
@@ -140,7 +140,7 @@ test.describe('correct results.zip', () => {
 		          - button:
 		            - img
 		      - text: Ordre
-		      - combobox "Symphypleona"
+		      - combobox "Ordre": Symphypleona
 		      - code: /\\d+%/
 		      - button "Supprimer cette valeur":
 		        - img
@@ -162,17 +162,17 @@ test.describe('correct results.zip', () => {
 		          - button:
 		            - img
 		      - text: Classe
-		      - combobox "Collembola"
+		      - combobox "Classe": Collembola
 		      - code: /\\d+%/
 		      - button "Supprimer cette valeur":
 		        - img
 		      - text: Phylum
-		      - combobox "Arthropoda"
+		      - combobox "Phylum": Arthropoda
 		      - code: /\\d+%/
 		      - button "Supprimer cette valeur":
 		        - img
 		      - text: Règne
-		      - combobox "Animalia"
+		      - combobox "Règne": Animalia
 		      - code: /\\d+%/
 		      - button "Supprimer cette valeur":
 		        - img
@@ -488,23 +488,28 @@ test('can extract EXIF GPS data from an image', async ({ page, context, app }) =
 	await mockUrl(
 		page,
 		context,
-		'https://nominatim.openstreetmap.org/reverse\\?format=jsonv2&lat=43.46715666666389&lon=11.885394999997223&addressdetails=0',
+		'https://nominatim.openstreetmap.org/reverse\\?format=geocodejson&lat=43.46715666666389&lon=11.885394999997223&addressdetails=1',
 		{
 			json: {
-				place_id: 73806197,
-				licence: 'Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright',
-				osm_type: 'node',
-				osm_id: 4797360321,
-				lat: '43.4674527',
-				lon: '11.8850787',
-				category: 'tourism',
-				type: 'viewpoint',
-				place_rank: 30,
-				importance: 0.00006763332570377688,
-				addresstype: 'tourism',
-				name: '',
-				display_name: 'Via Madonna Laura, Arezzo, Toscane, 52100, Italie',
-				boundingbox: ['43.4674027', '43.4675027', '11.8850287', '11.8851287'],
+				type: 'FeatureCollection',
+				features: [
+					{
+						type: 'Feature',
+						geometry: {
+							type: 'Point',
+							coordinates: [43.4674527, 11.8850787],
+						},
+						properties: {
+							geocoding: {
+								housenumber: '',
+								street: 'Via Madonna Laura',
+								city: 'Arezzo',
+								postcode: '52100',
+								country: 'Italie',
+							},
+						},
+					},
+				],
 			},
 		}
 	);
@@ -516,7 +521,7 @@ test('can extract EXIF GPS data from an image', async ({ page, context, app }) =
 	await app.gallery.card(0).click();
 	await assert(app.metadata.textbox('Date')).toHaveValue('2008-10-22');
 	await assert(app.metadata.combobox('Localisation')).toHaveValue(
-		'Via Madonna Laura, Arezzo, Toscane, 52100, Italie'
+		'Via Madonna Laura, 52100 Arezzo, Italie'
 	);
 
 	const metadataValues = await app.db.metadata.values({ image: 'with-exif-gps.jpeg' });

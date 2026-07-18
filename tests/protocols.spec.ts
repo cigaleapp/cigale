@@ -451,9 +451,8 @@ test('can use a protocol that imports metadata from another protocol', async ({
 	  - option /^Option 20\\d*$/
 	  - option /^Option 20\\d*$/
 	  - option /^Option 20\\d*$/
-	  - option /^Option 20\\d*$/
 	`);
-	await app.metadata.combobox('Imported enum').fill('2067');
+	await app.metadata.combobox('Imported enum').fill('Option 2067');
 	await page
 		.getByTestId('metadata-combobox-viewport')
 		.getByRole('option', { name: 'Option 2067' })
@@ -494,29 +493,42 @@ test('can infer metadata from a sidecar file', async ({ page, context, app, temp
 
 	await app.settings.set({ debugMode: false });
 
-	const locationDisplayName =
-		'Околтын, Akaltyn, Oltinsoy District, Province de Sourkhan-Daria, Ouzbékistan';
+	const building = '';
+	const housenumber = '';
+	const street = 'Околтын';
+	const postcode = '';
+	const city = 'Akaltyn';
+	const country = 'Ouzbékistan';
+
+	const locationParts = {
+		housenumber,
+		street,
+		city,
+		country,
+		postcode,
+		building,
+	};
+
+	const locationDisplayName = `${street}, ${city}, ${country}`;
 
 	await mockUrl(
 		page,
 		context,
-		'https://nominatim.openstreetmap.org/reverse\\?format=jsonv2&lat=38.12232&lon=67.676767&addressdetails=0',
+		'https://nominatim.openstreetmap.org/reverse\\?format=geocodejson&lon=67.676767&lat=38.12232&addressdetails=1',
 		{
 			json: {
-				place_id: 194730330,
-				licence: 'Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright',
-				osm_type: 'way',
-				osm_id: 855726288,
-				lat: '38.1228066',
-				lon: '67.6767144',
-				category: 'highway',
-				type: 'living_street',
-				place_rank: 26,
-				importance: 0.05337333409628439,
-				addresstype: 'road',
-				name: '',
-				display_name: locationDisplayName,
-				boundingbox: ['38.1227130', '38.1229923', '67.6758481', '67.6785654'],
+				type: 'FeatureCollection',
+				features: [
+					{
+						geometry: {
+							type: 'Point',
+							coordinates: [67.6767144, 38.1228066],
+						},
+						properties: {
+							geocoding: locationParts,
+						},
+					},
+				],
 			},
 		}
 	);

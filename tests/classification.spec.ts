@@ -223,6 +223,8 @@ test.describe('full-screen classification view', pr(1071), () => {
 						.getByRole('combobox');
 
 					await combobox.fill('Allacma fu');
+					// Wait for search
+					await app.wait('3s');
 					await page
 						.getByTestId('metadata-combobox-viewport')
 						.getByRole('option')
@@ -418,7 +420,10 @@ test.describe('full-screen classification view', pr(1071), () => {
 
 		// Classify it
 
+		await page.keyboard.press(controlOrMeta(page, 'F'));
 		await page.getByTestId('current').getByRole('combobox').fill('Seira musarum');
+		// wait for search
+		await app.wait('3s');
 		await page.keyboard.press('Enter');
 		await page.getByTestId('current').getByRole('combobox').blur();
 		await expect(

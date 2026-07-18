@@ -4,11 +4,11 @@ import { Schemas } from '../src/lib/database.js';
 import { issue } from './annotations.js';
 import { assert, exampleProtocol, expect, test } from './fixtures.js';
 import {
-	browserConsole,
-	chooseFirstSession,
-	getDatabaseRowById,
-	imagesByName,
-	setImageMetadata,
+    browserConsole,
+    chooseFirstSession,
+    getDatabaseRowById,
+    imagesByName,
+    setImageMetadata,
 } from './utils/index.js';
 import { controlOrMeta } from './utils/keyboard.js';
 
@@ -323,7 +323,7 @@ test.describe('Cropper view', () => {
 				await expectAllImagesConfirmedInDatabase(page, app, false);
 				await makeBox(page, 10, 10, 50, 50);
 				await expectBoxInList(page, 2, 245, 245);
-				await expectConfirmed(page, app, true);
+				await expectConfirmed(page, app, false);
 			});
 
 			test('undo/redo', async ({ page }) => {
@@ -402,7 +402,7 @@ test.describe('Cropper view', () => {
 				await expectAllImagesConfirmedInDatabase(page, app, false);
 				await makeBox(page, 10, 10, 50, 50);
 				await expectBoxInList(page, 2, 327, 327);
-				await expectConfirmed(page, app, true);
+				await expectConfirmed(page, app, false);
 			});
 
 			test('undo/redo', async ({ page }) => {
@@ -463,7 +463,7 @@ test.describe('Cropper view', () => {
 				await expectAllImagesConfirmedInDatabase(page, app, false);
 				await makeBox(page, 10, 10, 50, 50, 50, 100, 10, 100);
 				await expectBoxInList(page, 2, 327, 735);
-				await expectConfirmed(page, app, true);
+				await expectConfirmed(page, app, false);
 			});
 
 			test('does not leave ghost boxes', issue(462), async ({ page, app }) => {

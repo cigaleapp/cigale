@@ -143,6 +143,8 @@
 		async (signal, metadataId: NamespacedMetadataID, skip: boolean) => {
 			if (skip) return;
 			if (!uiState.currentProtocolId) return;
+			const { _optionsCount } = await idb.get('Metadata', metadataId);
+			if (_optionsCount > 100) return;
 			console.info('Fetching options for metadata', metadataId);
 			signal.throwIfAborted();
 			options = await metadataOptionsOf(

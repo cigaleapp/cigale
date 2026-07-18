@@ -322,6 +322,8 @@
 		&.mobile {
 			grid-template-rows: max-content auto max-content;
 			gap: 1rem;
+			/* XXX: prevent out-of-flow action buttons from hiding scrolled content */
+			padding-bottom: 200px;
 		}
 	}
 

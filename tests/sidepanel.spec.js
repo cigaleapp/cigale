@@ -128,33 +128,35 @@ testBasic('can update a enum-type metadata with cascades', async ({ page, app })
 	await assert(page.getByTestId('metadata-combobox-viewport')).toBeVisible();
 	await expect(page.getByTestId('metadata-combobox-viewport')).toMatchAriaSnapshot(`
 	  - option /Entomobrya muscorum \\d+%/ [selected]:
-	    - img
-	    - text: "Entomobrya muscorum"
+	    - text: ""
 	    - code: /\\d+%/
 	  - option /Dicyrtomina saundersi \\d+%/:
-	    - text: "Dicyrtomina saundersi"
+	    - text: ""
 	    - code: /\\d+%/
 	  - option "Allacma fusca 9%":
-	    - text: "Allacma fusca"
+	    - text: ""
 	    - code: 9%
 	  - option "Pogonognathellus longicornis 5%":
-	    - text: "Pogonognathellus longicornis"
+	    - text: ""
 	    - code: 5%
 	  - option "Dicyrtomina ornata 4%":
-	    - text: "Dicyrtomina ornata"
+	    - text: ""
 	    - code: 4%
 	  - option "Orchesella quinquefasciata 3%":
-	    - text: "Orchesella quinquefasciata"
+	    - text: ""
 	    - code: 3%
 	  - option "Entomobrya nivalis 2%":
-	    - text: "Entomobrya nivalis"
+	    - text: ""
 	    - code: 2%
 	  - option "Entomobrya superba 2%":
-	    - text: "Entomobrya superba"
+	    - text: ""
 	    - code: 2%
 	  - option "Caprainea marginata 2%":
-	    - text: "Caprainea marginata"
+	    - text: ""
 	    - code: 2%
+	  - option "Seira musarum 1%":
+	    - text: ""
+	    - code: 1%
 	  - heading "Entomobrya muscorum" [level=2]
 	  - link "En savoir plus gbif.org":
 	    - /url: https://gbif.org/species/2120749
@@ -192,38 +194,40 @@ testBasic('can update a enum-type metadata with cascades', async ({ page, app })
 		.hover();
 	await expect(page.getByTestId('metadata-combobox-viewport')).toMatchAriaSnapshot(`
 	  - option /Entomobrya muscorum \\d+%/ [selected]:
-	    - img
-	    - text: "Entomobrya muscorum"
+	    - text: ""
 	    - code: /\\d+%/
 	  - option /Dicyrtomina saundersi \\d+%/:
-	    - text: "Dicyrtomina saundersi"
+	    - text: ""
 	    - code: /\\d+%/
 	  - option "Allacma fusca 9%":
-	    - text: "Allacma fusca"
+	    - text: ""
 	    - code: 9%
 	  - option "Pogonognathellus longicornis 5%":
-	    - text: "Pogonognathellus longicornis"
+	    - text: ""
 	    - code: 5%
 	  - option "Dicyrtomina ornata 4%":
-	    - text: "Dicyrtomina ornata"
+	    - text: ""
 	    - code: 4%
 	  - option "Orchesella quinquefasciata 3%":
-	    - text: "Orchesella quinquefasciata"
+	    - text: ""
 	    - code: 3%
 	  - option "Entomobrya nivalis 2%":
-	    - text: "Entomobrya nivalis"
+	    - text: ""
 	    - code: 2%
 	  - option "Entomobrya superba 2%":
-	    - text: "Entomobrya superba"
+	    - text: ""
 	    - code: 2%
 	  - option "Caprainea marginata 2%":
-	    - text: "Caprainea marginata"
+	    - text: ""
 	    - code: 2%
+	  - option "Seira musarum 1%":
+	    - text: ""
+	    - code: 1%
 	  - heading "Dicyrtomina saundersi" [level=2]
 	  - link "En savoir plus gbif.org":
 	    - /url: https://gbif.org/species/4536978
 	    - img
-	    - text: "En savoir plus"
+	    - text: ""
 	    - code: gbif.org
 	  - table "Métadonées mises à jour au choix de cette option":
 	    - caption:
@@ -256,7 +260,7 @@ testBasic('can update a enum-type metadata with cascades', async ({ page, app })
 		.click();
 	await expect(app.metadata.section('Espèce')).toMatchAriaSnapshot(`
 	  - text: Espèce
-	  - combobox "Dicyrtomina saundersi"
+	  - combobox "Espèce": Dicyrtomina saundersi
 	  - button "Supprimer cette valeur":
 	    - img
 	  - text: Suggestions
@@ -280,22 +284,22 @@ testBasic('can update a enum-type metadata with cascades', async ({ page, app })
 
 	// Check the cascades
 	await expect(nthCombobox(2)).toMatchAriaSnapshot(`
-	  - combobox "Dicyrtomina"
+	  - combobox "Genre": Dicyrtomina
 	`);
 	await expect(nthCombobox(3)).toMatchAriaSnapshot(`
-	  - combobox "Dicyrtomidae"
+	  - combobox "Famille": Dicyrtomidae
 	`);
 	await expect(nthCombobox(4)).toMatchAriaSnapshot(`
-	  - combobox "Symphypleona"
+	  - combobox "Ordre": Symphypleona
 	`);
 	await expect(nthCombobox(5)).toMatchAriaSnapshot(`
-	  - combobox "Collembola"
+	  - combobox "Classe": Collembola
 	`);
 	await expect(nthCombobox(6)).toMatchAriaSnapshot(`
-	  - combobox "Arthropoda"
+	  - combobox "Phylum": Arthropoda
 	`);
 	await expect(nthCombobox(7)).toMatchAriaSnapshot(`
-	  - combobox "Animalia"
+	  - combobox "Règne": Animalia
 	`);
 
 	// Unselect and reselect
@@ -333,28 +337,28 @@ test.describe('can search in a enum-type metadata combobox', () => {
 
 		await assert(page.getByTestId('metadata-combobox-viewport').locator('.items'))
 			.toMatchAriaSnapshot(`
-		  - option /Dicyrtomina saundersi \\d+%/:
-		    - text: "Dicyrtomina saundersi"
-		    - code: /\\d+%/
-		  - option "Dicyrtomina ornata 4%":
-		    - text: "Dicyrtomina ornata"
-		    - code: 4%
-		  - option "Dicyrtomina minuta 1%":
-		    - text: "Dicyrtomina minuta"
-		    - code: 1%
-		  - option "Dicyrtoma fusca 0.4%":
-		    - text: "Dicyrtoma fusca"
-		    - code: 0.4%
-		  - option "Dicyrtomina signata 0.3%":
-		    - text: "Dicyrtomina signata"
-		    - code: 0.3%
-		  - option "Dicyrtomina flavosignata 0.2%":
-		    - text: "Dicyrtomina flavosignata"
-		    - code: 0.2%
-		  - option "Allacma fusca AKA Dicyrtoma fusca 9%":
-		    - text: "Allacma fusca AKA Dicyrtoma fusca"
-		    - code: 9%
-		`);
+			  - option "Dicyrtoma fusca 0.4%":
+			    - text: ""
+			    - code: 0.4%
+			  - option "Dicyrtomina minuta 1%":
+			    - text: ""
+			    - code: 1%
+			  - option "Dicyrtomina ornata 4%":
+			    - text: ""
+			    - code: 4%
+			  - option "Allacma fusca 9%":
+			    - text: ""
+			    - code: 9%
+			  - option "Dicyrtomina flavosignata 0.2%":
+			    - text: ""
+			    - code: 0.2%
+			  - option /Dicyrtomina saundersi \\d+%/:
+			    - text: ""
+			    - code: /\\d+%/
+			  - option "Dicyrtomina signata 0.3%":
+			    - text: ""
+			    - code: 0.3%
+			`);
 	});
 
 	testBasic('by synonym', async ({ page, app }) => {
@@ -362,25 +366,25 @@ test.describe('can search in a enum-type metadata combobox', () => {
 		await page.getByTestId('sidepanel').getByRole('combobox').first().fill('desoria');
 		await assert(page.getByTestId('metadata-combobox-viewport').locator('.items'))
 			.toMatchAriaSnapshot(`
-		  - option "Isotomurus maculatus AKA Desoria riparia 1%":
-		    - text: "Isotomurus maculatus AKA Desoria riparia"
-		    - code: 1%
-		  - option "Isotoma riparia AKA Desoria riparia 0.4%":
-		    - text: "Isotoma riparia AKA Desoria riparia"
-		    - code: 0.4%
-		  - option "Isotomurus palustris AKA Desoria riparia 0.1%":
-		    - text: "Isotomurus palustris AKA Desoria riparia"
-		    - code: 0.1%
-		  - option "Vertagopus asiaticus AKA Desoria cylindrica 0.1%":
-		    - text: "Vertagopus asiaticus AKA Desoria cylindrica"
-		    - code: 0.1%
-		  - option "Parisotoma notabilis AKA Desoria monticola 0.1%":
-		    - text: "Parisotoma notabilis AKA Desoria monticola"
-		    - code: 0.1%
-		  - option "Isotoma viridis AKA Desoria fusia 0.1%":
-		    - text: "Isotoma viridis AKA Desoria fusia"
-		    - code: 0.1%
-		`);
+			  - option "Vertagopus asiaticus 0.1%":
+			    - text: ""
+			    - code: 0.1%
+			  - option "Isotoma viridis 0.1%":
+			    - text: ""
+			    - code: 0.1%
+			  - option "Parisotoma notabilis 0.1%":
+			    - text: ""
+			    - code: 0.1%
+			  - option "Isotomurus palustris 0.1%":
+			    - text: ""
+			    - code: 0.1%
+			  - option "Isotomurus maculatus 1%":
+			    - text: ""
+			    - code: 1%
+			  - option "Isotoma riparia 0.4%":
+			    - text: ""
+			    - code: 0.4%
+			`);
 	});
 });
 

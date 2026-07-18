@@ -94,41 +94,109 @@ test('import into new session', async ({ page, app }) => {
 	await page.getByText('cyan', { exact: true }).click();
 	await assert(page.getByTestId('sidepanel').locator('> *').nth(2)).toMatchAriaSnapshot(`
 	  - text: Espèce
-	  - combobox "Allacma fusca"
+	  - combobox "Espèce": Allacma fusca
 	  - code: /\\d+%/
 	  - button "Supprimer cette valeur":
 	    - img
+	  - text: Suggestions
+	  - list:
+	    - listitem:
+	      - text: Sminthurus viridis
+	      - code: /\\d+%/
+	      - button:
+	        - img
+	    - listitem:
+	      - text: Bourletiella hortensis
+	      - code: /\\d+%/
+	      - button:
+	        - img
+	    - listitem:
+	      - text: Sminthurides aquaticus
+	      - code: 4%
+	      - button:
+	        - img
 	  - group:
 	    - img
 	    - text: Taxonomie
 	    - paragraph: Classification taxonomique de l'espèce
 	    - text: Genre
-	    - combobox "Allacma"
+	    - combobox "Genre": Allacma
 	    - code: /\\d+%/
 	    - button "Supprimer cette valeur":
 	      - img
+	    - text: Suggestions
+	    - list:
+	      - listitem:
+	        - text: Bourletiella
+	        - code: /\\d+%/
+	        - button:
+	          - img
+	      - listitem:
+	        - text: Sminthurus
+	        - code: /\\d+%/
+	        - button:
+	          - img
+	      - listitem:
+	        - text: Willowsia
+	        - code: 7%
+	        - button:
+	          - img
 	    - text: Famille
-	    - combobox "Sminthuridae"
+	    - combobox "Famille": Sminthuridae
 	    - code: /\\d+%/
 	    - button "Supprimer cette valeur":
 	      - img
+	    - text: Suggestions
+	    - list:
+	      - listitem:
+	        - text: Entomobryidae
+	        - code: /\\d+%/
+	        - button:
+	          - img
+	      - listitem:
+	        - text: Bourletiellidae
+	        - code: /\\d+%/
+	        - button:
+	          - img
+	      - listitem:
+	        - text: Isotomidae
+	        - code: 6%
+	        - button:
+	          - img
 	    - text: Ordre
-	    - combobox "Symphypleona"
+	    - combobox "Ordre": Symphypleona
 	    - code: /\\d+%/
 	    - button "Supprimer cette valeur":
 	      - img
+	    - text: Suggestions
+	    - list:
+	      - listitem:
+	        - text: Entomobryomorpha
+	        - code: /\\d+%/
+	        - button:
+	          - img
+	      - listitem:
+	        - text: Poduromorpha
+	        - code: 5%
+	        - button:
+	          - img
+	      - listitem:
+	        - text: Neelipleona
+	        - code: 0.8%
+	        - button:
+	          - img
 	    - text: Classe
-	    - combobox "Collembola"
+	    - combobox "Classe": Collembola
 	    - code: /\\d+%/
 	    - button "Supprimer cette valeur":
 	      - img
 	    - text: Phylum
-	    - combobox "Arthropoda"
+	    - combobox "Phylum": Arthropoda
 	    - code: /\\d+%/
 	    - button "Supprimer cette valeur":
 	      - img
 	    - text: Règne
-	    - combobox "Animalia"
+	    - combobox "Règne": Animalia
 	    - code: /\\d+%/
 	    - button "Supprimer cette valeur":
 	      - img
