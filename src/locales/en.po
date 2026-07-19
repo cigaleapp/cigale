@@ -3013,3 +3013,7 @@ msgstr ""
 #: src/routes/(app)/(sidepanel)/o/[observation]/TopbarExtras.svelte
 msgid "Mode debug"
 msgstr ""
+
+#: src/routes/(app)/accounts/ModalAddAccount.svelte
+msgid "<0/> Un token est comme un mot de passe (en pire, car on ne peut pas le changer). Ne le partage pas."
+msgstr ""

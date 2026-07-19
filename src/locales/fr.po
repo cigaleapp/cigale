@@ -3013,3 +3013,7 @@ msgstr "Affectée par <0>Autres métadonnées qui change {0} à {1}</0>"
 #: src/routes/(app)/(sidepanel)/o/[observation]/TopbarExtras.svelte
 msgid "Mode debug"
 msgstr "Mode debug"
+
+#: src/routes/(app)/accounts/ModalAddAccount.svelte
+msgid "<0/> Un token est comme un mot de passe (en pire, car on ne peut pas le changer). Ne le partage pas."
+msgstr "<0/> Un token est comme un mot de passe (en pire, car on ne peut pas le changer). Ne le partage pas."
