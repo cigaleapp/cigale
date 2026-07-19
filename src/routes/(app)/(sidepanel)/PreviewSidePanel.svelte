@@ -239,7 +239,15 @@
 		{/if}
 		{#if onimport}
 			<div class="side-by-side">
-				<ButtonSecondary onclick={onimport}>
+				<ButtonSecondary
+					onclick={async () => {
+						if (mobile.current) {
+							collapsed = true;
+						}
+
+						await onimport();
+					}}
+				>
 					<IconImport />
 					Plus d'images
 				</ButtonSecondary>
