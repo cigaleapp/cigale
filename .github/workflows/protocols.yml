@@ -123,7 +123,7 @@ jobs:
           WORDPRESS_APP_PASSWORD: ${{ secrets.WORDPRESS_APP_PASSWORD }}
 
       - name: Set google-drive-key.json
-        uses: mobiledevops/secret-to-file-action@be5f14e82c235ccde011f6ab0f6c984b35dc34c6 # v2.0.0
+        uses: mobiledevops/secret-to-file-action@085a45b601133564d1311589e82b5b136d0839bb # v2.0.0
         with:
           base64-encoded-secret: ${{ secrets.GOOGLE_DRIVE_KEY_BASE64 }}
           filename: google-drive-key.json
