@@ -84,7 +84,7 @@ msgstr "Aides à l'identification"
 msgid "Analyse…"
 msgstr "Analyse…"
 
-#: src/lib/MetadataComboboxMobile.svelte
+#: src/lib/ComboboxMobile.svelte
 #: src/lib/ModalConfirmDeletion.svelte
 #: src/lib/toasts.svelte.js
 #: src/lib/undo.svelte.js
@@ -111,10 +111,6 @@ msgstr "Aucun protocole sélectionné"
 #: src/lib/KeyboardShortcuts.svelte
 msgid "Aucun raccouci clavier pour cette page"
 msgstr "Aucun raccouci clavier pour cette page"
-
-#: src/lib/Combobox.svelte
-msgid "Aucun résultat :/"
-msgstr "Aucun résultat :/"
 
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
 #: src/routes/(app)/(sidepanel)/crop/+page.svelte
@@ -1101,7 +1097,7 @@ msgstr "Rechercher une option"
 msgid "Rechercher…"
 msgstr "Rechercher…"
 
-#: src/lib/MetadataComboboxMobile.svelte
+#: src/lib/ComboboxMobile.svelte
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/+layout.svelte
 msgid "Effacer la recherche"
 msgstr "Effacer la recherche"
@@ -2807,36 +2803,19 @@ msgstr "coucou toi :) <0/> passes une bonne journée ! 💖💖"
 msgid "Métadonées mises à jour au choix de cette option"
 msgstr "Métadonées mises à jour au choix de cette option"
 
-#: src/lib/MetadataComboboxDesktop.svelte
-msgid "Chargement"
-msgstr "Chargement"
-
-#: src/lib/MetadataComboboxDesktop.svelte
-msgid "Aussi connu sous le nom de"
-msgstr "Aussi connu sous le nom de"
-
-#: src/lib/MetadataComboboxDesktop.svelte
-msgid "AKA"
-msgstr "AKA"
-
-#. 0: error
-#: src/lib/MetadataComboboxDesktop.svelte
-msgid "Erreur lors de la récupération des étiquettes en cascade: {0}"
-msgstr "Erreur lors de la récupération des étiquettes en cascade: {0}"
-
-#: src/lib/MetadataComboboxMobile.svelte
+#: src/lib/ComboboxMobile.svelte
 msgid "Chercher…"
 msgstr "Chercher…"
 
-#: src/lib/MetadataComboboxMobile.svelte
+#: src/lib/ComboboxMobile.svelte
 msgid "OK"
 msgstr "OK"
 
-#: src/lib/MetadataComboboxMobile.svelte
+#: src/lib/ComboboxMobile.svelte
 msgid "Aucun résultat"
 msgstr "Aucun résultat"
 
-#: src/lib/MetadataComboboxMobile.svelte
+#: src/lib/ComboboxMobile.svelte
 msgid "Pas trouvé?<0/> <1>Essayes la barre de recherche</1>"
 msgstr "Pas trouvé?<0/> <1>Essayes la barre de recherche</1>"
 
@@ -2849,7 +2828,7 @@ msgstr "Description et images de l'option sélectionnée"
 msgid "Aucune description pour {0}."
 msgstr "Aucune description pour {0}."
 
-#: src/lib/MetadataComboboxMobile.svelte
+#: src/lib/ComboboxMobile.svelte
 msgid "Aucune option sélectionée"
 msgstr "Aucune option sélectionée"
 
@@ -2903,11 +2882,11 @@ msgctxt "Upgrading a protocol. The <0 /> is an icon arrow"
 msgid "Mise à jour…"
 msgstr "Mise à jour…"
 
-#: src/lib/MetadataComboboxMobile.svelte
+#: src/lib/ComboboxMobile.svelte
 msgid "Aucun·e"
 msgstr "Aucun·e"
 
-#: src/lib/MetadataComboboxMobile.svelte
+#: src/lib/ComboboxMobile.svelte
 msgid "Sauvegarde…"
 msgstr "Sauvegarde…"
 
@@ -3017,3 +2996,12 @@ msgstr "Mode debug"
 #: src/routes/(app)/accounts/ModalAddAccount.svelte
 msgid "<0/> Un token est comme un mot de passe (en pire, car on ne peut pas le changer). Ne le partage pas."
 msgstr "<0/> Un token est comme un mot de passe (en pire, car on ne peut pas le changer). Ne le partage pas."
+
+#. 0: error
+#: src/lib/MetadataCombobox.svelte
+msgid "Erreur lors de la récupération des étiquettes en cascade: {0}"
+msgstr "Erreur lors de la récupération des étiquettes en cascade: {0}"
+
+#: src/lib/ComboboxDesktop.svelte
+msgid "Aucun résultat :/"
+msgstr "Aucun résultat :/"
