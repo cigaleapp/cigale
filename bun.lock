@@ -83,7 +83,7 @@
         "@actions/core": "^3.0.1",
         "@capacitor/assets": "^3.0.5",
         "@capacitor/cli": "^8.4.1",
-        "@capgo/cli": "^8.25.0",
+        "@capgo/cli": "^8.28.1",
         "@date-fns/tz": "^1.5.0",
         "@electron-forge/cli": "^7.11.2",
         "@electron-forge/maker-deb": "^7.11.2",
@@ -262,7 +262,7 @@
 
     "@capgo/capacitor-updater": ["@capgo/capacitor-updater@8.50.2", "", { "peerDependencies": { "@capacitor/core": "^8.0.0" } }, "sha512-bMsZFp17jg39hBqCioLrJfRyH4VDUS3vcvTJ55MlcdBAxEfj2rqkJZtBPVerO3Y8oJuoGM4x89ISdXJkPzmTfA=="],
 
-    "@capgo/cli": ["@capgo/cli@8.25.0", "", { "dependencies": { "@inkjs/ui": "^2.0.0", "@rrweb/types": "^2.0.1", "@xterm/addon-serialize": "^0.14.0", "@xterm/headless": "^6.0.0", "happy-dom": "^20.10.4", "ink": "^7.0.4", "ink-spinner": "^5.0.0", "jsonwebtoken": "^9.0.3", "node-forge": "^1.4.0", "qrcode": "^1.5.4", "react": "^19.2.6", "rrweb-snapshot": "^2.0.1", "string-width": "^8.2.1" }, "optionalDependencies": { "@capgo/cli-helper-darwin-arm64": "^1.1.1", "@capgo/cli-helper-darwin-x64": "^1.1.1", "node-pty": "^1.1.0" }, "bin": { "capgo": "dist/index.js" } }, "sha512-b6tsopKS8uurpqxbsJuqkyG4G1HJdtbcfLx4WZEzZQVOew0A4/XnBj9Bt6LMn1qlLYPauUv5/XO904xVWyFBBw=="],
+    "@capgo/cli": ["@capgo/cli@8.28.2", "", { "dependencies": { "@inkjs/ui": "^2.0.0", "@rrweb/types": "^2.0.1", "@xterm/addon-serialize": "^0.14.0", "@xterm/headless": "^6.0.0", "happy-dom": "^20.10.4", "ink": "^7.0.4", "ink-spinner": "^5.0.0", "jsonwebtoken": "^9.0.3", "node-forge": "^1.4.0", "qrcode": "^1.5.4", "react": "^19.2.6", "rrweb-snapshot": "^2.0.1", "string-width": "^8.2.1" }, "optionalDependencies": { "@capgo/cli-helper-darwin-arm64": "^1.1.1", "@capgo/cli-helper-darwin-x64": "^1.1.1", "node-pty": "^1.1.0" }, "bin": { "capgo": "dist/index.js" } }, "sha512-aJlDl08ey+FEDXTFjRMSHZGbmUh0ppIlS7lslz4vLDXNJkLaqU0cNMdM4PVS1L813wwG43L68Jenx2NSGQrtuQ=="],
 
     "@capgo/cli-helper-darwin-arm64": ["@capgo/cli-helper-darwin-arm64@1.1.1", "", { "os": "darwin", "cpu": "arm64" }, "sha512-yHatsJ6KkltSRsSw8/UF4+fYFZGlbHPLw+mIdqlhTirWGAxwEaE+wFh/u3eSqXqxclSG4wQg4kcykYmtu2/r4Q=="],
 
