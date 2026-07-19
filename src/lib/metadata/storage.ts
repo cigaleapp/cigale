@@ -8,6 +8,7 @@ import { ArkErrors } from 'arktype';
 
 import { computeCascades } from '$lib/cascades.js';
 import { Tables } from '$lib/database.js';
+import { percent } from '$lib/i18n.js';
 import { observationMetadata } from '$lib/observations.js';
 import {
 	ensureNamespacedMetadataId,
@@ -181,6 +182,8 @@ async function refreshTables(sessionId: string, ...tableNames: ReactiveTableName
  * @param options.cascadedFrom ID des métadonnées dont celle-ci est dérivée, pour éviter les boucles infinies (cf "cascade" dans MetadataEnumVariant)
  * @param options.abortSignal signal d'abandon pour annuler la requête
  * @param options.sessionId id de la session en cours, important pour refresh le state réactif des tables
+ * @param options.clearConfidences effacer tout les scores de confiance au lieu de fusionner ceux existants et ceux donnés. Par défaut, vrai quand les scores de confiances précédents sont tous === 1
+ * @param options.backupPreviousValue stocker la valeur actuelle (avant modification) dans `confidences`. Par défaut, vrai quand la valeur actuelle a un score de confiance < 1
  */
 export async function storeMetadataValue<Type extends DB.MetadataType>({
 	db,
@@ -196,9 +199,10 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 	clearErrors = true,
 	isDefault = false,
 	updateReactiveState = true,
-	clearConfidences = false,
+	clearConfidences,
 	unit = undefined,
 	applyCascades = true,
+	backupPreviousValue,
 	sessionId,
 	abortSignal,
 }: {
@@ -221,6 +225,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 	abortSignal?: AbortSignal | undefined;
 	sessionId?: string | undefined | null;
 	updateReactiveState?: boolean;
+	backupPreviousValue?: boolean;
 }) {
 	if (!isNamespacedToProtocol(null, metadataId)) {
 		throw new Error(`Le metadataId ${metadataId} n'est pas namespacé`);
@@ -256,23 +261,44 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 				),
 	};
 
-	// Keep neural inference's score in confidences map if we're
-	// storing a user override
-	if (newValue.manuallyModified && confidence === 1) {
-		newValue.confidences[serializeMetadataValue(value)] ??= confidence;
-	} else {
-		newValue.confidences[serializeMetadataValue(value)] = confidence;
-	}
-
 	/**
 	 * Updates newValue.confidences to take into account the old confidences (if clearConfidences is false)
 	 */
 	function processConfidences(
 		target: typeof newValue,
-		oldValue: undefined | { confidences: Record<string, number> }
+		oldValue:
+			undefined | { confidences: Record<string, number>; confidence: number; value: unknown }
 	) {
+		clearConfidences ??=
+			oldValue && Object.values(oldValue.confidences).every((score) => score >= 1);
+
+		if (clearConfidences) {
+			console.debug(`Clearing previously stored confidence scores for ${metadataId}`, {
+				oldValue,
+			});
+		}
+
 		if (oldValue && !clearConfidences) {
 			target.confidences = { ...oldValue.confidences, ...target.confidences };
+		}
+
+		if (oldValue) {
+			backupPreviousValue ??= oldValue.confidence < 1;
+		}
+
+		// Keep neural inference's score in confidences map if we're
+		// storing a user override
+		if (target.manuallyModified && confidence === 1 && backupPreviousValue) {
+			console.debug(
+				`Backing up previous value ${metadataId} =`,
+				oldValue.value,
+				`@ ${percent(oldValue.confidence)} into .confidences`,
+				{ oldValue }
+			);
+
+			target.confidences[serializeMetadataValue(value)] ??= confidence;
+		} else {
+			target.confidences[serializeMetadataValue(value)] = confidence;
 		}
 	}
 
