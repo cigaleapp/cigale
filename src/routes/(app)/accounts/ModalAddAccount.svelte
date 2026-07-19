@@ -7,6 +7,7 @@
 
 	import IconCheck from '~icons/ri/check-line';
 	import IconFail from '~icons/ri/error-warning-line';
+	import IconWarning from '~icons/ri/triangle-line';
 	import KoboToolbox from '$lib/accounts/kobotoolbox.js';
 	import EnumButtons from '$lib/EnumButtons.svelte';
 	import { errorMessage } from '$lib/i18n.js';
@@ -233,6 +234,11 @@
 								</div>
 							{/if}
 						</div>
+						<p class="token-sharing-warning">
+							<IconWarning />
+							Un token est comme un mot de passe (en pire, car on ne peut pas le changer).
+							Ne le partage pas.
+						</p>
 					{/if}
 				{/snippet}
 			</Stepper>
@@ -252,6 +258,12 @@
 		gap: 1em;
 		margin-top: 0.5em;
 		width: 100%;
+	}
+
+	.token-sharing-warning {
+		color: var(--fg-warning);
+		width: 67ch;
+		vertical-align: center;
 	}
 
 	.feedback {
