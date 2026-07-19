@@ -5,6 +5,7 @@ const mockBinaryStorage = {
 	count: vi.fn(),
 	create: vi.fn(),
 	delete: vi.fn(),
+	write: vi.fn(),
 	list: vi.fn(),
 	read: vi.fn(),
 	size: vi.fn(),
@@ -19,6 +20,10 @@ vi.mock('@capacitor/core', () => ({
 	Capacitor: {
 		isNativePlatform: mockIsNativePlatform,
 	},
+}));
+
+vi.mock('$lib/geolocation.js', () => ({
+	getCurrentLocation: () => ({ longitude: 0, latitude: 0 }),
 }));
 
 vi.mock('$lib/storage/index.js', () => ({
@@ -66,13 +71,30 @@ describe('PendingStorage', () => {
 		mockIsNativePlatform.mockReturnValue(false);
 		mockBinaryStorage.count.mockResolvedValue(0);
 		mockBinaryStorage.create.mockResolvedValue({
-			area: '.pending_captures',
+			area: '.pending_captures/photos',
 			sessionId: 'session',
 			name: 'IMG_0001.PNG',
 		});
+		mockBinaryStorage.write.mockResolvedValue({
+			area: '.pending_captures/exif',
+			sessionId: 'session',
+			name: 'IMG_0001.PNG.json',
+		});
 		mockBinaryStorage.delete.mockResolvedValue(undefined);
 		mockBinaryStorage.list.mockReturnValue(asyncIterable([]));
-		mockBinaryStorage.read.mockResolvedValue({ name: 'IMG_0001.PNG', type: 'image/png' });
+		// mockBinaryStorage.read.mockResolvedValue();
+		mockBinaryStorage.read.mockImplementation(async ({ area }) => {
+			if (area === '.pending_captures/photos') {
+				return { name: 'IMG_0001.PNG', type: 'image/png' };
+			}
+			return {
+				name: 'IMG_0001.PNG.json',
+				type: 'application/json',
+				async text() {
+					return '{}';
+				},
+			};
+		});
 		mockBinaryStorage.size.mockResolvedValue(0);
 		mockBinaryStorage.clear.mockResolvedValue(undefined);
 		mockProcessImageFile.mockResolvedValue(undefined);
@@ -82,12 +104,13 @@ describe('PendingStorage', () => {
 
 	it('opens a storage and lists sessions', async () => {
 		const { PendingStorage, PENDING_PHOTOS_ROOT_FOLDER } = await importModule();
+		const root = `${PENDING_PHOTOS_ROOT_FOLDER}/photos`;
 		mockBinaryStorage.count.mockResolvedValueOnce(3);
 		mockBinaryStorage.list.mockReturnValueOnce(
 			asyncIterable([
-				{ area: PENDING_PHOTOS_ROOT_FOLDER, sessionId: 'one', name: '' },
-				{ area: PENDING_PHOTOS_ROOT_FOLDER, sessionId: '', name: '' },
-				{ area: PENDING_PHOTOS_ROOT_FOLDER, sessionId: 'two', name: '' },
+				{ area: root, sessionId: 'one', name: '' },
+				{ area: root, sessionId: '', name: '' },
+				{ area: root, sessionId: 'two', name: '' },
 			])
 		);
 
@@ -95,7 +118,7 @@ describe('PendingStorage', () => {
 		const sessions = await collect(PendingStorage.sessions());
 
 		expect(mockBinaryStorage.count).toHaveBeenCalledWith({
-			area: PENDING_PHOTOS_ROOT_FOLDER,
+			area: root,
 			sessionId: 'session-a',
 			name: '',
 		});
@@ -108,7 +131,7 @@ describe('PendingStorage', () => {
 		const { PendingStorage } = await importModule();
 		const storage = await PendingStorage.open('session-a');
 		mockBinaryStorage.create.mockResolvedValueOnce({
-			area: '.pending_captures',
+			area: '.pending_captures/photos',
 			sessionId: 'session-a',
 			name: 'IMG_0001.JPEG',
 		});
@@ -118,7 +141,7 @@ describe('PendingStorage', () => {
 		expect(storage.count).toBe(1);
 		expect(mockBinaryStorage.create).toHaveBeenCalledWith(
 			{
-				area: '.pending_captures',
+				area: '.pending_captures/photos',
 				sessionId: 'session-a',
 				name: 'IMG.JPEG',
 			},
@@ -153,9 +176,9 @@ describe('PendingStorage', () => {
 		const storage = await PendingStorage.open('session-a');
 		mockBinaryStorage.list.mockReturnValueOnce(
 			asyncIterable([
-				{ area: '.pending_captures', sessionId: 'session-a', name: 'IMG_0001.PNG' },
-				{ area: '.pending_captures', sessionId: 'session-a', name: 'notes.txt' },
-				{ area: '.pending_captures', sessionId: 'session-a', name: 'IMG_0002.PNG' },
+				{ area: '.pending_captures/photos', sessionId: 'session-a', name: 'IMG_0001.PNG' },
+				{ area: '.pending_captures/photos', sessionId: 'session-a', name: 'notes.txt' },
+				{ area: '.pending_captures/photos', sessionId: 'session-a', name: 'IMG_0002.PNG' },
 			])
 		);
 		mockBinaryStorage.read.mockResolvedValueOnce({ name: 'IMG_0001.PNG', type: 'image/png' });
@@ -169,8 +192,8 @@ describe('PendingStorage', () => {
 
 		mockBinaryStorage.list.mockReturnValueOnce(
 			asyncIterable([
-				{ area: '.pending_captures', sessionId: 'session-a', name: 'IMG_0001.PNG' },
-				{ area: '.pending_captures', sessionId: 'session-a', name: 'IMG_0002.PNG' },
+				{ area: '.pending_captures/photos', sessionId: 'session-a', name: 'IMG_0001.PNG' },
+				{ area: '.pending_captures/photos', sessionId: 'session-a', name: 'IMG_0002.PNG' },
 			])
 		);
 		mockBinaryStorage.size.mockResolvedValueOnce(12);
@@ -185,13 +208,27 @@ describe('PendingStorage', () => {
 		storage.count = 2;
 		mockBinaryStorage.list.mockReturnValueOnce(
 			asyncIterable([
-				{ area: '.pending_captures', sessionId: 'session-a', name: 'IMG_0001.PNG' },
-				{ area: '.pending_captures', sessionId: 'session-a', name: 'IMG_0002.PNG' },
+				{ area: '.pending_captures/photos', sessionId: 'session-a', name: 'IMG_0001.PNG' },
+				{ area: '.pending_captures/photos', sessionId: 'session-a', name: 'IMG_0002.PNG' },
 			])
 		);
+
+		const mockReadImpl =
+			(filename: string) =>
+			async ({ area }) =>
+				area === '.pending_captures/photos'
+					? { name: `${filename}`, type: 'image/png' }
+					: {
+							name: `${filename}.json`,
+							type: 'application/json',
+							text: async () => '{ "ImageWidth": 67 }',
+						};
+
 		mockBinaryStorage.read
-			.mockResolvedValueOnce({ name: 'IMG_0001.PNG', type: 'image/png' })
-			.mockResolvedValueOnce({ name: 'IMG_0002.PNG', type: 'image/png' });
+			.mockImplementationOnce(mockReadImpl('IMG_0001.PNG'))
+			.mockImplementationOnce(mockReadImpl('IMG_0001.PNG'))
+			.mockImplementationOnce(mockReadImpl('IMG_0002.PNG'))
+			.mockImplementationOnce(mockReadImpl('IMG_0002.PNG'));
 		mockProcessImageFile
 			.mockResolvedValueOnce(undefined)
 			.mockRejectedValueOnce(new Error('import failed'));
@@ -204,20 +241,27 @@ describe('PendingStorage', () => {
 		expect(ok).toBe(false);
 		expect(mockImageFileId).toHaveBeenCalledTimes(2);
 		expect(mockProcessImageFile).toHaveBeenNthCalledWith(1, {
+			extraExif: { ImageWidth: 67 },
 			id: 'generated-image-id',
 			file: { name: 'IMG_0001.PNG', type: 'image/png' },
 			sidecars: [],
 		});
 		expect(mockProcessImageFile).toHaveBeenNthCalledWith(2, {
+			extraExif: { ImageWidth: 67 },
 			id: 'generated-image-id',
 			file: { name: 'IMG_0002.PNG', type: 'image/png' },
 			sidecars: [],
 		});
-		expect(mockBinaryStorage.delete).toHaveBeenCalledTimes(1);
-		expect(mockBinaryStorage.delete).toHaveBeenCalledWith({
-			area: '.pending_captures',
+		expect(mockBinaryStorage.delete).toHaveBeenCalledTimes(2);
+		expect(mockBinaryStorage.delete).toHaveBeenNthCalledWith(1, {
+			area: '.pending_captures/photos',
 			sessionId: 'session-a',
 			name: 'IMG_0001.PNG',
+		});
+		expect(mockBinaryStorage.delete).toHaveBeenNthCalledWith(2, {
+			area: '.pending_captures/exif',
+			sessionId: 'session-a',
+			name: 'IMG_0001.PNG.json',
 		});
 		expect(progress).toEqual([
 			{ total: 2, done: 1 },

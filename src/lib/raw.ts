@@ -157,7 +157,7 @@ export async function processRawMetadata(
 
 	for (const { id: subjectId } of images) {
 		for (const { id: metadataId, infer, type } of metadataDefs) {
-			let value: RuntimeValue;
+			let value: RuntimeValue | undefined;
 			if (!infer) continue;
 
 			if ('latitude' in infer && 'longitude' in infer) {
@@ -168,40 +168,19 @@ export async function processRawMetadata(
 					`Inferring EXIF from RAW photo: ${infer.latitude.exif} & ${infer.longitude.exif} -> ${metadataId}`
 				);
 
-				const latitude = findRawMetadataFieldByExifTag(metadata, infer.latitude.exif);
-				const longitude = findRawMetadataFieldByExifTag(metadata, infer.longitude.exif);
-
-				// Skip if either latitude or longitude is missing
-				if (latitude === undefined || longitude === undefined) {
-					continue;
-				}
-
-				// Skip if both are 0
-				if (!latitude && !longitude) {
-					continue;
-				}
-
-				value = {
-					latitude: coerceExifValue(latitude, 'float'),
-					longitude: coerceExifValue(longitude, 'float'),
-				};
+				value = coerceExifValue('location', {
+					latitude: findRawMetadataFieldByExifTag(metadata, infer.latitude.exif),
+					longitude: findRawMetadataFieldByExifTag(metadata, infer.longitude.exif),
+				});
 			} else {
 				if (!InferenceConfigs.exif.allows(infer)) continue;
 
 				console.debug(`Inferring EXIF from RAW photo: ${infer.exif} -> ${metadataId}`);
 
-				const rawValue = findRawMetadataFieldByExifTag(metadata, infer.exif);
-
-				// Skip if the raw metadata field is not present
-				if (rawValue === undefined) {
-					console.warn(
-						`EXIF tag ${infer.exif} not found in metadata for session ${sessionId}, subject ${subjectId}, skipping metadata ${metadataId}`
-					);
-					continue;
-				}
-
-				value = coerceExifValue(rawValue, type);
+				value = coerceExifValue(type, findRawMetadataFieldByExifTag(metadata, infer.exif));
 			}
+
+			if (value === undefined) continue;
 
 			await storeMetadataValue({
 				db: await openDatabase(),

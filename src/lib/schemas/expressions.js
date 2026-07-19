@@ -2,11 +2,13 @@
  * Computed expression templates: Handlebars and Jsonata
  */
 import { ArkErrors, type } from 'arktype';
+import { ms } from 'convert';
 import { format as formatDate, formatISO, parse as parseDate } from 'date-fns';
 import Handlebars from 'handlebars';
 import jsonata from 'jsonata';
 
 import { errorMessage } from '../i18n.js';
+import { getCurrentLocation } from '../geolocation.js';
 import {
 	mapValues,
 	safeJSONStringify,
@@ -150,6 +152,13 @@ export const HELPERS = /** @type {const} */ ({
 		usage: [[], '2026-12-31T23:59:00Z'],
 		implementation() {
 			return formatISO(new Date());
+		},
+	},
+	here: {
+		documentation: 'Renvoie la position GPS courante',
+		usage: [[], { latitude: 76, longitude: 67 }],
+		async implementationJsonata() {
+			return getCurrentLocation();
 		},
 	},
 	year: {
@@ -492,7 +501,11 @@ export const JsonataExpression = (Input, Output) =>
 					let raw;
 
 					try {
-						raw = await expr.evaluate(Input.assert(data));
+						raw = await expr.evaluate(Input.assert(data), {
+							// Async helpers that depend on user intereaction (e.g. $here() helper that asks for geolocation permission)
+							// can take a long time to resolve
+							timeout: t.includes('$here()') ? ms('30s') : undefined,
+						});
 					} catch (error) {
 						console.error(
 							`Error while running jsonata expression ${safeJSONStringify(t)}:`,
@@ -538,15 +551,24 @@ export const JsonataExpression = (Input, Output) =>
 				},
 			};
 		} catch (cause) {
-			throw new Error(
-				`Invalid Jsonata expression ${safeJSONStringify(t)}: ${errorMessage(cause)}`,
-				{ cause }
-			);
+			return {
+				toJSON: () => t,
+				evaluate() {
+					throw new Error(
+						`Invalid Jsonata expression ${safeJSONStringify(t)}: ${errorMessage(cause)}`,
+						{ cause }
+					);
+				},
+			};
 		}
 	});
 
 if (import.meta.vitest) {
-	const { test, expect, describe } = import.meta.vitest;
+	const { test, expect, describe, vi } = import.meta.vitest;
+
+	vi.mock('$lib/geolocation.js', () => ({
+		getCurrentLocation: async () => ({ latitude: 76, longitude: 67 }),
+	}));
 
 	describe('Jsonata helpers', () => {
 		for (const [name, { usageArgs, usageResult }] of Object.entries(JSONATA_HELPERS)) {

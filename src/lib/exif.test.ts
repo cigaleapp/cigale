@@ -6,13 +6,7 @@ import type * as DB from './database.js';
 import exif from 'exif-parser';
 import { beforeEach, describe, expect, test } from 'vitest';
 
-import {
-	addExifMetadata,
-	coerceExifValue,
-	extractMetadata,
-	processExifData,
-	serializeExifValue,
-} from './exif.js';
+import { addExifMetadata, coerceExifValue, processExifData, serializeExifValue } from './exif.js';
 import * as db from './idb.svelte.js';
 import { imageId } from './images.js';
 import { namespacedMetadataId } from './schemas/metadata.js';
@@ -96,9 +90,14 @@ describe('processExifData', () => {
 	test('extracts from image without GPS', async () => {
 		const imageBytes = await readImageBytes('lil-fella.jpeg');
 
-		await processExifData('testing', 'quoicoubaka', imageBytes, {
-			type: 'image/jpeg',
-			name: 'test.jpg',
+		await processExifData({
+			sessionId: 'testing',
+			imageFileId: 'quoicoubaka',
+			imageBytes,
+			file: {
+				type: 'image/jpeg',
+				name: 'test.jpg',
+			},
 		});
 
 		const image = await db.tables.Image.get(imageId(0, 0));
@@ -122,9 +121,14 @@ describe('processExifData', () => {
 	test('extracts from image with GPS', async () => {
 		const imageBytes = await readImageBytes('with-exif-gps.jpeg');
 
-		await processExifData('testing', 'quoicoubaka', imageBytes, {
-			type: 'image/jpeg',
-			name: 'test.jpg',
+		await processExifData({
+			sessionId: 'testing',
+			imageFileId: 'quoicoubaka',
+			imageBytes,
+			file: {
+				type: 'image/jpeg',
+				name: 'test.jpg',
+			},
 		});
 
 		const image = await db.tables.Image.get(imageId(0, 0));
@@ -160,148 +164,47 @@ describe('processExifData', () => {
 	});
 });
 
-describe('extractMetadata', () => {
-	const plan = [
-		{
-			id: 'date',
-			type: 'date',
-			infer: { exif: 'DateTimeOriginal' },
-		},
-		{
-			id: 'location',
-			type: 'location',
-			infer: {
-				latitude: { exif: 'GPSLatitude' },
-				longitude: { exif: 'GPSLongitude' },
-			},
-		},
-		{
-			id: 'make',
-			type: 'string',
-			infer: { exif: 'Make' },
-		},
-		{
-			id: 'model',
-			type: 'string',
-			infer: { exif: 'Model' },
-		},
-	] as const satisfies Array<Pick<DB.Metadata, 'type' | 'infer'> & { id: string }>;
-
-	test('extracts from image without GPS', async () => {
-		const imageBytes = await readImageBytes('lil-fella.jpeg');
-		const extraction = await extractMetadata(imageBytes, [...plan]);
-
-		expect(extraction).toMatchObject({
-			date: {
-				value: new Date('2025-04-25T12:38:36.000Z'),
-				alternatives: [],
-				confidence: 1,
-			},
-			make: {
-				alternatives: [],
-				confidence: 1,
-				value: 'Canon',
-			},
-			model: {
-				alternatives: [],
-				confidence: 1,
-				value: 'Canon EOS RP',
-			},
-		});
-	});
-
-	test('extracts from image with GPS', async () => {
-		const imageBytes = await readImageBytes('with-exif-gps.jpeg');
-		const extraction = await extractMetadata(imageBytes, [...plan]);
-
-		expect(extraction).toMatchObject({
-			date: {
-				confidence: 1,
-				alternatives: [],
-				value: new Date('2008-10-22T16:29:49.000Z'),
-			},
-			location: {
-				confidence: 1,
-				alternatives: [],
-				value: {
-					latitude: 43.46715666666389,
-					longitude: 11.885394999997223,
-				},
-			},
-			make: {
-				confidence: 1,
-				alternatives: [],
-				value: 'NIKON',
-			},
-			model: {
-				confidence: 1,
-				alternatives: [],
-				value: 'COOLPIX P6000',
-			},
-		});
-	});
-
-	test('does not extract GPS even if possible if not in extraction plan', async () => {
-		const imageBytes = await readImageBytes('with-exif-gps.jpeg');
-		const extraction = await extractMetadata(imageBytes, [
-			{
-				id: 'date',
-				infer: { exif: 'DateTimeOriginal' },
-				type: 'date',
-			},
-		]);
-
-		expect(extraction).toEqual({
-			date: {
-				confidence: 1,
-				alternatives: [],
-				value: new Date('2008-10-22T16:29:49.000Z'),
-			},
-		});
-	});
-});
-
 describe('coerceExifValue', () => {
 	test('to string', () => {
-		expect(coerceExifValue('test', 'string')).toEqual('test');
+		expect(coerceExifValue('string', 'test')).toEqual('test');
 	});
 
 	describe('to date', () => {
 		test('valid date', () => {
 			expect(
-				coerceExifValue(new Date('2023-10-01T12:00:00Z').valueOf() * 1e-3, 'date')
+				coerceExifValue('date', new Date('2023-10-01T12:00:00Z').valueOf() * 1e-3)
 			).toEqual(new Date('2023-10-01T12:00:00Z'));
 		});
 		test('NaN-valued date', () => {
-			expect(() => coerceExifValue(NaN, 'date')).toThrowErrorMatchingInlineSnapshot(
+			expect(() => coerceExifValue('date', NaN)).toThrowErrorMatchingInlineSnapshot(
 				`[Error: Date value is invalid]`
 			);
 		});
 		test('malformed date', () => {
-			expect(() => coerceExifValue('test', 'date')).toThrowErrorMatchingInlineSnapshot(
+			expect(() => coerceExifValue('date', 'test')).toThrowErrorMatchingInlineSnapshot(
 				`[Error: Date format is invalid]`
 			);
 		});
 	});
 
 	test('to float', () => {
-		expect(coerceExifValue('1.23', 'float')).toEqual(1.23);
+		expect(coerceExifValue('float', '1.23')).toEqual(1.23);
 	});
 
 	test('to int', () => {
-		expect(coerceExifValue('123', 'integer')).toEqual(123);
+		expect(coerceExifValue('integer', '123')).toEqual(123);
 	});
 
 	test('to boundingbox', () => {
-		expect(() => coerceExifValue('123', 'boundingbox')).toThrowError(/not supported/);
+		expect(() => coerceExifValue('boundingbox', '123')).toThrowError(/not supported/);
 	});
 
 	describe('to enum', () => {
 		test('valid value', () => {
-			expect(coerceExifValue('test', 'enum')).toEqual('test');
+			expect(coerceExifValue('enum', 'test')).toEqual('test');
 		});
 		test('invalid value', () => {
-			expect(() => coerceExifValue(123, 'enum')).toThrowError(/must be a string/);
+			expect(() => coerceExifValue('enum', 123)).toThrowError(/must be a string/);
 		});
 	});
 });

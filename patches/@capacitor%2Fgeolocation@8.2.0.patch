@@ -1,0 +1,15 @@
+diff --git a/android/build.gradle b/android/build.gradle
+index d4d955b231ba9cd3963f6172719781c7cd9dbf6a..abbdc1aaebf817ccbc598d13fe9a9e068954c704 100644
+--- a/android/build.gradle
++++ b/android/build.gradle
+@@ -27,7 +27,9 @@ buildscript {
+ }
+ 
+ apply plugin: 'com.android.library'
+-apply plugin: 'kotlin-android'
++if (project.extensions.findByName('kotlin') == null) {
++    apply plugin: 'kotlin-android'
++}
+ if (System.getenv("CAP_PLUGIN_PUBLISH") == "true") {
+     apply plugin: 'io.github.gradle-nexus.publish-plugin'
+     apply from: file('../scripts/android/publish-root.gradle')

@@ -2,6 +2,14 @@
 import { DurationFormat } from '@formatjs/intl-durationformat';
 import { intervalToDuration, isValid, parse } from 'date-fns';
 
+export const SANE_ISO_DATE_FORMATS = [
+	'yyyy-MM-dd',
+	"yyyy-MM-dd'T'HH:mm:ss",
+	"yyyy-MM-dd'T'HH:mm:ss.SSS",
+	"yyyy-MM-dd'T'HH:mm:ssXXX",
+	"yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
+];
+
 /**
  * Returns a parsed date or undefined if a parse error occurs or the date is invalid
  * @param maybeDatestring a date string in the following formats:
@@ -13,14 +21,7 @@ import { intervalToDuration, isValid, parse } from 'date-fns';
  * We don't accept any other [valid, but insane ISO datestring](https://bsky.app/profile/gwen.works/post/3ljvdiur2lc2s)
  */
 export function parseISOSafe(maybeDatestring: string) {
-	return tryParse(
-		maybeDatestring,
-		'yyyy-MM-dd',
-		"yyyy-MM-dd'T'HH:mm:ss",
-		"yyyy-MM-dd'T'HH:mm:ss.SSS",
-		"yyyy-MM-dd'T'HH:mm:ssXXX",
-		"yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
-	);
+	return tryParseDate(maybeDatestring, ...SANE_ISO_DATE_FORMATS);
 }
 
 if (import.meta.vitest) {
@@ -45,7 +46,7 @@ if (import.meta.vitest) {
  * Returns a parsed date or undefined if a parse error occurs or the date is invalid,
  * trying the given formats in order
  */
-function tryParse(maybeDatestring: string, ...formats: string[]): Date | undefined {
+export function tryParseDate(maybeDatestring: string, ...formats: string[]): Date | undefined {
 	for (const format of formats) {
 		try {
 			const date = parse(maybeDatestring, format, new Date());
@@ -62,18 +63,20 @@ if (import.meta.vitest) {
 
 	describe('tryParse', () => {
 		test('works on valid datestrings', () => {
-			expect(tryParse('2023-10-01', 'yyyy-MM-dd')).toBeInstanceOf(Date);
-			expect(tryParse('2023-10-01T12:00:00', "yyyy-MM-dd'T'HH:mm:ss")).toBeInstanceOf(Date);
-			expect(tryParse('2023-10-01T12:00:00Z', "yyyy-MM-dd'T'HH:mm:ssXXX")).toBeInstanceOf(
+			expect(tryParseDate('2023-10-01', 'yyyy-MM-dd')).toBeInstanceOf(Date);
+			expect(tryParseDate('2023-10-01T12:00:00', "yyyy-MM-dd'T'HH:mm:ss")).toBeInstanceOf(
+				Date
+			);
+			expect(tryParseDate('2023-10-01T12:00:00Z', "yyyy-MM-dd'T'HH:mm:ssXXX")).toBeInstanceOf(
 				Date
 			);
 		});
 		test('returns undefined for Invalid Date datestrings', () => {
-			expect(tryParse('2019-05-09T08:25:22+0000')).toBeUndefined();
+			expect(tryParseDate('2019-05-09T08:25:22+0000')).toBeUndefined();
 		});
 		test('returns undefined for malformed datestrings', () => {
-			expect(tryParse('2023_10-01', 'yyyy-MM-dd')).toBeUndefined();
-			expect(tryParse('chicken jockey')).toBeUndefined();
+			expect(tryParseDate('2023_10-01', 'yyyy-MM-dd')).toBeUndefined();
+			expect(tryParseDate('chicken jockey')).toBeUndefined();
 		});
 	});
 }

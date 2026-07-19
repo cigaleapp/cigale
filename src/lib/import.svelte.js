@@ -1,5 +1,6 @@
 /**
  * @import { DimensionsInput } from '$lib/database.js';
+ * @import { ExifFieldKey } from '$lib/exiffields.js';
  */
 import * as dates from 'date-fns';
 
@@ -44,8 +45,9 @@ export const ACCEPTED_IMPORT_TYPES = [
  * @param {File} param0.file
  * @param {string} param0.id new, free ImageFile id to use
  * @param {File[]} param0.sidecars
+ * @param {{[K in ExifFieldKey]?: string | number | Array<[number, number]>}} [param0.extraExif] additional exif fields, to be processed as if they were on the photo file
  */
-export async function processImageFile({ file, id: fileId, sidecars }) {
+export async function processImageFile({ file, id: fileId, sidecars, extraExif }) {
 	if (!uiState.currentProtocol) {
 		toasts.error('Aucun protocole sélectionné');
 		return;
@@ -130,7 +132,13 @@ export async function processImageFile({ file, id: fileId, sidecars }) {
 		});
 	}
 
-	await processExifData(uiState.currentSession.id, fileId, originalBytes, file).catch((error) => {
+	await processExifData({
+		sessionId: uiState.currentSession.id,
+		imageFileId: fileId,
+		imageBytes: originalBytes,
+		file,
+		extra: extraExif,
+	}).catch((error) => {
 		console.error(error);
 		toasts.error(`Erreur lors de l'extraction des métadonnées EXIF pour ${file.name}`);
 	});

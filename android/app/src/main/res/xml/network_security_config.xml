@@ -1,0 +1,14 @@
+<!-- 
+Source - https://stackoverflow.com/a/22040887
+Posted by Dean Wild, modified by community. See post 'Timeline' for change history
+Retrieved 2026-07-20, License - CC BY-SA 4.0 
+-->
+
+<network-security-config>
+    <debug-overrides>
+        <trust-anchors>
+            <!-- Trust user added CAs while debuggable only -->
+            <certificates src="user" />
+        </trust-anchors>
+    </debug-overrides>
+</network-security-config>
