@@ -4,11 +4,11 @@ import { Schemas } from '../src/lib/database.js';
 import { issue } from './annotations.js';
 import { assert, exampleProtocol, expect, test } from './fixtures.js';
 import {
-    browserConsole,
-    chooseFirstSession,
-    getDatabaseRowById,
-    imagesByName,
-    setImageMetadata,
+	browserConsole,
+	chooseFirstSession,
+	getDatabaseRowById,
+	imagesByName,
+	setImageMetadata,
 } from './utils/index.js';
 import { controlOrMeta } from './utils/keyboard.js';
 
