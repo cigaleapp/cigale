@@ -1,78 +1,57 @@
-<script lang="ts">
-	import type { PropsForSubcomponent } from './MetadataCombobox.svelte';
+<script lang="ts" generics="I extends Item, V extends Item['key']">
+	import type { Item, SubcomponentProps } from './Combobox.svelte';
 
 	import Icon from '@iconify/svelte';
+	import { uniqBy } from 'es-toolkit';
 	import { Debounced } from 'runed';
-	import { SvelteMap } from 'svelte/reactivity';
 	import { fade } from 'svelte/transition';
 
 	import IconClose from '~icons/ri/arrow-left-s-line';
 	import IconSelected from '~icons/ri/check-line';
 	import IconClear from '~icons/ri/close-line';
 	import IconSearch from '~icons/ri/search-line';
-	import * as DB from '$lib/database.js';
+	import ButtonIcon from '$lib/ButtonIcon.svelte';
+	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
+	import ConfidencePercentage from '$lib/ConfidencePercentage.svelte';
 	import DebugOnly from '$lib/DebugOnly.svelte';
-
-	import ButtonIcon from './ButtonIcon.svelte';
-	import ButtonPrimary from './ButtonPrimary.svelte';
-	import ConfidencePercentage from './ConfidencePercentage.svelte';
-	import { errorMessage } from './i18n.js';
-	import { databaseHandle } from './idb.svelte.js';
-	import LoadingScreen from './LoadingScreen.svelte';
-	import { resolveMetadataImport } from './metadata/namespacing.js';
-	import { serializeMetadataValue } from './metadata/serializing.js';
-	import { metadataIdOfOption, metadataOption } from './metadata/storage.js';
-	import MetadataOptionCarousel from './MetadataOptionCarousel.svelte';
-	import OverflowableText from './OverflowableText.svelte';
-	import { makeSearcher } from './search.js';
-	import { uiState } from './uistate.svelte.js';
-	import {
-		compareBy,
-		corsfixIfLocalhost,
-		nonnull,
-		readableOn,
-		safeJSONParse,
-		switchConditions,
-	} from './utils.js';
+	import { errorMessage } from '$lib/i18n';
+	import LoadingScreen from '$lib/LoadingScreen.svelte';
+	import { corsfixIfLocalhost, readableOn, switchConditions } from '$lib/utils';
 
 	let {
-		focuser = $bindable(),
-		value,
-		onValueChange,
-		alternatives,
+		initially,
+		suggestions,
 		multiple,
-		confidences,
-		metadata: definition,
-		optionIsDisabled,
+		onValueChange,
+		searcher,
+		searcherError,
+		loadingItems,
+		usingPreloadedItems,
+		itemsByKey,
+		loadItemsError: selectedItemsError,
 		sorter,
-		options: preloadedOptions,
-		enumOptionsExtraContent,
-	}: PropsForSubcomponent = $props();
+		itemExtraContent,
+		open = $bindable(false),
+		id,
+		focuser = $bindable(),
+		details,
+	}: SubcomponentProps<I, V> = $props();
 
-	// Perf hit if too much
-	const usePreloadedOptions = $derived((preloadedOptions ?? []).length <= 100);
+	const initialKeys = $derived(initially.map((i) => i.key));
 
-	const initially = $derived(
-		(multiple ? [value, ...(alternatives ?? [])] : [value]).filter(nonnull)
-	);
-
-	let selected = $derived(initially);
+	let selected = $derived(initialKeys);
 
 	$effect(() => {
 		if (!open) {
-			selected = initially;
+			selected = initialKeys;
 		}
 	});
 
 	let query = $state('');
 	const debouncedQuery = new Debounced(() => query, 500);
 
-	let open = $state(false);
-
 	/** The selected option part takes the whole screen */
 	let expanded = $state(false);
-
-	const optionsByKey = new SvelteMap<string, DB.MetadataEnumVariant>();
 
 	function openModal() {
 		dialogElement?.showModal();
@@ -81,112 +60,51 @@
 
 	let dialogElement = $state<HTMLDialogElement>();
 
-	const confidenceOf = $derived((key: string) => confidences?.[serializeMetadataValue(key)]);
-
 	$effect(() => {
 		focuser = () => {
 			openModal();
 		};
 	});
 
-	// eslint-disable-next-line no-unused-vars
-	let searcher = $state<(query: string) => AsyncIterable<DB.MetadataEnumVariant>>();
-	let searcherError = $state('');
-	$effect(() => {
-		if (!open) return;
-		if (searcher) return;
-
-		void makeSearcher({
-			db: databaseHandle(),
-			tables: DB.Tables,
-			table: 'MetadataOption',
-			max: 30,
-			filter: (id) =>
-				metadataIdOfOption(uiState.currentProtocol!, id) ===
-				resolveMetadataImport(uiState.currentProtocol!, definition.id),
-		})
-			.then((result) => {
-				searcher = result;
-			})
-			.catch((error) => {
-				searcherError = errorMessage(error, 'Impossible de préparer la recherche');
-			});
-	});
-
-	let selectedOptions = $state<DB.MetadataEnumVariant[]>();
-	let selectedOptionsError = $state('');
-	$effect(() => {
-		(async () => {
-			// eslint-disable-next-line svelte/prefer-svelte-reactivity
-			const seen = new Set<string>();
-			let resolved: DB.MetadataEnumVariant[] = [];
-
-			if (usePreloadedOptions) {
-				for (const opt of preloadedOptions ?? []) {
-					if (seen.has(opt.key)) continue;
-					resolved.push(opt);
-					seen.add(opt.key);
-					optionsByKey.set(opt.key, opt);
-				}
-			}
-
-			if (value && !seen.has(value)) {
-				const valueOption = await metadataOption(databaseHandle(), definition.id, value);
-
-				if (valueOption) {
-					optionsByKey.set(value, valueOption);
-					seen.add(value);
-					resolved.push(valueOption);
-				}
-			}
-
-			const bestSuggestions = Object.entries(confidences ?? {})
-				.sort(compareBy(([, score]) => -score))
-				.slice(0, 100)
-				.map(([key]) => safeJSONParse(key)?.toString() ?? key.toString());
-
-			for (const key of bestSuggestions) {
-				if (seen.has(key)) continue;
-				const opt = await metadataOption(databaseHandle(), definition.id, key);
-
-				if (opt) {
-					const object = DB.Tables.MetadataOption.assert(opt);
-					resolved.push(object);
-					optionsByKey.set(object.key, object);
-					seen.add(key);
-				}
-			}
-
-			return resolved;
-		})()
-			.then((result) => {
-				selectedOptions = result;
-			})
-			.catch((error) => {
-				selectedOptionsError = errorMessage(
-					error,
-					'Impossible de récupérer les options sélectionnées'
-				);
-			});
-	});
-
-	let highlight = $state('');
-
-	const shown = $derived(optionsByKey.get(highlight || selected.at(0) || ''));
+	const shown = $derived(itemsByKey.get(selected.at(0) || ''));
 	let resetSuggestionsScroll = $state<() => void>();
 	let focusSearchBar = $state<() => void>();
+
+	const empty = $derived(initially.length === 0);
+
+	let temporaryNewItem = $state<I>();
+
+	const firstValue = $derived(initially.at(0));
+
+	const items = $derived(
+		uniqBy(
+			[...(temporaryNewItem ? [temporaryNewItem] : []), ...(initially ?? []), ...suggestions],
+			(i) => i.key
+		)
+	);
+
+	function handleClick(key: V) {
+		if (selected.includes(key)) {
+			selected = selected.filter((s) => s !== key);
+		} else if (multiple) {
+			selected = [key, ...selected];
+		} else {
+			selected = [key];
+		}
+	}
 </script>
 
 <!-- XXX: the .underscored class disables the dashes bottom border that MetadataInput adds -->
 <div class="searchbox underscored">
 	<button
-		class:empty={!value}
+		{id}
+		class:empty
 		onclick={() => {
 			openModal();
 		}}
 	>
-		{#if value}
-			{optionsByKey.get(value)?.label ?? value?.toString() ?? '<?>'}
+		{#if firstValue}
+			{firstValue?.label ?? '<?>'}
 		{:else}
 			Aucun·e
 		{/if}
@@ -248,7 +166,8 @@
 				tight
 				loading
 				onclick={async () => {
-					await onValueChange(selected[0], selected);
+					temporaryNewItem = undefined;
+					await onValueChange?.(selected[0], selected);
 					dialogElement?.close();
 				}}
 			>
@@ -263,10 +182,14 @@
 		</div>
 	</header>
 	<LoadingScreen
-		loading={!searcher || !selectedOptions}
-		failure={searcherError || selectedOptionsError}
+		loading={switchConditions({
+			'Préparation de la recherche…': !searcher,
+			'Chargement des options…': loadingItems,
+		})}
+		failure={searcherError || selectedItemsError}
 		empty={switchConditions({
-			'Aucune option sélectionnée': !debouncedQuery.current && !selectedOptions?.length,
+			'Aucune option sélectionnée':
+				!debouncedQuery.current && !initially?.length && !suggestions?.length,
 		})}
 	>
 		<section
@@ -279,26 +202,15 @@
 				};
 			}}
 		>
-			{#snippet suggestion(option: DB.MetadataEnumVariant)}
-				{const { images, label, key, icon, color } = $derived(option)}
-				{const disabled = $derived(optionIsDisabled?.(option))}
-				{const image = $derived(images?.at(0))}
-				{const confidence = $derived(confidenceOf(key))}
+			{#snippet suggestion(item: I)}
+				{const { label, key, icon, color, disabled, thumbnail, confidence } =
+					$derived(item)}
 
 				<button
 					class="suggestion"
 					aria-selected={selected.includes(key)}
-					{disabled}
-					onclick={async () => {
-						optionsByKey.set(key, option);
-						if (selected.includes(key)) {
-							selected = selected.filter((s) => s !== key);
-						} else if (multiple) {
-							selected = [key, ...selected];
-						} else {
-							selected = [key];
-						}
-					}}
+					disabled={Boolean(disabled)}
+					onclick={async () => handleClick(key)}
 				>
 					<div
 						class="image"
@@ -310,14 +222,15 @@
 								<IconSelected />
 							</div>
 						</div>
-						{#if image}
-							<img src={corsfixIfLocalhost(image)} />
+						{#if thumbnail}
+							<img src={corsfixIfLocalhost(thumbnail)} />
 						{:else if icon}
 							<Icon {icon} />
 						{/if}
 					</div>
 					<div class="label">
-						<OverflowableText text={label} />
+						<!-- <OverflowableText text={label} /> -->
+						<p>{label}</p>
 						{#if disabled}
 							<div class="disabled-why">
 								<DebugOnly inline data={key} />
@@ -334,13 +247,10 @@
 						{/if}
 					</div>
 
-					{#if enumOptionsExtraContent}
+					{#if itemExtraContent}
 						<div class="extra-content">
-							{@render enumOptionsExtraContent({
-								option,
-								disabled: optionIsDisabled?.(option) ?? false,
+							{@render itemExtraContent(item, {
 								selected: selected.includes(key),
-								confidence,
 							})}
 						</div>
 					{/if}
@@ -358,11 +268,11 @@
 					<LoadingScreen failure={errorMessage(error)} />
 				{/await}
 			{:else}
-				{#each (selectedOptions ?? []).toSorted(sorter) as option (option.key)}
+				{#each items.toSorted(sorter) as option (option.key)}
 					{@render suggestion(option)}
 				{/each}
 				<!-- If we're using pre-loaded options, we're guaranteed to have the complete list displayed -->
-				{#if !usePreloadedOptions}
+				{#if usingPreloadedItems.length > 0}
 					<button
 						class="suggestion"
 						onclick={() => {
@@ -380,20 +290,18 @@
 		</section>
 		<section class="selected" in:fade={{ duration: 200 }}>
 			{#if shown}
-				<MetadataOptionCarousel
-					bind:expanded
-					option={shown}
-					debugdata={{
-						selected,
-						multiple,
-						value,
-						alternatives,
-						loaded: Array.from(optionsByKey.keys()),
-						confidences: Object.entries(confidences ?? {})
-							.sort(compareBy(([, confidence]) => -confidence))
-							.map(([key, val]) => `${key} @ ${val}`),
-					}}
-				/>
+				{@render details(shown, {
+					allItems: [...itemsByKey.values()],
+					expanded,
+					expand(newExpanded) {
+						expanded = newExpanded;
+					},
+					select(item) {
+						itemsByKey.set(item.key, item);
+						temporaryNewItem = item;
+						handleClick(item.key);
+					},
+				})}
 			{:else}
 				<LoadingScreen empty="Aucune option sélectionée" />
 			{/if}
@@ -495,6 +403,7 @@
 
 	search {
 		min-width: 0;
+		overflow: hidden;
 	}
 
 	search,
@@ -517,16 +426,17 @@
 
 	.suggestion {
 		display: grid;
-		--h: 3rem;
+		--h: var(--combobox-option-height, 3rem);
 		height: var(--h);
 		gap: 1rem;
 		align-items: center;
 		text-align: left;
 		font-size: 0.95rem;
+		max-width: 100dvw;
 
-		grid-template-columns: max-content auto max-content;
+		grid-template-columns: max-content 1fr max-content;
 		&:has(.extra-content) {
-			grid-template-columns: max-content auto max-content max-content;
+			grid-template-columns: max-content 4fr max-content 1fr;
 		}
 
 		&[disabled] {
@@ -534,6 +444,9 @@
 		}
 
 		.label {
+			/*display: flex;
+			flex-direction: column;
+			flex-shrink: 1;*/
 			font-size: 1.1em;
 		}
 
@@ -542,8 +455,9 @@
 			justify-content: center;
 			align-items: center;
 			font-size: 1.2rem;
-			height: calc(0.9 * var(--h));
-			width: calc(0.9 * var(--h));
+			--size: var(--combobox-option-image-size, calc(min(33dvw, 10dvh, 0.9 * var(--h))));
+			height: var(--size);
+			width: var(--size);
 			border-radius: var(--corner-radius);
 			overflow: hidden;
 			border: 1px solid transparent;

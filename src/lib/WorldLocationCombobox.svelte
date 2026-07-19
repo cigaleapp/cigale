@@ -1,12 +1,13 @@
 <script lang="ts">
-	import type { RuntimeValue } from './schemas/metadata.js';
+	import type { RuntimeValue } from '$lib/schemas/metadata.js';
 
 	import { ArkErrors, type } from 'arktype';
 	import { SvelteMap } from 'svelte/reactivity';
 
+	import { coordinatesToAddress, suggestCoordinates } from '$lib/nominatim.js';
+	import { orEmpty2 } from '$lib/utils.js';
+
 	import Combobox from './Combobox.svelte';
-	import { coordinatesToAddress, suggestCoordinates } from './nominatim.js';
-	import { orEmpty2 } from './utils.js';
 	import WorldMap from './WorldMap.svelte';
 
 	interface Props {
@@ -25,7 +26,7 @@
 	function coordsToKey(v: RuntimeValue<'location'>): CoordsKey;
 	function coordsToKey(v: RuntimeValue<'location'> | undefined): CoordsKey | undefined;
 	function coordsToKey(v: typeof value) {
-		return v ? `${v.latitude};${v.longitude}` : undefined;
+		return v ? `${v.longitude};${v.latitude}` : undefined;
 	}
 
 	function keyToCoords(k: CoordsKey): RuntimeValue<'location'>;
@@ -59,70 +60,78 @@
 				reverseGeocodings.set(coordsToKey(value), 'Unknown');
 			});
 	});
+
+	function loadItem(from: CoordsKey | { lng: number; lat: number } | RuntimeValue<'location'>) {
+		if (typeof from === 'string') {
+			const { latitude, longitude } = keyToCoords(from);
+			return {
+				key: from,
+				label: reverseGeocodings.get(from) ?? `${longitude}, ${latitude}`,
+			};
+		}
+
+		return loadItem(
+			coordsToKey({
+				longitude: 'longitude' in from ? from.longitude : from.lng,
+				latitude: 'latitude' in from ? from.latitude : from.lat,
+			})
+		);
+	}
 </script>
 
 <Combobox
-	type="single"
+	--combobox-option-image-size="3rem"
+	--combobox-option-height="4rem"
 	value={coordsToKey(value)}
 	sorter={() => 0}
-	searcher={(label) => label}
-	onValueChange={(val) => onblur(keyToCoords(val))}
-	suggestions={async (search) => {
-		const coords = Coords(search);
+	onValueChange={async (val) => onblur(keyToCoords(val))}
+	preloadedItems={orEmpty2(value, (coords) => loadItem(coords))}
+	{loadItem}
+	searcher={async function* search(query: string) {
+		const coords = Coords(query);
 
 		if (coords instanceof ArkErrors) {
-			return suggestCoordinates(search);
+			for await (const { label, ...coords } of suggestCoordinates(query)) {
+				const key = coordsToKey(coords);
+				reverseGeocodings.set(key, label);
+				yield { label, key };
+			}
+
+			return;
 		}
 
-		return [
-			{
-				...coords,
-				key: coordsToKey(coords),
-				label: `Utiliser des coordonnées`,
-			},
-		];
+		yield loadItem(coords);
 	}}
-	items={orEmpty2(value, ({ latitude, longitude }) => {
-		const key = coordsToKey({ latitude, longitude });
-
-		return {
-			key,
-			latitude,
-			longitude,
-			label: reverseGeocodings.get(key) || `${latitude}, ${longitude}`,
-		};
-	})}
 >
-	{#snippet listItem({ selected, label, latitude, longitude })}
-		<div class="location-suggestion" class:selected>
-			<div class="label">{label}</div>
-			<div class="coords">{latitude}, {longitude}</div>
-		</div>
-	{/snippet}
-	{#snippet highlight(o)}
-		{o.label}
+	{#snippet details({ label, key }, { select })}
+		{const { latitude, longitude } = $derived(keyToCoords(key))}
 		<div class="location-combobox-map">
-			<WorldMap zoom={10} markers={[o]} />
+			<WorldMap
+				scrollToZoom
+				zoom={10}
+				markers={[
+					{
+						latitude,
+						longitude,
+						key,
+						label,
+						onMove({ lngLat: [lng, lat] }) {
+							select(loadItem({ lng, lat }));
+						},
+					},
+				]}
+				onNewMarker={async ({ lngLat }) => {
+					select(loadItem(lngLat));
+				}}
+			/>
 		</div>
 	{/snippet}
 </Combobox>
 
 <style>
 	.location-combobox-map {
-		height: 15rem;
+		height: 100%;
 		border-radius: var(--corner-radius);
 		overflow: hidden;
-	}
-
-	.location-suggestion .label {
-		overflow-x: hidden;
-		white-space: nowrap;
-		text-overflow: ellipsis;
-	}
-
-	.location-suggestion .coords {
-		font-size: 0.8em;
-		color: var(--gay);
-		font-family: var(--font-mono);
 	}
 </style>

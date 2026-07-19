@@ -4,9 +4,8 @@
 
 	import { DefaultMarker, MapEvents, MapLibre, Popup } from 'svelte-maplibre';
 
+	import { avg } from '$lib/utils.js';
 	import { getTheme } from '$routes/+layout.svelte';
-
-	import { avg } from './utils.js';
 
 	interface Props {
 		scrollToZoom?: boolean;
