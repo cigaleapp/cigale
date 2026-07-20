@@ -3,8 +3,8 @@
 	"id": "io.github.cigaleapp.arthropods.example",
 	"name": "Example: arthropodes",
 	"summary": "Protocole de base pour arthropodes",
-	"learnMore": "https://github.com/cigaleapp/cigale/tree/efe23c3438c3f34334853b4b8bcba4d61343f463/scripts/README.md#protocoles-arthropodsexample",
-	"version": 120,
+	"learnMore": "https://github.com/cigaleapp/cigale/tree/4af43bdb09a5e257dd70d2357cef4ef599b353da/scripts/README.md#protocoles-arthropodsexample",
+	"version": 121,
 	"updates": "automatic",
 	"source": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json",
 	"description": "Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification\n\nClés d'identification d'abeilles fournies par IDmyBee.com, extraites depuis [IDMYBEE - Andrena sur Xper3](https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html).",
@@ -353418,8 +353418,23 @@
 					"key": "1541412",
 					"label": "Mallota fuciformis",
 					"synonyms": ["Musca fusiformis", "Syrphus fuciformis"],
-					"description": "",
-					"learnMore": "https://gbif.org/species/1541412",
+					"description": "**_Mallota fuciformis_** **(Fabricius, 1794)**\n\n**Risques de confusions** :\n\n\\- **_Volucella bombylans_** a l'arista plumeuse et la cellule R1 fermée. La variante _plumata_, qui imite le Bourdon des bois (_Bombus lucorum_) et le Bourdon terrestre (_Bombus terrestris_), a l'apex de l'abdomen blanc ou orange et une bande orange latérale sur le thorax. La variante _bombylans_ est noire à l’extrémité de l’abdomen rouge orange et imite le Bourdon des pierres (_Bombus lapidarius_).\n\n\\- La femelle **_Eristalis intricaria_** lui ressemble mais sa cellule R1 est fermée et son arista est plumeuse\n\n\\- **_Merodon equestris_** a le fémur 3 épaissi\n\n**Chez les espèces suivantes, la nervure r4+5 est droite, non courbée en U. On peut également noter :**\n\n\\- **_Arctophila bombiformis_** (= _Sericomya bombiformis_) qui a l'arista plumeuse et la face fortement allongée vers le bas\n\n\\- **_Cheilosia illustrata_** est une espèce moins trapue\n\n\\- Les **_Criorhina_** ressemblent à des bourdons mais ils n'ont pas le même pattern de coloration et leur face est fortement allongée vers le bas\n\n\\- **_Eriozona syrphoides_** a a face jaune, son thorax est noir avec une touffe de poils blancs au niveau des calus huméraux\n\n\\- **_Pocota personata_** a le scutellum noir et le thorax jaune sur ses 2/3 en avant\n\n**Taille** : 14 à 16mm\n\n**Habitat, répartition** : Se rencontre dans les vieilles dorêts de feuillus.\n\nL’espèce semble largement répartie en France même s'il y a peu d'observations. L'espèce semble de plus en plus rare et est probablement menacée à l’échelle européenne.  \n  \nEurope centrale et du sud.\n\n**Biologie** : La larve, de type ver à queue de rat, est saprophage et se développe dans les cavités humides de vieux arbres.\n\n**Photographies :**\n\n© [Michael Knapp](https://www.inaturalist.org/people/waldgeist) \\- [CC-BY](https://creativecommons.org/licenses/by/4.0/) \\- Photo principale\n\n© [Paul](https://www.inaturalist.org/people/paulvon) \\- [CC-BY-NC](https://creativecommons.org/licenses/by-nc/4.0/) \\- Photo de profil\n\n**Sources :**\n\n[Inaturalist](https://www.inaturalist.org/taxa/569480-Mallota-fuciformis)\n\n[GBIF](https://www.gbif.org/fr/species/1541412)\n\n[Clé des syrphes de Belgique et des Pays-Bas](https://sapoll.eu/cle-des-syrphes-de-belgique-et-des-pays-bas/)  \n  \n[Clé StN pour la détermination des espèces européennes de plusieurs genres de syrphes](https://pollinators.ie/wordpress/wp-content/uploads/2018/05/StN-2017-KEYS-to-SPECIES.pdf)\n\n[Species account of european syrphidae (Diptera), Glasgow 2011](https://diptera.info/downloads/StN_Species_Accounts_Glasgow_2011.pdf)",
+					"learnMore": "https://www.gbif.org/fr/species/1541412",
+					"links": {
+						"Michael Knapp": "https://www.inaturalist.org/people/waldgeist",
+						"CC-BY": "https://creativecommons.org/licenses/by/4.0/",
+						"Paul": "https://www.inaturalist.org/people/paulvon",
+						"CC-BY-NC": "https://creativecommons.org/licenses/by-nc/4.0/",
+						"Inaturalist": "https://www.inaturalist.org/taxa/569480-Mallota-fuciformis",
+						"GBIF": "https://www.gbif.org/fr/species/1541412",
+						"Clé des syrphes de Belgique et des Pays-Bas": "https://sapoll.eu/cle-des-syrphes-de-belgique-et-des-pays-bas/",
+						"Clé StN pour la détermination des espèces européennes de plusieurs genres de syrphes": "https://pollinators.ie/wordpress/wp-content/uploads/2018/05/StN-2017-KEYS-to-SPECIES.pdf",
+						"Species account of european syrphidae (Diptera), Glasgow 2011": "https://diptera.info/downloads/StN_Species_Accounts_Glasgow_2011.pdf"
+					},
+					"images": [
+						"https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Mallota%20fuciformis_0.png",
+						"https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Mallota%20fuciformis_1.png"
+					],
 					"cascade": {
 						"genus": "1541361",
 						"family": "6920",
@@ -483541,25 +483556,8 @@
 						"Timarcha sontiaca",
 						"Timarcha transitoria"
 					],
-					"description": "**_Timarcha tenebricosa_** **(Fabricius, 1775)**\n\nCrache-sang\n\n**Confusions possibles** :\n\n\\- L’autre espèce du genre à être largement répartie en France est **_Timarcha goettingensis_**. Chez elle, les bords du pronotum sont régulièrement arrondis, il n’est pas plus rétréci à la base qu’à l’apex. Son corps est plus fortement ponctué. C’est une espèce plus petite, qui mesure de 6,5 à 13mm.\n\nLes autres sont plus localisées.\n\n\\- Notons tout de même que le pronotum cordiforme, se rétrécissant fortement à la base, permet d’écarter la plupart des autres _Timarcha_. La seule autre espèce à présenter cette caractéristique est **_Timarcha strangulata_**. C’est une espèce des Pyrénées occidentales et centrales, que l’on rencontre dans les pelouses alpines jusqu’aux limites des neiges éternelles. Chez elle, la plus grande largeur du pronotum se situe au milieu de ce dernier (au tiers antérieur pour _T. tenebricosa_). Sa ponctuation élytrale est généralement plus forte, presque ridée, mais cela dépend des localités. C’est une plus petite espèce, mesurant de 8 à 12mm.\n\n\\- Certaines espèces du genre **_Chrysolina_** peuvent être semblables à première vue, quoi que d’aspect généralement moins trapu. Chez ce genre, l’espace entre les hanches intermédiaires et postérieures est nettement plus grand que l’espace entre les hanches intermédiaires et antérieures (ces espacements sont à peu près égaux chez les _Timarcha_).\n\nA titre d’information, bien que l’aspect du pronotum suffise à les écarter (il faut une vue bien dorsale pour correctement apprécier le critère), les autres espèces de France sont :\n\n\\- **_Timarcha affinis_**, espèce endémique du massif des Albères dans les Pyrénées Orientales, étendant sa répartition dans d’autres secteurs du département.  \n  \n\\- **_Timarcha metallica_**, qui a comme son nom l’indique des reflets cuivrés métalliques sur le corps. Ses pattes et ses antennes sont brun-roux. C’est une espèce que l’on rencontre dans le Nord (en forêt de Guines), dans les Ardennes, et dans les forêts d’altitude dans les Vosges, le Jura et les Alpes de Savoie.\n\n\\- **_Timarcha nicaeensis_**, se trouvant dans les garrigues du sud-est de la France\n\n\\- **_Timarcha maritima_**, se trouvant sur les dunes du littoral atlantique\n\n\\- **_Timarcha cornuta_**, endémique de Corse\n\n\\- **_Timarcha sardea_**, endémique de Corse et de Sardaigne\n\n**Taille** : 12,9 à 19,7mm\n\n**Habitat, répartition** : On le rencontre le long des chemins enherbés, en lisière de bois, au bord des ruisseaux.\n\nIl est présent dans toute la France et répandu en Europe de l’ouest et méditerranéenne.\n\n**Biologie** : Ce coléoptère ne possède pas d’ailes et ne peut donc pas voler pour s’enfuir. Lorsqu’un danger le menace, il commence par faire le mort, puis émet par la bouche et les articulations un liquide répulsif rouge orangé, d’où son nom commun de “crache sang”. La larve se développe sur divers gaillets\n\n**Photographies** :\n\n© [spoonbilling](https://www.inaturalist.org/people/4705833) \\- [CC-BY](https://creativecommons.org/licenses/by/4.0/deed.fr) \\- individu seul\n\n© [Peter Danter](https://www.inaturalist.org/people/2554989) \\- [CC-BY-ND](https://creativecommons.org/licenses/by-nd/4.0/deed.fr) \\- couple\n\n© Jessica Joachim - _Timarcha goettigensis_\n\n**Sources**\n\n[Inaturalist](https://www.inaturalist.org/taxa/118838-Timarcha-tenebricosa)\n\n[GBIF](https://www.gbif.org/fr/species/4460356)\n\n[Les Chrysomelinae de France](https://r-a-r-e.fr/wp-content/uploads/2020/06/Les-chrysomelinae-de-France.pdf)\n\n[Les chrysomèles du genre](https://obs37.fr/index.php?module=actu&action=article&idactu=6&ret=Timarcha) _[Timarcha](https://obs37.fr/index.php?module=actu&action=article&idactu=6&ret=Timarcha)_\n\n[Note d’identification E-Observations - Les Crache-sang](https://quelestcetanimal-lagalerie.com/wp-content/uploads/2024/01/note_didentification_e-obs_les_crache-sang_2021.pdf)",
-					"learnMore": "https://www.inaturalist.org/people/4705833",
-					"links": {
-						"spoonbilling": "https://www.inaturalist.org/people/4705833",
-						"CC-BY": "https://creativecommons.org/licenses/by/4.0/deed.fr",
-						"Peter Danter": "https://www.inaturalist.org/people/2554989",
-						"CC-BY-ND": "https://creativecommons.org/licenses/by-nd/4.0/deed.fr",
-						"Inaturalist ": "https://www.inaturalist.org/taxa/118838-Timarcha-tenebricosa",
-						"GBIF ": "https://www.gbif.org/fr/species/4460356",
-						"Les Chrysomelinae de France ": "https://r-a-r-e.fr/wp-content/uploads/2020/06/Les-chrysomelinae-de-France.pdf",
-						"Les chrysomèles du genre ": "https://obs37.fr/index.php?module=actu&action=article&idactu=6&ret=Timarcha",
-						"Timarcha ": "https://obs37.fr/index.php?module=actu&action=article&idactu=6&ret=Timarcha",
-						"Note d’identification E-Observations - Les Crache-sang": "https://quelestcetanimal-lagalerie.com/wp-content/uploads/2024/01/note_didentification_e-obs_les_crache-sang_2021.pdf"
-					},
-					"images": [
-						"https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Timarcha%20tenebricosa_0.png",
-						"https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Timarcha%20tenebricosa_1.png",
-						"https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Timarcha%20tenebricosa_2.png"
-					],
+					"description": "",
+					"learnMore": "https://gbif.org/species/4460356",
 					"cascade": {
 						"genus": "7397854",
 						"family": "7780",
