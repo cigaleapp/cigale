@@ -2323,8 +2323,6 @@ msgid "Aller à l'{0} prochaine"
 msgstr "Aller à l'{0} prochaine"
 
 #. 0: labels.item.toLowerCase()
-#. 0: labels.item.toLowerCase()
-#: src/routes/(app)/(sidepanel)/o/[observation]/TopbarExtras.svelte
 #: src/routes/(app)/(sidepanel)/o/[observation]/TopbarExtras.svelte
 msgid "Aller à l'{0} précédente"
 msgstr "Aller à l'{0} précédente"
@@ -3005,3 +3003,7 @@ msgstr "Erreur lors de la récupération des étiquettes en cascade: {0}"
 #: src/lib/ComboboxDesktop.svelte
 msgid "Aucun résultat :/"
 msgstr "Aucun résultat :/"
+
+#: src/lib/KeyboardShortcuts.svelte
+msgid "ou"
+msgstr "ou"
