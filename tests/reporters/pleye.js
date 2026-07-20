@@ -339,17 +339,22 @@ export default class Pleye {
 				Authorization: `Bearer ${this.#apiKey}`,
 			},
 			body: JSON.stringify(payload),
-		}).then(async (res) => {
-			if (!this.#debugging) return;
-			if (res.ok) return;
-			console.error(
-				`Failed to send ${event.toString()} payload:`,
-				res.status,
-				res.statusText,
-				await res.text()
-			);
-			console.error('Payload was:', payload);
-		});
+		})
+			.then(async (res) => {
+				if (!this.#debugging) return;
+				if (res.ok) return;
+				console.error(
+					`Failed to send ${event.toString()} payload:`,
+					res.status,
+					res.statusText,
+					await res.text()
+				);
+				console.error('Payload was:', payload);
+			})
+			.catch((e) => {
+				console.error('Could not send payload', payload);
+				console.error(e);
+			});
 	}
 
 	/**
