@@ -780,7 +780,7 @@ export default class Provider implements Account {
 			last_ui_language: 'string',
 			organization_type: 'string',
 			organization_website: 'string',
-			newsletter_subscription: 'boolean',
+			newsletter_subscription: 'boolean | string',
 			require_auth: 'boolean',
 		},
 		git_rev: 'boolean',
