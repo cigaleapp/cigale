@@ -354,7 +354,7 @@ jobs:
           regexFlags: ims
           content: |
             <!-- apk -->
-            [${{ steps.datetime.outputs.now }}] Downloading the Android app preview from Diawi:
+            [${{ steps.datetime.outputs.now }} ${{ steps.event.pull_request.head.sha }}] Downloading the Android app preview from Diawi:
               
             <img alt="QR code" src="${{ steps.diawi.outputs.qrcode }}" height=200>
 
