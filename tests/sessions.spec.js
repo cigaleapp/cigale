@@ -253,28 +253,30 @@ test('import into new session', async ({ page, app }) => {
 	  - button "Supprimer cette valeur" [disabled]:
 	    - img
 	  - paragraph: Statut de conservation IUCN de l'espèce
+	  - link "En savoir plus":
+	    - /url: https://iucnredlist.org/
 	  - radiogroup:
-	    - radio "EX Éteint (“Extinct”)"
-	    - text: EX
-	    - paragraph: Éteint (“Extinct”)
-	    - radio "EW Éteint à l’état sauvage (“Extinct in the Wild”)"
-	    - text: EW
-	    - paragraph: Éteint à l’état sauvage (“Extinct in the Wild”)
-	    - radio "CR En danger critique d’extinction (“Critically Endangered”)"
-	    - text: CR
-	    - paragraph: En danger critique d’extinction (“Critically Endangered”)
-	    - radio "EN En danger (“Endangered”)"
-	    - text: EN
-	    - paragraph: En danger (“Endangered”)
-	    - radio "VU Vulnérable (“Vulnerable”)"
-	    - text: VU
-	    - paragraph: Vulnérable (“Vulnerable”)
-	    - radio "NT Quasi menacé (“Near Threatened”)"
-	    - text: NT
-	    - paragraph: Quasi menacé (“Near Threatened”)
 	    - radio "LC Préoccupation mineure (“Least Concern”)"
 	    - text: LC
 	    - paragraph: Préoccupation mineure (“Least Concern”)
+	    - radio "NT Quasi menacé (“Near Threatened”)"
+	    - text: NT
+	    - paragraph: Quasi menacé (“Near Threatened”)
+	    - radio "VU Vulnérable (“Vulnerable”)"
+	    - text: VU
+	    - paragraph: Vulnérable (“Vulnerable”)
+	    - radio "EN En danger (“Endangered”)"
+	    - text: EN
+	    - paragraph: En danger (“Endangered”)
+	    - radio "CR En danger critique d’extinction (“Critically Endangered”)"
+	    - text: CR
+	    - paragraph: En danger critique d’extinction (“Critically Endangered”)
+	    - radio "EW Éteint à l’état sauvage (“Extinct in the Wild”)"
+	    - text: EW
+	    - paragraph: Éteint à l’état sauvage (“Extinct in the Wild”)
+	    - radio "EX Éteint (“Extinct”)"
+	    - text: EX
+	    - paragraph: Éteint (“Extinct”)
 	  - group:
 	    - img
 	    - text: Andrènes

@@ -806,8 +806,8 @@ test.describe('narrowing view', pr(1570), () => {
 				ligne_centrale_du_clypeus: 'sanslignel_1738781166639_9542',
 				largeur_des_marges: 'margesdest_1738783177141_8874',
 				couleur_de_la_face_ventrale_du_flagelle_antennaire: 'flagelleor_1738780660819_6814',
-				aspect_de_la_surface_interne_du_triangle_du_propdeum:
-					'surfaceint_1738782376741_6760',
+				// aspect_de_la_surface_interne_du_triangle_du_propdeum:
+				// 	'surfaceint_1738782376741_6760',
 				nombre_de_cellules_cubitales: '3_1738784490337_8950',
 				ride_du_pronotum: 'pronotumav_1738781708314_7333',
 				// couleur_des_marges_des_tergites: [
