@@ -3,8 +3,8 @@
 	"id": "io.github.cigaleapp.arthropods.example",
 	"name": "Example: arthropodes",
 	"summary": "Protocole de base pour arthropodes",
-	"learnMore": "https://github.com/cigaleapp/cigale/tree/4af43bdb09a5e257dd70d2357cef4ef599b353da/scripts/README.md#protocoles-arthropodsexample",
-	"version": 121,
+	"learnMore": "https://github.com/cigaleapp/cigale/tree/d35cfeceb8f5e247be7023dc8e894034f6c8918a/scripts/README.md#protocoles-arthropodsexample",
+	"version": 122,
 	"updates": "automatic",
 	"source": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json",
 	"description": "Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification\n\nClés d'identification d'abeilles fournies par IDmyBee.com, extraites depuis [IDMYBEE - Andrena sur Xper3](https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html).",
@@ -83343,19 +83343,6 @@
 						"class": "216",
 						"phylum": "54",
 						"kingdom": "1"
-					}
-				},
-				{
-					"key": "8395064",
-					"label": "Rosa",
-					"description": "",
-					"learnMore": "https://gbif.org/species/8395064",
-					"cascade": {
-						"family": "5015",
-						"order": "691",
-						"class": "220",
-						"phylum": "7707728",
-						"kingdom": "6"
 					}
 				},
 				{
@@ -176743,47 +176730,6 @@
 						"class": "216",
 						"phylum": "54",
 						"kingdom": "1"
-					}
-				},
-				{
-					"label": "Anthophora plumipes",
-					"key": "12368501",
-					"images": [
-						"https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Anthophora%20plumipes_0.png",
-						"https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Anthophora%20plumipes_1.png",
-						"https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Anthophora%20plumipes_2.png",
-						"https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Anthophora%20plumipes_3.png"
-					],
-					"description": "**_Anthophora plumipes_** **(Pallas, 1772)**\n\nAnthophore à pattes plumeuses\n\n**Risques de confusions** :\n\n**Pour le mâle**\n\nOn le reconnaît facilement aux longues soies sur les tarses de la seconde paire de pattes. Attention, car d’autres espèces possèdent les même touffes de soies aux premier et dernier articles de ces même tarses, mais pas ou peu de soies sur les articles 2, 3 et 4. Le basitarse 3 gonflé est également un bon critère pour cette espèce, critère partagé avec **_Anthophora dispar_**, qui ne possède jamais de taches claires sur les mandibules (taches présentes ou absentes pour _A. plumipes_). _A. dispar_ a lui aussi quelques poils sur les articles 2, 3 et 4 du tarse 2, mais ils sont plus courts et moins nombreux. De plus, la brosse du premier article possède beaucoup de poils clairs chez _A. dispar_, alors qu’elle est entièrement noire chez _A. plumipes_.\n\n**Pour la femelle**\n\nLa femelle est bien plus difficile à identifier, les autres espèces du genre pouvant être très similaires, et en plus _A. plumipes_ femelle est très variable…\n\n\\- Notons pour commencer le genre **_Eucera_** qui a la même allure, mais ne possède que deux cellules cubitales.\n\n\\- La forme noire d’_A. plumipes_ est assez caractéristique, on peut toutefois la confondre avec une autre espèce : **_Anthophora retusa_**, qui vole surtout d’avril à juin. Chez la forme noire d’_A. retusa_, les éperons tibiaux sont clairs, oranges (brun sombre chez _plumipes_) et la pilosité est plus courte et plus régulière (plus hirsute chez _A. plumipes_). La forme plus claire possède une bande interalaire noire (sur le thorax, reliant les tegula) que ne possède pas _A. plumipes_.\n\n\\- Pour les autres espèces d’_Anthophora_ de France, on peut noter quelques critères pour essayer de les séparer de A. plumipes, mais n’hésitez pas à consulter les clés mises dans les sources pour plus de précisions :\n\n\\- **_Anthophora canescens_**, **_Anthophora robusta_**, **_Anthophora femorata_**, **_Anthophora gallica_**, **_Anthophora podagra_**, **_Anthophora aestivalis_**, **_Anthophora atriceps_**, **_Anthophora atroalba_**, **_Anthophora leucophaea_**, **_Anthophora furcata_** possèdent une bande interalaire noire, sur le thorax, reliant les tegula.\n\n\\- **_Anthophora crinipes_** : brosse de poils roux à l'apex du basitarse 3, yeux verts (mais certaines _plumipes_ peuvent avoir les yeux verts)\n\n\\- **_Anthophora fulvitarsis_** : clypéus clair au moins en partie\n\n\\- **_Anthophora punctilabris_** : vole de février à avril\n\n\\- **_Anthophora senescens_** : basitarse 3 à pilosité rousse (ce qui est également le cas de certaines _plumipes_) ou noire/brune ; yeux verts (également le cas de certaines _plumipes_) ; vole tôt également.\n\n\\- **_Anthophora dufourii_** : clypéus clair au moins en partie\n\n\\- **_Anthophora pubescens_** : clypéus clair au moins en partie\n\n\\- **_Anthophora quadrimaculata_** : espace malaire court (presque inexistant), vole de mai à août, yeux verts, 10 à 12mm\n\n\\- **_Anthophora bimaculata_** : clypéus clair au moins en partie\n\n\\- **_Anthophora fulvodimidiata_** : clypéus clair au moins en partie\n\n\\- **_Anthophora affinis_** : grande espèce 17 à 20mm, T1 à 3 plus ou moins bruns/noirs, mais à bande de pilosité blanchâtres apicales, T4 à 6 à pilosité entièrement noire, vole d'avril à juin\n\n\\- **_Anthophora agama_** : clypéus clair au moins en partie\n\n\\- **_Anthophora dispar_** : très précoce (février-avril), abdomen sombre à bandes de poils clairs à poils très longues, hirsutes et denses\n\n\\- **_Anthophora mucida_** : 16 à 19mm, vole d'avril à juin\n\n\\- **_Anthophora plagiata_** : vole surtout de mai à juillet, très variable mais ne possède pas de bandes de poils plus clairs à l'apex des tergites, espace malaire court\n\n\\- **_Anthophora ahlamae_** : vole probablement en été, une seule mention ancienne en France, espace malaire court, pas de bandes de poils clairs à l'apex des tergites\n\n\\- **_Anthophora balneorum_** : vole de mai à juillet, espace malaire court, pas de bandes de poils à l'apex des tergites, T5 à pilosité apicale rousse, brosse de poils rousse à l'apex du basitarse 3\n\n\\- **_Anthophora larvata_** : vole de juin à juillet, espace malaire court, apex de T5 à pilosité rousse, brosse de poils rousse à l'apex du basitarse 3\n\n\\- **_Anthophora nigrovittata_** : vole d'avril à juin, endémique de Corse et de Sardaigne, pas de bandes de poils clairs à l'apex des tergites, T5 à pilosité apicale rousse, brosse de poils rousse à l'apex du basitarse 3\n\n\\- **_Anthophora calcarata_** : vole tardivement (septembre à décembre), espace malaire court, petite taille (10 à 12mm), scopa blanche (mais peut être blanche chez _plumipes_)\n\n\\- **_Anthophora crassipes_** : vole de mai à décembre, 10 à 13mm\n\n\\- **_Anthophora sichelii_** : endémique de Corse et de Sardaigne, pas de bandes de poils clairs à l'apex des tergites\n\n**Taille** : 13 à 16 mm pour la femelle, 12 à 16mm pour le mâle\n\n**Habitat, répartition** :\n\nC’est l’espèce du genre la plus abondante dans toute l’Europe. Elle est répandue en Europe du sud et centrale, au nord jusqu’au niveau de Stockholm. En France, elle est présente partout, dans tous types de milieux.\n\n**Biologie** : C’est une espèce qui vole de février à mai, et butine une grande diversité de fleurs printanières. Elle creuse son nid dans le sol, puis remplit les cellules de nectar et de pollen, qui serviront de nourriture aux larves.\n\n**Photographies :**\n\n© [Wolfgang Bacher](https://www.inaturalist.org/people/wolfgangbacher) \\- [CC-BY-NC](https://creativecommons.org/licenses/by-nc/4.0/) \\- Mâle butinant\n\n© [Adrian Tync](https://www.inaturalist.org/people/gower) \\- [CC-BY](https://creativecommons.org/licenses/by/4.0/deed.fr) \\- Mâle, face\n\n© [Nils-Uno Svensson](https://www.inaturalist.org/people/sunos) \\- [CC-BY-NC](https://creativecommons.org/licenses/by-nc/4.0/) \\- Mâle avec pattes apparentes\n\n© [vassilvassilev](https://www.inaturalist.org/people/vassilvassilev) \\- [CC-BY-NC](https://creativecommons.org/licenses/by-nc/4.0/) \\- Mâle, gros plan du tarse 2\n\n© [Herman Berteler](https://www.inaturalist.org/people/hermanberteler) \\- [CC-BY-NC](https://creativecommons.org/licenses/by-nc/4.0/) \\- Femelle en vol\n\n© [Roy Lowry](https://www.inaturalist.org/people/rkl) \\- [CC-BY](https://creativecommons.org/licenses/by/4.0/deed.fr) \\- Femelle noire\n\n© [Benoit NABHOLZ](https://www.inaturalist.org/people/benoitnabholz) \\- [CC BY-SA](https://creativecommons.org/licenses/by-sa/4.0/) \\- Femelle de profil\n\n© [Stephan Mende](https://www.inaturalist.org/people/grid33) \\- [CC-BY](https://creativecommons.org/licenses/by/4.0/deed.fr) \\- Femelle, aile\n\n**Sources :**\n\n[Inaturalist](https://www.inaturalist.org/taxa/124542-Anthophora-plumipes)\n\n[GBIF](https://www.gbif.org/fr/species/1344087)\n\nAbeilles d’Europe, NAP éditions\n\n[Clé des femelles](https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-3204125869493565297/mkey.html) _[Anthophora](https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-3204125869493565297/mkey.html)_ [de France](https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-3204125869493565297/mkey.html)\n\n[Clé des mâles](https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-7866104293306906190/mkey.html) _[Anthophora](https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-7866104293306906190/mkey.html)_ [de France](https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-7866104293306906190/mkey.html)  \n  \n[Clé des](https://geonature.arb-idf.fr/sites/default/files/articles/documents/ClefIdent/Hymenopteres/Memoire_Chorein_2007.pdf) _[Anthophora](https://geonature.arb-idf.fr/sites/default/files/articles/documents/ClefIdent/Hymenopteres/Memoire_Chorein_2007.pdf)_ [de Belgique et du nord de la France](https://geonature.arb-idf.fr/sites/default/files/articles/documents/ClefIdent/Hymenopteres/Memoire_Chorein_2007.pdf)",
-					"links": {
-						"Wolfgang Bacher": "https://www.inaturalist.org/people/wolfgangbacher",
-						"CC-BY-NC": "https://creativecommons.org/licenses/by-nc/4.0/",
-						"Adrian Tync": "https://www.inaturalist.org/people/gower",
-						"CC-BY": "https://creativecommons.org/licenses/by/4.0/deed.fr",
-						"Nils-Uno Svensson": "https://www.inaturalist.org/people/sunos",
-						"vassilvassilev": "https://www.inaturalist.org/people/vassilvassilev",
-						"Herman Berteler": "https://www.inaturalist.org/people/hermanberteler",
-						"Roy Lowry": "https://www.inaturalist.org/people/rkl",
-						"Benoit NABHOLZ": "https://www.inaturalist.org/people/benoitnabholz",
-						"CC BY-SA": "https://creativecommons.org/licenses/by-sa/4.0/",
-						"Stephan Mende": "https://www.inaturalist.org/people/grid33",
-						"Inaturalist": "https://www.inaturalist.org/taxa/124542-Anthophora-plumipes",
-						"GBIF": "https://www.gbif.org/fr/species/1344087",
-						"Clé des femelles ": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-3204125869493565297/mkey.html",
-						"Anthophora ": "https://geonature.arb-idf.fr/sites/default/files/articles/documents/ClefIdent/Hymenopteres/Memoire_Chorein_2007.pdf",
-						"de France": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-7866104293306906190/mkey.html",
-						"Clé des mâles ": "https://app.xper3.fr/xper3GeneratedFiles/publish/identification/-7866104293306906190/mkey.html",
-						"Clé des ": "https://geonature.arb-idf.fr/sites/default/files/articles/documents/ClefIdent/Hymenopteres/Memoire_Chorein_2007.pdf",
-						"de Belgique et du nord de la France": "https://geonature.arb-idf.fr/sites/default/files/articles/documents/ClefIdent/Hymenopteres/Memoire_Chorein_2007.pdf"
-					},
-					"learnMore": "https://www.gbif.org/fr/species/1344087",
-					"cascade": {
-						"genus": "8395064",
-						"family": "5015",
-						"order": "691",
-						"class": "220",
-						"phylum": "7707728",
-						"kingdom": "6"
 					}
 				},
 				{
@@ -483556,8 +483502,25 @@
 						"Timarcha sontiaca",
 						"Timarcha transitoria"
 					],
-					"description": "",
-					"learnMore": "https://gbif.org/species/4460356",
+					"description": "**_Timarcha tenebricosa_** **(Fabricius, 1775)**\n\nCrache-sang\n\n**Confusions possibles** :\n\n\\- L’autre espèce du genre à être largement répartie en France est **_Timarcha goettingensis_**. Chez elle, les bords du pronotum sont régulièrement arrondis, il n’est pas plus rétréci à la base qu’à l’apex. Son corps est plus fortement ponctué. C’est une espèce plus petite, qui mesure de 6,5 à 13mm.\n\nLes autres sont plus localisées.\n\n\\- Notons tout de même que le pronotum cordiforme, se rétrécissant fortement à la base, permet d’écarter la plupart des autres _Timarcha_. La seule autre espèce à présenter cette caractéristique est **_Timarcha strangulata_**. C’est une espèce des Pyrénées occidentales et centrales, que l’on rencontre dans les pelouses alpines jusqu’aux limites des neiges éternelles. Chez elle, la plus grande largeur du pronotum se situe au milieu de ce dernier (au tiers antérieur pour _T. tenebricosa_). Sa ponctuation élytrale est généralement plus forte, presque ridée, mais cela dépend des localités. C’est une plus petite espèce, mesurant de 8 à 12mm.\n\n\\- Certaines espèces du genre **_Chrysolina_** peuvent être semblables à première vue, quoi que d’aspect généralement moins trapu. Chez ce genre, l’espace entre les hanches intermédiaires et postérieures est nettement plus grand que l’espace entre les hanches intermédiaires et antérieures (ces espacements sont à peu près égaux chez les _Timarcha_).\n\nA titre d’information, bien que l’aspect du pronotum suffise à les écarter (il faut une vue bien dorsale pour correctement apprécier le critère), les autres espèces de France sont :\n\n\\- **_Timarcha affinis_**, espèce endémique du massif des Albères dans les Pyrénées Orientales, étendant sa répartition dans d’autres secteurs du département.  \n  \n\\- **_Timarcha metallica_**, qui a comme son nom l’indique des reflets cuivrés métalliques sur le corps. Ses pattes et ses antennes sont brun-roux. C’est une espèce que l’on rencontre dans le Nord (en forêt de Guines), dans les Ardennes, et dans les forêts d’altitude dans les Vosges, le Jura et les Alpes de Savoie.\n\n\\- **_Timarcha nicaeensis_**, se trouvant dans les garrigues du sud-est de la France\n\n\\- **_Timarcha maritima_**, se trouvant sur les dunes du littoral atlantique\n\n\\- **_Timarcha cornuta_**, endémique de Corse\n\n\\- **_Timarcha sardea_**, endémique de Corse et de Sardaigne\n\n**Taille** : 12,9 à 19,7mm\n\n**Habitat, répartition** : On le rencontre le long des chemins enherbés, en lisière de bois, au bord des ruisseaux.\n\nIl est présent dans toute la France et répandu en Europe de l’ouest et méditerranéenne.\n\n**Biologie** : Ce coléoptère ne possède pas d’ailes et ne peut donc pas voler pour s’enfuir. Lorsqu’un danger le menace, il commence par faire le mort, puis émet par la bouche et les articulations un liquide répulsif rouge orangé, d’où son nom commun de “crache sang”. La larve se développe sur divers gaillets\n\n**Photographies** :\n\n© [spoonbilling](https://www.inaturalist.org/people/4705833) \\- [CC-BY](https://creativecommons.org/licenses/by/4.0/deed.fr) \\- individu seul\n\n© [Peter Danter](https://www.inaturalist.org/people/2554989) \\- [CC-BY-ND](https://creativecommons.org/licenses/by-nd/4.0/deed.fr) \\- couple\n\n© Jessica Joachim - _Timarcha goettigensis_\n\n**Sources**\n\n[Inaturalist](https://www.inaturalist.org/taxa/118838-Timarcha-tenebricosa)\n\n[GBIF](https://www.gbif.org/fr/species/4460356)\n\n[Les Chrysomelinae de France](https://r-a-r-e.fr/wp-content/uploads/2020/06/Les-chrysomelinae-de-France.pdf)\n\n[Les chrysomèles du genre](https://obs37.fr/index.php?module=actu&action=article&idactu=6&ret=Timarcha) _[Timarcha](https://obs37.fr/index.php?module=actu&action=article&idactu=6&ret=Timarcha)_\n\n[Note d’identification E-Observations - Les Crache-sang](https://quelestcetanimal-lagalerie.com/wp-content/uploads/2024/01/note_didentification_e-obs_les_crache-sang_2021.pdf)",
+					"learnMore": "https://www.inaturalist.org/people/4705833",
+					"links": {
+						"spoonbilling": "https://www.inaturalist.org/people/4705833",
+						"CC-BY": "https://creativecommons.org/licenses/by/4.0/deed.fr",
+						"Peter Danter": "https://www.inaturalist.org/people/2554989",
+						"CC-BY-ND": "https://creativecommons.org/licenses/by-nd/4.0/deed.fr",
+						"Inaturalist ": "https://www.inaturalist.org/taxa/118838-Timarcha-tenebricosa",
+						"GBIF ": "https://www.gbif.org/fr/species/4460356",
+						"Les Chrysomelinae de France ": "https://r-a-r-e.fr/wp-content/uploads/2020/06/Les-chrysomelinae-de-France.pdf",
+						"Les chrysomèles du genre ": "https://obs37.fr/index.php?module=actu&action=article&idactu=6&ret=Timarcha",
+						"Timarcha ": "https://obs37.fr/index.php?module=actu&action=article&idactu=6&ret=Timarcha",
+						"Note d’identification E-Observations - Les Crache-sang": "https://quelestcetanimal-lagalerie.com/wp-content/uploads/2024/01/note_didentification_e-obs_les_crache-sang_2021.pdf"
+					},
+					"images": [
+						"https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Timarcha%20tenebricosa_0.png",
+						"https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Timarcha%20tenebricosa_1.png",
+						"https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Timarcha%20tenebricosa_2.png"
+					],
 					"cascade": {
 						"genus": "7397854",
 						"family": "7780",
