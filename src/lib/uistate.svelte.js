@@ -24,6 +24,7 @@ import { mapValues, omit, pick, transformObject } from './utils.js';
  * @property {boolean} [debug=false] only activate the keybinding in debug mode, hide it from help otherwise
  * @property {(e: MouseEvent|KeyboardEvent) => boolean} [when=() => true] condition to check before executing the keybind
  * @property {boolean} [allowInModals=false] allow the keybind to be active even when a modal is open
+ * @property {string[]} [alternatives] alternative binds that do the same action. Same syntax as {@link Keymap}'s keys
  */
 
 /**

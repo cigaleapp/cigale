@@ -55,7 +55,7 @@
 			const winmac = (win, mac) => (isMacOS ? mac : win);
 
 			if (part === '$mod') return winmac('Ctrl', '⌘');
-			if (part === 'shift') return winmac('Shift', '⇧');
+			if (part === 'shift') return winmac('Maj', '⇧');
 			if (part === 'ctrl') return winmac('Ctrl', '⌃');
 			if (part === 'alt') return winmac('Alt', '⌥');
 			if (part === 'win') return winmac('Win', '⌘');

@@ -112,24 +112,24 @@
 		},
 		'$mod+ArrowRight': {
 			help: `Aller à l'${labels.item.toLowerCase()} prochaine`,
+			alternatives: ['d'],
 			when: () => navigation.current !== navigation.total,
 			do: async () => navigation.next(),
 		},
 		'$mod+ArrowLeft': {
 			help: `Aller à l'${labels.item.toLowerCase()} précédente`,
+			alternatives: ['q', 'a', 'shift+space'],
 			when: () => navigation.current !== 1,
-			do: async () => navigation.previous(),
-		},
-		'Shift+Space': {
-			help: `Aller à l'${labels.item.toLowerCase()} précédente`,
 			do: async () => navigation.previous(),
 		},
 		'$mod+ArrowUp': {
 			help: `Marquer l'${labels.item.toLowerCase()} comme confirmée`,
+			alternatives: ['z', 'w'],
 			do: async () => progress.mark('confirmed'),
 		},
 		'$mod+ArrowDown': {
 			help: `Marquer l'${labels.item.toLowerCase()} comme non confirmée`,
+			alternatives: ['s'],
 			do: async () => progress.mark('unconfirmed'),
 		},
 	});

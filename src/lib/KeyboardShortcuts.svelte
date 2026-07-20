@@ -44,6 +44,9 @@
 				// Associating every pattern to its handler function...
 				Object.entries(binds)
 					.flatMap(([pattern, bind]) => {
+						return [pattern, ...(bind.alternatives ?? [])].map((pat) => [pat, bind]);
+					})
+					.flatMap(([pattern, bind]) => {
 						// Handle shift-number keybindings too
 						if (pattern.startsWith('Digit') && !pattern.includes(' ')) {
 							const number = pattern.replace('Digit', '');
@@ -128,9 +131,13 @@
 			<h2>{group}</h2>
 		{/if}
 		<dl>
-			{#each binds as [shortcut, { help }] (shortcut)}
+			{#each binds as [shortcut, { help, alternatives }] (shortcut)}
 				<dt>
 					<KeyboardHint mobile --size="1.2em" {shortcut} {help} />
+					{#each alternatives ?? [] as alt, i (i)}
+						<span class="or">ou</span>
+						<KeyboardHint mobile --size="1.2em" shortcut={alt} {help} />
+					{/each}
 				</dt>
 				<dd>{help}</dd>
 			{/each}
@@ -152,6 +159,10 @@
 		flex-wrap: wrap;
 		gap: 0.25em;
 		color: var(--fg-primary);
+
+		.or {
+			color: var(--gay);
+		}
 	}
 
 	dd {

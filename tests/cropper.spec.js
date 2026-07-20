@@ -44,148 +44,52 @@ test.describe('Cropper view', () => {
 		await assert(page.getByText('leaf.jpeg', { exact: true })).toBeVisible();
 	});
 
-	test.describe('autoskip enabled OR disabled', async () => {
-		for (const enabled of [true, false]) {
-			test.beforeEach(async ({ app }) => {
-				await app.settings.set({ cropAutoNext: enabled });
-			});
-
-			test(`navigate with arrow keys (autoskip ${enabled ? 'on' : 'off'})`, async ({
-				page,
-				app,
-			}) => {
-				const images = await imagesByName(app);
-				await page.getByText('leaf.jpeg', { exact: true }).click();
-				await app.path.wait(`/o/_/crop/${images.leaf.fileId}/`);
-				await page.keyboard.press(controlOrMeta(page, 'ArrowRight'));
-				await app.path.wait(`/o/_/crop/${images.withExifGps.fileId}/`);
-				await assert(page.getByText('with-exif-gps.jpeg', { exact: true })).toBeVisible();
-				await page.keyboard.press(controlOrMeta(page, 'ArrowLeft'));
-				await app.path.wait(`/o/_/crop/${images.leaf.fileId}/`);
-				await assert(page.getByText('leaf.jpeg', { exact: true })).toBeVisible();
-				await page.keyboard.press(controlOrMeta(page, 'ArrowLeft'));
-				await app.path.wait(`/o/_/crop/${images.cyan.fileId}/`);
-				await assert(page.getByText('cyan.jpeg', { exact: true })).toBeVisible();
-			});
-
-			test(`go back to import view with escape key (autoskip ${enabled ? 'on' : 'off'})`, async ({
-				page,
-				app,
-			}) => {
-				const { leaf: image } = await imagesByName(app);
-				await page.getByText('leaf.jpeg', { exact: true }).click();
-				await app.path.wait(`/o/_/crop/${image.fileId}/`);
-				await page.keyboard.press('Escape');
-				await app.path.wait('/crop');
-				await assert(
-					page.getByRole('main').getByText('lil-fella.jpeg', { exact: true })
-				).toBeVisible();
-				await assert(
-					page.getByRole('main').getByText('cyan.jpeg', { exact: true })
-				).toBeVisible();
-				await assert(
-					page.getByRole('main').getByText('leaf.jpeg', { exact: true })
-				).toBeVisible();
-			});
-		}
+	test('navigate with arrow keys', async ({ page, app }) => {
+		const images = await imagesByName(app);
+		await page.getByText('leaf.jpeg', { exact: true }).click();
+		await app.path.wait(`/o/_/crop/${images.leaf.fileId}/`);
+		await page.keyboard.press(controlOrMeta(page, 'ArrowRight'));
+		await app.path.wait(`/o/_/crop/${images.withExifGps.fileId}/`);
+		await assert(page.getByText('with-exif-gps.jpeg', { exact: true })).toBeVisible();
+		await page.keyboard.press(controlOrMeta(page, 'ArrowLeft'));
+		await app.path.wait(`/o/_/crop/${images.leaf.fileId}/`);
+		await assert(page.getByText('leaf.jpeg', { exact: true })).toBeVisible();
+		await page.keyboard.press(controlOrMeta(page, 'ArrowLeft'));
+		await app.path.wait(`/o/_/crop/${images.cyan.fileId}/`);
+		await assert(page.getByText('cyan.jpeg', { exact: true })).toBeVisible();
 	});
 
-	test.describe('autoskip disabled', () => {
-		test.beforeEach(async ({ app }) => {
-			await app.settings.set({ cropAutoNext: false });
-		});
-
-		test('should not skip on confirm button click', async ({ page, app }) => {
-			const { leaf: image } = await imagesByName(app);
-			await page.getByText('leaf.jpeg', { exact: true }).click();
-			await app.path.wait(`/o/_/crop/${image.fileId}/`);
-			await page.waitForTimeout(1000);
-			await page.getByRole('button', { name: 'Suivante', exact: true }).click();
-			await app.path.wait(`/o/_/crop/${image.fileId}/`);
-			await assert(page.getByText('leaf.jpeg', { exact: true })).not.toBeVisible();
-		});
-
-		test('should not skip on confirmation keybind', async ({ page, app }) => {
-			const { leaf: image } = await imagesByName(app);
-			await page.getByText('leaf.jpeg', { exact: true }).click();
-			await app.path.wait(`/o/_/crop/${image.fileId}/`);
-			await page.waitForTimeout(1000);
-			await page.keyboard.press('Space');
-			await app.path.wait(`/o/_/crop/${image.fileId}/`);
-			await assert(page.getByText('leaf.jpeg', { exact: true })).not.toBeVisible();
-		});
-
-		test('should toggle autoskip on on keybind press', async ({ page, app }) => {
-			const { leaf: image } = await imagesByName(app);
-			await page.getByText('leaf.jpeg', { exact: true }).click();
-			await app.path.wait(`/o/_/crop/${image.fileId}/`);
-
-			const { cropAutoNext: _, ...othersBefore } = await app.settings.get();
-			await page.keyboard.press('a');
-			await page.waitForTimeout(500);
-			const { cropAutoNext, ...othersAfter } = await app.settings.get();
-
-			assert(cropAutoNext).toBe(true);
-			assert(othersBefore).toMatchObject(othersAfter);
-		});
+	test('go back to import view with escape key', async ({ page, app }) => {
+		const { leaf: image } = await imagesByName(app);
+		await page.getByText('leaf.jpeg', { exact: true }).click();
+		await app.path.wait(`/o/_/crop/${image.fileId}/`);
+		await page.keyboard.press('Escape');
+		await app.path.wait('/crop');
+		await assert(
+			page.getByRole('main').getByText('lil-fella.jpeg', { exact: true })
+		).toBeVisible();
+		await assert(page.getByRole('main').getByText('cyan.jpeg', { exact: true })).toBeVisible();
+		await assert(page.getByRole('main').getByText('leaf.jpeg', { exact: true })).toBeVisible();
 	});
 
-	test.describe('autoskip enabled', () => {
-		test.beforeEach(async ({ app }) => {
-			await app.settings.set({ cropAutoNext: true, debugMode: true });
-		});
+	test('should not skip on confirm button click', async ({ page, app }) => {
+		const { leaf: image } = await imagesByName(app);
+		await page.getByText('leaf.jpeg', { exact: true }).click();
+		await app.path.wait(`/o/_/crop/${image.fileId}/`);
+		await page.waitForTimeout(1000);
+		await page.getByRole('button', { name: 'Suivante', exact: true }).click();
+		await app.path.wait(`/o/_/crop/${image.fileId}/`);
+		await assert(page.getByText('leaf.jpeg', { exact: true })).not.toBeVisible();
+	});
 
-		test('should skip on confirm button click', async ({ page, app }) => {
-			const images = await imagesByName(app);
-			await page.getByText('leaf.jpeg', { exact: true }).click();
-			await app.path.wait(`/o/_/crop/${images.leaf.fileId}/`);
-			await page.waitForTimeout(1000);
-			await page.getByRole('button', { name: 'Suivante', exact: true }).click();
-			await app.path.wait(`/o/_/crop/${images.withExifGps.fileId}/`);
-			await assert(page.getByText('with-exif-gps.jpeg', { exact: true })).toBeVisible();
-		});
-
-		test('should skip on confirmation keybind', async ({ page, app }) => {
-			const images = await imagesByName(app);
-			await page.getByText('leaf.jpeg', { exact: true }).click();
-			await app.path.wait(`/o/_/crop/${images.leaf.fileId}/`);
-			await page.waitForTimeout(1000);
-			await page.keyboard.press('Space');
-			await app.path.wait(`/o/_/crop/${images.withExifGps.fileId}/`);
-			await assert(page.getByText('with-exif-gps.jpeg', { exact: true })).toBeVisible();
-		});
-
-		test('should toggle autoskip off on keybind press', async ({ page, app }) => {
-			const { leaf: image } = await imagesByName(app);
-			await page.getByText('leaf.jpeg', { exact: true }).click();
-			await app.path.wait(`/o/_/crop/${image.fileId}/`);
-
-			const { cropAutoNext: _, ...othersBefore } = await app.settings.get();
-			await page.keyboard.press('a');
-			await page.waitForTimeout(500);
-			const { cropAutoNext, ...othersAfter } = await app.settings.get();
-
-			assert(cropAutoNext).toBe(false);
-			assert(othersBefore).toMatchObject(othersAfter);
-		});
-
-		test('should autoskip to classify when all images are confirmed', async ({ page, app }) => {
-			const { withExifGps: image } = await imagesByName(app);
-			await setImageConfirmedStatusInDB(
-				page,
-				await app.db.image
-					.list()
-					.then((images) =>
-						images.filter(({ fileId }) => fileId !== image.fileId).map(({ id }) => id)
-					)
-			);
-
-			await page.getByText('with-exif-gps.jpeg', { exact: true }).click();
-			await app.path.wait(`/o/_/crop/${image.fileId}/`);
-			await page.getByRole('button', { name: 'Suivante', exact: true }).click();
-			await page.waitForTimeout(1000);
-			assert(new URL(page.url()).pathname).toMatch(/^\/classify\/?$/);
-		});
+	test('should not skip on confirmation keybind', async ({ page, app }) => {
+		const { leaf: image } = await imagesByName(app);
+		await page.getByText('leaf.jpeg', { exact: true }).click();
+		await app.path.wait(`/o/_/crop/${image.fileId}/`);
+		await page.waitForTimeout(1000);
+		await page.keyboard.press('Space');
+		await app.path.wait(`/o/_/crop/${image.fileId}/`);
+		await assert(page.getByText('leaf.jpeg', { exact: true })).not.toBeVisible();
 	});
 
 	test.describe('deleting an image', () => {

@@ -39,7 +39,7 @@ export function setupKeyboardShortcuts({
 			help: 'Supprimer l’image',
 			do: deleteImageFileAndGotoNext,
 		},
-		a: {
+		'$mod+shift+a': {
 			help: 'Activer/désactiver la continuation automatique',
 			do: async () => toggleSetting('cropAutoNext'),
 		},
