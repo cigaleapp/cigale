@@ -3,8 +3,8 @@
 	"id": "io.github.cigaleapp.arthropods.example",
 	"name": "Example: arthropodes",
 	"summary": "Protocole de base pour arthropodes",
-	"learnMore": "https://github.com/cigaleapp/cigale/tree/eee63a6b57419f6e45003931002c3be009a01deb/scripts/README.md#protocoles-arthropodsexample",
-	"version": 140,
+	"learnMore": "https://github.com/cigaleapp/cigale/tree/2430285259247da2a0b9ae42865e77df881f97c4/scripts/README.md#protocoles-arthropodsexample",
+	"version": 141,
 	"updates": "automatic",
 	"source": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json",
 	"description": "Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification\n\nClés d'identification d'abeilles fournies par IDmyBee.com, extraites depuis [IDMYBEE - Andrena sur Xper3](https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html).",
@@ -480426,16 +480426,8 @@
 						"Thaumetopoea vareai",
 						"Traumatocampa pityocampa"
 					],
-					"description": "**_Thaumetopoea pityocampa_** **(Denis & Schiffermüller, 1776)**\n\n**Risques de confusions** :\n\nIl existe 2 autres espèces de _Thaumetopoea_ en France :\n\n\\- La **Processionnaire pinivore (****_Thaumetopoea pinivora_****)**, dont la chenille vit aussi sur les pins, est grégaire, mais ne construit pas de nid dans les branches. C'est une espèce localisée dans les Alpes du sud et le Massif Central. Sa biologie est différente, elle hiverne au stade d'oeuf, les chenilles se développent au printemps et se nymphosent en juillet.\n\nLe papillon est très ressemblant. Il est plus petit (31-32mm d'envergure) et la frange de ses ailes postérieures est plus distinctement tachée de sombre\n\n\\- La **Processionnaire du chêne (****_Thaumeotopoea processionea_****)** chenille a le dos en grande partie noir, parfois avec des bandes transversales brunes entre les pustules oranges d'où partent de longs poils blancs, généralement plus longs que ce que l'on voit chez _T. pityocampa_. Elle se nourrit exclusivement de chênes.\n\nLe papillon est assez ressemblant, mais souvent moins contrasté, un peu plus sombre, à dessins plus diffus, et possédant une plage assombrie à la base de l'aile, juste derrière la ligne basale. Elle possède également une ligne postmédiane foncée sur les ailes postérieures que ne possède pas _T. pityocampa_\n\nIl existe d'autres chenilles se nourrissant en groupes sur les arbres, mais elles ne vivent pas sur les résineux.\n\n**Pour le papillon** :\n\nLe genre **_Drymonia_** est un peu similaire, en particulier **_Drymonia ruficornis_**, mais la forme de ses ailes est un peu différente : l'apex est large et assez droit, alors que chez _T. pityocampa_ il est assez étroit et rebique légèrement vers l'extérieur\n\n**Taille** : 35 à 40mm d’envergure\n\n**Habitat, répartition** : Pinèdes bien exposées.\n\nEspèce originaire du bassin méditeranéen, présente aujourd’hui dans presque toute la France.\n\n**Biologie** : Les papillons éclosent entre juin et septembre. Ils s’accouplent, puis les femelles pondent sur les rameaux et les aiguilles de conifères. Les chenilles éclosent quelques semaines plus tard, et commencent à tisser un abri de soie entre les aiguilles. Elles sont grégaires toute leur vie et se déplacent en procession pour accéder à la nourriture. A l’approche de l’hiver, elles construisent un nid plus dense, où elles resteront durant la mauvaise saison. Au printemps, les chenilles quittent le nid en toujours procession afin de se nymphoser dans le sol. Elles se nourrissent surtout de cèdres et de pins, occasionnellement d’autres résineux.\n\n**Photographies :**\n\n**Sources :**\n\n[Inaturalist](https://www.inaturalist.org/taxa/61293-Thaumetopoea-pityocampa)  \n  \n[GBIF](https://www.gbif.org/fr/species/1824131)",
-					"learnMore": "https://www.gbif.org/fr/species/1824131",
-					"links": {
-						"Inaturalist": "https://www.inaturalist.org/taxa/61293-Thaumetopoea-pityocampa",
-						"GBIF": "https://www.gbif.org/fr/species/1824131"
-					},
-					"images": [
-						"https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Thaumetopoea%20pityocampa_0.png",
-						"https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Thaumetopoea%20pityocampa_1.png"
-					],
+					"description": "",
+					"learnMore": "https://gbif.org/species/1824131",
 					"cascade": {
 						"genus": "1824090",
 						"family": "7016",
