@@ -12,7 +12,7 @@ import { errorMessage } from './i18n.js';
 import * as db from './idb.svelte.js';
 import { resolveMetadataImport, storeMetadataValue } from './metadata/index.js';
 import { toasts } from './toasts.svelte.js';
-import { byteString, byteStringToArray } from './utils.js';
+import { byteString, byteStringToArray, throwError, transformObject } from './utils.js';
 
 export async function processExifData(
 	sessionId: string,
@@ -146,8 +146,23 @@ export function coerceExifValue<T extends DB.MetadataType>(
 
 		case 'date':
 			if (value instanceof Date) return value;
-			if (typeof value !== 'number')
-				throw new Error(`Date value must be a number, was ${typeof value}`);
+
+			if (typeof value === 'string') {
+				return tryParseDate(
+					value,
+					...SANE_ISO_DATE_FORMATS,
+					// EXIF also has some weird date format standards
+					'YYYY:mm:DD HH:MM:SS',
+					'YYYY:mm:DD'
+				) ?? throwError('Date format is invalid');
+			}
+
+			if (typeof value !== 'number') {
+				throw new Error(
+					`Unexpected type ${typeof value} for a date, cannot coerce exif value`
+				);
+			}
+
 			if (Number.isNaN(value)) throw new Error('Date value is invalid');
 			return new Date(value * 1e3);
 

@@ -114,7 +114,7 @@ sessionMetadata:
     mergeMethod: none
     required: true
     description: ''
-    default: '{{ now }}'
+    default: $now()
 
   is_training:
     type: boolean

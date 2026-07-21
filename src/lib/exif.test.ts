@@ -279,7 +279,7 @@ describe('coerceExifValue', () => {
 		});
 		test('malformed date', () => {
 			expect(() => coerceExifValue('test', 'date')).toThrowErrorMatchingInlineSnapshot(
-				`[Error: Date value must be a number, was string]`
+				`[Error: Date format is invalid]`
 			);
 		});
 	});

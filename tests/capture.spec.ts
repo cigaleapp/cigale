@@ -7,6 +7,8 @@ import { test } from './fixtures.js';
 import { newSession } from './utils/sessions.js';
 
 test.describe('Camera', () => {
+	test.use({ permissions: ['geolocation'], geolocation: { latitude: 0, longitude: 0 } });
+
 	test.beforeEach(({ browserName }) => {
 		test.skip(browserName !== 'chromium', 'Camera device mocking only works on Chrome');
 	});

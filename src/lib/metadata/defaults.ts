@@ -78,9 +78,14 @@ export async function resolveDefaults({
 				if (currentValue && !currentValue.isDefault) continue;
 
 				const value =
-					typeof defaultSpec === 'object' && 'render' in defaultSpec
-						? defaultSpec.render(payload)
-						: defaultSpec;
+					typeof defaultSpec === 'object' && 'evaluate' in defaultSpec
+						? await defaultSpec.evaluate(payload).catch((e) => {
+								console.error(`Cant resolve default for ${id} (${defaultSpec})`, e);
+								return undefined;
+							})
+						: typeof defaultSpec === 'object' && 'render' in defaultSpec
+							? defaultSpec.render(payload)
+							: defaultSpec;
 
 				if (value instanceof ArkErrors) {
 					toasts.warn(
@@ -98,6 +103,8 @@ export async function resolveDefaults({
 						current: serializeMetadataValue(currentValue?.value),
 					},
 				});
+
+				if (value === undefined) continue
 
 				if (serializeMetadataValue(value) === serializeMetadataValue(currentValue?.value))
 					continue;

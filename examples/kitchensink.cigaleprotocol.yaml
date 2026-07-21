@@ -12,7 +12,7 @@ sessionMetadata:
     mergeMethod: average
     required: true
     description: feur
-    default: '{{ session.createdAt }}'
+    default: session.createdAt
 
   transect_code:
     label: Code du transect
