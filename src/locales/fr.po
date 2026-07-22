@@ -2645,6 +2645,7 @@ msgstr "Relancer l'app après un changement du parallélisme"
 
 #: src/lib/exif.ts
 #: src/lib/exif.ts
+#: src/lib/exif.ts
 msgid "GPSLatitude"
 msgstr "GPSLatitude"
 
@@ -2652,6 +2653,7 @@ msgstr "GPSLatitude"
 msgid "GPSLatitudeRef"
 msgstr "GPSLatitudeRef"
 
+#: src/lib/exif.ts
 #: src/lib/exif.ts
 #: src/lib/exif.ts
 msgid "GPSLongitude"
@@ -3007,14 +3009,6 @@ msgstr "Aucun résultat :/"
 #: src/lib/KeyboardShortcuts.svelte
 msgid "ou"
 msgstr "ou"
-
-#: src/lib/exif.ts
-msgid "YYYY:mm:DD HH:MM:SS"
-msgstr "YYYY:mm:DD HH:MM:SS"
-
-#: src/lib/exif.ts
-msgid "YYYY:mm:DD"
-msgstr "YYYY:mm:DD"
 
 #: src/lib/exif.ts
 msgid "Date format is invalid"

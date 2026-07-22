@@ -2645,6 +2645,7 @@ msgstr ""
 
 #: src/lib/exif.ts
 #: src/lib/exif.ts
+#: src/lib/exif.ts
 msgid "GPSLatitude"
 msgstr ""
 
@@ -2652,6 +2653,7 @@ msgstr ""
 msgid "GPSLatitudeRef"
 msgstr ""
 
+#: src/lib/exif.ts
 #: src/lib/exif.ts
 #: src/lib/exif.ts
 msgid "GPSLongitude"
@@ -3006,14 +3008,6 @@ msgstr ""
 
 #: src/lib/KeyboardShortcuts.svelte
 msgid "ou"
-msgstr ""
-
-#: src/lib/exif.ts
-msgid "YYYY:mm:DD HH:MM:SS"
-msgstr ""
-
-#: src/lib/exif.ts
-msgid "YYYY:mm:DD"
 msgstr ""
 
 #: src/lib/exif.ts
