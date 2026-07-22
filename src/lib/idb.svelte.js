@@ -17,7 +17,7 @@ export const previewingPrNumber =
 	import.meta.env.previewingPrNumber === 'null' ? null : import.meta.env.previewingPrNumber;
 
 export const databaseName = previewingPrNumber ? `previews/pr-${previewingPrNumber}` : 'database';
-export const databaseRevision = 14;
+export const databaseRevision = 15;
 
 const profile = profiler('Database');
 
@@ -553,34 +553,34 @@ export async function openDatabase() {
 			};
 
 			// No clean migration path for 1 -> 2, just drop everything
-			if (oldVersion === 1) {
+			if (oldVersion < 2) {
 				for (const tableName of db.objectStoreNames) {
 					db.deleteObjectStore(tableName);
 				}
 			}
-			if (oldVersion === 2) {
+			if (oldVersion < 3) {
 				createTable(/* @wc-ignore */ 'ImagePreviewFile', Tables.ImagePreviewFile);
 				return;
 			}
 
-			if (oldVersion === 3) {
+			if (oldVersion < 4) {
 				createTable('Session', Tables.Session);
 			}
 
-			if (oldVersion === 4) {
+			if (oldVersion < 5) {
 				rebuildIndexes('ImageFile');
 				rebuildIndexes('ImagePreviewFile');
 			}
 
-			if (oldVersion === 6) {
+			if (oldVersion < 7) {
 				rebuildIndexes('Session');
 			}
 
-			if (oldVersion === 7) {
+			if (oldVersion < 8) {
 				rebuildIndexes('MetadataOption');
 			}
 
-			if (oldVersion === 8) {
+			if (oldVersion < 9) {
 				const migrateAlternativesIn =
 					(/** @type {string} */ propertyname) =>
 					async (/** @type {Record<string, any>} */ entry) => ({
@@ -606,21 +606,25 @@ export async function openDatabase() {
 				await mutateRows('Session', migrateAlternativesIn('metadata'));
 			}
 
-			if (oldVersion === 9) {
+			if (oldVersion < 10) {
 				await rebuildIndexes('Image');
 				await rebuildIndexes('Observation');
 			}
 
-			if (oldVersion === 11) {
+			if (oldVersion < 12) {
 				await rebuildIndexes('Image');
 			}
 
-			if (oldVersion === 12) {
+			if (oldVersion < 13) {
 				await recomputeSearchIndex(tx, Tables, 'MetadataOption', null);
 				await rebuildIndexes('MetadataOption');
 			}
 
-			if (oldVersion === 13) {
+			if (oldVersion < 14) {
+				await rebuildIndexes('Image');
+			}
+
+			if (oldVersion < 15) {
 				await rebuildIndexes('Image');
 			}
 
