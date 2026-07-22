@@ -22,7 +22,8 @@ vi.mock('@capacitor/core', () => ({
 	},
 }));
 
-vi.mock('$lib/geolocation.js', () => ({
+vi.mock('$lib/geolocation.js', async (original) => ({
+	...(await original()),
 	getCurrentLocation: () => ({ longitude: 0, latitude: 0 }),
 }));
 

@@ -57,6 +57,7 @@ export class PendingStorage {
 		if (location) {
 			fields.GPSLongitude = GPSHelper.degToDmsRational(location.longitude);
 			fields.GPSLatitude = GPSHelper.degToDmsRational(location.latitude);
+			fields.GPSHPositioningError = location.accuracy;
 
 			if (location.altitude !== null) {
 				fields.GPSAltitudeRef = location.altitude > 0 ? 0 : 1;

@@ -8,7 +8,7 @@ export const SANE_ISO_DATE_FORMATS = [
 	"yyyy-MM-dd'T'HH:mm:ss.SSS",
 	"yyyy-MM-dd'T'HH:mm:ssXXX",
 	"yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
-];
+] as const;
 
 /**
  * Returns a parsed date or undefined if a parse error occurs or the date is invalid

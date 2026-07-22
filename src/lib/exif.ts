@@ -11,6 +11,11 @@ import piexif from 'piexifjs';
 import { Schemas } from './database.js';
 import { SANE_ISO_DATE_FORMATS, tryParseDate } from './date.js';
 import { EXIF_FIELDS, exifParserKeyToRealKey } from './exiffields.js';
+import {
+	geolocationAccuracyFromMake,
+	geolocationAccuracyToConfidence,
+	gpsDilutionOfPrecisionToConfidence,
+} from './geolocation.js';
 import { errorMessage } from './i18n.js';
 import * as db from './idb.svelte.js';
 import { resolveMetadataImport, storeMetadataValue } from './metadata/index.js';
@@ -57,6 +62,7 @@ export async function processExifData({
 			if (!def.infer) continue;
 
 			let coerced: RuntimeValue | undefined;
+			let confidence = 1;
 
 			if (def.type === 'location') {
 				if (!def.infer.longitude?.exif) continue;
@@ -71,6 +77,22 @@ export async function processExifData({
 					latitude: fields[def.infer.latitude.exif],
 					latitudeRef: latref in fields ? fields[latref as ExifFieldKey] : undefined,
 				});
+
+				// TODO: could also work with other GPS-related keys, such as GPSDest*
+				if (
+					def.infer.longitude.exif === 'GPSLongitude' &&
+					def.infer.latitude.exif === 'GPSLatitude'
+				) {
+					const dop = coerceExifValue('float', fields.GPSDOP);
+					const herr =
+						coerceExifValue('float', fields.GPSHPositioningError) ??
+						geolocationAccuracyFromMake(coerceExifValue('string', fields.Make));
+
+					confidence = Math.min(
+						herr !== undefined ? geolocationAccuracyToConfidence(herr) : 1,
+						dop !== undefined ? gpsDilutionOfPrecisionToConfidence(dop) : 1
+					);
+				}
 
 				if (!coerced) {
 					console.warn(
@@ -102,7 +124,7 @@ export async function processExifData({
 			if (!coerced) continue;
 
 			metadataFromExif[def.id] = {
-				confidence: 1,
+				confidence,
 				alternatives: [],
 				value: coerced,
 				confirmed: false,
@@ -189,8 +211,8 @@ export function coerceExifValue<T extends DB.MetadataType>(
 						value,
 						...SANE_ISO_DATE_FORMATS,
 						// EXIF also has some weird date format standards
-						'YYYY:mm:DD HH:MM:SS',
-						'YYYY:mm:DD'
+						'yyyy:MM:dd HH:mm:SS',
+						'yyyy:MM:dd'
 					) ?? throwError('Date format is invalid')
 				);
 			}
