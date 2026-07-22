@@ -503,7 +503,7 @@ export async function openDatabase() {
 			 * @param {keyof typeof Tables} tableName
 			 * @param {import('arktype').Type} schema
 			 */
-			const createTable = (tableName, schema) => {
+			const createTable = async (tableName, schema) => {
 				if (!schema.meta.table) return;
 				const keyPath = schema.meta.table.indexes[0];
 				if (db.objectStoreNames.contains(tableName)) {
@@ -552,84 +552,85 @@ export async function openDatabase() {
 				}
 			};
 
-			// No clean migration path for 1 -> 2, just drop everything
-			if (oldVersion < 2) {
-				for (const tableName of db.objectStoreNames) {
-					db.deleteObjectStore(tableName);
+			if (oldVersion > 0) {
+				// No clean migration path for 1 -> 2, just drop everything
+				if (oldVersion < 2) {
+					for (const tableName of db.objectStoreNames) {
+						db.deleteObjectStore(tableName);
+					}
 				}
-			}
-			if (oldVersion < 3) {
-				createTable(/* @wc-ignore */ 'ImagePreviewFile', Tables.ImagePreviewFile);
-				return;
-			}
+				if (oldVersion < 3) {
+					await createTable(/* @wc-ignore */ 'ImagePreviewFile', Tables.ImagePreviewFile);
+				}
 
-			if (oldVersion < 4) {
-				createTable('Session', Tables.Session);
-			}
+				if (oldVersion < 4) {
+					await createTable('Session', Tables.Session);
+				}
 
-			if (oldVersion < 5) {
-				rebuildIndexes('ImageFile');
-				rebuildIndexes('ImagePreviewFile');
-			}
+				if (oldVersion < 5) {
+					await rebuildIndexes('ImageFile');
+					await rebuildIndexes('ImagePreviewFile');
+				}
 
-			if (oldVersion < 7) {
-				rebuildIndexes('Session');
-			}
+				if (oldVersion < 7) {
+					await rebuildIndexes('Session');
+				}
 
-			if (oldVersion < 8) {
-				rebuildIndexes('MetadataOption');
-			}
+				if (oldVersion < 8) {
+					await rebuildIndexes('MetadataOption');
+				}
 
-			if (oldVersion < 9) {
-				const migrateAlternativesIn =
-					(/** @type {string} */ propertyname) =>
-					async (/** @type {Record<string, any>} */ entry) => ({
-						...entry,
-						[propertyname]: Object.fromEntries(
-							Object.entries(entry[propertyname]).map(
-								([id, { alternatives, ...rest }]) => [
-									id,
-									{
-										...rest,
-										confidences: alternatives,
-										alternatives: Object.entries(alternatives)
-											.filter(([, score]) => score >= 1)
-											.map(([value]) => value),
-									},
-								]
-							)
-						),
-					});
+				if (oldVersion < 9) {
+					const migrateAlternativesIn =
+						(/** @type {string} */ propertyname) =>
+						async (/** @type {Record<string, any>} */ entry) => ({
+							...entry,
+							[propertyname]: Object.fromEntries(
+								Object.entries(entry[propertyname]).map(
+									([id, { alternatives, ...rest }]) => [
+										id,
+										{
+											...rest,
+											confidences: alternatives,
+											alternatives: Object.entries(alternatives)
+												.filter(([, score]) => score >= 1)
+												.map(([value]) => value),
+										},
+									]
+								)
+							),
+						});
 
-				await mutateRows('Observation', migrateAlternativesIn('metadataOverrides'));
-				await mutateRows('Image', migrateAlternativesIn('metadata'));
-				await mutateRows('Session', migrateAlternativesIn('metadata'));
-			}
+					await mutateRows('Observation', migrateAlternativesIn('metadataOverrides'));
+					await mutateRows('Image', migrateAlternativesIn('metadata'));
+					await mutateRows('Session', migrateAlternativesIn('metadata'));
+				}
 
-			if (oldVersion < 10) {
-				await rebuildIndexes('Image');
-				await rebuildIndexes('Observation');
-			}
+				if (oldVersion < 10) {
+					await rebuildIndexes('Image');
+					await rebuildIndexes('Observation');
+				}
 
-			if (oldVersion < 12) {
-				await rebuildIndexes('Image');
-			}
+				if (oldVersion < 12) {
+					await rebuildIndexes('Image');
+				}
 
-			if (oldVersion < 13) {
-				await recomputeSearchIndex(tx, Tables, 'MetadataOption', null);
-				await rebuildIndexes('MetadataOption');
-			}
+				if (oldVersion < 13) {
+					await recomputeSearchIndex(tx, Tables, 'MetadataOption', null);
+					await rebuildIndexes('MetadataOption');
+				}
 
-			if (oldVersion < 14) {
-				await rebuildIndexes('Image');
-			}
+				if (oldVersion < 14) {
+					await rebuildIndexes('Image');
+				}
 
-			if (oldVersion < 15) {
-				await rebuildIndexes('Image');
+				if (oldVersion < 15) {
+					await rebuildIndexes('Image');
+				}
 			}
 
 			for (const [tableName, schema] of tablesByName) {
-				createTable(tableName, schema);
+				await createTable(tableName, schema);
 			}
 		},
 	});
