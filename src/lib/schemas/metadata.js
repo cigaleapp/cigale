@@ -95,7 +95,7 @@ export const MetadataRuntimeValue = /** @type {const} */ ({
 	float: type('number'),
 	enum: type('string | number'),
 	date: type('Date'),
-	location: type({ latitude: 'number', longitude: 'number',}),
+	location: type({ latitude: 'number', longitude: 'number' }),
 	boundingbox: type({ x: 'number', y: 'number', w: 'number', h: 'number' }),
 	file: type(ID),
 });
@@ -364,15 +364,15 @@ export const MetadataDefaultDynamicPayload = type({
 const MDDP = MetadataDefaultDynamicPayload;
 const MRV = MetadataRuntimeValue;
 const MetadataDefault = {
-	string: TemplatedString(MDDP, value => value.trim()),
-	enum: TemplatedString(MDDP, value => value.trim()),
+	string: TemplatedString(MDDP, (value) => value.trim()),
+	enum: TemplatedString(MDDP, (value) => value.trim()),
 	location: type.or(MRV.location, JsonataExpression(MDDP, MRV.location)),
 	boolean: type.or(MRV.boolean, JsonataExpression(MDDP, MRV.boolean)),
 	integer: type.or(MRV.integer, JsonataExpression(MDDP, MRV.integer)),
 	float: type.or(MRV.float, JsonataExpression(MDDP, MRV.float)),
 	date: JsonataExpression(MDDP, type('string.date.iso.parse')),
 	boundingbox: type.or(MRV.boundingbox, JsonataExpression(MDDP, MRV.boundingbox)),
-	file: TemplatedString(MDDP, value => value.trim()),
+	file: TemplatedString(MDDP, (value) => value.trim()),
 };
 
 export const MetadataPatternConstraint = type.or();

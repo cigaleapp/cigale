@@ -104,7 +104,7 @@ export async function resolveDefaults({
 					},
 				});
 
-				if (value === undefined) continue
+				if (value === undefined) continue;
 
 				if (serializeMetadataValue(value) === serializeMetadataValue(currentValue?.value))
 					continue;

@@ -1,8 +1,8 @@
 import { CameraPreview } from '@capacitor-community/camera-preview';
 import { Capacitor } from '@capacitor/core';
 
-import { errorMessage } from '$lib/i18n.js';
 import { getCurrentLocation } from '$lib/geolocation.js';
+import { errorMessage } from '$lib/i18n.js';
 
 const ALL_FLASH_MODES = ['off', 'auto', 'on', 'torch'] as const;
 export type FlashMode = (typeof ALL_FLASH_MODES)[number];
@@ -29,7 +29,7 @@ export async function startCamera(webElement: HTMLElement | null, state: CameraS
 	state.failure = '';
 
 	// Ask for permissions
-	await getCurrentLocation()
+	await getCurrentLocation();
 
 	if (!webElement && !Capacitor.isNativePlatform()) {
 		console.error('Cant start camera as platform is web and webElement is null');

@@ -4,10 +4,10 @@ import type { BinaryStorageLocator } from '$lib/storage/types.js';
 import { Capacitor } from '@capacitor/core';
 import { GPSHelper } from 'piexifjs';
 
+import { getCurrentLocation } from '$lib/geolocation.js';
 import { errorMessage } from '$lib/i18n.js';
 import { imageFileId } from '$lib/images.js';
 import { processImageFile } from '$lib/import.svelte.js';
-import { getCurrentLocation } from '$lib/geolocation.js';
 import { binaryStorage } from '$lib/storage/index.js';
 import { toasts } from '$lib/toasts.svelte.js';
 

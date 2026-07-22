@@ -184,13 +184,15 @@ export function coerceExifValue<T extends DB.MetadataType>(
 			if (value instanceof Date) return value;
 
 			if (typeof value === 'string') {
-				return tryParseDate(
-					value,
-					...SANE_ISO_DATE_FORMATS,
-					// EXIF also has some weird date format standards
-					'YYYY:mm:DD HH:MM:SS',
-					'YYYY:mm:DD'
-				) ?? throwError('Date format is invalid');
+				return (
+					tryParseDate(
+						value,
+						...SANE_ISO_DATE_FORMATS,
+						// EXIF also has some weird date format standards
+						'YYYY:mm:DD HH:MM:SS',
+						'YYYY:mm:DD'
+					) ?? throwError('Date format is invalid')
+				);
 			}
 
 			if (typeof value !== 'number') {

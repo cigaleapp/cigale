@@ -27,12 +27,12 @@
 	import EnumButtons from './EnumButtons.svelte';
 	import FilePreview from './FilePreview.svelte';
 	import { promptForFiles } from './files.js';
+	import { getCurrentLocation } from './geolocation.js';
 	import { formatBytesSize } from './i18n.js';
 	import { databaseHandle } from './idb.svelte.js';
 	import InputRange from './InputRange.svelte';
 	import Lightbox from './Lightbox.svelte';
 	import LoadingText, { Loading } from './LoadingText.svelte';
-	import { getCurrentLocation } from './geolocation.js';
 	import MetadataTypeswitch from './metadata/MetadataTypeswitch.svelte';
 	import { serializeMetadataValue } from './metadata/serializing.js';
 	import { metadataOptionsOf } from './metadata/storage.js';
@@ -851,7 +851,7 @@
 		flex-grow: 1;
 		width: 100%;
 	}
-	
+
 	.location-input {
 		display: flex;
 		align-items: center;

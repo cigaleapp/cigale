@@ -7,8 +7,8 @@ import { format as formatDate, formatISO, parse as parseDate } from 'date-fns';
 import Handlebars from 'handlebars';
 import jsonata from 'jsonata';
 
-import { errorMessage } from '../i18n.js';
 import { getCurrentLocation } from '../geolocation.js';
+import { errorMessage } from '../i18n.js';
 import {
 	mapValues,
 	safeJSONStringify,
