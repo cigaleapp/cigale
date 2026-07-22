@@ -566,7 +566,8 @@ export const JsonataExpression = (Input, Output) =>
 if (import.meta.vitest) {
 	const { test, expect, describe, vi } = import.meta.vitest;
 
-	vi.mock('$lib/geolocation.js', () => ({
+	vi.mock('$lib/geolocation.js', async (original) => ({
+		...(await original()),
 		getCurrentLocation: async () => ({ latitude: 76, longitude: 67 }),
 	}));
 
