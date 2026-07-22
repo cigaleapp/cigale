@@ -16,6 +16,7 @@
 	import IconIncrement from '~icons/ri/add-line';
 	import IconCheck from '~icons/ri/check-line';
 	import IconError from '~icons/ri/error-warning-fill';
+	import IconGPS from '~icons/ri/map-pin-line';
 	import IconDecrement from '~icons/ri/subtract-line';
 	import * as idb from '$lib/idb.svelte.js';
 
@@ -31,6 +32,7 @@
 	import InputRange from './InputRange.svelte';
 	import Lightbox from './Lightbox.svelte';
 	import LoadingText, { Loading } from './LoadingText.svelte';
+	import { getCurrentLocation } from './geolocation.js';
 	import MetadataTypeswitch from './metadata/MetadataTypeswitch.svelte';
 	import { serializeMetadataValue } from './metadata/serializing.js';
 	import { metadataOptionsOf } from './metadata/storage.js';
@@ -505,10 +507,23 @@
 			/>
 		{/snippet}
 		{#snippet location(value)}
-			<WorldLocationCombobox
-				value={value as RuntimeValue<'location'>}
-				onblur={async (value) => await onblur(value)}
-			/>
+			<div class="location-input">
+				<WorldLocationCombobox
+					value={value as RuntimeValue<'location'>}
+					onblur={async (value) => await onblur(value)}
+				/>
+
+				<ButtonIcon
+					loading
+					help="Utiliser la position actuelle"
+					onclick={async () => {
+						const location = await getCurrentLocation();
+						if (location) await onblur(location);
+					}}
+				>
+					<IconGPS />
+				</ButtonIcon>
+			</div>
 		{/snippet}
 		{#snippet file(currentFileId)}
 			{@const { accept, size } = definition as typeof MetadataFile.infer}
@@ -835,6 +850,12 @@
 	.metadata-input[data-type='file'] {
 		flex-grow: 1;
 		width: 100%;
+	}
+	
+	.location-input {
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
 	}
 
 	.metadata-input:is([data-type='integer'], [data-type='float']) input {

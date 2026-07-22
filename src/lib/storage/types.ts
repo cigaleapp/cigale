@@ -1,5 +1,5 @@
 import type { BINARY_CONTENT_TABLES } from '$lib/database.js';
-import type { PENDING_PHOTOS_ROOT_FOLDER } from '$routes/(app)/capture/pendingstorage.svelte.js';
+import type { PendingPhotosRootFolders } from '$routes/(app)/capture/pendingstorage.svelte.js';
 
 export type BinaryStorageName = 'opfs' | 'capacitor' | 'uninitialized';
 
@@ -44,7 +44,7 @@ export interface BinaryStorageBackend<Name extends BinaryStorageName = BinarySto
 }
 
 export type BinaryStorageLocator<Filename extends string = string> = {
-	area: (typeof BINARY_CONTENT_TABLES)[number] | typeof PENDING_PHOTOS_ROOT_FOLDER;
+	area: (typeof BINARY_CONTENT_TABLES)[number] | PendingPhotosRootFolders;
 	sessionId: string | undefined;
 	/** Use an empty string to denote an entire folder */
 	name: Filename;
@@ -67,7 +67,7 @@ type ContentType<Category extends ContentTypeCategory = ContentTypeCategory> =
 	`${Category}/${string}`;
 
 export type BinaryStorageContent =
-	| { type: ContentType<'text'>; text: string }
+	| { type: ContentType<'text'> | 'application/json'; text: string }
 	| ({ type: ContentType<Exclude<ContentTypeCategory, 'text'>> } & (
 			{ base64: string } | { bytes: Uint8Array<ArrayBuffer> | ArrayBuffer }
 	  ));

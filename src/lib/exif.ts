@@ -1,25 +1,35 @@
 import type * as DB from './database.js';
 import type { ExifFieldKey } from './exiffields.js';
+import type { NamespacedMetadataID } from './schemas/common.js';
+import type { RuntimeValue } from './schemas/metadata.js';
 
-import { match, type } from 'arktype';
+import { type } from 'arktype';
 import * as dates from 'date-fns';
 import * as exifParser from 'exif-parser';
 import piexif from 'piexifjs';
 
 import { Schemas } from './database.js';
-import { EXIF_FIELDS } from './exiffields.js';
+import { SANE_ISO_DATE_FORMATS, tryParseDate } from './date.js';
+import { EXIF_FIELDS, exifParserKeyToRealKey } from './exiffields.js';
 import { errorMessage } from './i18n.js';
 import * as db from './idb.svelte.js';
 import { resolveMetadataImport, storeMetadataValue } from './metadata/index.js';
 import { toasts } from './toasts.svelte.js';
-import { byteString, byteStringToArray } from './utils.js';
+import { byteString, byteStringToArray, throwError, transformObject } from './utils.js';
 
-export async function processExifData(
-	sessionId: string,
-	imageFileId: string,
-	imageBytes: ArrayBuffer | Buffer,
-	file: { type: string; name: string }
-) {
+export async function processExifData({
+	sessionId,
+	imageFileId,
+	imageBytes,
+	file,
+	extra,
+}: {
+	sessionId: string;
+	imageFileId: string;
+	imageBytes: ArrayBuffer | Buffer;
+	file: { type: string; name: string };
+	extra?: { [K in ExifFieldKey]?: unknown };
+}) {
 	const session = await db.tables.Session.get(sessionId);
 	if (!session) {
 		throw new Error(`Session ${sessionId} introuvable`);
@@ -33,12 +43,75 @@ export async function processExifData(
 		protocol.metadata.map((key) => resolveMetadataImport(protocol, key))
 	);
 
-	const metadataFromExif = await extractMetadata(
-		// 2^16 + 100 of margin
-		// see https://www.npmjs.com/package/exif-parser#creating-a-parser
-		imageBytes.slice(0, 2 ** 16 + 100),
-		metadataOfProtocol ?? []
-	).catch((e) => {
+	const metadataFromExif = {} as Record<NamespacedMetadataID, DB.MetadataValue>;
+
+	try {
+		const fields = {
+			...extra,
+			...(await parseExif(imageBytes, file.type)),
+		};
+
+		console.debug('Processing EXIF fields', fields);
+
+		for (const def of metadataOfProtocol ?? []) {
+			if (!def.infer) continue;
+
+			let coerced: RuntimeValue | undefined;
+
+			if (def.type === 'location') {
+				if (!def.infer.longitude?.exif) continue;
+				if (!def.infer.latitude?.exif) continue;
+
+				const lngref = `${def.infer.longitude.exif}Ref` as const;
+				const latref = `${def.infer.latitude.exif}Ref` as const;
+
+				coerced = coerceExifValue('location', {
+					longitude: fields[def.infer.longitude.exif],
+					longitudeRef: lngref in fields ? fields[lngref as ExifFieldKey] : undefined,
+					latitude: fields[def.infer.latitude.exif],
+					latitudeRef: latref in fields ? fields[latref as ExifFieldKey] : undefined,
+				});
+
+				if (!coerced) {
+					console.warn(
+						`Couldn't coerce EXIF fields to ${def.type}:`,
+						def.infer.longitude.exif,
+						'=',
+						fields[def.infer.longitude.exif],
+						def.infer.latitude.exif,
+						'=',
+						fields[def.infer.latitude.exif]
+					);
+				}
+			} else {
+				if (!('exif' in def.infer)) continue;
+				if (!def.infer.exif) continue;
+
+				coerced = coerceExifValue(def.type, fields[def.infer.exif]);
+
+				if (!coerced) {
+					console.warn(
+						`Couldn't coerce EXIF field(s) to ${def.type}:`,
+						def.infer.exif,
+						'=',
+						fields[def.infer.exif]
+					);
+				}
+			}
+
+			if (!coerced) continue;
+
+			metadataFromExif[def.id] = {
+				confidence: 1,
+				alternatives: [],
+				value: coerced,
+				confirmed: false,
+				manuallyModified: false,
+				isDefault: false,
+				confidences: {},
+			};
+		}
+	} catch (e) {
 		console.warn(e);
 		if (file.type === 'image/jpeg') {
 			toasts.warn(
@@ -46,7 +119,7 @@ export async function processExifData(
 			);
 		}
 		return {};
-	});
+	}
 
 	const images = await db
 		.listByIndex('Image', 'sessionId', sessionId)
@@ -66,77 +139,40 @@ export async function processExifData(
 	}
 }
 
-type ExifExtractionPlanItem = Pick<DB.Metadata, 'id' | 'infer' | 'type'>;
+async function parseExif(buffer: ArrayBuffer | Buffer, contentType: string) {
+	if (contentType !== 'image/jpeg') return;
 
-export async function extractMetadata(
-	buffer: ArrayBuffer | Buffer,
-	extractionPlan: ExifExtractionPlanItem[]
-): Promise<Record<string, { value: unknown; confidence: number; alternatives: unknown[] }>> {
-	const exif = exifParser.create(buffer).enableImageSize(false).parse();
-
-	if (!exif) return {};
-	console.debug('Starting EXIF Extraction', { extractionPlan, exif });
-
-	const extract = match
-		.case(
-			{
-				type: '"location"',
-				infer: {
-					latitude: { exif: 'string' },
-					longitude: { exif: 'string' },
-				},
-			},
-			({ infer }) => {
-				if (!(infer.longitude.exif in exif.tags)) return undefined;
-				if (!(infer.latitude.exif in exif.tags)) return undefined;
-
-				return {
-					confidence: 1,
-					alternatives: [],
-					value: {
-						longitude: coerceExifValue(exif.tags[infer.longitude.exif], 'float'),
-						latitude: coerceExifValue(exif.tags[infer.latitude.exif], 'float'),
-					},
-				};
-			}
+	const exif = exifParser
+		.create(
+			// 2^16 + 100 of margin
+			// see https://www.npmjs.com/package/exif-parser#creating-a-parser
+			buffer.slice(0, 2 ** 16 + 100)
 		)
-		.case(
-			{
-				type: Schemas.MetadataTypeSchema,
-				infer: { exif: 'string' },
-			},
-			({ infer, type }) => {
-				if (!(infer.exif in exif.tags)) return undefined;
+		.enableImageSize(false)
+		.parse();
 
-				return {
-					confidence: 1,
-					alternatives: [],
-					value: coerceExifValue(exif.tags[infer.exif], type),
-				};
-			}
-		)
-		.default(() => undefined);
+	console.debug('Finished parsing EXIF data from bytes', exif);
 
-	return Object.fromEntries(
-		extractionPlan
-			.map(({ id, ...option }) => {
-				return /** @type {const} */ [id, extract(option)];
-			})
-			.filter(
-				([, extracted]) =>
-					extracted !== undefined &&
-					!type({ latitude: 'number.NaN', longitude: 'number.NaN' }).allows(
-						extracted.value
-					) &&
-					!Number.isNaN(extracted.value)
-			)
-	);
+	return transformObject(exif.tags, (key, value) => {
+		try {
+			return [exifParserKeyToRealKey(key), value];
+		} catch (e) {
+			console.warn(
+				`Couldn't translate exif-parser field ${key} to a standard EXIF field:`,
+				e
+			);
+			return undefined;
+		}
+	});
 }
 
 export function coerceExifValue<T extends DB.MetadataType>(
-	value: unknown,
-	coerceTo: T
-): import('./schemas/metadata.js').RuntimeValue<T> {
+	coerceTo: T,
+	value: unknown
+): import('./schemas/metadata.js').RuntimeValue<T> | undefined {
+	if (value === undefined) return undefined;
+	if (value === null) return undefined;
+
 	switch (coerceTo) {
 		case 'string':
 			return value?.toString() ?? '';
@@ -146,9 +182,25 @@ export function coerceExifValue<T extends DB.MetadataType>(
 
 		case 'date':
 			if (value instanceof Date) return value;
-			if (typeof value !== 'number')
-				throw new Error(`Date value must be a number, was ${typeof value}`);
+
+			if (typeof value === 'string') {
+				return tryParseDate(
+					value,
+					...SANE_ISO_DATE_FORMATS,
+					// EXIF also has some weird date format standards
+					'YYYY:mm:DD HH:MM:SS',
+					'YYYY:mm:DD'
+				) ?? throwError('Date format is invalid');
+			}
+
+			if (typeof value !== 'number') {
+				throw new Error(
+					`Unexpected type ${typeof value} for a date, cannot coerce exif value`
+				);
+			}
+
 			if (Number.isNaN(value)) throw new Error('Date value is invalid');
+
 			return new Date(value * 1e3);
 
 		case 'boundingbox':
@@ -159,8 +211,39 @@ export function coerceExifValue<T extends DB.MetadataType>(
 			return value;
 
 		case 'integer':
-		case 'float':
+		case 'float': {
+			if (type(['number', 'number']).array().allows(value)) {
+				const [[num, denom]] = value;
+				return num / denom;
+			}
+
 			return Number(value);
+		}
+
+		case 'location': {
+			if (!value) return;
+			if (typeof value !== 'object') return;
+			if (!('longitude' in value)) return;
+			if (!('latitude' in value)) return;
+
+			function coerceCoordinate(coord: unknown, ref: unknown, refFallback: string) {
+				if (type(['number', 'number']).array().allows(coord)) {
+					return piexif.GPSHelper.dmsRationalToDeg(
+						coord,
+						typeof ref === 'string' ? ref : refFallback
+					);
+				}
+
+				return coerceExifValue('float', coord);
+			}
+
+			const lng = coerceCoordinate(value.longitude, value.longitudeRef, 'E');
+			const lat = coerceCoordinate(value.latitude, value.latitudeRef, 'N');
+
+			if (!lng || !lat) return;
+
+			return { longitude: lng, latitude: lat };
+		}
 
 		default:
 			throw new Error(`Unknown type ${coerceTo}`);

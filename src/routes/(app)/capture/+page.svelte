@@ -122,7 +122,7 @@
 			return;
 		}
 
-		await pendingStorage.save(output);
+		void pendingStorage.save(output);
 	}
 
 	let askBeforeQuitting = $state<() => Promise<boolean>>();

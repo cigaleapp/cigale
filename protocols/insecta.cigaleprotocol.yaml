@@ -114,7 +114,7 @@ sessionMetadata:
     mergeMethod: none
     required: true
     description: ''
-    default: '{{ now }}'
+    default: $now()
 
   is_training:
     type: boolean
@@ -323,8 +323,8 @@ sessionMetadata:
       Dès que vous avez réussi à vous géolocaliser, c'est parti pour 20 minutes de safari macrophotographique! Laissez ou prenez un point de repère pour retrouver votre point de départ. Vous pouvez mettre le téléphone en veille et revenir sur ce questionnaire à la fin des 20min pour indiquer votre point d'arrivée et les 3 dernières questions. N'oubliez pas de lancer un chronomètre
     mergeMethod: none
     required: true
-    # TODO: shoot_location of argmin(photos shoot_date)
-    # default:
+    # TODO: shoot_location of argmin(photos shoot_date) instead
+    default: $here()
 
   end_at:
     type: location

@@ -156,6 +156,7 @@
 		"@capacitor/core": "^8.4.1",
 		"@capacitor/file-viewer": "^2.0.1",
 		"@capacitor/filesystem": "^8.1.2",
+		"@capacitor/geolocation": "^8.2.0",
 		"@capacitor/ios": "^8.4.1",
 		"@capacitor/local-notifications": "^8.2.0",
 		"@capacitor/share": "^8.0.1",
@@ -229,6 +230,7 @@
 		"natural-regex@0.5.0": "patches/natural-regex@0.5.0.patch",
 		"@types/piexifjs@1.0.0": "patches/@types%2Fpiexifjs@1.0.0.patch",
 		"svelte-bottom-sheet@2.3.0": "patches/svelte-bottom-sheet@2.3.0.patch",
-		"@capacitor-community/camera-preview@8.0.1": "patches/@capacitor-community%2Fcamera-preview@8.0.1.patch"
+		"@capacitor-community/camera-preview@8.0.1": "patches/@capacitor-community%2Fcamera-preview@8.0.1.patch",
+		"@capacitor/geolocation@8.2.0": "patches/@capacitor%2Fgeolocation@8.2.0.patch"
 	}
 }

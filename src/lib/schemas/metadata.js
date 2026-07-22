@@ -95,7 +95,7 @@ export const MetadataRuntimeValue = /** @type {const} */ ({
 	float: type('number'),
 	enum: type('string | number'),
 	date: type('Date'),
-	location: type({ latitude: 'number', longitude: 'number' }),
+	location: type({ latitude: 'number', longitude: 'number',}),
 	boundingbox: type({ x: 'number', y: 'number', w: 'number', h: 'number' }),
 	file: type(ID),
 });
@@ -361,28 +361,19 @@ export const MetadataDefaultDynamicPayload = type({
 	},
 });
 
-export const MetadataDefault = scope({ MetadataRuntimeValueAny }).type(
-	'<static extends MetadataRuntimeValueAny>',
-	[
-		[
-			'Exclude<static, string>',
-			'@',
-			"Une valeur par défaut pour une métadonnée. Pour l'instant, uniquement supportée sur les métadonnées de session",
-		],
-		'|',
-		TemplatedString(MetadataDefaultDynamicPayload, (serialized) => {
-			const parsed = MetadataValue.get('value')(serialized);
-
-			if (parsed instanceof ArkErrors) {
-				return serialized.trim();
-			}
-
-			return parsed;
-		}).describe(
-			"Une valeur par défaut dynamique. Pour l'instant, uniquement supportée sur les métadonnées de session. C'est une templates Handlebars, avec pour variables `protocolMetadata` (contenant les métadonnées du protocole courant) et `metadata` (contenant les métadonnées de _toutes_ les métadonnées). La valeur par défaut sera évaluée en considérant que le texte final (après éxécution de la template Handlebars) est une représentation JSON (sauf pour les métadonnées de type texte ou enum, où le text final est pris tel-quel). Les helpers gps, boundingBox, date, object et array sont disponibles pour facilement construire des représentations JSON de valeurs complexes"
-		),
-	]
-);
+const MDDP = MetadataDefaultDynamicPayload;
+const MRV = MetadataRuntimeValue;
+const MetadataDefault = {
+	string: TemplatedString(MDDP, value => value.trim()),
+	enum: TemplatedString(MDDP, value => value.trim()),
+	location: type.or(MRV.location, JsonataExpression(MDDP, MRV.location)),
+	boolean: type.or(MRV.boolean, JsonataExpression(MDDP, MRV.boolean)),
+	integer: type.or(MRV.integer, JsonataExpression(MDDP, MRV.integer)),
+	float: type.or(MRV.float, JsonataExpression(MDDP, MRV.float)),
+	date: JsonataExpression(MDDP, type('string.date.iso.parse')),
+	boundingbox: type.or(MRV.boundingbox, JsonataExpression(MDDP, MRV.boundingbox)),
+	file: TemplatedString(MDDP, value => value.trim()),
+};
 
 export const MetadataPatternConstraint = type.or();
 
@@ -442,7 +433,7 @@ const MetadataBase = type({
 
 const MetadataBoolean = MetadataBase.omit('kobocollect').and({
 	type: '"boolean"',
-	'default?': MetadataDefault('boolean'),
+	'default?': MetadataDefault.boolean,
 	'infer?': type.and(
 		InferenceConfigs.exif.partial(),
 		InferenceConfigs.sidecar(type('boolean')).partial()
@@ -482,7 +473,7 @@ const MetadataBoolean = MetadataBase.omit('kobocollect').and({
 
 export const MetadataString = MetadataBase.and({
 	type: '"string"',
-	'default?': MetadataDefault('string'),
+	'default?': MetadataDefault.string,
 	'infer?': type.and(
 		InferenceConfigs.exif.partial(),
 		InferenceConfigs.sidecar(type('string')).partial()
@@ -496,7 +487,7 @@ export const MetadataString = MetadataBase.and({
 export const MetadataInteger = MetadataBase.and({
 	type: '"integer"',
 	'range?': NumberRangeLiteral,
-	'default?': MetadataDefault('number.integer'),
+	'default?': MetadataDefault.integer,
 	'infer?': type.and(
 		InferenceConfigs.exif.partial(),
 		InferenceConfigs.sidecar(type('number.integer')).partial()
@@ -507,7 +498,7 @@ export const MetadataInteger = MetadataBase.and({
 export const MetadataFloat = MetadataBase.and({
 	type: '"float"',
 	'range?': NumberRangeLiteral,
-	'default?': MetadataDefault('number'),
+	'default?': MetadataDefault.float,
 	'infer?': type.and(
 		InferenceConfigs.exif.partial(),
 		InferenceConfigs.sidecar(type('number')).partial()
@@ -523,7 +514,7 @@ export const MetadataFloat = MetadataBase.and({
 export const MetadataDate = MetadataBase.and({
 	type: '"date"',
 	'range?': '"future" | "past"',
-	'default?': MetadataDefault('string.date.iso'),
+	'default?': MetadataDefault.date,
 	'infer?': type.and(
 		InferenceConfigs.exif.partial(),
 		InferenceConfigs.sidecar(type('string.date.iso.parse')).partial()
@@ -532,7 +523,7 @@ export const MetadataDate = MetadataBase.and({
 
 const MetadataLocation = MetadataBase.and({
 	type: '"location"',
-	'default?': MetadataDefault({ latitude: 'number', longitude: 'number' }),
+	'default?': MetadataDefault.location,
 	'infer?': type.and(
 		InferenceConfigs.sidecar(
 			type({ latitude: 'number', longitude: 'number', '+': 'reject' })
@@ -546,7 +537,7 @@ const MetadataLocation = MetadataBase.and({
 
 const MetadataEnum = MetadataBase.and({
 	type: '"enum"',
-	'default?': MetadataDefault('string | number'),
+	'default?': MetadataDefault.enum,
 	presentation: type
 		.enumerated('dropdown', 'buttons', 'auto')
 		.describe(
@@ -564,12 +555,7 @@ const MetadataEnum = MetadataBase.and({
 
 const MetadataBoundingbox = MetadataBase.and({
 	type: '"boundingbox"',
-	'default?': MetadataDefault({
-		x: '0 <= number <= 1',
-		y: '0 <= number <= 1',
-		w: '0 <= number <= 1',
-		h: '0 <= number <= 1',
-	}),
+	'default?': MetadataDefault.boundingbox,
 	'infer?': type.and(
 		InferenceConfigs.neuralBoundingBox.partial(),
 		InferenceConfigs.sidecar(

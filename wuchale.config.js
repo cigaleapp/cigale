@@ -70,6 +70,9 @@ export default defineConfig({
 				// Microdiff action types
 				if (['CREATE', 'REMOVE', 'CHANGE'].includes(msg)) return false;
 
+				// EXIF IFDs
+				if (['GPSInfo', 'Iop', 'MpfInfo'].includes(msg)) return false;
+
 				// Log messages for ProcessingQueue
 				if (file === 'src/lib/queue.svelte.js') {
 					if (call === '[MemberExpression].log') return false;

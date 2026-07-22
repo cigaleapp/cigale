@@ -35,6 +35,9 @@ on:
       live-reload:
         type: boolean
         description: Enable Live Reload. See https://capacitorjs.com/docs/guides/live-reload
+      notify:
+        type: boolean
+        description: Send push notification when QR code is available on the PR description
 
     outputs:
       artifact:
@@ -319,6 +322,9 @@ jobs:
       name: '${{ github.event.pull_request.number || github.ref_name }}: Android APK'
       url: ${{ steps.diawi.outputs.url }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
       - name: Retrieve APK file
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
@@ -360,6 +366,14 @@ jobs:
 
             ${{ steps.diawi.outputs.url }}
             <!-- /apk -->
+
+      - name: Notify
+        if: inputs.notify
+        uses: ./.github/actions/notify
+        with:
+          title: '🤌 APK ready for #${{ github.event.pull_request.number }} (${{ github.event.pull_request.head.ref }})'
+          message: Build ${{ github.run_number }} ready to install
+          url: ${{ steps.diawi.outputs.url }}
 
   report:
     if: ${{ !cancelled() }}
