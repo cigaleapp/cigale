@@ -21,6 +21,12 @@ on:
       coverage-check:
         description: Can be either "pass" or "fail". If compare-coverage is false, itll be "pass"
         value: ${{ jobs.compare-coverage.outputs.result || 'pass' }}
+      report-url:
+        description: URL to a uploaded report of unit tests
+        value: ${{ jobs.upload-test-report.outputs.url }}
+      coverage-url:
+        description: URL to a uploaded coverage report of unit tests
+        value: ${{ jobs.upload-coverage-report.outputs.url }}
 
 env:
   ELECTRON_SKIP_BINARY_DOWNLOAD: 'true'

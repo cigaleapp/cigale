@@ -333,8 +333,7 @@ jobs:
       - if: needs.test.result == 'failure'
         run: |
           echo "MESSAGE=Unit tests failed" >> $GITHUB_ENV
-          url=$(gh run view ${{ github.run_id }} --json  jobs --jq '[.jobs[] | select(.name == "Unit tests / Test").url][0] // "$URL"')
-          echo "URL=$url" >> $GITHUB_ENV
+          echo "URL=${{ needs.test.outputs.report-url }}" >> $GITHUB_ENV
       - if: needs.e2e.result == 'failure'
         run: |
           echo "MESSAGE=E2E: ${{ needs.e2e.outputs.failed }} failed, ${{ needs.e2e.outputs.flaky }} flaky, ${{ needs.e2e.outputs.total }} total" >> $GITHUB_ENV

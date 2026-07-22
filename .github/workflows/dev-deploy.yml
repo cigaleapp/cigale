@@ -14,6 +14,10 @@ on:
         required: true
       DEV_DEPLOYMENTS_HOST_KEY:
         required: true
+    outputs:
+      url:
+        description: URL to the published site
+        value: https://${{ inputs.subdomain }}.${{ inputs.domain }}${{ inputs.path }}${{ inputs.environment-url-append }}
     inputs:
       environment:
         type: string
