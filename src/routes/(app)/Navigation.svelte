@@ -3,6 +3,8 @@
 	import { fade } from 'svelte/transition';
 
 	import IconNext from '~icons/ri/arrow-right-s-fill';
+	import IconCameraFilled from '~icons/ri/camera-fill';
+	import IconCamera from '~icons/ri/camera-line';
 	import IconClassifyFilled from '~icons/ri/checkbox-multiple-fill';
 	import IconClassify from '~icons/ri/checkbox-multiple-line';
 	import IconCropFilled from '~icons/ri/crop-fill';
@@ -73,6 +75,10 @@
 	// Never disable it, it's annoying and the fact that you don't go to this tab at first is clear enough
 	// it's called "Results" after all
 	const resultsTabDisabled = false;
+
+	const importTabOpensCamera = $derived(
+		mobile.current && Boolean(uiState.currentProtocol?.capture) 
+	);
 
 	/* eslint-disable svelte/prefer-writable-derived */
 	// The window object is not reactive
@@ -369,19 +375,35 @@ Tab bar is only when a session is active
 					<span class="label">Session</span>
 				</a>
 
-				<a
-					href={resolve('/import/')}
-					pw-testid="mobile-goto-import"
-					aria-disabled={!isDebugMode() && importTabDisabled}
-					class:active={page.route.id === '/(app)/(sidepanel)/import'}
-				>
-					{#if page.route.id === '/(app)/(sidepanel)/import'}
-						<IconImportFilled />
-					{:else}
-						<IconImport />
-					{/if}
-					<span class="label">Importer</span>
-				</a>
+				{#if importTabOpensCamera}
+					<a
+						href={resolve('/capture/')}
+						pw-testid="mobile-goto-camera"
+						aria-disabled={!isDebugMode() && importTabDisabled}
+						class:active={page.route.id === '/(app)/capture'}
+					>
+						{#if page.route.id === '/(app)/capture'}
+							<IconCameraFilled />
+						{:else}
+							<IconCamera />
+						{/if}
+						<span class="label">Capturer</span>
+					</a>
+				{:else}
+					<a
+						href={resolve('/import/')}
+						pw-testid="mobile-goto-import"
+						aria-disabled={!isDebugMode() && importTabDisabled}
+						class:active={page.route.id === '/(app)/(sidepanel)/import'}
+					>
+						{#if page.route.id === '/(app)/(sidepanel)/import'}
+							<IconImportFilled />
+						{:else}
+							<IconImport />
+						{/if}
+						<span class="label">Importer</span>
+					</a>
+				{/if}
 
 				<a
 					href={resolve('/crop/')}

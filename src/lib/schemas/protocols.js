@@ -5,6 +5,7 @@ import {
 	FilepathTemplate,
 	HTTPRequest,
 	ID,
+	MillisecondsLiteral,
 	MIMEType,
 	NamespacedMetadataID,
 	ProtocolID,
@@ -86,6 +87,21 @@ export const ProtocolImport = type({
 		: ctx.reject('Un import ne peut pas être vide')
 );
 
+export const CaptureTimersMessageTemplate = TemplatedString(
+	type({
+		laps: {
+			totalCount: 'number.integer >= 0',
+			doneCount: 'number.integer >= 0',
+			remainingCount: 'number.integer >= 0',
+			currentRemainingMs: 'number >= 0',
+		},
+		total: {
+			durationMs: 'number >= 0',
+			remainingMs: 'number >= 0',
+		},
+	})
+);
+
 export const Protocol = type({
 	id: ProtocolID,
 	dirty: type('boolean')
@@ -111,6 +127,41 @@ export const Protocol = type({
 				'Template Handlebars pour construire le titre de la session à partir des colonnes de la soumissions Kobocollect (dans `survey`) et des valeur des métadonnées de la session (sans préfixe de protocole, dans `metadata`). Par exemple, si il y a une colonne Transect_code et une metadata start: `Transect #{{ survey.Transect_code }} du {{ metadata.start.value | formatDate "dd/MM/yyyy" }}`'
 			),
 		},
+	},
+	'capture?': {
+		'timers?': type({
+			'every?': MillisecondsLiteral.describe('Répéter le timer tout les ...'),
+			'count?': type('number.integer').describe('Répéter le timer n fois'),
+			during: MillisecondsLiteral,
+			messages: type
+				.scope({
+					Templated: CaptureTimersMessageTemplate,
+				})
+				.type({
+					lap: ['Templated', '=', ''],
+					start: ['Templated', '=', 'Démarré'],
+					end: ['Templated', '=', 'Fini'],
+					status: [
+						'Templated[]',
+						'=',
+						() => [
+							'{{ laps.doneCount }}/{{ laps.totalCount }}',
+							'{{ formatDurationStopwatch total.remainingMs }}',
+						],
+					],
+				})
+				.default(() => ({})),
+		})
+			.describe(
+				"Timer d'aide à la réalisation du protocole, visible lorsque l'on prend des photos dans l'app"
+			)
+			.pipe((timers) => {
+				if (timers.every) return timers;
+				return {
+					...timers,
+					every: timers.during,
+				};
+			}),
 	},
 	importedMetadata: type({
 		sessionwide: [

@@ -7,6 +7,7 @@ import { format as formatDate, formatISO, parse as parseDate } from 'date-fns';
 import Handlebars from 'handlebars';
 import jsonata from 'jsonata';
 
+import { formatDurationStopwatch } from '../date.js';
 import { getCurrentLocation } from '../geolocation.js';
 import { errorMessage } from '../i18n.js';
 import {
@@ -297,6 +298,17 @@ export const HELPERS = /** @type {const} */ ({
 		 */
 		implementation(datestring, format) {
 			return formatDate(new Date(datestring), format);
+		},
+	},
+	formatDurationStopwatch: {
+		documentation:
+			'Formatte une durée au format "chronomètre" (XX:XX\'XX") à partir d\'une durée en millisecondes',
+		usage: [[(2 * 3600e3 + 52 * 60e3 + 5e3).toString()], '02:52\'05"'],
+		/**
+		 * @param {number} milliseconds
+		 */
+		implementation(milliseconds) {
+			return formatDurationStopwatch(milliseconds);
 		},
 	},
 	object: {

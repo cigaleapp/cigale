@@ -31,6 +31,7 @@ export type PlaywrightTestId =
 	| 'goto-accounts'
 	| 'mobile-goto-current-session'
 	| 'mobile-goto-import'
+	| 'mobile-goto-camera'
 	| 'mobile-goto-crop'
 	| 'mobile-goto-classify'
 	| 'mobile-goto-results'
