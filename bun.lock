@@ -8,7 +8,7 @@
         "@andy0130tw/es-arraybuffer-base64": "^1.1.2-browser.0",
         "@capacitor-community/camera-preview": "^8.0.1",
         "@capacitor/android": "^8.4.1",
-        "@capacitor/app": "^8.1.0",
+        "@capacitor/app": "^8.1.1",
         "@capacitor/core": "^8.4.1",
         "@capacitor/file-viewer": "^2.0.1",
         "@capacitor/filesystem": "^8.1.2",
@@ -235,7 +235,7 @@
 
     "@capacitor/android": ["@capacitor/android@8.4.1", "", { "peerDependencies": { "@capacitor/core": "^8.4.0" } }, "sha512-igtDCJ7QQn0P2qHFD9p4KXaa6V1b2PRNt+MxjVwtjTm/BJvqmiazOJq6rPjwFSZnfHm6iFoZk8TfzHd44pyBGw=="],
 
-    "@capacitor/app": ["@capacitor/app@8.1.0", "", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-MlmttTOWHDedr/G4SrhNRxsXMqY+R75S4MM4eIgzsgCzOYhb/MpCkA5Q3nuOCfL1oHm26xjUzqZ5aupbOwdfYg=="],
+    "@capacitor/app": ["@capacitor/app@8.1.1", "", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-xM2ZTX5jK60tFtmjsmJv+Cdj1Qsb6NcavkqmdEnCPQBeya9oKhamZJxYOnQNj1ZvcJM7sWfG6BEtSLx42pisbA=="],
 
     "@capacitor/assets": ["@capacitor/assets@3.0.5", "", { "dependencies": { "@capacitor/cli": "^5.3.0", "@ionic/utils-array": "2.1.6", "@ionic/utils-fs": "3.1.7", "@trapezedev/project": "^7.0.10", "commander": "8.3.0", "debug": "4.3.4", "fs-extra": "10.1.0", "node-fetch": "2.7.0", "node-html-parser": "5.4.2", "sharp": "0.32.6", "tslib": "2.6.2", "yargs": "17.7.2" }, "bin": { "capacitor-assets": "bin/capacitor-assets" } }, "sha512-ohz/OUq61Y1Fc6aVSt0uDrUdeOA7oTH4pkWDbv/8I3UrPjH7oPkzYhShuDRUjekNp9RBi198VSFdt0CetpEOzw=="],
 
