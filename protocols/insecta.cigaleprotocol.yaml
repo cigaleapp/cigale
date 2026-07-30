@@ -259,7 +259,7 @@ sessionMetadata:
     description: Si il y a du vent mais que sa vitesse est trop faible pour être détectée par votre anémomètre, indiquez 1 km/h
     # TODO: once https://github.com/jonahsnider/convert/issues/497 is resolved
     # implement speed units and use them here
-    display: 
+    display:
       suffix: km/h
     mergeMethod: average
     required: false
@@ -389,7 +389,7 @@ sessionMetadata:
 metadata:
   f_stop:
     label: Ouverture
-    description: ""
+    description: ''
     learnMore: https://fr.wikipedia.org/wiki/Ouverture_(photographie)
     type: float
     mergeMethod: average
