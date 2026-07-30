@@ -251,7 +251,7 @@ sessionMetadata:
     required: true
     pattern: year, month, day, hours, minutes, uppercase letter minimum 2 times
     default: |
-      {{ formatDate (metadata session "date") "yyyymmDDHHMM" }}
+      {{ formatDate (metadata session "date") "yyyyMMddHHmm" }}
 
   wind_speed:
     type: float
