@@ -77,7 +77,7 @@
 	const resultsTabDisabled = false;
 
 	const importTabOpensCamera = $derived(
-		mobile.current && Boolean(uiState.currentProtocol?.capture) 
+		mobile.current && Boolean(uiState.currentProtocol?.capture)
 	);
 
 	/* eslint-disable svelte/prefer-writable-derived */
