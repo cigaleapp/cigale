@@ -187,8 +187,16 @@ describe('coerceExifValue', () => {
 		});
 	});
 
-	test('to float', () => {
-		expect(coerceExifValue('float', '1.23')).toEqual(1.23);
+	describe('to float', () => {
+		test('plain', () => {
+			expect(coerceExifValue('float', '1.23')).toEqual(1.23);
+		});
+		test('temperature, regular', () => {
+			expect(coerceExifValue('float', '38.4', 'Temperature')).toEqual(38.4);
+		});
+		test('temperature, sentinel value', () => {
+			expect(coerceExifValue('float', '-1000', 'Temperature')).toBeUndefined();
+		});
 	});
 
 	test('to int', () => {

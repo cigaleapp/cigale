@@ -1,7 +1,7 @@
 import { ArkErrors, scope, type } from 'arktype';
 
 import { parseISOSafe } from '../date.js';
-import { EXIF_FIELDS } from '../exiffields.js';
+import { EXIF_FIELDS, EXIF_FIELDS_DETAILS } from '../exiffields.js';
 import { boundingBoxResolver } from '../inference_utils.js';
 import { ensureArray, entries, keys, mapValues, transformObject, unique } from '../utils.js';
 import {
@@ -290,9 +290,18 @@ export const MetadataEnumVariant = type({
 	_narrowableIn: type('string[]').default(() => []),
 });
 
-export const EXIFField = type.enumerated(...keys(EXIF_FIELDS));
+export const EXIFField = type.or(
+	...EXIF_FIELDS_DETAILS.map(({ key, description }) =>
+		type(
+			/** @type {const} */
+			(`"${key}"`),
+			'@',
+			description
+		)
+	)
+);
 
-export const EXIFInference = EXIFField.describe('Inférer depuis un champ EXIF', 'self');
+export const EXIFInference = EXIFField;
 
 export const SidecarFilepathTemplatePayload = type({
 	filepath: ['string', '@', "Chemin vers le fichier de l'image traitée"],
@@ -325,8 +334,8 @@ export const SidecarInference = (QueryOutput) =>
 
 export const InferenceConfigs = /** @type {const} */ ({
 	exif: type({
-		exif: EXIFInference.describe("Inférer depuis les données EXIF de l'image"),
-	}),
+		exif: EXIFInference,
+	}).configure("Inférer depuis les données EXIF de l'image", "self"),
 
 	/**
 	 * @template {import('arktype').Type} T

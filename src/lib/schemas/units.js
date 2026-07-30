@@ -1,6 +1,10 @@
 import { type } from 'arktype';
 import { conversions } from 'convert/conversions';
 
+/**
+ * @import { ValueOfMap } from '$lib/utils.js';
+ */
+
 export const NumericUnit = type.enumerated(
 	// TODO turn ...[...x] into just ...x once Vite build supports Iterator#flatMap
 	// see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Iterator/flatMap
@@ -35,17 +39,34 @@ export function findUnit(nameOrSymbol) {
  * @returns {import('convert').Unit[]}
  */
 export function availableUnitsFor(unit) {
+	/**
+	 *
+	 * @param {ValueOfMap<typeof conversions>['units'][number]} def
+	 * @param {import('convert').Unit} u
+	 * @returns
+	 */
+	const matchesUnitDefinition = (def, u) => def.names.includes(u) || def.symbols.includes(u);
+
 	// TODO turn [...x] into just x once Vite build supports Iterator#flatMap
 	// see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Iterator/flatMap
 	const kind = [...conversions.values()].find((kind) =>
-		kind.units.some(
-			(u) =>
-				/** @type {readonly string[]} */ (u.names).includes(unit) ||
-				('symbols' in u && /** @type {readonly string[]} */ (u.symbols).includes(unit))
-		)
+		kind.units.some((def) => matchesUnitDefinition(def, unit))
 	);
 
-	return kind?.units.map(({ names }) => names[0]) ?? [];
+	if (!kind) return [];
+
+	const best = new Set([...kind.best.metric, ...kind.best.imperial]);
+	const currentUnitSymbols = new Set([
+		...(kind.units.find((def) => matchesUnitDefinition(def, unit))?.symbols ?? []),
+	]);
+
+	let candidates = kind.units;
+
+	if (best.size > 1 && best.intersection(currentUnitSymbols).size > 0) {
+		candidates = candidates.filter(({ symbols }) => symbols.some((symbol) => best.has(symbol)));
+	}
+
+	return candidates.map(({ names: [name] }) => /** @type {import('convert').Unit} */ (name));
 }
 
 /**
