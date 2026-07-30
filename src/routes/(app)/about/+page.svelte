@@ -336,7 +336,18 @@
 		par <a href="https://www.zhangxiaochun.com/">Jimmy Cheung</a> et
 		<a href="https://gaoquanquan.com/">Wendy Gao</a>
 	</dd>
-
+	<dt>Effets sonores</dt>
+	<dd>
+		<dl>
+			<dt>Timer - tour terminé</dt>
+			<dd><a href="https://uppbeat.io/sfx/futuristic-interface-click/7165/23135">Futuristic interface - click par betacut</a></dd>
+			<dt>Timer - terminé</dt>
+			<dd><a href="https://uppbeat.io/sfx/ui-alarm-alert-bells/168277/56100">UI alarm - alert bells par RA Music</a></dd>
+			<dt>Batterie faible</dt>
+			<dd><a href="https://uppbeat.io/sfx/classic-low-battery-alert/165165/48533">Classic low battery alert par Brukowskij</a></dd>
+		</dl>
+	</dd>
+	
 	<dt>Grâce aux bibliothèques</dt>
 	<dd>
 		{#await showDependencies()}

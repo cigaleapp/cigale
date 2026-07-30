@@ -82,6 +82,22 @@ if (import.meta.vitest) {
 }
 
 /**
+ * Formats a duration, in a stopwatch / scoreboard format (XX:XX'XX")
+ */
+export function formatDurationStopwatch(durationMs: number): `${number}:${number}'${number}"` {
+	const { hours, minutes, seconds } = intervalToDuration({
+		start: Date.now(),
+		end: Date.now() + durationMs,
+	});
+
+	const [h, m, s] = [hours, minutes, seconds].map(
+		(val) => (val ?? 0).toString().padStart(2, '0') as `${number}`
+	);
+
+	return `${h}:${m}'${s}"` as const;
+}
+
+/**
  * Formats a date as a distance to now, but in a short format (e.g. "5m" instead of "5 minutes ago")
  * Uses Intl.DurationFormat#formatToParts under the hood
  * @returns array of non-whitespace-only parts. In practice, this is a alternating array of numbers and unit strings, in descending order of magnitude (e.g. ["1", "d", "5", "hr"] for "1 day and 5 hours ago"). Useful if you have not much space and wanna cut it to e.g. only "1d" instead of "1d 5hr".

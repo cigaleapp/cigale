@@ -389,6 +389,16 @@ sessionMetadata:
 # All metadata are imported from the base arthropods protocol
 metadata: {}
 
+capture:
+  timers:
+    every: 30s
+    during: 20min
+    messages:
+      lap: Faire un pas en avant
+      status:
+        - '{{ laps.doneCount }} pas / {{ laps.totalCount }}'
+        - '{{ formatDurationStopwatch total.remainingMs }}'
+
 exports:
   images:
     mtime: shoot_date

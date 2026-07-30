@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { CameraPreview } from '@capacitor-community/camera-preview';
 	import { Capacitor } from '@capacitor/core';
+	import { Haptics, ImpactStyle } from '@capacitor/haptics';
 	import { onDestroy } from 'svelte';
 	import { fade } from 'svelte/transition';
 
@@ -12,6 +13,7 @@
 	import IconFlashOff from '~icons/ri/flashlight-line';
 	import IconMore from '~icons/ri/more-line';
 	import IconGallery from '~icons/ri/multi-image-line';
+	import IconStartTimer from '~icons/ri/timer-line';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import LoadingText, { Loading } from '$lib/LoadingText.svelte';
 	import { goto } from '$lib/paths.js';
@@ -29,23 +31,28 @@
 	import { percent, plural } from '$lib/i18n.js';
 	import LoadingScreen from '$lib/LoadingScreen.svelte';
 	import ModalConfirm from '$lib/ModalConfirm.svelte';
+	import { getSettings, toggleSetting } from '$lib/settings.svelte.js';
+	import { sfx } from '$lib/sound.js';
 	import { uiState } from '$lib/uistate.svelte.js';
 	import { cycleValues, orEmpty, switchValue } from '$lib/utils.js';
 
 	import ModalSubmitIssue from '../ModalSubmitIssue.svelte';
 	import { cameraStarted, refreshSupportedFlashModes, startCamera } from './camera.js';
 	import { PendingStorage } from './pendingstorage.svelte.js';
+	import { Timer } from './timers.svelte.js';
 
 	let submitBugReport = $state<() => void>();
 
 	let floatingMessage = $state('');
 	let floatingMessageFadeout = $state<number>();
-	function setFloatingMessage(message: string) {
+	function setFloatingMessage(category: string, message: string) {
+		if (!message || !category) return;
+
 		if (floatingMessageFadeout) {
 			clearTimeout(floatingMessageFadeout);
 		}
 
-		floatingMessage = message;
+		floatingMessage = `${category}: ${message}`;
 		floatingMessageFadeout = afterDelay('3s', () => {
 			floatingMessage = '';
 		});
@@ -144,12 +151,41 @@
 	async function finish() {
 		const allOk = await pendingStorage?.flush({
 			onProgress({ done, total }) {
-				setFloatingMessage(`Import: ${done}/${total} (${percent(done / total)})`);
+				setFloatingMessage('Import', `${done}/${total} (${percent(done / total)})`);
 			},
 		});
 
 		if (allOk) await goto('/(app)/(sidepanel)/import');
 	}
+
+	const timer = $derived.by(() => {
+		const settings = uiState.currentProtocol?.capture?.timers;
+		if (!settings) return;
+		return new Timer(settings, {
+			onstart(t) {
+				setFloatingMessage('Timer', t.formatMessage(settings.messages.start));
+				void Haptics.impact({ style: ImpactStyle.Heavy });
+			},
+			onlap(t) {
+				setFloatingMessage('Timer', t.formatMessage(settings.messages.lap));
+				if (getSettings().timerSounds) sfx('timer-lap');
+				void Haptics.impact({ style: ImpactStyle.Medium });
+			},
+			onfinished(t) {
+				setFloatingMessage('Timer', t.formatMessage(settings.messages.end));
+				if (getSettings().timerSounds) sfx('timer-finished');
+				void Haptics.impact({ style: ImpactStyle.Heavy });
+			},
+		});
+	});
+
+	function startTimer() {
+		timer?.start();
+	}
+
+	onDestroy(() => {
+		timer?.stop();
+	});
 </script>
 
 <ModalSubmitIssue type="bug" bind:open={submitBugReport} trigger={false} />
@@ -187,13 +223,24 @@
 									await refreshSupportedFlashModes(camera);
 
 									setFloatingMessage(
+										'Objectif',
 										switchValue(camera.side, {
-											rear: 'Objectif: arrière',
-											front: 'Objectif: avant',
+											rear: 'Arrière',
+											front: 'Avant',
 										})
 									);
 								},
 							}),
+							{
+								label: 'Effets sonores pour le timer',
+								type: 'selectable',
+								data: null,
+								selected: getSettings().timerSounds,
+								closeOnSelect: false,
+								onclick() {
+									toggleSetting('timerSounds');
+								},
+							},
 							{
 								label: 'Quitter et garder les photos',
 								type: 'clickable',
@@ -251,12 +298,13 @@
 
 						camera.flash.current = nextFlashMode;
 						setFloatingMessage(
-							`Flash: ${switchValue(camera.flash.current, {
+							'Flash',
+							switchValue(camera.flash.current, {
 								off: 'Off',
 								on: 'On',
 								auto: 'Auto',
 								torch: 'Lampe-torche',
-							})}`
+							})
 						);
 					}}
 				>
@@ -271,8 +319,14 @@
 			{/if}
 		</section>
 		<section class="center">
-			{#if uiState.currentSession}
-				<div class="session">{uiState.currentSession.name}</div>
+			{#if timer?.started}
+				<div class="info">
+					{#each uiState.currentProtocol.capture!.timers.messages.status as line, i (i)}
+						<div class="line">{timer.formatMessage(line)}</div>
+					{/each}
+				</div>
+			{:else if uiState.currentSession}
+				<div class="info">{uiState.currentSession.name}</div>
 			{/if}
 		</section>
 		<section class="quit">
@@ -338,19 +392,63 @@
 				</span>
 			</ButtonSecondary>
 		</section>
-		<button class="shoot" disabled={!ready} title="Prendre une photo" onclick={capture}>
+		<button
+			class="shoot"
+			disabled={!ready}
+			title="Prendre une photo"
+			onclick={() => {
+				if (timer && !timer.started) startTimer();
+				else capture();
+			}}
+		>
+			{#if timer && !timer.started}
+				<div class="start-timer-icon">
+					<IconStartTimer />
+				</div>
+			{/if}
 			<svg class="shoot-icon">
 				<circle
 					class="ring"
 					cx="50%"
 					cy="50%"
-					r="48%"
+					r="43%"
 					fill="none"
 					stroke="var(--color, white)"
 					stroke-width="2px"
+					stroke-linecap="round"
+					{@attach (node: SVGCircleElement) => {
+						if (!timer) return;
+						const length = node.getTotalLength();
+						const nongap = (length - 4 * timer.lapsTotalCount) / timer.lapsTotalCount;
+						node.style.strokeDasharray = `${Math.round(nongap)} 4`;
+					}}
 				></circle>
-				<circle class="inside" cx="50%" cy="50%" r="40%" fill="var(--color, white)"
+
+				<circle
+					class="inside"
+					cx="50%"
+					cy="50%"
+					r="{timer && !timer.started ? 0 : 37}%"
+					fill="var(--color, white)"
 				></circle>
+
+				{#if timer}
+					<circle
+						class="timer-progress"
+						cx="50%"
+						cy="50%"
+						r="43%"
+						fill="none"
+						stroke="var(--progress-color, var(--fg-primary))"
+						stroke-width="3px"
+						{@attach (node: SVGCircleElement) => {
+							const length = node.getTotalLength();
+							node.style.strokeDasharray = `${timer.globalProgress * length} 1000000`;
+							node.style.transformOrigin = '50% 50%';
+							node.style.rotate = '-90deg';
+						}}
+					></circle>
+				{/if}
 			</svg>
 		</button>
 		<section class="right">
@@ -503,9 +601,13 @@
 			}
 		}
 
-		.session {
+		.info {
 			color: white;
 			text-align: center;
+			/*display: flex;
+			justify-content: center;
+			align-items: center;
+			gap: 1em*/
 		}
 	}
 
@@ -530,6 +632,22 @@
 
 		&:disabled .shoot-icon {
 			--color: darkgray;
+		}
+
+		.shoot-icon circle {
+			transition: 500ms;
+		}
+
+		& {
+			position: relative;
+
+			.start-timer-icon {
+				position: absolute;
+				inset: 0;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+			}
 		}
 	}
 

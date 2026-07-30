@@ -1,6 +1,7 @@
 import { type } from 'arktype';
 
 import { clamp, cleanFilepath, safeJSONStringify } from '../utils.js';
+import { ms } from 'convert'
 import { TemplatedString } from './expressions.js';
 
 export const ID = type(/^[\w._-]+$/);
@@ -150,3 +151,5 @@ export const SingleEntryRecord = (k, v) =>
 		const [key, value] = entries[0];
 		return { key: k.assert(key), value: v.assert(value) };
 	});
+
+export const MillisecondsLiteral =  type('/^\\d+(\\.\\d+)?(?<unit>ms|s|min|h)$/').pipe(literal => ms(literal))
