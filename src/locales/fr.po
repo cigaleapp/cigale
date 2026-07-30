@@ -3049,3 +3049,8 @@ msgstr "Batterie faible"
 #: src/routes/(app)/about/+page.svelte
 msgid "Effets sonores"
 msgstr "Effets sonores"
+
+#: src/lib/exif.ts
+#: src/lib/exif.ts
+msgid "Temperature"
+msgstr "Temperature"

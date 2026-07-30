@@ -3049,3 +3049,8 @@ msgstr ""
 #: src/routes/(app)/about/+page.svelte
 msgid "Effets sonores"
 msgstr ""
+
+#: src/lib/exif.ts
+#: src/lib/exif.ts
+msgid "Temperature"
+msgstr ""
