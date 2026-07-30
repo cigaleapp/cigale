@@ -124,6 +124,22 @@ export const HELPERS = /** @type {const} */ ({
 			return `${(value * 100).toFixed(decimals)}%`;
 		},
 	},
+	fraction: {
+		documentation:
+			'Convertit un numérateur et un nombre entre 0 et numérateur en une string "numérateur/dénominateur", avec dénominateur entier (arrondi). Si le nombre est en dehors de ]0, numérateur], il est renvoyé tel-quel',
+
+		usage: [['1', '0.0040000837293'], '1/250'],
+		/**
+		 * @param {number} numerator
+		 * @param {number} value
+		 */
+		implementation(numerator, value) {
+			if (value > numerator) return value.toString();
+			if (value <= 0) return value.toString();
+
+			return [numerator, Math.round(numerator / value)].join('/');
+		},
+	},
 	metadata: {
 		documentation:
 			"Récupère la valeur d'une métadonnée sur un subjet (une session, une observation ou une image) donnée. L'ID de la métadonnée peut ne pas comporter de namespace. Dans ce cas, le namespace correspondant au protocole courant est utilisé. Renvoie null si la métadonnée n'existe pas.",
