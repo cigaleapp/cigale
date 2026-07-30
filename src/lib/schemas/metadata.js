@@ -335,7 +335,7 @@ export const SidecarInference = (QueryOutput) =>
 export const InferenceConfigs = /** @type {const} */ ({
 	exif: type({
 		exif: EXIFInference,
-	}).configure("Inférer depuis les données EXIF de l'image", "self"),
+	}).configure("Inférer depuis les données EXIF de l'image", 'self'),
 
 	/**
 	 * @template {import('arktype').Type} T

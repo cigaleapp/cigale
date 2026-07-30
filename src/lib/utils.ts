@@ -120,7 +120,7 @@ if (import.meta.vitest) {
 	});
 }
 
-export function entries<K extends string|number, V>(subject: Record<K, V>): Array<[K, V]> {
+export function entries<K extends string | number, V>(subject: Record<K, V>): Array<[K, V]> {
 	// @ts-expect-error can't preserve types though Object.entries
 	return Object.entries(subject);
 }
@@ -1617,4 +1617,6 @@ if (import.meta.vitest) {
 	});
 }
 
-export type ValueOfMap<M> = M extends Map<unknown, infer V> | ReadonlyMap<unknown, infer V> ? V : never
+export type ValueOfMap<M> = M extends Map<unknown, infer V> | ReadonlyMap<unknown, infer V>
+	? V
+	: never;
