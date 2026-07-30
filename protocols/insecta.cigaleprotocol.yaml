@@ -251,9 +251,7 @@ sessionMetadata:
     required: true
     pattern: year, month, day, hours, minutes, uppercase letter minimum 2 times
     default: |
-      {{#with (metadata session "date") }}
-        {{ year . }}{{ month . }}{{ day . }}{{ hour . }}{{ minute . }}ABC
-      {{/with}}
+      {{ formatDate (metadata session "date") "YYYYmmDDHHMM" }}
 
   wind_speed:
     type: float
@@ -386,8 +384,66 @@ sessionMetadata:
     label: Remarque ou commentaire
     mergeMethod: none
 
-# All metadata are imported from the base arthropods protocol
-metadata: {}
+metadata:
+  f_stop:
+    label: Ouverture
+    description: Nombre après le "f/"
+    learnMore: https://fr.wikipedia.org/wiki/Ouverture_(photographie)
+    type: float
+    mergeMethod: average
+    required: false
+    range: x >= 0
+    infer:
+      exif: FNumber
+  focal_length:
+    label: Focale
+    description: Longueur de focale, au format 35mm
+    learnMore: https://fr.wikipedia.org/wiki/Distance_focale_%C3%A9quivalente_en_35_mm
+    type: float
+    unit: mm
+    range: x >= 0
+    mergeMethod: average
+    required: false
+    infer:
+      exif: FocalLengthIn35mmFilm
+  shutter_speed:
+    label: Vitesse d'obturation
+    description: Aussi appelé Durée d'exposition ou Temps de pose. _Shutter speed_ en anglais.
+    learnMore: https://fr.wikipedia.org/wiki/Temps_de_pose
+    type: float
+    unit: seconds
+    range: x >= 0
+    mergeMethod: average
+    required: false
+    infer:
+      exif: ExposureTime
+  iso:
+    label: Sensibilité ISO
+    description: ''
+    learnMore: https://fr.wikipedia.org/wiki/Sensibilité_ISO
+    type: integer
+    mergeMethod: average
+    range: x >= 0
+    required: false
+    infer:
+      exif: ISOSpeedRatings
+
+  camera_brand:
+    label: ''
+    description: ''
+    type: string
+    mergeMethod: none
+    required: false
+    infer:
+      exif: Make
+  camera_model:
+    label: ''
+    description: ''
+    type: string
+    mergeMethod: none
+    required: false
+    infer:
+      exif: Model
 
 capture:
   timers:
