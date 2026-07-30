@@ -255,10 +255,12 @@ sessionMetadata:
 
   wind_speed:
     type: float
+    label: Vitesse du vent
+    description: Si il y a du vent mais que sa vitesse est trop faible pour être détectée par votre anémomètre, indiquez 1 km/h
     # TODO: once https://github.com/jonahsnider/convert/issues/497 is resolved
     # implement speed units and use them here
-    label: Vitesse du vent (km/h)
-    description: Si il y a du vent mais que sa vitesse est trop faible pour être détectée par votre anémomètre, indiquez 1 km/h
+    display: 
+      suffix: km/h
     mergeMethod: average
     required: false
     range: 1..30
@@ -387,12 +389,14 @@ sessionMetadata:
 metadata:
   f_stop:
     label: Ouverture
-    description: Nombre après le "f/"
+    description: ""
     learnMore: https://fr.wikipedia.org/wiki/Ouverture_(photographie)
     type: float
     mergeMethod: average
     required: false
     range: x >= 0
+    display:
+      prefix: f/
     infer:
       exif: FNumber
   focal_length:
@@ -412,18 +416,26 @@ metadata:
     learnMore: https://fr.wikipedia.org/wiki/Temps_de_pose
     type: float
     unit: seconds
+    display:
+      format: $fraction(1, value)
+      parse: |
+        $contains(value, "/")
+          ? 1 / $number($split(value, "/")[1])
+          : $number(value)
     range: x >= 0
     mergeMethod: average
     required: false
     infer:
       exif: ExposureTime
   iso:
-    label: Sensibilité ISO
+    label: Sensibilité
     description: ''
     learnMore: https://fr.wikipedia.org/wiki/Sensibilité_ISO
     type: integer
     mergeMethod: average
     range: x >= 0
+    display:
+      prefix: 'ISO '
     required: false
     infer:
       exif: ISOSpeedRatings

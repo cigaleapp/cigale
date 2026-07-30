@@ -1,9 +1,9 @@
-import { ArkErrors, scope, type } from 'arktype';
+import { type } from 'arktype';
 
 import { parseISOSafe } from '../date.js';
-import { EXIF_FIELDS, EXIF_FIELDS_DETAILS } from '../exiffields.js';
+import { EXIF_FIELDS_DETAILS } from '../exiffields.js';
 import { boundingBoxResolver } from '../inference_utils.js';
-import { ensureArray, entries, keys, mapValues, transformObject, unique } from '../utils.js';
+import { ensureArray, entries, mapValues, transformObject, unique } from '../utils.js';
 import {
 	ColorHex,
 	FilepathTemplate,
@@ -493,10 +493,18 @@ export const MetadataString = MetadataBase.and({
 	'pattern?': NaturalRegexExpression,
 });
 
+export const MetadataNumericDisplay = type({
+	'prefix?': 'string',
+	'suffix?': 'string',
+	'format?': JsonataExpression(type({ value: 'number' }), type('string')),
+	'parse?': JsonataExpression(type({ value: 'string' }), type('number')),
+});
+
 export const MetadataInteger = MetadataBase.and({
 	type: '"integer"',
 	'range?': NumberRangeLiteral,
 	'default?': MetadataDefault.integer,
+	'display?': MetadataNumericDisplay,
 	'infer?': type.and(
 		InferenceConfigs.exif.partial(),
 		InferenceConfigs.sidecar(type('number.integer')).partial()
@@ -508,6 +516,7 @@ export const MetadataFloat = MetadataBase.and({
 	type: '"float"',
 	'range?': NumberRangeLiteral,
 	'default?': MetadataDefault.float,
+	'display?': MetadataNumericDisplay,
 	'infer?': type.and(
 		InferenceConfigs.exif.partial(),
 		InferenceConfigs.sidecar(type('number')).partial()

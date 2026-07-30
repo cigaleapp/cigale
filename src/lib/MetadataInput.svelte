@@ -283,6 +283,7 @@
 					{/snippet}
 				</EnumButtons>
 			{:else}
+				<!-- If we have less than like, 10 options, don't show selected +suggestions first, as in that case we can easily see all options at once anyways and it allows sorting by the metadata definition's order, which will be prettier (e.g. conservation status' color gradient) -->
 				<MetadataCombobox
 					{id}
 					{options}
@@ -295,7 +296,6 @@
 					type="single"
 					disabled={disabled ?? false}
 					value={deserializeValueIfNeeded(value)}
-					// If we have less than like, 10 options, don't show selected +suggestions first, as in that case we can easily see all options at once anyways and it allows sorting by the metadata definition's order, which will be prettier (e.g. conservation status' color gradient)
 					sorter={(options ?? []).length <= 10
 						? compareBy((opt) => opt.index)
 						: undefined}
@@ -338,7 +338,7 @@
 				}}
 			/>
 		{/snippet}
-		{#snippet numeric(val, { range: intervalInBaseUnit, unit: baseUnit })}
+		{#snippet numeric(val, { range: intervalInBaseUnit, unit: baseUnit, display })}
 			{@const interval = intervalInBaseUnit
 				? mapValues(pick(intervalInBaseUnit, 'min', 'max'), (v) =>
 						valueUnit && baseUnit && v !== undefined
@@ -348,11 +348,14 @@
 				: undefined}
 			<div class="value-and-unit">
 				<div class="underscored">
+					{#if display?.prefix}
+						<div class="prefix">{display.prefix.replaceAll(' ', '\u00A0')}</div>
+					{/if}
 					<input
 						{id}
 						{disabled}
 						type="text"
-						inputmode="numeric"
+						inputmode={display?.parse ? undefined : 'numeric'}
 						{...interval}
 						onblur={async ({ currentTarget }) => {
 							if (!(currentTarget instanceof HTMLInputElement)) return;
@@ -362,8 +365,9 @@
 								return;
 							}
 
-							let parsedValue: number | undefined =
-								definition.type === 'integer'
+							let parsedValue: number | undefined = display?.parse
+								? await display.parse.evaluate({ value: newValue })
+								: definition.type === 'integer'
 									? Number.parseInt(newValue, 10)
 									: Number.parseFloat(newValue);
 
@@ -373,8 +377,15 @@
 
 							await onblur(parsedValue, selectedUnit);
 						}}
-						value={temporaryValue ?? val?.toString() ?? ''}
+						value={(temporaryValue ?? val) === undefined
+							? ''
+							: display?.format
+								? await display.format.evaluate({ value: temporaryValue ?? val })
+								: (temporaryValue ?? val)!.toString()}
 					/>
+					{#if display?.suffix}
+						<div class="suffix">{display.suffix.replaceAll(' ', '\u00A0')}</div>
+					{/if}
 				</div>
 
 				{#if baseUnit}
@@ -858,7 +869,7 @@
 		gap: 0.5em;
 	}
 
-	.metadata-input:is([data-type='integer'], [data-type='float']) input {
+	.metadata-input:is([data-type='integer'], [data-type='float']) .underscored {
 		text-align: right;
 		max-width: 10ch;
 	}

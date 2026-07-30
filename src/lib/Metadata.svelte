@@ -173,7 +173,7 @@
 							<IconTechnical />
 						</div>
 						<code>
-							<OverflowableText text={definition.id} />
+							<OverflowableText text={splitMetadataId(definition.id).id} />
 						</code>
 					{/if}
 				</label>
