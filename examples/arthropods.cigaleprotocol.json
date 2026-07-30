@@ -3,8 +3,8 @@
 	"id": "io.github.cigaleapp.arthropods.example",
 	"name": "Example: arthropodes",
 	"summary": "Protocole de base pour arthropodes",
-	"learnMore": "https://github.com/cigaleapp/cigale/tree/042136ab1be5886b01022a4b7a586b7c426af519/scripts/README.md#protocoles-arthropodsexample",
-	"version": 112,
+	"learnMore": "https://github.com/cigaleapp/cigale/tree/e427720bdce0d7bbdf8d555c8986eecaffebb606/scripts/README.md#protocoles-arthropodsexample",
+	"version": 113,
 	"updates": "automatic",
 	"source": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json",
 	"description": "Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification\n\nClés d'identification d'abeilles fournies par IDmyBee.com, extraites depuis [IDMYBEE - Andrena sur Xper3](https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html).",
@@ -392,10 +392,10 @@
 					"learnMore": "https://gbif.org/species/1"
 				},
 				{
-					"key": "330213397",
+					"key": "331217812",
 					"label": "Animalia",
 					"description": "",
-					"learnMore": "https://gbif.org/species/330213397"
+					"learnMore": "https://gbif.org/species/331217812"
 				},
 				{
 					"key": "4",
@@ -437,12 +437,12 @@
 					}
 				},
 				{
-					"key": "330213398",
+					"key": "331217813",
 					"label": "Arthropoda",
 					"description": "",
-					"learnMore": "https://gbif.org/species/330213398",
+					"learnMore": "https://gbif.org/species/331217813",
 					"cascade": {
-						"kingdom": "330213397"
+						"kingdom": "331217812"
 					}
 				},
 				{
@@ -631,13 +631,13 @@
 					}
 				},
 				{
-					"key": "330213399",
+					"key": "331217814",
 					"label": "Insecta",
 					"description": "",
-					"learnMore": "https://gbif.org/species/330213399",
+					"learnMore": "https://gbif.org/species/331217814",
 					"cascade": {
-						"phylum": "330213398",
-						"kingdom": "330213397"
+						"phylum": "331217813",
+						"kingdom": "331217812"
 					}
 				},
 				{
@@ -1052,14 +1052,14 @@
 					}
 				},
 				{
-					"key": "330213400",
+					"key": "331217815",
 					"label": "Hymenoptera",
 					"description": "",
-					"learnMore": "https://gbif.org/species/330213400",
+					"learnMore": "https://gbif.org/species/331217815",
 					"cascade": {
-						"class": "330213399",
-						"phylum": "330213398",
-						"kingdom": "330213397"
+						"class": "331217814",
+						"phylum": "331217813",
+						"kingdom": "331217812"
 					}
 				},
 				{
@@ -1997,15 +1997,15 @@
 					}
 				},
 				{
-					"key": "330213438",
+					"key": "331217853",
 					"label": "Andrenidae",
 					"description": "",
-					"learnMore": "https://gbif.org/species/330213438",
+					"learnMore": "https://gbif.org/species/331217853",
 					"cascade": {
-						"order": "330213400",
-						"class": "330213399",
-						"phylum": "330213398",
-						"kingdom": "330213397"
+						"order": "331217815",
+						"class": "331217814",
+						"phylum": "331217813",
+						"kingdom": "331217812"
 					}
 				},
 				{
@@ -16278,16 +16278,16 @@
 					}
 				},
 				{
-					"key": "330213441",
+					"key": "331217856",
 					"label": "Andrena",
 					"description": "**Ordre : Hymenoptera**  \n**Sous-ordre : Apocrita**  \n**Infra-ordre :**  \n**Super famille : Apoidea**  \n**Famille : Andrenidae**  \n**Sous-famille : Andreninae**  \n**Tribu :**  \n**Genre : _Andrena_**  \n**Espèce :**\n\nIl existe beaucoup d’espèces d’_Andrena_ en France, en particulier dans le sud. N’ayant accès qu’à la clé des _Andrena_ du nord de la France, beaucoup d’espèces ne sont pas identifiables sur photo.\n\nCelle-ci est probablement une _Andrena thoracica_, mais difficile d’en être sûre. Il faudrait une meilleure vue des pleures et des épines tibiales. Voici [le sujet complet](https://www.insecte.org/forum/viewtopic.php?t=241647) sur insecte.org, avec le cheminement.\n\nCette vieille femelle pourrait appartenir à 3 espèces : _afrensis, agilissima_ ou _asperrima_. Il faudrait voir la ponctuation sur le premier tergite, un individu frais est aussi plus facile à identifier.\n\nUn mâle problématique d’_Andrena_, peut-être du sous genre _Micrandrena_ avec sa petite taille mais je n’ai pas tous les éléments pour en être certaine. Avec sa pilosité entièrement blonde sauf sur la face et à la base des antennes, j’ai repéré 3 espèces : _minutula_, _minutuloides_ et _bicolor_. Mais il en exste peut-être d’autres, surtout dans le sud de la France. [Sujet ici](https://www.insecte.org/forum/viewtopic.php?f=3&t=210787&hilit=andrena).\n\nEn suivant quand même la clé pour ce mâle, je note que A3 (le 3ème segment antennaire) est bien plus petit que A4. Le sous genre Hoplandrena pourrait correspondre avec ce rouge à l’apex des tergites. J’ai reçu de l’aide pour en arriver là, car suivre la clé à la lettre jusqu’à ce stade est très compliqué. Ce pourrait être _A. trimmerana_ mais la 1ère génération de printemps aurai une épine fine sur la joue, ou alors _A. carantonica_ (qui aurait aussi des liserés rouge) et une courte dent émoussée sur la joue, comme ici. Mais on ne peut exclure avec la clé les espèces sudistes dont je ne connais pas les critères distinctifs. Le sujet de discussion : [https://www.insecte.org/forum/viewtopic.php?f=3&t=192496&hilit=andrena](https://www.insecte.org/forum/viewtopic.php?f=3&t=192496&hilit=andrena)",
 					"learnMore": "https://jessica-joachim.com/insectes/hymenopteres/andrenidae/andrena-sp/",
 					"cascade": {
-						"family": "330213438",
-						"order": "330213400",
-						"class": "330213399",
-						"phylum": "330213398",
-						"kingdom": "330213397"
+						"family": "331217853",
+						"order": "331217815",
+						"class": "331217814",
+						"phylum": "331217813",
+						"kingdom": "331217812"
 					},
 					"images": [
 						"https://jessica-joachim.com/wp-content/uploads/2019/04/andrena-sp-5.jpg"
@@ -55602,7 +55602,7 @@
 				{
 					"key": "1443961",
 					"label": "Limnia",
-					"description": "**Identification** : _Limnia_ est un genre à l’allure caractéristique de la famille des Sciomyzidae. Il se reconnait à ses antennes pourvues d’un arista blanc et à ses ailes réticulées. Il existe deux espèces, _Limnia unguicornis_ et _Limnia paludicola.  \n_On peut distinguer les deux seulement si ce sont des femelles à la couleur du thorax :  \n– tricolore pourvu d’une bande jaune centrale entourée de deux fines lignes brunes, le tout encadré de deux lignes bleutées puis bordé par deux lignes brune pour _L.unguicornis  \n–_ juste une bande brune à la place de la bande jaune centrale bordée de fines lignes brunes pour _L.paludicola_.  \nCe critère n’est plus valable pour les mâles, qu’il faut disséquer pour arriver à une identification certaine.  \nLes mâles ont un abdomen cylindrique se terminant de manière arrondie, celui des femelles est ovoïde s’atténuant progressivement vers l’apex.\n\n**Taille** : De 4,5 à 7,5mm.\n\n**Habitat** : Prairies humides et lisières de forêts.\n\n**Répartition géographique** : Très commune de l’Europe à l’Asie centrale.\n\n**Larves** : Elles se développent dans les limaces et les escargots.\n\n**Espèces semblables** :  \nLe genre _Dichetophora_ possède seulement 2 soies dressées sur le scutellum.  \nLe genre _Coremacera_ est beaucoup plus sombre.  \nLes genres _Elgiva_, _Ilione_ et _Hydromya_ n’ont pas des ailes réticulées comme ça, elles ne possèdent que quelques zones sombres qui forment des taches isolées.  \nLe genre _Euthycera_ ailes plus enfumées, d’apparence sombre à points blancs, et le point noir sur les soies fronto orbitales antérieures est plus ovale.  \nLes autres ont des antennes un peu différentes ou une arista noire.\n\n**Sources** :  \n[http://www.insecte.org/](http://www.insecte.org/)  \n[http://nl.wikipedia.org/wiki/Hoofdpagina](http://nl.wikipedia.org/wiki/Hoofdpagina)  \n[http://denbourge.free.fr/index.htm](http://denbourge.free.fr/index.htm)",
+					"description": "**Identification** : _Limnia_ est un genre à l’allure caractéristique de la famille des Sciomyzidae. Il se reconnait à ses antennes pourvues d’une arista blanche et à ses ailes réticulées. Il existe deux espèces, _Limnia unguicornis_ et _Limnia paludicola.  \n_On peut distinguer les deux seulement si ce sont des femelles à la couleur du thorax :  \n– tricolore pourvu d’une bande jaune centrale entourée de deux fines lignes brunes, le tout encadré de deux lignes bleutées puis bordé par deux lignes brune pour _L.unguicornis  \n–_ juste une bande brune à la place de la bande jaune centrale bordée de fines lignes brunes pour _L.paludicola_.  \nCe critère n’est plus valable pour les mâles, qu’il faut disséquer pour arriver à une identification certaine.  \nLes mâles ont un abdomen cylindrique se terminant de manière arrondie, celui des femelles est ovoïde s’atténuant progressivement vers l’apex.\n\n**Taille** : De 4,5 à 7,5mm.\n\n**Habitat** : Prairies humides et lisières de forêts.\n\n**Répartition géographique** : Très commune de l’Europe à l’Asie centrale.\n\n**Larves** : Elles se développent dans les limaces et les escargots.\n\n**Espèces semblables** :  \nLe genre _Dichetophora_ possède seulement 2 soies dressées sur le scutellum.  \nLe genre _Coremacera_ est beaucoup plus sombre.  \nLes genres _Elgiva_, _Ilione_ et _Hydromya_ n’ont pas des ailes réticulées comme ça, elles ne possèdent que quelques zones sombres qui forment des taches isolées.  \nLe genre _Euthycera_ ailes plus enfumées, d’apparence sombre à points blancs, et le point noir sur les soies fronto orbitales antérieures est plus ovale.  \nLes autres ont des antennes un peu différentes ou une arista noire.\n\n**Sources** :  \n[http://www.insecte.org/](http://www.insecte.org/)  \n[http://nl.wikipedia.org/wiki/Hoofdpagina](http://nl.wikipedia.org/wiki/Hoofdpagina)  \n[http://denbourge.free.fr/index.htm](http://denbourge.free.fr/index.htm)",
 					"learnMore": "https://jessica-joachim.com/insectes/dipteres/sciomyzidae/limnia-sp-genre/",
 					"cascade": {
 						"family": "3524",
@@ -150699,12 +150699,12 @@
 							"foncsnoir_1738784728418_9571"
 						],
 						"morphogroup": ["gpe_nigropilosa"],
-						"genus": "330213441",
-						"family": "330213438",
-						"order": "330213400",
-						"class": "330213399",
-						"phylum": "330213398",
-						"kingdom": "330213397"
+						"genus": "331217856",
+						"family": "331217853",
+						"order": "331217815",
+						"class": "331217814",
+						"phylum": "331217813",
+						"kingdom": "331217812"
 					}
 				},
 				{
