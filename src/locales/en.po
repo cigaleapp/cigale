@@ -3017,3 +3017,35 @@ msgstr ""
 #: src/lib/MetadataInput.svelte
 msgid "Utiliser la position actuelle"
 msgstr ""
+
+#: src/routes/(app)/Navigation.svelte
+msgid "Capturer"
+msgstr ""
+
+#: src/routes/(app)/about/+page.svelte
+msgid "Futuristic interface - click par betacut"
+msgstr ""
+
+#: src/routes/(app)/about/+page.svelte
+msgid "UI alarm - alert bells par RA Music"
+msgstr ""
+
+#: src/routes/(app)/about/+page.svelte
+msgid "Classic low battery alert par Brukowskij"
+msgstr ""
+
+#: src/routes/(app)/about/+page.svelte
+msgid "Timer - tour terminé"
+msgstr ""
+
+#: src/routes/(app)/about/+page.svelte
+msgid "Timer - terminé"
+msgstr ""
+
+#: src/routes/(app)/about/+page.svelte
+msgid "Batterie faible"
+msgstr ""
+
+#: src/routes/(app)/about/+page.svelte
+msgid "Effets sonores"
+msgstr ""
