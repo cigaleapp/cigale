@@ -1,11 +1,15 @@
 msgid ""
 msgstr ""
-"Plural-Forms: nplurals=2; plural=n != 1;\n"
-"Source-Language: fr\n"
+"PO-Revision-Date: 2026-07-30 22:07+0000\n"
+"Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
 "Language: en\n"
-"MIME-Version: 1.0\n"
+"Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"MIME-Version: 1.0\n"
+"X-Generator: Weblate 5.12.2\n"
+"Source-Language: fr\n"
 
 #: src/lib/SessionMetadataForm.svelte
 #: src/routes/(app)/PrepareForOffline.svelte
@@ -1642,7 +1646,7 @@ msgstr ""
 
 #: src/routes/(app)/ModalSubmitIssue.svelte
 msgid "Database rev."
-msgstr ""
+msgstr "Database rev."
 
 #: src/routes/(app)/ModalSubmitIssue.svelte
 msgid "Loaded objects"
@@ -2475,11 +2479,11 @@ msgstr ""
 
 #: src/routes/(app)/storage/+page.svelte
 msgid "<0/> utilisés sur <1/> <2/>"
-msgstr ""
+msgstr "<0/> used on <1/> <2/>"
 
 #: src/lib/SessionMetadataForm.svelte
 msgid "<0/> Aucune métadonnée à renseigner"
-msgstr ""
+msgstr "<0/> No metadata to fill"
 
 #: src/routes/(app)/+layout.svelte
 msgid "Show current UI State"
@@ -2491,19 +2495,19 @@ msgstr ""
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/CandidatesListXper3.svelte
 msgid "Liste des candidats restants"
-msgstr ""
+msgstr "Remaining candidates list"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/CandidatesListXper3.svelte
 msgid "Liste compatible avec un import dans Xper3"
-msgstr ""
+msgstr "Xper3-compatible list"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/CandidatesListXper3.svelte
 msgid "Copier"
-msgstr ""
+msgstr "Copy"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/CandidatesListXper3.svelte
 msgid "Exporter la liste des candidats restants vers Xper3"
-msgstr ""
+msgstr "Export remaining candidates list into Xper3"
 
 #: src/lib/Xper3Logo.svelte
 msgid "Artboard1"
@@ -2515,19 +2519,19 @@ msgstr ""
 
 #: src/routes/(app)/Settings.svelte
 msgid "Impossible de télécharger la mise à jour. Veuillez rééssayer plus tard."
-msgstr ""
+msgstr "Cannot download update. Please try again later."
 
 #: src/routes/(app)/Settings.svelte
 msgid "Impossible d'installer la mise à jour"
-msgstr ""
+msgstr "Cannot install update"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Code natif"
-msgstr ""
+msgstr "Native code"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Update bundle"
-msgstr ""
+msgstr "Update bundle"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "ID"
@@ -2545,47 +2549,47 @@ msgstr ""
 #. 0: label
 #: src/lib/gallery.ts
 msgid "{0}: confiance à 75%-100%"
-msgstr ""
+msgstr "{0}: confidence is 75%-100%"
 
 #. 0: label
 #: src/lib/gallery.ts
 msgid "{0}: confiance à 50%-75%"
-msgstr ""
+msgstr "{0}: confidence is 50%-75%"
 
 #. 0: label
 #: src/lib/gallery.ts
 msgid "{0}: confiance à 25%-50%"
-msgstr ""
+msgstr "{0}: confidence is 25%-50%"
 
 #. 0: label
 #: src/lib/gallery.ts
 msgid "{0}: confiance à 0%-25%"
-msgstr ""
+msgstr "{0}: confidence is 0%-25%"
 
 #. 0: p.id; 1: p.name; 2: p.version ?? '<none>'
 #: src/lib/protocols.js
 msgid "{0} ({1}, v{2})"
-msgstr ""
+msgstr "{0} ({1}, v{2})"
 
 #. 0: uiState.currentProtocol.id; 1: uiState.currentProtocol.version
 #: src/routes/(app)/ModalSubmitIssue.svelte
 msgid "{0} v{1}"
-msgstr ""
+msgstr "{0} v{1}"
 
 #. 0: updates.length; 1: updates.map((u) => `"${u.name}"`).join(', ')
 #: src/routes/(app)/+layout.ts
 msgid "{0} protocoles ont été mis à jour: {1}"
-msgstr ""
+msgstr "{0} protocols were updated: {1}"
 
 #. 0: file.name
 #: src/lib/MetadataInput.svelte
 msgid "{0} enregistré"
-msgstr ""
+msgstr "{0} saved"
 
 #. 0: e.kind; 1: metadata?.label || metadataId; 2: e.message
 #: src/lib/CardObservation.svelte
 msgid "{0} sur {1}: {2}"
-msgstr ""
+msgstr "{0} on {1}: {2}"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Roman Shamin"
@@ -2598,11 +2602,11 @@ msgstr ""
 #: src/routes/(app)/about/+page.svelte
 #: src/routes/(app)/about/+page.svelte
 msgid "par"
-msgstr ""
+msgstr "by"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "et"
-msgstr ""
+msgstr "and"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Remix Icon"
@@ -2619,15 +2623,15 @@ msgstr ""
 #. 0: account.username
 #: src/routes/(app)/accounts/RowAccount.svelte
 msgid "Photo de {0}"
-msgstr ""
+msgstr "{0}'s photo"
 
 #: src/routes/(app)/accounts/RowAccount.svelte
 msgid "Type de compte inconnu"
-msgstr ""
+msgstr "Unknown account type"
 
 #: src/routes/(app)/accounts/RowAccount.svelte
 msgid "Déconnecter"
-msgstr ""
+msgstr "Log out"
 
 #. 0: corner
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/WithExpandButton.svelte
