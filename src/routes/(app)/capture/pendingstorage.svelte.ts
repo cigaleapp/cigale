@@ -52,10 +52,7 @@ export class PendingStorage {
 
 		fields.ProcessingSoftware = 'Cigale Integrated Capture Mode';
 
-		const location = await getCurrentLocation().catch((e) => {
-			console.error("Couldnt get current location", e)
-			return undefined
-		});
+		const location = await getCurrentLocation();
 
 		if (location) {
 			fields.GPSLongitude = GPSHelper.degToDmsRational(location.longitude);
