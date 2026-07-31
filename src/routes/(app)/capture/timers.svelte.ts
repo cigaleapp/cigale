@@ -114,7 +114,7 @@ export class Timer {
 
 	restart() {
 		this.stop();
-		this.callbacks?.onfinished();
+		this.callbacks?.onfinished(this);
 		this.reset();
 		this.start();
 	}

@@ -1,8 +1,11 @@
+import type { PendingStorage } from './pendingstorage.svelte.js';
+
 import { CameraPreview } from '@capacitor-community/camera-preview';
 import { Capacitor } from '@capacitor/core';
 
 import { getCurrentLocation } from '$lib/geolocation.js';
 import { errorMessage } from '$lib/i18n.js';
+import { toasts } from '$lib/toasts.svelte';
 
 const ALL_FLASH_MODES = ['off', 'auto', 'on', 'torch'] as const;
 export type FlashMode = (typeof ALL_FLASH_MODES)[number];
@@ -11,6 +14,11 @@ export type CameraState = {
 	ready: boolean;
 	failure: string;
 	side: 'rear' | 'front';
+	/** Stays true for a small duration while a pic is being saved */
+	snapping: boolean;
+	listeners: {
+		onsaved: Array<(name: string | undefined) => void | Promise<void>>;
+	};
 	flash: {
 		current: FlashMode;
 		supported: FlashMode[];
@@ -85,4 +93,37 @@ export async function refreshSupportedFlashModes(camera: CameraState) {
 	if (!camera.flash.supported.includes(camera.flash.current)) {
 		camera.flash.current = 'off';
 	}
+}
+
+export async function capture(camera: CameraState, storage: PendingStorage) {
+	const { value: output } = await CameraPreview.capture({});
+
+	camera.snapping = true;
+	setTimeout(() => {
+		camera.snapping = false;
+	}, 100);
+
+	if (!storage) {
+		toasts.error("Le stockage n'est pas encore prêt, veuillez rééssayer");
+		return;
+	}
+
+	void storage
+		.save(output)
+		.then(async (name) => {
+			// oxlint-disable-next-line promise/no-callback-in-promise
+			await Promise.all(camera.listeners.onsaved.map(async (cb) => cb(name)));
+		})
+		.catch(async () => {
+			// oxlint-disable-next-line promise/no-callback-in-promise
+			await Promise.all(camera.listeners.onsaved.map(async (cb) => cb(undefined)));
+		});
+}
+
+export async function waitForCapture(camera: CameraState): Promise<{ name: string }> {
+	return new Promise((resolve, reject) => {
+		camera.listeners.onsaved.push((name) =>
+			name ? resolve({ name }) : reject('Impossible de sauvegarder la photo')
+		);
+	});
 }

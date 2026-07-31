@@ -114,7 +114,8 @@ sessionMetadata:
     mergeMethod: none
     required: true
     description: ''
-    default: $now()
+    infer:
+      capture: before-timer
 
   is_training:
     type: boolean
@@ -221,6 +222,8 @@ sessionMetadata:
       - image/*
     size:
       maximum: 10 MB
+    infer:
+      capture: before-timer
 
   soil_photo_start:
     type: file
@@ -233,6 +236,8 @@ sessionMetadata:
       - image/*
     size:
       maximum: 10 MB
+    infer:
+      capture: before-timer
 
   habitat_comment:
     type: string
@@ -323,8 +328,8 @@ sessionMetadata:
       Dès que vous avez réussi à vous géolocaliser, c'est parti pour 20 minutes de safari macrophotographique! Laissez ou prenez un point de repère pour retrouver votre point de départ. Vous pouvez mettre le téléphone en veille et revenir sur ce questionnaire à la fin des 20min pour indiquer votre point d'arrivée et les 3 dernières questions. N'oubliez pas de lancer un chronomètre
     mergeMethod: none
     required: true
-    # TODO: shoot_location of argmin(photos shoot_date) instead
-    default: $here()
+    infer:
+      capture: before-timer
 
   end_at:
     type: location
@@ -332,8 +337,8 @@ sessionMetadata:
     description: Les 20min sont écoulées. Enregistrez la localisation de votre point d'arrivé.
     mergeMethod: none
     required: true
-    # TODO: shoot_location of argmax(photos shoot_date)
-    # default:
+    infer:
+      capture: after-timer
 
   soil_photo_end:
     type: file
@@ -346,6 +351,8 @@ sessionMetadata:
       - image/*
     size:
       maximum: 10 MB
+    infer:
+      capture: after-timer
 
   distance:
     type: float
@@ -354,8 +361,9 @@ sessionMetadata:
     unit: m
     required: true
     mergeMethod: average
-    description: En revenant sur vos pas. Estimez en enjambées de 1 m la distance exact parcouru entre le point d'arrivée et le point de départ.
+    description: En revenant sur vos pas. Estimez en enjambées de 1 m la distance exact parcourue entre le point d'arrivée et le point de départ.
     range: x > 0
+    # TODO: cascade from a surface-type metadata made from start_at and end_at, by taking its hypot
 
   camera_type:
     type: enum

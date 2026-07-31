@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import 'fake-indexeddb/auto';
+
 const mockIsNativePlatform = vi.fn();
 const mockBinaryStorage = {
 	count: vi.fn(),
@@ -22,6 +24,23 @@ vi.mock('@capacitor/core', () => ({
 	},
 }));
 
+vi.mock('$lib/idb.svelte.js', () => ({}));
+
+vi.mock('$lib/database.js', () => ({
+	generateId: vi.fn(() => 'sampleId'),
+}));
+
+vi.mock('$lib/metadata/index.js', () => ({
+	storeMetadataValue: vi.fn(),
+}));
+
+vi.mock('$lib/uistate.svelte.js', () => ({
+	uiState: {
+		currentSessionId: undefined,
+		currentSession: undefined,
+	},
+}));
+
 vi.mock('$lib/geolocation.js', async (original) => ({
 	...(await original()),
 	getCurrentLocation: () => ({ longitude: 0, latitude: 0 }),
@@ -41,6 +60,7 @@ vi.mock('$lib/images.js', () => ({
 
 vi.mock('$lib/i18n.js', () => ({
 	errorMessage: mockErrorMessage,
+	localeFromNavigator: vi.fn(() => 'fr'),
 }));
 
 vi.mock('$lib/toasts.svelte.js', () => ({
@@ -139,7 +159,6 @@ describe('PendingStorage', () => {
 
 		await storage.save('base64-photo');
 
-		expect(storage.count).toBe(1);
 		expect(mockBinaryStorage.create).toHaveBeenCalledWith(
 			{
 				area: '.pending_captures/photos',

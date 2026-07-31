@@ -358,6 +358,14 @@ export const InferenceConfigs = /** @type {const} */ ({
 			"Inférer depuis un ou plusieurs réseaux neuronaux de détection d'objets"
 		),
 	}),
+
+	capture: type({
+		capture: type
+			.enumerated('before-timer', 'after-timer')
+			.describe(
+				'Prélever une valeur avant le début (before-timer) ou après la fin (after-timer) du timer de capture. Seulement effectif sur les métadonnées de session de type date (prend la date actuelle), location (prend la position gps actuelle) et file avec accept comprenant "image/*" (propose de prendre une photo)'
+			),
+	}),
 });
 
 export const MetadataDefaultDynamicPayload = type({
@@ -534,6 +542,7 @@ export const MetadataDate = MetadataBase.and({
 	'range?': '"future" | "past"',
 	'default?': MetadataDefault.date,
 	'infer?': type.and(
+		InferenceConfigs.capture.partial(),
 		InferenceConfigs.exif.partial(),
 		InferenceConfigs.sidecar(type('string.date.iso.parse')).partial()
 	),
@@ -543,6 +552,7 @@ const MetadataLocation = MetadataBase.and({
 	type: '"location"',
 	'default?': MetadataDefault.location,
 	'infer?': type.and(
+		InferenceConfigs.capture.partial(),
 		InferenceConfigs.sidecar(
 			type({ latitude: 'number', longitude: 'number', '+': 'reject' })
 		).partial(),

@@ -1,9 +1,14 @@
 <script lang="ts">
+	import type { CameraState } from './camera.js';
+
 	import { CameraPreview } from '@capacitor-community/camera-preview';
+	import { App } from '@capacitor/app';
 	import { Capacitor } from '@capacitor/core';
 	import { Haptics, ImpactStyle } from '@capacitor/haptics';
 	import { onDestroy } from 'svelte';
 	import { fade } from 'svelte/transition';
+
+	import '@layflags/rolling-number';
 
 	import IconSwitchCameraSides from '~icons/ri/camera-switch-line';
 	import IconFinish from '~icons/ri/check-line';
@@ -15,34 +20,39 @@
 	import IconGallery from '~icons/ri/multi-image-line';
 	import IconStartTimer from '~icons/ri/timer-line';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import LoadingText, { Loading } from '$lib/LoadingText.svelte';
-	import { goto } from '$lib/paths.js';
-	import { toasts } from '$lib/toasts.svelte.js';
-	import { afterDelay } from '$lib/utils.js';
-
-	import '@layflags/rolling-number';
-
-	import type { CameraState } from './camera.js';
-
-	import { App } from '@capacitor/app';
-
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import DropdownMenu from '$lib/DropdownMenu.svelte';
+	import { geolocationAccuracyToConfidence, getCurrentLocation } from '$lib/geolocation.js';
 	import { percent, plural } from '$lib/i18n.js';
+	import { databaseHandle, tables } from '$lib/idb.svelte.js';
 	import LoadingScreen from '$lib/LoadingScreen.svelte';
+	import LoadingText, { Loading } from '$lib/LoadingText.svelte';
+	import { storeMetadataValue } from '$lib/metadata/storage.js';
 	import ModalConfirm from '$lib/ModalConfirm.svelte';
+	import { goto } from '$lib/paths.js';
+	import { isMetadataInProtocol } from '$lib/schemas/protocols.js';
 	import { getSettings, toggleSetting } from '$lib/settings.svelte.js';
 	import { sfx } from '$lib/sound.js';
+	import { toasts } from '$lib/toasts.svelte.js';
 	import { uiState } from '$lib/uistate.svelte.js';
-	import { cycleValues, orEmpty, switchValue } from '$lib/utils.js';
+	import { afterDelay, cycleValues, orEmpty, switchValue } from '$lib/utils.js';
 
 	import ModalSubmitIssue from '../ModalSubmitIssue.svelte';
-	import { cameraStarted, refreshSupportedFlashModes, startCamera } from './camera.js';
+	import {
+		cameraStarted,
+		capture,
+		refreshSupportedFlashModes,
+		startCamera,
+		waitForCapture,
+	} from './camera.js';
 	import { PendingStorage } from './pendingstorage.svelte.js';
 	import { Timer } from './timers.svelte.js';
 
 	let submitBugReport = $state<() => void>();
 
+	// When timer will start once before-timer capture inferences finish
+	let timerWillStart = $state(false);
+	let timerFinished = $state(false);
 	let floatingMessage = $state('');
 	let floatingMessageFadeout = $state<number>();
 	function setFloatingMessage(category: string, message: string) {
@@ -58,10 +68,27 @@
 		});
 	}
 
+	/**
+	 * Sets a floating message but prevents it from being removed after a timemout
+	 */
+	function freezeFloatingMessage(category: string, message: string) {
+		setFloatingMessage(category, message);
+		if (floatingMessageFadeout) clearTimeout(floatingMessageFadeout);
+	}
+
+	function clearFloatingMessage() {
+		if (floatingMessageFadeout) clearTimeout(floatingMessageFadeout);
+		floatingMessage = '';
+	}
+
 	let camera = $state<CameraState>({
 		ready: false,
+		snapping: false,
 		failure: '',
 		side: 'rear',
+		listeners: {
+			onsaved: [],
+		},
 		flash: {
 			current: 'off',
 			supported: [],
@@ -74,9 +101,6 @@
 	// The entire page needs to be transparent so that the native preview
 	// (that isn't within the DOM) can be seen through the UI
 	const transparentDocument = $derived(ready && Capacitor.isNativePlatform());
-
-	// Stays true for a small duration while a pic is being saved
-	let snapping = $state(false);
 
 	let pendingStorage = $state<PendingStorage>();
 	$effect(() => {
@@ -116,22 +140,6 @@
 		CameraPreview.stop();
 	});
 
-	async function capture() {
-		const { value: output } = await CameraPreview.capture({});
-
-		snapping = true;
-		setTimeout(() => {
-			snapping = false;
-		}, 100);
-
-		if (!pendingStorage) {
-			toasts.error("Le stockage n'est pas encore prêt, veuillez rééssayer");
-			return;
-		}
-
-		void pendingStorage.save(output);
-	}
-
 	let askBeforeQuitting = $state<() => Promise<boolean>>();
 	async function quit() {
 		// Storage not ready yet
@@ -158,11 +166,80 @@
 		if (allOk) await goto('/(app)/(sidepanel)/import');
 	}
 
+	async function runCaptureInferences(selector: 'before-timer' | 'after-timer') {
+		if (!uiState.currentProtocol) return;
+
+		const beforeTimerInferences = tables.Metadata.state
+			.filter((m) => isMetadataInProtocol(uiState.currentProtocol, m.id))
+			.filter((m) => m.infer && 'capture' in m.infer && m.infer.capture === selector);
+
+		async function askForPics() {
+			// Gather all file-type metadata with before-timer capture inference
+			const picsToTake = beforeTimerInferences
+				.filter((m) => m.type === 'file')
+				.filter((m) => m.accept.includes('image/*'));
+
+			pendingStorage?.freezeCount();
+
+			for (const metadata of picsToTake) {
+				freezeFloatingMessage('Prendre en photo', metadata.label);
+				const pic = await waitForCapture(camera);
+				await pendingStorage?.flushToMetadata(pic.name, metadata.id);
+			}
+
+			await pendingStorage?.unfreezeCount();
+
+			clearFloatingMessage();
+		}
+
+		if (selector === 'before-timer') await askForPics();
+
+		// Gather all other before-timer capture inferences
+		for (const metadata of beforeTimerInferences) {
+			freezeFloatingMessage('Collecte', metadata.label);
+			switch (metadata.type) {
+				case 'file':
+					continue;
+				case 'date': {
+					await storeMetadataValue({
+						db: databaseHandle(),
+						type: 'date',
+						value: new Date(),
+						metadataId: metadata.id,
+						sessionId: uiState.currentSessionId!,
+						subjectId: uiState.currentSessionId!,
+					});
+					break;
+				}
+				case 'location': {
+					const position = await getCurrentLocation();
+					if (!position) return;
+
+					await storeMetadataValue({
+						db: databaseHandle(),
+						type: 'location',
+						confidence: geolocationAccuracyToConfidence(position.accuracy),
+						value: position,
+						metadataId: metadata.id,
+						sessionId: uiState.currentSessionId!,
+						subjectId: uiState.currentSessionId!,
+					});
+					break;
+				}
+			}
+		}
+
+		clearFloatingMessage();
+
+		if (selector === 'after-timer') await askForPics();
+	}
+
 	const timer = $derived.by(() => {
 		const settings = uiState.currentProtocol?.capture?.timers;
 		if (!settings) return;
 		return new Timer(settings, {
 			onstart(t) {
+				timerFinished = false;
 				setFloatingMessage('Timer', t.formatMessage(settings.messages.start));
 				void Haptics.impact({ style: ImpactStyle.Heavy });
 			},
@@ -171,16 +248,27 @@
 				if (getSettings().timerSounds) sfx('timer-lap');
 				void Haptics.impact({ style: ImpactStyle.Medium });
 			},
-			onfinished(t) {
+			async onfinished(t) {
 				setFloatingMessage('Timer', t.formatMessage(settings.messages.end));
 				if (getSettings().timerSounds) sfx('timer-finished');
-				void Haptics.impact({ style: ImpactStyle.Heavy });
+				timerFinished = true;
+				await Haptics.impact({ style: ImpactStyle.Heavy });
+				await runCaptureInferences('after-timer');
+				timerFinished = false;
+				timer?.reset();
+				await finish();
 			},
 		});
 	});
 
-	function startTimer() {
-		timer?.start();
+	async function startTimer() {
+		try {
+			timerWillStart = true;
+			await runCaptureInferences('before-timer');
+			timer?.start();
+		} finally {
+			timerWillStart = false;
+		}
 	}
 
 	onDestroy(() => {
@@ -201,7 +289,7 @@
 	Il y a {pendingStorage?.count ?? 0} photos en attente qui seront supprimées si tu quitte
 </ModalConfirm>
 
-<main data-snapping={snapping} data-transparent={transparentDocument}>
+<main data-snapping={camera.snapping} data-transparent={transparentDocument}>
 	<header class="actions" pw-testid="actions-top">
 		<section class="left">
 			<DropdownMenu
@@ -234,6 +322,7 @@
 							{
 								label: 'Effets sonores pour le timer',
 								type: 'selectable',
+								key: 'sfx',
 								data: null,
 								selected: getSettings().timerSounds,
 								closeOnSelect: false,
@@ -258,7 +347,7 @@
 									submitBugReport?.();
 								},
 							},
-						],
+						]!,
 					},
 				]}
 			>
@@ -321,7 +410,7 @@
 		<section class="center">
 			{#if timer?.started}
 				<div class="info">
-					{#each uiState.currentProtocol.capture!.timers.messages.status as line, i (i)}
+					{#each uiState.currentProtocol!.capture!.timers!.messages.status as line, i (i)}
 						<div class="line">{timer.formatMessage(line)}</div>
 					{/each}
 				</div>
@@ -392,16 +481,23 @@
 				</span>
 			</ButtonSecondary>
 		</section>
+
+		{const shooting = $derived(!timer || timer.started || timerWillStart || timerFinished)}
+
 		<button
 			class="shoot"
 			disabled={!ready}
 			title="Prendre une photo"
-			onclick={() => {
-				if (timer && !timer.started) startTimer();
-				else capture();
+			onclick={async () => {
+				if (!shooting) {
+					await startTimer();
+				} else {
+					if (!pendingStorage) return;
+					await capture(camera, pendingStorage);
+				}
 			}}
 		>
-			{#if timer && !timer.started}
+			{#if !shooting}
 				<div class="start-timer-icon">
 					<IconStartTimer />
 				</div>
@@ -428,7 +524,7 @@
 					class="inside"
 					cx="50%"
 					cy="50%"
-					r="{timer && !timer.started ? 0 : 37}%"
+					r="{shooting ? 37 : 0}%"
 					fill="var(--color, white)"
 				></circle>
 
