@@ -92,6 +92,7 @@ export const CaptureTimersMessageTemplate = TemplatedString(
 		laps: {
 			totalCount: ['number.integer >= 0', '@', 'Nombre total de tours'],
 			doneCount: ['number.integer >= 0', '@', 'Nombre de tours terminés'],
+			currentNo: ['number.integer >= 1', '@', 'Numéro du tour courant (commence à 1)'],
 			remainingCount: ['number.integer >= 0', '@', 'Nombre de tours restants'],
 			currentRemainingMs: ['number >= 0', '@', 'Temps restant dans le tour actuel'],
 		},

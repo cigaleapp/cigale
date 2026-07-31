@@ -18,6 +18,7 @@
 	import IconFlashOff from '~icons/ri/flashlight-line';
 	import IconMore from '~icons/ri/more-line';
 	import IconGallery from '~icons/ri/multi-image-line';
+	import IconPlay from '~icons/ri/play-large-line';
 	import IconStartTimer from '~icons/ri/timer-line';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
@@ -50,9 +51,44 @@
 
 	let submitBugReport = $state<() => void>();
 
-	// When timer will start once before-timer capture inferences finish
-	let timerWillStart = $state(false);
-	let timerFinished = $state(false);
+	type ShootingPhase =
+		'inert' | 'before-timer' | 'wait-start-timer' | 'timer-running' | 'after-timer' | 'done';
+
+	let shootingPhase = $state<ShootingPhase>('inert');
+
+	$effect(() => {
+		if (!uiState.currentSession) return;
+		if (shootingPhase === 'inert') {
+			shootingPhase = uiState.currentSession.captureModeShootingPhase;
+		}
+	});
+
+	function setShootingPhase(phase: ShootingPhase) {
+		shootingPhase = phase;
+		if (!uiState.currentSessionId) return;
+		void tables.Session.update(uiState.currentSessionId, 'captureModeShootingPhase', phase);
+	}
+
+	function resetShootingPhase() {
+		// TODO: handle other phases too
+		// we reset when re-opening the page from a state leaves us in a weird UI:
+		// for example, (for now), if we restart the page with a phase set to timer-running,
+		// the Timer instance won't be actually started so itll be weird.
+		// same for after/before phases, the frozen messages wont be shown...
+
+		setShootingPhase(
+			switchValue(shootingPhase, {
+				inert: 'inert', // duh
+				'before-timer': 'inert',
+				'wait-start-timer': 'wait-start-timer',
+				// for timer-running, handle it slightly better by setting it to wait-start-timer instead
+				'timer-running': 'wait-start-timer',
+				'after-timer': 'inert',
+				done: 'inert',
+			})
+		);
+	}
+
 	let floatingMessage = $state('');
 	let floatingMessageFadeout = $state<number>();
 	function setFloatingMessage(category: string, message: string) {
@@ -153,6 +189,7 @@
 		}
 
 		void pendingStorage.clear();
+		resetShootingPhase();
 		await goto('/(app)/(sidepanel)/import');
 	}
 
@@ -163,7 +200,10 @@
 			},
 		});
 
-		if (allOk) await goto('/(app)/(sidepanel)/import');
+		if (allOk) {
+			resetShootingPhase();
+			await goto('/(app)/(sidepanel)/import');
+		}
 	}
 
 	async function runCaptureInferences(selector: 'before-timer' | 'after-timer') {
@@ -239,7 +279,7 @@
 		if (!settings) return;
 		return new Timer(settings, {
 			onstart(t) {
-				timerFinished = false;
+				setShootingPhase('timer-running');
 				setFloatingMessage('Timer', t.formatMessage(settings.messages.start));
 				void Haptics.impact({ style: ImpactStyle.Heavy });
 			},
@@ -249,25 +289,52 @@
 				void Haptics.impact({ style: ImpactStyle.Medium });
 			},
 			async onfinished(t) {
-				setFloatingMessage('Timer', t.formatMessage(settings.messages.end));
 				if (getSettings().timerSounds) sfx('timer-finished');
-				timerFinished = true;
+				setShootingPhase('after-timer');
 				await Haptics.impact({ style: ImpactStyle.Heavy });
 				await runCaptureInferences('after-timer');
-				timerFinished = false;
-				timer?.reset();
-				await finish();
+				setFloatingMessage('Timer', t.formatMessage(settings.messages.end));
+				setShootingPhase('done');
 			},
 		});
 	});
 
-	async function startTimer() {
-		try {
-			timerWillStart = true;
-			await runCaptureInferences('before-timer');
-			timer?.start();
-		} finally {
-			timerWillStart = false;
+	async function shoot() {
+		if (!pendingStorage) return;
+		if (!timer) {
+			await capture(camera, pendingStorage);
+			return;
+		}
+
+		switch (shootingPhase) {
+			case 'inert': {
+				setShootingPhase('before-timer');
+				void runCaptureInferences('before-timer').then(() => {
+					setShootingPhase('wait-start-timer');
+					freezeFloatingMessage('Timer', 'En attente du démarrage');
+				});
+				break;
+			}
+			case 'before-timer': {
+				await capture(camera, pendingStorage);
+				break;
+			}
+			case 'wait-start-timer': {
+				timer.start();
+				break;
+			}
+			case 'timer-running': {
+				await capture(camera, pendingStorage);
+				break;
+			}
+			case 'after-timer': {
+				await capture(camera, pendingStorage);
+				break;
+			}
+			case 'done': {
+				await capture(camera, pendingStorage);
+				break;
+			}
 		}
 	}
 
@@ -453,7 +520,9 @@
 		{/if}
 	</section>
 
-	<footer class="actions">
+	{const shooting = $derived(shootingPhase !== 'inert' && shootingPhase !== 'done')}
+
+	<footer class="actions" data-is-shooting={shooting}>
 		<section class="left">
 			<ButtonSecondary
 				subtle
@@ -482,27 +551,24 @@
 			</ButtonSecondary>
 		</section>
 
-		{const shooting = $derived(!timer || timer.started || timerWillStart || timerFinished)}
+		<button class="shoot" disabled={!ready} title="Prendre une photo" onclick={shoot}>
+			{const Icon = $derived(
+				switchValue(shootingPhase, {
+					inert: IconStartTimer,
+					'before-timer': null,
+					'wait-start-timer': IconPlay,
+					'after-timer': null,
+					done: null,
+				})
+			)}
 
-		<button
-			class="shoot"
-			disabled={!ready}
-			title="Prendre une photo"
-			onclick={async () => {
-				if (!shooting) {
-					await startTimer();
-				} else {
-					if (!pendingStorage) return;
-					await capture(camera, pendingStorage);
-				}
-			}}
-		>
-			{#if !shooting}
+			{#if Icon}
 				<div class="start-timer-icon">
-					<IconStartTimer />
+					<Icon />
 				</div>
 			{/if}
-			<svg class="shoot-icon">
+
+			<svg class="shoot-icon" data-phase={shootingPhase}>
 				<circle
 					class="ring"
 					cx="50%"
@@ -513,37 +579,61 @@
 					stroke-width="2px"
 					stroke-linecap="round"
 					{@attach (node: SVGCircleElement) => {
-						if (!timer) return;
+						if (!['wait-start-timer', 'timer-running'].includes(shootingPhase)) {
+							node.style.strokeDasharray = '';
+							node.style.stroke = 'white';
+							return;
+						}
+
 						const length = node.getTotalLength();
-						const nongap = (length - 4 * timer.lapsTotalCount) / timer.lapsTotalCount;
-						node.style.strokeDasharray = `${Math.round(nongap)} 4`;
+
+						const gap = 4;
+						const nongap = Math.round(
+							(length - gap * timer.lapsTotalCount) / timer.lapsTotalCount
+						);
+
+						node.style.strokeDasharray = `${nongap} ${gap}`;
+						node.style.stroke = 'var(--gay)';
 					}}
 				></circle>
 
-				<circle
-					class="inside"
-					cx="50%"
-					cy="50%"
-					r="{shooting ? 37 : 0}%"
-					fill="var(--color, white)"
-				></circle>
-
-				{#if timer}
-					<circle
-						class="timer-progress"
-						cx="50%"
-						cy="50%"
-						r="43%"
-						fill="none"
-						stroke="var(--progress-color, var(--fg-primary))"
-						stroke-width="3px"
-						{@attach (node: SVGCircleElement) => {
-							const length = node.getTotalLength();
-							node.style.strokeDasharray = `${timer.globalProgress * length} 1000000`;
-							node.style.transformOrigin = '50% 50%';
-							node.style.rotate = '-90deg';
-						}}
+				{#if !Icon}
+					<circle class="inside" cx="50%" cy="50%" r="37%" fill="var(--color, white)"
 					></circle>
+				{/if}
+
+				{#if timer?.started}
+					{#key timer.globalProgress}
+						<circle
+							class="timer-progress"
+							cx="50%"
+							cy="50%"
+							r="43%"
+							fill="none"
+							stroke="var(--progress-color, white)"
+							stroke-width="3px"
+							{@attach (node: SVGCircleElement) => {
+								const length = node.getTotalLength();
+								node.style.strokeDasharray = `${timer.globalProgress * length} 1000000`;
+							}}
+						></circle>
+					{/key}
+
+					{#key timer.lapProgress}
+						<circle
+							class="lap-progress"
+							cx="50%"
+							cy="50%"
+							r="39%"
+							fill="none"
+							stroke="var(--lap-progress-color, red)"
+							stroke-width="1px"
+							{@attach (node: SVGCircleElement) => {
+								const length = node.getTotalLength();
+								node.style.strokeDasharray = `${timer.lapProgress * length} 1000000`;
+							}}
+						></circle>
+					{/key}
 				{/if}
 			</svg>
 		</button>
@@ -640,6 +730,7 @@
 			align-items: center;
 			justify-content: center;
 			gap: 0.25em;
+			transition: opacity 500ms;
 
 			&:first-child {
 				justify-content: flex-start;
@@ -648,6 +739,10 @@
 			&:last-child {
 				justify-content: flex-end;
 			}
+		}
+
+		&[data-is-shooting='true'] > *:not(.shoot) {
+			opacity: 0;
 		}
 
 		&:is(header) {
@@ -732,6 +827,19 @@
 
 		.shoot-icon circle {
 			transition: 500ms;
+			transform-origin: 50% 50%;
+			rotate: -90deg;
+
+			--lap-progress-color: white;
+
+			&.timer-progress,
+			&.lap-progress {
+				transition: 50ms linear;
+			}
+		}
+
+		.shoot-icon[data-phase='wait-start-timer'] .ring {
+			animation: blink infinite 1s ease;
 		}
 
 		& {
@@ -744,6 +852,18 @@
 				justify-content: center;
 				align-items: center;
 			}
+		}
+	}
+
+	@keyframes blink {
+		from {
+			opacity: 1;
+		}
+		50% {
+			opacity: 0.25;
+		}
+		to {
+			opacity: 1;
 		}
 	}
 
