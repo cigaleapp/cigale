@@ -472,7 +472,7 @@ capture:
     messages:
       lap: Faire un pas en avant
       status:
-        - '{{ laps.doneCount }} pas / {{ laps.totalCount }}'
+        - '{{ laps.doneCount }} pas / {{ decrease laps.totalCount 1 }}'
         - '{{ formatDurationStopwatch total.remainingMs }}'
 
 exports:

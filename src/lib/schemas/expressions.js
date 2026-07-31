@@ -99,6 +99,28 @@ export const HELPERS = /** @type {const} */ ({
 			return Math.min(Math.max(value, min), max);
 		},
 	},
+	decrease: {
+		documentation: 'Effectuer a - b',
+		usage: [['5', '4'], 1],
+		/**
+		 * @param {number} a
+		 * @param {number} b
+		 */
+		implementationHandlebars(a, b) {
+			return a - b;
+		},
+	},
+	increase: {
+		documentation: 'Effectuer a + b',
+		usage: [['5', '4'], 9],
+		/**
+		 * @param {number} a
+		 * @param {number} b
+		 */
+		implementationHandlebars(a, b) {
+			return a + b;
+		},
+	},
 	trim: {
 		documentation: 'Supprime les espaces au début et à la fin d’un texte',
 		usage: [["'   some text   '"], 'some text'],
