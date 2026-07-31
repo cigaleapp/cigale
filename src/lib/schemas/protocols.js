@@ -90,14 +90,14 @@ export const ProtocolImport = type({
 export const CaptureTimersMessageTemplate = TemplatedString(
 	type({
 		laps: {
-			totalCount: 'number.integer >= 0',
-			doneCount: 'number.integer >= 0',
-			remainingCount: 'number.integer >= 0',
-			currentRemainingMs: 'number >= 0',
+			totalCount: ['number.integer >= 0', '@', 'Nombre total de tours'],
+			doneCount: ['number.integer >= 0', '@', 'Nombre de tours terminés'],
+			remainingCount: ['number.integer >= 0', '@', 'Nombre de tours restants'],
+			currentRemainingMs: ['number >= 0', '@', 'Temps restant dans le tour actuel'],
 		},
 		total: {
-			durationMs: 'number >= 0',
-			remainingMs: 'number >= 0',
+			durationMs: ['number >= 0', '@', 'Durée totale du timer'],
+			remainingMs: ['number >= 0', '@', 'Temps restant au total'],
 		},
 	})
 );
@@ -133,24 +133,23 @@ export const Protocol = type({
 			'every?': MillisecondsLiteral.describe('Répéter le timer tout les ...'),
 			'count?': type('number.integer').describe('Répéter le timer n fois'),
 			during: MillisecondsLiteral,
-			messages: type
-				.scope({
-					Templated: CaptureTimersMessageTemplate,
-				})
-				.type({
-					lap: ['Templated', '=', ''],
-					start: ['Templated', '=', 'Démarré'],
-					end: ['Templated', '=', 'Fini'],
-					status: [
-						'Templated[]',
-						'=',
-						() => [
-							'{{ laps.doneCount }}/{{ laps.totalCount }}',
-							'{{ formatDurationStopwatch total.remainingMs }}',
-						],
-					],
-				})
-				.default(() => ({})),
+			messages: type({
+				lap: CaptureTimersMessageTemplate.describe("Affiché à la fin d'un tour").default(
+					''
+				),
+				start: CaptureTimersMessageTemplate.describe(
+					'Affiché au démarrage du timer'
+				).default('Démarré'),
+				end: CaptureTimersMessageTemplate.describe('Affiché à la fin du timer').default(
+					'Fini'
+				),
+				status: CaptureTimersMessageTemplate.array()
+					.describe('Affiché en permanence pendant la prise de photos')
+					.default(() => [
+						'{{ laps.doneCount }}/{{ laps.totalCount }}',
+						'{{ formatDurationStopwatch total.remainingMs }}',
+					]),
+			}).default(() => ({})),
 		})
 			.describe(
 				"Timer d'aide à la réalisation du protocole, visible lorsque l'on prend des photos dans l'app"
