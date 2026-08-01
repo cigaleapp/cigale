@@ -1,9 +1,14 @@
 <script lang="ts">
+	import type { CameraState } from './camera.js';
+
 	import { CameraPreview } from '@capacitor-community/camera-preview';
+	import { App } from '@capacitor/app';
 	import { Capacitor } from '@capacitor/core';
 	import { Haptics, ImpactStyle } from '@capacitor/haptics';
 	import { onDestroy } from 'svelte';
 	import { fade } from 'svelte/transition';
+
+	import '@layflags/rolling-number';
 
 	import IconSwitchCameraSides from '~icons/ri/camera-switch-line';
 	import IconFinish from '~icons/ri/check-line';
@@ -13,35 +18,76 @@
 	import IconFlashOff from '~icons/ri/flashlight-line';
 	import IconMore from '~icons/ri/more-line';
 	import IconGallery from '~icons/ri/multi-image-line';
+	import IconPlay from '~icons/ri/play-large-line';
 	import IconStartTimer from '~icons/ri/timer-line';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import LoadingText, { Loading } from '$lib/LoadingText.svelte';
-	import { goto } from '$lib/paths.js';
-	import { toasts } from '$lib/toasts.svelte.js';
-	import { afterDelay } from '$lib/utils.js';
-
-	import '@layflags/rolling-number';
-
-	import type { CameraState } from './camera.js';
-
-	import { App } from '@capacitor/app';
-
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import DropdownMenu from '$lib/DropdownMenu.svelte';
+	import { geolocationAccuracyToConfidence, getCurrentLocation } from '$lib/geolocation.js';
 	import { percent, plural } from '$lib/i18n.js';
+	import { databaseHandle, tables } from '$lib/idb.svelte.js';
 	import LoadingScreen from '$lib/LoadingScreen.svelte';
+	import LoadingText, { Loading } from '$lib/LoadingText.svelte';
+	import { storeMetadataValue } from '$lib/metadata/storage.js';
 	import ModalConfirm from '$lib/ModalConfirm.svelte';
+	import { goto } from '$lib/paths.js';
+	import { isMetadataInProtocol } from '$lib/schemas/protocols.js';
 	import { getSettings, toggleSetting } from '$lib/settings.svelte.js';
 	import { sfx } from '$lib/sound.js';
+	import { toasts } from '$lib/toasts.svelte.js';
 	import { uiState } from '$lib/uistate.svelte.js';
-	import { cycleValues, orEmpty, switchValue } from '$lib/utils.js';
+	import { afterDelay, cycleValues, orEmpty, switchValue } from '$lib/utils.js';
 
 	import ModalSubmitIssue from '../ModalSubmitIssue.svelte';
-	import { cameraStarted, refreshSupportedFlashModes, startCamera } from './camera.js';
+	import {
+		cameraStarted,
+		capture,
+		refreshSupportedFlashModes,
+		startCamera,
+		waitForCapture,
+	} from './camera.js';
 	import { PendingStorage } from './pendingstorage.svelte.js';
 	import { Timer } from './timers.svelte.js';
 
 	let submitBugReport = $state<() => void>();
+
+	type ShootingPhase =
+		'inert' | 'before-timer' | 'wait-start-timer' | 'timer-running' | 'after-timer' | 'done';
+
+	let shootingPhase = $state<ShootingPhase>('inert');
+
+	$effect(() => {
+		if (!uiState.currentSession) return;
+		if (shootingPhase === 'inert') {
+			shootingPhase = uiState.currentSession.captureModeShootingPhase;
+		}
+	});
+
+	function setShootingPhase(phase: ShootingPhase) {
+		shootingPhase = phase;
+		if (!uiState.currentSessionId) return;
+		void tables.Session.update(uiState.currentSessionId, 'captureModeShootingPhase', phase);
+	}
+
+	function resetShootingPhase() {
+		// TODO: handle other phases too
+		// we reset when re-opening the page from a state leaves us in a weird UI:
+		// for example, (for now), if we restart the page with a phase set to timer-running,
+		// the Timer instance won't be actually started so itll be weird.
+		// same for after/before phases, the frozen messages wont be shown...
+
+		setShootingPhase(
+			switchValue(shootingPhase, {
+				inert: 'inert', // duh
+				'before-timer': 'inert',
+				'wait-start-timer': 'wait-start-timer',
+				// for timer-running, handle it slightly better by setting it to wait-start-timer instead
+				'timer-running': 'wait-start-timer',
+				'after-timer': 'inert',
+				done: 'inert',
+			})
+		);
+	}
 
 	let floatingMessage = $state('');
 	let floatingMessageFadeout = $state<number>();
@@ -58,10 +104,27 @@
 		});
 	}
 
+	/**
+	 * Sets a floating message but prevents it from being removed after a timemout
+	 */
+	function freezeFloatingMessage(category: string, message: string) {
+		setFloatingMessage(category, message);
+		if (floatingMessageFadeout) clearTimeout(floatingMessageFadeout);
+	}
+
+	function clearFloatingMessage() {
+		if (floatingMessageFadeout) clearTimeout(floatingMessageFadeout);
+		floatingMessage = '';
+	}
+
 	let camera = $state<CameraState>({
 		ready: false,
+		snapping: false,
 		failure: '',
 		side: 'rear',
+		listeners: {
+			onsaved: [],
+		},
 		flash: {
 			current: 'off',
 			supported: [],
@@ -74,9 +137,6 @@
 	// The entire page needs to be transparent so that the native preview
 	// (that isn't within the DOM) can be seen through the UI
 	const transparentDocument = $derived(ready && Capacitor.isNativePlatform());
-
-	// Stays true for a small duration while a pic is being saved
-	let snapping = $state(false);
 
 	let pendingStorage = $state<PendingStorage>();
 	$effect(() => {
@@ -116,22 +176,6 @@
 		CameraPreview.stop();
 	});
 
-	async function capture() {
-		const { value: output } = await CameraPreview.capture({});
-
-		snapping = true;
-		setTimeout(() => {
-			snapping = false;
-		}, 100);
-
-		if (!pendingStorage) {
-			toasts.error("Le stockage n'est pas encore prêt, veuillez rééssayer");
-			return;
-		}
-
-		void pendingStorage.save(output);
-	}
-
 	let askBeforeQuitting = $state<() => Promise<boolean>>();
 	async function quit() {
 		// Storage not ready yet
@@ -145,6 +189,7 @@
 		}
 
 		void pendingStorage.clear();
+		resetShootingPhase();
 		await goto('/(app)/(sidepanel)/import');
 	}
 
@@ -155,7 +200,78 @@
 			},
 		});
 
-		if (allOk) await goto('/(app)/(sidepanel)/import');
+		if (allOk) {
+			resetShootingPhase();
+			await goto('/(app)/(sidepanel)/import');
+		}
+	}
+
+	async function runCaptureInferences(selector: 'before-timer' | 'after-timer') {
+		if (!uiState.currentProtocol) return;
+
+		const beforeTimerInferences = tables.Metadata.state
+			.filter((m) => isMetadataInProtocol(uiState.currentProtocol, m.id))
+			.filter((m) => m.infer && 'capture' in m.infer && m.infer.capture === selector);
+
+		async function askForPics() {
+			// Gather all file-type metadata with before-timer capture inference
+			const picsToTake = beforeTimerInferences
+				.filter((m) => m.type === 'file')
+				.filter((m) => m.accept.includes('image/*'));
+
+			pendingStorage?.freezeCount();
+
+			for (const metadata of picsToTake) {
+				freezeFloatingMessage('Prendre en photo', metadata.label);
+				const pic = await waitForCapture(camera);
+				await pendingStorage?.flushToMetadata(pic.name, metadata.id);
+			}
+
+			await pendingStorage?.unfreezeCount();
+
+			clearFloatingMessage();
+		}
+
+		if (selector === 'before-timer') await askForPics();
+
+		// Gather all other before-timer capture inferences
+		for (const metadata of beforeTimerInferences) {
+			freezeFloatingMessage('Collecte', metadata.label);
+			switch (metadata.type) {
+				case 'file':
+					continue;
+				case 'date': {
+					await storeMetadataValue({
+						db: databaseHandle(),
+						type: 'date',
+						value: new Date(),
+						metadataId: metadata.id,
+						sessionId: uiState.currentSessionId!,
+						subjectId: uiState.currentSessionId!,
+					});
+					break;
+				}
+				case 'location': {
+					const position = await getCurrentLocation();
+					if (!position) return;
+
+					await storeMetadataValue({
+						db: databaseHandle(),
+						type: 'location',
+						confidence: geolocationAccuracyToConfidence(position.accuracy),
+						value: position,
+						metadataId: metadata.id,
+						sessionId: uiState.currentSessionId!,
+						subjectId: uiState.currentSessionId!,
+					});
+					break;
+				}
+			}
+		}
+
+		clearFloatingMessage();
+
+		if (selector === 'after-timer') await askForPics();
 	}
 
 	const timer = $derived.by(() => {
@@ -163,6 +279,7 @@
 		if (!settings) return;
 		return new Timer(settings, {
 			onstart(t) {
+				setShootingPhase('timer-running');
 				setFloatingMessage('Timer', t.formatMessage(settings.messages.start));
 				void Haptics.impact({ style: ImpactStyle.Heavy });
 			},
@@ -171,16 +288,54 @@
 				if (getSettings().timerSounds) sfx('timer-lap');
 				void Haptics.impact({ style: ImpactStyle.Medium });
 			},
-			onfinished(t) {
-				setFloatingMessage('Timer', t.formatMessage(settings.messages.end));
+			async onfinished(t) {
 				if (getSettings().timerSounds) sfx('timer-finished');
-				void Haptics.impact({ style: ImpactStyle.Heavy });
+				setShootingPhase('after-timer');
+				await Haptics.impact({ style: ImpactStyle.Heavy });
+				await runCaptureInferences('after-timer');
+				setFloatingMessage('Timer', t.formatMessage(settings.messages.end));
+				setShootingPhase('done');
 			},
 		});
 	});
 
-	function startTimer() {
-		timer?.start();
+	async function shoot() {
+		if (!pendingStorage) return;
+		if (!timer) {
+			await capture(camera, pendingStorage);
+			return;
+		}
+
+		switch (shootingPhase) {
+			case 'inert': {
+				setShootingPhase('before-timer');
+				void runCaptureInferences('before-timer').then(() => {
+					setShootingPhase('wait-start-timer');
+					freezeFloatingMessage('Timer', 'En attente du démarrage');
+				});
+				break;
+			}
+			case 'before-timer': {
+				await capture(camera, pendingStorage);
+				break;
+			}
+			case 'wait-start-timer': {
+				timer.start();
+				break;
+			}
+			case 'timer-running': {
+				await capture(camera, pendingStorage);
+				break;
+			}
+			case 'after-timer': {
+				await capture(camera, pendingStorage);
+				break;
+			}
+			case 'done': {
+				await capture(camera, pendingStorage);
+				break;
+			}
+		}
 	}
 
 	onDestroy(() => {
@@ -201,7 +356,7 @@
 	Il y a {pendingStorage?.count ?? 0} photos en attente qui seront supprimées si tu quitte
 </ModalConfirm>
 
-<main data-snapping={snapping} data-transparent={transparentDocument}>
+<main data-snapping={camera.snapping} data-transparent={transparentDocument}>
 	<header class="actions" pw-testid="actions-top">
 		<section class="left">
 			<DropdownMenu
@@ -234,6 +389,7 @@
 							{
 								label: 'Effets sonores pour le timer',
 								type: 'selectable',
+								key: 'sfx',
 								data: null,
 								selected: getSettings().timerSounds,
 								closeOnSelect: false,
@@ -258,7 +414,7 @@
 									submitBugReport?.();
 								},
 							},
-						],
+						]!,
 					},
 				]}
 			>
@@ -321,7 +477,7 @@
 		<section class="center">
 			{#if timer?.started}
 				<div class="info">
-					{#each uiState.currentProtocol.capture!.timers.messages.status as line, i (i)}
+					{#each uiState.currentProtocol!.capture!.timers!.messages.status as line, i (i)}
 						<div class="line">{timer.formatMessage(line)}</div>
 					{/each}
 				</div>
@@ -364,7 +520,9 @@
 		{/if}
 	</section>
 
-	<footer class="actions">
+	{const shooting = $derived(shootingPhase !== 'inert' && shootingPhase !== 'done')}
+
+	<footer class="actions" data-is-shooting={shooting}>
 		<section class="left">
 			<ButtonSecondary
 				subtle
@@ -392,21 +550,25 @@
 				</span>
 			</ButtonSecondary>
 		</section>
-		<button
-			class="shoot"
-			disabled={!ready}
-			title="Prendre une photo"
-			onclick={() => {
-				if (timer && !timer.started) startTimer();
-				else capture();
-			}}
-		>
-			{#if timer && !timer.started}
+
+		<button class="shoot" disabled={!ready} title="Prendre une photo" onclick={shoot}>
+			{const Icon = $derived(
+				switchValue(shootingPhase, {
+					inert: IconStartTimer,
+					'before-timer': null,
+					'wait-start-timer': IconPlay,
+					'after-timer': null,
+					done: null,
+				})
+			)}
+
+			{#if Icon}
 				<div class="start-timer-icon">
-					<IconStartTimer />
+					<Icon />
 				</div>
 			{/if}
-			<svg class="shoot-icon">
+
+			<svg class="shoot-icon" data-phase={shootingPhase}>
 				<circle
 					class="ring"
 					cx="50%"
@@ -417,37 +579,61 @@
 					stroke-width="2px"
 					stroke-linecap="round"
 					{@attach (node: SVGCircleElement) => {
-						if (!timer) return;
+						if (!['wait-start-timer', 'timer-running'].includes(shootingPhase)) {
+							node.style.strokeDasharray = '';
+							node.style.stroke = 'white';
+							return;
+						}
+
 						const length = node.getTotalLength();
-						const nongap = (length - 4 * timer.lapsTotalCount) / timer.lapsTotalCount;
-						node.style.strokeDasharray = `${Math.round(nongap)} 4`;
+
+						const gap = 4;
+						const nongap = Math.round(
+							(length - gap * timer.lapsTotalCount) / timer.lapsTotalCount
+						);
+
+						node.style.strokeDasharray = `${nongap} ${gap}`;
+						node.style.stroke = 'var(--gay)';
 					}}
 				></circle>
 
-				<circle
-					class="inside"
-					cx="50%"
-					cy="50%"
-					r="{timer && !timer.started ? 0 : 37}%"
-					fill="var(--color, white)"
-				></circle>
-
-				{#if timer}
-					<circle
-						class="timer-progress"
-						cx="50%"
-						cy="50%"
-						r="43%"
-						fill="none"
-						stroke="var(--progress-color, var(--fg-primary))"
-						stroke-width="3px"
-						{@attach (node: SVGCircleElement) => {
-							const length = node.getTotalLength();
-							node.style.strokeDasharray = `${timer.globalProgress * length} 1000000`;
-							node.style.transformOrigin = '50% 50%';
-							node.style.rotate = '-90deg';
-						}}
+				{#if !Icon}
+					<circle class="inside" cx="50%" cy="50%" r="37%" fill="var(--color, white)"
 					></circle>
+				{/if}
+
+				{#if timer?.started}
+					{#key timer.globalProgress}
+						<circle
+							class="timer-progress"
+							cx="50%"
+							cy="50%"
+							r="43%"
+							fill="none"
+							stroke="var(--progress-color, white)"
+							stroke-width="3px"
+							{@attach (node: SVGCircleElement) => {
+								const length = node.getTotalLength();
+								node.style.strokeDasharray = `${timer.globalProgress * length} 1000000`;
+							}}
+						></circle>
+					{/key}
+
+					{#key timer.lapProgress}
+						<circle
+							class="lap-progress"
+							cx="50%"
+							cy="50%"
+							r="39%"
+							fill="none"
+							stroke="var(--lap-progress-color, red)"
+							stroke-width="1px"
+							{@attach (node: SVGCircleElement) => {
+								const length = node.getTotalLength();
+								node.style.strokeDasharray = `${timer.lapProgress * length} 1000000`;
+							}}
+						></circle>
+					{/key}
 				{/if}
 			</svg>
 		</button>
@@ -544,6 +730,7 @@
 			align-items: center;
 			justify-content: center;
 			gap: 0.25em;
+			transition: opacity 500ms;
 
 			&:first-child {
 				justify-content: flex-start;
@@ -552,6 +739,10 @@
 			&:last-child {
 				justify-content: flex-end;
 			}
+		}
+
+		&[data-is-shooting='true'] > *:not(.shoot) {
+			opacity: 0;
 		}
 
 		&:is(header) {
@@ -636,6 +827,19 @@
 
 		.shoot-icon circle {
 			transition: 500ms;
+			transform-origin: 50% 50%;
+			rotate: -90deg;
+
+			--lap-progress-color: white;
+
+			&.timer-progress,
+			&.lap-progress {
+				transition: 50ms linear;
+			}
+		}
+
+		.shoot-icon[data-phase='wait-start-timer'] .ring {
+			animation: blink infinite 1s ease;
 		}
 
 		& {
@@ -648,6 +852,18 @@
 				justify-content: center;
 				align-items: center;
 			}
+		}
+	}
+
+	@keyframes blink {
+		from {
+			opacity: 1;
+		}
+		50% {
+			opacity: 0.25;
+		}
+		to {
+			opacity: 1;
 		}
 	}
 

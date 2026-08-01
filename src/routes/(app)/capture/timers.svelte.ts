@@ -9,8 +9,10 @@ export class Timer {
 	laps = $state(0);
 	started = $state(false);
 
-	globalProgress = $derived(this.elapsedTotal / (this.totalDuration || 1));
-	remainingTotal = $derived(this.totalDuration - this.elapsedTotal);
+	globalProgress = $derived(Math.max(0, this.elapsedTotal / (this.totalDuration || 1)));
+	remainingTotal = $derived(Math.max(0, this.totalDuration - this.elapsedTotal));
+
+	lapProgress = $derived(Math.max(0, this.elapsedLap / this.lapDuration));
 
 	#handle: NodeJS.Timeout | number | undefined;
 
@@ -55,8 +57,8 @@ export class Timer {
 	}
 
 	get timeResolution() {
-		if (this.lapDuration <= ms('1s')) return ms('10ms');
-		if (this.lapDuration <= ms('1h')) return ms('500ms');
+		if (this.lapDuration <= ms('1h')) return ms('10ms');
+		if (this.lapDuration <= ms('7h')) return ms('500ms');
 		return ms('30s');
 	}
 
@@ -67,11 +69,12 @@ export class Timer {
 					totalCount: this.lapsTotalCount,
 					currentRemainingMs: this.elapsedLap,
 					doneCount: this.laps,
-					remainingCount: this.lapsTotalCount - this.laps,
+					currentNo: this.laps + 1,
+					remainingCount: Math.max(0, this.lapsTotalCount - this.laps),
 				},
 				total: {
 					durationMs: this.timings.during,
-					remainingMs: this.timings.during - this.elapsedTotal,
+					remainingMs: Math.max(0, this.timings.during - this.elapsedTotal),
 				},
 			});
 		} catch (e) {
@@ -83,20 +86,26 @@ export class Timer {
 	start() {
 		this.started = true;
 		this.callbacks?.onstart(this);
+		let checkpoint = performance.now();
 		this.#handle = setInterval(() => {
-			this.elapsedTotal += this.timeResolution;
-			this.elapsedLap += this.timeResolution;
+			const now = performance.now();
+			const elapsed = now - checkpoint;
+			checkpoint = now;
 
-			if (this.elapsedLap >= this.lapDuration) {
-				this.elapsedLap = 0;
-				this.laps++;
-				this.callbacks?.onlap?.(this);
-			}
+			this.elapsedTotal += elapsed;
+			this.elapsedLap += elapsed;
 
 			if (this.elapsedTotal >= this.timings.during) {
 				this.started = false;
 				clearTimeout(this.#handle);
 				this.callbacks?.onfinished(this);
+				return;
+			}
+
+			if (this.elapsedLap >= this.lapDuration) {
+				this.elapsedLap = 0;
+				this.laps++;
+				this.callbacks?.onlap?.(this);
 			}
 		}, this.timeResolution);
 	}
@@ -114,7 +123,7 @@ export class Timer {
 
 	restart() {
 		this.stop();
-		this.callbacks?.onfinished();
+		this.callbacks?.onfinished(this);
 		this.reset();
 		this.start();
 	}

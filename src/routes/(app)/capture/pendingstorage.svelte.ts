@@ -1,15 +1,20 @@
 import type { ExifFieldKey } from '$lib/exiffields';
+import type { NamespacedMetadataID } from '$lib/schemas/common';
 import type { BinaryStorageLocator } from '$lib/storage/types.js';
 
 import { Capacitor } from '@capacitor/core';
 import { GPSHelper } from 'piexifjs';
 
+import { generateId } from '$lib/database.js';
 import { getCurrentLocation } from '$lib/geolocation.js';
 import { errorMessage } from '$lib/i18n.js';
+import * as idb from '$lib/idb.svelte.js';
 import { imageFileId } from '$lib/images.js';
 import { processImageFile } from '$lib/import.svelte.js';
+import { storeMetadataValue } from '$lib/metadata/index.js';
 import { binaryStorage } from '$lib/storage/index.js';
 import { toasts } from '$lib/toasts.svelte.js';
+import { uiState } from '$lib/uistate.svelte';
 
 export const PENDING_PHOTOS_ROOT_FOLDER = '.pending_captures';
 
@@ -22,6 +27,7 @@ export type PendingPhotosRootFolders =
 
 export class PendingStorage {
 	public count = $state(0);
+	private frozenCount = false;
 
 	constructor(private sessionId: string) {}
 
@@ -29,8 +35,7 @@ export class PendingStorage {
 		console.debug(PendingStorage.logHeader(''), 'opening', sessionId);
 
 		const storage = new PendingStorage(sessionId);
-
-		storage.count = await binaryStorage.count(storage.locator('photos', ''));
+		await storage.refreshCount();
 
 		return storage;
 	}
@@ -43,6 +48,19 @@ export class PendingStorage {
 		})) {
 			if (sessionId) yield sessionId;
 		}
+	}
+
+	public freezeCount() {
+		this.frozenCount = true;
+	}
+	public async unfreezeCount() {
+		this.frozenCount = false;
+		await this.refreshCount();
+	}
+
+	async refreshCount() {
+		if (this.frozenCount) return;
+		this.count = await binaryStorage.count(this.locator('photos', ''));
 	}
 
 	async saveExtraExif(photoName: string) {
@@ -91,9 +109,12 @@ export class PendingStorage {
 		return fields;
 	}
 
+	/** @returns the name of the saved file */
 	async save(data: string) {
-		// Optimistic update + beyond an await state changes arent tracked anyways
-		this.count++;
+		if (!this.frozenCount) {
+			// Optimistic update + beyond an await state changes arent tracked anyways
+			this.count++;
+		}
 
 		try {
 			const { name } = await binaryStorage.create(
@@ -110,16 +131,22 @@ export class PendingStorage {
 			this.log('saved photo as ', name);
 
 			await this.saveExtraExif(name);
+
+			return name;
 		} catch (e) {
 			console.error('Could not save photo', e);
 			toasts.error(errorMessage(e, 'Impossible de sauvgarder la photo'));
-			this.count--;
+			if (!this.frozenCount) this.count--;
+		} finally {
+			await this.refreshCount();
 		}
 	}
 
 	async delete(filename: string) {
-		// Same reasoning as .save()
-		this.count--;
+		if (!this.frozenCount) {
+			// Same reasoning as .save()
+			this.count--;
+		}
 
 		try {
 			await binaryStorage.delete(this.locator('photos', filename));
@@ -127,9 +154,8 @@ export class PendingStorage {
 		} catch (e) {
 			console.error('Could not delete photo', e);
 			toasts.error(errorMessage(e, 'Impossible de supprimer la photo'));
-			this.count = await binaryStorage
-				.count(this.locator('photos', ''))
-				.catch(() => this.count - 1);
+		} finally {
+			await this.refreshCount();
 		}
 	}
 
@@ -189,17 +215,46 @@ export class PendingStorage {
 				toasts.error(errorMessage(error, `Impossible d'importer ${file.name}`));
 			}
 
-			if (imported)
+			if (imported) {
 				await this.delete(file.name).catch((e) => console.error('couldnt delete file', e));
+			}
 
 			done++;
-			onProgress({
-				total,
-				done,
-			});
+			onProgress({ total, done });
 		}
 
 		return !hasErrors;
+	}
+
+	async flushToMetadata(name: string, metadata: NamespacedMetadataID) {
+		this.log(`flushing ${name} to metadata ${metadata}`);
+
+		const existing = uiState.currentSession?.metadata[metadata]?.value as string | undefined;
+		if (existing) await idb.drop('MetadataValueFile', existing);
+
+		const file = await binaryStorage.read(this.locator('photos', name), this.photosContentType);
+
+		const id = await idb.set('MetadataValueFile', {
+			id: generateId('MetadataValueFile'),
+			sessionId: uiState.currentSessionId!,
+			size: file.size,
+			contentType: file.type,
+			filename: file.name,
+			bytes: await file.arrayBuffer(),
+			// eslint-disable-next-line svelte/prefer-svelte-reactivity
+			lastModifiedAt: new Date(file.lastModified || Date.now()).toISOString(),
+		});
+
+		await storeMetadataValue({
+			db: idb.databaseHandle(),
+			type: 'file',
+			sessionId: uiState.currentSessionId!,
+			subjectId: uiState.currentSessionId!,
+			metadataId: metadata,
+			value: id,
+		});
+
+		await this.delete(name);
 	}
 
 	async clear() {
