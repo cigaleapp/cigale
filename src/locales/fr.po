@@ -2677,10 +2677,6 @@ msgid "Photos en attente"
 msgstr "Photos en attente"
 
 #: src/routes/(app)/capture/+page.svelte
-msgid "Le stockage n'est pas encore prêt, veuillez rééssayer"
-msgstr "Le stockage n'est pas encore prêt, veuillez rééssayer"
-
-#: src/routes/(app)/capture/+page.svelte
 msgid "Ne pas quitter"
 msgstr "Ne pas quitter"
 

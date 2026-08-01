@@ -1,15 +1,11 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2026-07-30 22:07+0000\n"
-"Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"Source-Language: fr\n"
 "Language: en\n"
-"Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
+"MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=n != 1;\n"
-"MIME-Version: 1.0\n"
-"X-Generator: Weblate 5.12.2\n"
-"Source-Language: fr\n"
 
 #: src/lib/SessionMetadataForm.svelte
 #: src/routes/(app)/PrepareForOffline.svelte
@@ -2679,10 +2675,6 @@ msgstr ""
 #: src/routes/(app)/storage/+page.svelte
 msgid "Photos en attente"
 msgstr "Pending photos"
-
-#: src/routes/(app)/capture/+page.svelte
-msgid "Le stockage n'est pas encore prêt, veuillez rééssayer"
-msgstr "Storage is not ready yet, please wait"
 
 #: src/routes/(app)/capture/+page.svelte
 msgid "Ne pas quitter"
