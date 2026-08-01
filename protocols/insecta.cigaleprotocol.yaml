@@ -467,13 +467,23 @@ metadata:
 
 capture:
   timers:
-    every: 30s
-    during: 20min
-    messages:
-      lap: Faire un pas en avant
-      status:
-        - '{{ laps.doneCount }} pas / {{ decrease laps.totalCount 1 }}'
-        - '{{ formatDurationStopwatch (increase total.remainingMs 1000) }}'
+    - name: Actif
+      shoot: manually
+      every: 30s
+      during: 20min
+      messages:
+        lap: Faire un pas en avant
+        status:
+          - '{{ formatDurationStopwatch (increase total.remainingMs 1000) }}'
+          - '{{ laps.doneCount }} pas / {{ decrease laps.totalCount 1 }}'
+    - name: Passif
+      shoot: on-timer
+      count: 100
+      during: 10min
+      messages:
+        status:
+          - '{{ formatDurationStopwatch (increase total.remainingMs 1000) }}'
+          - '{{ laps.doneCount }} photos / {{ laps.totalCount }}'
 
 exports:
   images:

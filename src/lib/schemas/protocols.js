@@ -3,6 +3,7 @@ import { type } from 'arktype';
 import { mapKeys, omit, orEmptyObj2 } from '../utils.js';
 import {
 	FilepathTemplate,
+	HourRange,
 	HTTPRequest,
 	ID,
 	MillisecondsLiteral,
@@ -103,6 +104,32 @@ export const CaptureTimersMessageTemplate = TemplatedString(
 	})
 );
 
+export const CaptureTimer = type({
+	name: 'string = ""',
+	shoot: type.enumerated('manually', 'on-timer').default('manually'),
+	'every?': MillisecondsLiteral.describe('Répéter le timer tout les ...'),
+	'count?': type('number.integer').describe('Répéter le timer n fois'),
+	'during?': MillisecondsLiteral,
+	'within?': HourRange.describe(
+		"Contraindre le démarrage et l'arrêt du timer à une plage horaire"
+	),
+	messages: type({
+		lap: CaptureTimersMessageTemplate.describe("Affiché à la fin d'un tour").default(''),
+		start: CaptureTimersMessageTemplate.describe('Affiché au démarrage du timer').default(
+			'Démarré'
+		),
+		end: CaptureTimersMessageTemplate.describe('Affiché à la fin du timer').default('Fini'),
+		status: CaptureTimersMessageTemplate.array()
+			.describe('Affiché en permanence pendant la prise de photos')
+			.default(() => [
+				'{{ laps.doneCount }}/{{ laps.totalCount }}',
+				'{{ formatDurationStopwatch total.remainingMs }}',
+			]),
+	}).default(() => ({})),
+}).describe(
+	"Timer d'aide à la réalisation du protocole, visible lorsque l'on prend des photos dans l'app"
+);
+
 export const Protocol = type({
 	id: ProtocolID,
 	dirty: type('boolean')
@@ -130,38 +157,7 @@ export const Protocol = type({
 		},
 	},
 	'capture?': {
-		'timers?': type({
-			'every?': MillisecondsLiteral.describe('Répéter le timer tout les ...'),
-			'count?': type('number.integer').describe('Répéter le timer n fois'),
-			during: MillisecondsLiteral,
-			messages: type({
-				lap: CaptureTimersMessageTemplate.describe("Affiché à la fin d'un tour").default(
-					''
-				),
-				start: CaptureTimersMessageTemplate.describe(
-					'Affiché au démarrage du timer'
-				).default('Démarré'),
-				end: CaptureTimersMessageTemplate.describe('Affiché à la fin du timer').default(
-					'Fini'
-				),
-				status: CaptureTimersMessageTemplate.array()
-					.describe('Affiché en permanence pendant la prise de photos')
-					.default(() => [
-						'{{ laps.doneCount }}/{{ laps.totalCount }}',
-						'{{ formatDurationStopwatch total.remainingMs }}',
-					]),
-			}).default(() => ({})),
-		})
-			.describe(
-				"Timer d'aide à la réalisation du protocole, visible lorsque l'on prend des photos dans l'app"
-			)
-			.pipe((timers) => {
-				if (timers.every) return timers;
-				return {
-					...timers,
-					every: timers.during,
-				};
-			}),
+		'timers?': CaptureTimer.array()
 	},
 	importedMetadata: type({
 		sessionwide: [

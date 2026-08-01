@@ -18,9 +18,14 @@
 	import IconFlashOff from '~icons/ri/flashlight-line';
 	import IconMore from '~icons/ri/more-line';
 	import IconGallery from '~icons/ri/multi-image-line';
+	import IconPause from '~icons/ri/pause-line';
+	import IconPlayFill from '~icons/ri/play-fill';
 	import IconPlay from '~icons/ri/play-large-line';
 	import IconStartTimer from '~icons/ri/timer-line';
+	import IconSfxOff from '~icons/ri/volume-mute-line';
+	import IconSfxOn from '~icons/ri/volume-up-line';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
+	import ButtonInk from '$lib/ButtonInk.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import DropdownMenu from '$lib/DropdownMenu.svelte';
 	import { geolocationAccuracyToConfidence, getCurrentLocation } from '$lib/geolocation.js';
@@ -47,7 +52,7 @@
 		waitForCapture,
 	} from './camera.js';
 	import { PendingStorage } from './pendingstorage.svelte.js';
-	import { Timer } from './timers.svelte.js';
+	import { displayTimerConfig, Timer } from './timers.svelte.js';
 
 	let submitBugReport = $state<() => void>();
 
@@ -274,8 +279,17 @@
 		if (selector === 'after-timer') await askForPics();
 	}
 
+	const timers = $derived(uiState.currentProtocol?.capture?.timers ?? []);
+
+	const timerIndex = $derived(uiState.currentSession?.captureModeSelectedTimerIndex);
+
+	$effect(() => {
+		if (!timer) setShootingPhase('inert');
+	});
+
 	const timer = $derived.by(() => {
-		const settings = uiState.currentProtocol?.capture?.timers;
+		const settings = timers[timerIndex ?? -1];
+
 		if (!settings) return;
 		return new Timer(settings, {
 			onstart(t) {
@@ -283,9 +297,15 @@
 				setFloatingMessage('Timer', t.formatMessage(settings.messages.start));
 				void Haptics.impact({ style: ImpactStyle.Heavy });
 			},
-			onlap(t) {
+			async onlap(t) {
 				setFloatingMessage('Timer', t.formatMessage(settings.messages.lap));
-				if (getSettings().timerSounds) sfx('timer-lap');
+
+				if (settings.shoot === 'on-timer') {
+					await capture(camera, pendingStorage);
+				} else if (getSettings().timerSounds) {
+					sfx('timer-lap');
+				}
+
 				void Haptics.impact({ style: ImpactStyle.Medium });
 			},
 			async onfinished(t) {
@@ -366,12 +386,59 @@
 					{
 						label: '',
 						items: [
+							...orEmpty(timers.length > 0, {
+								label: 'Timer',
+								type: 'submenu',
+								data: {},
+								icon: IconStartTimer,
+								subtext: (timer?.config.name ?? 'Aucun') || 'Par défaut',
+								submenu: {
+									label: 'Timers',
+									items: [
+										...timers.map((t, i) => ({
+											label: t.name || 'Par défaut',
+											type: 'selectable',
+											key: t.name || 'default',
+											selected: timer?.config.name === t.name,
+											data: {},
+											subtext: displayTimerConfig(t),
+											async onclick() {
+												timer?.stop();
+												await tables.Session.update(
+													uiState.currentSessionId!,
+													'captureModeSelectedTimerIndex',
+													i
+												);
+												resetShootingPhase();
+												setFloatingMessage('Timer', t.name);
+											},
+										})),
+										{
+											label: 'Aucun',
+											type: 'selectable',
+											key: '__none__',
+											selected: !timer,
+											data: {},
+											async onclick() {
+												timer?.stop();
+												await tables.Session.update(
+													uiState.currentSessionId!,
+													'captureModeSelectedTimerIndex',
+													null
+												);
+												setShootingPhase('inert');
+												setFloatingMessage('Timer', 'Aucun');
+											},
+										},
+									],
+								},
+							}),
 							...orEmpty(Capacitor.isNativePlatform(), {
 								label: "Basculer sur l'autre caméra",
 								type: 'clickable' as const,
 								icon: IconSwitchCameraSides,
 								closeOnSelect: false,
-								data: null,
+								data: {},
 								async onclick() {
 									await CameraPreview.flip();
 									camera.side = cycleValues(['rear', 'front'], camera.side);
@@ -387,12 +454,14 @@
 								},
 							}),
 							{
-								label: 'Effets sonores pour le timer',
+								label: 'Son pour le timer',
 								type: 'selectable',
 								key: 'sfx',
-								data: null,
+								data: {},
 								selected: getSettings().timerSounds,
 								closeOnSelect: false,
+								icon: getSettings().timerSounds ? IconSfxOn : IconSfxOff,
+								subtext: getSettings().timerSounds ? 'Activé' : 'Désactivé',
 								onclick() {
 									toggleSetting('timerSounds');
 								},
@@ -400,7 +469,7 @@
 							{
 								label: 'Quitter et garder les photos',
 								type: 'clickable',
-								data: null,
+								data: {},
 								async onclick() {
 									await goto('/(app)/(sidepanel)/import');
 								},
@@ -409,7 +478,7 @@
 								label: 'Signaler un bug',
 								icon: IconBugReport,
 								type: 'clickable',
-								data: null,
+								data: {},
 								onclick() {
 									submitBugReport?.();
 								},
@@ -477,8 +546,14 @@
 		<section class="center">
 			{#if timer?.started}
 				<div class="info">
-					{#each uiState.currentProtocol!.capture!.timers!.messages.status as line, i (i)}
-						<div class="line">{timer.formatMessage(line)}</div>
+					{#each timer.config.messages.status as line, i (i)}
+						{const formatted = $derived(timer.formatMessage(line))}
+						{const stopwatchPattern = new RegExp(`^[0-9.,'":-\\s]+$`)}
+
+						<svelte:element
+							this={stopwatchPattern.test(formatted) ? 'code' : 'div'}
+							class="line">{formatted}</svelte:element
+						>
 					{/each}
 				</div>
 			{:else if uiState.currentSession}
@@ -520,7 +595,27 @@
 		{/if}
 	</section>
 
-	{const shooting = $derived(shootingPhase !== 'inert' && shootingPhase !== 'done')}
+	{const shooting = $derived(
+		shootingPhase !== 'inert' &&
+			shootingPhase !== 'done' &&
+			timer?.config.shoot === 'manually' &&
+			!timer?.paused
+	)}
+
+	<section class="floating-action" data-blink={timer?.paused}>
+		{const canPause = $derived(timer?.started)}
+		{#if canPause}
+			<ButtonInk onclick={() => timer?.togglePause()}>
+				{#if timer.paused}
+					<IconPlayFill />
+					Reprendre
+				{:else}
+					<IconPause />
+					Pause
+				{/if}
+			</ButtonInk>
+		{/if}
+	</section>
 
 	<footer class="actions" data-is-shooting={shooting}>
 		<section class="left">
@@ -554,21 +649,36 @@
 		<button class="shoot" disabled={!ready} title="Prendre une photo" onclick={shoot}>
 			{const Icon = $derived(
 				switchValue(shootingPhase, {
-					inert: IconStartTimer,
+					inert: timer ? IconStartTimer : null,
 					'before-timer': null,
 					'wait-start-timer': IconPlay,
+					'timer-running': switchValue(timer?.config.shoot ?? 'manually', {
+						manually: null,
+						'on-timer': 'A',
+					}),
 					'after-timer': null,
 					done: null,
 				})
 			)}
 
 			{#if Icon}
-				<div class="start-timer-icon">
-					<Icon />
+				<div
+					class="start-timer-icon"
+					style:color={typeof Icon === 'string' ? 'black' : 'white'}
+				>
+					{#if typeof Icon === 'string'}
+						{Icon}
+					{:else}
+						<Icon />
+					{/if}
 				</div>
 			{/if}
 
-			<svg class="shoot-icon" data-phase={shootingPhase}>
+			<svg
+				class="shoot-icon"
+				data-phase={shootingPhase}
+				data-shoot={timer?.config.shoot ?? 'manually'}
+			>
 				<circle
 					class="ring"
 					cx="50%"
@@ -579,6 +689,12 @@
 					stroke-width="2px"
 					stroke-linecap="round"
 					{@attach (node: SVGCircleElement) => {
+						if (!timer) {
+							node.style.strokeDasharray = '';
+							node.style.stroke = 'white';
+							return;
+						}
+
 						if (!['wait-start-timer', 'timer-running'].includes(shootingPhase)) {
 							node.style.strokeDasharray = '';
 							node.style.stroke = 'white';
@@ -597,7 +713,7 @@
 					}}
 				></circle>
 
-				{#if !Icon}
+				{#if !Icon || typeof Icon === 'string'}
 					<circle class="inside" cx="50%" cy="50%" r="37%" fill="var(--color, white)"
 					></circle>
 				{/if}
@@ -700,7 +816,7 @@
 		z-index: 20;
 		position: fixed;
 		inset-inline: 0;
-		bottom: calc(var(--bottom-actions-height) + 1em);
+		bottom: calc(var(--bottom-actions-height) + 1.5em);
 		display: flex;
 		justify-content: center;
 		align-items: center;
@@ -714,12 +830,29 @@
 		}
 	}
 
+	.floating-action {
+		z-index: 15;
+		position: fixed;
+		inset-inline: 0;
+		bottom: calc(var(--bottom-actions-height) - 0.75em);
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		flex-direction: column;
+
+		--fg: white;
+
+		&[data-blink='true'] {
+			animation: blink infinite 1s;
+		}
+	}
+
 	.actions {
 		z-index: 20;
 		position: fixed;
 		inset-inline: 0;
 		display: grid;
-		grid-template-columns: repeat(3, 1fr);
+		grid-template-columns: 1fr 1.5fr 1fr;
 
 		/* ButtonIcon & ButtonInk colors */
 		--fg: white;
@@ -795,10 +928,10 @@
 		.info {
 			color: white;
 			text-align: center;
-			/*display: flex;
-			justify-content: center;
-			align-items: center;
-			gap: 1em*/
+
+			code {
+				font-size: 0.9em;
+			}
 		}
 	}
 
@@ -807,11 +940,6 @@
 			height: 5em;
 			width: 5em;
 			--color: white;
-
-			circle.inside {
-				transform-origin: 50% 50%;
-				transition: scale 100ms ease;
-			}
 		}
 
 		&:active,
@@ -836,10 +964,19 @@
 			&.lap-progress {
 				transition: 50ms linear;
 			}
+
+			&.inside {
+				transform-origin: 50% 50%;
+				transition: scale 100ms ease;
+			}
 		}
 
 		.shoot-icon[data-phase='wait-start-timer'] .ring {
 			animation: blink infinite 1s ease;
+		}
+
+		.shoot-icon[data-shoot='on-timer'][data-phase='timer-running'] .lap-progress {
+			stroke-width: 2px;
 		}
 
 		& {
@@ -860,7 +997,7 @@
 			opacity: 1;
 		}
 		50% {
-			opacity: 0.25;
+			opacity: 0.125;
 		}
 		to {
 			opacity: 1;

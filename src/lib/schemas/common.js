@@ -1,5 +1,12 @@
 import { type } from 'arktype';
 import { ms } from 'convert';
+import {
+	differenceInMilliseconds,
+	intervalToDuration,
+	isWithinInterval,
+	setHours,
+	setMinutes,
+} from 'date-fns';
 
 import { clamp, cleanFilepath, safeJSONStringify } from '../utils.js';
 import { TemplatedString } from './expressions.js';
@@ -155,3 +162,46 @@ export const SingleEntryRecord = (k, v) =>
 export const MillisecondsLiteral = type('/^\\d+(\\.\\d+)?(?<unit>ms|s|min|h)$/').pipe((literal) =>
 	ms(literal)
 );
+
+export const HourRange = type('/^\\d{2}:\\d{2}-\\d{2}:\\d{2}$/').pipe((literal) => {
+	const [start, end] = literal.split('-');
+
+	/** @param {string} literal */
+	const parseTime = (literal) => {
+		const [h, m] = literal.split(':');
+		return { hours: Number(h), minutes: Number(m) };
+	};
+
+	return {
+		toString: () => literal,
+		start: parseTime(start),
+		end: parseTime(end),
+		/**
+		 * Turn into a concrete pair of dates based on the given base date
+		 * @param {Date} base
+		 */
+		reify(base) {
+			return {
+				start: setMinutes(setHours(base, this.start.hours), this.start.minutes),
+				end: setMinutes(setHours(base, this.end.hours), this.end.minutes),
+			};
+		},
+		/**
+		 * Duration in milliseconds of the interval
+		 * This requires a base date (defaults to today)
+		 * Because of potential daylight savings occuring within the interval
+		 * This does assume the timezone does not change within the interval though
+		 * @param {Date} [base]
+		 */
+		duration(base) {
+			const { start, end } = this.reify(base ?? new Date());
+			return differenceInMilliseconds(end, start);
+		},
+		/**
+		 * @param {Date} date
+		 */
+		within(date) {
+			return isWithinInterval(date, this.reify(date));
+		},
+	};
+});

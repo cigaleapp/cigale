@@ -113,7 +113,8 @@ export const Session = type({
 	description: 'string',
 	protocol: ID,
 	metadata: MetadataValues,
-	captureModeShootingPhase: ['string', '=', 'inert'],
+	captureModeShootingPhase: "string = 'inert'",
+	captureModeSelectedTimerIndex: 'null | number >= 0 = 0',
 	fullscreenClassifier: type({
 		layout: type.enumerated(...FULLSCREEN_CLASSIFY_LAYOUTS),
 		'focusedMetadata?': NamespacedMetadataID,

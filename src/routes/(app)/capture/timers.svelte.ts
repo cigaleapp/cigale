@@ -1,6 +1,10 @@
-import type { CaptureTimersMessageTemplate } from '$lib/schemas/protocols';
+import type { CaptureTimer, CaptureTimersMessageTemplate } from '$lib/schemas/protocols';
 
 import { ms } from 'convert';
+
+import { formatDurationShort } from '$lib/date';
+import { getSettings } from '$lib/settings.svelte';
+import { switchValue } from '$lib/utils';
 
 export class Timer {
 	totalDuration = 0;
@@ -8,6 +12,9 @@ export class Timer {
 	elapsedLap = $state(0);
 	laps = $state(0);
 	started = $state(false);
+	/** Will start once the hour range (timer's within property) is active */
+	armed = $state(false);
+	paused = $state(false);
 
 	globalProgress = $derived(Math.max(0, this.elapsedTotal / (this.totalDuration || 1)));
 	remainingTotal = $derived(Math.max(0, this.totalDuration - this.elapsedTotal));
@@ -17,22 +24,26 @@ export class Timer {
 	#handle: NodeJS.Timeout | number | undefined;
 
 	constructor(
-		private timings: {
-			every?: number | undefined;
-			during: number;
-			count?: number | undefined;
-		},
+		public config: (typeof CaptureTimer)['infer'],
 		private callbacks?: {
 			onstart: (t: Timer) => void;
 			onlap: (t: Timer) => void;
 			onfinished: (t: Timer) => void;
 		}
 	) {
-		this.totalDuration = timings.during;
+		const duration = config.during ?? config.within?.duration();
 
-		if (timings.every && timings.every > timings.during) {
+		if (!duration) {
 			throw new Error(
-				`Capture timer is invalid: capture.timers.every (${timings.every}ms) is longer than capture.timers.during (${timings.during}ms)`
+				`Capture timer is invalid: neither capture.timers.during nor capture.timers.within is set`
+			);
+		}
+
+		this.totalDuration = duration;
+
+		if (config.every && config.every > this.totalDuration) {
+			throw new Error(
+				`Capture timer is invalid: capture.timers.every (${config.every}ms) is longer than capture.timers.during (${config.during}ms)`
 			);
 		}
 
@@ -47,8 +58,8 @@ export class Timer {
 
 	get lapDuration() {
 		return Math.min(
-			this.timings.every ?? Infinity,
-			this.timings.during / (this.timings.count || 1)
+			this.config.every ?? Infinity,
+			this.totalDuration / (this.config.count || 1)
 		);
 	}
 
@@ -62,6 +73,11 @@ export class Timer {
 		return ms('30s');
 	}
 
+	withinRange() {
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity
+		return this.config.within?.within(new Date()) ?? true;
+	}
+
 	formatMessage(template: (typeof CaptureTimersMessageTemplate)['infer']) {
 		try {
 			return template.render({
@@ -73,8 +89,8 @@ export class Timer {
 					remainingCount: Math.max(0, this.lapsTotalCount - this.laps),
 				},
 				total: {
-					durationMs: this.timings.during,
-					remainingMs: Math.max(0, this.timings.during - this.elapsedTotal),
+					durationMs: this.totalDuration,
+					remainingMs: Math.max(0, this.totalDuration - this.elapsedTotal),
 				},
 			});
 		} catch (e) {
@@ -84,10 +100,18 @@ export class Timer {
 	}
 
 	start() {
-		this.started = true;
-		this.callbacks?.onstart(this);
 		let checkpoint = performance.now();
+		this.armed = true;
 		this.#handle = setInterval(() => {
+			if (!this.withinRange()) {
+				return;
+			}
+
+			if (!this.started) {
+				this.callbacks?.onstart(this);
+				this.started = true;
+			}
+
 			const now = performance.now();
 			const elapsed = now - checkpoint;
 			checkpoint = now;
@@ -95,23 +119,41 @@ export class Timer {
 			this.elapsedTotal += elapsed;
 			this.elapsedLap += elapsed;
 
-			if (this.elapsedTotal >= this.timings.during) {
+			if (this.elapsedTotal >= this.totalDuration) {
 				this.started = false;
 				clearTimeout(this.#handle);
-				this.callbacks?.onfinished(this);
+				void this.callbacks?.onfinished(this);
 				return;
 			}
 
-			if (this.elapsedLap >= this.lapDuration) {
+			if (this.elapsedLap >= this.lapDuration || !this.withinRange()) {
 				this.elapsedLap = 0;
 				this.laps++;
-				this.callbacks?.onlap?.(this);
+				void this.callbacks?.onlap?.(this);
 			}
 		}, this.timeResolution);
 	}
 
 	stop() {
 		clearTimeout(this.#handle);
+	}
+
+	pause() {
+		this.stop();
+		this.paused = true;
+	}
+
+	resume() {
+		this.paused = false;
+		this.start();
+	}
+
+	togglePause() {
+		if (this.paused) {
+			this.resume();
+		} else {
+			this.pause();
+		}
 	}
 
 	reset() {
@@ -127,4 +169,25 @@ export class Timer {
 		this.reset();
 		this.start();
 	}
+}
+
+export function displayTimerConfig(config: (typeof CaptureTimer)['infer']) {
+	let lap = '';
+	let total = '';
+
+	const shootmode = switchValue(config.shoot, {
+		manually: '',
+		'on-timer': '[A]',
+	});
+
+	const duration = (ms: number) => formatDurationShort(getSettings().language, ms);
+
+	if (config.count) lap += `${config.count}×`;
+	if (config.every) lap += `1/${duration(config.every)}`;
+
+	if (config.during) total += duration(config.during);
+	if (config.within) total += config.within.toString();
+
+	if (lap && total) return `${shootmode} ${lap} (${total})`;
+	return total || lap;
 }
