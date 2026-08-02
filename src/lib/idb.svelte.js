@@ -17,7 +17,7 @@ export const previewingPrNumber =
 	import.meta.env.previewingPrNumber === 'null' ? null : import.meta.env.previewingPrNumber;
 
 export const databaseName = previewingPrNumber ? `previews/pr-${previewingPrNumber}` : 'database';
-export const databaseRevision = 15;
+export const databaseRevision = 16;
 
 const profile = profiler('Database');
 
@@ -626,6 +626,14 @@ export async function openDatabase() {
 
 				if (oldVersion < 15) {
 					await rebuildIndexes('Image');
+				}
+
+				if (oldVersion < 16) {
+					await mutateRows('Protocol', async (protocol) => {
+						if (!protocol.capture?.timers) return protocol;
+						protocol.capture.timers = [protocol.capture.timers];
+						return protocol
+					});
 				}
 			}
 

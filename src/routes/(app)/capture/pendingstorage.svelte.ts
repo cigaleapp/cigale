@@ -130,7 +130,7 @@ export class PendingStorage {
 
 			this.log('saved photo as ', name);
 
-			await this.saveExtraExif(name);
+			void this.saveExtraExif(name);
 
 			return name;
 		} catch (e) {

@@ -1,4 +1,6 @@
 // TODO(#1522): remove when Intl.DurationFormat is Baseline Widely Available (in Sep 2027)
+import type { Interval } from 'date-fns';
+
 import { DurationFormat } from '@formatjs/intl-durationformat';
 import { intervalToDuration, isValid, parse } from 'date-fns';
 
@@ -97,18 +99,32 @@ export function formatDurationStopwatch(durationMs: number): `${number}:${number
 	return `${h}:${m}'${s}"` as const;
 }
 
+export function formatDurationShort(locale: string, durationMs: number) {
+	return formatDistanceToNowShortParts(locale, {
+		start: 0,
+		end: durationMs,
+	}).join('');
+}
+
 /**
  * Formats a date as a distance to now, but in a short format (e.g. "5m" instead of "5 minutes ago")
  * Uses Intl.DurationFormat#formatToParts under the hood
  * @returns array of non-whitespace-only parts. In practice, this is a alternating array of numbers and unit strings, in descending order of magnitude (e.g. ["1", "d", "5", "hr"] for "1 day and 5 hours ago"). Useful if you have not much space and wanna cut it to e.g. only "1d" instead of "1d 5hr".
  */
-export function formatDistanceToNowShortParts(locale: string, date: Date | number): string[] {
+export function formatDistanceToNowShortParts(
+	locale: string,
+	date: Interval | Date | number
+): string[] {
 	return new DurationFormat(locale, { style: 'narrow' })
 		.formatToParts(
-			intervalToDuration({
-				start: Date.now(),
-				end: date,
-			})
+			intervalToDuration(
+				date instanceof Date || typeof date === 'number'
+					? {
+							start: Date.now(),
+							end: date,
+						}
+					: date
+			)
 		)
 		.map((part) => part.value)
 		.filter((value) => value.trim());

@@ -18,6 +18,8 @@
 		danger?: boolean;
 		/** Show left of the label */
 		icon?: import('svelte').Component;
+		/** Add text on the right of the label, useful to show current status/short help/etc */
+		subtext?: string;
 	};
 
 	export type SelectableItem<SD> = Omit<Item<SD>, 'type' | 'key'> & {
@@ -64,6 +66,7 @@
 	import { IsMobile } from './mobile.svelte.js';
 	import Submenu from './Submenu.svelte';
 	import { sum } from './utils.js';
+	import OverflowableText from './OverflowableText.svelte';
 
 	interface Props {
 		/** Shown on mobile (when it's a drawer) and in place of the first item group's label if not set */
@@ -220,6 +223,11 @@
 								</div>
 							{/if}
 							{i.label}
+							{#if i.subtext}
+								<div class="subtext">
+									<OverflowableText text={i.subtext} />
+								</div>
+							{/if}
 						</div>
 					{/if}
 				</button>
@@ -443,6 +451,7 @@
 		gap: 0.5em;
 		align-items: center;
 		padding: 0.25em;
+		width: 100%;
 
 		.icon {
 			display: flex;
@@ -451,6 +460,12 @@
 			/* Makes space even if icon is empty */
 			width: 1.25em;
 			height: 1.25em;
+		}
+
+		.subtext {
+			color: var(--gay);
+			text-align: right;
+			margin-left: auto;
 		}
 	}
 </style>
