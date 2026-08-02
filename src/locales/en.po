@@ -3050,3 +3050,11 @@ msgstr ""
 #: src/lib/exif.ts
 msgid "Temperature"
 msgstr ""
+
+#: src/routes/(app)/capture/+page.svelte
+msgid "<0/> Reprendre"
+msgstr ""
+
+#: src/routes/(app)/capture/+page.svelte
+msgid "<0/> Pause"
+msgstr ""

@@ -3050,3 +3050,11 @@ msgstr "Effets sonores"
 #: src/lib/exif.ts
 msgid "Temperature"
 msgstr "Temperature"
+
+#: src/routes/(app)/capture/+page.svelte
+msgid "<0/> Reprendre"
+msgstr "<0/> Reprendre"
+
+#: src/routes/(app)/capture/+page.svelte
+msgid "<0/> Pause"
+msgstr "<0/> Pause"
