@@ -632,7 +632,7 @@ export async function openDatabase() {
 					await mutateRows('Protocol', async (protocol) => {
 						if (!protocol.capture?.timers) return protocol;
 						protocol.capture.timers = [protocol.capture.timers];
-						return protocol
+						return protocol;
 					});
 				}
 			}

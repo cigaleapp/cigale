@@ -157,7 +157,7 @@ export const Protocol = type({
 		},
 	},
 	'capture?': {
-		'timers?': CaptureTimer.array()
+		'timers?': CaptureTimer.array(),
 	},
 	importedMetadata: type({
 		sessionwide: [

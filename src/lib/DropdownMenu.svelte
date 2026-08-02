@@ -64,9 +64,9 @@
 
 	import BottomDrawer from './BottomDrawer.svelte';
 	import { IsMobile } from './mobile.svelte.js';
+	import OverflowableText from './OverflowableText.svelte';
 	import Submenu from './Submenu.svelte';
 	import { sum } from './utils.js';
-	import OverflowableText from './OverflowableText.svelte';
 
 	interface Props {
 		/** Shown on mobile (when it's a drawer) and in place of the first item group's label if not set */
