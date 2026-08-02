@@ -179,7 +179,7 @@
 		"bits-ui": "^1.8.0",
 		"caniuse-lite": "^1.0.30001806",
 		"clicked": "^4.0.3",
-		"convert": "^7.0.0",
+		"convert": "^7.0.2",
 		"date-fns": "^4.4.0",
 		"dequal": "^2.0.3",
 		"devalue": "^5.8.2",
