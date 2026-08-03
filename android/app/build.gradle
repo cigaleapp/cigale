@@ -3,6 +3,12 @@ apply plugin: 'com.android.application'
 android {
     namespace = "io.github.cigaleapp"
     compileSdk = rootProject.ext.compileSdkVersion
+
+    compileOptions {
+	   	sourceCompatibility JavaVersion.JAVA_17
+	    targetCompatibility JavaVersion.JAVA_17
+    }
+    
     defaultConfig {
         applicationId "io.github.cigaleapp"
         minSdkVersion rootProject.ext.minSdkVersion
@@ -45,8 +51,15 @@ android {
 			versionNameSuffix "-nightly"
 		}
 	}
+	
+	testOptions {
+		animationsDisabled = true
+	}
 }
 
+kotlinOptions {
+	jvmTarget = "17"
+}
 
 
 repositories {
@@ -64,6 +77,9 @@ dependencies {
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
+	androidTestImplementation "androidx.test.espresso:espresso-web:$androidxEspressoCoreVersion"
+	androidTestImplementation 'androidx.test:runner:1.7.0'
+	androidTestImplementation 'androidx.test:rules:1.7.0'
     implementation project(':capacitor-cordova-android-plugins')
 }
 
