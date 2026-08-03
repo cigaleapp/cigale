@@ -28,7 +28,8 @@ const env = arkenv({
 
 		if (isLocal) {
 			console.info(`Building on local dev computer, enabling CAPACITOR_LIVE_RELOAD`);
-			return true;
+			// TODO: doesnt work since it makes a http context, disabled for now
+			return false;
 		}
 
 		return false;

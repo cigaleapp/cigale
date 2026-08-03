@@ -148,6 +148,16 @@ jobs:
     with:
       artifact: ${{ needs.build-debug.outputs.artifact }}
 
+  e2e-android:
+    # XXX: DONT MERGE
+    # needs: [build-debug, json-schema, lint, test]
+    needs: [build-debug]
+    name: E2E Android
+    uses: ./.github/workflows/espresso.yml
+    secrets: inherit
+    with:
+      artifact: ${{ needs.build-debug.outputs.artifact }}
+
   bundlesize:
     if: github.ref_name != 'main'
     needs: test
@@ -306,6 +316,7 @@ jobs:
       - lint
       - test
       - e2e
+      - e2e-android
       - is-mergeable
       - dont-merge-comment
 
