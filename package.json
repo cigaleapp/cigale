@@ -120,7 +120,7 @@
 		"google-auth-library": "^10.9.1",
 		"google-fonts-helper": "^3.7.4",
 		"googleapis": "^173.0.0",
-		"gql.tada": "^1.11.2",
+		"gql.tada": "^1.11.3",
 		"graphql": "^17.0.2",
 		"idb-opfs": "^0.4.0",
 		"jsdom": "^29.1.1",
