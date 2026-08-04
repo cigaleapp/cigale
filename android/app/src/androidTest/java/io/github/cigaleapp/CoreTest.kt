@@ -20,31 +20,27 @@ import java.util.concurrent.TimeUnit
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 class CoreTest {
-	@get:Rule
-	val activityRule = ActivityScenarioRule(MainActivity::class.java)
+    @get:Rule
+    val activityRule = ActivityScenarioRule(MainActivity::class.java)
 
-	@Test
-	fun insectaProtocol() {
-		val webview = onWebView()
-		val body = findElement(Locator.TAG_NAME, "body")
+    @Test
+    fun insectaProtocol() {
+        val webview = onWebView()
+        val body = findElement(Locator.TAG_NAME, "body")
 
-		webview.withElement(body).check(
-			webMatches(getText(), containsString("Chargement…"))
-		)
+        webview.withElement(body).check(
+            webMatches(getText(), containsString("Chargement…"))
+        )
 
-		// onView(isRoot()).perform(
-		//		waitForWebText("CIGALE", 5, TimeUnit.MINUTES)
-		//	)
-		
-		// TODO: make wait for text work
-		Thread.sleep(4 * 60 * 1_000)
+        // onView(isRoot()).perform(
+        //		waitForWebText("CIGALE", 5, TimeUnit.MINUTES)
+        //	)
 
-		webview.withElement(body).check(
-			webMatches(getText(), containsString("CIGALE"))
-		)
-		
-		webview.withElement(
-			findElement(Locator.NAME)
-		)
-	}
+        // TODO: make wait for text work
+        Thread.sleep(4 * 60 * 1_000)
+
+        webview.withElement(body).check(
+            webMatches(getText(), containsString("CIGALE"))
+        )
+    }
 }
