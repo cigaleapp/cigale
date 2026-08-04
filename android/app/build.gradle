@@ -3,12 +3,6 @@ apply plugin: 'com.android.application'
 android {
     namespace = "io.github.cigaleapp"
     compileSdk = rootProject.ext.compileSdkVersion
-
-    compileOptions {
-	   	sourceCompatibility JavaVersion.JAVA_17
-	    targetCompatibility JavaVersion.JAVA_17
-    }
-    
     defaultConfig {
         applicationId "io.github.cigaleapp"
         minSdkVersion rootProject.ext.minSdkVersion
@@ -57,9 +51,6 @@ android {
 	}
 }
 
-kotlinOptions {
-	jvmTarget = "17"
-}
 
 
 repositories {
