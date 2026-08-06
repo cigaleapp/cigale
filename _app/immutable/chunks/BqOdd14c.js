@@ -1,0 +1,1 @@
+import{mt as e,ut as t}from"./ttysE-EJ.js";import{a as n}from"./DHWQV27G.js";import{t as r}from"./CJxPKyTL.js";function i({title:e}){let t=n();a(()=>{let n=r.currentSession?.name??`C.I.G.A.L.E.`;document.title=e?t(625,[e,n]):n})}function a(n){if(t()){n();return}e(()=>{n()})}export{i as t};

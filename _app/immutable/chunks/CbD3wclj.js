@@ -1,0 +1,2 @@
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["./DS-9QBKl2.js","./D6wqBHOR.js"])))=>i.map(i=>d[i]);
+import{i as e}from"./OSPVQt7-.js";import{a as t}from"./D6wqBHOR.js";var n=t(`App`,{web:()=>e(()=>import(`./DS-9QBKl2.js`).then(e=>new e.AppWeb),__vite__mapDeps([0,1]),import.meta.url)});export{n as t};
