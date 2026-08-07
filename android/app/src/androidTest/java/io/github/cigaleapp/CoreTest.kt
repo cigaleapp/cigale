@@ -28,6 +28,8 @@ class CoreTest {
         val webview = onWebView()
         val body = findElement(Locator.TAG_NAME, "body")
 
+        println("Checking for loading")
+
         webview.withElement(body).check(
             webMatches(getText(), containsString("Chargement…"))
         )
@@ -36,8 +38,12 @@ class CoreTest {
         //		waitForWebText("CIGALE", 5, TimeUnit.MINUTES)
         //	)
 
+        println("Waiting 4mn")
+
         // TODO: make wait for text work
         Thread.sleep(4 * 60 * 1_000)
+
+        println("Checking for CIGALE text")
 
         webview.withElement(body).check(
             webMatches(getText(), containsString("CIGALE"))
