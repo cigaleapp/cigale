@@ -33,7 +33,7 @@ class CoreTest {
         Log.d("io.github.cigaleapp", "Checking for loading")
 
         webview.withElement(body).check(
-            webMatches(getText(), containsString("Chargement…"))
+            webMatches(getText(), containsString("Loading…"))
         )
 
         // onView(isRoot()).perform(
