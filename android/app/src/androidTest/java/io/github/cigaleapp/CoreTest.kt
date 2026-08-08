@@ -1,5 +1,6 @@
 package io.github.cigaleapp
 
+import android.util.Log
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.matcher.ViewMatchers.isRoot
 import androidx.test.espresso.web.assertion.WebViewAssertions.webMatches
@@ -29,6 +30,7 @@ class CoreTest {
         val body = findElement(Locator.TAG_NAME, "body")
 
         println("Checking for loading")
+        Log.d("io.github.cigaleapp", "Checking for loading")
 
         webview.withElement(body).check(
             webMatches(getText(), containsString("Chargement…"))
@@ -39,11 +41,13 @@ class CoreTest {
         //	)
 
         println("Waiting 4mn")
+        Log.d("io.github.cigaleapp", "Waiting 4mn")
 
         // TODO: make wait for text work
         Thread.sleep(4 * 60 * 1_000)
 
         println("Checking for CIGALE text")
+        Log.d("io.github.cigaleapp", "Checking for CIGALE text")
 
         webview.withElement(body).check(
             webMatches(getText(), containsString("CIGALE"))
