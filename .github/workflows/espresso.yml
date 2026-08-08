@@ -187,6 +187,7 @@ jobs:
         with:
           api-level: 28
           working-directory: ./android
+          ram-size: 8192M
           script: |
             chmod +x ./gradlew
             ./gradlew connectedCheck --stacktrace
