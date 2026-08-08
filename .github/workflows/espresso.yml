@@ -185,9 +185,16 @@ jobs:
       - name: Run test on emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 28
+          api-level: 35
           working-directory: ./android
           ram-size: 8192M
           script: |
+            adb devices -l
+            adb shell getprop ro.build.version.sdk
+            adb shell getprop ro.product.cpu.abi
+            adb shell settings get global animator_duration_scale
+            adb shell settings get global window_animation_scale
+            adb shell settings get global transition_animation_scale
+          
             chmod +x ./gradlew
-            ./gradlew connectedCheck --stacktrace
+            ./gradlew :app:connectedNightlyDebugAndroidTest --stacktrace --info
