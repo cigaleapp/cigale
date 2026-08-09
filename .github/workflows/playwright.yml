@@ -146,7 +146,7 @@ jobs:
     name: Test (shard ${{ matrix.shard-index }} of ${{ matrix.shard-count }})
     needs: predownload
     container:
-      image: gwennlbh/playwright-bun:v1.62.0
+      image: gwennlbh/playwright-bun:v1.62.1
       options: --user 1001
     strategy:
       fail-fast: false
