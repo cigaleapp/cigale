@@ -188,6 +188,7 @@ jobs:
           api-level: 35
           working-directory: ./android
           target: google_apis_playstore
+          arch: x86_64
           ram-size: 8192M
           script: |
             adb devices -l
