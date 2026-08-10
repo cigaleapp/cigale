@@ -142,7 +142,7 @@ jobs:
 
   test:
     timeout-minutes: 60
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     name: Test
     needs: predownload
     steps:
@@ -185,10 +185,9 @@ jobs:
       - name: Run test on emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 35
+          # api-level: 35
           working-directory: ./android
-          target: google_apis_playstore
-          arch: arm64-v8a
+          # target: google_apis_playstore
           ram-size: 8192M
           script: |
             adb devices -l
