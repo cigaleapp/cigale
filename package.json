@@ -116,7 +116,7 @@
 		"fake-indexeddb": "^6.2.5",
 		"fast-xml-parser": "^5.10.1",
 		"gitmoji-cli": "^9.7.0",
-		"globals": "^17.8.0",
+		"globals": "^17.9.0",
 		"google-auth-library": "^10.9.1",
 		"google-fonts-helper": "^3.7.4",
 		"googleapis": "^173.0.0",
