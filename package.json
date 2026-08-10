@@ -130,7 +130,7 @@
 		"msw": "^2.15.0",
 		"octokit": "^5.0.5",
 		"odt2html": "^1.0.1",
-		"oxlint": "^1.76.0",
+		"oxlint": "^1.77.0",
 		"pdf-to-png-converter": "^4.1.1",
 		"playwright-performance-metrics": "^1.2.5",
 		"postcss-preset-env": "^11.3.2",
