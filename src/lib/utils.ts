@@ -1620,3 +1620,7 @@ if (import.meta.vitest) {
 export type ValueOfMap<M> = M extends Map<unknown, infer V> | ReadonlyMap<unknown, infer V>
 	? V
 	: never;
+
+export function degToRad(deg: number): number {
+	return (deg * Math.PI) / 180;
+}
