@@ -12,6 +12,7 @@ import { getCurrentLocation } from '../geolocation.js';
 import { errorMessage } from '../i18n.js';
 import {
 	mapValues,
+	round,
 	safeJSONStringify,
 	splitFilenameOnExtension,
 	transformObject,
@@ -388,6 +389,22 @@ export const HELPERS = /** @type {const} */ ({
 		 */
 		implementation(latitude, longitude) {
 			return safeJSONStringify({ latitude, longitude });
+		},
+	},
+	coordsBox: {
+		documentation:
+			'Crée une boîte (x - 1e-N),(y - 1e-N),(x + 1e-N),(x + 1e-N) à partir de x, y et n. Renvoie les 4 nombres, arrondis à N chiffres décimaux, séparés par des virgules (donc renvoie du texte)',
+		usage: [['-4.261320001', '48.407920101', '5'], '-4.26133,48.40791,-4.26131,48.40793'],
+		/**
+		 * @param {number} x
+		 * @param {number} y
+		 * @param {number} N
+		 */
+		implementation(x, y, N) {
+			const room = 10 ** -N;
+			return [x - room, y - room, x + room, y + room]
+				.map((c) => round(c, N).toString())
+				.join(',');
 		},
 	},
 	boundingBox: {
