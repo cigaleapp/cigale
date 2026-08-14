@@ -211,6 +211,139 @@ sessionMetadata:
     required: false
     # kobocollect: Code du site # defaults to matching by label
 
+  habitat:
+    type: enum
+    label: Habitat
+    description: Type d'habitat, selon la catégorisation CarHab
+    learnMore: https://researchgate.net/publication/374783237_Notice_CarHab_-_Programme_de_cartographie_nationale_des_habitats_naturels_et_semi-naturels
+    mergeMethod: none
+    required: false
+    options:
+      - key: '1100'
+        label: Glacier et névé
+        description: 'Physionomie dominée par la glace et/ou la neige. S’observe uniquement aux étages alpin et nival. Inclut les surfaces recouvertes de glace toute l’année (glaciers blancs, glaciers noirs, glaciers rocheux) et les surfaces dépourvues de glace, mais recouvertes de neige en dehors de la période hivernale (névés temporaires, névés permanents).'
+        color: '#e0ffff'
+      - key: '2100'
+        label: Minéral végétalisé
+        description: 'Physionomie peu couverte par la végétation, dominée par le substrat minéral nu ou par une végétation très clairsemée. Les végétations herbacées plus denses et ligneuses apparaissent par plages mais elles laissent une place significative au substrat nu. S’observe typiquement en situation d’éboulis, de dalles rocheuses, de parois, de falaises, de grèves exondées des rivières et plans d’eau, sur les estrans. Cette valeur n’est codée que sur des polygones dont la physionomie majoritaire a été calculée par modélisation supervisée. C’est une physionomie « complexe » issue uniquement d’un calcul : elle est déduite par analyse de la physionomie majoritaire et de la part des autres physionomies exprimées dans le polygone (pelouses, prairies, végétation herbacée haute, etc.).'
+        color: '#b3a985'
+      - key: '2200'
+        label: Minéral non ou peu végétalisé
+        description: 'Physionomie très peu couverte par la végétation, hormis une végétation cryptogamique très éparse et une végétation herbacée très clairsemée pratiquement indétectables par analyse d’images satellite. Les végétations pionnières apparaissent par plages mais elles sont de très faible densité. S’observe typiquement en situation d’éboulis, de dalles rocheuses, de parois, de falaises, de grèves grèves exondées des rivières et plans d’eau, sur les estrans. Cette valeur n’est codée que sur des polygones dont la physionomie majoritaire a été calculée par modélisation supervisée. Elle est déduite de la physionomie majoritaire.'
+        color: '#d5d2b0'
+      - key: '3100'
+        label: Pelouse
+        description: 'Physionomie dominée par une végétation herbacée vivace naturellement basse, à faible production de biomasse due à des conditions édaphiques pauvres en éléments nutritifs (milieu oligotrophe, sècheresse, etc.) ou à des conditions climatiques défavorables à l’activité photosynthétique (températures très basses, photopériode courte, etc.). Cette valeur n’est codée que sur des polygones dont la physionomie majoritaire a été calculée par modélisation supervisée. Elle correspond à la physionomie majoritaire.'
+        color: '#94e346'
+      - key: '3200'
+        label: Végétation herbacée haute
+        description: 'Physionomie dominée par une végétation herbacée vivace naturellement élevée, à forte production de biomasse, dont les espèces ont généralement un port ramifié, avec des feuilles caulinaires nombreuses et une inflorescence souvent de grande taille. La formation végétale typique est l’ourlet au sens large, incluant mégaphorbiaies, roselières et cariçaies. Cette valeur n’est codée que sur des polygones dont la physionomie majoritaire a été calculée par modélisation supervisée. Elle est déduite de la physionomie majoritaire.'
+        color: '#02e263'
+      - key: '3300'
+        label: Prairie de type indéterminé
+        description: 'Physionomie dominée par une végétation herbacée vivace à production de biomasse moyenne à forte due à des conditions édaphiques peu contraignantes, mais au développement vertical contraint par les activités agropastorales (fauche, pâturage).'
+        color: '#a8de89'
+      - key: '3301'
+        label: Prairie fauchée
+        description: 'Prairie dont le développement vertical est contraint par l’activité de fauche. La fauche produit des paysages assez homogènes à l’échelle parcellaire, avec peu de végétations associées à la végétation prairiale sensu stricto. Cette valeur n’est codée que sur des polygones dont la physionomie majoritaire a été calculée par modélisation supervisée. Elle est déduite de la physionomie ma-joritaire.'
+        color: '#c3e86c'
+      - key: '3302'
+        label: Prairie pâturée
+        description: 'Prairie dont le développement vertical est contraint par l’activité de pâturage. Le pâturage produit des paysages hétérogènes à l’échelle parcellaire, avec des entrées de pâture hébergeant des végétations piétinées, des reposoirs à bétail dont la végétation est celle d’une friche nitrophile, des abreuvoirs aux végétations aquatiques et amphibies, des rochers, des fourrés ponctuels, etc. Cette valeur n’est codée que sur des polygones dont la physionomie majoritaire a été calculée par modélisation supervisée. Elle est déduite de la physionomie ma-joritaire.'
+        color: '#caffae'
+      - key: '4100'
+        label: Fourré bas
+        description: 'Physionomie dominée par une végétation de chaméphytes (landes, garrigues basses etc.), dans des conditions contraignantes d’un point de vue édaphique (pauvreté en nutriments, sécheresse, salinité) ou climatique (températures très basses, photopériode courte, etc.). Les végétations chaméphytiques succulentes des estuaires (notamment à salicornes pérennes) font partie de cette catégorie. Les autres types de physionomies, quand ils sont présents, sont généralement des fourrés pionniers, des pelouses et du substrat minéral non végétalisé. Cette valeur n’est codée que sur des polygones dont la physionomie majoritaire a été calculée par modélisation supervisée. Elle est déduite de la physionomie ma-joritaire.'
+        color: '#83a729'
+      - key: '4200'
+        label: Fourré haut mixte
+        description: 'Physionomie mixte, associant des végétations herbacées hautes et des végéta-tions arbustives, et parfois d’autres végétations (souvent des végétations de pelouses ou de prairies, des fourrés bas, des éléments ponctuels de forêt pionnière etc.). C’est une physionomie issue uniquement par calcul. Elle est déduite par analyse de la physionomie majoritaire et de la part des autres physionomies exprimées dans le polygone (Fourré haut bas, Fourré haut etc.).'
+        color: '#05bc77'
+      - key: '4300'
+        label: Fourré haut dense
+        description: 'Physionomie dominée par une végétation d’arbustes et d’arbrisseaux de type nanophanérophytes. L’abondance des arbustes jointifs et l’absence de clairières herbacées correspondant à des stades dynamiques antérieurs persistants, donne une physionomie homogène. Cette valeur n’est codée que sur des polygones dont la physionomie majoritaire a été calculée par modélisation supervisée. Elle est déduite de la physionomie ma-joritaire.'
+        color: '#229c39'
+      - key: '5100'
+        label: Forêt pionnière
+        description: 'Physionomie dominée par une végétation dont la strate arborescente est moyen-nement haute (7 à 15 m environ) et peu dense, de telle manière que la flore herba-cée du sous-bois et des milieux associés est peu différente de la flore des milieux ouverts.'
+        color: '#095d2c'
+      - key: '5200'
+        label: Forêt mature de type indéterminée
+        description: "Physionomie dominée par une végétation dont la strate arborescente est haute et dense, de telle manière que la flore herbacée du sous-bois, conditionnée par la faible luminosité et les autres paramètres du climat forestier, est très différente de la flore des milieux ouverts environnants. Pour ce poste physionomique, la nature précise du peuplement forestier (forêt mature naturelle à semi-naturelle ou plan-tation forestière) n'a pas été déterminée."
+        color: '#4e6a0a'
+      - key: '5210'
+        label: Forêt mature naturelle de type indéterminé
+        description: Forêt mature excluant les plantations pour laquelle la couverture majoritaire (par les résineux ou par les feuillus) n'a pas été déterminée.
+        color: '#4e6a0a'
+      - key: '5211'
+        label: Forêt mature de résineux
+        description: Forêt mature avec couverture majoritaire de résineux mais excluant les plantations
+        color: '#07745d'
+      - key: '5212'
+        label: Forêt mature de feuillus
+        description: Forêt mature avec couverture majoritaire de feuillus mais excluant les plantations
+        color: '#487644'
+      - key: '5220'
+        label: Plantation forestière
+        description: 'Physionomie liée à la plantation de ligneux assez denses, de plus de 5 m de haut.'
+        color: '#5f5328'
+      - key: '6000'
+        label: Surface en eau
+        description: Physionomie liée à la présence d'une lame d'eau libre pour laquelle il n'a pas été déterminé si elle était colonisée ou non par des végétations aquatiques et amphi-bies.
+        color: '#6fdbeb'
+      - key: '6100'
+        label: Surface en eau végétalisée
+        description: "Physionomie correspondant aux surfaces en eau présentant une végétation aqua-tique, à laquelle peut s'associer une végétation amphibie. Cette valeur n'est codée que sur des polygones dont la physionomie majoritaire a été calculée par modélisation supervisée. Elle est déduite de la physionomie majoritaire"
+        color: '#6ce2c5'
+      - key: '6200'
+        label: Surface en eau non végétalisée
+        description: 'Physionomie correspondant aux surfaces d’eau sans végétation aquatique. Cette valeur n’est codée que sur des polygones dont la physionomie majoritaire a été calculée par modélisation supervisée. Elle est déduite de la physionomie majoritaire.'
+        color: '#30b6d4'
+      - key: '7100'
+        label: Autre culture permanente
+        description: 'Culture permanente de plantes ligneuses autre que les vergers, vignobles et plan-tations forestières.'
+        color: '#f8b80a'
+      - key: '7200'
+        label: Vergers
+        description: Physionomie correspondant aux parcelles de vergers
+        color: '#ed8d50'
+      - key: '7300'
+        label: Vignes
+        description: Physionomie correspondant aux parcelles de vignobles
+        color: '#8d5a99'
+      - key: '8000'
+        label: Culture annuelle ou prairie temporaire
+        description: Physionomie correspondant aux cultures annuelles ou aux prairies retournées dans l'année.
+        color: '#f8ef4a'
+      - key: '8001'
+        label: Prairie temporaire
+        description: Prairie retournée dans l’année. Culture de fourrage à rotation pluriannuelle (semi et labour sont en général espacés de plusieurs années) ; une à plusieurs récoltes par an.
+        color: '#ffff90'
+      - key: '8002'
+        label: Culture annuelle
+        description: 'Physionomie liée à la présence de cultures herbacées annuelles, au sein desquelles la végétation adventice vivace et annuelle se développe de manière assez éparse. Cette valeur n’est codée que sur des polygones dont la physionomie majoritaire a été calculée par modélisation supervisée. Elle est déduite de la physionomie majoritaire.'
+        color: '#f8ef4a'
+    infer:
+      http:
+        needs: [start_at]
+        granularities: { start_at: 1m }
+        # coordsBox call has N (third param) set to 5 since rounding GPS coords
+        # to 5th decimal gives approx. 1m of precision,
+        # which we reflect in start_at's granularity
+        select: |
+          (
+            $code := features[0].properties.code_hab_carhab;
+            $split($code, "-")[0]
+          )
+        from: https://data.geopf.fr/wfs
+          ?service=WFS
+          &version=2.0.0
+          &request=GetFeature
+          &typenames=Carhab_habitat:habitats_carhab
+          &bbox={{ coordsBox start_at.value.longitude start_at.value.latitude 5 }},EPSG:4326
+          &outputformat=application/json
+          &srsname=EPSG:4326
+
   habitat_photo:
     type: file
     label: Photo du milieu
