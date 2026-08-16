@@ -49,7 +49,7 @@ export async function inferHttp(
 
 	const data = await fetch(url).then((r) => r.json());
 
-	const output = await settings.select.evaluate({ ...values, ...data });
+	const output = await settings.select.evaluate({ metadata: values, ...data });
 
 	return output;
 }
