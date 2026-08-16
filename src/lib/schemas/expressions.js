@@ -122,6 +122,18 @@ export const HELPERS = /** @type {const} */ ({
 			return a + b;
 		},
 	},
+	round: {
+		// Already exists natively for JSONata
+		documentation: 'Arrondir un nombre à N chiffres après la virgule',
+		usage: [['12.939023', '3'], 12.939],
+		/**
+		 * @param {number} value
+		 * @param {number} digits
+		 */
+		implementationHandlebars(value, digits) {
+			return round(value, digits);
+		},
+	},
 	trim: {
 		documentation: 'Supprime les espaces au début et à la fin d’un texte',
 		usage: [["'   some text   '"], 'some text'],
