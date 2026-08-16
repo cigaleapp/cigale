@@ -14,7 +14,6 @@ import {
 	differenceInYears,
 } from 'date-fns';
 
-import { Tables } from '$lib/database.js';
 import { distanceBetweenGeoCoordinates } from '$lib/geolocation.js';
 import {
 	ensureNamespacedMetadataId,
@@ -64,9 +63,8 @@ export async function httpInferencesToRefresh(
 	const protocol = await db.get('Protocol', protocolId);
 
 	for (const id of protocol?.metadata ?? []) {
-		const metadata = await db
-			.get('Metadata', resolveMetadataImport(protocol, id))
-			.then((m) => Tables.Metadata.assert(m));
+		const metadata = await db.get('Metadata', resolveMetadataImport(protocol, id));
+		if (!metadata) continue;
 
 		if (await shouldRefreshHttpInference(db, protocolId, metadata, changes)) {
 			toRefresh.push(metadata);
