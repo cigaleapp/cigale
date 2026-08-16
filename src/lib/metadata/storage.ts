@@ -424,34 +424,36 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 
 	if (sessionId) {
 		const ses = await db.get('Session', sessionId);
-		const protocolId = ses!.protocol;
 
-		const values = image?.metadata ?? observation?.metadataOverrides ?? session?.metadata;
+		if (ses) {
+			const protocolId = ses.protocol;
+			const values = image?.metadata ?? observation?.metadataOverrides ?? session?.metadata;
 
-		const toRefresh = await httpInferencesToRefresh(db, protocolId, {
-			[metadataId]: [safeJSONParse(oldValue?.value), safeJSONParse(newValue.value)],
-		});
+			const toRefresh = await httpInferencesToRefresh(db, protocolId, {
+				[metadataId]: [safeJSONParse(oldValue?.value), safeJSONParse(newValue.value)],
+			});
 
-		for (const metadata of toRefresh) {
-			const value = await inferHttp(db, protocolId, metadata, values ?? {});
+			for (const metadata of toRefresh) {
+				const value = await inferHttp(db, protocolId, metadata, values ?? {});
 
-			// TODO: dont store if currently stored value is manuallyModified
+				// TODO: dont store if currently stored value is manuallyModified
 
-			if (value) {
-				await storeMetadataValue({
-					db,
-					sessionId,
-					subjectId,
-					metadataId: metadata.id,
-					manuallyModified: false,
-					isDefault,
-					confirmed,
-					value,
-					applyCascades,
-					updateReactiveState,
-					abortSignal,
-					clearErrors,
-				});
+				if (value) {
+					await storeMetadataValue({
+						db,
+						sessionId,
+						subjectId,
+						metadataId: metadata.id,
+						manuallyModified: false,
+						isDefault,
+						confirmed,
+						value,
+						applyCascades,
+						updateReactiveState,
+						abortSignal,
+						clearErrors,
+					});
+				}
 			}
 		}
 	}
