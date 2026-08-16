@@ -344,6 +344,123 @@ sessionMetadata:
           &outputformat=application/json
           &srsname=EPSG:4326
 
+  weather_condition:
+    type: enum
+    label: Météo
+    description: Conditions météo au lieu et moment de la session
+    learnMore: https://open-meteo.com/en/docs#weather_variable_documentation
+    mergeMethod: none
+    required: false
+    options:
+      - key: '0'
+        label: 'Ciel dégagé'
+        icon: ri:sun-line
+      - key: '1'
+        label: 'Principalement dégagé'
+        icon: ri:sun-line
+      - key: '2'
+        label: 'Partiellement nuageux'
+        icon: ri:sun-cloudy-line
+      - key: '3'
+        label: 'Couvert'
+        icon: ri:cloudy-line
+      - key: '48'
+        label: 'Brouillard'
+        icon: ri:foggy-line
+      - key: '45'
+        label: 'Brouillard givrant'
+        icon: ri:foggy-line
+      - key: '51'
+        label: 'Bruine légère'
+        icon: ri:mist-line
+      - key: '53'
+        label: 'Bruine modérée'
+        icon: ri:mist-line
+      - key: '55'
+        label: 'Bruine dense'
+        icon: ri:mist-line
+      - key: '56'
+        label: 'Bruine verglaçante légère'
+        icon: ri:mist-line
+      - key: '57'
+        label: 'Bruine verglaçante dense'
+        icon: ri:mist-line
+      - key: '61'
+        label: 'Pluie légère'
+        icon: ri:showers-line
+      - key: '63'
+        label: 'Pluie modérée'
+        icon: ri:showers-line
+      - key: '65'
+        label: 'Pluie forte'
+        icon: ri:heavy-showers-line
+      - key: '66'
+        label: 'Pluie verglaçante légère'
+        icon: ri:showers-line
+      - key: '67'
+        label: 'Pluie verglaçante forte'
+        icon: ri:heavy-showers-line
+      - key: '71'
+        label: 'Chute de neige légère'
+        icon: ri:snowy-line
+      - key: '73'
+        label: 'Chute de neige modérée'
+        icon: ri:snowy-line
+      - key: '75'
+        label: 'Chute de neige forte'
+        icon: ri:snowflake
+      - key: '77'
+        label: 'Grains de neige'
+      - key: '80'
+        label: 'Averses de pluie légères'
+        icon: ri:snowflake
+      - key: '81'
+        label: 'Averses de pluie modérées'
+        icon: ri:showers-line
+      - key: '82'
+        label: 'Averses de pluie violentes'
+        icon: ri:heavy-showers-line
+      - key: '85'
+        label: 'Averses de neige légères'
+        icon: ri:snowy-line
+      - key: '86'
+        label: 'Averses de neige fortes'
+        icon: ri:snowy-line
+      - key: '95'
+        label: 'Orage léger ou modéré'
+        icon: ri:thunderstorms-line
+      - key: '96'
+        label: 'Orage avec grêle légère'
+        icon: ri:thunderstorms-line
+      - key: '99'
+        label: 'Orage avec grêle forte'
+        icon: ri:thunderstorms-line
+    infer:
+      http:
+        needs: [start_at, date]
+        granularities:
+          start_at: 1km
+          date: hour
+
+        from: https://archive-api.open-meteo.com/v1/archive
+          ?latitude={{ round start_at.latitude.value 4 }}
+          &longitude={{ round start_at.longitude.value 4 }}
+          &start_date={{ date.value }}
+          &end_date={{ date.value }}
+          &format=json
+          &hourly=weather_code
+
+        select: |
+          (
+            $_h := $minute(metadata.date.value) > 30 ? $hour(metadata.date.value) + 1 : $hour(metadata.date.value);
+            $h := $_h < 10 ? "0" & $string($_h) : $string($_h);
+            $d := $formatDate(metadata.date.value, "YYYY-mm-DD'T'") & $h & ":00";
+
+            $by_time = $zip(hourly.time, hourly.weather_code){ $[0]: $[1] };
+
+            $string($by_time[$d])
+          )
+
   habitat_photo:
     type: file
     label: Photo du milieu
