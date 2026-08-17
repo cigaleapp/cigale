@@ -3,8 +3,8 @@
 	"id": "io.github.cigaleapp.arthropods.example",
 	"name": "Example: arthropodes",
 	"summary": "Protocole de base pour arthropodes",
-	"learnMore": "https://github.com/cigaleapp/cigale/tree/49a235ff8512e60e0b4259ba04e980156798e87b/scripts/README.md#protocoles-arthropodsexample",
-	"version": 117,
+	"learnMore": "https://github.com/cigaleapp/cigale/tree/38736abc8d7fa2f39ec6df9546068b2e3798b68e/scripts/README.md#protocoles-arthropodsexample",
+	"version": 118,
 	"updates": "automatic",
 	"source": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json",
 	"description": "Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification\n\nClés d'identification d'abeilles fournies par IDmyBee.com, extraites depuis [IDMYBEE - Andrena sur Xper3](https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html).",
@@ -283367,9 +283367,14 @@
 						"Eriopeltis rasinae",
 						"Eriopeltis zolotarevae"
 					],
-					"description": "",
-					"learnMore": "https://gbif.org/species/8205945",
+					"description": "#### Boyer de Fonscolombe, 1834\n\n❝\n\n_Cette cochenille se développe sur diverses graminées. La femelle mâture vit dans son ovisac laineux_\n\n**Ordre : Hemiptera**  \n**Sous-ordre : Stennorhyncha**  \n**Infra-ordre :**  \n**Super famille : Coccoidea**  \n**Famille : Coccidae**  \n**Sous-famille :** **Eriopeltinae**  \n**Tribu :**  \n**Genre : _Eriopeltis_**  \n**Espèce : _Eriopeltis festucae_**\n\n#### Difficulté de détermination\n\n#### Statut de conservation\n\nNon évalué\n\n#### Identification\n\nFemelle au dernier stade  \n- corps allongé et fortement convexe  \n- enfermée dans un ovisac allongé, recouvert de filaments laineux\n\n- les larves ont un corps ovale, large et arrondi aux extrêmités\n\n- les œufs sont rougeâtres\n\n#### Taille\n\n3 à 4mm pour la femelle, 8 à 10mm pour l’ovisac\n\n#### Répartition géographique\n\nPaléarctique  \n[Carte GBIF](https://www.gbif.org/species/8205945)\n\n#### Période d’observation\n\n#### Hivernation\n\nŒufs\n\n#### Biologie\n\nLes mâles sont très rares. Lors de la ponte, le corps de la femelle diminue et est petit à petit repoussé vers l’extérieur de l’ovisac. Les œufs sont pondus en fin d’été et passent l’hiver. Ils éclosent au mois de mai. Les adultes apparaissent à partir de juillet. Seul le premier stade larvaire est mobile.\n\n#### Plantes hôtes\n\n**Poaceae** : _Agrostis capillaris; Alopecurus myosuroides; Arrhenatherum elatius; Avenella flexuosa; Brachypodium pinnatum, Brachypodium retusum, Brachypodium rupestre, Brachypodium sylvaticum; Bromopsis erecta; Dactylis glomerata; Elytrigia repens; Festuca rubra; Milium effusum; Nardus stricta; Poa pratensis; Schedonorus pratensis; Stipa._  \nNotée également sur _Carex_ (_Cyperaceae_)\n\n#### Parasitoïde\n\n**Hyménoptère Encyrtidae** : _Metaphycus parvus, Metaphycus zebratus, Cerapterocerus mirabilis, Trichomasthus frontalis, Subprionomitus cantabricus_\n\n#### Risques de confusions\n\nA priori aucun avec des ovisacs aussi velus\n\n#### Sources\n\n- [Mapa Gob.es](https://www.mapa.gob.es/ministerio/pags/Biblioteca/fondo/pdf/44774_43.pdf)  \n- [Annales de la Société entomologique de France | 1834](https://gallica.bnf.fr/ark:/12148/bpt6k6333034g/f218.image)  \n- [Annales de la Société entomologique de France | 1871](https://gallica.bnf.fr/ark:/12148/bpt6k6328223n/f435.image)  \n- [Plant Parasites of Europe](https://bladmineerders.nl/en/parasites/animalia/arthropoda/insecta/hemiptera/sternorrhyncha/coccoidea/coccidae/eriopeltis/eriopeltis-festucae/)  \n- [Scalenet](https://scalenet.info/catalogue/Eriopeltis%20festucae/)  \n- [A Biological Study of scale insects on Chalk Grassland](http://dr.lib.sjp.ac.lk/handle/123456789/2972)",
+					"learnMore": "https://jessica-joachim.com/insectes/hemipteres/pucerons/coccidae/eriopeltis-festucae/",
+					"images": [
+						"https://jessica-joachim.com/wp-content/uploads/2026/08/Eriopeltis-festucae.jpg",
+						"https://jessica-joachim.com/wp-content/uploads/2026/08/Periode-dobs-homoptere-mai-oct.jpg"
+					],
 					"cascade": {
+						"identification_difficulty": "medium",
 						"genus": "2091322",
 						"family": "6963",
 						"order": "809",
