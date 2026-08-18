@@ -185,9 +185,10 @@ jobs:
       - name: Run test on emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          # api-level: 35
+          api-level: 35
           working-directory: ./android
-          # target: google_apis_playstore
+          target: google_apis_playstore
+          arch: x86_64
           ram-size: 8192M
           script: |
             adb devices -l
