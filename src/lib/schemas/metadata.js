@@ -410,7 +410,8 @@ export const InferenceConfigs = /** @type {const} */ ({
 					)
 					.describe(
 						"Décide quand ré-inférer cette métadonnée lorsque les valeurs des métadonnées changent. Par exemple, si on a needs: [foo], granularities: {foo: month}, et que foo est de type date, la métadonnée sera ré-inférée quand foo change de jour, mais si foo change uniquement les minutes, l'inférence ne tournera pas de nouveau"
-					),
+					)
+					.default(() => ({})),
 			}),
 		}),
 });
