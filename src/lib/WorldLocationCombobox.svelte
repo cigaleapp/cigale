@@ -1,6 +1,4 @@
 <script lang="ts">
-	import type { RuntimeValue } from '$lib/schemas/metadata.js';
-
 	import { ArkErrors, type } from 'arktype';
 	import { SvelteMap } from 'svelte/reactivity';
 
@@ -10,26 +8,29 @@
 	import Combobox from './Combobox.svelte';
 	import WorldMap from './WorldMap.svelte';
 
+	type Point = { longitude: number; latitude: number };
+
 	interface Props {
-		value: undefined | RuntimeValue<'location'>;
+		points: Point[];
 		// eslint-disable-next-line no-unused-vars
-		onblur: (value: undefined | RuntimeValue<'location'>) => void;
+		onblur: (points: Point[]) => void;
+		multiple?: boolean;
 	}
 
-	const { value, onblur }: Props = $props();
+	const { points, onblur, multiple = false }: Props = $props();
 
 	type CoordsKey = `${number};${number}`;
 
 	// False positive on function overload signatures
 	/* eslint-disable no-unused-vars */
 
-	function coordsToKey(v: RuntimeValue<'location'>): CoordsKey;
-	function coordsToKey(v: RuntimeValue<'location'> | undefined): CoordsKey | undefined;
+	function coordsToKey(v: Point): CoordsKey;
+	function coordsToKey(v: Point | undefined): CoordsKey | undefined;
 	function coordsToKey(v: typeof value) {
 		return v ? `${v.longitude};${v.latitude}` : undefined;
 	}
 
-	function keyToCoords(k: CoordsKey): RuntimeValue<'location'>;
+	function keyToCoords(k: CoordsKey): Point;
 	function keyToCoords(k: CoordsKey | undefined) {
 		if (!k) return undefined;
 		const [longitude, latitude] = k.split(';').map(Number);
@@ -46,8 +47,7 @@
 	});
 
 	let reverseGeocodings = new SvelteMap<CoordsKey, string>();
-	$effect(() => {
-		if (!value) return;
+	async function geocode(value: Point) {
 		if (reverseGeocodings.has(coordsToKey(value))) return;
 
 		void coordinatesToAddress(value)
@@ -59,9 +59,15 @@
 				console.error('Failed to reverse geocode coordinates', value, error);
 				reverseGeocodings.set(coordsToKey(value), 'Unknown');
 			});
+	}
+
+	$effect(() => {
+		for (const point of points) {
+			void geocode(point);
+		}
 	});
 
-	function loadItem(from: CoordsKey | { lng: number; lat: number } | RuntimeValue<'location'>) {
+	function loadItem(from: CoordsKey | Point | { lng: number; lat: number }) {
 		if (typeof from === 'string') {
 			const { latitude, longitude } = keyToCoords(from);
 			return {
@@ -82,10 +88,12 @@
 <Combobox
 	--combobox-option-image-size="3rem"
 	--combobox-option-height="4rem"
-	value={coordsToKey(value)}
-	sorter={() => 0}
-	onValueChange={async (val) => onblur(keyToCoords(val))}
-	preloadedItems={orEmpty2(value, (coords) => loadItem(coords))}
+	value={coordsToKey(points[0])}
+	values={points.map(coordsToKey)}
+	sorter={(p) => points.map(coordsToKey).indexOf(p)}
+	{multiple}
+	onValueChange={async (_, vals) => onblur(vals.map(keyToCoords))}
+	preloadedItems={points.map(loadItem)}
 	{loadItem}
 	searcher={async function* search(query: string) {
 		const coords = Coords(query);
@@ -103,23 +111,20 @@
 		yield loadItem(coords);
 	}}
 >
-	{#snippet details({ label, key }, { select })}
-		{const { latitude, longitude } = $derived(keyToCoords(key))}
+	{#snippet details(_, { select, deselect, allItems })}
 		<div class="location-combobox-map">
 			<WorldMap
 				scrollToZoom
 				zoom={10}
-				markers={[
-					{
-						latitude,
-						longitude,
-						key,
-						label,
-						onMove({ lngLat: [lng, lat] }) {
-							select(loadItem({ lng, lat }));
-						},
+				markers={allItems.map(({ key, label }) => ({
+					...keyToCoords(key),
+					key,
+					label,
+					onMove({ lngLat: [lng, lat] }) {
+						deselect(key)
+						select(loadItem({ lng, lat }));
 					},
-				]}
+				}))}
 				onNewMarker={async ({ lngLat }) => {
 					select(loadItem(lngLat));
 				}}
