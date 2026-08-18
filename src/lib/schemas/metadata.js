@@ -67,6 +67,10 @@ export const METADATA_TYPES = /** @type {const} */ ({
 		label: 'fichier',
 		help: 'un fichier, représenté par une référence à un MetadataFile, qui est exporté séparément',
 	},
+	surface: {
+		help: 'surface',
+		help: 'Un ensemble de points GPS formant une surface',
+	},
 });
 
 export const MetadataType = type.or(
@@ -78,7 +82,8 @@ export const MetadataType = type.or(
 	type("'date'", '@', METADATA_TYPES.date.help),
 	type("'location'", '@', METADATA_TYPES.location.help),
 	type("'boundingbox'", '@', METADATA_TYPES.boundingbox.help),
-	type("'file'", '@', METADATA_TYPES.file.help)
+	type("'file'", '@', METADATA_TYPES.file.help),
+	type("'surface'", '@', METADATA_TYPES.surface.help)
 );
 
 /**
@@ -98,6 +103,7 @@ export const MetadataRuntimeValue = /** @type {const} */ ({
 	location: type({ latitude: 'number', longitude: 'number' }),
 	boundingbox: type({ x: 'number', y: 'number', w: 'number', h: 'number' }),
 	file: type(ID),
+	surface: type({ latitude: 'number', longitude: 'number' }).array(),
 });
 
 export const MetadataRuntimeValueAny = type.or(
@@ -108,7 +114,8 @@ export const MetadataRuntimeValueAny = type.or(
 	MetadataRuntimeValue.enum,
 	MetadataRuntimeValue.date,
 	MetadataRuntimeValue.location,
-	MetadataRuntimeValue.boundingbox
+	MetadataRuntimeValue.boundingbox,
+	MetadataRuntimeValue.surface
 );
 
 export const MetadataError = type({
@@ -176,7 +183,8 @@ const JSONSchemaCompatibleRuntimeValue = type.or(
 	'string.date.iso',
 	MetadataRuntimeValue.location,
 	MetadataRuntimeValue.boundingbox,
-	MetadataRuntimeValue.file
+	MetadataRuntimeValue.file,
+	MetadataRuntimeValue.surface
 );
 
 export const MetadataRecordValue = MetadataValue.omit('value', 'alternatives').and({
@@ -343,6 +351,7 @@ export const Granularity =
 		date: type.enumerated('year', 'month', 'day', 'hour', 'minute', 'second', 'millisecond'),
 		boundingbox: type('number > 0'),
 		file: undefined,
+		surface: type('/^(?<number>-?(\\d+)(\\.\\d+)?)(?<unit>km|m|cm)$/'),
 	});
 
 export const InferenceConfigs = /** @type {const} */ ({
@@ -437,6 +446,7 @@ const MetadataDefault = {
 	date: JsonataExpression(MDDP, type('string.date.iso.parse')),
 	boundingbox: type.or(MRV.boundingbox, JsonataExpression(MDDP, MRV.boundingbox)),
 	file: TemplatedString(MDDP, (value) => value.trim()),
+	surface: type.or(MRV.location, JsonataExpression(MDDP, MRV.surface)),
 };
 
 export const MetadataPatternConstraint = type.or();
@@ -616,6 +626,18 @@ const MetadataLocation = MetadataBase.and({
 	),
 });
 
+const MetadataSurface = MetadataBase.and({
+	type: '"surface"',
+	'default?': MetadataDefault.surface,
+	'infer?': type.and(
+		InferenceConfigs.capture.partial(),
+		InferenceConfigs.http('surface').partial(),
+		InferenceConfigs.sidecar(
+			type({ latitude: 'number', longitude: 'number', '+': 'reject' }).array()
+		).partial()
+	),
+});
+
 const MetadataEnum = MetadataBase.and({
 	type: '"enum"',
 	'default?': MetadataDefault.enum,
@@ -697,7 +719,8 @@ export const Metadata = type.or(
 	MetadataLocation,
 	MetadataEnum,
 	MetadataBoundingbox,
-	MetadataFile
+	MetadataFile,
+	MetadataSurface
 );
 
 export const MetadataGroup = type({

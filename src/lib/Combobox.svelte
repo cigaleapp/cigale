@@ -40,6 +40,7 @@
 					allItems: NoInfer<I>[];
 					// eslint-disable-next-line no-unused-vars
 					select: (newItem: NoInfer<I>) => void;
+					deselect: (item : NoInfer<V>) => void;
 					expanded: boolean;
 					// eslint-disable-next-line no-unused-vars
 					expand: (expanded: boolean) => void;

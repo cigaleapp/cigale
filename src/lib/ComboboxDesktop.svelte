@@ -212,6 +212,9 @@
 								itemsByKey.set(item.key, item);
 								highlightedItem = item;
 							},
+							deselect() {
+								// TODO
+							}
 						})}
 					{:else}
 						<section class="empty">
