@@ -1,0 +1,1 @@
+import{n as e}from"./DHWQV27G.js";var t=e({sha:`string`,version:`/^0.0.\\d+$/`,android_native_code_version:`string.integer`,checksum:`string.hex`});export{t};
