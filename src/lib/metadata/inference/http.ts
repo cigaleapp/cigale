@@ -83,7 +83,7 @@ async function shouldRefreshHttpInference(
 	const settings = config.infer && 'http' in config.infer ? config.infer.http : undefined;
 	if (!settings) return;
 
-	const granularities = mapKeys(settings.granularities, (key) =>
+	const granularities = mapKeys(settings.granularities ?? {}, (key) =>
 		ensureNamespacedMetadataId(key, protocolId)
 	);
 

@@ -1,0 +1,214 @@
+{
+  "config": {
+    "argv": [
+      "/usr/local/bin/node",
+      "/home/runner/work/cigale/cigale/node_modules/.bin/playwright",
+      "test",
+      "tests/http-inference.spec.ts"
+    ],
+    "configFile": "/home/runner/work/cigale/cigale/playwright.config.js",
+    "rootDir": "/home/runner/work/cigale/cigale/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": true,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 1200000,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "generated": "2026-08-19 14:57:43",
+      "ci": {
+        "commitHref": "https://github.com/cigaleapp/cigale/commit/82e0f306439f04a50bc834db7fd308a2553d51ed",
+        "commitHash": "82e0f306439f04a50bc834db7fd308a2553d51ed",
+        "buildHref": "https://github.com/cigaleapp/cigale/actions/runs/32255107890"
+      },
+      "gitCommit": {
+        "shortHash": "82e0f30",
+        "hash": "82e0f306439f04a50bc834db7fd308a2553d51ed",
+        "subject": "WIP",
+        "body": "WIP\n",
+        "author": {
+          "name": "Gwenn Le Bihan",
+          "email": "gwenn.lebihan7@gmail.com",
+          "time": 1787066645000
+        },
+        "committer": {
+          "name": "Gwenn Le Bihan",
+          "email": "gwenn.lebihan7@gmail.com",
+          "time": 1787066645000
+        },
+        "branch": "httpinference"
+      }
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/home/runner/work/cigale/cigale/test-results",
+        "repeatEach": 1,
+        "retries": 2,
+        "metadata": {
+          "generated": "2026-08-19 14:57:43",
+          "ci": {
+            "commitHref": "https://github.com/cigaleapp/cigale/commit/82e0f306439f04a50bc834db7fd308a2553d51ed",
+            "commitHash": "82e0f306439f04a50bc834db7fd308a2553d51ed",
+            "buildHref": "https://github.com/cigaleapp/cigale/actions/runs/32255107890"
+          },
+          "gitCommit": {
+            "shortHash": "82e0f30",
+            "hash": "82e0f306439f04a50bc834db7fd308a2553d51ed",
+            "subject": "WIP",
+            "body": "WIP\n",
+            "author": {
+              "name": "Gwenn Le Bihan",
+              "email": "gwenn.lebihan7@gmail.com",
+              "time": 1787066645000
+            },
+            "committer": {
+              "name": "Gwenn Le Bihan",
+              "email": "gwenn.lebihan7@gmail.com",
+              "time": 1787066645000
+            },
+            "branch": "httpinference"
+          }
+        },
+        "id": "setup",
+        "name": "setup",
+        "testDir": "/home/runner/work/cigale/cigale/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/setup\\/.*\\.ts$/"
+        ],
+        "timeout": 90000
+      },
+      {
+        "outputDir": "/home/runner/work/cigale/cigale/test-results",
+        "repeatEach": 1,
+        "retries": 2,
+        "metadata": {
+          "generated": "2026-08-19 14:57:43",
+          "ci": {
+            "commitHref": "https://github.com/cigaleapp/cigale/commit/82e0f306439f04a50bc834db7fd308a2553d51ed",
+            "commitHash": "82e0f306439f04a50bc834db7fd308a2553d51ed",
+            "buildHref": "https://github.com/cigaleapp/cigale/actions/runs/32255107890"
+          },
+          "gitCommit": {
+            "shortHash": "82e0f30",
+            "hash": "82e0f306439f04a50bc834db7fd308a2553d51ed",
+            "subject": "WIP",
+            "body": "WIP\n",
+            "author": {
+              "name": "Gwenn Le Bihan",
+              "email": "gwenn.lebihan7@gmail.com",
+              "time": 1787066645000
+            },
+            "committer": {
+              "name": "Gwenn Le Bihan",
+              "email": "gwenn.lebihan7@gmail.com",
+              "time": 1787066645000
+            },
+            "branch": "httpinference"
+          }
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/home/runner/work/cigale/cigale/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 90000
+      },
+      {
+        "outputDir": "/home/runner/work/cigale/cigale/test-results",
+        "repeatEach": 1,
+        "retries": 2,
+        "metadata": {
+          "generated": "2026-08-19 14:57:43",
+          "ci": {
+            "commitHref": "https://github.com/cigaleapp/cigale/commit/82e0f306439f04a50bc834db7fd308a2553d51ed",
+            "commitHash": "82e0f306439f04a50bc834db7fd308a2553d51ed",
+            "buildHref": "https://github.com/cigaleapp/cigale/actions/runs/32255107890"
+          },
+          "gitCommit": {
+            "shortHash": "82e0f30",
+            "hash": "82e0f306439f04a50bc834db7fd308a2553d51ed",
+            "subject": "WIP",
+            "body": "WIP\n",
+            "author": {
+              "name": "Gwenn Le Bihan",
+              "email": "gwenn.lebihan7@gmail.com",
+              "time": 1787066645000
+            },
+            "committer": {
+              "name": "Gwenn Le Bihan",
+              "email": "gwenn.lebihan7@gmail.com",
+              "time": 1787066645000
+            },
+            "branch": "httpinference"
+          }
+        },
+        "id": "webkit",
+        "name": "webkit",
+        "testDir": "/home/runner/work/cigale/cigale/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/(core|performance)\\.spec\\.ts$/"
+        ],
+        "timeout": 120000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "json",
+        {
+          "outputFile": "test-results.json"
+        }
+      ],
+      [
+        "html",
+        null
+      ],
+      [
+        "github",
+        null
+      ],
+      [
+        "list",
+        null
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.62.1",
+    "workers": 1,
+    "webServer": {
+      "command": "bun run preview",
+      "port": 4173,
+      "reuseExistingServer": false
+    }
+  },
+  "suites": [],
+  "errors": [
+    {
+      "message": "Error: Process from config.webServer was not able to start. Exit code: 1",
+      "stack": "Error: Process from config.webServer was not able to start. Exit code: 1"
+    }
+  ],
+  "stats": {
+    "startTime": "2026-08-19T12:57:43.642Z",
+    "duration": 5880.901,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}
