@@ -2596,25 +2596,8 @@ msgid "Evil Martians"
 msgstr ""
 
 #: src/routes/(app)/about/+page.svelte
-#: src/routes/(app)/about/+page.svelte
 msgid "par"
 msgstr "by"
-
-#: src/routes/(app)/about/+page.svelte
-msgid "et"
-msgstr "and"
-
-#: src/routes/(app)/about/+page.svelte
-msgid "Remix Icon"
-msgstr ""
-
-#: src/routes/(app)/about/+page.svelte
-msgid "Jimmy Cheung"
-msgstr ""
-
-#: src/routes/(app)/about/+page.svelte
-msgid "Wendy Gao"
-msgstr ""
 
 #. 0: account.username
 #: src/routes/(app)/accounts/RowAccount.svelte
@@ -3057,4 +3040,8 @@ msgstr ""
 
 #: src/routes/(app)/capture/+page.svelte
 msgid "<0/> Pause"
+msgstr ""
+
+#: src/routes/(app)/about/+page.svelte
+msgid "<0>Remix Icon</0> par <1>Jimmy Cheung</1> et <2>Wendy Gao</2>"
 msgstr ""
