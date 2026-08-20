@@ -19,9 +19,10 @@ import {
 	namespacedMetadataId,
 	namespaceOfMetadataId,
 } from '$lib/schemas/metadata.js';
-import { groupBy, orEmptyObj3, prefixIDBKeyRange } from '$lib/utils.js';
+import { groupBy, orEmptyObj3, prefixIDBKeyRange, safeJSONParse } from '$lib/utils.js';
 
 import { resolveMetadataImport } from './imports.js';
+import { httpInferencesToRefresh, inferHttp } from './inference/http.js';
 import { serializeMetadataValue } from './serializing.js';
 
 // TODO: use everywhere
@@ -261,6 +262,8 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 				),
 	};
 
+	let oldValue: DB.MetadataValue | undefined = undefined;
+
 	/**
 	 * Updates newValue.confidences to take into account the old confidences (if clearConfidences is false)
 	 */
@@ -317,7 +320,8 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 
 	abortSignal?.throwIfAborted();
 	if (session) {
-		processConfidences(newValue, session.metadata?.[metadataId]);
+		oldValue = session.metadata?.[metadataId];
+		processConfidences(newValue, oldValue);
 
 		if (session.metadata) {
 			session.metadata[metadataId] = newValue;
@@ -327,7 +331,8 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 
 		await db.put('Session', session);
 	} else if (image) {
-		processConfidences(newValue, image.metadata[metadataId]);
+		oldValue = image.metadata[metadataId];
+		processConfidences(newValue, oldValue);
 
 		image.metadata[metadataId] = newValue;
 		if (clearErrors && image.metadataErrors?.[metadataId]) {
@@ -336,18 +341,17 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 
 		await db.put('Image', image);
 	} else if (observation) {
-		processConfidences(
-			newValue,
-			observationMetadata({
-				observation: Tables.Observation.assert(observation),
-				definitions: [Tables.Metadata.assert(await db.get('Metadata', metadataId))],
-				images: await Promise.all(
-					observation.images.map(async (img) =>
-						db.get('Image', img).then((i) => Tables.Image.assert(i))
-					)
-				),
-			})[metadataId]
-		);
+		oldValue = observationMetadata({
+			observation: Tables.Observation.assert(observation),
+			definitions: [Tables.Metadata.assert(await db.get('Metadata', metadataId))],
+			images: await Promise.all(
+				observation.images.map(async (img) =>
+					db.get('Image', img).then((i) => Tables.Image.assert(i))
+				)
+			),
+		})[metadataId];
+
+		processConfidences(newValue, oldValue);
 
 		observation.metadataOverrides[metadataId] = newValue;
 		if (clearErrors && observation.metadataErrors?.[metadataId]) {
@@ -415,6 +419,42 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 				abortSignal,
 				clearErrors,
 			});
+		}
+	}
+
+	if (sessionId) {
+		const ses = await db.get('Session', sessionId);
+
+		if (ses) {
+			const protocolId = ses.protocol;
+			const values = image?.metadata ?? observation?.metadataOverrides ?? session?.metadata;
+
+			const toRefresh = await httpInferencesToRefresh(db, protocolId, {
+				[metadataId]: [safeJSONParse(oldValue?.value), safeJSONParse(newValue.value)],
+			});
+
+			for (const metadata of toRefresh) {
+				const value = await inferHttp(db, protocolId, metadata, values ?? {});
+
+				// TODO: dont store if currently stored value is manuallyModified
+
+				if (value) {
+					await storeMetadataValue({
+						db,
+						sessionId,
+						subjectId,
+						metadataId: metadata.id,
+						manuallyModified: false,
+						isDefault,
+						confirmed,
+						value,
+						applyCascades,
+						updateReactiveState,
+						abortSignal,
+						clearErrors,
+					});
+				}
+			}
 		}
 	}
 
