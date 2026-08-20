@@ -2,7 +2,7 @@
 	import type { LngLatLike, MapMouseEvent } from 'maplibre-gl';
 	import type { MarkerClickInfo } from 'svelte-maplibre';
 
-	import { DefaultMarker, MapEvents, MapLibre, Popup } from 'svelte-maplibre';
+	import { DefaultMarker, GeoJSON, MapEvents, MapLibre, Popup } from 'svelte-maplibre';
 
 	import { avg } from '$lib/utils.js';
 	import { getTheme } from '$routes/+layout.svelte';
@@ -53,6 +53,39 @@
 
 		{#if onNewMarker}
 			<MapEvents onclick={onNewMarker} />
+		{/if}
+
+		{#if markers.length >= 3}
+			<GeoJSON
+				data={{
+					type: 'Feature',
+					geometry: {
+						type: 'Polygon',
+						coordinates: [
+							markers.map(({ latitude, longitude }) => [longitude, latitude]),
+						],
+					},
+					properties: {},
+				}}
+			>
+				<FillLayer />
+			</GeoJSON>
+		{:else if markers.length === 2}
+			<GeoJSON
+				data={{
+					type: 'Feature',
+					geometry: {
+						type: 'LineString',
+						coordinates: markers.map(({ latitude, longitude }) => [
+							longitude,
+							latitude,
+						]),
+					},
+					properties: {},
+				}}
+			>
+				<LineLayer />
+			</GeoJSON>
 		{/if}
 	</MapLibre>
 </div>
