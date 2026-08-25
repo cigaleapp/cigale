@@ -197,7 +197,7 @@
 		"jimp": "1.6.0",
 		"jsonata": "^2.2.2",
 		"libraw-wasm": "^1.6.0",
-		"maplibre-gl": "^6.2.0",
+		"maplibre-gl": "^6.4.1",
 		"marked": "^18.0.6",
 		"microdiff": "^1.5.0",
 		"nanoid": "^6.0.0",
