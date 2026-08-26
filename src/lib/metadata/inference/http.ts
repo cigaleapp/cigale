@@ -91,7 +91,7 @@ async function shouldRefreshHttpInference(
 	db: DatabaseHandle,
 	protocolId: string,
 	config: DB.Metadata & {
-		infer: { http: NonNullable<NonNullable<DB.Metadata['infer']>['http']> };
+		infer: ReturnType<(typeof InferenceConfigs)['http']>['infer'];
 	},
 	changes: Record<NamespacedMetadataID, [before: RuntimeValue | undefined, now: RuntimeValue]>
 ) {

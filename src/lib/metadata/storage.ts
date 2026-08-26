@@ -467,6 +467,59 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 	}
 }
 
+export async function storeMetadataValueConfirmation({
+	db,
+	subjectId,
+	sessionId,
+	metadataId,
+	confirmed,
+	updateReactiveState = true,
+}: {
+	db: DatabaseHandle;
+	subjectId: string;
+	sessionId: string;
+	metadataId: NamespacedMetadataID;
+	confirmed: boolean;
+	updateReactiveState?: boolean;
+}) {
+	const image = await db.get('Image', subjectId);
+	const observation = await db.get('Observation', subjectId);
+	const imagesFromImageFile = await db
+		.getAllFromIndex('Image', 'sessionId', sessionId)
+		.then((imgs) => imgs.filter(({ fileId }) => fileId === subjectId));
+
+	if (!image && !observation && imagesFromImageFile.length === 0)
+		throw new Error(`Aucune image ou observation avec l'ID ${subjectId}`);
+
+	console.debug(`Store metadata confirmation for ${metadataId} in ${subjectId}:`, confirmed);
+	if (image) {
+		image.metadata[metadataId].confirmed = confirmed;
+		db.put('Image', image);
+	} else if (observation) {
+		observation.metadataOverrides[metadataId].confirmed = confirmed;
+		db.put('Observation', observation);
+	} else if (imagesFromImageFile) {
+		for (const { id } of imagesFromImageFile) {
+			await storeMetadataValueConfirmation({
+				db,
+				sessionId,
+				subjectId: id,
+				metadataId,
+				confirmed,
+				updateReactiveState: false,
+			});
+		}
+	}
+
+	// Only refresh table state if asked
+	if (sessionId && updateReactiveState) {
+		await refreshTables(
+			sessionId,
+			image || imagesFromImageFile.length ? 'Image' : 'Observation'
+		);
+	}
+}
+
 export async function storeMetadataErrors(
 	{
 		db,
