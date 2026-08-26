@@ -114,7 +114,7 @@ async function shouldRefreshHttpInference(
 			[t in MetadataType]: {
 				type: t;
 				granularity: undefined | NonNullable<(typeof Granularity)[t]>['infer'];
-				old: RuntimeValue<t>;
+				old: undefined | RuntimeValue<t>;
 				now: RuntimeValue<t>;
 			};
 		}[MetadataType];
@@ -155,6 +155,8 @@ async function shouldRefreshHttpInference(
 				}
 
 				case 'location': {
+					if (!args.old) return true;
+
 					const { gval, gunit } = /^(?<gval>-?\d+(?:.\d+)?)(?<gunit>cm|m|km)$/.exec(
 						args.granularity
 					)!.groups!;
