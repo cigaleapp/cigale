@@ -64,6 +64,8 @@ export async function httpInferencesToRefresh(
 	protocolId: string,
 	changes: Record<NamespacedMetadataID, [before: RuntimeValue | undefined, now: RuntimeValue]>
 ) {
+	console.time('compute http inferences to refresh');
+
 	const toRefresh: DB.Metadata[] = [];
 	const protocol = await db.get('Protocol', protocolId);
 
@@ -71,10 +73,16 @@ export async function httpInferencesToRefresh(
 		const metadata = await db.get('Metadata', resolveMetadataImport(protocol, id));
 		if (!metadata) continue;
 
+		// Greatly improves performance (as opposed to shouldRefreshHttpInference that does a arktype check)
+		if (!('infer' in metadata)) continue;
+		if (!('http' in metadata.infer)) continue;
+
 		if (await shouldRefreshHttpInference(db, protocolId, metadata, changes)) {
 			toRefresh.push(metadata);
 		}
 	}
+
+	console.timeEnd('compute http inferences to refresh');
 
 	return toRefresh;
 }
@@ -82,12 +90,12 @@ export async function httpInferencesToRefresh(
 async function shouldRefreshHttpInference(
 	db: DatabaseHandle,
 	protocolId: string,
-	config: DB.Metadata,
+	config: DB.Metadata & {
+		infer: { http: NonNullable<NonNullable<DB.Metadata['infer']>['http']> };
+	},
 	changes: Record<NamespacedMetadataID, [before: RuntimeValue | undefined, now: RuntimeValue]>
 ) {
-	const settings = InferenceConfigs.http(config.type).get('http')(
-		config.infer && 'http' in config.infer ? config.infer.http : undefined
-	);
+	const settings = InferenceConfigs.http(config.type).get('http')(config.infer.http);
 
 	if (settings instanceof ArkErrors) return;
 
