@@ -3,6 +3,7 @@ import type { DatabaseHandle } from '$lib/idb.svelte.js';
 import type { NamespacedMetadataID } from '$lib/schemas/common.js';
 import type { MetadataType, RuntimeValue } from '$lib/schemas/metadata.js';
 
+import { ArkErrors } from 'arktype';
 import convert from 'convert';
 import {
 	differenceInDays,
@@ -18,6 +19,7 @@ import { distanceBetweenGeoCoordinates } from '$lib/geolocation.js';
 import {
 	ensureNamespacedMetadataId,
 	Granularity,
+	InferenceConfigs,
 	removeNamespaceFromMetadataId,
 } from '$lib/schemas/metadata.js';
 import { entries, mapKeys, safeJSONParse, switchValue, transformObject, zip } from '$lib/utils.js';
@@ -31,8 +33,11 @@ export async function inferHttp(
 	config: DB.Metadata,
 	values: Record<NamespacedMetadataID, DB.MetadataValue>
 ) {
-	const settings = config.infer && 'http' in config.infer ? config.infer.http : undefined;
-	if (!settings) return;
+	const settings = InferenceConfigs.http(config.type).get('http')(
+		config.infer && 'http' in config.infer ? config.infer.http : undefined
+	);
+
+	if (settings instanceof ArkErrors) return;
 
 	const payload = transformObject(values, (key, { value, ...rest }) => {
 		if (!settings.needs.some((need) => ensureNamespacedMetadataId(need, protocolId) === key))
@@ -80,12 +85,17 @@ async function shouldRefreshHttpInference(
 	config: DB.Metadata,
 	changes: Record<NamespacedMetadataID, [before: RuntimeValue | undefined, now: RuntimeValue]>
 ) {
-	const settings = config.infer && 'http' in config.infer ? config.infer.http : undefined;
-	if (!settings) return;
+	const settings = InferenceConfigs.http(config.type).get('http')(
+		config.infer && 'http' in config.infer ? config.infer.http : undefined
+	);
+
+	if (settings instanceof ArkErrors) return;
 
 	const granularities = mapKeys(settings.granularities ?? {}, (key) =>
 		ensureNamespacedMetadataId(key, protocolId)
 	);
+
+	// debugger
 
 	for (const [metadataId, [before, now]] of entries(changes)) {
 		const metadata = await db.get('Metadata', metadataId);
@@ -96,7 +106,7 @@ async function shouldRefreshHttpInference(
 		const granularitySchema = Granularity[metadata.type];
 		const granularity = granularities[metadataId];
 
-		if (!hasRuntimeType(type, before)) continue;
+		if (before !== undefined && !hasRuntimeType(type, before)) continue;
 		if (!hasRuntimeType(type, now)) continue;
 		if (granularitySchema && !granularitySchema.allows(granularity)) continue;
 
@@ -126,6 +136,7 @@ async function shouldRefreshHttpInference(
 
 					return Math.abs(diff(args.old, args.now)) >= 1;
 				}
+
 				case 'integer':
 				case 'float': {
 					return Math.abs(args.old - args.now) >= args.granularity;
@@ -142,6 +153,7 @@ async function shouldRefreshHttpInference(
 
 					return false;
 				}
+
 				case 'location': {
 					const { gval, gunit } = /^(?<gval>-?\d+(?:.\d+)?)(?<gunit>cm|m|km)$/.exec(
 						args.granularity
