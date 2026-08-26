@@ -1,11 +1,23 @@
 <script lang="ts">
-	import type { LngLatLike, MapMouseEvent } from 'maplibre-gl';
+	import type { LngLatLike } from 'maplibre-gl';
+	import type { ComponentProps } from 'svelte';
 	import type { MarkerClickInfo } from 'svelte-maplibre';
 
-	import { DefaultMarker, GeoJSON, MapEvents, MapLibre, Popup } from 'svelte-maplibre';
+	import {
+		DefaultMarker,
+		FillLayer,
+		GeoJSON,
+		LineLayer,
+		MapEvents,
+		MapLibre,
+		Popup,
+		SymbolLayer,
+	} from 'svelte-maplibre';
 
-	import { avg } from '$lib/utils.js';
+	import { avg, round } from '$lib/utils.js';
 	import { getTheme } from '$routes/+layout.svelte';
+
+	import { distanceBetweenGeoCoordinates } from './geolocation';
 
 	interface Props {
 		scrollToZoom?: boolean;
@@ -19,7 +31,7 @@
 			onMove?: (info: MarkerClickInfo) => void;
 		}>;
 		// eslint-disable-next-line no-unused-vars
-		onNewMarker?: (info: MapMouseEvent) => void;
+		onNewMarker?: ComponentProps<typeof MapEvents>['onclick'];
 	}
 
 	const { markers, onNewMarker, scrollToZoom = false, zoom = 15 }: Props = $props();
@@ -68,7 +80,11 @@
 					properties: {},
 				}}
 			>
-				<FillLayer />
+				<FillLayer
+					paint={{
+						'fill-color': '#ff000077',
+					}}
+				/>
 			</GeoJSON>
 		{:else if markers.length === 2}
 			<GeoJSON
@@ -84,7 +100,22 @@
 					properties: {},
 				}}
 			>
-				<LineLayer />
+				<LineLayer
+					paint={{
+						'line-width': 3,
+						'line-color': '#ff0000',
+					}}
+				/>
+
+				<Popup
+					lngLat={{
+						lat: avg(markers.map((m) => m.latitude)),
+						lng: avg(markers.map((m) => m.longitude)),
+					}}
+					open
+				>
+					{round(distanceBetweenGeoCoordinates(...markers), 1)}m
+				</Popup>
 			</GeoJSON>
 		{/if}
 	</MapLibre>

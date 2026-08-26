@@ -3,9 +3,9 @@
 	import { SvelteMap } from 'svelte/reactivity';
 
 	import { coordinatesToAddress, suggestCoordinates } from '$lib/nominatim.js';
-	import { orEmpty2 } from '$lib/utils.js';
 
 	import Combobox from './Combobox.svelte';
+	import { logexpr } from './utils.js';
 	import WorldMap from './WorldMap.svelte';
 
 	type Point = { longitude: number; latitude: number };
@@ -18,6 +18,8 @@
 	}
 
 	const { points, onblur, multiple = false }: Props = $props();
+
+	$inspect('points', points);
 
 	type CoordsKey = `${number};${number}`;
 
@@ -94,7 +96,7 @@
 	{multiple}
 	onValueChange={async (_, vals) => onblur(vals.map(keyToCoords))}
 	preloadedItems={points.map(loadItem)}
-	{loadItem}
+	loadItem={async (k) => loadItem(k)}
 	searcher={async function* search(query: string) {
 		const coords = Coords(query);
 
@@ -116,12 +118,12 @@
 			<WorldMap
 				scrollToZoom
 				zoom={10}
-				markers={allItems.map(({ key, label }) => ({
+				markers={logexpr('allitems', allItems).map(({ key, label }) => ({
 					...keyToCoords(key),
 					key,
 					label,
 					onMove({ lngLat: [lng, lat] }) {
-						deselect(key)
+						deselect(key);
 						select(loadItem({ lng, lat }));
 					},
 				}))}

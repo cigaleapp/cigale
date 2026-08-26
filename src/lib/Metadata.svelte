@@ -33,6 +33,7 @@
 	import {
 		compareBy,
 		corsfixIfLocalhost,
+		ensureArray,
 		orEmpty,
 		pick,
 		safeJSONParse,
@@ -252,25 +253,30 @@
 		{@render description()}
 	{/if}
 
-	{#if definition.type === 'location'}
-		{@const coords = (value as TypedMetadataValue<'location'> | undefined)?.value}
+	{#if definition.type === 'location' || definition.type === 'surface'}
+		{@const points = ensureArray(
+			(value as TypedMetadataValue<'location' | 'surface'> | undefined)?.value ?? []
+		)}
 
 		<section class="map">
 			<WorldMap
 				onNewMarker={async ({ lngLat: { lng, lat } }) => {
-					await onchange?.({ latitude: lat, longitude: lng });
+					const point = { latitude: lat, longitude: lng };
+					await onchange?.(definition.type === 'surface' ? [...points, point] : point);
 				}}
-				markers={orEmpty(coords !== undefined, {
+				markers={points.map((coords, i) => ({
 					...coords!,
-					id: '_',
+					key: JSON.stringify(coords),
 					async onMove({ lngLat: [longitude, latitude] }) {
 						await onchange?.({
-							value: { latitude, longitude },
-
+							value:
+								definition.type === 'surface'
+									? points.with(i, { latitude, longitude })
+									: { latitude, longitude },
 							nodes: { metadata: element },
 						});
 					},
-				})}
+				}))}
 			/>
 		</section>
 	{/if}

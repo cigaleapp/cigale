@@ -520,8 +520,9 @@
 		{#snippet location(value)}
 			<div class="location-input">
 				<WorldLocationCombobox
-points={[value as RuntimeValue<'location'>]}
-					onblur={async (value) => await onblur(value.length === 0 ? undefined:  value[0])}
+					points={value ? [value as RuntimeValue<'location'>] : []}
+					onblur={async (value) =>
+						await onblur(value.length === 0 ? undefined : value[0])}
 				/>
 
 				<ButtonIcon
@@ -539,7 +540,8 @@ points={[value as RuntimeValue<'location'>]}
 		{#snippet surface(value)}
 			<div class="location-input">
 				<WorldLocationCombobox
-					points={value as RuntimeValue<'surface'>}
+					multiple
+					points={(value as RuntimeValue<'surface'>) ?? []}
 					onblur={async (value) => await onblur(value)}
 				/>
 
@@ -548,7 +550,9 @@ points={[value as RuntimeValue<'location'>]}
 					help="Utiliser la position actuelle"
 					onclick={async () => {
 						const location = await getCurrentLocation();
-						if (location) await onblur(location);
+						if (location) {
+							await onblur([...((value as RuntimeValue<'surface'>) ?? []), location]);
+						}
 					}}
 				>
 					<IconGPS />
