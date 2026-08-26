@@ -5,7 +5,6 @@
 	import { coordinatesToAddress, suggestCoordinates } from '$lib/nominatim.js';
 
 	import Combobox from './Combobox.svelte';
-	import { logexpr } from './utils.js';
 	import WorldMap from './WorldMap.svelte';
 
 	type Point = { longitude: number; latitude: number };
@@ -118,7 +117,7 @@
 			<WorldMap
 				scrollToZoom
 				zoom={10}
-				markers={logexpr('allitems', allItems).map(({ key, label }) => ({
+				markers={allItems.map(({ key, label }) => ({
 					...keyToCoords(key),
 					key,
 					label,

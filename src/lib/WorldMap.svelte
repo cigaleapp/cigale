@@ -14,10 +14,9 @@
 		SymbolLayer,
 	} from 'svelte-maplibre';
 
+	import { distanceBetweenGeoCoordinates } from '$lib/geolocation.js';
 	import { avg, round } from '$lib/utils.js';
 	import { getTheme } from '$routes/+layout.svelte';
-
-	import { distanceBetweenGeoCoordinates } from './geolocation';
 
 	interface Props {
 		scrollToZoom?: boolean;
