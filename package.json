@@ -233,8 +233,5 @@
 		"svelte-bottom-sheet@2.3.0": "patches/svelte-bottom-sheet@2.3.0.patch",
 		"@capacitor-community/camera-preview@8.0.1": "patches/@capacitor-community%2Fcamera-preview@8.0.1.patch",
 		"@capacitor/geolocation@8.2.0": "patches/@capacitor%2Fgeolocation@8.2.0.patch"
-	},
-	"trustedDependencies": [
-		"protobufjs"
-	]
+	}
 }
