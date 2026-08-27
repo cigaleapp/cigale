@@ -107,22 +107,16 @@ export function geolocationAccuracyFromMake(make: string | undefined): number | 
  * @returns distance in meters. only works on earth (duh)
  */
 export function distanceBetweenGeoCoordinates(
-	a: { latitude: number; longitude: number },
-	b: { latitude: number; longitude: number }
+	{ latitude: a_lat, longitude: a_lng }: { latitude: number; longitude: number },
+	{ latitude: b_lat, longitude: b_lng }: { latitude: number; longitude: number }
 ): number {
 	const EARTH_RADIUS_METERS = 6_371_000;
 
-	const dLat = degToRad(b.latitude - a.latitude);
-	const dLon = degToRad(b.longitude - a.longitude);
+	const haversin = (x: number) => Math.sin(degToRad(x) / 2) ** 2;
+	const cos = (x: number) => Math.cos(degToRad(x));
 
-	a.latitude = degToRad(a.latitude);
-	b.latitude = degToRad(b.latitude);
-
-	const _a =
-		Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-		Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(a.latitude) * Math.cos(b.latitude);
-
-	const c = 2 * Math.atan2(Math.sqrt(_a), Math.sqrt(1 - _a));
+	const a = haversin(b_lat - a_lat) + haversin(b_lng - a_lng) * cos(a_lat) * cos(b_lat);
+	const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
 	return EARTH_RADIUS_METERS * c;
 }

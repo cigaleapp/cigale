@@ -46,29 +46,12 @@ describe('distanceBetweenGeoCoordinates', () => {
 		// Note: fresh objects per call, since the function mutates its inputs
 		// in place (see the test below) — reusing the same objects for both
 		// calls would silently double-convert them to radians.
-		const point1 = { latitude: 10, longitude: 20 };
-		const point2 = { latitude: -5, longitude: -30 };
-
-		expect(distanceBetweenGeoCoordinates({ ...point1 }, { ...point2 })).toBeCloseTo(
-			distanceBetweenGeoCoordinates({ ...point2 }, { ...point1 }),
-			6
-		);
-	});
-
-	// NOTE: the current implementation reassigns `a.latitude`/`b.latitude` in place
-	// (converting them to radians) while computing the distance. This test documents
-	// that existing behavior so a fix doesn't go unnoticed; ideally this function
-	// should not mutate its inputs and this test should be updated/removed if fixed.
-	test('currently mutates latitude on both input objects (converts to radians)', () => {
 		const a = { latitude: 10, longitude: 20 };
 		const b = { latitude: -5, longitude: -30 };
 
-		distanceBetweenGeoCoordinates(a, b);
-
-		expect(a.latitude).toBeCloseTo((10 * Math.PI) / 180, 10);
-		expect(b.latitude).toBeCloseTo((-5 * Math.PI) / 180, 10);
-		// longitude is left untouched
-		expect(a.longitude).toBe(20);
-		expect(b.longitude).toBe(-30);
+		expect(distanceBetweenGeoCoordinates(a, b)).toBeCloseTo(
+			distanceBetweenGeoCoordinates(b, a),
+			6
+		);
 	});
 });
