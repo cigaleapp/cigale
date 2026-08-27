@@ -116,7 +116,6 @@
 		<div class="location-combobox-map">
 			<WorldMap
 				scrollToZoom
-				zoom={10}
 				markers={allItems.map(({ key, label }) => ({
 					...keyToCoords(key),
 					key,

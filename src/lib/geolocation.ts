@@ -3,7 +3,7 @@ import type { PermissionStatus } from '@capacitor/geolocation';
 import { Geolocation } from '@capacitor/geolocation';
 
 // XXX: no $lib alias here, this file is imported by $lib/exif which is used in $lib/schemas/*
-import { clamp, degToRad } from './utils.js';
+import { avg, clamp, degToRad } from './utils.js';
 
 export async function getCurrentLocation() {
 	const permission = await Geolocation.checkPermissions().catch((e): PermissionStatus => {
@@ -119,4 +119,14 @@ export function distanceBetweenGeoCoordinates(
 	const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
 	return EARTH_RADIUS_METERS * c;
+}
+
+export function middleOfGeoCoordinates(
+	{ latitude: a_lat, longitude: a_lng }: { latitude: number; longitude: number },
+	{ latitude: b_lat, longitude: b_lng }: { latitude: number; longitude: number }
+) {
+	return {
+		longitude: avg([a_lng, b_lng]),
+		latitude: avg([a_lat, b_lat]),
+	};
 }

@@ -17,6 +17,7 @@
 
 	import Carousel from './Carousel.svelte';
 	import ConfidencePercentage from './ConfidencePercentage.svelte';
+	import { distanceBetweenGeoCoordinates, middleOfGeoCoordinates } from './geolocation.js';
 	import { databaseHandle } from './idb.svelte.js';
 	import {
 		metadataValueValidatorDate,
@@ -34,10 +35,12 @@
 		compareBy,
 		corsfixIfLocalhost,
 		ensureArray,
+		indexOfMin,
 		orEmpty,
 		pick,
 		safeJSONParse,
 		switchValue,
+		zip,
 	} from './utils.js';
 	import WorldMap from './WorldMap.svelte';
 
@@ -262,7 +265,30 @@
 			<WorldMap
 				onNewMarker={async ({ lngLat: { lng, lat } }) => {
 					const point = { latitude: lat, longitude: lng };
-					await onchange?.(definition.type === 'surface' ? [...points, point] : point);
+
+					if (definition.type === 'location') {
+						await onchange?.({ value: point });
+						return;
+					}
+
+					// Put point between the two extremities of the closest segment
+
+					const closestPointIndex = indexOfMin(
+						points.map((p, i) =>
+							distanceBetweenGeoCoordinates(
+								middleOfGeoCoordinates(points.at(i - 1)!, p),
+								point
+							)
+						)
+					);
+
+					await onchange?.({
+						value: [
+							...points.slice(0, closestPointIndex),
+							point,
+							...points.slice(closestPointIndex),
+						],
+					});
 				}}
 				markers={points.map((coords, i) => ({
 					...coords!,
