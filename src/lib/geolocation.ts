@@ -121,12 +121,9 @@ export function distanceBetweenGeoCoordinates(
 	return EARTH_RADIUS_METERS * c;
 }
 
-export function middleOfGeoCoordinates(
-	{ latitude: a_lat, longitude: a_lng }: { latitude: number; longitude: number },
-	{ latitude: b_lat, longitude: b_lng }: { latitude: number; longitude: number }
-) {
+export function middleOfGeoCoordinates(...points: Array<{ latitude: number; longitude: number }>) {
 	return {
-		longitude: avg([a_lng, b_lng]),
-		latitude: avg([a_lat, b_lat]),
+		longitude: avg(points.map((p) => p.longitude)),
+		latitude: avg(points.map((p) => p.latitude)),
 	};
 }

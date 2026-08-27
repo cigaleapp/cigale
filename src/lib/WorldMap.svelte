@@ -5,37 +5,51 @@
 
 	import { cartesianProduct } from 'es-toolkit';
 	import {
-		DefaultMarker,
 		FillLayer,
 		GeoJSON,
 		LineLayer,
 		MapEvents,
 		MapLibre,
+		Marker,
 		Popup,
 	} from 'svelte-maplibre';
 
+	import IconMapMarker from '~icons/ri/map-pin-2-fill';
+	import { resolveColorVariable } from '$lib/css.js';
+	import { geojsonLineStringFeature, geojsonPolygonFeature } from '$lib/geojson.js';
 	import { distanceBetweenGeoCoordinates } from '$lib/geolocation.js';
 	import { avg, round } from '$lib/utils.js';
 	import { getTheme } from '$routes/+layout.svelte';
+
+	type Point = { longitude: number; latitude: number };
 
 	type MapClickEvent = Parameters<NonNullable<ComponentProps<typeof MapEvents>['onclick']>>[0];
 
 	interface Props {
 		scrollToZoom?: boolean;
-		zoom?: number;
 		// eslint-disable-next-line no-unused-vars
 		onNewMarker?: (e: MapClickEvent) => void | Promise<void>;
+		/**
+		 * When there are multiple points, what to draw between them:
+		 * - nothing (default)
+		 * - segments (connected lines, requires 2 points to show)
+		 * - area (a polygon, requires 3 points to show)
+		 */
+		draw?: 'nothing' | 'segments' | 'area';
 		markers: Array<{
 			key: string;
 			latitude: number;
 			longitude: number;
 			label?: string;
+			highlighted?: boolean;
 			// eslint-disable-next-line no-unused-vars
 			onMove?: (info: MarkerClickInfo) => void;
+			// eslint-disable-next-line no-unused-vars
+			onDelete?: (info: MarkerClickInfo) => void;
 		}>;
 	}
 
-	const { markers, onNewMarker, scrollToZoom = false }: Props = $props();
+	const { markers, onNewMarker, scrollToZoom = false, draw = 'nothing' }: Props = $props();
 
 	const latitudes = $derived(markers.map((m) => m.latitude));
 	const longitudes = $derived(markers.map((m) => m.longitude));
@@ -52,8 +66,37 @@
 		return Math.log(km / a) / b;
 	}
 
+	function scaleFromZoomLevel(scale: number) {
+		const a = 4049.319132;
+		const b = -0.6850320277;
+
+		return a * Math.exp(b * scale);
+	}
+
+	const zoom = $derived.by(() => {
+		if (markers.length === 0) return 0;
+		if (markers.length === 1) return zoomLevelFromScale(0.1);
+
+		const longestSegment = Math.max(
+			...cartesianProduct(markers, markers).map(
+				([a, b]) => distanceBetweenGeoCoordinates(a, b) * 1e-3
+			)
+		);
+
+		return zoomLevelFromScale(longestSegment / 2);
+	});
+
+	function distanceToClosestMarker(p: Point) {
+		return Math.min(...markers.map((m) => distanceBetweenGeoCoordinates(m, p)));
+	}
+
 	const MAP_THEMES = { dark: 'dark-matter', light: 'positron' } as const;
 	const theme = getTheme();
+
+	const highlightedMarkers = $derived(markers.some((m) => m.highlighted !== undefined));
+
+	const accentColor = $derived(resolveColorVariable(theme, '--fg-primary'));
+	const accentColorTranslucent = $derived(accentColor + '55');
 </script>
 
 <div class="world-map">
@@ -62,66 +105,65 @@
 		style="https://basemaps.cartocdn.com/gl/{MAP_THEMES[theme.effective]}-gl-style/style.json"
 		standardControls
 		cooperativeGestures={!scrollToZoom}
-		zoom={markers.length === 0
-			? 0
-			: zoomLevelFromScale(
-					markers.length === 1
-						? 0.1
-						: Math.max(
-								...cartesianProduct(markers, markers).map(
-									([a, b]) => distanceBetweenGeoCoordinates(a, b) * 1e-3
-								)
-							) * 0.5
-				)}
+		{zoom}
 		{center}
 	>
 		{#each markers as marker (marker.key)}
-			<DefaultMarker
+			<Marker
 				lngLat={[marker.longitude, marker.latitude]}
 				draggable={Boolean(marker.onMove)}
 				ondragend={(e) => marker.onMove?.(e)}
+				onclick={(e) => marker.onDelete?.(e)}
 			>
+				<div
+					class="map-marker"
+					style:color={highlightedMarkers && !marker.highlighted
+						? 'var(--gray)'
+						: accentColor}
+					style:font-size="1.25rem"
+				>
+					<IconMapMarker />
+				</div>
 				<Popup offset={[0, -10]}>{marker.label ?? ''}</Popup>
-			</DefaultMarker>
+			</Marker>
 		{/each}
 
 		{#if onNewMarker}
-			<MapEvents onclick={onNewMarker} />
+			<MapEvents
+				onclick={(e) => {
+					const MARKER_HITBOX_RADIUS = 0.1; // relative to map scale
+
+					const point = { longitude: e.lngLat.lng, latitude: e.lngLat.lat };
+					const scale = scaleFromZoomLevel(zoom) * 1e3;
+
+					// If click is too close to a marker, ignore it
+					if (distanceToClosestMarker(point) < MARKER_HITBOX_RADIUS * scale) return;
+
+					onNewMarker(e);
+				}}
+			/>
 		{/if}
 
-		{#if markers.length >= 3}
-			<GeoJSON
-				data={{
-					type: 'Feature',
-					geometry: {
-						type: 'Polygon',
-						coordinates: [
-							markers.map(({ latitude, longitude }) => [longitude, latitude]),
-						],
-					},
-					properties: {},
-				}}
-			>
+		{#if draw === 'area' && markers.length >= 3}
+			<!-- Last marker is duplicated so that LineLayer outlines in a closed shape -->
+			<GeoJSON data={geojsonPolygonFeature([[...markers, markers.at(0)]])}>
 				<FillLayer
 					paint={{
-						'fill-color': '#ff000077',
+						'fill-color': accentColorTranslucent,
+					}}
+				/>
+
+				<LineLayer
+					paint={{
+						'line-width': 2,
+						'line-color': accentColor,
 					}}
 				/>
 			</GeoJSON>
-		{:else if markers.length === 2}
-			<GeoJSON
-				data={{
-					type: 'Feature',
-					geometry: {
-						type: 'LineString',
-						coordinates: markers.map(({ latitude, longitude }) => [
-							longitude,
-							latitude,
-						]),
-					},
-					properties: {},
-				}}
-			>
+		{/if}
+
+		{#if draw === 'segments' && markers.length >= 2}
+			<GeoJSON data={geojsonLineStringFeature(markers)}>
 				{let showPopup = $state(false)}
 
 				<LineLayer
@@ -133,7 +175,7 @@
 					}}
 					paint={{
 						'line-width': 3,
-						'line-color': '#ff0000',
+						'line-color': accentColor,
 					}}
 				/>
 

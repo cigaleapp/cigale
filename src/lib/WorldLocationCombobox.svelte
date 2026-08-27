@@ -16,9 +16,8 @@
 		multiple?: boolean;
 	}
 
-	const { points, onblur, multiple = false }: Props = $props();
+	const { points, onblur, multiple = false, }: Props = $props();
 
-	$inspect('points', points);
 
 	type CoordsKey = `${number};${number}`;
 
@@ -112,14 +111,19 @@
 		yield loadItem(coords);
 	}}
 >
-	{#snippet details(_, { select, deselect, allItems })}
+	{#snippet details(item, { select, deselect, allItems })}
 		<div class="location-combobox-map">
 			<WorldMap
+				draw="area"
 				scrollToZoom
 				markers={allItems.map(({ key, label }) => ({
 					...keyToCoords(key),
 					key,
 					label,
+					highlighted: key === item.key,
+					onDelete() {
+						deselect(key);
+					},
 					onMove({ lngLat: [lng, lat] }) {
 						deselect(key);
 						select(loadItem({ lng, lat }));
