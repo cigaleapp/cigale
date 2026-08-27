@@ -1620,3 +1620,18 @@ if (import.meta.vitest) {
 export type ValueOfMap<M> = M extends Map<unknown, infer V> | ReadonlyMap<unknown, infer V>
 	? V
 	: never;
+
+export function degToRad(deg: number): number {
+	return (deg * Math.PI) / 180;
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('degToRad', () => {
+		expect(degToRad(0)).toBe(0);
+		expect(degToRad(180)).toBeCloseTo(Math.PI, 10);
+		expect(degToRad(360)).toBeCloseTo(2 * Math.PI, 10);
+		expect(degToRad(90)).toBeCloseTo(Math.PI / 2, 10);
+		expect(degToRad(-90)).toBeCloseTo(-Math.PI / 2, 10);
+	});
+}

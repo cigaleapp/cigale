@@ -10,7 +10,6 @@ import { page } from '$app/state';
 import {
 	boundingBoxIsNonZero,
 	coordsAreEqual,
-	FULL_IMAGE_CROPBOX,
 	toCenteredCoords,
 	toTopLeftCoords,
 } from '$lib/BoundingBoxes.svelte.js';
@@ -21,7 +20,11 @@ import {
 	imageId as makeImageId,
 	parseImageId,
 } from '$lib/images.js';
-import { deleteMetadataValue, storeMetadataValue } from '$lib/metadata/storage.js';
+import {
+	deleteMetadataValue,
+	storeMetadataValue,
+	storeMetadataValueConfirmation,
+} from '$lib/metadata/storage.js';
 import { hasRuntimeType } from '$lib/metadata/types.js';
 import { ensureNoEmptyObservations } from '$lib/observations.js';
 import { goto } from '$lib/paths.js';
@@ -345,21 +348,11 @@ async function changeCropConfirmedStatus(image: DB.Image, confirmed: boolean) {
 	if (!uiState.currentSessionId) return;
 	if (!uiState.cropMetadataId) return;
 
-	const value = uiState.cropMetadataValueOf(image) ?? {
-		confidence: 1,
-		manuallyModified: true,
-		value: FULL_IMAGE_CROPBOX,
-		confidences: {},
-		confirmed: true,
-	};
-
-	await storeMetadataValue({
+	await storeMetadataValueConfirmation({
 		db: idb.databaseHandle(),
 		sessionId: uiState.currentSessionId,
 		metadataId: uiState.cropMetadataId,
 		subjectId: image.id,
-		type: 'boundingbox',
-		...value,
 		confirmed,
 	});
 }
@@ -368,9 +361,17 @@ export async function changeAllConfirmedStatuses(confirmed: boolean) {
 	// Nothing to do in that case
 	if (confirmed && hasConfirmedCrop(fileId)) return;
 
-	for (const image of currentImages()) {
-		await changeCropConfirmedStatus(image, confirmed);
-	}
+	if (!uiState.currentSessionId) return;
+	if (!uiState.cropMetadataId) return;
+	if (!fileId) return;
+
+	await storeMetadataValueConfirmation({
+		db: idb.databaseHandle(),
+		sessionId: uiState.currentSessionId,
+		metadataId: uiState.cropMetadataId,
+		subjectId: fileId,
+		confirmed,
+	});
 }
 
 export async function revertToInferredCrop(imageId: string) {

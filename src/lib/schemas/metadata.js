@@ -3,7 +3,7 @@ import { type } from 'arktype';
 import { parseISOSafe } from '../date.js';
 import { EXIF_FIELDS_DETAILS } from '../exiffields.js';
 import { boundingBoxResolver } from '../inference_utils.js';
-import { ensureArray, entries, mapValues, transformObject, unique } from '../utils.js';
+import { ensureArray, entries, mapValues, nonnull, transformObject, unique } from '../utils.js';
 import {
 	ColorHex,
 	FilepathTemplate,
@@ -332,6 +332,19 @@ export const SidecarInference = (QueryOutput) =>
 		}
 	);
 
+export const Granularity =
+	/** @type {const} @satisfies {Record<MetadataType, import('arktype').Type|undefined>} */ ({
+		string: undefined,
+		enum: undefined,
+		location: type('/^(?<number>-?(\\d+)(\\.\\d+)?)(?<unit>km|m|cm)$/'),
+		boolean: undefined,
+		integer: type('number.integer > 0'),
+		float: type('number > 0'),
+		date: type.enumerated('year', 'month', 'day', 'hour', 'minute', 'second', 'millisecond'),
+		boundingbox: type('number > 0'),
+		file: undefined,
+	});
+
 export const InferenceConfigs = /** @type {const} */ ({
 	exif: type({
 		exif: EXIFInference,
@@ -366,6 +379,41 @@ export const InferenceConfigs = /** @type {const} */ ({
 				'Prélever une valeur avant le début (before-timer) ou après la fin (after-timer) du timer de capture. Seulement effectif sur les métadonnées de session de type date (prend la date actuelle), location (prend la position gps actuelle) et file avec accept comprenant "image/*" (propose de prendre une photo)'
 			),
 	}),
+
+	/**
+	 * @template {MetadataType} T
+	 * @param {T} metadataType
+	 */
+	http: (metadataType) =>
+		type({
+			http: type({
+				needs: ID.array().describe(
+					"Liste des métadonnées dont dépend l'inférence de celle-ci. Utilisable dans `from` et `select`"
+				),
+				from: TemplatedString(MetadataRecord(ID), (value) =>
+					value.replaceAll(/\s/g, '')
+				).describe(
+					"URL à utiliser. Il est possible de mettre l'URL sur plusieurs lignes, tout les espaces et retours à la ligne sont supprimés avant d'obtenir l'URL finale"
+				),
+				select: JsonataExpression(
+					type.unknown,
+					MetadataRuntimeValue[metadataType]
+				).describe("Traitement à faire sur la réponse JSON obtenue depuis l'URL `from`"),
+				granularities: type
+					.Record(
+						ID,
+						type.or(
+							...entries(Granularity)
+								.map(([, v]) => v)
+								.filter(nonnull)
+						)
+					)
+					.describe(
+						"Décide quand ré-inférer cette métadonnée lorsque les valeurs des métadonnées changent. Par exemple, si on a needs: [foo], granularities: {foo: month}, et que foo est de type date, la métadonnée sera ré-inférée quand foo change de jour, mais si foo change uniquement les minutes, l'inférence ne tournera pas de nouveau"
+					)
+					.default(() => ({})),
+			}),
+		}),
 });
 
 export const MetadataDefaultDynamicPayload = type({
@@ -453,7 +501,8 @@ const MetadataBoolean = MetadataBase.omit('kobocollect').and({
 	'default?': MetadataDefault.boolean,
 	'infer?': type.and(
 		InferenceConfigs.exif.partial(),
-		InferenceConfigs.sidecar(type('boolean')).partial()
+		InferenceConfigs.sidecar(type('boolean')).partial(),
+		InferenceConfigs.http('boolean').partial()
 	),
 	'kobocollect?': type.or(
 		{
@@ -493,7 +542,8 @@ export const MetadataString = MetadataBase.and({
 	'default?': MetadataDefault.string,
 	'infer?': type.and(
 		InferenceConfigs.exif.partial(),
-		InferenceConfigs.sidecar(type('string')).partial()
+		InferenceConfigs.sidecar(type('string')).partial(),
+		InferenceConfigs.http('string').partial()
 	),
 	'regex?': RegexExpression.describe(
 		'Une expression régulière que la valeur de cette métadonnée doit respecter'
@@ -515,7 +565,8 @@ export const MetadataInteger = MetadataBase.and({
 	'display?': MetadataNumericDisplay,
 	'infer?': type.and(
 		InferenceConfigs.exif.partial(),
-		InferenceConfigs.sidecar(type('number.integer')).partial()
+		InferenceConfigs.sidecar(type('number.integer')).partial(),
+		InferenceConfigs.http('integer').partial()
 	),
 	'unit?': NumericUnit,
 });
@@ -527,7 +578,8 @@ export const MetadataFloat = MetadataBase.and({
 	'display?': MetadataNumericDisplay,
 	'infer?': type.and(
 		InferenceConfigs.exif.partial(),
-		InferenceConfigs.sidecar(type('number')).partial()
+		InferenceConfigs.sidecar(type('number')).partial(),
+		InferenceConfigs.http('float').partial()
 	),
 	'unit?': NumericUnit,
 	'cascade?': type
@@ -544,7 +596,8 @@ export const MetadataDate = MetadataBase.and({
 	'infer?': type.and(
 		InferenceConfigs.capture.partial(),
 		InferenceConfigs.exif.partial(),
-		InferenceConfigs.sidecar(type('string.date.iso.parse')).partial()
+		InferenceConfigs.sidecar(type('string.date.iso.parse')).partial(),
+		InferenceConfigs.http('date').partial()
 	),
 });
 
@@ -553,6 +606,7 @@ const MetadataLocation = MetadataBase.and({
 	'default?': MetadataDefault.location,
 	'infer?': type.and(
 		InferenceConfigs.capture.partial(),
+		InferenceConfigs.http('location').partial(),
 		InferenceConfigs.sidecar(
 			type({ latitude: 'number', longitude: 'number', '+': 'reject' })
 		).partial(),
@@ -574,6 +628,7 @@ const MetadataEnum = MetadataBase.and({
 		.default('auto'),
 	'infer?': type.and(
 		InferenceConfigs.exif.partial(),
+		InferenceConfigs.http('enum').partial(),
 		InferenceConfigs.sidecar(type('string|number')).partial(),
 		InferenceConfigs.neuralEnum.partial()
 	),
@@ -586,6 +641,7 @@ const MetadataBoundingbox = MetadataBase.and({
 	'default?': MetadataDefault.boundingbox,
 	'infer?': type.and(
 		InferenceConfigs.neuralBoundingBox.partial(),
+		InferenceConfigs.http('boundingbox').partial(),
 		InferenceConfigs.sidecar(
 			type({
 				'+': 'reject',

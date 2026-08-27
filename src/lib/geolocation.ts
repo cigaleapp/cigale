@@ -3,7 +3,7 @@ import type { PermissionStatus } from '@capacitor/geolocation';
 import { Geolocation } from '@capacitor/geolocation';
 
 // XXX: no $lib alias here, this file is imported by $lib/exif which is used in $lib/schemas/*
-import { clamp } from './utils.js';
+import { clamp, degToRad } from './utils.js';
 
 export async function getCurrentLocation() {
 	const permission = await Geolocation.checkPermissions().catch((e): PermissionStatus => {
@@ -101,4 +101,22 @@ export function geolocationAccuracyFromMake(make: string | undefined): number | 
 	};
 
 	return perMake[make.toLowerCase().trim()];
+}
+
+/**
+ * @returns distance in meters. only works on earth (duh)
+ */
+export function distanceBetweenGeoCoordinates(
+	{ latitude: a_lat, longitude: a_lng }: { latitude: number; longitude: number },
+	{ latitude: b_lat, longitude: b_lng }: { latitude: number; longitude: number }
+): number {
+	const EARTH_RADIUS_METERS = 6_371_000;
+
+	const haversin = (x: number) => Math.sin(degToRad(x) / 2) ** 2;
+	const cos = (x: number) => Math.cos(degToRad(x));
+
+	const a = haversin(b_lat - a_lat) + haversin(b_lng - a_lng) * cos(a_lat) * cos(b_lat);
+	const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+	return EARTH_RADIUS_METERS * c;
 }
