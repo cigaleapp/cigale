@@ -62,7 +62,10 @@ test('can infer metadata from http', async ({ page, app }) => {
 	await expect(app.metadata.textbox('Inferred')).toHaveValue('inferred:hello');
 
 	expect(
-		await app.db.metadata.values({ image: 'cyan.jpeg', protocolId: 'com.example.httpinference' })
+		await app.db.metadata.values({
+			image: 'cyan.jpeg',
+			protocolId: 'com.example.httpinference',
+		})
 	).toMatchObject({
 		from: 'hello',
 		inferred: 'inferred:hello',

@@ -7,7 +7,12 @@ import 'fake-indexeddb/auto';
 
 import { beforeEach, describe, expect, test } from 'vitest';
 
-import { deleteMetadataValue, storeMetadataErrors, storeMetadataValue } from './storage.js';
+import {
+	deleteMetadataValue,
+	storeMetadataErrors,
+	storeMetadataValue,
+	storeMetadataValueConfirmation,
+} from './storage.js';
 
 const PROTOCOL_ID = 'testproto';
 const SESSION_ID = 'sess001';
@@ -570,6 +575,142 @@ describe('storeMetadataErrors', () => {
 		).rejects.toThrowErrorMatchingInlineSnapshot(
 			`[Error: Aucune image ou observation avec l'ID nope]`
 		);
+	});
+});
+
+// ─── storeMetadataValueConfirmation ───────────────────────────────────
+
+describe('storeMetadataValueConfirmation', () => {
+	function mockValue(value: string, confirmed = false) {
+		return {
+			value,
+			confidence: 1,
+			confirmed,
+			manuallyModified: false,
+			confidences: {},
+			alternatives: [],
+		};
+	}
+
+	test('confirms a metadata value on an image', async () => {
+		const metadataId = nsId('species');
+		await db.add('Image', {
+			...mockImage('1'),
+			metadata: { [metadataId]: mockValue('"Rosalia alpina"', false) },
+		});
+
+		await storeMetadataValueConfirmation({
+			db,
+			subjectId: '1',
+			sessionId: SESSION_ID,
+			metadataId,
+			confirmed: true,
+		});
+
+		const img = await db.get('Image', '1');
+		expect(img?.metadata[metadataId]?.confirmed).toBe(true);
+	});
+
+	test('un-confirms a previously confirmed metadata value on an image', async () => {
+		const metadataId = nsId('species');
+		await db.add('Image', {
+			...mockImage('1'),
+			metadata: { [metadataId]: mockValue('"Rosalia alpina"', true) },
+		});
+
+		await storeMetadataValueConfirmation({
+			db,
+			subjectId: '1',
+			sessionId: SESSION_ID,
+			metadataId,
+			confirmed: false,
+		});
+
+		const img = await db.get('Image', '1');
+		expect(img?.metadata[metadataId]?.confirmed).toBe(false);
+	});
+
+	test('confirms a metadata value on an observation', async () => {
+		const metadataId = nsId('species');
+		await db.add('Observation', {
+			...mockObservation('o1', ['1']),
+			metadataOverrides: { [metadataId]: mockValue('"Lamia textor"', false) },
+		});
+
+		await storeMetadataValueConfirmation({
+			db,
+			subjectId: 'o1',
+			sessionId: SESSION_ID,
+			metadataId,
+			confirmed: true,
+		});
+
+		const obs = await db.get('Observation', 'o1');
+		expect(obs?.metadataOverrides[metadataId]?.confirmed).toBe(true);
+	});
+
+	test('propagates confirmation to all images sharing a fileId when subjectId is the fileId', async () => {
+		const metadataId = nsId('species');
+		await db.add('Image', {
+			...mockImage('1', SESSION_ID, 'sharedFile'),
+			metadata: { [metadataId]: mockValue('"a"', false) },
+		});
+		await db.add('Image', {
+			...mockImage('2', SESSION_ID, 'sharedFile'),
+			metadata: { [metadataId]: mockValue('"a"', false) },
+		});
+		await db.add('Image', {
+			...mockImage('3', SESSION_ID, 'otherFile'),
+			metadata: { [metadataId]: mockValue('"a"', false) },
+		});
+
+		await storeMetadataValueConfirmation({
+			db,
+			subjectId: 'sharedFile',
+			sessionId: SESSION_ID,
+			metadataId,
+			confirmed: true,
+		});
+
+		const img1 = await db.get('Image', '1');
+		const img2 = await db.get('Image', '2');
+		const img3 = await db.get('Image', '3');
+
+		expect(img1?.metadata[metadataId]?.confirmed).toBe(true);
+		expect(img2?.metadata[metadataId]?.confirmed).toBe(true);
+		expect(img3?.metadata[metadataId]?.confirmed).toBe(false);
+	});
+
+	test('throws if subject does not exist', async () => {
+		await expect(
+			storeMetadataValueConfirmation({
+				db,
+				subjectId: 'nonexistent',
+				sessionId: SESSION_ID,
+				metadataId: nsId('species'),
+				confirmed: true,
+			})
+		).rejects.toThrowErrorMatchingInlineSnapshot(
+			`[Error: Aucune image ou observation avec l'ID nonexistent]`
+		);
+	});
+
+	test('throws when the image exists but has no value for that metadata yet', async () => {
+		const metadataId = nsId('species');
+		await db.add('Image', mockImage('1')); // no metadata set for `species`
+
+		// Documents current behavior: storeMetadataValueConfirmation assumes the
+		// metadata value already exists on the subject and does not guard against
+		// a missing entry before setting `.confirmed` on it.
+		await expect(
+			storeMetadataValueConfirmation({
+				db,
+				subjectId: '1',
+				sessionId: SESSION_ID,
+				metadataId,
+				confirmed: true,
+			})
+		).rejects.toThrow();
 	});
 });
 
