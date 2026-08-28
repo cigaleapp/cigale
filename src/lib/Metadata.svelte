@@ -12,33 +12,34 @@
 	import IconClear from '~icons/ri/close-line';
 	import IconTechnical from '~icons/ri/settings-line';
 	import IconMerged from '~icons/ri/stack-line';
+	import Carousel from '$lib/Carousel.svelte';
+	import ConfidencePercentage from '$lib/ConfidencePercentage.svelte';
+	import { addPointToGeoPolygon } from '$lib/geolocation.js';
+	import { databaseHandle } from '$lib/idb.svelte.js';
 	import LoadingText from '$lib/LoadingText.svelte';
-	import { metadataOption } from '$lib/metadata/storage.js';
-
-	import Carousel from './Carousel.svelte';
-	import ConfidencePercentage from './ConfidencePercentage.svelte';
-	import { databaseHandle } from './idb.svelte.js';
 	import {
 		metadataValueValidatorDate,
 		metadataValueValidatorNumeric,
 		metadataValueValidatorString,
-	} from './metadata/constraints.js';
-	import { serializeMetadataValue } from './metadata/index.js';
-	import MetadataInput from './MetadataInput.svelte';
-	import { IsMobile } from './mobile.svelte.js';
-	import OverflowableText from './OverflowableText.svelte';
-	import { splitMetadataId } from './schemas/metadata.js';
-	import { isDebugMode } from './settings.svelte.js';
-	import { tooltip } from './tooltips.js';
+	} from '$lib/metadata/constraints.js';
+	import { serializeMetadataValue } from '$lib/metadata/index.js';
+	import { metadataOption } from '$lib/metadata/storage.js';
+	import MetadataInput from '$lib/MetadataInput.svelte';
+	import { IsMobile } from '$lib/mobile.svelte.js';
+	import OverflowableText from '$lib/OverflowableText.svelte';
+	import { splitMetadataId } from '$lib/schemas/metadata.js';
+	import { isDebugMode } from '$lib/settings.svelte.js';
+	import { tooltip } from '$lib/tooltips.js';
 	import {
 		compareBy,
 		corsfixIfLocalhost,
+		ensureArray,
 		orEmpty,
 		pick,
 		safeJSONParse,
 		switchValue,
-	} from './utils.js';
-	import WorldMap from './WorldMap.svelte';
+	} from '$lib/utils.js';
+	import WorldMap from '$lib/WorldMap.svelte';
 
 	type Props = {
 		definition: Metadata;
@@ -252,25 +253,54 @@
 		{@render description()}
 	{/if}
 
-	{#if definition.type === 'location'}
-		{@const coords = (value as TypedMetadataValue<'location'> | undefined)?.value}
+	{#if definition.type === 'location' || definition.type === 'surface'}
+		{@const points = ensureArray(
+			(value as TypedMetadataValue<'location' | 'surface'> | undefined)?.value ?? []
+		)}
 
 		<section class="map">
 			<WorldMap
+				testid={definition.id}
+				draw={switchValue(definition.type, {
+					location: 'nothing',
+					surface: 'area',
+				})}
 				onNewMarker={async ({ lngLat: { lng, lat } }) => {
-					await onchange?.({ latitude: lat, longitude: lng });
+					const point = { latitude: lat, longitude: lng };
+
+					if (definition.type === 'location') {
+						await onchange?.({ value: point });
+						return;
+					}
+
+					await onchange?.({
+						value: addPointToGeoPolygon(points, point),
+					});
 				}}
-				markers={orEmpty(coords !== undefined, {
+				markers={points.map((coords, i) => ({
 					...coords!,
-					id: '_',
+					key: JSON.stringify(coords),
+					async onDelete({ lngLat: [longitude, latitude] }) {
+						await onchange?.({
+							value:
+								definition.type === 'surface' && points.length > 1
+									? points.filter(
+											(p) =>
+												p.longitude !== longitude || p.latitude !== latitude
+										)
+									: undefined,
+						});
+					},
 					async onMove({ lngLat: [longitude, latitude] }) {
 						await onchange?.({
-							value: { latitude, longitude },
-
+							value:
+								definition.type === 'surface'
+									? points.with(i, { latitude, longitude })
+									: { latitude, longitude },
 							nodes: { metadata: element },
 						});
 					},
-				})}
+				}))}
 			/>
 		</section>
 	{/if}

@@ -130,6 +130,13 @@ metadata:
     type: file
     accept: [application/json, application/yaml]
 
+  surface:
+    description: surface
+    label: surface
+    mergeMethod: union
+    required: false
+    type: surface
+
 crop:
   padding: 0px
 

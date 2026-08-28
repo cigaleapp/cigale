@@ -1,6 +1,11 @@
 import { describe, expect, test } from 'vitest';
 
-import { distanceBetweenGeoCoordinates } from './geolocation.js';
+import {
+	addPointToGeoPolygon,
+	areaBetweenGeoCoordinates,
+	distanceBetweenGeoCoordinates,
+	middleOfGeoCoordinates,
+} from './geolocation.js';
 
 // ─── distanceBetweenGeoCoordinates ───────────────────────────────────
 
@@ -53,5 +58,82 @@ describe('distanceBetweenGeoCoordinates', () => {
 			distanceBetweenGeoCoordinates(b, a),
 			6
 		);
+	});
+});
+
+const p = (longitude: number, latitude: number) => ({ longitude, latitude });
+
+describe('middleOfGeoCoordinates', () => {
+	test('2 points', () => {
+		expect(middleOfGeoCoordinates(p(0, 1), p(1, 0))).toStrictEqual(p(0.5, 0.5));
+		expect(middleOfGeoCoordinates(p(0, 1), p(0, 2))).toStrictEqual(p(0, 1.5));
+	});
+
+	test('3 points', () => {
+		expect(middleOfGeoCoordinates(p(0, 1), p(1, 0), p(2, 2))).toStrictEqual(p(1, 1));
+		expect(middleOfGeoCoordinates(p(0, 1), p(0, 2))).toStrictEqual(p(0, 1.5));
+	});
+});
+
+describe('areaBetweenGeoCoordinates', () => {
+	test('less than 3 points', () => {
+		expect(areaBetweenGeoCoordinates([])).toBe(0);
+		expect(areaBetweenGeoCoordinates([p(0, 0)])).toBe(0);
+		expect(areaBetweenGeoCoordinates([p(0, 0), p(0, 0)])).toBe(0);
+	});
+
+	test('triangle', () => {
+		expect(areaBetweenGeoCoordinates([p(0, 0), p(0, 1), p(1, 1)])).toBeCloseTo(
+			6_181_528_030.949073
+		);
+	});
+
+	test('n-gon', () => {
+		expect(
+			areaBetweenGeoCoordinates([
+				p(1.4448383066965675, 43.60217100864341),
+				p(1.4476261190043829, 43.60170313976584),
+				p(1.4514607729122702, 43.60327617412922),
+				p(1.4469470703627678, 43.60456310440037),
+				p(1.4445080951651561, 43.60390104116154),
+			])
+		).toBeCloseTo(108_016.908);
+	});
+});
+
+describe('addPointToGeoPolygon', () => {
+	test('add to 0 points', () => {
+		expect(addPointToGeoPolygon([], p(0, 0))).toStrictEqual([p(0, 0)]);
+	});
+
+	test('add to <3 point', () => {
+		expect(addPointToGeoPolygon([p(1, 0)], p(0, 0))).toStrictEqual([p(0, 0), p(1, 0)]);
+		expect(addPointToGeoPolygon([p(1, 0), p(2, 0)], p(0, 0))).toStrictEqual([
+			p(0, 0),
+			p(1, 0),
+			p(2, 0),
+		]);
+	});
+
+	test('add to n-gon', () => {
+		expect(
+			addPointToGeoPolygon(
+				[
+					p(1.4448383066965675, 43.60217100864341),
+					p(1.4476261190043829, 43.60170313976584),
+					p(1.4514607729122702, 43.60327617412922),
+					p(1.4469470703627678, 43.60456310440037),
+					p(1.4445080951651561, 43.60390104116154),
+				],
+				p(1.4515361548542671, 43.60157388613547)
+			)
+		).toStrictEqual([
+			p(1.4448383066965675, 43.60217100864341),
+			p(1.4476261190043829, 43.60170313976584),
+			p(1.4515361548542671, 43.60157388613547),
+			p(1.4514607729122702, 43.60327617412922),
+			p(1.4469470703627678, 43.60456310440037),
+			p(1.4445080951651561, 43.60390104116154),
+		]);
 	});
 });

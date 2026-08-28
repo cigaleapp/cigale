@@ -1635,3 +1635,26 @@ if (import.meta.vitest) {
 		expect(degToRad(-90)).toBeCloseTo(-Math.PI / 2, 10);
 	});
 }
+
+/**
+ * Get index of smallest element in given array
+ */
+export function indexOfMin(values: number[]) {
+	let index = 0;
+
+	for (let i = 0; i < values.length; i++) {
+		if (values[i] < values[index]) {
+			index = i;
+		}
+	}
+
+	return index;
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('indexOfMin', () => {
+		expect(indexOfMin([2, 5, 1, 3, 5, 2])).toBe(2);
+		expect(indexOfMin([0, 5, 0, 3, 5, 2])).toBe(0);
+	});
+}
