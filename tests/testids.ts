@@ -61,4 +61,7 @@ export type PlaywrightTestId =
 	| 'synonyms'
 	| 'description'
 	| 'metadata-combobox-viewport'
-	| 'mobile-option-details';
+	| 'mobile-option-details'
+	| `${string}-point-${number}`
+	| `${string}-label-area`
+	| `${string}-label-segment-${number}`;

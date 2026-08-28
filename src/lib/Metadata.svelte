@@ -261,6 +261,7 @@
 
 		<section class="map">
 			<WorldMap
+				testid={definition.id}
 				draw={switchValue(definition.type, {
 					location: 'nothing',
 					surface: 'area',

@@ -32,6 +32,8 @@
 	type MapClickEvent = Parameters<NonNullable<ComponentProps<typeof MapEvents>['onclick']>>[0];
 
 	interface Props {
+		/** Prefix used for pw-testid attributes on markers and labels */
+		testid?: string;
 		scrollToZoom?: boolean;
 		// eslint-disable-next-line no-unused-vars
 		onNewMarker?: (e: MapClickEvent) => void | Promise<void>;
@@ -55,7 +57,16 @@
 		}>;
 	}
 
-	const { markers, onNewMarker, scrollToZoom = false, draw = 'nothing' }: Props = $props();
+	const {
+		markers,
+		onNewMarker,
+		testid: testidPrefix,
+		scrollToZoom = false,
+		draw = 'nothing',
+	}: Props = $props();
+
+	const testid = <T extends string>(suffix: T) =>
+		testidPrefix ? (`${testidPrefix}-${suffix}` as const) : undefined;
 
 	const latitudes = $derived(markers.map((m) => m.latitude));
 	const longitudes = $derived(markers.map((m) => m.longitude));
@@ -114,7 +125,7 @@
 		{zoom}
 		{center}
 	>
-		{#each markers as marker (marker.key)}
+		{#each markers as marker, i (marker.key)}
 			<Marker
 				lngLat={[marker.longitude, marker.latitude]}
 				draggable={Boolean(marker.onMove)}
@@ -123,6 +134,7 @@
 			>
 				<div
 					class="map-marker"
+					pw-testid={testid(`point-${i}`)}
 					style:color={highlightedMarkers && !marker.highlighted
 						? 'var(--gray)'
 						: accentColor}
@@ -175,7 +187,7 @@
 					{const sqmeters = $derived(areaBetweenGeoCoordinates(markers))}
 					{const hectares = $derived(convert(sqmeters, 'square meters').to('hectares'))}
 
-					<span class="text-marker">
+					<span class="text-marker" pw-testid={testid('label-area')}>
 						{#if hectares >= 0.2}
 							{round(hectares, 2)} ha
 						{:else}
@@ -202,7 +214,7 @@
 					<Marker lngLat={lnglat(middleOfGeoCoordinates(p1, p2))}>
 						{const meters = round(distanceBetweenGeoCoordinates(p1, p2), 1)}
 
-						<span class="text-marker">
+						<span class="text-marker" pw-testid={testid(`label-segment-${i}`)}>
 							{#if meters > 1e3}
 								{round(meters * 1e-3, 2)} km
 							{:else}
