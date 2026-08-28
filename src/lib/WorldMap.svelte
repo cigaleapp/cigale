@@ -177,7 +177,7 @@
 					{const hectares = $derived(convert(sqmeters, 'square meters').to('hectares'))}
 
 					<span class="text-marker">
-						{#if hectares >= 1}
+						{#if hectares >= 0.2}
 							{round(hectares, 2)} ha
 						{:else}
 							{round(sqmeters, sqmeters > 1 ? 0 : 2)} m²
