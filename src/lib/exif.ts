@@ -386,7 +386,7 @@ export function setExifFields(bytes: ArrayBuffer, changes: Partial<Record<ExifFi
 		return byteStringToArray(outputstr);
 	} catch (error) {
 		toasts.warn(errorMessage(error, 'Impossible de modifier les données EXIF'));
-		return new Uint8Array(buffer);
+		return new Uint8Array(bytes);
 	}
 }
 
