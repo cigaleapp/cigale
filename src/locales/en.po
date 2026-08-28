@@ -2995,6 +2995,7 @@ msgid "Date format is invalid"
 msgstr ""
 
 #: src/lib/MetadataInput.svelte
+#: src/lib/MetadataInput.svelte
 msgid "Utiliser la position actuelle"
 msgstr ""
 
@@ -3041,6 +3042,21 @@ msgstr ""
 
 #: src/routes/(app)/capture/+page.svelte
 msgid "<0/> Pause"
+msgstr ""
+
+#. 0: round(hectares, 2)
+#: src/lib/WorldMap.svelte
+msgid "{0} ha"
+msgstr ""
+
+#. 0: round(sqmeters, sqmeters > 1 ? 0 \\: 2)
+#: src/lib/WorldMap.svelte
+msgid "{0} m²"
+msgstr ""
+
+#. 0: round(meters * 1e-3, 2)
+#: src/lib/WorldMap.svelte
+msgid "{0} km"
 msgstr ""
 
 #: src/routes/(app)/about/+page.svelte

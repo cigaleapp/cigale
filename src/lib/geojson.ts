@@ -1,3 +1,5 @@
+// @wc-ignore-file
+
 import { type } from 'arktype';
 
 type Point = { longitude: number; latitude: number };
