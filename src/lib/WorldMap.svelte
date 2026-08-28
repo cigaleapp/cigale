@@ -12,7 +12,6 @@
 		MapEvents,
 		MapLibre,
 		Marker,
-		MarkerLayer,
 		Popup,
 	} from 'svelte-maplibre';
 

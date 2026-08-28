@@ -20,8 +20,7 @@ function nsId(id: string) {
 function mockMetadata(
 	id: string,
 	metadataType: MetadataType = 'string',
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	extra: Record<string, any> = {}
+	extra: Record<string, unknown> = {}
 ) {
 	return {
 		id: nsId(id),
@@ -82,11 +81,9 @@ describe('inferHttp', () => {
 			[nsId('species')]: mockValue('vulpesvulpes'),
 			// Not listed in `needs`: should be excluded from the payload/URL
 			[nsId('unused')]: mockValue('should-not-appear'),
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		} as Record<NamespacedMetadataID, any>;
+		} as Record<NamespacedMetadataID, unknown>;
 
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		const result = await inferHttp(db, PROTOCOL_ID, config as any, values);
+		const result = await inferHttp(db, PROTOCOL_ID, config as unknown, values);
 
 		expect(result).toBe(42);
 		expect(fetchMock).toHaveBeenCalledWith('https://api.example.org/weight?name=vulpesvulpes');

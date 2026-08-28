@@ -25,7 +25,7 @@
 
 	function coordsToKey(v: Point): CoordsKey;
 	function coordsToKey(v: Point | undefined): CoordsKey | undefined;
-	function coordsToKey(v: typeof value) {
+	function coordsToKey(v: Point) {
 		return v ? `${v.longitude};${v.latitude}` : undefined;
 	}
 
