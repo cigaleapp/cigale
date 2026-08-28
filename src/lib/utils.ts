@@ -1688,3 +1688,23 @@ if (import.meta.vitest) {
 		expect(isFulfilled(rejected)).toBe(false);
 	});
 }
+
+function gcd(...args: number[]): number {
+	if (args.length > 2) {
+		return args.reduce((a, b) => gcd(a, b));
+	}
+
+	const [a, b] = args;
+
+	return !b ? a : gcd(b, a % b);
+}
+
+export function lcm(...args: number[]): number {
+	if (args.length > 2) {
+		return args.reduce((a, b) => lcm(a, b));
+	}
+
+	const [x, y] = args;
+
+	return (x * y) / gcd(x, y);
+}
