@@ -1,6 +1,8 @@
+
+
 // @wc-ignore-file
 
-import { type } from 'arktype';
+import { Type, type } from 'arktype';
 
 type Point = { longitude: number; latitude: number };
 
@@ -10,12 +12,38 @@ export const GeoJSONFeatureCollection = type('<Feature>', {
 });
 
 const GeoJSONPointFeature = type('<Props>', {
+	type: '"Feature"',
+	properties: 'Props',
 	geometry: {
 		type: "'Point'",
 		coordinates: ['number', 'number'],
 	},
-	properties: 'Props',
 });
+
+const GeoJSONLineStringFeature = type('<Props>', {
+	type: '"Feature"',
+	properties: 'Props',
+	geometry: {
+		type: '"LineString"',
+		coordinates: type(['number', 'number']).array(),
+	},
+});
+
+const GeoJSONPolygonFeature = type('<Props>', {
+	type: '"Feature"',
+	properties: 'Props',
+	geometry: {
+		type: '"Polygon"',
+		coordinates: type(['number', 'number']).array().array(),
+	},
+});
+
+export const GeoJSONFeature = (Props: Type) =>
+	type.or(
+		GeoJSONPointFeature(Props),
+		GeoJSONLineStringFeature(Props),
+		GeoJSONPolygonFeature(Props)
+	);
 
 export const GeocodeJSONProperties = type({
 	geocoding: {

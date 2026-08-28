@@ -11,11 +11,14 @@ import { formatDurationStopwatch } from '../date.js';
 import { getCurrentLocation } from '../geolocation.js';
 import { errorMessage } from '../i18n.js';
 import {
+	compareBy,
+	ensureArray,
 	mapValues,
 	round,
 	safeJSONStringify,
 	splitFilenameOnExtension,
 	transformObject,
+	unique,
 } from '../utils.js';
 
 /**
@@ -300,6 +303,31 @@ export const HELPERS = /** @type {const} */ ({
 			return subject.slice(start, stop);
 		},
 	},
+	mostCommon: {
+		documentation: "Récupérer l'élément le plus commun dans une liste ",
+		usage: [[JSON.stringify([667, 1, 2, 54, 2, 1, 34, 1])], 1],
+		/**
+		 * @param {Array<boolean|string|number>} values
+		 */
+		implementationJsonata(values) {
+			return ensureArray(values)
+				.toSorted(compareBy((value) => values.filter((x) => x === value).length))
+				.at(-1);
+		},
+	},
+	sortByPopularity: {
+		documentation:
+			"Renvoie une liste sans dupliquées triées par ordre décroissant de nombre d'occurences des valeurs",
+		usage: [[JSON.stringify([1, 2, 3, 3, 3, 2, 2, 2, 5, 1])], [2, 3, 1, 5]],
+		/**
+		 * @param {Array<boolean|string|number>} values
+		 */
+		implementationJsonata(values) {
+			return unique(ensureArray(values))
+				.toSorted(compareBy((value) => values.filter((x) => x === value).length))
+				.toReversed();
+		},
+	},
 	parseDate: {
 		documentation: "Construire une date à partir d'un texte et d'un format",
 		usage: [['"202508311121"', '"yyyyMMddHHmm"'], '2025-08-31T11:21:00.000Z'],
@@ -554,8 +582,9 @@ if (import.meta.vitest) {
  * @template {import("arktype").Type} O
  * @param {I} Input
  * @param {O} Output
+ * @param {(d: unknown) => unknown}  [postprocess]
  */
-export const JsonataExpression = (Input, Output) =>
+export const JsonataExpression = (Input, Output, postprocess) =>
 	type.string.pipe((t) => {
 		try {
 			const expr = jsonata(t);
@@ -613,12 +642,16 @@ export const JsonataExpression = (Input, Output) =>
 						raw = mapValues(raw, (v) => v);
 					}
 
+					if (postprocess) {
+						raw = postprocess(raw);
+					}
+
 					const out = Output(raw);
 
 					if (out instanceof ArkErrors) {
 						console.error(
 							`Validation error on output of jsonata expression ${safeJSONStringify(t)}: ${out.summary}`,
-							{ raw, out }
+							{ raw, out, data }
 						);
 						throw new Error(
 							`Résultat (${safeJSONStringify(raw)}) de l'expression Jsonata ${t}, non conforme`,
