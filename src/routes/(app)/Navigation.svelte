@@ -328,7 +328,7 @@
 						</a>
 						<a href={resolve('/protocols/')} pw-testid="goto-protocols">
 							Protocoles
-							{#if page.route.id === '/(app)/protocols'}
+							{#if page.route.id?.startsWith('/(app)/protocols')}
 								<div class="line"></div>
 							{/if}
 						</a>

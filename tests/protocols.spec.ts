@@ -491,6 +491,7 @@ test('can infer metadata from a sidecar file', async ({ page, context, app, temp
 				type: 'FeatureCollection',
 				features: [
 					{
+						type: 'Feature',
 						geometry: {
 							type: 'Point',
 							coordinates: [67.6767144, 38.1228066],

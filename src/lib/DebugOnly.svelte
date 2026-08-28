@@ -34,8 +34,13 @@
 
 <style>
 	.debugonly {
-		font-size: 0.8em;
+		font-size: 0.75rem;
 		font-weight: 200;
+		overflow: auto;
+
+		pre {
+			font-size: 0.8em;
+		}
 
 		&:is(div) {
 			text-align: var(--debugonly-text-align, left);

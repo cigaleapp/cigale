@@ -1,6 +1,7 @@
 import { type } from 'arktype';
 
 import { mapKeys, omit, orEmptyObj2 } from '../utils.js';
+import { Charts } from './charts.js';
 import {
 	FilepathTemplate,
 	HourRange,
@@ -221,6 +222,7 @@ export const Protocol = type({
 	'capture?': {
 		'timers?': CaptureTimer.array(),
 	},
+	'charts?': Charts.array(),
 	importedMetadata: type({
 		sessionwide: [
 			'boolean',
