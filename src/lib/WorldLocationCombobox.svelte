@@ -83,7 +83,7 @@
 		);
 	}
 
-	function selected(p: { key: string }): boolean {
+	function selected(p: { key: CoordsKey }): boolean {
 		return points.map(coordsToKey).includes(p.key);
 	}
 </script>

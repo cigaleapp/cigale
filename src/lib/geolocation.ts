@@ -3,7 +3,7 @@ import type { PermissionStatus } from '@capacitor/geolocation';
 import { Geolocation } from '@capacitor/geolocation';
 
 // XXX: no $lib alias here, this file is imported by $lib/exif which is used in $lib/schemas/*
-import { avg, clamp, degToRad } from './utils.js';
+import { avg, clamp, degToRad, indexOfMin } from './utils.js';
 
 type Point = { latitude: number; longitude: number };
 
@@ -163,4 +163,29 @@ export function lnglat(p: Point) {
 		lng: p.longitude,
 		lat: p.latitude,
 	};
+}
+
+export function hasGeoCoordinate(haystack: Point[], needle: Point) {
+	return haystack.some((p) => distanceBetweenGeoCoordinates(p, needle) === 0);
+}
+
+/**
+ * Add a given point to a list of points forming a polygon.
+ * Adds it between the two extremities of the segment the point
+ * is the closest to.
+ *
+ * Does nothing if the point is already in the polygon
+ */
+export function addPointToGeoPolygon(polygon: Point[], point: Point): Point[] {
+	if (hasGeoCoordinate(polygon, point)) return polygon;
+	if (polygon.length === 0) return [point];
+
+	const i = indexOfMin(
+		polygon.map((p, i) => {
+			const segment = middleOfGeoCoordinates(p, polygon.at(i - 1)!);
+			return distanceBetweenGeoCoordinates(segment, point);
+		})
+	);
+
+	return [...polygon.slice(0, i), point, ...polygon.slice(i)];
 }

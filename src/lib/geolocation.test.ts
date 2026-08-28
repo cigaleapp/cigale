@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { distanceBetweenGeoCoordinates } from './geolocation.js';
+import { distanceBetweenGeoCoordinates, middleOfGeoCoordinates } from './geolocation.js';
 
 // ─── distanceBetweenGeoCoordinates ───────────────────────────────────
 
@@ -54,4 +54,18 @@ describe('distanceBetweenGeoCoordinates', () => {
 			6
 		);
 	});
+});
+
+describe('middleOfGeoCoordinates', () => {
+	const p = (lng: number, lat: number) => ({ longitude: lng, latitude: lat });
+
+	test('2 points', () => {
+		expect(middleOfGeoCoordinates(p(0, 1), p(1, 0))).toStrictEqual(p(0.5, 0.5));
+		expect(middleOfGeoCoordinates(p(0, 1), p(0, 2))).toStrictEqual(p(0, 1));
+	});
+
+	test('3 points', () => {
+		expect(middleOfGeoCoordinates(p(0, 1), p(1, 0), p(2, 2))).toStrictEqual(p(0.5, 0.5));
+		expect(middleOfGeoCoordinates(p(0, 1), p(0, 2))).toStrictEqual(p(0, 1));
+	})
 });

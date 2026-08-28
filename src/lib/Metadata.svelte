@@ -14,7 +14,7 @@
 	import IconMerged from '~icons/ri/stack-line';
 	import Carousel from '$lib/Carousel.svelte';
 	import ConfidencePercentage from '$lib/ConfidencePercentage.svelte';
-	import { distanceBetweenGeoCoordinates, middleOfGeoCoordinates } from '$lib/geolocation.js';
+	import { addPointToGeoPolygon } from '$lib/geolocation.js';
 	import { databaseHandle } from '$lib/idb.svelte.js';
 	import LoadingText from '$lib/LoadingText.svelte';
 	import {
@@ -273,23 +273,8 @@
 						return;
 					}
 
-					// Put point between the two extremities of the closest segment
-
-					const closestPointIndex = indexOfMin(
-						points.map((p, i) =>
-							distanceBetweenGeoCoordinates(
-								middleOfGeoCoordinates(points.at(i - 1)!, p),
-								point
-							)
-						)
-					);
-
 					await onchange?.({
-						value: [
-							...points.slice(0, closestPointIndex),
-							point,
-							...points.slice(closestPointIndex),
-						],
+						value: addPointToGeoPolygon(points, point),
 					});
 				}}
 				markers={points.map((coords, i) => ({

@@ -27,7 +27,7 @@
 	import EnumButtons from './EnumButtons.svelte';
 	import FilePreview from './FilePreview.svelte';
 	import { promptForFiles } from './files.js';
-	import { getCurrentLocation } from './geolocation.js';
+	import { addPointToGeoPolygon, getCurrentLocation } from './geolocation.js';
 	import { formatBytesSize } from './i18n.js';
 	import { databaseHandle } from './idb.svelte.js';
 	import InputRange from './InputRange.svelte';
@@ -550,9 +550,11 @@
 					help="Utiliser la position actuelle"
 					onclick={async () => {
 						const location = await getCurrentLocation();
-						if (location) {
-							await onblur([...((value as RuntimeValue<'surface'>) ?? []), location]);
-						}
+						if (!location) return;
+
+						const existing = (value as RuntimeValue<'surface'>) ?? [];
+
+						await onblur(addPointToGeoPolygon(existing, location));
 					}}
 				>
 					<IconGPS />
