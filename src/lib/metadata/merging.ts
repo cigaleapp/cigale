@@ -26,7 +26,7 @@ export function mergeMetadataFromImagesAndObservations({
 	observations,
 }: {
 	definitions: DB.Metadata[];
-	images: DB.Image[];
+	images: Pick<DB.Image, "metadata" | "id">[];
 	observations: DB.Observation[];
 }) {
 	// TODO improve performance by passing a cache
