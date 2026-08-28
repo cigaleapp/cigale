@@ -16,8 +16,7 @@
 		multiple?: boolean;
 	}
 
-	const { points, onblur, multiple = false, }: Props = $props();
-
+	const { points, onblur, multiple = false }: Props = $props();
 
 	type CoordsKey = `${number};${number}`;
 
@@ -83,6 +82,10 @@
 			})
 		);
 	}
+
+	function selected(p: { key: string }): boolean {
+		return points.map(coordsToKey).includes(p.key);
+	}
 </script>
 
 <Combobox
@@ -114,13 +117,13 @@
 	{#snippet details(item, { select, deselect, allItems })}
 		<div class="location-combobox-map">
 			<WorldMap
-				draw="area"
+				draw={allItems.every(selected) ? 'area' : 'nothing'}
 				scrollToZoom
 				markers={allItems.map(({ key, label }) => ({
 					...keyToCoords(key),
 					key,
 					label,
-					highlighted: key === item.key,
+					highlighted: allItems.length === 1 ? undefined : key === item.key,
 					onDelete() {
 						deselect(key);
 					},

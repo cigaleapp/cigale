@@ -3,6 +3,7 @@
 	import type { ComponentProps } from 'svelte';
 	import type { MarkerClickInfo } from 'svelte-maplibre';
 
+	import convert from 'convert';
 	import { cartesianProduct } from 'es-toolkit';
 	import {
 		FillLayer,
@@ -11,14 +12,20 @@
 		MapEvents,
 		MapLibre,
 		Marker,
+		MarkerLayer,
 		Popup,
 	} from 'svelte-maplibre';
 
 	import IconMapMarker from '~icons/ri/map-pin-2-fill';
 	import { resolveColorVariable } from '$lib/css.js';
 	import { geojsonLineStringFeature, geojsonPolygonFeature } from '$lib/geojson.js';
-	import { distanceBetweenGeoCoordinates } from '$lib/geolocation.js';
-	import { avg, round } from '$lib/utils.js';
+	import {
+		areaBetweenGeoCoordinates,
+		distanceBetweenGeoCoordinates,
+		lnglat,
+		middleOfGeoCoordinates,
+	} from '$lib/geolocation.js';
+	import { avg, range, round } from '$lib/utils.js';
 	import { getTheme } from '$routes/+layout.svelte';
 
 	type Point = { longitude: number; latitude: number };
@@ -41,7 +48,7 @@
 			latitude: number;
 			longitude: number;
 			label?: string;
-			highlighted?: boolean;
+			highlighted?: boolean | undefined;
 			// eslint-disable-next-line no-unused-vars
 			onMove?: (info: MarkerClickInfo) => void;
 			// eslint-disable-next-line no-unused-vars
@@ -159,42 +166,52 @@
 						'line-color': accentColor,
 					}}
 				/>
+
+				<Marker
+					lngLat={{
+						lat: avg(markers.map((m) => m.latitude)),
+						lng: avg(markers.map((m) => m.longitude)),
+					}}
+				>
+					{const sqmeters = $derived(areaBetweenGeoCoordinates(markers))}
+					{const hectares = $derived(convert(sqmeters, 'square meters').to('hectares'))}
+
+					<span class="text-marker">
+						{#if hectares >= 1}
+							{round(hectares, 2)} ha
+						{:else}
+							{round(sqmeters, sqmeters > 1 ? 0 : 2)} m²
+						{/if}
+					</span>
+				</Marker>
 			</GeoJSON>
 		{/if}
 
 		{#if draw === 'segments' && markers.length >= 2}
 			<GeoJSON data={geojsonLineStringFeature(markers)}>
-				{let showPopup = $state(false)}
-
 				<LineLayer
-					onmouseenter={() => {
-						showPopup = true;
-					}}
-					onmouseleave={() => {
-						showPopup = false;
-					}}
 					paint={{
 						'line-width': 3,
 						'line-color': accentColor,
 					}}
 				/>
 
-				<Popup
-					open={showPopup}
-					lngLat={{
-						lat: avg(markers.map((m) => m.latitude)),
-						lng: avg(markers.map((m) => m.longitude)),
-					}}
-				>
-					<span style:color="black">
-						{const meters = round(distanceBetweenGeoCoordinates(...markers), 1)}
-						{#if meters > 1e3}
-							{round(meters * 1e-3, 2)} km
-						{:else}
-							{meters} m
-						{/if}
-					</span>
-				</Popup>
+				{#each range(1, markers.length) as i (i)}
+					{const p1 = $derived(markers[i - 1])}
+					{const p2 = $derived(markers[i])}
+
+					<Marker lngLat={lnglat(middleOfGeoCoordinates(p1, p2))}>
+						{const meters = round(distanceBetweenGeoCoordinates(p1, p2), 1)}
+
+						<span class="text-marker">
+							{#if meters > 1e3}
+								{round(meters * 1e-3, 2)} km
+							{:else}
+								{meters} m
+							{/if}</span
+						>
+					</Marker>
+				{/each}
 			</GeoJSON>
 		{/if}
 	</MapLibre>
@@ -205,5 +222,11 @@
 	.world-map :global(.maplibre) {
 		width: 100%;
 		height: 100%;
+	}
+
+	.text-marker {
+		background-color: var(--bg-neutral);
+		color: var(--fg-neutral);
+		padding: 2px;
 	}
 </style>

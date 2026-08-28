@@ -5,6 +5,10 @@ import { Geolocation } from '@capacitor/geolocation';
 // XXX: no $lib alias here, this file is imported by $lib/exif which is used in $lib/schemas/*
 import { avg, clamp, degToRad } from './utils.js';
 
+type Point = { latitude: number; longitude: number };
+
+const EARTH_RADIUS_METERS = 6_371_000;
+
 export async function getCurrentLocation() {
 	const permission = await Geolocation.checkPermissions().catch((e): PermissionStatus => {
 		console.error('Checking for geolocation permissions failed', e);
@@ -107,11 +111,9 @@ export function geolocationAccuracyFromMake(make: string | undefined): number | 
  * @returns distance in meters. only works on earth (duh)
  */
 export function distanceBetweenGeoCoordinates(
-	{ latitude: a_lat, longitude: a_lng }: { latitude: number; longitude: number },
-	{ latitude: b_lat, longitude: b_lng }: { latitude: number; longitude: number }
+	{ latitude: a_lat, longitude: a_lng }: Point,
+	{ latitude: b_lat, longitude: b_lng }: Point
 ): number {
-	const EARTH_RADIUS_METERS = 6_371_000;
-
 	const haversin = (x: number) => Math.sin(degToRad(x) / 2) ** 2;
 	const cos = (x: number) => Math.cos(degToRad(x));
 
@@ -121,9 +123,44 @@ export function distanceBetweenGeoCoordinates(
 	return EARTH_RADIUS_METERS * c;
 }
 
-export function middleOfGeoCoordinates(...points: Array<{ latitude: number; longitude: number }>) {
+export function middleOfGeoCoordinates(...points: Point[]) {
 	return {
 		longitude: avg(points.map((p) => p.longitude)),
 		latitude: avg(points.map((p) => p.latitude)),
+	};
+}
+
+/**
+ * In meters squared, only works on Earth
+ */
+export function areaBetweenGeoCoordinates(points: Point[]) {
+	// https://github.com/googlemaps/android-maps-utils/blob/7368f6157560c6d132de55f27e1147cd6a43c961/library/src/com/google/maps/android/SphericalUtil.java#L222
+
+	const tanLat = (p: Point) => Math.tan((Math.PI / 2 - degToRad(p.latitude)) / 2);
+
+	const polarTriangleArea = (p1: Point, p2: Point) => {
+		const Δ_lng = degToRad(p2.longitude - p1.longitude);
+		const t = tanLat(p1) * tanLat(p2);
+
+		return 2 * Math.atan2(t * Math.sin(Δ_lng), 1 + t * Math.cos(Δ_lng));
+	};
+
+	if (points.length < 3) return 0;
+
+	let total = 0;
+	let previous = points.at(-1)!;
+
+	for (const point of points) {
+		total += polarTriangleArea(point, previous);
+		previous = point;
+	}
+
+	return Math.abs(total * EARTH_RADIUS_METERS ** 2);
+}
+
+export function lnglat(p: Point) {
+	return {
+		lng: p.longitude,
+		lat: p.latitude,
 	};
 }
