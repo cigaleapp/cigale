@@ -165,7 +165,7 @@ export function lnglat(p: Point) {
 	};
 }
 
-export function hasGeoCoordinate(haystack: Point[], needle: Point) {
+function hasGeoCoordinate(haystack: Point[], needle: Point) {
 	return haystack.some((p) => distanceBetweenGeoCoordinates(p, needle) === 0);
 }
 

@@ -34,7 +34,6 @@
 		compareBy,
 		corsfixIfLocalhost,
 		ensureArray,
-		indexOfMin,
 		orEmpty,
 		pick,
 		safeJSONParse,
