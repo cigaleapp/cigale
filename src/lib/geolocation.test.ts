@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest';
 
 import {
+	addPointToGeoPolygon,
 	areaBetweenGeoCoordinates,
 	distanceBetweenGeoCoordinates,
 	middleOfGeoCoordinates,
@@ -91,11 +92,48 @@ describe('areaBetweenGeoCoordinates', () => {
 		expect(
 			areaBetweenGeoCoordinates([
 				p(1.4448383066965675, 43.60217100864341),
-				p(1.4476261190043829, 43.601703139765846),
-				p(1.4514607729122702, 43.603276174129206),
+				p(1.4476261190043829, 43.60170313976584),
+				p(1.4514607729122702, 43.60327617412922),
 				p(1.4469470703627678, 43.60456310440037),
-				p(1.4445, 43.6039),
+				p(1.4445080951651561, 43.60390104116154),
 			])
-		).toBeCloseTo(108_093.768);
+		).toBeCloseTo(108_016.908);
+	});
+});
+
+describe('addPointToGeoPolygon', () => {
+	test('add to 0 points', () => {
+		expect(addPointToGeoPolygon([], p(0, 0))).toStrictEqual([p(0, 0)]);
+	});
+
+	test('add to <3 point', () => {
+		expect(addPointToGeoPolygon([p(1, 0)], p(0, 0))).toStrictEqual([p(0, 0), p(1, 0)]);
+		expect(addPointToGeoPolygon([p(1, 0), p(2, 0)], p(0, 0))).toStrictEqual([
+			p(0, 0),
+			p(1, 0),
+			p(2, 0),
+		]);
+	});
+
+	test('add to n-gon', () => {
+		expect(
+			addPointToGeoPolygon(
+				[
+					p(1.4448383066965675, 43.60217100864341),
+					p(1.4476261190043829, 43.60170313976584),
+					p(1.4514607729122702, 43.60327617412922),
+					p(1.4469470703627678, 43.60456310440037),
+					p(1.4445080951651561, 43.60390104116154),
+				],
+				p(1.4515361548542671, 43.60157388613547)
+			)
+		).toStrictEqual([
+			p(1.4448383066965675, 43.60217100864341),
+			p(1.4476261190043829, 43.60170313976584),
+			p(1.4515361548542671, 43.60157388613547),
+			p(1.4514607729122702, 43.60327617412922),
+			p(1.4469470703627678, 43.60456310440037),
+			p(1.4445080951651561, 43.60390104116154),
+		]);
 	});
 });
