@@ -20,6 +20,7 @@
 	import { FULL_IMAGE_CROPBOX, toRelativeCoords } from '$lib/BoundingBoxes.svelte.js';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
+	import Charts from '$lib/charts/Charts.svelte';
 	import CroppedImg from '$lib/CroppedImg.svelte';
 	import { downloadAsFile } from '$lib/download.js';
 	import EnumButtons from '$lib/EnumButtons.svelte';
@@ -298,6 +299,16 @@
 				/>
 			{/if}
 		</section>
+
+		{#if uiState.currentProtocol?.charts?.session}
+			<header>
+				<h2>Statistiques</h2>
+			</header>
+
+			<section class="stats">
+				<Charts scope="session" protocol={uiState.currentProtocol.id} />
+			</section>
+		{/if}
 	</section>
 
 	<section class="export" pw-testid="export-results" class:collapsed={collapsedExportPanel}>
