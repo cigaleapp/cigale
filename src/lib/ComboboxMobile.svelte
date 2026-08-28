@@ -302,8 +302,8 @@
 						handleClick(item.key);
 					},
 					deselect(key) {
-						handleClick(key)
-					}
+						handleClick(key);
+					},
 				})}
 			{:else}
 				<LoadingScreen empty="Aucune option sélectionée" />

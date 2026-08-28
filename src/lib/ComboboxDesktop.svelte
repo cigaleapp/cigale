@@ -214,7 +214,7 @@
 							},
 							deselect() {
 								// TODO
-							}
+							},
 						})}
 					{:else}
 						<section class="empty">
