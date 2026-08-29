@@ -173,7 +173,7 @@
 								help="Voir {option.label || option.key}"
 								onclick={() =>
 									goto(
-										'/(app)/protocols/[id]/metadata/[metadata]/options/[option]',
+										'/(app)/protocols/[id]/edit/metadata/[metadata]/options/[option]',
 										{
 											id: page.params.id ?? '',
 											metadata: shortId,
@@ -213,7 +213,7 @@
 									help="Voir {option.label || option.key}"
 									onclick={() =>
 										goto(
-											'/(app)/protocols/[id]/metadata/[metadata]/options/[option]',
+											'/(app)/protocols/[id]/edit/metadata/[metadata]/options/[option]',
 											{
 												id: page.params.id ?? '',
 												metadata: shortId,
