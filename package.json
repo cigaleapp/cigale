@@ -175,7 +175,7 @@
 		"@wuchale/svelte": "^0.20.5",
 		"arktype": "^2.2.3",
 		"arrival-time": "^1.0.6",
-		"baseline-browser-mapping": "^2.11.14",
+		"baseline-browser-mapping": "^2.11.18",
 		"bits-ui": "^1.8.0",
 		"caniuse-lite": "^1.0.30001806",
 		"clicked": "^4.0.3",
