@@ -772,7 +772,7 @@ test.describe('narrowing view', pr(1570), () => {
 				.click();
 
 			await expect(app.modals.byTitle('Andrena vetula')).not.toBeVisible({
-				timeout: ms('10s')
+				timeout: ms('10s'),
 			});
 
 			await expectMetadataValues(app, {
