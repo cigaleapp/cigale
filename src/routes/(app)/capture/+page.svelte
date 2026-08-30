@@ -309,6 +309,10 @@
 				void Haptics.impact({ style: ImpactStyle.Medium });
 			},
 			async onfinished(t) {
+				if (settings.shoot === 'on-timer') {
+					await capture(camera, pendingStorage);
+				}
+
 				if (getSettings().timerSounds) sfx('timer-finished');
 				setShootingPhase('after-timer');
 				await Haptics.impact({ style: ImpactStyle.Heavy });
