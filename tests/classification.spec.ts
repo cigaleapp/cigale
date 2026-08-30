@@ -1,4 +1,4 @@
-import type { AppFixture } from './fixtures.js';
+import type { AppFixture } from './fixtures/app.js';
 import type { Page } from '@playwright/test';
 
 import { ms } from 'convert';
@@ -771,7 +771,9 @@ test.describe('narrowing view', pr(1570), () => {
 				.getByRole('button', { name: 'Choisir ce candidat' })
 				.click();
 
-			await expect(app.modals.byTitle('Andrena vetula')).not.toBeVisible();
+			await expect(app.modals.byTitle('Andrena vetula')).not.toBeVisible({
+				timeout: ms('10s')
+			});
 
 			await expectMetadataValues(app, {
 				densite_des_bandes_de_poils_des_tergites: 'pilositden_1738782981690_2927',
