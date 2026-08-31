@@ -1,7 +1,7 @@
-name: Signaler un bug
-description: Signalement d'un bug sur l'appli
+name: Proposer une fonctionnalité
+description: Proposer une nouvelle fonctionnalité sur l'appli
 
-type: bug
+type: feature
 
 body:
   - type: textarea
