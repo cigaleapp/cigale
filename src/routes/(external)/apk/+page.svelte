@@ -2,6 +2,7 @@
 	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
 	import { openFileFromUrl } from '$lib/download.js';
 	import QRCode from '$lib/QRCode.svelte';
+	import { APK_DOWNLOAD_URL } from '$lib/update-bundles.js';
 
 	const { data } = $props();
 	const info = $derived(data.info);
@@ -10,14 +11,12 @@
 <main>
 	<h1>Télécharger l'app mobile</h1>
 
-	<ButtonPrimary
-		onclick={async () => openFileFromUrl('https://apk.cigale.gwen.works/cigale.apk')}
-	>
+	<ButtonPrimary onclick={async () => openFileFromUrl(APK_DOWNLOAD_URL)}>
 		Télécharger
 	</ButtonPrimary>
 
 	<section class="qrcode">
-		<QRCode kind="url" url="https://apk.cigale.gwen.works/cigale.apk" />
+		<QRCode kind="url" url={APK_DOWNLOAD_URL} />
 	</section>
 
 	{#if info}

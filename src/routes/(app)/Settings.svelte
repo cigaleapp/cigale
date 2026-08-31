@@ -23,6 +23,7 @@
 	import IconOffline from '~icons/ri/wifi-off-line';
 	import { version } from '$app/environment';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
+	import { openFileFromUrl } from '$lib/download.js';
 	import DropdownMenu from '$lib/DropdownMenu.svelte';
 	import { formatBytesSize, plural } from '$lib/i18n.js';
 	import { tables } from '$lib/idb.svelte.js';
@@ -387,7 +388,7 @@
 
 						if (!updater.compatible(updateBundle)) {
 							// TODO: once we're on the stores, open the relevant store page here
-							window.open('https://cigaleapp.github.io/cigale/apk', '_blank');
+							await openFileFromUrl(APK_DOWNLOAD_URL);
 							return;
 						}
 
