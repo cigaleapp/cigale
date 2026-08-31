@@ -37,6 +37,7 @@
 	import { getSettings, setSetting } from '$lib/settings.svelte';
 	import { toasts } from '$lib/toasts.svelte.js';
 	import * as updater from '$lib/update-bundles.js';
+	import { APK_DOWNLOAD_URL } from '$lib/update-bundles.js';
 	import { orEmpty, platform, switchValue } from '$lib/utils.js';
 	import { getTheme } from '$routes/+layout.svelte';
 
