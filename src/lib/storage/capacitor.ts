@@ -1,15 +1,27 @@
-import type { BinaryStorageBackend } from './types.js';
+import type { BinaryStorageBackend, BinaryStorageLocator } from './types.js';
 
 import { Capacitor } from '@capacitor/core';
 import { Directory, Filesystem } from '@capacitor/filesystem';
 
-import { locatorToPath } from './utils.js';
+import { locatorToPath as _locatorToPath } from './utils.js';
 
-export function CapacitorFilesystemBackend(): BinaryStorageBackend<'capacitor'> {
+function locatorToPath(locator: BinaryStorageLocator) {
+	return ['Cigale', _locatorToPath(locator)].join('/');
+}
+
+export async function CapacitorFilesystemBackend(): Promise<BinaryStorageBackend<'capacitor'>> {
 	if (!Capacitor.isNativePlatform())
 		throw new Error('Capacitor filesystem binary storage backend is not supported on Web');
 
 	const root = Directory.Documents;
+
+	console.debug(
+		`opening capacitor binarystorage backend in ${root}. files:\n`,
+		await Filesystem.readdir({
+			directory: root,
+			path: 'Cigale',
+		}).then((result) => result.files.map((f) => `${f.size}\t${f.name}`).join('\n'))
+	);
 
 	return {
 		name: 'capacitor',

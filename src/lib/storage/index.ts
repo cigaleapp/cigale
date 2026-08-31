@@ -95,7 +95,7 @@ async function initializeBinaryStorage() {
 	if (currentBackend) return;
 
 	if (Capacitor.isNativePlatform()) {
-		currentBackend = CapacitorFilesystemBackend();
+		currentBackend = await CapacitorFilesystemBackend();
 	} else {
 		currentBackend = await OPFSBackend();
 	}
