@@ -6,7 +6,7 @@ import { CapacitorUpdater } from '@capgo/capacitor-updater';
 
 import { UpdateBundleMetadata } from './schemas/update-bundle.js';
 
-export const APK_DOWNLOAD_URL = "https://apk.cigale.gwen.works/cigale.apk"
+export const APK_DOWNLOAD_URL = 'https://apk.cigale.gwen.works/cigale.apk';
 
 /**
  * Check for new update bundles
