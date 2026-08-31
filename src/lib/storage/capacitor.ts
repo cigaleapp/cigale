@@ -15,7 +15,10 @@ export async function CapacitorFilesystemBackend(): Promise<BinaryStorageBackend
 
 	const root = Directory.Documents;
 
-	const inww = typeof WorkerGlobalScope !== undefined && self instanceof WorkerGlobalScope;
+	const inww =
+		'WorkerGlobalScope' in self &&
+		typeof WorkerGlobalScope !== undefined &&
+		self instanceof WorkerGlobalScope;
 
 	console.debug(
 		`opening (in ${inww ? 'ww' : 'ui'} context) capacitor binarystorage backend in ${root}. files:\n`,
