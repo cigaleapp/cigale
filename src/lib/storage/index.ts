@@ -18,6 +18,10 @@ let currentBackend: undefined | BinaryStorageBackend<BinaryStorageName>;
 
 export const binaryStorage: BinaryStorage = {
 	name: currentBackend?.name ?? 'uninitialized',
+	async resolvePath(...args) {
+		if (!currentBackend) await initializeBinaryStorage();
+		return currentBackend!.resolvePath(...args);
+	},
 	async exists(...args) {
 		if (!currentBackend) await initializeBinaryStorage();
 		return currentBackend!.exists(...args);
