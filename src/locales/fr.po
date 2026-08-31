@@ -2596,7 +2596,6 @@ msgid "Evil Martians"
 msgstr "Evil Martians"
 
 #: src/routes/(app)/about/+page.svelte
-#: src/routes/(app)/about/+page.svelte
 msgid "par"
 msgstr "par"
 
@@ -3060,17 +3059,5 @@ msgid "{0} km"
 msgstr "{0} km"
 
 #: src/routes/(app)/about/+page.svelte
-msgid "et"
-msgstr "et"
-
-#: src/routes/(app)/about/+page.svelte
-msgid "Remix Icon"
-msgstr "Remix Icon"
-
-#: src/routes/(app)/about/+page.svelte
-msgid "Jimmy Cheung"
-msgstr "Jimmy Cheung"
-
-#: src/routes/(app)/about/+page.svelte
-msgid "Wendy Gao"
-msgstr "Wendy Gao"
+msgid "<0>Remix Icon</0> par <1>Jimmy Cheung</1> et <2>Wendy Gao</2>"
+msgstr "<0>Remix Icon</0> par <1>Jimmy Cheung</1> et <2>Wendy Gao</2>"
