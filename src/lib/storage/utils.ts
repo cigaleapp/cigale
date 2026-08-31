@@ -51,16 +51,15 @@ export async function createBytes<Table extends (typeof BINARY_CONTENT_TABLES)[n
 	table: Table,
 	input: CreateBytesObjectFields<Table> & { bytes: ArrayBuffer; type: `image/${string}` }
 ): Promise<CreateBytesObjectFields<Table> & { bytes: 'migrated' }> {
-	console.debug('createBytes', table, input);
+	const locator = {
+		area: table,
+		sessionId: 'sessionId' in input ? input.sessionId : undefined,
+		name: input.filename,
+	};
 
-	const written = await binaryStorage.create(
-		{
-			area: table,
-			sessionId: 'sessionId' in input ? input.sessionId : undefined,
-			name: input.filename,
-		},
-		pick(input, 'type', 'bytes')
-	);
+	console.debug('createBytes', table, input, 'at:', await binaryStorage.resolvePath(locator));
+
+	const written = await binaryStorage.create(locator, pick(input, 'type', 'bytes'));
 
 	return {
 		...input,
@@ -118,13 +117,15 @@ export async function accessBytes<Table extends (typeof BINARY_CONTENT_TABLES)[n
 		return object.bytes;
 	}
 
-	console.debug(`accessBytes ${table}`, object);
-
-	return binaryStorage.bytes({
+	const locator = {
 		area: table,
 		sessionId: 'sessionId' in object ? object.sessionId : undefined,
 		name: object.filename,
-	});
+	};
+
+	console.debug(`accessBytes ${table}`, object, 'at:', await binaryStorage.resolvePath(locator));
+
+	return binaryStorage.bytes(locator);
 }
 
 /**
