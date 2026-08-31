@@ -148,11 +148,6 @@ sessionMetadata:
     kobocollect:
       list: Code projet
       choice: psibiom
-    learnMore: https://www.terroiko.fr/fr/recherche-et-developpement/psibiom
-    images:
-      [
-        https://cors.gwen.works/www.terroiko.fr/sites/default/files/inline-images/PSIBIOM%20logo%20%28fond%20noir%29.jpg,
-      ]
     description: ''
     mergeMethod: min
     required: true
@@ -178,11 +173,6 @@ sessionMetadata:
     kobocollect:
       list: Code projet
       choice: adept
-    learnMore: https://fundatia-adept.org/projects/
-    images:
-      [
-        https://cors.gwen.works/fundatia-adept.org/wp-content/uploads/2018/02/logo-transparent-adept.png,
-      ]
     description: ''
     mergeMethod: min
     required: true
@@ -195,8 +185,6 @@ sessionMetadata:
     kobocollect:
       list: Code projet
       choice: wildnet
-    learnMore: https://wildnet.org/
-    images: [https://cors.gwen.works/wildnet.org/wp-content/themes/wcn/theme/images/wcn-favicon.svg]
     description: ''
     mergeMethod: min
     required: true
