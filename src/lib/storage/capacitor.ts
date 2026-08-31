@@ -9,10 +9,18 @@ export function CapacitorFilesystemBackend(): BinaryStorageBackend<'capacitor'> 
 	if (!Capacitor.isNativePlatform())
 		throw new Error('Capacitor filesystem binary storage backend is not supported on Web');
 
-	const root = Directory.Data;
+	const root = Directory.Documents;
 
 	return {
 		name: 'capacitor',
+		async resolvePath(locator) {
+			const result = await Filesystem.getUri({
+				directory: root,
+				path: locatorToPath(locator),
+			});
+
+			return result.uri;
+		},
 		async exists(locator) {
 			try {
 				const stat = await Filesystem.stat({

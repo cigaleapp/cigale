@@ -5,6 +5,10 @@ export type BinaryStorageName = 'opfs' | 'capacitor' | 'uninitialized';
 
 export interface BinaryStorageBackend<Name extends BinaryStorageName = BinaryStorageName> {
 	name: Name;
+	/**
+	 * For debug purposes.
+	 */
+	resolvePath(locator: BinaryStorageLocator): Promise<string>;
 	exists(locator: BinaryStorageLocator): Promise<boolean>;
 	bytes(locator: BinaryStorageLocator): Promise<ArrayBuffer>;
 	text(locator: BinaryStorageLocator): Promise<string>;
