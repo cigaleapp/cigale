@@ -15,12 +15,16 @@ export async function CapacitorFilesystemBackend(): Promise<BinaryStorageBackend
 
 	const root = Directory.Documents;
 
+	const inww = typeof WorkerGlobalScope !== undefined && self instanceof WorkerGlobalScope;
+
 	console.debug(
-		`opening capacitor binarystorage backend in ${root}. files:\n`,
+		`opening (in ${inww ? 'ww' : 'ui'} context) capacitor binarystorage backend in ${root}. files:\n`,
 		await Filesystem.readdir({
 			directory: root,
 			path: 'Cigale',
-		}).then((result) => result.files.map((f) => `${f.size}\t${f.name}`).join('\n'))
+		})
+			.then((result) => result.files.map((f) => `${f.size}\t${f.name}`).join('\n'))
+			.catch(() => '<nonexistent>')
 	);
 
 	return {
