@@ -165,9 +165,8 @@ sessionMetadata:
     kobocollect:
       list: Code projet
       choice: renat
-    learnMore: https://renat.wiki/
-    images: [https://renot.gogocarto.fr/uploads/renot/images/config/logo-fond-blanc.png]
-    description: Parc Naturel Régional des Pyrénées Ariégeoises
+    learnMore: https://sites.google.com/view/projetrenat/accueil/
+    description: porté par la SETE-CNRS au sein du réseau TERRA FORMA
     mergeMethod: min
     required: true
     default: false
