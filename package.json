@@ -99,8 +99,8 @@
 		"@types/piexifjs": "^1.0.0",
 		"@types/turndown": "^5.0.6",
 		"@types/yauzl-promise": "^4.0.1",
-		"@vitest/coverage-v8": "^4.1.10",
-		"@vitest/ui": "^4.1.10",
+		"@vitest/coverage-v8": "^4.1.11",
+		"@vitest/ui": "^4.1.11",
 		"all-contributors-cli": "^6.26.1",
 		"arkenv": "^0.12.3",
 		"braces": "^3.0.3",
@@ -145,7 +145,7 @@
 		"vite": "^8.2.2",
 		"vite-bundle-analyzer": "^1.3.9",
 		"vite-plugin-cross-origin-isolation": "^0.1.6",
-		"vitest": "^4.1.10",
+		"vitest": "^4.1.11",
 		"yauzl-promise": "^4.0.0"
 	},
 	"dependencies": {
