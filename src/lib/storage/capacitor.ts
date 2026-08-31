@@ -75,7 +75,7 @@ export function CapacitorFilesystemBackend(): BinaryStorageBackend<'capacitor'> 
 			const stat = await Filesystem.stat({
 				directory: root,
 				path: locatorToPath(locator),
-			});
+			}).catch(() => ({ size: 0 }));
 
 			return stat.size;
 		},
