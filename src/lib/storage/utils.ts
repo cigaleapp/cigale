@@ -1,5 +1,5 @@
 import type { BinaryStorageLocator } from './types.js';
-import type { Tables } from '$lib/database.js';
+import type { BINARY_CONTENT_TABLES, Tables } from '$lib/database.js';
 import type { DatabaseHandle, IDBDatabaseType } from '$lib/idb.svelte.js';
 
 import { pick } from '$lib/utils.js';
@@ -9,7 +9,7 @@ import { binaryStorage } from './index.js';
 /**
  * Get the size in bytes of the given database object
  */
-export async function byteSizeOfObject<Table extends BinaryStorageLocator['area']>(
+export async function byteSizeOfObject<Table extends (typeof BINARY_CONTENT_TABLES)[number]>(
 	table: Table,
 	object: Pick<IDBDatabaseType[Table]['value'], 'sessionId' | 'filename' | 'bytes'>
 ): Promise<number> {
@@ -24,7 +24,7 @@ export async function byteSizeOfObject<Table extends BinaryStorageLocator['area'
 	});
 }
 
-type CreateBytesObjectFields<Table extends BinaryStorageLocator['area']> = Pick<
+type CreateBytesObjectFields<Table extends (typeof BINARY_CONTENT_TABLES)[number]> = Pick<
 	IDBDatabaseType[Table]['value'],
 	'filename' | 'sessionId'
 >;
@@ -47,7 +47,7 @@ type CreateBytesObjectFields<Table extends BinaryStorageLocator['area']> = Pick<
  * @param filename
  * @param content
  */
-export async function createBytes<Table extends BinaryStorageLocator['area']>(
+export async function createBytes<Table extends (typeof BINARY_CONTENT_TABLES)[number]>(
 	table: Table,
 	input: CreateBytesObjectFields<Table> & { bytes: ArrayBuffer; type: `image/${string}` }
 ): Promise<CreateBytesObjectFields<Table> & { bytes: 'migrated' }> {
@@ -86,7 +86,7 @@ export async function createBytes<Table extends BinaryStorageLocator['area']>(
  *
  * Writes the binary content of the object in binary storage.
  */
-export async function storeBytes<Table extends BinaryStorageLocator['area']>(
+export async function storeBytes<Table extends (typeof BINARY_CONTENT_TABLES)[number]>(
 	table: Table,
 	object: (typeof Tables)[Table]['inferIn'],
 	content: ArrayBuffer
@@ -97,7 +97,9 @@ export async function storeBytes<Table extends BinaryStorageLocator['area']>(
 			sessionId: 'sessionId' in object ? object.sessionId : undefined,
 			name: object.filename,
 		},
-		content
+		new File([content], object.filename, {
+			type: object.contentType,
+		})
 	);
 
 	return 'migrated';
@@ -108,7 +110,7 @@ export async function storeBytes<Table extends BinaryStorageLocator['area']>(
  * Handles objects that have their binary data stored in the binary storage
  * @param object the table
  */
-export async function accessBytes<Table extends BinaryStorageLocator['area']>(
+export async function accessBytes<Table extends (typeof BINARY_CONTENT_TABLES)[number]>(
 	table: Table,
 	object: Pick<(typeof Tables)[Table]['inferIn' | 'inferOut'], 'sessionId' | 'filename' | 'bytes'>
 ): Promise<ArrayBuffer> {
@@ -132,7 +134,7 @@ export async function accessBytes<Table extends BinaryStorageLocator['area']>(
  * @param id
  * @returns the object (undefined if not found), with the bytes field always a {@link ArrayBuffer}
  */
-export async function resolveObjectWithBytes<Table extends BinaryStorageLocator['area']>(
+export async function resolveObjectWithBytes<Table extends (typeof BINARY_CONTENT_TABLES)[number]>(
 	db: DatabaseHandle,
 	table: Table,
 	id: string

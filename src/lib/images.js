@@ -9,8 +9,8 @@ import { tables } from './idb.svelte.js';
 import { imageLimits } from './inference_utils.js';
 import { removeImagesFromObservation } from './observations.js';
 import { RAW_IMAGE_MEDIA_TYPES } from './raw.js';
-import { accessBytes, createBytes, storeBytes } from './storage/utils.js';
-import { clamp, throwError, unique } from './utils.js';
+import { accessBytes, createBytes } from './storage/utils.js';
+import { clamp, throwError } from './utils.js';
 
 /**
  * @import { Image, Protocol } from './database.js';
