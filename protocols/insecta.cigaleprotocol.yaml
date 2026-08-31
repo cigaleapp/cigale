@@ -148,6 +148,7 @@ sessionMetadata:
     kobocollect:
       list: Code projet
       choice: psibiom
+    learnMore: https://www.terroiko.fr/fr/recherche-et-developpement/psibiom
     description: ''
     mergeMethod: min
     required: true
