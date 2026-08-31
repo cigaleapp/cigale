@@ -3,8 +3,8 @@
 	"id": "io.github.cigaleapp.arthropods.example",
 	"name": "Example: arthropodes",
 	"summary": "Protocole de base pour arthropodes",
-	"learnMore": "https://github.com/cigaleapp/cigale/tree/4a8098f7ee35e70a91e46b5e2f39635f4b78d41c/scripts/README.md#protocoles-arthropodsexample",
-	"version": 138,
+	"learnMore": "https://github.com/cigaleapp/cigale/tree/0ef0e5f64d0cf8f266d00877ecafa3e3ec6ca97a/scripts/README.md#protocoles-arthropodsexample",
+	"version": 139,
 	"updates": "automatic",
 	"source": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json",
 	"description": "Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification\n\nClés d'identification d'abeilles fournies par IDmyBee.com, extraites depuis [IDMYBEE - Andrena sur Xper3](https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html).",
@@ -490200,6 +490200,36 @@
 						"class": "216",
 						"phylum": "54",
 						"kingdom": "1"
+					}
+				},
+				{
+					"label": "Tropidia fasciata",
+					"key": "318750101",
+					"images": [
+						"https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Tropidia%20fasciata_0.png",
+						"https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Tropidia%20fasciata_1.png"
+					],
+					"description": "**_Tropidia fasciata_** **(Meigen, 1822)**\n\n**Risques de confusions** :\n\n\\- **_Tropidia scita_** a le thorax noir et brillant, le fémur 3 entièrement noir, la nervure r4+5 presque droite et les antennes sombres\n\n\\- La dent apicale sur la face ventrale du fémur 3 permet de reconnaitre les _Tropidia_ des autres genres à fémur 3 épaissi (**_Syritta pipiens, Eumerus, Xylota, Brachypalpoides, Chalcosyrphus_**)\n\n**Taille** : 10 à 12mm\n\n**Habitat, répartition** : Zones humides\n\nAssez commun, un peu partout en France sauf en région méditeranéenne.  \n  \nDistribué du sud de la Finlande jusqu’aux Pyrénées. Elle semble cependant très rare ailleurs qu’en France.\n\n**Biologie** : La femelle a été observée en train de pondre dans la boue humide contenant beaucoup de débris organiques, sous de petits saules au bord d’un cours d’eau à faible courant. L’adulte vole de juin à septembre.\n\n**Photographies :**\n\n[Patrick Le Mao](https://www.inaturalist.org/people/patricklm35) \\- [CC0](https://creativecommons.org/publicdomain/zero/1.0/) \\- Photo principale\n\n© [M. Blondel](https://www.inaturalist.org/people/mariie76) \\- [CC-BY-NC](https://creativecommons.org/licenses/by-nc/4.0/) \\- Profil du fémur 3\n\n© [Bastien Louboutin](https://www.inaturalist.org/people/b_louboutin) \\- [CC-BY-NC](https://creativecommons.org/licenses/by-nc/4.0/) \\- Individu en vol, mâle, femelle\n\n**Sources :**\n\n[Inaturalist](https://www.inaturalist.org/taxa/1077811-Tropidia-fasciata)\n\n[GBIF](https://www.gbif.org/species/1542199)\n\n[Clé des syrphes de Belgique et des Pays-Bas](https://sapoll.eu/cle-des-syrphes-de-belgique-et-des-pays-bas/)\n\n[Clé StN pour la détermination des espèces européennes de plusieurs genres de syrphes](https://pollinators.ie/wordpress/wp-content/uploads/2018/05/StN-2017-KEYS-to-SPECIES.pdf)\n\n[Species account of european syrphidae (Diptera), Glasgow 2011](https://diptera.info/downloads/StN_Species_Accounts_Glasgow_2011.pdf)",
+					"links": {
+						"Patrick Le Mao": "https://www.inaturalist.org/people/patricklm35",
+						"CC0": "https://creativecommons.org/publicdomain/zero/1.0/",
+						"M. Blondel": "https://www.inaturalist.org/people/mariie76",
+						"CC-BY-NC": "https://creativecommons.org/licenses/by-nc/4.0/",
+						"Bastien Louboutin": "https://www.inaturalist.org/people/b_louboutin",
+						"Inaturalist": "https://www.inaturalist.org/taxa/1077811-Tropidia-fasciata",
+						"GBIF": "https://www.gbif.org/species/1542199",
+						"Clé des syrphes de Belgique et des Pays-Bas": "https://sapoll.eu/cle-des-syrphes-de-belgique-et-des-pays-bas/",
+						"Clé StN pour la détermination des espèces européennes de plusieurs genres de syrphes": "https://pollinators.ie/wordpress/wp-content/uploads/2018/05/StN-2017-KEYS-to-SPECIES.pdf",
+						"Species account of european syrphidae (Diptera), Glasgow 2011": "https://diptera.info/downloads/StN_Species_Accounts_Glasgow_2011.pdf"
+					},
+					"learnMore": "https://www.gbif.org/species/1542199",
+					"cascade": {
+						"genus": "336398569",
+						"family": "336398566",
+						"order": "336398528",
+						"class": "336398527",
+						"phylum": "336398526",
+						"kingdom": "336398525"
 					}
 				},
 				{
