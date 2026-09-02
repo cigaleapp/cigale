@@ -253,7 +253,7 @@
 								label="Réglages d'import"
 								tab="import"
 								models={[]}
-								currentModelIndex={-1}
+								currentModel={{ kind: 'disabled' }}
 								setModel={async () => {}}
 							/>
 						</div>
@@ -283,8 +283,10 @@
 								label="Réglages de recadrage"
 								tab="crop"
 								models={uiState.cropModels}
-								currentModelIndex={uiState.selectedCropModel}
-								setModel={async (i) => uiState.setModelSelections({ crop: i })}
+								currentModel={uiState.selectedCropModel}
+								setModel={async (selector) => {
+									uiState.selectNeuralModel(uiState.cropMetadataId, selector);
+								}}
 							/>
 						</div>
 						<div class="separator"><IconNext /></div>
@@ -304,9 +306,7 @@
 								tab="classify"
 								label="Réglages de classification"
 								models={uiState.classificationModels}
-								currentModelIndex={uiState.selectedClassificationModel}
-								setModel={async (i) =>
-									uiState.setModelSelections({ classification: i })}
+								currentModel={uiState.selectedClassificationModel}
 							/>
 						</div>
 						<div class="separator"><IconNext /></div>
@@ -379,7 +379,7 @@ Tab bar is only when a session is active
 					<a
 						href={resolve('/capture/')}
 						pw-testid="mobile-goto-camera"
-						aria-disabled={!isDebugMode() && importTabDisabled}
+						// aria-disabled={!isDebugMode() && importTabDisabled}
 						class:active={page.route.id === '/(app)/capture'}
 					>
 						{#if page.route.id === '/(app)/capture'}
@@ -393,7 +393,7 @@ Tab bar is only when a session is active
 					<a
 						href={resolve('/import/')}
 						pw-testid="mobile-goto-import"
-						aria-disabled={!isDebugMode() && importTabDisabled}
+						// aria-disabled={!isDebugMode() && importTabDisabled}
 						class:active={page.route.id === '/(app)/(sidepanel)/import'}
 					>
 						{#if page.route.id === '/(app)/(sidepanel)/import'}
@@ -408,7 +408,7 @@ Tab bar is only when a session is active
 				<a
 					href={resolve('/crop/')}
 					pw-testid="mobile-goto-crop"
-					aria-disabled={!isDebugMode() && cropTabDisabled}
+					// aria-disabled={!isDebugMode() && cropTabDisabled}
 					class:active={page.route.id === '/(app)/(sidepanel)/crop'}
 				>
 					{#if page.route.id === '/(app)/(sidepanel)/crop'}
@@ -422,7 +422,7 @@ Tab bar is only when a session is active
 				<a
 					href={resolve('/classify/')}
 					pw-testid="mobile-goto-classify"
-					aria-disabled={!isDebugMode() && classifyTabDisabled}
+					// aria-disabled={!isDebugMode() && classifyTabDisabled}
 					class:active={page.route.id === '/(app)/(sidepanel)/classify'}
 				>
 					{#if page.route.id === '/(app)/(sidepanel)/classify'}
@@ -436,7 +436,7 @@ Tab bar is only when a session is active
 				<a
 					href={resolve('/results/')}
 					pw-testid="mobile-goto-results"
-					aria-disabled={!isDebugMode() && resultsTabDisabled}
+					// aria-disabled={!isDebugMode() && resultsTabDisabled}
 					class:active={page.route.id === '/(app)/results'}
 				>
 					{#if page.route.id === '/(app)/results'}

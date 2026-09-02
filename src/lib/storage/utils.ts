@@ -1,15 +1,20 @@
 import type { BinaryStorageLocator } from './types.js';
-import type { BINARY_CONTENT_TABLES, Tables } from '$lib/database.js';
+import type { Tables } from '$lib/database.js';
 import type { DatabaseHandle, IDBDatabaseType } from '$lib/idb.svelte.js';
 
 import { pick } from '$lib/utils.js';
 
 import { binaryStorage } from './index.js';
 
+type BinaryTableName = Exclude<
+	BinaryStorageLocator['area'],
+	`.pending_captures${'' | `/${string}`}`
+>;
+
 /**
  * Get the size in bytes of the given database object
  */
-export async function byteSizeOfObject<Table extends (typeof BINARY_CONTENT_TABLES)[number]>(
+export async function byteSizeOfObject<Table extends BinaryTableName>(
 	table: Table,
 	object: Pick<IDBDatabaseType[Table]['value'], 'sessionId' | 'filename' | 'bytes'>
 ): Promise<number> {
@@ -24,7 +29,7 @@ export async function byteSizeOfObject<Table extends (typeof BINARY_CONTENT_TABL
 	});
 }
 
-type CreateBytesObjectFields<Table extends (typeof BINARY_CONTENT_TABLES)[number]> = Pick<
+type CreateBytesObjectFields<Table extends BinaryTableName> = Pick<
 	IDBDatabaseType[Table]['value'],
 	'filename' | 'sessionId'
 >;
@@ -47,9 +52,12 @@ type CreateBytesObjectFields<Table extends (typeof BINARY_CONTENT_TABLES)[number
  * @param filename
  * @param content
  */
-export async function createBytes<Table extends (typeof BINARY_CONTENT_TABLES)[number]>(
+export async function createBytes<Table extends BinaryTableName>(
 	table: Table,
-	input: CreateBytesObjectFields<Table> & { bytes: ArrayBuffer; type: `image/${string}` }
+	input: CreateBytesObjectFields<Table> & {
+		bytes: ArrayBuffer;
+		type: `image/${string}` | 'application/octet-stream';
+	}
 ): Promise<CreateBytesObjectFields<Table> & { bytes: 'migrated' }> {
 	const locator = {
 		area: table,
@@ -85,7 +93,7 @@ export async function createBytes<Table extends (typeof BINARY_CONTENT_TABLES)[n
  *
  * Writes the binary content of the object in binary storage.
  */
-export async function storeBytes<Table extends (typeof BINARY_CONTENT_TABLES)[number]>(
+export async function storeBytes<Table extends BinaryTableName>(
 	table: Table,
 	object: (typeof Tables)[Table]['inferIn'],
 	content: ArrayBuffer
@@ -109,11 +117,11 @@ export async function storeBytes<Table extends (typeof BINARY_CONTENT_TABLES)[nu
  * Handles objects that have their binary data stored in the binary storage
  * @param object the table
  */
-export async function accessBytes<Table extends (typeof BINARY_CONTENT_TABLES)[number]>(
+export async function accessBytes<Table extends BinaryTableName>(
 	table: Table,
 	object: Pick<(typeof Tables)[Table]['inferIn' | 'inferOut'], 'sessionId' | 'filename' | 'bytes'>
 ): Promise<ArrayBuffer> {
-	if (object.bytes !== 'migrated') {
+	if (object.bytes !== 'migrated' && object.bytes !== undefined) {
 		return object.bytes;
 	}
 
@@ -128,6 +136,26 @@ export async function accessBytes<Table extends (typeof BINARY_CONTENT_TABLES)[n
 	return binaryStorage.bytes(locator);
 }
 
+export async function deleteObjectWithBytes<Table extends BinaryTableName>(
+	db: DatabaseHandle,
+	table: Table,
+	id: string
+) {
+	const object = await db.get(table, id);
+	if (!object) return;
+
+	const locator = {
+		area: table,
+		sessionId: 'sessionId' in object ? object.sessionId : undefined,
+		name: object.filename,
+	};
+
+	console.debug(`deleteBytes ${table}`, object, 'at:', await binaryStorage.resolvePath(locator));
+
+	await binaryStorage.delete(locator);
+	await db.delete(table, id);
+}
+
 /**
  * Get an object from a table and resolves its `bytes` field to an ArrayBuffer
  * by reading in the binary storage if necessary
@@ -135,7 +163,7 @@ export async function accessBytes<Table extends (typeof BINARY_CONTENT_TABLES)[n
  * @param id
  * @returns the object (undefined if not found), with the bytes field always a {@link ArrayBuffer}
  */
-export async function resolveObjectWithBytes<Table extends (typeof BINARY_CONTENT_TABLES)[number]>(
+export async function resolveObjectWithBytes<Table extends BinaryTableName>(
 	db: DatabaseHandle,
 	table: Table,
 	id: string

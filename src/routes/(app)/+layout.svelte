@@ -29,6 +29,7 @@
 	import { undo } from '$lib/undo.svelte';
 	import { nonnull, pick } from '$lib/utils';
 
+	import ModalCreateCustomNeuralNetwork from './ModalCreateCustomNeuralNetwork.svelte';
 	import Navigation from './Navigation.svelte';
 	import PrepareForOffline from './PrepareForOffline.svelte';
 	import ToastsArea from './ToastsArea.svelte';
@@ -178,6 +179,8 @@
 />
 
 <PrepareForOffline bind:open={globalModals.modal_prepare_for_offline_use.open} />
+
+<ModalCreateCustomNeuralNetwork />
 
 <Modal
 	key="modal_debug_ui_state"
