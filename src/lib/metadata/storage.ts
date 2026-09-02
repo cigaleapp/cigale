@@ -19,6 +19,7 @@ import {
 	namespacedMetadataId,
 	namespaceOfMetadataId,
 } from '$lib/schemas/metadata.js';
+import { toasts } from '$lib/toasts.svelte.js';
 import { groupBy, orEmptyObj3, prefixIDBKeyRange, safeJSONParse } from '$lib/utils.js';
 
 import { resolveMetadataImport } from './imports.js';
@@ -434,25 +435,30 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 			});
 
 			for (const metadata of toRefresh) {
-				const value = await inferHttp(db, protocolId, metadata, values ?? {});
+				try {
+					const value = await inferHttp(db, protocolId, metadata, values ?? {});
 
-				// TODO: dont store if currently stored value is manuallyModified
+					// TODO: dont store if currently stored value is manuallyModified
 
-				if (value) {
-					await storeMetadataValue({
-						db,
-						sessionId,
-						subjectId,
-						metadataId: metadata.id,
-						manuallyModified: false,
-						isDefault,
-						confirmed,
-						value,
-						applyCascades,
-						updateReactiveState,
-						abortSignal,
-						clearErrors,
-					});
+					if (value) {
+						await storeMetadataValue({
+							db,
+							sessionId,
+							subjectId,
+							metadataId: metadata.id,
+							manuallyModified: false,
+							isDefault,
+							confirmed,
+							value,
+							applyCascades,
+							updateReactiveState,
+							abortSignal,
+							clearErrors,
+						});
+					}
+				} catch (e) {
+					toasts.error(`Erreur à l'inférence HTTP de ${metadataId}: ${e}`);
+					console.error(`http infer ${metadataId} on ${subjectId}`, e);
 				}
 			}
 		}

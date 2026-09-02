@@ -406,7 +406,7 @@ export const InferenceConfigs = /** @type {const} */ ({
 				),
 				select: JsonataExpression(
 					type.unknown,
-					MetadataRuntimeValue[metadataType]
+					MetadataRuntimeValue[metadataType].or('undefined')
 				).describe("Traitement à faire sur la réponse JSON obtenue depuis l'URL `from`"),
 				granularities: type
 					.Record(
