@@ -19,6 +19,7 @@ vi.mock('@capacitor/core', () => ({
 vi.mock('@capacitor/filesystem', () => ({
 	Directory: {
 		Data: 'Data',
+		Documents: 'Documents',
 	},
 	Filesystem: {
 		stat: mockStat,
@@ -58,14 +59,14 @@ describe('CapacitorFilesystemBackend', () => {
 
 		const { CapacitorFilesystemBackend } = await importModule();
 
-		expect(() => CapacitorFilesystemBackend()).toThrow(
+		await expect(async () => CapacitorFilesystemBackend()).rejects.toThrow(
 			'Capacitor filesystem binary storage backend is not supported on Web'
 		);
 	});
 
 	it('writes, reads and reports file metadata', async () => {
 		const { CapacitorFilesystemBackend } = await importModule();
-		const backend = CapacitorFilesystemBackend();
+		const backend = await CapacitorFilesystemBackend();
 		const parent = { area: 'ImageFile', sessionId: 'session-a', name: '' as const };
 		const locator = { ...parent, name: 'sample.txt' as const };
 
@@ -81,14 +82,14 @@ describe('CapacitorFilesystemBackend', () => {
 		);
 
 		expect(mockWriteFile).toHaveBeenNthCalledWith(1, {
-			directory: 'Data',
-			path: 'ImageFile/session-a/sample.txt',
+			directory: 'Documents',
+			path: 'Cigale/ImageFile/session-a/sample.txt',
 			data: 'aGVsbG8=',
 			recursive: true,
 		});
 		expect(mockWriteFile).toHaveBeenNthCalledWith(2, {
-			directory: 'Data',
-			path: 'ImageFile/session-a/bytes.bin',
+			directory: 'Documents',
+			path: 'Cigale/ImageFile/session-a/bytes.bin',
 			data: 'AQID',
 			recursive: true,
 		});
@@ -111,14 +112,14 @@ describe('CapacitorFilesystemBackend', () => {
 
 		await backend.delete(locator);
 		expect(mockDeleteFile).toHaveBeenCalledWith({
-			directory: 'Data',
-			path: 'ImageFile/session-a/sample.txt',
+			directory: 'Documents',
+			path: 'Cigale/ImageFile/session-a/sample.txt',
 		});
 
 		await backend.clear(parent);
 		expect(mockRmdir).toHaveBeenCalledWith({
-			directory: 'Data',
-			path: 'ImageFile/session-a',
+			directory: 'Documents',
+			path: 'Cigale/ImageFile/session-a',
 			recursive: true,
 		});
 	});
@@ -127,7 +128,7 @@ describe('CapacitorFilesystemBackend', () => {
 		mockReaddir.mockRejectedValueOnce(new Error('missing'));
 
 		const { CapacitorFilesystemBackend } = await importModule();
-		const backend = CapacitorFilesystemBackend();
+		const backend = await CapacitorFilesystemBackend();
 		const parent = { area: 'ImageFile', sessionId: 'missing-session', name: '' as const };
 
 		expect(await backend.count(parent)).toBe(0);
