@@ -118,6 +118,18 @@ function mergeMetadata(
 	values: DB.MetadataValue[],
 	options: DB.MetadataEnumVariant[] = []
 ) {
+	const confidenceOf = ({
+		confidence,
+		confidences,
+		value,
+	}: Pick<DB.MetadataValue, 'confidence' | 'confidences' | 'value'>) => {
+		if (typeof confidence === 'number' && Number.isFinite(confidence)) return confidence;
+		const valueConfidence = confidences[serializeMetadataValue(value)];
+		if (typeof valueConfidence === 'number' && Number.isFinite(valueConfidence))
+			return valueConfidence;
+		return 0;
+	};
+
 	const mergeConfidences = (
 		merger: (probabilities: number[]) => number,
 		values: DB.MetadataValue[]
@@ -128,7 +140,9 @@ function mergeMetadata(
 				.map((valueAsString) => [
 					valueAsString,
 					merger(
-						values.flatMap((v) => v.confidences[valueAsString] ?? null).filter(Boolean)
+						values
+							.flatMap((v) => v.confidences[valueAsString] ?? null)
+							.filter((score): score is number => Number.isFinite(score))
 					),
 				])
 		);
@@ -142,7 +156,7 @@ function mergeMetadata(
 	}): DB.MetadataValue => ({
 		value,
 		manuallyModified: values.some((v) => v.manuallyModified),
-		confidence: confidences(values.map((v) => v.confidence)),
+		confidence: confidences(values.map(confidenceOf)),
 		confirmed: values.every((v) => v.confirmed),
 		confidences: mergeConfidences(confidences, values),
 		isDefault: values.every((v) => v.isDefault),
@@ -169,7 +183,13 @@ function mergeMetadata(
 		case 'min':
 			return mergeFullValue({
 				confidences: max,
-				value: mergeByMajority(definition.type, values),
+				value: mergeByMajority(
+					definition.type,
+					values.map((v) => ({
+						value: v.value,
+						confidence: confidenceOf(v),
+					}))
+				),
 			});
 		case 'median':
 			return mergeFullValue({
