@@ -5,12 +5,10 @@ import type {
 	BinaryStorageName,
 } from './types.js';
 
-import { Capacitor } from '@capacitor/core';
 import { dichotomid } from 'dichotomid';
 
 import { splitFilenameOnExtension } from '$lib/utils.js';
 
-import { CapacitorFilesystemBackend } from './capacitor.js';
 import { OPFSBackend } from './opfs.js';
 import { locatorToPath } from './utils.js';
 
