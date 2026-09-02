@@ -1,0 +1,275 @@
+# cigale's codebase
+
+Cigale is a local-only web-app, so one of the most important things is that there's no server-side.
+
+## Tech stack
+
+- A mix of [Typescript](https://typescript.com) and [plain JS with JSDoc](https://jsdoc.app/): new files should be written in Typescript. The project originally started with plain JS because it was a student group project and I didn't want everyone to have to learn yet another thing on top of Svelte. The conversion of the source code to Typescript is done gradually. Unfortunately, [automating the conversion doesn't seem feasible](https://github.com/cigaleapp/cigale/pull/984#pullrequestreview-3601220496).
+- [Bun](https://bun.com): A Javascript (and Typescript) runtime and package (libraries) manager. We use it to manage dependencies, build the app and run the various scripts of the codebase.
+- [SvelteKit](https://kit.svelte.dev): A framework to build web applications using reusable bricks of interface called "components".
+- [IndexedDB](https://developer.mozilla.org/en-US/docs/Glossary/IndexedDB): A database that's built into every browser, that allows us to store all of the data on the user's browser (remember, no server-side!)
+- [sw&rpc](https://swarpc.js.org): Some tasks (such as running inference with neural network models) are resource-heavy. Running them normally would lag the interface, so we run it in the background using [Web Workers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers). sw&rpc allows us to define functions that are to be run on these workers, while keeping type-safety and ease of use.
+- [Wuchale](https://wuchale.dev): a library to translate the app into other languages (we offer French and English for now). It uses heuristics defined in its config file to determine which pieces of text are to be translated, and adds them to `.po` files so that they can be translated next.
+- [Weblate](https://weblate.org/): A app to contribute translations of Cigale in other languages: it reads & writes the `.po` files created by Wuchale. Currently, Cigale's translations are done on at https://weblate.gwen.works, on my personal VPS.
+- [Playwright](https://playwright.dev): Enables us to verify that the app works from the user's point of view: we write series of instructions (click on that button) and assertions (is the following text in the UI right now?) and Playwright launches a automated browser to simulate a user using the app.
+- [Github Pages](): The service that hosts the web application, currently at https://cigaleapp.github.io/cigale. Since the app has no server-side, a [static]() web hosting service suffices.
+- [Capacitor](https://capacitorjs.com): A technology to package a web app as a native mobile app that can be distributed on the app stores. It works by running a WebView with the app code, and also exposes functions to interact with the phone's OS as a native app could. Although the technology also supports iOS, we only build the app for Android for now.
+- [Electron](https://www.electronjs.org/): Similarly to Capacitor, Electron is a technology to make a native desktop app that can be installed, and exposes ways to access things a website cannot access, such as the files of the computer it's installed on. It's also a bit more convenient to launch compared to having a volatile tab on a browser. The desktop app is currently not used by anybody though, so it's provided on a "best effort" basis. Currently, the only Electron-excluse feature is to have the app's progress bar reflected as a progress bar under the app icon. For now, the desktop app is only built for Windows, but could easily be built for other platforms too since Electron supports all three (MacOS, Windows and Linux).
+- a [CORS](https://developer.mozilla.org/en-US/docs/Glossary/CORS) proxy: Some APIs (namely Kobocollect's) do not enable cross-origin requests, so we have to pretend that we aren't requesting from another website. This is done by running a small proxy server that takes in a URL, does the request, and returns the response back to the web app. Currently, this is done with a [CORS Anywhere]() server running on https://cors.gwen.works (my personal VPS)
+
+Some additional but less important developer tooling is also used: a formatter to keep the code pretty, a linter to prevent silly mistakes from finding their way on production.
+
+## Technical terms
+
+To quickly and precisely refer to some features or parts of the UI, we have a few words that don't appear in the user interface but can appear in technical documentation, code comments, commit messages, issues & pull requests, etc.
+
+Some are project-specific, and others are widely-used in web development but are still listed here in case you don't know them.
+
+<dl>
+	<dt>Fullscreen cropper,</dt>
+	<dt>Cropper</dt>
+	<dd>Refers to the full-screen (image by image) crop view that you get by opening an image from the "crop" tab inside of a session</dd>
+	<dt>Fullscreen classification,</dt>
+	<dt>Classifier,</dt>
+	<dt>Suggestions classifier</dt>
+	<dd>Refers to the full-screen (image by image) classification view that you get by opening an image from the "classify" tab inside of a session</dd>
+	<dt>Narrowing classifier</dt>
+	<dd>Refers to the full-screen (image by image) classification view's "Elimination" mode that you get by opening an image from the "classify" tab inside of a session, then switch to "Elimination" in the top bar</dd>
+	<dt>Fullscreen importer,</dt>
+	<dt>Importer</dt>
+	<dd>Refers to the fullscreen (image by image) import view that you get by opening an image from the "import" tab inside of a session (note: not yet implemented, see #1932)</dd>
+	<dt>Fullscreen view</dt>
+	<dd>Any of Importer, Cropper, Suggestions classifer or Narrowing classifier.</dd>
+	<dt>Capture mode,</dt>
+	<dt>Capture</dt>
+	<dd>View that allows users to take photos with their smartphone camera directly from within the app. Accessed by buttons with a camera icon that mention something akin to "Open camera" or "Take photos"</dd>
+	<dt>Capture gallery</dt>
+	<dd>View that allows users to review the photos they took with the Capture view before importing them</dd>
+	<dt>Metadata value</dt>
+	<dd>A rich metadata value, carrying not only the value itself but surrounding information, such as the confidence, alternative values and their confidences, whether the value was manually modified by the user, whether the value is a default value, etc.</dd>
+	<dt>Runtime metadata value,</dt>
+	<dt>Runtime value</dt>
+	<dd>The actual value itself of a Metadata value</dd>
+	<dt>Serialized metadata value</dt>
+	<dd>A Runtime metadata value, that has been serialized to a JSON string. Serialization is needed to store alternative values' confidences: it's an object with keys being the serialized values and values being the confidence scores.
+	</dd>
+	<dt>PreviewSidepanel</dt>
+	<dd>The UI component visible to the right (on desktop) of the cards in import, crop and classify tabs</dd>
+	<dt>Area observation,</dt>
+	<dt>AreaObservation,</dt>
+	<dt>Observations area</dt>
+	<dd>The gallery-like grid of images cards, visible for example on import, crop and classify tabs</dd>
+	<dt>Active mode</dt>
+	<dd>Capture view with "active" timers to help users keep track of time between manually taken photos</dd>
+	<dt>Passive mode</dt>
+	<dd>Capture view with "passive" timers that allows automatic capture of photos at regular time intervals</dd>
+	<dt>Storage backend</dt>
+	<dd>The app has multiple ways to store files (namely the photos we're working with), depending on the platform: via OPFS, via the native filesystem on the Capacitor app, directly in IndexedDB (the original way we did it, now deprecated), and possibly more such as network-based storage in the future. These all implement a common interface that is used to retrieve and store bytes</dd>
+	<dt>Lightbox</dt>
+	<dd>The UI that pops up when clicking on an image to view it in fullscreen</dd>
+	<dt>Toast</dt>
+	<dd>Notification-like alerts that pop up on the bottom-(right) side of the app, to inform users of an error, a successful operation or warn/inform them about something. For example, when the app has been updated, there's a toast that says "App updated"</dd>
+	<dt>Update bundle</dt>
+	<dd>A .zip file that can be used to update the mobile native app, as long as only the web code changes (no native code changes or new/removed/updated Capacitor plugins)</dd>
+	<dt>E2E,</dt>
+	<dt>E2E test</dt>
+	<dd>A end-to-end test, most likely done with Playwright.</dd>
+	<dt>Fixture</dt>
+	<dd>A asset or file only used for (most often E2E) tests. Example data, most of the time. For example, sample photos or .zip result exports used to test functionality of the app with.</dd>
+	<dd>Fixtures can also refer to <a href="https://playwright.dev/docs/test-fixtures">Playwright's fixtures</a>, which allows extending it with additional features such as creating temporary files during tests, doing common app actions (such as changing tabs, selecting a photo, importing photos, etc) without repeating the same instructions everywhere</dd>
+	<dt>Transaction</dt>
+	<dd>A IndexedDB transaction</dd>
+	<dt>Workflow,</dt>
+	<dt>Job</dt>
+	<dd>Refers to Github Actions workflows and/or jobs, especially when it's in commit mesages, issues or PRs</dd>
+</dl>
+
+## Deployment
+
+The app is [continuously]() deployed from the main branch of the github repository. Once all automated checks (tests, linter, etc) pass, a CI workflow builds the application, and deploys it to Github Pages.
+
+## Files & folders
+
+- `.github/worfklows/`: all the CI workflows used to define automated checks (tests, linting, formatting, etc) and tasks (re-generating the Backbone protocol, etc)
+- `.vscode/`: settings for the VSCode code editor that are useful to be shared with anyone working on Cigale (for example, recommended editor extensions to work on `.svelte` files, etc)
+- `android/`: Source code for the Capacitor-backed mobile app.
+- `examples/`: Contains the Backbone protocol (called "Example: arthropods" in the app, stored as `arthropods.cigaleprotocol.json` in that directory). It is generated from various data sources and provides the basis for all other protocols (mainly the huge list of species with their reference images and descriptions). Other protocols are also stored here but are only used for Playwright tests.
+- `patches/`: Small modifications to libraries' source code, when the library does not work correctly and waiting for a new version is not feasible (the library has been abandonned, etc). Patches are applied using Bun's [`bun patch`](https://bun.com/docs/pm/cli/patch) system.
+- `protocols/`: Protocol definition files: INSECTA, Entomoscope, etc.
+- `scripts/`: various scripts for miscellaneous tasks in the codebase: downloading fonts before building the application, generating schemas to validate protocol files (continue reading), etc.
+- `scripts/` [for now](https://github.com/cigaleapp/cigale/pull/1313): the directory also has script to generate the Backbone protocol (continue reading)
+- `src/**/*.test.{ts,js}`: files that contain only unit tests, that test functions located in the related file (that has the same filename, without the `.test`)
+- `src/electron/`: Contains source code specific to Electron, mostly functions that are meant to run on the desktop, outside of the web app, via Electron.
+- `src/lib/schemas/`: declare the shape of the app's data (for example, a Observation has a label; a list of Images, etc)
+- `src/lib/metadata/`: various functions to manipulate metadata (split into multiple files because a single file would be too large)
+- `src/lib/*.{js,ts}`: mostly individual functions that do one specific thing. Some files end in `.svelte.{js,ts}` because they contain [Svelte runes](https://svelte.dev/docs/svelte/svelte-js-files), mostly for shared reactive state purposes.
+- `src/lib/*.svelte`: UI components that are not specific to a single part of the application (for example, ButtonIcon)
+- `src/lib/state.svelte.js`: A singleton class `UIState` that stores global data associated with the app, but that doesn't need to be stored persistently in the database. For example, the currently-open session. The class also has a bunch of convenience properties (for example, `UIState.currentSessionId` is a actual field that is changed, but `UIState.currentSession` is a `get`-property that allows us to have access to the currently-open session object without having to fetch it from the database manually every time).
+- `src/lib/database.svelte.js`: Declares all the tables that are stored in the database. It mostly uses types defined in `src/lib/schemas/`.
+- `src/lib/idb.svelte.js`: Declares migration steps when database changes require those, and a system to have a in-memory, reactive view of the database so that the UI can respond to changes without having to query the database again. Most tables are in that in-memory view, but some aren't because it isn't feasible, RAM-wise (for example, the `MetadataOption` table that stores all enum variants of all protocols can have upwards of 20k objects, as the Backbone protocol contains a lot of species)
+- `src/locales/`: [Gettext `.po`]() files for translations. The app's source code is written in French, but we offer a English translation. Wuchale and Weblate deal with those files, they can be manually edited but aren't meant to be.
+- `src/routes/**/+page.svelte`: The different pages (when the URL changes it means we're on a different page) of the app.
+- `src/routes/**/+layout.svelte`: Interface parts that are shared by multiple pages: for example, the navigation bar at the top.
+- `src/routes/**/*.{svelte,js,ts}`: Components and functions that are only used in specific routes
+- `src/routes/worker/procedures.js`: Defines the types of inputs & outputs for functions that are run on web workers, via swarpc
+- `src/routes/worker/start.js`: Imported during app startup to
+- `src/routes/worker/*.{ts,js}`: Implements the functions declared in `procedures.js`
+- `src/app.d.ts`: Additional type declarations, for example to declare additional properties & methods on the `Window` global object.
+- `src/app.html`: The HTML shell for the web application: this is what the user's browser intially receives. It contains placeholders that, at build time, are replaced with `<script>` tags that load the app's code.
+- `src/hooks.server.js`: Code that runs before every page, at build-time. Mostly used by Wuchale to replace hard-coded text with calls to its functions that allow the shown text to change depending on the selected language.
+- `src/hooks.client.ts`: Code that runs before the app starts, at run time. On the mobile app, used to check for new update bundles, download them and apply update bundles if the app is in the background.
+- `src/service-worker.js`: A [service worker](https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorker), that intercepts all requests the app makes and allows for aggressive caching of, for example, the app's source code. This is also where all web requests are handled if the app is launched while offline.
+- `static/`: various files that are meant to be available as-is on `https://cigaleapp.github.io/cigale`. Mostly logos, fonts and JSON Schemas for protocol definition files, JSON analysis files in ZIP result exports, etc.
+- `tests/*.spec.{ts,js}`: Playwright tests
+- `tests/*.spec.{ts,js}-snpahots/`: Snapshots for tests (see Playwright docs), for example exported images to verify that nothing broke the results export code.
+- `tests/tasks/*.spec.{ts,js}`: Playwright "tests" that aren't really tests, but Playwright is useful to achieve the task at hand. For example, generating up-to-date screenshots of the app.
+- `tests/setup/database.ts`: Code that runs before every tests: for example, it fills the database with dummy data, and stores it so that all other tests can re-use that stored state without having to fill the database by themselves (which can be long if filling the database involves importing photos, running NN inference, etc)
+- `tests/fixtures/`: Various files that are used in tests (photos, etc)
+- `fixtures.ts`: Sets up various things that are the same for all tests. See Playwright documentation for more.
+- `utils/`: Various utility functions for writing tests (for example, `importPhotos` runs instructions that import photos into the app)
+- `/`: Most files directly at the root of the repository are configuration files for the various developer tooling.
+
+## Flows
+
+### Launching the app
+
+```mermaid
+flowchart TB
+
+shell[app.html]
+clientinit[src/hooks.client.ts]
+init[src/routes/+layout.svelte]
+startup["src/routes/(app)/+layout.js"]
+layout["src/routes/(app)/+layout.svelte"]
+page["src/routes/(app)/.../+page.svelte (depending on the URL)"]
+done[Done!]
+
+shell -->|Svelte loads the app's code, a basic loading spinner is shown| --> clientinit
+shell --> static[static/manifest.json static/favicon.png, etc] -->|PWA manifest, website icon, etc.| clientinit
+shell --> sw[src/service-worker.js] -->|Offline handling, requests caching| clientinit
+
+clientinit -->|Mobile app auto-updater| init
+
+init --> deeplinks[assetlinks.json] -->|Deeplinking for the mobile app| startup
+init --> globalcss[src/routes/style.css] -->|"CSS Variables (colors, font sets, etc)"| startup
+
+startup --> idb[src/lib/idb.svelte.js] -->|Database| layout
+startup --> uistate[src/lib/state.svelte.js]  -->|UI State| layout
+startup --> swarpc[src/lib/workers/start.js] -->|"Web Workers (sw&rpc nodes)"| idb -->|Web Workers also start their own database client| layout
+startup --> protocols[protocols/*.yaml, examples/arthropods.cigaleprotocol.json] -->|Built-in protocols| layout
+startup --> i18n[src/locales/*.po] -->|Translations| layout
+
+layout --> navbar["src/routes/(app)/Navbar.svelte"] -->|Navigation bar| page
+layout --> kbd[src/lib/KeyboardShortcuts.svelte]  -->|Keyboard shortcuts| page
+layout --> queue[src/lib/queue.svelte.js] -->|Processing queue| page
+layout --> toasts[src/lib/toasts.svelte.js] -->|Toasts manager| page
+
+
+page -->|Page-specific content| done
+```
+
+### Creating a session
+
+### Processing photos
+
+#### Import
+
+```mermaid
+sequenceDiagram
+
+
+User->>Page: Import photo
+Page->>Queue: importMore()
+Queue->>UIState: processing.files.add()
+Queue->>UIState: queuedImages.add()
+UIState->>Page: (reactive update)
+Page->>User: A loading photo card appears in the UI
+
+loop up to n concurrently (n = parallelism setting)
+	Queue->>UIState: queuedImages.remove()
+	Queue->>UIState: loadingImages.add()
+	alt processImageFile()
+		alt if is RAW photo
+			activate LibRaw worker
+			Queue->LibRaw worker: transcodeRawPhotoToJPEG()
+			deactivate LibRaw worker
+		end
+		Queue->Queue: resizeToMaxSize()
+		Queue->>DB: storeImageBytes()
+		Queue->>DB: tables.Image.set() (create)
+		Queue->>DB: tables.Observation.set() (create)
+		Queue->>UIState: processing.files.remove()
+		Queue->>DB: processSidecars() (metadata)
+		alt if is RAW photo
+			Queue->>DB: processRawMetadata() (metadata)
+		end
+		Queue->>DB: processExifData() (metadata)
+	end
+	Queue->>UIState: loadingImages.remove()
+	UIState->>Page: (reactive update)
+	Page->>User: Photo has finished loading in UI
+end
+```
+
+#### Crop
+
+```mermaid
+sequenceDiagram
+
+User->>Page: Go to crop tab
+Page->WebWorkers: loadModel({ task: "detection", ... })
+WebWorkers->>ONNX Worker: InferenceSession.create()
+Page->>User: Model loading screen disappears, photo is loading
+
+Page->>Queue: detectMore()
+Queue->>UIState: queuedImages.add()
+loop Up to n concurrently (n = parallelism setting)
+	Queue->>UIState: queuedImages.remove()
+	Queue->>UIState: loadingImages.add()
+	alt inferBoundingBoxes()
+		Queue->WebWorkers: swarpc.inferBoundingBoxes()
+		WebWorker->>DB: get("ImageFile", ...)
+		WebWorker->WebWorker: loadToTensor()
+		WebWorker->ONNX Worker: inferenceSessions:detection.run()
+		Queue->Queue: convert coordinates to relative
+		Queue->>DB: tables.Image.set() (metadata)
+	end
+	Queue->>UIState: loadingImages.remove()
+	UIState->>Page: (reactive update)
+	Page->>User: Photo has finished loading in UI
+end
+```
+
+#### Classify
+
+```mermaid
+sequenceDiagram
+
+User->>Page: Go to crop tab
+Page->WebWorkers: loadModel({ task: "detection", ... })
+WebWorkers->>ONNX Worker: InferenceSession.create()
+Page->>User: Model loading screen disappears, photo is loading
+
+Page->>Queue: detectMore()
+Queue->>UIState: queuedImages.add()
+loop Up to n concurrently (n = parallelism setting)
+	Queue->>UIState: queuedImages.remove()
+	Queue->>UIState: loadingImages.add()
+	alt classifyImage()
+		Queue->>WebWorker: swarpc.classify()
+		WebWorker->>DB: get("Image", ...)
+		WebWorker->>DB: get("ImageFile", ...)
+		WebWorker->WebWorker: loadToTensor({crop: ...})
+		WebWorker->>ONNX Worker: inferenceSession:classification.run()
+		WebWorker->WebWorker: Lookup in classmapping
+		WebWorker->>DB: storeMetadataValue()
+	end
+	Queue->>DB: tables.Image.refresh()
+	note right of DB: This is because DB writes from WebWorkers do not update reactive state
+	Queue->>UIState: loadingImages.remove()
+	UIState->>Page: (reactive update)
+	Page->>User: Photo has finished loading in UI
+end
+```
+
+### Exporting results

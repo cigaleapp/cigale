@@ -1658,3 +1658,23 @@ if (import.meta.vitest) {
 		expect(indexOfMin([0, 5, 0, 3, 5, 2])).toBe(0);
 	});
 }
+
+function gcd(...args: number[]): number {
+	if (args.length > 2) {
+		return args.reduce((a, b) => gcd(a, b));
+	}
+
+	const [a, b] = args;
+
+	return !b ? a : gcd(b, a % b);
+}
+
+export function lcm(...args: number[]): number {
+	if (args.length > 2) {
+		return args.reduce((a, b) => lcm(a, b));
+	}
+
+	const [x, y] = args;
+
+	return (x * y) / gcd(x, y);
+}

@@ -18,6 +18,10 @@ let currentBackend: undefined | BinaryStorageBackend<BinaryStorageName>;
 
 export const binaryStorage: BinaryStorage = {
 	name: currentBackend?.name ?? 'uninitialized',
+	async resolvePath(...args) {
+		if (!currentBackend) await initializeBinaryStorage();
+		return currentBackend!.resolvePath(...args);
+	},
 	async exists(...args) {
 		if (!currentBackend) await initializeBinaryStorage();
 		return currentBackend!.exists(...args);
@@ -90,11 +94,14 @@ export const binaryStorage: BinaryStorage = {
 async function initializeBinaryStorage() {
 	if (currentBackend) return;
 
-	if (Capacitor.isNativePlatform()) {
-		currentBackend = CapacitorFilesystemBackend();
-	} else {
-		currentBackend = await OPFSBackend();
-	}
+	// FIXME: Capacitor not accessible in web workers
+	// if (Capacitor.isNativePlatform()) {
+	// 	console.debug('[binary storage] initialize with capacitor backend');
+	// 	currentBackend = await CapacitorFilesystemBackend();
+	// } else {
+	console.debug('[binary storage] initialize with opfs backend');
+	currentBackend = await OPFSBackend();
+	// }
 }
 
 interface BinaryStorage<

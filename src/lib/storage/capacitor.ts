@@ -1,18 +1,40 @@
-import type { BinaryStorageBackend } from './types.js';
+import type { BinaryStorageBackend, BinaryStorageLocator } from './types.js';
 
 import { Capacitor } from '@capacitor/core';
 import { Directory, Filesystem } from '@capacitor/filesystem';
 
-import { locatorToPath } from './utils.js';
+import { locatorToPath as _locatorToPath } from './utils.js';
 
-export function CapacitorFilesystemBackend(): BinaryStorageBackend<'capacitor'> {
+function locatorToPath(locator: BinaryStorageLocator) {
+	return ['Cigale', _locatorToPath(locator)].join('/');
+}
+
+export async function CapacitorFilesystemBackend(): Promise<BinaryStorageBackend<'capacitor'>> {
 	if (!Capacitor.isNativePlatform())
 		throw new Error('Capacitor filesystem binary storage backend is not supported on Web');
 
-	const root = Directory.Data;
+	const root = Directory.Documents;
+
+	const inww =
+		'WorkerGlobalScope' in self &&
+		typeof WorkerGlobalScope !== undefined &&
+		self instanceof WorkerGlobalScope;
+
+	console.debug(
+		`opening (in ${inww ? 'ww' : 'ui'} context) capacitor binarystorage backend in ${root}. files:\n`,
+		debugdir(root)
+	);
 
 	return {
 		name: 'capacitor',
+		async resolvePath(locator) {
+			const result = await Filesystem.getUri({
+				directory: root,
+				path: locatorToPath(locator),
+			});
+
+			return result.uri;
+		},
 		async exists(locator) {
 			try {
 				const stat = await Filesystem.stat({
@@ -34,14 +56,24 @@ export function CapacitorFilesystemBackend(): BinaryStorageBackend<'capacitor'> 
 			});
 		},
 		async bytes(locator) {
-			const file = await Filesystem.readFile({
-				directory: root,
-				path: locatorToPath(locator),
-			});
+			try {
+				const file = await Filesystem.readFile({
+					directory: root,
+					path: locatorToPath(locator),
+				});
 
-			const bytes = Uint8Array.fromBase64(file.data as string);
+				const bytes = Uint8Array.fromBase64(file.data as string);
 
-			return bytes.buffer;
+				return bytes.buffer;
+			} catch (e) {
+				console.error(`Couldn't read file at ${locatorToPath(locator)}: `, e);
+				console.debug(`Contents at root:`, await debugdir(root));
+				console.debug(`Contents at ${locator.area}`, await debugdir(root, locator.area));
+				console.debug(
+					`Contents at ${locatorToPath({ ...locator, name: '' })}`,
+					await debugdir(root, locatorToPath({ ...locator, name: '' }))
+				);
+			}
 		},
 		async text(locator) {
 			const bytes = await this.bytes(locator);
@@ -75,7 +107,7 @@ export function CapacitorFilesystemBackend(): BinaryStorageBackend<'capacitor'> 
 			const stat = await Filesystem.stat({
 				directory: root,
 				path: locatorToPath(locator),
-			});
+			}).catch(() => ({ size: 0 }));
 
 			return stat.size;
 		},
@@ -105,4 +137,13 @@ export function CapacitorFilesystemBackend(): BinaryStorageBackend<'capacitor'> 
 			});
 		},
 	};
+}
+
+async function debugdir(dir: Directory, path = '') {
+	return await Filesystem.readdir({
+		directory: dir,
+		path: ['Cigale', path].join('/'),
+	})
+		.then((r) => r.files.map((f) => `${f.size}\t${f.name}`).join('\n'))
+		.catch(() => '<not found>');
 }

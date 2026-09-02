@@ -1,0 +1,275 @@
+# yaml-language-server: $schema=https://cigaleapp.github.io/cigale/protocol.schema.json
+
+id: org.noe.lepinoc
+name: Lépinoc
+description: Collecte de papillons de nuits
+learnMore: https://lepinoc.noe.org/
+authors:
+  - name: Noé
+    email: lepinoc@noe.org
+
+imports:
+  - from: io.github.cigaleapp.arthropods.example
+    metadataGroups:
+      - taxonomy
+    metadata:
+      - species
+      - identification_difficulty
+      - conservation_status
+      - shoot_date
+      - shoot_location
+      - crop
+  - from: fr.osug.terra-forma-web.insecta
+    sessionMetadata:
+      - start_at
+      - habitat
+
+sessionMetadata:
+  structure:
+    type: string
+    label: Structure
+    description: ''
+    required: true
+    mergeMethod: none
+  site_id:
+    type: string
+    label: Site
+    description: ''
+    required: true
+    mergeMethod: none
+  management_practices:
+    type: string
+    label: Pratiques de gestion
+    description: ''
+    required: false
+    mergeMethod: none
+
+metadata: {}
+
+charts:
+  user:
+    layout:
+      - [foreword]
+      - [context, your_sessions, id_precision]
+      - [id_results]
+      - [species_per_session, observations_per_session]
+      - [popular_species]
+
+    sections:
+      context:
+        title: Contexte
+        layout:
+          - [structure_name]
+          - [site_name]
+          - [most_popular_habitat]
+          - [management_practices]
+      your_sessions:
+        title: Vos sessions Lépinoc
+        layout:
+          - [sessions_count]
+          - [sessions_list]
+          - [photos_count]
+      id_results:
+        title: Vos résultats d'identification
+        layout:
+          - [observations_count, genus_count, genus_ids]
+          - [expert_ids, family_count, family_ids]
+          - [species_ids, order_ids, null]
+      popular_species:
+        title: Zoom sur les espèces observées
+        layout:
+          - [popular_species_1]
+          - [popular_species_2]
+          - [popular_species_3]
+
+    blocks:
+      foreword:
+        type: text
+        title: Mot de l'équipe Lépinoc
+        description: |
+          Lisa et Justine de l'équipe Lépinoc vous remercient d'avoir contribué au programme en 2025. Cette année a été riche en observations et en identifications grâce à vos participations. Nous espérons donc vous compter dans notre réseau pour l'année 2026. N'hésitez pas à nous contacter pour toute question sur notre adresse mail : <lepinoc@noe.org>
+      structure_name:
+        type: figure
+        title: Votre structure
+        needs: [structure]
+        compute: $mostCommon(sessions.metadata.structure.value)
+      site_name:
+        type: figure
+        title: Votre site
+        needs: [site_id]
+        compute: $mostCommon(sessions.metadata.site_id.value)
+      most_popular_habitat:
+        type: spotlight
+        title: Votre habitat
+        needs: [habitat]
+        metadata: habitat
+        compute: $mostCommon(sessions.metadata.habitat.value)
+      management_practices:
+        type: text
+        title: Vos pratiques de gestion
+        needs: [management_practices]
+        compute: |
+          $join(
+            $distinct(sessions.metadata.management_practices.value),
+            "\n\n"
+          )
+      sessions_count:
+        type: figure
+        title: ''
+        suffix: sessions
+        compute: $count(sessions)
+      sessions_list:
+        type: list
+        title: ''
+        compute: sessions.( "le " & $formatDate(createdAt, "dd MMMM yyyy") )
+      photos_count:
+        type: figure
+        title: ''
+        suffix: photographies
+        description: Comprenant des individus de papillons de nuit
+        # We do observations.images so that images that dont have any associated observation (images with no species) dont get counted
+        compute: |
+          $sum(
+            sessions.(
+              $count($distinct(
+                observations["crop" in $keys(metadata)].images.filename
+              ))
+            )
+          )
+      id_precision:
+        type: partition
+        title: Degré d'identification des individus
+        suffix: espèces
+        needs: [species, genus, family, order]
+        compute: |
+          [
+            {
+              "label": "Espèce",
+              "value": $count(sessions.observations[
+                "species" in $keys(metadata)
+              ])
+            },
+            {
+              "label": "Genre",
+              "value": $count(sessions.observations[
+                "genus" in $keys(metadata)
+                and $not("species" in $keys(metadata))
+              ])
+            },
+            {
+              "label": "Famille",
+              "value": $count(sessions.observations[
+                "family" in $keys(metadata) 
+                and $not("genus" in $keys(metadata))
+                and $not("species" in $keys(metadata))
+              ])
+            },
+            {
+              "label": "Ordre",
+              "value": $count(sessions.observations[
+                "order" in $keys(metadata) 
+                and $not("family" in $keys(metadata))
+                and $not("genus" in $keys(metadata))
+                and $not("species" in $keys(metadata))
+              ])
+            }
+          ]
+      observations_count:
+        type: figure
+        title: ''
+        suffix: 'observations de papillons denuit sur le dispositif'
+        compute: $count(sessions.observations["crop" in $keys(metadata)])
+      expert_ids:
+        type: figure
+        title: ''
+        suffix: espèces identifiées par un expert lépidoptériste
+        compute: $count(sessions.observations[validated])
+      species_ids:
+        type: figure
+        title: ''
+        suffix: papillons identifiées jusqu'à l'espèce
+        needs: [species]
+        compute: $count(sessions.observations[
+          "species" in $keys(metadata)
+          ])
+      genus_ids:
+        type: figure
+        title: ''
+        suffix: papillons identifiés jusqu'au genre
+        needs: [genus, species]
+        compute: $count(sessions.observations[
+          "genus" in $keys(metadata)
+          and $not("species" in $keys(metadata))
+          ])
+      family_ids:
+        type: figure
+        title: ''
+        suffix: papillons identifiés jusqu'à la famille
+        needs: [family, genus, species]
+        compute: $count($keys(sessions.observations[
+          "family" in $keys(metadata)
+          and $not("genus" in $keys(metadata))
+          and $not("species" in $keys(metadata))
+          ]))
+      order_ids:
+        type: figure
+        title: ''
+        suffix: papillons identifiés jusqu'à l'ordre
+        needs: [order, family, genus, species]
+        compute: $count(sessions.observations[
+          "order" in $keys(metadata)
+          and $not("family" in $keys(metadata))
+          and $not("genus" in $keys(metadata))
+          and $not("species" in $keys(metadata))
+          ])
+      genus_count:
+        type: figure
+        title: ''
+        suffix: genres différents
+        needs: [genus]
+        compute: $count($distinct(sessions.observations.metadata.genus.value))
+      family_count:
+        type: figure
+        title: ''
+        suffix: familles différentes
+        needs: [family]
+        compute: $count($distinct(sessions.observations.metadata.family.value))
+      species_per_session:
+        type: histogram
+        title: Nombre d'espèces
+        needs: [species]
+        compute: |
+          sessions^($json(createdAt)).(
+            {
+              "x": $formatDate(createdAt, "dd/MM"),
+              "y": $count($distinct(observations.metadata.species.value))
+            }
+          )
+      observations_per_session:
+        type: histogram
+        title: Nombre de papillons
+        compute: |
+          sessions^($json(createdAt)).(
+            {
+              "x": $formatDate(createdAt, "dd/MM"),
+              "y": $count(observations["crop" in $keys(metadata)])
+            }
+          )
+      popular_species_1:
+        type: spotlight
+        title: L'espèce la plus observée
+        needs: [species]
+        metadata: species
+        compute: $mostCommon(sessions.observations.metadata.species.value)
+      popular_species_2:
+        type: spotlight
+        title: La seconde espèce la plus observée
+        needs: [species]
+        metadata: species
+        compute: $sortByPopularity(sessions.observations.metadata.species.value)[1]
+      popular_species_3:
+        type: spotlight
+        title: Une espèce remarquable
+        needs: [species]
+        metadata: species
+        compute: $sortByPopularity(sessions.observations.metadata.species.value)[-1]

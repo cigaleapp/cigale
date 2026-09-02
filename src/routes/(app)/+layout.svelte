@@ -42,7 +42,7 @@
 
 	const navbarAppearance = $derived.by<NavbarAppearance>(() => {
 		if (routeIsIn('/(app)/(sidepanel)/o/[observation]')) return 'hidden';
-		if (routeIsIn('/(app)/protocols/[id]')) return 'hidden';
+		if (routeIsIn('/(app)/protocols/[id]/edit')) return 'hidden';
 		if (routeIsIn('/(app)/capture')) return 'hidden';
 
 		return 'full';
@@ -208,7 +208,7 @@
 	<div
 		class="contents"
 		class:padded={!page.route.id?.includes('/(sidepanel)') &&
-			!page.route.id?.includes('protocols/[id]/') &&
+			!page.route.id?.includes('protocols/[id]/edit/') &&
 			page.route.id !== '/(app)/capture'}
 	>
 		{@render children?.()}

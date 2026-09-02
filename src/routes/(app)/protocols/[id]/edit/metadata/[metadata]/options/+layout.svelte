@@ -11,11 +11,11 @@
 		page.data.options = options.filter((o) => o.key !== key);
 
 		const wasOnOptionPage =
-			page.route.id === '/(app)/protocols/[id]/metadata/[metadata]/options/[option]' &&
+			page.route.id === '/(app)/protocols/[id]/edit/metadata/[metadata]/options/[option]' &&
 			page.params.option === key;
 
 		if (wasOnOptionPage) {
-			await goto('/(app)/protocols/[id]/metadata/[metadata]/options', {
+			await goto('/(app)/protocols/[id]/edit/metadata/[metadata]/options', {
 				id: page.params.id ?? '',
 				metadata: page.params.metadata ?? '',
 			});
@@ -32,7 +32,7 @@
 				await invalidate(dependencyURI('Metadata', page.data.metadata.id, 'options'));
 				// Go back to the option page if we were on it before
 				if (wasOnOptionPage) {
-					await goto('/(app)/protocols/[id]/metadata/[metadata]/options/[option]', {
+					await goto('/(app)/protocols/[id]/edit/metadata/[metadata]/options/[option]', {
 						id: page.params.id ?? '',
 						metadata: page.params.metadata ?? '',
 						option: key,
@@ -104,7 +104,7 @@
 			nameInput.value = '';
 
 			await invalidate(dependencyURI('Metadata', data.metadata.id, 'options'));
-			await goto('/(app)/protocols/[id]/metadata/[metadata]/options/[option]', {
+			await goto('/(app)/protocols/[id]/edit/metadata/[metadata]/options/[option]', {
 				id: data.protocol.id,
 				metadata: removeNamespaceFromMetadataId(data.metadata.id),
 				option: key,
@@ -149,7 +149,7 @@
 					<div class="navlink" class:active={page.params.option === key}>
 						<a
 							href={resolve(
-								'/(app)/protocols/[id]/metadata/[metadata]/options/[option]',
+								'/(app)/protocols/[id]/edit/metadata/[metadata]/options/[option]',
 								{
 									id: data.protocol.id,
 									metadata: removeNamespaceFromMetadataId(data.metadata.id),

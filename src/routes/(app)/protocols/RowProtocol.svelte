@@ -4,6 +4,7 @@
 	import IconUpgrade from '~icons/ri/arrow-up-circle-line';
 	import IconDelete from '~icons/ri/delete-bin-line';
 	import IconEdit from '~icons/ri/pencil-line';
+	import IconStats from '~icons/ri/pie-chart-2-line';
 	import IconExport from '~icons/ri/share-forward-line';
 	import Badge from '$lib/Badge.svelte';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
@@ -23,6 +24,7 @@
 		version?: number;
 		ondelete: () => void;
 		updates: 'automatic' | 'manual';
+		charts?: Protocol['charts'];
 
 		expanded?: boolean;
 	}
@@ -35,6 +37,7 @@
 		ondelete,
 		updates,
 		expanded = $bindable(false),
+		charts,
 	}: Props = $props();
 
 	const autoUpdatesEnabled = $derived.by(() => {
@@ -42,6 +45,8 @@
 		if (id in user) return user[id];
 		return updates === 'automatic';
 	});
+
+	const hasUserScopedCharts = $derived(charts && 'user' in charts);
 </script>
 
 <li>
@@ -123,7 +128,13 @@
 				<IconDelete />
 				Supprimer
 			</ButtonSecondary>
-			<ButtonSecondary onclick={() => goto('/(app)/protocols/[id]/infos', { id })}>
+			{#if hasUserScopedCharts}
+				<ButtonSecondary onclick={() => goto('/(app)/protocols/[id]/results', { id })}>
+					<IconStats />
+					Stats
+				</ButtonSecondary>
+			{/if}
+			<ButtonSecondary onclick={() => goto('/(app)/protocols/[id]/edit/infos', { id })}>
 				<IconEdit />
 				Modifier
 				<Badge>Beta</Badge>
