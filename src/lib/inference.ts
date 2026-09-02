@@ -1,15 +1,20 @@
+import type { DatabaseHandle } from './idb.svelte.js';
+import type { NamespacedMetadataID } from './schemas/common.js';
+import type { NeuralModelSelector } from './schemas/sessions.js';
+import type * as DB from '$lib/database.js';
+import type { PROCEDURES } from '$worker/procedures.js';
+import type { SwarpcClient } from 'swarpc';
+
 import * as ort from 'onnxruntime-web';
 
 import { loadToTensor, output2BB, preprocessTensor } from './inference_utils.js';
+import { accessBytes } from './storage/utils.js';
 import { fetchHttpRequest, progressSplitter } from './utils.js';
 
 /**
- * @import { PROCEDURES } from '$worker/procedures.js';
+ * [x,y,w,h]
  */
-
-/**
- * @typedef {[number, number, number, number]} BB [x,y,w,h]
- */
+type BB = [number, number, number, number];
 
 /* 
 ce fichier et le fichier utils associé (inference_utils.js) contiennent les fonctions pour effectuer les inférences de détection et de classification.
@@ -52,42 +57,66 @@ de plus ça se lance que sur chrome, avec la commande linux mettant les flags :
 
 // nombre de threads pour wasm
 ort.env.wasm.numThreads = 1;
-// nécéssaire sinon ça casse
 
 ort.env.wasm.wasmPaths = {
-	// @ts-ignore
+	// @ts-expect-error nécéssaire sinon ça casse
 	'ort-wasm-simd-threaded.wasm': '/ort-wasm-simd-threaded.wasm',
 };
 
-export const TARGETWIDTH = 640; // taille de l'image d'entrée du modèle de détection
-export const TARGETHEIGHT = 640; // taille de l'image d'entrée du modèle de détection
+const TARGETWIDTH = 640; // taille de l'image d'entrée du modèle de détection
+const TARGETHEIGHT = 640; // taille de l'image d'entrée du modèle de détection
 const NUMCONF = 0.437; // seuil de confiance pour la détection
 const STD = [0.229, 0.224, 0.225]; // valeurs de normalisation pour la classification
 const MEAN = [0.485, 0.456, 0.406]; // valeurs de normalisation pour la classification
 
 /**
- *
- * @param {import('swarpc').SwarpcClient<typeof PROCEDURES>} swarpc
- * @param { 'classification' | 'detection' } task
- * @param {object} params
- * @param {string} params.protocolId
- * @param {object} params.requests
- * @param {typeof import('$lib/schemas/common').HTTPRequest.infer} params.requests.model
- * @param {typeof import('$lib/schemas/neural.js').NeuralEnumInference.infer['classmapping'] | undefined} params.requests.classmapping
- * @param {boolean} [params.webgpu]
- * @param {(p: number) => void} [params.onProgress] called everytime the progress changes
- * @param {AbortSignal} [params.abortSignal] signal to abort the loading
- * @returns {Promise<string>} ID of the inference session
+ * @returns  ID of the inference session
  */
-export async function loadModel(
+export async function loadModel({
+	db,
 	swarpc,
-	task,
-	{ protocolId, requests, webgpu = false, onProgress, abortSignal }
-) {
+	selector,
+	protocolId,
+	metadataId,
+	alreadyLoadedSessions = new Set(),
+	/** called everytime the progress changes */
+	onProgress,
+	/** signal to abort the loading */
+	abortSignal,
+}: {
+	protocolId: string;
+	onProgress: (p: number) => void;
+	abortSignal: AbortSignal;
+	db: DatabaseHandle;
+	swarpc: SwarpcClient<typeof PROCEDURES>;
+	metadataId: NamespacedMetadataID;
+	alreadyLoadedSessions: Set<string>;
+	selector: (typeof NeuralModelSelector)['infer'];
+}): Promise<string | undefined> {
 	onProgress ??= () => {};
 	const splitProgress = progressSplitter('model', 0.8, 'classmapping', 0.1, 'loading');
+	const metadata = await db.get('Metadata', metadataId);
+	if (!metadata) return;
+	if (!metadata.infer) return;
+	if (!('neural' in metadata.infer)) return;
 
-	const id = inferenceModelId(protocolId, requests.model);
+	const task =
+		metadata.type === 'boundingbox' ? ('detection' as const) : ('classification' as const);
+
+	if (selector.kind === 'disabled') return;
+
+	const config =
+		selector.kind === 'protocol'
+			? metadata.infer.neural[selector.i]
+			: selector.kind === 'custom'
+				? await db.get('CustomNeuralNetwork', selector.id)
+				: undefined;
+
+	if (!config) return;
+
+	const id = inferenceModelId(protocolId, config);
+
+	if (alreadyLoadedSessions.has(id)) return;
 
 	const existingSession = await swarpc.inferenceSessionId.broadcast.once
 		.orThrow(task)
@@ -104,35 +133,39 @@ export async function loadModel(
 		return id;
 	}
 
-	const model = await fetchHttpRequest(requests.model, {
-		signal: abortSignal,
-		cacheAs: 'model',
-		onProgress({ transferred, total }) {
-			onProgress(splitProgress('model', transferred / total));
-		},
-	})
-		.then((response) => response.arrayBuffer())
-		.then((buffer) => new Uint8Array(buffer));
+	const model =
+		'source' in config && config.source === 'local'
+			? await accessBytes('CustomNeuralNetwork', config).then((buf) => new Uint8Array(buf))
+			: await fetchHttpRequest('model' in config ? config.model : config.url, {
+					signal: abortSignal,
+					cacheAs: 'model',
+					onProgress({ transferred, total }) {
+						onProgress(splitProgress('model', transferred / total));
+					},
+				})
+					.then((response) => response.arrayBuffer())
+					.then((buffer) => new Uint8Array(buffer));
 
 	/** @type {string | undefined} */
-	let classmapping = undefined;
-	if (requests.classmapping && Array.isArray(requests.classmapping)) {
-		classmapping = requests.classmapping.join('\n');
-	} else if (requests.classmapping) {
-		classmapping = await fetchHttpRequest(requests.classmapping, {
-			signal: abortSignal,
-			cacheAs: 'model',
-			onProgress({ transferred, total }) {
-				onProgress(splitProgress('classmapping', transferred / total));
-			},
-		}).then((res) => res.text());
+	let classmapping: string | undefined = undefined;
+	if ('classmapping' in config && config.classmapping) {
+		if (Array.isArray(config.classmapping)) {
+			classmapping = config.classmapping.join('\n');
+		} else {
+			classmapping = await fetchHttpRequest(config.classmapping, {
+				signal: abortSignal,
+				cacheAs: 'model',
+				onProgress({ transferred, total }) {
+					onProgress(splitProgress('classmapping', transferred / total));
+				},
+			}).then((res) => res.text());
+		}
 	}
 
 	const loaded = await swarpc.loadModel.broadcast.once.orThrow({
 		task,
 		model,
 		classmapping,
-		webgpu,
 		inferenceSessionId: id,
 	});
 
@@ -145,26 +178,28 @@ export async function loadModel(
 	return id;
 }
 
-/**
- * @param {string} protocolId
- * @param {import('$lib/database.js').HTTPRequest} request
- * @returns {string}
- */
-export function inferenceModelId(protocolId, request) {
+export function inferenceModelId(
+	protocolId: string,
+	request: { model: DB.HTTPRequest } | { id: string }
+): string {
 	/** @type {Array<string|undefined>} */
-	let components = [protocolId];
+	let components: Array<string | undefined> = [protocolId];
 
-	if (typeof request === 'string') {
-		components = [...components, 'GET', request];
+	if ('id' in request) {
+		components = [...components, 'custom', request.id];
 	} else {
-		components = [
-			...components,
-			request.method,
-			request.url,
-			...Object.entries(request.headers ?? {})
-				.sort(([a], [b]) => a.localeCompare(b))
-				.map(([k, v]) => `${k}:${v}`),
-		];
+		if (typeof request.model === 'string') {
+			components = [...components, 'GET', request.model];
+		} else {
+			components = [
+				...components,
+				request.model.method,
+				request.model.url,
+				...Object.entries(request.model.headers ?? {})
+					.sort(([a], [b]) => a.localeCompare(b))
+					.map(([k, v]) => `${k}:${v}`),
+			];
+		}
 	}
 
 	return components.filter(Boolean).join('|');
@@ -174,16 +209,25 @@ if (import.meta.vitest) {
 	const { test, expect } = import.meta.vitest;
 
 	test('inferenceModelId', () => {
-		const id1 = inferenceModelId('protocol1', 'http://example.com/model.onnx');
+		const id1 = inferenceModelId('protocol1', {
+			model: 'http://example.com/model.onnx',
+		});
 		const id2 = inferenceModelId('protocol1', {
-			url: 'http://example.com/model.onnx',
-			method: 'GET',
-			headers: { Authorization: 'Bearer token' },
+			model: {
+				url: 'http://example.com/model.onnx',
+				method: 'GET',
+				headers: { Authorization: 'Bearer token' },
+			},
 		});
 		const id3 = inferenceModelId('protocol1', {
-			url: 'http://example.com/model.onnx',
-			method: 'GET',
-			headers: { 'X-Custom-Header': 'value', Authorization: 'Bearer token' },
+			model: {
+				url: 'http://example.com/model.onnx',
+				method: 'GET',
+				headers: { 'X-Custom-Header': 'value', Authorization: 'Bearer token' },
+			},
+		});
+		const id4 = inferenceModelId('protocol2', {
+			id: 'feur',
 		});
 
 		expect(id1).toBe('protocol1|GET|http://example.com/model.onnx');
@@ -191,45 +235,30 @@ if (import.meta.vitest) {
 		expect(id3).toBe(
 			'protocol1|GET|http://example.com/model.onnx|Authorization:Bearer token|X-Custom-Header:value'
 		);
+		expect(id4).toBe('protocol2|custom|feur');
 	});
 }
 
-/**
- * @param {import('$lib/database').HTTPRequest} model
- * @returns {string}
- */
-export function modelUrl(model) {
+export function modelUrl(model: HTTPRequest): string {
 	if (typeof model === 'string') return model;
 	return model.url;
 }
 
-/**
- *
- * @param {object} taskSettings
- * @param {object} taskSettings.input
- * @param {number} taskSettings.input.width
- * @param {number} taskSettings.input.height
- * @param {string} taskSettings.input.name
- * @param {boolean} taskSettings.input.normalized
- * @param {object} taskSettings.output
- * @param {string} taskSettings.output.name
- * @param {import('./database.js').ModelDetectionOutputShapes} taskSettings.output.shape
- * @param {AbortSignal} [taskSettings.abortSignal]
- * @param {ArrayBuffer[]} buffers
- * @param {import('onnxruntime-web').InferenceSession} session
- * @param {typeof import('./uistate.svelte.js').uiState} [uiState]
- * @param {boolean} sequence
- * @param {boolean} webgpu
- * @returns {Promise<[BB[][], number[][], number, ort.Tensor[]]>}
- */
 export async function infer(
-	{ abortSignal, ...taskSettings },
-	buffers,
-	session,
-	uiState,
-	sequence = false,
-	webgpu = true
-) {
+	{
+		abortSignal,
+		...taskSettings
+	}: {
+		input: { width: number; height: number; name: string; normalized: boolean };
+		output: { name: string; shape: ModelDetectionOutputShapes };
+		abortSignal?: AbortSignal;
+	},
+	buffers: ArrayBuffer[],
+	session: import('onnxruntime-web').InferenceSession,
+	uiState: typeof import('./uistate.svelte.js').uiState,
+	sequence: boolean = false,
+	webgpu: boolean = true
+): Promise<[BB[][], number[][], number, ort.Tensor]> {
 	/*Effectue une inférence de détection sur une ou plusieurs images. 
     -------------inputs----------------
         files : liste de fichiers images
@@ -281,9 +310,8 @@ export async function infer(
 			...taskSettings?.output,
 		},
 	};
-	let inputTensor;
 
-	inputTensor = await loadToTensor(buffers, {
+	const inputTensor = await loadToTensor(buffers, {
 		...taskSettings.input,
 		...(abortSignal ? { abortSignal } : {}),
 	});
@@ -293,7 +321,7 @@ export async function infer(
 
 	const bbs = output2BB(
 		taskSettings.output.shape,
-		/** @type {Float32Array} */ (outputTensor[outputName].data),
+		outputTensor[outputName].data as Float32Array,
 		buffers.length,
 		NUMCONF,
 		abortSignal
@@ -304,19 +332,19 @@ export async function infer(
 		uiState.processing.done = buffers.length;
 		uiState.processing.time = (Date.now() - start) / 1000;
 	}
-	// @ts-ignore
+
 	return [boundingboxes, bestScores, start, inputTensor];
 }
 
 /**
- *
- * @param {typeof import('$worker/procedures.js').PROCEDURES.classify.input['infer']['taskSettings']} settings
- * @param {ort.Tensor} image
- * @param {import('onnxruntime-web').InferenceSession} model
- * @param {AbortSignal} [abortSignal]
- * @returns {Promise<number[]>} scores for each class
+ * @returns  scores for each class
  */
-export async function classify(settings, image, model, abortSignal) {
+export async function classify(
+	settings: (typeof PROCEDURES.classify.input)['infer']['taskSettings'],
+	image: ort.Tensor,
+	model: ort.InferenceSession,
+	abortSignal: AbortSignal
+): Promise<number[]> {
 	const inputName = settings.input.name ?? model.inputNames[0];
 
 	const input = await preprocessTensor(settings, image, MEAN, STD, abortSignal);
@@ -327,7 +355,7 @@ export async function classify(settings, image, model, abortSignal) {
 
 	const scores = await output[Object.keys(output)[0]]
 		.getData(true)
-		.then((scores) => /** @type {number[]} */ ([...scores.values()]));
+		.then((scores) => /** @type {number[]} */ [...scores.values()]);
 
 	image.dispose();
 	return scores;
