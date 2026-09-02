@@ -17,13 +17,14 @@
 <script lang="ts">
 	import IconInfo from '~icons/ri/information-line';
 	import { formatBytesSize } from '$lib/i18n.js';
-	import { list, listByIndex, tables } from '$lib/idb.svelte.js';
+	import { databaseHandle, list, listByIndex, tables } from '$lib/idb.svelte.js';
+	import * as idb from '$lib/idb.svelte.js';
 	import LoadingText, { Loading } from '$lib/LoadingText.svelte';
 	import { IsMobile } from '$lib/mobile.svelte.js';
 	import { goto } from '$lib/paths.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { deleteSession, switchSession } from '$lib/sessions.js';
-	import { byteSizeOfObject } from '$lib/storage/utils.js';
+	import { byteSizeOfObject, deleteObjectWithBytes } from '$lib/storage/utils.js';
 	import { tooltip } from '$lib/tooltips.js';
 	import { PendingStorage } from '$routes/(app)/capture/pendingstorage.svelte.js';
 
@@ -34,7 +35,7 @@
 		void estimateStorageQuotaUsage();
 	});
 
-	async function cacheEntrySize(key: Request) {
+	async function cacheEntrySize(key: Request | URL) {
 		const res = await fetch(key);
 		const body = await res.bytes();
 		return body.length;
@@ -96,13 +97,42 @@
 	<section class="models">
 		<h2>Modèles d'inférence</h2>
 
-		{@render cacheTable('cache-models')}
+		{@render cacheTable(3, 'Inclus dans les protocoles', 'cache-models')}
+
+		<Table
+			title="Modèles personnalisés"
+			titleLevel={3}
+			listEntries={async () => {
+				const models = await list('CustomNeuralNetwork');
+				return models.map((model) => ({
+					name: model.name,
+					key: model.id,
+					origin: model.url || model.filename,
+					originTooltip: '',
+				}));
+			}}
+			deleteEntry={async (entry) => {
+				await deleteObjectWithBytes(databaseHandle(), 'CustomNeuralNetwork', entry.key);
+				await idb.tables.CustomNeuralNetwork.refresh(null);
+			}}
+			entrySize={async (entry) => {
+				const object = await idb.get('CustomNeuralNetwork', entry.key);
+				if (!object)
+					throw new Error(`Could not find CustomNeuralNetwork with id ${entry.key}`);
+
+				switch (object.source) {
+					case 'remote':
+						return cacheEntrySize(object.url);
+					case 'local':
+						return byteSizeOfObject('CustomNeuralNetwork', object);
+				}
+			}}
+		/>
 	</section>
 
 	<section class="sessions">
-		<h2>Sessions</h2>
-
 		<Table
+			title="Sessions"
 			listEntries={async () => {
 				const sessions = await list('Session');
 				return sessions.map((session) => ({
@@ -124,10 +154,9 @@
 	</section>
 
 	<section class="pending-photos">
-		<h2>Photos en attente</h2>
-
 		<!-- TODO: make Table take async iterators for listEntries instead of async functions -->
 		<Table
+			title="Photos en attente"
 			listEntries={async () => {
 				const entries = [];
 				for await (const sessionId of PendingStorage.sessions()) {
@@ -196,9 +225,8 @@
 	</section> -->
 
 	<section class="misc">
-		<h2>Autres</h2>
-
 		<Table
+			title="Autres"
 			listEntries={async () => {
 				if (!caches) return [];
 				const names = await caches.keys();
@@ -226,8 +254,10 @@
 		/>
 	</section>
 
-	{#snippet cacheTable(cacheName: string)}
+	{#snippet cacheTable(headingLevel: 2 | 3, heading: string, cacheName: string)}
 		<Table
+			title={heading}
+			titleLevel={headingLevel}
 			listEntries={async () => {
 				if (!caches) return [];
 				const cache = await caches.open(cacheName);
@@ -289,7 +319,7 @@
 		width: 20rem;
 	}
 
-	section h2 {
+	h2 {
 		margin-bottom: 1rem;
 	}
 </style>

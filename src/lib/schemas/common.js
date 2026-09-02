@@ -1,12 +1,6 @@
 import { type } from 'arktype';
 import { ms } from 'convert';
-import {
-	differenceInMilliseconds,
-	intervalToDuration,
-	isWithinInterval,
-	setHours,
-	setMinutes,
-} from 'date-fns';
+import { differenceInMilliseconds, isWithinInterval, setHours, setMinutes } from 'date-fns';
 
 import { clamp, cleanFilepath, safeJSONStringify } from '../utils.js';
 import { TemplatedString } from './expressions.js';

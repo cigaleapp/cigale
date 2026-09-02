@@ -12,9 +12,9 @@
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import CardImage from '$lib/CardImage.svelte';
 	import CardObservation from '$lib/CardObservation.svelte';
-	import { tables } from '$lib/idb.svelte';
+	import { databaseHandle, tables } from '$lib/idb.svelte.js';
 	import { deleteImage, imageBufferWasSaved, imageIsClassified } from '$lib/images';
-	import { inferenceModelId, loadModel } from '$lib/inference.js';
+	import { loadModel } from '$lib/inference.js';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
 	import Logo from '$lib/Logo.svelte';
 	import { IsMobile } from '$lib/mobile.svelte.js';
@@ -117,26 +117,12 @@
 		const protocolId = protocol.id;
 
 		const enabledMetadata = uiState.enabledClassificationMetadata;
-		const modelLoads = enabledMetadata.flatMap((metadata) => {
-			const modelIndex = uiState.selectedClassificationModels[metadata.id] ?? -1;
-			const settings = uiState.allClassificationModels[metadata.id]?.[modelIndex];
-
-			if (!settings) {
-				console.warn(`No model found for metadata ${metadata.id} at index ${modelIndex}`);
-				return [];
-			}
-
-			return [
-				{
-					metadataId: metadata.id,
-					settings,
-					sessionId: inferenceModelId(protocolId, settings.model),
-				},
-			];
-		});
-
-		classifmodelLoaded = false;
-		modelLoadingProgress = 0;
+		const modelLoads = enabledMetadata.map((metadata) => ({
+			metadataId: metadata.id,
+			selector: uiState.selectedClassificationModels[metadata.id] ?? {
+				kind: 'disabled',
+			},
+		}));
 
 		// If nothing is enabled, there is nothing to load.
 		if (modelLoads.length === 0) {
@@ -144,35 +130,30 @@
 			return;
 		}
 
-		const pendingLoads = modelLoads.filter(
-			({ sessionId }) => !uiState.loadedInferenceSessions.has(sessionId)
-		);
-		if (pendingLoads.length === 0) {
-			classifmodelLoaded = true;
-			queueClassificationsIfReady();
-			return;
-		}
-
 		if (!uiState.classificationInferenceAvailable) return;
+
+		classifmodelLoaded = false;
+		modelLoadingProgress = 0;
 
 		modelAbortController.abort();
 		classifModelLoadingError = undefined;
 		modelAbortController = new AbortController();
 
 		try {
-			for (let i = 0; i < pendingLoads.length; i++) {
-				const { settings, sessionId, metadataId } = pendingLoads[i];
-				await loadModel(data.swarpc, 'classification', {
+			for (const [i, { metadataId, selector }] of modelLoads.entries()) {
+				const sessionId = await loadModel({
+					alreadyLoadedSessions: uiState.loadedInferenceSessions,
+					db: databaseHandle(),
+					swarpc: data.swarpc,
 					abortSignal: modelAbortController.signal,
 					protocolId,
-					requests: {
-						model: settings.model,
-						classmapping: settings.classmapping,
-					},
+					metadataId,
+					selector,
 					onProgress(p) {
-						modelLoadingProgress = (i + p) / pendingLoads.length;
+						modelLoadingProgress = (i + p) / modelLoads.length;
 					},
 				});
+
 				loadedModels.add(metadataId);
 				uiState.loadedInferenceSessions.add(sessionId);
 			}
@@ -228,21 +209,25 @@
 {#snippet modelsource()}
 	{#if uiState.classificationInferenceAvailable}
 		{#each uiState.allClassificationMetadata as metadata (metadata.id)}
-			{@const modelIndex = uiState.selectedClassificationModels[metadata.id] ?? 0}
-			{@const models = uiState.allClassificationModels[metadata.id]}
-			{@const model = models?.[modelIndex]?.model}
+			{const selector = uiState.selectedClassificationModels[metadata.id] ?? 0}
+			{const model = uiState.classificationModelBySelector(selector, metadata.id)}
+			{const url = uiState.classificationModelUrl(selector, metadata.id)}
+
 			{#if model}
-				{@const url = new URL(typeof model === 'string' ? model : model?.url)}
 				<div class="is-loaded">
 					{#if loadedModels.has(metadata.id)}
 						<IconLoaded />
 					{/if}
 				</div>
 				<span class="metadata-label">{metadata.label}: </span>
-				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
-				<a href={url.toString()} target="_blank" title={metadata.id}>
-					<code>{url.pathname.split('/').at(-1)}</code>
-				</a>
+				{#if url}
+					<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
+					<a href={url.toString()} target="_blank" title={metadata.id}>
+						<code>{url.pathname.split('/').at(-1)}</code>
+					</a>
+				{:else}
+					{model.name}
+				{/if}
 			{/if}
 		{/each}
 	{/if}

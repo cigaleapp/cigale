@@ -15,7 +15,7 @@ Example:
 		--scores 0.1 0.2 0.5 0.15 0.05 \
 
 Input:
-	float32 tensor [B,C,H,W]
+	float32 tensor [B,C,W,H]
 
 Output:
 	float32 tensor [B,N]
@@ -31,111 +31,111 @@ import onnx
 from onnx import TensorProto, checker, helper, numpy_helper
 
 
-def build_model(channels, height, width, scores):
-	num_classes = len(scores)
+def build_model(channels, width, height, scores):
+    num_classes = len(scores)
 
-	flat = channels * height * width
+    flat = channels * height * width
 
-	input_tensor = helper.make_tensor_value_info(
-		"input",
-		TensorProto.FLOAT,
-		[None, channels, height, width],
-	)
+    input_tensor = helper.make_tensor_value_info(
+        "input",
+        TensorProto.FLOAT,
+        ["batch", channels, width, height],
+    )
 
-	output_tensor = helper.make_tensor_value_info(
-		"output",
-		TensorProto.FLOAT,
-		[None, num_classes],
-	)
+    output_tensor = helper.make_tensor_value_info(
+        "output",
+        TensorProto.FLOAT,
+        ["batch", num_classes],
+    )
 
-	reshape_shape = numpy_helper.from_array(
-		np.array([-1, flat], dtype=np.int64),
-		name="reshape_shape",
-	)
+    reshape_shape = numpy_helper.from_array(
+        np.array([-1, flat], dtype=np.int64),
+        name="reshape_shape",
+    )
 
-	weights = numpy_helper.from_array(
-		np.zeros((flat, num_classes), dtype=np.float32),
-		name="weights",
-	)
+    weights = numpy_helper.from_array(
+        np.zeros((flat, num_classes), dtype=np.float32),
+        name="weights",
+    )
 
-	bias = numpy_helper.from_array(
-		np.array(scores, dtype=np.float32),
-		name="bias",
-	)
+    bias = numpy_helper.from_array(
+        np.array(scores, dtype=np.float32),
+        name="bias",
+    )
 
-	reshape = helper.make_node(
-		"Reshape",
-		["input", "reshape_shape"],
-		["flat"],
-	)
+    reshape = helper.make_node(
+        "Reshape",
+        ["input", "reshape_shape"],
+        ["flat"],
+    )
 
-	matmul = helper.make_node(
-		"MatMul",
-		["flat", "weights"],
-		["matmul_out"],
-	)
+    matmul = helper.make_node(
+        "MatMul",
+        ["flat", "weights"],
+        ["matmul_out"],
+    )
 
-	add = helper.make_node(
-		"Add",
-		["matmul_out", "bias"],
-		["output"],
-	)
+    add = helper.make_node(
+        "Add",
+        ["matmul_out", "bias"],
+        ["output"],
+    )
 
-	graph = helper.make_graph(
-		[reshape, matmul, add],
-		"fixed_score_model",
-		[input_tensor],
-		[output_tensor],
-		initializer=[
-			reshape_shape,
-			weights,
-			bias,
-		],
-	)
+    graph = helper.make_graph(
+        [reshape, matmul, add],
+        "fixed_score_model",
+        [input_tensor],
+        [output_tensor],
+        initializer=[
+            reshape_shape,
+            weights,
+            bias,
+        ],
+    )
 
-	model = helper.make_model(
-		graph,
-		producer_name="generate_fixed_score_model",
-		opset_imports=[
-			helper.make_opsetid("", 13),
-		],
-	)
+    model = helper.make_model(
+        graph,
+        producer_name="generate_fixed_score_model",
+        opset_imports=[
+            helper.make_opsetid("", 13),
+        ],
+    )
 
-	model.ir_version = 8
+    model.ir_version = 8
 
-	checker.check_model(model)
+    checker.check_model(model)
 
-	return model
+    return model
 
 
 def main():
-	parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser()
 
-	parser.add_argument(
-		"--shape",
-		nargs=3,
-		type=int,
-		metavar=("C", "H", "W"),
-		required=True,
-		help="Input tensor shape.",
-	)
+    parser.add_argument(
+        "--shape",
+        nargs=3,
+        type=int,
+        metavar=("C", "H", "W"),
+        required=True,
+        help="Input tensor shape.",
+    )
 
-	parser.add_argument(
-		"--scores",
-		nargs="+",
-		type=float,
-		required=True,
-		help="Fixed output scores.",
-	)
+    parser.add_argument(
+        "--scores",
+        nargs="+",
+        type=float,
+        required=True,
+        help="Fixed output scores.",
+    )
 
-	args = parser.parse_args()
+    args = parser.parse_args()
 
-	c, h, w = args.shape
+    c, h, w = args.shape
 
-	model = build_model( c, h, w, args.scores)
+    model = build_model(c, h, w, args.scores)
 
-	onnx.save(model, sys.stdout.buffer)
+    onnx.save(model, sys.stdout.buffer)
 
 
 if __name__ == "__main__":
-	main()
+    main()

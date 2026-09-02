@@ -89,7 +89,7 @@ export async function loadToTensor(
             forme : [files.length, 3, targetHeight, targetWidth]
     */
 
-	var float32Data = new Float32Array(targetHeight * targetWidth * 3 * buffers.length);
+	var float32Data = new Float32Array(targetWidth * targetHeight * 3 * buffers.length);
 	for (let f = 0; f < buffers.length; f++) {
 		abortSignal?.throwIfAborted();
 
@@ -127,14 +127,11 @@ export async function loadToTensor(
 		}
 
 		const transposedData = redArray.concat(greenArray).concat(blueArray);
-		let i,
-			l = transposedData.length;
+		const l = transposedData.length;
 
-		if (normalized) {
-			for (i = 0; i < l; i++) {
-				abortSignal?.throwIfAborted();
-				float32Data[f * l + i] = transposedData[i] / 255.0; // convert to float
-			}
+		for (let i = 0; i < l; i++) {
+			abortSignal?.throwIfAborted();
+			float32Data[f * l + i] = transposedData[i] / (normalized ? 255.0 : 1); // convert to float
 		}
 	}
 
@@ -142,8 +139,8 @@ export async function loadToTensor(
 	var tensor = new ort.Tensor('float32', float32Data, [
 		buffers.length,
 		3,
-		targetHeight,
 		targetWidth,
+		targetHeight,
 	]);
 
 	return tensor;
@@ -340,8 +337,8 @@ async function resizeTensor(tensor, targetWidth, targetHeight, abortSignal) {
 	const data = await tensor.getData();
 	const dims = tensor.dims;
 
-	const resizedData = new Float32Array(targetHeight * targetWidth * 3);
-	const resizedDims = [1, 3, targetHeight, targetWidth];
+	const resizedData = new Float32Array(targetWidth * targetHeight * 3);
+	const resizedDims = [1, 3, targetWidth, targetHeight];
 
 	const widthRatio = dims[3] / targetWidth;
 	const heightRatio = dims[2] / targetHeight;
