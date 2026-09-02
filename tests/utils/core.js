@@ -391,7 +391,13 @@ export async function clickInDropdown(page, trigger, ...option) {
 		// Hover over the first option
 		await submenuTrigger.hover();
 
-		await expect(submenuTrigger).toHaveAttribute('aria-controls');
+		try {
+			await expect(submenuTrigger).toHaveAttribute('aria-controls');
+		} catch {
+			// Sometimes hovering doesn't work: click the submenu trigger in that case
+			await submenuTrigger.click();
+			await expect(submenuTrigger).toHaveAttribute('aria-controls');
+		}
 
 		// Find the submenu
 		const submenu = await submenuTrigger

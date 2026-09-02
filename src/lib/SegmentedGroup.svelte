@@ -9,15 +9,17 @@
 		options: Key[];
 		current: NoInfer<Key>;
 		// eslint-disable-next-line no-unused-vars
-		disabled?: (key: Key) => boolean | string;
+		disabled?: boolean | ((key: Key) => boolean | string);
 	} & Record<`option_${NoInfer<Key>}`, Snippet<[{ current: boolean; disabled: boolean }]>>;
 
 	let {
 		options,
-		disabled: isDisabled = () => false,
+		disabled: _disabled = false,
 		current = $bindable(),
 		...snippets
 	}: Props = $props();
+
+	const isDisabled = typeof _disabled === 'boolean' ? () => _disabled : _disabled;
 
 	const id = $props.id();
 </script>
@@ -27,7 +29,12 @@
 		{@const disabled = isDisabled(key)}
 		{@const disabledWhy = typeof disabled === 'string' ? disabled : undefined}
 
-		<label for="{id}-{key}" use:tooltip={disabledWhy} role="tab">
+		<label
+			for="{id}-{key}"
+			use:tooltip={disabledWhy}
+			role="tab"
+			aria-selected={current === key}
+		>
 			<input
 				disabled={Boolean(disabled)}
 				type="radio"

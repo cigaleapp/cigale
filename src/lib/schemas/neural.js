@@ -5,16 +5,16 @@ import { HTTPRequest } from './common.js';
 import { JsonataExpression } from './expressions.js';
 
 export const MODEL_DETECTION_OUTPUT_SHAPES = {
-	cx: { help: 'Coordonée X du point central' },
-	cy: { help: 'Coordonée Y du point central' },
-	sy: { help: 'Coordonée Y du point supérieur gauche' },
-	sx: { help: 'Coordonée X du point supérieur gauche' },
-	ex: { help: 'Coordonée X du point inférieur droit' },
-	ey: { help: 'Coordonée Y du point inférieur droit' },
-	w: { help: 'Largeur de la boîte englobante' },
-	h: { help: 'Hauteur de la boîte englobante' },
-	score: { help: 'Score de confiance de cette boîte, entre 0 et 1' },
-	_: { help: 'Autre valeur (ignorée par CIGALE)' },
+	cx: { help: 'Centre, X' },
+	cy: { help: 'Centre, Y' },
+	sy: { help: 'Supérieur gauche, X' },
+	sx: { help: 'Supérieur gauche, Y' },
+	ex: { help: 'Inférieur droit, X' },
+	ey: { help: 'Inférieur droit, Y' },
+	w: { help: 'Largeur de la boîte' },
+	h: { help: 'Hauteur de la boîte' },
+	score: { help: 'Confiance (0—1)' },
+	_: { help: 'Autre valeur (ignorée)' },
 };
 
 export const ModelDetectionOutputShape = type.or(
@@ -56,7 +56,7 @@ export const ModelOutputBoundingBox = ModelOutputCommon.and({
 		"Si les coordonnées des boîtes englobantes sont normalisées par rapport aux dimensions de l'image",
 	],
 	shape: ModelDetectionOutputShapes.describe(
-		"Forme de sortie de chaque boîte englobante. Nécéssite obligatoirement d'avoir 'score'; 2 parmi 'cx', 'sx', 'ex', 'w'; et 2 parmi 'cy', 'sy', 'ey', 'h'. Si les boîtes contiennent d'autre valeurs, bien les mentionner avec '_', même quand c'est à la fin de la liste: cela permet de savoir quand on passe à la boîte suivante. Par exemple, [cx, cy, w, h, score, _] correspond à un modèle YOLO11 COCO"
+		"Forme de sortie de chaque boîte englobante. Nécéssite obligatoirement d'avoir 'score'; 2 parmi 'cx', 'sx', 'ex', 'w'; et 2 parmi 'cy', 'sy', 'ey', 'h'. Si les boîtes contiennent d'autre valeurs, bien les mentionner avec '_', même quand c'est à la fin de la liste: cela permet de savoir quand on passe à la boîte suivante. Par exemple, [cx, cy, w, h, score, _] correspond à un modèle YOLO11"
 	),
 });
 

@@ -337,7 +337,8 @@ export async function app({ page }: { page: Page }, use: (fixture: AppFixture) =
 			byType: (type) => toast(page, null, { type }),
 		},
 		settings: {
-			open: async () => page.getByTestId('app-nav').getByLabel('Réglages').click(),
+			open: async () =>
+				page.getByTestId('app-nav').getByLabel('Réglages', { exact: true }).click(),
 			set: async (values) => setSettings({ page }, values),
 			get: async <Key extends keyof DB.Settings>(...maybeKey: [] | [Key]) => {
 				const settings = await getSettings({ page });
