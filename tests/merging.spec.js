@@ -148,7 +148,7 @@ test(
 	async ({ page, app }) => {
 		await app.gallery.select('cyan', 'leaf');
 		await page.getByTestId('sidepanel').getByRole('button', { name: 'Regrouper' }).click();
-		await assert(page.getByTestId('observations-area').locator('article')).toHaveCount(2);
+		await assert(page.getByTestId('observations-area').locator('article')).toHaveCount(3);
 
 		await expect(app.metadata.section('Genre').locator('code.figure').first()).toHaveText(
 			/\d+(\.\d+)?%/
