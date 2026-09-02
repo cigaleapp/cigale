@@ -1,14 +1,16 @@
 <script lang="ts">
-	import type { ChartBlock } from '$lib/schemas/charts';
+	import type { TypedMetadataValue } from '$lib/metadata';
+	import type { ChartBlock, ComputationPayloadSession } from '$lib/schemas/charts.js';
 
 	import { BarChart, PieChart } from 'layerchart';
+	import { IsInViewport } from 'runed';
 
 	import Carousel from '$lib/Carousel.svelte';
 	import { databaseHandle, get, tables } from '$lib/idb.svelte.js';
 	import LearnMoreLink from '$lib/LearnMoreLink.svelte';
 	import LoadingText, { Loading } from '$lib/LoadingText.svelte';
 	import Markdown from '$lib/Markdown.svelte';
-	import { metadataOption, metadataOptionsOf } from '$lib/metadata';
+	import { metadataOption } from '$lib/metadata';
 	import { resolveMetadataImport } from '$lib/metadata/imports.js';
 	import { mergeMetadataFromImagesAndObservations } from '$lib/metadata/merging.js';
 	import {
@@ -19,7 +21,7 @@
 	} from '$lib/schemas/metadata.js';
 	import { toMetadataRecord } from '$lib/schemas/results.js';
 	import { uiState } from '$lib/uistate.svelte';
-	import { corsfixIfLocalhost, ensureArray, mapKeys } from '$lib/utils.js';
+	import { clamp, corsfixIfLocalhost, ensureArray, mapKeys } from '$lib/utils.js';
 
 	type BlockTypes = (typeof ChartBlock)['infer']['type'];
 	type BlockData<Type extends BlockTypes = BlockTypes> = (typeof ChartBlock)['infer'] & {
@@ -29,16 +31,25 @@
 	interface Props {
 		scope: 'user' | 'session';
 		protocol?: string;
+		name: string;
 		block: BlockData;
 	}
 
-	const { block, scope, protocol: protocolId }: Props = $props();
+	const { block, scope, protocol: protocolId, name: blockName }: Props = $props();
 	const { title, description } = $derived(block);
+
+	let dimensions = $state<ClientRect>();
+
+	let inViewport = $state<IsInViewport>();
 
 	async function compute<B extends BlockData>(
 		block: B
 	): Promise<Awaited<ReturnType<B['compute']['evaluate']>>> {
-		async function metadataRecord(record: Record<string, MetadataRuntimeValue>) {
+		await new Promise((resolve, reject) => {
+			if (inViewport?.current) resolve();
+		});
+
+		async function metadataRecord(record: Record<string, TypedMetadataValue>) {
 			const rec = toMetadataRecord(record);
 
 			for (const [key, val] of Object.entries(rec)) {
@@ -50,7 +61,7 @@
 
 				if (!block.needs?.includes(id.id)) continue;
 
-				const options = await metadataOptionsOf(databaseHandle(), id.namespace, id.id);
+				if (val.value === null) continue;
 
 				const option = await metadataOption(databaseHandle(), def.id, val.value.toString());
 
@@ -73,6 +84,7 @@
 			id: string
 		): Promise<(typeof ComputationPayloadSession)['infer']> {
 			const session = await tables.Session.get(id);
+			if (!session) throw new Error('Session not found');
 
 			const out: (typeof ComputationPayloadSession)['infer'] = {
 				...session,
@@ -89,18 +101,18 @@
 				});
 			}
 
-			for (const obs of await tables.Observation.list('sessionId', id)) {
-				const images = out.images.filter((img) => obs.images.includes(img.id));
+			const images = await tables.Image.list('sessionId', id);
 
+			for (const obs of await tables.Observation.list('sessionId', id)) {
 				const merged = mergeMetadataFromImagesAndObservations({
-					images,
+					images: images.filter((img) => obs.images.includes(img.id)),
 					observations: [obs],
 					definitions: tables.Metadata.state,
 				});
 
 				out.observations.push({
 					...obs,
-					images,
+					images: out.images.filter((img) => obs.images.includes(img.id)),
 					metadata: await metadataRecord(merged),
 					metadataOverrides: await metadataRecord(obs.metadataOverrides),
 				});
@@ -123,7 +135,14 @@
 					sessions,
 				});
 
-				console.log(`[${block.type}] compute with`, sessions, '=', result);
+				console.log(
+					`[${block.type}] compute ${blockName} with`,
+					sessions,
+					'=',
+					result,
+					'expr is',
+					block.compute.toJSON()
+				);
 				return result;
 			}
 
@@ -155,7 +174,13 @@
 	}
 </script>
 
-<article class="block">
+<article
+	class="block"
+	bind:contentRect={dimensions}
+	{@attach (node) => {
+		inViewport = new IsInViewport(node, { once: true });
+	}}
+>
 	<h2>{title}</h2>
 	<Markdown source={description} />
 
@@ -168,7 +193,10 @@
 			<div class="big">
 				<LoadingText
 					mask="123"
-					value={async () => await compute(block).catch(console.error)}
+					value={async () =>
+						await compute(block)
+							.catch(console.error)
+							.then((value) => value ?? 'N/A')}
 				/>
 			</div>
 
@@ -181,14 +209,15 @@
 			{#await compute(block).catch(console.error)}
 				<LoadingText value={Loading} mask={{ lines: 4 }} />
 			{:then data}
-				<!-- TODO: dynamic height -->
 				<!-- XXX: why do we need json-parse, seems like output is a non-pojo ? -->
 				<PieChart
-					data={ensureArray(JSON.parse(JSON.stringify(data)))}
+					data={ensureArray(JSON.parse(JSON.stringify(data))).filter(
+						(entry) => entry.value !== 0
+					)}
 					key="label"
 					value="value"
 					c={data.every((d) => d.color) ? 'color' : undefined}
-					height={250}
+					height={clamp(0.8 * dimensions.width, 50, 500)}
 					padding={{ top: 50, bottom: 50 }}
 					labels={{ placement: 'callout', value: 'label' }}
 				/>
@@ -199,7 +228,6 @@
 			{#await compute(block).catch(console.error)}
 				<LoadingText value={Loading} mask={{ lines: 4 }} />
 			{:then data}
-				<!-- TODO: dynamic height -->
 				<!-- XXX: why do we need json-parse, seems like output is a non-pojo ? -->
 				<BarChart
 					data={ensureArray(JSON.parse(JSON.stringify(data)))}
@@ -265,7 +293,7 @@
 			{#await compute(block)}
 				<LoadingText value={Loading} />
 			{:then text}
-				<Markdown source={text} />
+				<Markdown source={text ?? ''} />
 			{/await}
 		</div>
 	{/if}
@@ -274,6 +302,7 @@
 <style>
 	.block {
 		padding: 1em;
+		container-type: inline-size;
 	}
 
 	.figure {
@@ -314,6 +343,10 @@
 		display: flex;
 		align-items: start;
 		gap: 2em;
+
+		@container (max-width: 67ch) {
+			flex-direction: column-reverse;
+		}
 
 		&:has(.images) {
 			margin-top: 1em;

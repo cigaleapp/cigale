@@ -1988,7 +1988,7 @@ msgstr "<0/> Import .zip"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/+layout@(app).svelte
 #: src/routes/(app)/(sidepanel)/o/[observation]/+layout@(app).svelte
-#: src/routes/(app)/TopbarBackToHome.svelte
+#: src/routes/(app)/TopbarBack.svelte
 msgid "Retour"
 msgstr "Back"
 

@@ -673,7 +673,7 @@ export const JsonataExpression = (Input, Output, postprocess) =>
 					if (out instanceof ArkErrors) {
 						console.error(
 							`Validation error on output of jsonata expression ${safeJSONStringify(t)}: ${out.summary}`,
-							{ raw, out, data }
+							{ raw, out, data,  }
 						);
 						throw new Error(
 							`Résultat (${safeJSONStringify(raw)}) de l'expression Jsonata ${t}, non conforme`,

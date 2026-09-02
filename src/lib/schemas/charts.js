@@ -12,7 +12,7 @@ const ChartBlockBase = type({
 	description: 'string = ""',
 });
 
-const Image = type({ filename: 'string', metadata: MetadataRecord(ID) });
+const Image = type({ id: 'string', filename: 'string', metadata: MetadataRecord(ID) });
 
 export const ComputationPayloadSession = type({
 	createdAt: 'Date',
@@ -43,7 +43,7 @@ export const ComputationPayload = type.or(
 const Computation = (Out) =>
 	JsonataExpression(
 		ComputationPayload,
-		Out.or('undefined'),
+		Out.or('undefined|null'),
 		Out.extends('unknown[]') ? ensureArray : undefined
 	);
 
