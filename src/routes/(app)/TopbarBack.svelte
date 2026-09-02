@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { Pathname } from '$app/types';
 	import type { Snippet } from 'svelte';
 
 	import IconBack from '~icons/ri/arrow-left-s-line';
@@ -10,9 +11,11 @@
 
 	interface Props {
 		children: Snippet;
+		/** Home by default */
+		to?: Pathname;
 	}
 
-	const { children }: Props = $props();
+	const { children, to = '/sessions/' }: Props = $props();
 </script>
 
 <TopbarContent>
@@ -20,7 +23,7 @@
 		<ButtonIcon
 			help="Retour"
 			onclick={async () => {
-				await goto('/sessions/');
+				await goto(to);
 			}}
 		>
 			<IconBack />
