@@ -22,7 +22,7 @@
 	import { isDebugMode } from '$lib/settings.svelte.js';
 	import { safeJSONParse } from '$lib/utils.js';
 
-	import TopbarBackToHome from '../TopbarBackToHome.svelte';
+	import TopbarBack from '../TopbarBack.svelte';
 
 	const { data } = $props();
 
@@ -141,7 +141,7 @@
 	}
 </script>
 
-<TopbarBackToHome>À propos</TopbarBackToHome>
+<TopbarBack>À propos</TopbarBack>
 
 <header>
 	<Logo drawpercent={logoDrawPercent} />

@@ -6,7 +6,7 @@
 	import { databaseHandle, tables } from '$lib/idb.svelte.js';
 	import Logo from '$lib/Logo.svelte';
 
-	import TopbarBackToHome from '../TopbarBackToHome.svelte';
+	import TopbarBack from '../TopbarBack.svelte';
 	import ModalAddAccount from './ModalAddAccount.svelte';
 	import RowAccount from './RowAccount.svelte';
 
@@ -18,7 +18,7 @@
 
 <ModalAddAccount {adding} bind:open={login} />
 
-<TopbarBackToHome>Comptes</TopbarBackToHome>
+<TopbarBack>Comptes</TopbarBack>
 
 <main>
 	<header>

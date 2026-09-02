@@ -1,4 +1,6 @@
 <script lang="ts">
+	import type { Layout } from './layout.js';
+
 	import { tables } from '$lib/idb.svelte.js';
 	import { transformObject, unique } from '$lib/utils.js';
 
@@ -14,21 +16,13 @@
 
 	const content = $derived(
 		tables.Protocol.getFromState(protocolId)?.charts?.[scope] ?? {
-			blocks: {},
+			blocks: undefined,
 			sections: undefined,
 			layout: undefined,
 		}
 	);
 
-	const { layout = [], sections = {}, blocks } = $derived(content);
-
-	function normalizedLayout(cells: string[][]) {
-		if (cells.length === 0) {
-			return verticalAutoLayout([...Object.keys(sections), ...Object.keys(blocks)]);
-		}
-
-		return homogenizeLayout(layout);
-	}
+	const { layout = [], sections = {}, blocks = {} } = $derived(content);
 
 	/** Blocks that arent in any section */
 	const loneBlocks = $derived(
@@ -38,7 +32,29 @@
 				: [name, block]
 		)
 	);
+
+	let windowWidth = $state(0);
+
+	$inspect(sections);
+
+	function layoutMinWidth(layout: Layout) {
+		return Math.max(...layout.map((row) => row.length)) * 300;
+	}
+
+	function normalizedLayout(cells: Layout) {
+		if (cells.length === 0) {
+			return verticalAutoLayout([...Object.keys(sections), ...Object.keys(blocks)]);
+		}
+
+		if (layoutMinWidth(cells) > windowWidth) {
+			return verticalAutoLayout(unique(cells.flat()).filter((cell) => cell !== null));
+		}
+
+		return homogenizeLayout(cells);
+	}
 </script>
+
+<svelte:window bind:innerWidth={windowWidth} />
 
 <div
 	class="blocks"
@@ -47,7 +63,7 @@
 >
 	{#each Object.entries(loneBlocks) as [name, block] (name)}
 		<div class="block" style:grid-area={name}>
-			<Block {scope} protocol={protocolId} {block} />
+			<Block {name} {scope} protocol={protocolId} {block} />
 		</div>
 	{/each}
 
@@ -56,12 +72,12 @@
 			<h2>{section.title}</h2>
 			<div
 				class="blocks"
-				style:grid-template-areas={cssGridAreas(homogenizeLayout(section.layout))}
+				style:grid-template-areas={cssGridAreas(normalizedLayout(section.layout))}
 			>
-				{#each unique(section.layout.flat().flat()) as name (name)}
+				{#each unique(section.layout.flat()) as name (name)}
 					{#if name !== null}
 						<div class="block" style:grid-area={name}>
-							<Block {scope} protocol={protocolId} block={blocks[name]} />
+							<Block {name} {scope} protocol={protocolId} block={blocks[name]} />
 						</div>
 					{/if}
 				{/each}
@@ -72,8 +88,11 @@
 
 <style>
 	.blocks {
-		display: grid;
 		gap: 2em;
+
+		&:not(.too-wide) {
+			display: grid;
+		}
 
 		.section > & {
 			gap: 1em;

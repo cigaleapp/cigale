@@ -1,6 +1,6 @@
 import { lcm, range } from '$lib/utils.js';
 
-type Layout = (string | null)[][];
+export type Layout = (string | null)[][];
 
 /**
  * Ensures that all rows of the given layout are of same width
