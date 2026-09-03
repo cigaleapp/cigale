@@ -117,7 +117,9 @@ describe('accessBytes', () => {
 describe('storeBytes', () => {
 	test('writes bytes to binary storage and returns migrated', async () => {
 		const spy = vi.spyOn(binaryStorage, 'write').mockResolvedValueOnce(undefined);
-		const content = new Uint8Array([1, 2, 3]).buffer;
+		const content = new File([new Uint8Array([1, 2, 3]).buffer], 'feur.png', {
+			type: 'image/png',
+		});
 
 		expect(
 			await storeBytes(
