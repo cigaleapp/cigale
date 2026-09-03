@@ -1,9 +1,10 @@
 # yaml-language-server: $schema=https://cigaleapp.github.io/cigale/protocol.schema.json
 
 id: org.noe.lepinoc
-name: Lépinoc
+name: Lépinoc par Noé
 description: Collecte de papillons de nuits
 learnMore: https://lepinoc.noe.org/
+logo: http://localhost:5173/logo_noe_orange_square.png
 authors:
   - name: Noé
     email: lepinoc@noe.org
