@@ -33,20 +33,44 @@ export async function inferHttp(
 	config: DB.Metadata,
 	values: Record<NamespacedMetadataID, DB.MetadataValue>
 ) {
+	console.time(`http inference for ${config.id}`);
 	const settings = InferenceConfigs.http(config.type).get('http')(
 		config.infer && 'http' in config.infer ? config.infer.http : undefined
 	);
 
+	const protocol = await db.get('Protocol', protocolId);
+	if (!protocol) return;
+
 	if (settings instanceof ArkErrors) return;
 
 	const payload = transformObject(values, (key, { value, ...rest }) => {
-		if (!settings.needs.some((need) => ensureNamespacedMetadataId(need, protocolId) === key))
+		if (
+			!settings.needs.some(
+				(need) =>
+					key ===
+					resolveMetadataImport(protocol, ensureNamespacedMetadataId(need, protocolId))
+			)
+		)
 			return;
 
-		return [removeNamespaceFromMetadataId(key), { ...rest, value: safeJSONParse(value) }];
+		return [
+			removeNamespaceFromMetadataId(key),
+			{ ...rest, value: safeJSONParse(value) ?? value },
+		];
 	});
 
-	debugger;
+	if (settings.needs.some((need) => !Object.keys(payload).includes(need))) {
+		console.warn(
+			`not running http inference for ${settings.from.toJSON()}, as some needed metadata are absent`
+		);
+		return;
+	}
+
+	console.debug(
+		`http inference ${config.id}: render url ${settings.from.toJSON()} with`,
+		payload
+	);
+
 	const url = settings.from.render(payload);
 
 	if (!url) return;
@@ -54,8 +78,14 @@ export async function inferHttp(
 
 	const data = await fetch(url).then((r) => r.json());
 
-	const output = await settings.select.evaluate({ metadata: values, ...data });
+	console.debug(`http inference ${config.id}: select data`, {
+		selector: settings.select.toJSON(),
+		payload: { metadata: payload, ...data },
+	});
 
+	const output = await settings.select.evaluate({ metadata: payload, ...data });
+
+	console.timeEnd(`http inference for ${config.id}`);
 	return output;
 }
 
@@ -97,7 +127,7 @@ async function shouldRefreshHttpInference(
 ) {
 	const settings = InferenceConfigs.http(config.type).get('http')(config.infer.http);
 
-	if (settings instanceof ArkErrors) return;
+	if (settings instanceof ArkErrors) return false;
 
 	const granularities = mapKeys(settings.granularities ?? {}, (key) =>
 		ensureNamespacedMetadataId(key, protocolId)
@@ -142,15 +172,17 @@ async function shouldRefreshHttpInference(
 						year: differenceInYears,
 					});
 
-					return Math.abs(diff(args.old, args.now)) >= 1;
+					return !args.old || Math.abs(diff(args.old, args.now)) >= 1;
 				}
 
 				case 'integer':
 				case 'float': {
-					return Math.abs(args.old - args.now) >= args.granularity;
+					return !args.old || Math.abs(args.old - args.now) >= args.granularity;
 				}
 
 				case 'boundingbox': {
+					if (!args.old) return true;
+
 					function coords(box: RuntimeValue<'boundingbox'>) {
 						return [box.x, box.y, box.w, box.h];
 					}

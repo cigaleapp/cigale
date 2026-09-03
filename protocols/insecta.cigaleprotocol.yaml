@@ -431,22 +431,22 @@ sessionMetadata:
           date: hour
 
         from: https://archive-api.open-meteo.com/v1/archive
-          ?latitude={{ round start_at.latitude.value 4 }}
-          &longitude={{ round start_at.longitude.value 4 }}
-          &start_date={{ date.value }}
-          &end_date={{ date.value }}
+          ?latitude={{ round start_at.value.latitude 4 }}
+          &longitude={{ round start_at.value.longitude 4 }}
+          &start_date={{ formatDate date.value "yyyy-MM-dd" }}
+          &end_date={{ formatDate date.value "yyyy-MM-dd" }}
           &format=json
           &hourly=weather_code
 
         select: |
           (
-            $_h := $minute(metadata.date.value) > 30 ? $hour(metadata.date.value) + 1 : $hour(metadata.date.value);
+            $_h := $number($minute(metadata.date.value)) > 30 ? $number($hour(metadata.date.value)) + 1 : $number($hour(metadata.date.value));
             $h := $_h < 10 ? "0" & $string($_h) : $string($_h);
-            $d := $formatDate(metadata.date.value, "YYYY-mm-DD'T'") & $h & ":00";
+            $d := $formatDate(metadata.date.value, "yyyy-MM-dd'T'") & $h & ":00";
 
-            $by_time = $zip(hourly.time, hourly.weather_code){ $[0]: $[1] };
+            $by_time := $zip(hourly.time, hourly.weather_code){ $[0]: $[1] };
 
-            $string($by_time[$d])
+            $string($lookup($by_time, $d))
           )
 
   habitat_photo:

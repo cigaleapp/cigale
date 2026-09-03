@@ -457,8 +457,8 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 						});
 					}
 				} catch (e) {
-					toasts.error(`Erreur à l'inférence HTTP de ${metadataId}: ${e}`);
-					console.error(`http infer ${metadataId} on ${subjectId}`, e);
+					toasts.error(`Erreur à l'inférence HTTP de ${metadata.id}: ${e}`);
+					console.error(`http infer ${metadata.id} on ${subjectId}`, e);
 				}
 			}
 		}
