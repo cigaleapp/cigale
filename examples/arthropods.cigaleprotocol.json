@@ -3,8 +3,8 @@
 	"id": "io.github.cigaleapp.arthropods.example",
 	"name": "Example: arthropodes",
 	"summary": "Protocole de base pour arthropodes",
-	"learnMore": "https://github.com/cigaleapp/cigale/tree/bd43b77b5cd17e0b83c5284f4e1c819439b9c58e/scripts/README.md#protocoles-arthropodsexample",
-	"version": 121,
+	"learnMore": "https://github.com/cigaleapp/cigale/tree/b42493f5ae874c567db8760bcfa8051edf401f86/scripts/README.md#protocoles-arthropodsexample",
+	"version": 122,
 	"updates": "automatic",
 	"source": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json",
 	"description": "Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification\n\nClés d'identification d'abeilles fournies par IDmyBee.com, extraites depuis [IDMYBEE - Andrena sur Xper3](https://app.xper3.fr:443/xper3GeneratedFiles/publish/identification/-8127384317153031006/mkey.html).",
@@ -392,10 +392,10 @@
 					"learnMore": "https://gbif.org/species/1"
 				},
 				{
-					"key": "333284773",
+					"key": "336398525",
 					"label": "Animalia",
 					"description": "",
-					"learnMore": "https://gbif.org/species/333284773"
+					"learnMore": "https://gbif.org/species/336398525"
 				},
 				{
 					"key": "4",
@@ -437,12 +437,12 @@
 					}
 				},
 				{
-					"key": "333284774",
+					"key": "336398526",
 					"label": "Arthropoda",
 					"description": "",
-					"learnMore": "https://gbif.org/species/333284774",
+					"learnMore": "https://gbif.org/species/336398526",
 					"cascade": {
-						"kingdom": "333284773"
+						"kingdom": "336398525"
 					}
 				},
 				{
@@ -631,13 +631,13 @@
 					}
 				},
 				{
-					"key": "333284775",
+					"key": "336398527",
 					"label": "Insecta",
 					"description": "",
-					"learnMore": "https://gbif.org/species/333284775",
+					"learnMore": "https://gbif.org/species/336398527",
 					"cascade": {
-						"phylum": "333284774",
-						"kingdom": "333284773"
+						"phylum": "336398526",
+						"kingdom": "336398525"
 					}
 				},
 				{
@@ -1052,14 +1052,14 @@
 					}
 				},
 				{
-					"key": "333284776",
+					"key": "336398528",
 					"label": "Hymenoptera",
 					"description": "",
-					"learnMore": "https://gbif.org/species/333284776",
+					"learnMore": "https://gbif.org/species/336398528",
 					"cascade": {
-						"class": "333284775",
-						"phylum": "333284774",
-						"kingdom": "333284773"
+						"class": "336398527",
+						"phylum": "336398526",
+						"kingdom": "336398525"
 					}
 				},
 				{
@@ -1997,15 +1997,15 @@
 					}
 				},
 				{
-					"key": "333284814",
+					"key": "336398566",
 					"label": "Andrenidae",
 					"description": "",
-					"learnMore": "https://gbif.org/species/333284814",
+					"learnMore": "https://gbif.org/species/336398566",
 					"cascade": {
-						"order": "333284776",
-						"class": "333284775",
-						"phylum": "333284774",
-						"kingdom": "333284773"
+						"order": "336398528",
+						"class": "336398527",
+						"phylum": "336398526",
+						"kingdom": "336398525"
 					}
 				},
 				{
@@ -16278,16 +16278,16 @@
 					}
 				},
 				{
-					"key": "333284817",
+					"key": "336398569",
 					"label": "Andrena",
 					"description": "**Ordre : Hymenoptera**  \n**Sous-ordre : Apocrita**  \n**Infra-ordre :**  \n**Super famille : Apoidea**  \n**Famille : Andrenidae**  \n**Sous-famille : Andreninae**  \n**Tribu :**  \n**Genre : _Andrena_**  \n**Espèce :**\n\nIl existe beaucoup d’espèces d’_Andrena_ en France, en particulier dans le sud. N’ayant accès qu’à la clé des _Andrena_ du nord de la France, beaucoup d’espèces ne sont pas identifiables sur photo.\n\nCelle-ci est probablement une _Andrena thoracica_, mais difficile d’en être sûre. Il faudrait une meilleure vue des pleures et des épines tibiales. Voici [le sujet complet](https://www.insecte.org/forum/viewtopic.php?t=241647) sur insecte.org, avec le cheminement.\n\nCette vieille femelle pourrait appartenir à 3 espèces : _afrensis, agilissima_ ou _asperrima_. Il faudrait voir la ponctuation sur le premier tergite, un individu frais est aussi plus facile à identifier.\n\nUn mâle problématique d’_Andrena_, peut-être du sous genre _Micrandrena_ avec sa petite taille mais je n’ai pas tous les éléments pour en être certaine. Avec sa pilosité entièrement blonde sauf sur la face et à la base des antennes, j’ai repéré 3 espèces : _minutula_, _minutuloides_ et _bicolor_. Mais il en exste peut-être d’autres, surtout dans le sud de la France. [Sujet ici](https://www.insecte.org/forum/viewtopic.php?f=3&t=210787&hilit=andrena).\n\nEn suivant quand même la clé pour ce mâle, je note que A3 (le 3ème segment antennaire) est bien plus petit que A4. Le sous genre Hoplandrena pourrait correspondre avec ce rouge à l’apex des tergites. J’ai reçu de l’aide pour en arriver là, car suivre la clé à la lettre jusqu’à ce stade est très compliqué. Ce pourrait être _A. trimmerana_ mais la 1ère génération de printemps aurai une épine fine sur la joue, ou alors _A. carantonica_ (qui aurait aussi des liserés rouge) et une courte dent émoussée sur la joue, comme ici. Mais on ne peut exclure avec la clé les espèces sudistes dont je ne connais pas les critères distinctifs. Le sujet de discussion : [https://www.insecte.org/forum/viewtopic.php?f=3&t=192496&hilit=andrena](https://www.insecte.org/forum/viewtopic.php?f=3&t=192496&hilit=andrena)",
 					"learnMore": "https://jessica-joachim.com/insectes/hymenopteres/andrenidae/andrena-sp/",
 					"cascade": {
-						"family": "333284814",
-						"order": "333284776",
-						"class": "333284775",
-						"phylum": "333284774",
-						"kingdom": "333284773"
+						"family": "336398566",
+						"order": "336398528",
+						"class": "336398527",
+						"phylum": "336398526",
+						"kingdom": "336398525"
 					},
 					"images": [
 						"https://jessica-joachim.com/wp-content/uploads/2019/04/andrena-sp-5.jpg"
@@ -150699,12 +150699,12 @@
 							"foncsnoir_1738784728418_9571"
 						],
 						"morphogroup": ["gpe_nigropilosa"],
-						"genus": "333284817",
-						"family": "333284814",
-						"order": "333284776",
-						"class": "333284775",
-						"phylum": "333284774",
-						"kingdom": "333284773"
+						"genus": "336398569",
+						"family": "336398566",
+						"order": "336398528",
+						"class": "336398527",
+						"phylum": "336398526",
+						"kingdom": "336398525"
 					}
 				},
 				{
