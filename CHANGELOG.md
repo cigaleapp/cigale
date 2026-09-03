@@ -1,59 +1,165 @@
+
+
 # Changelog
 
 All notable changes to this project will be documented in this file, on a monthly basis, with a consistent, simple format: month/year heading > type of change heading > list of changes.
 
-## July 2026
+
+
+## September 2026
+
+
+### Bug Fixes
+
+- Fix binary storage on Android (#2128)
+- Preserve cascaded metadata confidence when merging observations (#2133)
+
+
+### Data Updates
+
+- Regenerate example protocols
+
+
+
+## August 2026
+
 
 ### Improvements
 
+- Add surface metadata type (#2081)
+- Download apk directly when updating to bundle-incompatible version from settings
+- Implement HTTP inference (#2071)
+- Line up 0:00'00" with actual end for capture timer status message of INSECTA
+- Passive timers (#2025)
+
+
+### Bug Fixes
+
+- Fix github bug reports not being prefilled
+- Fix missing final photo for auto capture timers
+
+
+### Data Updates
+
+- Add habitat metadata to INSECTA protocol (#2072)
+- Bump protocol version of protocols/insecta.cigaleprotocol.yaml [ci skip]
+- Fix link, logo & description for INSECTA is_renat
+- Re-add site url for INSECTA Psi-Biom
+- Regenerate example protocols
+- Remove wrong site & logos for INSECTA projects
+
+
+### Translation Updates
+
+- Refresh translation files
+
+
+
+## July 2026
+
+
+### Improvements
+
+- Add GPS support in captured images and location metadata inputs
+- Add q/a and d as keybinds for switching images in fullscreen views
 - Add reload button for parallelism setting (See #1524)
+- Add w/z and s as keybinds for changing confirmation status
+- Close sidepanel when usig import more images button (Closes #1947) (#1949)
+- Custom formatting of numeric metadata (Closes #1941) (#2017)
+- Don't forget neural inference confidence scores when manually changing metadata
+- Dont overwrite confidence score if new one would be 1 (#1895)
+- Dont show persistent storage warning toast on Safari either
 - Fix Lightbox content not being horizontally centered
 - Fix border radius for postion=top BottomDrawer
 - Fix missing spacing around bottom drawer group titles
+- Fix selection panel in metadata combobox being to tall when search results are few
 - Hide keyboard hint from ButtonSecondary[tight] if its also shown in its tooltip
+- Ignore unknown metadata when cascading
 - Implement camera (active mode) to snap pictures directly!
+- Implement capture inference
 - Implement pinch to zoom and swipe to pan
 - Improve errors related to execution or validation of Jsonata expressions
+- Improve layout of mobile suggestions classifier
+- Improve shoot button in capture mode with timers
+- Infer confidence value of GPS-inferred metadata from GPS precision metrics (Closes #1467) (#1983)
 - Make boxes list in fullscreen cropper collapsible
+- Make mobile cropper experience more immersive
+- More EXIF fields from capture mode and RAW images
+- Only show most useful units instead of everything in metadata inputs
+- Open on session details page when session has no images (Closes #1742) (#1915)
 - Proper APK download page (#1867)
 - Remove click-on-empty-to-import (Closes #1840) (#1842)
 - Show on toolbar when undo/redo are not possible
 - Support touch screens for box creation & modification
 - Swipe-to-dismiss toasts (Closes #1498)
+- Timers in capture mode (#1986)
+- Trim session name (Closes #1662) (#1913)
+- Use JSONata instead of handlebars for non-string metadata types
 - Use space word instead of the spacebar character in keyboard shortcuts (Closes #1876)
+- Use total lap count - 1 instead of entire lap count in status message of capture timer for INSECTA
+
+
+### Performance Improvements
+
+- Implement index-based searching for metadata options
+
+
+### Accessibility Improvements
+
+- Disable layout transitions when prefers-reduced-motion
+- Disable metadata combobox expand/reduce description animations when prefers-reduced-motion
+
 
 ### Bug Fixes
 
 - Always enable results tab (Closes #1843)
 - Fix (probably) overscroll behavior x stuck to none after going to cropper
 - Fix ModalConfirm:show never resolving on mobile when tapping outside to close
+- Fix background being black on desktop in cropper
 - Fix boxes list wasnt scrollable
+- Fix cannot go to next image when on cropper, and file count is wrong
 - Fix close button doesnt work in narrowing classifier (Closes #1829)
 - Fix cropper n-point creation tools
+- Fix error on capture save on Android when cannot get current location
 - Fix exif data processing
 - Fix horizontal overflow on fullscreen cropper (Closes #1822)
+- Fix kobotoolbox accounts with a non-bool extra_details.newsletter_subscription /notify
+- Fix mobile metatadata combobox's description tab expanding/collapsing even when not the current tab
 - Fix mobile tabbar not hidden on navbarAppearance=hidden pages
 - Fix mousewheel-drag-to-pan wasnt working anymore
 - Fix navigating to image without saved zoom state would not reset zoom
+- Fix new default expression for session started_at metadata in INSECTA
+- Fix sortable/groupable imported metadata not showing up
 - Fix update button on settings on mobile app
 - Ignore EXIF orientation (Fixes #1824)
+- Maybe fix longpress to select sometimes makes the entire app unresponsive to touches (Closes #1911)
 - Polyfill Uint8Array.{from,to}Base64
 - Polyfill newer Set methods (Closes #1794)
 - Run classification inferences per-subject sequentially
+- Try fixing longpress vs regular clicks on card media
 - Use a different issue template for feature request button when submitting via github
+
 
 ### Data Updates
 
+- Add camera settings -related metadata in INSECTA protocol
+- Bump protocol version of protocols/insecta.cigaleprotocol.yaml [ci skip]
 - Fix wilkella-argentata handling for IDmyBee
 - Regenerate example protocols
 - Regenerate protocols (only Xper3 step)
 - Use new favicon logo
 
+
 ### Translation Updates
 
 - Refresh translation files
+- Translate via Weblate (English)
+- Use Maj instead of Shift to display keyboard patterns
+
+
 
 ## June 2026
+
 
 ### Improvements
 
@@ -63,15 +169,15 @@ All notable changes to this project will be documented in this file, on a monthl
 - Add infer.neural.output.select to change selected values after inference
 - Allow explicitly marking which metadata are to be used for classification
 - Enable persistent storage, add storage manager
-- Generic storage backend: image storage (Closes #1728)
+- Generic storage backend: image storage  (Closes #1728)
 - Handle empty session metadata forms
 - Handle non-browser environments in localeFromNavigator()
-- Ignore unknown metadata when cascading
 - Improve warning styling for bottom drawer submenu items
 - Serve live updates for the android application (Closes #1756)
 - Shake to report bug (#1784)
 - Use Xper3 logo for open candidate list export modal button
 - Warn if low on storage quota
+
 
 ### Bug Fixes
 
@@ -82,9 +188,9 @@ All notable changes to this project will be documented in this file, on a monthl
 - Fix classifier confirmation progress bar
 - Fix cors proxy usage (#1707)
 - Fix merge of enum metadata values with non-numeric option keys
-- Fix sortable/groupable imported metadata not showing up
 - Handle imported metadata in cascades
 - Rework imagefile/image/observation deletion
+
 
 ### Data Updates
 
@@ -104,13 +210,16 @@ All notable changes to this project will be documented in this file, on a monthl
 - Remove IDmyBee from built-in protocols
 - Remove andrena metadata group from entomoscope & insecta protocols
 - Remove incorrect namespace from metadata IDs in IDmyBee protocol
-- Use original image's filenames for export filenames in IDmyBee
+
 
 ### Translation Updates
 
 - Refresh translation files
 
+
+
 ## May 2026
+
 
 ### Improvements
 
@@ -162,9 +271,11 @@ All notable changes to this project will be documented in this file, on a monthl
 - Use a different app icon for nightly builds
 - Use a different app name for different flavors
 
+
 ### Performance Improvements
 
 - Don't recurse when cascading metadata (Closes #1571)
+
 
 ### Bug Fixes
 
@@ -194,6 +305,7 @@ All notable changes to this project will be documented in this file, on a monthl
 - Setup WEB_ORIGIN to prevent bugs on mobile app
 - Try fixing deeplinking by not adding non-preview assetlinks to PR preview domains and fixing fingerprint for preview domains
 
+
 ### Data Updates
 
 - Add andrena group to Entomoscope protocol
@@ -214,13 +326,17 @@ All notable changes to this project will be documented in this file, on a monthl
 - Update thumbnail selector for Entomoscope protocol
 - Use different colors for the badges in the mobile app icon
 
+
 ### Translation Updates
 
 - Refresh translation files
 - Regenerate translations
 - Translate via Weblate (English)
 
+
+
 ## April 2026
+
 
 ### Improvements
 
@@ -232,15 +348,18 @@ All notable changes to this project will be documented in this file, on a monthl
 - Skip builtin protocol imports only based on the presence of a same-source local protocol
 - Validate that protocol:remote.kobocollect.form URL is #/forms/...
 
+
 ### Performance Improvements
 
 - Don't do app startup before / -> /sessions
+
 
 ### Bug Fixes
 
 - Fix /results
 - Fix jank when going back to sessions list
 - Fix worker local storage type handling
+
 
 ### Data Updates
 
@@ -250,11 +369,15 @@ All notable changes to this project will be documented in this file, on a monthl
 - Regenerate example protocols
 - Setup kobocollect imports for Entomoscope protocol
 
+
 ### Translation Updates
 
 - Refresh translation files
 
+
+
 ## March 2026
+
 
 ### Improvements
 
@@ -269,12 +392,14 @@ All notable changes to this project will be documented in this file, on a monthl
 - Put metadata images at the left side when possible
 - Resolve defaults on session create, and don't set group/sort options if metadata don't support it
 
+
 ### Bug Fixes
 
 - Dont assume json when checking for protocol updates (#1374)
 - Fix description hidden by very long cascades in vertical fullscreen classifier
 - Resolve defaults on results tab load
 - Support YAML builtin protocols
+
 
 ### Data Updates
 
@@ -285,12 +410,16 @@ All notable changes to this project will be documented in this file, on a monthl
 - Regenerate example protocols
 - Set default for strictness metadata in default protocol
 
+
 ### Translation Updates
 
 - Refresh translation files
 - Update po files
 
+
+
 ## February 2026
+
 
 ### Improvements
 
@@ -315,6 +444,7 @@ All notable changes to this project will be documented in this file, on a monthl
 - Store inference errors in exports
 - Support JSONC for protocol imports
 
+
 ### Bug Fixes
 
 - Fix a test and fix $lib/file-tree
@@ -332,17 +462,22 @@ All notable changes to this project will be documented in this file, on a monthl
 - Prevent negative coords when converting bounding box to topleft format
 - Raise error in storeMetadataValue if no subjects found
 
+
 ### Data Updates
 
 - Add ranges on relevant metadata on example protocol
 - Regenerate example protocols
 - Remove now-unused confirmed_crop on example protocol
 
+
 ### Translation Updates
 
 - Refresh translation files
 
+
+
 ## January 2026
+
 
 ### Improvements
 
@@ -383,6 +518,7 @@ All notable changes to this project will be documented in this file, on a monthl
 - Use skeleton UI instead of spinners where relevant (Closes #1047)
 - Use submenus to shorten tab settings dropdown
 
+
 ### Bug Fixes
 
 - Fix UI not reflecting confirmed status change on spacebar/continue button
@@ -404,6 +540,7 @@ All notable changes to this project will be documented in this file, on a monthl
 - Reset collapsed groups state when group settings change
 - Restore group and sort settings when importing an exported session
 
+
 ### Data Updates
 
 - Add missing images for builtin protocol
@@ -414,12 +551,16 @@ All notable changes to this project will be documented in this file, on a monthl
 - Regenerate example protocols
 - Set groupable and sortable on relevant metadata for built-in protocol
 
+
 ### Translation Updates
 
 - Refresh translation files
 - Translate via Weblate (English)
 
+
+
 ## October 2025
+
 
 ### Improvements
 
@@ -459,6 +600,7 @@ All notable changes to this project will be documented in this file, on a monthl
 - Tweak text styles in /about
 - Validate bundle analyzer modes on config load instead of assuming type
 
+
 ### Bug Fixes
 
 - Fix computation progress for protocol diffing not showing up
@@ -469,9 +611,11 @@ All notable changes to this project will be documented in this file, on a monthl
 - Fix translations not working anymore
 - Remove weird import in sidepanel's +layout.svelte
 
+
 ### Data Updates
 
 - Regenerate example protocols
+
 
 ### Translation Updates
 
@@ -482,7 +626,10 @@ All notable changes to this project will be documented in this file, on a monthl
 - Translate some more
 - Translate via Weblate (English)
 
+
+
 ## December 2025
+
 
 ### Improvements
 
@@ -523,9 +670,11 @@ All notable changes to this project will be documented in this file, on a monthl
 - Show synonyms when metadata search matched by synonym
 - Use title attribute when putting a tooltip on a element inside of a <dialog>
 
+
 ### Accessibility Improvements
 
 - Allow ButtonInk to be a <a> tag, expose this for toast actions
+
 
 ### Bug Fixes
 
@@ -553,6 +702,7 @@ All notable changes to this project will be documented in this file, on a monthl
 - Sort metadata options by index instead of (non-specified) ordering property
 - Try fixing full-page reload on each goto() navigation in prod only
 
+
 ### Data Updates
 
 - Add ETA and exponential retry wait time for IUCN augmentation script
@@ -568,13 +718,17 @@ All notable changes to this project will be documented in this file, on a monthl
 - Use JJ site for genus descriptions too (#920)
 - Use images instead of image when generating example protocol
 
+
 ### Translation Updates
 
 - Refresh translation files
 - Translate via Weblate (English)
 - Update translations
 
+
+
 ## November 2025
+
 
 ### Improvements
 
@@ -588,6 +742,7 @@ All notable changes to this project will be documented in this file, on a monthl
 - Introduce metadata option synonyms
 - Select Arthropods model by default on built-in protocol (#906)
 
+
 ### Bug Fixes
 
 - Corner handles of crop box were transparent when hovered or held
@@ -598,6 +753,7 @@ All notable changes to this project will be documented in this file, on a monthl
 - Fix mystery null values in synonyms for built-in protocol
 - Fix whole-page reload on every <a> click
 
+
 ### Data Updates
 
 - Regenerate example protocols
@@ -605,11 +761,15 @@ All notable changes to this project will be documented in this file, on a monthl
 - Search with synonyms in Jessica Joachim site when generating built-in protocol
 - Set synonyms on species for built-in protocol
 
+
 ### Translation Updates
 
 - Refresh translation files
 
+
+
 ## September 2025
+
 
 ### Improvements
 
@@ -645,15 +805,18 @@ All notable changes to this project will be documented in this file, on a monthl
 - Style the range input
 - Use color on a gradient scale for confidence percentages
 
+
 ### Performance Improvements
 
 - Improve general performance
 - Parallelize job queue
 
+
 ### Accessibility Improvements
 
 - Remove useless default aria-label for switch buttons
 - Set aria-label on icon-only buttons
+
 
 ### Bug Fixes
 
@@ -675,17 +838,22 @@ All notable changes to this project will be documented in this file, on a monthl
 - Prevent caching attempts on non-HTTP schemes
 - Prevent keyboard shortcuts from triggering when typing text into a field
 
+
 ### Data Updates
 
 - Add beamup.origin to generated arthropods protocol
 - Regenerate arthropods protocol (#689)
+
 
 ### Translation Updates
 
 - Localize metadataPrettyValue
 - Translate date- and number-related formatting
 
+
+
 ## August 2025
+
 
 ### Improvements
 
@@ -702,9 +870,11 @@ All notable changes to this project will be documented in this file, on a monthl
 - Raise memory limit for JPEG image decoding
 - Remove "model loaded" toast
 
+
 ### Accessibility Improvements
 
 - Improve accessiblity of RadioButtons and protocol selection UI
+
 
 ### Bug Fixes
 
@@ -715,15 +885,20 @@ All notable changes to this project will be documented in this file, on a monthl
 - Prevent empty observations from being created when deleting an image in the import tab
 - Surface errors in toast when ImageFile could not be created
 
+
 ### Data Updates
 
 - Regenerate arthropods protocol
+
 
 ### Translation Updates
 
 - Translate inference unavailable tooltips
 
+
+
 ## July 2025
+
 
 ### Improvements
 
@@ -732,7 +907,6 @@ All notable changes to this project will be documented in this file, on a monthl
 - Add messages to make initial load screen more interesting
 - Allow deleting images from cropper view (Closes #389)
 - Disable crop padding UI when export doesnt include cropped images
-- Don't close import URL-preselected protocol modal until import finishes
 - Don't throw inside a catch handler
 - Hide "no inference" indicator icons in navbar when no protocol is selected
 - Hide native titlebar
@@ -752,9 +926,11 @@ All notable changes to this project will be documented in this file, on a monthl
 - Show feedback when protocol upgrade is in progress
 - Show translation completion on languages switch
 
+
 ### Performance Improvements
 
 - Cache npm i and playwright browsers
+
 
 ### Bug Fixes
 
@@ -794,6 +970,7 @@ All notable changes to this project will be documented in this file, on a monthl
 - Update merged metadata values passed to sidepanel on metadata changes
 - Use a dedicated Worker instead of the SW for off-thread computation
 
+
 ### Data Updates
 
 - Add icons for Electron app
@@ -801,6 +978,7 @@ All notable changes to this project will be documented in this file, on a monthl
 - Fix wait-for-analysis logic
 - Regenerate arthropods protocol
 - Use real protocol in screenshots
+
 
 ### Translation Updates
 
@@ -812,12 +990,16 @@ All notable changes to this project will be documented in this file, on a monthl
 - Translate new strings to English
 - Translate readme
 
+
 ### Legal Changes
 
 - Add emojis at bottom of readmeeee <3
 - License under MIT
 
+
+
 ## June 2025
+
 
 ### Improvements
 
@@ -837,6 +1019,7 @@ All notable changes to this project will be documented in this file, on a monthl
 - Sort options by label after loading on sidepanel
 - Support full HTTPRequest instead of just URLs for protocol models
 
+
 ### Bug Fixes
 
 - Fix 17k model URL in example protocol
@@ -851,17 +1034,21 @@ All notable changes to this project will be documented in this file, on a monthl
 - Limit add-species-from-jessica-joachim to lightweight model's classes
 - Protocol generation: sort options with numerical keys correctly
 
+
 ### Data Updates
 
 - Also include lightweight-protocol-only species
 - Regenerate arthropods protocol
 - Sort options by label in example protocol
 
+
+
 ## May 2025
+
 
 ### Improvements
 
-- Rework "crop confirmation" representation, add global revert button
+-  Rework "crop confirmation" representation, add global revert button
 - Add "import more" button in sidepanel
 - Add 'union' metadata merging strategy, for bounding boxes
 - Add a background blur for cardobservation with cropped images
@@ -893,9 +1080,10 @@ All notable changes to this project will be documented in this file, on a monthl
 - Surface metadata merging errors
 - Use markdown in description
 
+
 ### Bug Fixes
 
-- Fix various zip export errors, use jsdoc @import in some places
+-  Fix various zip export errors, use jsdoc @import in some places
 - Add missing manuallyModified prop in results json schema
 - Also delete references to image in observations when deleting image
 - Cachebust protocol update checks and upgrades
@@ -923,6 +1111,7 @@ All notable changes to this project will be documented in this file, on a monthl
 - Try fixing sequence numbers still not stable-ordered by changing ordering key
 - Use max instead of average for enum metadata in example protocol
 
+
 ### Data Updates
 
 - Add cache busters to image URLs of example protocol
@@ -942,11 +1131,14 @@ All notable changes to this project will be documented in this file, on a monthl
 - Rename example protocol
 - Use real Google Drive folder url
 
+
+
 ## April 2025
+
 
 ### Improvements
 
-- Get rid of builtin protocol, preload arthropods transect
+-  Get rid of builtin protocol, preload arthropods transect
 - Add MetadataValue.manuallyModified, shown in export analysis json too
 - Add a keyboard shortcut for autoskip mode toggle
 - Add bouding box!!
@@ -987,6 +1179,7 @@ All notable changes to this project will be documented in this file, on a monthl
 - Use monospace font for library versions
 - make backdrop stand out more in dark mode (Closes #141)
 
+
 ### Bug Fixes
 
 - Change builtin protocol ID to force redownload
@@ -1006,8 +1199,9 @@ All notable changes to this project will be documented in this file, on a monthl
 - Refresh cropper image rect on image load event (Fixes #206, fixes #205)
 - Remove debug saveAsFile feur.jpeg
 - Round percentages for crop
-- Storred infered EXIF metadata values when _not_ NaN (Fixes #194)
+- Storred infered EXIF metadata values when *not* NaN (Fixes #194)
 - Temporarily disable image duplication when multiple crop boxes exist
+
 
 ### Data Updates
 
@@ -1016,11 +1210,14 @@ All notable changes to this project will be documented in this file, on a monthl
 - Pull .v2 protocol
 - Regenerate arthropods protocol
 
+
+
 ## March 2025
+
 
 ### Improvements
 
-- Allow ey and ex output tokens for detection model
+-  Allow ey and ex output tokens for detection model
 - AAAAAAAAAAAAAAAAAAAAAAAA
 - Add about page (not linked anywhere for now lol)
 - Add feedback for loading/error states when exporting results
@@ -1096,9 +1293,11 @@ All notable changes to this project will be documented in this file, on a monthl
 - Use transaction for ctrl-u
 - le preview pannel la o
 
+
 ### Performance Improvements
 
 - Rendre le site installable et dispo offline (#92)
+
 
 ### Accessibility Improvements
 
@@ -1106,10 +1305,11 @@ All notable changes to this project will be documented in this file, on a monthl
 - Ensure all ButtonIcon have a tooltip
 - Make crop box & handles more visible in Cropup
 
+
 ### Bug Fixes
 
-- Fix empty or out of date combobox
-- Fix scrollbars lookin horrible on Chrome, and various other small things
+-  Fix empty or out of date combobox
+-  Fix scrollbars lookin horrible on Chrome, and various other small things
 - Add missing clade class in taxonomy
 - Correctly namespace protocol metadata defs on import
 - Define isLoading in crop page
@@ -1160,6 +1360,7 @@ All notable changes to this project will be documented in this file, on a monthl
 - Shown crop box did not always match chosen thumbnail for stacked cards (closes #63)
 - Turn lone images into 1-image observations before exporting
 
+
 ### Data Updates
 
 - Add model declarations
@@ -1173,7 +1374,10 @@ All notable changes to this project will be documented in this file, on a monthl
 - Reglages ok ?
 - Use CNRS drive URLs for hosting model files
 
+
+
 ## February 2025
+
 
 ### Improvements
 
@@ -1216,9 +1420,11 @@ All notable changes to this project will be documented in this file, on a monthl
 - Use parent element of component for selection zone
 - Use real colors for TextArea
 
+
 ### Accessibility Improvements
 
 - Support prefers-reduced-motion
+
 
 ### Bug Fixes
 
@@ -1239,6 +1445,7 @@ All notable changes to this project will be documented in this file, on a monthl
 - Prevent hover/focus styles for loading-state cards
 - Ça se déploie pas
 
+
 ### Data Updates
 
 - Add --bg-primary-translucent
@@ -1257,3 +1464,5 @@ All notable changes to this project will be documented in this file, on a monthl
 - Radio button + Global CSS Color
 - Radio button but better
 - Réglages 2.0
+
+

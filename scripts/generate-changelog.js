@@ -7,26 +7,39 @@ import * as date from 'date-fns';
 
 import { sh } from './utils.ts';
 
-const upTo = process.argv[2];
+const upTo = date.parse(process.argv[2], 'yyyy-MM-dd', new Date());
 
-console.info(
-	`Generating user-facing changelog up to ${date.parse(upTo, 'yyyy-MM-dd', new Date())}`
-);
+console.info(`Generating user-facing changelog up to ${date.format(upTo, 'yyyy-MM-dd')}`);
 
-const gitlog = sh(
-	'git',
-	'log',
-	`--since=${upTo}`,
-	`--until=${date.format(Date.now(), 'yyyy-MM-dd')}`
-);
+const datePages = [upTo];
+
+while (date.isPast(datePages.at(-1))) {
+	datePages.push(date.addMonths(datePages.at(-1), 6));
+}
+
+datePages.reverse();
+
+const gitlog = datePages
+	.slice(1)
+	.map((since, i) =>
+		sh(
+			'$ git',
+			'log',
+			`--since=${date.format(since, 'yyyy-MM-dd')}`,
+			`--until=${date.format(datePages[i], 'yyyy-MM-dd')}`
+		)
+	);
 
 const commits = gitlog
+	.join('\n')
 	.split(/\n\ncommit [0-9a-f]{40}/m)
 	.map((raw) => {
 		const lines = raw
 			.split('\n')
 			.map((line) => line.trim())
 			.filter((line) => line.length > 0);
+
+		if (lines.length === 0) return {};
 
 		const [subject, ...body] = lines.filter((line) => !/^(Merge|Author|Date):/.test(line));
 
@@ -42,11 +55,13 @@ const commits = gitlog
 
 		return { subject, emoji, title: title.join(' '), body: body.join('\n'), committedAt };
 	})
-	.filter(({ committedAt }) =>
-		date.isWithinInterval(committedAt, {
-			start: date.parse(upTo, 'yyyy-MM-dd', new Date()),
-			end: new Date(),
-		})
+	.filter(
+		({ committedAt }) =>
+			committedAt &&
+			date.isWithinInterval(committedAt, {
+				start: upTo,
+				end: new Date(),
+			})
 	);
 
 const SECTIONS = /** @type {const} */ ([
