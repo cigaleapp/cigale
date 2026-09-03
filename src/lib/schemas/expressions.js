@@ -3,7 +3,13 @@
  */
 import { ArkErrors, type } from 'arktype';
 import { ms } from 'convert';
-import { format as formatDate, formatISO, parse as parseDate } from 'date-fns';
+import {
+	format as formatDate,
+	formatISO,
+	parse as parseDate,
+	roundToNearestHours,
+	roundToNearestMinutes,
+} from 'date-fns';
 import Handlebars from 'handlebars';
 import jsonata from 'jsonata';
 
@@ -298,6 +304,22 @@ export const HELPERS = /** @type {const} */ ({
 		 */
 		implementation(subject, start, stop) {
 			return subject.slice(start, stop);
+		},
+	},
+	roundDate: {
+		documentation: 'Arrondir une date à la minute/heure la plus proche',
+		usage: [["'2024-12-31T23:59:01'", "'hour'"], '2025-01-01T00:00:00.000Z'],
+		/**
+		 * @param {string|Date} date
+		 * @param {"minute"|"hour"} precision
+		 */
+		implementation(date, precision) {
+			switch (precision) {
+				case 'minute':
+					return roundToNearestMinutes(date).toISOString();
+				case 'hour':
+					return roundToNearestHours(date).toISOString();
+			}
 		},
 	},
 	parseDate: {

@@ -440,13 +440,13 @@ sessionMetadata:
 
         select: |
           (
-            $_h := $number($minute(metadata.date.value)) > 30 ? $number($hour(metadata.date.value)) + 1 : $number($hour(metadata.date.value));
-            $h := $_h < 10 ? "0" & $string($_h) : $string($_h);
-            $d := $formatDate(metadata.date.value, "yyyy-MM-dd'T'") & $h & ":00";
-
             $by_time := $zip(hourly.time, hourly.weather_code){ $[0]: $[1] };
 
-            $string($lookup($by_time, $d))
+            metadata.date.value 
+            ~> $roundDate(?, "hour") 
+            ~> $formatDate(?, "yyyy-MM-dd'T'HH:mm") 
+            ~> $lookup($by_time, ?) 
+            ~> $string
           )
 
   habitat_photo:
