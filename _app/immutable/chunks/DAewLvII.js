@@ -1,0 +1,1 @@
+import{n as e,p as t}from"./7ilwFQq4.js";import"./DPCxwR79.js";import{t as n}from"./1to-q8WM.js";async function r(...n){await e(t(...n))}function i(e,t=n.route.id){return t?t.startsWith(e):!1}function a(e){return n.route.id?e[n.route.id]??e.else:e.else}export{i as n,a as r,r as t};

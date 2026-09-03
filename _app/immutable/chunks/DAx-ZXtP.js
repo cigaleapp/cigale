@@ -1,0 +1,1 @@
+import{r as e}from"./N1OmPR4X.js";var t=class extends e{async getPluginVersion(){return{version:`web`}}};export{t as CapacitorShakeWeb};
