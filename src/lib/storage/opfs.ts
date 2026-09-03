@@ -40,7 +40,7 @@ export async function OPFSBackend(): Promise<BinaryStorageBackend<'opfs'>> {
 	return {
 		name: 'opfs',
 		async resolvePath(locator) {
-			return locatorToPath(locator)
+			return locatorToPath(locator);
 		},
 		async exists(locator) {
 			const [directory, name] = await walk(locator);
