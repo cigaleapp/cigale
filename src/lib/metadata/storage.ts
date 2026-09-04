@@ -263,6 +263,11 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 				),
 	};
 
+	if (newValue.value === 'null') {
+		console.warn(`Not saving null into ${metadataId} @ ${subjectId}`);
+		return;
+	}
+
 	let oldValue: DB.MetadataValue | undefined = undefined;
 
 	/**
