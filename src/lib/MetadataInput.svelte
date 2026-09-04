@@ -511,7 +511,27 @@
 						return undefined;
 					}
 
-					const parsed = dates.parse(newValue, 'yyyy-MM-dd', new Date());
+					const parsed = dates.parse(newValue, 'yyyy-MM-dd', value ?? new Date());
+					await onblur(parsed);
+					return newValue;
+				}}
+			/>
+
+			<input
+				class="underscored"
+				type="time"
+				id="{id}-time"
+				{disabled}
+				value={value === undefined ? undefined : dates.format(value, 'HH:mm')}
+				onblur={async ({ currentTarget }) => {
+					const newValue = currentTarget.value;
+
+					if (newValue === undefined) {
+						await onblur(undefined);
+						return undefined;
+					}
+
+					const parsed = dates.parse(newValue, 'HH:mm', value ?? new Date());
 					await onblur(parsed);
 					return newValue;
 				}}
