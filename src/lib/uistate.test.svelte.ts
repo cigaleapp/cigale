@@ -1,5 +1,7 @@
 import 'fake-indexeddb/auto';
 
+import type * as DB from './database.js';
+
 import { beforeEach, describe, expect, it, test } from 'vitest';
 
 import { _tablesState, nukeDatabase } from './idb.svelte.js';
@@ -289,8 +291,7 @@ describe('currentSessionId derived state', () => {
 });
 
 describe('derived state from tables', () => {
-	/** @type {import('./database.js').Session} */
-	const session = {
+	const session: DB.Session = {
 		id: 'session-1',
 		name: 'Test Session',
 		description: '',
@@ -298,18 +299,19 @@ describe('derived state from tables', () => {
 		createdAt: new Date().toISOString(),
 		openedAt: new Date().toISOString(),
 		metadata: {},
-		inferenceModels: {},
+		neuralModels: {},
+		// @ts-expect-error branded type, annoying
 		remoteId: '',
 		fullscreenClassifier: { layout: 'top-bottom' },
 		sort: { global: { field: 'id', direction: 'asc' } },
-		group: { global: { field: 'none' } },
+		group: { global: { field: 'none', tolerances: { dates: 'minute', decimal: 'unit' } } },
 	};
 
-	/** @type {import('./database.js').Protocol} */
-	const protocol = {
+	const protocol: DB.Protocol = {
 		id: 'com.example.proto',
 		name: 'Test Protocol',
 		description: 'A test protocol',
+		summary: '',
 		metadata: ['com.example.proto__species', 'com.example.proto__crop'],
 		sessionMetadata: [],
 		importedMetadata: [],
@@ -320,8 +322,7 @@ describe('derived state from tables', () => {
 		learnMore: 'https://example.com',
 	};
 
-	/** @type {import('./database.js').Metadata} */
-	const speciesMetadata = {
+	const speciesMetadata: DB.Metadata = {
 		id: 'com.example.proto__species',
 		type: 'enum',
 		label: 'Species',
@@ -335,15 +336,14 @@ describe('derived state from tables', () => {
 			neural: [
 				{
 					model: { url: 'https://example.com/model.onnx' },
-					input: { width: 224, height: 224, channels: 3 },
+					input: { width: 224, height: 224 },
 					classmapping: ['species-a', 'species-b'],
 				},
 			],
 		},
 	};
 
-	/** @type {import('./database.js').Metadata} */
-	const speciesMetadata2 = {
+	const speciesMetadata2: DB.Metadata = {
 		id: 'com.example.proto__subspecies',
 		type: 'enum',
 		label: 'Subspecies',
@@ -364,8 +364,7 @@ describe('derived state from tables', () => {
 		},
 	};
 
-	/** @type {import('./database.js').Metadata} */
-	const cropMetadata = {
+	const cropMetadata: DB.Metadata = {
 		id: 'com.example.proto__crop',
 		type: 'boundingbox',
 		label: 'Crop',
@@ -499,7 +498,7 @@ describe('derived state from tables', () => {
 					'com.example.proto__species',
 					'com.example.proto__subspecies',
 					'com.example.proto__crop',
-				],
+				] as const,
 			};
 			_tablesState.Session = [{ ...session, protocol: extendedProtocol.id }];
 			_tablesState.Protocol = [extendedProtocol];
@@ -516,31 +515,43 @@ describe('derived state from tables', () => {
 		})();
 	});
 
-	test('selectedClassificationModels defaults to 0 when not set in inferenceModels', () => {
+	test('selectedClassificationModels defaults to first protocol model when not set in inferenceModels', () => {
 		$effect.root(() => {
 			_tablesState.Session = [session];
 			_tablesState.Protocol = [protocol];
 			_tablesState.Metadata = [speciesMetadata, cropMetadata];
 			const state = new UIState();
 			state._currentSessionId = 'session-1';
-			expect(state.selectedClassificationModels['com.example.proto__species']).toBe(0);
+			expect(state.selectedClassificationModels['com.example.proto__species']).toStrictEqual({
+				kind: 'protocol',
+				i: 0,
+			});
 		})();
 	});
 
 	test('selectedClassificationModels uses inferenceModels from session', () => {
 		$effect.root(() => {
 			_tablesState.Session = [
-				{ ...session, inferenceModels: { 'com.example.proto__species': 1 } },
+				{
+					...session,
+					neuralModels: { 'com.example.proto__species': { kind: 'protocol', i: 1 } },
+				},
 			];
 			_tablesState.Protocol = [protocol];
 			_tablesState.Metadata = [speciesMetadata, cropMetadata];
+
 			const state = new UIState();
+
 			state._currentSessionId = 'session-1';
-			expect(state.selectedClassificationModels['com.example.proto__species']).toBe(1);
+
+			expect(state.selectedClassificationModels['com.example.proto__species']).toStrictEqual({
+				kind: 'protocol',
+				i: 1,
+			});
 		})();
 	});
 
-	test('enabledClassificationMetadata excludes metadata with inferenceModels set to -1', () => {
+	test('enabledClassificationMetadata excludes metadata with neuralModels set to kind:disabled', () => {
 		$effect.root(() => {
 			const extendedProtocol = {
 				...protocol,
@@ -548,13 +559,13 @@ describe('derived state from tables', () => {
 					'com.example.proto__species',
 					'com.example.proto__subspecies',
 					'com.example.proto__crop',
-				],
+				] as const,
 			};
 			_tablesState.Session = [
 				{
 					...session,
 					protocol: extendedProtocol.id,
-					inferenceModels: { 'com.example.proto__species': -1 },
+					neuralModels: { 'com.example.proto__species': { kind: 'disabled' } },
 				},
 			];
 			_tablesState.Protocol = [extendedProtocol];
@@ -581,10 +592,10 @@ describe('derived state from tables', () => {
 		})();
 	});
 
-	test('cropInferenceAvailable is false when selectedCropModel is -1', () => {
+	test('cropInferenceAvailable is false when selectedCropModel is kind:disabled', () => {
 		$effect.root(() => {
 			_tablesState.Session = [
-				{ ...session, inferenceModels: { 'com.example.proto__crop': -1 } },
+				{ ...session, neuralModels: { 'com.example.proto__crop': { kind: 'disabled' } } },
 			];
 			_tablesState.Protocol = [protocol];
 			_tablesState.Metadata = [speciesMetadata, cropMetadata];
@@ -619,7 +630,10 @@ describe('derived state from tables', () => {
 	test('classificationInferenceAvailable is false when all classification metadata are disabled', () => {
 		$effect.root(() => {
 			_tablesState.Session = [
-				{ ...session, inferenceModels: { 'com.example.proto__species': -1 } },
+				{
+					...session,
+					neuralModels: { 'com.example.proto__species': { kind: 'disabled' } },
+				},
 			];
 			_tablesState.Protocol = [protocol];
 			_tablesState.Metadata = [speciesMetadata, cropMetadata];
@@ -629,21 +643,21 @@ describe('derived state from tables', () => {
 		})();
 	});
 
-	test('selectedCropModel defaults to 0 when not set in inferenceModels', () => {
+	test('selectedCropModel defaults to first protocol model when not set in neuralModels', () => {
 		$effect.root(() => {
 			_tablesState.Session = [session];
 			_tablesState.Protocol = [protocol];
 			_tablesState.Metadata = [speciesMetadata, cropMetadata];
 			const state = new UIState();
 			state._currentSessionId = 'session-1';
-			expect(state.selectedCropModel).toBe(0);
+			expect(state.selectedCropModel).toStrictEqual({ kind: 'protocol', i: 0 });
 		})();
 	});
 
-	test('selectedCropModel is -1 when no current protocol', () => {
+	test('selectedCropModel is kind:disabled when no current protocol', () => {
 		$effect.root(() => {
 			const state = new UIState();
-			expect(state.selectedCropModel).toBe(-1);
+			expect(state.selectedCropModel).toStrictEqual({ kind: 'disabled' });
 		})();
 	});
 });
@@ -661,8 +675,8 @@ describe('cropMetadataValueOf', () => {
 
 	test('returns the metadata value when present', () => {
 		$effect.root(() => {
-			/** @type {import('./database.js').Protocol} */
-			const protocol = {
+			/** @type {DB.Protocol} */
+			const protocol: DB.Protocol = {
 				id: 'com.example.proto',
 				name: 'Test',
 				description: '',
@@ -675,8 +689,8 @@ describe('cropMetadataValueOf', () => {
 				updates: 'manual',
 				learnMore: 'https://example.com',
 			};
-			/** @type {import('./database.js').Metadata} */
-			const cropMeta = {
+			/** @type {DB.Metadata} */
+			const cropMeta: DB.Metadata = {
 				id: 'com.example.proto__crop',
 				type: 'boundingbox',
 				label: 'Crop',

@@ -20,7 +20,11 @@ import {
 	MetadataValue,
 	MetadataValues,
 } from './schemas/metadata.js';
-import { ModelDetectionOutputShapes, ModelInput } from './schemas/neural.js';
+import {
+	ModelDetectionOutputShapes,
+	ModelInput,
+	ModelOutputBoundingBox,
+} from './schemas/neural.js';
 import { Image as ImageSchema, Observation as ObservationSchema } from './schemas/observations.js';
 import {
 	ExportsFilepathTemplateObservation,
@@ -226,6 +230,43 @@ const Account = table(
 	)
 );
 
+const CustomNeuralNetwork = table(
+	['id'],
+	type({
+		id: ID,
+		name: 'string',
+		input: ModelInput,
+		bytes: '"migrated" = "migrated"',
+		sessionId: '"_" = "_"',
+	})
+		.and(
+			type.or(
+				{
+					source: '"remote"',
+					url: 'string.url.parse',
+					filename: '"none"',
+				},
+				{
+					source: '"local"',
+					filename: 'string',
+				}
+			)
+		)
+		.and(
+			type.or(
+				{
+					purpose: '"classify"',
+					classmapping: HTTPRequest.or('string[]'),
+					'output?': { 'name?': 'string' },
+				},
+				{
+					purpose: '"detect"',
+					output: ModelOutputBoundingBox,
+				}
+			)
+		)
+);
+
 export const Schemas = {
 	ID,
 	ExportsFilepathTemplateObservation,
@@ -247,6 +288,7 @@ export const Schemas = {
 	EXIFField,
 	HTTPRequest,
 	Account,
+	CustomNeuralNetwork,
 };
 
 /**
@@ -277,6 +319,7 @@ export const BINARY_CONTENT_TABLES = /** @type {const} */ ([
 	'ImageFile',
 	'ImagePreviewFile',
 	'MetadataValueFile',
+	'CustomNeuralNetwork',
 ]);
 
 /**
@@ -313,6 +356,7 @@ export const Tables = {
 	Protocol,
 	Settings,
 	Account,
+	CustomNeuralNetwork,
 };
 
 /**

@@ -9,6 +9,7 @@
 	 * @property {string} value
 	 * @property {string} [help] shows a tooltip. supersedes label when discreet
 	 * @property {boolean} [required=false]
+	 * @property {boolean} [disabled=false]
 	 * @property {boolean} [discreet=false] don't show bottom border until hover/focus, show tooltip on hover if no placeholder is set (even if help is not set, using label as tooltip content)
 	 * @property {boolean} [monospace] use a monospace font
 	 * @property {string | { idle: string; focused: string }} [placeholder] give an object to have a different placeholder when focused
@@ -23,6 +24,7 @@
 		label,
 		discreet,
 		monospace,
+		disabled = false,
 		required,
 		help,
 		value = $bindable(),
@@ -47,6 +49,7 @@
 	aria-label={label}
 	class="inline-input"
 	{required}
+	{disabled}
 	class:monospace
 	class:discreet
 	placeholder={focused ? placeholder.focused : placeholder.idle}
@@ -75,6 +78,14 @@
 		font-weight: inherit;
 		font-family: inherit;
 		border-bottom: 2px solid var(--fg-primary);
+
+		transition: all 500ms ease;
+	}
+
+	.inline-input:disabled {
+		border-color: var(--gay);
+		background-color: var(--bg2-neutral);
+		cursor: not-allowed;
 	}
 
 	.inline-input.monospace {
@@ -85,7 +96,7 @@
 		border-color: transparent;
 	}
 
-	.inline-input:is(:hover, :focus-visible) {
+	.inline-input:not(:disabled):is(:hover, :focus-visible) {
 		border-color: var(--bg-primary);
 		outline: none;
 	}

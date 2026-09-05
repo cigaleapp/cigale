@@ -1,9 +1,12 @@
 <script lang="ts">
+	import type { NamespacedMetadataID } from '$lib/schemas/common.js';
 	import type { NeuralInference } from '$lib/schemas/neural';
 	import type { Snippet } from 'svelte';
 
+	import { dequal } from 'dequal';
 	import { scale } from 'svelte/transition';
 
+	import IconAdd from '~icons/ri/add-line';
 	import IconSelect from '~icons/ri/arrow-down-s-line';
 	import IconSubmenu from '~icons/ri/arrow-right-s-line';
 	import IconCamera from '~icons/ri/camera-line';
@@ -12,10 +15,12 @@
 	import IconSortAsc from '~icons/ri/sort-asc';
 	import IconSortDesc from '~icons/ri/sort-desc';
 	import IconInferenceEnabled from '~icons/ri/sparkling-line';
+	import IconModelCustom from '~icons/ri/wrench-line';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import DropdownMenu from '$lib/DropdownMenu.svelte';
 	import { tables } from '$lib/idb.svelte.js';
 	import { resolveMetadataImport } from '$lib/metadata/namespacing.js';
+	import { globalModals } from '$lib/modals.svelte.js';
 	import { goto } from '$lib/paths.js';
 	import { metadataDefinitionComparator } from '$lib/protocols.js';
 	import { removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';
@@ -23,42 +28,69 @@
 		GROUP_FIELDS,
 		GROUPING_TOLERANCES,
 		GroupSettings,
+		NeuralModelSelector,
 		SORT_FIELDS,
 		sortOrGroupFieldNeedsMetadata,
 		SortSettings,
 	} from '$lib/schemas/sessions.js';
+	import { tooltip } from '$lib/tooltips.js';
 	import { uiState } from '$lib/uistate.svelte.js';
 	import { entries, nonnull, orEmpty } from '$lib/utils.js';
+
+	type ModelSelector = (typeof NeuralModelSelector)['infer'];
 
 	interface Props {
 		tab: 'crop' | 'classify' | 'import';
 		label: string;
 		models: NeuralInference[];
-		currentModelIndex: number;
-		setModel: (_i: number) => Promise<void>;
+		currentModel: ModelSelector;
 		trigger?: Snippet<[{ help: string; onclick: () => void } & Record<string, unknown>]>;
 	}
 
-	const {
-		tab,
-		models,
-		currentModelIndex,
-		setModel,
-		label,
-		trigger: customTrigger,
-	}: Props = $props();
+	const { tab, models, currentModel, label, trigger: customTrigger }: Props = $props();
 
-	function selectableModel(i: number, label: string) {
+	function selectableModel(
+		metadata: NamespacedMetadataID,
+		selector: ModelSelector,
+		label: string
+	) {
 		return {
 			type: 'selectable' as const,
-			data: { direction: null },
-			key: i,
+			data: { direction: null, customModel: selector.kind === 'custom' },
+			key: `${metadata}:${JSON.stringify(selector)}`,
 			label,
-			selected: currentModelIndex === i,
+			selected: dequal(currentModel, selector),
 			async onclick() {
-				await setModel(i);
+				await uiState.selectNeuralModel(metadata, selector);
 			},
 		};
+	}
+
+	function selectableModels(metadata: NamespacedMetadataID, purpose: 'detect' | 'classify') {
+		const models =
+			purpose === 'detect' ? uiState.cropModels : uiState.allClassificationModels[metadata];
+
+		return [
+			selectableModel(metadata, { kind: 'disabled' }, 'Aucune inférence'),
+			...models.map((model, i) =>
+				selectableModel(metadata, { kind: 'protocol', i }, model.name ?? `Modèle ${i + 1}`)
+			),
+			...tables.CustomNeuralNetwork.state
+				.filter((nn) => nn.purpose === purpose)
+				.map((model) =>
+					selectableModel(metadata, { kind: 'custom', id: model.id }, model.name)
+				),
+			{
+				type: 'clickable',
+				label: 'Modèle personnalisé…',
+				key: 'new',
+				data: { direction: null, icon: IconAdd },
+				icon: IconAdd,
+				onclick() {
+					globalModals.modal_create_custom_neural_network.open?.();
+				},
+			},
+		];
 	}
 
 	const protocol = $derived(uiState.currentProtocol);
@@ -313,12 +345,7 @@
 			...orEmpty(tab !== 'classify' && uiState.currentProtocol && models.length > 0, {
 				label: "Modèle d'inférence",
 				testid: `${tab}-settings-inference-model` as const,
-				items: [
-					selectableModel(-1, 'Aucune inférence'),
-					...models.map((model, i) =>
-						selectableModel(i, model.name ?? `Modèle ${i + 1}`)
-					),
-				],
+				items: selectableModels(uiState.cropMetadataId, 'detect'),
 			}),
 			...orEmpty(
 				tab === 'classify' &&
@@ -331,49 +358,18 @@
 						const metadataLabel =
 							metadata.label || removeNamespaceFromMetadataId(metadata.id);
 						const selectedModelIndex =
-							uiState.selectedClassificationModels[metadata.id] ?? -1;
-						const modelsForMetadata =
-							uiState.allClassificationModels[metadata.id] ?? [];
+							uiState.selectedClassificationModels[metadata.id]?.kind ?? 'disabled';
 
 						return {
 							type: 'submenu' as const,
 							data: { direction: null, neural: true },
 							label: metadataLabel,
-							selected: selectedModelIndex !== -1,
+							selected: selectedModelIndex !== 'disabled',
 							submenu: {
 								label: metadataLabel,
 								testid: `${tab}-settings-inference-model-${metadata.id}`,
 								empty: 'Le protocole ne définit aucun modèle pour cette métadonnée.',
-								items: [
-									{
-										type: 'selectable' as const,
-										data: { direction: null },
-										key: `${metadata.id}:none`,
-										label: 'Aucune inférence',
-										selected: selectedModelIndex === -1,
-										closeOnSelect: false,
-										async onclick() {
-											await uiState.setClassificationModelSelection(
-												metadata.id,
-												-1
-											);
-										},
-									},
-									...modelsForMetadata.map((model, i) => ({
-										type: 'selectable' as const,
-										data: { direction: null },
-										key: `${metadata.id}:${i}`,
-										label: model.name ?? `Modèle ${i + 1}`,
-										selected: selectedModelIndex === i,
-										closeOnSelect: false,
-										async onclick() {
-											await uiState.setClassificationModelSelection(
-												metadata.id,
-												i
-											);
-										},
-									})),
-								],
+								items: selectableModels(metadata.id, 'classify'),
 							},
 						};
 					}),
@@ -390,7 +386,7 @@
 				</ButtonIcon>
 			{/if}
 		{/snippet}
-		{#snippet item({ direction, icon, neural }, { label, selected, type })}
+		{#snippet item({ direction, icon, neural, customModel = false }, { label, selected, type })}
 			{#snippet stateIcon(Icon: null | import('svelte').Component, extraClasses = '')}
 				<div in:scale={{ start: 0.75, duration: 200 }} class="icon {extraClasses}">
 					{#if Icon}<Icon />{/if}
@@ -418,9 +414,11 @@
 				{/if}
 				{label}
 			</div>
-			<div class="icon">
+			<div class="icon" use:tooltip={customModel ? 'Modèle personalisé' : undefined}>
 				{#if type === 'submenu'}
 					<IconSubmenu />
+				{:else if customModel}
+					<IconModelCustom />
 				{/if}
 			</div>
 		{/snippet}

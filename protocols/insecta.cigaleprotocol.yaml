@@ -430,7 +430,8 @@ sessionMetadata:
           start_at: 1km
           date: hour
 
-        from: https://archive-api.open-meteo.com/v1/archive
+        from: |
+          https://archive-api.open-meteo.com/v1/archive
           ?latitude={{ round start_at.value.latitude 4 }}
           &longitude={{ round start_at.value.longitude 4 }}
           &start_date={{ formatDate date.value "yyyy-MM-dd" }}

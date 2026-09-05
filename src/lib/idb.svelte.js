@@ -17,7 +17,7 @@ export const previewingPrNumber =
 	import.meta.env.previewingPrNumber === 'null' ? null : import.meta.env.previewingPrNumber;
 
 export const databaseName = previewingPrNumber ? `previews/pr-${previewingPrNumber}` : 'database';
-export const databaseRevision = 16;
+export const databaseRevision = 17;
 
 const profile = profiler('Database');
 
@@ -42,6 +42,7 @@ export const _tablesState = $state({
 	Settings: [],
 	Session: [],
 	Account: [],
+	CustomNeuralNetwork: [],
 });
 
 /**

@@ -17,13 +17,14 @@
 <script lang="ts">
 	import IconInfo from '~icons/ri/information-line';
 	import { formatBytesSize } from '$lib/i18n.js';
-	import { list, listByIndex, tables } from '$lib/idb.svelte.js';
+	import { databaseHandle, list, listByIndex, tables } from '$lib/idb.svelte.js';
+	import * as idb from '$lib/idb.svelte.js';
 	import LoadingText, { Loading } from '$lib/LoadingText.svelte';
 	import { IsMobile } from '$lib/mobile.svelte.js';
 	import { goto } from '$lib/paths.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { deleteSession, switchSession } from '$lib/sessions.js';
-	import { byteSizeOfObject } from '$lib/storage/utils.js';
+	import { byteSizeOfObject, deleteObjectWithBytes } from '$lib/storage/utils.js';
 	import { tooltip } from '$lib/tooltips.js';
 	import { PendingStorage } from '$routes/(app)/capture/pendingstorage.svelte.js';
 
@@ -34,7 +35,7 @@
 		void estimateStorageQuotaUsage();
 	});
 
-	async function cacheEntrySize(key: Request) {
+	async function cacheEntrySize(key: Request | URL) {
 		const res = await fetch(key);
 		const body = await res.bytes();
 		return body.length;
@@ -97,6 +98,35 @@
 		<h2>Modèles d'inférence</h2>
 
 		{@render cacheTable('cache-models')}
+
+		<h3>Modèles personnalisés</h3>
+
+		<Table
+			listEntries={async () => {
+				const models = await list('CustomNeuralNetwork');
+				return models.map((model) => ({
+					name: model.name,
+					key: model.id,
+					origin: '',
+					originTooltip: '',
+				}));
+			}}
+			deleteEntry={async (entry) => {
+				await deleteObjectWithBytes(databaseHandle(), 'CustomNeuralNetwork', entry.key);
+			}}
+			entrySize={async (entry) => {
+				const object = await idb.get('CustomNeuralNetwork', entry.key);
+				if (!object)
+					throw new Error(`Could not find CustomNeuralNetwork with id ${entry.key}`);
+
+				switch (object.source) {
+					case 'remote':
+						return cacheEntrySize(object.url);
+					case 'local':
+						return byteSizeOfObject('CustomNeuralNetwork', object);
+				}
+			}}
+		/>
 	</section>
 
 	<section class="sessions">
@@ -291,5 +321,10 @@
 
 	section h2 {
 		margin-bottom: 1rem;
+	}
+
+	section h3 {
+		margin-top: 1.5rem;
+		margin-bottom: 0.5rem;
 	}
 </style>
