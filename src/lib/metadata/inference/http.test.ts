@@ -1,3 +1,4 @@
+import type * as DB from '$lib/database.js';
 import type { DatabaseHandle } from '$lib/idb.svelte.js';
 import type { NamespacedMetadataID } from '$lib/schemas/common.js';
 import type { MetadataType } from '$lib/schemas/metadata.js';
@@ -61,6 +62,16 @@ afterEach(() => {
 // ─── inferHttp ────────────────────────────────────────────────────────
 
 describe('inferHttp', () => {
+	beforeEach(async () => {
+		await db.put('Protocol', {
+			id: PROTOCOL_ID,
+			name: 'Test protocol',
+			authors: [],
+			description: '',
+			metadata: ['testproto__species'],
+		});
+	});
+
 	test('fetches the rendered URL and returns the jsonata-selected value', async () => {
 		const fetchMock = vi.fn(async () => ({
 			json: async () => ({ result: 42 }),
@@ -81,9 +92,9 @@ describe('inferHttp', () => {
 			[nsId('species')]: mockValue('vulpesvulpes'),
 			// Not listed in `needs`: should be excluded from the payload/URL
 			[nsId('unused')]: mockValue('should-not-appear'),
-		} as Record<NamespacedMetadataID, unknown>;
+		} as Record<NamespacedMetadataID, DB.MetadataValue>;
 
-		const result = await inferHttp(db, PROTOCOL_ID, config as unknown, values);
+		const result = await inferHttp(db, PROTOCOL_ID, config as DB.Metadata, values);
 
 		expect(result).toBe(42);
 		expect(fetchMock).toHaveBeenCalledWith('https://api.example.org/weight?name=vulpesvulpes');
