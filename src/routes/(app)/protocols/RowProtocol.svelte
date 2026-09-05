@@ -123,7 +123,7 @@
 				<IconDelete />
 				Supprimer
 			</ButtonSecondary>
-			<ButtonSecondary onclick={() => goto('/(app)/protocols/[id]/infos', { id })}>
+			<ButtonSecondary onclick={() => goto('/(app)/protocols/[id]/edit/infos', { id })}>
 				<IconEdit />
 				Modifier
 				<Badge>Beta</Badge>
