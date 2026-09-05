@@ -101,8 +101,14 @@ export function metadataSections(page) {
 
 	return {
 		section,
-		/** @param {string | RegExp} label */
-		textbox: (label) => section(label).getByRole('textbox'),
+		/**
+		 * @param {string | RegExp} label
+		 * @param {"date"|"time"|"number"} [type]
+		 */
+		textbox: (label, type) =>
+			type
+				? section(label).locator(`input[type="${type}"]`)
+				: section(label).getByRole('textbox'),
 		/** @param {string | RegExp} label */
 		combobox: (label) => section(label).getByRole('combobox'),
 		/** @param {string | RegExp} label */

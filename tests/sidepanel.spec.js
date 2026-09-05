@@ -418,23 +418,24 @@ testKitchensink('shows crop-type metadata as non representable', async ({ page, 
 	`);
 });
 
+// TODO test time part of the input too
 testKitchensink('can update a date-type metadata', async ({ page, app }) => {
 	await initialize({ page, app, protocol: 'kitchensink' });
 
-	await assert(app.metadata.textbox('date')).toHaveValue('');
+	await assert(app.metadata.textbox('date', 'date')).toHaveValue('');
 
-	await app.metadata.textbox('date').fill('2025-05-01');
-	await app.metadata.textbox('date').blur();
+	await app.metadata.textbox('date', 'date').fill('2025-05-01');
+	await app.metadata.textbox('date', 'date').blur();
 
-	await expect(app.metadata.textbox('date')).toHaveValue('2025-05-01');
+	await expect(app.metadata.textbox('date', 'date')).toHaveValue('2025-05-01');
 	expect(await metadataValueInDatabase(app, 'date')).toBe('2025-05-01T00:00:00');
 	await expect(app.metadata.section('date')).toHaveText(/must be .+ or later/);
 
 	const futureDate = formatDate(addDays(new Date(), 10), 'yyyy-MM-dd');
-	await app.metadata.textbox('date').fill(futureDate);
-	await app.metadata.textbox('date').blur();
+	await app.metadata.textbox('date', 'date').fill(futureDate);
+	await app.metadata.textbox('date', 'date').blur();
 
-	await expect(app.metadata.textbox('date')).toHaveValue(futureDate);
+	await expect(app.metadata.textbox('date', 'date')).toHaveValue(futureDate);
 	expect(await metadataValueInDatabase(app, 'date')).toBe(`${futureDate}T00:00:00`);
 	await expect(app.metadata.section('date')).not.toHaveText(/must be .+ or later/);
 });

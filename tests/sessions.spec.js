@@ -478,7 +478,7 @@ testKitchensink('session metadata form has default values @no-builtins', async (
 
 	expect(differenceInMinutes(new Date(), new Date(session.createdAt))).toBeLessThan(5);
 
-	await expect(app.metadata.textbox('Date du transect')).toHaveValue(
+	await expect(app.metadata.textbox('Date du transect', 'date')).toHaveValue(
 		formatDate(session.createdAt, 'yyyy-MM-dd', {
 			in: tz('Etc/UTC'),
 		})
@@ -494,8 +494,8 @@ testKitchensink('session metadata form has default values @no-builtins', async (
 
 	// Changing a value that another default value depends on
 
-	await app.metadata.textbox('Date du transect').fill('2024-01-01');
-	await app.metadata.textbox('Date du transect').blur();
+	await app.metadata.textbox('Date du transect', 'date').fill('2024-01-01');
+	await app.metadata.textbox('Date du transect', 'date').blur();
 
 	await app.wait('500ms');
 
@@ -504,8 +504,8 @@ testKitchensink('session metadata form has default values @no-builtins', async (
 	// Value should not change even if resolved default value changes if its value has been modified by the user
 
 	await app.metadata.textbox('Code du transect').fill('custom code');
-	await app.metadata.textbox('Date du transect').fill('2024-02-01');
-	await app.metadata.textbox('Date du transect').blur();
+	await app.metadata.textbox('Date du transect', 'date').fill('2024-02-01');
+	await app.metadata.textbox('Date du transect', 'date').blur();
 
 	await app.wait('500ms');
 

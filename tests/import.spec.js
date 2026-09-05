@@ -476,7 +476,7 @@ test('can extract EXIF date from an image', async ({ page, app }) => {
 	await importPhotos({ page }, 'lil-fella.jpeg');
 	await app.loading.wait();
 	await app.gallery.card(0).click();
-	await assert(app.metadata.textbox('Date')).toHaveValue('2025-04-25');
+	await assert(app.metadata.textbox('Date', 'date')).toHaveValue('2025-04-25');
 
 	const metadataValues = await app.db.metadata.values({ image: 'lil-fella.jpeg' });
 
@@ -521,7 +521,7 @@ test('can extract EXIF GPS data from an image', async ({ page, context, app }) =
 	await importPhotos({ page }, 'with-exif-gps.jpeg');
 	await app.loading.wait();
 	await app.gallery.card(0).click();
-	await assert(app.metadata.textbox('Date')).toHaveValue('2008-10-22');
+	await assert(app.metadata.textbox('Date', 'date')).toHaveValue('2008-10-22');
 	await assert(app.metadata.combobox('Localisation')).toHaveValue(
 		'Via Madonna Laura, 52100 Arezzo, Italie'
 	);

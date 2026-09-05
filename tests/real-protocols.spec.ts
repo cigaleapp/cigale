@@ -51,7 +51,8 @@ test('Entomoscope @real-protocol', async ({ app, page, browserName }) => {
 	await expect(app.metadata.textbox('Luminosité')).toHaveValue(/^831\.9\d+/);
 	await expect(app.metadata.radio('Modèle de caméra', 'V3', { exact: false })).toBeChecked();
 	await expect(app.metadata.textbox('Intensité des LEDs')).toHaveValue('61');
-	await expect(app.metadata.textbox('Date')).toHaveValue(/^2026-02-09T?/);
+	await expect(app.metadata.textbox('Date', 'date')).toHaveValue('2026-02-09');
+	await expect(app.metadata.textbox('Date', 'time')).toHaveValue('13:18');
 	// FIXME: sometimes it's Planifyr, sometimes it's Planifry, 560061, sometimes it's 0, 0
 	// await expect(app.metadata.combobox('Lieu')).toHaveValue('0, 0');
 	await expect(app.metadata.textbox('ID du site')).toHaveValue('Col31');

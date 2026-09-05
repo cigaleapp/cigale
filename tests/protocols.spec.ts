@@ -633,7 +633,7 @@ location:
 	await app.gallery.card(0).click();
 
 	await expect(app.metadata.switch('bool')).toBeChecked();
-	await expect(app.metadata.textbox('date')).toHaveValue('2026-01-01');
+	await expect(app.metadata.textbox('date', 'date')).toHaveValue('2026-01-01');
 	await expect(app.metadata.radio('enum', 'Option 1', { exact: false })).toBeChecked();
 	await expect(app.metadata.textbox('float')).toHaveValue('100.4');
 	await expect(app.metadata.textbox('integer')).toHaveValue('100');
