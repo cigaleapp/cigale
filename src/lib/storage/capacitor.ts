@@ -26,7 +26,7 @@ export async function CapacitorFilesystemBackend(): Promise<BinaryStorageBackend
 	);
 
 	return {
-		name: 'capacitor',
+	name: 'capacitor',
 		async resolvePath(locator) {
 			const result = await Filesystem.getUri({
 				directory: root,
@@ -35,108 +35,108 @@ export async function CapacitorFilesystemBackend(): Promise<BinaryStorageBackend
 
 			return result.uri;
 		},
-		async exists(locator) {
-			try {
-				const stat = await Filesystem.stat({
-					directory: root,
-					path: locatorToPath(locator),
-				});
-				console.debug('[local fs] exists? yes: ', locatorToPath(locator), stat);
-			} catch (error) {
-				console.debug('[local fs] exists? no: ', locatorToPath(locator), error);
-				return false;
-			}
-
-			return true;
-		},
-		async delete(locator) {
-			await Filesystem.deleteFile({
-				directory: root,
-				path: locatorToPath(locator),
-			});
-		},
-		async bytes(locator) {
-			try {
-				const file = await Filesystem.readFile({
-					directory: root,
-					path: locatorToPath(locator),
-				});
-
-				const bytes = Uint8Array.fromBase64(file.data as string);
-
-				return bytes.buffer;
-			} catch (e) {
-				console.error(`Couldn't read file at ${locatorToPath(locator)}: `, e);
-				console.debug(`Contents at root:`, await debugdir(root));
-				console.debug(`Contents at ${locator.area}`, await debugdir(root, locator.area));
-				console.debug(
-					`Contents at ${locatorToPath({ ...locator, name: '' })}`,
-					await debugdir(root, locatorToPath({ ...locator, name: '' }))
-				);
-			}
-		},
-		async text(locator) {
-			const bytes = await this.bytes(locator);
-
-			return new TextDecoder().decode(bytes);
-		},
-		async read(locator, type) {
-			return new File([await this.bytes(locator)], locator.name, { type });
-		},
-		async write(locator, content) {
-			let base64: string;
-
-			if (content instanceof Blob) {
-				base64 = (await content.bytes()).toBase64();
-			} else if ('text' in content) {
-				base64 = btoa(content.text);
-			} else if ('bytes' in content) {
-				base64 = new Uint8Array(content.bytes).toBase64();
-			} else {
-				base64 = content.base64;
-			}
-
-			await Filesystem.writeFile({
-				directory: root,
-				path: locatorToPath(locator),
-				data: base64,
-				recursive: true,
-			});
-		},
-		async size(locator) {
+	async exists(locator) {
+		try {
 			const stat = await Filesystem.stat({
 				directory: root,
 				path: locatorToPath(locator),
-			}).catch(() => ({ size: 0 }));
-
-			return stat.size;
-		},
-		async count(locator) {
-			return Filesystem.readdir({
-				directory: root,
-				path: locatorToPath(locator),
-			})
-				.then(({ files }) => files.length)
-				.catch(() => 0);
-		},
-		async *list(locator) {
-			const { files } = await Filesystem.readdir({
-				directory: root,
-				path: locatorToPath(locator),
-			}).catch(() => ({ files: [] }));
-
-			for (const file of files) {
-				yield { ...locator, name: file.name };
-			}
-		},
-		async clear(locator) {
-			await Filesystem.rmdir({
-				directory: root,
-				path: locatorToPath(locator),
-				recursive: true,
 			});
-		},
-	};
+			console.debug('[local fs] exists? yes: ', locatorToPath(locator), stat);
+		} catch (error) {
+			console.debug('[local fs] exists? no: ', locatorToPath(locator), error);
+			return false;
+		}
+
+		return true;
+	},
+	async delete(locator) {
+		await Filesystem.deleteFile({
+			directory: root,
+			path: locatorToPath(locator),
+		});
+	},
+	async bytes(locator) {
+		try {
+			const file = await Filesystem.readFile({
+				directory: root,
+				path: locatorToPath(locator),
+			});
+
+			const bytes = Uint8Array.fromBase64(file.data as string);
+
+			return bytes.buffer;
+		} catch (e) {
+			console.error(`Couldn't read file at ${locatorToPath(locator)}: `, e);
+			console.debug(`Contents at root:`, await debugdir(root));
+			console.debug(`Contents at ${locator.area}`, await debugdir(root, locator.area));
+			console.debug(
+				`Contents at ${locatorToPath({ ...locator, name: '' })}`,
+				await debugdir(root, locatorToPath({ ...locator, name: '' }))
+			);
+		}
+	},
+	async text(locator) {
+		const bytes = await this.bytes(locator);
+
+		return new TextDecoder().decode(bytes);
+	},
+	async read(locator, type) {
+		return new File([await this.bytes(locator)], locator.name, { type });
+	},
+	async write(locator, content) {
+		let base64: string;
+
+		if (content instanceof Blob) {
+			base64 = (await content.bytes()).toBase64();
+		} else if ('text' in content) {
+			base64 = btoa(content.text);
+		} else if ('bytes' in content) {
+			base64 = new Uint8Array(content.bytes).toBase64();
+		} else {
+			base64 = content.base64;
+		}
+
+		await Filesystem.writeFile({
+			directory: root,
+			path: locatorToPath(locator),
+			data: base64,
+			recursive: true,
+		});
+	},
+	async size(locator) {
+		const stat = await Filesystem.stat({
+			directory: root,
+			path: locatorToPath(locator),
+		}).catch(() => ({ size: 0 }));
+
+		return stat.size;
+	},
+	async count(locator) {
+		return Filesystem.readdir({
+			directory: root,
+			path: locatorToPath(locator),
+		})
+			.then(({ files }) => files.length)
+			.catch(() => 0);
+	},
+	async *list(locator) {
+		const { files } = await Filesystem.readdir({
+			directory: root,
+			path: locatorToPath(locator),
+		}).catch(() => ({ files: [] }));
+
+		for (const file of files) {
+			yield { ...locator, name: file.name };
+		}
+	},
+	async clear(locator) {
+		await Filesystem.rmdir({
+			directory: root,
+			path: locatorToPath(locator),
+			recursive: true,
+		});
+	},
+};
 }
 
 async function debugdir(dir: Directory, path = '') {
