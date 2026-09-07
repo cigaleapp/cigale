@@ -33,7 +33,7 @@
         "arrival-time": "^1.0.6",
         "baseline-browser-mapping": "^2.11.20",
         "bits-ui": "^1.8.0",
-        "caniuse-lite": "^1.0.30001809",
+        "caniuse-lite": "^1.0.30001810",
         "clicked": "^4.0.3",
         "convert": "^7.0.2",
         "date-fns": "^4.4.0",
