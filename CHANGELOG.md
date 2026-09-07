@@ -4,13 +4,20 @@ All notable changes to this project will be documented in this file, on a monthl
 
 ## September 2026
 
+### Improvements
+
+- Add time input for date metadata (Closes #1562)
+
 ### Bug Fixes
 
+- Fix HTTP inferences
 - Fix binary storage on Android (#2128)
 - Preserve cascaded metadata confidence when merging observations (#2133)
+- Prevent database fatal error by preventing null-value metadata writes
 
 ### Data Updates
 
+- Bump protocol version of protocols/insecta.cigaleprotocol.yaml [ci skip]
 - Regenerate example protocols
 
 ## August 2026
@@ -812,6 +819,7 @@ All notable changes to this project will be documented in this file, on a monthl
 - Add messages to make initial load screen more interesting
 - Allow deleting images from cropper view (Closes #389)
 - Disable crop padding UI when export doesnt include cropped images
+- Don't close import URL-preselected protocol modal until import finishes
 - Don't throw inside a catch handler
 - Hide "no inference" indicator icons in navbar when no protocol is selected
 - Hide native titlebar
