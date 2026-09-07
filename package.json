@@ -171,7 +171,7 @@
 		"@layflags/rolling-number": "^1.0.0",
 		"@sveltejs/svelte-virtual-list": "^3.0.1",
 		"@ungap/set-methods": "^0.1.1",
-		"@viselect/vanilla": "^3.9.0",
+		"@viselect/vanilla": "^3.10.0",
 		"@wuchale/svelte": "^0.20.7",
 		"arktype": "^2.2.3",
 		"arrival-time": "^1.0.6",
