@@ -199,7 +199,7 @@
 		"libraw-wasm": "^1.6.0",
 		"maplibre-gl": "^6.6.0",
 		"marked": "^18.0.6",
-		"microdiff": "^1.5.0",
+		"microdiff": "^1.6.0",
 		"nanoid": "^6.0.1",
 		"natural-regex": "^0.5.0",
 		"onnxruntime-web": "1.22.0",
