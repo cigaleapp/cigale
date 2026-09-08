@@ -203,7 +203,7 @@
 		"nanoid": "^6.0.1",
 		"natural-regex": "^0.5.0",
 		"onnxruntime-web": "1.22.0",
-		"opfs-mock": "^2.7.0",
+		"opfs-mock": "^2.8.0",
 		"pica-gpu": "^0.2.0",
 		"piexifjs": "^1.0.6",
 		"runed": "^0.37.1",
