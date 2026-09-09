@@ -1,10 +1,11 @@
 import type { TypedMetadataValue } from './types.js';
+import type { NamespacedMetadataID } from '$lib/schemas/common.js';
 
 import * as dates from 'date-fns';
 
 import * as DB from '$lib/database';
-import { MetadataRuntimeValue } from '$lib/schemas/metadata.js';
-import { clamp, mapValues } from '$lib/utils';
+import { MetadataRecordValue, MetadataRuntimeValue } from '$lib/schemas/metadata.js';
+import { clamp, mapValues, transformObject } from '$lib/utils';
 
 /**
  * Serialize a metadata value for storing in the database.
@@ -60,4 +61,15 @@ export function serializeMetadataFullValue<T extends TypedMetadataValue>({
  */
 export function serializeMetadataValues(values: DB.MetadataValues): DB.MetadataValues {
 	return mapValues(values, serializeMetadataFullValue);
+}
+
+export function metadataRecordToSerialized<K extends string>(
+	record: Record<K, typeof MetadataRecordValue.infer>,
+	namespacer: (key: K) => NamespacedMetadataID = (key) => key
+) {
+	return transformObject(record, (key, value) => {
+		if (value.value === null) return undefined;
+		if (value.alternatives.includes(null)) return undefined;
+		return [namespacer(key), serializeMetadataFullValue(value as TypedMetadataValue)];
+	});
 }

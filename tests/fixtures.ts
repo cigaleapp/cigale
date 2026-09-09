@@ -5,9 +5,11 @@ import 'urlpattern-polyfill';
 import type { AppFixture } from './fixtures/app.js';
 import type { ONNXModelsFixture } from './fixtures/onnxmodels.js';
 import type { OPFSTestArg } from './utils/opfs.js';
+import type { NetworkFixture } from '@msw/playwright';
 
 import { defineNetworkFixture } from '@msw/playwright';
 import { test as base } from '@playwright/test';
+import { http, HttpResponse } from 'msw';
 
 import lightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import { FixturePaths } from './filepaths.js';
@@ -21,8 +23,14 @@ export type ExtraTestArgs = {
 	app: AppFixture;
 	tempfiles: TempFilesFixture;
 	onnxmodels: ONNXModelsFixture;
-	networkHandlers: Array<import('msw').AnyHandler>;
 	network: import('@msw/playwright').NetworkFixture;
+	/** 
+	 * Just like network, but can also mock assets, meaning routes that end in a file extension.
+	 * Required when mocking an API that happens to have a route ending with a asset-looking path segment 
+	 * This has perf implications, so only use it when necessary 
+	 * See https://claude.ai/share/9b09b767-2e90-4f9e-b0e5-a4e286000830
+	 */
+	networkWithAssets: import('@msw/playwright').NetworkFixture;
 	opfsState?: OPFSTestArg;
 	storageState:
 		| FixturePaths.Absolute<FixturePaths.StorageStates>
@@ -31,25 +39,28 @@ export type ExtraTestArgs = {
 
 const _test = base.extend<ExtraTestArgs, { forEachWorker: void }>({
 	tempfiles,
-	async networkHandlers({}, use) {
-		await use([]);
-	},
-	network: [
-		async ({ context, networkHandlers: additionalHandlers }, use) => {
-			const network = defineNetworkFixture({
-				context,
-				handlers: [
-					// No default handlers for now, but, should we add some, they'd go here
-					...additionalHandlers,
-				],
-			});
+	network: async ({ context }, use: (network: NetworkFixture) => Promise<void>) => {
+		const network = defineNetworkFixture({
+			context,
+			handlers: [http.get('https://example.com/is-mocked', () => HttpResponse.json(true))],
+		});
 
-			await network.enable();
-			await use(network);
-			await network.disable();
-		},
-		{ auto: true },
-	],
+		await network.enable();
+		await use(network);
+		await network.disable();
+	},
+	networkWithAssets: async ({ context }, use: (network: NetworkFixture) => Promise<void>) => {
+		const network = defineNetworkFixture({
+			context,
+			handlers: [http.get('https://example.com/is-mocked', () => HttpResponse.json(true))],
+			// See https://claude.ai/share/9b09b767-2e90-4f9e-b0e5-a4e286000830
+			skipAssetRequests: false,
+		});
+
+		await network.enable();
+		await use(network);
+		await network.disable();
+	},
 	onnxmodels,
 	app,
 	forEachWorker: [forEachWorker, { scope: 'worker', auto: true }],

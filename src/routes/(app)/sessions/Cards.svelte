@@ -1,7 +1,16 @@
-<script
-	lang="ts"
-	generics="Session extends { id: string, protocol: string, name: string, downloaded?: boolean ,nextCursor?:string|undefined }"
->
+<script lang="ts" module>
+	type SessionBase = {
+		id: string;
+		protocol: string;
+		name: string;
+		downloaded?: boolean;
+		remoteId?: SessionRemoteID;
+		nextCursor?: string | undefined;
+	};
+</script>
+
+<script lang="ts" generics="Session extends SessionBase">
+	import type { SessionRemoteID } from '$lib/schemas/sessions.js';
 	import type { Snippet } from 'svelte';
 
 	import { onDestroy } from 'svelte';
@@ -9,9 +18,13 @@
 	import { fade } from 'svelte/transition';
 
 	import IconAdd from '~icons/ri/add-line';
+	// TODO: request a cloud-check icon
+	import IconUploaded from '~icons/ri/cloud-line';
 	import IconDownloaded from '~icons/ri/hard-drive-2-line';
+	import { providers } from '$lib/accounts/registry.js';
 	import AsyncEach from '$lib/AsyncEach.svelte';
 	import Card from '$lib/Card.svelte';
+	import CompositeAvatar from '$lib/CompositeAvatar.svelte';
 	import { errorMessage } from '$lib/i18n.js';
 	import { tables } from '$lib/idb.svelte.js';
 	import IfInViewport from '$lib/IfInViewport.svelte';
@@ -67,9 +80,29 @@
 		<Card {...props} --card-border={props.highlighted ? 'var(--bg-primary)' : ''}>
 			<div class="content">
 				{#if session.downloaded}
-					<div class="indicator-downloaded" use:tooltip={"Disponible sur l'appareil"}>
+					<div
+						class="status"
+						use:tooltip={"Disponible sur l'appareil"}
+						pw-testid="session-card-indicator-downloaded"
+					>
 						<IconDownloaded />
 					</div>
+				{:else if session.remoteId}
+					{const account = $derived(tables.Account.getFromState(session.account ?? ''))}
+					{const provider = providers.get(account?.type ?? '')}
+					{#if account && provider}
+						<div class="status" use:tooltip={`Également sur ${provider.displayName}`}>
+							<CompositeAvatar
+								avatar={account.avatarURL}
+								avatarColor={'color' in account ? account.color : undefined}
+								sublogo={provider.logoURL}
+							/>
+						</div>
+					{:else}
+						<div class="status" use:tooltip={'Également sur une plateforme en ligne'}>
+							<IconUploaded />
+						</div>
+					{/if}
 				{/if}
 				<div class="gallery">
 					<IfInViewport>
@@ -175,15 +208,18 @@
 		position: relative;
 	}
 
-	.indicator-downloaded {
+	.status {
 		position: absolute;
-		top: 1.1em;
-		right: 1.1em;
+		top: 0.5em;
+		right: 0.5em;
 		font-size: 1.05em;
 		color: var(--gay);
 		display: flex;
 		justify-content: center;
 		align-items: center;
+		background-color: var(--bg-neutral);
+		padding: 0.5em;
+		border-radius: var(--corner-radius);
 	}
 
 	.content.new {

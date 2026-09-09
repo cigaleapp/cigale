@@ -1,11 +1,18 @@
-<script>
+<script lang="ts">
 	import { fade } from 'svelte/transition';
 
+	import IconViewExternal from '~icons/ri/arrow-right-up-box-line';
+	import IconSyncDown from '~icons/ri/download-line';
+	import IconUnlink from '~icons/ri/link-unlink-m';
 	import { invalidate } from '$app/navigation';
+	import Account from '$lib/Account.svelte';
+	import { providers } from '$lib/accounts/registry.js';
 	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
+	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
+	import DebugOnly from '$lib/DebugOnly.svelte';
 	import Field from '$lib/Field.svelte';
-	import { plural } from '$lib/i18n.js';
-	import { dependencyURI, tables } from '$lib/idb.svelte.js';
+	import { formatBytesSize, plural } from '$lib/i18n.js';
+	import { databaseHandle, dependencyURI, tables } from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import InputSelectProtocol from '$lib/InputSelectProtocol.svelte';
 	import Markdown from '$lib/Markdown.svelte';
@@ -14,6 +21,7 @@
 	import SessionMetadataForm from '$lib/SessionMetadataForm.svelte';
 	import { deleteSession, switchSession } from '$lib/sessions.js';
 	import { toasts } from '$lib/toasts.svelte.js';
+	import { uiState } from '$lib/uistate.svelte.js';
 	import TopbarOpenSession from '$routes/(app)/TopbarOpenSession.svelte';
 
 	const { data } = $props();
@@ -37,8 +45,106 @@
 			}}
 		/>
 
-		<section class="actions"></section>
+		<section class="actions">
+			<ButtonPrimary
+				loading
+				onclick={async () => {
+					await new Promise(() => {});
+					await switchSession(data.session.id);
+					await goto(`/import/`);
+				}}
+			>
+				Ouvrir
+			</ButtonPrimary>
+		</section>
 	</h1>
+	{#if uiState.currentProtocol && (data.session.account || data.session.remoteId)}
+		{const account = tables.Account.getFromState(data.session.account ?? '')}
+		{const provider = providers.get(account?.type ?? '')}
+		{const acc = account ? provider?.fromDatabase(databaseHandle(), account) : undefined}
+		{const externalUrl = acc?.sessionPage(uiState.currentProtocol, data.session)}
+
+		<Field composite label="Session disponible sur {provider?.displayName ?? 'une plateforme'}">
+			<section class="remote">
+				<Account {account} />
+				<div class="actions">
+					<!-- 
+					Case where externalUrl && !provider is impossible
+					Because externalUrl needs acc which needs provider
+					-->
+					{#if externalUrl && provider}
+						<ButtonSecondary
+							onclick={() => {
+								window.open(externalUrl, '_blank');
+							}}
+						>
+							<IconViewExternal />
+							Voir
+						</ButtonSecondary>
+					{/if}
+
+					{#if account && provider?.capabilities.includes('sync')}
+						<ButtonSecondary
+							loading
+							help="Synchroniser depuis {provider.displayName}"
+							errorprefix="Impossible de synchroniser"
+							onclicksuccess="Session synchronisée"
+							onclick={async (_, { setText }) => {
+								if (!acc) return;
+								if (!account) return;
+								const protocol = uiState.currentProtocol;
+								const session = uiState.currentSession;
+								if (!protocol) return;
+								if (!session) return;
+								for await (const msg of acc.sync(protocol, session)) {
+									if (msg.message !== 'progress') continue;
+									const withUnit =
+										'unit' in msg && msg.unit === 'bytes'
+											? (x: number) => formatBytesSize(x)
+											: (x: number) => x.toString();
+
+									setText(
+										msg.total
+											? `${msg.action} (${msg.done}/${withUnit(msg.total)})`
+											: `${msg.action}…`
+									);
+								}
+								await uiState.refreshSessionTables();
+							}}
+						>
+							{#snippet children({ loading })}
+								{#if !loading}
+									<IconSyncDown />
+								{/if}
+								Sync.
+							{/snippet}
+						</ButtonSecondary>
+					{/if}
+					<ButtonSecondary
+						danger
+						loading
+						help={provider
+							? `Dé-lier de ${provider.displayName}`
+							: 'Dé-lier de la plateforme en ligne'}
+						onclick={async () => {
+							await tables.Session.morph(data.session.id, (session) => {
+								delete session.account;
+								delete session.remoteId;
+							});
+							invalidate(dependencyURI('Session', data.session.id));
+						}}
+					>
+						{#snippet children({ loading })}
+							{#if !loading}
+								<IconUnlink />
+							{/if}
+							Dé-lier
+						{/snippet}
+					</ButtonSecondary>
+				</div>
+			</section>
+		</Field>
+	{/if}
 
 	<form
 		onsubmit={(e) => {
@@ -70,6 +176,7 @@
 	{#if !data.protocol}
 		<section class="error">
 			Protocole <code>{data.session.protocol}</code> introuvable.
+			<DebugOnly data={data.session.metadata} />
 		</section>
 	{:else}
 		<section class="protocol-description">
@@ -127,7 +234,7 @@
 	main {
 		margin: 0 auto;
 		width: 100%;
-		max-width: 600px;
+		max-width: 800px;
 		display: flex;
 		flex-direction: column;
 		gap: 2rem;
@@ -146,6 +253,19 @@
 		display: flex;
 		flex-direction: column;
 		gap: 0.5rem;
+	}
+
+	.remote {
+		display: flex;
+		gap: 1rem;
+		justify-content: space-between;
+		align-items: center;
+		flex-wrap: wrap;
+
+		.actions {
+			flex-direction: row;
+			flex-wrap: wrap;
+		}
 	}
 
 	form {

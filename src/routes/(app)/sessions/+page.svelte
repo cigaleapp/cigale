@@ -7,7 +7,7 @@
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonInk from '$lib/ButtonInk.svelte';
 	import Datetime from '$lib/Datetime.svelte';
-	import { plural } from '$lib/i18n.js';
+	import { errorMessage, plural } from '$lib/i18n.js';
 	import { countByIndex, databaseHandle, listByIndex, tables } from '$lib/idb.svelte.js';
 	import { loadPreviewImage } from '$lib/images.js';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
@@ -17,6 +17,7 @@
 	import { seo } from '$lib/seo.svelte';
 	import { switchSession } from '$lib/sessions.js';
 	import { getSettings, isDebugMode } from '$lib/settings.svelte.js';
+	import { toasts } from '$lib/toasts.svelte.js';
 	import { uiState } from '$lib/uistate.svelte.js';
 	import { nonnull } from '$lib/utils.js';
 
@@ -74,76 +75,78 @@
 	<section class="sessions" data-scrollable="true">
 		{#if directory.platform === 'local'}
 			<div class="cards" in:fade={{ duration: 200 }}>
-				<Cards
-					create={createSession}
-					sessions={tables.Session.state.filter(
-						(ses) => !directory.protocol || ses.protocol === directory.protocol
-					)}
-					card={(session) => ({
-						highlighted: uiState.currentSessionId === session.id,
-						tooltip: 'Ouvrir la session',
-						loading: 'Ouverture…',
-						async onclick() {
-							await switchSession(session.id);
-							// Get number of images in the session to decide which tab to open on
-							const imagesCount = await countByIndex(
-								'Image',
-								'sessionId',
-								session.id
-							);
-							if (imagesCount > 0) {
-								await goto('/(app)/(sidepanel)/import');
-							} else {
-								await goto('/(app)/sessions/[id]', session);
-							}
-						},
-					})}
-					thumbnails={async function* ({ id }) {
-						const images = await listByIndex('Image', 'sessionId', id);
+				{#key directory}
+					<Cards
+						create={createSession}
+						sessions={tables.Session.state.filter(
+							(ses) => !directory.protocol || ses.protocol === directory.protocol
+						)}
+						card={(session) => ({
+							highlighted: uiState.currentSessionId === session.id,
+							tooltip: 'Ouvrir la session',
+							loading: 'Ouverture…',
+							async onclick() {
+								await switchSession(session.id);
+								// Get number of images in the session to decide which tab to open on
+								const imagesCount = await countByIndex(
+									'Image',
+									'sessionId',
+									session.id
+								);
+								if (imagesCount > 0) {
+									await goto('/(app)/(sidepanel)/import');
+								} else {
+									await goto('/(app)/sessions/[id]', session);
+								}
+							},
+						})}
+						thumbnails={async function* ({ id }) {
+							const images = await listByIndex('Image', 'sessionId', id);
 
-						const firstUniqueFileIds = [
-							...new Set(images.map((image) => image.fileId).filter(nonnull)),
-						].slice(0, 4);
+							const firstUniqueFileIds = [
+								...new Set(images.map((image) => image.fileId).filter(nonnull)),
+							].slice(0, 4);
 
-						for (const fileId of firstUniqueFileIds) {
-							if (uiState.hasPreviewURL(fileId)) {
+							for (const fileId of firstUniqueFileIds) {
+								if (uiState.hasPreviewURL(fileId)) {
+									yield uiState.getPreviewURL(fileId)!;
+									continue;
+								}
+
+								await loadPreviewImage(fileId, 'global');
 								yield uiState.getPreviewURL(fileId)!;
-								continue;
 							}
+						}}
+					>
+						{#snippet subtitle({ id, createdAt })}
+							<LoadingText
+								mask="# images"
+								value={async () =>
+									listByIndex('Image', 'sessionId', id).then(
+										(images) => images.length
+									)}
+							>
+								{#snippet loaded(count)}
+									{plural(count, ['# image', '# images'])}
+								{/snippet}
+							</LoadingText>
+							· <Datetime parts="date" show="absolute" value={createdAt} />
+						{/snippet}
 
-							await loadPreviewImage(fileId, 'global');
-							yield uiState.getPreviewURL(fileId)!;
-						}
-					}}
-				>
-					{#snippet subtitle({ id, createdAt })}
-						<LoadingText
-							mask="# images"
-							value={async () =>
-								listByIndex('Image', 'sessionId', id).then(
-									(images) => images.length
-								)}
-						>
-							{#snippet loaded(count)}
-								{plural(count, ['# image', '# images'])}
-							{/snippet}
-						</LoadingText>
-						· <Datetime parts="date" show="absolute" value={createdAt} />
-					{/snippet}
-
-					{#snippet actions({ id })}
-						<ButtonInk
-							fills
-							onclick={async (e) => {
-								e.stopPropagation();
-								await switchSession(id);
-								await goto('/(app)/sessions/[id]', { id });
-							}}
-						>
-							Gérer
-						</ButtonInk>
-					{/snippet}
-				</Cards>
+						{#snippet actions({ id })}
+							<ButtonInk
+								fills
+								onclick={async (e) => {
+									e.stopPropagation();
+									await switchSession(id);
+									await goto('/(app)/sessions/[id]', { id });
+								}}
+							>
+								Gérer
+							</ButtonInk>
+						{/snippet}
+					</Cards>
+				{/key}
 			</div>
 		{:else if account}
 			{#key directory}
@@ -201,6 +204,16 @@
 										account,
 										session,
 										mutator,
+									}).catch((e) => {
+										console.error(e);
+										toasts.error(
+											errorMessage(
+												`Impossible de télécharger ${session.name}`,
+												e
+											)
+										);
+
+										return undefined;
 									});
 								}
 								if (!id) return;

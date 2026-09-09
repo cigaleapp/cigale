@@ -62,7 +62,8 @@
 		"test:dirty": "bun run scripts/test-dirty.ts",
 		"wuchale": "bunx --bun wuchale",
 		"all-contributors": "all-contributors --files README.md --files README_FR.md",
-		"test:update-fixtures": "playwright test tasks/exports.spec.js --update-snapshots -x --headed && playwright test tasks/dbdump.spec.js --update-snapshots -x --headed "
+		"test:update-fixtures": "playwright test tasks/exports.spec.js --update-snapshots -x --headed && playwright test tasks/dbdump.spec.js --update-snapshots -x --headed ",
+		"ecosignal": "cd ecosignal && docker compose up"
 	},
 	"devDependencies": {
 		"@actions/core": "^3.0.1",
@@ -101,6 +102,7 @@
 		"@types/yauzl-promise": "^4.0.1",
 		"@vitest/coverage-v8": "^4.1.11",
 		"@vitest/ui": "^4.1.11",
+		"@vitest/web-worker": "^5.0.1",
 		"all-contributors-cli": "^6.26.1",
 		"arkenv": "^0.12.3",
 		"braces": "^3.0.3",

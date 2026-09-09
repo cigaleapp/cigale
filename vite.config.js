@@ -61,7 +61,7 @@ export default defineConfig({
 		],
 		reporters: env.GITHUB_ACTIONS ? ['dot', 'github-actions', 'html'] : ['default'],
 		globalSetup: './vitest-timezone.js',
-		setupFiles: ['./vitest-setup.js'],
+		setupFiles: ['@vitest/web-worker', './vitest-setup.js'],
 		coverage: {
 			reporter: ['json-summary', 'json', 'html'],
 			reportOnFailure: true,
