@@ -1,21 +1,35 @@
 <script lang="ts">
+	import IconUser from '~icons/ri/user-line';
 	import { tooltip } from '$lib/tooltips.js';
 
-	import { corsfix } from './utils.js';
+	import { corsfix, readableOn } from './utils.js';
 
 	interface Props {
 		sublogo: string | URL | undefined;
 		avatar: string | URL | undefined;
+		avatarColor?: string;
 		tooltip?: string;
 	}
-	const { sublogo, avatar, tooltip: tooltipText }: Props = $props();
+	const { sublogo, avatar, tooltip: tooltipText, avatarColor }: Props = $props();
 </script>
 
 <div class="composite-avatar" use:tooltip={tooltipText}>
 	{#if sublogo}
 		<img class="provider-logo" src={sublogo.toString()} />
 	{/if}
-	<img class="avatar" src={corsfix(avatar?.toString() ?? '')} />
+	{#if avatar}
+		<img class="avatar" src={corsfix(avatar?.toString() ?? '')} />
+	{:else}
+		<div
+			class="avatar empty"
+			style:background-color={avatarColor ? avatarColor : undefined}
+			style:color={avatarColor ? readableOn(avatarColor) : undefined}
+		>
+			<div class="icon">
+				<IconUser />
+			</div>
+		</div>
+	{/if}
 </div>
 
 <style>
@@ -40,5 +54,16 @@
 		border-radius: 50%;
 		height: 1em;
 		width: 1em;
+	}
+
+	.avatar.empty {
+		border: 2px solid var(--faint);
+	}
+
+	.avatar .icon {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		font-size: 0.5em;
 	}
 </style>

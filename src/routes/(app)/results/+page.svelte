@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type * as DB from '$lib/database.js';
 	import type { TreeNode, TreeNodeMaybeLoading } from '$lib/file-tree.js';
 	import type { NamespacedMetadataID } from '$lib/schemas/common.js';
 
@@ -8,6 +9,7 @@
 	import { tick } from 'svelte';
 	import { SvelteMap } from 'svelte/reactivity';
 
+	import IconSendToPlatform from '~icons/ri/cloud-line';
 	import IconCroppedOnly from '~icons/ri/crop-line';
 	import IconDownloadAsZip from '~icons/ri/file-zip-line';
 	import IconDownloadAsFolder from '~icons/ri/folder-download-line';
@@ -17,9 +19,11 @@
 	import IconCollapse from '~icons/ri/skip-right-line';
 	import { asset } from '$app/paths';
 	import { page } from '$app/state';
+	import { providers } from '$lib/accounts/registry.js';
 	import { FULL_IMAGE_CROPBOX, toRelativeCoords } from '$lib/BoundingBoxes.svelte.js';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
+	import CompositeAvatar from '$lib/CompositeAvatar.svelte';
 	import CroppedImg from '$lib/CroppedImg.svelte';
 	import { downloadAsFile } from '$lib/download.js';
 	import EnumButtons from '$lib/EnumButtons.svelte';
@@ -27,7 +31,7 @@
 	import { gatherToTree } from '$lib/file-tree.js';
 	import { writeToFilesystem } from '$lib/filesystem.js';
 	import { formatBytesSize } from '$lib/i18n';
-	import { tables } from '$lib/idb.svelte.js';
+	import { databaseHandle, tables } from '$lib/idb.svelte.js';
 	import { parseCropPadding } from '$lib/images';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
@@ -35,12 +39,13 @@
 	import ModalConfirm from '$lib/ModalConfirm.svelte';
 	import { sendNotification } from '$lib/notifications.js';
 	import { ensureNoLoneImages } from '$lib/observations.js';
+	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
 	import SessionMetadataForm from '$lib/SessionMetadataForm.svelte';
 	import { toasts } from '$lib/toasts.svelte.js';
 	import Tooltip from '$lib/Tooltip.svelte';
 	import { tooltip } from '$lib/tooltips.js';
 	import { uiState } from '$lib/uistate.svelte.js';
-	import { entries } from '$lib/utils.js';
+	import { corsfix, entries } from '$lib/utils.js';
 	import ZipContentsTree from '$lib/ZipContentsTree.svelte';
 
 	import TopbarOpenSession from '../TopbarOpenSession.svelte';
@@ -48,8 +53,31 @@
 	const { data } = $props();
 	const swarpc = $derived(data.swarpc);
 
+	const compatibleProviders = $derived(
+		providers
+			.list()
+			.filter(
+				(provider) =>
+					provider.capabilities.includes('upload') &&
+					provider.compatibleWith(uiState.currentProtocol)
+			)
+	);
+
 	let windowWidth: number | undefined = $state();
 	let collapsedExportPanel = $derived((windowWidth ?? 0) <= 1400);
+	let exportDestinationTab = $derived(
+		compatibleProviders.some((platform) =>
+			tables.Account.state.some((acct) => acct.type === platform.id)
+		)
+			? 'platforms'
+			: 'local'
+	);
+
+	let publishWith = $derived(
+		tables.Account.state.find((acct) =>
+			compatibleProviders.some((provider) => provider.id === acct.type)
+		)
+	);
 
 	/** We are currently generating an export (of the specified format) */
 	let exporting: 'zip' | 'folder' | false = $state(false);
@@ -217,26 +245,31 @@
 
 	let reloadPreviews = $state(0);
 
-	watch([() => reloadPreviews, () => include], () => {
+	watch([() => exportDestinationTab, () => reloadPreviews, () => include], () => {
 		preview = undefined;
 		(async () => {
+			if (exportDestinationTab !== 'local') return;
 			preview = await previewZipContents();
 		})();
 	});
 
 	let sizeEstimates: { compressed?: number; uncompressed?: number } = $state({});
 
-	watch([() => reloadPreviews, () => include, () => cropPadding], () => {
-		sizeEstimates = {};
-		(async () => {
-			if (!uiState.currentSessionId) return;
-			sizeEstimates = await swarpc.estimateResultsZipSize.once({
-				include,
-				sessionId: uiState.currentSessionId,
-				cropPadding: cropPadding.withUnit,
-			});
-		})();
-	});
+	watch(
+		[() => exportDestinationTab, () => reloadPreviews, () => include, () => cropPadding],
+		() => {
+			sizeEstimates = {};
+			(async () => {
+				if (!uiState.currentSessionId) return;
+				if (exportDestinationTab !== 'local') return;
+				sizeEstimates = await swarpc.estimateResultsZipSize.once({
+					include,
+					sessionId: uiState.currentSessionId,
+					cropPadding: cropPadding.withUnit,
+				});
+			})();
+		}
+	);
 
 	const loadingFolder: TreeNodeMaybeLoading[number] = {
 		folder: Loading,
@@ -319,97 +352,167 @@
 				</ButtonIcon>
 			</div>
 			<h2>Exporter</h2>
+
+			<div class="tabs">
+				<SegmentedGroup
+					options={['local', 'platforms'] as const}
+					bind:current={exportDestinationTab}
+				>
+					{#snippet option_local()}
+						Fichiers
+					{/snippet}
+					{#snippet option_platforms()}
+						Plateformes
+					{/snippet}
+				</SegmentedGroup>
+			</div>
 		</header>
 
 		<div class="scrollable">
 			<div class="settings-and-gallery">
 				<div class="settings">
-					<div class="include">
-						<Field label="Inclure">
-							<EnumButtons
-								bind:value={include}
-								cards
-								options={[
-									{
-										key: 'metadataonly',
-										label: 'Métadonnées seulement',
-										icon: IconMetadataOnly,
-									},
-									{
-										key: 'croppedonly',
-										label: 'Métadonnées et images recadrées',
-										icon: IconCroppedOnly,
-									},
-									{
-										key: 'full',
-										label: 'Tout',
-										subtext: 'Permet de ré-importer ultérieurement',
-										icon: IconFullExport,
-									},
-								]}
-							/>
-						</Field>
-					</div>
-					<div class="crop-padding" class:irrelevant={include === 'metadataonly'}>
-						<Field>
-							{#snippet label()}
-								Marge de recadrage
-								<p class="fineprint"></p>
-							{/snippet}
-							<EnumButtons
-								options={[
-									{ key: 'none', label: 'Aucune' },
-									{ key: 'small', label: '5%' },
-									{ key: 'medium', label: '10%' },
-									{ key: 'customPercent', label: '?%' },
-									{ key: 'customPixels', label: '?px' },
-								]}
-								// labels={{ none: 'Aucune', small: '5%', medium: '10%' }}
-								bind:value={cropPaddingPreset}
-							>
-								{#snippet children({ key: option, label })}
-									{#if option.startsWith('custom')}
-										{@const unit = option === 'customPercent' ? '%' : 'px'}
-										<div
-											class="numeric"
-											style:--width={unit === '%' ? '3ch' : '4ch'}
-										>
-											<InlineTextInput
-												label={option === 'customPercent'
-													? "en pourcentage des dimensions de l'image"
-													: 'en pixels'}
-												value={cropPadding.unitless === 0
-													? '0'
-													: cropPadding.unit === unit
-														? cropPadding.unitless.toString()
-														: '?'}
-												onblur={async (newValue) => {
-													// otherwise, the input value updates to a '?' too quickly when changing value but not unit
-													await tick();
-													const parsed = Number.parseInt(newValue, 10);
-													if (!isNaN(parsed) && parsed > 0) {
-														cropPadding = parseCropPadding(
-															parsed + unit
-														);
-														cropPaddingPreset = option;
-													}
-												}}
-											/>
-											{unit}
-										</div>
-									{:else if label.includes('%')}
-										<Tooltip
-											text="Pour chaque image, relativement à ses dimensions"
-										>
-											{label}
-										</Tooltip>
-									{:else}
-										{label}
-									{/if}
+					{#if exportDestinationTab === 'local'}
+						<div class="include">
+							<Field label="Inclure">
+								<EnumButtons
+									bind:value={include}
+									cards
+									options={[
+										{
+											key: 'metadataonly',
+											label: 'Métadonnées seulement',
+											icon: IconMetadataOnly,
+										},
+										{
+											key: 'croppedonly',
+											label: 'Métadonnées et images recadrées',
+											icon: IconCroppedOnly,
+										},
+										{
+											key: 'full',
+											label: 'Tout',
+											subtext: 'Permet de ré-importer ultérieurement',
+											icon: IconFullExport,
+										},
+									]}
+								/>
+							</Field>
+						</div>
+						<div class="crop-padding" class:irrelevant={include === 'metadataonly'}>
+							<Field>
+								{#snippet label()}
+									Marge de recadrage
+									<p class="fineprint"></p>
 								{/snippet}
-							</EnumButtons>
-						</Field>
-					</div>
+								<EnumButtons
+									options={[
+										{ key: 'none', label: 'Aucune' },
+										{ key: 'small', label: '5%' },
+										{ key: 'medium', label: '10%' },
+										{ key: 'customPercent', label: '?%' },
+										{ key: 'customPixels', label: '?px' },
+									]}
+									// labels={{ none: 'Aucune', small: '5%', medium: '10%' }}
+									bind:value={cropPaddingPreset}
+								>
+									{#snippet children({ key: option, label })}
+										{#if option.startsWith('custom')}
+											{@const unit = option === 'customPercent' ? '%' : 'px'}
+											<div
+												class="numeric"
+												style:--width={unit === '%' ? '3ch' : '4ch'}
+											>
+												<InlineTextInput
+													label={option === 'customPercent'
+														? "en pourcentage des dimensions de l'image"
+														: 'en pixels'}
+													value={cropPadding.unitless === 0
+														? '0'
+														: cropPadding.unit === unit
+															? cropPadding.unitless.toString()
+															: '?'}
+													onblur={async (newValue) => {
+														// otherwise, the input value updates to a '?' too quickly when changing value but not unit
+														await tick();
+														const parsed = Number.parseInt(
+															newValue,
+															10
+														);
+														if (!isNaN(parsed) && parsed > 0) {
+															cropPadding = parseCropPadding(
+																parsed + unit
+															);
+															cropPaddingPreset = option;
+														}
+													}}
+												/>
+												{unit}
+											</div>
+										{:else if label.includes('%')}
+											<Tooltip
+												text="Pour chaque image, relativement à ses dimensions"
+											>
+												{label}
+											</Tooltip>
+										{:else}
+											{label}
+										{/if}
+									{/snippet}
+								</EnumButtons>
+							</Field>
+						</div>
+					{:else}
+						<div class="providers">
+							<Field label="Choisir un compte">
+								<EnumButtons
+									cards
+									options={compatibleProviders.flatMap((provider) =>
+										tables.Account.state
+											.filter((account) => account.type === provider.id)
+											.map((account) => ({
+												key: account.id,
+												label: account.displayName,
+												provider,
+												account,
+											}))
+									)}
+									value={publishWith?.id}
+									onchange={(id) => {
+										publishWith = tables.Account.getFromState(id);
+									}}
+								>
+									{#snippet children({ provider, account })}
+										<div class="account-option">
+											<div class="icon">
+												<CompositeAvatar
+													avatar={account.logoURL}
+													avatarColor={'color' in account
+														? account.color
+														: undefined}
+													sublogo={provider.logoURL}
+												/>
+											</div>
+											<div class="text">
+												<div class="name">
+													{account.displayName}
+												</div>
+												<div class="provider">
+													{[
+														provider.displayName,
+														'domain' in account
+															? account.domain
+															: undefined,
+													]
+														.filter(Boolean)
+														.join(' · ')}
+												</div>
+											</div>
+										</div>
+									{/snippet}
+								</EnumButtons>
+							</Field>
+						</div>
+					{/if}
 				</div>
 
 				<div class="gallery">
@@ -434,88 +537,136 @@
 				</div>
 			</div>
 
-			<div class="tree loading" pw-testid="zip-preview">
-				<Field label="Contenu de l'export">
-					<ZipContentsTree
-						tree={preview ?? [
-							Loading,
-							Loading,
-							...{
-								metadataonly: [],
-								croppedonly: [loadingFolder],
-								full: [loadingFolder, loadingFolder],
-							}[include],
-						]}
-					>
-						{#snippet rootHelp()}
-							<LoadingText
-								value={sizeEstimates.uncompressed}
-								mask="~{formatBytesSize(1e6, 'narrow')}"
-							>
-								{#snippet loaded(size)}
-									~{formatBytesSize(size, 'narrow')}
-								{/snippet}
-							</LoadingText>
-							une fois dézippé
-						{/snippet}
-					</ZipContentsTree>
-				</Field>
-			</div>
+			{#if exportDestinationTab === 'local'}
+				<div class="tree loading" pw-testid="zip-preview">
+					<Field label="Contenu de l'export">
+						<ZipContentsTree
+							tree={preview ?? [
+								Loading,
+								Loading,
+								...{
+									metadataonly: [],
+									croppedonly: [loadingFolder],
+									full: [loadingFolder, loadingFolder],
+								}[include],
+							]}
+						>
+							{#snippet rootHelp()}
+								<LoadingText
+									value={sizeEstimates.uncompressed}
+									mask="~{formatBytesSize(1e6, 'narrow')}"
+								>
+									{#snippet loaded(size)}
+										~{formatBytesSize(size, 'narrow')}
+									{/snippet}
+								</LoadingText>
+								une fois dézippé
+							{/snippet}
+						</ZipContentsTree>
+					</Field>
+				</div>
+			{/if}
 		</div>
 
 		<div class="actions">
-			<ButtonSecondary onclick={async () => await downloadExport(undefined)}>
-				{#if exporting === 'zip'}
-					<LoadingSpinner />
-				{:else}
-					<IconDownloadAsZip />
-				{/if}
-				Archive ZIP
-				<code class="size" use:tooltip={"Taille estimée de l'archive .zip"}>
-					<LoadingText
-						value={sizeEstimates.compressed}
-						mask="~{formatBytesSize(150e3, 'narrow')}"
-					>
-						{#snippet loaded(size)}
-							~{formatBytesSize(size, 'narrow')}
-						{/snippet}
-					</LoadingText>
-				</code>
-			</ButtonSecondary>
-			{#if !Capacitor.isNativePlatform()}
-				<ButtonSecondary
-					disabled={!supportsWritingFolder}
-					help={supportsWritingFolder
-						? undefined
-						: "Votre navigateur ne supporte pas l'exportation en dossier, utilisez Chrome ou Edge."}
-					onclick={async () => {
-						if (!supportsWritingFolder) return;
-						const directory = await (window as any).showDirectoryPicker({
-							mode: 'readwrite',
-							startIn: 'documents',
-							id: 'results-export',
-						});
-						await downloadExport(directory);
-					}}
-				>
-					{#if exporting === 'folder'}
+			{#if exportDestinationTab === 'local'}
+				<ButtonSecondary onclick={async () => await downloadExport(undefined)}>
+					{#if exporting === 'zip'}
 						<LoadingSpinner />
 					{:else}
-						<IconDownloadAsFolder />
+						<IconDownloadAsZip />
 					{/if}
-					Dossier
-					{#if supportsWritingFolder}
-						<code class="size" use:tooltip={'Taille totale estimée du dossier'}>
-							<LoadingText
-								value={sizeEstimates.uncompressed}
-								mask="~{formatBytesSize(150e3, 'narrow')}"
-							>
-								{#snippet loaded(size)}
-									~{formatBytesSize(size, 'narrow')}
-								{/snippet}
-							</LoadingText>
-						</code>
-					{/if}
+					Archive ZIP
+					<code class="size" use:tooltip={"Taille estimée de l'archive .zip"}>
+						<LoadingText
+							value={sizeEstimates.compressed}
+							mask="~{formatBytesSize(150e3, 'narrow')}"
+						>
+							{#snippet loaded(size)}
+								~{formatBytesSize(size, 'narrow')}
+							{/snippet}
+						</LoadingText>
+					</code>
+				</ButtonSecondary>
+				{#if !Capacitor.isNativePlatform()}
+					<ButtonSecondary
+						disabled={!supportsWritingFolder}
+						help={supportsWritingFolder
+							? undefined
+							: "Votre navigateur ne supporte pas l'exportation en dossier, utilisez Chrome ou Edge."}
+						onclick={async () => {
+							if (!supportsWritingFolder) return;
+							const directory = await (window as any).showDirectoryPicker({
+								mode: 'readwrite',
+								startIn: 'documents',
+								id: 'results-export',
+							});
+							await downloadExport(directory);
+						}}
+					>
+						{#if exporting === 'folder'}
+							<LoadingSpinner />
+						{:else}
+							<IconDownloadAsFolder />
+						{/if}
+						Dossier
+						{#if supportsWritingFolder}
+							<code class="size" use:tooltip={'Taille totale estimée du dossier'}>
+								<LoadingText
+									value={sizeEstimates.uncompressed}
+									mask="~{formatBytesSize(150e3, 'narrow')}"
+								>
+									{#snippet loaded(size)}
+										~{formatBytesSize(size, 'narrow')}
+									{/snippet}
+								</LoadingText>
+							</code>
+						{/if}
+					</ButtonSecondary>
+				{/if}
+			{:else if exportDestinationTab === 'platforms'}
+				{const provider = $derived(publishWith && providers.get(publishWith.type))}
+				<ButtonSecondary
+					disabled={!publishWith}
+					loading
+					onclick={async () => {
+						if (!publishWith) return;
+						if (!provider) return;
+
+						const protocol = uiState.currentProtocol;
+						const session = uiState.currentSession;
+						if (!protocol) return;
+						if (!session) return;
+
+						const account = provider.fromDatabase(databaseHandle(), publishWith);
+						const uploaded = await account.upload(protocol, session, console.debug);
+
+						await tables.Session.update(session.id, 'remoteId', uploaded.remoteID);
+					}}
+				>
+					{#snippet children({ loading })}
+						{#if loading}
+							<!-- nothing -->
+						{:else if publishWith && provider}
+							<div class="avatar">
+								<CompositeAvatar
+									avatar={publishWith.logoURL}
+									avatarColor={'color' in publishWith
+										? publishWith.color
+										: undefined}
+									sublogo={provider.logoURL}
+								/>
+							</div>
+						{:else}
+							<IconSendToPlatform />
+						{/if}
+
+						{#if provider}
+							Envoyer sur {provider.displayName}
+						{:else}
+							Envoyer
+						{/if}
+					{/snippet}
 				</ButtonSecondary>
 			{/if}
 		</div>
@@ -536,6 +687,10 @@
 		display: flex;
 		align-items: center;
 		gap: 1em;
+	}
+
+	header .tabs {
+		margin-left: auto;
 	}
 
 	.problems {
@@ -611,7 +766,7 @@
 		--gallery-thumb: 80px;
 		--gallery-gap: 1em;
 		display: grid;
-		grid-template-columns: auto calc(3 * (var(--gallery-thumb) + var(--gallery-gap)));
+		grid-template-columns: 400px calc(3 * (var(--gallery-thumb) + var(--gallery-gap)));
 		gap: 3em;
 
 		@media (max-width: 600px) {
@@ -679,12 +834,31 @@
 		margin-top: 1em;
 	}
 
+	.account-option {
+		display: flex;
+		align-items: center;
+		gap: 1em;
+
+		.icon {
+			font-size: 1.25em;
+		}
+
+		.provider {
+			color: var(--gay);
+		}
+	}
+
 	.actions {
 		display: flex;
 		gap: 1em;
 		align-items: center;
 		justify-content: center;
 		flex-wrap: wrap;
+
+		.avatar {
+			font-size: 0.75rem;
+			margin-right: 0.5em;
+		}
 	}
 
 	@media (max-width: 1300px) {
