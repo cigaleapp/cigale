@@ -1,8 +1,13 @@
 import type { BinaryStorageBackend, BinaryStorageLocator } from './types.js';
 
-import { pick } from '$lib/utils.js';
+import { nanoid } from 'nanoid';
 
+import { IterateCallback, pick } from '$lib/utils.js';
+
+import StreamWorker from './opfs-stream-worker.js?worker';
 import { locatorToPath } from './utils.js';
+
+const streamWorker = new StreamWorker({ name: 'OPFS streaming worker' });
 
 export async function OPFSBackend(): Promise<BinaryStorageBackend<'opfs'>> {
 	if (localStorage.getItem('playwright_mock_opfs') === 'true') {
@@ -76,6 +81,42 @@ export async function OPFSBackend(): Promise<BinaryStorageBackend<'opfs'>> {
 		},
 		async bytes(locator) {
 			return getFile(locator).then((file) => file.arrayBuffer());
+		},
+		async *stream(locator, chunksize) {
+			const reqid = nanoid();
+			const [directory, name] = await walk(locator);
+			const handle = await directory.getFileHandle(name);
+			// const path = await root.resolve(handle);
+			// if (path === null) throw new Error(`Couldnt resolve ${locatorToPath(locator)}`);
+
+			const iterator = new IterateCallback<
+				| { type: 'item'; item: { index: number; total: number; bytes: ArrayBuffer } }
+				| { type: 'error'; error: unknown }
+			>(locatorToPath(locator));
+
+			streamWorker.addEventListener('message', (e) => {
+				if (e.data.key !== reqid) return;
+				if (e.data.done) {
+					iterator.done();
+				} else {
+					iterator.push({ type: 'item', item: e.data.item });
+				}
+			});
+
+			streamWorker.addEventListener('error', (e) => {
+				console.error('FROM WW received error from worker', e);
+				iterator.finish({ type: 'error', error: e });
+			});
+
+			streamWorker.postMessage({
+				type: '__args',
+				args: structuredClone({ handle, chunksize, key: reqid }),
+			});
+
+			for await (const event of iterator.stream()) {
+				if (event.type === 'error') throw event.error;
+				yield event.item;
+			}
 		},
 		async text(locator) {
 			return getFile(locator).then((file) => file.text());

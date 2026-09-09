@@ -39,6 +39,27 @@ crop:
   metadata: crop
 
 remote:
+  ecosignal:
+    project: 1
+    # pour savoir si une image sans boîtes a été envoyée depuis Cigale (donc à ne pas ré-analyser)
+    label: from-cigale
+    # pour savoir sur quelle métadonnée stocker les coordonnées des annotations
+    crop: crop
+    # quel status ecosignal correspond à une annotation confirmée
+    confirmedStatus: Accepted
+
+    domains:
+      VPS de Gwenn (temporaire): https://ecosignal.gwen.works
+
+    sites:
+      create: true
+      protect: true
+      name:
+        metadata: site_code
+      location:
+        metadata: start_at
+        fallback: FRA
+
   kobocollect:
     # form: https://kf.kobotoolbox.org/#/forms/aTocGmTVNFFtuTAbtcgsEK/
     form: https://kf.kobotoolbox.org/#/forms/a3kVqAFEJwnHFcFc7PpWj4/

@@ -18,7 +18,7 @@ import { corsfix, ensureArray, mapValues } from '$lib/utils.js';
 
 export default class Provider implements Account {
 	static id = 'kobotoolbox' as const;
-	static servers = [
+	static _servers = [
 		{ domain: 'kf.kobotoolbox.org', name: 'Global' },
 		{ domain: 'eu.kobotoolbox.org', name: 'Europe' },
 	] as const;
@@ -27,14 +27,23 @@ export default class Provider implements Account {
 	static displayName = 'KoboToolbox';
 	static logoURL = new URL('https://avatars.githubusercontent.com/u/5543677?s=280&v=4');
 
+	#abortSignal: AbortSignal|undefined=undefined
 	#token: string;
 	username: string;
 	displayName: string;
 	avatarURL: URL | undefined;
-	domain: (typeof Provider.servers)[number]['domain'];
+	domain: (typeof Provider._servers)[number]['domain'];
 	db: DatabaseHandle;
 	/** Database ID of the account */
 	id: string | undefined;
+
+	async servers() {
+		return Provider._servers;
+	}
+
+	armAbort(signal: AbortSignal) {
+		this.#abortSignal = signal
+	}
 
 	get v2domain(): string {
 		return this.domain;
@@ -55,7 +64,7 @@ export default class Provider implements Account {
 
 	static domainOfProfileURL(
 		profileURL: string | URL
-	): (typeof Provider.servers)[number]['domain'] {
+	): (typeof Provider._servers)[number]['domain'] {
 		switch (new URL(profileURL).hostname) {
 			case 'kc.kobotoolbox.org':
 				return 'kf.kobotoolbox.org';
@@ -79,7 +88,7 @@ export default class Provider implements Account {
 			id,
 		}: {
 			token: string;
-			domain: (typeof Provider.servers)[number]['domain'];
+			domain: (typeof Provider._servers)[number]['domain'];
 			username?: string;
 			displayName?: string;
 			avatarURL?: URL | undefined;
@@ -88,7 +97,7 @@ export default class Provider implements Account {
 	) {
 		this.#token = token;
 		this.username = username ?? '';
-		this.domain = type.enumerated(...Provider.servers.map((s) => s.domain)).assert(domain);
+		this.domain = type.enumerated(...Provider._servers.map((s) => s.domain)).assert(domain);
 		this.displayName = displayName ?? '';
 		this.avatarURL = avatarURL;
 		this.db = db;
@@ -106,10 +115,14 @@ export default class Provider implements Account {
 		};
 	}
 
+	static compatibleWith(protocol: DB.Protocol | undefined) {
+		return Boolean(protocol?.remote?.kobocollect);
+	}
+
 	static async checkAuth({
 		server,
 		token,
-	}: LoginData<(typeof Provider.servers)[number]['domain']>) {
+	}: LoginData<(typeof Provider._servers)[number]['domain']>) {
 		if (!token) return 'Token vide';
 
 		const response = await new Provider(undefined!, { token, domain: server }).fetch(
@@ -142,7 +155,7 @@ export default class Provider implements Account {
 
 	static async login(
 		db: DatabaseHandle,
-		{ token, server }: LoginData<(typeof Provider.servers)[number]['domain']>
+		{ token, server }: LoginData<(typeof Provider._servers)[number]['domain']>
 	) {
 		if (!token) throw new Error('No login data provided');
 
@@ -171,7 +184,7 @@ export default class Provider implements Account {
 
 	async logout() {}
 
-	async *sessions({ cursor = undefined, limit = 40, mine = false } = {}) {
+	async *sessions({ cursor = '', limit = 40, mine = false } = {}) {
 		const yielded = new Set<string>();
 		let total = 0;
 
@@ -313,7 +326,7 @@ export default class Provider implements Account {
 				...rest,
 				value: serializeMetadataValue(value),
 			})),
-			inferenceModels: {},
+			neuralModels: {},
 			group: {
 				global: { field: 'none', tolerances: { dates: 'day', decimal: 'unit' } } as const,
 			},
@@ -668,7 +681,13 @@ export default class Provider implements Account {
 			...init.headers,
 		};
 
+		this.#maybeAbort()
+
 		return fetch(corsfix(url), init);
+	}
+
+	#maybeAbort() {
+		this.#abortSignal?.throwIfAborted()
 	}
 
 	static PaginatedResponse = type('<T>', {

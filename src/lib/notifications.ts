@@ -2,14 +2,17 @@ import { Capacitor } from '@capacitor/core';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { millisecondsToSeconds } from 'date-fns';
 
-import { getSettings } from './settings.svelte';
-import { toasts } from './toasts.svelte';
+import { getSettings } from '$lib/settings.svelte.js';
+import { toasts } from '$lib/toasts.svelte.js';
 
 /**
  * Maps actionTypeId to action id to action details (title and callback)
- * @type {Record<string, Record<string, {title: string, callback: () => Promise<void>}>>}
  */
-let _notificationActions = {};
+let _notificationActions: Record<
+	string,
+	Record<string, { title: string; callback: () => Promise<void> }>
+> = {};
+
 let _notificationActionsListenerStarted = false;
 
 /**
@@ -50,12 +53,28 @@ export async function askForNotificationPermission() {
 
 /**
  * Send a system notification if permission was granted
- * `actionTypeId` defaults to the title
- * @param {string} title
- * @param {NotificationOptions & { actionsTypeId?: string,  actions?: Array<{ id: string, callback: () => Promise<void>, title: string }> }} options actions are only supported on native
- * @returns
  */
-export async function sendNotification(title, { actionsTypeId = title, actions = [], ...options }) {
+export async function sendNotification(
+	title: string,
+	{
+		actionsTypeId = title,
+		actions = [],
+		awayOnly = false,
+		...options
+	}: NotificationOptions & {
+		/** Defaults to the title */
+		actionsTypeId?: string;
+		/** Only supported on native platforms */
+		actions?: Array<{ id: string; callback: () => Promise<void>; title: string }>;
+		/**
+		 * Only send notification if user is not looking at the app
+		 * On web platforms, this means {@link Document.hidden} is true
+		 */
+		awayOnly?: boolean;
+	} = {}
+) {
+	if (awayOnly && !document.hidden) return;
+
 	if (Capacitor.isNativePlatform()) {
 		try {
 			if (actions.length > 0) {
@@ -149,10 +168,7 @@ export async function sendNotification(title, { actionsTypeId = title, actions =
 	new Notification(title, options);
 }
 
-/**
- * @param {boolean|null} isSettingOn
- */
-export async function hasNotificationsEnabled(isSettingOn) {
+export async function hasNotificationsEnabled(isSettingOn: boolean | null) {
 	if (Capacitor.isNativePlatform()) {
 		return isSettingOn && (await LocalNotifications.checkPermissions()).display === 'granted';
 	}
