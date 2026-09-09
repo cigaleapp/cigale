@@ -16,7 +16,7 @@
 	import Datetime from '$lib/Datetime.svelte';
 	import DropdownMenu from '$lib/DropdownMenu.svelte';
 	import { promptForFiles } from '$lib/files';
-	import { plural } from '$lib/i18n.js';
+	import { errorMessage, plural } from '$lib/i18n.js';
 	import { countByIndex, databaseHandle, listByIndex, tables } from '$lib/idb.svelte.js';
 	import { loadPreviewImage } from '$lib/images.js';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
@@ -28,6 +28,7 @@
 	import { seo } from '$lib/seo.svelte';
 	import { switchSession } from '$lib/sessions.js';
 	import { getSettings, isDebugMode, setSetting } from '$lib/settings.svelte.js';
+	import { toasts } from '$lib/toasts.svelte.js';
 	import { uiState } from '$lib/uistate.svelte.js';
 	import { nonnull } from '$lib/utils.js';
 
@@ -150,6 +151,7 @@
 								<div class="icon">
 									<CompositeAvatar
 										avatar={account.avatarURL}
+										avatarColor={'color' in account ? account.color : undefined}
 										sublogo={provider.logoURL}
 										tooltip="{account.username} sur {provider.displayName}"
 									/>
@@ -171,6 +173,7 @@
 							{#if provider && account}
 								<CompositeAvatar
 									avatar={account.avatarURL}
+									avatarColor={'color' in account ? account.color : undefined}
 									sublogo={provider.logoURL}
 								/>
 							{:else if special === 'local'}
@@ -341,6 +344,16 @@
 										account,
 										session,
 										mutator,
+									}).catch((e) => {
+										console.error(e);
+										toasts.error(
+											errorMessage(
+												`Impossible de télécharger ${session.name}`,
+												e
+											)
+										);
+
+										return undefined
 									});
 								}
 								if (!id) return;

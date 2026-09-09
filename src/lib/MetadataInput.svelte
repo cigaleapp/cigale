@@ -19,6 +19,7 @@
 	import IconGPS from '~icons/ri/map-pin-line';
 	import IconDecrement from '~icons/ri/subtract-line';
 	import * as idb from '$lib/idb.svelte.js';
+	import { createBytes } from '$lib/storage/utils.js';
 
 	import ButtonIcon from './ButtonIcon.svelte';
 	import ButtonInk from './ButtonInk.svelte';
@@ -665,14 +666,16 @@
 
 									const id = await idb.set('MetadataValueFile', {
 										id: generateId('MetadataValueFile'),
-										sessionId: uiState.currentSessionId,
-										size: file.size,
-										contentType: file.type,
-										filename: file.name,
-										bytes: await file.arrayBuffer(),
 										lastModifiedAt: new Date(
 											file.lastModified || Date.now()
 										).toISOString(),
+										contentType: file.type,
+										...(await createBytes('MetadataValueFile', {
+											filename: file.name,
+											sessionId: uiState.currentSessionId,
+											bytes: await file.arrayBuffer(),
+											type: file.type,
+										})),
 									});
 
 									const timeElapsed = performance.now() - savingStart;

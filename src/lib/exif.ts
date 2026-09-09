@@ -20,7 +20,7 @@ import { errorMessage } from './i18n.js';
 import * as db from './idb.svelte.js';
 import { resolveMetadataImport, storeMetadataValue } from './metadata/index.js';
 import { toasts } from './toasts.svelte.js';
-import { byteString, byteStringToArray, throwError, transformObject } from './utils.js';
+import { byteString, byteStringToArray, entries, throwError, transformObject } from './utils.js';
 
 export async function processExifData({
 	sessionId,
@@ -136,8 +136,9 @@ export async function processExifData({
 	} catch (e) {
 		console.warn(e);
 		if (file.type === 'image/jpeg') {
+			console.warn(e);
 			toasts.warn(
-				`Impossible d'extraire les métadonnées EXIF de ${file.name}: ${e?.toString() ?? 'Erreur inattendue'}`
+				errorMessage(e, `Impossible d'extraire les métadonnées EXIF de ${file.name}`)
 			);
 		}
 		return {};
@@ -365,8 +366,10 @@ export function setExifFields(bytes: ArrayBuffer, changes: Partial<Record<ExifFi
 			const field = EXIF_FIELDS[key];
 
 			const [category] =
-				Object.entries(exifDict).find(([, tags]) => tags && field in tags) ??
-				Object.entries(piexif.TAGS).find(
+				entries(exifDict).find(
+					([cat, tags]) => cat !== 'thumbnail' && tags && field in tags
+				) ??
+				entries(piexif.TAGS).find(
 					([cat, tags]) => cat !== 'Image' && field in tags
 				) ??
 				[];
@@ -386,7 +389,7 @@ export function setExifFields(bytes: ArrayBuffer, changes: Partial<Record<ExifFi
 		return byteStringToArray(outputstr);
 	} catch (error) {
 		toasts.warn(errorMessage(error, 'Impossible de modifier les données EXIF'));
-		return new Uint8Array(buffer);
+		return new Uint8Array(bytes);
 	}
 }
 

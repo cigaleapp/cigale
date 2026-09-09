@@ -4,6 +4,8 @@ import type { SessionRemoteID } from '$lib/schemas/sessions.js';
 
 export type AuthenticationMethod = 'oauth' | 'token' | 'password';
 
+export type AccountCapability = 'sessions' | 'upload' | 'images' | 'sync';
+
 export type LoginData<S extends string = string> = {
 	server: S;
 	token?: string;
@@ -17,21 +19,35 @@ export interface Account {
 	avatarURL: URL | undefined;
 	/** Database ID of the account. */
 	id: string | undefined;
-
 	logout(): Promise<void>;
+
+	armAbort(signal: AbortSignal): void;
+
+	sessionPage(protocol: DB.Protocol|undefined, session: DB.Session|undefined): URL | undefined;
 
 	/**
 	 * Upload a session to the account
 	 * @param session session object from the database
 	 */
-	upload(session: DB.Session): Promise<{
-		/** If the session has a remote ID that can be used to import it back later into CIGALE. Useful if the Account is ALSO a {@link AccountRemoteSessions} */
-		remoteID?: SessionRemoteID;
-		/**
-		 * URL to where the session can be visited on the account
-		 */
-		page?: URL;
-	}>;
+	upload(
+		protocol: DB.Protocol,
+		session: DB.Session
+	): AsyncIterable<
+		| {
+				message: 'session-id';
+				/** If the session has a remote ID that can be used to import it back later into CIGALE. Useful if the Account has session capabilities */
+				remoteId?: SessionRemoteID;
+		  }
+		| {
+				/** Progress update */
+				message: 'progress';
+				action: string;
+				done?: number;
+				total?: number;
+				/** Is a sub-task */
+				indent?: boolean;
+		  }
+	>;
 
 	/**
 	 * List available remote sessions on the account
@@ -66,44 +82,51 @@ export interface Account {
 	>;
 
 	/**
-	 * Get the remote session
+	 * Download the remote session
 	 * @param protocol protocol of the session
 	 * @param id remote ID of the session
 	 */
-	session(
+	download(
 		protocol: DB.Protocol,
 		id: SessionRemoteID
-	): Promise<Omit<(typeof DB.Schemas.Session)['inferIn'], 'id' | 'account'>>;
+	): AsyncIterable<
+		| {
+				message: 'session-id';
+				/** The database id of the newly created, in-db session object */
+				databaseId?: string;
+		  }
+		| {
+				/** Progress update */
+				message: 'progress';
+				action: string;
+				done?: number;
+				total?: number;
+				/** Is a sub-task */
+				indent?: boolean;
+		  }
+	>;
+
+	/**
+	 * Sync local session with remote session
+	 */
+	sync(
+		protocol: DB.Protocol,
+		session: DB.Session
+	): AsyncIterable<{
+		/** Progress update */
+		message: 'progress';
+		action: string;
+		done?: number;
+		total?: number;
+		/** Is a sub-task */
+		indent?: boolean;
+	}>;
 
 	/**
 	 * Fetch the thumbnail for a session,
 	 * returning a blob:// URL ready for use
 	 */
 	thumbnail(url: URL): Promise<URL>;
-
-	/**
-	 * Get all observations/images/image files of the remote session
-	 * @param protocol protocol of the session
-	 * @param session remote ID of the session (in Session.remote.id in the database)
-	 */
-	items(
-		protocol: DB.Protocol,
-		session: SessionRemoteID
-	): Promise<{
-		observations: Array<(typeof DB.Schemas.Observation)['inferIn']>;
-		images: Array<(typeof DB.Schemas.Image)['inferIn']>;
-		files: Array<(typeof DB.Tables.ImageFile)['inferIn']>;
-	}>;
-
-	/**
-	 * Get files from file-type session metadata values
-	 * @param protocol protocol of the session
-	 * @param session remote ID of the session
-	 */
-	files(
-		protocol: DB.Protocol,
-		session: SessionRemoteID
-	): AsyncIterable<Omit<(typeof DB.Tables.MetadataValueFile)['inferIn'], 'sessionId'>>;
 }
 
 export interface AccountConstructor<
@@ -116,9 +139,12 @@ export interface AccountConstructor<
 	id: string;
 	logoURL: URL;
 	displayName: string;
-	capabilities: readonly ('sessions' | 'images' | 'upload')[];
+	capabilities: readonly AccountCapability[];
 	auth: Auth;
-	servers: readonly { domain: Server; name?: string }[];
+
+	servers(db: DatabaseHandle): Promise<Array<{ domain: Server; name?: string }>>;
+
+	compatibleWith(protocol: DB.Protocol | undefined): boolean;
 
 	/** Returns the error message, or undefined if everything is a-ok */
 	checkAuth(data: LoginData<Server>): Promise<undefined | string>;
