@@ -302,7 +302,7 @@ describe('db-dependent', () => {
 			const acc = await getAccount();
 			const prot = DB.Schemas.Protocol.assert(await db.get('Protocol', 'not.kobo'));
 			await expect(
-				acc.session(prot, MOCK_SESSION_REMOTEID())
+				acc.download(prot, MOCK_SESSION_REMOTEID())
 			).rejects.toThrowErrorMatchingInlineSnapshot(
 				`[Error: This protocol doesn't support KoboToolbox remote sessions]`
 			);
@@ -327,7 +327,7 @@ describe('db-dependent', () => {
 			const prot = DB.Schemas.Protocol.assert(await db.get('Protocol', 'with.kobo'));
 
 			await expect(
-				acc.session(prot, MOCK_SESSION_REMOTEID(MOCK_SESSION_REMOTEID_NOTFOUND_DATA_ID))
+				acc.download(prot, MOCK_SESSION_REMOTEID(MOCK_SESSION_REMOTEID_NOTFOUND_DATA_ID))
 			).rejects.toThrowErrorMatchingInlineSnapshot(
 				`[Error: Impossible de se connecter à KoboToolbox: {"detail":"Not found."}]`
 			);
@@ -350,7 +350,7 @@ describe('db-dependent', () => {
 			const acc = await getAccount();
 			const prot = DB.Schemas.Protocol.assert(await db.get('Protocol', 'with.kobo'));
 
-			await expect(acc.session(prot, MOCK_SESSION_REMOTEID())).resolves
+			await expect(acc.download(prot, MOCK_SESSION_REMOTEID())).resolves
 				.toMatchInlineSnapshot(`
 				{
 				  "createdAt": "2026-03-28T13:55:19.000Z",

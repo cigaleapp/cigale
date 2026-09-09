@@ -171,6 +171,7 @@
 	})}
 >
 	<div class="main-card">
+		<!-- TODO move error display to <Card /> and use it for session cards too (e.g. download errors for remote sessions) -->
 		<Card tag="div" ondoubleclick={(e) => callEventHandler('ondoubleclick', e)}>
 			<div class="inner">
 				{#if status !== 'ok'}

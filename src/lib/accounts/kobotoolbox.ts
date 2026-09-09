@@ -1,24 +1,27 @@
 import type { DatabaseHandle } from '../idb.svelte.js';
 import type { Account, AuthenticationMethod, LoginData } from '$lib/accounts/types.js';
 import type * as DB from '$lib/database.js';
+import type { TypedMetadataValue } from '$lib/metadata/types.js';
 import type { MetadataRecordValue, RuntimeValue } from '$lib/schemas/metadata.js';
 
 import { Type, type } from 'arktype';
 import * as date from 'date-fns';
 
-import { Schemas } from '$lib/database.js';
+import { generateId, Schemas } from '$lib/database.js';
 import { resolveMetadataImport } from '$lib/metadata/imports.js';
 import { protocolMetadataValues } from '$lib/metadata/namespacing.js';
-import { serializeMetadataValue } from '$lib/metadata/serializing.js';
+import { serializeMetadataFullValue, serializeMetadataValue } from '$lib/metadata/serializing.js';
 import { metadataOptionsKeyRange } from '$lib/metadata/storage.js';
 import { MIMEType, NamespacedMetadataID } from '$lib/schemas/common.js';
 import { removeNamespaceFromMetadataId, splitMetadataId } from '$lib/schemas/metadata.js';
+import { toMetadataRecord } from '$lib/schemas/results.js';
 import { SessionRemoteID } from '$lib/schemas/sessions.js';
+import { createBytes } from '$lib/storage/utils.js';
 import { corsfix, ensureArray, mapValues } from '$lib/utils.js';
 
 export default class Provider implements Account {
 	static id = 'kobotoolbox' as const;
-	static servers = [
+	static _servers = [
 		{ domain: 'kf.kobotoolbox.org', name: 'Global' },
 		{ domain: 'eu.kobotoolbox.org', name: 'Europe' },
 	] as const;
@@ -27,14 +30,23 @@ export default class Provider implements Account {
 	static displayName = 'KoboToolbox';
 	static logoURL = new URL('https://avatars.githubusercontent.com/u/5543677?s=280&v=4');
 
+	#abortSignal: AbortSignal | undefined = undefined;
 	#token: string;
 	username: string;
 	displayName: string;
 	avatarURL: URL | undefined;
-	domain: (typeof Provider.servers)[number]['domain'];
+	domain: (typeof Provider._servers)[number]['domain'];
 	db: DatabaseHandle;
 	/** Database ID of the account */
 	id: string | undefined;
+
+	async servers() {
+		return Provider._servers;
+	}
+
+	armAbort(signal: AbortSignal) {
+		this.#abortSignal = signal;
+	}
 
 	get v2domain(): string {
 		return this.domain;
@@ -55,7 +67,7 @@ export default class Provider implements Account {
 
 	static domainOfProfileURL(
 		profileURL: string | URL
-	): (typeof Provider.servers)[number]['domain'] {
+	): (typeof Provider._servers)[number]['domain'] {
 		switch (new URL(profileURL).hostname) {
 			case 'kc.kobotoolbox.org':
 				return 'kf.kobotoolbox.org';
@@ -79,7 +91,7 @@ export default class Provider implements Account {
 			id,
 		}: {
 			token: string;
-			domain: (typeof Provider.servers)[number]['domain'];
+			domain: (typeof Provider._servers)[number]['domain'];
 			username?: string;
 			displayName?: string;
 			avatarURL?: URL | undefined;
@@ -88,7 +100,7 @@ export default class Provider implements Account {
 	) {
 		this.#token = token;
 		this.username = username ?? '';
-		this.domain = type.enumerated(...Provider.servers.map((s) => s.domain)).assert(domain);
+		this.domain = type.enumerated(...Provider._servers.map((s) => s.domain)).assert(domain);
 		this.displayName = displayName ?? '';
 		this.avatarURL = avatarURL;
 		this.db = db;
@@ -106,10 +118,14 @@ export default class Provider implements Account {
 		};
 	}
 
+	static compatibleWith(protocol: DB.Protocol | undefined) {
+		return Boolean(protocol?.remote?.kobocollect);
+	}
+
 	static async checkAuth({
 		server,
 		token,
-	}: LoginData<(typeof Provider.servers)[number]['domain']>) {
+	}: LoginData<(typeof Provider._servers)[number]['domain']>) {
 		if (!token) return 'Token vide';
 
 		const response = await new Provider(undefined!, { token, domain: server }).fetch(
@@ -142,7 +158,7 @@ export default class Provider implements Account {
 
 	static async login(
 		db: DatabaseHandle,
-		{ token, server }: LoginData<(typeof Provider.servers)[number]['domain']>
+		{ token, server }: LoginData<(typeof Provider._servers)[number]['domain']>
 	) {
 		if (!token) throw new Error('No login data provided');
 
@@ -171,7 +187,7 @@ export default class Provider implements Account {
 
 	async logout() {}
 
-	async *sessions({ cursor = undefined, limit = 40, mine = false } = {}) {
+	async *sessions({ cursor = '', limit = 40, mine = false } = {}) {
 		const yielded = new Set<string>();
 		let total = 0;
 
@@ -226,6 +242,7 @@ export default class Provider implements Account {
 				);
 
 				const metadata = await this.#rowToMetadata(protocol, project, result);
+				const record = toMetadataRecord(metadata);
 
 				let name = 'Sans nom';
 
@@ -233,8 +250,8 @@ export default class Provider implements Account {
 					name = protocol.remote.kobocollect.title.render({
 						survey: result,
 						session: {
-							metadata,
-							protocolMetadata: protocolMetadataValues('session', protocol, metadata),
+							metadata: record,
+							protocolMetadata: protocolMetadataValues('session', protocol, record),
 						},
 					});
 				} catch (error) {
@@ -268,7 +285,7 @@ export default class Provider implements Account {
 			.then((blob) => new URL(URL.createObjectURL(blob)));
 	}
 
-	async session(protocol: DB.Protocol, id: SessionRemoteID) {
+	async *download(protocol: DB.Protocol, id: SessionRemoteID) {
 		if (!protocol.remote?.kobocollect)
 			throw new Error("This protocol doesn't support KoboToolbox remote sessions");
 
@@ -291,29 +308,28 @@ export default class Provider implements Account {
 		);
 
 		try {
+			const record = toMetadataRecord(metadata);
 			name = protocol.remote.kobocollect.title.render({
 				survey: row,
 				session: {
-					metadata,
-					protocolMetadata: protocolMetadataValues('session', protocol, metadata),
+					metadata: record,
+					protocolMetadata: protocolMetadataValues('session', protocol, record),
 				},
 			});
 		} catch (error) {
 			console.error(error);
 		}
 
-		return {
+		const sessionId = await this.db.put('Session', {
+			id: generateId('Session'),
 			remoteId: id,
 			protocol: protocol.id,
 			name,
 			createdAt: row._submission_time.toISOString(),
 			description: `Créée sur KoboToolbox. Voir ${submissionUrl}`,
 			openedAt: new Date().toISOString(),
-			metadata: mapValues(metadata, ({ value, ...rest }) => ({
-				...rest,
-				value: serializeMetadataValue(value),
-			})),
-			inferenceModels: {},
+			metadata: mapValues(metadata, serializeMetadataFullValue),
+			neuralModels: {},
 			group: {
 				global: { field: 'none', tolerances: { dates: 'day', decimal: 'unit' } } as const,
 			},
@@ -323,21 +339,14 @@ export default class Provider implements Account {
 			fullscreenClassifier: {
 				layout: 'top-bottom' as const,
 			},
+		});
+
+		yield {
+			message: 'session-id',
+			databaseId: sessionId,
 		};
-	}
 
-	async items() {
-		return {
-			observations: [],
-			images: [],
-			files: [],
-		};
-	}
-
-	async *files(protocol: DB.Protocol, id: SessionRemoteID) {
-		const project = await this.#fetchProject(id);
-		const row = await this.#fetchData(id);
-
+		let done = 0;
 		for (const metadataId of protocol.sessionMetadata) {
 			const def = await this.db
 				.get('Metadata', resolveMetadataImport(protocol, metadataId))
@@ -358,20 +367,29 @@ export default class Provider implements Account {
 			const file = await this.fetch(attachment.download_url);
 			const bytes = await file.arrayBuffer();
 
-			yield {
+			await this.db.put('MetadataValueFile', {
 				// TODO: support attaching download_url here
 				id: this.#compositeFileId(project, row, attachment),
-				bytes,
 				contentType: attachment.mimetype,
-				filename: attachment.media_file_basename,
-				size: bytes.byteLength,
 				// kobocollect doesn't store it...
 				lastModifiedAt: row._submission_time.toISOString(),
-			};
+				...(await createBytes('MetadataValueFile', {
+					sessionId,
+					bytes,
+					type: attachment.mimetype,
+					filename: attachment.media_file_basename,
+				})),
+			});
+
+			yield { message: 'progress', action: 'Fichiers', done, total: row._attachments.length };
 		}
 	}
 
-	async upload(): Promise<{ remoteID?: SessionRemoteID; page?: URL }> {
+	async *upload() {
+		throw new Error('Not implemented');
+	}
+
+	async *sync() {
 		throw new Error('Not implemented');
 	}
 
@@ -388,10 +406,7 @@ export default class Provider implements Account {
 		project: (typeof Provider.ProjectResponse)['infer'],
 		row: (typeof Provider.ProjectDataResponse)['infer']
 	) {
-		const metadataValues: Record<
-			NamespacedMetadataID,
-			(typeof MetadataRecordValue)['inferIn']
-		> = {};
+		const metadataValues: Record<NamespacedMetadataID, TypedMetadataValue> = {};
 
 		for (const id of protocol.sessionMetadata) {
 			const def = await this.db
@@ -434,6 +449,10 @@ export default class Provider implements Account {
 					if (!option) continue;
 
 					metadataValues[def.id] = {
+						confidence: 1,
+						confirmed: false,
+						manuallyModified: false,
+						isDefault: false,
 						value: option.key,
 						confidences: {},
 						alternatives: [],
@@ -451,6 +470,10 @@ export default class Provider implements Account {
 					if (!file) continue;
 
 					metadataValues[def.id] = {
+						confidence: 1,
+						confirmed: false,
+						manuallyModified: false,
+						isDefault: false,
 						value: this.#compositeFileId(project, row, file),
 						alternatives: [],
 						confidences: {},
@@ -462,6 +485,10 @@ export default class Provider implements Account {
 					if (parsed === undefined) continue;
 
 					metadataValues[def.id] = {
+						confidence: 1,
+						confirmed: false,
+						manuallyModified: false,
+						isDefault: false,
 						value: parsed instanceof Date ? parsed.toISOString() : parsed,
 						alternatives: [],
 						confidences: {},
@@ -668,7 +695,13 @@ export default class Provider implements Account {
 			...init.headers,
 		};
 
+		this.#maybeAbort();
+
 		return fetch(corsfix(url), init);
+	}
+
+	#maybeAbort() {
+		this.#abortSignal?.throwIfAborted();
 	}
 
 	static PaginatedResponse = type('<T>', {

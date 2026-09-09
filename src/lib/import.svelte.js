@@ -66,6 +66,7 @@ export async function processImageFile({ file, id: fileId, sidecars, extraExif }
 		return;
 	}
 
+	let original = file;
 	let transcoded = file;
 	/** @type {import('libraw-wasm').Metadata | undefined} */
 	let rawMetadata = undefined;
@@ -86,7 +87,7 @@ export async function processImageFile({ file, id: fileId, sidecars, extraExif }
 
 	const [[width, height], resizedBytes] = await resizeToMaxSize({ source: transcoded });
 
-	await storeImageBytes({
+	const actualFilename = await storeImageBytes({
 		id: fileId,
 		resizedBytes,
 		originalBytes,
@@ -99,7 +100,7 @@ export async function processImageFile({ file, id: fileId, sidecars, extraExif }
 	const image = await tables.Image.set({
 		id: imageId(fileId, 0),
 		sessionId: uiState.currentSession.id,
-		filename: transcoded.name,
+		filename: actualFilename,
 		addedAt: dates.formatISO(Date.now()),
 		contentType: transcoded.type,
 		dimensions: { width, height },
@@ -118,18 +119,22 @@ export async function processImageFile({ file, id: fileId, sidecars, extraExif }
 		db: databaseHandle(),
 		sessionId: uiState.currentSession.id,
 		cropMetadataId: uiState.cropMetadataId,
-		file,
+		file: original,
 		imageFileId: fileId,
 		sidecars,
 	}).catch((e) => {
 		console.error(e);
-		toasts.error(`Erreur lors du traitement du/des fichiers annexes associés à ${file.name}`);
+		toasts.error(
+			`Erreur lors du traitement du/des fichiers annexes associés à ${original.name}`
+		);
 	});
 
 	if (rawMetadata) {
 		await processRawMetadata(uiState.currentSession.id, fileId, rawMetadata).catch((e) => {
 			console.error(e);
-			toasts.error(`Erreur lors de l'extraction des métadonnées du fichier RAW ${file.name}`);
+			toasts.error(
+				`Erreur lors de l'extraction des métadonnées du fichier RAW ${original.name}`
+			);
 		});
 	}
 
@@ -137,11 +142,11 @@ export async function processImageFile({ file, id: fileId, sidecars, extraExif }
 		sessionId: uiState.currentSession.id,
 		imageFileId: fileId,
 		imageBytes: originalBytes,
-		file,
-		extra: extraExif,
+		file: original,
+		extra: extraExif ?? {},
 	}).catch((error) => {
 		console.error(error);
-		toasts.error(`Erreur lors de l'extraction des métadonnées EXIF pour ${file.name}`);
+		toasts.error(`Erreur lors de l'extraction des métadonnées EXIF pour ${original.name}`);
 	});
 }
 

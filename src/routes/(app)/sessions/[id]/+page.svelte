@@ -2,7 +2,9 @@
 	import { fade } from 'svelte/transition';
 
 	import { invalidate } from '$app/navigation';
+	import { providers } from '$lib/accounts/registry.js';
 	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
+	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import Field from '$lib/Field.svelte';
 	import { plural } from '$lib/i18n.js';
 	import { dependencyURI, tables } from '$lib/idb.svelte.js';
@@ -116,6 +118,29 @@
 				});
 			}}
 		/>
+
+		{#if data.session.account || data.session.remoteId}
+			<ButtonSecondary
+				danger
+				loading
+				onclick={async () => {
+					await tables.Session.morph(data.session.id, (session) => {
+						delete session.account;
+						delete session.remoteId;
+					});
+
+					invalidate(dependencyURI('Session', data.session.id));
+				}}
+			>
+				{const account = tables.Account.getFromState(data.session.account ?? '')}
+				{const provider = providers.get(account?.type ?? '')}
+				{#if provider}
+					Dé-lier de {provider.displayName}
+				{:else}
+					Dé-lier de la plateforme en ligne
+				{/if}
+			</ButtonSecondary>
+		{/if}
 	</div>
 
 	<Field label="ID de la session">
