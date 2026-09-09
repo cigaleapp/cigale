@@ -29,6 +29,7 @@
 	import { undo } from '$lib/undo.svelte';
 	import { nonnull, pick } from '$lib/utils';
 
+	import ModalCreateCustomNeuralNetwork from './ModalCreateCustomNeuralNetwork.svelte';
 	import Navigation from './Navigation.svelte';
 	import PrepareForOffline from './PrepareForOffline.svelte';
 	import ToastsArea from './ToastsArea.svelte';
@@ -42,7 +43,7 @@
 
 	const navbarAppearance = $derived.by<NavbarAppearance>(() => {
 		if (routeIsIn('/(app)/(sidepanel)/o/[observation]')) return 'hidden';
-		if (routeIsIn('/(app)/protocols/[id]')) return 'hidden';
+		if (routeIsIn('/(app)/protocols/[id]/edit')) return 'hidden';
 		if (routeIsIn('/(app)/capture')) return 'hidden';
 
 		return 'full';
@@ -179,6 +180,8 @@
 
 <PrepareForOffline bind:open={globalModals.modal_prepare_for_offline_use.open} />
 
+<ModalCreateCustomNeuralNetwork />
+
 <Modal
 	key="modal_debug_ui_state"
 	title="UI State"
@@ -208,7 +211,7 @@
 	<div
 		class="contents"
 		class:padded={!page.route.id?.includes('/(sidepanel)') &&
-			!page.route.id?.includes('protocols/[id]/') &&
+			!page.route.id?.includes('protocols/[id]/edit/') &&
 			page.route.id !== '/(app)/capture'}
 	>
 		{@render children?.()}

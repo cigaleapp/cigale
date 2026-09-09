@@ -10,7 +10,7 @@
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import { MODEL_DETECTION_OUTPUT_SHAPES } from '$lib/schemas/neural.js';
 	import { tooltip } from '$lib/tooltips';
-	import { entries } from '$lib/utils.js';
+	import { compareBy, entries } from '$lib/utils.js';
 
 	import MorphArrow from './MorphArrow.svelte';
 	import ShapeAtomDisplay from './ShapeAtomDisplay.svelte';
@@ -22,9 +22,9 @@
 	/**
 	 * @typedef {object} Props
 	 * @property {Atom[]} shape
-	 * @property {(i: number) => Promise<void>} ondelete
-	 * @property {(change: [number, Atom]) => Promise<void>} onchange
-	 * @property {(newAtom: Atom) => Promise<void>} onadd
+	 * @property {(i: number) => (void|Promise<void>)} ondelete
+	 * @property {(change: [number, Atom]) => (void|Promise<void>)} onchange
+	 * @property {(newAtom: Atom) => (void|Promise<void>)} onadd
 	 */
 
 	/** @type {Props} */
@@ -32,6 +32,14 @@
 
 	/** @type {Set<number>} */
 	let openedPickers = new SvelteSet();
+
+	const ALL_SHAPES = entries(MODEL_DETECTION_OUTPUT_SHAPES)
+		.map(([atom, data]) => ({ atom, ...data }))
+		.toSorted(
+			compareBy(({ atom }) =>
+				['score', 'cx', 'cy', 'sx', 'sy', 'ex', 'ey', 'w', 'h', '_'].indexOf(atom)
+			)
+		);
 
 	/**
 	 * @param {Array<typeof shape[number]>} atoms
@@ -131,6 +139,7 @@
 								<button
 									{...props}
 									class="open-atom-picker"
+									use:tooltip={MODEL_DETECTION_OUTPUT_SHAPES[dim]?.help}
 									class:create={dim === ''}
 								>
 									<div class="label">
@@ -148,7 +157,7 @@
 						</Popover.Trigger>
 
 						<Popover.Content align="end">
-							{#each entries(MODEL_DETECTION_OUTPUT_SHAPES) as [atom, { help }] (atom)}
+							{#each ALL_SHAPES as { help, atom } (atom)}
 								<ButtonIcon
 									{help}
 									onclick={() => {
@@ -161,7 +170,10 @@
 										}
 									}}
 								>
-									<ShapeAtomDisplay {atom} />
+									<div class="popover-option">
+										<ShapeAtomDisplay {atom} />
+										<span class="name">{help}</span>
+									</div>
 								</ButtonIcon>
 							{/each}
 							<div class="spacer"></div>
@@ -174,7 +186,10 @@
 									ondelete(i);
 								}}
 							>
-								<IconTrash />
+								<div class="popover-option">
+									<IconTrash />
+									<span class="name">Supprimer</span>
+								</div>
 							</ButtonIcon>
 						</Popover.Content>
 					</Popover.Root>
@@ -194,6 +209,7 @@
 	</div>
 
 	<div class="sep">
+		<small>devient</small>
 		<MorphArrow />
 	</div>
 
@@ -206,7 +222,7 @@
 					class="invalid"
 					use:tooltip={"Impossible de déterminer la hauteur. Il manque l'une des grandeurs suivantes: (h) ou (sy et ey) ou (cy et ey) ou (cy et sy)"}
 				>
-					Invalide
+					?
 				</span>
 			{/if}
 		</span>
@@ -220,7 +236,7 @@
 					class="invalid"
 					use:tooltip={"Impossible de déterminer la largeur. Il manque l'une des grandeurs suivantes: (w) ou (sx et ex) ou (cx et ex) ou (cx et sx)"}
 				>
-					Invalide
+					?
 				</span>
 			{/if}
 		</span>
@@ -242,7 +258,7 @@
 								class="invalid"
 								use:tooltip={"Impossible de déterminer cette coordonnée. Il manque l'une des grandeurs suivantes: (cx et w) ou (ex) ou (sx et w)"}
 							>
-								Invalide
+								?
 							</mtext>
 						{/if}
 					{/snippet}
@@ -254,7 +270,7 @@
 								class="invalid"
 								use:tooltip={"Impossible de déterminer cette coordonnée. Il manque l'une des grandeurs suivantes: (cy et h) ou (ey) ou (sy et h)"}
 							>
-								Invalide
+								?
 							</mtext>
 						{/if}
 					{/snippet}
@@ -271,7 +287,7 @@
 		Couche de sortie du modèle
 		<p class="details">Répété pour chaque boîte englobante détectée</p>
 	</div>
-	<div class="sep"></div>
+	<!-- <div class="sep"></div> -->
 	<div>Boîte englobante</div>
 </div>
 
@@ -280,9 +296,16 @@
 	.diagram-labels {
 		margin: 2em 0;
 		display: grid;
-		grid-template-columns: 1.5fr 4rem 3fr;
 		gap: 3em;
 		align-items: center;
+	}
+
+	.diagram {
+		grid-template-columns: 100px 3em 1fr;
+	}
+
+	.diagram-labels {
+		grid-template-columns: 1fr 1fr;
 	}
 
 	.diagram-labels div {
@@ -355,15 +378,6 @@
 		}
 	}
 
-	@keyframes spin {
-		from {
-			rotate: 0deg;
-		}
-		to {
-			rotate: 360deg;
-		}
-	}
-
 	.neuron {
 		width: 30px;
 		height: 30px;
@@ -382,6 +396,17 @@
 		opacity: 0.5;
 	}
 
+	.sep {
+		font-size: 1.5em;
+		display: flex;
+		flex-direction: column;
+		color: var(--fg-primary);
+
+		small {
+			font-size: 0.65em;
+		}
+	}
+
 	.bounding-box {
 		position: relative;
 		height: 350px;
@@ -392,7 +417,7 @@
 		border: 1px solid var(--fg-neutral);
 		position: absolute;
 		top: 75px;
-		right: 100px;
+		right: 20px;
 		height: 200px;
 		width: 200px;
 		/* background-image: url('/ant.png');
@@ -405,15 +430,15 @@
 
 		&.width {
 			top: 10px;
-			right: 100px;
+			right: 20px;
 			width: 200px;
 			text-align: center;
 		}
 
 		&.height {
-			top: calc(50px + 200px / 2 - 50px);
-			right: calc(100px + 200px + 50px + 25px / 2);
-			width: 6rem;
+			top: calc(50px + 200px / 2 - 65px);
+			right: calc(20px + 200px + 50px);
+			width: 6em;
 			text-align: right;
 		}
 	}
@@ -426,14 +451,14 @@
 			height: 1px;
 			width: 200px;
 			top: 50px;
-			right: 100px;
+			right: 20px;
 		}
 
 		&.height {
 			width: 1px;
 			height: 200px;
 			top: 75px;
-			right: calc(100px + 200px + 25px);
+			right: calc(20px + 200px + 25px);
 		}
 
 		&::before,
@@ -529,17 +554,30 @@
 	}
 
 	:global([data-popover-content]) {
-		padding: 0.5rem;
+		padding: 0.5em;
 		border-radius: var(--corner-radius);
 		background-color: var(--bg-neutral);
 		box-shadow:
 			0 3px 6px rgba(0, 0, 0, 0.16),
 			0 3px 6px rgba(0, 0, 0, 0.23);
-		display: grid;
-		grid-template-columns: repeat(4, 5rem);
-		grid-auto-rows: 5rem;
+		display: flex;
+		flex-direction: column;
+		/* gap: 1em; */
 		z-index: 100;
-		font-size: 1.3em;
+		/* font-size: 1.3em; */
+	}
+
+	.popover-option {
+		display: grid;
+		grid-template-columns: 3em 1fr;
+		align-items: center;
+		width: 100%;
+		gap: 1ch;
+		font-weight: normal;
+
+		.name {
+			text-align: start;
+		}
 	}
 
 	button.create {

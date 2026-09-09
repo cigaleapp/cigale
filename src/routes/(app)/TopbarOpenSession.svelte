@@ -62,8 +62,7 @@
 				label="Réglages d'import"
 				trigger={tabSettingsTrigger}
 				models={[]}
-				currentModelIndex={-1}
-				setModel={async () => {}}
+				currentModel={{ kind: 'disabled' }}
 			/>
 		{:else if page.route.id === '/(app)/(sidepanel)/crop'}
 			<TabSettings
@@ -71,10 +70,7 @@
 				label="Réglages de recadrage"
 				trigger={tabSettingsTrigger}
 				models={uiState.cropModels}
-				currentModelIndex={uiState.selectedCropModel}
-				setModel={async (i) => {
-					uiState.setModelSelections({ crop: i });
-				}}
+				currentModel={uiState.selectedCropModel}
 			/>
 		{:else if page.route.id === '/(app)/(sidepanel)/classify'}
 			<TabSettings
@@ -82,10 +78,7 @@
 				label="Réglages de classification"
 				trigger={tabSettingsTrigger}
 				models={uiState.classificationModels}
-				currentModelIndex={uiState.selectedClassificationModel}
-				setModel={async (i) => {
-					uiState.setModelSelections({ classification: i });
-				}}
+				currentModel={uiState.selectedClassificationModel}
 			/>
 		{/if}
 	</div>
