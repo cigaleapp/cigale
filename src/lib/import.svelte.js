@@ -196,7 +196,10 @@ export async function inferBoundingBoxes(swarpc, cancellers, fileId) {
 	/**
 	 * @param {[number, number, number, number]} param0
 	 */
-	const toCropBox = ([x, y, w, h]) => toRelativeCoords(inferenceSettings.input)({ x, y, w, h });
+	const toCropBox = ([x, y, w, h]) =>
+		inferenceSettings.output?.normalized
+			? { x, y, w, h }
+			: toRelativeCoords(inferenceSettings.input)({ x, y, w, h });
 
 	for (let i = 0; i < boxes.length; i++) {
 		const serializedBox = JSON.stringify(toCropBox(boxes[i]));

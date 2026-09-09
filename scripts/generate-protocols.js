@@ -498,7 +498,7 @@ const protocol = {
 							normalized: true,
 						},
 						output: {
-							normalized: true,
+							normalized: false,
 							shape: ['sx', 'sy', 'ex', 'ey', 'score', '_'],
 						},
 					},
