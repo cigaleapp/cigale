@@ -141,7 +141,7 @@ export async function removeImagesFromObservation({
  * @param {Array<{ filename: string} | {label: string}>} parts
  * @returns {string} computed fallback label for the new observation
  */
-function fallbackObservationLabel(parts) {
+export function fallbackObservationLabel(parts) {
 	for (const part of parts) {
 		if ('label' in part) return part.label;
 		if ('filename' in part) return part.filename.replace(/\.[^.]+$/, '');

@@ -641,7 +641,7 @@ location:
 	await expect(app.metadata.textbox('string')).toHaveValue('some text right there  ');
 	await expect(app.metadata.combobox('location')).toHaveValue(locationDisplayName);
 	await expect(app.metadata.section('sidecar').locator('.file-preview > pre')).toHaveText(
-		sidecars.json.content
+		sidecars.json.text()
 	);
 
 	const dbvalues = await app.db.metadata.values({
@@ -657,12 +657,18 @@ location:
 	expect(dbvalues.string).toBe('some text right there  ');
 	expect(dbvalues.location).toEqual({ latitude: 38.12232, longitude: 67.676767 });
 	expect(
-		await page.evaluate(async (id) => {
-			const f = await window.DB.get('MetadataValueFile', id);
-			if (!f) throw new Error('MetadataValueFile not found');
-			return JSON.parse(new TextDecoder('utf-8').decode(f.bytes));
-		}, dbvalues.sidecar.toString())
-	).toEqual(JSON.parse(sidecars.json.content));
+		await page.evaluate(async (filename) => {
+			const ses = window.uiState?._currentSessionId;
+			if (!ses) throw new Error('No current session id');
+			const bytes = await window.binaryStorage?.bytes({
+				area: 'MetadataValueFile',
+				sessionId: ses,
+				name: filename,
+			});
+			if (!bytes) throw new Error('MetadataValueFile not found');
+			return JSON.parse(new TextDecoder('utf-8').decode(bytes));
+		}, sidecars.json.filename)
+	).toEqual(JSON.parse(sidecars.json.text()));
 
 	// Each box in a boundingbox-type sidecar inference result should create a separate Image for the ImageFile
 

@@ -19,6 +19,7 @@
 	import IconGPS from '~icons/ri/map-pin-line';
 	import IconDecrement from '~icons/ri/subtract-line';
 	import * as idb from '$lib/idb.svelte.js';
+	import { createBytes, deleteObjectWithBytes } from '$lib/storage/utils.js';
 
 	import ButtonIcon from './ButtonIcon.svelte';
 	import ButtonInk from './ButtonInk.svelte';
@@ -28,7 +29,7 @@
 	import FilePreview from './FilePreview.svelte';
 	import { promptForFiles } from './files.js';
 	import { addPointToGeoPolygon, getCurrentLocation } from './geolocation.js';
-	import { formatBytesSize } from './i18n.js';
+	import { errorMessage, formatBytesSize } from './i18n.js';
 	import { databaseHandle } from './idb.svelte.js';
 	import InputRange from './InputRange.svelte';
 	import Lightbox from './Lightbox.svelte';
@@ -115,16 +116,6 @@
 	 * Used (for now) only for syncing the value of the range input with the text input, without saving on every change of the range input
 	 */
 	let temporaryValue: undefined | RuntimeValue = $derived(value);
-
-	let windowIsFocused = $state(true);
-	$effect(() => {
-		window.onfocus = () => {
-			windowIsFocused = true;
-		};
-		window.onblur = () => {
-			windowIsFocused = false;
-		};
-	});
 
 	const debouncedOnblur = useDebounce(async () => {
 		await onblur(temporaryValue, selectedUnit);
@@ -646,7 +637,11 @@
 									savingFile = true;
 
 									if (fileObject) {
-										await idb.drop('MetadataValueFile', fileObject.id);
+										await deleteObjectWithBytes(
+											databaseHandle(),
+											'MetadataValueFile',
+											fileObject.id
+										);
 									}
 
 									if (!file) {
@@ -665,23 +660,24 @@
 
 									const id = await idb.set('MetadataValueFile', {
 										id: generateId('MetadataValueFile'),
-										sessionId: uiState.currentSessionId,
-										size: file.size,
-										contentType: file.type,
-										filename: file.name,
-										bytes: await file.arrayBuffer(),
 										lastModifiedAt: new Date(
 											file.lastModified || Date.now()
 										).toISOString(),
+										contentType: file.type,
+										...(await createBytes('MetadataValueFile', {
+											filename: file.name,
+											sessionId: uiState.currentSessionId,
+											bytes: await file.arrayBuffer(),
+											type: file.type,
+										})),
 									});
 
 									const timeElapsed = performance.now() - savingStart;
 
-									if (!windowIsFocused || timeElapsed > ms('5s')) {
-										sendNotification(`${file.name} enregistré`, {
-											body: 'Le fichier a été enregistré avec succès',
-										});
-									}
+									sendNotification(`${file.name} enregistré`, {
+										awayOnly: timeElapsed < ms('5s'),
+										body: 'Le fichier a été enregistré avec succès',
+									});
 
 									savingFile = false;
 									await onblur(id);
@@ -706,6 +702,10 @@
 							<FilePreview {file} />
 						</div>
 					{/if}
+				{:catch error}
+					<div class="preview errored" in:fade>
+						{errorMessage(error, 'Fichier introuvable')}
+					</div>
 				{/await}
 			</div>
 		{/snippet}
@@ -963,6 +963,17 @@
 
 		.preview {
 			height: 25vh;
+
+			&.errored {
+				color: var(--fg-error);
+				background: var(--bg-error);
+				border-radius: var(--corner-radius);
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				text-align: center;
+				padding: 1em;
+			}
 		}
 	}
 </style>

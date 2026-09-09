@@ -26,9 +26,9 @@ import { clamp, fetchHttpRequest, profiler, progressSplitter, switchValue } from
 import { PROCEDURES } from '$worker/procedures.js';
 import WebWorker from '$worker/start.js?worker';
 
-// Polyfills
 import '@andy0130tw/es-arraybuffer-base64/auto';
 import '@ungap/set-methods';
+import { binaryStorage } from '$lib/storage/index.js';
 
 export const ssr = false;
 
@@ -199,6 +199,10 @@ export async function load({ url }) {
 				},
 			}
 		);
+	}
+
+	if (window) {
+		window.binaryStorage = binaryStorage;
 	}
 
 	return { swarpc, parallelism };

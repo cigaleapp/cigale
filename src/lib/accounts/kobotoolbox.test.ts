@@ -64,6 +64,7 @@ describe('.checkAuth', () => {
 	test('invalid server', async () => {
 		await expect(
 			Provider.checkAuth({
+				// @ts-expect-error testing error case
 				server: 'example.org',
 				token: MOCK_TOKEN,
 			})
@@ -178,7 +179,9 @@ describe('db-dependent', () => {
 
 	async function getAccount(id = '_default') {
 		const db = await openDatabase();
-		const acc = DB.Schemas.Account.assert(await db.get('Account', id));
+		const acc = DB.Schemas.Account.and({ type: '"kobotoolbox"' }).assert(
+			await db.get('Account', id)
+		);
 		return Provider.fromDatabase(db, acc);
 	}
 
@@ -232,9 +235,7 @@ describe('db-dependent', () => {
 			    "total": 5,
 			  },
 			  {
-			    "filesCount": 3,
 			    "id": "/api/v2/assets/a3kVqAFEJwnHFcFc7PpWj4/data/709547383",
-			    "imagesCount": 0,
 			    "name": "Static title",
 			    "nextCursor": "https://kf.kobotoolbox.org/api/v2/assets/a3kVqAFEJwnHFcFc7PpWj4/data/?limit=5&sort=%7B%22_submission_time%22%3A+-1%7D&start=5",
 			    "page": "https://kf.kobotoolbox.org/api/v2/assets/a3kVqAFEJwnHFcFc7PpWj4/data/709547383/enketo/redirect/view",
@@ -244,9 +245,7 @@ describe('db-dependent', () => {
 			    "thumbnails": [],
 			  },
 			  {
-			    "filesCount": 3,
 			    "id": "/api/v2/assets/a3kVqAFEJwnHFcFc7PpWj4/data/570002381",
-			    "imagesCount": 0,
 			    "name": "Static title",
 			    "nextCursor": "https://kf.kobotoolbox.org/api/v2/assets/a3kVqAFEJwnHFcFc7PpWj4/data/?limit=5&sort=%7B%22_submission_time%22%3A+-1%7D&start=5",
 			    "page": "https://kf.kobotoolbox.org/api/v2/assets/a3kVqAFEJwnHFcFc7PpWj4/data/570002381/enketo/redirect/view",
@@ -256,9 +255,7 @@ describe('db-dependent', () => {
 			    "thumbnails": [],
 			  },
 			  {
-			    "filesCount": 3,
 			    "id": "/api/v2/assets/a3kVqAFEJwnHFcFc7PpWj4/data/569513024",
-			    "imagesCount": 0,
 			    "name": "Static title",
 			    "nextCursor": "https://kf.kobotoolbox.org/api/v2/assets/a3kVqAFEJwnHFcFc7PpWj4/data/?limit=5&sort=%7B%22_submission_time%22%3A+-1%7D&start=5",
 			    "page": "https://kf.kobotoolbox.org/api/v2/assets/a3kVqAFEJwnHFcFc7PpWj4/data/569513024/enketo/redirect/view",
@@ -268,9 +265,7 @@ describe('db-dependent', () => {
 			    "thumbnails": [],
 			  },
 			  {
-			    "filesCount": 3,
 			    "id": "/api/v2/assets/a3kVqAFEJwnHFcFc7PpWj4/data/569479409",
-			    "imagesCount": 0,
 			    "name": "Static title",
 			    "nextCursor": "https://kf.kobotoolbox.org/api/v2/assets/a3kVqAFEJwnHFcFc7PpWj4/data/?limit=5&sort=%7B%22_submission_time%22%3A+-1%7D&start=5",
 			    "page": "https://kf.kobotoolbox.org/api/v2/assets/a3kVqAFEJwnHFcFc7PpWj4/data/569479409/enketo/redirect/view",
@@ -280,9 +275,7 @@ describe('db-dependent', () => {
 			    "thumbnails": [],
 			  },
 			  {
-			    "filesCount": 3,
 			    "id": "/api/v2/assets/a3kVqAFEJwnHFcFc7PpWj4/data/569469537",
-			    "imagesCount": 0,
 			    "name": "Static title",
 			    "nextCursor": "https://kf.kobotoolbox.org/api/v2/assets/a3kVqAFEJwnHFcFc7PpWj4/data/?limit=5&sort=%7B%22_submission_time%22%3A+-1%7D&start=5",
 			    "page": "https://kf.kobotoolbox.org/api/v2/assets/a3kVqAFEJwnHFcFc7PpWj4/data/569469537/enketo/redirect/view",
@@ -301,8 +294,8 @@ describe('db-dependent', () => {
 			const db = await setupProtocols({ id: 'not.kobo' });
 			const acc = await getAccount();
 			const prot = DB.Schemas.Protocol.assert(await db.get('Protocol', 'not.kobo'));
-			await expect(
-				acc.session(prot, MOCK_SESSION_REMOTEID())
+			await expect(async () =>
+				Array.fromAsync(acc.download(prot, MOCK_SESSION_REMOTEID()))
 			).rejects.toThrowErrorMatchingInlineSnapshot(
 				`[Error: This protocol doesn't support KoboToolbox remote sessions]`
 			);
@@ -326,8 +319,13 @@ describe('db-dependent', () => {
 			const acc = await getAccount();
 			const prot = DB.Schemas.Protocol.assert(await db.get('Protocol', 'with.kobo'));
 
-			await expect(
-				acc.session(prot, MOCK_SESSION_REMOTEID(MOCK_SESSION_REMOTEID_NOTFOUND_DATA_ID))
+			await expect(async () =>
+				Array.fromAsync(
+					acc.download(
+						prot,
+						MOCK_SESSION_REMOTEID(MOCK_SESSION_REMOTEID_NOTFOUND_DATA_ID)
+					)
+				)
 			).rejects.toThrowErrorMatchingInlineSnapshot(
 				`[Error: Impossible de se connecter à KoboToolbox: {"detail":"Not found."}]`
 			);
@@ -350,9 +348,21 @@ describe('db-dependent', () => {
 			const acc = await getAccount();
 			const prot = DB.Schemas.Protocol.assert(await db.get('Protocol', 'with.kobo'));
 
-			await expect(acc.session(prot, MOCK_SESSION_REMOTEID())).resolves
-				.toMatchInlineSnapshot(`
+			const session = await new Promise<DB.Session>(async (resolve, reject) => {
+				for await (const event of acc.download(prot, MOCK_SESSION_REMOTEID())) {
+					if (event.message === 'session-id') {
+						resolve(await db.get('Session', event.databaseId));
+					}
+				}
+
+				reject(new Error('session-id event was never sent'));
+			});
+
+			session.id = 'placeholder id';
+
+			expect(session).toMatchInlineSnapshot(`
 				{
+				  "account": "_default",
 				  "createdAt": "2026-03-28T13:55:19.000Z",
 				  "description": "Créée sur KoboToolbox. Voir https://ee.kobotoolbox.org/view/103e4931120464df0cebb60b35df43b6?instance_id=c2983a5e-fd4c-4032-9b07-50d3e0b8db5f&return_url=false",
 				  "fullscreenClassifier": {
@@ -367,9 +377,10 @@ describe('db-dependent', () => {
 				      },
 				    },
 				  },
-				  "inferenceModels": {},
+				  "id": "placeholder id",
 				  "metadata": {},
 				  "name": "Static title",
+				  "neuralModels": {},
 				  "openedAt": "2026-04-09T09:09:17.500Z",
 				  "protocol": "with.kobo",
 				  "remoteId": "/api/v2/assets/a3kVqAFEJwnHFcFc7PpWj4/data/709547383/",

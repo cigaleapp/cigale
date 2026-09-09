@@ -48,6 +48,9 @@ const config: CapacitorConfig = {
 		CapacitorUpdater: {
 			autoUpdate: 'atBackground',
 		},
+		CapacitorHttp: {
+			enabled: true,
+		},
 	},
 	android: {
 		// The app is open source, let's allow anyone to inspect the webview :)

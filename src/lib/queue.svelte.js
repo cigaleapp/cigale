@@ -1,12 +1,13 @@
-import { classifyImage } from './classification.svelte.js';
-import { errorMessage, plural } from './i18n.js';
-import { imageFileId } from './images.js';
-import { inferBoundingBoxes, processImageFile } from './import.svelte.js';
-import { sendNotification } from './notifications.js';
-import { importResultsZip } from './results.svelte.js';
-import { isSidecar } from './sidecars.js';
-import { uiState } from './uistate.svelte.js';
-import { isZip, range } from './utils.js';
+import { classifyImage } from '$lib/classification.svelte.js';
+import { errorMessage, plural } from '$lib/i18n.js';
+import { imageFileId } from '$lib/images.js';
+import { inferBoundingBoxes, processImageFile } from '$lib/import.svelte.js';
+import { Channel } from '$lib/iterables.js';
+import { sendNotification } from '$lib/notifications.js';
+import { importResultsZip } from '$lib/results.svelte.js';
+import { isSidecar } from '$lib/sidecars.js';
+import { uiState } from '$lib/uistate.svelte.js';
+import { isZip, range } from '$lib/utils.js';
 
 /**
  * @type {undefined | ProcessingQueue}
@@ -54,11 +55,17 @@ class ProcessingQueue {
 		});
 	}
 
+	/** Callbacks when a certain task ID is done */
+	/** @type {Map<string, Array<() => Promise<void>>>} */
+	#subscribers = new Map();
+
 	async start() {
 		this.log(
 			null,
 			`Starting processing queue mainloop with up to ${this.parallelism} concurrent tasks`
 		);
+		this.#subscribers.clear();
+
 		while (true) {
 			while (this.tasks.length > 0) {
 				await new Promise((resolve, reject) => {
@@ -161,9 +168,16 @@ class ProcessingQueue {
 	/**
 	 *
 	 * @param {ProcessingQueueTask} task
+	 * @param {() => Promise<void>} [onDone] called when the task is finished
 	 */
-	push(task) {
+	push(task, onDone) {
 		const id = this.taskId(task);
+
+		if (onDone) {
+			const subs = this.#subscribers.getOrInsert(id, []);
+			subs.push(onDone);
+		}
+
 		if (this.taskIds.has(id)) {
 			this.logWarning(id, 'Task already in queue, skipping.', task);
 			return;
@@ -257,6 +271,9 @@ class ProcessingQueue {
 			uiState.erroredImages.set(this.taskSubjectId(task), errorMessage(error));
 		} finally {
 			uiState.loadingImages.delete(this.taskSubjectId(task));
+
+			const subscribers = this.#subscribers.get(this.taskId(task)) ?? [];
+			void Promise.all(subscribers.map((sub) => sub()));
 		}
 	}
 }
@@ -333,14 +350,26 @@ export function cancelTask(subjectId, reason) {
  * @param {{title: string} & NotificationOptions} notification when batch is done
  */
 function scheduleBatch(tasks, { title, ...options }) {
-	Promise.all(tasks.map((task) => withQueue((q) => q.push(task)))).then(() => {
-		if (tasks.length === 0) return;
-		sendNotification(title, {
+	/** @type {undefined | Channel<boolean>} */
+	const processing = tasks.length > 0 ? new Channel(tasks.length) : undefined;
+
+	tasks.map((task) =>
+		withQueue((q) =>
+			q.push(task, async () => {
+				processing?.push(true);
+			})
+		)
+	);
+
+	void (async () => {
+		if (!processing) return;
+		await processing.done;
+		await sendNotification(title, {
 			icon: '/icon.png',
 			badge: '/badge.png',
 			...options,
 		});
-	});
+	})();
 }
 
 /**

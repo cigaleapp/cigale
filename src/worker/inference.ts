@@ -96,6 +96,7 @@ swarp.inferBoundingBoxes(async ({ fileId, taskSettings }, _, tools) => {
 
 	const [[boxes], [scores]] = await infer(
 		{
+			debug: sessionId?.includes('|custom|'),
 			...inferenceSettings,
 			...(tools.abortSignal ? { abortSignal: tools.abortSignal } : {}),
 		},
@@ -155,8 +156,13 @@ swarp.classify(async ({ imageId, metadataIds, taskSettings, inferenceSessionId }
 		...(tools.abortSignal ? { abortSignal: tools.abortSignal } : {}),
 	});
 
-	const scores = await classify(taskSettings, img, onnx, tools.abortSignal);
-	tools.abortSignal?.throwIfAborted();
+	const scores = await classify({
+		settings: taskSettings,
+		image: img,
+		model: onnx,
+		abortSignal: tools.abortSignal,
+		debug: inferenceSessionId.includes('|custom|'),
+	});
 
 	const results = scores
 		?.map((score, i) => ({

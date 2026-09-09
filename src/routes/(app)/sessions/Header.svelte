@@ -188,8 +188,8 @@
 							.map((protocol) => ({
 								type: 'selectable' as const,
 								disabled: !(
-									providers.get(directory.platform)?.compatibleWith(protocol) ??
-									true
+									directory.platform === 'local' ||
+									providers.get(directory.platform)?.compatibleWith(protocol)
 								),
 								selected: directory.protocol === protocol.id,
 								label: protocol.name,

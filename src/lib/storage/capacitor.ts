@@ -73,7 +73,13 @@ export async function CapacitorFilesystemBackend(): Promise<BinaryStorageBackend
 					`Contents at ${locatorToPath({ ...locator, name: '' })}`,
 					await debugdir(root, locatorToPath({ ...locator, name: '' }))
 				);
+
+				throw e;
 			}
+		},
+		async *stream(locator, _chunksize) {
+			// TODO: see if it's possible?
+			yield this.bytes(locator);
 		},
 		async text(locator) {
 			const bytes = await this.bytes(locator);
@@ -136,7 +142,7 @@ export async function CapacitorFilesystemBackend(): Promise<BinaryStorageBackend
 				recursive: true,
 			});
 		},
-	};
+	} as BinaryStorageBackend<'capacitor'>;
 }
 
 async function debugdir(dir: Directory, path = '') {

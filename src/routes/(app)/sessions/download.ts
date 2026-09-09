@@ -1,10 +1,11 @@
 import type { Account } from '$lib/accounts/types.js';
 import type { SessionRemoteID } from '$lib/schemas/sessions.js';
 
-import { set, tables } from '$lib/idb.svelte.js';
+import { formatBytesSize } from '$lib/i18n.js';
+import { tables } from '$lib/idb.svelte.js';
 
 export async function downloadRemoteSession({
-	session,
+	session: remoteSession,
 	account,
 	mutator,
 }: {
@@ -14,35 +15,40 @@ export async function downloadRemoteSession({
 }) {
 	if (!account.id) return;
 
-	const protocol = await tables.Protocol.get(session.protocol);
+	const protocol = await tables.Protocol.get(remoteSession.protocol);
 	if (!protocol) return;
 
-	const ses = await account.session(protocol, session.id);
+	let sessionId: string | undefined = undefined;
+	for await (const event of account.download(protocol, remoteSession.id)) {
+		switch (event.message) {
+			case 'session-id': {
+				sessionId = event.databaseId;
+				break;
+			}
+			case 'progress': {
+				let withUnit = (x: number) => x.toString();
 
-	mutator({ loading: 'Sauvegarde…' });
-	const { id } = await tables.Session.add({
-		account: account.id,
-		...ses,
-	});
+				if ('unit' in event && event.unit === 'bytes') {
+					withUnit = (x: number) => formatBytesSize(x);
+				}
 
-	let i = 0;
-	mutator({
-		loading: `Fichiers (${i}/${session.filesCount})…`,
-	});
-
-	for await (const file of account.files(protocol, session.id)) {
-		i++;
-
-		mutator({
-			loading: `Fichiers (${i}/${session.filesCount})…`,
-		});
-		await set('MetadataValueFile', {
-			sessionId: id,
-			...file,
-		});
+				mutator({
+					loading: event.total
+						? `${event.action} (${event.done}/${withUnit(event.total)})`
+						: `${event.action}…`,
+				});
+				break;
+			}
+		}
 	}
 
-	mutator({ loading: 'Ouverture…' });
+	if (!sessionId) {
+		throw new Error(`Impossible de télécharger la session (session-id was never set)`);
+	}
 
-	return id;
+	mutator({
+		loading: 'Chargement…',
+	});
+
+	return sessionId;
 }

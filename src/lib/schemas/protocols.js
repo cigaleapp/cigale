@@ -136,6 +136,59 @@ export const Protocol = type({
 		.describe('Si le protocole a été modifié depuis sa dernière exportation')
 		.default(false),
 	'remote?': {
+		'ecosignal?': {
+			domains: type
+				.or(URLString, URLString.array(), type.Record('string', URLString))
+				.describe('Use an object to give name(s) to the domain(s)'),
+			project: 'number.integer',
+			'label?': [
+				'0 < string <= 20',
+				'@',
+				'Label à appliquer aux médias uploadés depuis Cigale',
+			],
+			confirmedStatus: type(
+				'string ',
+				'@',
+				"Statut utilisé pour signifier qu'une annotation est confirmée"
+			).default('Accepted'),
+			crop: [
+				'string > 0',
+				'@',
+				'Sur quelle métadonnée stocker les coordonnées des annotations (boîtes)',
+			],
+			'sites?': {
+				create: [
+					'boolean',
+					'@',
+					"Créer des sites manquants. Si désactivé, indique une erreur si un site n'exisite pas.",
+				],
+				protect: [
+					'boolean',
+					'@',
+					"Empêcher l'envoi de sessions sur un site que l'utilsateur·ice n'a pas créé",
+				],
+				name: {
+					metadata: ['string', '@', 'Sur quelle métadonnée récupérer le nom du site'],
+					'fallback?': [
+						'string',
+						'@',
+						"Nom de site à utiliser si la métadonnée n'est pas remplie. Si non renseigné, l'utilisateur·ice sera obligé·e de rentrer un nom de site dans la métadonnée appropriée",
+					],
+				},
+				location: {
+					fallback: [
+						'string == 3',
+						'@',
+						'Un code à 3 lettres de pays à utiliser pour créer le site si les coordonnées ne sont pas disponible',
+					],
+					'metadata?': [
+						'string',
+						'@',
+						'Sur quelle métadonnée (de type location) récupérer la position du site.',
+					],
+				},
+			},
+		},
 		'kobocollect?': {
 			form: /^https:\/\/(kf|eu)\.kobotoolbox\.org\/#\/forms\/[a-zA-Z0-9]+\//,
 			'thumbnails?': [

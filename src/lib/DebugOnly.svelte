@@ -36,6 +36,10 @@
 	.debugonly {
 		font-size: 0.8em;
 		font-weight: 200;
+
+		&:is(div) {
+			text-align: var(--debugonly-text-align, left);
+		}
 	}
 
 	.explainer {

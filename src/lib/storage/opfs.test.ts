@@ -19,12 +19,12 @@ describe('OPFSBackend', () => {
 
 	it('writes and reads files in a session directory', async () => {
 		const backend = await OPFSBackend();
-		const parent = { area: 'ImageFile', sessionId: 'session-a', name: '' as const };
-		const first = { ...parent, name: 'first.txt' as const };
-		const second = { ...parent, name: 'second.txt' as const };
-		const third = { ...parent, name: 'third.txt' as const };
-		const fourth = { ...parent, name: 'fourth.txt' as const };
-		const fifth = { ...parent, name: 'fifth.txt' as const };
+		const parent = { area: 'ImageFile', sessionId: 'session-a', name: '' } as const;
+		const first = { ...parent, name: 'first.txt' } as const;
+		const second = { ...parent, name: 'second.txt' } as const;
+		const third = { ...parent, name: 'third.txt' } as const;
+		const fourth = { ...parent, name: 'fourth.txt' } as const;
+		const fifth = { ...parent, name: 'fifth.txt' } as const;
 
 		await backend.write(first, new Blob(['hello'], { type: 'text/plain' }));
 		await backend.write(second, { type: 'text/plain', text: 'world' });

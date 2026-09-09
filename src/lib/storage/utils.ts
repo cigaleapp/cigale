@@ -16,9 +16,15 @@ type BinaryTableName = Exclude<
  */
 export async function byteSizeOfObject<Table extends BinaryTableName>(
 	table: Table,
-	object: Pick<IDBDatabaseType[Table]['value'], 'sessionId' | 'filename' | 'bytes'>
+	object: IDBDatabaseType[Table]['value'] extends { size?: number }
+		? Pick<IDBDatabaseType[Table]['value'], 'sessionId' | 'filename' | 'bytes' | 'size'>
+		: Pick<IDBDatabaseType[Table]['value'], 'sessionId' | 'filename' | 'bytes'>
 ): Promise<number> {
-	if (object.bytes !== 'migrated') {
+	if ('size' in object && (object.size ?? 0) > 0) {
+		return object.size;
+	}
+
+	if (object.bytes !== undefined && object.bytes !== 'migrated') {
 		return object.bytes.byteLength;
 	}
 
@@ -56,14 +62,16 @@ export async function createBytes<Table extends BinaryTableName>(
 	table: Table,
 	input: CreateBytesObjectFields<Table> & {
 		bytes: ArrayBuffer;
-		type: `image/${string}` | 'application/octet-stream';
+		type: string;
 	}
-): Promise<CreateBytesObjectFields<Table> & { bytes: 'migrated' }> {
+): Promise<CreateBytesObjectFields<Table> & { bytes: 'migrated'; size: number }> {
 	const locator = {
 		area: table,
 		sessionId: 'sessionId' in input ? input.sessionId : undefined,
 		name: input.filename,
 	};
+
+	const size = input.bytes.byteLength;
 
 	console.debug('createBytes', table, input, 'at:', await binaryStorage.resolvePath(locator));
 
@@ -72,6 +80,7 @@ export async function createBytes<Table extends BinaryTableName>(
 	return {
 		...input,
 		filename: written.name,
+		size,
 		bytes: 'migrated',
 	};
 }
@@ -115,7 +124,6 @@ export async function storeBytes<Table extends BinaryTableName>(
 /**
  * Access bytes of a table object storing binary data in its `bytes` field.
  * Handles objects that have their binary data stored in the binary storage
- * @param object the table
  */
 export async function accessBytes<Table extends BinaryTableName>(
 	table: Table,
@@ -134,6 +142,35 @@ export async function accessBytes<Table extends BinaryTableName>(
 	console.debug(`accessBytes ${table}`, object, 'at:', await binaryStorage.resolvePath(locator));
 
 	return binaryStorage.bytes(locator);
+}
+
+/**
+ * Stream bytes of a table object storing binary data in its `bytes` field.
+ * Handles objects that have their binary data store in the binary storage
+ */
+export async function* streamBytes<Table extends (typeof BINARY_CONTENT_TABLES)[number]>(
+	table: Table,
+	object: Pick<
+		(typeof Tables)[Table]['inferIn' | 'inferOut'],
+		'sessionId' | 'filename' | 'bytes'
+	>,
+	chunksize: number
+): AsyncIterable<{ total: number; index: number; bytes: ArrayBuffer }> {
+	if (object.bytes !== 'migrated') {
+		// TODO: stream these too
+		yield { total: 1, index: 0, bytes: object.bytes };
+		return;
+	}
+
+	const locator = {
+		area: table,
+		sessionId: 'sessionId' in object ? object.sessionId : undefined,
+		name: object.filename,
+	};
+
+	console.debug(`streamBytes ${table}`, object, 'at:', await binaryStorage.resolvePath(locator));
+
+	yield* binaryStorage.stream(locator, chunksize);
 }
 
 export async function deleteObjectWithBytes<Table extends BinaryTableName>(

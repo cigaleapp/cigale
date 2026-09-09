@@ -9,11 +9,12 @@ import { Estimation as ETA } from 'arrival-time';
 import { dequal } from 'dequal';
 import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 
+import { isSessionDependentReactiveTable, Tables } from './database.js';
 import { tables } from './idb.svelte.js';
 import { getMetadataValue } from './metadata/index.js';
 import { defaultClassificationMetadata, defaultCropMetadata } from './protocols.js';
 import { isMetadataInProtocol } from './schemas/protocols.js';
-import { mapValues, omit, pick, transformObject } from './utils.js';
+import { keys, mapValues, omit, pick, transformObject } from './utils.js';
 
 type NeuralModelSelector = (typeof NeuralModelSelector)['infer'];
 
@@ -446,6 +447,21 @@ export class UIState {
 		} else {
 			this.setSelection([...this.selection, ...ids]);
 		}
+	}
+
+	/**
+	 * Refresh all relevant tables for the current session
+	 */
+	async refreshSessionTables() {
+		const sessionId = this.currentSessionId;
+		if (!sessionId) return;
+
+		for (const table of keys(Tables)) {
+			if (!isSessionDependentReactiveTable(table)) continue;
+			await tables[table].refresh(sessionId, { sessionOnly: true });
+		}
+
+		await tables.Session.refresh(sessionId);
 	}
 }
 

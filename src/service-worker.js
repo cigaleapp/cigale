@@ -53,6 +53,8 @@ sw.addEventListener('activate', (event) => {
 sw.addEventListener('fetch', (/** @type {FetchEvent} */ event) => {
 	// ignore POST requests etc.
 	if (event.request.method !== 'GET') return;
+	const u = new URL(event.request.url);
+	if (u.hostname === 'ecosignal.gwen.works') return;
 
 	async function respond() {
 		let url = new URL(event.request.url);
