@@ -28,7 +28,7 @@
 	import { tooltip } from '$lib/tooltips.js';
 	import { PendingStorage } from '$routes/(app)/capture/pendingstorage.svelte.js';
 
-	import TopbarBackToHome from '../TopbarBackToHome.svelte';
+	import TopbarBack from '../TopbarBack.svelte';
 	import Table from './Table.svelte';
 
 	$effect(() => {
@@ -64,7 +64,7 @@
 	const mobile = new IsMobile();
 </script>
 
-<TopbarBackToHome>Stockage</TopbarBackToHome>
+<TopbarBack>Stockage</TopbarBack>
 
 <main>
 	<header>

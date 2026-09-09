@@ -43,20 +43,20 @@ export async function OPFSBackend(): Promise<BinaryStorageBackend<'opfs'>> {
 			return locatorToPath(locator);
 		},
 		async exists(locator) {
-			const [directory, name] = await walk(locator);
+		const [directory, name] = await walk(locator);
 
-			try {
-				await directory.getFileHandle(name);
-			} catch (error) {
-				if (error instanceof DOMException && error.name === 'NotFoundError') {
-					return false;
-				}
-
-				throw error;
+		try {
+			await directory.getFileHandle(name);
+		} catch (error) {
+			if (error instanceof DOMException && error.name === 'NotFoundError') {
+				return false;
 			}
 
-			return true;
-		},
+			throw error;
+		}
+
+		return true;
+	},
 		async delete(locator) {
 			const [directory, name] = await walk(locator);
 			await directory.removeEntry(name);
