@@ -5,8 +5,6 @@
 
 	import convert from 'convert';
 	import { cartesianProduct } from 'es-toolkit';
-	import * as maplibregl from 'maplibre-gl';
-	import maplibreGlWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 	import {
 		FillLayer,
 		GeoJSON,
@@ -67,10 +65,6 @@
 		draw = 'nothing',
 	}: Props = $props();
 
-	$effect(() => {
-		maplibregl.setWorkerUrl(maplibreGlWorkerUrl);
-	});
-
 	const testid = <T extends string>(suffix: T) =>
 		testidPrefix ? (`${testidPrefix}-${suffix}` as const) : undefined;
 
@@ -130,9 +124,6 @@
 		cooperativeGestures={!scrollToZoom}
 		{zoom}
 		{center}
-		// TODO: see if its really necessary, this was added when migrating to svelte-maplibre v2
-		// see https://github.com/dimfeld/svelte-maplibre/releases/tag/v2.0.0#:~:text=MapLibre%20accepts%20a-,zoomLevelsToOverscale,-prop%2E%20MapLibre%206
-		zoomLevelsToOverscale={null}
 	>
 		{#each markers as marker, i (marker.key)}
 			<Marker
