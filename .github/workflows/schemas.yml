@@ -18,7 +18,7 @@ jobs:
       - name: Generate JSON schema
         run: bun run scripts/generate-json-schemas.js
       - name: Validate protocols with JSON schema
-        uses: GrantBirki/json-yaml-validate@3ff75979f3b21171f2e8a44705f0ff4bed30bbc0 # v5.0.0
+        uses: GrantBirki/json-yaml-validate@9dbc6e6ff950c53200156e8afbc16ef1355f1c8d # v5.0.1
         with:
           json_schema: static/protocol.schema.json
           json_schema_version: draft-2020-12
@@ -26,7 +26,7 @@ jobs:
             examples/*.cigaleprotocol.{yaml,json}
             protocols/*.cigaleprotocol.{yaml,json}
       - name: Validate registry with JSON schema
-        uses: GrantBirki/json-yaml-validate@3ff75979f3b21171f2e8a44705f0ff4bed30bbc0 # v5.0.0
+        uses: GrantBirki/json-yaml-validate@9dbc6e6ff950c53200156e8afbc16ef1355f1c8d # v5.0.1
         with:
           json_schema: static/registry.schema.json
           json_schema_version: draft-2020-12
