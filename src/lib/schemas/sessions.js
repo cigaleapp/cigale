@@ -100,6 +100,20 @@ export const SessionRemoteID = type('string#Session.remote');
  * @typedef {typeof SessionRemoteID['infer']} SessionRemoteID
  */
 
+export const NeuralModelSelector = type.or(
+	{
+		kind: '"disabled"',
+	},
+	{
+		kind: '"protocol"',
+		i: 'number',
+	},
+	{
+		kind: '"custom"',
+		id: ID,
+	}
+);
+
 export const Session = type({
 	id: ID,
 	/** When the session is hosted on a remote server. On the root of the object for indexing purposes. Empty if session is local-only  */
@@ -140,11 +154,17 @@ export const Session = type({
 	}).default(() => ({
 		global: { field: 'none' },
 	})),
+	neuralModels: scope({ ID })
+		.type({
+			'[ID]': NeuralModelSelector,
+		})
+		.default(() => ({})),
+	/** @deprecated use neuralModels instead */
 	inferenceModels: scope({ ID })
 		.type({
 			// -1 is for none selected
 			'[ID]': 'number.integer >= -1',
 		})
-		.describe('Maps metadata IDs to selected model indices')
+		.configure({ deprecated: true })
 		.default(() => ({})),
 });

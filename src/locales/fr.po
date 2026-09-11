@@ -8,6 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: src/lib/SessionMetadataForm.svelte
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
 #: src/routes/(app)/PrepareForOffline.svelte
 #: src/routes/(app)/sessions/Cards.svelte
 msgid "<0/> Chargement…"
@@ -89,6 +90,7 @@ msgstr "Analyse…"
 #: src/lib/toasts.svelte.js
 #: src/lib/undo.svelte.js
 #: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/Toolbar.svelte
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
 #: src/routes/(app)/protocols/ModalCreateProtocol.svelte
 msgid "Annuler"
 msgstr "Annuler"
@@ -184,6 +186,7 @@ msgid "Chrome"
 msgstr "Chrome"
 
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
 #: src/routes/(app)/about/+page.svelte
 msgid "Classification"
 msgstr "Classification"
@@ -300,7 +303,6 @@ msgid "Erreur lors de l'import du protocole distant: {0}"
 msgstr "Erreur lors de l'import du protocole distant: {0}"
 
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
-#: src/routes/(app)/(sidepanel)/crop/+layout.svelte
 msgid "Erreur lors du chargement du modèle de classification"
 msgstr "Erreur lors du chargement du modèle de classification"
 
@@ -537,6 +539,7 @@ msgstr "Supprime toutes les données pour ce déploiement de preview"
 
 #: src/lib/AreaObservations.svelte
 #: src/lib/ModalConfirmDeletion.svelte
+#: src/lib/ModelOutputShapeDiagram.svelte
 #: src/routes/(app)/storage/Table.svelte
 msgid "Supprimer"
 msgstr "Supprimer"
@@ -784,6 +787,8 @@ msgstr "<0/> Voir"
 msgid "<0/> Aucune métadonnée"
 msgstr "<0/> Aucune métadonnée"
 
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelConfig.svelte
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelConfig.svelte
 msgid "Nom du modèle"
@@ -797,11 +802,13 @@ msgstr "URL du ficher .onnx"
 msgid "Taille des images en entrée"
 msgstr "Taille des images en entrée"
 
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelConfig.svelte
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelConfig.svelte
 msgid "Largeur"
 msgstr "Largeur"
 
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelConfig.svelte
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelConfig.svelte
 msgid "Hauteur"
@@ -831,31 +838,26 @@ msgstr "entre 0 et 255"
 msgid "entre 0 et 1"
 msgstr "entre 0 et 1"
 
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelConfig.svelte
 msgid "Forme de la sortie"
 msgstr "Forme de la sortie"
 
 #: src/lib/MetadataInput.svelte
-#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelOutputShapeDiagram.svelte
+#: src/lib/ModelOutputShapeDiagram.svelte
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
 msgid "Ajouter"
 msgstr "Ajouter"
 
-#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelOutputShapeDiagram.svelte
+#: src/lib/ModelOutputShapeDiagram.svelte
 msgid "Supprimer cet élément"
 msgstr "Supprimer cet élément"
 
-#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelOutputShapeDiagram.svelte
-#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelOutputShapeDiagram.svelte
-#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelOutputShapeDiagram.svelte
-#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelOutputShapeDiagram.svelte
-msgid "Invalide"
-msgstr "Invalide"
-
-#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelOutputShapeDiagram.svelte
+#: src/lib/ModelOutputShapeDiagram.svelte
 msgid "Couche de sortie du modèle <0>Répété pour chaque boîte englobante détectée</0>"
 msgstr "Couche de sortie du modèle <0>Répété pour chaque boîte englobante détectée</0>"
 
-#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelOutputShapeDiagram.svelte
+#: src/lib/ModelOutputShapeDiagram.svelte
 msgid "Boîte englobante"
 msgstr "Boîte englobante"
 
@@ -1548,12 +1550,12 @@ msgstr "Aucune session active à exporter."
 msgid "Aucune session active à prévisualiser."
 msgstr "Aucune session active à prévisualiser."
 
-#: src/lib/inference.js
-#: src/lib/inference.js
+#: src/lib/inference.ts
+#: src/lib/inference.ts
 msgid "Bearer token"
 msgstr "Bearer token"
 
-#: src/lib/inference.js
+#: src/lib/inference.ts
 msgid "X-Custom-Header"
 msgstr "X-Custom-Header"
 
@@ -3061,3 +3063,150 @@ msgstr "{0} km"
 #: src/routes/(app)/about/+page.svelte
 msgid "<0>Remix Icon</0> par <1>Jimmy Cheung</1> et <2>Wendy Gao</2>"
 msgstr "<0>Remix Icon</0> par <1>Jimmy Cheung</1> et <2>Wendy Gao</2>"
+
+#: src/lib/ModelOutputShapeDiagram.svelte
+msgid "devient"
+msgstr "devient"
+
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+msgid "Ajouter un réseau neuronal"
+msgstr "Ajouter un réseau neuronal"
+
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+msgid "URL"
+msgstr "URL"
+
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+msgid "Fichier .onnx"
+msgstr "Fichier .onnx"
+
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+msgid "URL vers un fichier .onnx"
+msgstr "URL vers un fichier .onnx"
+
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+msgid "<0/> Analyse…"
+msgstr "<0/> Analyse…"
+
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+msgid "Ajouter un fichier .onnx"
+msgstr "Ajouter un fichier .onnx"
+
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+msgid "Entrées"
+msgstr "Entrées"
+
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+msgid "Sorties"
+msgstr "Sorties"
+
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+msgid "Couche"
+msgstr "Couche"
+
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+msgid "Taille des images"
+msgstr "Taille des images"
+
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+msgid "Disposition "
+msgstr "Disposition "
+
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+msgid "Batch, Canal, Hauteur, Largeur"
+msgstr "Batch, Canal, Hauteur, Largeur"
+
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+msgid "Canal, Hauteur, Largeur"
+msgstr "Canal, Hauteur, Largeur"
+
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+msgid "Pixels"
+msgstr "Pixels"
+
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+msgid "Normalisés (0—1)"
+msgstr "Normalisés (0—1)"
+
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+msgid "Bruts (0—255)"
+msgstr "Bruts (0—255)"
+
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+msgid "Entrée"
+msgstr "Entrée"
+
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+msgid "Type de réseau"
+msgstr "Type de réseau"
+
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+msgid "Détection"
+msgstr "Détection"
+
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+msgid "Classmapping"
+msgstr "Classmapping"
+
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+msgid "Une valeur de métadonnée par ligne, dans le même ordre que les neurones"
+msgstr "Une valeur de métadonnée par ligne, dans le même ordre que les neurones"
+
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+msgid "Fichier .txt"
+msgstr "Fichier .txt"
+
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+msgid "Manuel"
+msgstr "Manuel"
+
+#. 0: d.classmapping.length
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+msgid "{0} classes"
+msgstr "{0} classes"
+
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+msgid "<0/> Ajouter un fichier .txt"
+msgstr "<0/> Ajouter un fichier .txt"
+
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+msgid "URL vers un fichier .txt"
+msgstr "URL vers un fichier .txt"
+
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+msgid "Coordonnées des boîtes"
+msgstr "Coordonnées des boîtes"
+
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+msgid "Normalisées (0—1)"
+msgstr "Normalisées (0—1)"
+
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+msgid "Brutes (pixels)"
+msgstr "Brutes (pixels)"
+
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+msgid "Personnalisé"
+msgstr "Personnalisé"
+
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+msgid "YOLOv11"
+msgstr "YOLOv11"
+
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+msgid "Sortie"
+msgstr "Sortie"
+
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+msgid "Ajout…"
+msgstr "Ajout…"
+
+#: src/routes/(app)/storage/+page.svelte
+msgid "Modèles personnalisés"
+msgstr "Modèles personnalisés"
+
+#: src/routes/(app)/(sidepanel)/crop/+layout.svelte
+msgid "Erreur lors du chargement du modèle de détection"
+msgstr "Erreur lors du chargement du modèle de détection"

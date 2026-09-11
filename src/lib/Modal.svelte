@@ -201,8 +201,9 @@ CSS variables:
 		background: var(--bg-neutral);
 		border: 3px solid var(--bg-primary);
 		width: var(--modal-width, 75vw);
+		flex-grow: 0;
 		min-height: max(50vh, 300px);
-		min-width: min(100vw, 400px);
+		min-width: var(--modal-height, min(100vw, 400px));
 		max-width: calc(max(var(--modal-width, 0), 700px));
 		transition:
 			opacity,

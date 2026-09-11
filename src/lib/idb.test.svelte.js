@@ -22,18 +22,20 @@ test('openDatabase', async () => {
 	expect(db.objectStoreNames).toMatchInlineSnapshot(`
 		FakeDOMStringList {
 		  "0": "Account",
-		  "1": "Image",
-		  "10": "Settings",
-		  "2": "ImageFile",
-		  "3": "ImagePreviewFile",
-		  "4": "Metadata",
-		  "5": "MetadataOption",
-		  "6": "MetadataValueFile",
-		  "7": "Observation",
-		  "8": "Protocol",
-		  "9": "Session",
+		  "1": "CustomNeuralNetwork",
+		  "10": "Session",
+		  "11": "Settings",
+		  "2": "Image",
+		  "3": "ImageFile",
+		  "4": "ImagePreviewFile",
+		  "5": "Metadata",
+		  "6": "MetadataOption",
+		  "7": "MetadataValueFile",
+		  "8": "Observation",
+		  "9": "Protocol",
 		  "_values": [
 		    "Account",
+		    "CustomNeuralNetwork",
 		    "Image",
 		    "ImageFile",
 		    "ImagePreviewFile",
@@ -429,6 +431,7 @@ describe('wrangler', () => {
 			Metadata: [],
 			Protocol: [],
 			Settings: [],
+			CustomNeuralNetwork: [],
 		});
 	});
 	describe('refresh', () => {

@@ -39,27 +39,49 @@ export async function classifyImage(
 	// Do it sequentially to avoid race conditions when storing metadata
 	// see flakiness in e.g. https://github.com/cigaleapp/cigale/actions/runs/28614994005/job/84858867027#step:11:39
 	for (const metadata of allClassificationMetadata) {
-		const modelIndex = uiState.selectedClassificationModels[metadata.id] ?? 0;
-		const allModels = uiState.allClassificationModels[metadata.id];
+		const selector = uiState.selectedClassificationModels[metadata.id] ?? {
+			kind: 'protocol',
+			i: 0,
+		};
 
-		if (!allModels || !allModels[modelIndex]) {
-			console.warn(
-				`No model found for metadata ${metadata.id} at index ${modelIndex}, skipping`
-			);
-			return;
+		if (selector.kind === 'disabled') {
+			continue;
 		}
 
-		const settings = $state.snapshot(allModels[modelIndex]);
+		const allModels = uiState.allClassificationModels[metadata.id];
+
+		const settings = $state.snapshot(
+			selector.kind === 'protocol'
+				? allModels[selector.i]
+				: tables.CustomNeuralNetwork.getFromState(selector.id)
+		);
+
+		if (!settings) {
+			throw new Error(
+				`Impossible d'inférer ${metadata.id} avec ${JSON.stringify(selector)}: modèle introuvable`
+			);
+		}
+
+		if ('purpose' in settings && settings.purpose !== 'classify') {
+			throw new Error(`Le modèle ${settings.name} n'est pas fait pour la classification`);
+		}
 
 		// Generate the inference session ID based on the protocol and model
-		const inferenceSessionId = inferenceModelId(uiState.currentProtocol.id, settings.model);
+		const inferenceSessionId = inferenceModelId(
+			uiState.currentProtocol.id,
+			settings
+		);
 
 		const taskSettings = {
 			...settings,
 			output: {
 				name: settings.output?.name ?? 'output0',
-				// XXX: $state.snapshot turns the type of output.select into a string, idk why cuz at runtime it isnt
-				select: allModels[modelIndex].output?.select?.toJSON(),
+				select:
+					// XXX: $state.snapshot turns the type of output.select into a string, idk why cuz at runtime it isnt
+					// TODO: allow custom protocols to define a selector?
+					selector.kind === 'protocol'
+						? allModels[selector.i].output?.select?.toJSON()
+						: undefined,
 			},
 		};
 
