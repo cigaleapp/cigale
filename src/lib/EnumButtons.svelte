@@ -106,11 +106,9 @@
 					value,
 					selected: multiple ? values.includes(key) : key === value,
 				})}
-			{:else}
+			{:else if Icon}
 				<div class="with-icon">
-					{#if Icon}
-						<div class="icon"><Icon /></div>
-					{/if}
+					<div class="icon"><Icon /></div>
 					<div class="text">
 						<LoadingText value={label} />
 						{#if 'subtext' in option}
@@ -120,6 +118,13 @@
 						{/if}
 					</div>
 				</div>
+			{:else}
+				<LoadingText value={label} />
+				{#if 'subtext' in option}
+					<p class="subtext">
+						<LoadingText value={option.subtext} />
+					</p>
+				{/if}
 			{/if}
 		</label>
 	{/each}

@@ -136,6 +136,21 @@ export const Protocol = type({
 		.describe('Si le protocole a été modifié depuis sa dernière exportation')
 		.default(false),
 	'remote?': {
+		'ecosignal?': {
+			domain: 'string.url',
+			project: 'number.integer',
+			'label?': ['string > 0', '@', 'Label à appliquer aux médias uploadés depuis Cigale'],
+			confirmedStatus: type(
+				'string ',
+				'@',
+				"Statut utilisé pour signifier qu'une annotation est confirmée"
+			).default('Accepted'),
+			crop: [
+				'string > 0',
+				'@',
+				'Sur quelle métadonnée stocker les coordonnées des annotations (boîtes)',
+			],
+		},
 		'kobocollect?': {
 			form: /^https:\/\/(kf|eu)\.kobotoolbox\.org\/#\/forms\/[a-zA-Z0-9]+\//,
 			'thumbnails?': [

@@ -106,6 +106,10 @@ export default class Provider implements Account {
 		};
 	}
 
+	static compatibleWith(protocol: DB.Protocol | undefined) {
+		return Boolean(protocol?.remote?.kobocollect);
+	}
+
 	static async checkAuth({
 		server,
 		token,
@@ -171,7 +175,7 @@ export default class Provider implements Account {
 
 	async logout() {}
 
-	async *sessions({ cursor = undefined, limit = 40, mine = false } = {}) {
+	async *sessions({ cursor = '', limit = 40, mine = false } = {}) {
 		const yielded = new Set<string>();
 		let total = 0;
 
@@ -313,7 +317,7 @@ export default class Provider implements Account {
 				...rest,
 				value: serializeMetadataValue(value),
 			})),
-			inferenceModels: {},
+			neuralModels: {},
 			group: {
 				global: { field: 'none', tolerances: { dates: 'day', decimal: 'unit' } } as const,
 			},

@@ -18,3 +18,7 @@ indent_style = space
 [AndroidManifest.xml]
 indent_size = 2
 indent_style = space
+
+[ecosignal/**/*.py]
+indent_size = 4
+indent_style = space

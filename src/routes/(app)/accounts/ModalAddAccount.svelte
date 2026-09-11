@@ -10,6 +10,7 @@
 	import IconWarning from '~icons/ri/triangle-line';
 	import KoboToolbox from '$lib/accounts/kobotoolbox.js';
 	import EnumButtons from '$lib/EnumButtons.svelte';
+	import Field from '$lib/Field.svelte';
 	import { errorMessage } from '$lib/i18n.js';
 	import { databaseHandle, tables } from '$lib/idb.svelte.js';
 	import { inAppBrowser } from '$lib/inappbrowser.js';
@@ -30,12 +31,34 @@
 
 	let loginData: undefined | LoginData = $state();
 
+	$effect(() => {
+		if (!adding) return;
+		if (adding.servers.length > 1) return;
+		if (loginData?.server) return;
+		loginData ??= { server: adding.servers[0].domain };
+	});
+
 	let tokenValidation = $state<'empty' | 'loading' | 'ok' | (string & {})>('empty');
 	$effect(() => {
 		void (async () => {
-			if (!loginData?.token) {
+			if (!loginData) {
 				tokenValidation = 'empty';
 				return;
+			}
+
+			switch (adding?.auth) {
+				case 'token': {
+					if (!loginData.token) {
+						tokenValidation = 'empty';
+						return;
+					}
+				}
+				case 'password': {
+					if (!(loginData.password?.password && loginData?.password?.username)) {
+						tokenValidation = 'empty';
+						return;
+					}
+				}
 			}
 
 			tokenValidation = 'loading';
@@ -242,6 +265,83 @@
 					{/if}
 				{/snippet}
 			</Stepper>
+		{:else if adding?.auth === 'password'}
+			<Stepper
+				steps={[
+					{ name: 'step_server', title: 'Serveur' },
+					{ name: 'step_credentials', title: 'Identifiants' },
+				] as const}
+			>
+				{#snippet step_server({ done })}
+					<EnumButtons
+						options={adding!.servers.map(({ domain, name }) => ({
+							key: domain,
+							label: name ?? domain,
+							subtext: name ? domain : '',
+						}))}
+						bind:value={
+							() => loginData?.server,
+							(server) => {
+								if (!server) return;
+								loginData ??= { server };
+								loginData.server = server;
+								done();
+							}
+						}
+					/>
+				{/snippet}
+				{#snippet step_credentials({ done })}
+					<form onsubmit={(e) => e.preventDefault()}>
+						<Field label="Identifiant">
+							<InlineTextInput
+								label="Identifiant"
+								value={loginData?.password?.username}
+								onblur={(username) => {
+									loginData!.password ??= { username, password: '' };
+									loginData!.password!.username = username;
+								}}
+							/>
+						</Field>
+
+						<Field label="Mot de passe">
+							<InlineTextInput
+								label="Mot de passe"
+								type="password"
+								value={loginData?.password?.password}
+								onblur={(password) => {
+									loginData!.password ??= { username: '', password };
+									loginData!.password!.password = password;
+								}}
+							/>
+						</Field>
+
+						{#if tokenValidation === 'ok'}
+							<div class="feedback ok" in:fade={{ duration: 200 }}>
+								<IconCheck />
+								Identifiants valide
+							</div>
+						{:else if tokenValidation === 'loading'}
+							<div class="feedback" in:fade={{ duration: 200 }}>
+								<LoadingSpinner --size="1em" />
+								Vérification…
+							</div>
+						{:else if tokenValidation === 'empty'}
+							<div class="feedback" in:fade={{ duration: 200 }}>
+								<!-- empty -->
+							</div>
+						{:else}
+							<div
+								class="feedback err"
+								in:fade={{ duration: 200 }}
+								use:tooltip={tokenValidation || 'Erreur inattendue'}
+							>
+								<IconFail />
+								Identifiants incorrects
+							</div>
+						{/if}
+					</form>
+				{/snippet}
+			</Stepper>
 		{/if}
 	</div>
 </ModalConfirm>
@@ -292,5 +392,11 @@
 			color: var(--fg-error);
 			background-color: var(--bg-error);
 		}
+	}
+
+	form {
+		display: flex;
+		flex-direction: column;
+		gap: 1em;
 	}
 </style>
