@@ -456,7 +456,6 @@ sessionMetadata:
     mergeMethod: none
     required: false
 
-
   # end_at:
   #   type: location
   #   label: Point d'arrivée
