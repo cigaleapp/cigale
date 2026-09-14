@@ -1,7 +1,5 @@
 import { type } from 'arktype';
 
-import { TARGETHEIGHT, TARGETWIDTH } from './inference.js';
-
 export const centeredBoundingBox = type({
 	x: 'number',
 	y: 'number',
@@ -85,8 +83,8 @@ if (import.meta.vitest) {
 export const toRelativeCoords = (input: undefined | { width: number; height: number }) => {
 	if (!input) throw new Error('No input settings were provided');
 	return coordsScaler({
-		x: 1 / (input.width ?? TARGETWIDTH),
-		y: 1 / (input.height ?? TARGETHEIGHT),
+		x: 1 / input.width,
+		y: 1 / input.height,
 	});
 };
 

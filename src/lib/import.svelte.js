@@ -27,6 +27,7 @@ import {
 	RAW_IMAGE_MEDIA_TYPES,
 	transcodeRawPhotoToJPEG,
 } from './raw.js';
+import { NeuralBoundingBoxInference } from './schemas/neural.js';
 import { ACCEPTED_SIDECAR_TYPES, processSidecars } from './sidecars.js';
 
 export const ACCEPTED_IMPORT_TYPES = [
@@ -156,9 +157,10 @@ export async function inferBoundingBoxes(swarpc, cancellers, fileId) {
 		return;
 	}
 
-	const inferenceSettings = $state.snapshot(uiState.cropModels.at(uiState.selectedCropModel));
+	const inferenceSettings = $state.snapshot(uiState.selectedCropModelSettings);
 
-	if (!inferenceSettings) {
+	if (!NeuralBoundingBoxInference.pick('input', 'output').allows(inferenceSettings)) {
+		console.error(NeuralBoundingBoxInference(inferenceSettings));
 		return;
 	}
 

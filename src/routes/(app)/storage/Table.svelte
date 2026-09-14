@@ -21,6 +21,8 @@
 	import { estimateStorageQuotaUsage } from './+page.svelte';
 
 	interface Props {
+		title: string;
+		titleLevel?: 2 | 3 | 4;
 		listEntries: () => Promise<Entry[]>;
 		// eslint-disable-next-line no-unused-vars
 		deleteEntry: (entry: Entry) => Promise<void>;
@@ -28,7 +30,9 @@
 		entrySize: (entry: Entry) => Promise<number>;
 	}
 
-	const { listEntries, deleteEntry, entrySize }: Props = $props();
+	const { listEntries, deleteEntry, entrySize, title, titleLevel = 2 }: Props = $props();
+
+	const titleElementName = $derived(`h${titleLevel}` as const);
 
 	let entries = $state<Entry[]>([]);
 	$effect(() => {
@@ -41,11 +45,15 @@
 	}
 
 	const hasOpenButtons = $derived(entries.some((entry) => Boolean(entry.open)));
+
+	const id = $props.id();
 </script>
 
-<div class="table">
+<svelte:element this={titleElementName} id="table-title-{id}">{title}</svelte:element>
+
+<div class="table" role="table" aria-labelledby="table-title-{id}">
 	{#each entries as entry (entry.key)}
-		<div class="row">
+		<div class="row" role="row">
 			{#if hasOpenButtons}
 				<div class="open">
 					<ButtonIcon
@@ -125,5 +133,14 @@
 	.row .label .origin {
 		font-size: 0.875rem;
 		color: var(--gay);
+	}
+
+	h2 {
+		margin-bottom: 1rem;
+	}
+
+	h3 {
+		margin-top: 1.5rem;
+		margin-bottom: 0.5rem;
 	}
 </style>
