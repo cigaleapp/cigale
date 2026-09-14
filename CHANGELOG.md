@@ -14,9 +14,11 @@ All notable changes to this project will be documented in this file, on a monthl
 - Fix binary storage on Android (#2128)
 - Preserve cascaded metadata confidence when merging observations (#2133)
 - Prevent database fatal error by preventing null-value metadata writes
+- Properly handle normalized-output detection models
 
 ### Data Updates
 
+- Add opportunistic protocol
 - Bump protocol version of protocols/insecta.cigaleprotocol.yaml [ci skip]
 - Regenerate example protocols
 
