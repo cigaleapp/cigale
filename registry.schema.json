@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "protocols": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Identifiant unique pour un protocole. On conseille de mettre une partie qui vous identifie dans cet identifiant, car il doit être globalement unique. Par exemple, fr.sete-moulis-cnrs.mon-protocole si vous contrôler le nom de domain sete-moulis.cnrs.fr",
+            "pattern": "[\\w.-]+"
+          },
+          "url": {
+            "type": "string",
+            "description": "URL où télécharger le protocole",
+            "pattern": "https?:\\/\\/.+"
+          }
+        },
+        "required": [
+          "id",
+          "url"
+        ]
+      }
+    }
+  },
+  "required": [
+    "protocols"
+  ]
+}
