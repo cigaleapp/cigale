@@ -35,7 +35,7 @@
         "bits-ui": "^1.8.0",
         "caniuse-lite": "^1.0.30001810",
         "clicked": "^4.0.3",
-        "convert": "^7.0.2",
+        "convert": "^8.0.1",
         "date-fns": "^4.4.0",
         "dequal": "^2.0.3",
         "devalue": "^5.9.2",
@@ -1485,7 +1485,7 @@
 
     "conventional-commits-parser": ["conventional-commits-parser@3.2.4", "", { "dependencies": { "JSONStream": "^1.0.4", "is-text-path": "^1.0.1", "lodash": "^4.17.15", "meow": "^8.0.0", "split2": "^3.0.0", "through2": "^4.0.0" }, "bin": { "conventional-commits-parser": "cli.js" } }, "sha512-nK7sAtfi+QXbxHCYfhpZsfRtaitZLIA6889kFIouLvz6repszQDgxBu7wf2WbU+Dco7sAnNCJYERCwt54WPC2Q=="],
 
-    "convert": ["convert@7.0.2", "", {}, "sha512-vDIDqKYqSxmg3x16wYdB+CyfioYOd70GJBtFeU9eoj7PXzhhsmEut+N9NJ7X4Lc+mp18AHOPL9YgyXyejpDc1A=="],
+    "convert": ["convert@8.0.2", "", {}, "sha512-Fc/9LZbtnjdrcwnV4M6TJaUnpIWIRp6sR8Qhvn0x+22pVjNhLdqRJMih4Nue3g0W7PH2zy3wdp/+iysZYYg0IQ=="],
 
     "convert-source-map": ["convert-source-map@2.0.0", "", {}, "sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg=="],
 
