@@ -196,6 +196,7 @@
 		"idb": "^8.0.3",
 		"jimp": "1.6.0",
 		"jsonata": "^2.2.2",
+		"layerchart": "^2.3.1",
 		"libraw-wasm": "^1.6.0",
 		"maplibre-gl": "^6.5.0",
 		"marked": "^18.0.6",

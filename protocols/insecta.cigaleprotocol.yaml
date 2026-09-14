@@ -731,3 +731,42 @@ exports:
   metadata:
     csv: metadata.csv
     files: Files/{{ sequence }}-{{ metadataKey }}.{{ extension filename }}
+
+charts:
+  session:
+    layout:
+      - [unique_species]
+      - [order, iucn]
+    blocks:
+      unique_species:
+        type: figure
+        title: Espèces uniques
+        compute: $count($distinct(observations.metadata.species.value))
+      order:
+        type: partition
+        title: Ordres
+        needs: [order]
+        compute: |
+          $distinct(observations.metadata.order.valueLabel)@$label.(
+            {
+              "label": $label,
+              "value": $count(observations[metadata.order.valueLabel = $label])
+            }
+          )
+      iucn:
+        type: partition
+        title: Statut IUCN
+        needs: [conservation_status]
+        compute: |
+          (
+            $labels := observations.metadata.conservation_status{ value: $distinct(valueLabel) };
+            $colors := observations.metadata.conservation_status{ value: $distinct(valueColor) };
+
+            $distinct(observations.metadata.conservation_status.value)@$key.(
+              {
+                "label": $lookup($labels, $key),
+                "color": $lookup($colors, $key),
+                "value": $count(observations[metadata.conservation_status.value = $key])
+              }
+            );
+          )
