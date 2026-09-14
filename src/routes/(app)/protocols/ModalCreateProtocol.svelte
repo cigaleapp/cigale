@@ -91,7 +91,7 @@
 							metadata: namespace('crop'),
 						},
 					});
-					await goto('/(app)/protocols/[id]/infos', { id: newProtocol.id });
+					await goto('/(app)/protocols/[id]/edit/infos', { id: newProtocol.id });
 				} catch (error) {
 					toasts.error(errorMessage(error));
 				}

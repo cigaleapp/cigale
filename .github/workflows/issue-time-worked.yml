@@ -40,3 +40,4 @@ jobs:
             fix-exif-orientation2:exiv2-wasm@main
             parallelworkers:swarpc@loadbalancer
             offthread:swarpc@main
+            resultspage:cigale@moveprotocoleditpages
