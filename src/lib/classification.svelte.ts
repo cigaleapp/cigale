@@ -67,10 +67,7 @@ export async function classifyImage(
 		}
 
 		// Generate the inference session ID based on the protocol and model
-		const inferenceSessionId = inferenceModelId(
-			uiState.currentProtocol.id,
-			settings
-		);
+		const inferenceSessionId = inferenceModelId(uiState.currentProtocol.id, settings);
 
 		const taskSettings = {
 			...settings,
