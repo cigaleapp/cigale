@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { NodeProvenance } from '../../../../../lib/file-tree.js';
+	import type { NodeProvenance } from '$lib/file-tree.js';
 
 	import { fade } from 'svelte/transition';
 

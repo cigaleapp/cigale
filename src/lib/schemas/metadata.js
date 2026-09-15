@@ -165,9 +165,9 @@ export const MetadataValue = type({
 		.describe('Si la valeur est la valeur par défaut définie dans le protocole')
 		.default(false),
 	alternatives: MetadataValueMain.array().default(() => []),
-	confidences: {
+	confidences: type({
 		'[string.json]': Probability,
-	},
+	}),
 });
 
 export const MetadataValues = type.Record(NamespacedMetadataID, MetadataValue);
@@ -189,11 +189,11 @@ const JSONSchemaCompatibleRuntimeValue = type.or(
 
 export const MetadataRecordValue = MetadataValue.omit('value', 'alternatives').and({
 	value: [JSONSchemaCompatibleRuntimeValue, '@', 'Valeur de la métadonnée'],
-	alternatives: [
+	alternatives: type(
 		JSONSchemaCompatibleRuntimeValue.array(),
 		'@',
-		'Valeurs alternatives pour la métadonnée',
-	],
+		'Valeurs alternatives pour la métadonnée'
+	).default(() => []),
 	'valueLabel?': [
 		'string',
 		'@',

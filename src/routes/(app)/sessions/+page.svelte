@@ -150,6 +150,7 @@
 								<div class="icon">
 									<CompositeAvatar
 										avatar={account.avatarURL}
+										avatarColor={'color' in account ? account.color : undefined}
 										sublogo={provider.logoURL}
 										tooltip="{account.username} sur {provider.displayName}"
 									/>
@@ -171,6 +172,7 @@
 							{#if provider && account}
 								<CompositeAvatar
 									avatar={account.avatarURL}
+									avatarColor={'color' in account ? account.color : undefined}
 									sublogo={provider.logoURL}
 								/>
 							{:else if special === 'local'}

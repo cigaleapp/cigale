@@ -4,6 +4,8 @@ import type { SessionRemoteID } from '$lib/schemas/sessions.js';
 
 export type AuthenticationMethod = 'oauth' | 'token' | 'password';
 
+export type AccountCapability = 'sessions' | 'upload' | 'images';
+
 export type LoginData<S extends string = string> = {
 	server: S;
 	token?: string;
@@ -17,21 +19,33 @@ export interface Account {
 	avatarURL: URL | undefined;
 	/** Database ID of the account. */
 	id: string | undefined;
-
 	logout(): Promise<void>;
+
+	armAbort(signal: AbortSignal): void
 
 	/**
 	 * Upload a session to the account
 	 * @param session session object from the database
 	 */
-	upload(session: DB.Session): Promise<{
-		/** If the session has a remote ID that can be used to import it back later into CIGALE. Useful if the Account is ALSO a {@link AccountRemoteSessions} */
-		remoteID?: SessionRemoteID;
-		/**
-		 * URL to where the session can be visited on the account
-		 */
-		page?: URL;
-	}>;
+	upload(
+		protocol: DB.Protocol,
+		session: DB.Session
+	): AsyncIterable<
+		| {
+				message: 'session-id';
+				/** If the session has a remote ID that can be used to import it back later into CIGALE. Useful if the Account has session capabilities */
+				remoteId?: SessionRemoteID;
+		  }
+		| {
+				/** Progress update */
+				message: 'progress';
+				action: string;
+				done?: number;
+				total?: number;
+				/** Is a sub-task */
+				indent?: boolean;
+		  }
+	>;
 
 	/**
 	 * List available remote sessions on the account
@@ -88,7 +102,8 @@ export interface Account {
 	 */
 	items(
 		protocol: DB.Protocol,
-		session: SessionRemoteID
+		session: DB.Session,
+		onProgress: (message: string) => void
 	): Promise<{
 		observations: Array<(typeof DB.Schemas.Observation)['inferIn']>;
 		images: Array<(typeof DB.Schemas.Image)['inferIn']>;
@@ -102,7 +117,7 @@ export interface Account {
 	 */
 	files(
 		protocol: DB.Protocol,
-		session: SessionRemoteID
+		session: DB.Session
 	): AsyncIterable<Omit<(typeof DB.Tables.MetadataValueFile)['inferIn'], 'sessionId'>>;
 }
 
@@ -116,9 +131,12 @@ export interface AccountConstructor<
 	id: string;
 	logoURL: URL;
 	displayName: string;
-	capabilities: readonly ('sessions' | 'images' | 'upload')[];
+	capabilities: readonly AccountCapability[];
 	auth: Auth;
-	servers: readonly { domain: Server; name?: string }[];
+
+	servers(db: DatabaseHandle): Promise<Array<{ domain: Server; name?: string }>>;
+
+	compatibleWith(protocol: DB.Protocol | undefined): boolean;
 
 	/** Returns the error message, or undefined if everything is a-ok */
 	checkAuth(data: LoginData<Server>): Promise<undefined | string>;

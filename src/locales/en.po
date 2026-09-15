@@ -704,6 +704,7 @@ msgstr "<0/> Unreachable: HTTP {0} <1/>"
 
 #: src/lib/FieldURL.svelte
 #: src/routes/(app)/accounts/ModalAddAccount.svelte
+#: src/routes/(app)/accounts/ModalAddAccount.svelte
 msgid "<0/> Vérification…"
 msgstr "<0/> Checking…"
 
@@ -1522,6 +1523,7 @@ msgid "Une erreur est survenue lors de la soumission de votre demande. Veuillez 
 msgstr "An error occured while submitting your request. Please try again later."
 
 #: src/routes/(app)/ModalSubmitIssue.svelte
+#: src/routes/(app)/results/+page.svelte
 msgid "Envoyer"
 msgstr "Send"
 
@@ -3209,4 +3211,48 @@ msgstr ""
 
 #: src/routes/(app)/(sidepanel)/crop/+layout.svelte
 msgid "Erreur lors du chargement du modèle de détection"
+msgstr ""
+
+#: src/routes/(app)/results/+page.svelte
+msgid "Fichiers"
+msgstr ""
+
+#: src/routes/(app)/results/+page.svelte
+msgid "Plateformes"
+msgstr ""
+
+#: src/routes/(app)/results/+page.svelte
+msgid "Choisir un compte"
+msgstr ""
+
+#. 0: provider.displayName
+#: src/routes/(app)/results/+page.svelte
+msgid "Envoyer sur {0}"
+msgstr ""
+
+#: src/routes/(app)/accounts/ModalAddAccount.svelte
+#: src/routes/(app)/accounts/ModalAddAccount.svelte
+msgid "Identifiant"
+msgstr ""
+
+#: src/routes/(app)/accounts/ModalAddAccount.svelte
+#: src/routes/(app)/accounts/ModalAddAccount.svelte
+msgid "Mot de passe"
+msgstr ""
+
+#: src/routes/(app)/accounts/ModalAddAccount.svelte
+msgid "<0/> Identifiants valide"
+msgstr ""
+
+#: src/routes/(app)/accounts/ModalAddAccount.svelte
+msgid "<0/> Identifiants incorrects"
+msgstr ""
+
+#. 0: provider.displayName
+#: src/routes/(app)/sessions/[id]/+page.svelte
+msgid "Dé-lier de {0}"
+msgstr ""
+
+#: src/routes/(app)/sessions/[id]/+page.svelte
+msgid "Dé-lier de la plateforme en ligne"
 msgstr ""

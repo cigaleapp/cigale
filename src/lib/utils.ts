@@ -3,6 +3,7 @@
 import { Capacitor } from '@capacitor/core';
 import { ms } from 'convert';
 import fetchProgress from 'fetch-progress';
+import { SymbolLayer } from 'svelte-maplibre';
 import JSONC from 'tiny-jsonc';
 import YAML from 'yaml';
 
@@ -1401,8 +1402,12 @@ export function corsfix(url: string | URL): string {
 	return 'https://cors.gwen.works/' + url.toString().replace(/^https?:\/\//, '');
 }
 
+export function isLocalhost() {
+	return location.hostname === 'localhost'
+}
+
 export function corsfixIfLocalhost(src: string): string {
-	if (location.hostname !== 'localhost') return src;
+	if (!isLocalhost()) return src;
 	return corsfix(src);
 }
 
@@ -1657,4 +1662,196 @@ if (import.meta.vitest) {
 		expect(indexOfMin([2, 5, 1, 3, 5, 2])).toBe(2);
 		expect(indexOfMin([0, 5, 0, 3, 5, 2])).toBe(0);
 	});
+}
+
+export function isFulfilled<T>(
+	result: PromiseSettledResult<T>
+): result is PromiseFulfilledResult<T> {
+	return result.status === 'fulfilled';
+}
+
+export class IterateCallback<T> {
+	#stream: TransformStream<T>;
+	#closed = false;
+
+	constructor(debugkey: string) {
+		this.#stream = new TransformStream<T>();
+	}
+
+	/**
+	 * Wait for writable stream to be available, acquire its writer, do the given action and release the lock
+	 */
+	async withWriter(action: (writer: WritableStreamDefaultWriter<T>) => Promise<void>) {
+		const writable = this.#stream.writable;
+		while (writable.locked) {
+			await sleep(200);
+		}
+
+		const writer = writable.getWriter();
+		await action(writer);
+		writer.releaseLock();
+	}
+
+	async push(item: T) {
+		await this.withWriter(async (writer) => {
+			if (this.#closed) {
+				console.warn('attempted to push', item, 'to closed stream, ignoring');
+				return;
+			}
+
+			await writer.write(item);
+		});
+	}
+
+	async done() {
+		await this.withWriter(async (writer) => {
+			await writer.close();
+			this.#closed = true;
+		});
+	}
+
+	async finish(item: T) {
+		await this.push(item);
+		await this.done();
+	}
+
+	async *stream(): AsyncIterable<T> {
+		const reader = this.#stream.readable.getReader();
+
+		while (true) {
+			const { value, done } = await reader.read();
+
+			if (done) {
+				break;
+			} else {
+				yield value;
+			}
+		}
+	}
+}
+
+async function* combineIterables<T>(iterables: Iterable<AsyncIterable<T>>): AsyncIterable<T> {
+	const stream = new ReadableStream<T>({
+		async pull(controller) {
+			await Promise.all(
+				[...iterables].map(async (iterable) => {
+					for await (const result of iterable) {
+						controller.enqueue(result);
+					}
+				})
+			);
+
+			controller.close();
+		},
+	});
+
+	const reader = stream.getReader();
+
+	while (true) {
+		const { value, done } = await reader.read();
+
+		if (done) {
+			break;
+		} else {
+			yield value;
+		}
+	}
+}
+
+export async function* concurrently<I, O>(
+	items: I[],
+	process: (item: I) => AsyncIterable<O>
+): AsyncIterable<{ input: I; output: O }> {
+	yield* combineIterables(
+		items.map(async function* _(input: I) {
+			for await (const output of process(input)) {
+				yield { input, output };
+			}
+		})
+	);
+}
+
+export async function* poll<T>(
+	/** Polling rate in milliseconds */
+	interval: number,
+	ping: () => Promise<T>,
+	stop: (data: T) => boolean
+) {
+	let data: T | undefined;
+
+	while (data === undefined || !stop(data)) {
+		data = await ping();
+		yield data;
+		await sleep(interval);
+	}
+
+	yield data;
+}
+
+/**
+ * Run a iterator function in a web worker.
+ * Simply runs it if we're already in a web worker.
+ * If not, the provided function's name will be used to set the created worker's name
+ * @param input arguments to pass to the function
+ * @param run the iterator function
+ */
+export async function* iterateFromWebWorker<I, O>(input: I, run: (input: I) => AsyncIterable<O>) {
+	if (
+		'WorkerGlobalScope' in globalThis &&
+		typeof WorkerGlobalScope !== 'undefined' &&
+		self instanceof WorkerGlobalScope
+	) {
+		yield* run(input);
+		return;
+	}
+
+	function setup() {
+		onmessage = function (e) {
+			if (e.data.type === '__args') {
+				void (async () => {
+					// @ts-expect-error __func is dynamically defined
+					for await (const item of __func(e.data.args)) {
+						postMessage({ done: false, item });
+					}
+
+					postMessage({ done: true });
+				})();
+			}
+		};
+	}
+
+	const worker = new Worker(
+		`data:text/javascript:charset=UTF-8,var __func = ${run.toString()};(${setup}).call(this);`,
+		{
+			name: run.name,
+		}
+	);
+
+	const iterator = new IterateCallback<
+		{ type: 'item'; item: O } | { type: 'error'; error: unknown }
+	>();
+
+	worker.onmessage = (e) => {
+		if (e.data.done) {
+			iterator.done();
+			worker.terminate();
+		} else {
+			iterator.push({ type: 'item', item: e.data.item });
+		}
+	};
+
+	worker.onerror?.((e) => {
+		console.error('FROM WW received error from worker', e);
+		iterator.finish({ type: 'error', error: e });
+	});
+
+	worker.postMessage({
+		type: '__args',
+		args: structuredClone(input),
+	});
+
+	for await (const event of iterator.stream()) {
+		if (event.type === 'error') throw event.error;
+		yield event.item;
+	}
 }
