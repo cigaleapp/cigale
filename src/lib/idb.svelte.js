@@ -82,7 +82,7 @@ function wrangler(table) {
 		/**
 		 * @param {string|null} sessionId
 		 * @param {object} options
-		 * @param {boolean} options.sessionOnly if true, only refresh session-dependent tables
+		 * @param {boolean} [options.sessionOnly] if true, only refresh session-dependent tables
 		 */
 		async refresh(sessionId, { sessionOnly = false } = {}) {
 			if (!sessionId && isSessionDependentReactiveTable(table)) {
@@ -92,6 +92,14 @@ function wrangler(table) {
 				console.debug(`refresh ${table} for session ${sessionId}`);
 				// @ts-ignore
 				_tablesState[table] = await this.list('sessionId', sessionId);
+			} else if (table === 'Session' && sessionId) {
+				const updated = await this.get(sessionId);
+				if (!updated) return;
+
+				_tablesState[table] = [
+					..._tablesState[table].filter((t) => t.id !== sessionId),
+					updated,
+				];
 			} else if (!sessionOnly) {
 				console.debug(`refresh ${table}`);
 				// @ts-ignore
@@ -124,6 +132,43 @@ function wrangler(table) {
 				_tablesState[table].sort(idComparator);
 			}
 			return output;
+		},
+		/**
+		 *
+		 * @param {string} key
+		 * @param {(object: typeof Tables[Table]['inferIn']) => void|Promise<void>} updater in-place updates
+		 * @returns {Promise<boolean>} true if the item was found and updated, false otherwise
+		 */
+		async morph(key, updater) {
+			const logLabel = `mph ${table} ${key}`;
+
+			// Get item from DB
+			const item = await this.raw.get(key);
+
+			// Handle not found
+			if (!item) {
+				console.error(`${logLabel}: item not found`);
+				return false;
+			}
+
+			// Update property in DB object
+			await updater(item);
+			await set(table, item);
+
+			// Update reactive state
+			const index = _tablesState[table].findIndex((item) => item.id === key);
+			if (index === -1) {
+				console.debug(
+					`${logLabel}: item not found in reactive state, refetching entire list`
+				);
+				// @ts-ignore
+				_tablesState[table] = await this.list();
+			} else {
+				console.debug(`${logLabel}: updating state @ ${table}[${index}]`);
+				_tablesState[table][index] = Tables[table].assert(item);
+			}
+
+			return true;
 		},
 		/**
 		 *

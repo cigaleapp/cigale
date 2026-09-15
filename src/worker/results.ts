@@ -449,7 +449,7 @@ swarp.estimateResultsZipSize(async ({ sessionId, include, cropPadding }, _, { ab
 		imageFileStats.set(id, {
 			dimensions,
 			fullSize: bytes.byteLength,
-			bytePerPixel: bytes.byteLength / (dimensions.width * dimensions.height),
+			bytesPerPixel: bytes.byteLength / (dimensions.width * dimensions.height),
 		});
 	}
 
@@ -493,7 +493,7 @@ swarp.estimateResultsZipSize(async ({ sessionId, include, cropPadding }, _, { ab
 					cropbox
 				);
 
-				const estimation = stats.bytePerPixel * (width * height);
+				const estimation = stats.bytesPerPixel * (width * height);
 
 				// XXX: We determined experimentally that cropped size estimation has a +80% error when compared to real sizes.
 				// We see that the estimated size is on average 6.37 times smaller than the real size. (with σ = 3.30 so... yeah not ideal)
