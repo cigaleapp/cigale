@@ -3111,7 +3111,7 @@ msgid "Taille des images"
 msgstr ""
 
 #: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
-msgid "Disposition "
+msgid "Disposition"
 msgstr ""
 
 #: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
