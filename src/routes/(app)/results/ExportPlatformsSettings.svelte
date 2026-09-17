@@ -16,8 +16,8 @@
 	);
 </script>
 
-{#if exporter.sessionProvider && externalPageUrl}
-	<div class="page">
+<div class="page">
+	{#if exporter.sessionProvider && externalPageUrl && !exporter.uploading}
 		<Field label="Disponible sur {exporter.sessionProvider.displayName}">
 			<ButtonSecondary
 				onclick={() => {
@@ -29,8 +29,15 @@
 				Voir
 			</ButtonSecondary>
 		</Field>
-	</div>
-{/if}
+	{:else}
+		<Field label={exporter.uploading ? 'Envoi…' : 'Pas encore envoyé'}>
+			<ButtonSecondary disabled onclick={() => {}}>
+				<IconOpenExternal />
+				Voir
+			</ButtonSecondary>
+		</Field>
+	{/if}
+</div>
 
 <div class="providers">
 	<Field label={exporter.sessionAccount ? 'Changer de compte' : 'Choisir un compte'}>

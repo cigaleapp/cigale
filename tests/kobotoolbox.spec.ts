@@ -1,7 +1,7 @@
 import type { AppFixture } from './fixtures.js';
 import type { Locator, Page } from '@playwright/test';
 
-import { test as baseTest, expect } from './fixtures.js';
+import { expect, test } from './fixtures.js';
 import { MOCK_TOKEN } from './fixtures/http/kobotoolbox/handlers.js';
 import * as kobotoolbox from './fixtures/http/kobotoolbox/handlers.js';
 import { chooseInDropdown } from './utils/core.js';
@@ -10,10 +10,8 @@ import { importProtocol } from './utils/protocols.js';
 
 // TODO: test for graceful handling of external API being down
 
-const test = baseTest.extend({
-	async networkHandlers({}, use) {
-		await use(kobotoolbox.handlers);
-	},
+test.beforeEach(async ({ network }) => {
+	network.use(...kobotoolbox.handlers);
 });
 
 test.describe('adding a kobotoolbox account', () => {

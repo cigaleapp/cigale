@@ -2153,8 +2153,8 @@ export default class Provider implements Account {
 
 	static DateInput = type('Date', '=>', (date) => dates.format(date, 'yyyy-MM-dd HH:mm:ss'));
 
-	static MetadataFieldMultiline = type('string', '=>', (raw) => {
-		const lines = raw.split(/\r?\n/);
+	static MetadataFieldMultiline = type('string|null', '=>', (raw) => {
+		const lines = raw?.split(/\r?\n/) ?? [];
 		let insideMetadata = false;
 		const analysis = {
 			free: [] as string[],
@@ -2395,7 +2395,7 @@ export default class Provider implements Account {
 			min_y: 'number >= 0',
 			max_x: 'number >= 0',
 			max_y: 'number >= 0',
-			object_type: 'string',
+			object_type: 'string | null',
 			creation_date: 'string.date.parse',
 			comments: Provider.MetadataFieldSingleline,
 		},
@@ -2427,6 +2427,7 @@ export default class Provider implements Account {
 	static AnnotationUpdatePayload = Provider.AnnotationCreatePayload.partial();
 
 	static ReviewsResponse = Provider.ResponsePaginated({
+		review_id: 'number.integer',
 		annotation_id: 'number',
 		status_name: 'string',
 	});
@@ -2465,6 +2466,7 @@ export default class Provider implements Account {
 			name: 'string',
 			label_id: 'number.integer',
 			creator_id: 'number.integer',
+			/** "private" or "public" (for now) */
 			type: 'string',
 			creation_date: 'string.date',
 		},

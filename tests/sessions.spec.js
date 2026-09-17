@@ -67,11 +67,9 @@ test.describe('isolation', () => {
 
 test('import into new session', async ({ page, app }) => {
 	await app.settings.set({ debugMode: false });
-	const picker = page.waitForEvent('filechooser');
-	await page.getByRole('button', { name: 'Importer .zip' }).click();
-	await picker.then((picker) => {
-		picker.setFiles('./tests/fixtures/exports/correct.zip');
-	});
+
+	await pickFiles(page.getByRole('button', { name: 'Importer .zip' }), 'exports/correct.zip');
+
 	await app.path.wait('/(app)/(sidepanel)/import');
 
 	await assert(page.getByTestId('goto-current-session')).toHaveText('Testing session');

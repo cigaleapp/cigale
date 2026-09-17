@@ -1,19 +1,17 @@
 import { http, HttpResponse } from 'msw';
 
-import { test as baseTest, expect } from './fixtures.js';
+import { expect, test } from './fixtures.js';
 import { goToProtocolManagement, importPhotos, importProtocol, newSession } from './utils/index.js';
 
-const test = baseTest.extend({
-	async networkHandlers({}, use) {
-		await use([
-			http.get('https://foo.example.org/infer', ({ request }) => {
-				const url = new URL(request.url);
-				const from = url.searchParams.get('from');
+test.beforeEach(({ network }) => {
+	network.use(
+		http.get('https://foo.example.org/infer', ({ request }) => {
+			const url = new URL(request.url);
+			const from = url.searchParams.get('from');
 
-				return HttpResponse.json({ inferred: from ? `inferred:${from}` : null });
-			}),
-		]);
-	},
+			return HttpResponse.json({ inferred: from ? `inferred:${from}` : null });
+		})
+	);
 });
 
 test('can infer metadata from http', async ({ page, app }) => {
