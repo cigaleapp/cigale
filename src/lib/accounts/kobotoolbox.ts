@@ -4,6 +4,7 @@ import type * as DB from '$lib/database.js';
 import type { MetadataRecordValue, RuntimeValue } from '$lib/schemas/metadata.js';
 
 import { Type, type } from 'arktype';
+import { RateLimit } from 'async-sema';
 import * as date from 'date-fns';
 
 import { Schemas } from '$lib/database.js';
@@ -35,6 +36,8 @@ export default class Provider implements Account {
 	db: DatabaseHandle;
 	/** Database ID of the account */
 	id: string | undefined;
+
+	ratelimit = new RateLimit(5);
 
 	get v2domain(): string {
 		return this.domain;
@@ -106,6 +109,10 @@ export default class Provider implements Account {
 		};
 	}
 
+	static compatibleWith(protocol: DB.Protocol | undefined) {
+		return Boolean(protocol?.remote?.kobocollect);
+	}
+
 	static async checkAuth({
 		server,
 		token,
@@ -171,13 +178,23 @@ export default class Provider implements Account {
 
 	async logout() {}
 
-	async *sessions({ cursor = undefined, limit = 40, mine = false } = {}) {
+	async *sessions({
+		cursor = '',
+		limit = 30,
+		...filters
+	}: {
+		cursor?: string | undefined;
+		limit?: number;
+		mine?: boolean;
+		protocol?: string | undefined;
+	} = {}) {
 		const yielded = new Set<string>();
 		let total = 0;
 
 		for (const p of await this.db.getAll('Protocol')) {
 			const protocol = Schemas.Protocol.assert(p);
 			if (!protocol.remote?.kobocollect) continue;
+			if (filters.protocol && protocol.id !== filters.protocol) continue;
 
 			const assetUid = this.#projectAssetUid(protocol.remote.kobocollect.form);
 
@@ -193,9 +210,9 @@ export default class Provider implements Account {
 				'v2',
 				`/api/v2/assets/${assetUid}/data?${new URLSearchParams({
 					limit: limit.toString(),
-					offset: cursor ? (new URL(cursor).searchParams.get('offset') ?? '0') : '0',
+					start: cursor ? (new URL(cursor).searchParams.get('start') ?? '0') : '0',
 					query: JSON.stringify({
-						_submitted_by: mine ? this.username : undefined,
+						_submitted_by: filters.mine ? this.username : undefined,
 					}),
 					sort: JSON.stringify({
 						_submission_time: -1,
@@ -645,6 +662,8 @@ export default class Provider implements Account {
 		responseSchema: Response,
 		init?: RequestInit
 	) {
+		await this.ratelimit();
+
 		const response = await this.fetch(
 			new URL(path, `https://${version === 'v1' ? this.v1domain : this.v2domain}`),
 			{
@@ -707,9 +726,9 @@ export default class Provider implements Account {
 		uid: 'string',
 		version_id: 'string',
 		deployment__uuid: 'string',
-		deployment__links: {
-			url: 'string.url.parse',
-		},
+		// deployment__links: {
+		// 	'url?': 'string.url.parse',
+		// },
 		deployment__active: 'boolean',
 		settings: {
 			description: 'string',

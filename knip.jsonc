@@ -17,7 +17,6 @@
 		"@iconify-json/.+",
 		"bun",
 		"@sveltejs/vite-plugin-svelte-inspector",
-		"svelte-mathml",
 		"@capacitor/assets",
 		"@capacitor/ios",
 		"baseline-browser-mapping",
