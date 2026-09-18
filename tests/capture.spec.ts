@@ -1,4 +1,4 @@
-import type { Page } from '@playwright/test';
+ import type { Page } from '@playwright/test';
 import type { ExportedProtocol } from '$lib/schemas/protocols.js';
 
 import { ms } from 'convert';

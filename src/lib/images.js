@@ -304,12 +304,14 @@ export async function storeImageBytes({
 			id,
 			contentType,
 			dimensions: { width, height },
+			size: originalBytes.byteLength,
 			...file,
 		});
 		await tx.objectStore('ImagePreviewFile').put({
 			id,
 			contentType,
 			dimensions: { width, height },
+			size: resizedBytes.byteLength,
 			...previewfile,
 		});
 		const preview = new Blob([resizedBytes], { type: contentType });

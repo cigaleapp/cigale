@@ -58,7 +58,7 @@
 		<div class="actions">
 			<ButtonInk
 				onclick={async () =>
-					goto('/(app)/protocols/[id]/metadata/[metadata]/infos', {
+					goto('/(app)/protocols/[id]/edit/metadata/[metadata]/infos', {
 						id: protocolId,
 						metadata: shortKey,
 					})}
@@ -89,7 +89,7 @@
 
 						onupdate?.(p, shortKey);
 
-						await goto('/(app)/protocols/[id]/metadata/[metadata]/infos', {
+						await goto('/(app)/protocols/[id]/edit/metadata/[metadata]/infos', {
 							id: p.id,
 							metadata: shortKey,
 						});
