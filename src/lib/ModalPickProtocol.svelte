@@ -3,24 +3,49 @@
 	let open = $state<() => void>();
 
 	let onpicked = $state(
-		(data: { protocolId: string | null; closer: undefined | (() => void) }) => {
+		(data: {
+			protocolId: string | null;
+			extraKey?: string | undefined;
+			closer: undefined | (() => void);
+		}) => {
 			data.closer?.();
 		}
 	);
 
-	export async function pickProtocol({
+	let onclose = $state(() => {});
+
+	type ExtraOption<Key extends string> = {
+		key: Key;
+		label: string;
+		icon?: import('svelte').Component;
+		subtext?: string;
+	};
+
+	let extraOptions = $state<ExtraOption[]>([]);
+
+	export async function pickProtocol<ExtraKey extends string = never>({
 		after,
+		extraOptions: _extraOptions = [],
 	}: {
-		// eslint-disable-next-line no-unused-vars
-		after?: { loadingText: string; do: (picked: undefined | DB.Protocol) => Promise<void> };
+		extraOptions?: ExtraOption<ExtraKey>[];
+		after?: {
+			loadingText: string;
+			// eslint-disable-next-line no-unused-vars
+			do: (picked: undefined | DB.Protocol | ExtraKey) => Promise<void>;
+		};
 	}): Promise<undefined | DB.Protocol> {
+		extraOptions = _extraOptions;
+
 		open?.();
 
 		let closeModal: undefined | (() => void);
 		const picked = await new Promise<undefined | DB.Protocol>((resolve) => {
-			onpicked = ({ closer, protocolId }) => {
-				resolve(tables.Protocol.getFromState(protocolId ?? ''));
+			onpicked = ({ closer, protocolId, extraKey }) => {
+				resolve(extraKey ?? tables.Protocol.getFromState(protocolId ?? ''));
 				closeModal = closer;
+			};
+			onclose = () => {
+				resolve(undefined);
 			};
 		});
 
@@ -58,6 +83,7 @@
 	title="Choisir un protocole pour la session"
 	--modal-width="700px"
 	bind:open
+	{onclose}
 >
 	{#snippet children({ close })}
 		<div class="content">
@@ -96,6 +122,33 @@
 							</div>
 							<div class="description">
 								<OverflowableText text={summary || description} />
+							</div>
+						</div>
+					</button>
+				{/each}
+
+				{#each extraOptions as { key, label, subtext, icon: Icon } (`extra_${key}`)}
+					<button
+						role="menuitem"
+						aria-label={label}
+						onclick={() => {
+							onpicked({ extraKey: key, closer: close });
+						}}
+						class="choice"
+					>
+						<div class="logo">
+							{#if Icon}
+								<Icon />
+							{/if}
+						</div>
+						<div class="text">
+							<div class="title">
+								<span class="name">
+									<OverflowableText text={label} />
+								</span>
+							</div>
+							<div class="description">
+								<OverflowableText text={subtext} />
 							</div>
 						</div>
 					</button>

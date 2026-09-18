@@ -15,7 +15,7 @@
 		title?: string;
 		position?: BottomSheetSettings['position'];
 		trigger?: Snippet;
-		footer: Snippet<[{ close: () => void }]>;
+		footer?: Snippet<[{ close: () => void }]>;
 		/**
 		 * The trigger will be the bottom bar. The value of this prop is the text shown.
 		 * Also sets the title (if it hasnt been manually set)
@@ -35,6 +35,7 @@
 
 	import { mutationobserver } from './mutations.js';
 	import { onswipe } from './touch/swipes.js';
+	import { Portal } from 'bits-ui';
 
 	let {
 		open = $bindable(false),
@@ -67,66 +68,68 @@
 	</BottombarContent>
 {/if}
 
-<div
-	data-bottomsheet-wrapper
-	use:mutationobserver={{
-		subtree: true,
-		attributes: true,
-		attributeFilter: ['open'],
-		onattributes(event) {
-			if (!(event.target instanceof HTMLDialogElement)) return;
-			disableGestures = event.target.open;
-		},
-	}}
->
-	<BottomSheet
-		settings={{
-			maxHeight,
-			position,
-			disableClosing: disableGestures,
-			disableDragging: disableGestures,
+<Portal to="#portal-target-dropdowns">
+	<div
+		data-bottomsheet-wrapper
+		use:mutationobserver={{
+			subtree: true,
+			attributes: true,
+			attributeFilter: ['open'],
+			onattributes(event) {
+				if (!(event.target instanceof HTMLDialogElement)) return;
+				disableGestures = event.target.open;
+			},
 		}}
-		bind:isSheetOpen={open}
 	>
-		{#if trigger}
-			<BottomSheet.Trigger>
-				{@render trigger()}
-			</BottomSheet.Trigger>
-		{/if}
-		<BottomSheet.Overlay>
-			<BottomSheet.Sheet>
-				<BottomSheet.Handle>
-					<div class="handle"></div>
-					{#if title && position === 'bottom'}
-						<p class="title bottom">
-							{title}
-						</p>
-					{/if}
-				</BottomSheet.Handle>
-				<BottomSheet.Content>
-					{#if title && position === 'top'}
-						<p class="title top">
-							{title}
-						</p>
-					{/if}
-					{@render children()}
-					{#if footer}
-						{let footerHeight = $state(0)}
-						<footer bind:clientHeight={footerHeight}>
-							{@render footer({
-								close() {
-									open = false;
-								},
-							})}
-						</footer>
-
-						<div class="footer-spacer" style:height="{footerHeight}px"></div>
-					{/if}
-				</BottomSheet.Content>
-			</BottomSheet.Sheet>
-		</BottomSheet.Overlay>
-	</BottomSheet>
-</div>
+		<BottomSheet
+			settings={{
+				maxHeight,
+				position,
+				disableClosing: disableGestures,
+				disableDragging: disableGestures,
+			}}
+			bind:isSheetOpen={open}
+		>
+			{#if trigger}
+				<BottomSheet.Trigger>
+					{@render trigger()}
+				</BottomSheet.Trigger>
+			{/if}
+			<BottomSheet.Overlay>
+				<BottomSheet.Sheet>
+					<BottomSheet.Handle>
+						<div class="handle"></div>
+						{#if title && position === 'bottom'}
+							<p class="title bottom">
+								{title}
+							</p>
+						{/if}
+					</BottomSheet.Handle>
+					<BottomSheet.Content>
+						{#if title && position === 'top'}
+							<p class="title top">
+								{title}
+							</p>
+						{/if}
+						{@render children()}
+						{#if footer}
+							{let footerHeight = $state(0)}
+							<footer bind:clientHeight={footerHeight}>
+								{@render footer({
+									close() {
+										open = false;
+									},
+								})}
+							</footer>
+	
+							<div class="footer-spacer" style:height="{footerHeight}px"></div>
+						{/if}
+					</BottomSheet.Content>
+				</BottomSheet.Sheet>
+			</BottomSheet.Overlay>
+		</BottomSheet>
+	</div>
+</Portal>
 
 <style>
 	[data-bottomsheet-wrapper] {

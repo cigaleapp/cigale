@@ -106,7 +106,7 @@
 	<ul
 		class="tree"
 		class:leaves-only={hasOnlyLeaves}
-		{@attach hasOnlyLeaves ? scrollfader : () => {}}
+		{@attach hasOnlyLeaves ? scrollfader() : () => {}}
 	>
 		{#if editable}
 			<li class="new-folder">

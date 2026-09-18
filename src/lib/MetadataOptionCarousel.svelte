@@ -78,7 +78,7 @@
 			{#if key === 'debug' && debugdata}
 				<DebugOnly data={debugdata} />
 			{:else if key === 'details'}
-				<div class="details" {@attach scrollfader}>
+				<div class="details" {@attach scrollfader()}>
 					{#if description}
 						<Markdown source={description} />
 					{:else}

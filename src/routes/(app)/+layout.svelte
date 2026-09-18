@@ -19,6 +19,7 @@
 	import KeyboardShortcuts from '$lib/KeyboardShortcuts.svelte';
 	import { IsMobile } from '$lib/mobile.svelte.js';
 	import Modal from '$lib/Modal.svelte';
+	import ModalPickProtocol from '$lib/ModalPickProtocol.svelte';
 	import { globalModals } from '$lib/modals.svelte.js';
 	import { routeIsIn } from '$lib/paths.js';
 	import { initializeProcessingQueue } from '$lib/queue.svelte';
@@ -182,6 +183,8 @@
 
 <ModalCreateCustomNeuralNetwork />
 
+<ModalPickProtocol />
+
 <Modal
 	key="modal_debug_ui_state"
 	title="UI State"
@@ -194,6 +197,8 @@
 		{/key}
 	{/if}
 </Modal>
+
+<div id="portal-target-dropdowns"></div>
 
 <div class="layout" id="app-layout">
 	{#if !mobile.current}
@@ -212,7 +217,8 @@
 		class="contents"
 		class:padded={!page.route.id?.includes('/(sidepanel)') &&
 			!page.route.id?.includes('protocols/[id]/') &&
-			page.route.id !== '/(app)/capture'}
+			page.route.id !== '/(app)/capture' &&
+			page.route.id !== '/(app)/sessions'}
 	>
 		{@render children?.()}
 	</div>

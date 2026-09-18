@@ -1,17 +1,42 @@
+import IconImport from '~icons/ri/import-line';
+import { promptForFiles } from '$lib/files';
 import { databaseHandle, tables } from '$lib/idb.svelte.js';
 import { resolveDefaults } from '$lib/metadata/defaults.js';
 import { pickProtocol } from '$lib/ModalPickProtocol.svelte';
 import { goto } from '$lib/paths.js';
 import { defaultClassificationMetadata, defaultCropMetadata } from '$lib/protocols.js';
+import { importMore } from '$lib/queue.svelte';
 import { isNamespacedToProtocol } from '$lib/schemas/metadata.js';
 import { switchSession } from '$lib/sessions.js';
 import { compareBy, orEmptyObj } from '$lib/utils.js';
 
 export async function createSession() {
 	await pickProtocol({
+		extraOptions: [
+			{
+				key: 'zip',
+				label: 'Importer un .zip',
+				subtext: 'Importer un export Cigale',
+				icon: IconImport,
+			},
+		],
 		after: {
 			loadingText: 'Création de la session…',
 			async do(selectedProtocol) {
+				if (selectedProtocol === 'zip') {
+					const zipfile = await promptForFiles({
+						accept: 'application/zip',
+						multiple: false,
+					});
+					if (zipfile.length === 0) return;
+
+					await switchSession(null);
+					importMore(zipfile);
+					await goto('/(app)/(sidepanel)/import');
+
+					return;
+				}
+
 				if (!selectedProtocol) {
 					return;
 				}

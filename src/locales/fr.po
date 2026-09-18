@@ -15,7 +15,7 @@ msgid "<0/> Chargement…"
 msgstr "<0/> Chargement…"
 
 #: src/routes/(app)/protocols/+page.svelte
-#: src/routes/(app)/sessions/+page.svelte
+#: src/routes/(app)/sessions/Header.svelte
 msgid "<0/> Créer"
 msgstr "<0/> Créer"
 
@@ -1443,6 +1443,7 @@ msgstr "Nom de la session"
 msgid "Session supprimée."
 msgstr "Session supprimée."
 
+#: src/routes/(app)/sessions/Header.svelte
 #: src/routes/(app)/sessions/[id]/+page.svelte
 msgid "Protocole"
 msgstr "Protocole"
@@ -1818,10 +1819,6 @@ msgstr "Pour ouvrir ou publier des sessions en ligne"
 msgid "Supprimer toutes les sessions"
 msgstr "Supprimer toutes les sessions"
 
-#: src/routes/(app)/sessions/+page.svelte
-msgid "Sur l'appareil"
-msgstr "Sur l'appareil"
-
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"
 msgstr "Import des images terminé"
@@ -1984,10 +1981,6 @@ msgstr "Protocole \"{0}\" mis à jour à la v{1}"
 msgid "Error: "
 msgstr "Error: "
 
-#: src/routes/(app)/sessions/+page.svelte
-msgid "<0/> Importer .zip"
-msgstr "<0/> Importer .zip"
-
 #: src/routes/(app)/(sidepanel)/o/[observation]/+layout@(app).svelte
 #: src/routes/(app)/(sidepanel)/o/[observation]/+layout@(app).svelte
 #: src/routes/(app)/TopbarBackToHome.svelte
@@ -2071,6 +2064,7 @@ msgid "Copie-colle ton token (partie entre les {0})"
 msgstr "Copie-colle ton token (partie entre les {0})"
 
 #: src/routes/(app)/about/+page.svelte
+#: src/routes/(app)/sessions/Header.svelte
 msgid "Plateforme"
 msgstr "Plateforme"
 
@@ -3210,3 +3204,28 @@ msgstr "Modèles personnalisés"
 #: src/routes/(app)/(sidepanel)/crop/+layout.svelte
 msgid "Erreur lors du chargement du modèle de détection"
 msgstr "Erreur lors du chargement du modèle de détection"
+
+#: src/routes/(app)/sessions/+page.svelte
+msgid "Créer une session"
+msgstr "Créer une session"
+
+#: src/routes/(app)/sessions/Header.svelte
+msgid "Sur l'appareil"
+msgstr "Sur l'appareil"
+
+#: src/routes/(app)/sessions/Header.svelte
+msgid "Filtrer par protocole"
+msgstr "Filtrer par protocole"
+
+#. 0: provider.displayName
+#: src/routes/(app)/sessions/Header.svelte
+msgid "Protocole incompatible avec {0}"
+msgstr "Protocole incompatible avec {0}"
+
+#: src/routes/(app)/sessions/Header.svelte
+msgid "Protocole incompatible"
+msgstr "Protocole incompatible"
+
+#: src/routes/(app)/sessions/Header.svelte
+msgid "<0/> Importer .zip"
+msgstr "<0/> Importer .zip"
