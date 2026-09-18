@@ -429,7 +429,7 @@ metadata:
             disposition: 1CHW
             normalized: true
           output:
-            normalized: true
+            normalized: false
             shape: [sx, sy, ex, ey, score, _]
       # TODO: guard against missing or malformed metadata
       # and return an empty array in that case
