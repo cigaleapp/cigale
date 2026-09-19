@@ -9,6 +9,7 @@ import { imageId } from './images.js';
 import { resolveMetadataImport } from './metadata/imports.js';
 import { storeMetadataValue } from './metadata/storage.js';
 import { MetadataType, namespaceOfMetadataId } from './schemas/metadata.js';
+import { createBytes } from './storage/utils.js';
 import { compareBy } from './utils.js';
 
 export const ACCEPTED_SIDECAR_TYPES = ['.json', '.xml', '.xmp', '.yaml', '.yml'] as const;
@@ -163,12 +164,14 @@ export async function processSidecars({
 			const ref = DB.generateId('MetadataValueFile');
 			await db.put('MetadataValueFile', {
 				id: ref,
-				filename: file.name,
-				contentType: file.type,
-				size: file.size,
 				lastModifiedAt: new Date(file.lastModified).toISOString(),
-				sessionId: session.id,
-				bytes: await file.arrayBuffer(),
+				contentType: file.type,
+				...(await createBytes('MetadataValueFile', {
+					filename: file.name,
+					type: file.type,
+					sessionId: session.id,
+					bytes: await file.arrayBuffer(),
+				})),
 			});
 
 			await storeMetadataValue({

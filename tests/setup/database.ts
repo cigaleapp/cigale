@@ -24,7 +24,9 @@ setup.use({ storageState: { cookies: [], origins: [] }, opfsState: [] });
 
 setup('empty, basic', async ({ page }) => {
 	await goToProtocolManagement(page);
-	await importProtocol(page, 'examples/arthropods.light.cigaleprotocol.json');
+	await importProtocol(page, 'examples/arthropods.light.cigaleprotocol.json', (p) => {
+		p.updates = 'manual';
+	});
 
 	await writeStates(page, 'empty.json', {
 		localStorage: {

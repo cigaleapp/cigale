@@ -1,7 +1,10 @@
 import type * as DB from '$lib/database.js';
 import type { NamespacedMetadataID } from '$lib/schemas/common.js';
 
-import { removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';
+import {
+	ensureNamespacedMetadataId,
+	removeNamespaceFromMetadataId,
+} from '$lib/schemas/metadata.js';
 import { fromEntries } from '$lib/utils.js';
 
 import { METADATA_ZERO_VALUE } from './index.js';
@@ -41,4 +44,16 @@ export function resolveMetadataImport(
 		protocol.importedMetadata?.find((imp) => [imp.target, imp.source].includes(metadataId))
 			?.source ?? metadataId
 	);
+}
+
+/**
+ * Like {@link resolveMetadataImport}, but `metadataId` is allowed
+ * to be namespace-less: in that case, the provided protocol's ID
+ * is used as a fallback namespace before resolving imports
+ */
+export function resolveMetadataImportBare(
+	protocol: Pick<DB.Protocol, 'importedMetadata'>,
+	key: string
+): NamespacedMetadataID {
+	return resolveMetadataImport(protocol, ensureNamespacedMetadataId(key, protocol.id));
 }

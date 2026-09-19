@@ -112,7 +112,19 @@ export function errorMessage(error, prefix = '') {
 		result = result.slice('Error: '.length);
 	}
 
-	return prefix ? `${prefix}: ${result}` : result;
+	const MAX_LENGTH = 2_000;
+
+	result = prefix ? `${prefix}: ${result}` : result;
+
+	if (result.length > MAX_LENGTH) {
+		result = result.slice(0, MAX_LENGTH - 2) + '…';
+		console.warn('Truncated error message', {
+			message: result,
+			originalError: error,
+		});
+	}
+
+	return result;
 }
 
 if (import.meta.vitest) {

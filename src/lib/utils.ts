@@ -2,6 +2,7 @@
 
 import { Capacitor } from '@capacitor/core';
 import { ms } from 'convert';
+import { chunk } from 'es-toolkit';
 import fetchProgress from 'fetch-progress';
 import JSONC from 'tiny-jsonc';
 import YAML from 'yaml';
@@ -285,6 +286,7 @@ if (import.meta.vitest) {
 	});
 }
 
+/** Tries to parse the given value as a JSON string. If parsing fails, returns undefined without throwing.  */
 export function safeJSONParse(str: unknown): unknown {
 	try {
 		return JSON.parse(str?.toString() ?? '');
@@ -1398,11 +1400,20 @@ if (import.meta.vitest) {
 }
 
 export function corsfix(url: string | URL): string {
+	// Don't try to corsfix localhost urls since they wont be accessible by the cors proxy server anyways
+	if (new URL(url).hostname === 'localhost') {
+		return new URL(url).toString();
+	}
+
 	return 'https://cors.gwen.works/' + url.toString().replace(/^https?:\/\//, '');
 }
 
+export function isLocalhost() {
+	return location.hostname === 'localhost';
+}
+
 export function corsfixIfLocalhost(src: string): string {
-	if (location.hostname !== 'localhost') return src;
+	if (!isLocalhost()) return src;
 	return corsfix(src);
 }
 
@@ -1657,4 +1668,312 @@ if (import.meta.vitest) {
 		expect(indexOfMin([2, 5, 1, 3, 5, 2])).toBe(2);
 		expect(indexOfMin([0, 5, 0, 3, 5, 2])).toBe(0);
 	});
+}
+
+export function isFulfilled<T>(
+	result: PromiseSettledResult<T>
+): result is PromiseFulfilledResult<T> {
+	return result.status === 'fulfilled';
+}
+
+/**
+ * A way to iterate (with a for-await loop)
+ * on arbitrary data received in e.g. callbacks
+ * of a async function call
+ *
+ * @example
+ * ```ts
+ *
+ * async function compute(numbers: number[], onUpdate: (done: number) => void) {
+ * 		let result = 0
+ * 		for (const number of numbers) {
+ * 			result = expensiveStuff(result, number)
+ * 			onUpdate(number)
+ * 		}
+ * 		return result
+ * }
+ *
+ * const numbers = [1, 2, 3, 4, 5, 6]
+ * const updates = new Channel<number>()
+ * const computation = compute(
+ * 		numbers,
+ *		done => updates.push(done)
+ * ).finally(() => updates.done())
+ *
+ * for await (const done of updates) {
+ * 		console.log(`did ${done}`)
+ * }
+ *
+ * const result = await computation
+ * console.log(`result is ${result}`)
+ *
+ * ```
+ */
+export class Channel<T> {
+	#stream: TransformStream<T>;
+	#closed = false;
+	#pushedCount = 0;
+
+	constructor(
+		/** If more than 0, channel will auto-close once a certain number of items have been pushed */
+		public capacity = 0
+	) {
+		this.#stream = new TransformStream<T>();
+	}
+
+	/**
+	 * Wait for writable stream to be available, acquire its writer, do the given action and release the lock
+	 */
+	async withWriter(action: (writer: WritableStreamDefaultWriter<T>) => Promise<void>) {
+		const writable = this.#stream.writable;
+		while (writable.locked) {
+			await sleep(200);
+		}
+
+		const writer = writable.getWriter();
+		await action(writer);
+		writer.releaseLock();
+	}
+
+	async push(item: T) {
+		await this.withWriter(async (writer) => {
+			if (this.#closed) {
+				console.warn('attempted to push', item, 'to closed stream, ignoring');
+				return;
+			}
+
+			await writer.write(item);
+			this.#pushedCount++;
+		});
+
+		if (this.capacity > 0 && this.#pushedCount >= this.capacity) {
+			this.close();
+			return;
+		}
+	}
+
+	async close() {
+		if (this.#closed) return;
+		await this.withWriter(async (writer) => {
+			await writer.close();
+			this.#closed = true;
+		});
+	}
+
+	async finish(item: T) {
+		await this.push(item);
+		await this.close();
+	}
+
+	get done() {
+		return (async () => {
+			for await (const _ of this) {
+				// nothing
+			}
+		})();
+	}
+
+	/**
+	 * An easier way to call an async function
+	 * that accepts a "notify me" callback
+	 * while the function is running
+	 *
+	 * @example
+	 * ```ts
+	 * const updates = new Channel<number>()
+	 *
+	 * const computation = channel.bind(async cb => expensive(data, { onUpdate: cb }))
+	 *
+	 * for await (const update of updates) {
+	 *		console.lo(`progress: ${update*100}%`)
+	 * }
+	 *
+	 * console.log(`result: ${await computation}`)
+	 * ```
+	 *
+	 * with a function like this
+	 *
+	 * ```ts
+	 * async function expensive(data: number[], { onUpdate?: (progress: number) => void } = {}) {
+	 * 		let result = 0
+	 * 		for (const [i, row] of data.entries()) {
+	 * 			await transmogrify(result, row)
+	 * 			onUpdate?.(i / row.length)
+	 * 		}
+	 * 		return result
+	 * }
+	 * ```
+	 */
+	async bind<R>(binder: (callback: (data: T) => unknown) => Promise<R>): Promise<R> {
+		return binder((data) => this.push(data)).finally(() => this.close());
+	}
+
+	async *[Symbol.asyncIterator](): AsyncIterator<T> {
+		const reader = this.#stream.readable.getReader();
+
+		while (true) {
+			const { value, done } = await reader.read();
+
+			if (done) {
+				break;
+			} else {
+				yield value;
+			}
+		}
+	}
+}
+
+/**
+ * Turn a async-call-with-updates-callback
+ * into a async iterable
+ *
+ * @example
+ * ```ts
+ * const request = iterateOnCallbacked(async notify => classify(image, notify))
+ *
+ * for await (const progress of request) {
+ * 		progressbar.update(progress)
+ * }
+ *
+ * image.classification = await request
+ * ```
+ */
+export async function* iterateOnCallbacked<U, T>(
+	withIterator: (onIteration: (iteration: U) => void) => Promise<T>
+): AsyncIterable<U, T> {
+	const updates = new Channel<U>();
+
+	const result = updates.bind(async (cb) => withIterator(cb));
+
+	yield* updates;
+
+	return await result;
+}
+
+async function* combineIterables<T>(iterables: Iterable<AsyncIterable<T>>): AsyncIterable<T> {
+	const stream = new ReadableStream<T>({
+		async pull(controller) {
+			await Promise.all(
+				[...iterables].map(async (iterable) => {
+					for await (const result of iterable) {
+						controller.enqueue(result);
+					}
+				})
+			);
+
+			controller.close();
+		},
+	});
+
+	const reader = stream.getReader();
+
+	while (true) {
+		const { value, done } = await reader.read();
+
+		if (done) {
+			break;
+		} else {
+			yield value;
+		}
+	}
+}
+
+export async function* concurrently<I, O>(
+	/** Maximum number of process calls running at the same time. 0 to not limit */
+	parallelism: number,
+	items: I[],
+	process: (item: I) => AsyncIterable<O>
+): AsyncIterable<{ input: I; output: O }> {
+	for (const batch of chunk(items, parallelism || items.length)) {
+		yield* combineIterables(
+			batch.map(async function* _(input: I) {
+				for await (const output of process(input)) {
+					yield { input, output };
+				}
+			})
+		);
+	}
+}
+
+export async function* poll<T>(
+	/** Polling rate in milliseconds */
+	interval: number,
+	ping: () => Promise<T>,
+	stop: (data: T) => boolean
+) {
+	let data: T | undefined;
+
+	while (data === undefined || !stop(data)) {
+		data = await ping();
+		yield data;
+		await sleep(interval);
+	}
+
+	yield data;
+}
+
+/**
+ * Run a iterator function in a web worker.
+ * Simply runs it if we're already in a web worker.
+ * If not, the provided function's name will be used to set the created worker's name
+ * @param input arguments to pass to the function
+ * @param run the iterator function
+ */
+export async function* iterateFromWebWorker<I, O>(input: I, run: (input: I) => AsyncIterable<O>) {
+	if (
+		'WorkerGlobalScope' in globalThis &&
+		typeof WorkerGlobalScope !== 'undefined' &&
+		self instanceof WorkerGlobalScope
+	) {
+		yield* run(input);
+		return;
+	}
+
+	function setup() {
+		onmessage = function (e) {
+			if (e.data.type === '__args') {
+				void (async () => {
+					// @ts-expect-error __func is dynamically defined
+					for await (const item of __func(e.data.args)) {
+						postMessage({ done: false, item });
+					}
+
+					postMessage({ done: true });
+				})();
+			}
+		};
+	}
+
+	const worker = new Worker(
+		`data:text/javascript:charset=UTF-8,var __func = ${run.toString()};(${setup}).call(this);`,
+		{
+			name: run.name,
+		}
+	);
+
+	const stream = new Channel<{ type: 'item'; item: O } | { type: 'error'; error: unknown }>();
+
+	worker.onmessage = (e) => {
+		if (e.data.done) {
+			stream.close();
+			worker.terminate();
+		} else {
+			stream.push({ type: 'item', item: e.data.item });
+		}
+	};
+
+	worker.onerror?.((e) => {
+		console.error('FROM WW received error from worker', e);
+		stream.finish({ type: 'error', error: e });
+	});
+
+	worker.postMessage({
+		type: '__args',
+		args: structuredClone(input),
+	});
+
+	for await (const event of stream) {
+		if (event.type === 'error') throw event.error;
+		yield event.item;
+	}
 }

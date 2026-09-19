@@ -315,6 +315,8 @@ export async function storeImageBytes({
 		const preview = new Blob([resizedBytes], { type: contentType });
 		uiState.setPreviewURL(id, URL.createObjectURL(preview));
 	});
+
+	return file.filename
 }
 
 /**
