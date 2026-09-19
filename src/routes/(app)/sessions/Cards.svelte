@@ -1,6 +1,6 @@
 <script
 	lang="ts"
-	generics="Session extends { id: string, protocol: string, name: string, downloaded?: boolean }"
+	generics="Session extends { id: string, protocol: string, name: string, downloaded?: boolean ,nextCursor?:string|undefined }"
 >
 	import type { Snippet } from 'svelte';
 
@@ -21,10 +21,13 @@
 	import { tooltip } from '$lib/tooltips.js';
 
 	interface Props {
-		cache?: { key: string; entries: Map<string, NoInfer<Session>[]> };
+		cache?: { key: string; entries: Map<[string, string], NoInfer<Session>[]> };
 		// eslint-disable-next-line no-unused-vars
 		thumbnails: (session: Session) => AsyncIterable<string>;
-		sessions: Array<Session> | (() => AsyncIterable<Session | { total: number }>);
+		sessions:
+			| Array<Session>
+			// eslint-disable-next-line no-unused-vars
+			| ((cursor?: string | undefined) => AsyncIterable<Session | { total: number }>);
 		subtitle: Snippet<[Session]>;
 		actions: Snippet<[Session]>;
 		create?: undefined | (() => Promise<void>);
@@ -47,8 +50,18 @@
 	});
 </script>
 
-<AsyncEach {cache} items={sessions} key={(s, i) => s.id + i}>
-	{#snippet children(session)}
+<AsyncEach
+	{cache}
+	items={sessions}
+	key={(s, i) => s.id + i}
+	more={async function* (item: Session) {
+		if (Array.isArray(sessions)) return;
+		if (!item?.nextCursor) return;
+		console.debug('loading more items from cursor', item.nextCursor);
+		yield* sessions(item.nextCursor);
+	}}
+>
+	{#snippet children(session, _)}
 		{@const protocol = tables.Protocol.getFromState(session.protocol)}
 		{@const props = card(session)}
 		<Card {...props} --card-border={props.highlighted ? 'var(--bg-primary)' : ''}>

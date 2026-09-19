@@ -40,11 +40,13 @@ export interface Account {
 	 * @param options.cursor see nextCursor in the response
 	 * @param options.limit change the number of sessions returned in each call. Default is implementation-specific
 	 * @param options.mine only return sessions created by the account's user
+	 * @param options.protocol filter out sessions of a certain protocol
 	 */
 	sessions(options?: {
 		cursor?: string | undefined;
 		limit?: number;
 		mine?: boolean;
+		protocol?: string|undefined
 	}): AsyncIterable<
 		| {
 				/** Signals the total number of sessions */
@@ -119,6 +121,8 @@ export interface AccountConstructor<
 	capabilities: readonly ('sessions' | 'images' | 'upload')[];
 	auth: Auth;
 	servers: readonly { domain: Server; name?: string }[];
+
+	compatibleWith(protocol: DB.Protocol | undefined): boolean;
 
 	/** Returns the error message, or undefined if everything is a-ok */
 	checkAuth(data: LoginData<Server>): Promise<undefined | string>;

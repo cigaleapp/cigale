@@ -5,6 +5,7 @@
 	import { fade } from 'svelte/transition';
 
 	import IconAdd from '~icons/ri/add-line';
+	import IconFilterAll from '~icons/ri/apps-2-line';
 	import IconDropdown from '~icons/ri/arrow-down-s-fill';
 	import IconLocal from '~icons/ri/hard-drive-2-line';
 	import IconImport from '~icons/ri/import-line';
@@ -21,6 +22,7 @@
 	import { loadPreviewImage } from '$lib/images.js';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
 	import LoadingText from '$lib/LoadingText.svelte';
+	import Logo from '$lib/Logo.svelte';
 	import ModalPickProtocol from '$lib/ModalPickProtocol.svelte';
 	import OverflowableText from '$lib/OverflowableText.svelte';
 	import { goto } from '$lib/paths.js';
@@ -139,7 +141,7 @@
 			>
 				{#snippet trigger(props)}
 					<ButtonSecondary {...props}>
-						<div class="account-selection-item">
+						<div class="filter-option button">
 							{#if directory.platform === 'local'}
 								<div class="icon">
 									<IconLocal />
@@ -164,9 +166,8 @@
 						</div>
 					</ButtonSecondary>
 				{/snippet}
-
 				{#snippet item({ provider, account, special }, { label })}
-					<div class="account-selection-item taller">
+					<div class="filter-option">
 						<div class="icon">
 							{#if provider && account}
 								<CompositeAvatar
@@ -177,6 +178,95 @@
 								<IconLocal />
 							{:else if special === 'manage'}
 								<IconManage />
+							{/if}
+						</div>
+						<span class="label">
+							<OverflowableText text={label} />
+						</span>
+					</div>
+				{/snippet}
+			</DropdownMenu>
+
+			<DropdownMenu
+				items={[
+					{
+						label: 'Filtrer par protocole',
+						items: [
+							{
+								type: 'selectable' as const,
+								selected: !directory.protocol,
+								label: 'Tous',
+								key: 'all',
+								data: null,
+								onclick() {
+									setSetting('sessionsDirectory', {
+										...$state.snapshot(directory),
+										protocol: undefined,
+									});
+								},
+							},
+							...tables.Protocol.state
+								.filter(
+									(protocol) =>
+										providers
+											.get(directory.platform)
+											?.compatibleWith(protocol) ?? true
+								)
+								.map((protocol) => ({
+									type: 'selectable' as const,
+									selected: directory.protocol === protocol.id,
+									label: protocol.name,
+									key: protocol.id,
+									data: protocol,
+
+									onclick() {
+										setSetting('sessionsDirectory', {
+											...$state.snapshot(directory),
+											protocol: protocol.id,
+										});
+									},
+								})),
+						],
+					},
+				]}
+			>
+				{#snippet trigger(props)}
+					<ButtonSecondary {...props}>
+						<div class="filter-option button">
+							{const protocol = $derived(
+								tables.Protocol.getFromState(directory.protocol ?? '')
+							)}
+							<div class="icon">
+								{#if !protocol}
+									<IconFilterAll />
+								{:else if protocol.logo}
+									<CompositeAvatar avatar={protocol.logo} sublogo={undefined} />
+								{:else}
+									<Logo variant="empty" />
+								{/if}
+							</div>
+							<div class="label">
+								{#if protocol}
+									{protocol.name}
+								{:else}
+									<span class="filter-not-filtering">Tous</span>
+								{/if}
+							</div>
+							<div class="dropdown-arrow icon">
+								<IconDropdown />
+							</div>
+						</div>
+					</ButtonSecondary>
+				{/snippet}
+				{#snippet item(protocol, { label })}
+					<div class="filter-option">
+						<div class="icon">
+							{#if !protocol}
+								<IconFilterAll />
+							{:else if protocol.logo}
+								<CompositeAvatar avatar={protocol.logo} sublogo={undefined} />
+							{:else}
+								<Logo variant="empty" />
 							{/if}
 						</div>
 						<span class="label">
@@ -216,12 +306,14 @@
 		{/if}
 	</header>
 
-	<section class="sessions">
+	<section class="sessions" data-scrollable="true">
 		{#if directory.platform === 'local'}
 			<div class="cards" in:fade={{ duration: 200 }}>
 				<Cards
 					create={createSession}
-					sessions={tables.Session.state}
+					sessions={tables.Session.state.filter(
+						(ses) => !directory.protocol || ses.protocol === directory.protocol
+					)}
 					card={(session) => ({
 						highlighted: uiState.currentSessionId === session.id,
 						tooltip: 'Ouvrir la session',
@@ -296,8 +388,11 @@
 							key: `${directory.platform}:${directory.account}`,
 							entries: sessionsCache,
 						}}
-						sessions={async function* () {
-							for await (const session of account.sessions()) {
+						sessions={async function* (cursor: string | undefined) {
+							for await (const session of account.sessions({
+								cursor,
+								protocol: directory.protocol,
+							})) {
 								if ('total' in session) {
 									yield session;
 									continue;
@@ -392,8 +487,21 @@
 <style>
 	main {
 		width: 100%;
-		max-width: 1200px;
 		margin: 0 auto;
+		height: 100%;
+		display: grid;
+		grid-template-rows: max-content 1fr;
+	}
+
+	section.sessions .cards,
+	main > header {
+		max-width: 1200px;
+		width: 100%;
+		margin: 0 auto;
+	}
+
+	section.sessions {
+		overflow-y: auto;
 	}
 
 	main > header {
@@ -404,7 +512,8 @@
 		gap: 1rem;
 		flex-wrap: wrap;
 
-		.actions {
+		.actions,
+		.filters {
 			display: flex;
 			align-items: center;
 			gap: 1rem;
@@ -428,12 +537,12 @@
 		--card-padding: 0;
 	}
 
-	.account-selection-item {
+	.filter-option {
 		display: flex;
 		align-items: center;
 		gap: 1em;
 
-		&.taller {
+		&:not(.button) {
 			height: 2.3em;
 		}
 
@@ -443,10 +552,28 @@
 			align-items: center;
 			width: 1.5em;
 			height: 1.5em;
+
+			/* For fallback logo on protocols */
+			--stroke-width: 250px;
+		}
+
+		.filter-not-filtering {
+			color: var(--gay);
 		}
 
 		.label {
+			overflow: hidden;
+			text-overflow: ellipsis;
+			text-wrap: nowrap;
+			text-align: left;
+		}
+
+		&:not(.button) .label {
 			max-width: 20ch;
+		}
+
+		&.button .label {
+			width: 12ch;
 		}
 	}
 </style>
