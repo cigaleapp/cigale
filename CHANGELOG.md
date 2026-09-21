@@ -20,6 +20,7 @@ All notable changes to this project will be documented in this file, on a monthl
 ### Data Updates
 
 - Add opportunistic protocol
+- Bump protocol version of protocols/entomoscope.cigaleprotocol.yaml [ci skip]
 - Bump protocol version of protocols/insecta.cigaleprotocol.yaml [ci skip]
 - Fix model output for YOLO of Entomoscope
 - Regenerate example protocols
