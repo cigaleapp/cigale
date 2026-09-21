@@ -131,7 +131,7 @@
 				<div
 					class="cascades"
 					{@attach area('cascades')}
-					{@attach scrollfader}
+					{@attach scrollfader()}
 					in:fade={{ duration: 200 }}
 				>
 					<Field
@@ -151,7 +151,7 @@
 				<div
 					class="synonyms"
 					{@attach area('synonyms')}
-					{@attach scrollfader}
+					{@attach scrollfader()}
 					in:fade={{ duration: 200 }}
 				>
 					<Field composite label="Synonymes" Icon={IconSynonyms} indent-icon={false}>
@@ -170,7 +170,7 @@
 				<div
 					class="description"
 					{@attach area('description')}
-					{@attach scrollfader}
+					{@attach scrollfader()}
 					in:fade={{ duration: 200 }}
 				>
 					<Field composite label="Description" Icon={IconDescription} indent-icon={false}>

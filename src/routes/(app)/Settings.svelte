@@ -440,7 +440,7 @@
 
 				Whereas on desktop, the caret icon sets an expectation of a sub-dropdown, so it only appears when there is actually a submenu
 			-->
-			<span>{mobile.current ? label.replace(/…$/, '') : label}</span>
+			<OverflowableText text={mobile.current ? label.replace(/…$/, '') : label} />
 			{#if key === 'parallelism'}
 				<div class="input">
 					<ButtonIcon

@@ -197,7 +197,7 @@
 						{/snippet}
 					</VirtualList>
 				</div>
-				<div class="docs" {@attach scrollfader}>
+				<div class="docs" {@attach scrollfader()}>
 					{#if highlightedItem}
 						{@render details(highlightedItem, {
 							allItems: items,

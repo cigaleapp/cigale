@@ -1,5 +1,7 @@
 import type { Attachment } from 'svelte/attachments';
 
+import { switchValue } from './utils.js';
+
 /**
  * Indicates that a container is scrollable by fading out content at the bottom, unless there's nothing more to scroll.
  * Height of the fade is 200px.
@@ -8,53 +10,66 @@ import type { Attachment } from 'svelte/attachments';
  * @see https://github.com/harshmandan/svelte-overflow-fade/blob/0f8104c9f1ad29b8d3817e18dd016ad8a7ac09b2/src/lib/index.ts#L212
  * @param element the scrollable container to apply the fade to
  */
-export const scrollfader: Attachment<HTMLElement> = (element) => {
-	// TODO configurable / percentage of element clientHeight ?
-	const height = 200;
+export const scrollfader =
+	// TODO: allow relative values?
+	(direction: 'y' | 'x' = 'y', size?: number): Attachment<HTMLElement> =>
+		(element) => {
+			size ??= switchValue(direction, { y: 200, x: 30 });
 
-	setupFadeProperty();
+			setupFadeProperty();
 
-	const gradient = `linear-gradient(to bottom, 
-			black calc(100% - ${height}px),
-			rgba(0, 0, 0, calc(1 - var(--fade)))
-		)`;
+			const gradient = `linear-gradient(to ${switchValue(direction, {
+				y: 'bottom',
+				x: 'right',
+			})}, 
+				black calc(100% - ${size}px),
+				rgba(0, 0, 0, calc(1 - var(--fade)))
+			)`;
 
-	element.style.maskImage = gradient;
-	element.style.webkitMaskImage = gradient;
-	element.style.transition = '--fade 0.1s ease';
+			element.style.maskImage = gradient;
+			element.style.webkitMaskImage = gradient;
+			element.style.transition = '--fade 0.1s ease';
 
-	const onscroll = ({ target: scrollable }: Pick<Event, 'target'>) => {
-		if (!(scrollable instanceof HTMLElement)) return;
-		const scrollTop = scrollable.scrollTop;
-		const scrollHeight = scrollable.scrollHeight;
-		const clientHeight = scrollable.clientHeight;
+			const onscroll = ({ target: scrollable }: Pick<Event, 'target'>) => {
+				if (!(scrollable instanceof HTMLElement)) return;
+				const scrollTop = scrollable.scrollTop;
+				const scrollHeight = scrollable.scrollHeight;
+				const clientHeight = scrollable.clientHeight;
+				const clientWidth = scrollable.clientWidth;
+				const scrollLeft = scrollable.scrollLeft;
+				const scrollWidth = scrollable.scrollWidth;
 
-		// --fade is 0 when at bottom, 1 when >= 200px remains from bottom
-		const distanceFromBottom = scrollHeight - (scrollTop + clientHeight);
-		const fadeValue = Math.min(distanceFromBottom / height, 1);
-		element.style.setProperty('--fade', fadeValue.toString());
-	};
+				// --fade is 0 when at end, 1 when at start
+				const distance = switchValue(direction, {
+					y: scrollHeight - (scrollTop + clientHeight),
+					x: scrollWidth - (scrollLeft + clientWidth),
+				});
 
-	onscroll({ target: element });
+				const fadeValue = Math.min(distance / size!, 1);
 
-	const observer = new MutationObserver(() => {
-		onscroll({ target: element });
-	});
+				element.style.setProperty('--fade', fadeValue.toString());
+			};
 
-	observer.observe(element, {
-		attributes: true,
-		childList: true,
-		subtree: true,
-		characterData: true,
-	});
+			onscroll({ target: element });
 
-	element.addEventListener('scroll', onscroll);
+			const observer = new MutationObserver(() => {
+				onscroll({ target: element });
+			});
 
-	return () => {
-		element.removeEventListener('scroll', onscroll);
-		observer.disconnect();
-	};
-};
+			observer.observe(element, {
+				attributes: true,
+				childList: true,
+				subtree: true,
+				characterData: true,
+			});
+
+			element.addEventListener('scroll', onscroll);
+
+			return () => {
+				element.removeEventListener('scroll', onscroll);
+				observer.disconnect();
+			};
+		};
 
 function setupFadeProperty() {
 	let styleElement = document.querySelector(
@@ -90,7 +105,7 @@ if (import.meta.vitest) {
 			div.innerHTML = '<div style="height:1000px;"></div>';
 			document.body.appendChild(div);
 
-			const detach = scrollfader(div);
+			const detach = scrollfader()(div);
 
 			expect(div.style.maskImage).toContain('linear-gradient');
 			expect(div.style.webkitMaskImage).toContain('linear-gradient');
@@ -108,7 +123,7 @@ if (import.meta.vitest) {
 			div.innerHTML = '<div style="height:1000px;"></div>';
 			document.body.appendChild(div);
 
-			const detach = scrollfader(div);
+			const detach = scrollfader()(div);
 
 			// Scroll to bottom
 			div.scrollTop = div.scrollHeight - div.clientHeight;

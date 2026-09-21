@@ -16,15 +16,17 @@ export async function promptForFiles({ accept = '', multiple = false } = {}) {
 			if (!(event.currentTarget instanceof HTMLInputElement)) return;
 			if (!event.currentTarget.files) return;
 			const files = Array.from(event.currentTarget.files);
-			if (files.length === 0) return;
 			resolve(files);
+		});
+		input.addEventListener('cancel', () => {
+			resolve([]);
 		});
 		input.click();
 	});
 }
 
 if (import.meta.vitest) {
-	const { it, expect, vi } = import.meta.vitest;
+	const { it, expect } = import.meta.vitest;
 	it('promptForFiles', async () => {
 		const mockFiles = [new File(['content'], 'test.txt', { type: 'text/plain' })];
 

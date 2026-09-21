@@ -5,6 +5,8 @@
 		onclick: () => void;
 		/** Adds aria-checked="true" to the item, and set role="menuitemcheckbox" to all items */
 		selected?: boolean;
+		/** Disables the option */
+		disabled?: boolean;
 		/** Whether to close the menu when this item is selected (default: true) */
 		closeOnSelect?: boolean;
 		/** Additional data associated with the item */
@@ -33,6 +35,7 @@
 		data: D;
 		label: string;
 		selected?: boolean;
+		disabled?: boolean;
 		testid?: PlaywrightTestIdBaseForDropdownMenu;
 		key?: string | number;
 		submenu: {
@@ -197,6 +200,7 @@
 					class="bottom-drawer-item"
 					class:warning={i.warning}
 					class:danger={i.danger}
+					disabled={i.disabled}
 					onclick={async () => {
 						i.onclick();
 
@@ -270,6 +274,7 @@
 									<DropdownMenu.Item
 										textValue={i.label}
 										onSelect={i.onclick}
+										disabled={i.disabled}
 										closeOnSelect={i.closeOnSelect ?? true}
 										aria-label={i.label}
 									>
@@ -283,6 +288,7 @@
 									<DropdownMenu.CheckboxItem
 										checked={i.selected}
 										onSelect={i.onclick}
+										disabled={i.disabled}
 										closeOnSelect={i.closeOnSelect ?? true}
 										value={i.key.toString()}
 										textValue={i.label}
@@ -298,6 +304,7 @@
 									<DropdownMenu.Sub>
 										<DropdownMenu.SubTrigger
 											pw-testid={testids(i.testid).trigger}
+											disabled={i.disabled}
 										>
 											{#if item}
 												{@render item(i.data, { selected: false, ...i })}
@@ -307,6 +314,7 @@
 										</DropdownMenu.SubTrigger>
 										<DropdownMenu.SubContent
 											pw-testid={testids(i.testid).content}
+											disabled={i.disabled}
 										>
 											<DropdownMenu.Group>
 												{#if i.submenu.label}
@@ -321,6 +329,7 @@
 														<DropdownMenu.Item
 															textValue={j.label}
 															onSelect={j.onclick}
+															disabled={j.disabled}
 															closeOnSelect={j.closeOnSelect ?? true}
 															aria-label={j.label}
 														>
@@ -337,6 +346,7 @@
 														<DropdownMenu.CheckboxItem
 															checked={j.selected}
 															onSelect={j.onclick}
+															disabled={j.disabled}
 															closeOnSelect={j.closeOnSelect ?? true}
 															value={j.key.toString()}
 															textValue={j.label}

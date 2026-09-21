@@ -38,7 +38,7 @@
 				<Badge>Éliminé</Badge>
 			{/if}
 		</div>
-		<div class="description" {@attach scrollfader}>
+		<div class="description" {@attach scrollfader()}>
 			<Markdown source={candidate.description ?? ''} />
 		</div>
 		<div class="actions">

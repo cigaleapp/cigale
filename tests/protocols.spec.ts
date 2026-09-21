@@ -120,8 +120,9 @@ test('can use a protocol that imports metadata from another protocol', async ({
 	app,
 }) => {
 	await goToProtocolManagement(page);
-	await page.getByText('Example: arthropodes (lightweight)').click();
-	await page.getByRole('button', { name: 'Supprimer', exact: true }).click();
+	await page.locator('main').getByText('Example: arthropodes (lightweight)').click();
+	await page.locator('main').getByRole('button', { name: 'Supprimer', exact: true }).click();
+
 	await app.modals.confirmDeletion('modal_delete_protocol', 'Example: arthropodes (lightweight)');
 
 	await mockUrl(page, context, 'https://example.com/protocols/com.example.remote.json', {
