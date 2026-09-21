@@ -11,7 +11,7 @@ let package = Package(
             targets: ["CapApp-SPM"])
     ],
     dependencies: [
-        .package(url: "https://github.com/ionic-team/capacitor-swift-pm.git", exact: "8.4.2"),
+        .package(url: "https://github.com/ionic-team/capacitor-swift-pm.git", exact: "8.5.1"),
         .package(name: "CapacitorCommunityCameraPreview", path: "../../../node_modules/@capacitor-community/camera-preview"),
         .package(name: "CapacitorApp", path: "../../../node_modules/@capacitor/app"),
         .package(name: "CapacitorFileViewer", path: "../../../node_modules/@capacitor/file-viewer"),
@@ -22,6 +22,7 @@ let package = Package(
         .package(name: "CapacitorShare", path: "../../../node_modules/@capacitor/share"),
         .package(name: "CapacitorSplashScreen", path: "../../../node_modules/@capacitor/splash-screen"),
         .package(name: "CapawesomeCapacitorFilePicker", path: "../../../node_modules/@capawesome/capacitor-file-picker"),
+        .package(name: "CapawesomeCapacitorKeepAwake", path: "../../../node_modules/@capawesome/capacitor-keep-awake"),
         .package(name: "CapgoCapacitorShake", path: "../../../node_modules/@capgo/capacitor-shake"),
         .package(name: "CapgoCapacitorUpdater", path: "../../../node_modules/@capgo/capacitor-updater"),
         .package(name: "CapgoInappbrowser", path: "../../../node_modules/@capgo/inappbrowser")
@@ -42,6 +43,7 @@ let package = Package(
                 .product(name: "CapacitorShare", package: "CapacitorShare"),
                 .product(name: "CapacitorSplashScreen", package: "CapacitorSplashScreen"),
                 .product(name: "CapawesomeCapacitorFilePicker", package: "CapawesomeCapacitorFilePicker"),
+                .product(name: "CapawesomeCapacitorKeepAwake", package: "CapawesomeCapacitorKeepAwake"),
                 .product(name: "CapgoCapacitorShake", package: "CapgoCapacitorShake"),
                 .product(name: "CapgoCapacitorUpdater", package: "CapgoCapacitorUpdater"),
                 .product(name: "CapgoInappbrowser", package: "CapgoInappbrowser")

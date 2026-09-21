@@ -1,5 +1,6 @@
 import type { CaptureTimer, CaptureTimersMessageTemplate } from '$lib/schemas/protocols';
 
+import { KeepAwake } from '@capawesome/capacitor-keep-awake';
 import { ms } from 'convert';
 
 import { formatDurationShort } from '$lib/date';
@@ -132,10 +133,13 @@ export class Timer {
 				void this.callbacks?.onlap?.(this);
 			}
 		}, this.timeResolution);
+
+		void KeepAwake.keepAwake();
 	}
 
 	stop() {
 		clearTimeout(this.#handle);
+		void KeepAwake.allowSleep();
 	}
 
 	pause() {
@@ -161,6 +165,7 @@ export class Timer {
 		this.elapsedTotal = 0;
 		this.elapsedLap = 0;
 		this.laps = 0;
+		void KeepAwake.allowSleep();
 	}
 
 	restart() {

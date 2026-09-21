@@ -165,6 +165,7 @@
 		"@capacitor/share": "^8.0.1",
 		"@capacitor/splash-screen": "^8.0.2",
 		"@capawesome/capacitor-file-picker": "^8.1.0",
+		"@capawesome/capacitor-keep-awake": "^0.1.2",
 		"@capgo/capacitor-shake": "^8.0.40",
 		"@capgo/capacitor-updater": "^8.51.15",
 		"@capgo/inappbrowser": "^8.6.14",
