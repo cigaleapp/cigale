@@ -516,7 +516,7 @@ sessionMetadata:
     description: Il faut s'assurer que la température mesurée soit bien celle de l'air à l'ombre et qu'elle soit influencé le moins possible par le soleil, par le sol ou par votre température corporelle. Si vous n'avez pas de thermomètre utilisez la température prédite par la météo locale
     mergeMethod: average
     required: true
-    range: x ≤ 13
+    range: x ≥ 13
 
   grass_height:
     type: float
