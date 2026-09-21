@@ -1,0 +1,1 @@
+import{ft as e,gt as t}from"./CA0XFDIy.js";import{t as n}from"./griYPmSD.js";import{o as r}from"./BP9o3e7s.js";function i({title:e}){let t=r();a(()=>{let r=n.currentSession?.name??`C.I.G.A.L.E.`;document.title=e?t(664,[e,r]):r})}function a(n){if(e()){n();return}t(()=>{n()})}export{i as t};
