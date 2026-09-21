@@ -28,6 +28,7 @@
 	import type { Snippet } from 'svelte';
 	import type { BottomSheetSettings } from 'svelte-bottom-sheet';
 
+	import { Portal } from 'bits-ui';
 	import { BottomSheet } from 'svelte-bottom-sheet';
 
 	import IconShowPanel from '~icons/ri/arrow-up-s-line';
@@ -35,7 +36,6 @@
 
 	import { mutationobserver } from './mutations.js';
 	import { onswipe } from './touch/swipes.js';
-	import { Portal } from 'bits-ui';
 
 	let {
 		open = $bindable(false),
@@ -121,7 +121,7 @@
 									},
 								})}
 							</footer>
-	
+
 							<div class="footer-spacer" style:height="{footerHeight}px"></div>
 						{/if}
 					</BottomSheet.Content>

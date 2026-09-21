@@ -46,7 +46,7 @@ export interface Account {
 		cursor?: string | undefined;
 		limit?: number;
 		mine?: boolean;
-		protocol?: string|undefined
+		protocol?: string | undefined;
 	}): AsyncIterable<
 		| {
 				/** Signals the total number of sessions */
