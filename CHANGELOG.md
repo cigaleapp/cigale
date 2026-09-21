@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file, on a monthl
 ### Improvements
 
 - Add time input for date metadata (Closes #1562)
+- Implement custom (user) neural networks (#2135)
 
 ### Bug Fixes
 
@@ -20,7 +21,12 @@ All notable changes to this project will be documented in this file, on a monthl
 
 - Add opportunistic protocol
 - Bump protocol version of protocols/insecta.cigaleprotocol.yaml [ci skip]
+- Fix model output for YOLO of Entomoscope
 - Regenerate example protocols
+
+### Translation Updates
+
+- Refresh translation files
 
 ## August 2026
 
