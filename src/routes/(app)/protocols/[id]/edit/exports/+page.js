@@ -1,7 +1,7 @@
-import { gatherToTree } from '../../../../../lib/file-tree.js';
+import { gatherToTree } from '$lib/file-tree.js';
 
 /**
- * @import { TreeNode } from '../../../../../lib/file-tree.js';
+ * @import { TreeNode } from '$lib/file-tree.js';
  */
 
 export async function load({ parent }) {
