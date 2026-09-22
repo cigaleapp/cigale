@@ -3,6 +3,8 @@ import type { BinaryStorageBackend, BinaryStorageLocator } from './types.js';
 import { Capacitor } from '@capacitor/core';
 import { Directory, Filesystem } from '@capacitor/filesystem';
 
+import { Channel } from '$lib/utils.js';
+
 import { locatorToPath as _locatorToPath } from './utils.js';
 
 function locatorToPath(locator: BinaryStorageLocator) {
@@ -27,6 +29,8 @@ export async function CapacitorFilesystemBackend(): Promise<BinaryStorageBackend
 
 	return {
 		name: 'capacitor',
+		// TODO: figure out a way to do that?
+		supportsWorkers: false,
 		async resolvePath(locator) {
 			const result = await Filesystem.getUri({
 				directory: root,
@@ -77,9 +81,33 @@ export async function CapacitorFilesystemBackend(): Promise<BinaryStorageBackend
 				throw e;
 			}
 		},
-		async *stream(locator, _chunksize) {
-			// TODO: see if it's possible?
-			yield this.bytes(locator);
+		async *stream(locator, chunkSize) {
+			const updates = new Channel<[value: ArrayBuffer | null, error: unknown]>();
+
+			void Filesystem.readFileInChunks(
+				{
+					directory: root,
+					path: locatorToPath(locator),
+					chunkSize,
+				},
+				(data, err) => {
+					if (data === null) {
+						updates.finish([data, err]);
+					} else if (!data.data) {
+						updates.close();
+					} else if (typeof data.data === 'string') {
+						updates.push([Uint8Array.fromBase64(data.data).buffer, err]);
+					} else {
+						// Only happens on mobile, so no need for that here
+						// updates.push([await data.data.arrayBuffer(), err]);
+					}
+				}
+			);
+
+			for await (const [chunk, error] of updates) {
+				if (error) throw error;
+				if (chunk) yield chunk;
+			}
 		},
 		async text(locator) {
 			const bytes = await this.bytes(locator);
