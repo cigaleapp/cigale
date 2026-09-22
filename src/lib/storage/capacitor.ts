@@ -27,6 +27,8 @@ export async function CapacitorFilesystemBackend(): Promise<BinaryStorageBackend
 
 	return {
 		name: 'capacitor',
+		// TODO: figure out a way to do that?
+		supportsWorkers: false,
 		async resolvePath(locator) {
 			const result = await Filesystem.getUri({
 				directory: root,

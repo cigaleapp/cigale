@@ -183,3 +183,22 @@ export async function resolveObjectWithBytes<Table extends BinaryTableName>(
 export function locatorToPath(locator: BinaryStorageLocator): string {
 	return [locator.area, locator.sessionId, locator.name].filter(Boolean).join('/');
 }
+
+/**
+ * Returns the bytes of the database object,
+ * but only if the current binary storage
+ * doesn't support web workers
+ */
+export async function resolveObjectBytesIfNotWorker<Table extends BinaryTableName>(
+	db: DatabaseHandle,
+	table: Table,
+	id: string
+): Promise<undefined | ArrayBuffer> {
+	if (binaryStorage.supportsWorkers) return;
+
+	const object = await db.get(table, id);
+
+	if (!object) throw new Error(`${table} with ID ${id} not found`);
+
+	return await accessBytes('ImageFile', object);
+}

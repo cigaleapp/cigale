@@ -5,10 +5,12 @@ import type {
 	BinaryStorageName,
 } from './types.js';
 
+import { Capacitor } from '@capacitor/core';
 import { dichotomid } from 'dichotomid';
 
 import { splitFilenameOnExtension } from '$lib/utils.js';
 
+import { CapacitorFilesystemBackend } from './capacitor.js';
 import { OPFSBackend } from './opfs.js';
 import { locatorToPath } from './utils.js';
 
@@ -16,6 +18,7 @@ let currentBackend: undefined | BinaryStorageBackend<BinaryStorageName>;
 
 export const binaryStorage: BinaryStorage = {
 	name: currentBackend?.name ?? 'uninitialized',
+	supportsWorkers: currentBackend?.supportsWorkers ?? false,
 	async resolvePath(...args) {
 		if (!currentBackend) await initializeBinaryStorage();
 		return currentBackend!.resolvePath(...args);
@@ -92,19 +95,23 @@ export const binaryStorage: BinaryStorage = {
 async function initializeBinaryStorage() {
 	if (currentBackend) return;
 
-	// FIXME: Capacitor not accessible in web workers
-	// if (Capacitor.isNativePlatform()) {
-	// 	console.debug('[binary storage] initialize with capacitor backend');
-	// 	currentBackend = await CapacitorFilesystemBackend();
-	// } else {
-	console.debug('[binary storage] initialize with opfs backend');
-	currentBackend = await OPFSBackend();
-	// }
+	if (Capacitor.isNativePlatform()) {
+		console.debug('[binary storage] initialize with capacitor backend');
+		currentBackend = await CapacitorFilesystemBackend();
+	} else {
+		console.debug('[binary storage] initialize with opfs backend');
+		currentBackend = await OPFSBackend();
+	}
 }
 
 interface BinaryStorage<
 	Name extends BinaryStorageName = BinaryStorageName,
 > extends BinaryStorageBackend<Name> {
+	/**
+	 * Can be called from within a Web Worker
+	 */
+	supportsWorkers: boolean;
+
 	/**
 	 * If the file exists, add a _n at the end (with n chosen so that it doesn't exist)
 	 * before writing to avoid duplicates.
