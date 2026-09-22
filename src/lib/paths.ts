@@ -10,6 +10,7 @@ type ResolveArgs<T extends RouteId | Pathname> = T extends RouteId
 		: [route: T, params: RouteParams<T>]
 	: [route: T];
 
+export async function goto(args: Pathname): Promise<void>
 export async function goto<T extends RouteId | Pathname>(...args: ResolveArgs<T>) {
 	await navigation.goto(resolve(...args));
 }

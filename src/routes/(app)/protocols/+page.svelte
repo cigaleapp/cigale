@@ -9,7 +9,7 @@
 	import { promptAndImportProtocol } from '$lib/protocols';
 	import { toasts } from '$lib/toasts.svelte';
 
-	import TopbarBackToHome from '../TopbarBackToHome.svelte';
+	import TopbarBack from '../TopbarBack.svelte';
 	import ModalCreateProtocol from './ModalCreateProtocol.svelte';
 	import ModalDeleteProtocol from './ModalDeleteProtocol.svelte';
 	import RowProtocol from './RowProtocol.svelte';
@@ -35,7 +35,7 @@
 
 <ModalCreateProtocol bind:open={openProtocolCreation} />
 
-<TopbarBackToHome>Protocoles</TopbarBackToHome>
+<TopbarBack>Protocoles</TopbarBack>
 
 <main class="page" in:fade={{ duration: 100 }}>
 	<header>
