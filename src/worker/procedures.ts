@@ -44,6 +44,8 @@ export const PROCEDURES = {
 	inferBoundingBoxes: {
 		input: type({
 			fileId: 'string',
+			/** Useful when the web worker cannot read the bytes of the file (e.g. capacitor-backed storage) */
+			imageBytes: 'ArrayBuffer | undefined',
 			webgpu: 'boolean = false',
 			taskSettings: {
 				input: Schemas.ModelInput,
@@ -62,6 +64,8 @@ export const PROCEDURES = {
 	classify: {
 		input: type({
 			imageId: 'string',
+			/** Useful when the web worker cannot read the bytes of the file (e.g. capacitor-backed storage) */
+			imageBytes: 'ArrayBuffer | undefined',
 			'webgpu?': 'boolean',
 			'inferenceSessionId?': 'string',
 			metadataIds: {
