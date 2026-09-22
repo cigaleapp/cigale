@@ -4,10 +4,10 @@
 	import IconCreate from '~icons/ri/add-circle-line';
 	import IconImport from '~icons/ri/download-2-line';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import { plural } from '$lib/i18n';
+	import { plural } from '$lib/i18n.js';
 	import { tables } from '$lib/idb.svelte.js';
-	import { promptAndImportProtocol } from '$lib/protocols';
-	import { toasts } from '$lib/toasts.svelte';
+	import { promptAndImportProtocol } from '$lib/protocols.js';
+	import { toasts } from '$lib/toasts.svelte.js';
 
 	import TopbarBackToHome from '../TopbarBackToHome.svelte';
 	import ModalCreateProtocol from './ModalCreateProtocol.svelte';
