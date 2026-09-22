@@ -65,7 +65,7 @@ swarp.loadModel(async ({ task, model, classmapping, inferenceSessionId: id, webg
 
 swarp.inferenceSessionId(async (task) => latestSessionIdByTask.get(task) ?? null);
 
-swarp.inferBoundingBoxes(async ({ fileId, taskSettings }, _, tools) => {
+swarp.inferBoundingBoxes(async ({ fileId, taskSettings, imageBytes }, _, tools) => {
 	const sessionId = latestSessionIdByTask.get('detection');
 	const session = sessionId ? inferenceSessions.get(sessionId)?.onnx : undefined;
 	if (!session) {
@@ -89,10 +89,10 @@ swarp.inferBoundingBoxes(async ({ fileId, taskSettings }, _, tools) => {
 	const db = await openDatabase();
 	tools.abortSignal?.throwIfAborted();
 
-	const file = await resolveObjectWithBytes(db, 'ImageFile', fileId);
-	if (!file) {
-		throw new Error(`Fichier avec l'ID ${fileId} non trouvé`);
-	}
+	const bytes =
+		imageBytes ??
+		(await resolveObjectWithBytes(db, 'ImageFile', fileId))?.bytes ??
+		throwError(`Fichier avec l'ID ${fileId} non trouvé`);
 
 	const [[boxes], [scores]] = await infer(
 		{
@@ -100,134 +100,139 @@ swarp.inferBoundingBoxes(async ({ fileId, taskSettings }, _, tools) => {
 			...inferenceSettings,
 			...(tools.abortSignal ? { abortSignal: tools.abortSignal } : {}),
 		},
-		[file.bytes],
+		[bytes],
 		session
 	);
 
 	return { boxes, scores };
 });
 
-swarp.classify(async ({ imageId, metadataIds, taskSettings, inferenceSessionId }, _, tools) => {
-	tools.abortSignal?.throwIfAborted();
+swarp.classify(
+	async ({ imageId, imageBytes, metadataIds, taskSettings, inferenceSessionId }, _, tools) => {
+		tools.abortSignal?.throwIfAborted();
 
-	const db = await openDatabase();
+		const db = await openDatabase();
 
-	const image = Schemas.Image.assert(await db.get('Image', imageId));
+		const image = Schemas.Image.assert(await db.get('Image', imageId));
 
-	tools.abortSignal?.throwIfAborted();
+		tools.abortSignal?.throwIfAborted();
 
-	// Use the specified inference session, or fall back to the latest classification session
-	let session;
-	if (inferenceSessionId) {
-		session = inferenceSessions.get(inferenceSessionId);
-		if (!session) {
-			throw new Error(
-				`Inference session ${inferenceSessionId} not found. Models may not be loaded.`
-			);
-		}
-	} else {
-		session = inferenceSessions.get(latestSessionIdByTask.get('classification') ?? '');
-		if (!session) {
-			return { scores: [] };
-		}
-	}
-
-	const { classmapping, onnx } = session;
-	if (!classmapping)
-		throw new Error("Le modèle de classification n'a pas de classmapping associé");
-
-	tools.abortSignal?.throwIfAborted();
-	if (!image.fileId) throw new Error(`Image ${imageId} has no ImageFile`);
-	const file = await resolveObjectWithBytes(db, 'ImageFile', image.fileId);
-	if (!file) {
-		throw new Error(`Fichier avec l'ID ${image.fileId} non trouvé`);
-	}
-
-	const cropbox =
-		getMetadataValue(image, 'boundingbox', metadataIds.cropbox)?.value ?? FULL_IMAGE_CROPBOX;
-
-	console.debug('Classifying image', image.id, 'with cropbox', cropbox);
-
-	// We gotta normalize since this img will be used to set a cropped Preview URL -- classify() itself takes care of normalizing (or not) depending on the protocol
-	const img = await loadToTensor([file.bytes], {
-		...taskSettings.input,
-		normalized: true,
-		crop: cropbox,
-		...(tools.abortSignal ? { abortSignal: tools.abortSignal } : {}),
-	});
-
-	const scores = await classify({
-		settings: taskSettings,
-		image: img,
-		model: onnx,
-		abortSignal: tools.abortSignal,
-		debug: inferenceSessionId.includes('|custom|'),
-	});
-
-	const results = scores
-		?.map((score, i) => ({
-			score,
-			key: classmapping[i],
-		}))
-		.sort(compareBy('score'))
-		.reverse()
-		.slice(0, 100);
-
-	tools.abortSignal?.throwIfAborted();
-
-	if (!results?.length) {
-		throw new Error("Le modèle de classification n'a retourné aucun résultat");
-	}
-
-	const confidences = results.map((r) => ({
-		confidence: r.score,
-		value: r.key,
-	}));
-
-	let { value, confidence } = confidences[0];
-	let alternatives = [] as string[];
-
-	if (taskSettings.output?.select) {
-		const selector = ModelOutputEnum.get('select').assert(taskSettings.output.select);
-		const selection = await selector?.evaluate({
-			neurons: results,
-		});
-
-		console.debug(`Applied output.select to result of inference`, {
-			selector: selector?.toJSON(),
-			selection,
-		});
-
-		if (!selection) throw new Error("La sélection (output.select) n'a pas renvoyé de résultat");
-
-		const [first, ...others] = selection.map((key) => {
-			const result =
-				results.find((result) => result.key === key) ??
-				throwError(
-					`La sélection (output.select) contient une clé d'option (key) inconnue: ${key}`
+		// Use the specified inference session, or fall back to the latest classification session
+		let session;
+		if (inferenceSessionId) {
+			session = inferenceSessions.get(inferenceSessionId);
+			if (!session) {
+				throw new Error(
+					`Inference session ${inferenceSessionId} not found. Models may not be loaded.`
 				);
+			}
+		} else {
+			session = inferenceSessions.get(latestSessionIdByTask.get('classification') ?? '');
+			if (!session) {
+				return { scores: [] };
+			}
+		}
 
-			return {
-				key,
-				score: result.score,
-			};
+		const { classmapping, onnx } = session;
+		if (!classmapping)
+			throw new Error("Le modèle de classification n'a pas de classmapping associé");
+
+		tools.abortSignal?.throwIfAborted();
+		if (!image.fileId) throw new Error(`Image ${imageId} has no ImageFile`);
+
+		const bytes =
+			imageBytes ??
+			(await resolveObjectWithBytes(db, 'ImageFile', image.fileId))?.bytes ??
+			throwError(`Fichier avec l'ID ${image.fileId} non trouvé`);
+
+		const cropbox =
+			getMetadataValue(image, 'boundingbox', metadataIds.cropbox)?.value ??
+			FULL_IMAGE_CROPBOX;
+
+		console.debug('Classifying image', image.id, 'with cropbox', cropbox);
+
+		// We gotta normalize since this img will be used to set a cropped Preview URL -- classify() itself takes care of normalizing (or not) depending on the protocol
+		const img = await loadToTensor([bytes], {
+			...taskSettings.input,
+			normalized: true,
+			crop: cropbox,
+			...(tools.abortSignal ? { abortSignal: tools.abortSignal } : {}),
 		});
 
-		value = first.key;
-		confidence = first.score;
-		alternatives = others.map((result) => result.key);
+		const scores = await classify({
+			settings: taskSettings,
+			image: img,
+			model: onnx,
+			abortSignal: tools.abortSignal,
+			debug: inferenceSessionId.includes('|custom|'),
+		});
+
+		const results = scores
+			?.map((score, i) => ({
+				score,
+				key: classmapping[i],
+			}))
+			.sort(compareBy('score'))
+			.reverse()
+			.slice(0, 100);
+
+		tools.abortSignal?.throwIfAborted();
+
+		if (!results?.length) {
+			throw new Error("Le modèle de classification n'a retourné aucun résultat");
+		}
+
+		const confidences = results.map((r) => ({
+			confidence: r.score,
+			value: r.key,
+		}));
+
+		let { value, confidence } = confidences[0];
+		let alternatives = [] as string[];
+
+		if (taskSettings.output?.select) {
+			const selector = ModelOutputEnum.get('select').assert(taskSettings.output.select);
+			const selection = await selector?.evaluate({
+				neurons: results,
+			});
+
+			console.debug(`Applied output.select to result of inference`, {
+				selector: selector?.toJSON(),
+				selection,
+			});
+
+			if (!selection)
+				throw new Error("La sélection (output.select) n'a pas renvoyé de résultat");
+
+			const [first, ...others] = selection.map((key) => {
+				const result =
+					results.find((result) => result.key === key) ??
+					throwError(
+						`La sélection (output.select) contient une clé d'option (key) inconnue: ${key}`
+					);
+
+				return {
+					key,
+					score: result.score,
+				};
+			});
+
+			value = first.key;
+			confidence = first.score;
+			alternatives = others.map((result) => result.key);
+		}
+
+		await storeMetadataValue({
+			db,
+			abortSignal: tools.abortSignal,
+			metadataId: metadataIds.target,
+			subjectId: imageId,
+			confidences,
+			value,
+			confidence,
+			alternatives,
+		});
+
+		return { scores };
 	}
-
-	await storeMetadataValue({
-		db,
-		abortSignal: tools.abortSignal,
-		metadataId: metadataIds.target,
-		subjectId: imageId,
-		confidences,
-		value,
-		confidence,
-		alternatives,
-	});
-
-	return { scores };
-});
+);
