@@ -15,6 +15,7 @@
 	import IconSortAsc from '~icons/ri/sort-asc';
 	import IconSortDesc from '~icons/ri/sort-desc';
 	import IconInferenceEnabled from '~icons/ri/sparkling-line';
+	import IconImport from '~icons/ri/upload-2-line';
 	import IconModelCustom from '~icons/ri/wrench-line';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import DropdownMenu from '$lib/DropdownMenu.svelte';
@@ -164,6 +165,10 @@
 		neural?: boolean;
 		icon?: string | import('svelte').Component;
 	};
+
+	const bottomNavHasCapture = $derived(
+		mobile.current && Boolean(uiState.currentProtocol?.capture)
+	);
 </script>
 
 <div class="inference">
@@ -174,7 +179,23 @@
 			...orEmpty(tab === 'import', {
 				label: '',
 				items: [
-					{
+					...orEmpty(bottomNavHasCapture, {
+						type: 'clickable' as const,
+						label: 'Ajouter des photos',
+						data: {
+							direction: null,
+							icon: IconImport,
+						} as ItemExtras,
+						async onclick() {
+							importMore(
+								await promptForFiles({
+									accept: ACCEPTED_IMPORT_TYPES,
+									multiple: true,
+								})
+							);
+						},
+					}),
+					...orEmpty(!bottomNavHasCapture, {
 						type: 'clickable' as const,
 						label: 'Prendre des photos',
 						data: {
@@ -184,7 +205,7 @@
 						async onclick() {
 							await goto('/(app)/capture');
 						},
-					},
+					}),
 				],
 			}),
 			{
