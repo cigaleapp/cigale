@@ -3,18 +3,21 @@ import type { TypedMetadataValue } from './types.js';
 import * as dates from 'date-fns';
 
 import * as DB from '$lib/database';
-import { mapValues } from '$lib/utils';
+import { MetadataRuntimeValue } from '$lib/schemas/metadata.js';
+import { clamp, mapValues } from '$lib/utils';
 
 /**
  * Serialize a metadata value for storing in the database.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function serializeMetadataValue(value: any): string {
-	return JSON.stringify(
-		value instanceof Date && dates.isValid(value)
-			? dates.format(value, "yyyy-MM-dd'T'HH:mm:ss")
-			: value
-	);
+	if (value instanceof Date && dates.isValid(value))
+		return JSON.stringify(dates.format(value, "yyyy-MM-dd'T'HH:mm:ss"));
+
+	if (MetadataRuntimeValue.boundingbox.allows(value))
+		return JSON.stringify(mapValues(value, (coord) => clamp(coord, 0, 1)));
+
+	return JSON.stringify(value);
 }
 
 if (import.meta.vitest) {
