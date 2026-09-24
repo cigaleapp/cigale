@@ -22,7 +22,7 @@
         "@capgo/capacitor-shake": "^8.0.40",
         "@capgo/capacitor-updater": "^8.51.15",
         "@capgo/inappbrowser": "^8.6.14",
-        "@formatjs/intl-durationformat": "^0.10.18",
+        "@formatjs/intl-durationformat": "^0.11.1",
         "@iconify/svelte": "^5.2.2",
         "@layflags/rolling-number": "^1.0.0",
         "@sveltejs/svelte-virtual-list": "^3.0.1",
@@ -506,9 +506,9 @@
 
     "@formatjs/fast-memoize": ["@formatjs/fast-memoize@3.1.7", "", {}, "sha512-zXfhLpvA6T7+efdt9JLbBwZ00tT7NsBMDVnDu8rpHeNNv8KfRZAMo2gkG0k9lK/Nzc//3kJ9pImsfuJxk3KhUA=="],
 
-    "@formatjs/intl-durationformat": ["@formatjs/intl-durationformat@0.10.18", "", { "dependencies": { "@formatjs/bigdecimal": "0.2.7", "@formatjs/intl-localematcher": "0.8.13" } }, "sha512-Wyn7TYW1c5EORLuh6IeAyEpaJf6GmvHPN7TXjJj3VT0bl9U2/zv/A518R+5lYtCmXLmmxX7DYz4iKSKzoKkR7g=="],
+    "@formatjs/intl-durationformat": ["@formatjs/intl-durationformat@0.11.1", "", { "dependencies": { "@formatjs/bigdecimal": "0.2.7", "@formatjs/intl-localematcher": "0.9.0" } }, "sha512-Mkuc+Q8/96Hb0w4Pwa9sqkKVQVl75TCaqaXIXHgsVsLDko+FKQhw9n/7BnbonueqPxkQkGYvn8/G2IKzT970og=="],
 
-    "@formatjs/intl-localematcher": ["@formatjs/intl-localematcher@0.8.13", "", { "dependencies": { "@formatjs/fast-memoize": "3.1.7" } }, "sha512-kHEAFOkeJSPNi7c5PaKaRjxcBrJwzzt81ifUu+8uve1EDW/VJl83KsxmqgqNZLzcFEhSliZGvx3+pk/RH0IOmg=="],
+    "@formatjs/intl-localematcher": ["@formatjs/intl-localematcher@0.9.0", "", { "dependencies": { "@formatjs/fast-memoize": "3.1.7" } }, "sha512-Z7TD3ssNry1Av1dVDoq/mzpxGyxqWwU0ClWEo+BB3k0JQTeQvUGmeK9WZGYvlqStS0UqkaKXk3dfjsb6NaHAxw=="],
 
     "@gar/promisify": ["@gar/promisify@1.1.3", "", {}, "sha512-k2Ty1JcVojjJFwrg/ThKi2ujJ7XNLYaFGNB/bWT9wGR+oSMJHMa5w+CUq6p/pVrKeNNgA7pCqEcjSnHVoqJQFw=="],
 
