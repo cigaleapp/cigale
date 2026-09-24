@@ -217,7 +217,7 @@
 		"tinykeys": "^4.0.0",
 		"ua-parser-js": "^2.0.10",
 		"ulid": "^3.0.2",
-		"unplugin-icons": "^23.0.1",
+		"unplugin-icons": "^24.0.0",
 		"update-electron-app": "^3.3.0",
 		"uqr": "^0.1.3",
 		"vite-plugin-mkcert": "^2.1.0",
