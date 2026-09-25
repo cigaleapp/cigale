@@ -44,6 +44,7 @@ export async function OPFSBackend(): Promise<BinaryStorageBackend<'opfs'>> {
 
 	return {
 		name: 'opfs',
+		supportsWorkers: true,
 		async resolvePath(locator) {
 			return locatorToPath(locator);
 		},
