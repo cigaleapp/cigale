@@ -48,30 +48,30 @@ test.describe('isolation', () => {
 		await newSession(page, { name: 'Session α' });
 		await app.tabs.go('import');
 		await importPhotos({ page, additionalWaitTime: ms('2s') }, 'lil-fella.jpeg');
-		await assert(page.getByText('lil-fella.jpeg')).toBeVisible();
+		await assert(app.gallery.card('lil-fella.jpeg')).toBeVisible();
+		await app.loading.maybeWait()
 
 		await newSession(page, { name: 'Session β' });
 		await app.tabs.go('import');
 		await importPhotos({ page, additionalWaitTime: ms('2s') }, 'debugsquare.png');
-		await assert(page.getByText('debugsquare.png')).toBeVisible();
+		await assert(app.gallery.card('debugsquare.png')).toBeVisible();
+		await app.loading.maybeWait()
 
 		await deleteSession(page, 'Session α');
 		await assert(page.getByText('Session α', { exact: true })).toHaveCount(0); // robust to strict mode violations
 
 		await switchSession(page, 'Session β');
 		await app.tabs.go('import');
-		await assert(page.getByText('debugsquare.png')).toBeVisible();
-		await assert(page.getByText('lil-fella.jpeg')).not.toBeVisible();
+		await assert(app.gallery.card('debugsquare.png')).toBeVisible();
+		await assert(app.gallery.card('lil-fella.jpeg')).not.toBeVisible();
 	});
 });
 
 test('import into new session', async ({ page, app }) => {
 	await app.settings.set({ debugMode: false });
-	const picker = page.waitForEvent('filechooser');
-	await page.getByRole('button', { name: 'Importer .zip' }).click();
-	await picker.then((picker) => {
-		picker.setFiles('./tests/fixtures/exports/correct.zip');
-	});
+
+	await pickFiles(page.getByRole('button', { name: 'Importer .zip' }), 'exports/correct.zip');
+
 	await app.path.wait('/(app)/(sidepanel)/import');
 
 	await assert(page.getByTestId('goto-current-session')).toHaveText('Testing session');
@@ -211,11 +211,14 @@ test('import into new session', async ({ page, app }) => {
 	    - text: C'est une photo de l'habitat à proximité
 	  - text: Date
 	  - textbox "Date"
+	  - textbox
 	  - button "Supprimer cette valeur" [disabled]:
 	    - img
 	  - paragraph: Moment où la photo a été prise
 	  - text: Localisation
 	  - combobox
+	  - button "Utiliser la position actuelle":
+	    - img
 	  - button "Supprimer cette valeur" [disabled]:
 	    - img
 	  - paragraph: Endroit où la photo a été prise

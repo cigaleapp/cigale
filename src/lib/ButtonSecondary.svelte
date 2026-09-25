@@ -19,7 +19,7 @@ Available CSS variables:
 	 * @typedef Props
 	 * @type {object}
 	 * @property {import('svelte').Snippet<[{loading: boolean}]>} children
-	 * @property {undefined | ((e: MouseEvent, signals: { loadingStarted: () => void, loadingEnded: () => void }) => Promise<void> |void)} onclick
+	 * @property {undefined | ((e: MouseEvent, signals: { setText: (text: string) => void, loadingStarted: () => void, loadingEnded: () => void }) => Promise<void> |void)} onclick
 	 * @property {boolean} [disabled=false]
 	 * @property {boolean} [tight=false] limit the height of the button. also hides keyboard shortcut hint if itll be displayed in a tooltip, and doesn't auto-append a spinner when loading, and {@link loading} is true
 	 * @property {Parameters<typeof tooltip>[1]} [help]
@@ -28,6 +28,8 @@ Available CSS variables:
 	 * @property {boolean} [aria-pressed]
 	 * @property {string} [aria-label]
 	 * @property {boolean |"always"} [loading] show a loading state while the onlick handler is running. set to "always" to always show the loading state.
+	 * @property {string} [errorprefix] show an error toast if the onclick handler fails. message is constructed with errorMessage(e, errorprefix)
+	 * @property {string} [onclicksuccess] show a success toast if the onclick handler doesnt fail.
 	 * @property {boolean} [danger=false] use a red color scheme for dangerous actions
 	 * @property {boolean} [subtle=false] disable the border except on hover/focus
 	 * @property {boolean} [submits=false] if true, the button acts as a submit button in a form context
@@ -36,6 +38,9 @@ Available CSS variables:
 </script>
 
 <script>
+	import { errorMessage } from '$lib/i18n.js';
+	import { toasts } from '$lib/toasts.svelte.js';
+
 	import { hasPhysicalKeyboard } from './keyboard.svelte';
 	import KeyboardHint from './KeyboardHint.svelte';
 	import LoadingSpinner from './LoadingSpinner.svelte';
@@ -48,6 +53,8 @@ Available CSS variables:
 		disabled = false,
 		danger = false,
 		subtle = false,
+		errorprefix = '',
+		onclicksuccess = '',
 		help,
 		keyboard,
 		submits,
@@ -62,6 +69,11 @@ Available CSS variables:
 	const keyboardHintIsInTooltip = $derived(
 		help && (typeof help === 'string' ? keyboard : 'keyboard' in help)
 	);
+
+	let onclickTextOverride = $state('');
+
+	/** Width of button, to lock the button width while loading (when content can possible change width) */
+	let width = $state(0);
 </script>
 
 <!-- 
@@ -75,6 +87,7 @@ Available CSS variables:
 	use:tooltip={typeof help === 'string' && keyboard ? { text: help, keyboard } : help}
 >
 	<button
+		{...aria}
 		data-tooltip-content={typeof help === 'string'
 			? help
 			: Array.isArray(help)
@@ -85,7 +98,15 @@ Available CSS variables:
 		class:tight
 		class:danger
 		class:subtle
-		{...aria}
+		class:loading={isLoading}
+		style:width={isLoading ? `${width}px` : undefined}
+		bind:clientWidth={
+			() => 0 /* ignored */,
+			(newWidth) => {
+				if (isLoading) return;
+				width = newWidth;
+			}
+		}
 		onclick={async (e) => {
 			if (!onclick) return;
 
@@ -95,6 +116,9 @@ Available CSS variables:
 
 			try {
 				await onclick(e, {
+					setText: (text) => {
+						if (loading) onclickTextOverride = text;
+					},
 					loadingStarted: () => {
 						isLoading = true;
 					},
@@ -102,8 +126,16 @@ Available CSS variables:
 						isLoading = false;
 					},
 				});
+
+				if (onclicksuccess) toasts.success(onclicksuccess);
+			} catch (e) {
+				if (errorprefix) {
+					toasts.error(errorMessage(e, errorprefix));
+				}
+				console.error(e);
 			} finally {
 				if (loading) isLoading = false;
+				onclickTextOverride = '';
 			}
 		}}
 		pw-testid={testid || undefined}
@@ -113,9 +145,13 @@ Available CSS variables:
 				<LoadingSpinner />
 			</div>
 		{/if}
-		{@render children({ loading: isLoading && loading !== false })}
-		{#if keyboard && !(tight && keyboardHintIsInTooltip) && hasPhysicalKeyboard()}
-			<KeyboardHint shortcut={keyboard} />
+		{#if onclickTextOverride}
+			{onclickTextOverride}
+		{:else}
+			{@render children({ loading: isLoading && loading !== false })}
+			{#if keyboard && !(tight && keyboardHintIsInTooltip) && hasPhysicalKeyboard()}
+				<KeyboardHint shortcut={keyboard} />
+			{/if}
 		{/if}
 	</button>
 </div>
@@ -145,6 +181,14 @@ Available CSS variables:
 			background-color 0.2s,
 			color 0.2s,
 			border-color 0.2s;
+	}
+
+	button.loading {
+		padding: 0.75em 0.8em;
+		box-sizing: border-box;
+		text-overflow: ellipsis;
+		text-wrap: nowrap;
+		overflow: hidden;
 	}
 
 	button.danger:not(:disabled) {

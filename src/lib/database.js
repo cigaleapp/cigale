@@ -67,30 +67,36 @@ if (import.meta.vitest) {
 }
 
 const ImageFile = table(
-	['id', 'sessionId'],
+	['id', 'sessionId', 'remoteId'],
 	type({
 		/** ID of the associated Image object */
 		id: ID,
 		/** @deprecated use $lib/storage/backend.ts:binaryStorage instead */
 		bytes: 'ArrayBuffer | "migrated"',
+		/** In bytes */
+		size: 'number = 0',
 		filename: 'string',
 		contentType: MIMEType,
 		dimensions: Dimensions,
 		sessionId: ID,
+		'remoteId?': 'string#RemoteImageFileID',
 	})
 );
 
 const ImagePreviewFile = table(
-	['id', 'sessionId'],
+	['id', 'sessionId', 'remoteId'],
 	type({
 		/** ID of the associated Image object */
 		id: ID,
 		/** @deprecated use $lib/storage/backend.ts:binaryStorage instead */
 		bytes: 'ArrayBuffer | "migrated"',
+		/** In bytes */
+		size: 'number = 0',
 		filename: 'string',
 		contentType: MIMEType,
 		dimensions: Dimensions,
 		sessionId: ID,
+		'remoteId?': 'string#RemoteImageFileID',
 	})
 );
 
@@ -109,6 +115,8 @@ const MetadataValueFile = table(
 		contentType: MIMEType,
 		size: ['number', '@', 'in bytes'],
 		lastModifiedAt: 'string.date.iso',
+		// TODO: add metadataId and index by it.
+		// will be useful in e.g. listing metadata value files for upload in EcoSignal
 	})
 );
 
@@ -145,7 +153,7 @@ const Settings = table(
 		cropperSidebarCollapsed: 'boolean = false',
 		timerSounds: 'boolean = true',
 		sessionsDirectory: type({
-			platform: type.enumerated('local', 'kobotoolbox'),
+			platform: type.enumerated('local', 'kobotoolbox', 'ecosignal'),
 			account: 'string | undefined',
 			protocol: 'string | undefined',
 			filters: {
@@ -219,14 +227,23 @@ const Account = table(
 		id: 'string',
 		username: 'string',
 		displayName: 'string',
-		avatarURL: 'string.url.parse',
-		profileURL: 'string.url.parse',
+		avatarURL: 'string.url.parse | undefined',
+		profileURL: 'string.url.parse | undefined',
 		addedAt: ['string.date.iso.parse', '=', () => new Date().toISOString()],
 	}).and(
-		type.or({
-			type: '"kobotoolbox"',
-			token: 'string',
-		})
+		type.or(
+			{
+				type: '"kobotoolbox"',
+				token: 'string',
+			},
+			{
+				type: '"ecosignal"',
+				password: 'string',
+				domain: 'string.url',
+				userId: 'number.integer',
+				color: 'string'
+			}
+		)
 	)
 );
 
@@ -335,7 +352,7 @@ export function isReactiveTable(name) {
 /**
  * @template {keyof typeof Tables} TableName
  * @param {TableName} name
- * @returns {boolean}
+ * @returns {name is Extract<TableName, typeof SESSION_DEPENDENT_TABLES[number]> & Exclude<TableName, typeof NO_REACTIVE_STATE_TABLES[number]>}
  */
 export function isSessionDependentReactiveTable(name) {
 	return (
@@ -509,6 +526,11 @@ export const idComparator = (a, b) => {
 /**
  * @typedef ImageFile
  * @type {typeof ImageFile.infer}
+ */
+
+/**
+ * @typedef ImagePreviewFile
+ * @type {typeof ImagePreviewFile.infer}
  */
 
 /**

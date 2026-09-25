@@ -18,6 +18,20 @@ export interface BinaryStorageBackend<Name extends BinaryStorageName = BinarySto
 	 * @param fallbackContentType some backends don't store content types. for these backends, the returned File will use this value
 	 */
 	read(locator: BinaryStorageLocator, fallbackContentType: ContentType): Promise<File>;
+
+	stream(
+		locator: BinaryStorageLocator,
+		/** Size in bytes for each chunk */
+		chunksize: number
+	): AsyncIterable<{
+		/** The total number of chunks that this file needs */
+		total: number;
+		/** The current chunk's number. 0-based */
+		index: number;
+		/** The chunk's bytes */
+		bytes: ArrayBuffer;
+	}>;
+
 	list(locator: BinaryStorageLocator<''>): AsyncIterable<BinaryStorageLocator>;
 	/**
 	 *

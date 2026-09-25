@@ -64,4 +64,5 @@ export type PlaywrightTestId =
 	| 'mobile-option-details'
 	| `${string}-point-${number}`
 	| `${string}-label-area`
-	| `${string}-label-segment-${number}`;
+	| `${string}-label-segment-${number}`
+	| 'session-card-indicator-downloaded';

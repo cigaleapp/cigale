@@ -92,6 +92,7 @@ msgstr "Analyzing…"
 #: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/Toolbar.svelte
 #: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
 #: src/routes/(app)/protocols/ModalCreateProtocol.svelte
+#: src/routes/(app)/results/ExportPlatformsPreview.svelte
 msgid "Annuler"
 msgstr "Cancel"
 
@@ -281,7 +282,6 @@ msgstr "Learn more"
 msgid "Erreur"
 msgstr "Error"
 
-#: src/lib/exif.ts
 #: src/lib/i18n.js
 #: src/lib/i18n.js
 #: src/lib/i18n.js
@@ -290,7 +290,7 @@ msgstr "Error"
 msgid "Erreur inattendue"
 msgstr "Unexpected error"
 
-#. 0: file.name
+#. 0: original.name
 #: src/lib/import.svelte.js
 msgid "Erreur lors de l'extraction des métadonnées EXIF pour {0}"
 msgstr "Error while extracting EXIF metadata for {0}"
@@ -305,10 +305,6 @@ msgstr "Error while importing remote protocol: {0}"
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
 msgid "Erreur lors du chargement du modèle de classification"
 msgstr "Error while loading classification model"
-
-#: src/routes/(app)/results/+page.svelte
-msgid "Exporter"
-msgstr "Export"
 
 #: src/routes/(app)/Navigation.svelte
 msgid "Exporter les résultats"
@@ -383,11 +379,6 @@ msgstr "Import images"
 #: src/routes/(app)/protocols/import/[...url]/+page.svelte
 msgid "Importer le protocole distant ?"
 msgstr "Import remote protocol ?"
-
-#. 0: file.name; 1: e?.toString() ?? 'Erreur inattendue'
-#: src/lib/exif.ts
-msgid "Impossible d'extraire les métadonnées EXIF de {0}: {1}"
-msgstr "Cannot extract EXIF metadata for {0}: {1}"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Impossible de charger les dépendances"
@@ -704,6 +695,7 @@ msgstr "<0/> Unreachable: HTTP {0} <1/>"
 
 #: src/lib/FieldURL.svelte
 #: src/routes/(app)/accounts/ModalAddAccount.svelte
+#: src/routes/(app)/accounts/ModalAddAccount.svelte
 msgid "<0/> Vérification…"
 msgstr "<0/> Checking…"
 
@@ -780,6 +772,8 @@ msgid "Supprimer la métadonnée"
 msgstr "Delete the metadata"
 
 #: src/routes/(app)/protocols/[id]/MetadataLink.svelte
+#: src/routes/(app)/results/ExportPlatformsSettings.svelte
+#: src/routes/(app)/results/ExportPlatformsSettings.svelte
 msgid "<0/> Voir"
 msgstr "<0/> See"
 
@@ -1260,10 +1254,6 @@ msgstr "Not versioned"
 msgid "<0/> Le protocole local a des modifications non publiées, voir ci-dessous <1>Passer à la v{0}</1>"
 msgstr "<0/> Local protocol has unsaved changes, see below <1>Set to v{0}</1>"
 
-#: src/lib/notifications.js
-msgid "Vous avez refusé les notifications système. Veuillez changer cela dans les paramètres de votre navigateur."
-msgstr "You refused system notifications. Please change this in your browser's settings."
-
 #: src/lib/AreaObservations.svelte
 msgid "Suppprimer tout les éléments de ce groupe"
 msgstr "Delete all items from this group"
@@ -1330,16 +1320,6 @@ msgstr "File structure"
 #: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/Toolbar.svelte
 msgid "Rétablir"
 msgstr "Redo"
-
-#. 0: filename
-#: src/routes/(app)/results/+page.svelte
-msgid "Impossible d'ajouter les métadonnées EXIF à l'image {0}"
-msgstr "Cannot add EXIF metadata to {0}"
-
-#. 0: error
-#: src/routes/(app)/results/+page.svelte
-msgid "Erreur lors de l'exportation des résultats: {0}"
-msgstr "Could not export results: {0}"
 
 #. 0: shortId
 #: src/routes/(app)/protocols/[id]/+layout.svelte
@@ -1523,6 +1503,7 @@ msgid "Une erreur est survenue lors de la soumission de votre demande. Veuillez 
 msgstr "An error occured while submitting your request. Please try again later."
 
 #: src/routes/(app)/ModalSubmitIssue.svelte
+#: src/routes/(app)/results/ExportPlatformsActions.svelte
 msgid "Envoyer"
 msgstr "Send"
 
@@ -1542,14 +1523,6 @@ msgstr "Empty folder"
 #: src/routes/(app)/Navigation.svelte
 msgid "Résultats <0/>"
 msgstr "Results <0/>"
-
-#: src/routes/(app)/results/+page.svelte
-msgid "Aucune session active à exporter."
-msgstr "No active session to export."
-
-#: src/routes/(app)/results/+page.svelte
-msgid "Aucune session active à prévisualiser."
-msgstr "No session to preview."
 
 #: src/lib/inference.ts
 #: src/lib/inference.ts
@@ -1634,11 +1607,6 @@ msgstr "No active session"
 msgid "Session active introuvable"
 msgstr "Active session not found"
 
-#. 0: directoryHandle.name
-#: src/routes/(app)/results/+page.svelte
-msgid "Fichiers sauvegardés dans {0}"
-msgstr "Files saved in {0}"
-
 #: src/routes/(app)/ModalSubmitIssue.svelte
 msgid "User Agent"
 msgstr ""
@@ -1721,7 +1689,7 @@ msgstr "No session is active. Unable to save the file."
 msgid "Aucun session active"
 msgstr "No session is active"
 
-#. 0: file.name
+#. 0: original.name
 #: src/lib/import.svelte.js
 msgid "Erreur lors du traitement du/des fichiers annexes associés à {0}"
 msgstr "Error while processing sidecar file(s) associated with {0}"
@@ -1748,18 +1716,6 @@ msgstr "Could not load protocol {0}. Check your interner connection or try reloa
 #: src/routes/(app)/results/+page.svelte
 msgid "Vérifier les métadonnées"
 msgstr "Check your metadata"
-
-#: src/routes/(app)/results/+page.svelte
-msgid "Inclure"
-msgstr "Include"
-
-#: src/routes/(app)/results/+page.svelte
-msgid "Pour chaque image, relativement à ses dimensions"
-msgstr "For each image, relative to its dimensions"
-
-#: src/routes/(app)/results/+page.svelte
-msgid "Contenu de l'export"
-msgstr "Export contents"
 
 #: src/lib/Metadata.svelte
 msgid "(Optionnel)"
@@ -2084,25 +2040,6 @@ msgstr "App version"
 msgid "Build de l'app"
 msgstr "App build no."
 
-#: src/lib/notifications.js
-msgid "Vous avez refusé les notifications."
-msgstr "You did not accept notifications."
-
-#: src/lib/notifications.js
-#: src/lib/notifications.js
-#: src/lib/notifications.js
-msgid "Notification"
-msgstr "Notification"
-
-#: src/lib/notifications.js
-#: src/lib/notifications.js
-msgid "Votre navigateur ne supporte pas les notifications système."
-msgstr "Your browser does not support system notifications."
-
-#: src/lib/notifications.js
-msgid "Impossible d'envoyer la notification système."
-msgstr "Could not send system notification."
-
 #: src/lib/share.ts
 msgid "Lien copié dans le presse-papiers : "
 msgstr "Link copied to clipboard: "
@@ -2415,7 +2352,7 @@ msgstr "No choices made yet"
 msgid "Décrire l'observation"
 msgstr "Describe observation"
 
-#. 0: file.name
+#. 0: original.name
 #: src/lib/import.svelte.js
 msgid "Erreur lors de l'extraction des métadonnées du fichier RAW {0}"
 msgstr "Could not extract metadata from RAW file {0}"
@@ -2909,22 +2846,6 @@ msgstr ""
 msgid "L'identifiant ne doit comporter que des lettres, chiffres, <0/> ou <1/>"
 msgstr ""
 
-#: src/routes/(app)/results/+page.svelte
-msgid "Marge de recadrage <0/>"
-msgstr ""
-
-#: src/routes/(app)/results/+page.svelte
-msgid "<0/> une fois dézippé"
-msgstr ""
-
-#: src/routes/(app)/results/+page.svelte
-msgid "<0/> Dossier <1/>"
-msgstr ""
-
-#: src/routes/(app)/results/+page.svelte
-msgid "<0/> Archive ZIP <1/>"
-msgstr ""
-
 #: src/routes/(app)/capture/gallery/+page.svelte
 msgid "Photos capturées"
 msgstr ""
@@ -3228,4 +3149,135 @@ msgstr ""
 
 #: src/routes/(app)/sessions/Header.svelte
 msgid "<0/> Importer .zip"
+msgstr ""
+
+#. 0: file.name
+#: src/lib/exif.ts
+msgid "Impossible d'extraire les métadonnées EXIF de {0}"
+msgstr ""
+
+#: src/lib/Account.svelte
+msgid "Compte introuvable"
+msgstr ""
+
+#: src/routes/(app)/accounts/ModalAddAccount.svelte
+#: src/routes/(app)/accounts/ModalAddAccount.svelte
+msgid "Identifiant"
+msgstr ""
+
+#: src/routes/(app)/accounts/ModalAddAccount.svelte
+#: src/routes/(app)/accounts/ModalAddAccount.svelte
+msgid "Mot de passe"
+msgstr ""
+
+#: src/routes/(app)/accounts/ModalAddAccount.svelte
+msgid "<0/> Identifiants valide"
+msgstr ""
+
+#: src/routes/(app)/accounts/ModalAddAccount.svelte
+msgid "<0/> Identifiants incorrects"
+msgstr ""
+
+#: src/lib/notifications.ts
+msgid "Vous avez refusé les notifications."
+msgstr ""
+
+#: src/lib/notifications.ts
+#: src/lib/notifications.ts
+#: src/lib/notifications.ts
+msgid "Notification"
+msgstr ""
+
+#: src/lib/notifications.ts
+#: src/lib/notifications.ts
+msgid "Votre navigateur ne supporte pas les notifications système."
+msgstr ""
+
+#: src/lib/notifications.ts
+msgid "Vous avez refusé les notifications système. Veuillez changer cela dans les paramètres de votre navigateur."
+msgstr ""
+
+#: src/lib/notifications.ts
+msgid "Impossible d'envoyer la notification système."
+msgstr ""
+
+#: src/routes/(app)/results/ExportLocalActions.svelte
+msgid "Aucune session active à exporter."
+msgstr ""
+
+#. 0: filename
+#: src/routes/(app)/results/ExportLocalActions.svelte
+msgid "Impossible d'ajouter les métadonnées EXIF à l'image {0}"
+msgstr ""
+
+#. 0: directoryHandle.name
+#: src/routes/(app)/results/ExportLocalActions.svelte
+msgid "Fichiers sauvegardés dans {0}"
+msgstr ""
+
+#. 0: error
+#: src/routes/(app)/results/ExportLocalActions.svelte
+msgid "Erreur lors de l'exportation des résultats: {0}"
+msgstr ""
+
+#: src/routes/(app)/results/ExportLocalActions.svelte
+msgid "<0/> Dossier <1/>"
+msgstr ""
+
+#: src/routes/(app)/results/ExportLocalActions.svelte
+msgid "<0/> Archive ZIP <1/>"
+msgstr ""
+
+#: src/routes/(app)/results/ExportLocalPreview.svelte
+msgid "Aucune session active à prévisualiser."
+msgstr ""
+
+#: src/routes/(app)/results/ExportLocalPreview.svelte
+msgid "Contenu de l'export"
+msgstr ""
+
+#: src/routes/(app)/results/ExportLocalPreview.svelte
+msgid "<0/> une fois dézippé"
+msgstr ""
+
+#: src/routes/(app)/results/ExportLocalSettings.svelte
+msgid "Inclure"
+msgstr ""
+
+#: src/routes/(app)/results/ExportLocalSettings.svelte
+msgid "Marge de recadrage <0/>"
+msgstr ""
+
+#: src/routes/(app)/results/ExportLocalSettings.svelte
+msgid "Pour chaque image, relativement à ses dimensions"
+msgstr ""
+
+#: src/routes/(app)/results/ExportPanel.svelte
+msgid "Fichiers"
+msgstr ""
+
+#: src/routes/(app)/results/ExportPanel.svelte
+msgid "Plateformes"
+msgstr ""
+
+#: src/routes/(app)/results/ExportPanel.svelte
+msgid "Exporter"
+msgstr ""
+
+#. 0: uploader.selectedProvider.displayName
+#: src/routes/(app)/results/ExportPlatformsActions.svelte
+msgid "Envoyer sur {0}"
+msgstr ""
+
+#: src/routes/(app)/results/ExportPlatformsPreview.svelte
+msgid "Envoi en cours"
+msgstr ""
+
+#: src/routes/(app)/results/ExportPlatformsPreview.svelte
+msgid "Envoi terminé"
+msgstr ""
+
+#. 0: exporter.sessionProvider.displayName
+#: src/routes/(app)/results/ExportPlatformsSettings.svelte
+msgid "Disponible sur {0}"
 msgstr ""

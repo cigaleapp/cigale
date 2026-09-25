@@ -238,8 +238,14 @@ testKitchensink('includes metadata files in export', async ({ page, app }) => {
 
 	await pickFiles(sessionwideFile.getByRole('button', { name: 'Ajouter' }), 'debugsquare.png');
 	await assert(sessionwideFile).toHaveText(/debugsquare\.png/);
+	await assert(sessionwideFile.getByRole('button', { name: 'Modifier' })).toBeVisible();
+	await assert(sessionwideFile.getByRole('button', { name: 'Ajouter' })).not.toBeVisible();
 
-	await app.tabs.go('results', { force: true });
+	// XXX: needed to ensure results tab is not deactivated
+	await app.settings.set({ debugMode: true });
+	await app.tabs.go('results');
+	await app.settings.set({ debugMode: false });
+
 	await expect(page.getByTestId('zip-preview')).toMatchAriaSnapshot(
 		`
 	  - text: Contenu de l'export

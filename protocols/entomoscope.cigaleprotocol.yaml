@@ -30,6 +30,12 @@ sidecars:
   filepath: ./{{ stem filepath }}.json
 
 remote:
+  ecosignal:
+    crop: crop
+    project: 2
+    label: observation
+    domains:
+      VPS de Gwenn (temporaire): https://ecosignal.gwen.works
   kobocollect:
     form: https://kf.kobotoolbox.org/#/forms/ao3ZXMuHX9hCufTYbEzEcY/summary
     title: '{{ survey.session_id }}'
@@ -163,6 +169,8 @@ sessionMetadata:
   microhabitat:
     type: file
     label: Microhabitat
+    ecosignal:
+      label: microhabitat
     description: Photo du microhabitat monitoré
     mergeMethod: none
     required: false
@@ -179,6 +187,8 @@ sessionMetadata:
   landscape:
     type: file
     label: Paysage
+    ecosignal:
+      label: landscape
     description: Photo du paysage environnant l'entomoscope
     mergeMethod: none
     required: false

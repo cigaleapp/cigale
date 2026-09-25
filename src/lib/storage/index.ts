@@ -28,6 +28,10 @@ export const binaryStorage: BinaryStorage = {
 		if (!currentBackend) await initializeBinaryStorage();
 		return currentBackend!.delete(...args);
 	},
+	async *stream(...args) {
+		if (!currentBackend) await initializeBinaryStorage();
+		yield* currentBackend!.stream(...args);
+	},
 	async read(...args) {
 		if (!currentBackend) await initializeBinaryStorage();
 		return currentBackend!.read(...args);
@@ -102,7 +106,7 @@ async function initializeBinaryStorage() {
 	// }
 }
 
-interface BinaryStorage<
+export interface BinaryStorage<
 	Name extends BinaryStorageName = BinaryStorageName,
 > extends BinaryStorageBackend<Name> {
 	/**
