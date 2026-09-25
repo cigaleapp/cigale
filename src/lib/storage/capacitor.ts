@@ -1,4 +1,4 @@
-import type { BinaryStorageBackend, BinaryStorageLocator } from './types.js';
+import type { BinaryStorageBackend, BinaryStorageLocator, BinaryStoragePath } from './types.js';
 
 import { Capacitor } from '@capacitor/core';
 import { Directory, Filesystem } from '@capacitor/filesystem';
@@ -28,16 +28,11 @@ export async function CapacitorFilesystemBackend(): Promise<BinaryStorageBackend
 	);
 
 	return {
-		name: 'capacitor',
+		backend: 'capacitor',
 		// TODO: figure out a way to do that?
 		supportsWorkers: false,
 		async resolvePath(locator) {
-			const result = await Filesystem.getUri({
-				directory: root,
-				path: locatorToPath(locator),
-			});
-
-			return result.uri;
+			return CapacitorFilepath.fromLocator(root, locator);
 		},
 		async exists(locator) {
 			try {
@@ -180,4 +175,35 @@ async function debugdir(dir: Directory, path = '') {
 	})
 		.then((r) => r.files.map((f) => `${f.size}\t${f.name}`).join('\n'))
 		.catch(() => '<not found>');
+}
+
+export class CapacitorFilesystemPath implements BinaryStoragePath {
+	backend = 'capacitor' as const;
+
+	constructor(
+		public uri: string,
+		private locator: BinaryStorageLocator
+	) {}
+
+	static async fromLocator(root: Directory, locator: BinaryStorageLocator) {
+		const result = await Filesystem.getUri({
+			directory: root,
+			path: locatorToPath(locator),
+		});
+
+		return new CapacitorFilesystemPath(result.uri, locator);
+	}
+
+	toLocator() {
+		return this.locator;
+	}
+
+	toString() {
+		return this.uri;
+	}
+
+	equals(other: BinaryStoragePath): other is CapacitorFilesystemPath {
+		if (!(other instanceof CapacitorFilesystemPath)) return false;
+		return this.uri === other.uri;
+	}
 }

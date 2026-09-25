@@ -42,6 +42,7 @@
 	"scripts": {
 		"dev": "bun --bun vite dev --host",
 		"dev:native": "electron-forge start",
+		"add-cap": "bun run scripts/add-capacitor-dependency.ts",
 		"codegen": "bun run scripts/download-google-fonts.js && bun run scripts/generate-json-schemas.js && bun run scripts/codegen-filepath-types.ts && bun run scripts/generate-assetlinks.ts",
 		"prebuild": "bun run codegen && bun wuchale --clean --sync",
 		"build": "bun --bun vite build",
@@ -168,6 +169,7 @@
 		"@capawesome/capacitor-keep-awake": "^0.1.2",
 		"@capgo/capacitor-shake": "^8.0.40",
 		"@capgo/capacitor-updater": "^8.51.15",
+		"@capgo/capacitor-uploader": "^8.3.18",
 		"@capgo/inappbrowser": "^8.6.14",
 		"@formatjs/intl-durationformat": "^0.10.18",
 		"@iconify/svelte": "^5.2.2",

@@ -1,4 +1,4 @@
-import type { BinaryStorageBackend, BinaryStorageLocator } from './types.js';
+import type { BinaryStorageBackend, BinaryStorageLocator, BinaryStoragePath } from './types.js';
 
 import { nanoid } from 'nanoid';
 
@@ -43,10 +43,10 @@ export async function OPFSBackend(): Promise<BinaryStorageBackend<'opfs'>> {
 	}
 
 	return {
-		name: 'opfs',
+		backend: 'opfs',
 		supportsWorkers: true,
 		async resolvePath(locator) {
-			return locatorToPath(locator);
+			return new OPFSPath(locator);
 		},
 		async exists(locator) {
 			const [directory, name] = await walk(locator);
@@ -176,4 +176,23 @@ export async function OPFSBackend(): Promise<BinaryStorageBackend<'opfs'>> {
 			}
 		},
 	};
+}
+
+export class OPFSPath implements BinaryStoragePath {
+	backend = 'opfs' as const;
+
+	constructor(private locator: BinaryStorageLocator) {}
+
+	toString() {
+		return locatorToPath(this.locator);
+	}
+
+	toLocator() {
+		return this.locator;
+	}
+
+	equals(other: BinaryStoragePath): other is OPFSPath {
+		if (!(other instanceof OPFSPath)) return false;
+		return this.toString() === other.toString();
+	}
 }
