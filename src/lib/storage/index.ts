@@ -17,8 +17,12 @@ import { locatorToPath } from './utils.js';
 let currentBackend: undefined | BinaryStorageBackend<BinaryStorageName>;
 
 export const binaryStorage: BinaryStorage = {
-	name: currentBackend?.name ?? 'uninitialized',
-	supportsWorkers: currentBackend?.supportsWorkers ?? false,
+	get backend() {
+		return currentBackend?.backend ?? 'uninitialized';
+	},
+	get supportsWorkers() {
+		return currentBackend?.supportsWorkers ?? false;
+	},
 	async resolvePath(...args) {
 		if (!currentBackend) await initializeBinaryStorage();
 		return currentBackend!.resolvePath(...args);
@@ -90,7 +94,7 @@ export const binaryStorage: BinaryStorage = {
 		const exists = await this.exists(locator);
 
 		if (!exists)
-			throw new Error(`File ${locatorToPath(locator)} does not exist in ${this.name}`);
+			throw new Error(`File ${locatorToPath(locator)} does not exist in ${this.backend}`);
 
 		return this.write(locator, content);
 	},
