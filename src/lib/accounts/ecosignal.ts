@@ -4,9 +4,11 @@ import type { Account, AccountCapability, AuthenticationMethod, LoginData } from
 import type * as DB from '$lib/database.js';
 import type { DatabaseHandle } from '$lib/idb.svelte.js';
 import type { RuntimeValue } from '$lib/schemas/metadata.js';
+import type { BinaryStoragePath } from '$lib/storage/types.js';
 import type { FetchProgressData } from 'fetch-progress';
 
 import { Capacitor, CapacitorHttp } from '@capacitor/core';
+import { Uploader as CapacitorUploader } from '@capgo/capacitor-uploader';
 import { ArkErrors, type, Type } from 'arktype';
 import { RateLimit } from 'async-sema';
 import * as dates from 'date-fns';
@@ -30,6 +32,8 @@ import { NamespacedMetadataID } from '$lib/schemas/common.js';
 import { MetadataRecord, removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';
 import { toMetadataRecord } from '$lib/schemas/results.js';
 import { SessionRemoteID } from '$lib/schemas/sessions.js';
+import { CapacitorFilesystemPath } from '$lib/storage/capacitor.js';
+import { binaryStorage } from '$lib/storage/index.js';
 import { byteSizeOfObject, createBytes, streamBytes } from '$lib/storage/utils.js';
 import {
 	Channel,
@@ -1639,45 +1643,50 @@ export default class Provider implements Account {
 		const chunkSizes = new Map<number, number>();
 		let transferredBytes = 0;
 
-		for await (const chunk of streamBytes(upload.table, upload.file, chunkSize)) {
-			totalChunks = chunk.total;
-			chunkSizes.set(chunk.index, chunk.bytes.byteLength);
+		if (binaryStorage.backend === 'capacitor') {
+			totalChunks = 1;
+		} else {
+			for await (const chunk of streamBytes(upload.table, upload.file, chunkSize)) {
+				totalChunks = chunk.total;
+				chunkSizes.set(chunk.index, chunk.bytes.byteLength);
 
-			const updates = new Channel<FetchProgressData>();
+				const updates = new Channel<FetchProgressData>();
 
-			const response = this.json(
-				'POST',
-				'v1',
-				`file-upload-batches/${batchId}/chunks`,
-				Provider.ResponseBase({ 'file_upload_id?': 'number.integer' }),
-				{},
-				Provider.FileUploadBatchChunkPayload,
-				{
-					filename: this.#conformFilename(filename),
-					chunk_index: chunk.index,
-					total_chunks: chunk.total,
-					collection_id: collectionId,
-					media_type: 'photo',
-					file: new File([chunk.bytes], this.#conformFilename(filename), {
-						type: contentType,
-					}),
-				},
-				{ updates }
-			);
+				const response = this.json(
+					'POST',
+					'v1',
+					`file-upload-batches/${batchId}/chunks`,
+					Provider.ResponseBase({ 'file_upload_id?': 'number.integer' }),
+					{},
+					Provider.FileUploadBatchChunkPayload,
+					{
+						filename: this.#conformFilename(filename),
+						chunk_index: chunk.index,
+						total_chunks: chunk.total,
+						collection_id: collectionId,
+						media_type: 'photo',
+						file: new File([chunk.bytes], this.#conformFilename(filename), {
+							type: contentType,
+						}),
+					},
+					{ updates }
+				);
 
-			for await (const { transferred, total } of updates) {
-				yield {
-					finished: false,
-					fileUploadId: undefined,
-					doneBytes: transferredBytes + (transferred / total) * chunk.bytes.byteLength,
-				};
+				for await (const { transferred, total } of updates) {
+					yield {
+						finished: false,
+						fileUploadId: undefined,
+						doneBytes:
+							transferredBytes + (transferred / total) * chunk.bytes.byteLength,
+					};
+				}
+
+				const { data } = await response;
+
+				transferredBytes += chunk.bytes.byteLength;
+
+				if (data.file_upload_id) fileUploadId = data.file_upload_id;
 			}
-
-			const { data } = await response;
-
-			transferredBytes += chunk.bytes.byteLength;
-
-			if (data.file_upload_id) fileUploadId = data.file_upload_id;
 		}
 
 		for await (const status of poll(
@@ -1925,12 +1934,15 @@ export default class Provider implements Account {
 		const isFormData = bodySchema?.meta.encoding === 'multipart';
 
 		let encodedBody: string | FormData | undefined;
+		let fileUpload: undefined | { field: string; path: BinaryStoragePath } = undefined;
 
 		if (body && bodySchema && method !== 'GET') {
 			if (isFormData) {
 				encodedBody = new FormData();
 				for (const [key, value] of Object.entries(bodySchema.assert(body))) {
-					if (value instanceof Blob || value instanceof File) {
+					if (value instanceof CapacitorFilesystemPath) {
+						fileUpload = { field: key, path: value };
+					} else if (value instanceof Blob || value instanceof File) {
 						encodedBody.append(key, value);
 					} else if (value !== undefined && value !== null) {
 						encodedBody.append(key, value.toString());
@@ -1948,6 +1960,7 @@ export default class Provider implements Account {
 
 		const response = await this.fetch(method, path, queryParams, {
 			updates,
+			fileUpload,
 			init: {
 				...init,
 				body: encodedBody ?? null,
@@ -2003,7 +2016,18 @@ export default class Provider implements Account {
 		{
 			updates,
 			init = {},
-		}: { init?: RequestInit; updates?: Channel<FetchProgressData> | undefined } = {}
+			fileUpload,
+		}: {
+			init?: RequestInit;
+			/** Upload file directory (only supported on native) */
+			fileUpload?: {
+				/** The FormData field name to use */
+				field: string;
+				/** Path to the file  */
+				path: BinaryStoragePath;
+			};
+			updates?: Channel<FetchProgressData> | undefined;
+		} = {}
 	) {
 		this.#maybeAbort();
 
@@ -2052,73 +2076,146 @@ export default class Provider implements Account {
 		if (init.body instanceof FormData && Capacitor.isNativePlatform()) {
 			console.warn("Encoding form data of request since we're on native", init.body);
 
-			const toBase64 = (key: string, file: File) =>
-				new Promise<{
-					key: string;
-					type: 'base64File';
-					fileName: string;
-					contentType: string;
-					value: string;
-				}>((resolve, reject) => {
-					const r = new FileReader();
+			if (fileUpload) {
+				console.debug(
+					'Request has a fileUpload, uploading straight from native fs',
+					fileUpload
+				);
 
-					r.onerror = reject;
-					r.onload = () =>
-						resolve({
-							key,
-							type: 'base64File',
-							fileName: file.name,
-							contentType: file.type,
-							value: btoa(r.result as string),
-						});
-
-					r.readAsBinaryString(file);
-				});
-
-			const encoded = [] as Array<{ key: string; value: unknown }>;
-
-			for (const [key, value] of init.body.entries()) {
-				if (value instanceof File) {
-					console.warn(
-						`Encoding form data entry "${key}" to base64 since we're on native`,
-						value
+				if (init.body.values().some((v) => v instanceof Blob)) {
+					throw new Error(
+						'Cannot have Blob values in form data when requesting with a fileUpload'
 					);
 				}
 
-				encoded.push(
-					value instanceof File
-						? await toBase64(key, value)
-						: { key, value: value.toString(), type: 'string' }
+				const { status, error } = await new Promise<{ status: number; error: string }>(
+					async (resolve, reject) => {
+						let upload = { id: '', status: 0, error: '' };
+
+						await CapacitorUploader.addListener('events', (status) => {
+							if (status.eventId !== upload.id) return;
+
+							switch (status.name) {
+								case 'uploading': {
+									updates?.push({
+										eta: 0,
+										speed: 1,
+										total: 100,
+										transferred: status.payload.percent ?? 0,
+									});
+									break;
+								}
+								case 'completed': {
+									upload.status = status.payload.statusCode ?? 0;
+									updates?.finish({
+										eta: 0,
+										speed: 1,
+										total: 100,
+										transferred: 100,
+									});
+									resolve(upload);
+									break;
+								}
+								case 'failed': {
+									upload.status = status.payload.statusCode ?? 400;
+									upload.error = status.payload.error ?? '';
+									resolve(upload);
+									break;
+								}
+							}
+						}).catch(reject);
+
+						const response = await CapacitorUploader.uploadMultipart({
+							fieldName: fileUpload.field,
+							filePath: fileUpload.path.toString(),
+							url,
+							headers: Object.fromEntries(request.headers.entries()),
+							fields: Object.fromEntries(
+								(init.body as FormData)
+									.entries()
+									.map(([key, value]) => [key, value.toString()])
+							),
+						}).catch(reject);
+
+						upload.id = response.id;
+					}
 				);
-			}
 
-			console.debug('Sending encoded formdata to Capacitor', encoded);
+				return {
+					ok: status < 400,
+					text: () => error,
+					// TODO
+					json: () => ({}),
+				};
+			} else {
+				const toBase64 = (key: string, file: File) =>
+					new Promise<{
+						key: string;
+						type: 'base64File';
+						fileName: string;
+						contentType: string;
+						value: string;
+					}>((resolve, reject) => {
+						const r = new FileReader();
 
-			const response = await CapacitorHttp.request({
-				url,
-				method: request.method ?? 'POST',
-				dataType: 'formData',
-				data: encoded,
-				headers: {
-					...Object.fromEntries(request.headers.entries()),
-					'Content-Type': 'multipart/form-data',
-				},
-			});
+						r.onerror = reject;
+						r.onload = () =>
+							resolve({
+								key,
+								type: 'base64File',
+								fileName: file.name,
+								contentType: file.type,
+								value: btoa(r.result as string),
+							});
 
-			if (updates) {
-				updates.finish({
-					eta: 0,
-					speed: 0,
-					total: 1,
-					transferred: 1,
+						r.readAsBinaryString(file);
+					});
+
+				const encoded = [] as Array<{ key: string; value: unknown }>;
+
+				for (const [key, value] of init.body.entries()) {
+					if (value instanceof File) {
+						console.warn(
+							`Encoding form data entry "${key}" to base64 since we're on native`,
+							value
+						);
+					}
+
+					encoded.push(
+						value instanceof File
+							? await toBase64(key, value)
+							: { key, value: value.toString(), type: 'string' }
+					);
+				}
+
+				console.debug('Sending encoded formdata to Capacitor', encoded);
+
+				const response = await CapacitorHttp.request({
+					url,
+					method: request.method ?? 'POST',
+					dataType: 'formData',
+					data: encoded,
+					headers: {
+						...Object.fromEntries(request.headers.entries()),
+						'Content-Type': 'multipart/form-data',
+					},
 				});
-			}
 
-			return {
-				ok: response.status < 400,
-				text: async () => String(response.data),
-				json: async () => response.data,
-			};
+				if (updates) {
+					updates.finish({
+						eta: 0,
+						speed: 0,
+						total: 1,
+						transferred: 1,
+					});
+				}
+
+				return {
+					ok: response.status < 400,
+					text: async () => String(response.data),
+					json: async () => response.data,
+				};
+			}
 		}
 
 		if (updates) {
@@ -2444,7 +2541,7 @@ export default class Provider implements Account {
 		chunk_index: 'number.integer >= 0',
 		total_chunks: 'number.integer >= 1',
 		'collection_id?': 'number.integer',
-		file: 'File',
+		file: ['File', '|', ['instanceof', CapacitorFilesystemPath]],
 	}).configure({
 		encoding: 'multipart',
 	});
@@ -2629,7 +2726,7 @@ export default class Provider implements Account {
 
 	static FileGenericUploadPayload = type({
 		/** A non-empty filename is needed for validation by the API */
-		file: 'File',
+		file: ['File', '|', ['instanceof', CapacitorFilesystemPath]],
 	}).configure({
 		encoding: 'multipart',
 	});

@@ -3,13 +3,19 @@ import type { PendingPhotosRootFolders } from '$routes/(app)/capture/pendingstor
 
 export type BinaryStorageName = 'opfs' | 'capacitor' | 'uninitialized';
 
+export interface BinaryStoragePath<Name extends BinaryStorageName = BinaryStorageName> {
+	toString(): string;
+	backend: Name;
+	toLocator(): BinaryStorageLocator;
+	equals(other: BinaryStoragePath): other is BinaryStoragePath<Name>;
+}
+
 export interface BinaryStorageBackend<Name extends BinaryStorageName = BinaryStorageName> {
 	supportsWorkers: boolean;
-	name: Name;
-	/**
-	 * For debug purposes.
-	 */
-	resolvePath(locator: BinaryStorageLocator): Promise<string>;
+	backend: Name;
+
+	resolvePath(locator: BinaryStorageLocator): Promise<BinaryStoragePath<Name>>;
+
 	exists(locator: BinaryStorageLocator): Promise<boolean>;
 	bytes(locator: BinaryStorageLocator): Promise<ArrayBuffer>;
 	text(locator: BinaryStorageLocator): Promise<string>;
