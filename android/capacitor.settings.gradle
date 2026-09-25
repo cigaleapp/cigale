@@ -32,6 +32,9 @@ project(':capacitor-splash-screen').projectDir = new File('../node_modules/@capa
 include ':capawesome-capacitor-file-picker'
 project(':capawesome-capacitor-file-picker').projectDir = new File('../node_modules/@capawesome/capacitor-file-picker/android')
 
+include ':capawesome-capacitor-keep-awake'
+project(':capawesome-capacitor-keep-awake').projectDir = new File('../node_modules/@capawesome/capacitor-keep-awake/android')
+
 include ':capgo-capacitor-shake'
 project(':capgo-capacitor-shake').projectDir = new File('../node_modules/@capgo/capacitor-shake/android')
 

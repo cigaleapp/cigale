@@ -8,6 +8,7 @@
 	import { ArkErrors } from 'arktype';
 
 	import IconRequired from '~icons/ri/asterisk';
+	import IconCamera from '~icons/ri/camera-line';
 	import IconCheck from '~icons/ri/check-line';
 	import IconClear from '~icons/ri/close-line';
 	import IconTechnical from '~icons/ri/settings-line';
@@ -149,6 +150,10 @@
 			.slice(0, 3)
 	);
 
+	const setByCaptureMode = $derived.by(() => {
+		return Boolean(definition.infer?.capture);
+	});
+
 	let element = $state<HTMLElement>();
 </script>
 
@@ -163,14 +168,22 @@
 			<section class="first-line">
 				<label for={_id}>
 					{#if required}
-						<div class="required-indicator" use:tooltip={'Métadonnée obligatoire'}>
+						<div class="indicator required" use:tooltip={'Métadonnée obligatoire'}>
 							<IconRequired />
+						</div>
+					{/if}
+					{#if setByCaptureMode}
+						<div
+							class="indicator capture-mode"
+							use:tooltip={'Métadonnée remplie en mode capture'}
+						>
+							<IconCamera />
 						</div>
 					{/if}
 					{#if definition.label}
 						<OverflowableText text={definition.label} />
 					{:else}
-						<div class="technical-indicator" use:tooltip={'Métadonnée technique'}>
+						<div class="indicator technical" use:tooltip={'Métadonnée technique'}>
 							<IconTechnical />
 						</div>
 						<code>
@@ -185,6 +198,9 @@
 					{@render extraInline()}
 				</div>
 			</section>
+			{#if setByCaptureMode}
+				<div class="capture-mode-inference">Remplie au moment de la prise de photos</div>
+			{/if}
 			{#if !inputIsInline}
 				{@render description()}
 			{/if}
@@ -496,12 +512,19 @@
 		gap: 0.5em;
 	}
 
-	.required-indicator {
+	.indicator {
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		color: var(--fg-error);
 		font-size: 0.75em;
+
+		&.required {
+			color: var(--fg-error);
+		}
+
+		&.capture-mode {
+			color: var(--fg-primary);
+		}
 	}
 
 	.alternatives {
@@ -566,5 +589,10 @@
 
 	.optional {
 		color: var(--gay);
+	}
+
+	.capture-mode-inference {
+		color: var(--fg-primary);
+		font-style: italic;
 	}
 </style>
