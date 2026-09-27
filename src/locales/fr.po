@@ -3321,3 +3321,7 @@ msgstr "<0/> Dé-lier"
 #: src/routes/(app)/sessions/[id]/+page.svelte
 msgid "Protocole <0/> introuvable. <1/>"
 msgstr "Protocole <0/> introuvable. <1/>"
+
+#: src/lib/Metadata.svelte
+msgid "Remplie au moment de la prise de photos"
+msgstr "Remplie au moment de la prise de photos"

@@ -3321,3 +3321,7 @@ msgstr ""
 #: src/routes/(app)/sessions/[id]/+page.svelte
 msgid "Protocole <0/> introuvable. <1/>"
 msgstr ""
+
+#: src/lib/Metadata.svelte
+msgid "Remplie au moment de la prise de photos"
+msgstr ""
