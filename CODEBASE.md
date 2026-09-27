@@ -12,10 +12,10 @@ Cigale is a local-only web-app, so one of the most important things is that ther
 - [Wuchale](https://wuchale.dev): a library to translate the app into other languages (we offer French and English for now). It uses heuristics defined in its config file to determine which pieces of text are to be translated, and adds them to `.po` files so that they can be translated next.
 - [Weblate](https://weblate.org/): A app to contribute translations of Cigale in other languages: it reads & writes the `.po` files created by Wuchale. Currently, Cigale's translations are done on at https://weblate.gwen.works, on my personal VPS.
 - [Playwright](https://playwright.dev): Enables us to verify that the app works from the user's point of view: we write series of instructions (click on that button) and assertions (is the following text in the UI right now?) and Playwright launches a automated browser to simulate a user using the app.
-- [Github Pages](): The service that hosts the web application, currently at https://cigaleapp.github.io/cigale. Since the app has no server-side, a [static]() web hosting service suffices.
+- [Github Pages](<>): The service that hosts the web application, currently at https://cigaleapp.github.io/cigale. Since the app has no server-side, a [static](<>) web hosting service suffices.
 - [Capacitor](https://capacitorjs.com): A technology to package a web app as a native mobile app that can be distributed on the app stores. It works by running a WebView with the app code, and also exposes functions to interact with the phone's OS as a native app could. Although the technology also supports iOS, we only build the app for Android for now.
 - [Electron](https://www.electronjs.org/): Similarly to Capacitor, Electron is a technology to make a native desktop app that can be installed, and exposes ways to access things a website cannot access, such as the files of the computer it's installed on. It's also a bit more convenient to launch compared to having a volatile tab on a browser. The desktop app is currently not used by anybody though, so it's provided on a "best effort" basis. Currently, the only Electron-excluse feature is to have the app's progress bar reflected as a progress bar under the app icon. For now, the desktop app is only built for Windows, but could easily be built for other platforms too since Electron supports all three (MacOS, Windows and Linux).
-- a [CORS](https://developer.mozilla.org/en-US/docs/Glossary/CORS) proxy: Some APIs (namely Kobocollect's) do not enable cross-origin requests, so we have to pretend that we aren't requesting from another website. This is done by running a small proxy server that takes in a URL, does the request, and returns the response back to the web app. Currently, this is done with a [CORS Anywhere]() server running on https://cors.gwen.works (my personal VPS)
+- a [CORS](https://developer.mozilla.org/en-US/docs/Glossary/CORS) proxy: Some APIs (namely Kobocollect's) do not enable cross-origin requests, so we have to pretend that we aren't requesting from another website. This is done by running a small proxy server that takes in a URL, does the request, and returns the response back to the web app. Currently, this is done with a [CORS Anywhere](<>) server running on https://cors.gwen.works (my personal VPS)
 
 Some additional but less important developer tooling is also used: a formatter to keep the code pretty, a linter to prevent silly mistakes from finding their way on production.
 
@@ -86,7 +86,7 @@ Some are project-specific, and others are widely-used in web development but are
 
 ## Deployment
 
-The app is [continuously]() deployed from the main branch of the github repository. Once all automated checks (tests, linter, etc) pass, a CI workflow builds the application, and deploys it to Github Pages.
+The app is [continuously](<>) deployed from the main branch of the github repository. Once all automated checks (tests, linter, etc) pass, a CI workflow builds the application, and deploys it to Github Pages.
 
 ## Files & folders
 
@@ -107,7 +107,7 @@ The app is [continuously]() deployed from the main branch of the github reposito
 - `src/lib/state.svelte.js`: A singleton class `UIState` that stores global data associated with the app, but that doesn't need to be stored persistently in the database. For example, the currently-open session. The class also has a bunch of convenience properties (for example, `UIState.currentSessionId` is a actual field that is changed, but `UIState.currentSession` is a `get`-property that allows us to have access to the currently-open session object without having to fetch it from the database manually every time).
 - `src/lib/database.svelte.js`: Declares all the tables that are stored in the database. It mostly uses types defined in `src/lib/schemas/`.
 - `src/lib/idb.svelte.js`: Declares migration steps when database changes require those, and a system to have a in-memory, reactive view of the database so that the UI can respond to changes without having to query the database again. Most tables are in that in-memory view, but some aren't because it isn't feasible, RAM-wise (for example, the `MetadataOption` table that stores all enum variants of all protocols can have upwards of 20k objects, as the Backbone protocol contains a lot of species)
-- `src/locales/`: [Gettext `.po`]() files for translations. The app's source code is written in French, but we offer a English translation. Wuchale and Weblate deal with those files, they can be manually edited but aren't meant to be.
+- `src/locales/`: [Gettext `.po`](<>) files for translations. The app's source code is written in French, but we offer a English translation. Wuchale and Weblate deal with those files, they can be manually edited but aren't meant to be.
 - `src/routes/**/+page.svelte`: The different pages (when the URL changes it means we're on a different page) of the app.
 - `src/routes/**/+layout.svelte`: Interface parts that are shared by multiple pages: for example, the navigation bar at the top.
 - `src/routes/**/*.{svelte,js,ts}`: Components and functions that are only used in specific routes
