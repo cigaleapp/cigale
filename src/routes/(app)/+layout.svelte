@@ -44,7 +44,7 @@
 
 	const navbarAppearance = $derived.by<NavbarAppearance>(() => {
 		if (routeIsIn('/(app)/(sidepanel)/o/[observation]')) return 'hidden';
-		if (routeIsIn('/(app)/protocols/[id]')) return 'hidden';
+		if (routeIsIn('/(app)/protocols/[id]/edit')) return 'hidden';
 		if (routeIsIn('/(app)/capture')) return 'hidden';
 
 		return 'full';
