@@ -1,6 +1,6 @@
 import 'fake-indexeddb/auto';
 import 'urlpattern-polyfill';
-import 'opfs-mock'
+import 'opfs-mock';
 
 import { setupServer } from 'msw/node';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, test } from 'vitest';
@@ -264,7 +264,9 @@ describe('#fetch / #json (token lifecycle)', () => {
 	});
 
 	test('json() creates a collection and returns its id', async () => {
-		const CollectionCreateResponse = Ecosignal.ResponseBase({ collection_id: 'number.integer' });
+		const CollectionCreateResponse = Ecosignal.ResponseBase({
+			collection_id: 'number.integer',
+		});
 
 		const { data } = await createProvider().json(
 			'POST',

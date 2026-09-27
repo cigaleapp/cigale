@@ -24,10 +24,10 @@ export type ExtraTestArgs = {
 	tempfiles: TempFilesFixture;
 	onnxmodels: ONNXModelsFixture;
 	network: import('@msw/playwright').NetworkFixture;
-	/** 
+	/**
 	 * Just like network, but can also mock assets, meaning routes that end in a file extension.
-	 * Required when mocking an API that happens to have a route ending with a asset-looking path segment 
-	 * This has perf implications, so only use it when necessary 
+	 * Required when mocking an API that happens to have a route ending with a asset-looking path segment
+	 * This has perf implications, so only use it when necessary
 	 * See https://claude.ai/share/9b09b767-2e90-4f9e-b0e5-a4e286000830
 	 */
 	networkWithAssets: import('@msw/playwright').NetworkFixture;

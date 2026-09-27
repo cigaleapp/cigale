@@ -241,7 +241,7 @@ const Account = table(
 				password: 'string',
 				domain: 'string.url',
 				userId: 'number.integer',
-				color: 'string'
+				color: 'string',
 			}
 		)
 	)

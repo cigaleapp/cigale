@@ -316,7 +316,7 @@ export async function storeImageBytes({
 		uiState.setPreviewURL(id, URL.createObjectURL(preview));
 	});
 
-	return file.filename
+	return file.filename;
 }
 
 /**

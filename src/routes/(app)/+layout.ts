@@ -28,6 +28,7 @@ import WebWorker from '$worker/start.js?worker';
 
 import '@andy0130tw/es-arraybuffer-base64/auto';
 import '@ungap/set-methods';
+
 import { binaryStorage } from '$lib/storage/index.js';
 
 export const ssr = false;

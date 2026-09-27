@@ -49,13 +49,13 @@ test.describe('isolation', () => {
 		await app.tabs.go('import');
 		await importPhotos({ page, additionalWaitTime: ms('2s') }, 'lil-fella.jpeg');
 		await assert(app.gallery.card('lil-fella.jpeg')).toBeVisible();
-		await app.loading.maybeWait()
+		await app.loading.maybeWait();
 
 		await newSession(page, { name: 'Session β' });
 		await app.tabs.go('import');
 		await importPhotos({ page, additionalWaitTime: ms('2s') }, 'debugsquare.png');
 		await assert(app.gallery.card('debugsquare.png')).toBeVisible();
-		await app.loading.maybeWait()
+		await app.loading.maybeWait();
 
 		await deleteSession(page, 'Session α');
 		await assert(page.getByText('Session α', { exact: true })).toHaveCount(0); // robust to strict mode violations

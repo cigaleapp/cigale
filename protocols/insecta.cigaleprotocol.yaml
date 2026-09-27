@@ -608,7 +608,7 @@ sessionMetadata:
     type: file
     label: Sol à l'arrivée
     kobocollect: Prenez une photo du sol au point d'arrivée du transect
-    ecosignal: 
+    ecosignal:
       label: cigale/soil at end
     description: La photo doit être parallèle au sol, à hauteur d'hanche (environ 1 m du sol) afin d'analyser la communauté de plante
     required: false

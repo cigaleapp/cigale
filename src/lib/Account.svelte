@@ -30,12 +30,14 @@
 				<OverflowableText text={account.displayName} />
 			</div>
 			<div class="provider">
-				<OverflowableText text={[
-					provider?.displayName ?? '(Plateforme inconnue)',
-					'domain' in account ? account.domain : undefined,
-				]
-					.filter(Boolean)
-					.join(' · ')} />
+				<OverflowableText
+					text={[
+						provider?.displayName ?? '(Plateforme inconnue)',
+						'domain' in account ? account.domain : undefined,
+					]
+						.filter(Boolean)
+						.join(' · ')}
+				/>
 			</div>
 		{:else}
 			Compte introuvable

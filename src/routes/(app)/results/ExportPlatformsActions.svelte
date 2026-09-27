@@ -15,7 +15,7 @@
 	const { confirmExportIfMetadataErrors }: Props = $props();
 
 	async function upload() {
-		if (!(await confirmExportIfMetadataErrors())) return
+		if (!(await confirmExportIfMetadataErrors())) return;
 
 		if (!uploader.selectedProvider) return;
 		if (!uploader.selectedAccount) return;

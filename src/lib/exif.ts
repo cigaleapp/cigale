@@ -369,9 +369,7 @@ export function setExifFields(bytes: ArrayBuffer, changes: Partial<Record<ExifFi
 				entries(exifDict).find(
 					([cat, tags]) => cat !== 'thumbnail' && tags && field in tags
 				) ??
-				entries(piexif.TAGS).find(
-					([cat, tags]) => cat !== 'Image' && field in tags
-				) ??
+				entries(piexif.TAGS).find(([cat, tags]) => cat !== 'Image' && field in tags) ??
 				[];
 
 			if (!category) continue;
