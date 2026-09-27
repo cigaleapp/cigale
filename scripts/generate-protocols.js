@@ -520,6 +520,9 @@ const protocol = {
 						name: 'Arthropodes (~17000 classes)',
 						description: 'Terrestres, France métropolitaine', // TODO
 						...MODELS.classifiers.arthropoda,
+						requirements: {
+							ram: '4 GB',
+						},
 						input: {
 							height: 224,
 							width: 224,
@@ -530,6 +533,9 @@ const protocol = {
 					{
 						name: 'Collemboles (~80 classes)',
 						...MODELS.classifiers.collembola,
+						requirements: {
+							ram: '2 GB',
+						},
 						input: {
 							height: 224,
 							width: 224,

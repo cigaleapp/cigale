@@ -1,7 +1,8 @@
 import { type } from 'arktype';
 
 import { entries } from '../utils.js';
-import { HTTPRequest } from './common.js';
+import { HTTPRequest, ID } from './common.js';
+import { HardwareRequirements } from './constraints.js';
 import { JsonataExpression } from './expressions.js';
 
 export const MODEL_DETECTION_OUTPUT_SHAPES = {
@@ -81,6 +82,9 @@ export const ModelSettingsCommon = type({
 		"Nom du réseau à afficher dans l'interface. Particulièrement utile si il y a plusieurs réseaux",
 	],
 	input: ModelInput.describe("Configuration de l'entrée des modèles"),
+	'requirements?': HardwareRequirements.describe(
+		'Configuration matérielle minimum pour éxécuter ce modèle'
+	),
 });
 
 export const NeuralBoundingBoxInference = ModelSettingsCommon.and({
@@ -103,3 +107,38 @@ export const NeuralEnumInference = ModelSettingsCommon.and({
 /**
  * @typedef {typeof NeuralBoundingBoxInference.infer | typeof NeuralEnumInference.infer} NeuralInference
  */
+
+export const CustomNeuralNetworkSchema = type({
+	id: ID,
+	name: 'string',
+	input: ModelInput,
+	bytes: '"migrated" = "migrated"',
+	sessionId: '"_" = "_"',
+	'requirements?': HardwareRequirements,
+})
+	.and(
+		type.or(
+			{
+				source: '"remote"',
+				url: 'string.url.parse',
+				filename: '"none"',
+			},
+			{
+				source: '"local"',
+				filename: 'string > 0',
+			}
+		)
+	)
+	.and(
+		type.or(
+			{
+				purpose: '"classify"',
+				classmapping: HTTPRequest.or('string[]'),
+				'output?': { 'name?': 'string' },
+			},
+			{
+				purpose: '"detect"',
+				output: ModelOutputBoundingBox,
+			}
+		)
+	);

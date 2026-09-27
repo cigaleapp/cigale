@@ -34,6 +34,13 @@ import lightProtocol from '../../examples/arthropods.light.cigaleprotocol.json' 
 type RemoveNamespace<Key extends `io.github.cigaleapp.arthropods.example.light__${string}`> =
 	Key extends `io.github.cigaleapp.arthropods.example.light__${infer Rest}` ? Rest : never;
 
+type RemoveSuffix<
+	Suffix extends string,
+	Subject extends `${string}${Suffix}`,
+> = Subject extends `${infer S}${Suffix}` ? S : never;
+
+type Autocomplete<Suggestions extends string> = Suggestions | (string & {});
+
 export type AppFixture = {
 	wait: (ms: number | `${number}${'ms' | 's'}`) => Promise<void>;
 	metadata: ReturnType<typeof metadataSections>;
@@ -88,11 +95,13 @@ export type AppFixture = {
 			>;
 			values(args: {
 				/** The image's filename */
-				image?: string;
+				image?: Autocomplete<FixturePaths.Photos>;
 				/** The image's ID */
 				imageId?: string;
 				/** The observation's label */
-				observation?: string;
+				observation?: Autocomplete<
+					RemoveSuffix<'.CR2' | '.jpg' | '.jpeg' | '.png' | '.json', FixturePaths.Photos>
+				>;
 				/** The session's name */
 				session?: string;
 				/** Remove namespace from metadata id (keys of returned object). By default, set to lightweight protocol's id */

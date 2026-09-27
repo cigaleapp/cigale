@@ -10,13 +10,14 @@ import {
 	type TestInfo,
 } from '@playwright/test';
 
+import { parseNavigatorDefineAnnotations } from '$e2e/annotations.js';
 import {
+	defineNavigatorProperties,
 	dumpDatabase,
 	getPredownloadedModel,
 	mockPredownloadedModels,
 	mockProtocolSourceURL,
 	mockUrl,
-	setHardwareConcurrency,
 } from '$e2e/utils/index.js';
 import { mockOPFSOnWebWorkers, restoreOPFSState } from '$e2e/utils/opfs.js';
 
@@ -119,16 +120,18 @@ export async function forEachTest(
 		species: [collembolaClassifierModel, arthropodaClassifierModel],
 	});
 
-	const concurrency = info.annotations.find((a) => a.type === 'concurrency')?.description;
-	if (concurrency) {
-		await setHardwareConcurrency(page, Number.parseInt(concurrency));
-	}
+	await defineNavigatorProperties(page, parseNavigatorDefineAnnotations(info.annotations));
 
 	if (
 		info.tags.includes('@webkit-no-parallelization') &&
 		context.browser()?.browserType().name() === 'webkit'
 	) {
-		await setHardwareConcurrency(page, 1);
+		await defineNavigatorProperties(page, { hardwareConcurrency: 1 });
+	}
+
+	const deviceMemory = info.annotations.find((a) => a.type === 'deviceMemory')?.description;
+	if (deviceMemory) {
+		await defineNavigatorProperties(page, { deviceMemory: Number.parseInt(deviceMemory) });
 	}
 
 	if (!info.tags.includes('@blank')) {

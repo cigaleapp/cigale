@@ -210,7 +210,7 @@
 	{#if uiState.classificationInferenceAvailable}
 		{#each uiState.allClassificationMetadata as metadata (metadata.id)}
 			{const selector = uiState.selectedClassificationModels[metadata.id] ?? 0}
-			{const model = uiState.classificationModelBySelector(selector, metadata.id)}
+			{const model = uiState.neuralModelBySelector(selector, metadata.id)}
 			{const url = uiState.classificationModelUrl(selector, metadata.id)}
 
 			{#if model}

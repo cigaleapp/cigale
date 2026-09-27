@@ -246,17 +246,21 @@ export function makeRegexpUnion(...parts) {
 /**
  * ⚠️ **Needs a navigation before taking effect**
  * @param {Page} page
- * @param {number} value
+ * @param {object} values
  */
-export async function setHardwareConcurrency(page, value) {
-	await page.addInitScript((value) => {
+export async function defineNavigatorProperties(page, values) {
+	if (Object.keys(values).length === 0) return;
+
+	await page.addInitScript((values) => {
 		const proto = Object.getPrototypeOf(navigator);
 
-		Object.defineProperty(proto, 'hardwareConcurrency', {
-			value,
-			writable: false,
-		});
-	}, value);
+		for (const [key, value] of Object.entries(values)) {
+			Object.defineProperty(proto, key, {
+				value,
+				writable: false,
+			});
+		}
+	}, values);
 }
 
 /**

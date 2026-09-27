@@ -15,7 +15,10 @@
 	import IconNeutral from '~icons/ri/quote-text';
 	import { version } from '$app/environment';
 	import lockfile from '$lib/../../bun.lock?raw';
+	import { getCpuThreadsCount, getRamCapacityBytes } from '$lib/hardware-requirements.js';
+	import { formatBytesSize } from '$lib/i18n.js';
 	import { databaseName, databaseRevision } from '$lib/idb.svelte.js';
+	import LoadingText from '$lib/LoadingText.svelte';
 	import Logo from '$lib/Logo.svelte';
 	import OverflowableText from '$lib/OverflowableText.svelte';
 	import { seo } from '$lib/seo.svelte';
@@ -267,6 +270,28 @@
 			<dd><code>{data.parallelism}</code> nodes</dd>
 			<dt>Hardware</dt>
 			<dd><code>{navigator.hardwareConcurrency}</code> threads</dd>
+		</dl>
+	</dd>
+	<dt>Hardware</dt>
+	<dd>
+		<dl>
+			<dt>CPU</dt>
+			<dd>
+				<LoadingText value={getCpuThreadsCount} />
+				threads
+			</dd>
+			<dt>RAM</dt>
+			<dd>
+				<LoadingText value={async () => (await getRamCapacityBytes()) ?? 'unknown'}>
+					{#snippet loaded(capacity)}
+						{#if capacity === 'unknown'}
+							???
+						{:else}
+							~{formatBytesSize(capacity)}
+						{/if}
+					{/snippet}
+				</LoadingText>
+			</dd>
 		</dl>
 	</dd>
 	<dt>Code source</dt>
