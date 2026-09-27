@@ -3,6 +3,7 @@
 
 	import { SvelteMap } from 'svelte/reactivity';
 
+	import Charts from '$lib/charts/Charts.svelte';
 	import Field from '$lib/Field.svelte';
 	import { tables } from '$lib/idb.svelte.js';
 	import ModalConfirm from '$lib/ModalConfirm.svelte';
@@ -74,6 +75,16 @@
 				/>
 			{/if}
 		</section>
+
+		{#if uiState.currentProtocol?.charts?.session}
+			<header>
+				<h2>Statistiques</h2>
+			</header>
+
+			<section class="stats">
+				<Charts scope="session" protocol={uiState.currentProtocol.id} />
+			</section>
+		{/if}
 	</section>
 
 	<ExportPanel {confirmExportIfMetadataErrors} />

@@ -441,7 +441,10 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 
 			for (const metadata of toRefresh) {
 				try {
-					const value = await inferHttp(db, protocolId, metadata, values ?? {});
+					const value = await inferHttp(db, protocolId, metadata, values ?? {}).catch((e) => {
+						console.error(e);
+						return;
+					});
 
 					// TODO: dont store if currently stored value is manuallyModified
 

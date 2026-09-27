@@ -25,8 +25,8 @@ export async function CapacitorFilesystemBackend(): Promise<BinaryStorageBackend
 		debugdir(root)
 	);
 
-	return {
-		name: 'capacitor',
+	return  {
+	name: 'capacitor',
 		async resolvePath(locator) {
 			const result = await Filesystem.getUri({
 				directory: root,
@@ -35,20 +35,20 @@ export async function CapacitorFilesystemBackend(): Promise<BinaryStorageBackend
 
 			return result.uri;
 		},
-		async exists(locator) {
-			try {
-				const stat = await Filesystem.stat({
-					directory: root,
-					path: locatorToPath(locator),
-				});
-				console.debug('[local fs] exists? yes: ', locatorToPath(locator), stat);
-			} catch (error) {
-				console.debug('[local fs] exists? no: ', locatorToPath(locator), error);
-				return false;
-			}
+	async exists(locator) {
+		try {
+			const stat = await Filesystem.stat({
+				directory: root,
+				path: locatorToPath(locator),
+			});
+			console.debug('[local fs] exists? yes: ', locatorToPath(locator), stat);
+		} catch (error) {
+			console.debug('[local fs] exists? no: ', locatorToPath(locator), error);
+			return false;
+		}
 
-			return true;
-		},
+		return true;
+	},
 		async delete(locator) {
 			await Filesystem.deleteFile({
 				directory: root,
@@ -117,31 +117,31 @@ export async function CapacitorFilesystemBackend(): Promise<BinaryStorageBackend
 
 			return stat.size;
 		},
-		async count(locator) {
-			return Filesystem.readdir({
-				directory: root,
-				path: locatorToPath(locator),
-			})
-				.then(({ files }) => files.length)
-				.catch(() => 0);
-		},
-		async *list(locator) {
-			const { files } = await Filesystem.readdir({
-				directory: root,
-				path: locatorToPath(locator),
-			}).catch(() => ({ files: [] }));
+	async count(locator) {
+		return Filesystem.readdir({
+			directory: root,
+			path: locatorToPath(locator),
+		})
+			.then(({ files }) => files.length)
+			.catch(() => 0);
+	},
+	async *list(locator) {
+		const { files } = await Filesystem.readdir({
+			directory: root,
+			path: locatorToPath(locator),
+		}).catch(() => ({ files: [] }));
 
-			for (const file of files) {
-				yield { ...locator, name: file.name };
-			}
-		},
-		async clear(locator) {
-			await Filesystem.rmdir({
-				directory: root,
-				path: locatorToPath(locator),
-				recursive: true,
-			});
-		},
+		for (const file of files) {
+			yield { ...locator, name: file.name };
+		}
+	},
+	async clear(locator) {
+		await Filesystem.rmdir({
+			directory: root,
+			path: locatorToPath(locator),
+			recursive: true,
+		});
+	},
 	} as BinaryStorageBackend<'capacitor'>;
 }
 
