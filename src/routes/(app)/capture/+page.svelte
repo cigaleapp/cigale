@@ -861,6 +861,7 @@
 		/* ButtonIcon & ButtonInk colors */
 		--fg: white;
 		--bg: var(--ui-surfaces);
+		--bg-hover: var(--ui-surfaces);
 
 		& > * {
 			display: flex;

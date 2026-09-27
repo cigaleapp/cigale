@@ -15,14 +15,19 @@
 	import IconSortAsc from '~icons/ri/sort-asc';
 	import IconSortDesc from '~icons/ri/sort-desc';
 	import IconInferenceEnabled from '~icons/ri/sparkling-line';
+	import IconImport from '~icons/ri/upload-2-line';
 	import IconModelCustom from '~icons/ri/wrench-line';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import DropdownMenu from '$lib/DropdownMenu.svelte';
+	import { promptForFiles } from '$lib/files.js';
 	import { tables } from '$lib/idb.svelte.js';
+	import { ACCEPTED_IMPORT_TYPES } from '$lib/import.svelte.js';
 	import { resolveMetadataImport } from '$lib/metadata/namespacing.js';
+	import { IsMobile } from '$lib/mobile.svelte.js';
 	import { globalModals } from '$lib/modals.svelte.js';
 	import { goto } from '$lib/paths.js';
 	import { metadataDefinitionComparator } from '$lib/protocols.js';
+	import { importMore } from '$lib/queue.svelte.js';
 	import { removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';
 	import {
 		GROUP_FIELDS,
@@ -164,6 +169,12 @@
 		neural?: boolean;
 		icon?: string | import('svelte').Component;
 	};
+
+	const mobile = new IsMobile();
+
+	const bottomNavHasCapture = $derived(
+		mobile.current && Boolean(uiState.currentProtocol?.capture)
+	);
 </script>
 
 <div class="inference">
@@ -174,7 +185,23 @@
 			...orEmpty(tab === 'import', {
 				label: '',
 				items: [
-					{
+					...orEmpty(bottomNavHasCapture, {
+						type: 'clickable' as const,
+						label: 'Ajouter des photos',
+						data: {
+							direction: null,
+							icon: IconImport,
+						} as ItemExtras,
+						async onclick() {
+							importMore(
+								await promptForFiles({
+									accept: ACCEPTED_IMPORT_TYPES,
+									multiple: true,
+								})
+							);
+						},
+					}),
+					...orEmpty(!bottomNavHasCapture, {
 						type: 'clickable' as const,
 						label: 'Prendre des photos',
 						data: {
@@ -184,7 +211,7 @@
 						async onclick() {
 							await goto('/(app)/capture');
 						},
-					},
+					}),
 				],
 			}),
 			{
