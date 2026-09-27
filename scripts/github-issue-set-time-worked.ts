@@ -389,29 +389,28 @@ async function analyzeIssue(
 
 		const display = `${value} ${unit === 'minutes' ? 'mins' : unit}`;
 
-		const issuesToUpdate = prs.flatMap((pr) => pr.closingIssuesReferences.nodes);
-
-		for (const issue of issuesToUpdate) {
+		// `issue` is the issue whose PRs we just analyzed. Do not update every
+		// issue referenced by those PRs: a PR can close several issues, and doing
+		// so would assign the total time of the whole PR set to each of them.
+		console.info(
+			`\nIssue #${issue.number} (${issue.title}) = ${display} [${formatDuration(duration)}]:`
+		);
+		for (const [i, pr] of prs.entries()) {
 			console.info(
-				`\nIssue #${issue.number} (${issue.title}) = ${display} [${formatDuration(duration)}]:`
+				` ${i > 0 ? '+' : ' '} ${pr.headRefName} (${prsPerBranch
+					.get(pr.headRefName)!
+					.map((pr) => `#${pr.number}`)
+					.join(', ')})`
 			);
-			for (const [i, pr] of prs.entries()) {
-				console.info(
-					` ${i > 0 ? '+' : ' '} ${pr.headRefName} (${prsPerBranch
-						.get(pr.headRefName)!
-						.map((pr) => `#${pr.number}`)
-						.join(', ')})`
-				);
-				const extras = extrasPerPR.get(pr.headRefName);
-				if (extras) {
-					for (const { other } of extras) {
-						console.info(` + ${pr.headRefName} (${other.project}@${other.branch})`);
-					}
+			const extras = extrasPerPR.get(pr.headRefName);
+			if (extras) {
+				for (const { other } of extras) {
+					console.info(` + ${pr.headRefName} (${other.project}@${other.branch})`);
 				}
 			}
-
-			times.push({ issue, time: display, seconds });
 		}
+
+		times.push({ issue, time: display, seconds });
 	} catch (error) {
 		console.error(`An error occurred during analysis of #${issue.number} (${issue.title}): `);
 		console.error(error);
