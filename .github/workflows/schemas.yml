@@ -5,8 +5,8 @@ on:
     inputs: {}
 
 jobs:
-  protocols:
-    name: Protocols
+  against-current:
+    name: Check against current
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -17,6 +17,7 @@ jobs:
         run: bun install --frozen-lockfile
       - name: Generate JSON schema
         run: bun run scripts/generate-json-schemas.js
+
       - name: Validate protocols with JSON schema
         uses: GrantBirki/json-yaml-validate@9dbc6e6ff950c53200156e8afbc16ef1355f1c8d # v5.0.1
         with:
@@ -25,6 +26,33 @@ jobs:
           files: |
             examples/*.cigaleprotocol.{yaml,json}
             protocols/*.cigaleprotocol.{yaml,json}
+
+      - name: Validate registry with JSON schema
+        uses: GrantBirki/json-yaml-validate@9dbc6e6ff950c53200156e8afbc16ef1355f1c8d # v5.0.1
+        with:
+          json_schema: static/registry.schema.json
+          json_schema_version: draft-2020-12
+          files: protocols/registry.json
+
+  against-main:
+    name: Check against main
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Download protocols schema
+        run: wget https://cigaleapp.github.io/cigale/protocol.schema.json -O static/protocol.schema.json
+      - name: Validate protocols with JSON schema
+        uses: GrantBirki/json-yaml-validate@9dbc6e6ff950c53200156e8afbc16ef1355f1c8d # v5.0.1
+        with:
+          json_schema: static/protocol.schema.json
+          json_schema_version: draft-2020-12
+          files: |
+            examples/*.cigaleprotocol.{yaml,json}
+            protocols/*.cigaleprotocol.{yaml,json}
+
+      - name: Download registry schema
+        run: wget https://cigaleapp.github.io/cigale/registry.schema.json -O static/registry.schema.json
       - name: Validate registry with JSON schema
         uses: GrantBirki/json-yaml-validate@9dbc6e6ff950c53200156e8afbc16ef1355f1c8d # v5.0.1
         with:
