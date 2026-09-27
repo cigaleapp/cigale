@@ -39,6 +39,28 @@ crop:
   metadata: crop
 
 remote:
+  ecosignal:
+    project: 1
+    # pour savoir si une image sans boîtes a été envoyée depuis Cigale (donc à ne pas ré-analyser)
+    label: cigale/observation
+    # pour savoir sur quelle métadonnée stocker les coordonnées des annotations
+    crop: crop
+    # quel status ecosignal correspond à une annotation confirmée
+    confirmedStatus: Accepted
+
+    domains:
+      VPS de Gwenn (temporaire): https://ecosignal.gwen.works
+
+    sites:
+      create: true
+      protect: true
+      name:
+        metadata: site_code
+        fallback: Non renseigné
+      location:
+        metadata: start_at
+        fallback: FRA
+
   kobocollect:
     # form: https://kf.kobotoolbox.org/#/forms/aTocGmTVNFFtuTAbtcgsEK/
     form: https://kf.kobotoolbox.org/#/forms/a3kVqAFEJwnHFcFc7PpWj4/
@@ -453,6 +475,8 @@ sessionMetadata:
     type: file
     label: Photo du milieu
     kobocollect: Prenez une photo du milieu
+    ecosignal:
+      label: cigale/habitat
     description: Prenez une photo qui représente bien l'endroit où vous allez effectuer l'inventaire photographique.
     mergeMethod: none
     required: false
@@ -467,6 +491,8 @@ sessionMetadata:
     type: file
     label: Sol au départ
     kobocollect: Prenez une photo du sol au point de départ du transect
+    ecosignal:
+      label: cigale/soil at start
     description: Prenez une photo du sol au point de départ du transect. Le téléphone/appareil doit être parallèle au sol, à hauteur d'hanche (environ 1 m du sol) afin d'analyser la communauté de plante
     mergeMethod: none
     required: false
@@ -582,6 +608,8 @@ sessionMetadata:
     type: file
     label: Sol à l'arrivée
     kobocollect: Prenez une photo du sol au point d'arrivée du transect
+    ecosignal: 
+      label: cigale/soil at end
     description: La photo doit être parallèle au sol, à hauteur d'hanche (environ 1 m du sol) afin d'analyser la communauté de plante
     required: false
     mergeMethod: none

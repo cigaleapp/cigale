@@ -28,6 +28,7 @@ declare global {
 				/** A function to update a _search multivariate, given the (raw, ie as-stored) columns of the object */
 				searchIndex?: (raw: Record<string, unknown>) => string[];
 			};
+			encoding?: "json" | "multipart"
 		};
 	}
 }

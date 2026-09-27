@@ -3,7 +3,7 @@ import { strFromU8, unzipSync } from 'fflate';
 
 import * as db from './idb.svelte.js';
 import { imageIdToFileId, resizeToMaxSize, storeImageBytes } from './images.js';
-import { serializeMetadataValue } from './metadata/index.js';
+import { metadataRecordToSerialized, serializeMetadataValue } from './metadata/index.js';
 import { Analysis } from './schemas/exports.js';
 import { ANALYSIS_JSON_ZIP_FILEPATH } from './schemas/protocols.js';
 import { switchSession } from './sessions.js';
@@ -83,10 +83,7 @@ export async function importResultsZip(file, id) {
 			createdAt: new Date().toISOString(),
 			// eslint-disable-next-line svelte/prefer-svelte-reactivity
 			openedAt: new Date().toISOString(),
-			metadata: mapValues(session.metadata ?? {}, ({ value, ...rest }) => ({
-				...rest,
-				value: serializeMetadataValue(value),
-			})),
+			metadata: metadataRecordToSerialized(session.metadata ?? {}),
 		});
 
 		await switchSession(newSession.id);

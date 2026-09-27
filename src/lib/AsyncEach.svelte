@@ -98,28 +98,19 @@ If you have a changing items iterator, please use a {#key} block around to ensur
 	async function loadItems(
 		last: T | undefined,
 		// eslint-disable-next-line no-unused-vars
-		generator: T[] | ((last?: T | undefined) => AsyncIterable<Iteration<T>>)
+		generator: (last?: T | undefined) => AsyncIterable<Iteration<T>>
 	) {
 		if (noMoreItems) return;
 
 		const totalBefore = total;
 		loading = true;
 
-		if (Array.isArray(generator)) {
-			loaded = generator;
-			noMoreItems = true;
-			loading = false;
-			error = undefined;
-			await onloaded?.(loaded);
-			return;
-		}
-
 		// Estimate total before receiving the actual total
 		total += pagesize;
 
 		try {
-			if (cache && cache.entries.has([cache.key, page.toString()])) {
-				loaded = [...loaded, ...cache.entries.get([cache.key, page.toString()])!];
+			if (cache && cache.entries.has([cache.key, page])) {
+				loaded = [...loaded, ...cache.entries.get([cache.key, page])!];
 			} else {
 				let i = 0;
 				for await (const item of generator(last)) {
@@ -149,7 +140,7 @@ If you have a changing items iterator, please use a {#key} block around to ensur
 				}
 
 				if (cache) {
-					cache.entries.set([cache.key, page.toString()], loaded);
+					cache.entries.set([cache.key, page], loaded);
 				}
 			}
 
@@ -166,6 +157,15 @@ If you have a changing items iterator, please use a {#key} block around to ensur
 
 	// Initial loading
 	watch([() => items], () => {
+		if (Array.isArray(items)) {
+			loaded = items;
+			noMoreItems = true;
+			loading = false;
+			error = undefined;
+			void onloaded?.(loaded);
+			return;
+		}
+
 		total = 0;
 		loaded = [];
 		void loadItems(undefined, items);

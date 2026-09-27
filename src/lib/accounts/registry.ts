@@ -2,19 +2,22 @@ import type { AccountConstructor } from './types.js';
 import type * as DB from '$lib/database.js';
 import type { DatabaseHandle } from '$lib/idb.svelte.js';
 
+import EcoSignal from '$lib/accounts/ecosignal.js';
 import KoboToolbox from '$lib/accounts/kobotoolbox.js';
 
 type AccountProviders = {
 	kobotoolbox: AccountConstructor<
 		typeof KoboToolbox.auth,
-		(typeof KoboToolbox.servers)[number]['domain']
+		(typeof KoboToolbox._servers)[number]['domain']
 	>;
+	ecosignal: AccountConstructor<typeof EcoSignal.auth, string>;
 };
 
 class AccountRegistry<Providers extends Record<string, AccountConstructor>> {
 	constructor(private providers: Providers) {}
 
-	get<K extends keyof Providers>(key: K): Providers[K] {
+	get<K extends 'local' | keyof Providers>(key: K): K extends 'local' ? undefined : Providers[K] {
+		if (key === 'local') return undefined;
 		return this.providers[key];
 	}
 
@@ -29,4 +32,5 @@ class AccountRegistry<Providers extends Record<string, AccountConstructor>> {
 
 export const providers = new AccountRegistry<AccountProviders>({
 	kobotoolbox: KoboToolbox,
+	ecosignal: EcoSignal,
 });

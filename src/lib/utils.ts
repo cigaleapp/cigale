@@ -285,6 +285,7 @@ if (import.meta.vitest) {
 	});
 }
 
+/** Tries to parse the given value as a JSON string. If parsing fails, returns undefined without throwing.  */
 export function safeJSONParse(str: unknown): unknown {
 	try {
 		return JSON.parse(str?.toString() ?? '');
@@ -1398,11 +1399,20 @@ if (import.meta.vitest) {
 }
 
 export function corsfix(url: string | URL): string {
+	// Don't try to corsfix localhost urls since they wont be accessible by the cors proxy server anyways
+	if (new URL(url).hostname === 'localhost') {
+		return new URL(url).toString();
+	}
+
 	return 'https://cors.gwen.works/' + url.toString().replace(/^https?:\/\//, '');
 }
 
+export function isLocalhost() {
+	return location.hostname === 'localhost';
+}
+
 export function corsfixIfLocalhost(src: string): string {
-	if (location.hostname !== 'localhost') return src;
+	if (!isLocalhost()) return src;
 	return corsfix(src);
 }
 
@@ -1656,5 +1666,25 @@ if (import.meta.vitest) {
 	test('indexOfMin', () => {
 		expect(indexOfMin([2, 5, 1, 3, 5, 2])).toBe(2);
 		expect(indexOfMin([0, 5, 0, 3, 5, 2])).toBe(0);
+	});
+}
+
+export function isFulfilled<T>(
+	result: PromiseSettledResult<T>
+): result is PromiseFulfilledResult<T> {
+	return result.status === 'fulfilled';
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+
+	test('isFulfilled', async () => {
+		const [resolved, rejected] = await Promise.allSettled([
+			Promise.resolve('yay'),
+			Promise.reject(new Error('oh noes :(')),
+		]);
+
+		expect(isFulfilled(resolved)).toBe(true);
+		expect(isFulfilled(rejected)).toBe(false);
 	});
 }

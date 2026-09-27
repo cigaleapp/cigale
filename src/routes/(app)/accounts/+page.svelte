@@ -3,8 +3,10 @@
 
 	import { providers } from '$lib/accounts/registry.js';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
+	import { errorMessage } from '$lib/i18n.js';
 	import { databaseHandle, tables } from '$lib/idb.svelte.js';
 	import Logo from '$lib/Logo.svelte';
+	import { toasts } from '$lib/toasts.svelte.js';
 
 	import TopbarBackToHome from '../TopbarBackToHome.svelte';
 	import ModalAddAccount from './ModalAddAccount.svelte';
@@ -54,7 +56,13 @@
 						const provider = providers.get(account.type);
 						if (!provider) return;
 						const acct = provider.fromDatabase(db, account);
-						await acct.logout();
+
+						try {
+							await acct.logout();
+						} catch (e) {
+							toasts.warn(errorMessage(e, 'Impossible de se déconnecter'));
+						}
+
 						await tables.Account.remove(account.id);
 					}}
 				/>

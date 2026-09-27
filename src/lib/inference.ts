@@ -246,15 +246,17 @@ export function modelUrl(model: HTTPRequest): string {
 export async function infer(
 	{
 		abortSignal,
+		debug = false,
 		...taskSettings
 	}: {
+		/** Log the raw output from the neural network */
+		debug?: boolean;
 		input: { width: number; height: number; name: string; normalized: boolean };
 		output: { name: string; shape: ModelDetectionOutputShapes };
 		abortSignal?: AbortSignal;
 	},
 	buffers: ArrayBuffer[],
 	session: import('onnxruntime-web').InferenceSession,
-	uiState: typeof import('./uistate.svelte.js').uiState,
 	sequence: boolean = false,
 	webgpu: boolean = true
 ): Promise<[BB[][], number[][], number, ort.Tensor]> {
@@ -292,30 +294,23 @@ export async function infer(
 		start = Date.now();
 	}
 
-	const inputName = session.inputNames[0];
-	const outputName = taskSettings.output?.name ?? 'output0';
-
 	const inputTensor = await loadToTensor(buffers, {
 		...taskSettings.input,
 		...(abortSignal ? { abortSignal } : {}),
 	});
 
-	// TODO figure out a way to use the abortSignal while running the inference
-	const outputTensor = await session.run({ [inputName]: inputTensor });
+	const data = await runModel({
+		model: session,
+		input: inputTensor,
+		settings: taskSettings,
+		debug,
+	});
 
-	const bbs = output2BB(
-		taskSettings.output.shape,
-		outputTensor[outputName].data as Float32Array,
-		buffers.length,
-		NUMCONF,
-		abortSignal
-	);
+	console.debug('Inference finished', data);
+
+	const bbs = output2BB(taskSettings.output.shape, data, buffers.length, NUMCONF, abortSignal);
 
 	const [boundingboxes, bestScores] = bbs;
-	if (!sequence && uiState) {
-		uiState.processing.done = buffers.length;
-		uiState.processing.time = (Date.now() - start) / 1000;
-	}
 
 	return [boundingboxes, bestScores, start, inputTensor];
 }
@@ -323,24 +318,56 @@ export async function infer(
 /**
  * @returns  scores for each class
  */
-export async function classify(
-	settings: (typeof PROCEDURES.classify.input)['infer']['taskSettings'],
-	image: ort.Tensor,
-	model: ort.InferenceSession,
-	abortSignal: AbortSignal
-): Promise<number[]> {
-	const inputName = settings.input.name ?? model.inputNames[0];
-
+export async function classify({
+	settings,
+	image,
+	model,
+	abortSignal,
+	debug = false,
+}: {
+	settings: (typeof PROCEDURES.classify.input)['infer']['taskSettings'];
+	image: ort.Tensor;
+	model: ort.InferenceSession;
+	abortSignal?: AbortSignal | undefined;
+	debug?: boolean;
+}): Promise<number[]> {
 	const input = await preprocessTensor(settings, image, MEAN, STD, abortSignal);
 
-	const output = await model.run({ [inputName]: input });
+	const output = await runModel({ model, input, settings, debug });
 
 	abortSignal?.throwIfAborted();
 
-	const scores = await output[Object.keys(output)[0]]
-		.getData(true)
-		.then((scores) => /** @type {number[]} */ [...scores.values()]);
+	const scores = [...output.values()];
 
 	image.dispose();
 	return scores;
+}
+
+async function runModel({
+	model,
+	input,
+	settings,
+	debug,
+}: {
+	model: ort.InferenceSession;
+	input: ort.Tensor;
+	settings: (typeof PROCEDURES)[
+		'classify' | 'inferBoundingBoxes']['input']['infer']['taskSettings'];
+	debug?: boolean;
+}): Promise<Float32Array> {
+	const inputName = settings.input?.name ?? model.inputNames[0];
+	const outputName = settings.output?.name ?? model.outputNames[0];
+
+	// TODO figure out a way to use the abortSignal while running the inference
+	const outputTensor = await model.run({ [inputName]: input });
+
+	// TODO once we fixed the output name for all models, remove the ??
+	const output = (outputTensor[outputName] ?? outputTensor[model.outputNames[0]])
+		.data as Float32Array;
+
+	if (debug) {
+		console.debug(`Finished inference, output is`, output);
+	}
+
+	return output;
 }

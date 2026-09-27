@@ -38,6 +38,10 @@ export class TempFilesFixture {
 		const file = {
 			filename,
 			content,
+			text() {
+				if (typeof content === 'string') return content;
+				return new TextDecoder().decode(content);
+			},
 			toString() {
 				return filename;
 			},
