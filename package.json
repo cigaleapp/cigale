@@ -224,7 +224,7 @@
 		"word-diff": "^1.0.1",
 		"wuchale": "^0.25.8",
 		"xss": "^1.0.15",
-		"yaml": "^2.9.0"
+		"yaml": "^2.9.1"
 	},
 	"patchedDependencies": {
 		"@capacitor/file-viewer@2.0.1": "patches/@capacitor__file-viewer@2.0.1.patch",
