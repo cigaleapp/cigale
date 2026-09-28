@@ -56,6 +56,8 @@ export const ProtocolRegistry = type({
 	protocols: type({
 		id: ProtocolID,
 		url: URLString.describe('URL où télécharger le protocole'),
+		name: 'string',
+		'logo?': URLString.or('null'),
 	}).array(),
 });
 

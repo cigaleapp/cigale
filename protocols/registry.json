@@ -2,18 +2,22 @@
 	"$schema": "https://cigaleapp.github.io/cigale/registry.schema.json",
 	"protocols": [
 		{
+			"name": "Example: arthropodes",
 			"id": "io.github.cigaleapp.arthropods.example",
 			"url": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json"
 		},
 		{
+			"name": "IDmyBee",
 			"id": "io.github.cigaleapp.idmybee",
 			"url": "https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/idmybee.cigaleprotocol.json"
 		},
 		{
+			"name": "INSECTA",
 			"id": "fr.osug.terra-forma-web.insecta",
 			"url": "https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/insecta.cigaleprotocol.yaml"
 		},
 		{
+			"name": "Entomoscope",
 			"id": "fr.osug.terra-forma-web.entomoscope",
 			"url": "https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/entomoscope.cigaleprotocol.yaml"
 		}
