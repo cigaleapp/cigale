@@ -53,6 +53,7 @@ msgid "<0/> nodes"
 msgstr "<0/> nodes"
 
 #: src/routes/(app)/about/+page.svelte
+#: src/routes/(app)/about/+page.svelte
 msgid "<0/> threads"
 msgstr "<0/> threads"
 
@@ -317,6 +318,7 @@ msgstr "Thanks to libraries"
 msgid "Gérer les protocoles"
 msgstr "Manage protocols"
 
+#: src/routes/(app)/about/+page.svelte
 #: src/routes/(app)/about/+page.svelte
 msgid "Hardware"
 msgstr "Hardware"
@@ -3292,4 +3294,22 @@ msgstr ""
 
 #: src/lib/Metadata.svelte
 msgid "Remplie au moment de la prise de photos"
+msgstr ""
+
+#. 0: cpuThreads; 1: requirements.cpu.threads.limit
+#: src/lib/hardware-requirements.ts
+msgid "Le processeur a {0} threads (minimum de {1} threads)"
+msgstr ""
+
+#. 0: formatBytesSize(ramCapacityBytes!); 1: formatBytesSize(requirementBytes)
+#: src/lib/hardware-requirements.ts
+msgid "L'appareil a {0} de RAM (minimum de {1} requis)"
+msgstr ""
+
+#: src/routes/(app)/about/+page.svelte
+msgid "CPU"
+msgstr ""
+
+#: src/routes/(app)/about/+page.svelte
+msgid "RAM"
 msgstr ""
