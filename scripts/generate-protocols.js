@@ -147,7 +147,6 @@ const namespaced = (id) => `io.github.cigaleapp.arthropods.example__${id}`;
 
 const cladeMetadata = (clade, label) => ({
 	type: 'enum',
-	options: [],
 	label,
 	required: false,
 	description: '',
@@ -156,6 +155,17 @@ const cladeMetadata = (clade, label) => ({
 	group: 'taxonomy',
 	// Force dropdown presentation even for higher clades that technically have a few options
 	presentation: 'dropdown',
+	...(['species', 'genus', 'family'].includes(clade)
+		? {
+				remoteOptions: {
+					query: {
+						one: `https://cigale-protocol-options.gwen.works/${clade}/{{ key }}`,
+						multiple: `https://cigale-protocol-options.gwen.works/${clade}/?{{#each keys}}{{#if @index}}&{{/if}}key={{ this }}{{/each}}`,
+						search: `https://cigale-protocol-options.gwen.works/${clade}?q={{ query }}`,
+					},
+				},
+			}
+		: { options: [] }),
 });
 
 /**
@@ -513,7 +523,8 @@ const protocol = {
 			groupable: true,
 			classification: true,
 			mergeMethod: 'max',
-			options: options.sort((a, b) => parseFloat(a.key) - parseFloat(b.key)),
+			// options: options.sort((a, b) => parseFloat(a.key) - parseFloat(b.key)),
+			remoteOptions: cladeMetadata('species', 'Espèce').remoteOptions!,
 			infer: {
 				neural: [
 					{

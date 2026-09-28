@@ -654,6 +654,17 @@ const MetadataEnum = MetadataBase.and({
 		InferenceConfigs.sidecar(type('string|number')).partial(),
 		InferenceConfigs.neuralEnum.partial()
 	),
+	'remoteOptions?': {
+		// 'count?': {
+		// 	request: 'string.url',
+		// 	select: JsonataExpression(type.unknown, type('number.integer >= 0')),
+		// },
+		query: {
+			one: TemplatedString(type({ key: 'string|number' })),
+			multiple: TemplatedString(type({ keys: '(string|number)[]' })),
+			search: TemplatedString(type({ query: 'string' })),
+		},
+	},
 	// --- Technical fields ---
 	_optionsCount: 'number.integer = 0',
 });
