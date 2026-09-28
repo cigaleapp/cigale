@@ -83,3 +83,4 @@ static/.well-known/assetlinks.json
 
 ecosignal/
 /static/registry.json
+/src/lib/registry.json

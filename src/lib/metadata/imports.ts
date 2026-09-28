@@ -2,6 +2,7 @@ import type * as DB from '$lib/database.js';
 import type { DatabaseHandle } from '$lib/idb.svelte.js';
 import type { NamespacedMetadataID } from '$lib/schemas/common.js';
 
+import _rawRegistry from '$lib/registry.json' with { type: 'json' };
 import { isNamespacedToProtocol, namespaceOfMetadataId } from '$lib/schemas/metadata.js';
 import { ExportedProtocol, ProtocolRegistry } from '$lib/schemas/protocols.js';
 
@@ -45,9 +46,7 @@ export async function resolveProtocolImports(
 		return [];
 	}
 
-	PROTOCOLS_REGISTRY ??= await fetch(`./registry.json`)
-		.then((res) => res.json())
-		.then((data) => ProtocolRegistry.assert(data));
+	PROTOCOLS_REGISTRY ??= ProtocolRegistry.assert(_rawRegistry);
 
 	const importedProtocolIds = new Set([
 		...importedMetadata.map((imp) => namespaceOfMetadataId(imp.source)),

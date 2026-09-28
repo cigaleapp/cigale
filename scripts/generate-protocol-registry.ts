@@ -34,7 +34,7 @@ for (const file of files) {
 
 registry.protocols = uniqBy(registry.protocols, (p) => p.id);
 
-await Bun.file(path.join(root, 'static', 'registry.json')).write(
+await Bun.file(path.join(root, 'src/lib', 'registry.json')).write(
 	JSON.stringify(
 		{
 			$schema: 'https://cigaleapp.github.io/cigale/registry.schema.json',
