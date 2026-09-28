@@ -26,14 +26,6 @@ const env = arkenv(
 		DEBUG: type('string|boolean').pipe(Boolean).default(false),
 		/** Required for mobile app, since window.location.origin returns localhost */
 		WEB_ORIGIN: 'string.url = "https://cigaleapp.github.io"',
-		BUILTIN_PROTOCOLS: type('string.url')
-			.array()
-			.default(() => [
-				'https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/insecta.cigaleprotocol.yaml',
-				'https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/entomoscope.cigaleprotocol.yaml',
-				'https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json',
-				'https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/idmybee.cigaleprotocol.json',
-			]),
 	},
 	{
 		arrayFormat: 'comma',
@@ -82,7 +74,6 @@ export default defineConfig({
 			execSync('git rev-parse HEAD').toString().trim()
 		),
 		'import.meta.env.previewingPrNumber': prNumber ?? 'null',
-		'import.meta.env.builtinProtocols': JSON.stringify(env.BUILTIN_PROTOCOLS),
 		'import.meta.env.webOrigin': JSON.stringify(env.WEB_ORIGIN),
 		'import.meta.env.androidNativeCodeVersion': JSON.stringify(
 			readFileSync('android/.native-code-version', {

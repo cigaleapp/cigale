@@ -22,7 +22,7 @@ import {
 import { autoUpdateProtocols } from '$lib/protocols';
 import { getSetting } from '$lib/settings.svelte';
 import { toasts } from '$lib/toasts.svelte';
-import { clamp, fetchHttpRequest, profiler, progressSplitter, switchValue } from '$lib/utils.js';
+import { profiler, progressSplitter, switchValue } from '$lib/utils.js';
 import { PROCEDURES } from '$worker/procedures.js';
 import WebWorker from '$worker/start.js?worker';
 
@@ -151,9 +151,6 @@ export async function load({ url }) {
 	}
 
 	try {
-		setLoadingMessage('Chargement des données intégrées…');
-		await profile('Startup', 'Load built-in protocols', loadDefaultProtocol);
-
 		setLoadingMessage('Initialisation de la base de données…');
 		setLoadingProgress('database', 0);
 
@@ -224,101 +221,6 @@ async function initializeSettings() {
 			gallerySort: { key: 'date', direction: 'asc' },
 		});
 	});
-}
-
-async function loadDefaultProtocol() {
-	setLoadingMessage('Chargement du protocole intégré');
-	setLoadingProgress('protocols', 0);
-
-	// const protocolsCount = await tables.Protocol.count();
-	const protocols = await tables.Protocol.list();
-	const sources = protocols.map((p) => p.source);
-
-	/** @type {string[]} */
-	const builtins =
-		JSON.parse(localStorage.getItem('builtinProtocols') ?? 'null') ??
-		import.meta.env.builtinProtocols;
-
-	const toImport = builtins.filter((source) => !sources.includes(source));
-
-	if (toImport.length) {
-		void window.swarpc?.wakeup.broadcast(undefined);
-	}
-
-	console.debug(`Importing built-in protocols`, toImport, 'since already have', sources);
-	for (const [i, importUrl] of toImport.entries()) {
-		const splitProgress = progressSplitter('download', 0.7, 'import');
-
-		function setLoading(phase: Parameters<typeof splitProgress>[0], progress: number) {
-			progress = clamp(progress, 0, 1);
-
-			setLoadingProgress('protocols', (i + splitProgress(phase, progress)) / toImport.length);
-		}
-
-		const filename = new URL(importUrl).pathname.split('/').at(-1);
-		console.debug(`Importing ${filename} since ${importUrl} not in`, sources);
-		try {
-			const contents = await fetchHttpRequest(importUrl, {
-				onProgress({ total, transferred }) {
-					setLoading('download', transferred / total);
-				},
-			}).then((res) => res.text());
-
-			setLoading('download', 1);
-
-			const isJSON = Boolean(filename?.endsWith('.json'));
-			await window.swarpc?.importProtocol(
-				{ contents, isJSON },
-				({ phase, detail, done, total }) => {
-					let secondLine = '';
-					switch (phase) {
-						case 'parsing':
-							secondLine = 'Analyse';
-							break;
-
-						case 'filtering-builtin-metadata':
-							secondLine = 'Filtrage des métadonnées intégrées';
-							break;
-
-						case 'input-validation':
-							secondLine = 'Validation';
-							break;
-
-						case 'write-protocol':
-							secondLine = 'Écriture du protocole';
-							break;
-
-						case 'write-metadata':
-							secondLine = `Écriture de la métadonnée<br>${detail}`;
-							break;
-
-						case 'write-metadata-options':
-							secondLine = `Écriture des options de la métadonnée<br>${detail}`;
-							break;
-
-						case 'output-validation':
-							secondLine = 'Post-validation';
-							break;
-
-						default:
-							break;
-					}
-
-					setLoadingMessage(`${`Chargement du protocole ${filename}`}<br>${secondLine}`);
-					setLoading('import', done / total);
-				}
-			);
-
-			setLoading('import', 1);
-		} catch (error) {
-			console.error(error);
-			toasts.error(
-				`Impossible de charger le protocole ${filename}. Vérifiez votre connexion Internet ou essayez de recharger la page.`
-			);
-		}
-	}
-
-	setLoadingProgress('protocols', 1);
 }
 
 function setLoadingMessage(message: string) {
