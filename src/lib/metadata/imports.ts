@@ -45,9 +45,7 @@ export async function resolveProtocolImports(
 		return [];
 	}
 
-	PROTOCOLS_REGISTRY ??= await fetch(
-		'https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/registry.json'
-	)
+	PROTOCOLS_REGISTRY ??= await fetch(`./registry.json`)
 		.then((res) => res.json())
 		.then((data) => ProtocolRegistry.assert(data));
 
