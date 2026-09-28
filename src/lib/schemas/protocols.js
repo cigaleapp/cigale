@@ -58,6 +58,8 @@ export const ProtocolRegistry = type({
 		url: URLString.describe('URL où télécharger le protocole'),
 		name: 'string',
 		'logo?': URLString.or('null'),
+		'version?': 'number',
+		suggested: 'boolean = true',
 	}).array(),
 });
 

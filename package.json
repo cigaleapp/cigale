@@ -43,7 +43,7 @@
 		"dev": "bun --bun vite dev --host",
 		"dev:native": "electron-forge start",
 		"add-cap": "bun run scripts/add-capacitor-dependency.ts",
-		"codegen": "bun run scripts/download-google-fonts.js && bun run scripts/generate-json-schemas.js && bun run scripts/codegen-filepath-types.ts && bun run scripts/generate-assetlinks.ts",
+		"codegen": "bun run scripts/download-google-fonts.js && bun run scripts/generate-json-schemas.js && bun run scripts/codegen-filepath-types.ts && bun run scripts/generate-assetlinks.ts && bun run scripts/generate-protocol-registry.ts",
 		"prebuild": "bun run codegen && bun wuchale --clean --sync",
 		"build": "bun --bun vite build",
 		"preview": "bun --bun vite preview",
