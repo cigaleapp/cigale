@@ -264,7 +264,7 @@ if (import.meta.vitest) {
 							return {
 								protocols: [
 									{
-										name: "Parent",
+										name: 'Parent',
 										id: 'parent-protocol',
 										url: 'https://example.com/parent.json',
 									},
