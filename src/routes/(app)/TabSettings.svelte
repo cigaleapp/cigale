@@ -20,6 +20,8 @@
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import DropdownMenu from '$lib/DropdownMenu.svelte';
 	import { promptForFiles } from '$lib/files.js';
+	import { assertHardwareRequirements } from '$lib/hardware-requirements.js';
+	import { errorMessage } from '$lib/i18n.js';
 	import { tables } from '$lib/idb.svelte.js';
 	import { ACCEPTED_IMPORT_TYPES } from '$lib/import.svelte.js';
 	import { resolveMetadataImport } from '$lib/metadata/namespacing.js';
@@ -38,12 +40,10 @@
 		sortOrGroupFieldNeedsMetadata,
 		SortSettings,
 	} from '$lib/schemas/sessions.js';
+	import { toasts } from '$lib/toasts.svelte.js';
 	import { tooltip } from '$lib/tooltips.js';
 	import { uiState } from '$lib/uistate.svelte.js';
 	import { entries, nonnull, orEmpty } from '$lib/utils.js';
-	import { assertHardwareRequirements } from '$lib/hardware-requirements.js';
-	import { errorMessage } from '$lib/i18n.js';
-	import { toasts } from '$lib/toasts.svelte.js';
 
 	type ModelSelector = (typeof NeuralModelSelector)['infer'];
 
