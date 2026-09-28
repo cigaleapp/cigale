@@ -7,10 +7,17 @@ All notable changes to this project will be documented in this file, on a monthl
 ### Improvements
 
 - Add time input for date metadata (Closes #1562)
+- Implement EcoSignal accounts (#2164)
 - Implement custom (user) neural networks (#2135)
+- Implement filtering by protocol & pagination for remote session list (#2190)
+- Indicate metadata that can be filled by capture mode
+- Keep screen awake while camera timer is running
+- Maybe fix button all white when importing from camera
+- Show import more photos button instead of enter capture mode when mobile navbar has capture mode
 
 ### Bug Fixes
 
+- Clamp crop boxes at metadata store time (Closes #2187) (#2212)
 - Fix HTTP inferences
 - Fix binary storage on Android (#2128)
 - Preserve cascaded metadata confidence when merging observations (#2133)
@@ -23,6 +30,7 @@ All notable changes to this project will be documented in this file, on a monthl
 - Bump protocol version of protocols/entomoscope.cigaleprotocol.yaml [ci skip]
 - Bump protocol version of protocols/insecta.cigaleprotocol.yaml [ci skip]
 - Fix model output for YOLO of Entomoscope
+- Fix shadow temperature constraint for INSECTA
 - Regenerate example protocols
 
 ### Translation Updates
