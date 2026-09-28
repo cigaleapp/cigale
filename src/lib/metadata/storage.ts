@@ -556,7 +556,7 @@ export async function storeMetadataErrors(
 
 	const serializedErrors = errors.map((error) => {
 		try {
-			JSON.stringify(error.details);
+			error.details = JSON.parse(JSON.stringify(error.details));
 		} catch {
 			error.details = `{{Non-JSONable}} ${String(error.details)}`;
 		}

@@ -380,7 +380,10 @@ export class UIState {
 	/**
 	 * Set the selected model index for a classification metadata.
 	 */
-	async selectNeuralModel(metadataId: string, selector: NeuralModelSelector): Promise<void> {
+	async selectNeuralModel(
+		selector: NeuralModelSelector,
+		metadataId: NamespacedMetadataID
+	): Promise<void> {
 		if (!this.currentSession) return;
 
 		const current = $state.snapshot(this.currentSession.neuralModels);
@@ -392,16 +395,14 @@ export class UIState {
 		});
 	}
 
-	classificationModelBySelector(selector: NeuralModelSelector, metadataId: NamespacedMetadataID) {
+	neuralModelBySelector(selector: NeuralModelSelector, metadataId: NamespacedMetadataID) {
 		switch (selector.kind) {
 			case 'disabled':
 				return undefined;
 			case 'custom':
 				return tables.CustomNeuralNetwork.getFromState(selector.id);
 			case 'protocol': {
-				const metadata = tables.Metadata.getFromState(metadataId);
-				if (metadata?.type === 'enum') return metadata.infer?.neural?.[selector.i];
-				return undefined;
+				return tables.Metadata.getFromState(metadataId).infer?.neural?.[selector.i];
 			}
 		}
 	}

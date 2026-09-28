@@ -2,7 +2,7 @@ import type * as DB from '$lib/database.js';
 import type { DatabaseHandle } from '$lib/idb.svelte.js';
 import type { NamespacedMetadataID } from '$lib/schemas/common.js';
 
-import { namespaceOfMetadataId } from '$lib/schemas/metadata.js';
+import { isNamespacedToProtocol, namespaceOfMetadataId } from '$lib/schemas/metadata.js';
 import { ExportedProtocol, ProtocolRegistry } from '$lib/schemas/protocols.js';
 
 let PROTOCOLS_REGISTRY: typeof ProtocolRegistry.infer | null = null;
@@ -18,6 +18,14 @@ export function resolveMetadataImport(
 	id: NamespacedMetadataID
 ) {
 	return protocol.importedMetadata?.find((imp) => imp.target === id)?.source ?? id;
+}
+
+export function metadataUsedByProtocol(
+	protocol: Pick<DB.Protocol, 'id' | 'importedMetadata'>,
+	metadata: NamespacedMetadataID
+) {
+	if (isNamespacedToProtocol(protocol.id, metadata)) return true;
+	return protocol.importedMetadata?.some((imp) => imp.target === metadata);
 }
 
 /**

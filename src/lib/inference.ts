@@ -8,7 +8,9 @@ import type { SwarpcClient } from 'swarpc';
 
 import * as ort from 'onnxruntime-web';
 
+import { assertHardwareRequirements } from './hardware-requirements.js';
 import { loadToTensor, output2BB, preprocessTensor } from './inference_utils.js';
+import { HardwareRequirements } from './schemas/constraints.js';
 import { accessBytes } from './storage/utils.js';
 import { fetchHttpRequest, progressSplitter } from './utils.js';
 
@@ -112,6 +114,10 @@ export async function loadModel({
 				: undefined;
 
 	if (!config) return;
+
+	if (config.requirements) {
+		await assertHardwareRequirements(HardwareRequirements.assert(config.requirements));
+	}
 
 	const id = inferenceModelId(protocolId, config);
 

@@ -1,14 +1,16 @@
 import IconImport from '~icons/ri/import-line';
 import { promptForFiles } from '$lib/files';
+import { satisfiesHardwareRequirements } from '$lib/hardware-requirements.js';
 import { databaseHandle, tables } from '$lib/idb.svelte.js';
 import { resolveDefaults } from '$lib/metadata/defaults.js';
+import { metadataUsedByProtocol } from '$lib/metadata/imports.js';
 import { pickProtocol } from '$lib/ModalPickProtocol.svelte';
 import { goto } from '$lib/paths.js';
 import { defaultClassificationMetadata, defaultCropMetadata } from '$lib/protocols.js';
 import { importMore } from '$lib/queue.svelte';
 import { isNamespacedToProtocol } from '$lib/schemas/metadata.js';
 import { switchSession } from '$lib/sessions.js';
-import { compareBy, orEmptyObj } from '$lib/utils.js';
+import { compareBy, nonnull, orEmptyObj } from '$lib/utils.js';
 
 export async function createSession() {
 	await pickProtocol({
@@ -72,6 +74,28 @@ export async function createSession() {
 					createdAt: new Date().toISOString(),
 					openedAt: new Date().toISOString(),
 					metadata: {},
+					neuralModels: Object.fromEntries(
+						await Promise.all(
+							tables.Metadata.state
+								.filter((metadata) =>
+									metadataUsedByProtocol(selectedProtocol, metadata.id)
+								)
+								.map(async (metadata) => {
+									if (!metadata.infer) return;
+									if (!('neural' in metadata.infer)) return;
+
+									for (const [i, model] of metadata.infer.neural.entries()) {
+										if (
+											await satisfiesHardwareRequirements(model.requirements)
+										) {
+											return [metadata.id, { kind: 'protocol', i }] as const;
+										}
+									}
+
+									return [metadata.id, { kind: 'disabled' }] as const;
+								})
+						).then((entries) => entries.filter(nonnull))
+					),
 					fullscreenClassifier: {
 						layout: 'top-bottom',
 						...orEmptyObj(largestNarrowableGroup !== undefined, {

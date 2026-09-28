@@ -21,9 +21,9 @@ import {
 	MetadataValues,
 } from './schemas/metadata.js';
 import {
+	CustomNeuralNetworkSchema,
 	ModelDetectionOutputShapes,
 	ModelInput,
-	ModelOutputBoundingBox,
 } from './schemas/neural.js';
 import { Image as ImageSchema, Observation as ObservationSchema } from './schemas/observations.js';
 import {
@@ -247,42 +247,7 @@ const Account = table(
 	)
 );
 
-const CustomNeuralNetwork = table(
-	['id'],
-	type({
-		id: ID,
-		name: 'string',
-		input: ModelInput,
-		bytes: '"migrated" = "migrated"',
-		sessionId: '"_" = "_"',
-	})
-		.and(
-			type.or(
-				{
-					source: '"remote"',
-					url: 'string.url.parse',
-					filename: '"none"',
-				},
-				{
-					source: '"local"',
-					filename: 'string > 0',
-				}
-			)
-		)
-		.and(
-			type.or(
-				{
-					purpose: '"classify"',
-					classmapping: HTTPRequest.or('string[]'),
-					'output?': { 'name?': 'string' },
-				},
-				{
-					purpose: '"detect"',
-					output: ModelOutputBoundingBox,
-				}
-			)
-		)
-);
+const CustomNeuralNetwork = table(['id'], CustomNeuralNetworkSchema);
 
 export const Schemas = {
 	ID,

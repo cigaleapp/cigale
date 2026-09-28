@@ -501716,6 +501716,7 @@
 						"description": "Terrestres, France métropolitaine",
 						"model": "https://huggingface.co/cigaleapp/built-in-protocols/resolve/main/classifier-arthropoda.onnx?download=true",
 						"classmapping": "https://huggingface.co/cigaleapp/built-in-protocols/resolve/main/classifier-arthropoda-classmapping.txt?download=true",
+						"requirements": { "ram": "4 GB" },
 						"input": {
 							"height": 224,
 							"width": 224,
@@ -501727,6 +501728,7 @@
 						"name": "Collemboles (~80 classes)",
 						"model": "https://huggingface.co/cigaleapp/built-in-protocols/resolve/main/classifier-collembola.onnx?download=true",
 						"classmapping": "https://huggingface.co/cigaleapp/built-in-protocols/resolve/main/classifier-collembola-classmapping.txt?download=true",
+						"requirements": { "ram": "2 GB" },
 						"input": {
 							"height": 224,
 							"width": 224,

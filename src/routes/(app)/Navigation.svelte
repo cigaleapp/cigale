@@ -284,9 +284,6 @@
 								tab="crop"
 								models={uiState.cropModels}
 								currentModel={uiState.selectedCropModel}
-								setModel={async (selector) => {
-									uiState.selectNeuralModel(uiState.cropMetadataId, selector);
-								}}
 							/>
 						</div>
 						<div class="separator"><IconNext /></div>

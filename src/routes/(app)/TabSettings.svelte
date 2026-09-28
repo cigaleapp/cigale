@@ -41,6 +41,9 @@
 	import { tooltip } from '$lib/tooltips.js';
 	import { uiState } from '$lib/uistate.svelte.js';
 	import { entries, nonnull, orEmpty } from '$lib/utils.js';
+	import { assertHardwareRequirements } from '$lib/hardware-requirements.js';
+	import { errorMessage } from '$lib/i18n.js';
+	import { toasts } from '$lib/toasts.svelte.js';
 
 	type ModelSelector = (typeof NeuralModelSelector)['infer'];
 
@@ -66,7 +69,14 @@
 			label,
 			selected: dequal(currentModel, selector),
 			async onclick() {
-				await uiState.selectNeuralModel(metadata, selector);
+				const model = uiState.neuralModelBySelector(selector, metadata);
+				try {
+					if (model?.requirements) await assertHardwareRequirements(model.requirements);
+					await uiState.selectNeuralModel(selector, metadata);
+				} catch (error) {
+					console.error(error);
+					toasts.error(errorMessage(error, 'Impossible de choisir ce modèle'));
+				}
 			},
 		};
 	}
