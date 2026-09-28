@@ -13,9 +13,10 @@ export default defineConfig({
 		main: svelte({
 			sourceLocale: 'fr',
 			loader: 'sveltekit',
-			// Routes only load translations inside the (app) group
-			files: ['src/lib/**/*.svelte', 'src/routes/(app)/**/*.svelte'],
+			files: ['src/**/*.svelte'],
 			heuristic({ msgStr: [msg], details: { file, scope, call } }) {
+				// Routes only load translations inside the (app) group
+				if (file.includes('/routes/') && !file.includes('/(app)/')) return false;
 				if (file.includes('/_playground/')) return false;
 
 				// Table names
