@@ -150,6 +150,7 @@ if (import.meta.vitest) {
 							return {
 								protocols: [
 									{
+										name: 'Parent',
 										id: 'parent-protocol',
 										url: 'https://example.com/parent.json',
 									},
@@ -181,7 +182,11 @@ if (import.meta.vitest) {
 				vi.fn(async () => ({
 					json: async () => ({
 						protocols: [
-							{ id: 'parent-protocol', url: 'https://example.com/parent.json' },
+							{
+								name: 'Parent',
+								id: 'parent-protocol',
+								url: 'https://example.com/parent.json',
+							},
 						],
 					}),
 				}))
@@ -209,7 +214,11 @@ if (import.meta.vitest) {
 				vi.fn(async () => ({
 					json: async () => ({
 						protocols: [
-							{ id: 'parent-protocol', url: 'https://example.com/parent.json' },
+							{
+								name: 'Parent',
+								id: 'parent-protocol',
+								url: 'https://example.com/parent.json',
+							},
 						],
 					}),
 				}))
@@ -255,6 +264,7 @@ if (import.meta.vitest) {
 							return {
 								protocols: [
 									{
+										name: "Parent",
 										id: 'parent-protocol',
 										url: 'https://example.com/parent.json',
 									},
@@ -293,8 +303,13 @@ if (import.meta.vitest) {
 						if (url.includes('registry.json')) {
 							return {
 								protocols: [
-									{ id: 'parent', url: 'https://example.com/proto-parent.json' },
 									{
+										name: 'Parent',
+										id: 'parent',
+										url: 'https://example.com/proto-parent.json',
+									},
+									{
+										name: 'Grandparent',
 										id: 'grandparent',
 										url: 'https://example.com/proto-grandparent.json',
 									},
