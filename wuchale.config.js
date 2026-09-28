@@ -13,7 +13,8 @@ export default defineConfig({
 		main: svelte({
 			sourceLocale: 'fr',
 			loader: 'sveltekit',
-			files: ['src/**/*.svelte'],
+			// Routes only load translations inside the (app) group
+			files: ['src/lib/**/*.svelte', 'src/routes/(app)/**/*.svelte'],
 			heuristic({ msgStr: [msg], details: { file, scope, call } }) {
 				if (file.includes('/_playground/')) return false;
 
