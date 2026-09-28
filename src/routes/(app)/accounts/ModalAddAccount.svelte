@@ -7,8 +7,11 @@
 
 	import IconCheck from '~icons/ri/check-line';
 	import IconFail from '~icons/ri/error-warning-line';
+	import IconHidePassword from '~icons/ri/eye-close-line';
+	import IconShowPassword from '~icons/ri/eye-line';
 	import IconWarning from '~icons/ri/triangle-line';
 	import KoboToolbox from '$lib/accounts/kobotoolbox.js';
+	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import EnumButtons from '$lib/EnumButtons.svelte';
 	import Field from '$lib/Field.svelte';
 	import { errorMessage } from '$lib/i18n.js';
@@ -308,15 +311,32 @@
 						</Field>
 
 						<Field label="Mot de passe">
-							<InlineTextInput
-								label="Mot de passe"
-								type="password"
-								value={loginData?.password?.password}
-								onblur={(password) => {
-									loginData!.password ??= { username: '', password };
-									loginData!.password!.password = password;
-								}}
-							/>
+							<div class="password-input">
+								{let showPassword = $state(false)}
+								<InlineTextInput
+									label="Mot de passe"
+									type={showPassword ? 'text' : 'password'}
+									value={loginData?.password?.password}
+									onblur={(password) => {
+										loginData!.password ??= { username: '', password };
+										loginData!.password!.password = password;
+									}}
+								/>
+								<ButtonIcon
+									onclick={() => {
+										showPassword = !showPassword;
+									}}
+									help={showPassword
+										? 'Cacher le mot de passe'
+										: 'Montrer le mot de passe'}
+								>
+									{#if showPassword}
+										<IconHidePassword />
+									{:else}
+										<IconShowPassword />
+									{/if}
+								</ButtonIcon>
+							</div>
 						</Field>
 
 						{#if tokenValidation === 'ok'}
@@ -401,6 +421,12 @@
 	form {
 		display: flex;
 		flex-direction: column;
+		gap: 1em;
+	}
+
+	.password-input {
+		display: flex;
+		align-items: center;
 		gap: 1em;
 	}
 </style>
