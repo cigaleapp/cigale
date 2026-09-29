@@ -2,11 +2,9 @@ import type * as DB from '$lib/database.js';
 import type { DatabaseHandle } from '$lib/idb.svelte.js';
 import type { NamespacedMetadataID } from '$lib/schemas/common.js';
 
-import _rawRegistry from '$lib/registry.json' with { type: 'json' };
+import { fetchProtocolRegistry } from '$lib/protocols/registry.js';
 import { isNamespacedToProtocol, namespaceOfMetadataId } from '$lib/schemas/metadata.js';
 import { ExportedProtocol, ProtocolRegistry } from '$lib/schemas/protocols.js';
-
-let PROTOCOLS_REGISTRY: typeof ProtocolRegistry.infer | null = null;
 
 /**
  * Resolve a metadata ID to its source metadata id in case it is imported
@@ -29,6 +27,16 @@ export function metadataUsedByProtocol(
 	return protocol.importedMetadata?.some((imp) => imp.target === metadata);
 }
 
+export function importedProtocols({
+	importedMetadata,
+	importedMetadataGroups,
+}: Pick<typeof ExportedProtocol.inferOut, 'importedMetadata' | 'id' | 'importedMetadataGroups'>) {
+	return new Set([
+		...importedMetadata.map((imp) => namespaceOfMetadataId(imp.source)),
+		...importedMetadataGroups.map((imp) => imp.from),
+	]);
+}
+
 /**
  * Downloads (recursively) all the protocols needed to import the given protocol
  */
@@ -46,12 +54,8 @@ export async function resolveProtocolImports(
 		return [];
 	}
 
-	PROTOCOLS_REGISTRY ??= ProtocolRegistry.assert(_rawRegistry);
-
-	const importedProtocolIds = new Set([
-		...importedMetadata.map((imp) => namespaceOfMetadataId(imp.source)),
-		...importedMetadataGroups.map((imp) => imp.from),
-	]);
+	const importedProtocolIds = importedProtocols({ importedMetadata, importedMetadataGroups });
+	const registry = await fetchProtocolRegistry();
 
 	for (const from of importedProtocolIds) {
 		if (resolved.has(from)) {
@@ -63,7 +67,7 @@ export async function resolveProtocolImports(
 			continue;
 		}
 
-		const registryEntry = PROTOCOLS_REGISTRY?.protocols.find((entry) => entry.id === from);
+		const registryEntry = registry.protocols.find((entry) => entry.id === from);
 
 		if (!registryEntry) {
 			throw new Error(`Protocol ${protocolId} inherits from unknown protocol ${from}`);
@@ -121,9 +125,21 @@ if (import.meta.vitest) {
 	}
 
 	describe('resolveProtocolImports', () => {
+		const mocked = vi.hoisted(() => ({
+			registry: undefined as (typeof ProtocolRegistry)['inferIn'] | undefined,
+		}));
+
+		vi.mock('$lib/protocols/registry.js', async (original) => ({
+			...(await original()),
+			fetchProtocolRegistry: async () => mocked.registry!,
+		}));
+
+		function mockRegistry(registry: (typeof ProtocolRegistry)['inferIn']) {
+			mocked.registry = registry;
+		}
+
 		beforeEach(() => {
 			// Reset module-level cache
-			PROTOCOLS_REGISTRY = null;
 			vi.restoreAllMocks();
 		});
 
@@ -139,23 +155,20 @@ if (import.meta.vitest) {
 		test('fetches registry and resolves a single import', async () => {
 			const parentInput = fakeExportedProtocol('parent-protocol');
 
+			mockRegistry({
+				protocols: [
+					{
+						name: 'Parent',
+						id: 'parent-protocol',
+						url: 'https://example.com/parent.json',
+					},
+				],
+			});
+
 			vi.stubGlobal(
 				'fetch',
-				vi.fn(async (url: string) => ({
-					json: async () => {
-						if (url.includes('registry.json')) {
-							return {
-								protocols: [
-									{
-										name: 'Parent',
-										id: 'parent-protocol',
-										url: 'https://example.com/parent.json',
-									},
-								],
-							};
-						}
-						return parentInput;
-					},
+				vi.fn(async () => ({
+					json: async () => parentInput,
 				}))
 			);
 
@@ -174,20 +187,15 @@ if (import.meta.vitest) {
 				['parent-protocol', { id: 'parent-protocol' } as typeof ExportedProtocol.infer],
 			]);
 
-			vi.stubGlobal(
-				'fetch',
-				vi.fn(async () => ({
-					json: async () => ({
-						protocols: [
-							{
-								name: 'Parent',
-								id: 'parent-protocol',
-								url: 'https://example.com/parent.json',
-							},
-						],
-					}),
-				}))
-			);
+			mockRegistry({
+				protocols: [
+					{
+						name: 'Parent',
+						id: 'parent-protocol',
+						url: 'https://example.com/parent.json',
+					},
+				],
+			});
 
 			const result = await resolveProtocolImports(
 				mockDb(),
@@ -201,25 +209,18 @@ if (import.meta.vitest) {
 
 			expect(result).toHaveLength(1);
 			expect(result[0].id).toBe('parent-protocol');
-			// fetch should only have been called once (for the registry), not for the protocol itself
-			expect(vi.mocked(fetch)).toHaveBeenCalledTimes(1);
 		});
 
 		test('skips protocols already in the database', async () => {
-			vi.stubGlobal(
-				'fetch',
-				vi.fn(async () => ({
-					json: async () => ({
-						protocols: [
-							{
-								name: 'Parent',
-								id: 'parent-protocol',
-								url: 'https://example.com/parent.json',
-							},
-						],
-					}),
-				}))
-			);
+			mockRegistry({
+				protocols: [
+					{
+						name: 'Parent',
+						id: 'parent-protocol',
+						url: 'https://example.com/parent.json',
+					},
+				],
+			});
 
 			const db = mockDb({ Protocol: { 'parent-protocol': { id: 'parent-protocol' } } });
 
@@ -234,12 +235,7 @@ if (import.meta.vitest) {
 		});
 
 		test('throws for unknown protocol in registry', async () => {
-			vi.stubGlobal(
-				'fetch',
-				vi.fn(async () => ({
-					json: async () => ({ protocols: [] }), // empty registry
-				}))
-			);
+			mockRegistry({ protocols: [] }); // empty registry
 
 			await expect(
 				resolveProtocolImports(mockDb(), {
@@ -253,23 +249,20 @@ if (import.meta.vitest) {
 		test('deduplicates imports from the same protocol', async () => {
 			const parentInput = fakeExportedProtocol('parent-protocol');
 
+			mockRegistry({
+				protocols: [
+					{
+						name: 'Parent',
+						id: 'parent-protocol',
+						url: 'https://example.com/parent.json',
+					},
+				],
+			});
+
 			vi.stubGlobal(
 				'fetch',
-				vi.fn(async (url: string) => ({
-					json: async () => {
-						if (url.includes('registry.json')) {
-							return {
-								protocols: [
-									{
-										name: 'Parent',
-										id: 'parent-protocol',
-										url: 'https://example.com/parent.json',
-									},
-								],
-							};
-						}
-						return parentInput;
-					},
+				vi.fn(async () => ({
+					json: async () => parentInput,
 				}))
 			);
 
@@ -283,8 +276,8 @@ if (import.meta.vitest) {
 			});
 
 			expect(result).toHaveLength(1);
-			// registry fetch + one protocol fetch = 2 calls total
-			expect(vi.mocked(fetch)).toHaveBeenCalledTimes(2);
+			// one protocol fetch
+			expect(vi.mocked(fetch)).toHaveBeenCalledTimes(1);
 		});
 
 		test('resolves recursive imports', async () => {
@@ -293,26 +286,25 @@ if (import.meta.vitest) {
 				{ from: 'grandparent', metadata: ['field'] },
 			]);
 
+			mockRegistry({
+				protocols: [
+					{
+						name: 'Parent',
+						id: 'parent',
+						url: 'https://example.com/proto-parent.json',
+					},
+					{
+						name: 'Grandparent',
+						id: 'grandparent',
+						url: 'https://example.com/proto-grandparent.json',
+					},
+				],
+			});
+
 			vi.stubGlobal(
 				'fetch',
 				vi.fn(async (url: string) => ({
 					json: async () => {
-						if (url.includes('registry.json')) {
-							return {
-								protocols: [
-									{
-										name: 'Parent',
-										id: 'parent',
-										url: 'https://example.com/proto-parent.json',
-									},
-									{
-										name: 'Grandparent',
-										id: 'grandparent',
-										url: 'https://example.com/proto-grandparent.json',
-									},
-								],
-							};
-						}
 						if (url.includes('proto-grandparent.json')) return grandparentInput;
 						if (url.includes('proto-parent.json')) return parentInput;
 						throw new Error(`Unexpected fetch: ${url}`);
