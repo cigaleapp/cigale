@@ -6,7 +6,9 @@ All notable changes to this project will be documented in this file, on a monthl
 
 ### Improvements
 
+- Add show/hide toggle for password field when adding accounts
 - Add time input for date metadata (Closes #1562)
+- Allow protocols to specify hardware reqs for neural models (#2217)
 - Implement EcoSignal accounts (#2164)
 - Implement custom (user) neural networks (#2135)
 - Implement filtering by protocol & pagination for remote session list (#2190)
@@ -20,13 +22,18 @@ All notable changes to this project will be documented in this file, on a monthl
 - Clamp crop boxes at metadata store time (Closes #2187) (#2212)
 - Fix HTTP inferences
 - Fix binary storage on Android (#2128)
+- Fix registry generation
+- Fix translatables replaced with empty strings in non-(app) routes
 - Preserve cascaded metadata confidence when merging observations (#2133)
 - Prevent database fatal error by preventing null-value metadata writes
 - Properly handle normalized-output detection models
+- Recreate old registry.json
 
 ### Data Updates
 
+- Add names & logos to protocol registry
 - Add opportunistic protocol
+- Add versions to protocols in registry
 - Bump protocol version of protocols/entomoscope.cigaleprotocol.yaml [ci skip]
 - Bump protocol version of protocols/insecta.cigaleprotocol.yaml [ci skip]
 - Fix model output for YOLO of Entomoscope
