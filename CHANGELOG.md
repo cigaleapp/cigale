@@ -22,6 +22,7 @@ All notable changes to this project will be documented in this file, on a monthl
 - Clamp crop boxes at metadata store time (Closes #2187) (#2212)
 - Fix HTTP inferences
 - Fix binary storage on Android (#2128)
+- Fix protocol registry import
 - Fix registry generation
 - Fix translatables replaced with empty strings in non-(app) routes
 - Preserve cascaded metadata confidence when merging observations (#2133)
