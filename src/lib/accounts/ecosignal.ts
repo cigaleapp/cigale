@@ -614,7 +614,8 @@ export default class Provider implements Account {
 								filename: image.filename,
 								addedAt: ann.creation_date.toISOString(),
 								dimensions: image.file.dimensions,
-								boundingBoxesAnalyzed: true,
+								boundingBoxesAnalyzed:
+									image.note.meta?.boundingBoxesAnalyzed ?? true,
 								contentType: image.file.contentType,
 								fileId: image.file.id,
 								sessionId: session.id,
@@ -645,10 +646,8 @@ export default class Provider implements Account {
 								filename: image.filename,
 								addedAt: image.creation_date.toISOString(),
 								dimensions: image.file.dimensions,
-								// Runs our analysis on images added to EcoSignal outside of Cigale
-								boundingBoxesAnalyzed: Boolean(
-									config.label && image.labels.includes(config.label)
-								),
+								boundingBoxesAnalyzed:
+									image.note.meta?.boundingBoxesAnalyzed ?? false,
 								contentType: image.file.contentType,
 								fileId: image.file.id,
 								sessionId: session.id,
@@ -1498,6 +1497,9 @@ export default class Provider implements Account {
 				note: observation
 					? this.#compoundMetadataToMultilineField('', {
 							metadata: observation.metadataOverrides,
+							boundingBoxesAnalyzed: images
+								.filter((image) => observation.images.includes(image.id))
+								.every((image) => image.boundingBoxesAnalyzed),
 						})
 					: null,
 			}
@@ -2184,12 +2186,15 @@ export default class Provider implements Account {
 
 	static MetadataFieldMultilinePayload = type({
 		'boxConfidence?': 'number',
+		'boundingBoxesAnalyzed?': 'boolean',
 		metadata: MetadataRecord(type.string),
 	});
 
 	#compoundMetadataToMultilineField(
 		notes: string,
-		meta: { boxConfidence?: number; metadata: DB.MetadataValues }
+		meta: Omit<(typeof Provider.MetadataFieldMultilinePayload)['inferIn'], 'metadata'> & {
+			metadata: DB.MetadataValues;
+		}
 	) {
 		return (
 			notes +
