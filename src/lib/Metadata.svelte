@@ -241,7 +241,7 @@
 								{/snippet}
 							</LoadingText>
 						</div>
-						<ConfidencePercentage value={confidence} />
+						<ConfidencePercentage show-hundred value={confidence} />
 						<button
 							use:tooltip={'Sélectionner cette valeur'}
 							onclick={async () => {
@@ -410,7 +410,11 @@
 
 {#snippet extraInline()}
 	{#if value?.confidence}
-		<ConfidencePercentage no-fallback value={value.confidence} />
+		<ConfidencePercentage
+			show-hundred={!value.manuallyModified}
+			no-fallback
+			value={value.confidence}
+		/>
 	{/if}
 	{#if merged}
 		<div
