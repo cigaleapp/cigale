@@ -1386,11 +1386,6 @@ msgid_plural "# images"
 msgstr[0] "# image"
 msgstr[1] "# images"
 
-#: src/routes/(app)/sessions/+page.svelte
-#: src/routes/(app)/sessions/+page.svelte
-msgid "Gérer"
-msgstr "Gérer"
-
 #: src/routes/(app)/sessions/Cards.svelte
 msgid "Créer une nouvelle session"
 msgstr "Créer une nouvelle session"
@@ -1732,11 +1727,6 @@ msgstr "Logo de {0}"
 #: src/routes/(app)/sessions/+page.svelte
 msgid "· par {0}"
 msgstr "· par {0}"
-
-#. 0: providers.get(directory.platform)!.displayName
-#: src/routes/(app)/sessions/+page.svelte
-msgid "Voir sur {0}"
-msgstr "Voir sur {0}"
 
 #: src/routes/(app)/sessions/Cards.svelte
 msgid "<0/> Aucune session"
