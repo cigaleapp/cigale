@@ -132,19 +132,6 @@
 							</LoadingText>
 							· <Datetime parts="date" show="absolute" value={createdAt} />
 						{/snippet}
-
-						{#snippet actions({ id })}
-							<ButtonInk
-								fills
-								onclick={async (e) => {
-									e.stopPropagation();
-									await switchSession(id);
-									await goto('/(app)/sessions/[id]', { id });
-								}}
-							>
-								Gérer
-							</ButtonInk>
-						{/snippet}
 					</Cards>
 				{/key}
 			</div>
@@ -234,29 +221,6 @@
 							<Datetime parts="date" show="absolute" value={submittedAt} />
 							{#if submittedBy}
 								· par {submittedBy}
-							{/if}
-						{/snippet}
-
-						{#snippet actions({ page, local })}
-							{#if page || local}
-								<ButtonInk
-									fills
-									onclick={async (e) => {
-										e.stopPropagation();
-										if (local) {
-											await switchSession(local.id);
-											await goto('/(app)/sessions/[id]', local);
-										} else {
-											window.open(page, '_blank');
-										}
-									}}
-								>
-									{#if local}
-										Gérer
-									{:else}
-										Voir sur {providers.get(directory.platform)!.displayName}
-									{/if}
-								</ButtonInk>
 							{/if}
 						{/snippet}
 					</Cards>

@@ -42,7 +42,6 @@
 			// eslint-disable-next-line no-unused-vars
 			| ((cursor?: string | undefined) => AsyncIterable<Session | { total: number }>);
 		subtitle: Snippet<[Session]>;
-		actions: Snippet<[Session]>;
 		create?: undefined | (() => Promise<void>);
 		// eslint-disable-next-line no-unused-vars
 		card: (session: Session) => {
@@ -54,7 +53,7 @@
 		};
 	}
 
-	const { thumbnails, sessions, subtitle, actions, card, cache, create }: Props = $props();
+	const { thumbnails, sessions, subtitle, card, cache, create }: Props = $props();
 
 	const thumbnailsCache = new SvelteMap<string, string[]>();
 
@@ -138,9 +137,6 @@
 						{@render subtitle(session)}
 					</div>
 				</header>
-				<footer>
-					{@render actions(session)}
-				</footer>
 			</div>
 		</Card>
 	{/snippet}
@@ -254,12 +250,6 @@
 		.date {
 			color: var(--gay);
 		}
-	}
-
-	.content footer {
-		display: flex;
-		justify-content: center;
-		flex-grow: 0;
 	}
 
 	.error-screen {
