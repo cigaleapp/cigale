@@ -27,7 +27,7 @@ export function metadataUsedByProtocol(
 	return protocol.importedMetadata?.some((imp) => imp.target === metadata);
 }
 
-export function importedProtocols({
+function importedProtocols({
 	importedMetadata,
 	importedMetadataGroups,
 }: Pick<typeof ExportedProtocol.inferOut, 'importedMetadata' | 'id' | 'importedMetadataGroups'>) {
