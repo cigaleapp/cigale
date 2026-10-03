@@ -1,7 +1,6 @@
-import type { AppFixture } from './fixtures.js';
+import type { AppFixture } from './fixtures/app.js';
 import type { Page } from '@playwright/test';
 import type { Analysis } from '$lib/schemas/exports.js';
-import type { ExportedProtocol } from '$lib/schemas/protocols.js';
 
 import { ms } from 'convert';
 
