@@ -22,8 +22,10 @@
 		source?: string;
 		version?: number;
 		ondelete: () => void;
+		// eslint-disable-next-line no-unused-vars
+		oninstall: (source: string) => Promise<void>;
+		installed?: boolean;
 		updates: 'automatic' | 'manual';
-
 		expanded?: boolean;
 	}
 
@@ -33,6 +35,8 @@
 		source,
 		version,
 		ondelete,
+		installed = true,
+		oninstall,
 		updates,
 		expanded = $bindable(false),
 	}: Props = $props();
@@ -59,38 +63,49 @@
 				<small><OverflowableText tag="code" text={id} /></small>
 			</section>
 			<section class="actions">
-				<ButtonIcon
-					help="Partager"
-					disabled={!source}
-					onclick={async () => {
-						if (!source) return;
-
-						await shareUrl(
-							new URL(
-								resolve('/(app)/protocols/import/[...url]', {
-									url: source,
-								}),
-								import.meta.env.webOrigin
-							)
-						);
-					}}
-				>
-					<IconExport />
-				</ButtonIcon>
-				{#if version && source}
-					<ButtonUpdateProtocol compact {version} {source} {id} />
+				{#if !installed && source}
+					<ButtonSecondary
+						loading
+						onclick={async () => {
+							await oninstall?.(source);
+						}}
+					>
+						Installer
+					</ButtonSecondary>
 				{:else}
 					<ButtonIcon
-						crossout
-						onclick={() => {}}
-						help="Ce protocole ne supporte pas la vérification des mises à jour"
+						help="Partager"
+						disabled={!source}
+						onclick={async () => {
+							if (!source) return;
+
+							await shareUrl(
+								new URL(
+									resolve('/(app)/protocols/import/[...url]', {
+										url: source,
+									}),
+									import.meta.env.webOrigin
+								)
+							);
+						}}
 					>
-						<IconUpgrade />
+						<IconExport />
 					</ButtonIcon>
+					{#if version && source}
+						<ButtonUpdateProtocol compact {version} {source} {id} />
+					{:else}
+						<ButtonIcon
+							crossout
+							onclick={() => {}}
+							help="Ce protocole ne supporte pas la vérification des mises à jour"
+						>
+							<IconUpgrade />
+						</ButtonIcon>
+					{/if}
 				{/if}
 			</section>
 		</summary>
-		{#if version && source}
+		{#if version && source && installed}
 			<label class="auto-updates">
 				<Switch
 					value={autoUpdatesEnabled}
@@ -112,27 +127,29 @@
 				</div>
 			</label>
 		{/if}
-		<div class="more-actions">
-			<ButtonSecondary
-				danger
-				disabled={id === uiState.currentProtocolId && uiState.processing.total > 0}
-				onclick={() => {
-					ondelete();
-				}}
-			>
-				<IconDelete />
-				Supprimer
-			</ButtonSecondary>
-			<ButtonSecondary onclick={() => goto('/(app)/protocols/[id]/infos', { id })}>
-				<IconEdit />
-				Modifier
-				<Badge>Beta</Badge>
-			</ButtonSecondary>
+		{#if installed}
+			<div class="more-actions">
+				<ButtonSecondary
+					danger
+					disabled={id === uiState.currentProtocolId && uiState.processing.total > 0}
+					onclick={() => {
+						ondelete();
+					}}
+				>
+					<IconDelete />
+					Supprimer
+				</ButtonSecondary>
+				<ButtonSecondary onclick={() => goto('/(app)/protocols/[id]/infos', { id })}>
+					<IconEdit />
+					Modifier
+					<Badge>Beta</Badge>
+				</ButtonSecondary>
 
-			{#if version && source}
-				<ButtonUpdateProtocol {version} {source} {id} />
-			{/if}
-		</div>
+				{#if version && source}
+					<ButtonUpdateProtocol {version} {source} {id} />
+				{/if}
+			</div>
+		{/if}
 	</details>
 </li>
 
