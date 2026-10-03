@@ -1404,7 +1404,7 @@ export function corsfix(url: string | URL): string {
 		return new URL(url).toString();
 	}
 
-	return 'https://cors.gwen.works/' + url.toString().replace(/^https?:\/\//, '');
+	return 'https://cigale-cors-proxy-default-data-terra.ai.meso.umontpellier.fr/' + url.toString().replace(/^https?:\/\//, '');
 }
 
 export function isLocalhost() {
