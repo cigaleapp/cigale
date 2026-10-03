@@ -63,6 +63,10 @@ export const ProtocolRegistry = type({
 	}).array(),
 });
 
+export const BeamupSettings = type({
+	origin: URLString.describe("URL de l'instance BeamUp d'où proviennent les données"),
+});
+
 const ItemsImportSpec = type
 	.or(
 		ID.describe('Clé de métadonnée à importer, sans le namespace'),
@@ -139,6 +143,7 @@ export const Protocol = type({
 	dirty: type('boolean')
 		.describe('Si le protocole a été modifié depuis sa dernière exportation')
 		.default(false),
+	'beamup?': BeamupSettings,
 	'remote?': {
 		'ecosignal?': {
 			domains: type

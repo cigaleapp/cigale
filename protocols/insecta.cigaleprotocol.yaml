@@ -38,6 +38,9 @@ imports:
 crop:
   metadata: crop
 
+beamup:
+  origin: https://cigale-beamup-default-data-terra.ai.meso.umontpellier.fr
+
 remote:
   ecosignal:
     project: 1
