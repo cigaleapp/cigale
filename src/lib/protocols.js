@@ -7,6 +7,7 @@ import { stringifyWithToplevelOrdering } from './download.js';
 import { promptForFiles } from './files.js';
 import { errorMessage } from './i18n.js';
 import { metadataOptionsOf } from './metadata/index.js';
+import { fetchProtocolRegistry } from './protocols/registry.js';
 import { removeNamespaceFromMetadataId } from './schemas/metadata.js';
 import { ExportedProtocol, isMetadataInProtocol, Protocol } from './schemas/protocols.js';
 import { shareOrDownloadAsFile } from './share.js';
@@ -202,17 +203,20 @@ export async function hasUpgradeAvailable({ version, source, id }) {
 	if (!version) throw new Error("Le protocole n'a pas de version");
 	if (!id) throw new Error("Le protocole n'a pas d'identifiant");
 
-	const response = await fetchHttpRequest(source, {
-		cachebust: true,
-		headers: {
-			Accept: 'application/json, application/yaml',
-		},
-	});
+	const registry = await fetchProtocolRegistry();
 
-	const protocol = ExportedProtocol.in
-		.pick('id', 'version')
-		.assert(await parseYAMLorJSON(response));
+	const protocol =
+		registry.protocols.find((p) => p.id === id) ??
+		(await fetchHttpRequest(source, {
+			cachebust: true,
+			headers: {
+				Accept: 'application/json, application/yaml',
+			},
+		}).then(async (response) =>
+			ExportedProtocol.in.pick('id', 'version').assert(await parseYAMLorJSON(response))
+		));
 
+	if (!protocol) throw new Error('Protocole introuvable');
 	if (!protocol.version) throw new Error("Le protocole n'a plus de version");
 	if (protocol.id !== id) throw new Error("Le protocole a changé d'identifiant");
 	if (protocol.version > version) {
