@@ -65,7 +65,8 @@ function get<ExtraParams extends Record<string, unknown> = BaseParams>(
 	...[route, resolver, options]: CorsedHandlerArgs<ExtraParams>
 ) {
 	return http.get<BaseParams & ExtraParams>(
-		'https://cigale-cors-proxy-default-data-terra.ai.meso.umontpellier.fr/:server.kobotoolbox.org' + route,
+		'https://cigale-cors-proxy-default-data-terra.ai.meso.umontpellier.fr/:server.kobotoolbox.org' +
+			route,
 		resolver,
 		options
 	);
@@ -75,7 +76,8 @@ function post<P extends Record<string, unknown> = BaseParams>(
 	...[route, resolver, options]: CorsedHandlerArgs<P>
 ) {
 	return http.post<BaseParams & P>(
-		'https://cigale-cors-proxy-default-data-terra.ai.meso.umontpellier.fr/:server.kobotoolbox.org' + route,
+		'https://cigale-cors-proxy-default-data-terra.ai.meso.umontpellier.fr/:server.kobotoolbox.org' +
+			route,
 		resolver,
 		options
 	);

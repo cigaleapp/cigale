@@ -607,8 +607,8 @@ testKitchensink('can set file-type metadata @no-builtins', async ({ page, app })
 
 testKitchensink('can convert between units', async ({ page, app }) => {
 	await app.settings.set({ debugMode: false });
-	await chooseFirstSession(page)
-	await goToSessionPage(page)
+	await chooseFirstSession(page);
+	await goToSessionPage(page);
 	const section = app.metadata.section('Has no default');
 	const unitChanger = section.getByRole('button', {
 		// XXX: When testing locally (headed or headless), it's "Utiliser une autre unité"
