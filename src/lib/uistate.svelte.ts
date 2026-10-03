@@ -14,7 +14,7 @@ import { tables } from './idb.svelte.js';
 import { getMetadataValue } from './metadata/index.js';
 import { defaultClassificationMetadata, defaultCropMetadata } from './protocols.js';
 import { isMetadataInProtocol } from './schemas/protocols.js';
-import { keys, mapValues, omit, pick, transformObject } from './utils.js';
+import { keys, mapValues, omit, pick, sleep, transformObject } from './utils.js';
 
 type NeuralModelSelector = (typeof NeuralModelSelector)['infer'];
 
@@ -100,7 +100,7 @@ export class UIState {
 		total: 0,
 		done: 0,
 		time: 0,
-		task: '' as '' | 'import' | 'detection' | 'classification' | 'export',
+		task: '' as '' | 'import' | 'detection' | 'classification' | 'export' | 'install-protocol',
 		get progress() {
 			return this.total ? this.done / this.total : 0;
 		},
@@ -114,6 +114,11 @@ export class UIState {
 			this.done = 0;
 			this.time = 0;
 			this.task = '';
+		},
+		async finish(): Promise<void> {
+			this.done = this.total;
+			await sleep(1_000);
+			this.reset();
 		},
 	});
 
