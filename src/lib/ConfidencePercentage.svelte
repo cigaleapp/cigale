@@ -6,7 +6,8 @@
 	interface Props {
 		/**  if undefined, the element shows a fallback "--%" text */
 		value: number | undefined;
-		/**  - text to show when hovering the percentage */
+		/**  text to show when hovering the percentage */
+		// eslint-disable-next-line no-unused-vars
 		tooltip: (percent: `${number}%`) => void;
 		/**  optional content to put before the percentage, useful to make it under the tooltip activation area */
 		children: import('svelte').Snippet;
@@ -18,6 +19,8 @@
 		'show-hundred': boolean;
 	}
 
+	// False positive for no-fallback and show-hundred
+	// eslint-disable-next-line svelte/no-unused-props
 	const {
 		value,
 		children,

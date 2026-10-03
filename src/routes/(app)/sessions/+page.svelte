@@ -5,7 +5,6 @@
 	import IconAdd from '~icons/ri/add-line';
 	import { providers } from '$lib/accounts/registry.js';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import ButtonInk from '$lib/ButtonInk.svelte';
 	import Datetime from '$lib/Datetime.svelte';
 	import { errorMessage, plural } from '$lib/i18n.js';
 	import { countByIndex, databaseHandle, listByIndex, tables } from '$lib/idb.svelte.js';
