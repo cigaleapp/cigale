@@ -13,7 +13,7 @@ swarp.syncStoredCorrections(async (_, onProgress) => {
 	}
 
 	/** @type {Array<{why: string, ids: string[]}>} */
-	let failed = [];
+	const failed = [];
 	let succeeded = 0;
 	const total = await db.count('BeamupCorrection');
 	if (total === 0) {
