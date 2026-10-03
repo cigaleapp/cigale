@@ -82,8 +82,7 @@
 	}
 
 	[role='button'].inline {
-		padding-left: 0;
-		padding-right: 0;
+		padding-block: 0;
 	}
 
 	[role='button']:is(:hover, :focus-visible) {

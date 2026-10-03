@@ -6,6 +6,7 @@ import type { NumericUnit } from '$lib/schemas/units.js';
 
 import { ArkErrors } from 'arktype';
 
+import { storeCorrection } from '$lib/beamup.js';
 import { computeCascades } from '$lib/cascades.js';
 import { Tables } from '$lib/database.js';
 import { percent } from '$lib/i18n.js';
@@ -209,8 +210,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 	abortSignal,
 }: {
 	subjectId: string;
-	// TODO switch to NamespacedMetadataId
-	metadataId: string;
+	metadataId: NamespacedMetadataID;
 	type?: Type;
 	value: RuntimeValue<Type>;
 	manuallyModified?: boolean;
@@ -475,6 +475,18 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 			sessionId,
 			session ? 'Session' : image || imagesFromImageFile.length ? 'Image' : 'Observation'
 		);
+	}
+
+	const protocol = await db.get('Protocol', namespaceOfMetadataId(metadataId));
+	if (protocol && oldValue && !oldValue.manuallyModified && manuallyModified) {
+		void storeCorrection(
+			db,
+			protocol,
+			subjectId,
+			metadata,
+			MetadataValue.assert(oldValue),
+			newValue
+		).catch(console.error);
 	}
 }
 

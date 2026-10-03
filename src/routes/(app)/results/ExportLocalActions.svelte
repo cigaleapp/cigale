@@ -42,6 +42,8 @@
 			return;
 		}
 
+		void swarpc.syncStoredCorrections(undefined);
+
 		try {
 			await ensureNoLoneImages();
 			uiState.processing.task = 'export';

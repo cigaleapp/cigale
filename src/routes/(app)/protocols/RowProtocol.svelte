@@ -3,6 +3,7 @@
 
 	import IconUpgrade from '~icons/ri/arrow-up-circle-line';
 	import IconDelete from '~icons/ri/delete-bin-line';
+	import IconLearnMore from '~icons/ri/information-line';
 	import IconEdit from '~icons/ri/pencil-line';
 	import IconExport from '~icons/ri/share-forward-line';
 	import Badge from '$lib/Badge.svelte';
@@ -16,6 +17,8 @@
 	import Switch from '$lib/Switch.svelte';
 	import { uiState } from '$lib/uistate.svelte.js';
 
+	import BeamupConsentLearnMore from './BeamupConsentLearnMore.svelte';
+
 	interface Props extends Partial<Protocol> {
 		id: string;
 		name: string;
@@ -23,7 +26,7 @@
 		version?: number;
 		ondelete: () => void;
 		updates: 'automatic' | 'manual';
-
+		beamup?: Protocol['beamup'];
 		expanded?: boolean;
 	}
 
@@ -34,6 +37,7 @@
 		version,
 		ondelete,
 		updates,
+		beamup,
 		expanded = $bindable(false),
 	}: Props = $props();
 
@@ -41,6 +45,13 @@
 		const user = getSettings().autoUpdateProtocols;
 		if (id in user) return user[id];
 		return updates === 'automatic';
+	});
+
+	const beamupEnabled = $derived.by(() => {
+		if (!beamup) return null;
+
+		const user = getSettings().beamupPreferences;
+		return Boolean(user[id]?.enable);
 	});
 </script>
 
@@ -112,6 +123,39 @@
 				</div>
 			</label>
 		{/if}
+		{#if beamup}
+			{let open = $state<() => void>()}
+
+			<BeamupConsentLearnMore config={beamup} protocol={id} bind:open />
+
+			<div class="beamup-consent">
+				<Switch
+					value={Boolean(beamupEnabled)}
+					label="Envoi de corrections pour améliorer le protocole"
+					onchange={async (enabled) => {
+						const currently = getSettings().beamupPreferences;
+						await setSetting('beamupPreferences', {
+							...currently,
+							[id]: {
+								email: currently[id]?.email ?? null,
+								enable: enabled,
+							},
+						});
+					}}
+				/>
+
+				<div class="text">
+					<p>Envoi des corrections</p>
+					<p class="via">
+						<OverflowableText text="À {beamup.origin}" />
+					</p>
+				</div>
+
+				<ButtonIcon help="En savoir plus" inline onclick={() => open?.()}>
+					<IconLearnMore />
+				</ButtonIcon>
+			</div>
+		{/if}
 		<div class="more-actions">
 			<ButtonSecondary
 				danger
@@ -159,9 +203,13 @@
 		border-radius: var(--corner-radius);
 	}
 
-	details:is(:hover, :focus-visible, :open) {
+	details:is(:hover, :focus-visible) {
 		background-color: var(--bg-primary-translucent);
 		cursor: pointer;
+	}
+
+	details:open {
+		background-color: var(--bg2-neutral);
 	}
 
 	details:open summary {
@@ -182,11 +230,13 @@
 		}
 	}
 
-	.auto-updates {
+	.auto-updates,
+	.beamup-consent {
 		display: grid;
-		grid-template-columns: max-content auto;
+		grid-template-columns: max-content auto max-content;
 		align-items: center;
 		gap: 1em;
+		margin-top: 1em;
 
 		.via {
 			color: var(--gay);
