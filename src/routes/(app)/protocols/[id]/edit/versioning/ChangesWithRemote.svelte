@@ -108,7 +108,7 @@
 			{#if i === 1 && typeof piece === 'string'}
 				<a
 					title="Voir la métadonnée"
-					href={resolve('/(app)/protocols/[id]/metadata/[metadata]', {
+					href={resolve('/(app)/protocols/[id]/edit/metadata/[metadata]', {
 						id: metadataId.namespace ?? page.params.id ?? '',
 						metadata: metadataId.id,
 					})}
@@ -121,7 +121,7 @@
 						<a
 							title="Voir l'option"
 							href={resolve(
-								'/(app)/protocols/[id]/metadata/[metadata]/options/[option]',
+								'/(app)/protocols/[id]/edit/metadata/[metadata]/options/[option]',
 								{
 									id: metadataId.namespace ?? page.params.id ?? '',
 									metadata: metadataId.id,
