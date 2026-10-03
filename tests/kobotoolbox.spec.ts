@@ -1,9 +1,9 @@
-import type { AppFixture } from './fixtures.js';
+import type { AppFixture } from './fixtures/app.js';
 import type { Locator, Page } from '@playwright/test';
 
 import { expect, test } from './fixtures.js';
-import { MOCK_TOKEN } from './fixtures/http/kobotoolbox/handlers.js';
 import * as kobotoolbox from './fixtures/http/kobotoolbox/handlers.js';
+import { MOCK_TOKEN } from './fixtures/http/kobotoolbox/handlers.js';
 import { chooseInDropdown } from './utils/core.js';
 import { goHome, goToSessionPage } from './utils/navigation.js';
 import { importProtocol } from './utils/protocols.js';
@@ -199,8 +199,8 @@ test('can download a session from a kobotoolbox account', async ({ page, context
 		page.getByRole('button', { name: 'Gwenn Le Bihan' }),
 		"Sur l'appareil"
 	);
-	card.getByRole('button', { name: 'Gérer' }).click();
-	await app.path.wait('/(app)/sessions/[id]');
+	await card.click();
+	await goToSessionPage(page);
 	// Get session id from the URL (kinda jank???)
 	const id = new URL(page.url()).pathname.split('/').at(2);
 	expect(await app.db.get('Session', id!)).toMatchObject({

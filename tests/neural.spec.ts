@@ -72,6 +72,7 @@ test(
 		await importPhotos({ page }, 'cyan.jpeg');
 
 		await app.tabs.go('crop');
+		await app.loading.wait();
 		await app.gallery.card('cyan.jpeg').click();
 		await app.path.wait('/(app)/(sidepanel)/o/[observation]/crop/[image]');
 		page.on('dialog', async (dialog) => {
@@ -169,6 +170,7 @@ test.describe('respects hardware requirements', () => {
 		await importPhotos({ page }, 'cyan.jpeg');
 
 		await app.tabs.go('crop');
+		await app.loading.wait();
 		await app.gallery.card('cyan.jpeg').click();
 		await app.path.wait('/(app)/(sidepanel)/o/[observation]/crop/[image]');
 		page.on('dialog', async (dialog) => {

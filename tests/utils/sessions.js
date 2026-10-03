@@ -4,6 +4,7 @@ import {
 	chooseInDropdown,
 	confirmDeletionModal,
 	goHome,
+	goToSessionPage,
 	goToTab,
 	modal,
 	setInferenceModels,
@@ -95,7 +96,7 @@ export async function switchSession(page, name) {
 		})
 		.click();
 
-	await waitForRoute(page, '/import');
+	await waitForRoute(page, '/import/');
 }
 
 /**
@@ -115,11 +116,14 @@ export async function deleteSession(page, name) {
 		}),
 	});
 
-	await sessionCard
-		.getByRole('button', {
-			name: 'Gérer',
-		})
-		.click();
+	await sessionCard.click();
+
+	await Promise.race([
+		waitForRoute(page, '/(app)/(sidepanel)/import'),
+		waitForRoute(page, '/(app)/sessions/[id]'),
+	]);
+
+	await goToSessionPage(page);
 
 	await page
 		.getByRole('button', {

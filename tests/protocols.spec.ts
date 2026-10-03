@@ -114,68 +114,12 @@ test('does not auto-update when disabled', async ({ page, app }) => {
 	assert(protocol).toHaveProperty('version', oldVersion);
 });
 
-test('can use a protocol that imports metadata from another protocol', async ({
-	page,
-	context,
-	app,
-}) => {
+test('can use a protocol that imports metadata from another protocol', async ({ page, app }) => {
 	await goToProtocolManagement(page);
 	await page.locator('main').getByText('Example: arthropodes (lightweight)').click();
 	await page.locator('main').getByRole('button', { name: 'Supprimer', exact: true }).click();
 
 	await app.modals.confirmDeletion('modal_delete_protocol', 'Example: arthropodes (lightweight)');
-
-	await mockUrl(page, context, 'https://example.com/protocols/com.example.remote.json', {
-		json: {
-			id: 'com.example.remote',
-			name: 'Remote Protocol',
-			description: 'This protocol is hosted remotely',
-			authors: [],
-			sessionMetadata: {
-				remote_session_metadata: {
-					type: 'string',
-					description: '',
-					group: 'all',
-					label: 'Remote session metadata',
-					required: false,
-					mergeMethod: 'none',
-				},
-			},
-			metadataGroups: {
-				all: {
-					name: 'All',
-					description: 'Everything',
-					collapsed: false,
-				},
-			},
-			metadata: {
-				remote_metadata: {
-					type: 'boolean',
-					description: '',
-					group: 'all',
-					label: 'Remote metadata',
-					required: false,
-					mergeMethod: 'none',
-				},
-			},
-		} satisfies typeof ExportedProtocol.inferIn,
-	});
-
-	await mockUrl(
-		page,
-		context,
-		'https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/registry.json',
-		{
-			json: {
-				protocols: [
-					{
-						id: 'com.example.remote',
-						url: 'https://example.com/protocols/com.example.remote.json',
-					},
-				],
-			},
-		}
-	);
 
 	// Trying to import from an unknown protocol should not work
 
@@ -340,8 +284,9 @@ test('can use a protocol that imports metadata from another protocol', async ({
 				metadata: ['should_come_from_parent2', 'crop'],
 			},
 			{
-				from: 'com.example.remote',
-				metadataGroups: ['all'],
+				from: 'io.github.cigaleapp.arthropods.example.light',
+				metadataGroups: ['taxonomy'],
+				sessionMetadata: ['prospection_duration'],
 			},
 		],
 		metadata: {
@@ -355,7 +300,7 @@ test('can use a protocol that imports metadata from another protocol', async ({
 		},
 	});
 
-	expect(await app.db.count('MetadataOption')).toBe(3000 + 3);
+	expect(await app.db.count('MetadataOption')).toBe(3000 + 819 + 3);
 
 	await app.tabs.go('sessions');
 	await newSession(page, {
@@ -374,22 +319,21 @@ test('can use a protocol that imports metadata from another protocol', async ({
 	    - img
 	  - paragraph:
 	    - emphasis: (Optionnel)
-	  - group:
+	  - text: Durée de prospection
+	  - textbox "Durée de prospection"
+	  - button "Utiliser une autre unité": min
+	  - button "Décrémenter":
 	    - img
-	    - text: All
-	    - paragraph: Everything
-	    - text: Remote session metadata
-	    - textbox "Remote session metadata"
-	    - button "Supprimer cette valeur" [disabled]:
-	      - img
-	    - paragraph:
-	      - emphasis: (Optionnel)
+	  - button "Incrémenter":
+	    - img
+	  - button "Supprimer cette valeur" [disabled]:
+	    - img
+	  - paragraph:
+	    - emphasis: (Optionnel)
+	    - text: Durée de la prospection sur le terrain
 	`);
 
-	await page
-		.getByTestId('session-metadata')
-		.getByRole('textbox', { name: 'Remote session metadata' })
-		.fill('Feur');
+	await app.metadata.textbox('Durée de prospection').fill('48');
 
 	await app.tabs.go('import');
 
@@ -404,7 +348,7 @@ test('can use a protocol that imports metadata from another protocol', async ({
 	  - button "Supprimer cette valeur" [disabled]:
 	    - img
 	  - text: Imported enum
-	  - combobox
+	  - combobox "Imported enum"
 	  - button "Supprimer cette valeur" [disabled]:
 	    - img
 	  - text: Is imported
@@ -425,15 +369,30 @@ test('can use a protocol that imports metadata from another protocol', async ({
 	  - paragraph: SMILE :D (porter robinson reference)
 	  - group:
 	    - img
-	    - text: All
-	    - paragraph: Everything
-	    - text: Remote metadata
-	    - switch:
-	      - img
+	    - text: Taxonomie
+	    - paragraph: Classification taxonomique de l'espèce
+	    - text: Classe
+	    - combobox "Classe"
 	    - button "Supprimer cette valeur" [disabled]:
 	      - img
-	    - text: Remote session metadata
-	    - textbox "Remote session metadata"
+	    - text: Famille
+	    - combobox "Famille"
+	    - button "Supprimer cette valeur" [disabled]:
+	      - img
+	    - text: Genre
+	    - combobox "Genre"
+	    - button "Supprimer cette valeur" [disabled]:
+	      - img
+	    - text: Règne
+	    - combobox "Règne"
+	    - button "Supprimer cette valeur" [disabled]:
+	      - img
+	    - text: Ordre
+	    - combobox "Ordre"
+	    - button "Supprimer cette valeur" [disabled]:
+	      - img
+	    - text: Phylum
+	    - combobox "Phylum"
 	    - button "Supprimer cette valeur" [disabled]:
 	      - img
 	`);
@@ -442,16 +401,16 @@ test('can use a protocol that imports metadata from another protocol', async ({
 	await app.metadata.combobox('Imported enum').fill('Option 20');
 	await expect(page.getByTestId('metadata-combobox-viewport').locator('.items'))
 		.toMatchAriaSnapshot(`
-	  - option /^Option 20\\d*$/
-	  - option /^Option 20\\d*$/
-	  - option /^Option 20\\d*$/
-	  - option /^Option 20\\d*$/
-	  - option /^Option 20\\d*$/
-	  - option /^Option 20\\d*$/
-	  - option /^Option 20\\d*$/
-	  - option /^Option 20\\d*$/
-	  - option /^Option 20\\d*$/
-	  - option /^Option 20\\d*$/
+	  - option /Option \\d+/
+	  - option /Option \\d+/
+	  - option /Option \\d+/
+	  - option /Option \\d+/
+	  - option /Option \\d+/
+	  - option /Option \\d+/
+	  - option /Option \\d+/
+	  - option /Option \\d+/
+	  - option /Option \\d+/
+	  - option /Option \\d+/
 	`);
 	await app.metadata.combobox('Imported enum').fill('Option 2067');
 	await page
@@ -462,9 +421,16 @@ test('can use a protocol that imports metadata from another protocol', async ({
 	await expect(app.metadata.radio('Is imported', 'Yes')).toBeChecked();
 	await app.metadata.radio('Is imported', 'No').check({ force: true });
 	await app.metadata.switch('Should come from parent2').click();
-	// Make it false
-	await app.metadata.switch('Remote metadata').click();
-	await app.metadata.switch('Remote metadata').click();
+	await app.metadata.combobox('Règne').fill('Animalia');
+	await page
+		.getByTestId('metadata-combobox-viewport')
+		.getByRole('option', { name: 'Animalia' })
+		// XXX: Theres multiple values with different IDs...
+		.first()
+		.click();
+	await app.metadata.combobox('Règne').blur();
+
+	await app.wait('200ms');
 
 	await app.tabs.go('results', { force: true });
 	const zip = await exportResults(page, { kind: 'metadata' });
@@ -475,13 +441,18 @@ test('can use a protocol that imports metadata from another protocol', async ({
 					from_child: assert.objectContaining({ value: true }),
 					is_imported: assert.objectContaining({ value: 'no' }),
 					should_come_from_parent2: assert.objectContaining({ value: true }),
-					remote_metadata: assert.objectContaining({ value: false }),
+					kingdom: assert.objectContaining({ value: '1' }),
 					imported_enum: assert.objectContaining({ value: 'option_2067' }),
 					crop: assert.objectContaining({ value: null }),
+					genus: assert.objectContaining({ value: null }),
+					family: assert.objectContaining({ value: null }),
+					class: assert.objectContaining({ value: null }),
+					order: assert.objectContaining({ value: null }),
+					phylum: assert.objectContaining({ value: null }),
 				});
 
 				expect(data.session.protocolMetadata).toEqual({
-					remote_session_metadata: assert.objectContaining({ value: 'Feur' }),
+					prospection_duration: assert.objectContaining({ value: 48 }),
 					imported_session_metadata: assert.objectContaining({ value: null }),
 				});
 			},

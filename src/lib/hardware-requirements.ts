@@ -39,10 +39,7 @@ function satisfiedBy<K extends MeasureKind | string>(
 
 	if (!actualUnit) return actualValue >= (requirement.limit ?? 0);
 
-	return (
-		convert(actualValue, actualUnit).to('best') >=
-		convert(requirement.limit!, requirement.unit).to('best')
-	);
+	return convert(actualValue, actualUnit).to(requirement.unit) >= requirement.limit!;
 }
 
 async function* hardwareRequirementsFailures(requirements: typeof HardwareRequirements.infer) {

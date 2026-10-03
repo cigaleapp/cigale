@@ -39,37 +39,37 @@ const appNavTabs = (lang = 'fr') =>
 	/** @type {const}, @satisfies {Record<string, { name: string; route: import('$app/types').ResolvedPathname }>} */ ({
 		import: {
 			name: lang === 'fr' ? 'Importer' : 'Import',
-			route: '/import',
+			route: '/import/',
 		},
 
 		crop: {
 			name: lang === 'fr' ? 'Recadrer' : 'Crop',
-			route: '/crop',
+			route: '/crop/',
 		},
 
 		classify: {
 			name: lang === 'fr' ? 'Classifier' : 'Classify',
-			route: '/classify',
+			route: '/classify/',
 		},
 
 		results: {
 			name: lang === 'fr' ? 'Résultats' : 'Results',
-			route: '/results',
+			route: '/results/',
 		},
 
 		sessions: {
 			name: lang === 'fr' ? 'Sessions' : 'Sessions',
-			route: '/sessions',
+			route: '/sessions/',
 		},
 
 		protocols: {
 			name: lang === 'fr' ? 'Protocoles' : 'Protocols',
-			route: '/protocols',
+			route: '/protocols/',
 		},
 
 		accounts: {
 			name: lang === 'fr' ? 'Comptes' : 'Accounts',
-			route: '/accounts',
+			route: '/accounts/',
 		},
 	});
 
