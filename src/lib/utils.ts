@@ -1404,7 +1404,10 @@ export function corsfix(url: string | URL): string {
 		return new URL(url).toString();
 	}
 
-	return 'https://cigale-cors-proxy-default-data-terra.ai.meso.umontpellier.fr/' + url.toString().replace(/^https?:\/\//, '');
+	return (
+		'https://cigale-cors-proxy-default-data-terra.ai.meso.umontpellier.fr/' +
+		url.toString().replace(/^https?:\/\//, '')
+	);
 }
 
 export function isLocalhost() {
@@ -1687,4 +1690,16 @@ if (import.meta.vitest) {
 		expect(isFulfilled(resolved)).toBe(true);
 		expect(isFulfilled(rejected)).toBe(false);
 	});
+}
+
+/**
+ * Prevents having to do the ugly `...(something ? { key: something } : {})` pattern
+ */
+export function propOrNothing<Key extends string, Value>(
+	key: Key,
+	value: Value
+): Partial<Record<Key, NonNullable<Value>>> {
+	// @ts-expect-error
+	if (nonnull(value)) return { [key]: value };
+	return {};
 }

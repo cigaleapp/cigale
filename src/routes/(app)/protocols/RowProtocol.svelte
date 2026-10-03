@@ -7,6 +7,7 @@
 	import IconExport from '~icons/ri/share-forward-line';
 	import Badge from '$lib/Badge.svelte';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
+	import ButtonInk from '$lib/ButtonInk.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import ButtonUpdateProtocol from '$lib/ButtonUpdateProtocol.svelte';
 	import OverflowableText from '$lib/OverflowableText.svelte';
@@ -16,6 +17,8 @@
 	import Switch from '$lib/Switch.svelte';
 	import { uiState } from '$lib/uistate.svelte.js';
 
+	import BeamupConsentLearnMore from './BeamupConsentLearnMore.svelte';
+
 	interface Props extends Partial<Protocol> {
 		id: string;
 		name: string;
@@ -23,7 +26,7 @@
 		version?: number;
 		ondelete: () => void;
 		updates: 'automatic' | 'manual';
-
+		beamup?: Protocol['beamup'];
 		expanded?: boolean;
 	}
 
@@ -34,6 +37,7 @@
 		version,
 		ondelete,
 		updates,
+		beamup,
 		expanded = $bindable(false),
 	}: Props = $props();
 
@@ -41,6 +45,14 @@
 		const user = getSettings().autoUpdateProtocols;
 		if (id in user) return user[id];
 		return updates === 'automatic';
+	});
+
+	const beamupEnabled = $derived.by(() => {
+		if (!beamup) return null;
+
+		const user = getSettings().beamupPreferences;
+		if (id in user) return user[id].enabled;
+		return false;
 	});
 </script>
 
@@ -112,6 +124,35 @@
 				</div>
 			</label>
 		{/if}
+		{#if beamup}
+			{let open = $state<() => void>()}
+
+			<BeamupConsentLearnMore config={beamup} protocol={id} bind:open />
+
+			<div class="beamup-consent">
+				<Switch
+					value={beamupEnabled}
+					label="Envoi des corrections pour améliorer le protocole"
+					onchange={async (enabled) => {
+						const currently = getSettings().beamupPreferences;
+						await setSetting('beamupPreferences', {
+							...currently,
+							[id]: { ...currently[id], enable: enabled },
+						});
+					}}
+				/>
+
+				<div class="text">
+					<p>
+						Envoi des corrections
+						<ButtonInk onclick={() => open?.()}>En savoir plus</ButtonInk>
+					</p>
+					<p class="via">
+						<OverflowableText text="À {beamup.origin}" />
+					</p>
+				</div>
+			</div>
+		{/if}
 		<div class="more-actions">
 			<ButtonSecondary
 				danger
@@ -182,11 +223,13 @@
 		}
 	}
 
-	.auto-updates {
+	.auto-updates,
+	.beamup-consent {
 		display: grid;
 		grid-template-columns: max-content auto;
 		align-items: center;
 		gap: 1em;
+		margin-top: 1em;
 
 		.via {
 			color: var(--gay);

@@ -51,7 +51,7 @@
 		/** callback to call when a metadata's value is modified */
 		onmetadatachange: (
 			// eslint-disable-next-line no-unused-vars
-			key: string,
+			key: NamespacedMetadataID,
 			// eslint-disable-next-line no-unused-vars
 			value: undefined | RuntimeValue,
 			// eslint-disable-next-line no-unused-vars

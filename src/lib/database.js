@@ -1,4 +1,4 @@
-import { type } from 'arktype';
+import { scope, type } from 'arktype';
 
 import { localeFromNavigator } from './i18n.js';
 import {
@@ -27,6 +27,7 @@ import {
 } from './schemas/neural.js';
 import { Image as ImageSchema, Observation as ObservationSchema } from './schemas/observations.js';
 import {
+	BeamupSettings,
 	ExportsFilepathTemplateObservation,
 	Protocol as ProtocolSchema,
 } from './schemas/protocols.js';
@@ -152,6 +153,14 @@ const Settings = table(
 		submitIssuesVia: '"form" | "github" = "form"',
 		cropperSidebarCollapsed: 'boolean = false',
 		timerSounds: 'boolean = true',
+		beamupPreferences: scope({ ID })
+			.type({
+				'[ID]': {
+					enable: 'boolean',
+					email: 'string.email | null',
+				},
+			})
+			.default(() => ({})),
 		sessionsDirectory: type({
 			platform: type.enumerated('local', 'kobotoolbox', 'ecosignal'),
 			account: 'string | undefined',
@@ -221,6 +230,34 @@ const Settings = table(
 	})
 );
 
+const BeamupCorrection = table(
+	['id'],
+	type({
+		id: ID,
+		client: { version: 'string' },
+		protocol: Protocol.pick('id', 'version', 'beamup'),
+		metadata: Metadata.pick('id', 'type'),
+		subject: {
+			'image?': Image.pick('id'),
+			'observation?': Observation.pick('id'),
+			'unknown?': { id: 'string' },
+			// TODO
+			contentHash: 'null',
+			// contentHash: SHA1Hash.or('null'),
+		},
+		'file?': ImageFile.pick(
+			'id',
+			/* TODO  'contentHash', */ 'filename',
+			'contentType',
+			'dimensions'
+		),
+		before: MetadataValue,
+		after: MetadataValue,
+		occurredAt: 'string.date.iso.parse',
+		email: 'string.email | null',
+	})
+);
+
 const Account = table(
 	'id',
 	type({
@@ -271,6 +308,7 @@ export const Schemas = {
 	HTTPRequest,
 	Account,
 	CustomNeuralNetwork,
+	BeamupCorrection,
 };
 
 /**
@@ -281,6 +319,7 @@ export const NO_REACTIVE_STATE_TABLES = /** @type {const} */ ([
 	'ImagePreviewFile',
 	'MetadataOption',
 	'MetadataValueFile',
+	'BeamupCorrection',
 ]);
 
 /**
@@ -339,6 +378,7 @@ export const Tables = {
 	Settings,
 	Account,
 	CustomNeuralNetwork,
+	BeamupCorrection,
 };
 
 /**
@@ -514,4 +554,9 @@ export const idComparator = (a, b) => {
 /**
  * @typedef Account
  * @type {typeof Account.infer}
+ */
+
+/**
+ * @typedef BeamupCorrection
+ * @type {typeof BeamupCorrection.infer}
  */

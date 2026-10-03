@@ -4,6 +4,7 @@ import { type } from 'arktype';
 
 import { Schemas } from '$lib/database.js';
 import { NodeProvenance } from '$lib/file-tree.js';
+import { NamespacedMetadataID } from '$lib/schemas/common.js';
 
 export const LOCAL_STORAGE = type({
 	databaseName: 'string',
@@ -64,8 +65,8 @@ export const PROCEDURES = {
 			'webgpu?': 'boolean',
 			'inferenceSessionId?': 'string',
 			metadataIds: {
-				cropbox: 'string',
-				target: 'string',
+				cropbox: NamespacedMetadataID,
+				target: NamespacedMetadataID,
 			},
 			taskSettings: {
 				input: Schemas.ModelInput,
@@ -174,6 +175,15 @@ export const PROCEDURES = {
 					{ path: '(number|string)[]', type: '"REMOVE"', oldValue: 'unknown' }
 				)
 				.array(),
+		}),
+	},
+	syncStoredCorrections: {
+		input: type('object'),
+		progress: type('number'),
+		success: type({
+			total: 'number',
+			failed: type({ why: 'string', ids: 'string[]' }).array(),
+			succeeded: 'number',
 		}),
 	},
 } as const satisfies ProceduresMap;
