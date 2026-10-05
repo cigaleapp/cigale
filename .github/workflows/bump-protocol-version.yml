@@ -47,4 +47,4 @@ jobs:
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@4a55954c782fc1ea30b9056cd3e7a2b40ca8887d # v7.2.0
         with:
-          commit_message: 🍱 Bump protocol version of ${{ steps.bump.outputs.changed }} [ci skip]
+          commit_message: 🍱 Bump protocol version of ${{ steps.bump.outputs.changed }}
