@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file, on a monthly basis, with a consistent, simple format: month/year heading > type of change heading > list of changes.
 
+## October 2026
+
+### Improvements
+
+- Remove footer actions from session cards
+- Show 100% in metadata confidence values when it's not manual
+
+### Bug Fixes
+
+- Fix media uploaded then downloaded from EcoSignal never getting crop-analyzed (#2223)
+
+### Data Updates
+
+- Bump protocol version of protocols/insecta.cigaleprotocol.yaml [ci skip]
+
+### Translation Updates
+
+- Refresh translation files
+
 ## September 2026
 
 ### Improvements
