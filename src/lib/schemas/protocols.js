@@ -14,6 +14,7 @@ import {
 	SingleEntryRecord,
 	URLString,
 } from './common.js';
+import { DarwinCoreProtocolConfig } from './darwincore.js';
 import { TemplatedString } from './expressions.js';
 import {
 	Metadata,
@@ -291,6 +292,7 @@ export const Protocol = type({
 	}).describe(
 		'Définition par défaut des fichiers sidecar (fichiers annexes associés à chaque image par rapport à son nom de fichier)'
 	),
+	'darwincore?': DarwinCoreProtocolConfig,
 	exports: type({
 		images: type({
 			cropped: ExportsFilepathTemplateObservation.describe('Chemins des images recadrées'),

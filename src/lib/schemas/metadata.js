@@ -469,6 +469,11 @@ const MetadataBase = type({
 		'@',
 		'Label(s) ou nom(s) de colonne de la question Kobocollect associée à cette métadonnée. Non sensible à la casse',
 	],
+	'darwincore?': [
+		'/^(\w+):\w+$/ | "coreid" | "id"',
+		'@',
+		`Champ DarwinCore associé à cette métadonnée. "id" pour le champ identifiant et "coreid" pour le champ de l'identifiant dans le fichier core`,
+	],
 	'classification?': [
 		'boolean',
 		'@',
