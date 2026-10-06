@@ -5,6 +5,7 @@
 	import IconDelete from '~icons/ri/delete-bin-line';
 	import IconLearnMore from '~icons/ri/information-line';
 	import IconEdit from '~icons/ri/pencil-line';
+	import IconStats from '~icons/ri/pie-chart-2-line';
 	import IconExport from '~icons/ri/share-forward-line';
 	import Badge from '$lib/Badge.svelte';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
@@ -27,6 +28,8 @@
 		ondelete: () => void;
 		updates: 'automatic' | 'manual';
 		beamup?: Protocol['beamup'];
+		charts?: Protocol['charts'];
+
 		expanded?: boolean;
 	}
 
@@ -39,6 +42,7 @@
 		updates,
 		beamup,
 		expanded = $bindable(false),
+		charts,
 	}: Props = $props();
 
 	const autoUpdatesEnabled = $derived.by(() => {
@@ -53,6 +57,10 @@
 		const user = getSettings().beamupPreferences;
 		return Boolean(user[id]?.enable);
 	});
+
+	const hasUserScopedCharts = $derived(
+		Boolean(charts?.some((chart) => ['both', 'user'].includes(chart.scope)))
+	);
 </script>
 
 <li>
@@ -167,6 +175,12 @@
 				<IconDelete />
 				Supprimer
 			</ButtonSecondary>
+			{#if hasUserScopedCharts}
+				<ButtonSecondary onclick={() => goto('/(app)/protocols/[id]/results', { id })}>
+					<IconStats />
+					Stats
+				</ButtonSecondary>
+			{/if}
 			<ButtonSecondary onclick={() => goto('/(app)/protocols/[id]/edit/infos', { id })}>
 				<IconEdit />
 				Modifier

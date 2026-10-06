@@ -58,18 +58,17 @@
 </script>
 
 {#if protocol}
-	{#if resolvingDefaults && refreshDefaults === 0}
-		<div class="loading">
-			<Logo loading />
-			Chargement…
-		</div>
-	{:else if metadataDefs.length === 0}
+	{#if metadataDefs.length === 0}
 		<div class="empty">
 			<Logo variant="empty" />
 			Aucune métadonnée à renseigner
 		</div>
 	{:else}
-		<form class="metadata" pw-testid="session-metadata">
+		<form
+			class="metadata"
+			pw-testid="session-metadata"
+			class:loading={resolvingDefaults && refreshDefaults === 0}
+		>
 			<MetadataList
 				definitions={metadataDefs}
 				values={session.metadata}
@@ -122,7 +121,6 @@
 {/if}
 
 <style>
-	.loading,
 	.empty {
 		display: flex;
 		flex-direction: column;
@@ -135,5 +133,10 @@
 
 	form {
 		--metadata-list-gap: 2em;
+
+		&.loading {
+			pointer-events: none;
+			opacity: 0.75;
+		}
 	}
 </style>

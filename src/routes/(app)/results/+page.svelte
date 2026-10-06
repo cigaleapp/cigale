@@ -3,6 +3,8 @@
 
 	import { SvelteMap } from 'svelte/reactivity';
 
+	import Badge from '$lib/Badge.svelte';
+	import Charts from '$lib/charts/Charts.svelte';
 	import Field from '$lib/Field.svelte';
 	import { tables } from '$lib/idb.svelte.js';
 	import ModalConfirm from '$lib/ModalConfirm.svelte';
@@ -28,7 +30,7 @@
 	async function confirmExportIfMetadataErrors() {
 		const hasErrors = metadataErrors.values().some((errs) => errs.length > 0);
 		if (!hasErrors) return true;
-		return await confirmExportWithMetadataErrors?.();
+		return (await confirmExportWithMetadataErrors?.()) ?? true;
 	}
 </script>
 
@@ -74,6 +76,20 @@
 				/>
 			{/if}
 		</section>
+
+		{#if uiState.currentProtocol?.charts?.some((c) => ['both', 'session'].includes(c.scope))}
+			<header>
+				<h2>
+					Statistiques
+
+					<Badge>Beta</Badge>
+				</h2>
+			</header>
+
+			<section class="stats">
+				<Charts scope="session" protocol={uiState.currentProtocol.id} />
+			</section>
+		{/if}
 	</section>
 
 	<ExportPanel {confirmExportIfMetadataErrors} />
