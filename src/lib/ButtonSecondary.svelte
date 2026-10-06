@@ -14,39 +14,65 @@ Available CSS variables:
  
 -->
 
-<script module>
-	/**
-	 * @typedef Props
-	 * @type {object}
-	 * @property {import('svelte').Snippet<[{loading: boolean}]>} children
-	 * @property {undefined | ((e: MouseEvent, signals: { setText: (text: string) => void, loadingStarted: () => void, loadingEnded: () => void }) => Promise<void> |void)} onclick
-	 * @property {boolean} [disabled=false]
-	 * @property {boolean} [tight=false] limit the height of the button. also hides keyboard shortcut hint if itll be displayed in a tooltip, and doesn't auto-append a spinner when loading, and {@link loading} is true
-	 * @property {Parameters<typeof tooltip>[1]} [help]
-	 * @property {string} [keyboard] keyboard shortcut hint to display
-	 * @property {import('$e2e/testids.js').PlaywrightTestId|undefined} [testid] add a attribute for Playwright getByTestId to the button
-	 * @property {boolean} [aria-pressed]
-	 * @property {string} [aria-label]
-	 * @property {boolean |"always"} [loading] show a loading state while the onlick handler is running. set to "always" to always show the loading state.
-	 * @property {string} [errorprefix] show an error toast if the onclick handler fails. message is constructed with errorMessage(e, errorprefix)
-	 * @property {string} [onclicksuccess] show a success toast if the onclick handler doesnt fail.
-	 * @property {boolean} [danger=false] use a red color scheme for dangerous actions
-	 * @property {boolean} [subtle=false] disable the border except on hover/focus
-	 * @property {boolean} [submits=false] if true, the button acts as a submit button in a form context
-	 * @property {string} [aria-label] accessible label for the button
-	 */
+<script lang="ts" module>
+	import type { PlaywrightTestId } from '$e2e/testids.js';
+	import type { Snippet } from 'svelte';
+
+	type OnclickSignals = {
+		/** Sets the button's displayed text. */
+		// eslint-disable-next-line no-unused-vars
+		setText: (text: string) => void;
+		/** Marks the beginning of the loading state. */
+		loadingStarted: () => void;
+		/** Marks the end of the loading state. */
+		loadingEnded: () => void;
+	};
+
+	export interface Props {
+		/** The button's content. */
+		children: Snippet<[{ loading: boolean }]>;
+		/** Handles clicks on the button. */
+		// eslint-disable-next-line no-unused-vars
+		onclick: undefined | ((e: MouseEvent, signals: OnclickSignals) => Promise<void> | void);
+		/** Disables the button. */
+		disabled?: boolean;
+		/** Limits the button height, hides the keyboard hint in a tooltip, and prevents automatically appending a spinner while loading. */
+		tight?: boolean;
+		/** Tooltip content for the button. */
+		help?: Parameters<typeof tooltip>[1];
+		/** Keyboard shortcut hint to display. */
+		keyboard?: string;
+		/** Attribute used by Playwright's getByTestId. */
+		testid?: PlaywrightTestId | undefined;
+		/** Indicates whether the button is pressed. */
+		'aria-pressed'?: boolean;
+		/** Accessible label for the button. */
+		'aria-label'?: string;
+		/** Shows a loading state while the click handler is running; use "always" to always show it. */
+		loading?: boolean | 'always';
+		/** Prefix for the error toast shown when the click handler fails. */
+		errorprefix?: string;
+		/** Success toast shown when the click handler succeeds. */
+		onclicksuccess?: string;
+		/** Uses a red color scheme for dangerous actions. */
+		danger?: boolean;
+		/** Disables the border except on hover or focus. */
+		subtle?: boolean;
+		/** Makes the button act as a submit button in a form context. */
+		submits?: boolean;
+	}
 </script>
 
-<script>
+<script lang="ts">
 	import { errorMessage } from '$lib/i18n.js';
 	import { toasts } from '$lib/toasts.svelte.js';
 
 	import { hasPhysicalKeyboard } from './keyboard.svelte';
 	import KeyboardHint from './KeyboardHint.svelte';
 	import LoadingSpinner from './LoadingSpinner.svelte';
+	import ProgressBar from './ProgressBar.svelte';
 	import { tooltip } from './tooltips.js';
 
-	/** @type {Props} */
 	let {
 		children,
 		onclick,
@@ -62,7 +88,7 @@ Available CSS variables:
 		loading = false,
 		tight = false,
 		...aria
-	} = $props();
+	}: Props = $props();
 
 	let isLoading = $state(false);
 
@@ -71,6 +97,8 @@ Available CSS variables:
 	);
 
 	let onclickTextOverride = $state('');
+
+	let loadingProgress = $state<number | null>(null);
 
 	/** Width of button, to lock the button width while loading (when content can possible change width) */
 	let width = $state(0);
@@ -86,6 +114,12 @@ Available CSS variables:
 	class="tooltip-container"
 	use:tooltip={typeof help === 'string' && keyboard ? { text: help, keyboard } : help}
 >
+	<div class="progress">
+		{#if loadingProgress !== null}
+			<ProgressBar progress={loadingProgress} />
+		{/if}
+	</div>
+
 	<button
 		{...aria}
 		data-tooltip-content={typeof help === 'string'
@@ -114,6 +148,8 @@ Available CSS variables:
 			// This is kinda crude but you cant reflect a function object's args in JS, see https://stackoverflow.com/q/6921588/9943464 (well you can, but by uhhhh parsing the source code, yeah.)
 			if (loading && !onclick.toString().includes('loadingStarted')) isLoading = true;
 
+			loadingProgress = null;
+
 			try {
 				await onclick(e, {
 					setText: (text) => {
@@ -124,6 +160,9 @@ Available CSS variables:
 					},
 					loadingEnded: () => {
 						isLoading = false;
+					},
+					progress(p) {
+						loadingProgress = p;
 					},
 				});
 
@@ -245,6 +284,19 @@ Available CSS variables:
 		}
 		to {
 			rotate: 360deg;
+		}
+	}
+
+	.progress {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+
+		.tooltip-container:has(&) {
+			position: relative;
+			border-radius: var(--corner-radius);
+			overflow: hidden;
 		}
 	}
 </style>

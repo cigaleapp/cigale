@@ -1,3 +1,5 @@
+import type { DatabaseHandle } from '$lib/idb.svelte.js';
+
 import _rawRegistry from '$lib/registry.json' with { type: 'json' };
 import { ProtocolRegistry } from '$lib/schemas/protocols.js';
 
@@ -12,4 +14,28 @@ export async function fetchProtocolRegistry() {
 	PROTOCOLS_REGISTRY ??= ProtocolRegistry.assert(_rawRegistry);
 
 	return PROTOCOLS_REGISTRY;
+}
+
+/**
+ * All protocols from registry
+ * and any protocol that was installed
+ * but is not listed in it
+ */
+export async function* listAllProtocols(db: DatabaseHandle) {
+	const locally = await db.getAll('Protocol');
+
+	for (const p of locally) {
+		yield { protocol: p, installed: true };
+	}
+
+	const registry = await fetchProtocolRegistry().catch((e) => {
+		console.error("Couldn't fetch protocol registry", e);
+		return { protocols: [] };
+	});
+
+	for (const p of registry.protocols) {
+		if (locally.some((l) => l.id === p.id)) continue;
+		if (!p.suggested) continue;
+		yield { installed: false, protocol: { source: p.url, ...p } };
+	}
 }

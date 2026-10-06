@@ -7,7 +7,6 @@ import { expect } from '@playwright/test';
 
 import { collectOPFSState } from '$e2e/utils/opfs.js';
 
-import lightProtocol from '../../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import { FixturePaths } from '../filepaths.js';
 import { exampleProtocol, test as setup } from '../fixtures.js';
 import {
@@ -28,22 +27,14 @@ setup('empty, basic', async ({ page }) => {
 		p.updates = 'manual';
 	});
 
-	await writeStates(page, 'empty.json', {
-		localStorage: {
-			builtinProtocols: JSON.stringify([lightProtocol.source]),
-		},
-	});
+	await writeStates(page, 'empty.json');
 
 	await importResults(page, 'exports/correct.zip');
 
 	// Prevent storing current session state in localStorage
 	await goHome(page);
 
-	await writeStates(page, 'basic.json', {
-		localStorage: {
-			builtinProtocols: JSON.stringify([lightProtocol.source]),
-		},
-	});
+	await writeStates(page, 'basic.json');
 });
 
 setup('kitchensink-protocol', async ({ page, app }) => {
@@ -75,20 +66,15 @@ setup('kitchensink-protocol', async ({ page, app }) => {
 	// Prevent storing current session state in localStorage
 	await goHome(page);
 
-	await writeStates(page, 'kitchen-sink.json', {
-		localStorage: {
-			builtinProtocols: JSON.stringify([]),
-		},
-	});
+	await writeStates(page, 'kitchen-sink.json');
 });
 
 async function writeStates(
 	page: Page,
 	filename: RemovePrefix<'storage-states/', FixturePaths.StorageStates> &
-		RemovePrefix<'opfs-states/', FixturePaths.OPFSStates>,
-	overrides: { localStorage?: Record<string, string> } = {}
+		RemovePrefix<'opfs-states/', FixturePaths.OPFSStates>
 ) {
-	await writeStorageState(page, `storage-states/${filename}`, overrides?.localStorage);
+	await writeStorageState(page, `storage-states/${filename}`);
 	await collectOPFSState(page, `opfs-states/${filename}`);
 }
 
