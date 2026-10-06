@@ -149,7 +149,7 @@ export async function processExifData({
 		.then((imgs) => imgs.filter((img) => img.fileId === imageFileId));
 
 	for (const { id: subjectId } of images) {
-		for (const [key, { value, confidence }] of Object.entries(metadataFromExif)) {
+		for (const [key, { value, confidence }] of entries(metadataFromExif)) {
 			await storeMetadataValue({
 				db: db.databaseHandle(),
 				subjectId,

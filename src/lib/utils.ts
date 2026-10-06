@@ -1691,3 +1691,14 @@ if (import.meta.vitest) {
 		expect(isFulfilled(rejected)).toBe(false);
 	});
 }
+
+/**
+ * Prevents having to do the ugly `...(something ? { key: something } : {})` pattern
+ */
+export function propOrNothing<Key extends string, Value>(
+	key: Key,
+	value: Value
+): { [key in Key]: Value } | Record<never, never> {
+	if (nonnull(value)) return { [key]: value };
+	return {};
+}

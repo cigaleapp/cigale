@@ -2,7 +2,7 @@ import { tables } from './idb.svelte.js';
 import { switchValue } from './utils.js';
 
 /**
- * @import {Settings} from './database.js';
+ * @import {Settings, Schemas} from './database.js';
  */
 
 /** @type {Settings}  */
@@ -33,11 +33,13 @@ export function getColorScheme() {
 /**
  *
  * @param {Key} key
- * @param {Settings[Key]} value
+ * @param {typeof Schemas.Settings['inferIn'][Key]} value
  * @template {keyof Settings} Key
  */
 export async function setSetting(key, value) {
-	console.debug('setSetting', key, value);
+	const val = $state.snapshot(value)
+
+	console.debug('setSetting', key, val);
 	const current = (await tables.Settings.get('user')) ?? (await tables.Settings.get('defaults'));
 
 	if (!current) {
@@ -47,7 +49,7 @@ export async function setSetting(key, value) {
 	return tables.Settings.set({
 		...current,
 		id: 'user',
-		[key]: value,
+		[key]: val,
 	});
 }
 

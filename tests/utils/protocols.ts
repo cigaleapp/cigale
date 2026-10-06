@@ -26,11 +26,11 @@ export async function importProtocol(
 	const utf8 = new TextEncoder();
 	const fileChooser = page.waitForEvent('filechooser');
 
-	await page
-		.getByRole('button', {
-			name: 'Importer',
-		})
-		.click();
+	const importButton = page.getByRole('button', {
+		name: 'Importer',
+	});
+
+	await importButton.click();
 
 	let protocolData: typeof ExportedProtocol.inferIn;
 	if (typeof protocol === 'string' && protocol.endsWith('.json')) {
@@ -66,6 +66,11 @@ export async function importProtocol(
 	}
 
 	if (options.wait) {
+		await expect.soft(importButton).toBeDisabled();
+		await expect.soft(importButton).not.toBeDisabled({
+			timeout: ms('2min'),
+		});
+
 		await expect
 			.soft(
 				page
@@ -74,6 +79,6 @@ export async function importProtocol(
 					.getByRole('code')
 					.getByText(protocolData.id)
 			)
-			.toBeVisible({ timeout: ms('2min') });
+			.toBeVisible({ timeout: ms('10s') });
 	}
 }

@@ -185,6 +185,7 @@
 
 <ModalPickProtocol />
 
+
 <Modal
 	key="modal_debug_ui_state"
 	title="UI State"
@@ -197,6 +198,8 @@
 		{/key}
 	{/if}
 </Modal>
+
+<div id="modals"></div>
 
 <div id="portal-target-dropdowns"></div>
 

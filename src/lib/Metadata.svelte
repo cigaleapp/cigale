@@ -411,7 +411,7 @@
 {#snippet extraInline()}
 	{#if value?.confidence}
 		<ConfidencePercentage
-			show-hundred={!value.manuallyModified}
+			show-hundred={!value.manuallyModified && !value.isDefault}
 			no-fallback
 			value={value.confidence}
 		/>

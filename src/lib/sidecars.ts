@@ -1,4 +1,5 @@
 import type { DatabaseHandle } from './idb.svelte.js';
+import type { NamespacedMetadataID } from './schemas/common.js';
 
 import JSONC from 'tiny-jsonc';
 import * as YAML from 'yaml';
@@ -47,7 +48,7 @@ export async function processSidecars({
 	protocols.set(protocol.id, protocol);
 
 	type ExtractionPlanItem<T extends MetadataType> = {
-		metadataId: string;
+		metadataId: NamespacedMetadataID;
 		type: T;
 		query: NonNullable<
 			NonNullable<Extract<DB.Metadata, { type: T }>['infer']>['sidecar']

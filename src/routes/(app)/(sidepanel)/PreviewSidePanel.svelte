@@ -29,6 +29,7 @@
 	import { goto } from '$lib/paths.js';
 	import { metadataDefinitionComparator } from '$lib/protocols.js';
 	import { uiState } from '$lib/uistate.svelte.js';
+	import type { NamespacedMetadataID } from '$lib/schemas/common.js';
 
 	interface Props {
 		/** source **href**s of the images/observations we're modifying the metadata on */
@@ -51,7 +52,7 @@
 		/** callback to call when a metadata's value is modified */
 		onmetadatachange: (
 			// eslint-disable-next-line no-unused-vars
-			key: string,
+			key: NamespacedMetadataID,
 			// eslint-disable-next-line no-unused-vars
 			value: undefined | RuntimeValue,
 			// eslint-disable-next-line no-unused-vars

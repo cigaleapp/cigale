@@ -46,6 +46,7 @@ CSS variables:
 	import ModalToasts from './ModalToasts.svelte';
 	import { getColorScheme } from './settings.svelte.js';
 	import { insideBoundingClientRect } from './utils.js';
+	import { Portal } from 'bits-ui';
 
 	/**  @type {Props} */
 	let {
@@ -133,61 +134,61 @@ CSS variables:
 		{/if}
 	</BottomDrawer>
 {:else}
-	<dialog
-		data-key={stateKey}
-		// Somehow page.state[stateKey] can be undefined sometimes
-		aria-hidden={page.state[stateKey] === false}
-		style:color-scheme={getColorScheme()}
-		bind:this={modalElement}
-		onclose={() => {
-			// Update state when dialog is closed via browser-controlled means (e.g. Esc key)
-			pushState('', { [stateKey]: false });
-			onclose?.();
-		}}
-		onmousedown={({ target, currentTarget, offsetX, offsetY }) => {
-			// If we're close enough to the edge of the dialog but still "inside", don't close, because target === currentTarget but it's not the backdrop yet (see #469)
-			if (
-				insideBoundingClientRect(
-					{ offsetX, offsetY },
-					currentTarget.getBoundingClientRect(),
-					20
-				)
-			) {
-				return;
-			}
-			// Close on backdrop click
-			if (target === currentTarget && !opening) close?.();
-		}}
-	>
-		<!-- Each page may have a banner landmark, but each page should generally be limited to a single element with the role of banner. -- MDN on role="banner" -->
-		<!-- Since <header> can be implicitly set to role="banner" in some situations, we force it to be role="generic"  -->
-		<header role="generic">
-			<h1>{title}</h1>
-			<ButtonIcon
-				help="Fermer"
-				onclick={() => {
-					close?.();
-				}}
-			>
-				<IconClose />
-			</ButtonIcon>
-		</header>
-		<div class="contents">
-			{@render children({ close })}
-		</div>
-
-		{#if toastsPool}
-			<section class="toasts">
-				<ModalToasts pool={toastsPool} />
-			</section>
-		{/if}
-
-		{#if footer}
-			<footer>
-				{@render footer({ close })}
-			</footer>
-		{/if}
-	</dialog>
+	<Portal to="#modals">
+		<dialog
+			data-key={stateKey}
+			// Somehow page.state[stateKey] can be undefined sometimes
+			aria-hidden={page.state[stateKey] === false}
+			style:color-scheme={getColorScheme()}
+			bind:this={modalElement}
+			onclose={() => {
+				// Update state when dialog is closed via browser-controlled means (e.g. Esc key)
+				pushState('', { [stateKey]: false });
+				onclose?.();
+			}}
+			onmousedown={({ target, currentTarget, offsetX, offsetY }) => {
+				// If we're close enough to the edge of the dialog but still "inside", don't close, because target === currentTarget but it's not the backdrop yet (see #469)
+				if (
+					insideBoundingClientRect(
+						{ offsetX, offsetY },
+						currentTarget.getBoundingClientRect(),
+						20
+					)
+				) {
+					return;
+				}
+				// Close on backdrop click
+				if (target === currentTarget && !opening) close?.();
+			}}
+		>
+			<!-- Each page may have a banner landmark, but each page should generally be limited to a single element with the role of banner. -- MDN on role="banner" -->
+			<!-- Since <header> can be implicitly set to role="banner" in some situations, we force it to be role="generic"  -->
+			<header role="generic">
+				<h1>{title}</h1>
+				<ButtonIcon
+					help="Fermer"
+					onclick={() => {
+						close?.();
+					}}
+				>
+					<IconClose />
+				</ButtonIcon>
+			</header>
+			<div class="contents">
+				{@render children({ close })}
+			</div>
+			{#if toastsPool}
+				<section class="toasts">
+					<ModalToasts pool={toastsPool} />
+				</section>
+			{/if}
+			{#if footer}
+				<footer>
+					{@render footer({ close })}
+				</footer>
+			{/if}
+		</dialog>
+	</Portal>
 {/if}
 
 <style>
@@ -228,7 +229,7 @@ CSS variables:
 	}
 
 	dialog[open]::backdrop {
-		background: rgba(0, 0, 0, 0.5);
+		background: rgba(0, 0, 0, 0.125);
 		backdrop-filter: blur(10px);
 	}
 
