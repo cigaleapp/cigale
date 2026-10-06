@@ -33,6 +33,7 @@ CSS variables:
 </script>
 
 <script>
+	import { Portal } from 'bits-ui';
 	import { ms } from 'convert';
 
 	import IconClose from '~icons/ri/close-line';
@@ -46,7 +47,6 @@ CSS variables:
 	import ModalToasts from './ModalToasts.svelte';
 	import { getColorScheme } from './settings.svelte.js';
 	import { insideBoundingClientRect } from './utils.js';
-	import { Portal } from 'bits-ui';
 
 	/**  @type {Props} */
 	let {

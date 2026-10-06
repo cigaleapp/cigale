@@ -37,7 +37,7 @@ export function getColorScheme() {
  * @template {keyof Settings} Key
  */
 export async function setSetting(key, value) {
-	const val = $state.snapshot(value)
+	const val = $state.snapshot(value);
 
 	console.debug('setSetting', key, val);
 	const current = (await tables.Settings.get('user')) ?? (await tables.Settings.get('defaults'));

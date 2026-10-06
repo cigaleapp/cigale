@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { TopLeftBoundingBox } from '$lib/BoundingBoxes.svelte.js';
 	import type * as DB from '$lib/database.js';
+	import type { NamespacedMetadataID } from '$lib/schemas/common.js';
 	import type { RuntimeValue } from '$lib/schemas/metadata.js';
 	import type { NumericUnit } from '$lib/schemas/units.js';
 
@@ -29,7 +30,6 @@
 	import { goto } from '$lib/paths.js';
 	import { metadataDefinitionComparator } from '$lib/protocols.js';
 	import { uiState } from '$lib/uistate.svelte.js';
-	import type { NamespacedMetadataID } from '$lib/schemas/common.js';
 
 	interface Props {
 		/** source **href**s of the images/observations we're modifying the metadata on */

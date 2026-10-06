@@ -185,7 +185,6 @@
 
 <ModalPickProtocol />
 
-
 <Modal
 	key="modal_debug_ui_state"
 	title="UI State"
