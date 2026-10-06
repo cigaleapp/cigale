@@ -253,6 +253,7 @@ msgstr "En attente"
 
 #: src/lib/LearnMoreLink.svelte
 #: src/lib/Metadata.svelte
+#: src/routes/(app)/protocols/RowProtocol.svelte
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/infos/+page.svelte
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
 msgid "En savoir plus"
@@ -2335,6 +2336,7 @@ msgid "Le stockage de votre navigateur n'est pas persistant, les données pourra
 msgstr "Le stockage de votre navigateur n'est pas persistant, les données pourraient être perdues en cas de manque d'espace de stockage."
 
 #: src/routes/(app)/+layout.ts
+#: src/routes/(app)/protocols/BeamupConsentLearnMore.svelte
 msgid "Activer"
 msgstr "Activer"
 
@@ -2676,6 +2678,7 @@ msgid "Chercher…"
 msgstr "Chercher…"
 
 #: src/lib/ComboboxMobile.svelte
+#: src/routes/(app)/protocols/BeamupConsentLearnMore.svelte
 msgid "OK"
 msgstr "OK"
 
@@ -3303,3 +3306,72 @@ msgstr "CPU"
 #: src/routes/(app)/about/+page.svelte
 msgid "RAM"
 msgstr "RAM"
+
+#: src/lib/beamup.ts
+msgid "Cigale"
+msgstr "Cigale"
+
+#: src/routes/(app)/protocols/RowProtocol.svelte
+msgid "Envoi de corrections pour améliorer le protocole"
+msgstr "Envoi de corrections pour améliorer le protocole"
+
+#: src/routes/(app)/protocols/RowProtocol.svelte
+msgid "Envoi des corrections"
+msgstr "Envoi des corrections"
+
+#: src/routes/(app)/protocols/BeamupConsentLearnMore.svelte
+msgid "Remontée de données d'usage anonymisées"
+msgstr "Remontée de données d'usage anonymisées"
+
+#: src/routes/(app)/protocols/BeamupConsentLearnMore.svelte
+msgid "Nom et version du protocole"
+msgstr "Nom et version du protocole"
+
+#: src/routes/(app)/protocols/BeamupConsentLearnMore.svelte
+msgid "Version actuelle de CIGALE"
+msgstr "Version actuelle de CIGALE"
+
+#: src/routes/(app)/protocols/BeamupConsentLearnMore.svelte
+msgid "Date et heure de la modification"
+msgstr "Date et heure de la modification"
+
+#: src/routes/(app)/protocols/BeamupConsentLearnMore.svelte
+msgid "Identifiant de la métadonnée ayant été modifiée"
+msgstr "Identifiant de la métadonnée ayant été modifiée"
+
+#: src/routes/(app)/protocols/BeamupConsentLearnMore.svelte
+msgid "Valeur, score de confiance et alternatives avant modification"
+msgstr "Valeur, score de confiance et alternatives avant modification"
+
+#: src/routes/(app)/protocols/BeamupConsentLearnMore.svelte
+msgid "Valeur, score de confiance et alternatives après modification"
+msgstr "Valeur, score de confiance et alternatives après modification"
+
+#: src/routes/(app)/protocols/BeamupConsentLearnMore.svelte
+msgid "Identifiant et <0>hash</0> du/des fichier(s) photos de l'observation ayant été modifiée"
+msgstr "Identifiant et <0>hash</0> du/des fichier(s) photos de l'observation ayant été modifiée"
+
+#: src/routes/(app)/protocols/BeamupConsentLearnMore.svelte
+msgid "Addresse e-mail"
+msgstr "Addresse e-mail"
+
+#: src/routes/(app)/protocols/BeamupConsentLearnMore.svelte
+msgid "Si vous le souhaitez, vous pouvez aussi renseigner une addresse e-mail, pour éventuellement être contacté·e"
+msgstr "Si vous le souhaitez, vous pouvez aussi renseigner une addresse e-mail, pour éventuellement être contacté·e"
+
+#: src/routes/(app)/protocols/BeamupConsentLearnMore.svelte
+msgid "Quand une métadonnée est modifiée manuellement après avoir été inférée automatiquement par un modèle, cette correction peut être remontée aux auteurices du protocole pour améliorer les modèles d'inférence."
+msgstr "Quand une métadonnée est modifiée manuellement après avoir été inférée automatiquement par un modèle, cette correction peut être remontée aux auteurices du protocole pour améliorer les modèles d'inférence."
+
+#. 0.0: domain
+#: src/routes/(app)/protocols/BeamupConsentLearnMore.svelte
+msgid "Pour cela, si vous activez cette option, et quand ce protocole est sélectionné, Cigale enverra les données suivantes au <0>serveur BeamUp à {0}</0>"
+msgstr "Pour cela, si vous activez cette option, et quand ce protocole est sélectionné, Cigale enverra les données suivantes au <0>serveur BeamUp à {0}</0>"
+
+#: src/routes/(app)/protocols/BeamupConsentLearnMore.svelte
+msgid "Il n'y a pas besoin d'être connecté·e à Internet au moment où l'on corrige la métadonnée, les corrections sont stockées localement et envoyées au prochain démarrage de l'appli, quand une connexion est disponible."
+msgstr "Il n'y a pas besoin d'être connecté·e à Internet au moment où l'on corrige la métadonnée, les corrections sont stockées localement et envoyées au prochain démarrage de l'appli, quand une connexion est disponible."
+
+#: src/routes/(app)/protocols/BeamupConsentLearnMore.svelte
+msgid "L'entièreté de ces données sont publiquement accessibles à <0/>"
+msgstr "L'entièreté de ces données sont publiquement accessibles à <0/>"
