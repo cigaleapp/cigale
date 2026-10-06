@@ -1,8 +1,9 @@
 import type { RuntimeValuesPerType } from './types.js';
 import type * as DB from '$lib/database';
+import type { NamespacedMetadataID } from '$lib/schemas/common.js';
 
 import { type RuntimeValue } from '$lib/schemas/metadata.js';
-import { avg, compareBy, mapValues, nonnull, unique } from '$lib/utils.js';
+import { avg, compareBy, keys, mapValues, nonnull, unique } from '$lib/utils.js';
 
 import { serializeMetadataValue } from './serializing.js';
 import { switchOnMetadataType } from './types.js';
@@ -57,11 +58,11 @@ export function mergeMetadataFromImagesAndObservations({
 		{ definitions }
 	);
 
-	const keys = new Set([...Object.keys(mergedValues), ...Object.keys(mergedOverrides)]);
+	const mergedKeys = new Set([...keys(mergedValues), ...keys(mergedOverrides)]);
 
-	const output: Record<string, DB.MetadataValue & { merged: boolean }> = {};
+	const output: Record<NamespacedMetadataID, DB.MetadataValue & { merged: boolean }> = {};
 
-	for (const key of keys) {
+	for (const key of mergedKeys) {
 		const value = mergedOverrides[key] ?? mergedValues[key];
 		if (value) output[key] = value;
 	}
@@ -79,7 +80,7 @@ export function mergeMetadataValues(
 		/** Key is id of the metadata */
 		options?: Record<string, DB.MetadataEnumVariant[]>;
 	}
-): Record<string, DB.MetadataValue & { merged: boolean }> {
+): Record<NamespacedMetadataID, DB.MetadataValue & { merged: boolean }> {
 	if (values.length === 1) {
 		return mapValues(values[0], (v) => ({ ...v, merged: false }));
 	}

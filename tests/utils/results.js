@@ -5,7 +5,14 @@ import { nanoid } from 'nanoid';
 import * as yauzl from 'yauzl-promise';
 
 import { FixturePaths } from '../filepaths.js';
-import { goToTab, newSession, pickFiles, setSettings, waitForLoadingEnd } from './index.js';
+import {
+	goToTab,
+	newSession,
+	pickFiles,
+	setSettings,
+	waitForDownload,
+	waitForLoadingEnd,
+} from './index.js';
 
 /**
  * @import { Page } from '@playwright/test';
@@ -71,9 +78,10 @@ export async function exportResults(page, { cropPadding = '0px', kind = 'cropped
 		)
 		.click();
 
-	const event = page.waitForEvent('download');
-	await area.getByRole('button', { name: 'Archive ZIP' }).click();
-	const download = await event;
+	const download = await waitForDownload(page, async () =>
+		area.getByRole('button', { name: 'Archive ZIP' }).click()
+	);
+
 	expect(download.suggestedFilename()).toBe('results.zip');
 	await download.saveAs(saveAs);
 
