@@ -1,0 +1,1 @@
+import{tn as e}from"../chunks/DrWy-0ZW.js";import"../chunks/DnKkSYKs.js";import"../chunks/2rH7RhMv.js";import{t}from"../chunks/3a4vBQ-Y.js";var n=e({load:()=>r});async function r({params:e}){await t(`/(app)/(sidepanel)/o/[observation]/classify/suggestions`,e)}function i(e){}export{i as component,n as universal};

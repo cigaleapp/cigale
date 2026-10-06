@@ -1,0 +1,1 @@
+import{tn as e}from"../chunks/DrWy-0ZW.js";import{It as t,S as n,bn as r,zt as i}from"../chunks/sBVK5rpz.js";import{t as a}from"../chunks/lfLfF69z.js";var o=e({load:()=>s});async function s({params:e,parent:a,depends:o}){let s=await a();return o(i(`Metadata`,r(e.id,e.metadata),`options`)),{...s,options:await n(t(),e.id,e.metadata)}}export{a as component,o as universal};

@@ -1,0 +1,1 @@
+import{Jt as e,P as t,Y as n,bt as r,k as i,q as a}from"./DrWy-0ZW.js";import"./DnKkSYKs.js";import{t as o}from"./BQRoQCwR.js";var s=n(`<div class="badge svelte-qm4qgq"><!></div>`);function c(n,c){var l=s(),u=r(l);t(u,()=>c.children),e(l),i(l,(e,t)=>o?.(e,t),()=>c.tooltip),a(n,l)}export{c as t};
