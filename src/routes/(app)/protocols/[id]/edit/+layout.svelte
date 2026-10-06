@@ -32,7 +32,7 @@
 	import { uiState } from '$lib/uistate.svelte.js';
 	import { slugify } from '$lib/utils';
 
-	import ModalDeleteProtocol from '../ModalDeleteProtocol.svelte';
+	import ModalDeleteProtocol from '../../ModalDeleteProtocol.svelte';
 	import { updater } from './updater.svelte';
 
 	seo({ title: `Protocole ${page.params.id}` });
@@ -51,7 +51,7 @@
 	/**
 	 * Available route IDs relative to here.
 	 * @import { ChildRouteId, WithoutPrefix  } from '$lib/utils';
-	 * @typedef {WithoutPrefix<"metadata/[metadata]", WithPrefix<"/(app)/protocols/[id]">>} ProtocolRouteIds
+	 * @typedef {WithoutPrefix<"metadata/[metadata]", WithPrefix<"/(app)/protocols/[id]/edit">>} ProtocolRouteIds
 	 */
 
 	/**
@@ -92,7 +92,7 @@
 				.item(metadata.length - 1)
 				?.scrollIntoView({ behavior: 'smooth', block: 'end' });
 
-			await goto('/(app)/protocols/[id]/metadata/[metadata]/infos', {
+			await goto('/(app)/protocols/[id]/edit/metadata/[metadata]/infos', {
 				id,
 				metadata: shortId,
 			}).then(() => {
@@ -270,9 +270,9 @@
 					{@const label = def.label || shortId}
 					{@const url = resolve(
 						// @ts-expect-error
-						page.route.id?.includes('/protocols/[id]/metadata/[metadata]/')
+						page.route.id?.includes('/protocols/[id]/edit/metadata/[metadata]/')
 							? page.route.id
-							: '/(app)/protocols/[id]/metadata/[metadata]/infos',
+							: '/(app)/protocols/[id]/edit/metadata/[metadata]/infos',
 						{
 							...page.params,
 							id,
@@ -333,7 +333,7 @@
 			</ButtonIcon>
 		</div>
 	</aside>
-	<div class="main" class:padded={!routeIsIn('/(app)/protocols/[id]/metadata')}>
+	<div class="main" class:padded={!routeIsIn('/(app)/protocols/[id]/edit/metadata')}>
 		{@render children()}
 	</div>
 </div>
@@ -344,12 +344,12 @@
 	/** @type {import('svelte').Component} */ Icon,
 	/** @type {string|number|undefined} */ badge = undefined
 )}
-	{@const path = route === '' ? route : resolve(`/(app)/protocols/[id]/${route}`, { id })}
+	{@const path = route === '' ? route : resolve(`/(app)/protocols/[id]/edit/${route}`, { id })}
 	<svelte:element
 		this={path ? 'a' : 'span'}
 		href={path || undefined}
 		class="navlink"
-		class:active={route && routeIsIn(`/(app)/protocols/[id]/${route}`)}
+		class:active={route && routeIsIn(`/(app)/protocols/[id]/edit/${route}`)}
 		use:tooltip={collapsedSidebar
 			? {
 					text: name,
