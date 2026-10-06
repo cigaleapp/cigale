@@ -6,7 +6,6 @@ import { boundingBoxResolver } from '../inference_utils.js';
 import { ensureArray, entries, mapValues, nonnull, transformObject, unique } from '../utils.js';
 import {
 	ColorHex,
-	FilepathTemplate,
 	FileSize,
 	ID,
 	MIMEType,
@@ -18,7 +17,7 @@ import {
 	URLString,
 } from './common.js';
 import { NaturalRegexExpression, NumberRangeLiteral, RegexExpression } from './constraints.js';
-import { JsonataExpression, TemplatedString } from './expressions.js';
+import { FilepathTemplate, JsonataExpression, TemplatedString } from './expressions.js';
 import {
 	MODEL_DETECTION_OUTPUT_SHAPES,
 	NeuralBoundingBoxInference,
@@ -195,7 +194,7 @@ export const MetadataRecordValue = MetadataValue.omit('value', 'alternatives').a
 		'Valeurs alternatives pour la métadonnée'
 	).default(() => []),
 	'valueLabel?': [
-		'string',
+		'string | undefined',
 		'@',
 		"Label de la valeur de la métadonnée. Existe pour les métadonnées de type enum, contient dans ce cas le label associé à la clé de l'option de l'enum choisie",
 	],
@@ -468,6 +467,11 @@ const MetadataBase = type({
 		'string | string[]',
 		'@',
 		'Label(s) ou nom(s) de colonne de la question Kobocollect associée à cette métadonnée. Non sensible à la casse',
+	],
+	'darwincore?': [
+		'/^(\\w+):\\w+$/',
+		'@',
+		`Champ DarwinCore associé à cette métadonnée. "id" pour le champ identifiant et "coreid" pour le champ de l'identifiant dans le fichier core`,
 	],
 	'classification?': [
 		'boolean',

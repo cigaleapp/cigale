@@ -87,6 +87,20 @@ if (import.meta.vitest) {
 	});
 }
 
+/**
+ * Maps values and keys of an object, and filters out entries with nullable values from the result
+ */
+export async function transformObjectAsync<KIn extends string, KOut extends string, VIn, VOut>(
+	subject: Record<KIn, VIn>,
+	mapper: (key: KIn, value: VIn) => Promise<[KOut, VOut] | undefined>
+): Promise<Record<KOut, VOut>> {
+	return fromEntries(
+		await Promise.all(entries(subject).map(async ([key, value]) => mapper(key, value))).then(
+			(entries) => entries.filter((entry): entry is [KOut, VOut] => entry !== undefined)
+		)
+	);
+}
+
 export function keys<K extends string>(subject: Record<K, unknown>): K[] {
 	// @ts-expect-error can't preserve types through Object.keys
 	return Object.keys(subject);

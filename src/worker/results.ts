@@ -9,6 +9,7 @@ import type { ZipEntry } from '$lib/zip.js';
 
 import { ArkErrors } from 'arktype';
 
+import { darwinCoreArchive } from '$lib/darwincore.js';
 import * as DB from '$lib/database.js';
 import { stringifyWithToplevelOrdering } from '$lib/download';
 import { addExifMetadata } from '$lib/exif';
@@ -530,6 +531,23 @@ swarp.estimateResultsZipSize(async ({ sessionId, include, cropPadding }, _, { ab
 	}
 });
 
+swarp.generateDarwinCoreExport(async ({ protocolId, sessionIds }, onProgress, { abortSignal }) => {
+	return await unlessAborted(
+		abortSignal,
+		darwinCoreArchive({
+			db: await openDatabase(),
+			protocolId,
+			sessionIds,
+			onProgress(done, total) {
+				onProgress?.({
+					done,
+					total,
+				});
+			},
+		})
+	);
+});
+
 async function prepare({
 	protocolUsed,
 	sessionId,
@@ -615,7 +633,8 @@ async function prepare({
 
 		const metadata = addBaseUnitValues(
 			metadataDefinitions,
-			addValueLabels(
+			await addValueLabels(
+				db,
 				metadataOptions,
 				observationMetadata({
 					definitions: metadataDefinitions,
@@ -644,7 +663,7 @@ async function prepare({
 
 			const metadataValues = addBaseUnitValues(
 				metadataDefinitions,
-				addValueLabels(metadataOptions, databaseImage.metadata)
+				await addValueLabels(db, metadataOptions, databaseImage.metadata)
 			);
 
 			abortSignal?.throwIfAborted();
@@ -771,7 +790,7 @@ async function prepare({
 		exportedMetadataFiles,
 		sessionMetadata: addBaseUnitValues(
 			metadataDefinitions,
-			addValueLabels(metadataOptions, session.metadata)
+			await addValueLabels(db, metadataOptions, session.metadata)
 		),
 	};
 }

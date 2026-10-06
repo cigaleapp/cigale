@@ -612,6 +612,7 @@ export default class Provider implements Account {
 							return {
 								id: imageId(image.file.id, ann.annotation_id),
 								filename: image.filename,
+								remoteUrl: image.media_url(this.domain).toString(),
 								addedAt: ann.creation_date.toISOString(),
 								dimensions: image.file.dimensions,
 								boundingBoxesAnalyzed:
@@ -756,6 +757,7 @@ export default class Provider implements Account {
 					...created,
 					id: imageFileId(),
 					remoteId: gid,
+					remoteUrl: image.media_url(this.domain).toString(),
 					sessionId: session.id,
 					contentType: blob.type,
 					dimensions: { width, height },
@@ -782,6 +784,7 @@ export default class Provider implements Account {
 							...created,
 							id: file.id,
 							remoteId: gid,
+							remoteUrl: image.media_url(this.domain).toString(),
 							sessionId: session.id,
 							contentType: blob.type,
 							dimensions: { width, height },
@@ -908,6 +911,16 @@ export default class Provider implements Account {
 				const existing = uploads.get(media.filename);
 				if (!existing) continue;
 
+				if (existing.table === 'ImageFile') {
+					const imageFile = await this.db.get('ImageFile', existing.file.id);
+					if (imageFile) {
+						await this.db.put('ImageFile', {
+							...imageFile,
+							remoteUrl: media.media_url(this.domain).toString(),
+						});
+					}
+				}
+
 				uploads.set(media.filename, {
 					...existing,
 					mediaId: media.media_id,
@@ -999,6 +1012,18 @@ export default class Provider implements Account {
 				for (const media of page) {
 					const existing = uploads.get(media.filename);
 					if (!existing) continue;
+
+					// Set remoteId on database Image object
+
+					if (existing.table === 'ImageFile') {
+						const imageFile = await this.db.get('ImageFile', existing.file.id);
+						if (imageFile) {
+							await this.db.put('ImageFile', {
+								...imageFile,
+								remoteUrl: media.media_url(this.domain).toString(),
+							});
+						}
+					}
 
 					uploads.set(media.filename, {
 						...existing,

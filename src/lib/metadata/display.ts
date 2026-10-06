@@ -1,3 +1,4 @@
+import type { DatabaseHandle } from '$lib/idb.svelte.js';
 import type { RuntimeValue } from '$lib/schemas/metadata';
 
 import { type } from 'arktype';
@@ -5,20 +6,27 @@ import convert from 'convert';
 import * as dates from 'date-fns';
 
 import * as DB from '$lib/database';
-import { round, transformObject } from '$lib/utils';
+import { metadataOptionId } from '$lib/schemas/metadata';
+import { round, transformObject, transformObjectAsync } from '$lib/utils';
 
 /**
  * Adds valueLabel to each metadata value object when the metadata is an enum.
  */
-export function addValueLabels<V extends DB.MetadataValue>(
-	metadataOptions: Record<string, Record<string, Pick<DB.MetadataEnumVariant, 'key' | 'label'>>>,
+export async function addValueLabels<V extends DB.MetadataValue>(
+	db: DatabaseHandle,
+	/** Pre-computed metadata options, or null if not available */
+	metadataOptions: null | Record<
+		string,
+		Record<string, Pick<DB.MetadataEnumVariant, 'key' | 'label'>>
+	>,
 	values: Record<string, V>
-): Record<string, V & { valueLabel?: string }> {
-	return transformObject(values, (key, value) => {
-		const opts = metadataOptions[key];
-		if (!opts) return [key, value];
+): Promise<Record<string, V & { valueLabel?: string }>> {
+	return transformObjectAsync(values, async (key, value) => {
+		if (typeof value.value !== 'string') return [key, value];
 
-		const opt = opts[value.value.toString()];
+		const opt = metadataOptions
+			? metadataOptions[key]?.opts[value.value.toString()]
+			: await db.get('MetadataOption', metadataOptionId(key, value.value));
 
 		return [key, { ...value, valueLabel: opt?.label }];
 	});

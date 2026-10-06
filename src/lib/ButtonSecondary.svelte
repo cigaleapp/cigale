@@ -99,7 +99,7 @@ Available CSS variables:
 		class:danger
 		class:subtle
 		class:loading={isLoading}
-		style:width={isLoading ? `${width}px` : undefined}
+		style:--content-width={`${width}px`}
 		bind:clientWidth={
 			() => 0 /* ignored */,
 			(newWidth) => {
@@ -185,10 +185,12 @@ Available CSS variables:
 
 	button.loading {
 		padding: 0.75em 0.8em;
-		box-sizing: border-box;
+		box-sizing: content-box;
 		text-overflow: ellipsis;
 		text-wrap: nowrap;
 		overflow: hidden;
+
+		width: calc(var(--content-width) - 2 * 0.75em);
 	}
 
 	button.danger:not(:disabled) {

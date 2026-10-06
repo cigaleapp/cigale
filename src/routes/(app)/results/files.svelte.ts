@@ -10,7 +10,7 @@ class ExporterFiles {
 	reloadPreviews = $state(0);
 
 	/** We are currently generating an export (of the specified format) */
-	exporting: 'zip' | 'folder' | false = $state(false);
+	exporting: 'zip' | 'folder' | 'darwincore' | false = $state(false);
 
 	include: 'metadataonly' | 'croppedonly' | 'full' = $state('croppedonly');
 
