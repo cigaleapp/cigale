@@ -1,6 +1,5 @@
 import type { RuntimeValue } from '$lib/schemas/metadata';
 
-import { type } from 'arktype';
 import convert from 'convert';
 import * as dates from 'date-fns';
 
@@ -92,21 +91,13 @@ export function metadataPrettyValue<Type extends DB.MetadataType>(
 			return valueLabel || value.toString();
 
 		case 'location': {
-			const { latitude, longitude } = type({
-				latitude: 'number',
-				longitude: 'number',
-			}).assert(value);
+			const { latitude, longitude } = value as RuntimeValue<'location'>;
 
 			return `${latitude}, ${longitude}`;
 		}
 
 		case 'boundingbox': {
-			const { x, y, w, h } = type({
-				x: 'number',
-				y: 'number',
-				h: 'number',
-				w: 'number',
-			}).assert(value);
+			const { x, y, w, h } = value as RuntimeValue<'boundingbox'>;
 
 			const coord = (v: number) =>
 				boundingBoxPrecision === 'unbounded'
@@ -128,7 +119,7 @@ export function metadataPrettyValue<Type extends DB.MetadataType>(
 
 		case 'float':
 		case 'integer':
-			return Intl.NumberFormat(language).format(type('number').assert(value));
+			return Intl.NumberFormat(language).format(value as RuntimeValue<'float' | 'integer'>);
 
 		default:
 			return value.toString();

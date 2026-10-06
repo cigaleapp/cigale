@@ -29,6 +29,13 @@ import {
 } from './raw.js';
 import { NeuralBoundingBoxInference } from './schemas/neural.js';
 import { ACCEPTED_SIDECAR_TYPES, processSidecars } from './sidecars.js';
+import { binaryStorage } from './storage/index.js';
+import {
+	accessBytes,
+	resolveObjectBytesIfNotWorker,
+	resolveObjectWithBytes,
+} from './storage/utils.js';
+import { throwError } from './utils.js';
 
 export const ACCEPTED_IMPORT_TYPES = [
 	'image/jpeg',
@@ -180,6 +187,11 @@ export async function inferBoundingBoxes(swarpc, cancellers, fileId) {
 	const inference = swarpc.inferBoundingBoxes.cancelable({
 		fileId: image.fileId,
 		taskSettings: inferenceSettings,
+		imageBytes: await resolveObjectBytesIfNotWorker(
+			databaseHandle(),
+			'ImageFile',
+			image.fileId
+		),
 	});
 
 	cancellers?.set(image.fileId, inference.cancel);
