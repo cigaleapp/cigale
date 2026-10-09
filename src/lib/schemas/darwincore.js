@@ -22,6 +22,8 @@ export const BUILTIN_EXTRA_FIELDS = {
 	'dc:subtype': 'http://rs.tdwg.org/acsubtype/values/Photograph',
 };
 
+export const DarwinCoreFieldShorthand = type('/^\\w+:\\w+$/');
+
 export const DarwinCoreProtocolConfig = type({
 	'namespaces?': type({
 		'[/\\w+/]': URLString,
