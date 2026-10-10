@@ -849,12 +849,6 @@ darwincore:
       ac:yFrac: '{{ image.protocolMetadata.crop.value.y }}'
 
       # Simple Multimedia extension fields
-      # dc:identifier: image.remoteUrl
-      dc:identifier: '{{ image.remoteUrl }}'
-      # dc:type: '"StillImage"' 
-      dc:type: StillImage
-      # dc:format: image.contentType
-      dc:format: '{{ image.contentType }}'
       # TODO: dc:references:
       # dc:title: $metadata(image, "species") ?: "Unidentified insect"
       dc:title: '{{ fallback (metadata image "species") "Unidentified insect" }}'

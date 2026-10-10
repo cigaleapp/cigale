@@ -1,10 +1,9 @@
 import { type } from 'arktype';
 
-import { ID, NamespacedMetadataID, URLString } from './common.js';
-import { JsonataExpression, TemplatedString } from './expressions.js';
+import { DarwinCoreFieldShorthand, ID, NamespacedMetadataID, URLString } from './common.js';
+import { TemplatedString } from './expressions.js';
 import { MetadataRecord } from './metadata.js';
 import { Image, ImageFile, Observation } from './observations.js';
-import { AnalyzedImage, AnalyzedObservation } from './results.js';
 import { Session } from './sessions.js';
 
 // TODO: fill everything from https://rs.gbif.org/extensions.html# ?
@@ -18,11 +17,55 @@ export const BUILTIN_DARWINCORE_NAMESPACES = {
 };
 
 export const BUILTIN_EXTRA_FIELDS = {
-	'dcterms:type': 'http://purl.org/dc/dcmitype/StillImage',
-	'dc:subtype': 'http://rs.tdwg.org/acsubtype/values/Photograph',
+	session: /** @type {Record<string, string>} */ ({}),
+	observation: /** @type {Record<string, string>} */ ({}),
+	media: {
+		// 'dcterms:type': 'http://purl.org/dc/dcmitype/StillImage',
+		'dc:type': 'StillImage',
+		'dc:format': '{{ image.contentType }}',
+		'dc:subtype': 'http://rs.tdwg.org/acsubtype/values/Photograph',
+		'dc:identifier': '{{ image.remoteUrl }}',
+	},
 };
 
-export const DarwinCoreFieldShorthand = type('/^\\w+:\\w+$/');
+export const DarwinCoreFieldPayload = {
+	session: type({
+		session: Session.omit('metadata').and({
+			metadata: MetadataRecord(NamespacedMetadataID),
+			protocolMetadata: MetadataRecord(ID),
+		}),
+	}),
+
+	observation: type({
+		session: Session.omit('metadata').and({
+			metadata: MetadataRecord(NamespacedMetadataID),
+			protocolMetadata: MetadataRecord(ID),
+		}),
+		observation: Observation.omit('metadataOverrides').and({
+			metadataOverrides: MetadataRecord(NamespacedMetadataID),
+		}),
+		images: Image.omit('metadata')
+			.and({
+				metadata: MetadataRecord(NamespacedMetadataID),
+				protocolMetadata: MetadataRecord(ID),
+			})
+			.array(),
+		metadata: MetadataRecord(ID),
+		allMetadata: MetadataRecord(NamespacedMetadataID),
+	}),
+
+	media: type({
+		session: Session.omit('metadata').and({
+			metadata: MetadataRecord(NamespacedMetadataID),
+			protocolMetadata: MetadataRecord(ID),
+		}),
+		file: ImageFile,
+		image: Image.omit('metadata').and({
+			metadata: MetadataRecord(NamespacedMetadataID),
+			protocolMetadata: MetadataRecord(ID),
+		}),
+	}),
+};
 
 export const DarwinCoreProtocolConfig = type({
 	'namespaces?': type({
@@ -79,59 +122,23 @@ export const DarwinCoreProtocolConfig = type({
 		},
 	},
 
-	'fields?': {
-		'session?': type({
-			'[/^\\w+:\\w+$/]': TemplatedString(
-				type({
-					session: Session.omit('metadata').and({
-						metadata: MetadataRecord(NamespacedMetadataID),
-						protocolMetadata: MetadataRecord(ID),
-					}),
-				})
-				// type('boolean|number|string|null|undefined')
-			),
-		}),
-		'observation?': type({
-			'[/^\\w+:\\w+$/]': TemplatedString(
-				type({
-					session: Session.omit('metadata').and({
-						metadata: MetadataRecord(NamespacedMetadataID),
-						protocolMetadata: MetadataRecord(ID),
-					}),
-					observation: Observation.omit('metadataOverrides').and({
-						metadataOverrides: MetadataRecord(NamespacedMetadataID),
-					}),
-					images: Image.omit('metadata')
-						.and({
-							metadata: MetadataRecord(NamespacedMetadataID),
-							protocolMetadata: MetadataRecord(ID),
-						})
-						.array(),
-					metadata: MetadataRecord(ID),
-					allMetadata: MetadataRecord(NamespacedMetadataID),
-				})
-				// type('boolean|number|string|null|undefined')
-			),
-		}),
-		'media?': type({
-			'[/^\\w+:\\w+$/]': TemplatedString(
-				type({
-					session: Session.omit('metadata').and({
-						metadata: MetadataRecord(NamespacedMetadataID),
-						protocolMetadata: MetadataRecord(ID),
-					}),
-					file: ImageFile,
-					image: Image.omit('metadata').and({
-						metadata: MetadataRecord(NamespacedMetadataID),
-						protocolMetadata: MetadataRecord(ID),
-					}),
-				})
-				// type('boolean|number|string|null|undefined')
-			),
-		}).describe(
-			`Champs à rajouter, avec un par fichier image. Les clés sont les abbréviations de champs (namespace:clé) et les valeurs sont des templates Handlebars, avec les mêmes données que exports.cropped/exports.original. Certains champs sont définis par défaut (${Object.keys(BUILTIN_EXTRA_FIELDS).join(', ')}) et sont re-définissables en les précisant ici.`
+	'fields?': type({
+		'session?': type.Record(
+			DarwinCoreFieldShorthand,
+			TemplatedString(DarwinCoreFieldPayload.session)
 		),
-	},
+
+		'observation?': type.Record(
+			DarwinCoreFieldShorthand,
+			TemplatedString(DarwinCoreFieldPayload.observation)
+		),
+
+		'media?': type
+			.Record(DarwinCoreFieldShorthand, TemplatedString(DarwinCoreFieldPayload.media))
+			.describe(
+				`Champs à rajouter, avec un par fichier image. Les clés sont les abbréviations de champs (namespace:clé) et les valeurs sont des templates Handlebars, avec les mêmes données que exports.cropped/exports.original. Certains champs sont définis par défaut (${Object.keys(BUILTIN_EXTRA_FIELDS.media).join(', ')}) et sont re-définissables en les précisant ici.`
+			),
+	}),
 
 	files: type({
 		core: [['boolean', '@', 'Ce fichier est le fichier core'], '=', false],
@@ -142,7 +149,7 @@ export const DarwinCoreProtocolConfig = type({
 				"Abbréviations de champs à inclure dans ce fichier. Utiliser namespace:* pour inclure tout les champs d'un namespace."
 			),
 		rowType: type
-			.or(URLString, '/^\\w+:\\w+$/')
+			.or(URLString, DarwinCoreFieldShorthand)
 			.describe('Abbréviation de la classe ou URL entière'),
 		path: ['string', '@', 'Chemin (ou simplement nom) du fichier dans le .zip'],
 	})

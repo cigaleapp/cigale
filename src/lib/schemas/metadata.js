@@ -6,6 +6,7 @@ import { boundingBoxResolver } from '../inference_utils.js';
 import { ensureArray, entries, mapValues, nonnull, transformObject, unique } from '../utils.js';
 import {
 	ColorHex,
+	DarwinCoreFieldShorthand,
 	FileSize,
 	ID,
 	MIMEType,
@@ -17,7 +18,6 @@ import {
 	URLString,
 } from './common.js';
 import { NaturalRegexExpression, NumberRangeLiteral, RegexExpression } from './constraints.js';
-import { DarwinCoreFieldShorthand } from './darwincore.js';
 import { FilepathTemplate, JsonataExpression, TemplatedString } from './expressions.js';
 import {
 	MODEL_DETECTION_OUTPUT_SHAPES,

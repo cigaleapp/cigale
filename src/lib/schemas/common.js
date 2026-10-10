@@ -194,3 +194,6 @@ export const HourRange = type('/^\\d{2}:\\d{2}-\\d{2}:\\d{2}$/').pipe((literal) 
 		},
 	};
 });
+
+
+export const DarwinCoreFieldShorthand = type('/^\\w+:\\w+$/');
