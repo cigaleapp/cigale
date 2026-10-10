@@ -575,10 +575,10 @@ export const MetadataInteger = MetadataBase.and({
 	'range?': NumberRangeLiteral,
 	'default?': MetadataDefault.integer,
 	'display?': MetadataNumericDisplay,
-	'darwincore?': {
+	'darwincore?': DarwinCoreFieldShorthand.describe('La valeur numérique').or({
 		'value?': DarwinCoreFieldShorthand.describe('La valeur numérique'),
 		'unit?': DarwinCoreFieldShorthand.describe("L'unité de la valeur"),
-	},
+	}),
 	'infer?': type.and(
 		InferenceConfigs.exif.partial(),
 		InferenceConfigs.sidecar(type('number.integer')).partial(),
@@ -592,10 +592,10 @@ export const MetadataFloat = MetadataBase.and({
 	'range?': NumberRangeLiteral,
 	'default?': MetadataDefault.float,
 	'display?': MetadataNumericDisplay,
-	'darwincore?': {
+	'darwincore?': DarwinCoreFieldShorthand.describe('La valeur numérique').or({
 		'value?': DarwinCoreFieldShorthand.describe('La valeur numérique'),
 		'unit?': DarwinCoreFieldShorthand.describe("L'unité de la valeur"),
-	},
+	}),
 	'infer?': type.and(
 		InferenceConfigs.exif.partial(),
 		InferenceConfigs.sidecar(type('number')).partial(),
@@ -634,6 +634,7 @@ const MetadataLocation = MetadataBase.and({
 	'darinwcore?': {
 		'latitude?': DarwinCoreFieldShorthand.describe('Latitude décimale'),
 		'longitude?': DarwinCoreFieldShorthand.describe('Longitude décimale'),
+		'datum?': DarwinCoreFieldShorthand.describe('Le datum utilisé: WGS84'),
 	},
 	'infer?': type.and(
 		InferenceConfigs.capture.partial(),

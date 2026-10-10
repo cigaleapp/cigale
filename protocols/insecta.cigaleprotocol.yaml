@@ -139,6 +139,9 @@ sessionMetadata:
     mergeMethod: none
     required: true
     description: ''
+    darwincore:
+      date: dwc:eventDate
+      time: dwc:eventTime
     infer:
       capture: before-timer
 
@@ -598,6 +601,13 @@ sessionMetadata:
       Dès que vous avez réussi à vous géolocaliser, c'est parti pour 20 minutes de safari macrophotographique! Laissez ou prenez un point de repère pour retrouver votre point de départ. Vous pouvez mettre le téléphone en veille et revenir sur ce questionnaire à la fin des 20min pour indiquer votre point d'arrivée et les 3 dernières questions. N'oubliez pas de lancer un chronomètre
     mergeMethod: none
     required: true
+    darwincore:
+      # TODO average them instead of just using the start
+      # TODO: introduce uncertainty for privacy?
+      # dwc:coordinateUncertaintyInMeters / dwc:coordinatePrecision
+      latitude: dwc:decimalLatitude
+      longitude: dwc:decimalLongitude
+      datum: dwc:geodeticDatum
     infer:
       capture: before-timer
 
@@ -633,6 +643,9 @@ sessionMetadata:
     unit: m
     required: true
     mergeMethod: average
+    darwincore:
+      value: dwc:sampleSizeValue
+      unit: dwc:sampleSizeUnit
     description: En revenant sur vos pas. Estimez en enjambées de 1 m la distance exact parcourue entre le point d'arrivée et le point de départ.
     range: x > 0
     # TODO: cascade from a surface-type metadata made from start_at and end_at, by taking its hypot
@@ -781,29 +794,12 @@ darwincore:
 
   fields:
     session:
-      # TODO: convert to UTC...
-      # dwc:eventDate: $formatDate($metadata(session, "date"), "yyyy-MM-dd") 
-      dwc:eventDate: '{{ formatDate session.protocolMetadata.date.value "yyyy-MM-dd" }}'
-      # dwc:eventTime: $formatDate($metadata(session, "date"), "HH:mm:ss")
-      dwc:eventTime: '{{ formatDate session.protocolMetadata.date.value "HH:mm:ss" }}'
-      # dwc:sampleSizeValue: 20
-      dwc:sampleSizeValue: '20'
-      # dwc:sampleSizeUnit: '"minute"'
-      dwc:sampleSizeUnit: minute
       # dwc:samplingEffort: $metadata(session, "distance") & " m by foot"
       dwc:samplingEffort: '{{ session.protocolMetadata.distance.value }} m by foot'
-      # TODO average them instead of just using the start
-      # TODO: introduce uncertainty for privacy?
-      # dwc:coordinateUncertaintyInMeters / dwc:coordinatePrecision
-      # dwc:decimalLatitude: $metadata(session, "start_at").latitude
-      dwc:decimalLatitude: '{{ session.protocolMetadata.start_at.value.latitude }}'
-      # dwc:decimalLongitude: $metadata(session, "start_at").longitude
-      dwc:decimalLongitude: '{{ session.protocolMetadata.start_at.value.longitude }}'
-      # dwc:geodeticDatum: '"WGS84"'
-      dwc:geodeticDatum: WGS84
       # this is technically in the observation rowtype but oh well
       # dwc:eventType: '"Transect"'
       dwc:eventType: Transect
+      eco:targetTaxonomicScope: Insecta
 
     observation:
       # dc:type: '"StillImage"'
@@ -820,10 +816,18 @@ darwincore:
       # dwc:associatedMedia: "{{ join () }}"
       # dwc:discipline: '"Entomology | Taxonomy"'
       dwc:discipline: Entomology | Taxonomy
-      # dwc:eventDate: $formatDate($metadata(session, "date"), "yyyy-MM-dd")
-      dwc:eventDate: '{{ formatDate metadata.date "yyyy-MM-dd" }}'
-      # dwc:eventTime: $formatDate($metadata(session, "date"), "HH:mm:ss")
-      dwc:eventTime: '{{ formatDate metadata.date "HH:mm:ss" }}'
+      dwc:taxonRank: |
+        {{#if metadata.species }}
+          species
+        {{else if metadata.genus }}
+          genus
+        {{else if metadata.family }}
+          family
+        {{else if metadata.order }}
+          order
+        {{else}}
+          kingdom
+        {{/if}}
 
     media:
       # Note: most of these arent actually recognized by GBIF i think?

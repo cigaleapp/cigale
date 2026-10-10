@@ -1,5 +1,8 @@
 import type { DatabaseHandle } from './idb.svelte.js';
+import type { TypedMetadataValue } from './metadata/types.js';
+import type { NamespacedMetadataID } from './schemas/common.js';
 import type * as DB from '$lib/database.js';
+import type { MaybePromise } from '$lib/utils.js';
 
 import * as dates from 'date-fns';
 
@@ -9,9 +12,12 @@ import { compareBy, entries, mapValues, orEmpty, orEmpty2, sum } from '$lib/util
 import { addValueLabels, metadataPrettyValue } from './metadata/display.js';
 import { mergeMetadataFromImagesAndObservations } from './metadata/merging.js';
 import { BUILTIN_DARWINCORE_NAMESPACES, DarwinCoreProtocolConfig } from './schemas/darwincore.js';
+import { TemplatedString } from './schemas/expressions.js';
 import { metadataOptionId, removeNamespaceFromMetadataId } from './schemas/metadata.js';
 import { toMetadataRecord, withProtocolMetadata } from './schemas/results.js';
 import { createZipArchive } from './zip.js';
+
+type MetadataWithDwC = Extract<DB.Metadata, { darwincore?: unknown }>;
 
 export async function darwinCoreArchive({
 	db,
@@ -34,7 +40,9 @@ export async function darwinCoreArchive({
 			.toSorted(compareBy((id) => protocol.metadataOrder?.indexOf(id)))
 			.map((m) => db.get('Metadata', m))
 	).then((defs) =>
-		defs.filter((def) => def?.darwincore).map((def) => Tables.Metadata.assert(def))
+		defs
+			.filter((def) => def && 'darwincore' in def && def.darwincore)
+			.map((def) => Tables.Metadata.assert(def))
 	);
 
 	let done = 0;
@@ -133,12 +141,9 @@ async function darwinCoreDataFiles({
 		);
 
 		// Header
+		const layout = fileLayout(protocol, metadataDefs, file);
 		contents[file.path] = [
-			[
-				'sessionId',
-				...metadata.map((def) => def.darwincore!.split(':')[1]),
-				...extra.map((field) => field.split(':')[1]),
-			],
+			layout.map((cell) => (cell.source === 'id' ? cell.name : removeNamespace(cell.field))),
 		];
 
 		for (const sessionId of sessionIds) {
@@ -146,38 +151,29 @@ async function darwinCoreDataFiles({
 			const session = Tables.Session.assert(rawSession);
 
 			if (file.scope === 'session') {
-				const extra = entries(protocol.darwincore.fields?.session ?? {})
-					.filter(([field]) => fieldIncludedInFile(protocol, file, field))
-					.map(([field, template]) => ({ field, template }));
+				const row = [];
 
-				const row = [sessionId];
+				for (const cell of layout) {
+					switch (cell.source) {
+						case 'id': {
+							row.push(sessionId);
+							break;
+						}
 
-				for (const def of metadata) {
-					const value = session.metadata[def.id]?.value ?? null;
-					row.push(
-						metadataPrettyValue(value, {
-							language: 'en',
-							type: def.type,
-							valueLabel:
-								typeof value === 'string'
-									? await db
-											.get('MetadataOption', metadataOptionId(def.id, value))
-											.then((opt) => opt?.label)
-									: undefined,
-						})
-					);
-				}
+						case 'metadata': {
+							const value = session.metadata[cell.metadataId];
+							row.push(value ? await cell.compute(value, db) : '');
+							break;
+						}
 
-				for (const def of extra) {
-					try {
-						row.push(
-							def.template.render({
-								session: await intoPayload(session),
-							})
-						);
-					} catch (e) {
-						console.error(e);
-						row.push('');
+						case 'extra': {
+							row.push(
+								await cell.template.render({
+									session: await intoPayload(session),
+								})
+							);
+							break;
+						}
 					}
 				}
 
@@ -185,10 +181,6 @@ async function darwinCoreDataFiles({
 
 				progress(1 / sessionIds.length);
 			} else if (file.scope === 'observation') {
-				const extra = entries(protocol.darwincore.fields?.observation ?? {})
-					.filter(([field]) => fieldIncludedInFile(protocol, file, field))
-					.map(([field, template]) => ({ field, template }));
-
 				const rawObservations = await db.getAllFromIndex(
 					'Observation',
 					'sessionId',
@@ -208,7 +200,19 @@ async function darwinCoreDataFiles({
 						observations: [obs],
 					});
 
-					const row = [sessionId];
+					const row = [];
+
+					for (const cell of layout) {
+						switch (cell.source) {
+							case "id": {
+								row.push(sessionId)
+								break
+							}
+							case "metadata": {
+								break
+							}
+						}
+					}
 
 					for (const def of metadata) {
 						const value = values[def.id]?.value ?? null;
@@ -297,22 +301,216 @@ async function darwinCoreDataFiles({
 	return mapValues(contents, (rows) => rows.map((row) => row.join('\t')).join('\n'));
 }
 
+async function darwinCoreDataRow(
+	db: DatabaseHandle,
+	scope: 'media' | 'session' | 'observation',
+	session: DB.Session
+) {}
+
+function fileLayout(
+	protocol: Pick<DB.Protocol, 'darwincore' | 'sessionMetadata' | 'metadataOrder'>,
+	metadata: DB.Metadata[],
+	file: { includes: string[]; scope: 'media' | 'session' | 'observation' }
+) {
+	if (!protocol.darwincore) return [];
+
+	const extra = Object.entries(protocol.darwincore.fields?.[file.scope] ?? {}).map(
+		([field, template]) => ({ field, template })
+	);
+
+	type Column<T extends DB.MetadataType = DB.MetadataType> =
+		| {
+				source: 'id';
+				name: string;
+		  }
+		| {
+				source: 'metadata';
+				field: string;
+				metadataId: NamespacedMetadataID;
+				compute: (
+					value: TypedMetadataValue<T>,
+					db: DatabaseHandle
+				) => MaybePromise<string | number>;
+		  }
+		| {
+				source: 'extra';
+				field: string;
+				template: (typeof extra)[number]['template'];
+		  };
+
+	return [
+		{ name: 'sessionId', source: 'id' as const },
+		...metadata
+			.sort(compareBy((m) => protocol.metadataOrder?.indexOf(m.id)))
+			.flatMap((def): Column[] => {
+				const item = <Type extends DB.MetadataType>(
+					field: string,
+					compute: (
+						value: TypedMetadataValue<Type>,
+						db: DatabaseHandle
+					) => MaybePromise<string | number>
+				) => ({ field, source: 'metadata' as const, metadataId: def.id, compute });
+
+				const itemValue = (field: string) =>
+					item(field, (v) =>
+						metadataPrettyValue(v.value, { language: 'en', type: def.type })
+					);
+
+				if (!('darwincore' in def)) return [];
+				if (!def.darwincore) return [];
+
+				switch (def.type) {
+					case 'string':
+					case 'boolean': {
+						return [itemValue(def.darwincore)];
+					}
+
+					case 'integer':
+					case 'float': {
+						if (typeof def.darwincore === 'string') {
+							return [itemValue(def.darwincore)];
+						}
+
+						const it = item<'integer' | 'float'>;
+						const out = [];
+
+						if (def.darwincore.value) {
+							out.push(it(def.darwincore.value, (v) => v.value));
+						}
+						if (def.darwincore.unit) {
+							out.push(it(def.darwincore.unit, (v) => v.unit ?? ''));
+						}
+
+						return out;
+					}
+
+					case 'date': {
+						const it = item<'date'>;
+						const out = [];
+						if (def.darwincore.date) {
+							out.push(
+								it(def.darwincore.date, (v) => dates.format(v.value, 'yyyy-MM-dd'))
+							);
+						}
+
+						if (def.darwincore.time) {
+							out.push(
+								it(def.darwincore.time, (v) => dates.format(v.value, 'HH:mm:ss'))
+							);
+						}
+
+						if (def.darwincore.datetime) {
+							out.push(it(def.darwincore.datetime, (v) => v.value.toISOString()));
+						}
+
+						return out;
+					}
+
+					case 'enum': {
+						const it = item<'enum'>;
+						const withOption = (
+							field: string,
+							computation: (
+								opt: DB.MetadataEnumVariant
+							) => MaybePromise<string | number>
+						) =>
+							it(field, async (v, db) => {
+								const opt = await db.get(
+									'MetadataOption',
+									metadataOptionId(def.id, v.value)
+								);
+
+								if (!opt) return '';
+
+								return computation(Tables.MetadataOption.assert(opt));
+							});
+
+						const out = [];
+
+						if (def.darwincore.key) {
+							out.push(it(def.darwincore.key, (v) => v.value));
+						}
+
+						if (def.darwincore.label) {
+							out.push(withOption(def.darwincore.label, (opt) => opt.label));
+						}
+
+						if (def.darwincore.color) {
+							out.push(withOption(def.darwincore.color, (opt) => opt.color ?? ''));
+						}
+
+						if (def.darwincore.image) {
+							out.push(
+								withOption(def.darwincore.image, (opt) => opt.images?.at(0) ?? '')
+							);
+						}
+
+						if (def.darwincore.images) {
+							out.push(
+								withOption(
+									def.darwincore.images,
+									(opt) => opt.images?.join(' | ') ?? ''
+								)
+							);
+						}
+
+						return out;
+					}
+
+					case 'boundingbox': {
+						const it = item<'boundingbox'>;
+						const out = [];
+
+						if (def.darwincore.cx) {
+							out.push(it(def.darwincore.cx, (v) => v.value.x));
+						}
+
+						if (def.darwincore.sx) {
+							out.push(it(def.darwincore.sx, (v) => v.value.x - v.value.w / 2));
+						}
+
+						if (def.darwincore.cy) {
+							out.push(it(def.darwincore.cy, (v) => v.value.y));
+						}
+
+						if (def.darwincore.sy) {
+							out.push(it(def.darwincore.sy, (v) => v.value.y - v.value.h / 2));
+						}
+
+						if (def.darwincore.h) {
+							out.push(it(def.darwincore.h, (x) => v.value.h));
+						}
+
+						if (def.darwincore.w) {
+							out.push(it(def.darwincore.w, (x) => v.value.w));
+						}
+					}
+				}
+
+				return [];
+			}),
+		...extra.map(({ field, template }) => ({
+			field,
+			source: 'extra' as const,
+			template,
+		})),
+	];
+}
+
 /**
  * @see https://docs.gbif.org/survey-monitoring-quick-start/en/#data-mapping-template
  * @returns
  */
 function darwinCoreMetafile(
 	protocol: Pick<DB.Protocol, 'darwincore' | 'sessionMetadata' | 'metadataOrder'>,
-	metadata: Pick<DB.Metadata, 'id' | 'darwincore'>[]
+	metadata: DB.Metadata[]
 ) {
 	if (!protocol.darwincore) return;
 
 	const { files } = protocol.darwincore;
 
 	function fileNode(file: (typeof files)[number]) {
-		const metadataFields = metadata.filter((m) =>
-			fieldIncludedInFile(protocol, file, m.darwincore!)
-		);
+		const layout = fileLayout(protocol, metadata, file);
 
 		return new XmlNode(
 			file.core ? 'core' : 'extension',
@@ -325,23 +523,15 @@ function darwinCoreMetafile(
 				fieldsEnclosedBy: '',
 			},
 			XmlNode.nested('files', { location: file.path }),
-			new XmlNode(file.core ? 'id' : 'coreid', { index: 0 }),
-			...metadataFields.map(
-				(metadata, i) =>
-					new XmlNode('field', {
-						term: expandNamespaced(protocol, metadata.darwincore!),
-						index: 1 + i,
-					})
-			),
-			...Object.keys(protocol.darwincore!.fields?.[file.scope] ?? {})
-				.filter((field) => fieldIncludedInFile(protocol, file, field))
-				.map(
-					(field, i) =>
-						new XmlNode('field', {
-							term: expandNamespaced(protocol, field),
-							index: 1 + metadataFields.length + i,
-						})
-				)
+			...layout.map((cell, index) => {
+				if (cell.source === 'id')
+					return new XmlNode(file.core ? 'id' : 'coreid', { index });
+
+				return new XmlNode('field', {
+					term: expandNamespaced(protocol, cell.field),
+					index,
+				});
+			})
 		);
 	}
 
@@ -755,6 +945,10 @@ function expandNamespaced(protocol: Pick<DB.Protocol, 'darwincore'>, key: string
 
 	const [ns, bare] = key.split(':');
 	return withNamespace(protocol, ns, bare);
+}
+
+function removeNamespace(field: string) {
+	return field.split(':')[1];
 }
 
 function fieldIncludedInFile(
