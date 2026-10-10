@@ -54,19 +54,25 @@ export const AnalyzedObservation = type({
 });
 
 /**
- * @template {{metadata: Record<NamespacedMetadataID, DB.MetadataValue>}} T
+ * @template MV
+ * @template {{metadata: Record<NamespacedMetadataID, MV>}} T
  * @param {DB.Protocol} protocol
  * @param {T} subject
- * @returns {T & { protocolMetadata: Record<string, typeof MetadataRecordValue.infer> }}
+ * @returns {T & { protocolMetadata: Record<string, MV> }}
  */
 export function withProtocolMetadata(protocol, subject) {
 	return {
 		...subject,
-		protocolMetadata: toMetadataRecord(subject.metadata, (namespaced) => {
-			if (protocol.metadata.includes(namespaced))
-				return removeNamespaceFromMetadataId(namespaced);
+		protocolMetadata: transformObject(subject.metadata, (namespaced, value) => {
+			if (protocol.metadata.includes(namespaced)) {
+				return [removeNamespaceFromMetadataId(namespaced), value];
+			}
+
 			const imp = protocol.importedMetadata.find((m) => m.source === namespaced);
-			if (imp) return removeNamespaceFromMetadataId(imp.target);
+			if (imp) {
+				return [removeNamespaceFromMetadataId(imp.target), value];
+			}
+
 			return undefined;
 		}),
 	};

@@ -61,8 +61,8 @@ const mockProtocol = {
 			},
 		},
 	} satisfies (typeof DarwinCoreProtocolConfig)['inferIn']),
-	sessionMetadata: ['foo__site', 'foo__when'] as const,
-	metadataOrder: ['foo__species', 'foo__genus'] as const,
+	sessionMetadata: ['foo__site' as const, 'foo__when' as const],
+	metadataOrder: ['foo__species' as const, 'foo__genus' as const],
 };
 
 test('fileLayout', () => {

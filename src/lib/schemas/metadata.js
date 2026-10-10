@@ -170,6 +170,16 @@ export const MetadataValue = type({
 	}),
 });
 
+export const MetadataValueParsed = MetadataValue.omit('value').and({
+	value: MetadataRuntimeValueAny,
+});
+
+/**
+ * @template {import('arktype').Type} Key
+ * @param {Key} Key
+ */
+export const MetadataValuesParsed = (Key) => type.Record(Key, MetadataValueParsed);
+
 export const MetadataValues = type.Record(NamespacedMetadataID, MetadataValue);
 
 const JSONSchemaCompatibleRuntimeValue = type.or(

@@ -25,7 +25,7 @@ export async function addValueLabels<V extends DB.MetadataValue>(
 		if (typeof value.value !== 'string') return [key, value];
 
 		const opt = metadataOptions
-			? metadataOptions[key]?.opts[value.value.toString()]
+			? metadataOptions[key]?.[value.value.toString()]
 			: await db.get('MetadataOption', metadataOptionId(key, value.value));
 
 		return [key, { ...value, valueLabel: opt?.label }];

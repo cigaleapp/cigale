@@ -236,7 +236,8 @@ sessionMetadata:
     learnMore: https://researchgate.net/publication/374783237_Notice_CarHab_-_Programme_de_cartographie_nationale_des_habitats_naturels_et_semi-naturels
     mergeMethod: none
     required: false
-    darwincore: dwc:habitat
+    darwincore: 
+      label: dwc:habitat
     options:
       - key: '1100'
         label: Glacier et névé
@@ -801,14 +802,14 @@ darwincore:
       dwc:eventType: Transect
       eco:targetTaxonomicScope: Insecta
 
-    observation:
+    image:
       # dc:type: '"StillImage"'
       dc:type: StillImage
       # TODO: dc:references: use images/learnMore of species option ?
       # dwc:basisOfRecord: '"HumanObservation"'
       dwc:basisOfRecord: HumanObservation
       # dwc:occurrenceID: $metadata(session, "id") & ":" & $metadata(observation, "id")
-      dwc:occurenceID: '{{ session.id }}:{{ observation.id }}'
+      dwc:occurenceID: '{{ session.id }}:{{ image.id }}'
       # TODO: ensure this is correct (INSECTA doesnt keep empty photos right?)
       # dwc:occurrenceStatus: '"present"'
       dwc:occurenceStatus: present
@@ -817,13 +818,13 @@ darwincore:
       # dwc:discipline: '"Entomology | Taxonomy"'
       dwc:discipline: Entomology | Taxonomy
       dwc:taxonRank: |
-        {{#if metadata.species }}
+        {{#if image.protocolMetadata.species }}
           species
-        {{else if metadata.genus }}
+        {{else if image.protocolMetadata.genus }}
           genus
-        {{else if metadata.family }}
+        {{else if image.protocolMetadata.family }}
           family
-        {{else if metadata.order }}
+        {{else if image.protocolMetadata.order }}
           order
         {{else}}
           kingdom
@@ -831,34 +832,9 @@ darwincore:
 
     media:
       # Note: most of these arent actually recognized by GBIF i think?
-      # ac:accessURI: image.remoteUrl
-      ac:accessURI: '{{ image.remoteUrl }}'
       # TODO: https://ac.tdwg.org/termlist/#ac_furtherInformationURL ?
-      # ac:physicalSetting: '"Natural"'
-      ac:physicalSetting: Natural
-      # ac:digitizationDate: $formatDate($metadata(image, "shoot_date"), "yyyy-MM-dd'T'HH:mm:ss")
-      ac:digitizationDate: |
-        {{ formatDate (metadata image "shoot_date") "yyyy-MM-dd'T'HH:mm:ss" }}
-      # ac:widthFrac: $metadata(image, "crop").w
-      ac:widthFrac: '{{ image.protocolMetadata.crop.value.w }}'
-      # ac:heightFrac: $metadata(image, "crop").h
-      ac:heightFrac: '{{ image.protocolMetadata.crop.value.h }}'
-      # ac:xFrac: $metadata(image, "crop").x
-      ac:xFrac: '{{ image.protocolMetadata.crop.value.x }}'
-      # ac:yFrac: $metadata(image, "crop").y
-      ac:yFrac: '{{ image.protocolMetadata.crop.value.y }}'
-
-      # Simple Multimedia extension fields
-      # TODO: dc:references:
-      # dc:title: $metadata(image, "species") ?: "Unidentified insect"
-      dc:title: '{{ fallback (metadata image "species") "Unidentified insect" }}'
-      # TODO
-      # dc:description: |
-      #   {{ fallback image.protocolMetadata.species.valueLabel "Unidentified insect" }} in
-      # dc:created: $formatDate($metadata(image, "shoot_date"), "yyyy-MM-dd")
-      dc:created: '{{ formatDate (metadata image "shoot_date") "yyyy-MM-dd" }}'
-      # dc:publisher: '"EcoSignal"'
       dc:publisher: EcoSignal
+      dwc:individualCount: "{{ images.length }}"
 
       # do we add dwc:individualCount ?
 

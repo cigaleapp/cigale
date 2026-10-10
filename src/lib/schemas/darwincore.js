@@ -2,8 +2,8 @@ import { type } from 'arktype';
 
 import { DarwinCoreFieldShorthand, ID, NamespacedMetadataID, URLString } from './common.js';
 import { TemplatedString } from './expressions.js';
-import { MetadataRecord } from './metadata.js';
-import { Image, ImageFile, Observation } from './observations.js';
+import { MetadataValuesParsed } from './metadata.js';
+import { Image, ImageFile } from './observations.js';
 import { Session } from './sessions.js';
 
 // TODO: fill everything from https://rs.gbif.org/extensions.html# ?
@@ -18,7 +18,7 @@ export const BUILTIN_DARWINCORE_NAMESPACES = {
 
 export const BUILTIN_EXTRA_FIELDS = {
 	session: /** @type {Record<string, string>} */ ({}),
-	observation: /** @type {Record<string, string>} */ ({}),
+	image: /** @type {Record<string, string>} */ ({}),
 	media: {
 		// 'dcterms:type': 'http://purl.org/dc/dcmitype/StillImage',
 		'dc:type': 'StillImage',
@@ -31,41 +31,42 @@ export const BUILTIN_EXTRA_FIELDS = {
 export const DarwinCoreFieldPayload = {
 	session: type({
 		session: Session.omit('metadata').and({
-			metadata: MetadataRecord(NamespacedMetadataID),
-			protocolMetadata: MetadataRecord(ID),
+			metadata: MetadataValuesParsed(NamespacedMetadataID),
+			protocolMetadata: MetadataValuesParsed(ID),
 		}),
 	}),
 
-	observation: type({
+	image: type({
 		session: Session.omit('metadata').and({
-			metadata: MetadataRecord(NamespacedMetadataID),
-			protocolMetadata: MetadataRecord(ID),
+			metadata: MetadataValuesParsed(NamespacedMetadataID),
+			protocolMetadata: MetadataValuesParsed(ID),
 		}),
-		observation: Observation.omit('metadataOverrides').and({
-			metadataOverrides: MetadataRecord(NamespacedMetadataID),
+		image: Image.omit('metadata').and({
+			metadata: MetadataValuesParsed(NamespacedMetadataID),
+			protocolMetadata: MetadataValuesParsed(ID),
 		}),
-		images: Image.omit('metadata')
-			.and({
-				metadata: MetadataRecord(NamespacedMetadataID),
-				protocolMetadata: MetadataRecord(ID),
-			})
-			.array(),
-		metadata: MetadataRecord(ID),
-		allMetadata: MetadataRecord(NamespacedMetadataID),
 	}),
 
 	media: type({
 		session: Session.omit('metadata').and({
-			metadata: MetadataRecord(NamespacedMetadataID),
-			protocolMetadata: MetadataRecord(ID),
+			metadata: MetadataValuesParsed(NamespacedMetadataID),
+			protocolMetadata: MetadataValuesParsed(ID),
 		}),
 		file: ImageFile,
-		image: Image.omit('metadata').and({
-			metadata: MetadataRecord(NamespacedMetadataID),
-			protocolMetadata: MetadataRecord(ID),
-		}),
+		images: Image.omit('metadata')
+			.and({
+				metadata: MetadataValuesParsed(NamespacedMetadataID),
+				protocolMetadata: MetadataValuesParsed(ID),
+			})
+			.array(),
 	}),
 };
+
+export const DarwinCoreFileScope = type.enumerated('image', 'session', 'media');
+
+/**
+ * @typedef {typeof DarwinCoreFileScope['infer']} DarwinCoreFileScope
+ */
 
 export const DarwinCoreProtocolConfig = type({
 	'namespaces?': type({
@@ -128,9 +129,9 @@ export const DarwinCoreProtocolConfig = type({
 			TemplatedString(DarwinCoreFieldPayload.session)
 		),
 
-		'observation?': type.Record(
+		'image?': type.Record(
 			DarwinCoreFieldShorthand,
-			TemplatedString(DarwinCoreFieldPayload.observation)
+			TemplatedString(DarwinCoreFieldPayload.image)
 		),
 
 		'media?': type
@@ -142,7 +143,7 @@ export const DarwinCoreProtocolConfig = type({
 
 	files: type({
 		core: [['boolean', '@', 'Ce fichier est le fichier core'], '=', false],
-		scope: "'observation' | 'session' | 'media'",
+		scope: DarwinCoreFileScope,
 		includes: type('/^\\w+:(\\*|\\w+)$/')
 			.array()
 			.describe(
@@ -159,13 +160,13 @@ export const DarwinCoreProtocolConfig = type({
 		.array()
 		.default(() => [
 			{
-				scope: 'observation',
+				scope: 'image',
 				includes: ['dwc:*'],
 				rowType: 'dwc:Occurence',
 				path: 'occurences.txt',
 			},
 			{
-				scope: 'observation',
+				scope: 'image',
 				includes: ['eco:*'],
 				rowType: 'eco:Event',
 				path: 'occurences_humboldt.txt',

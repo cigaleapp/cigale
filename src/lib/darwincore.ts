@@ -16,6 +16,7 @@ import {
 	BUILTIN_DARWINCORE_NAMESPACES,
 	BUILTIN_EXTRA_FIELDS,
 	DarwinCoreFieldPayload,
+	DarwinCoreFileScope,
 } from './schemas/darwincore.js';
 import { TemplatedString } from './schemas/expressions.js';
 import { metadataOptionId, removeNamespaceFromMetadataId } from './schemas/metadata.js';
@@ -128,7 +129,7 @@ async function darwinCoreDataFiles({
 			...('addedAt' in subject && subject.addedAt instanceof Date
 				? { addedAt: subject.addedAt.toISOString() }
 				: {}),
-			metadata: toMetadataRecord(await addValueLabels(db, null, subject.metadata)),
+			metadata: await addValueLabels(db, null, subject.metadata),
 		});
 	}
 
@@ -149,9 +150,10 @@ async function darwinCoreDataFiles({
 			};
 
 			if (file.scope === 'session') {
+				const cells = layout as Column<'session'>[];
 				const row = [];
 
-				for (const cell of layout) {
+				for (const cell of cells) {
 					switch (cell.source) {
 						case 'id': {
 							row.push(sessionId);
@@ -175,44 +177,29 @@ async function darwinCoreDataFiles({
 				contents[file.path].push(row);
 
 				progress(1 / sessionIds.length);
-			} else if (file.scope === 'observation') {
-				const observations = await db
-					.getAllFromIndex('Observation', 'sessionId', sessionId)
-					.then((obs) => obs.map((o) => Tables.Observation.assert(o)));
+			} else if (file.scope === 'image') {
+				const cells = layout as Column<'image'>[];
 
 				const images = await db
 					.getAllFromIndex('Image', 'sessionId', sessionId)
 					.then((images) => images.map((i) => Tables.Image.assert(i)));
 
-				for (const obs of observations) {
-					const values = mergeMetadataFromImagesAndObservations({
-						definitions: metadataDefs,
-						images: images.filter((img) => obs.images.includes(img.id)),
-						observations: [obs],
-					});
-
+				for (const img of images) {
 					const extraPayload = {
 						...sessionPayload,
-						observation: await intoPayload(observations.find((o) => o.id === obs.id)!),
-						images: await intoPayload(images.filter((i) => obs.images.includes(i.id))),
-						allMetadata: toMetadataRecord(values),
-						metadata: toMetadataRecord(values, (namespaced) =>
-							protocol.metadata.includes(namespaced)
-								? removeNamespaceFromMetadataId(namespaced)
-								: undefined
-						),
+						image: await intoPayload(img),
 					};
 
 					const row = [];
 
-					for (const cell of layout) {
+					for (const cell of cells) {
 						switch (cell.source) {
 							case 'id': {
 								row.push(sessionId);
 								break;
 							}
 							case 'metadata': {
-								const value = values[cell.metadataId];
+								const value = img.metadata[cell.metadataId];
 								// @ts-expect-error type is too precise and narrowing is near-impossible here
 								row.push(value ? String(await cell.compute(value, db)) : '');
 								break;
@@ -229,6 +216,8 @@ async function darwinCoreDataFiles({
 					progress(1 / totalObservations);
 				}
 			} else if (file.scope === 'media') {
+				const cells = layout as Column<'media'>[];
+
 				const images = await db
 					.getAllFromIndex('Image', 'sessionId', sessionId)
 					.then((images) => images.map((image) => Tables.Image.assert(image)));
@@ -239,12 +228,12 @@ async function darwinCoreDataFiles({
 					const extraPayload = {
 						...sessionPayload,
 						file: imageFile,
-						image: await intoPayload(images.find((i) => i.fileId === imageFile.id)!),
+						images: await intoPayload(images.filter((i) => i.fileId === imageFile.id)),
 					};
 
 					const row = [];
 
-					for (const cell of layout) {
+					for (const cell of cells) {
 						switch (cell.source) {
 							case 'id': {
 								row.push(sessionId);
@@ -273,7 +262,7 @@ async function darwinCoreDataFiles({
 	return mapValues(contents, (rows) => rows.map((row) => row.join('\t')).join('\n'));
 }
 
-type Column<Scope extends 'media' | 'session' | 'observation'> =
+type Column<Scope extends DarwinCoreFileScope> =
 	| {
 			source: 'id';
 			name: string;
@@ -299,7 +288,7 @@ type Column<Scope extends 'media' | 'session' | 'observation'> =
 			};
 	  };
 
-export function fileLayout<Scope extends 'media' | 'session' | 'observation'>(
+export function fileLayout<Scope extends DarwinCoreFileScope>(
 	protocol: Pick<DB.Protocol, 'darwincore' | 'sessionMetadata' | 'metadataOrder'>,
 	metadata: DB.Metadata[],
 	file: { includes: string[]; scope: Scope }
