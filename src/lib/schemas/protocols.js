@@ -3,7 +3,6 @@ import { type } from 'arktype';
 import { mapKeys, omit, orEmptyObj2 } from '../utils.js';
 import { Charts } from './charts.js';
 import {
-	FilepathTemplate,
 	HourRange,
 	HTTPRequest,
 	ID,
@@ -14,7 +13,8 @@ import {
 	SingleEntryRecord,
 	URLString,
 } from './common.js';
-import { TemplatedString } from './expressions.js';
+import { DarwinCoreProtocolConfig } from './darwincore.js';
+import { FilepathTemplate, TemplatedString } from './expressions.js';
 import {
 	Metadata,
 	MetadataGroup,
@@ -254,6 +254,7 @@ export const Protocol = type({
 		.describe('Description courte du protocole, en quelques mots')
 		.default(''),
 	description: ['string', '@', 'Description du protocole'],
+	'steps?': 'string[]',
 	'logo?': URLString.describe(
 		'URL vers le logo du protocole, qui peut être utilisé dans l’interface utilisateur pour représenter ce protocole'
 	),
@@ -291,6 +292,7 @@ export const Protocol = type({
 	}).describe(
 		'Définition par défaut des fichiers sidecar (fichiers annexes associés à chaque image par rapport à son nom de fichier)'
 	),
+	'darwincore?': DarwinCoreProtocolConfig,
 	exports: type({
 		images: type({
 			cropped: ExportsFilepathTemplateObservation.describe('Chemins des images recadrées'),

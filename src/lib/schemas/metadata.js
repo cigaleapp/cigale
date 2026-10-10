@@ -6,7 +6,7 @@ import { boundingBoxResolver } from '../inference_utils.js';
 import { ensureArray, entries, mapValues, nonnull, transformObject, unique } from '../utils.js';
 import {
 	ColorHex,
-	FilepathTemplate,
+	DarwinCoreFieldShorthand,
 	FileSize,
 	ID,
 	MIMEType,
@@ -18,7 +18,7 @@ import {
 	URLString,
 } from './common.js';
 import { NaturalRegexExpression, NumberRangeLiteral, RegexExpression } from './constraints.js';
-import { JsonataExpression, TemplatedString } from './expressions.js';
+import { FilepathTemplate, JsonataExpression, TemplatedString } from './expressions.js';
 import {
 	MODEL_DETECTION_OUTPUT_SHAPES,
 	NeuralBoundingBoxInference,
@@ -170,6 +170,16 @@ export const MetadataValue = type({
 	}),
 });
 
+export const MetadataValueParsed = MetadataValue.omit('value').and({
+	value: MetadataRuntimeValueAny,
+});
+
+/**
+ * @template {import('arktype').Type} Key
+ * @param {Key} Key
+ */
+export const MetadataValuesParsed = (Key) => type.Record(Key, MetadataValueParsed);
+
 export const MetadataValues = type.Record(NamespacedMetadataID, MetadataValue);
 
 const JSONSchemaCompatibleRuntimeValue = type.or(
@@ -195,7 +205,7 @@ export const MetadataRecordValue = MetadataValue.omit('value', 'alternatives').a
 		'Valeurs alternatives pour la métadonnée'
 	).default(() => []),
 	'valueLabel?': [
-		'string',
+		'string | undefined',
 		'@',
 		"Label de la valeur de la métadonnée. Existe pour les métadonnées de type enum, contient dans ce cas le label associé à la clé de l'option de l'enum choisie",
 	],
@@ -514,6 +524,7 @@ const MetadataBoolean = MetadataBase.omit('kobocollect').and({
 		InferenceConfigs.sidecar(type('boolean')).partial(),
 		InferenceConfigs.http('boolean').partial()
 	),
+	'darwincore?': DarwinCoreFieldShorthand,
 	'kobocollect?': type.or(
 		{
 			'list?': [
@@ -550,6 +561,7 @@ const MetadataBoolean = MetadataBase.omit('kobocollect').and({
 export const MetadataString = MetadataBase.and({
 	type: '"string"',
 	'default?': MetadataDefault.string,
+	'darwincore?': DarwinCoreFieldShorthand,
 	'infer?': type.and(
 		InferenceConfigs.exif.partial(),
 		InferenceConfigs.sidecar(type('string')).partial(),
@@ -573,6 +585,10 @@ export const MetadataInteger = MetadataBase.and({
 	'range?': NumberRangeLiteral,
 	'default?': MetadataDefault.integer,
 	'display?': MetadataNumericDisplay,
+	'darwincore?': DarwinCoreFieldShorthand.describe('La valeur numérique').or({
+		'value?': DarwinCoreFieldShorthand.describe('La valeur numérique'),
+		'unit?': DarwinCoreFieldShorthand.describe("L'unité de la valeur"),
+	}),
 	'infer?': type.and(
 		InferenceConfigs.exif.partial(),
 		InferenceConfigs.sidecar(type('number.integer')).partial(),
@@ -586,6 +602,10 @@ export const MetadataFloat = MetadataBase.and({
 	'range?': NumberRangeLiteral,
 	'default?': MetadataDefault.float,
 	'display?': MetadataNumericDisplay,
+	'darwincore?': DarwinCoreFieldShorthand.describe('La valeur numérique').or({
+		'value?': DarwinCoreFieldShorthand.describe('La valeur numérique'),
+		'unit?': DarwinCoreFieldShorthand.describe("L'unité de la valeur"),
+	}),
 	'infer?': type.and(
 		InferenceConfigs.exif.partial(),
 		InferenceConfigs.sidecar(type('number')).partial(),
@@ -603,6 +623,13 @@ export const MetadataDate = MetadataBase.and({
 	type: '"date"',
 	'range?': '"future" | "past"',
 	'default?': MetadataDefault.date,
+	'darwincore?': {
+		'date?': DarwinCoreFieldShorthand.describe('Partie date: yyyy-MM-dd'),
+		'time?': DarwinCoreFieldShorthand.describe('Partie temps: HH:mm:ss'),
+		'datetime?': DarwinCoreFieldShorthand.describe(
+			"Date & heure complète: yyyy-MM-dd'T'HH:mm:ss"
+		),
+	},
 	'infer?': type.and(
 		InferenceConfigs.capture.partial(),
 		InferenceConfigs.exif.partial(),
@@ -614,6 +641,11 @@ export const MetadataDate = MetadataBase.and({
 const MetadataLocation = MetadataBase.and({
 	type: '"location"',
 	'default?': MetadataDefault.location,
+	'darinwcore?': {
+		'latitude?': DarwinCoreFieldShorthand.describe('Latitude décimale'),
+		'longitude?': DarwinCoreFieldShorthand.describe('Longitude décimale'),
+		'datum?': DarwinCoreFieldShorthand.describe('Le datum utilisé: WGS84'),
+	},
 	'infer?': type.and(
 		InferenceConfigs.capture.partial(),
 		InferenceConfigs.http('location').partial(),
@@ -642,6 +674,15 @@ const MetadataSurface = MetadataBase.and({
 const MetadataEnum = MetadataBase.and({
 	type: '"enum"',
 	'default?': MetadataDefault.enum,
+	'darwincore?': {
+		'key?': DarwinCoreFieldShorthand.describe("La clé de l'option"),
+		'label?': DarwinCoreFieldShorthand.describe("Le label de l'option"),
+		'color?': DarwinCoreFieldShorthand.describe("La couleur de l'option"),
+		'image?': DarwinCoreFieldShorthand.describe("Lien vers la première image de l'option"),
+		'images?': DarwinCoreFieldShorthand.describe(
+			"Les liens vers les images de l'option, séparés par ' | '"
+		),
+	},
 	presentation: type
 		.enumerated('dropdown', 'buttons', 'auto')
 		.describe(
@@ -661,6 +702,22 @@ const MetadataEnum = MetadataBase.and({
 const MetadataBoundingbox = MetadataBase.and({
 	type: '"boundingbox"',
 	'default?': MetadataDefault.boundingbox,
+	'darwincore?': {
+		'cx?': DarwinCoreFieldShorthand.describe(
+			'Coordonnée fractionnelle X du centre de la boîte'
+		),
+		'cy?': DarwinCoreFieldShorthand.describe(
+			'Coordonnée fractionnelle Y du centre de la boîte'
+		),
+		'sx?': DarwinCoreFieldShorthand.describe(
+			'Coordonnée fractionnelle X du coin supérieur gauche de la boîte'
+		),
+		'sy?': DarwinCoreFieldShorthand.describe(
+			'Coordonnée fractionnelle Y du coin supérieur gauche de la boîte'
+		),
+		'w?': DarwinCoreFieldShorthand.describe('Largeur fractionnelle de la boîte'),
+		'h?': DarwinCoreFieldShorthand.describe('Hauteur fractionnelle de la boîte'),
+	},
 	'infer?': type.and(
 		InferenceConfigs.neuralBoundingBox.partial(),
 		InferenceConfigs.http('boundingbox').partial(),

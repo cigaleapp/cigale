@@ -139,6 +139,9 @@ sessionMetadata:
     mergeMethod: none
     required: true
     description: ''
+    darwincore:
+      date: dwc:eventDate
+      time: dwc:eventTime
     infer:
       capture: before-timer
 
@@ -222,6 +225,8 @@ sessionMetadata:
     description: Dépend du projet. Si vous ne faites pas le protocole dans le cadre d'un projet spécifique le nom de la commune ou de tout autre repère spatial est suffisant
     mergeMethod: none
     required: false
+    # TODO:  dwc:locationID vs dwc:fieldNumber ?
+    darwincore: dwc:fieldNumber
     # kobocollect: Code du site # defaults to matching by label
 
   habitat:
@@ -231,6 +236,8 @@ sessionMetadata:
     learnMore: https://researchgate.net/publication/374783237_Notice_CarHab_-_Programme_de_cartographie_nationale_des_habitats_naturels_et_semi-naturels
     mergeMethod: none
     required: false
+    darwincore: 
+      label: dwc:habitat
     options:
       - key: '1100'
         label: Glacier et névé
@@ -595,6 +602,13 @@ sessionMetadata:
       Dès que vous avez réussi à vous géolocaliser, c'est parti pour 20 minutes de safari macrophotographique! Laissez ou prenez un point de repère pour retrouver votre point de départ. Vous pouvez mettre le téléphone en veille et revenir sur ce questionnaire à la fin des 20min pour indiquer votre point d'arrivée et les 3 dernières questions. N'oubliez pas de lancer un chronomètre
     mergeMethod: none
     required: true
+    darwincore:
+      # TODO average them instead of just using the start
+      # TODO: introduce uncertainty for privacy?
+      # dwc:coordinateUncertaintyInMeters / dwc:coordinatePrecision
+      latitude: dwc:decimalLatitude
+      longitude: dwc:decimalLongitude
+      datum: dwc:geodeticDatum
     infer:
       capture: before-timer
 
@@ -630,6 +644,9 @@ sessionMetadata:
     unit: m
     required: true
     mergeMethod: average
+    darwincore:
+      value: dwc:sampleSizeValue
+      unit: dwc:sampleSizeUnit
     description: En revenant sur vos pas. Estimez en enjambées de 1 m la distance exact parcourue entre le point d'arrivée et le point de départ.
     range: x > 0
     # TODO: cascade from a surface-type metadata made from start_at and end_at, by taking its hypot
@@ -662,6 +679,7 @@ sessionMetadata:
     description: ''
     label: Remarque ou commentaire
     mergeMethod: none
+    darwincore: dwc:fieldNotes
 
 metadata:
   f_stop:
@@ -762,6 +780,63 @@ exports:
   metadata:
     csv: metadata.csv
     files: Files/{{ sequence }}-{{ metadataKey }}.{{ extension filename }}
+
+darwincore:
+  eml:
+    language: fr
+    title: Inventaire photographique d'insectes
+    taxonomy:
+      description: Insectes de la faune française métropolitaine
+      rank:
+        class: Insecta
+    geography:
+      description: France métropolitaine
+    license: CC-BY-SA-4.0
+
+  fields:
+    session:
+      # dwc:samplingEffort: $metadata(session, "distance") & " m by foot"
+      dwc:samplingEffort: '{{ session.protocolMetadata.distance.value }} m by foot'
+      # this is technically in the observation rowtype but oh well
+      # dwc:eventType: '"Transect"'
+      dwc:eventType: Transect
+      eco:targetTaxonomicScope: Insecta
+
+    image:
+      # dc:type: '"StillImage"'
+      dc:type: StillImage
+      # TODO: dc:references: use images/learnMore of species option ?
+      # dwc:basisOfRecord: '"HumanObservation"'
+      dwc:basisOfRecord: HumanObservation
+      # dwc:occurrenceID: $metadata(session, "id") & ":" & $metadata(observation, "id")
+      dwc:occurenceID: '{{ session.id }}:{{ image.id }}'
+      # TODO: ensure this is correct (INSECTA doesnt keep empty photos right?)
+      # dwc:occurrenceStatus: '"present"'
+      dwc:occurenceStatus: present
+      # TODO: do this but switch to jsonata expressions first... kinda annoying to do with handlebars
+      # dwc:associatedMedia: "{{ join () }}"
+      # dwc:discipline: '"Entomology | Taxonomy"'
+      dwc:discipline: Entomology | Taxonomy
+      dwc:taxonRank: |
+        {{#if image.protocolMetadata.species }}
+          species
+        {{else if image.protocolMetadata.genus }}
+          genus
+        {{else if image.protocolMetadata.family }}
+          family
+        {{else if image.protocolMetadata.order }}
+          order
+        {{else}}
+          kingdom
+        {{/if}}
+
+    media:
+      # Note: most of these arent actually recognized by GBIF i think?
+      # TODO: https://ac.tdwg.org/termlist/#ac_furtherInformationURL ?
+      dc:publisher: EcoSignal
+      dwc:individualCount: "{{ images.length }}"
+
+      # do we add dwc:individualCount ?
 
 charts:
   - scope: both

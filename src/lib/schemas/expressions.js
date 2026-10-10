@@ -1,8 +1,10 @@
 /**
+ *
  * Computed expression templates: Handlebars and Jsonata
  */
 import { ArkErrors, type } from 'arktype';
 import { ms } from 'convert';
+import * as dates from 'date-fns';
 import {
 	format as formatDate,
 	formatISO,
@@ -17,6 +19,7 @@ import { formatDurationStopwatch } from '../date.js';
 import { getCurrentLocation } from '../geolocation.js';
 import { errorMessage } from '../i18n.js';
 import {
+	cleanFilepath,
 	compareBy,
 	ensureArray,
 	mapValues,
@@ -26,6 +29,11 @@ import {
 	transformObject,
 	unique,
 } from '../utils.js';
+
+/**
+ * @import { NamespacedMetadataID } from '$lib/schemas/common.js';
+ * @import { MetadataValues } from '$lib/database.js';
+ */
 
 /**
  * @typedef {object} Helper
@@ -189,20 +197,32 @@ export const HELPERS = /** @type {const} */ ({
 			"Récupère la valeur d'une métadonnée sur un subjet (une session, une observation ou une image) donnée. L'ID de la métadonnée peut ne pas comporter de namespace. Dans ce cas, le namespace correspondant au protocole courant est utilisé. Renvoie null si la métadonnée n'existe pas.",
 		usage: [['session', "'transect_code'"], 'TR123'],
 		/**
-		 * @param {{ [ K in "protocolMetadata" | "metadata"]: import('$lib/database.js').MetadataValues } | { [ K in "metadataOverrides" | "protocolMetadataOverrides"]: import('$lib/database.js').MetadataValues }} subject
-		 * @param {import('$lib/schemas/common.js').NamespacedMetadataID} metadataId
+		 * @param {{ [ K in "protocolMetadata" | "metadata"]: MetadataValues } | { [ K in "metadataOverrides" | "protocolMetadataOverrides"]: MetadataValues }} subject
+		 * @param {NamespacedMetadataID} metadataId
 		 */
 		implementation(subject, metadataId) {
+			if (!subject) throw new Error('Subject is falsy instead of an object');
+
+			// TODO: find a way to import removeNamespaceFromMetadataId here ...
+			/**
+			 * @template T
+			 * @param {Record<NamespacedMetadataID, T>} subject
+			 */
+			const findByBareKey = (subject) =>
+				Object.entries(subject).find(
+					([key]) => key.split('__')[0] === metadataId.split('__')[0]
+				)?.[1];
+
 			if ('metadata' in subject) {
 				const record = subject.protocolMetadata ?? subject.metadata;
 				if (metadataId in record) return record[metadataId]?.value;
-				return null;
+				return findByBareKey(record) ?? null;
 			}
 
 			if ('metadataOverrides' in subject) {
 				const record = subject.protocolMetadataOverrides ?? subject.metadataOverrides;
 				if (metadataId in record) return record[metadataId]?.value;
-				return null;
+				return findByBareKey(record) ?? null;
 			}
 
 			throw new Error('Subject must have either metadata or metadataOverrides property');
@@ -394,11 +414,13 @@ export const HELPERS = /** @type {const} */ ({
 		documentation: "Formatte une date à partir d'une date au format ISO",
 		usage: [["'2024-01-10T02:03:04Z'", "'dd/MM/yyyy'"], '10/01/2024'],
 		/**
-		 * @param {string} datestring
+		 * @param {string|Date} date
 		 * @param {string} format
 		 */
-		implementation(datestring, format) {
-			return formatDate(new Date(datestring), format);
+		implementation(date, format) {
+			const d = new Date(date);
+			if (!dates.isValid(d)) return null;
+			return formatDate(d, format);
 		},
 	},
 	formatDurationStopwatch: {
@@ -545,7 +567,9 @@ const JSONATA_HELPERS = transformObject(
  * @param {(output: string) => O} [postprocess]
  */
 export const TemplatedString = (Input, postprocess) =>
-	type.string.pipe((t) => {
+	type.string.pipe((t, ctx) => {
+		const where = ctx.path.join('.');
+
 		try {
 			const compiled = Handlebars.compile(t, {
 				noEscape: true,
@@ -561,13 +585,19 @@ export const TemplatedString = (Input, postprocess) =>
 				 * @returns {O}
 				 */
 				render(data) {
-					const rendered = compiled(Input.assert(data));
-					// @ts-ignore
-					return postprocess ? postprocess(rendered) : rendered;
+					try {
+						const rendered = compiled(Input.assert(data));
+						// @ts-ignore
+						return postprocess ? postprocess(rendered) : rendered;
+					} catch (error) {
+						throw new Error(errorMessage(error, `Template de ${where}`), {
+							cause: error,
+						});
+					}
 				},
 			};
 		} catch (cause) {
-			throw new Error(`Invalid template ${safeJSONStringify(t)}`, { cause });
+			throw new Error(`Invalid ${where} template: ${safeJSONStringify(t)}`, { cause });
 		}
 	});
 
@@ -599,19 +629,29 @@ if (import.meta.vitest) {
 	});
 }
 
+/**
+ * @template {import("arktype").Type} T
+ * @param {T} Input
+ */
+export const FilepathTemplate = (Input) => TemplatedString(Input, cleanFilepath);
+
 export class JsonataRenderError extends Error {
 	/** @type {string} */
 	template;
+	/** @type {string} */
+	name;
 
 	/**
 	 *
+	 * @param {import('arktype').Traversal} ctx
 	 * @param {string} message
 	 * @param {string} template
 	 * @param {unknown} err
 	 */
-	constructor(message, template, err) {
+	constructor(ctx, message, template, err) {
 		super(message, { cause: err });
 		this.template = template;
+		this.name = ctx.path.join('.');
 	}
 }
 
@@ -623,7 +663,7 @@ export class JsonataRenderError extends Error {
  * @param {(d: unknown) => unknown}  [postprocess]
  */
 export const JsonataExpression = (Input, Output, postprocess) =>
-	type.string.pipe((t) => {
+	type.string.pipe((t, ctx) => {
 		try {
 			const expr = jsonata(t);
 
@@ -668,6 +708,7 @@ export const JsonataExpression = (Input, Output, postprocess) =>
 								: errorMessage(error);
 
 						throw new JsonataRenderError(
+							ctx,
 							`Erreur lors de l'exécution de l'expression Jsonata: ${details}`,
 							t,
 							error
@@ -692,6 +733,7 @@ export const JsonataExpression = (Input, Output, postprocess) =>
 						);
 
 						throw new JsonataRenderError(
+							ctx,
 							`Résultat non conforme: ${safeJSONStringify(raw)}`,
 							t,
 							out
@@ -706,6 +748,7 @@ export const JsonataExpression = (Input, Output, postprocess) =>
 				toJSON: () => t,
 				evaluate() {
 					throw new JsonataRenderError(
+						ctx,
 						errorMessage(cause, 'Invalid Jsonata expression'),
 						t,
 						cause

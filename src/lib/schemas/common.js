@@ -67,11 +67,6 @@ export const Dimensions = type({
 	aspectRatio: width / height,
 }));
 
-/**
- * @template {import("arktype").Type} T
- * @param {T} Input
- */
-export const FilepathTemplate = (Input) => TemplatedString(Input, cleanFilepath);
 
 export const MIMEType = type(
 	/^(application|audio|font|example|image|message|model|multipart|text|video|x-\w+)\/\w+$/
@@ -199,3 +194,6 @@ export const HourRange = type('/^\\d{2}:\\d{2}-\\d{2}:\\d{2}$/').pipe((literal) 
 		},
 	};
 });
+
+
+export const DarwinCoreFieldShorthand = type('/^\\w+:\\w+$/');

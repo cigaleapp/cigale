@@ -145,6 +145,10 @@ const oldProtocol = await readFile(
  */
 const namespaced = (id) => `io.github.cigaleapp.arthropods.example__${id}`;
 
+/**
+ * @param {string} clade
+ * @param {string} label
+ */
 const cladeMetadata = (clade, label) => ({
 	type: 'enum',
 	options: [],
@@ -156,6 +160,9 @@ const cladeMetadata = (clade, label) => ({
 	group: 'taxonomy',
 	// Force dropdown presentation even for higher clades that technically have a few options
 	presentation: 'dropdown',
+	darwincore: {
+		label: `dwc:${clade}`,
+	},
 });
 
 /**
@@ -469,6 +476,7 @@ const protocol = {
 			sortable: true,
 			groupable: true,
 			infer: { exif: 'DateTimeOriginal' },
+			darwincore: { date: 'dwc:eventDate', time: 'dwc:eventTime' },
 		},
 		[namespaced('shoot_location')]: {
 			type: 'location',
@@ -478,6 +486,11 @@ const protocol = {
 			mergeMethod: 'average',
 			groupable: true,
 			infer: { latitude: { exif: 'GPSLatitude' }, longitude: { exif: 'GPSLongitude' } },
+			darwincore: {
+				latitude: 'dwc:decimalLatitude',
+				longitude: 'dwc:decimalLongitude',
+				datum: 'dwc:geodeticDatum',
+			},
 		},
 		[namespaced('crop')]: {
 			type: 'boundingbox',
@@ -514,6 +527,10 @@ const protocol = {
 			classification: true,
 			mergeMethod: 'max',
 			options: options.sort((a, b) => parseFloat(a.key) - parseFloat(b.key)),
+			darwincore: {
+				key: 'dwc:acceptedNameUsageID',
+				label: 'dwc:scientificName',
+			},
 			infer: {
 				neural: [
 					{

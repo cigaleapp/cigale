@@ -384,6 +384,7 @@
 	"metadata": {
 		"io.github.cigaleapp.arthropods.example__kingdom": {
 			"type": "enum",
+			"darwincore": { "label": "dwc:kingdom" },
 			"options": [
 				{
 					"key": "1",
@@ -426,6 +427,7 @@
 		},
 		"io.github.cigaleapp.arthropods.example__phylum": {
 			"type": "enum",
+			"darwincore": { "label": "dwc:phylum" },
 			"options": [
 				{
 					"key": "54",
@@ -519,6 +521,7 @@
 		},
 		"io.github.cigaleapp.arthropods.example__class": {
 			"type": "enum",
+			"darwincore": { "label": "dwc:class" },
 			"options": [
 				{
 					"key": "186",
@@ -731,6 +734,7 @@
 		},
 		"io.github.cigaleapp.arthropods.example__order": {
 			"type": "enum",
+			"darwincore": { "label": "dwc:order" },
 			"options": [
 				{
 					"key": "1499",
@@ -1611,6 +1615,7 @@
 		},
 		"io.github.cigaleapp.arthropods.example__family": {
 			"type": "enum",
+			"darwincore": { "label": "dwc:family" },
 			"options": [
 				{
 					"key": "3311",
@@ -11569,6 +11574,7 @@
 		},
 		"io.github.cigaleapp.arthropods.example__genus": {
 			"type": "enum",
+			"darwincore": { "label": "dwc:genus" },
 			"options": [
 				{
 					"key": "1031485",
@@ -97666,6 +97672,10 @@
 			"groupable": true,
 			"infer": {
 				"exif": "DateTimeOriginal"
+			},
+			"darwincore": {
+				"time": "dwc:eventTime",
+				"date": "dwc:eventDate"
 			}
 		},
 		"io.github.cigaleapp.arthropods.example__shoot_location": {
@@ -97682,6 +97692,11 @@
 				"longitude": {
 					"exif": "GPSLongitude"
 				}
+			},
+			"darwincore": {
+				"latitude": "dwc:decimalLatitude",
+				"longitude": "dwc:decimalLongitude",
+				"datum": "dwc:geodeticDatum"
 			}
 		},
 		"io.github.cigaleapp.arthropods.example__crop": {
@@ -97712,6 +97727,7 @@
 		},
 		"io.github.cigaleapp.arthropods.example__species": {
 			"type": "enum",
+			"darwincore": { "label": "dwc:scientificName", "key": "dwc:acceptedNameUsageID" },
 			"label": "Espèce",
 			"description": "",
 			"required": true,

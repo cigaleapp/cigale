@@ -2,6 +2,7 @@
 	import { Capacitor } from '@capacitor/core';
 	import { FileViewer } from '@capacitor/file-viewer';
 
+	import IconDownloadAsDarwinCore from '~icons/ri/archive-2-line';
 	import IconDownloadAsZip from '~icons/ri/file-zip-line';
 	import IconDownloadAsFolder from '~icons/ri/folder-download-line';
 	import { asset } from '$app/paths';
@@ -17,6 +18,7 @@
 	import { toasts } from '$lib/toasts.svelte.js';
 	import { tooltip } from '$lib/tooltips.js';
 	import { uiState } from '$lib/uistate.svelte.js';
+	import { switchValue } from '$lib/utils.js';
 
 	import { exporter } from './files.svelte.js';
 
@@ -28,12 +30,22 @@
 
 	const { confirmExportIfMetadataErrors }: Props = $props();
 
-	async function downloadExport(directoryHandle: FileSystemDirectoryHandle | undefined) {
+	const supportsDarwinCore = $derived(Boolean(uiState.currentProtocol?.darwincore));
+
+	async function downloadExport(
+		format: 'cigale' | 'darwincore',
+		directoryHandle: FileSystemDirectoryHandle | undefined
+	) {
 		if (!(await confirmExportIfMetadataErrors())) return;
 
 		await toasts.clear('exporter');
 		uiState.processing.reset();
-		const exportFormat = directoryHandle ? 'folder' : 'zip';
+
+		const exportFormat = switchValue(format, {
+			darwincore: 'darwincore',
+			cigale: directoryHandle ? 'folder' : 'zip',
+		});
+
 		exporter.exporting = exportFormat;
 
 		if (!uiState.currentSessionId) {
@@ -50,53 +62,79 @@
 			uiState.processing.total = 1;
 			uiState.processing.done = 0;
 
-			const zipfileBytes = await swarpc.generateResultsExport.once(
-				{
-					include: exporter.include,
-					format: exportFormat,
-					sessionId: uiState.currentSessionId,
-					cropPadding: exporter.cropPadding.withUnit,
-					jsonSchemaURL: new URL(
-						asset('/results.schema.json'),
-						page.url.origin
-					).toString(),
-				},
-				async ({ event, data }) => {
-					switch (event) {
-						case 'progress':
-							uiState.processing.done = data;
-							break;
-						case 'writeFile': {
-							if (!directoryHandle) return;
-							await writeToFilesystem(directoryHandle, data.filepath, data.content);
-							break;
+			let zipfileBytes: ArrayBuffer | undefined;
+
+			switch (exportFormat) {
+				case 'darwincore': {
+					zipfileBytes = await swarpc.onceBy('export').generateDarwinCoreExport(
+						{
+							protocolId: uiState.currentProtocolId!,
+							sessionIds: [uiState.currentSessionId],
+						},
+						({ done, total }) => {
+							uiState.processing.done = done;
+							uiState.processing.total = total;
 						}
-						case 'warning': {
-							const [message, { filename }] = data;
-							switch (message) {
-								case 'exif-write-error':
-									toasts.warn(
-										`Impossible d'ajouter les métadonnées EXIF à l'image ${filename}`
+					);
+					break;
+				}
+				case 'zip':
+				case 'folder': {
+					zipfileBytes = await swarpc.onceBy('export').generateResultsExport(
+						{
+							include: exporter.include,
+							format: exportFormat,
+							sessionId: uiState.currentSessionId,
+							cropPadding: exporter.cropPadding.withUnit,
+							jsonSchemaURL: new URL(
+								asset('/results.schema.json'),
+								page.url.origin
+							).toString(),
+						},
+						async ({ event, data }) => {
+							switch (event) {
+								case 'progress':
+									uiState.processing.done = data;
+									break;
+								case 'writeFile': {
+									if (!directoryHandle) return;
+									await writeToFilesystem(
+										directoryHandle,
+										data.filepath,
+										data.content
 									);
 									break;
-							}
+								}
+								case 'warning': {
+									const [message, { filename }] = data;
+									switch (message) {
+										case 'exif-write-error':
+											toasts.warn(
+												`Impossible d'ajouter les métadonnées EXIF à l'image ${filename}`
+											);
+											break;
+									}
 
-							break;
+									break;
+								}
+							}
 						}
-					}
+					);
+					break;
 				}
-			);
+			}
 
 			if (exportFormat === 'folder' && directoryHandle) {
 				toasts.success(`Fichiers sauvegardés dans ${directoryHandle.name}`);
 			}
 
-			if (exportFormat === 'zip') {
+			if (exportFormat === 'zip' || exportFormat === 'darwincore') {
 				const savedAt = await downloadAsFile(
 					zipfileBytes,
-					'results.zip',
+					switchValue(exportFormat, { zip: 'results.zip', darwincore: 'dwca.zip' }),
 					'application/zip'
 				);
+
 				if (savedAt) {
 					await sendNotification('Export terminé', {
 						awayOnly: true,
@@ -124,7 +162,7 @@
 	}
 </script>
 
-<ButtonSecondary onclick={async () => await downloadExport(undefined)}>
+<ButtonSecondary onclick={async () => await downloadExport('cigale', undefined)}>
 	{#if exporter.exporting === 'zip'}
 		<LoadingSpinner />
 	{:else}
@@ -158,7 +196,7 @@
 				startIn: 'documents',
 				id: 'results-export',
 			});
-			await downloadExport(directory);
+			await downloadExport('cigale', directory);
 		}}
 	>
 		{#if exporter.exporting === 'folder'}
@@ -181,6 +219,18 @@
 				</LoadingText>
 			</code>
 		{/if}
+	</ButtonSecondary>
+{/if}
+
+{#if supportsDarwinCore}
+	<ButtonSecondary onclick={async () => await downloadExport('darwincore', undefined)}>
+		{#if exporter.exporting === 'darwincore'}
+			<LoadingSpinner />
+		{:else}
+			<IconDownloadAsDarwinCore />
+		{/if}
+
+		Darwin Core
 	</ButtonSecondary>
 {/if}
 

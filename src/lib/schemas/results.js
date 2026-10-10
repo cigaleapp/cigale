@@ -2,14 +2,24 @@ import { type } from 'arktype';
 
 // Can't use $lib/ in $lib/schemas files, they're susceptible
 // to be imported by non-Vite-managed pre-build scripts (e.g. JSON Schema generation)
-import { mapValues } from '../utils.js';
+import { mapValues, transformObject } from '../utils.js';
 import { ID, NamespacedMetadataID } from './common.js';
-import { MetadataErrors, MetadataRecord } from './metadata.js';
+import { MetadataErrors, MetadataRecord, removeNamespaceFromMetadataId } from './metadata.js';
+
+/**
+ * @import * as DB from '$lib/database.js';
+ * @import {MetadataRecordValue} from '$lib/schemas/metadata.js';
+ */
 
 export const AnalyzedImage = type({
 	id: ['string', '@', "ID de l'image"],
 	fileId: ['string | null', '@', "ID du fichier source de l'image"],
 	filename: ['string', '@', 'Nom du fichier utilisé pour cette image'],
+	'remoteUrl?': [
+		'string',
+		'@',
+		'URL vers le fichier image, si il a été mis en ligne par (par exemple) un envoi sur une plateforme tierce',
+	],
 	contentType: [
 		'string',
 		'@',
@@ -44,17 +54,54 @@ export const AnalyzedObservation = type({
 });
 
 /**
- * @template {string} K
- * @param {Record<K, Omit<import('$lib/database.js').MetadataValue, 'value'> & { value: null | import('$lib/schemas/metadata.js').RuntimeValue }>} values
- * @returns {Record<K, typeof import('$lib/schemas/metadata.js').MetadataRecordValue.infer>}
+ * @template MV
+ * @template {{metadata: Record<NamespacedMetadataID, MV>}} T
+ * @param {DB.Protocol} protocol
+ * @param {T} subject
+ * @returns {T & { protocolMetadata: Record<string, MV> }}
  */
-export function toMetadataRecord(values) {
+export function withProtocolMetadata(protocol, subject) {
+	return {
+		...subject,
+		protocolMetadata: transformObject(subject.metadata, (namespaced, value) => {
+			if (protocol.metadata.includes(namespaced)) {
+				return [removeNamespaceFromMetadataId(namespaced), value];
+			}
+
+			const imp = protocol.importedMetadata.find((m) => m.source === namespaced);
+			if (imp) {
+				return [removeNamespaceFromMetadataId(imp.target), value];
+			}
+
+			return undefined;
+		}),
+	};
+}
+
+/**
+ * @template {string} KIn
+ * @template {string} [KOut=KIn]
+ * @param {Record<KIn, Omit<import('$lib/database.js').MetadataValue, 'value'> & { value: null | import('$lib/schemas/metadata.js').RuntimeValue }>} values
+ * @param {(key: KIn) => KOut|undefined} [keyMappper] return undefined to remove an entry
+ * @returns {Record<KOut, typeof import('$lib/schemas/metadata.js').MetadataRecordValue.infer>}
+ */
+export function toMetadataRecord(values, keyMapper = (x) => x) {
+	/** @param {unknown} value */
 	const prepareForJSON = (value) => (value instanceof Date ? value.toISOString() : value);
-	return mapValues(values, ({ value, alternatives, ...rest }) => ({
-		value: prepareForJSON(value),
-		alternatives: (alternatives ?? []).map(prepareForJSON),
-		...rest,
-	}));
+
+	return transformObject(values, (key, value) => {
+		const mappedKey = keyMapper(key);
+		if (!mappedKey) return undefined;
+
+		return [
+			mappedKey,
+			{
+				...value,
+				value: prepareForJSON(value.value),
+				alternatives: (value.alternatives ?? []).map(prepareForJSON),
+			},
+		];
+	});
 }
 
 if (import.meta.vitest) {

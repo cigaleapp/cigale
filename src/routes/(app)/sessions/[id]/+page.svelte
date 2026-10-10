@@ -49,7 +49,6 @@
 			<ButtonPrimary
 				loading
 				onclick={async () => {
-					await new Promise(() => {});
 					await switchSession(data.session.id);
 					await goto(`/import/`);
 				}}
