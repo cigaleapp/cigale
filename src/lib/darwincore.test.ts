@@ -65,6 +65,9 @@ const mockProtocol = {
 	metadataOrder: ['foo__species' as const, 'foo__genus' as const],
 };
 
+test('darwincoreDataFiles', async () => {
+})
+
 test('fileLayout', () => {
 	expect(fileLayout(mockProtocol, mockMetadatas, mockProtocol.darwincore.files[0]))
 		.toMatchInlineSnapshot(`

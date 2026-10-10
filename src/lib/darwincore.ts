@@ -10,8 +10,7 @@ import { Tables } from '$lib/database.js';
 import { compareBy, entries, mapValues, orEmpty, orEmpty2, sum, switchValue } from '$lib/utils.js';
 
 import { addValueLabels, metadataPrettyValue } from './metadata/display.js';
-import { mergeMetadataFromImagesAndObservations } from './metadata/merging.js';
-import { hasRuntimeType } from './metadata/types.js';
+import { resolveMetadataImport } from './metadata/namespacing.js';
 import {
 	BUILTIN_DARWINCORE_NAMESPACES,
 	BUILTIN_EXTRA_FIELDS,
@@ -19,8 +18,8 @@ import {
 	DarwinCoreFileScope,
 } from './schemas/darwincore.js';
 import { TemplatedString } from './schemas/expressions.js';
-import { metadataOptionId, removeNamespaceFromMetadataId } from './schemas/metadata.js';
-import { toMetadataRecord, withProtocolMetadata } from './schemas/results.js';
+import { metadataOptionId } from './schemas/metadata.js';
+import { withProtocolMetadata } from './schemas/results.js';
 import { XmlNode } from './xml.js';
 import { createZipArchive } from './zip.js';
 
@@ -43,12 +42,15 @@ export async function darwinCoreArchive({
 	const metadataDefs = await Promise.all(
 		protocol.metadata
 			.toSorted(compareBy((id) => protocol.metadataOrder?.indexOf(id)))
+			.map((id) => resolveMetadataImport(protocol, id))
 			.map((m) => db.get('Metadata', m))
 	).then((defs) =>
 		defs
 			.filter((def) => def && 'darwincore' in def && def.darwincore)
 			.map((def) => Tables.Metadata.assert(def))
 	);
+
+	console.log('defs', metadataDefs);
 
 	let done = 0;
 
@@ -289,19 +291,26 @@ type Column<Scope extends DarwinCoreFileScope> =
 	  };
 
 export function fileLayout<Scope extends DarwinCoreFileScope>(
-	protocol: Pick<DB.Protocol, 'darwincore' | 'sessionMetadata' | 'metadataOrder'>,
+	protocol: Pick<
+		DB.Protocol,
+		'importedMetadata' | 'darwincore' | 'sessionMetadata' | 'metadataOrder'
+	>,
 	metadata: DB.Metadata[],
 	file: { includes: string[]; scope: Scope }
 ): Array<Column<Scope>> {
 	if (!protocol.darwincore) return [];
+
+	const sessionMetadataIds = protocol.sessionMetadata.map((id) =>
+		resolveMetadataImport(protocol, id)
+	);
 
 	return [
 		{ name: 'sessionId', source: 'id' as const },
 		...metadata
 			.filter((m) =>
 				switchValue(file.scope, {
-					session: protocol.sessionMetadata.includes(m.id),
-					observation: !protocol.sessionMetadata.includes(m.id),
+					session: sessionMetadataIds.includes(m.id),
+					image: !sessionMetadataIds.includes(m.id),
 					media: false,
 				})
 			)
@@ -422,6 +431,25 @@ export function fileLayout<Scope extends DarwinCoreFileScope>(
 									(opt) => opt.images?.join(' | ') ?? ''
 								)
 							);
+						}
+
+						return out;
+					}
+
+					case 'location': {
+						const it = item<'location'>;
+						const out = [];
+
+						if (def.darwincore.latitude) {
+							out.push(it(def.darwincore.latitude, (v) => v.value.latitude));
+						}
+
+						if (def.darwincore.longitude) {
+							out.push(it(def.darwincore.longitude, (v) => v.value.longitude));
+						}
+
+						if (def.darwincore.datum) {
+							out.push(it(def.darwincore.datum, () => 'WGS84'));
 						}
 
 						return out;

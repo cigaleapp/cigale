@@ -22,9 +22,9 @@ export const BUILTIN_EXTRA_FIELDS = {
 	media: {
 		// 'dcterms:type': 'http://purl.org/dc/dcmitype/StillImage',
 		'dc:type': 'StillImage',
-		'dc:format': '{{ image.contentType }}',
+		'dc:format': '{{ file.contentType }}',
 		'dc:subtype': 'http://rs.tdwg.org/acsubtype/values/Photograph',
-		'dc:identifier': '{{ image.remoteUrl }}',
+		'dc:identifier': '{{ file.remoteUrl }}',
 	},
 };
 
