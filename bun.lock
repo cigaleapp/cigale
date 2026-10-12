@@ -11,7 +11,7 @@
         "@capacitor/app": "^8.1.1",
         "@capacitor/core": "^8.5.1",
         "@capacitor/file-viewer": "^2.0.1",
-        "@capacitor/filesystem": "^8.1.2",
+        "@capacitor/filesystem": "^8.1.4",
         "@capacitor/geolocation": "^8.2.2",
         "@capacitor/haptics": "^8.0.2",
         "@capacitor/ios": "^8.5.1",
@@ -177,7 +177,6 @@
     "natural-regex@0.5.0": "patches/natural-regex@0.5.0.patch",
     "@types/piexifjs@1.0.0": "patches/@types%2Fpiexifjs@1.0.0.patch",
     "@capacitor-community/camera-preview@8.0.1": "patches/@capacitor-community%2Fcamera-preview@8.0.1.patch",
-    "@capacitor/filesystem@8.1.2": "patches/@capacitor__filesystem@8.1.2.patch",
     "@capacitor/file-viewer@2.0.1": "patches/@capacitor__file-viewer@2.0.1.patch",
   },
   "packages": {
@@ -251,7 +250,7 @@
 
     "@capacitor/file-viewer": ["@capacitor/file-viewer@2.0.1", "", { "dependencies": { "@capacitor/synapse": "^1.0.4" }, "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-1kICpFCCFi/Tr47jVmN1TWbViJhMA/kvXogC16Em87brmng0rgaGiFfiFi9bMNuDCMs17xG7ov7Rj0sUxrZBSA=="],
 
-    "@capacitor/filesystem": ["@capacitor/filesystem@8.1.2", "", { "dependencies": { "@capacitor/synapse": "^1.0.4" }, "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-doaaMfGoFR2hWU6aV6u83I+5ZsGyJVq+Gz4r9lMpJzUKMm1eMu0hLnFdV1aXZlU9FlK/RndFrVD8oRZfNOqWgQ=="],
+    "@capacitor/filesystem": ["@capacitor/filesystem@8.1.4", "", { "dependencies": { "@capacitor/synapse": "^1.0.4" }, "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-8MXmt10cb+dGWoh8jUeO8on0U6iETQCX5k+fmdB278PZ3MYDEVGQo08+hroaOtUbK3+5stiRk4/K6QBHKepv0A=="],
 
     "@capacitor/geolocation": ["@capacitor/geolocation@8.2.2", "", { "dependencies": { "@capacitor/synapse": "^1.0.4" }, "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-X8ryw6CfL4LspJnnfVL4++DUKKZVfdUIA9JljWVRljEDIQxZQZtz6xf7qstht+ymc+le6oa5EaUChVA6KsCYlA=="],
 
