@@ -142,7 +142,7 @@
         "globals": "^17.13.0",
         "google-auth-library": "^11.1.0",
         "google-fonts-helper": "^3.7.4",
-        "googleapis": "^178.0.0",
+        "googleapis": "^183.0.0",
         "gql.tada": "^1.11.4",
         "graphql": "^17.0.2",
         "idb-opfs": "^0.4.0",
@@ -2021,7 +2021,7 @@
 
     "google-logging-utils": ["google-logging-utils@2.0.1", "", {}, "sha512-HMhaQghlOTvbcb3c4T5jmmOMtG3JUF1iOQMezaJXL86CDS+Tm2vHd0IeLFRAx3+ewd+bo9E1HFHoy17X5aJa9A=="],
 
-    "googleapis": ["googleapis@178.1.1", "", { "dependencies": { "google-auth-library": "^11.0.0", "googleapis-common": "^9.0.0" } }, "sha512-oCJCUpC0gjHtAO54rMj6wVRN9hAs6DWJqWmaZy4iaR4uXB5Hl78qylLA5xu5hmHWjb1vX/bRzZ3tbzWG6+Ej1w=="],
+    "googleapis": ["googleapis@183.0.0", "", { "dependencies": { "google-auth-library": "^11.0.0", "googleapis-common": "^9.0.0" } }, "sha512-Aa0KKctjSDfRrvKHFU6PtPYP9yBC/aOUmuc1VpIjJUrHtfoHz3n8/apLB7t4e3d8NbhTDF1x6JcZJO1au7VNHQ=="],
 
     "googleapis-common": ["googleapis-common@9.0.4", "", { "dependencies": { "extend": "^3.0.2", "gaxios": "^7.3.0", "google-auth-library": "^11.0.0", "google-logging-utils": "^2.0.0", "qs": "^6.7.0", "url-template": "^2.0.8" } }, "sha512-fcI5bm1gN+9MNb+gvANRPFsxaJ07h/ZYvKCh6H3RoDJBUTwp5ySaCpCqnmX8gnGJUD/9bKmkacivRJT1g+xXyg=="],
 
