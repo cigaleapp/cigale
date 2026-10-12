@@ -6,7 +6,9 @@ All notable changes to this project will be documented in this file, on a monthl
 
 ### Improvements
 
+- Charts in results page (#2094)
 - Remove footer actions from session cards
+- Send corrections to beacon server (#2231)
 - Show 100% in metadata confidence values when it's not manual
 
 ### Bug Fixes
@@ -15,6 +17,7 @@ All notable changes to this project will be documented in this file, on a monthl
 
 ### Data Updates
 
+- Bump protocol version of protocols/insecta.cigaleprotocol.yaml
 - Bump protocol version of protocols/insecta.cigaleprotocol.yaml [ci skip]
 
 ### Translation Updates
