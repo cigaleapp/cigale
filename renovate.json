@@ -34,6 +34,16 @@
 			"matchManagers": ["gradle", "gradle-wrapper"],
 			"automerge": false,
 			"prPriority": -1
+		},
+		{
+			"description": "Group capacitor-related upgrades (for now)",
+			"matchDepTypes": ["devDependencies"],
+			"matchPackageNames": [
+				"@capacitor/*",
+				"@capgo/*",
+				"@capacitor-community/*",
+				"@capawesome/*"
+			]
 		}
 	]
 }
