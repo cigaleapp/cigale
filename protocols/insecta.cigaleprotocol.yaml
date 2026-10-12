@@ -757,8 +757,8 @@ capture:
 exports:
   images:
     mtime: shoot_date
-    cropped: Cropped/{{ fallback image.protocolMetadata.species.valueLabel "(Unknown)" }}_obs{{ observation.number }}_{{ sequence }}.{{ extension image.filename }}
-    original: Original/{{ fallback image.protocolMetadata.species.valueLabel "(Unknown)" }}_obs{{ observation.number }}_{{ sequence }}.{{ extension image.filename }}
+    cropped: Cropped/{{ fallback image.protocolMetadata.species.valueLabel "Insecte" }} {{ observation.number }}/{{ image.filename }}
+    original: Original/{{ fallback image.protocolMetadata.species.valueLabel "Insecte" }} {{ observation.number }}/{{ image.filename }}
   metadata:
     csv: metadata.csv
     files: Files/{{ sequence }}-{{ metadataKey }}.{{ extension filename }}
