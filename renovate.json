@@ -37,6 +37,7 @@
 		},
 		{
 			"description": "Group capacitor-related upgrades (for now)",
+			"groupName": "Capacitor",
 			"matchDepTypes": ["devDependencies"],
 			"matchPackageNames": [
 				"@capacitor/*",
