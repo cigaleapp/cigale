@@ -157,7 +157,7 @@
 		"@capacitor/android": "^8.5.2",
 		"@capacitor/app": "^8.1.1",
 		"@capacitor/core": "^8.5.2",
-		"@capacitor/file-viewer": "^2.0.1",
+		"@capacitor/file-viewer": "^2.0.4",
 		"@capacitor/filesystem": "^8.1.4",
 		"@capacitor/geolocation": "^8.2.2",
 		"@capacitor/haptics": "^8.0.2",
