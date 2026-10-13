@@ -39,14 +39,14 @@ Bar 1/8			| Foo 2/3 > Bar 1/8
 </script>
 
 <script lang="ts">
+	import { formatBytesSize } from '#lib/i18n.js';
+	import LoadingSpinner from '#lib/LoadingSpinner.svelte';
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
 
 	import IconDone from '~icons/ri/check-line';
 	import IconCanceled from '~icons/ri/close-line';
 	import IconError from '~icons/ri/error-warning-line';
-	import { formatBytesSize } from '$lib/i18n.js';
-	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 
 	import ProgressBar from './ProgressBar.svelte';
 

@@ -1,15 +1,15 @@
 <script>
+	import EnumButtons from '#lib/EnumButtons.svelte';
+	import { EXIF_FIELDS } from '#lib/exiffields.js';
+	import FieldUrl from '#lib/FieldURL.svelte';
+	import { tables } from '#lib/idb.svelte.js';
+	import { EXIFField } from '#lib/schemas/metadata.js';
+	import { toasts } from '#lib/toasts.svelte.js';
+	import { keys, omit } from '#lib/utils.js';
 	import { ArkErrors } from 'arktype';
 	import { fade } from 'svelte/transition';
 
 	import { invalidateAll } from '$app/navigation';
-	import EnumButtons from '$lib/EnumButtons.svelte';
-	import { EXIF_FIELDS } from '$lib/exiffields';
-	import FieldUrl from '$lib/FieldURL.svelte';
-	import { tables } from '$lib/idb.svelte';
-	import { EXIFField } from '$lib/schemas/metadata.js';
-	import { toasts } from '$lib/toasts.svelte.js';
-	import { keys, omit } from '$lib/utils';
 
 	const { data } = $props();
 	const { infer, id } = $derived(data.metadata);

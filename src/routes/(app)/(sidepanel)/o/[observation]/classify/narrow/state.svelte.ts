@@ -1,16 +1,17 @@
 /* eslint-disable svelte/prefer-svelte-reactivity */
 
 import type { Descriptors } from './candidates.js';
-import type * as DB from '$lib/database.js';
-import type { TypedMetadataValue } from '$lib/metadata/index.js';
-import type { NamespacedMetadataID } from '$lib/schemas/common.js';
+import type * as DB from '#lib/database.js';
+import type { TypedMetadataValue } from '#lib/metadata/index.js';
+import type { NamespacedMetadataID } from '#lib/schemas/common.js';
+
+import { tables } from '#lib/idb.svelte.js';
+import { observationMetadata } from '#lib/observations.js';
+import { isNamespacedToProtocol } from '#lib/schemas/metadata.js';
+import { uiState } from '#lib/uistate.svelte.js';
+import { entries, transformObject } from '#lib/utils.js';
 
 import { page } from '$app/state';
-import { tables } from '$lib/idb.svelte.js';
-import { observationMetadata } from '$lib/observations.js';
-import { isNamespacedToProtocol } from '$lib/schemas/metadata.js';
-import { uiState } from '$lib/uistate.svelte.js';
-import { entries, transformObject } from '$lib/utils.js';
 
 import { computeDescriptors, getAllCandidates, matches } from './candidates.js';
 

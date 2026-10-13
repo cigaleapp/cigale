@@ -1,38 +1,38 @@
 import type { SelectedBox } from './+page.svelte';
-import type { Rect } from '$lib/BoundingBoxes.svelte.js';
-import type * as DB from '$lib/database.js';
-import type { TypedMetadataValue } from '$lib/metadata/types.js';
-import type { RuntimeValue } from '$lib/schemas/metadata.js';
+import type { Rect } from '#lib/BoundingBoxes.svelte.js';
+import type * as DB from '#lib/database.js';
+import type { TypedMetadataValue } from '#lib/metadata/types.js';
+import type { RuntimeValue } from '#lib/schemas/metadata.js';
 
-import * as dates from 'date-fns';
-
-import { page } from '$app/state';
 import {
 	boundingBoxIsNonZero,
 	coordsAreEqual,
 	toCenteredCoords,
 	toTopLeftCoords,
-} from '$lib/BoundingBoxes.svelte.js';
-import * as idb from '$lib/idb.svelte.js';
+} from '#lib/BoundingBoxes.svelte.js';
+import * as idb from '#lib/idb.svelte.js';
 import {
 	deleteImageFile,
 	imageIdToFileId,
 	imageId as makeImageId,
 	parseImageId,
-} from '$lib/images.js';
+} from '#lib/images.js';
 import {
 	deleteMetadataValue,
 	storeMetadataValue,
 	storeMetadataValueConfirmation,
-} from '$lib/metadata/storage.js';
-import { hasRuntimeType } from '$lib/metadata/types.js';
-import { ensureNoEmptyObservations } from '$lib/observations.js';
-import { goto } from '$lib/paths.js';
-import { getSettings } from '$lib/settings.svelte.js';
-import { toasts } from '$lib/toasts.svelte.js';
-import { uiState } from '$lib/uistate.svelte.js';
-import { undo } from '$lib/undo.svelte.js';
-import { nonnull } from '$lib/utils.js';
+} from '#lib/metadata/storage.js';
+import { hasRuntimeType } from '#lib/metadata/types.js';
+import { ensureNoEmptyObservations } from '#lib/observations.js';
+import { goto } from '#lib/paths.js';
+import { getSettings } from '#lib/settings.svelte.js';
+import { toasts } from '#lib/toasts.svelte.js';
+import { uiState } from '#lib/uistate.svelte.js';
+import { undo } from '#lib/undo.svelte.js';
+import { nonnull } from '#lib/utils.js';
+import * as dates from 'date-fns';
+
+import { page } from '$app/state';
 
 import {
 	adjacentFileIds,

@@ -1,7 +1,7 @@
 <script lang="ts" module>
 	import type { PageData } from './$types.js';
 
-	import * as idb from '$lib/idb.svelte.js';
+	import * as idb from '#lib/idb.svelte.js';
 
 	export interface SelectedBox {
 		imageId: string | null;
@@ -120,7 +120,7 @@
 		return sortedFileIds.find((fileId) => !hasConfirmedCrop(fileId));
 	});
 
-	export async function goToNextUnconfirmedFile({ or: fallbackRoute }: { or: Pathname }) {
+	export async function goToNextUnconfirmedFile({ or: fallbackRoute }: { or: Path }) {
 		if (nextUnconfirmedImageId) {
 			await goToFile(nextUnconfirmedImageId);
 		} else {
@@ -134,22 +134,22 @@
 </script>
 
 <script lang="ts">
-	import type { Pathname } from '$app/types';
-	import type * as DB from '$lib/database.js';
+	import type * as DB from '#lib/database.js';
+	import type { Path } from '$app/types';
 
+	import BottomDrawer from '#lib/BottomDrawer.svelte';
+	import { imageIdToFileId, imagesOfImageFile } from '#lib/images.js';
+	import { assertIs } from '#lib/metadata/index.js';
+	import { IsMobile } from '#lib/mobile.svelte.js';
+	import { goto } from '#lib/paths.js';
+	import { seo } from '#lib/seo.svelte.js';
+	import { getSettings } from '#lib/settings.svelte.js';
+	import { uiState } from '#lib/uistate.svelte.js';
 	import { watch } from 'runed';
 
 	import IconDelete from '~icons/ri/delete-bin-line';
 	import IconReset from '~icons/ri/reset-left-fill';
 	import { page } from '$app/state';
-	import BottomDrawer from '$lib/BottomDrawer.svelte';
-	import { imageIdToFileId, imagesOfImageFile } from '$lib/images.js';
-	import { assertIs } from '$lib/metadata/index.js';
-	import { IsMobile } from '$lib/mobile.svelte.js';
-	import { goto } from '$lib/paths.js';
-	import { seo } from '$lib/seo.svelte';
-	import { getSettings } from '$lib/settings.svelte.js';
-	import { uiState } from '$lib/uistate.svelte.js';
 
 	import TopbarExtras from '../../TopbarExtras.svelte';
 	import {
@@ -309,9 +309,7 @@
 
 	<aside class="toolbar">
 		{#if mobile.current}
-			<div class="focus-switcher">
-				<FocusSwitcher bind:selectedBox {imageIsLoading} />
-			</div>
+			<div class="focus-switcher"><FocusSwitcher bind:selectedBox {imageIsLoading} /></div>
 		{/if}
 
 		<Toolbar intialTool={mobile.current && boxesCount > 0 ? 'Main' : 'Glisser-recadrer'} />

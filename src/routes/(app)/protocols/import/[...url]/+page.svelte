@@ -1,11 +1,12 @@
 <script>
+	import HighlightHostname from '#lib/HighlightHostname.svelte';
+	import { tables } from '#lib/idb.svelte.js';
+	import ModalConfirm from '#lib/ModalConfirm.svelte';
+	import { goto } from '#lib/paths.js';
+	import { toasts } from '#lib/toasts.svelte.js';
+
 	import { afterNavigate } from '$app/navigation';
 	import { page } from '$app/state';
-	import HighlightHostname from '$lib/HighlightHostname.svelte';
-	import { tables } from '$lib/idb.svelte.js';
-	import ModalConfirm from '$lib/ModalConfirm.svelte';
-	import { goto } from '$lib/paths';
-	import { toasts } from '$lib/toasts.svelte.js';
 
 	const { swarpc } = $derived(page.data);
 
@@ -24,7 +25,9 @@
 
 	let openModal = $state();
 
-	afterNavigate(() => {
+	afterNavigate(({ shallow, type }) => {
+		if (shallow && type === 'goto') return;
+
 		if (openModal && toImport && !importing) {
 			openModal();
 		}

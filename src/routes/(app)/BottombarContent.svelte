@@ -1,9 +1,8 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 
+	import { IsMobile } from '#lib/mobile.svelte.js';
 	import { Portal } from 'bits-ui';
-
-	import { IsMobile } from '$lib/mobile.svelte.js';
 
 	const { children }: { children: Snippet } = $props();
 

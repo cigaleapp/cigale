@@ -1,22 +1,23 @@
 <script lang="ts">
-	import type * as DB from '$lib/database.js';
+	import type * as DB from '#lib/database.js';
+
+	import { cascadeLabels } from '#lib/cascades.js';
+	import DebugOnly from '#lib/DebugOnly.svelte';
+	import { databaseHandle } from '#lib/idb.svelte.js';
+	import LearnMoreLink from '#lib/LearnMoreLink.svelte';
+	import Markdown from '#lib/Markdown.svelte';
+	import MetadataCascadesTable from '#lib/MetadataCascadesTable.svelte';
+	import { scrollfader } from '#lib/scrollfader.js';
+	import { isDebugMode } from '#lib/settings.svelte.js';
+	import TabbedView from '#lib/TabbedView.svelte';
+	import { uiState } from '#lib/uistate.svelte.js';
+	import { corsfixIfLocalhost } from '#lib/utils.js';
 
 	import IconDescription from '~icons/ri/align-left';
 	import IconCollapse from '~icons/ri/arrow-down-s-line';
 	import IconExpand from '~icons/ri/arrow-up-s-line';
 	import IconDebug from '~icons/ri/bug-2-line';
 	import IconImage from '~icons/ri/image-line';
-	import { cascadeLabels } from '$lib/cascades.js';
-	import DebugOnly from '$lib/DebugOnly.svelte';
-	import { databaseHandle } from '$lib/idb.svelte.js';
-	import LearnMoreLink from '$lib/LearnMoreLink.svelte';
-	import Markdown from '$lib/Markdown.svelte';
-	import MetadataCascadesTable from '$lib/MetadataCascadesTable.svelte';
-	import { scrollfader } from '$lib/scrollfader.js';
-	import { isDebugMode } from '$lib/settings.svelte.js';
-	import TabbedView from '$lib/TabbedView.svelte';
-	import { uiState } from '$lib/uistate.svelte.js';
-	import { corsfixIfLocalhost } from '$lib/utils.js';
 
 	interface Props {
 		option: DB.MetadataEnumVariant;

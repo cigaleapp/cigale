@@ -1,25 +1,25 @@
 <script lang="ts">
-	import { fade } from 'svelte/transition';
-
-	import { page } from '$app/state';
-	import { toTopLeftCoords } from '$lib/BoundingBoxes.svelte';
-	import { promptForFiles } from '$lib/files';
-	import * as db from '$lib/idb.svelte';
-	import { openTransaction, tables } from '$lib/idb.svelte';
-	import { deleteImage, deleteImageFile, imageFileId } from '$lib/images';
-	import { ACCEPTED_IMPORT_TYPES } from '$lib/import.svelte';
-	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
+	import { toTopLeftCoords } from '#lib/BoundingBoxes.svelte.js';
+	import { promptForFiles } from '#lib/files.js';
+	import * as db from '#lib/idb.svelte.js';
+	import { openTransaction, tables } from '#lib/idb.svelte.js';
+	import { deleteImage, deleteImageFile, imageFileId } from '#lib/images.js';
+	import { ACCEPTED_IMPORT_TYPES } from '#lib/import.svelte.js';
+	import { defineKeyboardShortcuts } from '#lib/keyboard.svelte.js';
 	import {
 		deleteMetadataValue,
 		mergeMetadataFromImagesAndObservations,
 		storeMetadataValue,
-	} from '$lib/metadata/index.js';
-	import { IsMobile } from '$lib/mobile.svelte.js';
-	import { deleteObservation, mergeToObservation, newObservation } from '$lib/observations';
-	import { cancelTask, importMore } from '$lib/queue.svelte.js';
-	import { seo } from '$lib/seo.svelte';
-	import { toasts } from '$lib/toasts.svelte';
-	import { uiState } from '$lib/uistate.svelte.js';
+	} from '#lib/metadata/index.js';
+	import { IsMobile } from '#lib/mobile.svelte.js';
+	import { deleteObservation, mergeToObservation, newObservation } from '#lib/observations.js';
+	import { cancelTask, importMore } from '#lib/queue.svelte.js';
+	import { seo } from '#lib/seo.svelte.js';
+	import { toasts } from '#lib/toasts.svelte.js';
+	import { uiState } from '#lib/uistate.svelte.js';
+	import { fade } from 'svelte/transition';
+
+	import { page } from '$app/state';
 
 	import TopbarOpenSession from '../TopbarOpenSession.svelte';
 	import PreviewSidePanel from './PreviewSidePanel.svelte';

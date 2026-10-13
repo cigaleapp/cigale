@@ -24,46 +24,46 @@ vi.mock('@capacitor/core', () => ({
 	},
 }));
 
-vi.mock('$lib/idb.svelte.js', () => ({}));
+vi.mock('#lib/idb.svelte.js', () => ({}));
 
-vi.mock('$lib/database.js', () => ({
+vi.mock('#lib/database.js', () => ({
 	generateId: vi.fn(() => 'sampleId'),
 }));
 
-vi.mock('$lib/metadata/index.js', () => ({
+vi.mock('#lib/metadata/index.js', () => ({
 	storeMetadataValue: vi.fn(),
 }));
 
-vi.mock('$lib/uistate.svelte.js', () => ({
+vi.mock('#lib/uistate.svelte.js', () => ({
 	uiState: {
 		currentSessionId: undefined,
 		currentSession: undefined,
 	},
 }));
 
-vi.mock('$lib/geolocation.js', async (original) => ({
+vi.mock('#lib/geolocation.js', async (original) => ({
 	...(await original()),
 	getCurrentLocation: () => ({ longitude: 0, latitude: 0 }),
 }));
 
-vi.mock('$lib/storage/index.js', () => ({
+vi.mock('#lib/storage/index.js', () => ({
 	binaryStorage: mockBinaryStorage,
 }));
 
-vi.mock('$lib/import.svelte.js', () => ({
+vi.mock('#lib/import.svelte.js', () => ({
 	processImageFile: mockProcessImageFile,
 }));
 
-vi.mock('$lib/images.js', () => ({
+vi.mock('#lib/images.js', () => ({
 	imageFileId: mockImageFileId,
 }));
 
-vi.mock('$lib/i18n.js', () => ({
+vi.mock('#lib/i18n.js', () => ({
 	errorMessage: mockErrorMessage,
 	localeFromNavigator: vi.fn(() => 'fr'),
 }));
 
-vi.mock('$lib/toasts.svelte.js', () => ({
+vi.mock('#lib/toasts.svelte.js', () => ({
 	toasts: {
 		error: mockToastError,
 	},

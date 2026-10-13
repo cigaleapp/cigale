@@ -5,9 +5,8 @@ import type {
 	BinaryStorageName,
 } from './types.js';
 
+import { splitFilenameOnExtension } from '#lib/utils.js';
 import { dichotomid } from 'dichotomid';
-
-import { splitFilenameOnExtension } from '$lib/utils.js';
 
 import { OPFSBackend } from './opfs.js';
 import { locatorToPath } from './utils.js';

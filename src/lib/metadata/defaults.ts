@@ -1,17 +1,16 @@
-import type { DatabaseHandle } from '$lib/idb.svelte.js';
+import type { DatabaseHandle } from '#lib/idb.svelte.js';
 
-import { ArkErrors } from 'arktype';
-
-import { Tables } from '$lib/database.js';
-import { tables } from '$lib/idb.svelte.js';
+import { Tables } from '#lib/database.js';
+import { tables } from '#lib/idb.svelte.js';
 import {
 	isNamespacedToProtocol,
 	MetadataDefaultDynamicPayload,
 	removeNamespaceFromMetadataId,
-} from '$lib/schemas/metadata.js';
-import { toMetadataRecord } from '$lib/schemas/results.js';
-import { toasts } from '$lib/toasts.svelte.js';
-import { profiler, transformObject } from '$lib/utils.js';
+} from '#lib/schemas/metadata.js';
+import { toMetadataRecord } from '#lib/schemas/results.js';
+import { toasts } from '#lib/toasts.svelte.js';
+import { profiler, transformObject } from '#lib/utils.js';
+import { ArkErrors } from 'arktype';
 
 import { serializeMetadataValue } from './serializing.js';
 import { storeMetadataValue } from './storage.js';
@@ -147,15 +146,15 @@ export async function resolveDefaults({
 if (import.meta.vitest) {
 	const { describe, it, expect, vi, beforeEach } = import.meta.vitest;
 
-	vi.mock('$lib/database.js', () => ({
+	vi.mock('#lib/database.js', () => ({
 		Tables: { Session: { assert: vi.fn((v: unknown) => v) } },
 	}));
 
-	vi.mock('$lib/idb.svelte.js', () => ({
+	vi.mock('#lib/idb.svelte.js', () => ({
 		tables: { Metadata: { getMany: vi.fn(async () => []) } },
 	}));
 
-	vi.mock('$lib/toasts.svelte.js', () => ({
+	vi.mock('#lib/toasts.svelte.js', () => ({
 		toasts: { warn: vi.fn() },
 	}));
 

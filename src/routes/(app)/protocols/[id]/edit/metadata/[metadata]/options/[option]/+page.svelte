@@ -1,4 +1,12 @@
 <script>
+	import ButtonIcon from '#lib/ButtonIcon.svelte';
+	import ButtonSecondary from '#lib/ButtonSecondary.svelte';
+	import Field from '#lib/Field.svelte';
+	import FieldUrl from '#lib/FieldURL.svelte';
+	import InlineTextInput from '#lib/InlineTextInput.svelte';
+	import { goto } from '#lib/paths.js';
+	import { removeNamespaceFromMetadataId } from '#lib/schemas/metadata.js';
+	import VirtualList from '#lib/VirtualList.svelte';
 	import { fade } from 'svelte/transition';
 
 	import IconArrow from '~icons/ri/arrow-right-line';
@@ -9,14 +17,6 @@
 	import IconImage from '~icons/ri/image-2-line';
 	import IconRemove from '~icons/ri/indeterminate-circle-line';
 	import { page } from '$app/state';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import Field from '$lib/Field.svelte';
-	import FieldUrl from '$lib/FieldURL.svelte';
-	import InlineTextInput from '$lib/InlineTextInput.svelte';
-	import { goto } from '$lib/paths.js';
-	import { removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';
-	import VirtualList from '$lib/VirtualList.svelte';
 
 	import { onDeleteOption } from '../+layout.svelte';
 	import { updater } from './updater.svelte.js';

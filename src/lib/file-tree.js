@@ -9,7 +9,7 @@ export const NodeProvenance = type.enumerated(
 );
 
 /**
- * @import {MaybeLoading} from '$lib/LoadingText.svelte';
+ * @import {MaybeLoading} from '#lib/LoadingText.svelte';
  */
 
 /**

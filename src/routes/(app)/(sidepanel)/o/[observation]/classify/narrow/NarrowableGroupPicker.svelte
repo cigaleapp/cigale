@@ -1,12 +1,13 @@
 <script lang="ts">
+	import DropdownMenu from '#lib/DropdownMenu.svelte';
+	import { plural } from '#lib/i18n.js';
+	import { tables } from '#lib/idb.svelte.js';
+	import { isNamespacedToProtocol } from '#lib/schemas/metadata.js';
+	import { uiState } from '#lib/uistate.svelte.js';
+	import { compareBy } from '#lib/utils.js';
+
 	import IconChoose from '~icons/ri/arrow-down-s-line';
 	import IconSelected from '~icons/ri/check-line';
-	import DropdownMenu from '$lib/DropdownMenu.svelte';
-	import { plural } from '$lib/i18n.js';
-	import { tables } from '$lib/idb.svelte.js';
-	import { isNamespacedToProtocol } from '$lib/schemas/metadata.js';
-	import { uiState } from '$lib/uistate.svelte.js';
-	import { compareBy } from '$lib/utils.js';
 
 	const narrowableGroups = $derived(
 		(uiState.currentProtocol?.metadataGroups.filter((group) => group.narrowable) ?? [])

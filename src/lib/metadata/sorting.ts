@@ -1,6 +1,6 @@
-import type * as DB from '$lib/database.js';
-import type { RuntimeValue } from '$lib/schemas/metadata.js';
-import type { Comparator } from '$lib/utils.js';
+import type * as DB from '#lib/database.js';
+import type { RuntimeValue } from '#lib/schemas/metadata.js';
+import type { Comparator } from '#lib/utils.js';
 
 import * as dates from 'date-fns';
 

@@ -1,11 +1,12 @@
 <script lang="ts">
+	import { tables } from '#lib/idb.svelte.js';
+	import { defineKeyboardShortcuts } from '#lib/keyboard.svelte.js';
+	import { FULLSCREEN_CLASSIFY_LAYOUTS as LAYOUTS } from '#lib/schemas/sessions.js';
+	import { tooltip } from '#lib/tooltips.js';
+	import { uiState } from '#lib/uistate.svelte.js';
+	import { sleep } from '#lib/utils.js';
+
 	import IconLayoutTopBottom from '~icons/ri/layout-4-line';
-	import { tables } from '$lib/idb.svelte';
-	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
-	import { FULLSCREEN_CLASSIFY_LAYOUTS as LAYOUTS } from '$lib/schemas/sessions';
-	import { tooltip } from '$lib/tooltips';
-	import { uiState } from '$lib/uistate.svelte.js';
-	import { sleep } from '$lib/utils';
 
 	interface Props {
 		/** A function that {en,dis}ables CSS transitions when called */

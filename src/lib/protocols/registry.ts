@@ -1,5 +1,5 @@
-import _rawRegistry from '$lib/registry.json' with { type: 'json' };
-import { ProtocolRegistry } from '$lib/schemas/protocols.js';
+import _rawRegistry from '#lib/registry.json' with { type: 'json' };
+import { ProtocolRegistry } from '#lib/schemas/protocols.js';
 
 let PROTOCOLS_REGISTRY: typeof ProtocolRegistry.infer | null = null;
 

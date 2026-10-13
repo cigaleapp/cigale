@@ -1,20 +1,20 @@
-import { ArkErrors } from 'arktype';
-
-import { invalidate } from '$app/navigation';
-import { page } from '$app/state';
-import { errorMessage } from '$lib/i18n';
-import { dependencyURI, get, set } from '$lib/idb.svelte';
+import { errorMessage } from '#lib/i18n.js';
+import { dependencyURI, get, set } from '#lib/idb.svelte.js';
 import {
 	ensureNamespacedMetadataId,
 	metadataOptionId,
 	namespacedMetadataId,
-} from '$lib/schemas/metadata';
-import { toasts } from '$lib/toasts.svelte';
+} from '#lib/schemas/metadata.js';
+import { toasts } from '#lib/toasts.svelte.js';
+import { ArkErrors } from 'arktype';
+
+import { invalidate } from '$app/navigation';
+import { page } from '$app/state';
 
 /**
  * Update the metadata information, save it to the database.
  * @template T
- * @param {(p: typeof import('$lib/database').Tables.MetadataOption.inferIn, v: T) => void | Promise<void>} changes
+ * @param {(p: typeof import('#lib/database.js').Tables.MetadataOption.inferIn, v: T) => void | Promise<void>} changes
  * @returns {(value: T) => Promise<void>} updater for InlineTextInput
  */
 export function updater(changes) {

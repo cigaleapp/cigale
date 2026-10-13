@@ -1,6 +1,17 @@
 <script lang="ts">
-	import type * as DropdownMenuTypes from '$lib/DropdownMenu.svelte';
+	import type * as DropdownMenuTypes from '#lib/DropdownMenu.svelte';
 
+	// TODO: ask for a dashed circle icon at https://github.com/Remix-Design/RemixIcon/issues for IconUnconfirmed
+	import ButtonIcon from '#lib/ButtonIcon.svelte';
+	import ButtonSecondary from '#lib/ButtonSecondary.svelte';
+	import ConfirmedOverlay from '#lib/ConfirmedOverlay.svelte';
+	import DropdownMenu from '#lib/DropdownMenu.svelte';
+	import { percent } from '#lib/i18n.js';
+	import { defineKeyboardShortcuts } from '#lib/keyboard.svelte.js';
+	import { IsMobile } from '#lib/mobile.svelte.js';
+	import { globalModals } from '#lib/modals.svelte.js';
+	import ProgressBar from '#lib/ProgressBar.svelte';
+	import { isDebugMode, toggleSetting } from '#lib/settings.svelte.js';
 	import { Portal } from 'bits-ui';
 
 	import IconPrev from '~icons/ri/arrow-left-s-line';
@@ -8,17 +19,6 @@
 	import IconUnconfirmed from '~icons/ri/loader-line';
 	import IconMore from '~icons/ri/more-2-fill';
 	import IconConfirmed from '~icons/ri/verified-badge-line';
-	// TODO: ask for a dashed circle icon at https://github.com/Remix-Design/RemixIcon/issues for IconUnconfirmed
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import ConfirmedOverlay from '$lib/ConfirmedOverlay.svelte';
-	import DropdownMenu from '$lib/DropdownMenu.svelte';
-	import { percent } from '$lib/i18n';
-	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
-	import { IsMobile } from '$lib/mobile.svelte';
-	import { globalModals } from '$lib/modals.svelte';
-	import ProgressBar from '$lib/ProgressBar.svelte';
-	import { isDebugMode, toggleSetting } from '$lib/settings.svelte';
 
 	import { topbarExtrasPortalId } from './+layout@(app).svelte';
 

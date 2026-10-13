@@ -1,22 +1,22 @@
 <script lang="ts">
+	import AreaObservations from '#lib/AreaObservations.svelte';
+	import ButtonSecondary from '#lib/ButtonSecondary.svelte';
+	import CardImage from '#lib/CardImage.svelte';
+	import CardMedia from '#lib/CardMedia.svelte';
+	import Dropzone from '#lib/Dropzone.svelte';
+	import { promptForFiles } from '#lib/files.js';
+	import { tables } from '#lib/idb.svelte.js';
+	import { deleteImage } from '#lib/images.js';
+	import { ACCEPTED_IMPORT_TYPES } from '#lib/import.svelte.js';
+	import Logo from '#lib/Logo.svelte';
+	import { goto } from '#lib/paths.js';
+	import { cancelTask, importMore } from '#lib/queue.svelte.js';
+	import { uiState } from '#lib/uistate.svelte.js';
+	import { unique } from '#lib/utils.js';
 	import { fade } from 'svelte/transition';
 
 	import IconCamera from '~icons/ri/camera-line';
 	import IconImport from '~icons/ri/upload-2-line';
-	import AreaObservations from '$lib/AreaObservations.svelte';
-	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import CardImage from '$lib/CardImage.svelte';
-	import CardMedia from '$lib/CardMedia.svelte';
-	import Dropzone from '$lib/Dropzone.svelte';
-	import { promptForFiles } from '$lib/files';
-	import { tables } from '$lib/idb.svelte';
-	import { deleteImage } from '$lib/images';
-	import { ACCEPTED_IMPORT_TYPES } from '$lib/import.svelte';
-	import Logo from '$lib/Logo.svelte';
-	import { goto } from '$lib/paths.js';
-	import { cancelTask, importMore } from '$lib/queue.svelte.js';
-	import { uiState } from '$lib/uistate.svelte.js';
-	import { unique } from '$lib/utils';
 
 	const allImages = $derived([
 		...unique(

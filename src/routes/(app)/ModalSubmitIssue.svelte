@@ -1,27 +1,27 @@
 <script lang="ts">
-	import type { IssueCreatorRequest } from '$lib/schemas/issue-creator';
+	import type { IssueCreatorRequest } from '#lib/schemas/issue-creator.js';
 
 	import { Capacitor } from '@capacitor/core';
 	import { CapacitorShake } from '@capgo/capacitor-shake';
+	import ButtonIcon from '#lib/ButtonIcon.svelte';
+	import ButtonPrimary from '#lib/ButtonPrimary.svelte';
+	import Field from '#lib/Field.svelte';
+	import { databaseHandle, tables } from '#lib/idb.svelte.js';
+	import InlineTextInput from '#lib/InlineTextInput.svelte';
+	import { defineKeyboardShortcuts } from '#lib/keyboard.svelte.js';
+	import Markdown from '#lib/Markdown.svelte';
+	import Modal from '#lib/Modal.svelte';
+	import { globalModals } from '#lib/modals.svelte.js';
+	import { getSettings } from '#lib/settings.svelte.js';
+	import { toasts } from '#lib/toasts.svelte.js';
+	import { uiState } from '#lib/uistate.svelte.js';
+	import { safeJSONParse } from '#lib/utils.js';
 	import { UAParser } from 'ua-parser-js';
 
 	import IconBug from '~icons/ri/bug-2-line';
 	import IconIdea from '~icons/ri/lightbulb-line';
-	import { version } from '$app/environment';
+	import { version } from '$app/env';
 	import { page } from '$app/state';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
-	import Field from '$lib/Field.svelte';
-	import { databaseHandle, tables } from '$lib/idb.svelte';
-	import InlineTextInput from '$lib/InlineTextInput.svelte';
-	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
-	import Markdown from '$lib/Markdown.svelte';
-	import Modal from '$lib/Modal.svelte';
-	import { globalModals } from '$lib/modals.svelte';
-	import { getSettings } from '$lib/settings.svelte.js';
-	import { toasts } from '$lib/toasts.svelte';
-	import { uiState } from '$lib/uistate.svelte.js';
-	import { safeJSONParse } from '$lib/utils';
 
 	interface Props {
 		type: 'bug' | 'feature';

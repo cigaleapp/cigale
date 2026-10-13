@@ -5,30 +5,30 @@
 </script>
 
 <script lang="ts">
+	import { tables } from '#lib/idb.svelte.js';
+	import { loadPreviewImage } from '#lib/images.js';
+	import { defineKeyboardShortcuts } from '#lib/keyboard.svelte.js';
+	import KeyboardShortcuts from '#lib/KeyboardShortcuts.svelte';
+	import { IsMobile } from '#lib/mobile.svelte.js';
+	import Modal from '#lib/Modal.svelte';
+	import ModalPickProtocol from '#lib/ModalPickProtocol.svelte';
+	import { globalModals } from '#lib/modals.svelte.js';
+	import { routeIsIn } from '#lib/paths.js';
+	import { initializeProcessingQueue } from '#lib/queue.svelte.js';
+	import { switchSession } from '#lib/sessions.js';
+	import { getColorScheme, isDebugMode, setSetting } from '#lib/settings.svelte.js';
+	import { toasts } from '#lib/toasts.svelte.js';
+	import { uiState } from '#lib/uistate.svelte.js';
+	import { undo } from '#lib/undo.svelte.js';
+	import { nonnull, pick } from '#lib/utils.js';
 	import { watch } from 'runed';
 	import { onMount } from 'svelte';
 	import { SvelteMap } from 'svelte/reactivity';
 
-	import { version } from '$app/environment';
+	import { version } from '$app/env';
 	import { goto } from '$app/navigation';
-	import { base, resolve } from '$app/paths';
+	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
-	import { tables } from '$lib/idb.svelte';
-	import { loadPreviewImage } from '$lib/images';
-	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
-	import KeyboardShortcuts from '$lib/KeyboardShortcuts.svelte';
-	import { IsMobile } from '$lib/mobile.svelte.js';
-	import Modal from '$lib/Modal.svelte';
-	import ModalPickProtocol from '$lib/ModalPickProtocol.svelte';
-	import { globalModals } from '$lib/modals.svelte.js';
-	import { routeIsIn } from '$lib/paths.js';
-	import { initializeProcessingQueue } from '$lib/queue.svelte';
-	import { switchSession } from '$lib/sessions';
-	import { getColorScheme, isDebugMode, setSetting } from '$lib/settings.svelte';
-	import { toasts } from '$lib/toasts.svelte';
-	import { uiState } from '$lib/uistate.svelte.js';
-	import { undo } from '$lib/undo.svelte';
-	import { nonnull, pick } from '$lib/utils';
 
 	import ModalCreateCustomNeuralNetwork from './ModalCreateCustomNeuralNetwork.svelte';
 	import Navigation from './Navigation.svelte';
@@ -55,7 +55,7 @@
 	// TODO(2026-01-24) remove at some point
 	onMount(() => {
 		if (page.url.hash.startsWith('#/')) {
-			goto(base + page.url.hash.slice(1));
+			goto(resolve(page.url.hash.slice(1).slice(1)));
 		}
 	});
 

@@ -1,16 +1,17 @@
 <script lang="ts">
 	import type { Expandable } from './WithExpandButton.svelte';
-	import type { Props as CarouselProps } from '$lib/Carousel.svelte';
-	import type { Image } from '$lib/database';
+	import type { Props as CarouselProps } from '#lib/Carousel.svelte';
+	import type { Image } from '#lib/database.js';
+
+	import { FULL_IMAGE_CROPBOX, toTopLeftCoords } from '#lib/BoundingBoxes.svelte.js';
+	import ButtonIcon from '#lib/ButtonIcon.svelte';
+	import Carousel from '#lib/Carousel.svelte';
+	import CroppedImg from '#lib/CroppedImg.svelte';
+	import { defineKeyboardShortcuts } from '#lib/keyboard.svelte.js';
+	import { uiState } from '#lib/uistate.svelte.js';
 
 	import IconZoomIn from '~icons/ri/zoom-in-line';
 	import IconZoomOut from '~icons/ri/zoom-out-line';
-	import { FULL_IMAGE_CROPBOX, toTopLeftCoords } from '$lib/BoundingBoxes.svelte';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import Carousel from '$lib/Carousel.svelte';
-	import CroppedImg from '$lib/CroppedImg.svelte';
-	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
-	import { uiState } from '$lib/uistate.svelte.js';
 
 	import WithExpandButton from './WithExpandButton.svelte';
 

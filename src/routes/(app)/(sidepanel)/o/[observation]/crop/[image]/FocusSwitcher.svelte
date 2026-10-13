@@ -1,14 +1,14 @@
 <script lang="ts">
 	import type { SelectedBox } from './+page.svelte';
 
+	import { toTopLeftCoords } from '#lib/BoundingBoxes.svelte.js';
+	import ConfidencePercentage from '#lib/ConfidencePercentage.svelte';
+	import CroppedImg from '#lib/CroppedImg.svelte';
+	import { tables } from '#lib/idb.svelte.js';
+	import { uiState } from '#lib/uistate.svelte.js';
 	import { fade, fly } from 'svelte/transition';
 
 	import IconAdd from '~icons/ri/add-line';
-	import { toTopLeftCoords } from '$lib/BoundingBoxes.svelte';
-	import ConfidencePercentage from '$lib/ConfidencePercentage.svelte';
-	import CroppedImg from '$lib/CroppedImg.svelte';
-	import { tables } from '$lib/idb.svelte';
-	import { uiState } from '$lib/uistate.svelte';
 
 	import {
 		boundingBoxes,

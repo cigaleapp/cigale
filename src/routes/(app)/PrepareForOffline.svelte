@@ -1,14 +1,13 @@
 <script>
+	import ButtonPrimary from '#lib/ButtonPrimary.svelte';
+	import { tables } from '#lib/idb.svelte.js';
+	import LoadingSpinner from '#lib/LoadingSpinner.svelte';
+	import Modal from '#lib/Modal.svelte';
+	import { prepareForOfflineUse } from '#lib/offline.js';
+	import ProgressBar from '#lib/ProgressBar.svelte';
+	import { toastIcon } from '#lib/Toast.svelte';
+	import { clamp } from '#lib/utils.js';
 	import { SvelteMap } from 'svelte/reactivity';
-
-	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
-	import { tables } from '$lib/idb.svelte';
-	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
-	import Modal from '$lib/Modal.svelte';
-	import { prepareForOfflineUse } from '$lib/offline';
-	import ProgressBar from '$lib/ProgressBar.svelte';
-	import { toastIcon } from '$lib/Toast.svelte';
-	import { clamp } from '$lib/utils';
 
 	let { open = $bindable() } = $props();
 

@@ -1,9 +1,9 @@
 <script lang="ts">
 	import type { Layout } from './layout.js';
 
-	import DebugOnly from '$lib/DebugOnly.svelte';
-	import { tables } from '$lib/idb.svelte.js';
-	import { transformObject, unique } from '$lib/utils.js';
+	import DebugOnly from '#lib/DebugOnly.svelte';
+	import { tables } from '#lib/idb.svelte.js';
+	import { transformObject, unique } from '#lib/utils.js';
 
 	import Block from './Block.svelte';
 	import { cssGridAreas, homogenizeLayout, verticalAutoLayout } from './layout.js';

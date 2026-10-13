@@ -1,13 +1,13 @@
 <script lang="ts">
+	import EnumButtons from '#lib/EnumButtons.svelte';
+	import Field from '#lib/Field.svelte';
+	import InlineTextInput from '#lib/InlineTextInput.svelte';
+	import Tooltip from '#lib/Tooltip.svelte';
 	import { tick } from 'svelte';
 
 	import IconCroppedOnly from '~icons/ri/crop-line';
 	import IconMetadataOnly from '~icons/ri/list-view';
 	import IconFullExport from '~icons/ri/multi-image-line';
-	import EnumButtons from '$lib/EnumButtons.svelte';
-	import Field from '$lib/Field.svelte';
-	import InlineTextInput from '$lib/InlineTextInput.svelte';
-	import Tooltip from '$lib/Tooltip.svelte';
 
 	import { exporter } from './files.svelte.js';
 

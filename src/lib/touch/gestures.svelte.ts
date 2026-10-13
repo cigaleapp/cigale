@@ -1,6 +1,5 @@
+import { avg, iterateDOMList } from '#lib/utils.js';
 import { SvelteMap } from 'svelte/reactivity';
-
-import { avg, iterateDOMList } from '$lib/utils.js';
 
 export type ClientPoint = { clientX: number; clientY: number };
 
