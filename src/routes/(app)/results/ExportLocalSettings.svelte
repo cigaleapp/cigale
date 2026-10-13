@@ -40,72 +40,11 @@
 		/>
 	</Field>
 </div>
-<div class="crop-padding" class:irrelevant={exporter.include === 'metadataonly'}>
-	<Field>
-		{#snippet label()}
-			Marge de recadrage
-			<p class="fineprint"></p>
-		{/snippet}
-		<EnumButtons
-			bind:value={exporter.cropPaddingPreset}
-			horizontal
-			--option-min-width="5rem"
-			options={[
-				{ key: 'none', label: 'Aucune' },
-				// { key: 'small', label: '5%' },
-				// { key: 'medium', label: '10%' },
-				{ key: 'customPercent', label: '?%' },
-				{ key: 'customPixels', label: '?px' },
-			]}
-		>
-			{#snippet children({ key: option, label })}
-				{#if option.startsWith('custom')}
-					<div
-						class="numeric"
-						style:--width={exporter.unitOfPreset(option) === '%' ? '4ch' : '5ch'}
-					>
-						<InlineTextInput
-							label={option === 'customPercent'
-								? "en pourcentage des dimensions de l'image"
-								: 'en pixels'}
-							value={exporter.cropPaddingDisplay(option)}
-							onblur={async (newValue) => {
-								// otherwise, the input value updates to a '?' too quickly when changing value but not unit
-								await tick();
-								exporter.updateCropPadding(newValue, option);
-							}}
-						/>
-						{exporter.unitOfPreset(option)}
-					</div>
-				{:else}
-					{label}
-				{/if}
-			{/snippet}
-		</EnumButtons>
-	</Field>
-</div>
 
 <style>
-	.crop-padding,
 	.include {
 		display: flex;
 		flex-direction: column;
 		accent-color: var(--fg-primary);
-	}
-
-	.crop-padding.irrelevant {
-		opacity: 0.5;
-		pointer-events: none;
-	}
-
-	.crop-padding .numeric {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.5em;
-		overflow: hidden;
-	}
-
-	.crop-padding .numeric :global(input) {
-		width: var(--width, 3ch);
 	}
 </style>
