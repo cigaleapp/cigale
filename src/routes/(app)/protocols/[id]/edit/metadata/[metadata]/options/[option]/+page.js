@@ -1,9 +1,8 @@
 import { error } from '@sveltejs/kit';
-
-import { databaseHandle, get, tables } from '$lib/idb.svelte.js';
-import { metadataOptionsKeyRange, metadataOptionsOf } from '$lib/metadata/index.js';
-import { metadataOptionId, namespacedMetadataId } from '$lib/schemas/metadata.js';
-import { entries } from '$lib/utils.js';
+import { databaseHandle, get, tables } from '#lib/idb.svelte.js';
+import { metadataOptionsKeyRange, metadataOptionsOf } from '#lib/metadata/index.js';
+import { metadataOptionId, namespacedMetadataId } from '#lib/schemas/metadata.js';
+import { entries } from '#lib/utils.js';
 
 export async function load({ parent, params }) {
 	if (!params.id) throw error(400, 'Protocol ID is required');
@@ -23,7 +22,7 @@ export async function load({ parent, params }) {
 			const metadata = await tables.Metadata.get(fullMetadataId);
 			if (!metadata) return { metadataId: fullMetadataId };
 
-			/** @type {import('$lib/database').MetadataEnumVariant | undefined} */
+			/** @type {import('#lib/database.js').MetadataEnumVariant | undefined} */
 			let option = undefined;
 			if (metadata.type === 'enum') {
 				option = await get('MetadataOption', metadataOptionId(fullMetadataId, value));

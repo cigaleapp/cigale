@@ -1,5 +1,5 @@
 import type { LocalStorage } from './procedures.js';
-import type { IDBDatabaseType } from '$lib/idb.svelte.js';
+import type { IDBDatabaseType } from '#lib/idb.svelte.js';
 import type { IDBPDatabase } from 'idb';
 
 import { openDB } from 'idb';

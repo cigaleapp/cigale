@@ -3,7 +3,7 @@ import { modelUrl } from './inference.js';
 import { fetchHttpRequest, nonnull } from './utils.js';
 
 /**
- * @import * as DB from '$lib/database';
+ * @import * as DB from '#lib/database.js';
  */
 
 /**

@@ -1,10 +1,9 @@
-import { ArkErrors } from 'arktype';
-
 import {
 	GeocodeJSONPointFeature,
 	GeocodeJSONProperties,
 	GeoJSONFeatureCollection,
-} from '$lib/geojson.js';
+} from '#lib/geojson.js';
+import { ArkErrors } from 'arktype';
 
 const NominatimResponseSchemas = {
 	Reverse: GeoJSONFeatureCollection(GeocodeJSONPointFeature),

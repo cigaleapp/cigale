@@ -2,6 +2,13 @@
 	import type { Item, SubcomponentProps } from './Combobox.svelte';
 
 	import Icon from '@iconify/svelte';
+	import ButtonIcon from '#lib/ButtonIcon.svelte';
+	import ButtonPrimary from '#lib/ButtonPrimary.svelte';
+	import ConfidencePercentage from '#lib/ConfidencePercentage.svelte';
+	import DebugOnly from '#lib/DebugOnly.svelte';
+	import { errorMessage } from '#lib/i18n.js';
+	import LoadingScreen from '#lib/LoadingScreen.svelte';
+	import { corsfixIfLocalhost, readableOn, switchConditions } from '#lib/utils.js';
 	import { uniqBy } from 'es-toolkit';
 	import { Debounced } from 'runed';
 	import { fade } from 'svelte/transition';
@@ -10,13 +17,6 @@
 	import IconSelected from '~icons/ri/check-line';
 	import IconClear from '~icons/ri/close-line';
 	import IconSearch from '~icons/ri/search-line';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
-	import ConfidencePercentage from '$lib/ConfidencePercentage.svelte';
-	import DebugOnly from '$lib/DebugOnly.svelte';
-	import { errorMessage } from '$lib/i18n';
-	import LoadingScreen from '$lib/LoadingScreen.svelte';
-	import { corsfixIfLocalhost, readableOn, switchConditions } from '$lib/utils';
 
 	let {
 		initially,

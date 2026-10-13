@@ -1,16 +1,17 @@
+import { promptForFiles } from '#lib/files.js';
+import { satisfiesHardwareRequirements } from '#lib/hardware-requirements.js';
+import { databaseHandle, tables } from '#lib/idb.svelte.js';
+import { resolveDefaults } from '#lib/metadata/defaults.js';
+import { metadataUsedByProtocol } from '#lib/metadata/imports.js';
+import { pickProtocol } from '#lib/ModalPickProtocol.svelte';
+import { goto } from '#lib/paths.js';
+import { defaultClassificationMetadata, defaultCropMetadata } from '#lib/protocols.js';
+import { importMore } from '#lib/queue.svelte.js';
+import { isNamespacedToProtocol } from '#lib/schemas/metadata.js';
+import { switchSession } from '#lib/sessions.js';
+import { compareBy, nonnull, orEmptyObj } from '#lib/utils.js';
+
 import IconImport from '~icons/ri/import-line';
-import { promptForFiles } from '$lib/files';
-import { satisfiesHardwareRequirements } from '$lib/hardware-requirements.js';
-import { databaseHandle, tables } from '$lib/idb.svelte.js';
-import { resolveDefaults } from '$lib/metadata/defaults.js';
-import { metadataUsedByProtocol } from '$lib/metadata/imports.js';
-import { pickProtocol } from '$lib/ModalPickProtocol.svelte';
-import { goto } from '$lib/paths.js';
-import { defaultClassificationMetadata, defaultCropMetadata } from '$lib/protocols.js';
-import { importMore } from '$lib/queue.svelte';
-import { isNamespacedToProtocol } from '$lib/schemas/metadata.js';
-import { switchSession } from '$lib/sessions.js';
-import { compareBy, nonnull, orEmptyObj } from '$lib/utils.js';
 
 export async function createSession() {
 	await pickProtocol({

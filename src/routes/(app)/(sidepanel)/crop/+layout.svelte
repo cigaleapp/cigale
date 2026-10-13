@@ -1,19 +1,18 @@
 <script lang="ts">
-	import type { NeuralModelSelector } from '$lib/schemas/sessions.js';
+	import type { NeuralModelSelector } from '#lib/schemas/sessions.js';
 
+	import { databaseHandle } from '#lib/idb.svelte.js';
+	import { loadModel } from '#lib/inference.js';
+	import Logo from '#lib/Logo.svelte';
+	import ProgressBar from '#lib/ProgressBar.svelte';
+	import { getSetting } from '#lib/settings.svelte.js';
+	import { toasts } from '#lib/toasts.svelte.js';
+	import { uiState } from '#lib/uistate.svelte.js';
+	import { isAbortError } from '#lib/utils.js';
 	import { dequal } from 'dequal';
 	import { watch } from 'runed';
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
-
-	import { databaseHandle } from '$lib/idb.svelte.js';
-	import { loadModel } from '$lib/inference.js';
-	import Logo from '$lib/Logo.svelte';
-	import ProgressBar from '$lib/ProgressBar.svelte';
-	import { getSetting } from '$lib/settings.svelte.js';
-	import { toasts } from '$lib/toasts.svelte';
-	import { uiState } from '$lib/uistate.svelte.js';
-	import { isAbortError } from '$lib/utils.js';
 
 	const { data, children } = $props();
 

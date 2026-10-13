@@ -16,7 +16,7 @@
 	import { tooltip } from './tooltips.js';
 	import { LOREM_IPSUM } from './utils.js';
 
-	import '$lib/skeleton-font.css';
+	import '#lib/skeleton-font.css';
 
 	import type { Snippet } from 'svelte';
 

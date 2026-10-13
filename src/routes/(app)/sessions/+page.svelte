@@ -1,24 +1,24 @@
 <script lang="ts">
+	import { providers } from '#lib/accounts/registry.js';
+	import ButtonIcon from '#lib/ButtonIcon.svelte';
+	import Datetime from '#lib/Datetime.svelte';
+	import { errorMessage, plural } from '#lib/i18n.js';
+	import { countByIndex, databaseHandle, listByIndex, tables } from '#lib/idb.svelte.js';
+	import { loadPreviewImage } from '#lib/images.js';
+	import { defineKeyboardShortcuts } from '#lib/keyboard.svelte.js';
+	import LoadingText from '#lib/LoadingText.svelte';
+	import { IsMobile } from '#lib/mobile.svelte.js';
+	import { goto } from '#lib/paths.js';
+	import { seo } from '#lib/seo.svelte.js';
+	import { switchSession } from '#lib/sessions.js';
+	import { getSettings, isDebugMode } from '#lib/settings.svelte.js';
+	import { toasts } from '#lib/toasts.svelte.js';
+	import { uiState } from '#lib/uistate.svelte.js';
+	import { nonnull } from '#lib/utils.js';
 	import { SvelteMap } from 'svelte/reactivity';
 	import { fade } from 'svelte/transition';
 
 	import IconAdd from '~icons/ri/add-line';
-	import { providers } from '$lib/accounts/registry.js';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import Datetime from '$lib/Datetime.svelte';
-	import { errorMessage, plural } from '$lib/i18n.js';
-	import { countByIndex, databaseHandle, listByIndex, tables } from '$lib/idb.svelte.js';
-	import { loadPreviewImage } from '$lib/images.js';
-	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
-	import LoadingText from '$lib/LoadingText.svelte';
-	import { IsMobile } from '$lib/mobile.svelte.js';
-	import { goto } from '$lib/paths.js';
-	import { seo } from '$lib/seo.svelte';
-	import { switchSession } from '$lib/sessions.js';
-	import { getSettings, isDebugMode } from '$lib/settings.svelte.js';
-	import { toasts } from '$lib/toasts.svelte.js';
-	import { uiState } from '$lib/uistate.svelte.js';
-	import { nonnull } from '$lib/utils.js';
 
 	import TopbarHome from '../TopbarHome.svelte';
 	import Cards from './Cards.svelte';

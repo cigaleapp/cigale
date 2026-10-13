@@ -1,8 +1,35 @@
 <script lang="ts">
-	import type { NamespacedMetadataID } from '$lib/schemas/common.js';
-	import type { NeuralInference } from '$lib/schemas/neural';
+	import type { NamespacedMetadataID } from '#lib/schemas/common.js';
+	import type { NeuralInference } from '#lib/schemas/neural.js';
 	import type { Snippet } from 'svelte';
 
+	import ButtonIcon from '#lib/ButtonIcon.svelte';
+	import DropdownMenu from '#lib/DropdownMenu.svelte';
+	import { promptForFiles } from '#lib/files.js';
+	import { assertHardwareRequirements } from '#lib/hardware-requirements.js';
+	import { errorMessage } from '#lib/i18n.js';
+	import { tables } from '#lib/idb.svelte.js';
+	import { ACCEPTED_IMPORT_TYPES } from '#lib/import.svelte.js';
+	import { resolveMetadataImport } from '#lib/metadata/namespacing.js';
+	import { IsMobile } from '#lib/mobile.svelte.js';
+	import { globalModals } from '#lib/modals.svelte.js';
+	import { goto } from '#lib/paths.js';
+	import { metadataDefinitionComparator } from '#lib/protocols.js';
+	import { importMore } from '#lib/queue.svelte.js';
+	import { removeNamespaceFromMetadataId } from '#lib/schemas/metadata.js';
+	import {
+		GROUP_FIELDS,
+		GROUPING_TOLERANCES,
+		GroupSettings,
+		NeuralModelSelector,
+		SORT_FIELDS,
+		sortOrGroupFieldNeedsMetadata,
+		SortSettings,
+	} from '#lib/schemas/sessions.js';
+	import { toasts } from '#lib/toasts.svelte.js';
+	import { tooltip } from '#lib/tooltips.js';
+	import { uiState } from '#lib/uistate.svelte.js';
+	import { entries, nonnull, orEmpty } from '#lib/utils.js';
 	import { dequal } from 'dequal';
 	import { scale } from 'svelte/transition';
 
@@ -17,33 +44,6 @@
 	import IconInferenceEnabled from '~icons/ri/sparkling-line';
 	import IconImport from '~icons/ri/upload-2-line';
 	import IconModelCustom from '~icons/ri/wrench-line';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import DropdownMenu from '$lib/DropdownMenu.svelte';
-	import { promptForFiles } from '$lib/files.js';
-	import { assertHardwareRequirements } from '$lib/hardware-requirements.js';
-	import { errorMessage } from '$lib/i18n.js';
-	import { tables } from '$lib/idb.svelte.js';
-	import { ACCEPTED_IMPORT_TYPES } from '$lib/import.svelte.js';
-	import { resolveMetadataImport } from '$lib/metadata/namespacing.js';
-	import { IsMobile } from '$lib/mobile.svelte.js';
-	import { globalModals } from '$lib/modals.svelte.js';
-	import { goto } from '$lib/paths.js';
-	import { metadataDefinitionComparator } from '$lib/protocols.js';
-	import { importMore } from '$lib/queue.svelte.js';
-	import { removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';
-	import {
-		GROUP_FIELDS,
-		GROUPING_TOLERANCES,
-		GroupSettings,
-		NeuralModelSelector,
-		SORT_FIELDS,
-		sortOrGroupFieldNeedsMetadata,
-		SortSettings,
-	} from '$lib/schemas/sessions.js';
-	import { toasts } from '$lib/toasts.svelte.js';
-	import { tooltip } from '$lib/tooltips.js';
-	import { uiState } from '$lib/uistate.svelte.js';
-	import { entries, nonnull, orEmpty } from '$lib/utils.js';
 
 	type ModelSelector = (typeof NeuralModelSelector)['infer'];
 

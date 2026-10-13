@@ -1,7 +1,6 @@
 import { error } from '@sveltejs/kit';
-
-import * as idb from '$lib/idb.svelte.js';
-import { tables } from '$lib/idb.svelte.js';
+import * as idb from '#lib/idb.svelte.js';
+import { tables } from '#lib/idb.svelte.js';
 
 export async function load({ params: { id }, depends }) {
 	depends(idb.dependencyURI('Session', id));

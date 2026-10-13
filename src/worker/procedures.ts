@@ -1,10 +1,9 @@
 import type { ProceduresMap } from 'swarpc';
 
+import { Schemas } from '#lib/database.js';
+import { NodeProvenance } from '#lib/file-tree.js';
+import { NamespacedMetadataID } from '#lib/schemas/common.js';
 import { type } from 'arktype';
-
-import { Schemas } from '$lib/database.js';
-import { NodeProvenance } from '$lib/file-tree.js';
-import { NamespacedMetadataID } from '$lib/schemas/common.js';
 
 export const LOCAL_STORAGE = type({
 	databaseName: 'string',

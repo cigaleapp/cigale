@@ -1,17 +1,17 @@
 <script lang="ts">
+	import ButtonIcon from '#lib/ButtonIcon.svelte';
+	import { formatDistanceToNowShortParts } from '#lib/date.js';
+	import OverflowableText from '#lib/OverflowableText.svelte';
+	import { goto } from '#lib/paths.js';
+	import { switchSession } from '#lib/sessions.js';
+	import { locale } from '#lib/settings.svelte.js';
+	import { tooltip } from '#lib/tooltips.js';
+	import { uiState } from '#lib/uistate.svelte.js';
 	import { formatDistanceToNow } from 'date-fns';
 
 	import IconClose from '~icons/ri/arrow-left-s-line';
 	import IconSettings from '~icons/ri/more-2-fill';
 	import { page } from '$app/state';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import { formatDistanceToNowShortParts } from '$lib/date.js';
-	import OverflowableText from '$lib/OverflowableText.svelte';
-	import { goto } from '$lib/paths.js';
-	import { switchSession } from '$lib/sessions.js';
-	import { locale } from '$lib/settings.svelte.js';
-	import { tooltip } from '$lib/tooltips.js';
-	import { uiState } from '$lib/uistate.svelte.js';
 
 	import ModalSubmitIssue from './ModalSubmitIssue.svelte';
 	import TabSettings from './TabSettings.svelte';

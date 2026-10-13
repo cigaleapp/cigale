@@ -1,37 +1,30 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 
 import type { Account, AccountCapability, AuthenticationMethod, LoginData } from './types.js';
-import type * as DB from '$lib/database.js';
-import type { DatabaseHandle } from '$lib/idb.svelte.js';
-import type { RuntimeValue } from '$lib/schemas/metadata.js';
+import type * as DB from '#lib/database.js';
+import type { DatabaseHandle } from '#lib/idb.svelte.js';
+import type { RuntimeValue } from '#lib/schemas/metadata.js';
 import type { FetchProgressData } from 'fetch-progress';
 
 import { Capacitor, CapacitorHttp } from '@capacitor/core';
-import { ArkErrors, type, Type } from 'arktype';
-import { RateLimit } from 'async-sema';
-import * as dates from 'date-fns';
-import { differenceInSeconds, isPast } from 'date-fns';
-import fetchProgress from 'fetch-progress';
-import * as YAML from 'yaml';
-
-import { coordsScaler } from '$lib/BoundingBoxes.svelte.js';
-import { generateId, Schemas, Tables } from '$lib/database.js';
-import { imageFileId, imageId, parseImageId } from '$lib/images.js';
-import { boundingBoxResolver } from '$lib/inference_utils.js';
-import { Channel, concurrently, poll } from '$lib/iterables.js';
-import { resolveMetadataImport, resolveMetadataImportBare } from '$lib/metadata/namespacing.js';
+import { coordsScaler } from '#lib/BoundingBoxes.svelte.js';
+import { generateId, Schemas, Tables } from '#lib/database.js';
+import { imageFileId, imageId, parseImageId } from '#lib/images.js';
+import { boundingBoxResolver } from '#lib/inference_utils.js';
+import { Channel, concurrently, poll } from '#lib/iterables.js';
+import { resolveMetadataImport, resolveMetadataImportBare } from '#lib/metadata/namespacing.js';
 import {
 	metadataRecordToSerialized,
 	serializeMetadataFullValue,
 	serializeMetadataValue,
-} from '$lib/metadata/serializing.js';
-import { hasRuntimeType } from '$lib/metadata/types.js';
-import { fallbackObservationLabel } from '$lib/observations.js';
-import { NamespacedMetadataID } from '$lib/schemas/common.js';
-import { MetadataRecord, removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';
-import { toMetadataRecord } from '$lib/schemas/results.js';
-import { SessionRemoteID } from '$lib/schemas/sessions.js';
-import { byteSizeOfObject, createBytes, streamBytes } from '$lib/storage/utils.js';
+} from '#lib/metadata/serializing.js';
+import { hasRuntimeType } from '#lib/metadata/types.js';
+import { fallbackObservationLabel } from '#lib/observations.js';
+import { NamespacedMetadataID } from '#lib/schemas/common.js';
+import { MetadataRecord, removeNamespaceFromMetadataId } from '#lib/schemas/metadata.js';
+import { toMetadataRecord } from '#lib/schemas/results.js';
+import { SessionRemoteID } from '#lib/schemas/sessions.js';
+import { byteSizeOfObject, createBytes, streamBytes } from '#lib/storage/utils.js';
 import {
 	clamp,
 	ensureArray,
@@ -45,7 +38,13 @@ import {
 	throwError,
 	transformObject,
 	unique,
-} from '$lib/utils.js';
+} from '#lib/utils.js';
+import { ArkErrors, type, Type } from 'arktype';
+import { RateLimit } from 'async-sema';
+import * as dates from 'date-fns';
+import { differenceInSeconds, isPast } from 'date-fns';
+import fetchProgress from 'fetch-progress';
+import * as YAML from 'yaml';
 
 type DBIn = {
 	[table in keyof typeof DB.Tables]: (typeof DB.Tables)[table]['inferIn'];

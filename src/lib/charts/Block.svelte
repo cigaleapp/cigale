@@ -1,31 +1,31 @@
 <script lang="ts">
-	import type { TypedMetadataValue } from '$lib/metadata';
-	import type { ChartBlock, ComputationPayloadSession } from '$lib/schemas/charts.js';
+	import type { TypedMetadataValue } from '#lib/metadata/index.js';
+	import type { ChartBlock, ComputationPayloadSession } from '#lib/schemas/charts.js';
 
-	import { BarChart, PieChart } from 'layerchart';
-	import { IsInViewport } from 'runed';
-
-	import IconToggleDefinition from '~icons/ri/code-line';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import Carousel from '$lib/Carousel.svelte';
-	import DebugOnly from '$lib/DebugOnly.svelte';
-	import { databaseHandle, get, tables } from '$lib/idb.svelte.js';
-	import LearnMoreLink from '$lib/LearnMoreLink.svelte';
-	import LoadingText, { Loading } from '$lib/LoadingText.svelte';
-	import Markdown from '$lib/Markdown.svelte';
-	import { metadataOption } from '$lib/metadata';
-	import { resolveMetadataImport } from '$lib/metadata/imports.js';
-	import { mergeMetadataFromImagesAndObservations } from '$lib/metadata/merging.js';
+	import ButtonIcon from '#lib/ButtonIcon.svelte';
+	import Carousel from '#lib/Carousel.svelte';
+	import DebugOnly from '#lib/DebugOnly.svelte';
+	import { databaseHandle, get, tables } from '#lib/idb.svelte.js';
+	import LearnMoreLink from '#lib/LearnMoreLink.svelte';
+	import LoadingText, { Loading } from '#lib/LoadingText.svelte';
+	import Markdown from '#lib/Markdown.svelte';
+	import { resolveMetadataImport } from '#lib/metadata/imports.js';
+	import { metadataOption } from '#lib/metadata/index.js';
+	import { mergeMetadataFromImagesAndObservations } from '#lib/metadata/merging.js';
 	import {
 		ensureNamespacedMetadataId,
 		metadataOptionId,
 		removeNamespaceFromMetadataId,
 		splitMetadataId,
-	} from '$lib/schemas/metadata.js';
-	import { toMetadataRecord } from '$lib/schemas/results.js';
-	import { isDebugMode } from '$lib/settings.svelte.js';
-	import { uiState } from '$lib/uistate.svelte';
-	import { clamp, corsfixIfLocalhost, ensureArray, mapKeys } from '$lib/utils.js';
+	} from '#lib/schemas/metadata.js';
+	import { toMetadataRecord } from '#lib/schemas/results.js';
+	import { isDebugMode } from '#lib/settings.svelte.js';
+	import { uiState } from '#lib/uistate.svelte.js';
+	import { clamp, corsfixIfLocalhost, ensureArray, mapKeys } from '#lib/utils.js';
+	import { BarChart, PieChart } from 'layerchart';
+	import { IsInViewport } from 'runed';
+
+	import IconToggleDefinition from '~icons/ri/code-line';
 
 	type BlockTypes = (typeof ChartBlock)['infer']['type'];
 	type BlockData<Type extends BlockTypes = BlockTypes> = (typeof ChartBlock)['infer'] & {

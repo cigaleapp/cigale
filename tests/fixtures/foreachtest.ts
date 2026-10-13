@@ -1,7 +1,7 @@
 import { mkdir, rm } from 'node:fs/promises';
+import type { ExportedProtocol } from '#lib/schemas/protocols.js';
 import type { ExtraTestArgs } from '$e2e/fixtures.js';
 import type { PredownloadedModel } from '$e2e/utils/index.js';
-import type { ExportedProtocol } from '$lib/schemas/protocols.js';
 
 import {
 	type PlaywrightTestArgs,

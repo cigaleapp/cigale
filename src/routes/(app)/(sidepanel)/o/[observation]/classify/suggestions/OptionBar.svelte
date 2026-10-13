@@ -1,23 +1,24 @@
 <script lang="ts">
-	import type { Metadata, MetadataEnumVariant, Observation } from '$lib/database.js';
-	import type { TypedMetadataValue } from '$lib/metadata/index.js';
-	import type { Props as ComboboxProps } from '$lib/MetadataCombobox.svelte';
+	import type { Metadata, MetadataEnumVariant, Observation } from '#lib/database.js';
+	import type { TypedMetadataValue } from '#lib/metadata/index.js';
+	import type { Props as ComboboxProps } from '#lib/MetadataCombobox.svelte';
+
+	import ButtonSecondary from '#lib/ButtonSecondary.svelte';
+	import ConfidencePercentage from '#lib/ConfidencePercentage.svelte';
+	import { dependencyURI, openDatabase } from '#lib/idb.svelte.js';
+	import { defineKeyboardShortcuts } from '#lib/keyboard.svelte.js';
+	import { storeMetadataValue } from '#lib/metadata/index.js';
+	import MetadataCombobox from '#lib/MetadataCombobox.svelte';
+	import { IsMobile } from '#lib/mobile.svelte.js';
+	import OverflowableText from '#lib/OverflowableText.svelte';
+	import { uiState } from '#lib/uistate.svelte.js';
+	import { undo } from '#lib/undo.svelte.js';
+	import { compareBy, mapKeys, nonnull } from '#lib/utils.js';
 
 	import IconPrevious from '~icons/ri/arrow-left-line';
 	import IconNext from '~icons/ri/arrow-right-line';
 	import IconExpand from '~icons/ri/expand-up-down-line';
 	import { invalidate } from '$app/navigation';
-	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import ConfidencePercentage from '$lib/ConfidencePercentage.svelte';
-	import { dependencyURI, openDatabase } from '$lib/idb.svelte.js';
-	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
-	import { storeMetadataValue } from '$lib/metadata/index.js';
-	import MetadataCombobox from '$lib/MetadataCombobox.svelte';
-	import { IsMobile } from '$lib/mobile.svelte';
-	import OverflowableText from '$lib/OverflowableText.svelte';
-	import { uiState } from '$lib/uistate.svelte.js';
-	import { undo } from '$lib/undo.svelte.js';
-	import { compareBy, mapKeys, nonnull } from '$lib/utils.js';
 
 	interface Props {
 		observation: Observation;

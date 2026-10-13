@@ -9,14 +9,15 @@
 </script>
 
 <script lang="ts" generics="Entry extends EntryBase">
+	import ButtonIcon from '#lib/ButtonIcon.svelte';
+	import { formatBytesSize } from '#lib/i18n.js';
+	import LoadingText, { Loading } from '#lib/LoadingText.svelte';
+	import OverflowableText from '#lib/OverflowableText.svelte';
+	import Tooltip from '#lib/Tooltip.svelte';
+	import { tooltip } from '#lib/tooltips.js';
+
 	import IconOpen from '~icons/ri/arrow-right-up-box-line';
 	import IconTrash from '~icons/ri/delete-bin-2-line';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import { formatBytesSize } from '$lib/i18n.js';
-	import LoadingText, { Loading } from '$lib/LoadingText.svelte';
-	import OverflowableText from '$lib/OverflowableText.svelte';
-	import Tooltip from '$lib/Tooltip.svelte';
-	import { tooltip } from '$lib/tooltips.js';
 
 	import { estimateStorageQuotaUsage } from './+page.svelte';
 

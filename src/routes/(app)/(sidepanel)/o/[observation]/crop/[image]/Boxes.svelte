@@ -14,24 +14,25 @@
 
 <script lang="ts">
 	import type { SelectedBox } from './+page.svelte';
-	import type { CenteredBoundingBox } from '$lib/BoundingBoxes.svelte.js';
+	import type { CenteredBoundingBox } from '#lib/BoundingBoxes.svelte.js';
+
+	import { coordsScaler, toTopLeftCoords } from '#lib/BoundingBoxes.svelte.js';
+	import ButtonIcon from '#lib/ButtonIcon.svelte';
+	import ButtonInk from '#lib/ButtonInk.svelte';
+	import ConfidencePercentage from '#lib/ConfidencePercentage.svelte';
+	import CroppedImg from '#lib/CroppedImg.svelte';
+	import { percent } from '#lib/i18n.js';
+	import { IsMobile } from '#lib/mobile.svelte.js';
+	import OverflowableText from '#lib/OverflowableText.svelte';
+	import SentenceJoin from '#lib/SentenceJoin.svelte';
+	import Tooltip from '#lib/Tooltip.svelte';
+	import { uiState } from '#lib/uistate.svelte.js';
+	import { mapValues } from '#lib/utils.js';
 
 	import IconFocus from '~icons/ri/crosshair-line';
 	import IconDelete from '~icons/ri/delete-bin-line';
 	import IconRevert from '~icons/ri/reset-left-fill';
 	import IconNeuralNet from '~icons/ri/sparkling-line';
-	import { coordsScaler, toTopLeftCoords } from '$lib/BoundingBoxes.svelte.js';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import ButtonInk from '$lib/ButtonInk.svelte';
-	import ConfidencePercentage from '$lib/ConfidencePercentage.svelte';
-	import CroppedImg from '$lib/CroppedImg.svelte';
-	import { percent } from '$lib/i18n.js';
-	import { IsMobile } from '$lib/mobile.svelte';
-	import OverflowableText from '$lib/OverflowableText.svelte';
-	import SentenceJoin from '$lib/SentenceJoin.svelte';
-	import Tooltip from '$lib/Tooltip.svelte';
-	import { uiState } from '$lib/uistate.svelte.js';
-	import { mapValues } from '$lib/utils.js';
 
 	import {
 		currentImages,

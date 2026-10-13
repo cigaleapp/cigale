@@ -5,18 +5,18 @@
 </script>
 
 <script lang="ts">
-	import '$lib/tippy-svg-arrow.css';
+	import '#lib/tippy-svg-arrow.css';
 	import './style.css';
 
 	import { App as CapacitorApp } from '@capacitor/app';
 	import { SplashScreen } from '@capacitor/splash-screen';
+	import { Theme } from '#lib/colorscheme.svelte.js';
+	import { uiState } from '#lib/uistate.svelte.js';
+	import { fadeOutElement } from '#lib/utils.js';
 	import { createContext } from 'svelte';
 
 	import { goto } from '$app/navigation';
 	import { match, resolve } from '$app/paths';
-	import { Theme } from '$lib/colorscheme.svelte';
-	import { uiState } from '$lib/uistate.svelte.js';
-	import { fadeOutElement } from '$lib/utils';
 
 	const { children } = $props();
 

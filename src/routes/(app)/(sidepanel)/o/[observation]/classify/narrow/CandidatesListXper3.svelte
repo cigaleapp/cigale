@@ -1,10 +1,9 @@
 <script lang="ts">
+	import ButtonIcon from '#lib/ButtonIcon.svelte';
+	import ButtonSecondary from '#lib/ButtonSecondary.svelte';
+	import Modal from '#lib/Modal.svelte';
+	import IconExportCandidatesList from '#lib/Xper3Logo.svelte';
 	import { watch } from 'runed';
-
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import Modal from '$lib/Modal.svelte';
-	import IconExportCandidatesList from '$lib/Xper3Logo.svelte';
 
 	import { narrowingState } from './+layout.svelte';
 

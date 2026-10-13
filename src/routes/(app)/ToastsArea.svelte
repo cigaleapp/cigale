@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Toast from '$lib/Toast.svelte';
-	import { toasts } from '$lib/toasts.svelte.js';
+	import Toast from '#lib/Toast.svelte';
+	import { toasts } from '#lib/toasts.svelte.js';
 </script>
 
 <section class="toasts" pw-testid="toasts-area">

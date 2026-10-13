@@ -1,6 +1,7 @@
 <script lang="ts">
+	import { tooltip } from '#lib/tooltips.js';
+
 	import IconUser from '~icons/ri/user-line';
-	import { tooltip } from '$lib/tooltips.js';
 
 	import { corsfix, readableOn } from './utils.js';
 

@@ -1,20 +1,19 @@
-import type { ExifFieldKey } from '$lib/exiffields';
-import type { NamespacedMetadataID } from '$lib/schemas/common';
-import type { BinaryStorageLocator } from '$lib/storage/types.js';
+import type { ExifFieldKey } from '#lib/exiffields.js';
+import type { NamespacedMetadataID } from '#lib/schemas/common.js';
+import type { BinaryStorageLocator } from '#lib/storage/types.js';
 
 import { Capacitor } from '@capacitor/core';
+import { generateId } from '#lib/database.js';
+import { getCurrentLocation } from '#lib/geolocation.js';
+import { errorMessage } from '#lib/i18n.js';
+import * as idb from '#lib/idb.svelte.js';
+import { imageFileId } from '#lib/images.js';
+import { processImageFile } from '#lib/import.svelte.js';
+import { storeMetadataValue } from '#lib/metadata/index.js';
+import { binaryStorage } from '#lib/storage/index.js';
+import { toasts } from '#lib/toasts.svelte.js';
+import { uiState } from '#lib/uistate.svelte.js';
 import { GPSHelper } from 'piexifjs';
-
-import { generateId } from '$lib/database.js';
-import { getCurrentLocation } from '$lib/geolocation.js';
-import { errorMessage } from '$lib/i18n.js';
-import * as idb from '$lib/idb.svelte.js';
-import { imageFileId } from '$lib/images.js';
-import { processImageFile } from '$lib/import.svelte.js';
-import { storeMetadataValue } from '$lib/metadata/index.js';
-import { binaryStorage } from '$lib/storage/index.js';
-import { toasts } from '$lib/toasts.svelte.js';
-import { uiState } from '$lib/uistate.svelte';
 
 export const PENDING_PHOTOS_ROOT_FOLDER = '.pending_captures';
 

@@ -1,14 +1,15 @@
 <script>
+	import ButtonInk from '#lib/ButtonInk.svelte';
+	import IconDatatype from '#lib/IconDatatype.svelte';
+	import {
+		ensureNamespacedMetadataId,
+		removeNamespaceFromMetadataId,
+	} from '#lib/schemas/metadata.js';
+
 	import IconGoto from '~icons/ri/arrow-right-line';
 	import IconError from '~icons/ri/error-warning-line';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import ButtonInk from '$lib/ButtonInk.svelte';
-	import IconDatatype from '$lib/IconDatatype.svelte';
-	import {
-		ensureNamespacedMetadataId,
-		removeNamespaceFromMetadataId,
-	} from '$lib/schemas/metadata';
 
 	import { updater } from './updater.svelte';
 
@@ -17,7 +18,7 @@
 	 * @property {string|undefined} key
 	 * @property {string} [help] help text to display when metadata is found
 	 * @property {string} [no-metadata] help text to display when no metadata
-	 * @property {import('$lib/database').Metadata[]} definitions
+	 * @property {import('#lib/database.js').Metadata[]} definitions
 	 * @property {(metadataKey: string) => Promise<void>} [oncreate] callback when creating a new metadata. Argument is the namespace-less metadata id.
 	 * @property {Parameters<typeof updater<string>>[0]} [onupdate] callback when creating a new metadata. Second argument is the namespace-less metadata id.
 	 */

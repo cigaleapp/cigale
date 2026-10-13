@@ -5,7 +5,8 @@
 
 import { ms } from 'convert';
 
-import { build, files, version } from '$service-worker';
+import { build, files } from '$app/manifest';
+import { version } from '$app/env';
 
 // Create a unique cache name for this deployment
 const CACHE = `cache-${version}`;

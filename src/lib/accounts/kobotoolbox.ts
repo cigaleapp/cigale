@@ -1,24 +1,23 @@
 import type { DatabaseHandle } from '../idb.svelte.js';
-import type { Account, AuthenticationMethod, LoginData } from '$lib/accounts/types.js';
-import type * as DB from '$lib/database.js';
-import type { TypedMetadataValue } from '$lib/metadata/types.js';
-import type { RuntimeValue } from '$lib/schemas/metadata.js';
+import type { Account, AuthenticationMethod, LoginData } from '#lib/accounts/types.js';
+import type * as DB from '#lib/database.js';
+import type { TypedMetadataValue } from '#lib/metadata/types.js';
+import type { RuntimeValue } from '#lib/schemas/metadata.js';
 
+import { generateId, Schemas } from '#lib/database.js';
+import { resolveMetadataImport } from '#lib/metadata/imports.js';
+import { protocolMetadataValues } from '#lib/metadata/namespacing.js';
+import { serializeMetadataFullValue } from '#lib/metadata/serializing.js';
+import { metadataOptionsKeyRange } from '#lib/metadata/storage.js';
+import { MIMEType, NamespacedMetadataID } from '#lib/schemas/common.js';
+import { removeNamespaceFromMetadataId, splitMetadataId } from '#lib/schemas/metadata.js';
+import { toMetadataRecord } from '#lib/schemas/results.js';
+import { SessionRemoteID } from '#lib/schemas/sessions.js';
+import { createBytes } from '#lib/storage/utils.js';
+import { corsfix, ensureArray, mapValues } from '#lib/utils.js';
 import { Type, type } from 'arktype';
 import { RateLimit } from 'async-sema';
 import * as date from 'date-fns';
-
-import { generateId, Schemas } from '$lib/database.js';
-import { resolveMetadataImport } from '$lib/metadata/imports.js';
-import { protocolMetadataValues } from '$lib/metadata/namespacing.js';
-import { serializeMetadataFullValue } from '$lib/metadata/serializing.js';
-import { metadataOptionsKeyRange } from '$lib/metadata/storage.js';
-import { MIMEType, NamespacedMetadataID } from '$lib/schemas/common.js';
-import { removeNamespaceFromMetadataId, splitMetadataId } from '$lib/schemas/metadata.js';
-import { toMetadataRecord } from '$lib/schemas/results.js';
-import { SessionRemoteID } from '$lib/schemas/sessions.js';
-import { createBytes } from '$lib/storage/utils.js';
-import { corsfix, ensureArray, mapValues } from '$lib/utils.js';
 
 export default class Provider implements Account {
 	static id = 'kobotoolbox' as const;

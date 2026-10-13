@@ -1,15 +1,14 @@
-import type { NumericUnit } from '$lib/schemas/units.js';
+import type { NumericUnit } from '#lib/schemas/units.js';
 
-import { type } from 'arktype';
-import convert from 'convert';
-
-import { NaturalRegexExpression } from '$lib/schemas/constraints.js';
+import { NaturalRegexExpression } from '#lib/schemas/constraints.js';
 import {
 	MetadataDate,
 	MetadataFloat,
 	MetadataInteger,
 	MetadataString,
-} from '$lib/schemas/metadata.js';
+} from '#lib/schemas/metadata.js';
+import { type } from 'arktype';
+import convert from 'convert';
 
 export function metadataValueValidatorNumeric(
 	metadata: typeof MetadataInteger.infer | typeof MetadataFloat.infer,

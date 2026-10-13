@@ -1,10 +1,11 @@
 <script lang="ts">
-	import type { Pathname } from '$app/types';
+	import type { Path } from '$app/types';
 	import type { Snippet } from 'svelte';
 
+	import ButtonIcon from '#lib/ButtonIcon.svelte';
+	import { goto } from '#lib/paths.js';
+
 	import IconBack from '~icons/ri/arrow-left-s-line';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import { goto } from '$lib/paths.js';
 
 	import ModalSubmitIssue from './ModalSubmitIssue.svelte';
 	import TopbarContent from './TopbarContent.svelte';
@@ -12,7 +13,7 @@
 	interface Props {
 		children: Snippet;
 		/** Home by default */
-		to?: Pathname;
+		to?: Path;
 	}
 
 	const { children, to = '/sessions/' }: Props = $props();

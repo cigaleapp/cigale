@@ -1,11 +1,12 @@
 <script lang="ts">
-	import type * as DB from '$lib/database.js';
+	import type * as DB from '#lib/database.js';
+
+	import Badge from '#lib/Badge.svelte';
+	import LearnMoreLink from '#lib/LearnMoreLink.svelte';
+	import Markdown from '#lib/Markdown.svelte';
+	import { scrollfader } from '#lib/scrollfader.js';
 
 	import IconNoImage from '~icons/ri/question-line';
-	import Badge from '$lib/Badge.svelte';
-	import LearnMoreLink from '$lib/LearnMoreLink.svelte';
-	import Markdown from '$lib/Markdown.svelte';
-	import { scrollfader } from '$lib/scrollfader.js';
 
 	import { narrowingState } from './+layout.svelte';
 

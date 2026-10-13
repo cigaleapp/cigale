@@ -15,17 +15,18 @@
 </script>
 
 <script lang="ts">
+	import { formatBytesSize } from '#lib/i18n.js';
+	import { databaseHandle, list, listByIndex, tables } from '#lib/idb.svelte.js';
+	import * as idb from '#lib/idb.svelte.js';
+	import LoadingText, { Loading } from '#lib/LoadingText.svelte';
+	import { IsMobile } from '#lib/mobile.svelte.js';
+	import { goto } from '#lib/paths.js';
+	import ProgressBar from '#lib/ProgressBar.svelte';
+	import { deleteSession, switchSession } from '#lib/sessions.js';
+	import { byteSizeOfObject, deleteObjectWithBytes } from '#lib/storage/utils.js';
+	import { tooltip } from '#lib/tooltips.js';
+
 	import IconInfo from '~icons/ri/information-line';
-	import { formatBytesSize } from '$lib/i18n.js';
-	import { databaseHandle, list, listByIndex, tables } from '$lib/idb.svelte.js';
-	import * as idb from '$lib/idb.svelte.js';
-	import LoadingText, { Loading } from '$lib/LoadingText.svelte';
-	import { IsMobile } from '$lib/mobile.svelte.js';
-	import { goto } from '$lib/paths.js';
-	import ProgressBar from '$lib/ProgressBar.svelte';
-	import { deleteSession, switchSession } from '$lib/sessions.js';
-	import { byteSizeOfObject, deleteObjectWithBytes } from '$lib/storage/utils.js';
-	import { tooltip } from '$lib/tooltips.js';
 	import { PendingStorage } from '$routes/(app)/capture/pendingstorage.svelte.js';
 
 	import TopbarBack from '../TopbarBack.svelte';

@@ -2,21 +2,22 @@
 </script>
 
 <script lang="ts">
-	import type * as DB from '$lib/database.js';
+	import type * as DB from '#lib/database.js';
+
+	import ButtonPrimary from '#lib/ButtonPrimary.svelte';
+	import ButtonSecondary from '#lib/ButtonSecondary.svelte';
+	import Carousel from '#lib/Carousel.svelte';
+	import { cascadeLabels } from '#lib/cascades.js';
+	import LearnMoreLink from '#lib/LearnMoreLink.svelte';
+	import Markdown from '#lib/Markdown.svelte';
+	import { storeMetadataValue } from '#lib/metadata/storage.js';
+	import MetadataCascadesTable from '#lib/MetadataCascadesTable.svelte';
+	import { IsMobile } from '#lib/mobile.svelte.js';
+	import Modal from '#lib/Modal.svelte';
+	import { uiState } from '#lib/uistate.svelte.js';
+	import { splitRecord } from '#lib/utils.js';
 
 	import { page } from '$app/state';
-	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
-	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import Carousel from '$lib/Carousel.svelte';
-	import { cascadeLabels } from '$lib/cascades.js';
-	import LearnMoreLink from '$lib/LearnMoreLink.svelte';
-	import Markdown from '$lib/Markdown.svelte';
-	import { storeMetadataValue } from '$lib/metadata/storage.js';
-	import MetadataCascadesTable from '$lib/MetadataCascadesTable.svelte';
-	import { IsMobile } from '$lib/mobile.svelte';
-	import Modal from '$lib/Modal.svelte';
-	import { uiState } from '$lib/uistate.svelte.js';
-	import { splitRecord } from '$lib/utils.js';
 
 	import { narrowingState } from './+layout.svelte';
 

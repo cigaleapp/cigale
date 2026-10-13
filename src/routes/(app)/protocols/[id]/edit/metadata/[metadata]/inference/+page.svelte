@@ -1,15 +1,15 @@
 <script>
+	import EnumButtons from '#lib/EnumButtons.svelte';
+	import { EXIF_FIELDS } from '#lib/exiffields.js';
+	import FieldUrl from '#lib/FieldURL.svelte';
+	import { tables } from '#lib/idb.svelte.js';
+	import { EXIFField } from '#lib/schemas/metadata.js';
+	import { toasts } from '#lib/toasts.svelte.js';
+	import { keys, omit } from '#lib/utils.js';
 	import { ArkErrors } from 'arktype';
 	import { fade } from 'svelte/transition';
 
-	import { invalidateAll } from '$app/navigation';
-	import EnumButtons from '$lib/EnumButtons.svelte';
-	import { EXIF_FIELDS } from '$lib/exiffields';
-	import FieldUrl from '$lib/FieldURL.svelte';
-	import { tables } from '$lib/idb.svelte';
-	import { EXIFField } from '$lib/schemas/metadata.js';
-	import { toasts } from '$lib/toasts.svelte.js';
-	import { keys, omit } from '$lib/utils';
+	import { refreshAll } from '$app/navigation';
 
 	const { data } = $props();
 	const { infer, id } = $derived(data.metadata);
@@ -49,7 +49,7 @@
 		onchange={async (key) => {
 			if (key === 'none' && currentInferenceType !== 'none') {
 				await tables.Metadata.set(omit(data.metadata, 'infer'));
-				await invalidateAll();
+				await refreshAll();
 			}
 		}}
 	>
@@ -77,7 +77,7 @@
 								model: newModel,
 							},
 						});
-						await invalidateAll();
+						await refreshAll();
 					}}
 				/>
 			{:else if key === 'exif'}
@@ -96,7 +96,7 @@
 								}
 
 								await tables.Metadata.update(id, 'infer', { exif: newExif });
-								await invalidateAll();
+								await refreshAll();
 							}}
 						/>
 						<datalist id="exif-fields">

@@ -2,10 +2,9 @@ import type { PendingStorage } from './pendingstorage.svelte.js';
 
 import { CameraPreview } from '@capacitor-community/camera-preview';
 import { Capacitor } from '@capacitor/core';
-
-import { getCurrentLocation } from '$lib/geolocation.js';
-import { errorMessage } from '$lib/i18n.js';
-import { toasts } from '$lib/toasts.svelte';
+import { getCurrentLocation } from '#lib/geolocation.js';
+import { errorMessage } from '#lib/i18n.js';
+import { toasts } from '#lib/toasts.svelte.js';
 
 const ALL_FLASH_MODES = ['off', 'auto', 'on', 'torch'] as const;
 export type FlashMode = (typeof ALL_FLASH_MODES)[number];

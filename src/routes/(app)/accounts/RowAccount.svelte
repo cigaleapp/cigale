@@ -1,11 +1,12 @@
 <script lang="ts">
-	import type * as DB from '$lib/database.js';
+	import type * as DB from '#lib/database.js';
+
+	import { providers } from '#lib/accounts/registry.js';
+	import ButtonIcon from '#lib/ButtonIcon.svelte';
+	import { corsfix, readableOn } from '#lib/utils.js';
 
 	import IconDisconnect from '~icons/ri/close-circle-line';
 	import IconUser from '~icons/ri/user-line';
-	import { providers } from '$lib/accounts/registry.js';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import { corsfix, readableOn } from '$lib/utils.js';
 
 	interface Props {
 		tag?: string;

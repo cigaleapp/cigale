@@ -1,10 +1,11 @@
 <script lang="ts">
+	import ButtonIcon from '#lib/ButtonIcon.svelte';
+	import SegmentedGroup from '#lib/SegmentedGroup.svelte';
+	import { uiState } from '#lib/uistate.svelte.js';
+	import { switchValue } from '#lib/utils.js';
+
 	import IconExpand from '~icons/ri/skip-left-line';
 	import IconCollapse from '~icons/ri/skip-right-line';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
-	import { uiState } from '$lib/uistate.svelte.js';
-	import { switchValue } from '$lib/utils.js';
 
 	import ExportGallery from './ExportGallery.svelte';
 	import ExportLocalActions from './ExportLocalActions.svelte';

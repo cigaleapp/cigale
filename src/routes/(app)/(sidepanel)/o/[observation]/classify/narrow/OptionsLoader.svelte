@@ -10,15 +10,15 @@
 </script>
 
 <script lang="ts">
-	import type * as DB from '$lib/database.js';
-	import type { NamespacedMetadataID } from '$lib/schemas/common.js';
+	import type * as DB from '#lib/database.js';
+	import type { NamespacedMetadataID } from '#lib/schemas/common.js';
 	import type { Snippet } from 'svelte';
 
-	import { databaseHandle } from '$lib/idb.svelte.js';
-	import Logo from '$lib/Logo.svelte';
-	import { metadataOptionsOf } from '$lib/metadata/storage.js';
-	import { uiState } from '$lib/uistate.svelte.js';
-	import { cancellable } from '$lib/utils.js';
+	import { databaseHandle } from '#lib/idb.svelte.js';
+	import Logo from '#lib/Logo.svelte';
+	import { metadataOptionsOf } from '#lib/metadata/storage.js';
+	import { uiState } from '#lib/uistate.svelte.js';
+	import { cancellable } from '#lib/utils.js';
 
 	import { narrowingState } from './+layout.svelte';
 

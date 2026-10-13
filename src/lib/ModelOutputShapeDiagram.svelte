@@ -1,19 +1,19 @@
 <script lang="ts">
-	import '$lib/fonts-math/import.css';
+	import '#lib/fonts-math/import.css';
 
+	import ButtonIcon from '#lib/ButtonIcon.svelte';
+	import {
+		MODEL_DETECTION_OUTPUT_SHAPES,
+		ModelDetectionOutputShape,
+	} from '#lib/schemas/neural.js';
+	import { tooltip } from '#lib/tooltips.js';
+	import { compareBy, entries } from '#lib/utils.js';
 	import { Popover } from 'bits-ui';
 	import * as Math from 'svelte-mathml';
 	import { SvelteSet } from 'svelte/reactivity';
 
 	import IconTrash from '~icons/ri/delete-bin-line';
 	import IconEdit from '~icons/ri/pencil-line';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import {
-		MODEL_DETECTION_OUTPUT_SHAPES,
-		ModelDetectionOutputShape,
-	} from '$lib/schemas/neural.js';
-	import { tooltip } from '$lib/tooltips';
-	import { compareBy, entries } from '$lib/utils.js';
 
 	import ShapeAtomDisplay from './ModelOutputShapeAtomDisplay.svelte';
 	import MorphArrow from './MorphArrow.svelte';

@@ -1,17 +1,18 @@
 <script lang="ts">
-	import type * as DB from '$lib/database.js';
+	import type * as DB from '#lib/database.js';
+
+	import { databaseHandle, tables } from '#lib/idb.svelte.js';
+	import { storeMetadataValue } from '#lib/metadata/storage.js';
+	import { observationMetadata } from '#lib/observations.js';
+	import { goto, switchRouteId } from '#lib/paths.js';
+	import { defaultClassificationMetadata } from '#lib/protocols.js';
+	import { toasts } from '#lib/toasts.svelte.js';
+	import { uiState } from '#lib/uistate.svelte.js';
+	import { compareBy } from '#lib/utils.js';
 
 	import IconEliminate from '~icons/ri/filter-line';
 	import IconSuggestions from '~icons/ri/list-check-3';
 	import { page } from '$app/state';
-	import { databaseHandle, tables } from '$lib/idb.svelte.js';
-	import { storeMetadataValue } from '$lib/metadata/storage.js';
-	import { observationMetadata } from '$lib/observations.js';
-	import { goto, switchRouteId } from '$lib/paths.js';
-	import { defaultClassificationMetadata } from '$lib/protocols.js';
-	import { toasts } from '$lib/toasts.svelte.js';
-	import { uiState } from '$lib/uistate.svelte.js';
-	import { compareBy } from '$lib/utils.js';
 
 	import TopbarExtras from '../TopbarExtras.svelte';
 

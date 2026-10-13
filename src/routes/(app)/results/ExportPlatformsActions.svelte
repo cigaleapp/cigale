@@ -1,10 +1,11 @@
 <script lang="ts">
+	import ButtonSecondary from '#lib/ButtonSecondary.svelte';
+	import CompositeAvatar from '#lib/CompositeAvatar.svelte';
+	import { tables } from '#lib/idb.svelte.js';
+	import { sendNotification } from '#lib/notifications.js';
+	import { uiState } from '#lib/uistate.svelte.js';
+
 	import IconSendToPlatform from '~icons/ri/cloud-line';
-	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import CompositeAvatar from '$lib/CompositeAvatar.svelte';
-	import { tables } from '$lib/idb.svelte.js';
-	import { sendNotification } from '$lib/notifications.js';
-	import { uiState } from '$lib/uistate.svelte.js';
 
 	import { exporter as uploader } from './platforms.svelte.js';
 

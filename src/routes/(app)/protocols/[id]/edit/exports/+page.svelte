@@ -1,16 +1,16 @@
 <script lang="ts">
-	import type { NodeProvenance } from '$lib/file-tree.js';
+	import type { NodeProvenance } from '#lib/file-tree.js';
 
+	import { tables } from '#lib/idb.svelte.js';
+	import { HANDLEBARS_HELPERS } from '#lib/schemas/expressions.js';
+	import { seo } from '#lib/seo.svelte.js';
+	import { getSettings } from '#lib/settings.svelte.js';
+	import { toasts } from '#lib/toasts.svelte.js';
+	import { entries } from '#lib/utils.js';
+	import ZipContentsTree from '#lib/ZipContentsTree.svelte';
 	import { fade } from 'svelte/transition';
 
 	import { page } from '$app/state';
-	import { tables } from '$lib/idb.svelte.js';
-	import { HANDLEBARS_HELPERS } from '$lib/schemas/expressions.js';
-	import { seo } from '$lib/seo.svelte';
-	import { getSettings } from '$lib/settings.svelte';
-	import { toasts } from '$lib/toasts.svelte';
-	import { entries } from '$lib/utils.js';
-	import ZipContentsTree from '$lib/ZipContentsTree.svelte';
 
 	import MetadataLink from '../MetadataLink.svelte';
 

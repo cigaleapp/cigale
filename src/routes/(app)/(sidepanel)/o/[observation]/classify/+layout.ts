@@ -1,11 +1,10 @@
 import { error } from '@sveltejs/kit';
-
-import { galleryEffectiveSorter } from '$lib/gallery.js';
-import { listByIndex, tables } from '$lib/idb.svelte.js';
-import { observationMetadata } from '$lib/observations.js';
-import { defaultClassificationMetadata } from '$lib/protocols.js';
-import { uiState } from '$lib/uistate.svelte.js';
-import { unique } from '$lib/utils.js';
+import { galleryEffectiveSorter } from '#lib/gallery.js';
+import { listByIndex, tables } from '#lib/idb.svelte.js';
+import { observationMetadata } from '#lib/observations.js';
+import { defaultClassificationMetadata } from '#lib/protocols.js';
+import { uiState } from '#lib/uistate.svelte.js';
+import { unique } from '#lib/utils.js';
 
 // Some stuff is loaded here to prevent loading it on every navigation within the fullscreen classifier
 // For instance, we wanna avoid re-sorting observations on every navigation, both for performance (it's one of the longest operations) and UX (otherwise changes in observations' metadata could re-order the observations while the user is inside the fullscreen classifier, which would be disruptive (imagine being on the 5/16 observation, correcting its species metadata, and finding yourself on the 16/16 instead of 6/16 after clicking "Next"))

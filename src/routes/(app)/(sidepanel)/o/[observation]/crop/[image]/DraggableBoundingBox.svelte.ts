@@ -1,9 +1,8 @@
 import type { Zoom } from './zoom.svelte.js';
-import type { Rect } from '$lib/BoundingBoxes.svelte.js';
+import type { Rect } from '#lib/BoundingBoxes.svelte.js';
 
+import { clamp, sign } from '#lib/utils.js';
 import { type } from 'arktype';
-
-import { clamp, sign } from '$lib/utils.js';
 
 /**
  * Calculate bounding rect for an image element that has object-fit: contain. The boundingClientRect is not the same as the actual, displayed image. We use both natural{Width,Height} and client{Width,Height} to calculate the displayed image size.

@@ -1,6 +1,6 @@
 /**
  * @import { Page } from '@playwright/test';
- * @import { MetadataValue } from '$lib/database.js';
+ * @import { MetadataValue } from '#lib/database.js';
  */
 
 /**

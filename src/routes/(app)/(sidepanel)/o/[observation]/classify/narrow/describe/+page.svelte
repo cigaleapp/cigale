@@ -1,18 +1,18 @@
 <script lang="ts">
-	import type * as DB from '$lib/database.js';
-	import type { NamespacedMetadataID } from '$lib/schemas/common.js';
+	import type * as DB from '#lib/database.js';
+	import type { NamespacedMetadataID } from '#lib/schemas/common.js';
 
-	import { ms } from 'convert';
-
-	import { page } from '$app/state';
-	import { tables } from '$lib/idb.svelte.js';
-	import MetadataList from '$lib/MetadataList.svelte';
+	import { tables } from '#lib/idb.svelte.js';
+	import MetadataList from '#lib/MetadataList.svelte';
 	import {
 		ensureNamespacedMetadataId,
 		namespaceOfMetadataId,
 		removeNamespaceFromMetadataId,
-	} from '$lib/schemas/metadata.js';
-	import { avg, compareBy, mapKeys, nonnull } from '$lib/utils.js';
+	} from '#lib/schemas/metadata.js';
+	import { avg, compareBy, mapKeys, nonnull } from '#lib/utils.js';
+	import { ms } from 'convert';
+
+	import { page } from '$app/state';
 
 	import { narrowingState } from '../+layout.svelte';
 	import { narrowingPower } from '../candidates.js';

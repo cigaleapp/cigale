@@ -1,10 +1,10 @@
 <script lang="ts">
+	import ButtonInk from '#lib/ButtonInk.svelte';
+	import ConfidencePercentage from '#lib/ConfidencePercentage.svelte';
 	import { fade } from 'svelte/transition';
 
 	import IconDelete from '~icons/ri/delete-bin-line';
 	import IconReset from '~icons/ri/reset-left-fill';
-	import ButtonInk from '$lib/ButtonInk.svelte';
-	import ConfidencePercentage from '$lib/ConfidencePercentage.svelte';
 
 	import { focusedImage, zoom } from './+page.svelte';
 	import {

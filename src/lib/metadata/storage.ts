@@ -1,16 +1,14 @@
-import type * as DB from '$lib/database.js';
-import type { DatabaseHandle, ReactiveTableNames } from '$lib/idb.svelte.js';
-import type { NamespacedMetadataID } from '$lib/schemas/common.js';
-import type { RuntimeValue } from '$lib/schemas/metadata.js';
-import type { NumericUnit } from '$lib/schemas/units.js';
+import type * as DB from '#lib/database.js';
+import type { DatabaseHandle, ReactiveTableNames } from '#lib/idb.svelte.js';
+import type { NamespacedMetadataID } from '#lib/schemas/common.js';
+import type { RuntimeValue } from '#lib/schemas/metadata.js';
+import type { NumericUnit } from '#lib/schemas/units.js';
 
-import { ArkErrors } from 'arktype';
-
-import { storeCorrection } from '$lib/beamup.js';
-import { computeCascades } from '$lib/cascades.js';
-import { Tables } from '$lib/database.js';
-import { percent } from '$lib/i18n.js';
-import { observationMetadata } from '$lib/observations.js';
+import { storeCorrection } from '#lib/beamup.js';
+import { computeCascades } from '#lib/cascades.js';
+import { Tables } from '#lib/database.js';
+import { percent } from '#lib/i18n.js';
+import { observationMetadata } from '#lib/observations.js';
 import {
 	ensureNamespacedMetadataId,
 	isNamespacedToProtocol,
@@ -19,9 +17,10 @@ import {
 	MetadataValue,
 	namespacedMetadataId,
 	namespaceOfMetadataId,
-} from '$lib/schemas/metadata.js';
-import { toasts } from '$lib/toasts.svelte.js';
-import { groupBy, orEmptyObj3, prefixIDBKeyRange, safeJSONParse } from '$lib/utils.js';
+} from '#lib/schemas/metadata.js';
+import { toasts } from '#lib/toasts.svelte.js';
+import { groupBy, orEmptyObj3, prefixIDBKeyRange, safeJSONParse } from '#lib/utils.js';
+import { ArkErrors } from 'arktype';
 
 import { resolveMetadataImport } from './imports.js';
 import { httpInferencesToRefresh, inferHttp } from './inference/http.js';
@@ -161,7 +160,7 @@ export async function metadataOptionsOf(
  */
 async function refreshTables(sessionId: string, ...tableNames: ReactiveTableNames[]) {
 	try {
-		const idb = await import('$lib/idb.svelte.js');
+		const idb = await import('#lib/idb.svelte.js');
 		await Promise.all(tableNames.map((name) => idb.tables[name].refresh(sessionId)));
 	} catch (error) {
 		console.warn(`Cannot refresh tables ${tableNames}:`, error);

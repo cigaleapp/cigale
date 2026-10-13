@@ -3,40 +3,39 @@
 /// <reference lib="esnext" />
 /// <reference lib="webworker" />
 
-import type { DatabaseHandle } from '$lib/idb.svelte.js';
-import type { RuntimeValue } from '$lib/schemas/metadata';
-import type { ZipEntry } from '$lib/zip.js';
+import type { DatabaseHandle } from '#lib/idb.svelte.js';
+import type { RuntimeValue } from '#lib/schemas/metadata.js';
+import type { ZipEntry } from '#lib/zip.js';
 
-import { ArkErrors } from 'arktype';
-
-import { darwinCoreArchive } from '$lib/darwincore.js';
-import * as DB from '$lib/database.js';
-import { stringifyWithToplevelOrdering } from '$lib/download';
-import { addExifMetadata } from '$lib/exif';
-import { cropImage, parseCropPadding } from '$lib/images.js';
+import { darwinCoreArchive } from '#lib/darwincore.js';
+import * as DB from '#lib/database.js';
+import { stringifyWithToplevelOrdering } from '#lib/download.js';
+import { addExifMetadata } from '#lib/exif.js';
+import { cropImage, parseCropPadding } from '#lib/images.js';
 import {
 	addBaseUnitValues,
 	addValueLabels,
 	metadataPrettyKey,
 	metadataPrettyValue,
 	protocolMetadataValues,
-} from '$lib/metadata/index.js';
-import { observationMetadata } from '$lib/observations.js';
-import { defaultCropMetadata } from '$lib/protocols.js';
-import { Analysis } from '$lib/schemas/exports.js';
+} from '#lib/metadata/index.js';
+import { observationMetadata } from '#lib/observations.js';
+import { defaultCropMetadata } from '#lib/protocols.js';
+import { Analysis } from '#lib/schemas/exports.js';
 import {
 	MetadataRuntimeValue,
 	MetadataValues,
 	removeNamespaceFromMetadataId,
-} from '$lib/schemas/metadata';
+} from '#lib/schemas/metadata.js';
 import {
 	ExportsFilepathTemplateMetadataFile,
 	ExportsFilepathTemplateObservation,
-} from '$lib/schemas/protocols';
-import { AnalyzedImage, AnalyzedObservation, toMetadataRecord } from '$lib/schemas/results';
-import { accessBytes, resolveObjectWithBytes } from '$lib/storage/utils.js';
-import { compareBy, entries, nonnull, progressSplitter, sum, UTF8_BOM } from '$lib/utils';
-import { createZipArchive } from '$lib/zip.js';
+} from '#lib/schemas/protocols.js';
+import { AnalyzedImage, AnalyzedObservation, toMetadataRecord } from '#lib/schemas/results.js';
+import { accessBytes, resolveObjectWithBytes } from '#lib/storage/utils.js';
+import { compareBy, entries, nonnull, progressSplitter, sum, UTF8_BOM } from '#lib/utils.js';
+import { createZipArchive } from '#lib/zip.js';
+import { ArkErrors } from 'arktype';
 
 import { Schemas } from '../lib/database.js';
 import { toCSV } from '../lib/results.svelte.js';

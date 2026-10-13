@@ -1,8 +1,8 @@
 import type { DatabaseHandle } from './idb.svelte.js';
 import type { NamespacedMetadataID } from './schemas/common.js';
 import type { NeuralModelSelector } from './schemas/sessions.js';
-import type * as DB from '$lib/database.js';
-import type { HTTPRequest, ModelDetectionOutputShapes } from '$lib/database.js';
+import type * as DB from '#lib/database.js';
+import type { HTTPRequest, ModelDetectionOutputShapes } from '#lib/database.js';
 import type { PROCEDURES } from '$worker/procedures.js';
 import type { SwarpcClient } from 'swarpc';
 

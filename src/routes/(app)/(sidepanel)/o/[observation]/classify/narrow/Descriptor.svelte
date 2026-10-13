@@ -1,9 +1,21 @@
 <script lang="ts">
-	import type * as DB from '$lib/database.js';
-	import type { TypedMetadataValue } from '$lib/metadata/types.js';
-	import type { NamespacedMetadataID } from '$lib/schemas/common.js';
-	import type { RuntimeValue } from '$lib/schemas/metadata.js';
+	import type * as DB from '#lib/database.js';
+	import type { TypedMetadataValue } from '#lib/metadata/types.js';
+	import type { NamespacedMetadataID } from '#lib/schemas/common.js';
+	import type { RuntimeValue } from '#lib/schemas/metadata.js';
 
+	import ButtonIcon from '#lib/ButtonIcon.svelte';
+	import { plural } from '#lib/i18n.js';
+	import { databaseHandle, tables } from '#lib/idb.svelte.js';
+	import IfInViewport from '#lib/IfInViewport.svelte';
+	import Metadata from '#lib/Metadata.svelte';
+	import { serializeMetadataValue } from '#lib/metadata/serializing.js';
+	import { deleteMetadataValue, storeMetadataValue } from '#lib/metadata/storage.js';
+	import OverflowableText from '#lib/OverflowableText.svelte';
+	import RadialProgress from '#lib/RadialProgress.svelte';
+	import { tooltip } from '#lib/tooltips.js';
+	import { uiState } from '#lib/uistate.svelte.js';
+	import { corsfixIfLocalhost } from '#lib/utils.js';
 	import { dequal } from 'dequal';
 	import { debounce } from 'es-toolkit';
 	import { SvelteSet } from 'svelte/reactivity';
@@ -12,18 +24,6 @@
 	import IconExpand from '~icons/ri/arrow-right-s-line';
 	import IconDelete from '~icons/ri/close-line';
 	import { page } from '$app/state';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import { plural } from '$lib/i18n.js';
-	import { databaseHandle, tables } from '$lib/idb.svelte.js';
-	import IfInViewport from '$lib/IfInViewport.svelte';
-	import Metadata from '$lib/Metadata.svelte';
-	import { serializeMetadataValue } from '$lib/metadata/serializing.js';
-	import { deleteMetadataValue, storeMetadataValue } from '$lib/metadata/storage.js';
-	import OverflowableText from '$lib/OverflowableText.svelte';
-	import RadialProgress from '$lib/RadialProgress.svelte';
-	import { tooltip } from '$lib/tooltips.js';
-	import { uiState } from '$lib/uistate.svelte.js';
-	import { corsfixIfLocalhost } from '$lib/utils.js';
 
 	import { narrowingState } from './+layout.svelte';
 	import { matches } from './candidates.js';

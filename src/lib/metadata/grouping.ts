@@ -1,11 +1,10 @@
-import type * as DB from '$lib/database.js';
+import type * as DB from '#lib/database.js';
 
+import { type Language } from '#lib/i18n.js';
+import { type RuntimeValue } from '#lib/schemas/metadata.js';
+import { GROUPING_TOLERANCES, GroupSettings } from '#lib/schemas/sessions.js';
+import { fromEntries, groupBy, keys, mapValues, round } from '#lib/utils.js';
 import * as dates from 'date-fns';
-
-import { type Language } from '$lib/i18n';
-import { type RuntimeValue } from '$lib/schemas/metadata.js';
-import { GROUPING_TOLERANCES, GroupSettings } from '$lib/schemas/sessions.js';
-import { fromEntries, groupBy, keys, mapValues, round } from '$lib/utils.js';
 
 import { metadataPrettyValue } from './display.js';
 import { switchOnMetadataType } from './types.js';

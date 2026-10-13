@@ -1,11 +1,10 @@
-import type { CaptureTimer, CaptureTimersMessageTemplate } from '$lib/schemas/protocols';
+import type { CaptureTimer, CaptureTimersMessageTemplate } from '#lib/schemas/protocols.js';
 
 import { KeepAwake } from '@capawesome/capacitor-keep-awake';
+import { formatDurationShort } from '#lib/date.js';
+import { getSettings } from '#lib/settings.svelte.js';
+import { switchValue } from '#lib/utils.js';
 import { ms } from 'convert';
-
-import { formatDurationShort } from '$lib/date';
-import { getSettings } from '$lib/settings.svelte';
-import { switchValue } from '$lib/utils';
 
 export class Timer {
 	totalDuration = 0;

@@ -1,12 +1,11 @@
 <script>
-	import '$lib/fonts-math/import.css';
+	import '#lib/fonts-math/import.css';
 
+	import EnumButtons from '#lib/EnumButtons.svelte';
+	import Field from '#lib/Field.svelte';
+	import FieldUrl from '#lib/FieldURL.svelte';
+	import InlineTextInput from '#lib/InlineTextInput.svelte';
 	import * as Math from 'svelte-mathml';
-
-	import EnumButtons from '$lib/EnumButtons.svelte';
-	import Field from '$lib/Field.svelte';
-	import FieldUrl from '$lib/FieldURL.svelte';
-	import InlineTextInput from '$lib/InlineTextInput.svelte';
 
 	import { updater as _updater } from '../updater.svelte';
 	import ModelOutputShapeDiagram from './ModelOutputShapeDiagram.svelte';
@@ -14,7 +13,7 @@
 	/**
 	 * @typedef {object} Props
 	 * @property {number} i index of the model in the protocol.crop.infer array
-	 * @property {import('$lib/schemas/neural').NeuralInference} inference
+	 * @property {import('#lib/schemas/neural.js').NeuralInference} inference
 	 */
 
 	/** @type {Props} */
@@ -23,7 +22,7 @@
 
 	/**
 	 * @template T
-	 * @param {(inferences: import('$lib/schemas/neural').NeuralInference[], v: T) => void | Promise<void>} changes
+	 * @param {(inferences: import('#lib/schemas/neural.js').NeuralInference[], v: T) => void | Promise<void>} changes
 	 * @returns {(v: T) => Promise<void>}
 	 */
 	const updater = (changes) =>
@@ -34,7 +33,7 @@
 
 	/**
 	 * @template T
-	 * @param {(shape: typeof import('$lib/schemas/neural').NeuralBoundingBoxInference.infer['output']['shape'], v: T) => void | Promise<void>} changes
+	 * @param {(shape: typeof import('#lib/schemas/neural').NeuralBoundingBoxInference.infer['output']['shape'], v: T) => void | Promise<void>} changes
 	 * @returns {(v: T) => Promise<void>}
 	 */
 	const outputShapeUpdater = (changes) =>

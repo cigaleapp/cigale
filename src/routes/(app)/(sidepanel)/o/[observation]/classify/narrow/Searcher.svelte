@@ -1,17 +1,16 @@
 <script lang="ts">
-	import type * as DB from '$lib/database.js';
-	import type { NamespacedMetadataID } from '$lib/schemas/common.js';
+	import type * as DB from '#lib/database.js';
+	import type { NamespacedMetadataID } from '#lib/schemas/common.js';
 	import type { Snippet } from 'svelte';
 
+	import ButtonSecondary from '#lib/ButtonSecondary.svelte';
+	import Logo from '#lib/Logo.svelte';
+	import { scrollController } from '#lib/scrollcontroller.svelte.js';
 	import { dequal } from 'dequal';
 	import Fuse from 'fuse.js';
 	import { Debounced, Previous } from 'runed';
 	import { untrack } from 'svelte';
 	import { fade } from 'svelte/transition';
-
-	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import Logo from '$lib/Logo.svelte';
-	import { scrollController } from '$lib/scrollcontroller.svelte.js';
 
 	interface Props {
 		query: string;

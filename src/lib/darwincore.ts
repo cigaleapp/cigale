@@ -1,13 +1,12 @@
 import type { DatabaseHandle } from './idb.svelte.js';
 import type { TypedMetadataValue } from './metadata/types.js';
 import type { NamespacedMetadataID } from './schemas/common.js';
-import type * as DB from '$lib/database.js';
-import type { MaybePromise } from '$lib/utils.js';
+import type * as DB from '#lib/database.js';
+import type { MaybePromise } from '#lib/utils.js';
 
+import { Tables } from '#lib/database.js';
+import { compareBy, entries, mapValues, orEmpty, orEmpty2, sum, switchValue } from '#lib/utils.js';
 import * as dates from 'date-fns';
-
-import { Tables } from '$lib/database.js';
-import { compareBy, entries, mapValues, orEmpty, orEmpty2, sum, switchValue } from '$lib/utils.js';
 
 import { addValueLabels, metadataPrettyValue } from './metadata/display.js';
 import { resolveMetadataImport } from './metadata/namespacing.js';

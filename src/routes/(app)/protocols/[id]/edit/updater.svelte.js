@@ -1,16 +1,16 @@
+import { errorMessage } from '#lib/i18n.js';
+import { dependencyURI, tables } from '#lib/idb.svelte.js';
+import { toasts } from '#lib/toasts.svelte.js';
 import { ArkErrors } from 'arktype';
 
 import { invalidate } from '$app/navigation';
 import { page } from '$app/state';
-import { errorMessage } from '$lib/i18n';
-import { dependencyURI, tables } from '$lib/idb.svelte';
-import { toasts } from '$lib/toasts.svelte';
 
 /**
  * Update the protocol information, save it to the database.
  * Return `false` from `changes` to skip saving to database and triggering load function reruns.
  * @template T
- * @param {(p: typeof import('$lib/database').Tables.Protocol.inferIn, ...v: T[]) => void | false | Promise<void | false>} changes
+ * @param {(p: typeof import('#lib/database.js').Tables.Protocol.inferIn, ...v: T[]) => void | false | Promise<void | false>} changes
  * @returns {(...value: NoInfer<T[]>) => Promise<void>} updater for InlineTextInput
  */
 export function updater(changes) {

@@ -21,7 +21,7 @@ import { FixturePaths } from '../filepaths.js';
  * @param {Page} page
  * @param {string|RegExp|null} message null to not filter on the message
  * @param {object} options
- * @param {undefined | import('$lib/toasts.svelte').Toast<null>['type']} [options.type]
+ * @param {undefined | import('#lib/toasts.svelte').Toast<null>['type']} [options.type]
  */
 export function toast(page, message, { type = undefined } = {}) {
 	let loc = page.getByTestId('toasts-area');

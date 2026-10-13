@@ -2,6 +2,8 @@ import 'fake-indexeddb/auto';
 import 'urlpattern-polyfill';
 import 'opfs-mock';
 
+import * as DB from '#lib/database.js';
+import { openDatabase } from '#lib/idb.svelte.js';
 import { setupServer } from 'msw/node';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, test } from 'vitest';
 
@@ -13,8 +15,6 @@ import {
 	MOCK_DOMAIN,
 	mockstate,
 } from '$e2e/fixtures/http/ecosignal/handlers.js';
-import * as DB from '$lib/database.js';
-import { openDatabase } from '$lib/idb.svelte.js';
 
 import Ecosignal from './ecosignal.js';
 

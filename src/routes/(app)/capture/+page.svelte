@@ -10,6 +10,25 @@
 
 	import '@layflags/rolling-number';
 
+	import ButtonIcon from '#lib/ButtonIcon.svelte';
+	import ButtonInk from '#lib/ButtonInk.svelte';
+	import ButtonSecondary from '#lib/ButtonSecondary.svelte';
+	import DropdownMenu from '#lib/DropdownMenu.svelte';
+	import { geolocationAccuracyToConfidence, getCurrentLocation } from '#lib/geolocation.js';
+	import { percent, plural } from '#lib/i18n.js';
+	import { databaseHandle, tables } from '#lib/idb.svelte.js';
+	import LoadingScreen from '#lib/LoadingScreen.svelte';
+	import LoadingText, { Loading } from '#lib/LoadingText.svelte';
+	import { storeMetadataValue } from '#lib/metadata/storage.js';
+	import ModalConfirm from '#lib/ModalConfirm.svelte';
+	import { goto } from '#lib/paths.js';
+	import { isMetadataInProtocol } from '#lib/schemas/protocols.js';
+	import { getSettings, toggleSetting } from '#lib/settings.svelte.js';
+	import { sfx } from '#lib/sound.js';
+	import { toasts } from '#lib/toasts.svelte.js';
+	import { uiState } from '#lib/uistate.svelte.js';
+	import { afterDelay, cycleValues, orEmpty, switchValue } from '#lib/utils.js';
+
 	import IconSwitchCameraSides from '~icons/ri/camera-switch-line';
 	import IconFinish from '~icons/ri/check-line';
 	import IconQuit from '~icons/ri/close-large-line';
@@ -24,24 +43,6 @@
 	import IconStartTimer from '~icons/ri/timer-line';
 	import IconSfxOff from '~icons/ri/volume-mute-line';
 	import IconSfxOn from '~icons/ri/volume-up-line';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import ButtonInk from '$lib/ButtonInk.svelte';
-	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import DropdownMenu from '$lib/DropdownMenu.svelte';
-	import { geolocationAccuracyToConfidence, getCurrentLocation } from '$lib/geolocation.js';
-	import { percent, plural } from '$lib/i18n.js';
-	import { databaseHandle, tables } from '$lib/idb.svelte.js';
-	import LoadingScreen from '$lib/LoadingScreen.svelte';
-	import LoadingText, { Loading } from '$lib/LoadingText.svelte';
-	import { storeMetadataValue } from '$lib/metadata/storage.js';
-	import ModalConfirm from '$lib/ModalConfirm.svelte';
-	import { goto } from '$lib/paths.js';
-	import { isMetadataInProtocol } from '$lib/schemas/protocols.js';
-	import { getSettings, toggleSetting } from '$lib/settings.svelte.js';
-	import { sfx } from '$lib/sound.js';
-	import { toasts } from '$lib/toasts.svelte.js';
-	import { uiState } from '$lib/uistate.svelte.js';
-	import { afterDelay, cycleValues, orEmpty, switchValue } from '$lib/utils.js';
 
 	import ModalSubmitIssue from '../ModalSubmitIssue.svelte';
 	import {

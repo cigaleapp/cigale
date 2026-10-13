@@ -1,5 +1,20 @@
 <script lang="ts">
-	import type { Account, AccountConstructor } from '$lib/accounts/types.js';
+	import type { Account, AccountConstructor } from '#lib/accounts/types.js';
+
+	import { providers } from '#lib/accounts/registry.js';
+	import ButtonSecondary from '#lib/ButtonSecondary.svelte';
+	import CompositeAvatar from '#lib/CompositeAvatar.svelte';
+	import DropdownMenu from '#lib/DropdownMenu.svelte';
+	import { promptForFiles } from '#lib/files.js';
+	import { databaseHandle, tables } from '#lib/idb.svelte.js';
+	import Logo from '#lib/Logo.svelte';
+	import { IsMobile } from '#lib/mobile.svelte.js';
+	import OverflowableText from '#lib/OverflowableText.svelte';
+	import { goto } from '#lib/paths.js';
+	import { importMore } from '#lib/queue.svelte.js';
+	import { scrollfader } from '#lib/scrollfader.js';
+	import { switchSession } from '#lib/sessions.js';
+	import { getSettings, setSetting } from '#lib/settings.svelte.js';
 
 	import IconAdd from '~icons/ri/add-line';
 	import IconFilterAll from '~icons/ri/apps-2-line';
@@ -7,20 +22,6 @@
 	import IconLocal from '~icons/ri/hard-drive-2-line';
 	import IconImport from '~icons/ri/import-line';
 	import IconManage from '~icons/ri/settings-3-line';
-	import { providers } from '$lib/accounts/registry.js';
-	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import CompositeAvatar from '$lib/CompositeAvatar.svelte';
-	import DropdownMenu from '$lib/DropdownMenu.svelte';
-	import { promptForFiles } from '$lib/files';
-	import { databaseHandle, tables } from '$lib/idb.svelte.js';
-	import Logo from '$lib/Logo.svelte';
-	import { IsMobile } from '$lib/mobile.svelte.js';
-	import OverflowableText from '$lib/OverflowableText.svelte';
-	import { goto } from '$lib/paths.js';
-	import { importMore } from '$lib/queue.svelte';
-	import { scrollfader } from '$lib/scrollfader.js';
-	import { switchSession } from '$lib/sessions.js';
-	import { getSettings, setSetting } from '$lib/settings.svelte.js';
 
 	import { createSession } from './create.js';
 

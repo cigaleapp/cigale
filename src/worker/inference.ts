@@ -5,17 +5,16 @@
 
 import type { PROCEDURES } from './procedures.js';
 
+import { FULL_IMAGE_CROPBOX } from '#lib/BoundingBoxes.svelte.js';
+import { Schemas } from '#lib/database.js';
+import { loadToTensor } from '#lib/inference_utils.js';
+import { classify, infer } from '#lib/inference.js';
+import { getMetadataValue, storeMetadataValue } from '#lib/metadata/index.js';
+import { ModelOutputEnum } from '#lib/schemas/neural.js';
+import { resolveObjectWithBytes } from '#lib/storage/utils.js';
+import { compareBy, throwError } from '#lib/utils.js';
+import { supportsWebGPU } from '#lib/webgpu.js';
 import * as ort from 'onnxruntime-web/webgpu';
-
-import { FULL_IMAGE_CROPBOX } from '$lib/BoundingBoxes.svelte.js';
-import { Schemas } from '$lib/database.js';
-import { loadToTensor } from '$lib/inference_utils.js';
-import { classify, infer } from '$lib/inference.js';
-import { getMetadataValue, storeMetadataValue } from '$lib/metadata/index.js';
-import { ModelOutputEnum } from '$lib/schemas/neural.js';
-import { resolveObjectWithBytes } from '$lib/storage/utils.js';
-import { compareBy, throwError } from '$lib/utils.js';
-import { supportsWebGPU } from '$lib/webgpu.js';
 
 import { openDatabase, swarp } from './index.js';
 

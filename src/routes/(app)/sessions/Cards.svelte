@@ -10,9 +10,20 @@
 </script>
 
 <script lang="ts" generics="Session extends SessionBase">
-	import type { SessionRemoteID } from '$lib/schemas/sessions.js';
+	import type { SessionRemoteID } from '#lib/schemas/sessions.js';
 	import type { Snippet } from 'svelte';
 
+	import { providers } from '#lib/accounts/registry.js';
+	import AsyncEach from '#lib/AsyncEach.svelte';
+	import Card from '#lib/Card.svelte';
+	import CompositeAvatar from '#lib/CompositeAvatar.svelte';
+	import { errorMessage } from '#lib/i18n.js';
+	import { tables } from '#lib/idb.svelte.js';
+	import IfInViewport from '#lib/IfInViewport.svelte';
+	import LoadingSpinner from '#lib/LoadingSpinner.svelte';
+	import LoadingText, { Loading } from '#lib/LoadingText.svelte';
+	import Logo from '#lib/Logo.svelte';
+	import { tooltip } from '#lib/tooltips.js';
 	import { onDestroy } from 'svelte';
 	import { SvelteMap } from 'svelte/reactivity';
 	import { fade } from 'svelte/transition';
@@ -21,17 +32,6 @@
 	// TODO: request a cloud-check icon
 	import IconUploaded from '~icons/ri/cloud-line';
 	import IconDownloaded from '~icons/ri/hard-drive-2-line';
-	import { providers } from '$lib/accounts/registry.js';
-	import AsyncEach from '$lib/AsyncEach.svelte';
-	import Card from '$lib/Card.svelte';
-	import CompositeAvatar from '$lib/CompositeAvatar.svelte';
-	import { errorMessage } from '$lib/i18n.js';
-	import { tables } from '$lib/idb.svelte.js';
-	import IfInViewport from '$lib/IfInViewport.svelte';
-	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
-	import LoadingText, { Loading } from '$lib/LoadingText.svelte';
-	import Logo from '$lib/Logo.svelte';
-	import { tooltip } from '$lib/tooltips.js';
 
 	interface Props {
 		cache?: { key: string; entries: Map<[string, string], NoInfer<Session>[]> };
@@ -48,7 +48,7 @@
 			loading: string;
 			tooltip: string;
 			// eslint-disable-next-line no-unused-vars
-			onclick: (e: MouseEvent, mutator: import('$lib/Card.svelte').Mutator) => Promise<void>;
+			onclick: (e: MouseEvent, mutator: import('#lib/Card.svelte').Mutator) => Promise<void>;
 			highlighted: boolean;
 		};
 	}

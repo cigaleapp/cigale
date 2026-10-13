@@ -1,7 +1,7 @@
 import { mkdirSync } from 'node:fs';
 import path from 'node:path';
 import type { Page } from '@playwright/test';
-import type { RemovePrefix } from '$lib/utils.js';
+import type { RemovePrefix } from '#lib/utils.js';
 
 import { expect } from '@playwright/test';
 
