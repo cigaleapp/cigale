@@ -179,7 +179,7 @@
 		"@ungap/set-methods": "^0.1.1",
 		"@viselect/vanilla": "^3.10.1",
 		"@wuchale/svelte": "^0.20.7",
-		"arktype": "^2.2.3",
+		"arktype": "^2.2.7",
 		"arrival-time": "^1.0.6",
 		"async-sema": "^3.1.1",
 		"baseline-browser-mapping": "^2.11.27",
