@@ -9,6 +9,7 @@ import {
 	NamespacedMetadataID,
 	Probability,
 	References,
+	URLString,
 } from './schemas/common.js';
 import {
 	EXIFField,
@@ -25,7 +26,12 @@ import {
 	ModelDetectionOutputShapes,
 	ModelInput,
 } from './schemas/neural.js';
-import { Image as ImageSchema, Observation as ObservationSchema } from './schemas/observations.js';
+import {
+	ImageFile as ImageFileSchema,
+	ImagePreviewFile as ImagePreviewFileSchema,
+	Image as ImageSchema,
+	Observation as ObservationSchema,
+} from './schemas/observations.js';
 import {
 	BeamupSettings,
 	ExportsFilepathTemplateObservation,
@@ -67,39 +73,9 @@ if (import.meta.vitest) {
 	});
 }
 
-const ImageFile = table(
-	['id', 'sessionId', 'remoteId'],
-	type({
-		/** ID of the associated Image object */
-		id: ID,
-		/** @deprecated use $lib/storage/backend.ts:binaryStorage instead */
-		bytes: 'ArrayBuffer | "migrated"',
-		/** In bytes */
-		size: 'number = 0',
-		filename: 'string',
-		contentType: MIMEType,
-		dimensions: Dimensions,
-		sessionId: ID,
-		'remoteId?': 'string#RemoteImageFileID',
-	})
-);
+const ImageFile = table(['id', 'sessionId', 'remoteId'], ImageFileSchema);
 
-const ImagePreviewFile = table(
-	['id', 'sessionId', 'remoteId'],
-	type({
-		/** ID of the associated Image object */
-		id: ID,
-		/** @deprecated use $lib/storage/backend.ts:binaryStorage instead */
-		bytes: 'ArrayBuffer | "migrated"',
-		/** In bytes */
-		size: 'number = 0',
-		filename: 'string',
-		contentType: MIMEType,
-		dimensions: Dimensions,
-		sessionId: ID,
-		'remoteId?': 'string#RemoteImageFileID',
-	})
-);
+const ImagePreviewFile = table(['id', 'sessionId', 'remoteId'], ImagePreviewFileSchema);
 
 const MetadataValueFile = table(
 	['id', 'sessionId'],

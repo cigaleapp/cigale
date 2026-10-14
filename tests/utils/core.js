@@ -7,6 +7,8 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
 import { ms } from 'convert';
+import { XMLParser } from 'fast-xml-parser';
+import { nanoid } from 'nanoid';
 
 import { FixturePaths } from '../filepaths.js';
 
@@ -278,6 +280,8 @@ async function readStreamToBuffer(stream) {
  * @property {(text: string) => void | Promise<void>} [text] function to call with the text content of the file
  * @property {(buffer: Buffer) => void | Promise<void>} [buffer] function to call with the buffer content of the file
  * @property {(json: any) => void | Promise<void>} [json] function to call with the parsed JSON content of the file
+ * @property {(xml: any) => void | Promise<void>} [xml] function to call with the parsed XML content of the file
+ * @property {(tsv: string[][]) => void | Promise<void>} [tsv] function to call with the parsed TSV content of the file
  * @property {(entry: import('yauzl-promise').Entry) => void | Promise<void>} [entry] function to call with the zip entry itself
  */
 
@@ -291,12 +295,17 @@ async function readStreamToBuffer(stream) {
 export async function expectZipFiles(zip, expectedFiles, checks = {}) {
 	const zipFiles = [];
 
+	const xmlparser = new XMLParser({
+		attributeNamePrefix: '$',
+		ignoreAttributes: false,
+	});
+
 	for await (const file of zip) {
 		zipFiles.push(file.filename);
 
 		if (file.filename in checks) {
 			// @ts-expect-error
-			const { json, text, buffer, entry } = checks[file.filename];
+			const { json, text, buffer, entry, xml, tsv } = checks[file.filename];
 
 			const buf = await file.openReadStream().then(readStreamToBuffer);
 
@@ -306,6 +315,12 @@ export async function expectZipFiles(zip, expectedFiles, checks = {}) {
 				await text(buf.toString('utf-8'));
 			} else if (json) {
 				await json(JSON.parse(buf.toString('utf-8')));
+			} else if (xml) {
+				await xml(xmlparser.parse(buf));
+			} else if (tsv) {
+				const lines = buf.toString('utf-8').split('\n');
+				const cells = lines.map((line) => line.split('\t'));
+				await tsv(cells);
 			}
 
 			if (entry) {
@@ -459,6 +474,19 @@ export async function waitForDownload(page, trigger) {
 	const event = page.waitForEvent('download');
 	await trigger();
 	return await event;
+}
+
+/**
+ *
+ * @param {Locator} button
+ * @param {string} [extension=""] including the dot
+ */
+export async function waitAndSaveDownload(button, extension = '') {
+	const download = await waitForDownload(button.page(), async () => button.click());
+
+	const path = `tests/results/${nanoid()}${extension}`;
+	await download.saveAs(path);
+	return path;
 }
 
 /**

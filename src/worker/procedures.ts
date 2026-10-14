@@ -136,6 +136,18 @@ export const PROCEDURES = {
 		),
 		success: type('ArrayBuffer'),
 	},
+	generateDarwinCoreExport: {
+		input: type({
+			protocolId: 'string',
+			sessionIds: 'string[]',
+		}),
+		progress: type({
+			// event: '"eml" | "meta" | "data" | "zipping"',
+			done: 'number >= 0',
+			total: 'number > 0',
+		}),
+		success: type('ArrayBuffer'),
+	},
 	previewResultsZip: {
 		input: type({
 			sessionId: 'string',
