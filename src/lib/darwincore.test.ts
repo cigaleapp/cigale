@@ -1,7 +1,17 @@
-import { expect, test, vi } from 'vitest';
+import 'fake-indexeddb/auto';
 
-import { darwinCoreEmlFile, darwinCoreMetafile, fileLayout } from './darwincore.js';
+import * as fflate from 'fflate';
+
+import { beforeEach, expect, test, vi } from 'vitest';
+
+import { darwinCoreArchive, darwinCoreEmlFile, darwinCoreMetafile, fileLayout } from './darwincore.js';
+import { nukeDatabase, openDatabase } from './idb.svelte.js';
 import { DarwinCoreProtocolConfig } from './schemas/darwincore.js';
+import { metadataOptionId } from './schemas/metadata.js';
+
+beforeEach(() => {
+	nukeDatabase();
+});
 
 const mbase = {
 	label: 'Foo',
@@ -66,7 +76,248 @@ const mockProtocol = {
 };
 
 test('darwincoreDataFiles', async () => {
-})
+	const db = await openDatabase();
+
+	const protocolId = 'proto';
+	const sessionId = 'session-1';
+	const metadataSiteId = `${protocolId}__site`;
+	const metadataSpeciesId = `${protocolId}__species`;
+
+	await db.put('Protocol', {
+		id: protocolId,
+		name: 'Darwin Core protocol',
+		description: 'Testing darwin core archive export',
+		metadata: [metadataSiteId, metadataSpeciesId],
+		sessionMetadata: [metadataSiteId],
+		metadataOrder: [metadataSpeciesId, metadataSiteId],
+		importedMetadata: [],
+		authors: [],
+		darwincore: {
+			eml: {
+				language: 'en',
+				title: 'Darwin Core protocol',
+				license: 'CC-BY-SA 4.0',
+			},
+			namespaces: {
+				ex: 'https://example.org/dwc',
+			},
+			fields: {
+				session: {
+					'dwc:eventID': '{{ session.id }}',
+				},
+				image: {
+					'ex:imageName': '{{ image.filename }}',
+				},
+				media: {
+					'dc:identifier': 'file-{{ file.id }}',
+				},
+			},
+			files: [
+				{
+					core: true,
+					scope: 'session',
+					includes: ['dwc:*'],
+					rowType: 'dwc:Event',
+					path: 'events.txt',
+				},
+				{
+					scope: 'image',
+					includes: ['dwc:*', 'ex:*'],
+					rowType: 'dwc:Occurence',
+					path: 'occurences.txt',
+				},
+				{
+					scope: 'media',
+					includes: ['dc:*'],
+					rowType: 'http://rs.gbif.org/terms/1.0/Multimedia',
+					path: 'media.txt',
+				},
+			],
+		},
+	});
+
+	await db.put('Metadata', {
+		id: metadataSiteId,
+		label: 'Site',
+		description: '',
+		mergeMethod: 'none',
+		required: false,
+		images: [],
+		sortable: false,
+		groupable: false,
+		type: 'string',
+		darwincore: 'dwc:locationID',
+	});
+
+	await db.put('Metadata', {
+		id: metadataSpeciesId,
+		label: 'Species',
+		description: '',
+		mergeMethod: 'none',
+		required: false,
+		images: [],
+		sortable: false,
+		groupable: false,
+		type: 'enum',
+		darwincore: {
+			key: 'dwc:species',
+			label: 'dwc:vernacularName',
+		},
+	});
+
+	await db.put('MetadataOption', {
+		id: metadataOptionId(metadataSpeciesId, 'sp1'),
+		metadataId: metadataSpeciesId,
+		key: 'sp1',
+		label: 'Species one',
+		confidence: 1,
+		aliases: [],
+		images: [],
+		synonyms: [],
+		dependsOn: {},
+	});
+
+	await db.put('Session', {
+		id: sessionId,
+		name: 'Session',
+		description: '',
+		createdAt: new Date('2026-01-01T00:00:00.000Z').toISOString(),
+		openedAt: new Date('2026-01-01T00:00:00.000Z').toISOString(),
+		protocol: protocolId,
+		metadata: {
+			[metadataSiteId]: {
+				value: '"Forest"',
+				confidences: {},
+			},
+		},
+	});
+
+	await db.put('ImageFile', {
+		id: 'file-1',
+		sessionId,
+		bytes: 'migrated',
+		filename: 'one.jpeg',
+		contentType: 'image/jpeg',
+		dimensions: { width: 10, height: 10 },
+	});
+	await db.put('ImageFile', {
+		id: 'file-2',
+		sessionId,
+		bytes: 'migrated',
+		filename: 'two.jpeg',
+		contentType: 'image/jpeg',
+		dimensions: { width: 10, height: 10 },
+	});
+
+	await db.put('Image', {
+		id: '1_0',
+		sessionId,
+		fileId: 'file-1',
+		filename: 'one.jpeg',
+		addedAt: new Date('2026-01-01T00:00:00.000Z').toISOString(),
+		dimensions: { width: 10, height: 10 },
+		contentType: 'image/jpeg',
+		metadataErrors: {},
+		metadata: {
+			[metadataSpeciesId]: {
+				value: '"sp1"',
+				confidences: {},
+			},
+		},
+	});
+	await db.put('Image', {
+		id: '1_1',
+		sessionId,
+		fileId: 'file-2',
+		filename: 'two.jpeg',
+		addedAt: new Date('2026-01-01T00:00:00.000Z').toISOString(),
+		dimensions: { width: 10, height: 10 },
+		contentType: 'image/jpeg',
+		metadataErrors: {},
+		metadata: {
+			[metadataSpeciesId]: {
+				value: '"sp1"',
+				confidences: {},
+			},
+		},
+	});
+
+	await db.put('Observation', {
+		id: 'obs-1',
+		sessionId,
+		label: 'Observation 1',
+		addedAt: new Date('2026-01-01T00:00:00.000Z').toISOString(),
+		metadataOverrides: {},
+		metadataErrors: {},
+		images: ['1_0'],
+	});
+	await db.put('Observation', {
+		id: 'obs-2',
+		sessionId,
+		label: 'Observation 2',
+		addedAt: new Date('2026-01-01T00:00:00.000Z').toISOString(),
+		metadataOverrides: {},
+		metadataErrors: {},
+		images: ['1_1'],
+	});
+
+	const progress = vi.fn<[number, number, 'eml' | 'meta' | 'data' | 'zipping'], void>();
+	const zip = await darwinCoreArchive({
+		db,
+		protocolId,
+		sessionIds: [sessionId],
+		onProgress: progress,
+	});
+
+	const files = fflate.unzipSync(new Uint8Array(zip));
+	const text = (path: string) => fflate.strFromU8(files[path]);
+	const tsv = (path: string) => text(path).split('\n').map((row) => row.split('\t'));
+
+	expect(Object.keys(files).toSorted()).toEqual([
+		'eml.xml',
+		'events.txt',
+		'media.txt',
+		'meta.xml',
+		'occurences.txt',
+	]);
+
+	expect(tsv('events.txt')).toEqual([
+		['sessionId', 'locationID', 'eventID'],
+		[sessionId, 'Forest', sessionId],
+	]);
+
+	expect(tsv('occurences.txt')).toEqual([
+		['sessionId', 'species', 'vernacularName', 'imageName'],
+		[sessionId, 'sp1', 'Species one', 'one.jpeg'],
+		[sessionId, 'sp1', 'Species one', 'two.jpeg'],
+	]);
+
+	const mediaRows = tsv('media.txt');
+	expect(mediaRows[0]).toEqual(['sessionId', 'type', 'format', 'subtype', 'identifier']);
+	expect(mediaRows.slice(1)).toEqual([
+		[
+			sessionId,
+			'StillImage',
+			'image/jpeg',
+			'http://rs.tdwg.org/acsubtype/values/Photograph',
+			'file-file-1',
+		],
+		[
+			sessionId,
+			'StillImage',
+			'image/jpeg',
+			'http://rs.tdwg.org/acsubtype/values/Photograph',
+			'file-file-2',
+		],
+	]);
+
+	expect(text('meta.xml')).toContain('<core rowType="http://rs.tdwg.org/dwc/terms/Event"');
+	expect(text('eml.xml')).toContain('Darwin Core protocol');
+
+	expect(progress.mock.calls.at(-1)).toEqual([5, 6, 'zipping']);
+	expect(progress).toHaveBeenCalledWith(3, 6, 'meta');
+	expect(progress).toHaveBeenCalledWith(4, 6, 'eml');
+});
 
 test('fileLayout', () => {
 	expect(fileLayout(mockProtocol, mockMetadatas, mockProtocol.darwincore.files[0]))
