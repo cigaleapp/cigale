@@ -3409,3 +3409,19 @@ msgstr "Cascades"
 #: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/options/[option]/+page.svelte
 msgid "Permet de changer la valeur d'autres métadonnées quand cette option est choisie. Peut être pratique pour représenter des taxonomies, ajouter des attributs à une métadonnée, etc."
 msgstr "Permet de changer la valeur d'autres métadonnées quand cette option est choisie. Peut être pratique pour représenter des taxonomies, ajouter des attributs à une métadonnée, etc."
+
+#: src/lib/darwincore.ts
+msgid "HH:mm:ss"
+msgstr "HH:mm:ss"
+
+#: src/lib/darwincore.ts
+msgid "GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type_2015-07-10.xml"
+msgstr "GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type_2015-07-10.xml"
+
+#: src/lib/darwincore.ts
+msgid "GBIF Dataset Subtype Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_subtype.xml"
+msgstr "GBIF Dataset Subtype Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_subtype.xml"
+
+#: src/routes/(app)/results/ExportLocalActions.svelte
+msgid "<0/> Darwin Core"
+msgstr "<0/> Darwin Core"
