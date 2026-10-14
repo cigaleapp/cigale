@@ -1737,5 +1737,4 @@ export function lcm(...args: number[]): number {
 	return (x * y) / gcd(x, y);
 }
 
-
-export type MaybePromise<T> = T | Promise<T>
+export type MaybePromise<T> = T | Promise<T>;

@@ -1,10 +1,14 @@
 import 'fake-indexeddb/auto';
 
 import * as fflate from 'fflate';
-
 import { beforeEach, expect, test, vi } from 'vitest';
 
-import { darwinCoreArchive, darwinCoreEmlFile, darwinCoreMetafile, fileLayout } from './darwincore.js';
+import {
+	darwinCoreArchive,
+	darwinCoreEmlFile,
+	darwinCoreMetafile,
+	fileLayout,
+} from './darwincore.js';
 import { nukeDatabase, openDatabase } from './idb.svelte.js';
 import { DarwinCoreProtocolConfig } from './schemas/darwincore.js';
 import { metadataOptionId } from './schemas/metadata.js';
@@ -271,7 +275,10 @@ test('darwincoreDataFiles', async () => {
 
 	const files = fflate.unzipSync(new Uint8Array(zip));
 	const text = (path: string) => fflate.strFromU8(files[path]);
-	const tsv = (path: string) => text(path).split('\n').map((row) => row.split('\t'));
+	const tsv = (path: string) =>
+		text(path)
+			.split('\n')
+			.map((row) => row.split('\t'));
 
 	expect(Object.keys(files).toSorted()).toEqual([
 		'eml.xml',
