@@ -23,18 +23,18 @@ test('allows cancelling classification of an observation', issue(430), async ({ 
 	await app.tabs.go('import');
 	await importPhotos({ page }, 'lil-fella.jpeg');
 	await assert(app.gallery.card(0)).not.toHaveText(/Analyse…|En attente/, {
-		timeout: 10_000,
+		timeout: ms('10s'),
 	});
 	await app.tabs.go('crop');
 	await app.loading.wait();
 	await app.tabs.go('classify');
 	await assert(app.gallery.card(0)).toHaveText(/Analyse…|En attente/, {
-		timeout: 10_000,
+		timeout: ms('10s'),
 	});
-	await page.waitForTimeout(1_000);
+	await app.wait('1s')
 	await app.gallery.card(0).getByRole('button', { name: 'Supprimer' }).click();
 	await assert(app.gallery.card(0)).not.toBeVisible({
-		timeout: 5_000,
+		timeout: ms('1s'),
 	});
 	assert(await app.db.observation.byLabel('lil-fella')).toBeUndefined();
 });
