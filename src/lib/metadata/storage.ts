@@ -428,11 +428,13 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 		}
 	}
 
+	let protocolId: string | undefined = undefined;
+
 	if (sessionId) {
 		const ses = await db.get('Session', sessionId);
 
 		if (ses) {
-			const protocolId = ses.protocol;
+			protocolId = ses.protocol;
 			const values = image?.metadata ?? observation?.metadataOverrides ?? session?.metadata;
 
 			const toRefresh = await httpInferencesToRefresh(db, protocolId, {
@@ -482,7 +484,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 		);
 	}
 
-	const protocol = await db.get('Protocol', namespaceOfMetadataId(metadataId));
+	const protocol = await db.get('Protocol', protocolId);
 	if (protocol && oldValue && !oldValue.manuallyModified && manuallyModified) {
 		void storeCorrection(
 			db,
