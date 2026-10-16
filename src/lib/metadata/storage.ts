@@ -484,7 +484,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 		);
 	}
 
-	const protocol = await db.get('Protocol', protocolId);
+	const protocol = protocolId ? await db.get('Protocol', protocolId) : undefined;
 	if (protocol && oldValue && !oldValue.manuallyModified && manuallyModified) {
 		void storeCorrection(
 			db,
