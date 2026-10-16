@@ -31,7 +31,7 @@ test('allows cancelling classification of an observation', issue(430), async ({ 
 	await assert(app.gallery.card(0)).toHaveText(/Analyse…|En attente/, {
 		timeout: ms('10s'),
 	});
-	await app.wait('1s')
+	await app.wait('1s');
 	await app.gallery.card(0).getByRole('button', { name: 'Supprimer' }).click();
 	await assert(app.gallery.card(0)).not.toBeVisible({
 		timeout: ms('1s'),
