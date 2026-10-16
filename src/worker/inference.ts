@@ -5,7 +5,7 @@
 
 import type { PROCEDURES } from './procedures.js';
 
-import * as ort from 'onnxruntime-web';
+import * as ort from 'onnxruntime-web/webgpu';
 
 import { FULL_IMAGE_CROPBOX } from '$lib/BoundingBoxes.svelte.js';
 import { Schemas } from '$lib/database.js';
@@ -15,11 +15,12 @@ import { getMetadataValue, storeMetadataValue } from '$lib/metadata/index.js';
 import { ModelOutputEnum } from '$lib/schemas/neural.js';
 import { resolveObjectWithBytes } from '$lib/storage/utils.js';
 import { compareBy, throwError } from '$lib/utils.js';
+import { supportsWebGPU } from '$lib/webgpu.js';
 
 import { openDatabase, swarp } from './index.js';
 
 interface InferenceSession {
-	onnx: import('onnxruntime-web').InferenceSession;
+	onnx: import('onnxruntime-web/webgpu').InferenceSession;
 	id: string;
 	task: string;
 	classmapping?: string[];
@@ -37,7 +38,7 @@ const inferenceSessions = new Map<string, InferenceSession>();
  */
 const latestSessionIdByTask = new Map<InferenceTask, string>();
 
-swarp.loadModel(async ({ task, model, classmapping, inferenceSessionId: id, webgpu }) => {
+swarp.loadModel(async ({ task, model, classmapping, inferenceSessionId: id, enableWebGPU }) => {
 	// If the worker already has a session with this id, treat the request as a no-op.
 	// This makes loadModel idempotent and avoids reloading the same model on
 	// repeated client requests (e.g., when components remount on tab switches).
@@ -47,7 +48,9 @@ swarp.loadModel(async ({ task, model, classmapping, inferenceSessionId: id, webg
 	}
 
 	const onnx = await ort.InferenceSession.create(model, {
-		executionProviders: webgpu ? ['webgpu'] : [],
+		logSeverityLevel: 0,
+		executionProviders:
+			enableWebGPU && (await supportsWebGPU()) ? ['webgpu', 'wasm'] : ['wasm'],
 	});
 
 	if (!onnx) throw new Error('Impossible de charger le modèle ONNX');

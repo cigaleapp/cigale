@@ -9,7 +9,6 @@ import {
 	NamespacedMetadataID,
 	Probability,
 	References,
-	URLString,
 } from './schemas/common.js';
 import {
 	EXIFField,
@@ -33,7 +32,6 @@ import {
 	Observation as ObservationSchema,
 } from './schemas/observations.js';
 import {
-	BeamupSettings,
 	ExportsFilepathTemplateObservation,
 	Protocol as ProtocolSchema,
 } from './schemas/protocols.js';
@@ -158,6 +156,7 @@ const Settings = table(
 				by: 'me',
 			},
 		})),
+		enableWebGPU: 'boolean = true',
 		theme: type.enumerated('dark', 'light', 'auto'),
 		gridSize: type.number.pipe((n) => clamp(n, 0.5, 2)),
 		notifications: 'boolean | null = null',

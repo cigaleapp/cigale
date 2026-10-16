@@ -2,7 +2,7 @@
 	import { ArkErrors, type } from 'arktype';
 	import { dequal } from 'dequal';
 	import { dichotomid } from 'dichotomid';
-	import * as onnx from 'onnxruntime-web';
+	import * as onnx from 'onnxruntime-web/webgpu';
 	import { watch } from 'runed';
 
 	import IconArrowDown from '~icons/ri/arrow-down-line';
@@ -27,6 +27,7 @@
 	import OverflowableText from '$lib/OverflowableText.svelte';
 	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
 	import { createBytes } from '$lib/storage/utils.js';
+	import Switch from '$lib/Switch.svelte';
 	import { toasts } from '$lib/toasts.svelte.js';
 	import { tooltip } from '$lib/tooltips.js';
 	import { entries, keys, switchValue } from '$lib/utils.js';
@@ -47,6 +48,7 @@
 		output: {},
 		source: 'local',
 		url: '',
+		webgpuReady: false,
 		input: {
 			width: 0,
 			height: 0,
@@ -255,6 +257,7 @@
 					}}
 				/>
 			</Field>
+			<Switch bind:value={data.webgpuReady} label="Autoriser l'inférence via WebGPU" />
 		</section>
 
 		<section class="preview">

@@ -39,6 +39,7 @@
 	import * as updater from '$lib/update-bundles.js';
 	import { APK_DOWNLOAD_URL } from '$lib/update-bundles.js';
 	import { orEmpty, platform, switchValue } from '$lib/utils.js';
+	import { supportsWebGPU } from '$lib/webgpu.js';
 	import { getTheme } from '$routes/+layout.svelte';
 
 	import ModalChromePersistentStorage, {
@@ -92,6 +93,14 @@
 	$effect(() => {
 		void (async () => {
 			storageIsPersistent = await navigator.storage.persisted();
+		})();
+	});
+
+	const webgpuEnabled = $derived(getSettings().enableWebGPU);
+	let webgpuAvailable = $state(false);
+	$effect(() => {
+		void (async () => {
+			webgpuAvailable = await supportsWebGPU();
 		})();
 	});
 
@@ -247,6 +256,20 @@
 						// noop, handled in a custom way belowk
 					},
 				},
+				...orEmpty(webgpuAvailable, {
+					type: 'selectable',
+					key: 'webgpu',
+					label: 'Utiliser le GPU',
+					selected: webgpuEnabled,
+					closeOnSelect: false,
+					data: {
+						icon: undefined,
+						subtext: '',
+					},
+					async onclick() {
+						await setSetting('enableWebGPU', !webgpuEnabled);
+					},
+				}),
 				{
 					type: 'selectable',
 					key: 'debug-mode',

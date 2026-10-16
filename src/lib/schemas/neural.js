@@ -85,6 +85,7 @@ export const ModelSettingsCommon = type({
 	'requirements?': HardwareRequirements.describe(
 		'Configuration matérielle minimum pour éxécuter ce modèle'
 	),
+	webgpuReady: 'boolean = false',
 });
 
 export const NeuralBoundingBoxInference = ModelSettingsCommon.and({
@@ -115,6 +116,7 @@ export const CustomNeuralNetworkSchema = type({
 	bytes: '"migrated" = "migrated"',
 	sessionId: '"_" = "_"',
 	'requirements?': HardwareRequirements,
+	webgpuReady: 'boolean = false',
 })
 	.and(
 		type.or(

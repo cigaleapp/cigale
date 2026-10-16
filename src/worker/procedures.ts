@@ -30,8 +30,8 @@ export const PROCEDURES = {
 			model: 'TypedArray.Uint8',
 			'classmapping?': 'string | undefined',
 			task: '"classification" | "detection"',
-			'webgpu?': 'boolean',
 			inferenceSessionId: 'string > 1',
+			enableWebGPU: "boolean = true"
 		}),
 		progress: type('undefined'),
 		success: type('true'),

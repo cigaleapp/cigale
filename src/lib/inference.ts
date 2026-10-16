@@ -6,7 +6,7 @@ import type { HTTPRequest, ModelDetectionOutputShapes } from '$lib/database.js';
 import type { PROCEDURES } from '$worker/procedures.js';
 import type { SwarpcClient } from 'swarpc';
 
-import * as ort from 'onnxruntime-web';
+import * as ort from 'onnxruntime-web/webgpu';
 
 import { assertHardwareRequirements } from './hardware-requirements.js';
 import { loadToTensor, output2BB, preprocessTensor } from './inference_utils.js';
@@ -61,6 +61,7 @@ de plus ça se lance que sur chrome, avec la commande linux mettant les flags :
 // nombre de threads pour wasm
 ort.env.wasm.numThreads = 1;
 
+ort.env.webgpu.profiling = { mode: 'default' };
 ort.env.wasm.wasmPaths = {
 	// @ts-expect-error nécéssaire sinon ça casse
 	'ort-wasm-simd-threaded.wasm': '/ort-wasm-simd-threaded.wasm',
@@ -80,6 +81,8 @@ export async function loadModel({
 	protocolId,
 	metadataId,
 	alreadyLoadedSessions = new Set(),
+	/** Try using web gpu EP */
+	enableWebGPU,
 	/** called everytime the progress changes */
 	onProgress,
 	/** signal to abort the loading */
@@ -91,6 +94,7 @@ export async function loadModel({
 	db: DatabaseHandle;
 	swarpc: SwarpcClient<typeof PROCEDURES>;
 	metadataId: NamespacedMetadataID;
+	enableWebGPU: boolean,
 	alreadyLoadedSessions: Set<string>;
 	selector: (typeof NeuralModelSelector)['infer'];
 }): Promise<string | undefined> {
@@ -171,6 +175,7 @@ export async function loadModel({
 		task,
 		model,
 		classmapping,
+		enableWebGPU: enableWebGPU && config.webgpuReady,
 		inferenceSessionId: id,
 	});
 

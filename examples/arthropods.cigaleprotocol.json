@@ -97711,6 +97711,7 @@
 					{
 						"model": "https://huggingface.co/cigaleapp/built-in-protocols/resolve/main/detector-arthropoda.onnx?download=true",
 						"name": "YOLO11",
+						"webgpuReady": true,
 						"input": {
 							"height": 640,
 							"width": 640,
@@ -501733,6 +501734,7 @@
 						"model": "https://huggingface.co/cigaleapp/built-in-protocols/resolve/main/classifier-arthropoda.onnx?download=true",
 						"classmapping": "https://huggingface.co/cigaleapp/built-in-protocols/resolve/main/classifier-arthropoda-classmapping.txt?download=true",
 						"requirements": { "ram": "4 GB" },
+						"webgpuReady": true,
 						"input": {
 							"height": 224,
 							"width": 224,
