@@ -156,6 +156,8 @@
 		overflow-y: auto;
 		height: 100%;
 		scrollbar-gutter: stable;
+		/** XXX: So that the box shadows of EnumButtons dont clip out on the sides */
+		padding: 0 0.5em;
 	}
 
 	.settings-and-gallery {

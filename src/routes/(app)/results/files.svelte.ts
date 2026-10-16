@@ -19,8 +19,8 @@ class ExporterFiles {
 	cropPaddingPreset = $derived.by(() => {
 		if (this.cropPadding.unitless === 0) return 'none' as const;
 		if (this.cropPadding.unit === 'px') return 'customPixels' as const;
-		if (this.cropPadding.unitless === 5) return 'small' as const;
-		if (this.cropPadding.unitless === 10) return 'medium' as const;
+		// if (this.cropPadding.unitless === 5) return 'small' as const;
+		// if (this.cropPadding.unitless === 10) return 'medium' as const;
 		return 'customPercent' as const;
 	});
 
@@ -63,13 +63,13 @@ class ExporterFiles {
 					this.cropPadding = parseCropPadding('0px');
 					break;
 
-				case 'small':
-					this.cropPadding = parseCropPadding('5%');
-					break;
+				// case 'small':
+				// 	this.cropPadding = parseCropPadding('5%');
+				// 	break;
 
-				case 'medium':
-					this.cropPadding = parseCropPadding('10%');
-					break;
+				// case 'medium':
+				// 	this.cropPadding = parseCropPadding('10%');
+				// 	break;
 
 				default:
 					break;

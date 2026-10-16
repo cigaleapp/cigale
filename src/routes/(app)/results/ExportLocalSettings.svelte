@@ -48,10 +48,12 @@
 		{/snippet}
 		<EnumButtons
 			bind:value={exporter.cropPaddingPreset}
+			horizontal
+			--option-min-width="5rem"
 			options={[
 				{ key: 'none', label: 'Aucune' },
-				{ key: 'small', label: '5%' },
-				{ key: 'medium', label: '10%' },
+				// { key: 'small', label: '5%' },
+				// { key: 'medium', label: '10%' },
 				{ key: 'customPercent', label: '?%' },
 				{ key: 'customPixels', label: '?px' },
 			]}
@@ -60,7 +62,7 @@
 				{#if option.startsWith('custom')}
 					<div
 						class="numeric"
-						style:--width={exporter.unitOfPreset(option) === '%' ? '3ch' : '4ch'}
+						style:--width={exporter.unitOfPreset(option) === '%' ? '4ch' : '5ch'}
 					>
 						<InlineTextInput
 							label={option === 'customPercent'
@@ -75,10 +77,6 @@
 						/>
 						{exporter.unitOfPreset(option)}
 					</div>
-				{:else if label.includes('%')}
-					<Tooltip text="Pour chaque image, relativement à ses dimensions">
-						{label}
-					</Tooltip>
 				{:else}
 					{label}
 				{/if}
