@@ -42,6 +42,9 @@ beamup:
   origin: https://cigale-beamup-default-data-terra.ai.meso.umontpellier.fr
 
 remote:
+  inaturalist:
+    project: 137789
+
   ecosignal:
     project: 1
     # pour savoir si une image sans boîtes a été envoyée depuis Cigale (donc à ne pas ré-analyser)
@@ -524,6 +527,8 @@ sessionMetadata:
   transect_code:
     type: string
     label: Code du transect
+    inaturalist:
+      projectField: INSECTA transect code
     description: |
       Le code du transect est composé de la date, de l'heure, et de vos initiales. Par exemple, un transect réalisé par Martin Galli le 07/12/2023 à 14h50 s'écrira : 202312071450MG
     mergeMethod: none
