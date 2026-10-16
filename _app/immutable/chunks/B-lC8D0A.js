@@ -1,0 +1,1 @@
+import{$ as e,Y as t,o as n,y as r}from"./BcIlhseZ.js";import"./Br_EB1KO.js";var i=new Set([`$$slots`,`$$events`,`$$legacy`]),a=e(`<svg><path fill="currentColor" d="M14 5H5v2h7v7.586H6.586L13 21l6.414-6.414H14z"></path></svg>`);function o(e,o){let s=n(o,i);var c=a();r(c,()=>({class:`icon`,viewBox:`0 0 24 24`,width:`1.2em`,height:`1.2em`,...s})),t(e,c)}export{o as t};

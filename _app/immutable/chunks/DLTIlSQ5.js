@@ -1,0 +1,1 @@
+import{a as e}from"./DKoKL3MK.js";var t=class extends e{async getPluginVersion(){return{version:`web`}}};export{t as CapacitorShakeWeb};
