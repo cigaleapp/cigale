@@ -81,6 +81,8 @@ export async function loadModel({
 	protocolId,
 	metadataId,
 	alreadyLoadedSessions = new Set(),
+	/** Try using web gpu EP */
+	enableWebGPU,
 	/** called everytime the progress changes */
 	onProgress,
 	/** signal to abort the loading */
@@ -92,6 +94,7 @@ export async function loadModel({
 	db: DatabaseHandle;
 	swarpc: SwarpcClient<typeof PROCEDURES>;
 	metadataId: NamespacedMetadataID;
+	enableWebGPU: boolean,
 	alreadyLoadedSessions: Set<string>;
 	selector: (typeof NeuralModelSelector)['infer'];
 }): Promise<string | undefined> {
@@ -172,6 +175,7 @@ export async function loadModel({
 		task,
 		model,
 		classmapping,
+		enableWebGPU,
 		inferenceSessionId: id,
 	});
 

@@ -38,7 +38,7 @@ const inferenceSessions = new Map<string, InferenceSession>();
  */
 const latestSessionIdByTask = new Map<InferenceTask, string>();
 
-swarp.loadModel(async ({ task, model, classmapping, inferenceSessionId: id }) => {
+swarp.loadModel(async ({ task, model, classmapping, inferenceSessionId: id, enableWebGPU }) => {
 	// If the worker already has a session with this id, treat the request as a no-op.
 	// This makes loadModel idempotent and avoids reloading the same model on
 	// repeated client requests (e.g., when components remount on tab switches).
@@ -48,8 +48,9 @@ swarp.loadModel(async ({ task, model, classmapping, inferenceSessionId: id }) =>
 	}
 
 	const onnx = await ort.InferenceSession.create(model, {
-		executionProviders: (await supportsWebGPU()) ? ['webgpu', 'wasm'] : ['wasm'],
 		logSeverityLevel: 0,
+		executionProviders:
+			enableWebGPU && (await supportsWebGPU()) ? ['webgpu', 'wasm'] : ['wasm'],
 	});
 
 	if (!onnx) throw new Error('Impossible de charger le modèle ONNX');

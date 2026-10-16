@@ -31,6 +31,7 @@ export const PROCEDURES = {
 			'classmapping?': 'string | undefined',
 			task: '"classification" | "detection"',
 			inferenceSessionId: 'string > 1',
+			enableWebGPU: "boolean = true"
 		}),
 		progress: type('undefined'),
 		success: type('true'),
