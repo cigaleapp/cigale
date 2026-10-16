@@ -2,7 +2,7 @@
 	import { ArkErrors, type } from 'arktype';
 	import { dequal } from 'dequal';
 	import { dichotomid } from 'dichotomid';
-	import * as onnx from 'onnxruntime-web';
+	import * as onnx from 'onnxruntime-web/webgpu';
 	import { watch } from 'runed';
 
 	import IconArrowDown from '~icons/ri/arrow-down-line';

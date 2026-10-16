@@ -6,7 +6,7 @@ import type { HTTPRequest, ModelDetectionOutputShapes } from '$lib/database.js';
 import type { PROCEDURES } from '$worker/procedures.js';
 import type { SwarpcClient } from 'swarpc';
 
-import * as ort from 'onnxruntime-web';
+import * as ort from 'onnxruntime-web/webgpu';
 
 import { assertHardwareRequirements } from './hardware-requirements.js';
 import { loadToTensor, output2BB, preprocessTensor } from './inference_utils.js';

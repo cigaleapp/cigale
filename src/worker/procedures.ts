@@ -30,7 +30,6 @@ export const PROCEDURES = {
 			model: 'TypedArray.Uint8',
 			'classmapping?': 'string | undefined',
 			task: '"classification" | "detection"',
-			'webgpu?': 'boolean',
 			inferenceSessionId: 'string > 1',
 		}),
 		progress: type('undefined'),
