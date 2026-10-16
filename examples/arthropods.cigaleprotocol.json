@@ -97711,6 +97711,7 @@
 					{
 						"model": "https://huggingface.co/cigaleapp/built-in-protocols/resolve/main/detector-arthropoda.onnx?download=true",
 						"name": "YOLO11",
+						"webgpuReady": true,
 						"input": {
 							"height": 640,
 							"width": 640,
