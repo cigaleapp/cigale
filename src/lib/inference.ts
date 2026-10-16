@@ -94,7 +94,7 @@ export async function loadModel({
 	db: DatabaseHandle;
 	swarpc: SwarpcClient<typeof PROCEDURES>;
 	metadataId: NamespacedMetadataID;
-	enableWebGPU: boolean,
+	enableWebGPU: boolean;
 	alreadyLoadedSessions: Set<string>;
 	selector: (typeof NeuralModelSelector)['infer'];
 }): Promise<string | undefined> {

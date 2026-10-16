@@ -10,10 +10,10 @@
 	import { loadModel } from '$lib/inference.js';
 	import Logo from '$lib/Logo.svelte';
 	import ProgressBar from '$lib/ProgressBar.svelte';
+	import { getSetting } from '$lib/settings.svelte.js';
 	import { toasts } from '$lib/toasts.svelte';
 	import { uiState } from '$lib/uistate.svelte.js';
 	import { isAbortError } from '$lib/utils.js';
-	import { getSetting } from '$lib/settings.svelte.js';
 
 	const { data, children } = $props();
 
@@ -37,7 +37,7 @@
 		await loadModel({
 			alreadyLoadedSessions: uiState.loadedInferenceSessions,
 			db: databaseHandle(),
-					enableWebGPU: await getSetting("enableWebGPU"),
+			enableWebGPU: await getSetting('enableWebGPU'),
 			swarpc: data.swarpc,
 			abortSignal: modelAbortController.signal,
 			protocolId: uiState.currentProtocol.id,

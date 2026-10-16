@@ -23,10 +23,10 @@
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { cancelTask, classifyMore } from '$lib/queue.svelte.js';
 	import { seo } from '$lib/seo.svelte';
+	import { getSetting } from '$lib/settings.svelte.js';
 	import { toasts } from '$lib/toasts.svelte';
 	import { uiState } from '$lib/uistate.svelte.js';
 	import { isAbortError, nonnull } from '$lib/utils.js';
-	import { getSetting } from '$lib/settings.svelte.js';
 
 	type Item = GalleryItem<{
 		image: DB.Image | undefined;
@@ -145,7 +145,7 @@
 				const sessionId = await loadModel({
 					alreadyLoadedSessions: uiState.loadedInferenceSessions,
 					db: databaseHandle(),
-					enableWebGPU: await getSetting("enableWebGPU"),
+					enableWebGPU: await getSetting('enableWebGPU'),
 					swarpc: data.swarpc,
 					abortSignal: modelAbortController.signal,
 					protocolId,
