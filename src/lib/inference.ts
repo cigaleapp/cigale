@@ -61,6 +61,7 @@ de plus ça se lance que sur chrome, avec la commande linux mettant les flags :
 // nombre de threads pour wasm
 ort.env.wasm.numThreads = 1;
 
+ort.env.webgpu.profiling = { mode: 'default' };
 ort.env.wasm.wasmPaths = {
 	// @ts-expect-error nécéssaire sinon ça casse
 	'ort-wasm-simd-threaded.wasm': '/ort-wasm-simd-threaded.wasm',

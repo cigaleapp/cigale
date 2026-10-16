@@ -49,6 +49,7 @@ swarp.loadModel(async ({ task, model, classmapping, inferenceSessionId: id }) =>
 
 	const onnx = await ort.InferenceSession.create(model, {
 		executionProviders: (await supportsWebGPU()) ? ['webgpu', 'wasm'] : ['wasm'],
+		logSeverityLevel: 0,
 	});
 
 	if (!onnx) throw new Error('Impossible de charger le modèle ONNX');
