@@ -221,26 +221,30 @@ test.describe('respects hardware requirements', () => {
 		}
 	);
 
-	test(
-		'hardware requirements met',
-		withHardware({ ram: '4 GB', threads: 4 }),
-		async ({ app }) => {
-			const { target } = await app.db.metadata.of({
-				image: 'cyan.jpeg',
-				protocolId: 'testing',
-			});
+	test.describe('hardware requirements met', () => {
+		for (const webgpu of [true, false]) {
+			test(
+				webgpu ? 'with WebGPU' : 'without WebGPU',
+				withHardware({ ram: '4 GB', threads: 4, webgpu }),
+				async ({ app }) => {
+					const { target } = await app.db.metadata.of({
+						image: 'cyan.jpeg',
+						protocolId: 'testing',
+					});
 
-			expect(target.confidence).toBeCloseTo(0.4, 2);
-			expect(target.parsedValue).toBe('c');
-			expect(target.alternatives).toHaveLength(0);
-			expect(target.confidences).toMatchObject({
-				'"a"': assert.closeTo(0.1, 2),
-				'"b"': assert.closeTo(0.2, 2),
-				'"c"': assert.closeTo(0.4, 2),
-				'"d"': assert.closeTo(0.05, 2),
-				'"e"': assert.closeTo(0.05, 2),
-				'"f"': assert.closeTo(0.2, 2),
-			});
+					expect(target.confidence).toBeCloseTo(0.4, 2);
+					expect(target.parsedValue).toBe('c');
+					expect(target.alternatives).toHaveLength(0);
+					expect(target.confidences).toMatchObject({
+						'"a"': assert.closeTo(0.1, 2),
+						'"b"': assert.closeTo(0.2, 2),
+						'"c"': assert.closeTo(0.4, 2),
+						'"d"': assert.closeTo(0.05, 2),
+						'"e"': assert.closeTo(0.05, 2),
+						'"f"': assert.closeTo(0.2, 2),
+					});
+				}
+			);
 		}
-	);
+	});
 });
