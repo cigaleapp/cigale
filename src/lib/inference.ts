@@ -175,7 +175,7 @@ export async function loadModel({
 		task,
 		model,
 		classmapping,
-		enableWebGPU,
+		enableWebGPU: enableWebGPU && config.webgpuReady,
 		inferenceSessionId: id,
 	});
 
