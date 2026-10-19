@@ -140,7 +140,7 @@
         "fast-xml-parser": "^5.11.2",
         "gitmoji-cli": "^9.7.0",
         "globals": "^17.13.0",
-        "google-auth-library": "^11.1.0",
+        "google-auth-library": "^11.2.0",
         "google-fonts-helper": "^3.7.4",
         "googleapis": "^178.0.0",
         "gql.tada": "^1.11.4",
