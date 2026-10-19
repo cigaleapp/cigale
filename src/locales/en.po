@@ -3425,3 +3425,7 @@ msgstr ""
 #: src/routes/(app)/results/ExportLocalActions.svelte
 msgid "<0/> Darwin Core"
 msgstr ""
+
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+msgid "Autoriser l'inférence via WebGPU"
+msgstr ""

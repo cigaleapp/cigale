@@ -3425,3 +3425,7 @@ msgstr "GBIF Dataset Subtype Vocabulary: http://rs.gbif.org/vocabulary/gbif/data
 #: src/routes/(app)/results/ExportLocalActions.svelte
 msgid "<0/> Darwin Core"
 msgstr "<0/> Darwin Core"
+
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+msgid "Autoriser l'inférence via WebGPU"
+msgstr "Autoriser l'inférence via WebGPU"
