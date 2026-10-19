@@ -6,14 +6,19 @@ All notable changes to this project will be documented in this file, on a monthl
 
 ### Improvements
 
+- Allow disabling WebGPU
 - Charts in results page (#2094)
+- Export as DarwinCore Archive (#2251)
 - Remove footer actions from session cards
 - Send corrections to beacon server (#2231)
 - Show 100% in metadata confidence values when it's not manual
 
 ### Bug Fixes
 
+- Don't try to get session's protocol if sessionId not set in storeMetadataValue()
 - Fix media uploaded then downloaded from EcoSignal never getting crop-analyzed (#2223)
+- Fix metadata changes not storing beamup corrections when the metadata is imported from a protocol without beamup configured
+- Make WebGPU inference per-model opt-in
 
 ### Data Updates
 
