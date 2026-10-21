@@ -205,7 +205,7 @@ function pleyeReporter() {
 		const config = {
 			debug: env.PLEYE_DEBUG === 'debug',
 			apiKey: env.PLEYE_API_KEY || '',
-			serverOrigin: 'https://pleye.gwen.works',
+			serverOrigin: 'https://pleye-default-data-terra.ai.meso.umontpellier.fr',
 			githubJobId: env.JOB_ID,
 			commitSha: env.COMMIT_SHA,
 			traceViewerUrl: (sha1, extension) =>

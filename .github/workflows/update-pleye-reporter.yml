@@ -20,6 +20,8 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+    env:
+      PLEYE_HOST: https://pleye-default-data-terra.ai.meso.umontpellier.fr
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -33,10 +35,10 @@ jobs:
       - name: Get current Pleye version on server
         id: pleye
         run: |
-          VERSION=$(curl -fsSL https://pleye.gwen.works/version)
+          VERSION=$(curl -fsSL https://$PLEYE_HOST/version)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
       - run: |
-          curl -fsSL https://pleye.gwen.works/reporter.js?no-version -o tests/reporters/pleye.js
+          curl -fsSL https://$PLEYE_HOST/reporter.js?no-version -o tests/reporters/pleye.js
           bunx prettier --write tests/reporters/pleye.js
 
       - if: inputs.commit
@@ -56,7 +58,7 @@ jobs:
           branch: update-pleye-reporter
           title: '👽 Update Pleye reporter'
           body: |
-            https://pleye.gwen.works has a new version of the Playwright reporter. 
+            https://${{ env.PLEYE_HOST }} has a new version of the Playwright reporter. 
             This PR updates it to the current version that the server provides.
 
             Pleye version is ${{ steps.pleye.outputs.version }}
