@@ -1,0 +1,40 @@
+name: Issues timeline
+
+on:
+  workflow_dispatch: 
+  schedule:
+    - cron: 0 0 * * 1
+
+jobs:
+  generate:
+    name: Generate the HTML chart page
+    runs-on: ubuntu-latest
+    outputs:
+      artifact: ${{ steps.artifact.outputs.name }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6
+        with:
+          bun-version-file: .bun-version
+      - name: Run script
+        run: bun scripts/issues-timeline-chart.ts ${{ github.repository }} 9 chart.html
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - name: Save chart.html
+        id: artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
+
+  Deploy:
+    name: Deploy page
+    needs: generate
+    uses: ./.github/workflows/dev-deploy.yml
+    secrets: inherit
+    with:
+      environment: Issues timeline
+      artifact: ${{ needs.generate.outputs.artifact }}
+      subdomain: timeline
+      path: /
+      file: chart.html
+      job: Deploy timeline
