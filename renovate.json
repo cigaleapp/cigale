@@ -7,7 +7,9 @@
 		{
 			"customType": "regex",
 			"description": "Update Caddy images in the inline Dockerfile",
-			"managerFilePatterns": ["/^\\.github\\/workflows\\/dev-deployments-server-image\\.yml$/"],
+			"managerFilePatterns": [
+				"/^\\.github\\/workflows\\/dev-deployments-server-image\\.yml$/"
+			],
 			"matchStrings": ["FROM\\s+caddy:(?<currentValue>\\d+\\.\\d+\\.\\d+(?:-[\\w.-]+)?)"],
 			"depNameTemplate": "caddy",
 			"datasourceTemplate": "docker",
@@ -16,7 +18,9 @@
 		{
 			"customType": "regex",
 			"description": "Update the caddy-fs-s3 Go module",
-			"managerFilePatterns": ["/^\\.github\\/workflows\\/dev-deployments-server-image\\.yml$/"],
+			"managerFilePatterns": [
+				"/^\\.github\\/workflows\\/dev-deployments-server-image\\.yml$/"
+			],
 			"matchStrings": [
 				"--with github\\.com/sagikazarmark/caddy-fs-s3@(?<currentValue>v?\\d+\\.\\d+\\.\\d+)"
 			],
