@@ -2,9 +2,9 @@ name: Issues timeline
 
 on:
   workflow_dispatch:
-  push: 
+  push:
     branches: [main]
-    paths: 
+    paths:
       - .github/workflows/timeline.yml
       - scripts/issues-timeline-chart.ts
   schedule:
