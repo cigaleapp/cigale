@@ -7,7 +7,7 @@
  *   (issues closed as "not planned" / duplicate are ignored, see INCLUDE_NOT_PLANNED)
  *
  * Bar start (first one that exists wins):
- *   1. project field "Start"  (only if the issue is in the given project)
+ *   1. issue field "Start"
  *   2. earliest creation date of the pull requests that close the issue
  *   3. the issue's own creation date
  *
@@ -22,16 +22,14 @@
  *
  * Usage:
  *   export GITHUB_TOKEN=ghp_xxx          # or be logged in with `gh auth login`
- *   npx tsx timeline.ts <owner/repo> [projectNumber] [output.html]
+ *   npx tsx timeline.ts <owner/repo> [output.html]
  *
- * Examples:
- *   npx tsx timeline.ts my-org/my-repo 4 timeline.html
- *   npx tsx timeline.ts my-org/my-repo            # no project -> Start comes from PRs only
+ * Example:
+ *   npx tsx timeline.ts my-org/my-repo timeline.html
  *
  * Optional env vars:
- *   START_FIELD         name of the PROJECT date field   (default "Start")
- *   DEADLINE_FIELD      name of the ISSUE date field     (default "Deadline")
- *   PROJECT_OWNER       owner of the project             (default: the repo owner)
+ *   START_FIELD         name of the start date issue field     (default "Start")
+ *   DEADLINE_FIELD      name of the deadline date issue field  (default "Deadline")
  *   SINCE=2026-01-01    drop bars that end before this date (handy for big repos)
  *   UNTIL=2026-12-31    hard right edge of the chart. Bars that run past it are cut off there
  *                       and show their real end date written on the bar. Bars that start after
@@ -39,9 +37,9 @@
  *   VIEW_MONTHS=12      how many months are visible when the page opens (default 12)
  *   INCLUDE_NOT_PLANNED=1   also draw issues closed as "not planned" / duplicate
  *
- * Token: classic PAT with `repo` (+ `read:project` if you use a project), or a fine-grained PAT
- * with Issues: read, Pull requests: read (and Projects: read for org projects).
- * `gh` CLI users: `gh auth refresh -s read:project`.
+ * Token: classic PAT with `repo`, or a fine-grained PAT with Issues: read and Pull requests: read.
+ * `gh` CLI users: just `gh auth login`.
+ * Issue fields are a preview feature (the script sends the `GraphQL-Features: issue_fields` header).
  *
  * Requires Node 18+ (global fetch).
  */
@@ -50,20 +48,17 @@ import { writeFileSync } from 'node:fs';
 
 // ───────────────────────────── config ─────────────────────────────
 
-const [repoArg, arg2, arg3] = process.argv.slice(2);
+const [repoArg, outArg] = process.argv.slice(2);
 if (!repoArg || !repoArg.includes('/')) {
-	console.error('Usage: npx tsx timeline.ts <owner/repo> [projectNumber] [output.html]');
+	console.error('Usage: npx tsx timeline.ts <owner/repo> [output.html]');
 	process.exit(1);
 }
 const [OWNER, REPO] = repoArg.split('/');
 
-// 2nd arg is a project number if numeric, otherwise treated as the output file
-const PROJECT_NUMBER = arg2 && /^\d+$/.test(arg2) ? Number(arg2) : null;
-const OUT = (PROJECT_NUMBER === null ? arg2 : arg3) ?? 'timeline.html';
+const OUT = outArg ?? 'timeline.html';
 
 const START_FIELD = process.env.START_FIELD ?? 'Start';
 const DEADLINE_FIELD = process.env.DEADLINE_FIELD ?? 'Deadline';
-const PROJECT_OWNER = (process.env.PROJECT_OWNER ?? OWNER).toLowerCase();
 const SINCE = process.env.SINCE ? new Date(process.env.SINCE + 'T00:00:00Z') : null;
 const UNTIL = process.env.UNTIL ? new Date(process.env.UNTIL + 'T00:00:00Z') : null;
 const VIEW_MONTHS = Number(process.env.VIEW_MONTHS ?? 12);
@@ -80,7 +75,7 @@ function getToken(): string {
 			.trim();
 	} catch {
 		console.error(
-			'No GitHub token found. Set GITHUB_TOKEN (classic PAT with `repo` + `read:project`) ' +
+			'No GitHub token found. Set GITHUB_TOKEN (classic PAT with `repo`) ' +
 				'or log in with the GitHub CLI: `gh auth login`.'
 		);
 		process.exit(1);
@@ -89,7 +84,7 @@ function getToken(): string {
 
 // ───────────────────────────── GitHub API ─────────────────────────────
 
-type StartSource = 'project field' | 'first closing PR' | 'issue creation';
+type StartSource = 'issue field' | 'first closing PR' | 'issue creation';
 
 interface Issue {
 	number: number;
@@ -135,35 +130,6 @@ const QUERY = /* GraphQL */ `
 					closedByPullRequestsReferences(first: 20, includeClosedPrs: true) {
 						nodes {
 							createdAt
-						}
-					}
-					projectItems(first: 10) {
-						nodes {
-							project {
-								number
-								owner {
-									__typename
-									... on Organization {
-										login
-									}
-									... on User {
-										login
-									}
-								}
-							}
-							fieldValues(first: 30) {
-								nodes {
-									__typename
-									... on ProjectV2ItemFieldDateValue {
-										date
-										field {
-											... on ProjectV2FieldCommon {
-												name
-											}
-										}
-									}
-								}
-							}
 						}
 					}
 				}
@@ -215,16 +181,13 @@ async function fetchIssues(token: string): Promise<Issue[]> {
 			scanned++;
 			const closed = n.state === 'CLOSED';
 
-			// issue-level date fields (e.g. "Deadline")
+			// issue-level date fields ("Start", "Deadline")
 			let deadline: Date | null = null;
+			let fieldStart: Date | null = null;
 			for (const fv of n.issueFieldValues?.nodes ?? []) {
-				if (
-					fv.__typename === 'IssueFieldDateValue' &&
-					fv.value &&
-					fv.field?.name === DEADLINE_FIELD
-				) {
-					deadline = parseDate(fv.value);
-				}
+				if (fv.__typename !== 'IssueFieldDateValue' || !fv.value) continue;
+				if (fv.field?.name === DEADLINE_FIELD) deadline = parseDate(fv.value);
+				if (fv.field?.name === START_FIELD) fieldStart = parseDate(fv.value);
 			}
 
 			// selection: closed OR has a deadline
@@ -241,29 +204,9 @@ async function fetchIssues(token: string): Promise<Issue[]> {
 			}
 
 			// start date, in order of preference
-			let start: Date | null = null;
-			let startSource: StartSource = 'issue creation';
+			let start: Date | null = fieldStart;
+			let startSource: StartSource = fieldStart ? 'issue field' : 'issue creation';
 
-			if (PROJECT_NUMBER !== null) {
-				for (const item of n.projectItems?.nodes ?? []) {
-					const p = item.project;
-					if (
-						p?.number !== PROJECT_NUMBER ||
-						p.owner?.login?.toLowerCase() !== PROJECT_OWNER
-					)
-						continue;
-					for (const fv of item.fieldValues.nodes) {
-						if (
-							fv.__typename === 'ProjectV2ItemFieldDateValue' &&
-							fv.date &&
-							fv.field?.name === START_FIELD
-						) {
-							start = parseDate(fv.date);
-							startSource = 'project field';
-						}
-					}
-				}
-			}
 			if (!start) {
 				const prDates: Date[] = (n.closedByPullRequestsReferences?.nodes ?? [])
 					.filter(Boolean)
@@ -796,7 +739,7 @@ async function main() {
 
 	const bySource = (s: StartSource) => bars.filter((b) => b.issue.startSource === s).length;
 	console.log(
-		`  start dates: ${bySource('project field')} from project field, ` +
+		`  start dates: ${bySource('issue field')} from issue field, ` +
 			`${bySource('first closing PR')} from first closing PR, ${bySource('issue creation')} from issue creation`
 	);
 
