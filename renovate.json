@@ -3,6 +3,28 @@
 	"extends": ["github>gwennlbh/renovate"],
 	"prConcurrentLimit": 8,
 	"gitIgnoredAuthors": ["41898282+github-actions[bot]@users.noreply.github.com"],
+	"customManagers": [
+		{
+			"customType": "regex",
+			"description": "Update Caddy images in the inline Dockerfile",
+			"managerFilePatterns": ["/^\\.github\\/workflows\\/build-and-push\\.yml$/"],
+			"matchStrings": ["FROM\\s+caddy:(?<currentValue>\\d+\\.\\d+\\.\\d+(?:-[\\w.-]+)?)"],
+			"depNameTemplate": "caddy",
+			"datasourceTemplate": "docker",
+			"versioningTemplate": "docker"
+		},
+		{
+			"customType": "regex",
+			"description": "Update the caddy-fs-s3 Go module",
+			"managerFilePatterns": ["/^\\.github\\/workflows\\/build-and-push\\.yml$/"],
+			"matchStrings": [
+				"--with github\\.com/sagikazarmark/caddy-fs-s3@(?<currentValue>v?\\d+\\.\\d+\\.\\d+)"
+			],
+			"depNameTemplate": "github.com/sagikazarmark/caddy-fs-s3",
+			"datasourceTemplate": "go",
+			"versioningTemplate": "semver"
+		}
+	],
 	"packageRules": [
 		{
 			"description": "Auto-merge updates to linters and formatters",
