@@ -46,6 +46,8 @@
 import { execSync } from 'node:child_process';
 import { writeFileSync } from 'node:fs';
 
+// eslint-disable @typescript-eslint/no-explicit-any
+
 // ───────────────────────────── config ─────────────────────────────
 
 const [repoArg, outArg] = process.argv.slice(2);
