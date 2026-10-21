@@ -17,6 +17,10 @@ on:
       HUGGINGFACE_ACCESS_TOKEN:
         required: true
         description: Access token for the Huggingface Hub API. Used to pre-download models from Huggingface. Shouldn't need any specific permissions, as repos it downloads files from are public.
+      DATATERRA_DEV_DEPLOYS_BUCKET_KEY_ID:
+        required: true
+      DATATERRA_DEV_DEPLOYS_BUCKET_KEY_SECRET:
+        required: true
     inputs:
       artifact:
         type: string

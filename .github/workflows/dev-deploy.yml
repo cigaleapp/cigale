@@ -14,10 +14,15 @@ on:
         required: true
       DEV_DEPLOYMENTS_HOST_KEY:
         required: true
+      DATATERRA_DEV_DEPLOYS_BUCKET_KEY_ID:
+        required: true
+      DATATERRA_DEV_DEPLOYS_BUCKET_KEY_SECRET:
+        required: true
     outputs:
       url:
         description: URL to the published site
-        value: https://${{ inputs.subdomain }}.${{ inputs.domain }}${{ inputs.path }}${{ inputs.environment-url-append }}
+        # value: https://${{ inputs.subdomain }}.${{ inputs.domain }}${{ inputs.path }}${{ inputs.environment-url-append }}
+        value: https://cigale-dev-default-data-terra.ai.meso.umontpellier.fr/${{ inputs.subdomain }}${{ inputs.path }}${{ inputs.environment-url-append }}
     inputs:
       environment:
         type: string
@@ -144,10 +149,38 @@ jobs:
           # Upload
           rsync $rsync_flags to-upload/ "dev-deployments:$path"
 
+
+      - name: Setup Rclone
+        uses: AnimMouse/setup-rclone@v1
+
+      - name: Upload to Data Terra S3 bucket
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.DATATERRA_DEV_DEPLOYS_BUCKET_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.DATATERRA_DEV_DEPLOYS_BUCKET_KEY_SECRET }}
+          BUCKET_NAME: cigale-dev-deployments
+        run: |
+          rclone config create dataterra s3 \
+            provider Other \
+            region default \
+            endpoint http://data-terra.s3-gateway.ai.meso.umontpellier.fr \
+            access_key_id $AWS_ACCESS_KEY_ID \
+            secret_access_key $AWS_SECRET_ACCESS_KEY
+
+          set -x 
+          path="${{ inputs.subdomain }}${{ inputs.path }}"
+
+          if [[ "$CLEAR" == "true" ]]; then
+            # Clean directory
+            rclone purge dataterra:$BUCKET_NAME/$path
+          fi
+          
+          rclone copy to-upload/ dataterra:$BUCKET_NAME/$path --progress
+
       - name: Wait for it to be live
         if: inputs.live-check
         env:
-          URL: https://${{ inputs.subdomain }}.${{ inputs.domain }}${{ inputs.path }}
+          # URL: https://${{ inputs.subdomain }}.${{ inputs.domain }}${{ inputs.path }}
+          URL: https://cigale-dev-default-data-terra.ai.meso.umontpellier.fr/${{ inputs.subdomain }}${{ inputs.path }}
         run: |
           echo Getting server IP from $HOST
           resolved_ip=$(dig +short $HOST | head -n 1)

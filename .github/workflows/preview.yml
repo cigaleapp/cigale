@@ -34,20 +34,17 @@ on:
       DIAWI_TOKEN:
         required: true
         description: 'API token for Diawi, used to upload Android app previews'
+      DATATERRA_DEV_DEPLOYS_BUCKET_KEY_ID:
+        required: true
+      DATATERRA_DEV_DEPLOYS_BUCKET_KEY_SECRET:
+        required: true
 
 jobs:
   android:
     name: Android app
     uses: ./.github/workflows/android.yml
     if: contains(github.event.pull_request.labels.*.name, 'mobile') || contains(github.event.pull_request.labels.*.name, 'native-android-changes') || !startsWith(github.base_ref, 'renovate/')
-    secrets:
-      ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_PR_KEYSTORE_BASE64 }}
-      ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_PR_KEYSTORE_PASSWORD }}
-      ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_PR_KEY_ALIAS }}
-      ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_PR_KEY_PASSWORD }}
-      DEV_DEPLOYMENTS_SSH_PRIVATE_KEY: ${{ secrets.DEV_DEPLOYMENTS_SSH_PRIVATE_KEY }}
-      DEV_DEPLOYMENTS_HOST_KEY: ${{ secrets.DEV_DEPLOYMENTS_HOST_KEY }}
-      DIAWI_TOKEN: ${{ secrets.DIAWI_TOKEN }}
+    secrets: inherit
     with:
       flavor: preview
       artifact: ${{ inputs.artifact}}
