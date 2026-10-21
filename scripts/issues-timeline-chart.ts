@@ -26,6 +26,9 @@
  *   DEADLINE_FIELD      name of the ISSUE date field     (default "Deadline")
  *   PROJECT_OWNER       owner of the project             (default: the repo owner)
  *   SINCE=2026-01-01    drop bars that end before this date (handy for big repos)
+ *   UNTIL=2026-12-31    zoom: the chart stops at this date. Bars that run past it are cut off
+ *                       at the right edge and show their real end date written on the bar.
+ *                       Bars that start after it are dropped.
  *   EXCLUDE_NOT_PLANNED=1   ignore issues closed as "not planned" / duplicate
  *
  * Token: classic PAT with `repo` (+ `read:project` if you use a project), or a fine-grained PAT
@@ -55,6 +58,7 @@ const START_FIELD = process.env.START_FIELD ?? "Start";
 const DEADLINE_FIELD = process.env.DEADLINE_FIELD ?? "Deadline";
 const PROJECT_OWNER = (process.env.PROJECT_OWNER ?? OWNER).toLowerCase();
 const SINCE = process.env.SINCE ? new Date(process.env.SINCE + "T00:00:00Z") : null;
+const UNTIL = process.env.UNTIL ? new Date(process.env.UNTIL + "T00:00:00Z") : null;
 const EXCLUDE_NOT_PLANNED = process.env.INCLUDE_NOT_PLANNED !== "1";
 
 // ───────────────────────────── auth ─────────────────────────────
@@ -264,6 +268,7 @@ function buildBars(issues: Issue[], today: Date): Bar[] {
       kind = end < today ? "overdue" : "open";
     }
     if (SINCE && end < SINCE) continue;
+    if (UNTIL && issue.start > UNTIL) continue;
     // never let a bar be shorter than one day (or negative)
     if (end.getTime() < issue.start.getTime() + DAY) end = new Date(issue.start.getTime() + DAY);
     bars.push({ issue, start: issue.start, end, kind });
@@ -287,9 +292,12 @@ function renderSvg(title: string, bars: Bar[], today: Date): string {
   const H = top + bars.length * rowH + 24;
   const chartW = W - labelW - rightPad;
 
-  const allDates = bars.flatMap((b) => [b.start, b.end]).concat(today);
+  // with UNTIL, bar ends are clipped to it and it becomes the right edge of the chart
+  const clip = (d: Date) => (UNTIL && d > UNTIL ? UNTIL : d);
+  const allDates = bars.flatMap((b) => [b.start, clip(b.end)]);
+  if (!UNTIL) allDates.push(today);
   const min = new Date(Math.min(...allDates.map((d) => d.getTime())) - 3 * DAY);
-  const max = new Date(Math.max(...allDates.map((d) => d.getTime())) + 3 * DAY);
+  const max = UNTIL ?? new Date(Math.max(...allDates.map((d) => d.getTime())) + 3 * DAY);
   const x = (d: Date) => labelW + ((d.getTime() - min.getTime()) / (max.getTime() - min.getTime())) * chartW;
 
   // month (or quarter) grid
@@ -313,6 +321,7 @@ function renderSvg(title: string, bars: Bar[], today: Date): string {
     }
     text { fill: var(--fg); font-size: 12px; }
     .muted { fill: var(--muted); }
+    .onbar { fill: #ffffff; font-size: 11px; font-weight: 600; }
     .title { font-size: 18px; font-weight: 600; }
     .grid { stroke: var(--grid); stroke-width: 1; }
     .row { fill: var(--row); }
@@ -359,7 +368,9 @@ function renderSvg(title: string, bars: Bar[], today: Date): string {
   bars.forEach((b, i) => {
     const y = top + i * rowH;
     const bx = x(b.start);
-    const bw = Math.max(x(b.end) - bx, 3);
+    const clipped = UNTIL !== null && b.end > UNTIL;
+    const endX = x(clip(b.end));
+    const bw = Math.max(endX - bx, 3);
     const label = `#${b.issue.number} ${trunc(b.issue.title, 46)}`;
 
     out.push(`<a href="${esc(b.issue.url)}" target="_blank">`);
@@ -375,8 +386,19 @@ function renderSvg(title: string, bars: Bar[], today: Date): string {
     );
     out.push(`</rect>`);
 
+    // bar runs past the zoom window -> write its real end date on the bar
+    if (clipped) {
+      const text = `→ ${fmt(b.end)}`;
+      const fits = bw >= text.length * 6.3 + 14;
+      out.push(
+        fits
+          ? `<text x="${endX - 6}" y="${y + rowH / 2 + 4}" text-anchor="end" class="onbar">${esc(text)}</text>`
+          : `<text x="${bx - 6}" y="${y + rowH / 2 + 4}" text-anchor="end" class="muted">${esc(text)}</text>`
+      );
+    }
+
     // deadline diamond for closed issues (shows early/late completion)
-    if (b.kind === "closed" && b.issue.deadline) {
+    if (b.kind === "closed" && b.issue.deadline && b.issue.deadline <= max) {
       const dx = x(b.issue.deadline);
       const cy = y + rowH / 2;
       out.push(`<path d="M${dx} ${cy - 6} l6 6 -6 6 -6 -6z" class="deadline"/>`);
@@ -385,9 +407,11 @@ function renderSvg(title: string, bars: Bar[], today: Date): string {
   });
 
   // today marker
-  const tx = x(today);
-  out.push(`<line x1="${tx}" y1="${top - 6}" x2="${tx}" y2="${H - 16}" class="today"/>`);
-  out.push(`<text x="${tx + 4}" y="${H - 4}" class="muted">today</text>`);
+  if (today >= min && today <= max) {
+    const tx = x(today);
+    out.push(`<line x1="${tx}" y1="${top - 6}" x2="${tx}" y2="${H - 16}" class="today"/>`);
+    out.push(`<text x="${tx + 4}" y="${H - 4}" class="muted">today</text>`);
+  }
 
   out.push(`</svg>`);
   return out.join("\n");
