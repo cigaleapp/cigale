@@ -234,7 +234,7 @@ async function fetchIssues(token: string): Promise<Issue[]> {
 		cursor = page.pageInfo.endCursor;
 		process.stdout.write(`\r  scanned ${scanned} issues…`);
 	}
-	console.log(
+	console.info(
 		`\r  scanned ${scanned} issues, ${issues.length} selected, ${notPlanned} "not planned" ignored`
 	);
 	return issues;
@@ -726,7 +726,7 @@ function renderHtml(title: string, bars: Bar[], today: Date): string {
 
 async function main() {
 	const token = getToken();
-	console.log(`Fetching issues of ${OWNER}/${REPO}…`);
+	console.info(`Fetching issues of ${OWNER}/${REPO}…`);
 	const issues = await fetchIssues(token);
 
 	const now = new Date();
@@ -738,13 +738,13 @@ async function main() {
 	}
 
 	const bySource = (s: StartSource) => bars.filter((b) => b.issue.startSource === s).length;
-	console.log(
+	console.info(
 		`  start dates: ${bySource('issue field')} from issue field, ` +
 			`${bySource('first closing PR')} from first closing PR, ${bySource('issue creation')} from issue creation`
 	);
 
 	writeFileSync(OUT, renderHtml(`${OWNER}/${REPO}`, bars, today), 'utf8');
-	console.log(`✓ ${bars.length} bars written to ${OUT}`);
+	console.info(`✓ ${bars.length} bars written to ${OUT}`);
 }
 
 main().catch((e) => {
