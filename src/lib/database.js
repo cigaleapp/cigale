@@ -156,7 +156,7 @@ const Settings = table(
 				by: 'me',
 			},
 		})),
-		enableWebGPU: 'boolean = true',
+		enableWebGPU: 'boolean = false',
 		theme: type.enumerated('dark', 'light', 'auto'),
 		gridSize: type.number.pipe((n) => clamp(n, 0.5, 2)),
 		notifications: 'boolean | null = null',
