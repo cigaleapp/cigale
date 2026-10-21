@@ -503,17 +503,76 @@ const CLIENT_JS = String.raw`
   }
 
   // ---- zoom & scroll ----
+  // Rows are sorted by start date, so zooming to another point in time usually means the
+  // relevant rows are somewhere else vertically. We pick the vertical position that shows
+  // the most bars overlapping the visible time window ("bar density"), rather than simply the
+  // first overlapping row (which is often a long-running issue sitting far above the action).
+  function rowH() { return (recs.length && recs[0].bar.parentNode.parentNode.offsetHeight) || 28; }
+  function headerH() { return document.querySelector(".top").offsetHeight + document.querySelector(".axis").offsetHeight; }
+  function rowsTop() { return rowsEl.getBoundingClientRect().top + window.scrollY; }
+  function timeWindow(left) { return [lo + left / ppd() * DAY, lo + (left + viewW()) / ppd() * DAY]; }
+  function visibleRows() { return Math.max(1, Math.floor((window.innerHeight - headerH()) / rowH())); }
+
+  // prefix[i] = number of rows before i whose bar overlaps the time window
+  function prefixCounts(left) {
+    var w = timeWindow(left), p = [0];
+    for (var i = 0; i < recs.length; i++) {
+      var b = recs[i].b;
+      p.push(p[i] + (clip(b.e) >= w[0] && b.s <= w[1] ? 1 : 0));
+    }
+    return p;
+  }
+  // best vertical slice: scrollTop that maximizes bars in view (-1 if the window holds no bars).
+  // With "must" (a row index), only slices that include that row are considered.
+  function bestSlice(left, must) {
+    var p = prefixCounts(left), n = recs.length, N = visibleRows();
+    var hasMust = must !== undefined && must >= 0;
+    var from = 0, to = Math.max(0, n - N);
+    if (hasMust) { from = Math.max(0, must - N + 1); to = Math.min(to, must); }
+    var best = -1, bi = from;
+    for (var i = from; i <= to; i++) {
+      var c = p[Math.min(n, i + N)] - p[i];
+      if (c > best) { best = c; bi = i; }
+    }
+    if (best <= 0 && !hasMust) return { top: -1, count: 0 };
+    var stop = hasMust ? must : n - 1;
+    if (best > 0) while (bi < stop && p[bi + 1] === p[bi]) bi++; // don't start on rows with no bar in the window
+    return { top: Math.max(0, rowsTop() + bi * rowH() - headerH()), count: Math.max(best, 0) };
+  }
+  // bars in view at the current vertical scroll position
+  function currentCount(left) {
+    var p = prefixCounts(left), n = recs.length;
+    var i0 = Math.min(n, Math.max(0, Math.floor((window.scrollY + headerH() - rowsTop()) / rowH())));
+    return p[Math.min(n, i0 + visibleRows())] - p[i0];
+  }
+
   function setPpm(newPpm, ax) {
     if (ax === undefined) ax = LABEL_W + viewW() / 2;
     ax = Math.max(ax, LABEL_W);
     var anchorMs = lo + (window.scrollX + ax - LABEL_W) / ppd() * DAY; // date under the cursor
     ppm = clampPpm(newPpm);
     layout();
-    window.scrollTo(x(anchorMs) - (ax - LABEL_W), window.scrollY);
+    var left = x(anchorMs) - (ax - LABEL_W);
+    var top = window.scrollY;
+    // keep the vertical position while it still shows a decent share of the possible bars,
+    // otherwise follow the zoom to the densest spot
+    var best = bestSlice(left);
+    if (best.top >= 0 && currentCount(left) < 0.7 * best.count) top = best.top;
+    window.scrollTo(left, top);
   }
+  // the most recently closed issue (by close date): the "Today" views always keep its row on screen
+  var latestClosed = -1;
+  recs.forEach(function (r, i) {
+    if (r.b.k === "closed" && (latestClosed < 0 || r.b.e >= recs[latestClosed].b.e)) latestClosed = i;
+  });
+
+  // jump to today: center it horizontally, bring the densest rows into view,
+  // and make sure the latest closed issue is visible
   function centerOn(ms, smooth) {
     var c = Math.min(Math.max(ms, lo), hi);
-    window.scrollTo({ left: x(c) - viewW() / 2, top: window.scrollY, behavior: smooth ? "smooth" : "auto" });
+    var left = x(c) - viewW() / 2;
+    var t = bestSlice(left, latestClosed).top;
+    window.scrollTo({ left: left, top: t >= 0 ? t : window.scrollY, behavior: smooth ? "smooth" : "auto" });
   }
 
   presetBtns.forEach(function (btn) {
@@ -522,7 +581,7 @@ const CLIENT_JS = String.raw`
   document.getElementById("zin").addEventListener("click", function () { setPpm(ppm * 1.4); });
   document.getElementById("zout").addEventListener("click", function () { setPpm(ppm / 1.4); });
   document.getElementById("all").addEventListener("click", function () {
-    setPpm(minPpm()); window.scrollTo(0, window.scrollY);
+    setPpm(minPpm()); window.scrollTo(0, 0);
   });
   document.getElementById("todaybtn").addEventListener("click", function () { centerOn(today, true); });
 
