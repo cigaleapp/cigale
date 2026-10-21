@@ -1,26 +1,36 @@
 #!/usr/bin/env tsx
 /**
- * Generates a timeline (gantt-style) SVG from a GitHub Projects v2 board.
+ * Generates a timeline (gantt-style) SVG from the issues of a GitHub repo.
  *
- *   one issue = one bar
- *   bar start = project field "Start"
- *   bar end   = issue closedAt (if closed) OR issue field "Deadline"
+ * Which issues become bars:
+ *   every issue of the repo that is CLOSED, or has a "Deadline" issue field set
+ *
+ * Bar start (first one that exists wins):
+ *   1. project field "Start"  (only if the issue is in the given project)
+ *   2. earliest creation date of the pull requests that close the issue
+ *   3. the issue's own creation date
+ *
+ * Bar end:
+ *   issue closedAt (if closed)  OR  issue field "Deadline"
  *
  * Usage:
- *   export GITHUB_TOKEN=ghp_xxx            # or just be logged in with `gh auth login`
- *   npx tsx timeline.ts <owner> <projectNumber> [output.svg]
+ *   export GITHUB_TOKEN=ghp_xxx          # or be logged in with `gh auth login`
+ *   npx tsx timeline.ts <owner/repo> [projectNumber] [output.svg]
  *
- * Example:
- *   npx tsx timeline.ts my-org 4 timeline.svg
+ * Examples:
+ *   npx tsx timeline.ts my-org/my-repo 4 timeline.svg
+ *   npx tsx timeline.ts my-org/my-repo            # no project -> Start comes from PRs only
  *
  * Optional env vars:
- *   START_FIELD     name of the PROJECT date field   (default "Start")
- *   DEADLINE_FIELD  name of the ISSUE date field     (default "Deadline")
- *                   (falls back to a project field of the same name if the issue has none)
+ *   START_FIELD         name of the PROJECT date field   (default "Start")
+ *   DEADLINE_FIELD      name of the ISSUE date field     (default "Deadline")
+ *   PROJECT_OWNER       owner of the project             (default: the repo owner)
+ *   SINCE=2026-01-01    drop bars that end before this date (handy for big repos)
+ *   EXCLUDE_NOT_PLANNED=1   ignore issues closed as "not planned" / duplicate
  *
- * Note: GitHub "issue fields" are in preview and need the `GraphQL-Features: issue_fields`
- * header (sent automatically). They are only readable if issue fields are enabled for your org.
- *   INCLUDE_ARCHIVED=1   also include archived project items
+ * Token: classic PAT with `repo` (+ `read:project` if you use a project), or a fine-grained PAT
+ * with Issues: read, Pull requests: read (and Projects: read for org projects).
+ * `gh` CLI users: `gh auth refresh -s read:project`.
  *
  * Requires Node 18+ (global fetch). No npm dependencies besides tsx/typescript.
  */
@@ -30,37 +40,30 @@ import { writeFileSync } from "node:fs";
 
 // ───────────────────────────── config ─────────────────────────────
 
-const [owner, numberArg, outArg] = process.argv.slice(2);
-if (!owner || !numberArg) {
-  console.error("Usage: npx tsx timeline.ts <owner> <projectNumber> [output.svg]");
+const [repoArg, arg2, arg3] = process.argv.slice(2);
+if (!repoArg || !repoArg.includes("/")) {
+  console.error("Usage: npx tsx timeline.ts <owner/repo> [projectNumber] [output.svg]");
   process.exit(1);
 }
-const PROJECT_NUMBER = Number(numberArg);
-const OUT = outArg ?? "timeline.svg";
+const [OWNER, REPO] = repoArg.split("/");
+
+// 2nd arg is a project number if numeric, otherwise treated as the output file
+const PROJECT_NUMBER = arg2 && /^\d+$/.test(arg2) ? Number(arg2) : null;
+const OUT = (PROJECT_NUMBER === null ? arg2 : arg3) ?? "timeline.svg";
+
 const START_FIELD = process.env.START_FIELD ?? "Start";
 const DEADLINE_FIELD = process.env.DEADLINE_FIELD ?? "Deadline";
-const INCLUDE_ARCHIVED = process.env.INCLUDE_ARCHIVED === "1";
+const PROJECT_OWNER = (process.env.PROJECT_OWNER ?? OWNER).toLowerCase();
+const SINCE = process.env.SINCE ? new Date(process.env.SINCE + "T00:00:00Z") : null;
+const EXCLUDE_NOT_PLANNED = process.env.INCLUDE_NOT_PLANNED !== "1";
 
 // ───────────────────────────── auth ─────────────────────────────
 
-/**
- * Token resolution order:
- *   1. GITHUB_TOKEN / GH_TOKEN env var
- *   2. `gh auth token` (GitHub CLI)
- *
- * Token needs access to Projects + Issues:
- *   - classic PAT: scopes `repo` + `read:project`  (works for user AND org projects)
- *   - fine-grained PAT: only works for ORG-owned projects
- *       (org permission "Projects: read" + repo permission "Issues: read")
- *   - gh CLI: run `gh auth refresh -s read:project` once
- */
 function getToken(): string {
   const env = process.env.GITHUB_TOKEN ?? process.env.GH_TOKEN;
   if (env) return env;
   try {
-    return execSync("gh auth token", { stdio: ["ignore", "pipe", "ignore"] })
-      .toString()
-      .trim();
+    return execSync("gh auth token", { stdio: ["ignore", "pipe", "ignore"] }).toString().trim();
   } catch {
     console.error(
       "No GitHub token found. Set GITHUB_TOKEN (classic PAT with `repo` + `read:project`) " +
@@ -72,54 +75,62 @@ function getToken(): string {
 
 // ───────────────────────────── GitHub API ─────────────────────────────
 
+type StartSource = "project field" | "first closing PR" | "issue creation";
+
 interface Issue {
   number: number;
   title: string;
   url: string;
-  repo: string;
   closed: boolean;
-  createdAt: Date|null;
   closedAt: Date | null;
-  start: Date | null;
+  start: Date;
+  startSource: StartSource;
   deadline: Date | null;
 }
 
-const QUERY = (ownerType: "organization" | "user") => /* GraphQL */ `
-  query ($owner: String!, $number: Int!, $cursor: String) {
-    ${ownerType}(login: $owner) {
-      projectV2(number: $number) {
-        title
-        items(first: 100, after: $cursor) {
-          pageInfo { hasNextPage endCursor }
-          nodes {
-            isArchived
-            content {
+const QUERY = /* GraphQL */ `
+  query ($owner: String!, $name: String!, $cursor: String) {
+    repository(owner: $owner, name: $name) {
+      nameWithOwner
+      issues(first: 100, after: $cursor, orderBy: { field: CREATED_AT, direction: ASC }) {
+        pageInfo { hasNextPage endCursor }
+        nodes {
+          number
+          title
+          url
+          state
+          stateReason
+          createdAt
+          closedAt
+          issueFieldValues(first: 20) {
+            nodes {
               __typename
-              ... on Issue {
-                number
-                title
-                url
-                state
-                closedAt
-				createdAt
-                repository { nameWithOwner }
-                issueFieldValues(first: 20) {
-                  nodes {
-                    __typename
-                    ... on IssueFieldDateValue {
-                      value
-                      field { ... on IssueFieldDate { name } }
-                    }
-                  }
-                }
+              ... on IssueFieldDateValue {
+                value
+                field { ... on IssueFieldDate { name } }
               }
             }
-            fieldValues(first: 30) {
-              nodes {
-                __typename
-                ... on ProjectV2ItemFieldDateValue {
-                  date
-                  field { ... on ProjectV2FieldCommon { name } }
+          }
+          closedByPullRequestsReferences(first: 20, includeClosedPrs: true) {
+            nodes { createdAt }
+          }
+          projectItems(first: 10) {
+            nodes {
+              project {
+                number
+                owner {
+                  __typename
+                  ... on Organization { login }
+                  ... on User { login }
+                }
+              }
+              fieldValues(first: 30) {
+                nodes {
+                  __typename
+                  ... on ProjectV2ItemFieldDateValue {
+                    date
+                    field { ... on ProjectV2FieldCommon { name } }
+                  }
                 }
               }
             }
@@ -130,87 +141,103 @@ const QUERY = (ownerType: "organization" | "user") => /* GraphQL */ `
   }
 `;
 
-/** Accepts "2026-04-15" or a full ISO timestamp; always returns UTC midnight-based date. */
+/** Accepts "2026-04-15" or a full ISO timestamp. */
 function parseDate(v: string): Date {
   return new Date(v.includes("T") ? v : v + "T00:00:00Z");
 }
 
-async function gql(token: string, query: string, variables: object) {
+async function gql(token: string, variables: object) {
   const res = await fetch("https://api.github.com/graphql", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
-      "User-Agent": "project-timeline-script",
-      "GraphQL-Features": "issue_fields", // required to read issue fields
+      "User-Agent": "repo-timeline-script",
+      "GraphQL-Features": "issue_fields", // required to read issue fields (preview)
     },
-    body: JSON.stringify({ query, variables }),
+    body: JSON.stringify({ query: QUERY, variables }),
   });
   if (res.status === 401) throw new Error("401 Unauthorized – check your token.");
   if (!res.ok) throw new Error(`GitHub API error ${res.status}: ${await res.text()}`);
   return (await res.json()) as { data?: any; errors?: { type?: string; message: string }[] };
 }
 
-/** Returns null if the project isn't found under this owner type. */
-async function fetchProject(
-  token: string,
-  ownerType: "organization" | "user"
-): Promise<{ title: string; issues: Issue[] } | null> {
+async function fetchIssues(token: string): Promise<Issue[]> {
   const issues: Issue[] = [];
-  let title = "";
   let cursor: string | null = null;
+  let scanned = 0;
 
   for (;;) {
-    const json = await gql(token, QUERY(ownerType), { owner, number: PROJECT_NUMBER, cursor });
-
+    const json = await gql(token, { owner: OWNER, name: REPO, cursor });
     if (json.errors?.length) {
-      const allNotFound = json.errors.every((e) => e.type === "NOT_FOUND");
-      if (allNotFound) return null;
+      if (json.errors.every((e) => e.type === "NOT_FOUND")) {
+        throw new Error(`Repository ${OWNER}/${REPO} not found (or your token can't see it).`);
+      }
       throw new Error(json.errors.map((e) => e.message).join("\n"));
     }
-    const project = json.data?.[ownerType]?.projectV2;
-    if (!project) return null;
+    const page = json.data.repository.issues;
 
-    title = project.title;
-    for (const node of project.items.nodes) {
-      if (node.isArchived && !INCLUDE_ARCHIVED) continue;
-      const c = node.content;
-      if (!c || c.__typename !== "Issue") continue; // skip draft issues / PRs
-
-      // project-level date fields (e.g. "Start")
-      const dates: Record<string, Date> = {};
-      for (const fv of node.fieldValues.nodes) {
-        if (fv.__typename === "ProjectV2ItemFieldDateValue" && fv.date && fv.field?.name) {
-          dates[fv.field.name] = parseDate(fv.date);
-        }
-      }
+    for (const n of page.nodes) {
+      scanned++;
+      const closed = n.state === "CLOSED";
 
       // issue-level date fields (e.g. "Deadline")
-      const issueDates: Record<string, Date> = {};
-      for (const fv of c.issueFieldValues?.nodes ?? []) {
-        if (fv.__typename === "IssueFieldDateValue" && fv.value && fv.field?.name) {
-          issueDates[fv.field.name] = parseDate(fv.value);
+      let deadline: Date | null = null;
+      for (const fv of n.issueFieldValues?.nodes ?? []) {
+        if (fv.__typename === "IssueFieldDateValue" && fv.value && fv.field?.name === DEADLINE_FIELD) {
+          deadline = parseDate(fv.value);
         }
       }
 
+      // selection: closed OR has a deadline
+      if (!closed && !deadline) continue;
+      if (closed && EXCLUDE_NOT_PLANNED && (n.stateReason === "NOT_PLANNED" || n.stateReason === "DUPLICATE")) continue;
+
+      // start date, in order of preference
+      let start: Date | null = null;
+      let startSource: StartSource = "issue creation";
+
+      if (PROJECT_NUMBER !== null) {
+        for (const item of n.projectItems?.nodes ?? []) {
+          const p = item.project;
+          if (p?.number !== PROJECT_NUMBER || p.owner?.login?.toLowerCase() !== PROJECT_OWNER) continue;
+          for (const fv of item.fieldValues.nodes) {
+            if (fv.__typename === "ProjectV2ItemFieldDateValue" && fv.date && fv.field?.name === START_FIELD) {
+              start = parseDate(fv.date);
+              startSource = "project field";
+            }
+          }
+        }
+      }
+      if (!start) {
+        const prDates: Date[] = (n.closedByPullRequestsReferences?.nodes ?? [])
+          .filter(Boolean)
+          .map((pr: { createdAt: string }) => new Date(pr.createdAt));
+        if (prDates.length) {
+          start = new Date(Math.min(...prDates.map((d) => d.getTime())));
+          startSource = "first closing PR";
+        }
+      }
+      if (!start) start = new Date(n.createdAt);
+
       issues.push({
-        number: c.number,
-        title: c.title,
-        url: c.url,
-        repo: c.repository.nameWithOwner,
-        closed: c.state === "CLOSED",
-        closedAt: c.closedAt ? new Date(c.closedAt) : null,
-		createdAt: c.createdAt ? new Date(c.createdAt) : null,
-        start: dates[START_FIELD] ?? null,
-        deadline: issueDates[DEADLINE_FIELD] ?? dates[DEADLINE_FIELD] ?? null,
+        number: n.number,
+        title: n.title,
+        url: n.url,
+        closed,
+        closedAt: n.closedAt ? new Date(n.closedAt) : null,
+        start,
+        startSource,
+        deadline,
       });
     }
 
-    const { hasNextPage, endCursor } = project.items.pageInfo;
-    if (!hasNextPage) break;
-    cursor = endCursor;
+    if (!page.pageInfo.hasNextPage) break;
+    cursor = page.pageInfo.endCursor;
+    process.stdout.write(`\r  scanned ${scanned} issues…`);
   }
-  return { title, issues };
+  console.log(`\r  scanned ${scanned} issues, ${issues.length} selected`);
+  return issues;
 }
 
 // ───────────────────────────── rendering ─────────────────────────────
@@ -221,34 +248,25 @@ interface Bar {
   issue: Issue;
   start: Date;
   end: Date;
-  kind: "closed" | "open" | "overdue" | "open-ended";
+  kind: "closed" | "open" | "overdue";
 }
 
 function buildBars(issues: Issue[], today: Date): Bar[] {
   const bars: Bar[] = [];
   for (const issue of issues) {
-	const start = issue.start ?? issue.createdAt
-    if (!start) {
-      console.warn(`⚠ skipping #${issue.number} "${issue.title}" (${issue.repo}): no "${START_FIELD}" date`);
-      continue;
-    }
     let end: Date;
     let kind: Bar["kind"];
     if (issue.closed && issue.closedAt) {
       end = issue.closedAt;
       kind = "closed";
-    } else if (issue.deadline) {
-      end = issue.deadline;
-      kind = issue.deadline < today ? "overdue" : "open";
     } else {
-      end = today; // open issue with no deadline → runs until today
-      kind = "open-ended";
+      end = issue.deadline!; // guaranteed by the selection filter
+      kind = end < today ? "overdue" : "open";
     }
+    if (SINCE && end < SINCE) continue;
     // never let a bar be shorter than one day (or negative)
-    if (end.getTime() < start.getTime() + DAY) {
-      end = new Date(start.getTime() + DAY);
-    }
-    bars.push({ issue, start, end, kind });
+    if (end.getTime() < issue.start.getTime() + DAY) end = new Date(issue.start.getTime() + DAY);
+    bars.push({ issue, start: issue.start, end, kind });
   }
   return bars.sort((a, b) => a.start.getTime() - b.start.getTime() || a.end.getTime() - b.end.getTime());
 }
@@ -259,7 +277,7 @@ const trunc = (s: string, n: number) => (s.length > n ? s.slice(0, n - 1) + "…
 const fmt = (d: Date) =>
   d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
 
-function renderSvg(projectTitle: string, bars: Bar[], today: Date): string {
+function renderSvg(title: string, bars: Bar[], today: Date): string {
   const W = 1400;
   const labelW = 380;
   const rightPad = 30;
@@ -288,10 +306,10 @@ function renderSvg(projectTitle: string, bars: Bar[], today: Date): string {
   out.push(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif">`);
   out.push(`<style>
     :root { --bg:#ffffff; --fg:#1f2328; --muted:#656d76; --grid:#d8dee4; --row:#f6f8fa;
-            --closed:#8250df; --open:#0969da; --overdue:#cf222e; --openended:#0969da; --today:#bf8700; }
+            --closed:#8250df; --open:#0969da; --overdue:#cf222e; --today:#bf8700; }
     @media (prefers-color-scheme: dark) {
       :root { --bg:#0d1117; --fg:#e6edf3; --muted:#8b949e; --grid:#30363d; --row:#161b22;
-              --closed:#a371f7; --open:#4493f8; --overdue:#f85149; --openended:#4493f8; --today:#d29922; }
+              --closed:#a371f7; --open:#4493f8; --overdue:#f85149; --today:#d29922; }
     }
     text { fill: var(--fg); font-size: 12px; }
     .muted { fill: var(--muted); }
@@ -301,20 +319,18 @@ function renderSvg(projectTitle: string, bars: Bar[], today: Date): string {
     .closed { fill: var(--closed); }
     .open { fill: var(--open); }
     .overdue { fill: var(--overdue); }
-    .open-ended { fill: var(--openended); fill-opacity: .3; stroke: var(--openended); stroke-dasharray: 4 3; }
     .today { stroke: var(--today); stroke-width: 2; stroke-dasharray: 5 3; }
     .deadline { fill: var(--fg); }
     a:hover text { text-decoration: underline; }
   </style>`);
   out.push(`<rect width="${W}" height="${H}" fill="var(--bg)"/>`);
-  out.push(`<text x="20" y="30" class="title">${esc(projectTitle)} – timeline</text>`);
+  out.push(`<text x="20" y="30" class="title">${esc(title)} – timeline</text>`);
 
   // legend
   const legend: [string, string][] = [
     ["closed", "Closed (ends at close date)"],
     ["open", "Open (ends at deadline)"],
     ["overdue", "Open, past deadline"],
-    ["open-ended", "Open, no deadline (until today)"],
   ];
   let lx = 20;
   for (const [cls, label] of legend) {
@@ -323,7 +339,7 @@ function renderSvg(projectTitle: string, bars: Bar[], today: Date): string {
     lx += 40 + label.length * 6.3;
   }
   out.push(`<path d="M${lx + 6} 43 l5 5 -5 5 -5 -5z" class="deadline"/>`);
-  out.push(`<text x="${lx + 20}" y="53" class="muted">Deadline (when different from end)</text>`);
+  out.push(`<text x="${lx + 20}" y="53" class="muted">Deadline (on closed issues)</text>`);
 
   // rows
   bars.forEach((_, i) => {
@@ -350,13 +366,16 @@ function renderSvg(projectTitle: string, bars: Bar[], today: Date): string {
     out.push(`<text x="20" y="${y + rowH / 2 + 4}">${esc(label)}</text>`);
     out.push(`<rect x="${bx}" y="${y + (rowH - barH) / 2}" width="${bw}" height="${barH}" rx="3" class="${b.kind}">`);
     out.push(
-      `<title>${esc(`${b.issue.repo}#${b.issue.number}: ${b.issue.title}\n${fmt(b.start)} → ${fmt(b.end)}` +
-        (b.issue.deadline ? `\nDeadline: ${fmt(b.issue.deadline)}` : "") +
-        (b.issue.closed ? "\nClosed" : "\nOpen"))}</title>`
+      `<title>${esc(
+        `#${b.issue.number}: ${b.issue.title}\n${fmt(b.start)} → ${fmt(b.end)}` +
+          `\nStart from: ${b.issue.startSource}` +
+          (b.issue.deadline ? `\nDeadline: ${fmt(b.issue.deadline)}` : "") +
+          (b.issue.closed ? "\nClosed" : "\nOpen")
+      )}</title>`
     );
     out.push(`</rect>`);
 
-    // deadline diamond for closed issues (so you can see early/late completion)
+    // deadline diamond for closed issues (shows early/late completion)
     if (b.kind === "closed" && b.issue.deadline) {
       const dx = x(b.issue.deadline);
       const cy = y + rowH / 2;
@@ -378,28 +397,25 @@ function renderSvg(projectTitle: string, bars: Bar[], today: Date): string {
 
 async function main() {
   const token = getToken();
-
-  // owner can be an org or a user – try both
-  const project =
-    (await fetchProject(token, "organization")) ?? (await fetchProject(token, "user"));
-  if (!project) {
-    console.error(
-      `Project #${PROJECT_NUMBER} not found for "${owner}". Check the owner/number, and that your token has ` +
-        "`read:project` (+ `repo` for private repos) access."
-    );
-    process.exit(1);
-  }
+  console.log(`Fetching issues of ${OWNER}/${REPO}…`);
+  const issues = await fetchIssues(token);
 
   const now = new Date();
   const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-  const bars = buildBars(project.issues, today);
+  const bars = buildBars(issues, today);
   if (!bars.length) {
-    console.error(`No issues with a "${START_FIELD}" date found – nothing to draw.`);
+    console.error("No closed issues or issues with a deadline found – nothing to draw.");
     process.exit(1);
   }
 
-  writeFileSync(OUT, renderSvg(project.title, bars, today), "utf8");
-  console.log(`✓ ${bars.length} bars written to ${OUT} (from ${project.issues.length} issues in "${project.title}")`);
+  const bySource = (s: StartSource) => bars.filter((b) => b.issue.startSource === s).length;
+  console.log(
+    `  start dates: ${bySource("project field")} from project field, ` +
+      `${bySource("first closing PR")} from first closing PR, ${bySource("issue creation")} from issue creation`
+  );
+
+  writeFileSync(OUT, renderSvg(`${OWNER}/${REPO}`, bars, today), "utf8");
+  console.log(`✓ ${bars.length} bars written to ${OUT}`);
 }
 
 main().catch((e) => {
