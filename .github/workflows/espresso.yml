@@ -99,6 +99,27 @@ jobs:
       - name: Sync capacitor
         run: bun cap sync
         
+      - name: Install emulator system dependencies
+        run: |
+          # The runner image lacks the shared libraries the Android emulator needs.
+          # On Ubuntu 24.04+ several of these were renamed with a t64 suffix, so
+          # fall back to the t64 name when the plain one doesn't exist.
+          install_pkg() {
+            apt-get install -y --no-install-recommends "$1" 2>/dev/null || apt-get install -y --no-install-recommends "${1}t64"
+          }
+          apt-get update
+          for pkg in \
+            libx11-6 libx11-xcb1 libxext6 libxfixes3 libxrender1 libxrandr2 \
+            libxi6 libxtst6 libxkbcommon0 libxshmfence1 \
+            libnss3 libnspr4 \
+            libatk1.0-0 libatk-bridge2.0-0 libatspi2.0-0 \
+            libcups2 libdrm2 libgbm1 libglib2.0-0 \
+            libpango-1.0-0 libpangocairo-1.0-0 libcairo2 \
+            libgtk-3-0 libgomp1 libasound2
+          do
+            install_pkg "$pkg"
+          done
+
       - name: Run test on emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
