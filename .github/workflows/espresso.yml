@@ -139,6 +139,9 @@ jobs:
           # The runner host has 8GB of RAM total: the emulator must not
           # reserve the whole thing or the host OOM-kills it.
           ram-size: 4096M
+          # The host has 8 vCPUs and rarely exceeds 4 in use; give the
+          # emulator more cores to speed up the slow TCG (software) boot.
+          cores: 4
           # TCG (software) emulation boots much slower than the 600s default.
           emulator-boot-timeout: 1800
           script: |
