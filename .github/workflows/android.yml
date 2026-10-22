@@ -260,7 +260,7 @@ jobs:
             {
               "version": "$VERSION_NAME",
               "sha": "${{ github.sha }}",
-              "android_native_code_version": "$(cat android/.native-code-version)",
+              "android_native_code_version": "$(tr -d '\r\n' < android/.native-code-version)",
               "checksum": "$(cat checksum.txt)",
               "built_at": "${{ steps.datetime.outputs.now }}",
               "build_logs": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}"
