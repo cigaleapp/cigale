@@ -136,7 +136,9 @@ jobs:
           working-directory: ./android
           target: google_apis_playstore
           arch: x86_64
-          ram-size: 8192M
+          # The runner host has 8GB of RAM total: the emulator must not
+          # reserve the whole thing or the host OOM-kills it.
+          ram-size: 4096M
           # TCG (software) emulation boots much slower than the 600s default.
           emulator-boot-timeout: 1800
           script: |
