@@ -109,6 +109,8 @@ jobs:
           ./gradlew :app:assembleNightlyDebugAndroidTest --stacktrace
 
       - name: Install emulator system dependencies
+        # GitHub-hosted runners already include the emulator's system libraries.
+        if: runner.environment != 'github'
         run: |
           # The runner image lacks the shared libraries the Android emulator needs.
           # On Ubuntu 24.04+ several of these were renamed with a t64 suffix, so
