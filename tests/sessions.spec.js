@@ -234,12 +234,11 @@ test('import into new session', async ({ page, app }) => {
 	    - link "MapLibre":
 	      - /url: https://maplibre.org/
 	    - text: "| ©"
+	    - link "OpenStreetMap":
+	      - /url: https://www.openstreetmap.org/copyright
+	    - text: contributors ©
 	    - link "CARTO":
 	      - /url: https://carto.com/about-carto/
-	    - text: ", ©"
-	    - link "OpenStreetMap":
-	      - /url: http://www.openstreetmap.org/about/
-	    - text: contributors
 	  - text: Difficulté d'identification
 	  - button "Supprimer cette valeur" [disabled]:
 	    - img
@@ -402,6 +401,7 @@ test('can change protocol of session', async ({ page, app }) => {
 	    - img
 	  - text: date
 	  - textbox "date"
+	  - textbox
 	  - button "Supprimer cette valeur" [disabled]:
 	    - img
 	  - paragraph: date metadata
@@ -436,6 +436,8 @@ test('can change protocol of session', async ({ page, app }) => {
 	  - paragraph: integer metadata
 	  - text: location
 	  - combobox
+	  - button "Utiliser la position actuelle":
+	    - img
 	  - button "Supprimer cette valeur" [disabled]:
 	    - img
 	  - paragraph: location metadata
@@ -450,12 +452,11 @@ test('can change protocol of session', async ({ page, app }) => {
 	    - link "MapLibre":
 	      - /url: https://maplibre.org/
 	    - text: "| ©"
+	    - link "OpenStreetMap":
+	      - /url: https://www.openstreetmap.org/copyright
+	    - text: contributors ©
 	    - link "CARTO":
 	      - /url: https://carto.com/about-carto/
-	    - text: ", ©"
-	    - link "OpenStreetMap":
-	      - /url: http://www.openstreetmap.org/about/
-	    - text: contributors
 	  - text: sidecar
 	  - button "Supprimer cette valeur" [disabled]:
 	    - img
@@ -468,6 +469,29 @@ test('can change protocol of session', async ({ page, app }) => {
 	  - button "Supprimer cette valeur" [disabled]:
 	    - img
 	  - paragraph: string metadata
+	  - text: surface
+	  - combobox
+	  - button "Utiliser la position actuelle":
+	    - img
+	  - button "Supprimer cette valeur" [disabled]:
+	    - img
+	  - paragraph: surface
+	  - region "Map"
+	  - button "Zoom in"
+	  - button "Zoom out" [disabled]
+	  - button "Drag to rotate map, click to reset north"
+	  - button "Find my location"
+	  - button "Enter fullscreen"
+	  - text: /\\d+ km/
+	  - group:
+	    - link "MapLibre":
+	      - /url: https://maplibre.org/
+	    - text: "| ©"
+	    - link "OpenStreetMap":
+	      - /url: https://www.openstreetmap.org/copyright
+	    - text: contributors ©
+	    - link "CARTO":
+	      - /url: https://carto.com/about-carto/
 	`);
 });
 
