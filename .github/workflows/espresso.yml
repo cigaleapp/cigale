@@ -60,7 +60,7 @@ env:
 
 jobs:
   test:
-    timeout-minutes: 60
+    timeout-minutes: 90
     runs-on: hyperfluid
     name: Test
     steps:
@@ -99,6 +99,15 @@ jobs:
       - name: Sync capacitor
         run: bun cap sync
         
+      - name: Pre-build APKs
+        working-directory: ./android
+        run: |
+          # Build the app and androidTest APKs before launching the emulator.
+          # Without KVM the emulator runs under pure software (TCG) emulation,
+          # and its CPU thread hangs if a heavy gradle build runs concurrently.
+          chmod +x ./gradlew
+          ./gradlew :app:assembleNightlyDebugAndroidTest --stacktrace
+
       - name: Install emulator system dependencies
         run: |
           # The runner image lacks the shared libraries the Android emulator needs.
@@ -128,6 +137,8 @@ jobs:
           target: google_apis_playstore
           arch: x86_64
           ram-size: 8192M
+          # TCG (software) emulation boots much slower than the 600s default.
+          emulator-boot-timeout: 1800
           script: |
             chmod +x ./gradlew
             ./gradlew :app:connectedNightlyDebugAndroidTest --stacktrace --info
