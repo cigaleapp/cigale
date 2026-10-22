@@ -161,7 +161,7 @@ jobs:
       - name: Set website_host string for PR domain
         if: github.event_name == 'pull_request'
         run: |
-          sed -i "s|<string name=\"website_host\">.*</string>|<string name=\"website_host\">pr-${{ github.event.number }}.cigale.gwen.works</string>|" $STRINGS_FILE
+          sed -i "s|<string name=\"website_host\">.*</string>|<string name=\"website_host\">https://cigale-dev-default-data-terra.ai.meso.umontpellier.fr/pr-${{ github.event.number }}</string>|" $STRINGS_FILE
           cat $STRINGS_FILE
 
       - name: Set app_name string depending on flavor

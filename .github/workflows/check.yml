@@ -95,7 +95,7 @@ jobs:
       github-pages: true
 
   build-pr-preview:
-    if: github.ref_name != 'main'
+    if: github.event_name == 'pull_request'
     name: Build (PR Preview)
     uses: ./.github/workflows/build.yml
     with:
@@ -261,7 +261,16 @@ jobs:
     needs: [build, test]
     name: Nightly APK
     uses: ./.github/workflows/android.yml
-    secrets: inherit
+    secrets:
+      ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_PROD_KEY_ALIAS }}
+      ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_PROD_KEY_PASSWORD }}
+      ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_PROD_KEYSTORE_BASE64 }}
+      ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_PROD_KEYSTORE_PASSWORD }}
+      DIAWI_TOKEN: ${{ secrets.DIAWI_TOKEN }}
+      DEV_DEPLOYMENTS_SSH_PRIVATE_KEY: ${{ secrets.DEV_DEPLOYMENTS_SSH_PRIVATE_KEY }}
+      DEV_DEPLOYMENTS_HOST_KEY: ${{ secrets.DEV_DEPLOYMENTS_HOST_KEY }}
+      DATATERRA_DEV_DEPLOYS_BUCKET_KEY_ID: ${{ secrets.DATATERRA_DEV_DEPLOYS_BUCKET_KEY_ID }}
+      DATATERRA_DEV_DEPLOYS_BUCKET_KEY_SECRET: ${{ secrets.DATATERRA_DEV_DEPLOYS_BUCKET_KEY_SECRET }}
     with:
       push-update: true
       flavor: nightly

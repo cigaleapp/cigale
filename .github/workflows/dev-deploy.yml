@@ -21,7 +21,6 @@ on:
     outputs:
       url:
         description: URL to the published site
-        # value: https://${{ inputs.subdomain }}.${{ inputs.domain }}${{ inputs.path }}${{ inputs.environment-url-append }}
         value: https://cigale-dev-default-data-terra.ai.meso.umontpellier.fr/${{ inputs.subdomain }}${{ inputs.path }}${{ inputs.environment-url-append }}
     inputs:
       environment:
@@ -31,11 +30,6 @@ on:
         type: string
         description: Suffix to append to the environment URL
         default: ''
-      domain:
-        type: string
-        description: You shouldnt have to change this
-        # TODO: once have cigale.cnrs.fr, change it
-        default: cigale.gwen.works
       subdomain:
         type: string
         description: Subdomain of the dev deployments domain to upload to
@@ -73,11 +67,11 @@ jobs:
   upload:
     runs-on: ubuntu-latest
     # Ugly in Github list of environments cuz it causes text wrapping
-    # name: Deploy to ${{ inputs.subdomain }}.${{ inputs.domain }}${{ inputs.path }}
+    # name: Deploy to cigale-dev-default-data-terra.ai.meso.umontpellier.fr/${{ inputs.subdomain }}${{ inputs.path }}
     name: ${{ inputs.job }}
     environment:
       name: '${{ github.event.pull_request.number || github.ref_name }}: ${{ inputs.environment }}'
-      url: https://${{ inputs.subdomain }}.${{ inputs.domain }}${{ inputs.path }}${{ inputs.environment-url-append }}
+      url: https://cigale-dev-default-data-terra.ai.meso.umontpellier.fr/${{ inputs.subdomain }}${{ inputs.path }}${{ inputs.environment-url-append }}
     steps:
       - name: Get the archive
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
@@ -179,25 +173,17 @@ jobs:
       - name: Wait for it to be live
         if: inputs.live-check
         env:
-          # URL: https://${{ inputs.subdomain }}.${{ inputs.domain }}${{ inputs.path }}
           URL: https://cigale-dev-default-data-terra.ai.meso.umontpellier.fr/${{ inputs.subdomain }}${{ inputs.path }}
         run: |
-          echo Getting server IP from $HOST
-          resolved_ip=$(dig +short $HOST | head -n 1)
-          echo Resolved IP is $resolved_ip
-
-          dns="--resolve ${{ inputs.subdomain }}.${{ inputs.domain }}:443:$resolved_ip"
-          echo Using curl with $dns
-
           string="<!-- COMMIT: ${{ github.sha }} -->"
 
-          echo "Checking if '$string' is in reponse at $URL"
+          echo "Checking if '$string' is in response at $URL"
           touch index.html
-          curl -fsSL $dns $URL > index.html 
+          curl -fsSL $URL > index.html
           while ! grep -F "$string" index.html; do
             echo "Deployment not live yet, waiting..."
             sleep 5
             rm index.html
             touch index.html
-            curl -fsSL $dns $URL > index.html
+            curl -fsSL $URL > index.html
           done
