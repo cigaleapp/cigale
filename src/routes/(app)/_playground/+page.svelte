@@ -1,23 +1,15 @@
 <svelte:options runes={true} />
 
 <script lang="ts">
-	import DropdownMenu from '$lib/DropdownMenu.svelte';
+	import AudioAnnotator from '$lib/audio/AudioAnnotator.svelte';
 </script>
 
-<DropdownMenu
-	items={[
-		{
-			label: 'Feur',
-			items: [
-				{
-					key: 'item',
-					label: 'Item',
-				},
-			],
-		},
-	]}
->
-	{#snippet trigger(props)}
-		<button {...props}> feur </button>
-	{/snippet}
-</DropdownMenu>
+<div class="ann">
+	<AudioAnnotator url="/20260407163000.wav" />
+</div>
+
+<style>
+	.ann {
+		max-width: 800px;
+	}
+</style>
