@@ -17,25 +17,50 @@ class CoreTest {
     @get:Rule
     val activityRule = ActivityScenarioRule(MainActivity::class.java)
 
-    // Hard, main-thread-independent timeout. waitForWebElementGone's own 5-minute
-    // cap runs on the main thread, so it can never fire if the app's WebView work
-    // blocks that thread (which is what hangs the job to the 90-min workflow limit).
-    // JUnit's timeout runs a watchdog on a separate thread, so it always fails the
-    // test fast, letting us collect the background-streamed logcat.
-    @Test(timeout = 600_000)
+    // The app shows a full-screen #loading overlay while it boots, then removes
+    // it from the DOM once the root layout has finished loading. Waiting for it
+    // to disappear is the most reliable "the app is ready" signal, since the
+    // landing page renders no stable text on a fresh emulator.
+    //
+    // The WebView check runs on a background thread with a hard timeout enforced
+    // on the test thread. This is critical: Espresso's onWebView() and
+    // uiController.loopMainThreadForAtLeast() both block the *calling* thread
+    // until the app's main thread is idle. If the app's main thread is blocked
+    // (e.g. by a hanging startup), a check on the test thread would hang forever
+    // and kill the job at the 90-min workflow limit with no report. Running the
+    // check on a background thread lets the test thread enforce a hard timeout
+    // and fail fast, so the background-streamed logcat is uploaded and we can
+    // diagnose the hang.
+    @Test
     fun insectaProtocol() {
-        println("Waiting for the app to finish loading")
         Log.d("io.github.cigaleapp", "Waiting for the app to finish loading")
 
-        // The app shows a full-screen #loading overlay while it boots, then removes
-        // it from the DOM once the root layout has finished loading. Waiting for it
-        // to disappear is the most reliable "the app is ready" signal, since the
-        // landing page renders no stable text on a fresh emulator.
-        onView(isRoot()).perform(
-            waitForWebElementGone("#loading", 5, TimeUnit.MINUTES)
-        )
+        var checkError: Throwable? = null
+        val checker = Thread {
+            try {
+                onView(isRoot()).perform(
+                    waitForWebElementGone("#loading", 5, TimeUnit.MINUTES)
+                )
+            } catch (t: Throwable) {
+                checkError = t
+            }
+        }
+        checker.start()
+        checker.join(6 * 60 * 1000L)
 
-        println("App loaded: the loading overlay is gone")
+        if (checker.isAlive) {
+            checker.interrupt()
+            throw AssertionError(
+                "The app did not finish loading within 6 minutes. " +
+                    "The WebView check is still blocked, which means the app's " +
+                    "main thread is blocked. Check the logcat for the root cause."
+            )
+        }
+
+        checkError?.let {
+            throw AssertionError("The app did not finish loading: $it", it)
+        }
+
         Log.d("io.github.cigaleapp", "App loaded: the loading overlay is gone")
     }
 }
