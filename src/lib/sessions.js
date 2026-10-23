@@ -1,4 +1,4 @@
-import * as idb from '$lib/idb.svelte.js';
+import * as idb from '#lib/idb.svelte.js';
 
 import { imageIdToFileId } from './images.js';
 import { clearMetadataOptionsCache } from './metadata/storage.js';

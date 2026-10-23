@@ -1,5 +1,5 @@
 import type { ZoomState } from './zoom.svelte';
-import type { PinchEvent } from '$lib/touch/gestures.svelte.js';
+import type { PinchEvent } from '#lib/touch/gestures.svelte.js';
 
 import { beforeEach, describe, expect, it } from 'vitest';
 

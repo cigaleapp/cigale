@@ -7,23 +7,23 @@
 </script>
 
 <script lang="ts">
+	import Badge from '#lib/Badge.svelte';
+	import ButtonIcon from '#lib/ButtonIcon.svelte';
+	import { plural } from '#lib/i18n.js';
+	import { dependencyURI, tables } from '#lib/idb.svelte.js';
+	import { imageId, imageIdToFileId } from '#lib/images.js';
+	import InlineTextInput from '#lib/InlineTextInput.svelte';
+	import { defineKeyboardShortcuts } from '#lib/keyboard.svelte.js';
+	import { IsMobile } from '#lib/mobile.svelte.js';
+	import OverflowableText from '#lib/OverflowableText.svelte';
+	import { goto } from '#lib/paths.js';
+	import SegmentedGroup from '#lib/SegmentedGroup.svelte';
+	import { uiState } from '#lib/uistate.svelte.js';
 	import { fade } from 'svelte/transition';
 
 	import IconClose from '~icons/ri/close-line';
 	import { invalidate } from '$app/navigation';
 	import { page } from '$app/state';
-	import Badge from '$lib/Badge.svelte';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import { plural } from '$lib/i18n.js';
-	import { dependencyURI, tables } from '$lib/idb.svelte';
-	import { imageId, imageIdToFileId } from '$lib/images';
-	import InlineTextInput from '$lib/InlineTextInput.svelte';
-	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
-	import { IsMobile } from '$lib/mobile.svelte';
-	import OverflowableText from '$lib/OverflowableText.svelte';
-	import { goto } from '$lib/paths.js';
-	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
-	import { uiState } from '$lib/uistate.svelte.js';
 	import ModalSubmitIssue from '$routes/(app)/ModalSubmitIssue.svelte';
 
 	const { children } = $props();

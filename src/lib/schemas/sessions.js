@@ -6,7 +6,7 @@ import { ID, NamespacedMetadataID } from './common.js';
 import { MetadataValues } from './metadata.js';
 
 /**
- * @import * as DB from '$lib/database.js';
+ * @import * as DB from '#lib/database.js';
  */
 
 export const SORT_FIELDS = /** @type {const} */ ({

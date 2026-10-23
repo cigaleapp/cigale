@@ -8,11 +8,11 @@
 	/**
 	 * @typedef {object} Props
 	 * @property {string} fileId
-	 * @property {import('$lib/database').Image[]} images all images with this fileId
+	 * @property {import('#lib/database.js').Image[]} images all images with this fileId
 	 * @property {boolean} [highlighted] - whether this image is highlighted
 	 */
 
-	/** @type { Omit< Partial<import('$lib/CardMedia.svelte').Props>, keyof Props> & Props} */
+	/** @type { Omit< Partial<import('#lib/CardMedia.svelte').Props>, keyof Props> & Props} */
 	const { fileId, images, highlighted = false, ...rest } = $props();
 
 	const status = $derived.by(() => {

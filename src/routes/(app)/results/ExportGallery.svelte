@@ -1,10 +1,10 @@
 <script lang="ts">
-	import type * as DB from '$lib/database.js';
+	import type * as DB from '#lib/database.js';
 
-	import { FULL_IMAGE_CROPBOX, toRelativeCoords } from '$lib/BoundingBoxes.svelte.js';
-	import CroppedImg from '$lib/CroppedImg.svelte';
-	import { tables } from '$lib/idb.svelte.js';
-	import { uiState } from '$lib/uistate.svelte.js';
+	import { FULL_IMAGE_CROPBOX, toRelativeCoords } from '#lib/BoundingBoxes.svelte.js';
+	import CroppedImg from '#lib/CroppedImg.svelte';
+	import { tables } from '#lib/idb.svelte.js';
+	import { uiState } from '#lib/uistate.svelte.js';
 
 	import { exporter } from './files.svelte.js';
 

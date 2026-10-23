@@ -1,4 +1,15 @@
 <script>
+	import ButtonInk from '#lib/ButtonInk.svelte';
+	import ButtonUpdateProtocol from '#lib/ButtonUpdateProtocol.svelte';
+	import Field from '#lib/Field.svelte';
+	import FieldUrl from '#lib/FieldURL.svelte';
+	import { percent } from '#lib/i18n.js';
+	import { tables } from '#lib/idb.svelte.js';
+	import InlineTextInput from '#lib/InlineTextInput.svelte';
+	import LoadingSpinner from '#lib/LoadingSpinner.svelte';
+	import Logo from '#lib/Logo.svelte';
+	import { hasUpgradeAvailable } from '#lib/protocols.js';
+	import { clamp, gradientedColor } from '#lib/utils.js';
 	import { type } from 'arktype';
 	import { fade } from 'svelte/transition';
 
@@ -6,17 +17,6 @@
 	import IconUnpublished from '~icons/ri/cloud-off-line';
 	import IconWarning from '~icons/ri/triangle-line';
 	import { page } from '$app/state';
-	import ButtonInk from '$lib/ButtonInk.svelte';
-	import ButtonUpdateProtocol from '$lib/ButtonUpdateProtocol.svelte';
-	import Field from '$lib/Field.svelte';
-	import FieldUrl from '$lib/FieldURL.svelte';
-	import { percent } from '$lib/i18n.js';
-	import { tables } from '$lib/idb.svelte.js';
-	import InlineTextInput from '$lib/InlineTextInput.svelte';
-	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
-	import Logo from '$lib/Logo.svelte';
-	import { hasUpgradeAvailable } from '$lib/protocols.js';
-	import { clamp, gradientedColor } from '$lib/utils.js';
 
 	import { updater } from '../updater.svelte.js';
 	import ChangesWithRemote from './ChangesWithRemote.svelte';
@@ -60,7 +60,7 @@
 	}
 
 	/**
-	 * @type {Record<import('$lib/ButtonUpdateProtocol.svelte').CustomButtonProps['state'], string>}
+	 * @type {Record<import('#lib/ButtonUpdateProtocol.svelte').CustomButtonProps['state'], string>}
 	 */
 	const updateButtonTexts = {
 		checking: '',

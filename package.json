@@ -90,8 +90,9 @@
 		"@jimp/js-jpeg": "^1.6.1",
 		"@msw/playwright": "^0.6.7",
 		"@playwright/test": "^1.62.1",
-		"@sveltejs/adapter-static": "^3.0.10",
-		"@sveltejs/kit": "^2.70.3",
+		"@sveltejs/adapter-static": "^4.0.0",
+		"@sveltejs/kit": "^3.0.1",
+		"@sveltejs/load-config": "^0.2.2",
 		"@sveltejs/vite-plugin-svelte": "^7.3.1",
 		"@sveltejs/vite-plugin-svelte-inspector": "^5.0.2",
 		"@types/braces": "^3.0.5",
@@ -241,5 +242,9 @@
 		"svelte-bottom-sheet@2.3.0": "patches/svelte-bottom-sheet@2.3.0.patch",
 		"@capacitor-community/camera-preview@8.0.1": "patches/@capacitor-community%2Fcamera-preview@8.0.1.patch",
 		"@capacitor/geolocation@8.2.0": "patches/@capacitor%2Fgeolocation@8.2.0.patch"
+	},
+	"imports": {
+		"#lib": "./src/lib/index.js",
+		"#lib/*": "./src/lib/*"
 	}
 }

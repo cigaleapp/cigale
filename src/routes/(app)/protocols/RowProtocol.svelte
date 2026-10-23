@@ -1,5 +1,16 @@
 <script lang="ts">
-	import type { Protocol } from '$lib/database';
+	import type { Protocol } from '#lib/database.js';
+
+	import Badge from '#lib/Badge.svelte';
+	import ButtonIcon from '#lib/ButtonIcon.svelte';
+	import ButtonSecondary from '#lib/ButtonSecondary.svelte';
+	import ButtonUpdateProtocol from '#lib/ButtonUpdateProtocol.svelte';
+	import OverflowableText from '#lib/OverflowableText.svelte';
+	import { goto, resolve } from '#lib/paths.js';
+	import { getSettings, setSetting } from '#lib/settings.svelte.js';
+	import { shareUrl } from '#lib/share.js';
+	import Switch from '#lib/Switch.svelte';
+	import { uiState } from '#lib/uistate.svelte.js';
 
 	import IconUpgrade from '~icons/ri/arrow-up-circle-line';
 	import IconDelete from '~icons/ri/delete-bin-line';
@@ -7,16 +18,6 @@
 	import IconEdit from '~icons/ri/pencil-line';
 	import IconStats from '~icons/ri/pie-chart-2-line';
 	import IconExport from '~icons/ri/share-forward-line';
-	import Badge from '$lib/Badge.svelte';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import ButtonUpdateProtocol from '$lib/ButtonUpdateProtocol.svelte';
-	import OverflowableText from '$lib/OverflowableText.svelte';
-	import { goto, resolve } from '$lib/paths';
-	import { getSettings, setSetting } from '$lib/settings.svelte';
-	import { shareUrl } from '$lib/share.js';
-	import Switch from '$lib/Switch.svelte';
-	import { uiState } from '$lib/uistate.svelte.js';
 
 	import BeamupConsentLearnMore from './BeamupConsentLearnMore.svelte';
 

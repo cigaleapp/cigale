@@ -7,6 +7,8 @@
 	import type { ComponentProps } from 'svelte';
 
 	import Icon from '@iconify/svelte';
+	import * as idb from '#lib/idb.svelte.js';
+	import { createBytes, deleteObjectWithBytes } from '#lib/storage/utils.js';
 	import { ArkErrors, type } from 'arktype';
 	import { convert, MeasureKind, ms } from 'convert';
 	import * as dates from 'date-fns';
@@ -18,8 +20,6 @@
 	import IconError from '~icons/ri/error-warning-fill';
 	import IconGPS from '~icons/ri/map-pin-line';
 	import IconDecrement from '~icons/ri/subtract-line';
-	import * as idb from '$lib/idb.svelte.js';
-	import { createBytes, deleteObjectWithBytes } from '$lib/storage/utils.js';
 
 	import ButtonIcon from './ButtonIcon.svelte';
 	import ButtonInk from './ButtonInk.svelte';

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { BundleInfo } from '@capgo/capacitor-updater';
-	import type { UpdateBundleMetadata } from '$lib/schemas/update-bundle.js';
+	import type { UpdateBundleMetadata } from '#lib/schemas/update-bundle.js';
 
 	import { App } from '@capacitor/app';
 	import { Capacitor } from '@capacitor/core';
@@ -13,17 +13,17 @@
 	import IconWarning from '~icons/ri/error-warning-line';
 	import IconPrimary from '~icons/ri/information-line';
 	import IconNeutral from '~icons/ri/quote-text';
-	import { version } from '$app/environment';
-	import lockfile from '$lib/../../bun.lock?raw';
-	import { getCpuThreadsCount, getRamCapacityBytes } from '$lib/hardware-requirements.js';
-	import { formatBytesSize } from '$lib/i18n.js';
-	import { databaseName, databaseRevision } from '$lib/idb.svelte.js';
-	import LoadingText from '$lib/LoadingText.svelte';
-	import Logo from '$lib/Logo.svelte';
-	import OverflowableText from '$lib/OverflowableText.svelte';
-	import { seo } from '$lib/seo.svelte';
-	import { isDebugMode } from '$lib/settings.svelte.js';
-	import { safeJSONParse } from '$lib/utils.js';
+	import { version } from '$app/env';
+	import lockfile from '#lib/../../bun.lock?raw';
+	import { getCpuThreadsCount, getRamCapacityBytes } from '#lib/hardware-requirements.js';
+	import { formatBytesSize } from '#lib/i18n.js';
+	import { databaseName, databaseRevision } from '#lib/idb.svelte.js';
+	import LoadingText from '#lib/LoadingText.svelte';
+	import Logo from '#lib/Logo.svelte';
+	import OverflowableText from '#lib/OverflowableText.svelte';
+	import { seo } from '#lib/seo.svelte.js';
+	import { isDebugMode } from '#lib/settings.svelte.js';
+	import { safeJSONParse } from '#lib/utils.js';
 
 	import TopbarBack from '../TopbarBack.svelte';
 
@@ -36,17 +36,17 @@
 	const browser = ua.getBrowser();
 
 	let electronVersions = $state<
-		| undefined
-		| {
-				node: string;
-				chrome: string;
-				electron: string;
-				os?: {
-					name: string;
-					version: string;
-					architecture: string;
+		undefined |
+		{ 
+			node: string;
+			chrome: string;
+			electron: string;
+			os?: { 
+				name: string;
+				version: string;
+				architecture: string;
 					archIsUnusual: boolean;
-				};
+			 };
 				sw: string[];
 		  }
 	>();
@@ -68,12 +68,12 @@
 	});
 
 	let capacitorInfo = $state<
-		| undefined
-		| {
-				platform: string;
-				name: string;
-				id: string;
-				version: string;
+		undefined |
+		{ 
+			platform: string;
+			name: string;
+			id: string;
+			version: string;
 				build: string;
 		  }
 	>();
@@ -93,11 +93,8 @@
 	let updateMetadata = $state<(typeof UpdateBundleMetadata)['infer'] | null>(null);
 
 	$effect(() => {
-		updateBundle =
-			(safeJSONParse(localStorage.getItem('updateBundle')) as BundleInfo | null) ?? null;
-		updateMetadata =
-			(safeJSONParse(localStorage.getItem('updateMetadata')) as
-				(typeof UpdateBundleMetadata)['infer'] | null) ?? null;
+		updateBundle = safeJSONParse(localStorage.getItem('updateBundle')) as BundleInfo | null ?? null;
+		updateMetadata = safeJSONParse(localStorage.getItem('updateMetadata')) as (typeof UpdateBundleMetadata)['infer'] | null ?? null;
 	});
 
 	let logoDrawPercent = $state(0);
@@ -282,7 +279,9 @@
 			</dd>
 			<dt>RAM</dt>
 			<dd>
-				<LoadingText value={async () => (await getRamCapacityBytes()) ?? 'unknown'}>
+				<LoadingText
+					value={async () => await getRamCapacityBytes() ?? 'unknown'}
+				>
 					{#snippet loaded(capacity)}
 						{#if capacity === 'unknown'}
 							???
@@ -418,7 +417,7 @@
 	</dd>
 </dl>
 
-{#snippet peoplelinks(/** @type {Array<{ name: string; url: string }>} */ people)}
+{#snippet peoplelinks(/** @type {Array<{ name: string; url: string }>} */ (people))}
 	{#each people.sort(() => Math.random() - 0.5) as { url, name }, i (url || name)}
 		{#if i > 0},
 		{/if}
@@ -431,10 +430,12 @@
 	{/each}
 {/snippet}
 
-{#snippet colorswatch(/** @type {string} */ color, /** @type {import('svelte').Component}*/ Icon)}
-	<div class="swatch" style:color="var(--fg-{color})" style:background-color="var(--bg-{color})">
-		<Icon />
-	</div>
+{#snippet colorswatch(/** @type {string} */ (color), /** @type {import('svelte').Component}*/ (Icon))}
+	<div
+		class="swatch"
+		style:color="var(--fg-{color})"
+		style:background-color="var(--bg-{color})"
+	><Icon /></div>
 {/snippet}
 
 <style>

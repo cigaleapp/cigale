@@ -1,10 +1,10 @@
-import type * as DB from '$lib/database.js';
-import type { DatabaseHandle } from '$lib/idb.svelte.js';
-import type { NamespacedMetadataID } from '$lib/schemas/common.js';
+import type * as DB from '#lib/database.js';
+import type { DatabaseHandle } from '#lib/idb.svelte.js';
+import type { NamespacedMetadataID } from '#lib/schemas/common.js';
 
-import { fetchProtocolRegistry } from '$lib/protocols/registry.js';
-import { isNamespacedToProtocol, namespaceOfMetadataId } from '$lib/schemas/metadata.js';
-import { ExportedProtocol, ProtocolRegistry } from '$lib/schemas/protocols.js';
+import { fetchProtocolRegistry } from '#lib/protocols/registry.js';
+import { isNamespacedToProtocol, namespaceOfMetadataId } from '#lib/schemas/metadata.js';
+import { ExportedProtocol, ProtocolRegistry } from '#lib/schemas/protocols.js';
 
 /**
  * Resolve a metadata ID to its source metadata id in case it is imported
@@ -129,7 +129,7 @@ if (import.meta.vitest) {
 			registry: undefined as (typeof ProtocolRegistry)['inferIn'] | undefined,
 		}));
 
-		vi.mock('$lib/protocols/registry.js', async (original) => ({
+		vi.mock('#lib/protocols/registry.js', async (original) => ({
 			...(await original()),
 			fetchProtocolRegistry: async () => mocked.registry!,
 		}));

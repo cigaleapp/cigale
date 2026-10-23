@@ -1,12 +1,11 @@
 import type { BundleInfo } from '@capgo/capacitor-updater';
-import type { ClientInit } from '@sveltejs/kit';
+import type { ClientInit } from '@sveltejs/kit/hooks';
 
 import { App } from '@capacitor/app';
 import { CapacitorUpdater } from '@capgo/capacitor-updater';
+import { toasts } from '#lib/toasts.svelte.js';
+import * as updater from '#lib/update-bundles.js';
 import { ms } from 'convert';
-
-import { toasts } from '$lib/toasts.svelte.js';
-import * as updater from '$lib/update-bundles.js';
 
 let downloaded: BundleInfo | undefined;
 

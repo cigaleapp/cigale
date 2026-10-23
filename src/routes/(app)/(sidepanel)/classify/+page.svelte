@@ -1,32 +1,36 @@
 <script lang="ts">
-	import type * as DB from '$lib/database.js';
-	import type { GalleryItem } from '$lib/gallery.js';
-	import type { NamespacedMetadataID } from '$lib/schemas/common.js';
+	import type * as DB from '#lib/database.js';
+	import type { GalleryItem } from '#lib/gallery.js';
+	import type { NamespacedMetadataID } from '#lib/schemas/common.js';
 
+	import AreaObservations from '#lib/AreaObservations.svelte';
+	import ButtonSecondary from '#lib/ButtonSecondary.svelte';
+	import CardImage from '#lib/CardImage.svelte';
+	import CardObservation from '#lib/CardObservation.svelte';
+	import { databaseHandle, tables } from '#lib/idb.svelte.js';
+	import { deleteImage, imageBufferWasSaved, imageIsClassified } from '#lib/images.js';
+	import { loadModel } from '#lib/inference.js';
+	import { defineKeyboardShortcuts } from '#lib/keyboard.svelte.js';
+	import Logo from '#lib/Logo.svelte';
+	import { IsMobile } from '#lib/mobile.svelte.js';
+	import {
+		deleteObservation,
+		ensureNoLoneImages,
+		observationMetadata,
+	} from '#lib/observations.js';
+	import { goto } from '#lib/paths.js';
+	import ProgressBar from '#lib/ProgressBar.svelte';
+	import { cancelTask, classifyMore } from '#lib/queue.svelte.js';
+	import { seo } from '#lib/seo.svelte.js';
+	import { getSetting } from '#lib/settings.svelte.js';
+	import { toasts } from '#lib/toasts.svelte.js';
+	import { uiState } from '#lib/uistate.svelte.js';
+	import { isAbortError, nonnull } from '#lib/utils.js';
 	import { watch } from 'runed';
 	import { SvelteSet } from 'svelte/reactivity';
 	import { fade } from 'svelte/transition';
 
 	import IconLoaded from '~icons/ri/check-line';
-	import AreaObservations from '$lib/AreaObservations.svelte';
-	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import CardImage from '$lib/CardImage.svelte';
-	import CardObservation from '$lib/CardObservation.svelte';
-	import { databaseHandle, tables } from '$lib/idb.svelte.js';
-	import { deleteImage, imageBufferWasSaved, imageIsClassified } from '$lib/images';
-	import { loadModel } from '$lib/inference.js';
-	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
-	import Logo from '$lib/Logo.svelte';
-	import { IsMobile } from '$lib/mobile.svelte.js';
-	import { deleteObservation, ensureNoLoneImages, observationMetadata } from '$lib/observations';
-	import { goto } from '$lib/paths.js';
-	import ProgressBar from '$lib/ProgressBar.svelte';
-	import { cancelTask, classifyMore } from '$lib/queue.svelte.js';
-	import { seo } from '$lib/seo.svelte';
-	import { getSetting } from '$lib/settings.svelte.js';
-	import { toasts } from '$lib/toasts.svelte';
-	import { uiState } from '$lib/uistate.svelte.js';
-	import { isAbortError, nonnull } from '$lib/utils.js';
 
 	type Item = GalleryItem<{
 		image: DB.Image | undefined;

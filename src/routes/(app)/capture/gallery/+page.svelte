@@ -1,18 +1,19 @@
 <script lang="ts">
+	import AreaObservations from '#lib/AreaObservations.svelte';
+	import ButtonIcon from '#lib/ButtonIcon.svelte';
+	import ButtonInk from '#lib/ButtonInk.svelte';
+	import CardMedia from '#lib/CardMedia.svelte';
+	import DropdownMenu from '#lib/DropdownMenu.svelte';
+	import { errorMessage, plural } from '#lib/i18n.js';
+	import Lightbox from '#lib/Lightbox.svelte';
+	import LoadingScreen from '#lib/LoadingScreen.svelte';
+	import { goto } from '#lib/paths.js';
+	import { uiState } from '#lib/uistate.svelte.js';
+
 	import IconBack from '~icons/ri/arrow-left-s-line';
 	import IconDeleteAll from '~icons/ri/delete-bin-2-line';
 	import IconDelete from '~icons/ri/delete-bin-6-line';
 	import IconMore from '~icons/ri/more-2-line';
-	import AreaObservations from '$lib/AreaObservations.svelte';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import ButtonInk from '$lib/ButtonInk.svelte';
-	import CardMedia from '$lib/CardMedia.svelte';
-	import DropdownMenu from '$lib/DropdownMenu.svelte';
-	import { errorMessage, plural } from '$lib/i18n.js';
-	import Lightbox from '$lib/Lightbox.svelte';
-	import LoadingScreen from '$lib/LoadingScreen.svelte';
-	import { goto } from '$lib/paths.js';
-	import { uiState } from '$lib/uistate.svelte.js';
 	import TopbarContent from '$routes/(app)/TopbarContent.svelte';
 
 	import { PendingStorage } from '../pendingstorage.svelte.js';

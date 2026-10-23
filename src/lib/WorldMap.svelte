@@ -3,6 +3,15 @@
 	import type { ComponentProps } from 'svelte';
 	import type { MarkerClickInfo } from 'svelte-maplibre';
 
+	import { resolveColorVariable } from '#lib/css.js';
+	import { geojsonLineStringFeature, geojsonPolygonFeature } from '#lib/geojson.js';
+	import {
+		areaBetweenGeoCoordinates,
+		distanceBetweenGeoCoordinates,
+		lnglat,
+		middleOfGeoCoordinates,
+	} from '#lib/geolocation.js';
+	import { avg, range, round } from '#lib/utils.js';
 	import convert from 'convert';
 	import { cartesianProduct } from 'es-toolkit';
 	import {
@@ -16,15 +25,6 @@
 	} from 'svelte-maplibre';
 
 	import IconMapMarker from '~icons/ri/map-pin-2-fill';
-	import { resolveColorVariable } from '$lib/css.js';
-	import { geojsonLineStringFeature, geojsonPolygonFeature } from '$lib/geojson.js';
-	import {
-		areaBetweenGeoCoordinates,
-		distanceBetweenGeoCoordinates,
-		lnglat,
-		middleOfGeoCoordinates,
-	} from '$lib/geolocation.js';
-	import { avg, range, round } from '$lib/utils.js';
 	import { getTheme } from '$routes/+layout.svelte';
 
 	type Point = { longitude: number; latitude: number };

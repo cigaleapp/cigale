@@ -35,27 +35,27 @@
 </script>
 
 <script lang="ts">
-	import type { Item } from '$lib/Combobox.svelte';
-	import type * as DB from '$lib/database.js';
-	import type { Comparator } from '$lib/utils.js';
+	import type { Item } from '#lib/Combobox.svelte';
+	import type * as DB from '#lib/database.js';
+	import type { Comparator } from '#lib/utils.js';
 	import type { Snippet } from 'svelte';
 
-	import Carousel from '$lib/Carousel.svelte';
-	import { cascadeLabels } from '$lib/cascades.js';
-	import Combobox from '$lib/Combobox.svelte';
-	import { Tables } from '$lib/database.js';
-	import { databaseHandle } from '$lib/idb.svelte.js';
-	import LearnMoreLink from '$lib/LearnMoreLink.svelte';
-	import Markdown from '$lib/Markdown.svelte';
-	import { resolveMetadataImport } from '$lib/metadata/namespacing.js';
-	import { serializeMetadataValue } from '$lib/metadata/serializing.js';
-	import { metadataIdOfOption, metadataOption } from '$lib/metadata/storage.js';
-	import MetadataCascadesTable from '$lib/MetadataCascadesTable.svelte';
-	import MetadataOptionCarousel from '$lib/MetadataOptionCarousel.svelte';
-	import { IsMobile } from '$lib/mobile.svelte.js';
-	import { makeSearcher } from '$lib/search.js';
-	import { uiState } from '$lib/uistate.svelte.js';
-	import { compareBy, corsfixIfLocalhost, nonnull, safeJSONParse } from '$lib/utils.js';
+	import Carousel from '#lib/Carousel.svelte';
+	import { cascadeLabels } from '#lib/cascades.js';
+	import Combobox from '#lib/Combobox.svelte';
+	import { Tables } from '#lib/database.js';
+	import { databaseHandle } from '#lib/idb.svelte.js';
+	import LearnMoreLink from '#lib/LearnMoreLink.svelte';
+	import Markdown from '#lib/Markdown.svelte';
+	import { resolveMetadataImport } from '#lib/metadata/namespacing.js';
+	import { serializeMetadataValue } from '#lib/metadata/serializing.js';
+	import { metadataIdOfOption, metadataOption } from '#lib/metadata/storage.js';
+	import MetadataCascadesTable from '#lib/MetadataCascadesTable.svelte';
+	import MetadataOptionCarousel from '#lib/MetadataOptionCarousel.svelte';
+	import { IsMobile } from '#lib/mobile.svelte.js';
+	import { makeSearcher } from '#lib/search.js';
+	import { uiState } from '#lib/uistate.svelte.js';
+	import { compareBy, corsfixIfLocalhost, nonnull, safeJSONParse } from '#lib/utils.js';
 
 	let {
 		focuser = $bindable(),

@@ -1,8 +1,7 @@
 import { redirect } from '@sveltejs/kit';
-
-import { openDatabase } from '$lib/idb.svelte.js';
-import { resolveDefaults } from '$lib/metadata/defaults.js';
-import { uiState } from '$lib/uistate.svelte.js';
+import { openDatabase } from '#lib/idb.svelte.js';
+import { resolveDefaults } from '#lib/metadata/defaults.js';
+import { uiState } from '#lib/uistate.svelte.js';
 
 export async function load({ parent }) {
 	await parent();

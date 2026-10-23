@@ -1,4 +1,17 @@
 <script>
+	import EnumButtons from '#lib/EnumButtons.svelte';
+	import Field from '#lib/Field.svelte';
+	import FieldUrl from '#lib/FieldURL.svelte';
+	import { uppercaseFirst } from '#lib/i18n.js';
+	import IconDatatype from '#lib/IconDatatype.svelte';
+	import { MERGEABLE_METADATA_TYPES } from '#lib/metadata/index.js';
+	import {
+		METADATA_MERGE_METHODS,
+		METADATA_TYPES,
+		removeNamespaceFromMetadataId,
+	} from '#lib/schemas/metadata.js';
+	import Switch from '#lib/Switch.svelte';
+	import { entries } from '#lib/utils.js';
 	import { fade } from 'svelte/transition';
 
 	import IconMergeNone from '~icons/ri/close-circle-line';
@@ -7,19 +20,6 @@
 	import IconMergeUnion from '~icons/ri/shadow-line';
 	import IconMergeMinimum from '~icons/ri/skip-down-line';
 	import IconMergeMaximum from '~icons/ri/skip-up-line';
-	import EnumButtons from '$lib/EnumButtons.svelte';
-	import Field from '$lib/Field.svelte';
-	import FieldUrl from '$lib/FieldURL.svelte';
-	import { uppercaseFirst } from '$lib/i18n';
-	import IconDatatype from '$lib/IconDatatype.svelte';
-	import { MERGEABLE_METADATA_TYPES } from '$lib/metadata/index.js';
-	import {
-		METADATA_MERGE_METHODS,
-		METADATA_TYPES,
-		removeNamespaceFromMetadataId,
-	} from '$lib/schemas/metadata';
-	import Switch from '$lib/Switch.svelte';
-	import { entries } from '$lib/utils';
 
 	import { updater } from '../updater.svelte.js';
 
@@ -28,7 +28,7 @@
 	const technical = $derived(!data.metadata.label);
 
 	/**
-	 * @param {typeof import('$lib/schemas/metadata').MetadataMergeMethod.infer} mergeMethod
+	 * @param {typeof import('#lib/schemas/metadata.js').MetadataMergeMethod.infer} mergeMethod
 	 */
 	const IconMergeMethod = (mergeMethod) =>
 		({

@@ -5,32 +5,24 @@
 	import type { NumericUnit } from './schemas/units.js';
 	import type { ComponentProps } from 'svelte';
 
-	import { ArkErrors } from 'arktype';
-
-	import IconRequired from '~icons/ri/asterisk';
-	import IconCamera from '~icons/ri/camera-line';
-	import IconCheck from '~icons/ri/check-line';
-	import IconClear from '~icons/ri/close-line';
-	import IconTechnical from '~icons/ri/settings-line';
-	import IconMerged from '~icons/ri/stack-line';
-	import Carousel from '$lib/Carousel.svelte';
-	import ConfidencePercentage from '$lib/ConfidencePercentage.svelte';
-	import { addPointToGeoPolygon } from '$lib/geolocation.js';
-	import { databaseHandle } from '$lib/idb.svelte.js';
-	import LoadingText from '$lib/LoadingText.svelte';
+	import Carousel from '#lib/Carousel.svelte';
+	import ConfidencePercentage from '#lib/ConfidencePercentage.svelte';
+	import { addPointToGeoPolygon } from '#lib/geolocation.js';
+	import { databaseHandle } from '#lib/idb.svelte.js';
+	import LoadingText from '#lib/LoadingText.svelte';
 	import {
 		metadataValueValidatorDate,
 		metadataValueValidatorNumeric,
 		metadataValueValidatorString,
-	} from '$lib/metadata/constraints.js';
-	import { serializeMetadataValue } from '$lib/metadata/index.js';
-	import { metadataOption } from '$lib/metadata/storage.js';
-	import MetadataInput from '$lib/MetadataInput.svelte';
-	import { IsMobile } from '$lib/mobile.svelte.js';
-	import OverflowableText from '$lib/OverflowableText.svelte';
-	import { splitMetadataId } from '$lib/schemas/metadata.js';
-	import { isDebugMode } from '$lib/settings.svelte.js';
-	import { tooltip } from '$lib/tooltips.js';
+	} from '#lib/metadata/constraints.js';
+	import { serializeMetadataValue } from '#lib/metadata/index.js';
+	import { metadataOption } from '#lib/metadata/storage.js';
+	import MetadataInput from '#lib/MetadataInput.svelte';
+	import { IsMobile } from '#lib/mobile.svelte.js';
+	import OverflowableText from '#lib/OverflowableText.svelte';
+	import { splitMetadataId } from '#lib/schemas/metadata.js';
+	import { isDebugMode } from '#lib/settings.svelte.js';
+	import { tooltip } from '#lib/tooltips.js';
 	import {
 		compareBy,
 		corsfixIfLocalhost,
@@ -39,8 +31,16 @@
 		pick,
 		safeJSONParse,
 		switchValue,
-	} from '$lib/utils.js';
-	import WorldMap from '$lib/WorldMap.svelte';
+	} from '#lib/utils.js';
+	import WorldMap from '#lib/WorldMap.svelte';
+	import { ArkErrors } from 'arktype';
+
+	import IconRequired from '~icons/ri/asterisk';
+	import IconCamera from '~icons/ri/camera-line';
+	import IconCheck from '~icons/ri/check-line';
+	import IconClear from '~icons/ri/close-line';
+	import IconTechnical from '~icons/ri/settings-line';
+	import IconMerged from '~icons/ri/stack-line';
 
 	type Props = {
 		definition: Metadata;

@@ -1,8 +1,7 @@
 <script lang="ts">
+	import { coordinatesToAddress, suggestCoordinates } from '#lib/nominatim.js';
 	import { ArkErrors, type } from 'arktype';
 	import { SvelteMap } from 'svelte/reactivity';
-
-	import { coordinatesToAddress, suggestCoordinates } from '$lib/nominatim.js';
 
 	import Combobox from './Combobox.svelte';
 	import WorldMap from './WorldMap.svelte';

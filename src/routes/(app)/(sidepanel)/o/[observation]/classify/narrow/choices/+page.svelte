@@ -1,18 +1,18 @@
 <script lang="ts">
-	import type { NamespacedMetadataID } from '$lib/schemas/common.js';
+	import type { NamespacedMetadataID } from '#lib/schemas/common.js';
 
+	import ButtonSecondary from '#lib/ButtonSecondary.svelte';
+	import Logo from '#lib/Logo.svelte';
+	import MetadataList from '#lib/MetadataList.svelte';
+	import { goto } from '#lib/paths.js';
+	import { ensureNamespacedMetadataId, namespaceOfMetadataId } from '#lib/schemas/metadata.js';
+	import { isDebugMode } from '#lib/settings.svelte.js';
+	import { uiState } from '#lib/uistate.svelte.js';
+	import { compareBy, mapKeys } from '#lib/utils.js';
 	import { SvelteSet } from 'svelte/reactivity';
 	import { fade } from 'svelte/transition';
 
 	import { page } from '$app/state';
-	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import Logo from '$lib/Logo.svelte';
-	import MetadataList from '$lib/MetadataList.svelte';
-	import { goto } from '$lib/paths.js';
-	import { ensureNamespacedMetadataId, namespaceOfMetadataId } from '$lib/schemas/metadata.js';
-	import { isDebugMode } from '$lib/settings.svelte.js';
-	import { uiState } from '$lib/uistate.svelte.js';
-	import { compareBy, mapKeys } from '$lib/utils.js';
 
 	import { narrowingState } from '../+layout.svelte';
 	import Descriptor from '../Descriptor.svelte';

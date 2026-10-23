@@ -21,7 +21,7 @@
 	 * @property {boolean} [dangerous] convey danger for the confirm button
 	 */
 
-	/** @type {Props & Partial<Omit<import('$lib/Modal.svelte').Props, keyof Props>>} */
+	/** @type {Props & Partial<Omit<import('#lib/Modal.svelte').Props, keyof Props>>} */
 	let {
 		onconfirm,
 		oncancel = undefined,

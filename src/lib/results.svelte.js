@@ -69,7 +69,7 @@ export async function importResultsZip(file, id) {
 
 	const { session, observations } = analysis;
 
-	/** @type {import('$lib/database').Session} */
+	/** @type {import('#lib/database.js').Session} */
 	let sessionToUse;
 
 	if (!uiState.currentSession) {

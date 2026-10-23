@@ -1,5 +1,5 @@
 /**
- * @typedef {import('$lib/database').Settings['language']} Language
+ * @typedef {import('#lib/database').Settings['language']} Language
  */
 
 /**
