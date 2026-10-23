@@ -11,6 +11,12 @@ on:
       DEV_DEPLOYMENTS_SSH_PRIVATE_KEY:
         required: true
         description: 'SSH private key for deploying to dev deployments server'
+      DEV_DEPLOYMENTS_HOST_KEY:
+        required: true
+      DATATERRA_DEV_DEPLOYS_BUCKET_KEY_ID:
+        required: true
+      DATATERRA_DEV_DEPLOYS_BUCKET_KEY_SECRET:
+        required: true
       PLEYE_API_KEY:
         required: false
         description: 'API key for uploading test results to Pleye'
@@ -33,6 +39,9 @@ on:
         required: false
         default: ''
     outputs:
+      report-url:
+        value: ${{ jobs.upload-report.outputs.url }}
+        description: URL to the Android instrumentation test report
       total:
         value: ${{ jobs.combine-reports.outputs.total }}
         description: Total number of tests than ran
@@ -147,4 +156,44 @@ jobs:
           emulator-boot-timeout: 1800
           script: |
             chmod +x ./gradlew
+            set +e
             ./gradlew :app:connectedNightlyDebugAndroidTest --stacktrace --info
+            status=$?
+            mkdir -p app/build/reports/androidTests/connected/debug/flavors/nightly
+            adb logcat -d > app/build/reports/androidTests/connected/debug/flavors/nightly/logcat.txt
+            exit $status
+
+      - name: Ensure Android test report exists
+        if: always()
+        working-directory: ./android
+        run: |
+          report=app/build/reports/androidTests/connected/debug/flavors/nightly
+          mkdir -p "$report"
+          if [ ! -f "$report/index.html" ]; then
+            {
+              echo '<!doctype html><meta charset="utf-8"><title>Android test report</title>'
+              echo '<h1>Android instrumentation test report</h1>'
+              echo '<p>Gradle did not produce an HTML report. See <a href="logcat.txt">logcat</a>.</p>'
+            } > "$report/index.html"
+          fi
+
+      - name: Save Android test report
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: android-test-report
+          path: android/app/build/reports/androidTests/connected/debug/flavors/nightly
+          if-no-files-found: error
+          retention-days: 30
+
+  upload-report:
+    if: always() && !cancelled()
+    name: Upload Android test report
+    needs: test
+    uses: ./.github/workflows/dev-deploy.yml
+    secrets: inherit
+    with:
+      environment: Android E2E tests
+      artifact: android-test-report
+      subdomain: pr-${{ github.event.number }}-reports
+      path: /android

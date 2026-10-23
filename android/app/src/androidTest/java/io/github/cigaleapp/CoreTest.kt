@@ -36,15 +36,11 @@ class CoreTest {
             webMatches(getText(), containsString("Loading…"))
         )
 
-        // onView(isRoot()).perform(
-        //		waitForWebText("CIGALE", 5, TimeUnit.MINUTES)
-        //	)
-
-        println("Waiting 4mn")
-        Log.d("io.github.cigaleapp", "Waiting 4mn")
-
-        // TODO: make wait for text work
-        Thread.sleep(4 * 60 * 1_000)
+        println("Waiting for CIGALE")
+        Log.d("io.github.cigaleapp", "Waiting for CIGALE")
+        onView(isRoot()).perform(
+            waitForWebText("CIGALE", 5, TimeUnit.MINUTES)
+        )
 
         println("Checking for CIGALE text")
         Log.d("io.github.cigaleapp", "Checking for CIGALE text")
