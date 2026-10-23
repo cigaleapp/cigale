@@ -1,11 +1,12 @@
 package io.github.cigaleapp
 
+import android.content.Intent
 import android.util.Log
-import androidx.test.core.scenario.ActivityScenario
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.matcher.ViewMatchers.isRoot
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.TimeUnit
@@ -29,14 +30,20 @@ class CoreTest {
     // diagnose the hang.
     @Test
     fun insectaProtocol() {
-        // Launch the activity manually instead of via ActivityScenarioRule.
-        // The rule's after() calls scenario.close(), which waits for the app's
-        // main thread to become idle. If the app's main thread is blocked (a
-        // hanging startup), close() hangs for the rest of the job and the
-        // runner never reports the test as completed. By launching manually
-        // and never closing the scenario, there is no teardown that waits on
-        // the main thread, so the test fails fast once the join timeout fires.
-        ActivityScenario.launch(MainActivity::class.java)
+        // Launch the activity manually via InstrumentationRegistry instead of
+        // ActivityScenario (androidx.test:core's scenario package is not
+        // available on this classpath) or ActivityScenarioRule (whose
+        // after() calls scenario.close(), which waits for the app's main
+        // thread to become idle. If the app's main thread is blocked by a
+        // hanging startup, close() hangs for the rest of the job and the
+        // runner never reports the test as completed). A plain
+        // startActivity() has no teardown that waits on the main thread, so
+        // the test fails fast once the join timeout below fires.
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        val context = instrumentation.targetContext.applicationContext
+        instrumentation.runOnMainSync {
+            context.startActivity(Intent(context, MainActivity::class.java))
+        }
 
         Log.d("io.github.cigaleapp", "Waiting for the app to finish loading")
 

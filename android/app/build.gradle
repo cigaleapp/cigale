@@ -71,7 +71,6 @@ dependencies {
 	androidTestImplementation "androidx.test.espresso:espresso-web:$androidxEspressoCoreVersion"
 	androidTestImplementation 'androidx.test:runner:1.7.0'
 	androidTestImplementation 'androidx.test:rules:1.7.0'
-	androidTestImplementation 'androidx.test:core:1.7.0'
     implementation project(':capacitor-cordova-android-plugins')
 }
 
