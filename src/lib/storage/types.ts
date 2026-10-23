@@ -4,6 +4,7 @@ import type { PendingPhotosRootFolders } from '$routes/(app)/capture/pendingstor
 export type BinaryStorageName = 'opfs' | 'capacitor' | 'uninitialized';
 
 export interface BinaryStorageBackend<Name extends BinaryStorageName = BinaryStorageName> {
+	supportsWorkers: boolean;
 	name: Name;
 	/**
 	 * For debug purposes.
