@@ -17,7 +17,12 @@ class CoreTest {
     @get:Rule
     val activityRule = ActivityScenarioRule(MainActivity::class.java)
 
-    @Test
+    // Hard, main-thread-independent timeout. waitForWebElementGone's own 5-minute
+    // cap runs on the main thread, so it can never fire if the app's WebView work
+    // blocks that thread (which is what hangs the job to the 90-min workflow limit).
+    // JUnit's timeout runs a watchdog on a separate thread, so it always fails the
+    // test fast, letting us collect the background-streamed logcat.
+    @Test(timeout = 600_000)
     fun insectaProtocol() {
         println("Waiting for the app to finish loading")
         Log.d("io.github.cigaleapp", "Waiting for the app to finish loading")
