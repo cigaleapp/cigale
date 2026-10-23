@@ -458,3 +458,12 @@ metadata:
             }
           })
         )
+
+exports:
+  images:
+    mtime: shoot_date
+    cropped: Cropped/{{ fallback image.protocolMetadata.species.valueLabel "Insecte" }} {{ observation.number }}/{{ image.filename }}
+    original: Original/{{ fallback image.protocolMetadata.species.valueLabel "Insecte" }} {{ observation.number }}/{{ image.filename }}
+  metadata:
+    csv: metadata.csv
+    files: Files/{{ sequence }}-{{ metadataKey }}.{{ extension filename }}
