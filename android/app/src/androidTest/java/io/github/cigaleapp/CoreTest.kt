@@ -1,12 +1,11 @@
 package io.github.cigaleapp
 
 import android.util.Log
+import androidx.test.core.scenario.ActivityScenario
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.matcher.ViewMatchers.isRoot
-import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.TimeUnit
@@ -14,9 +13,6 @@ import java.util.concurrent.TimeUnit
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 class CoreTest {
-    @get:Rule
-    val activityRule = ActivityScenarioRule(MainActivity::class.java)
-
     // The app shows a full-screen #loading overlay while it boots, then removes
     // it from the DOM once the root layout has finished loading. Waiting for it
     // to disappear is the most reliable "the app is ready" signal, since the
@@ -33,6 +29,15 @@ class CoreTest {
     // diagnose the hang.
     @Test
     fun insectaProtocol() {
+        // Launch the activity manually instead of via ActivityScenarioRule.
+        // The rule's after() calls scenario.close(), which waits for the app's
+        // main thread to become idle. If the app's main thread is blocked (a
+        // hanging startup), close() hangs for the rest of the job and the
+        // runner never reports the test as completed. By launching manually
+        // and never closing the scenario, there is no teardown that waits on
+        // the main thread, so the test fails fast once the join timeout fires.
+        ActivityScenario.launch(MainActivity::class.java)
+
         Log.d("io.github.cigaleapp", "Waiting for the app to finish loading")
 
         var checkError: Throwable? = null

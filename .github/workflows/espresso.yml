@@ -165,7 +165,7 @@ jobs:
           # on a variable (the report path, the logcat PID) must live on ONE line.
           script: |
             chmod +x ./gradlew
-            set +e; report=app/build/reports/androidTests/connected/debug/flavors/nightly; mkdir -p "$report"; adb logcat -v threadtime > "$report/logcat.txt" 2>&1 & logcat_pid=$!; ./gradlew :app:connectedNightlyDebugAndroidTest --stacktrace --info; status=$?; kill "$logcat_pid" 2>/dev/null; wait "$logcat_pid" 2>/dev/null; exit $status
+            set +e; report=app/build/reports/androidTests/connected/debug/flavors/nightly; mkdir -p "$report"; adb logcat -G 16M 2>/dev/null; adb logcat -v threadtime > "$report/logcat.txt" 2>&1 & logcat_pid=$!; ./gradlew :app:connectedNightlyDebugAndroidTest --stacktrace --info; status=$?; kill "$logcat_pid" 2>/dev/null; wait "$logcat_pid" 2>/dev/null; adb logcat -d -v threadtime > "$report/logcat-dump.txt" 2>&1; exit $status
 
       - name: Ensure Android test report exists
         if: always()
