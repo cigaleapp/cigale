@@ -3,7 +3,7 @@ import { ArkErrors } from 'arktype';
 import { UpdateBundleMetadata } from '$lib/schemas/update-bundle.js';
 
 export async function load() {
-	const info = await fetch('https://apk.cigale.gwen.works/update.json')
+	const info = await fetch('https://cigale-dev-default-data-terra.ai.meso.umontpellier.fr/apk/update.json')
 		.then((r) => r.json())
 		.then((json) => UpdateBundleMetadata(json));
 

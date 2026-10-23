@@ -34,6 +34,10 @@ on:
       DIAWI_TOKEN:
         required: true
         description: 'API token for Diawi, used to upload Android app previews'
+      DATATERRA_DEV_DEPLOYS_BUCKET_KEY_ID:
+        required: true
+      DATATERRA_DEV_DEPLOYS_BUCKET_KEY_SECRET:
+        required: true
 
 jobs:
   android:
@@ -48,6 +52,8 @@ jobs:
       DEV_DEPLOYMENTS_SSH_PRIVATE_KEY: ${{ secrets.DEV_DEPLOYMENTS_SSH_PRIVATE_KEY }}
       DEV_DEPLOYMENTS_HOST_KEY: ${{ secrets.DEV_DEPLOYMENTS_HOST_KEY }}
       DIAWI_TOKEN: ${{ secrets.DIAWI_TOKEN }}
+      DATATERRA_DEV_DEPLOYS_BUCKET_KEY_ID: ${{ secrets.DATATERRA_DEV_DEPLOYS_BUCKET_KEY_ID }}
+      DATATERRA_DEV_DEPLOYS_BUCKET_KEY_SECRET: ${{ secrets.DATATERRA_DEV_DEPLOYS_BUCKET_KEY_SECRET }}
     with:
       flavor: preview
       artifact: ${{ inputs.artifact}}

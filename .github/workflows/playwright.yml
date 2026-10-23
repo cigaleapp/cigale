@@ -17,6 +17,10 @@ on:
       HUGGINGFACE_ACCESS_TOKEN:
         required: true
         description: Access token for the Huggingface Hub API. Used to pre-download models from Huggingface. Shouldn't need any specific permissions, as repos it downloads files from are public.
+      DATATERRA_DEV_DEPLOYS_BUCKET_KEY_ID:
+        required: true
+      DATATERRA_DEV_DEPLOYS_BUCKET_KEY_SECRET:
+        required: true
     inputs:
       artifact:
         type: string
@@ -55,8 +59,7 @@ env:
   PLEYE_API_KEY: ${{ secrets.PLEYE_API_KEY }}
   PR_NUMBER: ${{ github.event.number }}
   COMMIT_SHA: ${{  github.event.pull_request.head.sha || github.sha }}
-  # XXX: Depends on dev-deployments workflow's domain default value
-  TRACE_VIEWER_BASE_URL: https://pr-${{ github.event.number }}-reports.cigale.gwen.works/playwright
+  TRACE_VIEWER_BASE_URL: https://cigale-dev-default-data-terra.ai.meso.umontpellier.fr/pr-${{ github.event.number }}-reports/playwright
 
 jobs:
   predownload:
@@ -323,7 +326,7 @@ jobs:
 
       - name: Get base branch metrics
         run: |
-          curl -sSL https://pr--reports.cigale.gwen.works/playwright/metrics.json > base-metrics.json
+          curl -sSL https://cigale-dev-default-data-terra.ai.meso.umontpellier.fr/pr--reports/playwright/metrics.json > base-metrics.json
 
       - name: Compare metrics
         id: comparison

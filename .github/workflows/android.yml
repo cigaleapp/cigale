@@ -66,6 +66,10 @@ on:
       DIAWI_TOKEN:
         required: true
         description: 'API token for Diawi, used to upload Android app previews'
+      DATATERRA_DEV_DEPLOYS_BUCKET_KEY_ID:
+        required: true
+      DATATERRA_DEV_DEPLOYS_BUCKET_KEY_SECRET:
+        required: true
 
 env:
   PR_NUMBER: ${{ github.event.number }}
@@ -157,7 +161,7 @@ jobs:
       - name: Set website_host string for PR domain
         if: github.event_name == 'pull_request'
         run: |
-          sed -i "s|<string name=\"website_host\">.*</string>|<string name=\"website_host\">pr-${{ github.event.number }}.cigale.gwen.works</string>|" $STRINGS_FILE
+          sed -i "s|<string name=\"website_host\">.*</string>|<string name=\"website_host\">https://cigale-dev-default-data-terra.ai.meso.umontpellier.fr/pr-${{ github.event.number }}</string>|" $STRINGS_FILE
           cat $STRINGS_FILE
 
       - name: Set app_name string depending on flavor
@@ -256,7 +260,7 @@ jobs:
             {
               "version": "$VERSION_NAME",
               "sha": "${{ github.sha }}",
-              "android_native_code_version": "$(cat android/.native-code-version)",
+              "android_native_code_version": "$(tr -d '\r\n' < android/.native-code-version)",
               "checksum": "$(cat checksum.txt)",
               "built_at": "${{ steps.datetime.outputs.now }}",
               "build_logs": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}"
@@ -302,9 +306,7 @@ jobs:
     needs: apk
     name: Upload update bundle
     uses: ./.github/workflows/dev-deploy.yml
-    secrets:
-      DEV_DEPLOYMENTS_HOST_KEY: ${{ secrets.DEV_DEPLOYMENTS_HOST_KEY }}
-      DEV_DEPLOYMENTS_SSH_PRIVATE_KEY: ${{ secrets.DEV_DEPLOYMENTS_SSH_PRIVATE_KEY }}
+    secrets: inherit
     with:
       artifact: ${{ needs.apk.outputs.update-artifact }}
       live-check: false

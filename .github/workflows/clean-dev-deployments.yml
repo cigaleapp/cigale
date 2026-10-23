@@ -72,3 +72,51 @@ jobs:
               echo "⏭️ $REPO_PR_URL/$number: $directory kept as $number is still open"
             fi
           done
+
+  clean-s3:
+    name: Clean S3 bucket
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Setup Rclone
+        uses: AnimMouse/setup-rclone@v1
+
+      - name: Configure Rclone
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.DATATERRA_DEV_DEPLOYS_BUCKET_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.DATATERRA_DEV_DEPLOYS_BUCKET_KEY_SECRET }}
+        run: |
+          rclone config create dataterra s3 \
+            provider Other \
+            region default \
+            endpoint http://data-terra.s3-gateway.ai.meso.umontpellier.fr \
+            access_key_id $AWS_ACCESS_KEY_ID \
+            secret_access_key $AWS_SECRET_ACCESS_KEY
+
+      - name: Remove stale deployments
+        env:
+          REPO_PR_URL: ${{ github.event.repository.html_url }}/pull
+          GH_TOKEN: ${{ github.token }}
+          BUCKET_NAME: cigale-dev-deployments
+        run: |
+          open_prs=$(gh -R ${{ github.repository }} pr list --state open --json number --jq '.[].number')
+          echo Open PRs: $open_prs
+
+          directories=$(rclone lsd dataterra:$BUCKET_NAME/ | awk '{print $5}')
+          echo Directories to check: $directories
+
+          for directory in $directories; do
+            name=$(basename "$directory")
+            if [[ "$name" != pr-* ]]; then
+              echo "⏭️ $name: not a PR deployment, skipping"
+              continue
+            fi
+            number=$(echo "$name" | cut -d'-' -f2)
+            if ! echo "$open_prs" | grep -q "$number"; then
+              echo "💢 $REPO_PR_URL/$number: $directory removed, as $number does not match any open PR"
+              rclone purge dataterra:$BUCKET_NAME/$directory
+            else
+              echo "⏭️ $REPO_PR_URL/$number: $directory kept as $number is still open"
+            fi
+          done

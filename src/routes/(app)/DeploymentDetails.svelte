@@ -20,7 +20,7 @@
 	 * @param {"playwright" | "vitest" | "coverage" | "node-modules"} umbrellaDir
 	 */
 	function pageURL(umbrellaDir) {
-		return `https://pr-${previewingPrNumber}-reports.cigale.gwen.works/${umbrellaDir}`;
+		return `https://cigale-dev-default-data-terra.ai.meso.umontpellier.fr/pr-${previewingPrNumber}-reports/${umbrellaDir}`;
 	}
 
 	/**

@@ -82,6 +82,7 @@ jobs:
     name: Build (production)
     uses: ./.github/workflows/build.yml
     with:
+      base-path: ""
       debug: false
 
   build-github-pages:
@@ -90,7 +91,16 @@ jobs:
     uses: ./.github/workflows/build.yml
     with:
       debug: false
+      base-path: /cigale
       github-pages: true
+
+  build-pr-preview:
+    if: github.event_name == 'pull_request'
+    name: Build (PR Preview)
+    uses: ./.github/workflows/build.yml
+    with:
+      debug: ${{ contains(github.event.pull_request.labels.*.name, 'unminified-preview') }}
+      base-path: /pr-${{ github.event.pull_request.number }}
 
   test:
     needs: lint
@@ -107,6 +117,7 @@ jobs:
     uses: ./.github/workflows/build.yml
     with:
       debug: true
+      base-path: ""
 
   e2e-concurrency:
     name: Compute E2E concurrency bucket
@@ -157,12 +168,12 @@ jobs:
 
   preview:
     if: github.event_name == 'pull_request' && !failure() && !cancelled()
-    needs: [build, build-debug, json-schema]
+    needs: [build-pr-preview, json-schema]
     name: PR Preview
     uses: ./.github/workflows/preview.yml
     secrets: inherit
     with:
-      artifact: ${{ contains(github.event.pull_request.labels.*.name, 'unminified-preview') && needs.build-debug.outputs.artifact || needs.build.outputs.artifact }}
+      artifact: ${{ needs.build-pr-preview.outputs.artifact }}
 
   deploy:
     if: github.event_name == 'push' && github.ref_name == 'main'
@@ -258,6 +269,8 @@ jobs:
       DIAWI_TOKEN: ${{ secrets.DIAWI_TOKEN }}
       DEV_DEPLOYMENTS_SSH_PRIVATE_KEY: ${{ secrets.DEV_DEPLOYMENTS_SSH_PRIVATE_KEY }}
       DEV_DEPLOYMENTS_HOST_KEY: ${{ secrets.DEV_DEPLOYMENTS_HOST_KEY }}
+      DATATERRA_DEV_DEPLOYS_BUCKET_KEY_ID: ${{ secrets.DATATERRA_DEV_DEPLOYS_BUCKET_KEY_ID }}
+      DATATERRA_DEV_DEPLOYS_BUCKET_KEY_SECRET: ${{ secrets.DATATERRA_DEV_DEPLOYS_BUCKET_KEY_SECRET }}
     with:
       push-update: true
       flavor: nightly

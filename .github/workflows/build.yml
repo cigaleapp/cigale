@@ -17,6 +17,10 @@ on:
         type: boolean
         default: false
         description: Build for Github Pages (sets SVELTE_FALLBACK_PAGE to 404.html and BASE_PATH to the repo name, which is required for correct routing on Github Pages)
+      base-path:
+        required: true
+        type: string
+        description: Base path for the app (used for routing). Use an empty string if the app is served from the root of the domain, or a path starting with a slash if the app is served from a subpath (e.g. /my-app). This is used to set the BASE_PATH environment variable for the build.
     outputs:
       artifact:
         description: The build artifact name
@@ -33,6 +37,7 @@ jobs:
       GITHUB_PAGES: ${{ inputs.github-pages }}
       PR_NUMBER: ${{ github.event.number }}
       BUILD_COMMIT: ${{ github.sha }}
+      BASE_PATH: ${{ inputs.base-path }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
@@ -80,15 +85,13 @@ jobs:
           if [[ -z "$PR_NUMBER" ]]; then
             echo "WEB_ORIGIN=https://cigaleapp.github.io" >> $GITHUB_ENV
           else
-            echo "WEB_ORIGIN=https://pr-${PR_NUMBER}.cigale.gwen.works" >> $GITHUB_ENV
+            echo "WEB_ORIGIN=https://cigale-dev-default-data-terra.ai.meso.umontpellier.fr/pr-${PR_NUMBER}" >> $GITHUB_ENV
           fi
 
           if [[ "$GITHUB_PAGES" == "true" ]]; then
             echo "SVELTE_FALLBACK_PAGE=404.html" >> $GITHUB_ENV
-            echo "BASE_PATH=/$(basename $GITHUB_REPOSITORY)" >> $GITHUB_ENV
           else
             echo "SVELTE_FALLBACK_PAGE=index.html" >> $GITHUB_ENV
-            echo "BASE_PATH=" >> $GITHUB_ENV
           fi
       - name: Install dependencies
         run: bun install --frozen-lockfile
