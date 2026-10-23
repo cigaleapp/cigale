@@ -254,6 +254,12 @@ const Account = table(
 				domain: 'string.url',
 				userId: 'number.integer',
 				color: 'string',
+			},
+			{
+				type: '"inaturalist"',
+				refreshToken: "string | undefined",
+				accessToken: "string",
+				userId: "number.integer > 0"
 			}
 		)
 	)

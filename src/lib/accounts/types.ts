@@ -18,7 +18,14 @@ export type LoginData<S extends string = string> = {
 	server: S;
 	token?: string;
 	password?: { username: string; password: string };
-	oauth?: { authorize: URL; identity: URL; token: URL };
+	oauth?:
+		| {
+				phase: 'authorization';
+		  }
+		| {
+				phase: 'token';
+				authorizationCode: string;
+		  };
 };
 
 export interface Account {
