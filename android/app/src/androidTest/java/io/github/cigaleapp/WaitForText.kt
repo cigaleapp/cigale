@@ -65,7 +65,7 @@ fun waitForWebElementGone(cssSelector: String, timeout: Long, unit: TimeUnit): V
 				val webviewReady = try {
 					onWebView().forceJavascriptEnabled()
 						.withElement(findElement(Locator.XPATH, "//body")).check(
-							webMatches(getText(), anything())
+							webMatches(getText(), anything<String>())
 						)
 					true
 				} catch (t: Throwable) {
@@ -77,7 +77,7 @@ fun waitForWebElementGone(cssSelector: String, timeout: Long, unit: TimeUnit): V
 					val stillPresent = try {
 						onWebView().forceJavascriptEnabled()
 							.withElement(findElement(Locator.CSS_SELECTOR, cssSelector)).check(
-								webMatches(getText(), anything())
+								webMatches(getText(), anything<String>())
 							)
 						true
 					} catch (t: Throwable) {
