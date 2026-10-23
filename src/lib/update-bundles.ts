@@ -6,7 +6,8 @@ import { CapacitorUpdater } from '@capgo/capacitor-updater';
 
 import { UpdateBundleMetadata } from './schemas/update-bundle.js';
 
-export const APK_DOWNLOAD_URL = 'https://cigale-dev-default-data-terra.ai.meso.umontpellier.fr/apk/cigale.apk';
+export const APK_DOWNLOAD_URL =
+	'https://cigale-dev-default-data-terra.ai.meso.umontpellier.fr/apk/cigale.apk';
 
 /**
  * Check for new update bundles
@@ -15,7 +16,9 @@ export const APK_DOWNLOAD_URL = 'https://cigale-dev-default-data-terra.ai.meso.u
 export async function check() {
 	if (!Capacitor.isNativePlatform()) return undefined;
 
-	const published = await fetch('https://cigale-dev-default-data-terra.ai.meso.umontpellier.fr/apk/update.json')
+	const published = await fetch(
+		'https://cigale-dev-default-data-terra.ai.meso.umontpellier.fr/apk/update.json'
+	)
 		.then((response) => response.json())
 		.then((json) => UpdateBundleMetadata.assert(json));
 

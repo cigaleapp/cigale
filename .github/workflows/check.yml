@@ -82,7 +82,7 @@ jobs:
     name: Build (production)
     uses: ./.github/workflows/build.yml
     with:
-      base-path: ""
+      base-path: ''
       debug: false
 
   build-github-pages:
@@ -117,7 +117,7 @@ jobs:
     uses: ./.github/workflows/build.yml
     with:
       debug: true
-      base-path: ""
+      base-path: ''
 
   e2e-concurrency:
     name: Compute E2E concurrency bucket

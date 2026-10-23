@@ -143,7 +143,6 @@ jobs:
           # Upload
           rsync $rsync_flags to-upload/ "dev-deployments:$path"
 
-
       - name: Setup Rclone
         uses: AnimMouse/setup-rclone@v1
 
@@ -167,7 +166,7 @@ jobs:
             # Clean directory
             rclone purge dataterra:$BUCKET_NAME/$path
           fi
-          
+
           rclone copy to-upload/ dataterra:$BUCKET_NAME/$path --progress
 
       - name: Wait for it to be live
