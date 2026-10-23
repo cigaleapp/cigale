@@ -12,7 +12,6 @@ import androidx.test.espresso.web.webdriver.DriverAtoms.findElement
 import androidx.test.espresso.web.webdriver.DriverAtoms.getText
 import androidx.test.espresso.web.webdriver.Locator
 import org.hamcrest.Matcher
-import org.hamcrest.Matchers.anything
 import org.hamcrest.Matchers.containsString
 import java.util.concurrent.TimeUnit
 
@@ -65,7 +64,7 @@ fun waitForWebElementGone(cssSelector: String, timeout: Long, unit: TimeUnit): V
 				val webviewReady = try {
 					onWebView().forceJavascriptEnabled()
 						.withElement(findElement(Locator.XPATH, "//body")).check(
-							webMatches(getText(), anything<String>())
+							webMatches(getText(), containsString(""))
 						)
 					true
 				} catch (t: Throwable) {
@@ -77,7 +76,7 @@ fun waitForWebElementGone(cssSelector: String, timeout: Long, unit: TimeUnit): V
 					val stillPresent = try {
 						onWebView().forceJavascriptEnabled()
 							.withElement(findElement(Locator.CSS_SELECTOR, cssSelector)).check(
-								webMatches(getText(), anything<String>())
+								webMatches(getText(), containsString(""))
 							)
 						true
 					} catch (t: Throwable) {
