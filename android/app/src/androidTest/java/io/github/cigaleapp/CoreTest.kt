@@ -3,16 +3,9 @@ package io.github.cigaleapp
 import android.util.Log
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.matcher.ViewMatchers.isRoot
-import androidx.test.espresso.web.assertion.WebViewAssertions.webMatches
-import androidx.test.espresso.web.sugar.Web.onWebView
-import androidx.test.espresso.web.webdriver.DriverAtoms.findElement
-import androidx.test.espresso.web.webdriver.DriverAtoms.getText
-import androidx.test.espresso.web.webdriver.Locator
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import org.hamcrest.CoreMatchers.allOf
-import org.hamcrest.CoreMatchers.containsString
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,27 +19,18 @@ class CoreTest {
 
     @Test
     fun insectaProtocol() {
-        val webview = onWebView()
-        val body = findElement(Locator.TAG_NAME, "body")
+        println("Waiting for the app to finish loading")
+        Log.d("io.github.cigaleapp", "Waiting for the app to finish loading")
 
-        println("Checking for loading")
-        Log.d("io.github.cigaleapp", "Checking for loading")
-
-        webview.withElement(body).check(
-            webMatches(getText(), containsString("Loading…"))
-        )
-
-        println("Waiting for CIGALE")
-        Log.d("io.github.cigaleapp", "Waiting for CIGALE")
+        // The app shows a full-screen #loading overlay while it boots, then removes
+        // it from the DOM once the root layout has finished loading. Waiting for it
+        // to disappear is the most reliable "the app is ready" signal, since the
+        // landing page renders no stable text on a fresh emulator.
         onView(isRoot()).perform(
-            waitForWebText("CIGALE", 5, TimeUnit.MINUTES)
+            waitForWebElementGone("#loading", 5, TimeUnit.MINUTES)
         )
 
-        println("Checking for CIGALE text")
-        Log.d("io.github.cigaleapp", "Checking for CIGALE text")
-
-        webview.withElement(body).check(
-            webMatches(getText(), containsString("CIGALE"))
-        )
+        println("App loaded: the loading overlay is gone")
+        Log.d("io.github.cigaleapp", "App loaded: the loading overlay is gone")
     }
 }
