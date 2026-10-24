@@ -162,10 +162,16 @@ jobs:
           emulator-boot-timeout: 1800
           # NOTE: this action runs each script line as a separate `sh -c`, so
           # shell variables do NOT persist across lines. Everything that relies
-          # on a variable (the report path, the logcat PID) must live on ONE line.
+          # on a variable (the report path, the logcat PID, the retry loop)
+          # must live on ONE line.
+          # The test is retried up to 3 times: on the software-emulated
+          # emulator, unrelated system processes (e.g. Google Play Services,
+          # which the app's WebView binds to for fonts) can die randomly, and
+          # Android then kills the app as collateral damage, failing the test
+          # without any bug in the app.
           script: |
             chmod +x ./gradlew
-            set +e; report=app/build/reports/androidTests/connected/debug/flavors/nightly; mkdir -p "$report"; adb logcat -G 16M 2>/dev/null; adb logcat -v threadtime > "$report/logcat.txt" 2>&1 & logcat_pid=$!; ./gradlew :app:connectedNightlyDebugAndroidTest --stacktrace --info; status=$?; kill "$logcat_pid" 2>/dev/null; wait "$logcat_pid" 2>/dev/null; adb logcat -d -v threadtime > "$report/logcat-dump.txt" 2>&1; exit $status
+            set +e; report=app/build/reports/androidTests/connected/debug/flavors/nightly; mkdir -p "$report"; status=1; for attempt in 1 2 3; do echo "=== Test attempt $attempt/3 ==="; adb logcat -G 16M 2>/dev/null; adb logcat -c 2>/dev/null; adb logcat -v threadtime > "$report/logcat.txt" 2>&1 & logcat_pid=$!; ./gradlew :app:connectedNightlyDebugAndroidTest --stacktrace --info; status=$?; kill "$logcat_pid" 2>/dev/null; wait "$logcat_pid" 2>/dev/null; adb logcat -d -v threadtime > "$report/logcat-dump.txt" 2>&1; if [ "$status" -eq 0 ]; then break; fi; echo "Attempt $attempt failed (status $status), retrying..."; sleep 30; done; exit $status
 
       - name: Ensure Android test report exists
         if: always()
