@@ -42,7 +42,10 @@ class CoreTest {
         val instrumentation = InstrumentationRegistry.getInstrumentation()
         val context = instrumentation.targetContext.applicationContext
         instrumentation.runOnMainSync {
-            context.startActivity(Intent(context, MainActivity::class.java))
+            context.startActivity(
+                Intent(context, MainActivity::class.java)
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            )
         }
 
         Log.d("io.github.cigaleapp", "Waiting for the app to finish loading")
