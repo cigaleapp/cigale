@@ -258,11 +258,23 @@ async function loadDefaultProtocol() {
 		const filename = new URL(importUrl).pathname.split('/').at(-1);
 		console.debug(`Importing ${filename} since ${importUrl} not in`, sources);
 		try {
-			const contents = await fetchHttpRequest(importUrl, {
-				onProgress({ total, transferred }) {
-					setLoading('download', transferred / total);
-				},
-			}).then((res) => res.text());
+			// Guard against a stalled network fetch hanging startup forever
+			// (e.g. on a slow software-emulated Android emulator). Without a
+			// timeout, a fetch that never resolves would block load() and the
+			// #loading overlay would never be removed.
+			const controller = new AbortController();
+			const timeout = setTimeout(() => controller.abort(), 60_000);
+			let contents: string;
+			try {
+				contents = await fetchHttpRequest(importUrl, {
+					onProgress({ total, transferred }) {
+						setLoading('download', transferred / total);
+					},
+					signal: controller.signal,
+				}).then((res) => res.text());
+			} finally {
+				clearTimeout(timeout);
+			}
 
 			setLoading('download', 1);
 
