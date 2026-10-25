@@ -261,19 +261,26 @@ async function loadDefaultProtocol() {
 			// Guard against a stalled network fetch hanging startup forever
 			// (e.g. on a slow software-emulated Android emulator). Without a
 			// timeout, a fetch that never resolves would block load() and the
-			// #loading overlay would never be removed.
+			// #loading overlay would never be removed. The timeout is based on
+			// inactivity (reset on each progress event) so a slow but
+			// progressing download is not aborted.
 			const controller = new AbortController();
-			const timeout = setTimeout(() => controller.abort(), 60_000);
+			let stallTimer = setTimeout(() => controller.abort(), 60_000);
+			const resetStallTimer = () => {
+				clearTimeout(stallTimer);
+				stallTimer = setTimeout(() => controller.abort(), 60_000);
+			};
 			let contents: string;
 			try {
 				contents = await fetchHttpRequest(importUrl, {
 					onProgress({ total, transferred }) {
-						setLoading('download', transferred / total);
+						resetStallTimer();
+						setLoading('download', total > 0 ? transferred / total : 0);
 					},
 					signal: controller.signal,
 				}).then((res) => res.text());
 			} finally {
-				clearTimeout(timeout);
+				clearTimeout(stallTimer);
 			}
 
 			setLoading('download', 1);
