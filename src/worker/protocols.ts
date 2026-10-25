@@ -44,17 +44,18 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 
 	onLoadingState('parsing');
 	console.time('Parsing protocol');
-	let parsed = isJSON ? JSONC.parse(contents) : YAML.parse(contents);
-	console.timeEnd('Parsing protocol');
+	let protocol;
+	{
+		const parsed = isJSON ? JSONC.parse(contents) : YAML.parse(contents);
+		console.timeEnd('Parsing protocol');
 
-	console.info(`Importing protocol ${parsed.id} [heap: ${heapMB()}MB]`);
+		console.info(`Importing protocol ${parsed.id} [heap: ${heapMB()}MB]`);
 
-	onLoadingState('input-validation');
-	console.time('Validating protocol');
-	const protocol = ExportedProtocol.assert(parsed);
-	console.timeEnd('Validating protocol');
-	// Release the raw parsed object graph to reduce peak V8 heap pressure.
-	parsed = null;
+		onLoadingState('input-validation');
+		console.time('Validating protocol');
+		protocol = ExportedProtocol.assert(parsed);
+		console.timeEnd('Validating protocol');
+	}
 	console.info(`[heap after validation: ${heapMB()}MB]`);
 
 	const db = await openDatabase();
@@ -76,7 +77,7 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 		}
 
 		// Transaction 1: resolve imported groups + write the protocol row.
-		const importedGroups = await (async () => {
+		await (async () => {
 			const tx = db.transaction(['Protocol', 'Metadata'], 'readwrite');
 			const groups = await Promise.all(
 				p.importedMetadataGroups.map(async ({ from, id }) => {
@@ -141,7 +142,6 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 			});
 			console.timeEnd('Storing Protocol');
 			await tx.done;
-			return groups;
 		})();
 
 		/** Maps metadata IDs to list of metadata group names the metadata is a part of that are narrowable  */
@@ -206,7 +206,7 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 									(key) => id === namespacedMetadataId(p.id, key)
 								)
 							)
-							.flatMap(([_, groups]) => [...groups])
+							.flatMap(([, groups]) => [...groups])
 					);
 
 					const optionId = metadataOptionId(namespacedMetadataId(p.id, id), option.key);
