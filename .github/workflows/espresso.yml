@@ -152,9 +152,15 @@ jobs:
           working-directory: ./android
           target: google_apis
           arch: x86_64
-          # The runner host has 8GB of RAM total: the emulator must not
-          # reserve the whole thing or the host OOM-kills it.
-          ram-size: 4096M
+          # Chromium's V8 max-old-generation heap limit scales with the
+          # device's physical RAM (~RAM/4). The app loads ~1140 protocol
+          # metadata entries into the WebView at startup, which needs ~1.4GB
+          # of live JS heap. At 4096M the V8 limit is ~1000MB and the render
+          # process OOMs mid-load ("Ineffective mark-compacts near heap
+          # limit"), crashing the app. 8192M raises the limit to ~2048MB.
+          # The ubuntu-24.04 runner host has 16GB, so 8GB for the emulator
+          # is safe.
+          ram-size: 8192M
           # The host has 8 vCPUs and rarely exceeds 4 in use; give the
           # emulator more cores to speed up the slow TCG (software) boot.
           cores: 4
