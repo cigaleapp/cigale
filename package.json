@@ -109,7 +109,7 @@
 		"braces": "^3.0.3",
 		"bun": "^1.4.2",
 		"discord.js": "^14.27.0",
-		"electron": "^44.5.1",
+		"electron": "^44.9.0",
 		"embla-carousel": "^8.6.0",
 		"eslint": "^10.12.0",
 		"eslint-config-prettier": "^10.1.8",
