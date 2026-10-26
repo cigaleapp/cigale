@@ -172,14 +172,19 @@ export async function load({ url }) {
 
 	console.time('background things');
 
-	void autoUpdateProtocols(databaseHandle(), swarpc).then((updates) => {
-		if (updates.length === 0) return;
-		toasts.info(
-			updates.length === 1
-				? `Protocole "${updates[0].name}" mis à jour à la v${updates[0].version}`
-				: `${updates.length} protocoles ont été mis à jour: ${updates.map((u) => `"${u.name}"`).join(', ')}`
-		);
-	});
+	// Delay the update check until after startup. It downloads and parses complete
+	// protocol files in the main renderer, which can overlap with the memory-heavy
+	// import of the built-in protocols on resource-constrained WebViews.
+	setTimeout(() => {
+		void autoUpdateProtocols(databaseHandle(), swarpc).then((updates) => {
+			if (updates.length === 0) return;
+			toasts.info(
+				updates.length === 1
+					? `Protocole "${updates[0].name}" mis à jour à la v${updates[0].version}`
+					: `${updates.length} protocoles ont été mis à jour: ${updates.map((u) => `"${u.name}"`).join(', ')}`
+			);
+		});
+	}, 30_000);
 
 	// Start workers in the background so that we can have the UI shown etc but warm them up so that they're ready when needed
 	void swarpc.wakeup(undefined);
