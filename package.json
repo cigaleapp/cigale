@@ -184,7 +184,7 @@
 		"async-sema": "^3.1.1",
 		"baseline-browser-mapping": "^2.11.27",
 		"bits-ui": "^1.8.0",
-		"caniuse-lite": "^1.0.30001814",
+		"caniuse-lite": "^1.0.30001816",
 		"clicked": "^4.0.3",
 		"convert": "^8.0.2",
 		"date-fns": "^4.4.0",
