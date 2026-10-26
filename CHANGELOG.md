@@ -19,6 +19,7 @@ All notable changes to this project will be documented in this file, on a monthl
 - Fix media uploaded then downloaded from EcoSignal never getting crop-analyzed (#2223)
 - Fix metadata changes not storing beamup corrections when the metadata is imported from a protocol without beamup configured
 - Make WebGPU inference per-model opt-in
+- Strip CR/LF from native code version when building update.json
 
 ### Data Updates
 
