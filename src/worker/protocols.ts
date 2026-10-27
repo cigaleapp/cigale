@@ -14,7 +14,16 @@ import { compareProtocolWithUpstream } from '$lib/protocols.js';
 import { metadataOptionId, namespacedMetadataId } from '$lib/schemas/metadata.js';
 import { ExportedProtocol } from '$lib/schemas/protocols.js';
 import { recomputeSearchIndex } from '$lib/search.js';
-import { entries, keys, omit, orEmptyObj, pick, prefixIDBKeyRange } from '$lib/utils.js';
+import {
+	entries,
+	fetchHttpRequest,
+	keys,
+	omit,
+	orEmptyObj,
+	parseYAMLorJSON,
+	pick,
+	prefixIDBKeyRange,
+} from '$lib/utils.js';
 
 import { openDatabase, swarp } from './index.js';
 
@@ -262,4 +271,25 @@ swarp.diffProtocolWithRemote(async ({ protocolId }, onProgress) => {
 	await db.put('Protocol', protocol);
 
 	return { dirty: protocol.dirty, changes };
+});
+
+swarp.hasUpgradeAvailable(async ({ id, version, source }) => {
+	const response = await fetchHttpRequest(source, {
+		cachebust: true,
+		headers: {
+			Accept: 'application/json, application/yaml',
+		},
+	});
+
+	const protocol = ExportedProtocol.in
+		.pick('id', 'version')
+		.assert(await parseYAMLorJSON(response));
+
+	if (!protocol.version) throw new Error("Le protocole n'a plus de version");
+	if (protocol.id !== id) throw new Error("Le protocole a changé d'identifiant");
+
+	return {
+		upToDate: protocol.version <= version,
+		newVersion: protocol.version,
+	};
 });
