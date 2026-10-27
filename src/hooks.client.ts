@@ -1,3 +1,15 @@
+// Polyfill URL.canParse for older WebViews (Chrome < 120, e.g. Android WebView 113)
+if (typeof (URL as any).canParse !== 'function') {
+	(URL as any).canParse = (url: string, base?: string): boolean => {
+		try {
+			new URL(url, base);
+			return true;
+		} catch {
+			return false;
+		}
+	};
+}
+
 import type { BundleInfo } from '@capgo/capacitor-updater';
 import type { ClientInit } from '@sveltejs/kit';
 
