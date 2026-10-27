@@ -1,6 +1,10 @@
 // Polyfill URL.canParse for older WebViews (Chrome < 120, e.g. Android WebView 113)
-if (typeof (URL as any).canParse !== 'function') {
-	(URL as any).canParse = (url: string, base?: string): boolean => {
+type URLWithCanParse = typeof URL & {
+	canParse?: (url: string, base?: string) => boolean;
+};
+const URLWithCanParse = URL as URLWithCanParse;
+if (typeof URLWithCanParse.canParse !== 'function') {
+	URLWithCanParse.canParse = (url, base) => {
 		try {
 			new URL(url, base);
 			return true;
