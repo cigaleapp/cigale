@@ -495,6 +495,9 @@ const MetadataBase = type({
 	),
 	required: ['boolean', '@', 'Si la métadonnée est obligatoire'],
 	description: ['string', '@', 'Description, pour aider à comprendre la métadonnée'],
+	'on?': MediaKind.array().describe(
+		'Types de média sur lesquels cette métadonnée est applicable. Si la métadonnée est applicable à tous les types de média, ne pas mettre ce champ. Ignoré pour une métadonnée de session.'
+	),
 	images: URLString.array()
 		.describe(
 			"Liste d'images illustrant cette métadonnée. Utile pour aider les utilisateurs à comprendre ce que représente la métadonnée"
