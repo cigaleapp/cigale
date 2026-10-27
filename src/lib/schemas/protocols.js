@@ -145,6 +145,9 @@ export const Protocol = type({
 		.describe('Si le protocole a été modifié depuis sa dernière exportation')
 		.default(false),
 	'beamup?': BeamupSettings,
+	media: type({
+		types: MediaKind.array(),
+	}).default(() => ({ types: ['image'] })),
 	'remote?': {
 		'ecosignal?': {
 			domains: type

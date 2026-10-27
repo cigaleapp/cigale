@@ -177,6 +177,7 @@ const protocol = {
 	version: (oldProtocol?.version ?? 0) + 1,
 	updates: 'automatic',
 	source: 'https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json',
+	media: { types: ['image', 'audio'] },
 	description:
 		'Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification',
 	authors: [
