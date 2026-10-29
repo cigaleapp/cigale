@@ -21,7 +21,7 @@ jobs:
       contents: write
       pull-requests: write
     env:
-      PLEYE_HOST: pleye-default-data-terra.ai.meso.umontpellier.fr
+      PLEYE_HOST: pleye-biodimedia-data-terra.ai.meso.umontpellier.fr
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
