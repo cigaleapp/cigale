@@ -150,7 +150,7 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.DATATERRA_DEV_DEPLOYS_BUCKET_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.DATATERRA_DEV_DEPLOYS_BUCKET_KEY_SECRET }}
-          BUCKET_NAME: cigale-dev-deployments
+          BUCKET_NAME: ${{ secrets.DATATERRA_DEV_DEPLOYS_BUCKET_NAME }}
         run: |
           rclone config create dataterra s3 \
             provider Other \
