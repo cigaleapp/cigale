@@ -1,5 +1,8 @@
 import type EcoSignal from '$e2e/../src/lib/accounts/ecosignal.js';
+import type { FixturePaths } from '$e2e/filepaths.js';
 import type { StrictRequest } from 'msw';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 
 import {
 	addMilliseconds,
@@ -9,6 +12,8 @@ import {
 } from 'date-fns';
 import { http, HttpResponse } from 'msw';
 import { nanoid } from 'nanoid';
+
+import { absoluteFixtureFilepath } from '$e2e/utils/core.js';
 
 export const MOCK_TOKEN = 'hougreiohgermijogreojigremijogre';
 export const MOCK_CREDS = { username: 'hello', password: 'hahahaha' };
@@ -255,6 +260,72 @@ class State {
 		console.log('Queue', this.queues);
 
 		return r({ queue_id: id });
+	}
+
+	async registerMedia(collectionName: string, files: FixturePaths.Photos[]) {
+		const collectionId = this.nextId('collection');
+		this.repository.collections.push({
+			collection_id: collectionId,
+			creator_id: 1,
+			creator_name: 'Hello World',
+			creation_date: new Date().toISOString(),
+			description: "A new session",
+			name: collectionName,
+			external_media_url: "",
+			project_url: "",
+			uuid: nanoid(),
+			project_ids: [1],
+		});
+
+		for (const filename of files) {
+			const id = this.nextId('media');
+
+			const blob = new File(
+				[readFileSync(absoluteFixtureFilepath(filename))],
+				path.basename(filename)
+			);
+
+			this.mediaBlobs.set(id, blob);
+
+			this.repository.medias.push({
+				audio_url: null,
+				filename: blob.name,
+				name: blob.name,
+				note: null,
+				date_time: new Date().toISOString(),
+				media_id: id,
+				uuid: nanoid(),
+				media_type: 'photo',
+				is_metadata: false,
+				size_b: blob.size,
+				md5_hash: null,
+				uploader_id: null,
+				uploader_name: null,
+				creator_id: null,
+				creator_name: null,
+				site_id: null,
+				site_name: null,
+				sensor_id: null,
+				sensor_name: null,
+				license_id: null,
+				license_name: null,
+				creation_date: new Date().toISOString(),
+				collection_id: collectionId,
+				collection_name: collectionName,
+				project_id: 1,
+				project_name: 'Demo project',
+				media_url: `/api/v1/media/${id}/content`,
+				previews: [],
+				photo_setting: {
+					exposure_ms: null,
+					aperture: null,
+					iso: null,
+				},
+				labels: [],
+				image_width: null,
+				image_height: null,
+			});
+		}
 	}
 }
 
