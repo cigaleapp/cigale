@@ -1,0 +1,215 @@
+name: Android E2E tests
+
+permissions:
+  actions: write
+  contents: read
+  pull-requests: write
+
+on:
+  workflow_call:
+    secrets:
+      DEV_DEPLOYMENTS_SSH_PRIVATE_KEY:
+        required: true
+        description: 'SSH private key for deploying to dev deployments server'
+      DEV_DEPLOYMENTS_HOST_KEY:
+        required: true
+      DATATERRA_DEV_DEPLOYS_BUCKET_KEY_ID:
+        required: true
+      DATATERRA_DEV_DEPLOYS_BUCKET_KEY_SECRET:
+        required: true
+      PLEYE_API_KEY:
+        required: false
+        description: 'API key for uploading test results to Pleye'
+      HUGGINGFACE_ACCESS_TOKEN:
+        required: true
+        description: Access token for the Huggingface Hub API. Used to pre-download models from Huggingface. Shouldn't need any specific permissions, as repos it downloads files from are public.
+    inputs:
+      artifact:
+        type: string
+        description: Name of artifact to download built app from.
+        required: true
+      env:
+        type: string
+        description: |
+          Additional environments variables when runnning tests. 
+          Syntax is NAME1=value1 NAME2=value2 ...
+
+          Useful variables:
+          - DEBUG_WORKERS=true: show logs when web workers are created/closed
+        required: false
+        default: ''
+    outputs:
+      report-url:
+        value: ${{ jobs.upload-report.outputs.url }}
+        description: URL to the Android instrumentation test report
+      total:
+        value: ${{ jobs.combine-reports.outputs.total }}
+        description: Total number of tests than ran
+      failed:
+        value: ${{ jobs.combine-reports.outputs.failed }}
+        description: Failed tests count
+      flaky:
+        value: ${{ jobs.combine-reports.outputs.flaky }}
+        description: Flaky tests count
+      successful:
+        value: ${{ jobs.combine-reports.outputs.successful }}
+        description: Successful tests count
+      skipped:
+        value: ${{ jobs.combine-reports.outputs.skipped }}
+        description: Skipped tests count
+
+env:
+  ELECTRON_SKIP_BINARY_DOWNLOAD: 'true'
+  PLEYE_DEBUG: nodebug
+  PLEYE_API_KEY: ${{ secrets.PLEYE_API_KEY }}
+  PR_NUMBER: ${{ github.event.number }}
+  COMMIT_SHA: ${{  github.event.pull_request.head.sha || github.sha }}
+  # XXX: Depends on dev-deployments workflow's domain default value
+  TRACE_VIEWER_BASE_URL: https://pr-${{ github.event.number }}-reports.cigale.gwen.works/playwright
+
+jobs:
+  test:
+    timeout-minutes: 90
+    runs-on: ubuntu-latest
+    name: Test
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 3
+          
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version-file: .bun-version
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24.21.0
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+        
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+      
+      - name: Download built app
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: ${{ inputs.artifact }}
+          path: ./
+          
+      - name: Setup Java
+        uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95 # v5.6.0
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@be39fa834029ff78f1a44aa3bb0819b8fc2bd8fd # v4.0.4
+
+      - name: Sync capacitor
+        run: bun cap sync
+        
+      - name: Pre-build APKs
+        working-directory: ./android
+        run: |
+          # Build the app and androidTest APKs before launching the emulator.
+          # Without KVM the emulator runs under pure software (TCG) emulation,
+          # and its CPU thread hangs if a heavy gradle build runs concurrently.
+          chmod +x ./gradlew
+          ./gradlew :app:assembleNightlyDebugAndroidTest --stacktrace
+
+      # GitHub-hosted runners already include the emulator's system libraries.
+      # - name: Install emulator system dependencies
+      #   run: |
+      #     # The runner image lacks the shared libraries the Android emulator needs.
+      #     # On Ubuntu 24.04+ several of these were renamed with a t64 suffix, so
+      #     # fall back to the t64 name when the plain one doesn't exist.
+      #     install_pkg() {
+      #       apt-get install -y --no-install-recommends "$1" 2>/dev/null || apt-get install -y --no-install-recommends "${1}t64"
+      #     }
+      #     apt-get update
+      #     for pkg in \
+      #       libx11-6 libx11-xcb1 libxext6 libxfixes3 libxrender1 libxrandr2 \
+      #       libxi6 libxtst6 libxkbcommon0 libxshmfence1 \
+      #       libnss3 libnspr4 \
+      #       libatk1.0-0 libatk-bridge2.0-0 libatspi2.0-0 \
+      #       libcups2 libdrm2 libgbm1 libglib2.0-0 \
+      #       libpango-1.0-0 libpangocairo-1.0-0 libcairo2 \
+      #       libgtk-3-0 libgomp1 libasound2
+      #     do
+      #       install_pkg "$pkg"
+      #     done
+
+      - name: Enable KVM group perms
+        run: |
+            echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+            sudo udevadm control --reload-rules
+            sudo udevadm trigger --name-match=kvm
+
+      - name: Run test on emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          working-directory: ./android
+          target: google_apis
+          arch: x86_64
+          # Chromium's V8 max-old-generation heap limit scales with the
+          # device's physical RAM (~RAM/4). The app loads ~1140 protocol
+          # metadata entries into the WebView at startup, which needs ~1.4GB
+          # of live JS heap. At 4096M the V8 limit is ~1000MB and the render
+          # process OOMs mid-load ("Ineffective mark-compacts near heap
+          # limit"), crashing the app. 8192M raises the limit to ~2048MB.
+          # The ubuntu-24.04 runner host has 16GB, so 8GB for the emulator
+          # is safe.
+          ram-size: 8192M
+          # The host has 8 vCPUs and rarely exceeds 4 in use; give the
+          # emulator more cores to speed up the slow TCG (software) boot.
+          cores: 4
+          # TCG (software) emulation boots much slower than the 600s default.
+          emulator-boot-timeout: 1800
+          # NOTE: this action runs each script line as a separate `sh -c`, so
+          # shell variables do NOT persist across lines. Everything that relies
+          # on a variable (the report path, the logcat PID, the retry loop)
+          # must live on ONE line.
+          # The test is retried up to 3 times: on the software-emulated
+          # emulator, unrelated system processes (e.g. Google Play Services,
+          # which the app's WebView binds to for fonts) can die randomly, and
+          # Android then kills the app as collateral damage, failing the test
+          # without any bug in the app.
+          script: |
+            chmod +x ./gradlew
+            set +e; report=app/build/reports/androidTests/connected/debug/flavors/nightly; mkdir -p "$report"; status=1; for attempt in 1 2 3; do echo "=== Test attempt $attempt/3 ==="; adb logcat -G 16M 2>/dev/null; adb logcat -c 2>/dev/null; adb logcat -v threadtime > "$report/logcat.txt" 2>&1 & logcat_pid=$!; ./gradlew :app:connectedNightlyDebugAndroidTest --stacktrace --info; status=$?; kill "$logcat_pid" 2>/dev/null; wait "$logcat_pid" 2>/dev/null; adb logcat -d -v threadtime > "$report/logcat-dump.txt" 2>&1; if [ "$status" -eq 0 ]; then break; fi; echo "Attempt $attempt failed (status $status), retrying..."; sleep 30; done; exit $status
+
+      - name: Ensure Android test report exists
+        if: always()
+        working-directory: ./android
+        run: |
+          report=app/build/reports/androidTests/connected/debug/flavors/nightly
+          mkdir -p "$report"
+          if [ ! -f "$report/index.html" ]; then
+            {
+              echo '<!doctype html><meta charset="utf-8"><title>Android test report</title>'
+              echo '<h1>Android instrumentation test report</h1>'
+              echo '<p>Gradle did not produce an HTML report. See <a href="logcat.txt">logcat</a>.</p>'
+            } > "$report/index.html"
+          fi
+
+      - name: Save Android test report
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: android-test-report
+          path: android/app/build/reports/androidTests/connected/debug/flavors/nightly
+          if-no-files-found: error
+          retention-days: 30
+
+  upload-report:
+    if: always() && !cancelled()
+    name: Upload Android test report
+    needs: test
+    uses: ./.github/workflows/dev-deploy.yml
+    secrets: inherit
+    with:
+      environment: Android E2E tests
+      artifact: android-test-report
+      subdomain: pr-${{ github.event.number }}-reports
+      path: /android

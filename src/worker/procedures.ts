@@ -189,6 +189,18 @@ export const PROCEDURES = {
 				.array(),
 		}),
 	},
+	hasUpgradeAvailable: {
+		input: type({
+			id: 'string',
+			version: 'number',
+			source: Schemas.HTTPRequest,
+		}),
+		progress: type('undefined'),
+		success: type({
+			upToDate: 'boolean',
+			newVersion: 'number',
+		}),
+	},
 	syncStoredCorrections: {
 		input: type('undefined'),
 		progress: type('number'),
