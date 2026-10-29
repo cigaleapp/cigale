@@ -16,6 +16,7 @@ import * as YAML from 'yaml';
 
 import { coordsScaler } from '$lib/BoundingBoxes.svelte.js';
 import { generateId, Schemas, Tables } from '$lib/database.js';
+import { guessContentTypeFromFilename } from '$lib/file-extensions.js';
 import { imageFileId, imageId, parseImageId } from '$lib/images.js';
 import { boundingBoxResolver } from '$lib/inference_utils.js';
 import { Channel, concurrently, poll } from '$lib/iterables.js';
@@ -706,7 +707,10 @@ export default class Provider implements Account {
 
 				file = {
 					id: generateId('MetadataValueFile'),
-					contentType: blob.type,
+					contentType:
+						blob.type ||
+						guessContentTypeFromFilename(image.filename) ||
+						throwError(`Could not guess content type for file ${image.filename}`),
 					lastModifiedAt: new Date().toISOString() /* TODO */,
 					...created,
 				};
@@ -738,6 +742,11 @@ export default class Provider implements Account {
 
 				const blob = await response.then((r) => r.blob());
 
+				const contentType =
+					blob.type ||
+					guessContentTypeFromFilename(image.filename) ||
+					throwError(`Could not guess content type for file ${image.filename}`);
+
 				let width = data.image_width;
 				let height = data.image_height;
 
@@ -750,7 +759,7 @@ export default class Provider implements Account {
 					filename: image.filename,
 					sessionId: session.id,
 					bytes: await blob.arrayBuffer(),
-					type: blob.type,
+					type: contentType,
 				});
 
 				file = {
@@ -759,7 +768,7 @@ export default class Provider implements Account {
 					remoteId: gid,
 					remoteUrl: image.media_url(this.domain).toString(),
 					sessionId: session.id,
-					contentType: blob.type,
+					contentType,
 					dimensions: { width, height },
 				};
 
@@ -2362,6 +2371,8 @@ export default class Provider implements Account {
 		creator_name: 'string',
 		creation_date: 'string.date.parse',
 		project_ids: 'number[]',
+		external_media_url: 'string.url | ""',
+		project_url: 'string.url | ""',
 		description: Provider.MetadataFieldMultiline,
 	});
 
