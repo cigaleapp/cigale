@@ -38,6 +38,8 @@ on:
         required: true
       DATATERRA_DEV_DEPLOYS_BUCKET_KEY_SECRET:
         required: true
+      DATATERRA_DEV_DEPLOYS_BUCKET_NAME:
+        required: true
 
 jobs:
   android:
@@ -54,6 +56,7 @@ jobs:
       DIAWI_TOKEN: ${{ secrets.DIAWI_TOKEN }}
       DATATERRA_DEV_DEPLOYS_BUCKET_KEY_ID: ${{ secrets.DATATERRA_DEV_DEPLOYS_BUCKET_KEY_ID }}
       DATATERRA_DEV_DEPLOYS_BUCKET_KEY_SECRET: ${{ secrets.DATATERRA_DEV_DEPLOYS_BUCKET_KEY_SECRET }}
+      DATATERRA_DEV_DEPLOYS_BUCKET_NAME: ${{ secrets.DATATERRA_DEV_DEPLOYS_BUCKET_NAME }}
     with:
       flavor: preview
       artifact: ${{ inputs.artifact}}

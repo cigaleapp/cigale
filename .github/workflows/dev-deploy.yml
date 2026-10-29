@@ -18,6 +18,8 @@ on:
         required: true
       DATATERRA_DEV_DEPLOYS_BUCKET_KEY_SECRET:
         required: true
+      DATATERRA_DEV_DEPLOYS_BUCKET_NAME:
+        required: true
     outputs:
       url:
         description: URL to the published site
