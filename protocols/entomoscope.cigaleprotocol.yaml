@@ -35,6 +35,7 @@ remote:
     project: 2
     label: observation
     domains:
+      Data Terra: https://ecosignal-frontend-biodimedia-data-terra.ai.meso.umontpellier.fr
       VPS de Gwenn (temporaire): https://ecosignal.gwen.works
   kobocollect:
     form: https://kf.kobotoolbox.org/#/forms/ao3ZXMuHX9hCufTYbEzEcY/summary
