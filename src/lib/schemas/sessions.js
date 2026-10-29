@@ -127,6 +127,7 @@ export const Session = type({
 	description: 'string',
 	protocol: ID,
 	metadata: MetadataValues,
+	'exportCropPadding?': '/^\\d+(%|px)$/',
 	captureModeShootingPhase: "string = 'inert'",
 	captureModeSelectedTimerIndex: 'null | number >= 0 = 0',
 	fullscreenClassifier: type({

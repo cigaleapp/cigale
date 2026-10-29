@@ -31,17 +31,32 @@
 		<section class="actions">
 			{#each providers.list() as provider (provider.id)}
 				<ButtonSecondary
-					onclick={() => {
+					loading
+					onclick={async () => {
 						adding = provider;
+						if (adding.auth === 'oauth') {
+							const servers = await adding.servers(databaseHandle());
+							if (servers.length <= 1) {
+								await adding.login(databaseHandle(), {
+									server: '',
+									oauth: { phase: 'authorization' },
+								});
+								return;
+							}
+						}
 						login?.();
 					}}
 				>
-					<img
-						class="logo"
-						src={provider.logoURL.href}
-						alt="Logo de {provider.displayName}"
-					/>
-					<p>{provider.displayName}</p>
+					{#snippet children({ loading })}
+						{#if !loading}
+							<img
+								class="logo"
+								src={provider.logoURL?.href ?? ''}
+								alt="Logo de {provider.displayName}"
+							/>
+						{/if}
+						<p>{provider.displayName}</p>
+					{/snippet}
 				</ButtonSecondary>
 			{/each}
 		</section>
