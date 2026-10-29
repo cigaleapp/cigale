@@ -85,7 +85,7 @@ jobs:
           if [[ -z "$PR_NUMBER" ]]; then
             echo "WEB_ORIGIN=https://cigaleapp.github.io" >> $GITHUB_ENV
           else
-            echo "WEB_ORIGIN=https://cigale-dev-default-data-terra.ai.meso.umontpellier.fr/pr-${PR_NUMBER}" >> $GITHUB_ENV
+            echo "WEB_ORIGIN=https://cigale-dev-biodimedia-data-terra.ai.meso.umontpellier.fr/pr-${PR_NUMBER}" >> $GITHUB_ENV
           fi
 
           if [[ "$GITHUB_PAGES" == "true" ]]; then

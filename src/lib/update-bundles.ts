@@ -7,7 +7,7 @@ import { CapacitorUpdater } from '@capgo/capacitor-updater';
 import { UpdateBundleMetadata } from './schemas/update-bundle.js';
 
 export const APK_DOWNLOAD_URL =
-	'https://cigale-dev-default-data-terra.ai.meso.umontpellier.fr/apk/cigale.apk';
+	'https://cigale-dev-biodimedia-data-terra.ai.meso.umontpellier.fr/apk/cigale.apk';
 
 /**
  * Check for new update bundles
@@ -17,7 +17,7 @@ export async function check() {
 	if (!Capacitor.isNativePlatform()) return undefined;
 
 	const published = await fetch(
-		'https://cigale-dev-default-data-terra.ai.meso.umontpellier.fr/apk/update.json'
+		'https://cigale-dev-biodimedia-data-terra.ai.meso.umontpellier.fr/apk/update.json'
 	)
 		.then((response) => response.json())
 		.then((json) => UpdateBundleMetadata.assert(json));
@@ -37,7 +37,7 @@ export async function download(bundle: (typeof UpdateBundleMetadata)['infer']) {
 	try {
 		const downloaded = await CapacitorUpdater.download({
 			version: bundle.version,
-			url: 'https://cigale-dev-default-data-terra.ai.meso.umontpellier.fr/apk/update.zip',
+			url: 'https://cigale-dev-biodimedia-data-terra.ai.meso.umontpellier.fr/apk/update.zip',
 		});
 
 		if (bundle.checksum === downloaded.checksum) {
