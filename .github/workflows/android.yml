@@ -70,6 +70,8 @@ on:
         required: true
       DATATERRA_DEV_DEPLOYS_BUCKET_KEY_SECRET:
         required: true
+      DATATERRA_DEV_DEPLOYS_BUCKET_NAME:
+        required: true
 
 env:
   PR_NUMBER: ${{ github.event.number }}
