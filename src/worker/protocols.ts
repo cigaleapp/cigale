@@ -22,6 +22,16 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 	// ri:* icons to preload from Iconify API. See MetadataEnumVariant's "icon" field.
 	const iconsToPreload = new Set<string>();
 
+	let _heapsize = 0;
+	function logHeapsize() {
+		if (!performance.memory) return;
+		const before = _heapsize;
+		_heapsize = performance.memory.usedJSHeapSize;
+		if (before) {
+			console.debug(`heap size: ${_heapsize * 1e-6} (diff ${(_heapsize - before) * 1e-6})`);
+		}
+	}
+
 	let total = 1;
 	let done = 0;
 
@@ -37,10 +47,12 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 		});
 	}
 
+	logHeapsize();
 	onLoadingState('parsing');
 	console.time('Parsing protocol');
 	const parsed = isJSON ? JSONC.parse(contents) : YAML.parse(contents);
 	console.timeEnd('Parsing protocol');
+	logHeapsize();
 
 	console.info(`Importing protocol ${parsed.id}`);
 	console.info(parsed);
@@ -49,12 +61,14 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 	console.time('Validating protocol');
 	const protocol = ExportedProtocol.assert(parsed);
 	console.timeEnd('Validating protocol');
+	logHeapsize();
 
 	const db = await openDatabase();
 
 	console.time('Resolve imports');
 	const importedProtocols = await resolveProtocolImports(db, protocol);
 	console.timeEnd('Resolve imports');
+	logHeapsize();
 
 	const tx = db.transaction(['Protocol', 'Metadata', 'MetadataOption'], 'readwrite');
 
@@ -131,6 +145,7 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 			],
 		});
 		console.timeEnd('Storing Protocol');
+		logHeapsize();
 
 		/** Maps metadata IDs to list of metadata group names the metadata is a part of that are narrowable  */
 		const narrowableMetadata = Object.fromEntries(
@@ -158,6 +173,7 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 				_optionsCount: metadata.options?.length ?? 0,
 			});
 			console.timeEnd(`Storing Metadata ${id}`);
+			logHeapsize();
 
 			console.time(`Storing Metadata Options for ${id}`);
 			const oTotal = metadata.options?.length ?? 0;
@@ -170,6 +186,7 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 						'write-metadata-options',
 						`${metadata.label || id} > ${option.label || option.key} (${i + 1}/${total})`
 					);
+					logHeapsize();
 				}
 
 				const narrowableIn = new Set(
@@ -199,6 +216,7 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 				}
 			}
 			console.timeEnd(`Storing Metadata Options for ${id}`);
+			logHeapsize();
 		}
 
 		if (p.id === protocol.id) {
