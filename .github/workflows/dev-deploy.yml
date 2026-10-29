@@ -21,7 +21,7 @@ on:
     outputs:
       url:
         description: URL to the published site
-        value: https://cigale-dev-default-data-terra.ai.meso.umontpellier.fr/${{ inputs.subdomain }}${{ inputs.path }}${{ inputs.environment-url-append }}
+        value: https://cigale-dev-biodimedia-data-terra.ai.meso.umontpellier.fr/${{ inputs.subdomain }}${{ inputs.path }}${{ inputs.environment-url-append }}
     inputs:
       environment:
         type: string
@@ -172,7 +172,7 @@ jobs:
       - name: Wait for it to be live
         if: inputs.live-check
         env:
-          URL: https://cigale-dev-default-data-terra.ai.meso.umontpellier.fr/${{ inputs.subdomain }}${{ inputs.path }}
+          URL: https://cigale-dev-biodimedia-data-terra.ai.meso.umontpellier.fr/${{ inputs.subdomain }}${{ inputs.path }}
         run: |
           string="<!-- COMMIT: ${{ github.sha }} -->"
 
