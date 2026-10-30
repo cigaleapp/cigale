@@ -23,6 +23,7 @@ All notable changes to this project will be documented in this file, on a monthl
 
 ### Data Updates
 
+- Add Data Terra ecosignal instance to protocols
 - Bump protocol version of protocols/insecta.cigaleprotocol.yaml
 - Bump protocol version of protocols/insecta.cigaleprotocol.yaml [ci skip]
 
