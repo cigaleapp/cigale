@@ -1,7 +1,7 @@
 <script lang="ts">
+	import Charts from '#lib/charts/Charts.svelte';
+	import { tables } from '#lib/idb.svelte.js';
 	import { page } from '$app/state';
-	import Charts from '$lib/charts/Charts.svelte';
-	import { tables } from '$lib/idb.svelte.js';
 	import TopbarBack from '$routes/(app)/TopbarBack.svelte';
 </script>
 

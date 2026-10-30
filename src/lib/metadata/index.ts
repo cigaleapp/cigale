@@ -1,4 +1,4 @@
-import type * as DB from '$lib/database.js';
+import type * as DB from '#lib/database.js';
 
 /**
  * A null-value MetadataValue object

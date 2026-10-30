@@ -1,15 +1,15 @@
 <script>
-	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
-	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import Field from '$lib/Field.svelte';
-	import { errorMessage } from '$lib/i18n';
-	import { tables } from '$lib/idb.svelte.js';
-	import InlineTextInput from '$lib/InlineTextInput.svelte';
-	import Modal from '$lib/Modal.svelte';
-	import { goto } from '$lib/paths';
-	import { ID } from '$lib/schemas/common';
-	import { namespacedMetadataId } from '$lib/schemas/metadata';
-	import { toasts } from '$lib/toasts.svelte';
+	import ButtonPrimary from '#lib/ButtonPrimary.svelte';
+	import ButtonSecondary from '#lib/ButtonSecondary.svelte';
+	import Field from '#lib/Field.svelte';
+	import { errorMessage } from '#lib/i18n.js';
+	import { tables } from '#lib/idb.svelte.js';
+	import InlineTextInput from '#lib/InlineTextInput.svelte';
+	import Modal from '#lib/Modal.svelte';
+	import { goto } from '#lib/paths.js';
+	import { ID } from '#lib/schemas/common.js';
+	import { namespacedMetadataId } from '#lib/schemas/metadata.js';
+	import { toasts } from '#lib/toasts.svelte.js';
 
 	/**
 	 * @typedef {object} Props

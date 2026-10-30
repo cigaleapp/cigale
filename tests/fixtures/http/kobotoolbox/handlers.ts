@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import type { SessionRemoteID } from '$lib/schemas/sessions.js';
+import type { SessionRemoteID } from '#lib/schemas/sessions.js';
 import type { HttpRequestResolverExtras, RequestHandlerOptions, ResponseResolver } from 'msw';
 
 import { http, HttpResponse } from 'msw';

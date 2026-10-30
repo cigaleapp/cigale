@@ -1,6 +1,6 @@
 /**
  * @import { Page } from '@playwright/test';
- * @import {IDBDatabaseType} from '$lib/idb.svelte.js';
+ * @import {IDBDatabaseType} from '#lib/idb.svelte.js';
  */
 
 /**
@@ -34,7 +34,7 @@ export async function getDatabaseRowById(page, tableName, id) {
 
 /**
  *
- * @template {import('idb').StoreNames<import('$lib/idb.svelte.js').IDBDatabaseType>} Table
+ * @template {import('idb').StoreNames<import('#lib/idb.svelte.js').IDBDatabaseType>} Table
  * @param {Page} page
  * @param {Table} tableName
  * @returns {ReturnType<typeof window.DB.getAll<Table>>}
@@ -61,7 +61,7 @@ export async function dumpDatabase(page) {
 	const encodedDump = await page.evaluate(async () => {
 		const tableNames = window.DB.objectStoreNames;
 
-		/** @type {Partial<Record<import('idb').StoreNames<import('$lib/idb.svelte.js').IDBDatabaseType>, any>>} */
+		/** @type {Partial<Record<import('idb').StoreNames<import('#lib/idb.svelte.js').IDBDatabaseType>, any>>} */
 		const dump = {};
 
 		for (const tableName of tableNames) {

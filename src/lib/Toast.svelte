@@ -10,7 +10,7 @@
 	import IconWarning from '~icons/ri/triangle-line';
 
 	/**
-	 * @param {import('$lib/toasts.svelte.js').Toast<any>['type']} type
+	 * @param {import('#lib/toasts.svelte.js').Toast<any>['type']} type
 	 */
 	export function toastIcon(type) {
 		switch (type) {
@@ -28,7 +28,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/toasts.svelte.js').Toast<any>['type']} type
+	 * @param {import('#lib/toasts.svelte.js').Toast<any>['type']} type
 	 */
 	export function toastTheme(type) {
 		switch (type) {
@@ -57,7 +57,7 @@
 
 	/**
 	 * @typedef Toast
-	 * @type {import('$lib/toasts.svelte').Toast<T>}
+	 * @type {import('#lib/toasts.svelte.js').Toast<T>}
 	 */
 
 	/**

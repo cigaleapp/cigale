@@ -3,7 +3,7 @@
 
 	import { Portal } from 'bits-ui';
 
-	import { IsMobile } from '$lib/mobile.svelte.js';
+	import { IsMobile } from '#lib/mobile.svelte.js';
 
 	const { children }: { children: Snippet } = $props();
 

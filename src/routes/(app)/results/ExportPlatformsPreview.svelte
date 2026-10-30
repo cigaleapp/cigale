@@ -1,7 +1,7 @@
 <script lang="ts">
-	import ButtonInk from '$lib/ButtonInk.svelte';
-	import Field from '$lib/Field.svelte';
-	import ProgressTree from '$lib/ProgressTree.svelte';
+	import ButtonInk from '#lib/ButtonInk.svelte';
+	import Field from '#lib/Field.svelte';
+	import ProgressTree from '#lib/ProgressTree.svelte';
 
 	import { exporter } from './platforms.svelte.js';
 </script>

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 
-	import Logo from '$lib/Logo.svelte';
+	import Logo from '#lib/Logo.svelte';
 
 	import ModalSubmitIssue from './ModalSubmitIssue.svelte';
 	import Settings from './Settings.svelte';

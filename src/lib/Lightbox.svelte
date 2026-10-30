@@ -3,8 +3,8 @@
 
 	import { Portal } from 'bits-ui';
 
+	import ButtonIcon from '#lib/ButtonIcon.svelte';
 	import IconClose from '~icons/ri/close-line';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
 
 	interface Props {
 		/** Content shown normally */

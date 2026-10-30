@@ -107,7 +107,7 @@ export async function syncCorrections(
 
 /**
  *
- * @param {typeof import('$lib/database').Tables.BeamupCorrection.inferIn} correction
+ * @param {typeof import('#lib/database.js').Tables.BeamupCorrection.inferIn} correction
  * @returns {import('@cigale/beamup').SendableCorrection}
  */
 function makeCorrection({
@@ -119,7 +119,7 @@ function makeCorrection({
 	occurredAt,
 	subject,
 	email,
-}: typeof import('$lib/database').Tables.BeamupCorrection.inferIn): import('@cigale/beamup').SendableCorrection {
+}: typeof import('#lib/database').Tables.BeamupCorrection.inferIn): import('@cigale/beamup').SendableCorrection {
 	return {
 		after: {
 			alternatives: entries(after.alternatives).map(([value, confidence]) => ({

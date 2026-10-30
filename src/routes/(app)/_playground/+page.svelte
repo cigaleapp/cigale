@@ -1,7 +1,7 @@
 <svelte:options runes={true} />
 
 <script lang="ts">
-	import DropdownMenu from '$lib/DropdownMenu.svelte';
+	import DropdownMenu from '#lib/DropdownMenu.svelte';
 </script>
 
 <DropdownMenu

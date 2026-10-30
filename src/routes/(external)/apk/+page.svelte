@@ -1,8 +1,8 @@
 <script lang="ts">
-	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
-	import { openFileFromUrl } from '$lib/download.js';
-	import QRCode from '$lib/QRCode.svelte';
-	import { APK_DOWNLOAD_URL } from '$lib/update-bundles.js';
+	import ButtonPrimary from '#lib/ButtonPrimary.svelte';
+	import { openFileFromUrl } from '#lib/download.js';
+	import QRCode from '#lib/QRCode.svelte';
+	import { APK_DOWNLOAD_URL } from '#lib/update-bundles.js';
 
 	const { data } = $props();
 	const info = $derived(data.info);

@@ -38,10 +38,10 @@ Available CSS variables:
 </script>
 
 <script>
-	import { errorMessage } from '$lib/i18n.js';
-	import { toasts } from '$lib/toasts.svelte.js';
+	import { errorMessage } from '#lib/i18n.js';
+	import { toasts } from '#lib/toasts.svelte.js';
 
-	import { hasPhysicalKeyboard } from './keyboard.svelte';
+	import { hasPhysicalKeyboard } from './keyboard.svelte.js';
 	import KeyboardHint from './KeyboardHint.svelte';
 	import LoadingSpinner from './LoadingSpinner.svelte';
 	import { tooltip } from './tooltips.js';

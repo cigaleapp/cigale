@@ -15,7 +15,7 @@
 	 * @property {boolean} [dangerous] style the button to indicate a dangerous action
 	 * @property {() => void} [preload] function to call on mouseover, useful for preloading the next page in a navigation button for instance
 	 * @property {boolean} [loading] whether to show a loading state (disable the button and show a spinner, while the onclick handler is running)
-	 * @property {Partial<import('$lib/tooltips.js').TooltipParameters>} [tooltipParams] additional params for the tooltip
+	 * @property {Partial<import('#lib/tooltips.js').TooltipParameters>} [tooltipParams] additional params for the tooltip
 	 */
 
 	/** @type {Props & Record<string, unknown>} */

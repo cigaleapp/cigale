@@ -1,10 +1,10 @@
 <script lang="ts">
-	import type * as DB from '$lib/database.js';
+	import type * as DB from '#lib/database.js';
 
 	import { type Snippet } from 'svelte';
 
+	import VirtualList from '#lib/VirtualList.svelte';
 	import IconExpand from '~icons/ri/arrow-right-s-line';
-	import VirtualList from '$lib/VirtualList.svelte';
 
 	import { metadataDefinitionComparator } from './protocols.js';
 	import { getSettings } from './settings.svelte.js';

@@ -1,6 +1,5 @@
+import { Analysis } from '#lib/schemas/exports.js';
 import { ms } from 'convert';
-
-import { Analysis } from '$lib/schemas/exports.js';
 
 import { expect, test } from './fixtures.js';
 import sidecarExample from './fixtures/real/entomoscope/20260209141830.json' with { type: 'json' };

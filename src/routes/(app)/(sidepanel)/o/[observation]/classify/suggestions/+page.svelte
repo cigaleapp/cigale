@@ -6,23 +6,23 @@
 	import { marked } from 'marked';
 	import { fade } from 'svelte/transition';
 
+	import { cascadeLabels } from '#lib/cascades.js';
+	import Field from '#lib/Field.svelte';
+	import { openDatabase } from '#lib/idb.svelte.js';
+	import LearnMoreLink from '#lib/LearnMoreLink.svelte';
+	import { getMetadataValue } from '#lib/metadata/index.js';
+	import MetadataCascadesTable from '#lib/MetadataCascadesTable.svelte';
+	import MetadataOptionCarousel from '#lib/MetadataOptionCarousel.svelte';
+	import { IsMobile } from '#lib/mobile.svelte.js';
+	import { observationMetadata } from '#lib/observations.js';
+	import { namespaceOfMetadataId } from '#lib/schemas/metadata.js';
+	import { scrollfader } from '#lib/scrollfader.js';
+	import { isDebugMode } from '#lib/settings.svelte.js';
+	import { uiState } from '#lib/uistate.svelte.js';
+	import { undo } from '#lib/undo.svelte.js';
 	import IconDescription from '~icons/ri/align-left';
 	import IconCascades from '~icons/ri/corner-right-down-fill';
 	import IconSynonyms from '~icons/ri/links-line';
-	import { cascadeLabels } from '$lib/cascades';
-	import Field from '$lib/Field.svelte';
-	import { openDatabase } from '$lib/idb.svelte.js';
-	import LearnMoreLink from '$lib/LearnMoreLink.svelte';
-	import { getMetadataValue } from '$lib/metadata/index.js';
-	import MetadataCascadesTable from '$lib/MetadataCascadesTable.svelte';
-	import MetadataOptionCarousel from '$lib/MetadataOptionCarousel.svelte';
-	import { IsMobile } from '$lib/mobile.svelte';
-	import { observationMetadata } from '$lib/observations';
-	import { namespaceOfMetadataId } from '$lib/schemas/metadata.js';
-	import { scrollfader } from '$lib/scrollfader';
-	import { isDebugMode } from '$lib/settings.svelte.js';
-	import { uiState } from '$lib/uistate.svelte.js';
-	import { undo } from '$lib/undo.svelte';
 
 	import { fullscreenState } from '../../+layout@(app).svelte';
 	import Subject from '../Subject.svelte';

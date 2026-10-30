@@ -14,18 +14,23 @@ export default defineConfig({
 			sourceLocale: 'fr',
 			loader: 'sveltekit',
 			files: ['src/**/*.svelte'],
-			heuristic({ msgStr: [msg], details: { file, scope, call } }) {
+			heuristic({ body, path }, file) {
+				const [msg] = Array.isArray(body) ? body : [body];
+
 				// Routes only load translations inside the (app) group
 				if (file.includes('/routes/') && !file.includes('/(app)/')) return false;
 				if (file.includes('/_playground/')) return false;
 
 				// Table names
-				if (scope === 'script' && Object.keys(Tables).includes(msg)) return false;
+				if (Object.keys(Tables).includes(msg)) return false;
 
 				// Probably math variables, see ModelOutputShapeDiagram.svelte
 				if (msg.length === 1) return false;
 
-				if (/^toasts\.(info|warn|error|success)$/.test(call)) return true;
+				const functioncall = path.find((scope) => scope.type === 'call');
+
+				if (functioncall && /^toasts\.(info|warn|error|success)$/.test(functioncall.name))
+					return true;
 
 				const startsWithUpperLetter =
 					msg[0] === msg[0].toUpperCase() &&
@@ -42,14 +47,18 @@ export default defineConfig({
 					return false;
 				}
 
-				if (startsWithUpperLetter && scope === 'script') {
-					return [
+				if (startsWithUpperLetter) {
+					const functions = [
 						'defineKeyboardShortcuts',
 						'seo',
 						'$derived.by',
 						'$derived',
 						'$effect',
-					].includes(call);
+					];
+
+					return path.some(
+						(scope) => scope.type === 'call' && functions.includes(scope.name)
+					);
 				}
 			},
 		}),
@@ -61,7 +70,9 @@ export default defineConfig({
 				'src/**/+{page,layout}.server.{js,ts}',
 				'src/lib/**.{js,ts}',
 			],
-			heuristic({ msgStr: [msg], details: { file, funcName, call } }) {
+			heuristic({ body }, file) {
+				const [msg] = Array.isArray(body) ? body : [body];
+
 				// Strings in test files
 				if (file.endsWith('.test.js') || file.endsWith('.test.svelte.js')) return false;
 				if (file.endsWith('.test.ts') || file.endsWith('.test.svelte.ts')) return false;
@@ -77,8 +88,7 @@ export default defineConfig({
 
 				// Log messages for ProcessingQueue
 				if (file === 'src/lib/queue.svelte.js') {
-					if (call === '[MemberExpression].log') return false;
-					if (call === '[MemberExpression].logWarning') return false;
+					return false;
 				}
 
 				// Headers.get
@@ -86,7 +96,7 @@ export default defineConfig({
 				if (msg === 'Content-Type') return false;
 
 				// EXIF fields in exif.js
-				if (file === 'src/lib/exif.js' && funcName === 'addExifMetadata') {
+				if (file === 'src/lib/exif.js') {
 					return false;
 				}
 

@@ -1,12 +1,26 @@
 <script lang="ts">
-	import type { TopLeftBoundingBox } from '$lib/BoundingBoxes.svelte.js';
-	import type * as DB from '$lib/database.js';
-	import type { NamespacedMetadataID } from '$lib/schemas/common.js';
-	import type { RuntimeValue } from '$lib/schemas/metadata.js';
-	import type { NumericUnit } from '$lib/schemas/units.js';
+	import type { TopLeftBoundingBox } from '#lib/BoundingBoxes.svelte.js';
+	import type * as DB from '#lib/database.js';
+	import type { NamespacedMetadataID } from '#lib/schemas/common.js';
+	import type { RuntimeValue } from '#lib/schemas/metadata.js';
+	import type { NumericUnit } from '#lib/schemas/units.js';
 
 	import { dequal } from 'dequal/lite';
 
+	import BottomDrawer from '#lib/BottomDrawer.svelte';
+	import ButtonSecondary from '#lib/ButtonSecondary.svelte';
+	import CroppedImg from '#lib/CroppedImg.svelte';
+	import { plural } from '#lib/i18n.js';
+	import { tables } from '#lib/idb.svelte.js';
+	import InlineTextInput from '#lib/InlineTextInput.svelte';
+	import KeyboardHint from '#lib/KeyboardHint.svelte';
+	import Metadata from '#lib/Metadata.svelte';
+	import MetadataList from '#lib/MetadataList.svelte';
+	import { IsMobile } from '#lib/mobile.svelte.js';
+	import OverflowableText from '#lib/OverflowableText.svelte';
+	import { goto } from '#lib/paths.js';
+	import { metadataDefinitionComparator } from '#lib/protocols.js';
+	import { uiState } from '#lib/uistate.svelte.js';
 	import IconObservation from '~icons/ri/bug-line';
 	import IconCamera from '~icons/ri/camera-line';
 	import IconDelete from '~icons/ri/delete-bin-line';
@@ -16,20 +30,6 @@
 	import IconMerge from '~icons/ri/shadow-line';
 	import IconImport from '~icons/ri/upload-2-line';
 	import { page } from '$app/state';
-	import BottomDrawer from '$lib/BottomDrawer.svelte';
-	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import CroppedImg from '$lib/CroppedImg.svelte';
-	import { plural } from '$lib/i18n.js';
-	import { tables } from '$lib/idb.svelte.js';
-	import InlineTextInput from '$lib/InlineTextInput.svelte';
-	import KeyboardHint from '$lib/KeyboardHint.svelte';
-	import Metadata from '$lib/Metadata.svelte';
-	import MetadataList from '$lib/MetadataList.svelte';
-	import { IsMobile } from '$lib/mobile.svelte.js';
-	import OverflowableText from '$lib/OverflowableText.svelte';
-	import { goto } from '$lib/paths.js';
-	import { metadataDefinitionComparator } from '$lib/protocols.js';
-	import { uiState } from '$lib/uistate.svelte.js';
 
 	interface Props {
 		/** source **href**s of the images/observations we're modifying the metadata on */
