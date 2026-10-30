@@ -1,10 +1,10 @@
-import type * as DB from '$lib/database.js';
-import type { DatabaseHandle } from '$lib/idb.svelte.js';
-import type { NamespacedMetadataID } from '$lib/schemas/common.js';
-import type { MetadataType } from '$lib/schemas/metadata.js';
+import type * as DB from '#lib/database.js';
+import type { DatabaseHandle } from '#lib/idb.svelte.js';
+import type { NamespacedMetadataID } from '#lib/schemas/common.js';
+import type { MetadataType } from '#lib/schemas/metadata.js';
 
-import { openDatabase } from '$lib/idb.svelte.js';
-import { namespacedMetadataId } from '$lib/schemas/metadata.js';
+import { openDatabase } from '#lib/idb.svelte.js';
+import { namespacedMetadataId } from '#lib/schemas/metadata.js';
 
 import 'fake-indexeddb/auto';
 

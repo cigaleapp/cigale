@@ -1,6 +1,5 @@
+import { UpdateBundleMetadata } from '#lib/schemas/update-bundle.js';
 import { ArkErrors } from 'arktype';
-
-import { UpdateBundleMetadata } from '$lib/schemas/update-bundle.js';
 
 export async function load() {
 	const info = await fetch(

@@ -1,6 +1,6 @@
 import { execFileSync } from 'node:child_process';
 import type { BrowserContext, Page } from '@playwright/test';
-import type { NeuralBoundingBoxInference, NeuralEnumInference } from '$lib/schemas/neural.js';
+import type { NeuralBoundingBoxInference, NeuralEnumInference } from '#lib/schemas/neural.js';
 
 import { nanoid } from 'nanoid';
 

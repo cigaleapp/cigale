@@ -1,9 +1,9 @@
 <script>
-	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import Datetime from '$lib/Datetime.svelte';
-	import { nukeDatabase, previewingPrNumber } from '$lib/idb.svelte';
-	import Markdown from '$lib/Markdown.svelte';
-	import Modal from '$lib/Modal.svelte';
+	import ButtonSecondary from '#lib/ButtonSecondary.svelte';
+	import Datetime from '#lib/Datetime.svelte';
+	import { nukeDatabase, previewingPrNumber } from '#lib/idb.svelte.js';
+	import Markdown from '#lib/Markdown.svelte';
+	import Modal from '#lib/Modal.svelte';
 
 	const buildCommit = import.meta.env.buildCommit;
 

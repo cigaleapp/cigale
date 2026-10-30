@@ -1,9 +1,8 @@
-import type * as DB from '$lib/database';
-import type { RuntimeValue } from '$lib/schemas/metadata';
+import type * as DB from '#lib/database.js';
+import type { RuntimeValue } from '#lib/schemas/metadata.js';
 
+import { MetadataRuntimeValue } from '#lib/schemas/metadata.js';
 import { ArkErrors } from 'arktype';
-
-import { MetadataRuntimeValue } from '$lib/schemas/metadata';
 
 import { ensureArray } from '../utils.js';
 

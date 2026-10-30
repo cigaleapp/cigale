@@ -10,6 +10,11 @@
 </script>
 
 <script>
+	import ButtonSecondary from '#lib/ButtonSecondary.svelte';
+	import LoadingSpinner from '#lib/LoadingSpinner.svelte';
+	import { hasUpgradeAvailable, upgradeProtocol } from '#lib/protocols.js';
+	import { toasts } from '#lib/toasts.svelte.js';
+
 	import IconArrow from '~icons/ri/arrow-right-line';
 	import IconUpgrade from '~icons/ri/arrow-up-circle-line';
 	import IconUpToDate from '~icons/ri/checkbox-circle-line';
@@ -17,10 +22,6 @@
 	import IconCheckAgain from '~icons/ri/loop-left-fill';
 	import IconNotVersioned from '~icons/ri/question-line';
 	import { page } from '$app/state';
-	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
-	import { hasUpgradeAvailable, upgradeProtocol } from '$lib/protocols.js';
-	import { toasts } from '$lib/toasts.svelte.js';
 
 	import ButtonIcon from './ButtonIcon.svelte';
 
@@ -28,7 +29,7 @@
 	 * @typedef {object} Props
 	 * @property {string} id
 	 * @property {number} version
-	 * @property {typeof import('$lib/schemas/common').HTTPRequest.infer} source
+	 * @property {typeof import('#lib/schemas/common.js').HTTPRequest.infer} source
 	 * @property {boolean} [compact=false]
 	 * @property {import('svelte').Snippet<[CustomButtonProps]>} [button]
 	 * @property {(newVersion: number) => void | Promise<void>} [onupgrade] called after a successful upgrade

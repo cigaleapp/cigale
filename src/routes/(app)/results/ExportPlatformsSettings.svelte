@@ -1,10 +1,11 @@
 <script lang="ts">
+	import Account from '#lib/Account.svelte';
+	import ButtonSecondary from '#lib/ButtonSecondary.svelte';
+	import EnumButtons from '#lib/EnumButtons.svelte';
+	import Field from '#lib/Field.svelte';
+	import { uiState } from '#lib/uistate.svelte.js';
+
 	import IconOpenExternal from '~icons/ri/arrow-right-up-box-line';
-	import Account from '$lib/Account.svelte';
-	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import EnumButtons from '$lib/EnumButtons.svelte';
-	import Field from '$lib/Field.svelte';
-	import { uiState } from '$lib/uistate.svelte.js';
 
 	import { exporter } from './platforms.svelte.js';
 

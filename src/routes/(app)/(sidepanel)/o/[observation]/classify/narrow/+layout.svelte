@@ -5,6 +5,27 @@
 </script>
 
 <script lang="ts">
+	import ButtonIcon from '#lib/ButtonIcon.svelte';
+	import ButtonInk from '#lib/ButtonInk.svelte';
+	import ConfidencePercentage from '#lib/ConfidencePercentage.svelte';
+	import { percent, plural } from '#lib/i18n.js';
+	import { databaseHandle, tables } from '#lib/idb.svelte.js';
+	import InlineTextInput from '#lib/InlineTextInput.svelte';
+	import { defineKeyboardShortcuts } from '#lib/keyboard.svelte.js';
+	import KeyboardHint from '#lib/KeyboardHint.svelte';
+	import Logo from '#lib/Logo.svelte';
+	import { deleteMetadataValue, storeMetadataValue } from '#lib/metadata/storage.js';
+	import MetadataInput from '#lib/MetadataInput.svelte';
+	import { IsMobile } from '#lib/mobile.svelte.js';
+	import OverflowableText from '#lib/OverflowableText.svelte';
+	import { goto } from '#lib/paths.js';
+	import ProgressBar from '#lib/ProgressBar.svelte';
+	import SegmentedGroup from '#lib/SegmentedGroup.svelte';
+	import { toasts } from '#lib/toasts.svelte.js';
+	import { tooltip } from '#lib/tooltips.js';
+	import { uiState } from '#lib/uistate.svelte.js';
+	import { compareBy, transformObject } from '#lib/utils.js';
+	import VirtualList from '#lib/VirtualList.svelte';
 	import { fade } from 'svelte/transition';
 
 	import IconCollapse from '~icons/ri/arrow-down-s-line';
@@ -13,27 +34,6 @@
 	import IconRestart from '~icons/ri/restart-line';
 	import IconSearch from '~icons/ri/search-line';
 	import { page } from '$app/state';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import ButtonInk from '$lib/ButtonInk.svelte';
-	import ConfidencePercentage from '$lib/ConfidencePercentage.svelte';
-	import { percent, plural } from '$lib/i18n.js';
-	import { databaseHandle, tables } from '$lib/idb.svelte.js';
-	import InlineTextInput from '$lib/InlineTextInput.svelte';
-	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
-	import KeyboardHint from '$lib/KeyboardHint.svelte';
-	import Logo from '$lib/Logo.svelte';
-	import { deleteMetadataValue, storeMetadataValue } from '$lib/metadata/storage.js';
-	import MetadataInput from '$lib/MetadataInput.svelte';
-	import { IsMobile } from '$lib/mobile.svelte';
-	import OverflowableText from '$lib/OverflowableText.svelte';
-	import { goto } from '$lib/paths.js';
-	import ProgressBar from '$lib/ProgressBar.svelte';
-	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
-	import { toasts } from '$lib/toasts.svelte.js';
-	import { tooltip } from '$lib/tooltips.js';
-	import { uiState } from '$lib/uistate.svelte.js';
-	import { compareBy, transformObject } from '$lib/utils.js';
-	import VirtualList from '$lib/VirtualList.svelte';
 
 	import { fullscreenState } from '../../+layout@(app).svelte';
 	import Subject from '../Subject.svelte';

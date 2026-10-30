@@ -1,12 +1,13 @@
 <script lang="ts">
 	import type { SelectedBox } from './+page.svelte';
 
+	import { toTopLeftCoords } from '#lib/BoundingBoxes.svelte.js';
+	import LoadingSpinner from '#lib/LoadingSpinner.svelte';
+	import { Gestures } from '#lib/touch/gestures.svelte.js';
+	import { uiState } from '#lib/uistate.svelte.js';
+	import { mapValues, overrideStyle, pick } from '#lib/utils.js';
+
 	import { page } from '$app/state';
-	import { toTopLeftCoords } from '$lib/BoundingBoxes.svelte.js';
-	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
-	import { Gestures } from '$lib/touch/gestures.svelte.js';
-	import { uiState } from '$lib/uistate.svelte.js';
-	import { mapValues, overrideStyle, pick } from '$lib/utils.js';
 
 	import {
 		focusedImage,

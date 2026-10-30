@@ -1,27 +1,27 @@
 <script lang="ts">
+	import Account from '#lib/Account.svelte';
+	import { providers } from '#lib/accounts/registry.js';
+	import ButtonPrimary from '#lib/ButtonPrimary.svelte';
+	import ButtonSecondary from '#lib/ButtonSecondary.svelte';
+	import DebugOnly from '#lib/DebugOnly.svelte';
+	import Field from '#lib/Field.svelte';
+	import { formatBytesSize, plural } from '#lib/i18n.js';
+	import { databaseHandle, dependencyURI, tables } from '#lib/idb.svelte.js';
+	import InlineTextInput from '#lib/InlineTextInput.svelte';
+	import InputSelectProtocol from '#lib/InputSelectProtocol.svelte';
+	import Markdown from '#lib/Markdown.svelte';
+	import ModalConfirmDeletion from '#lib/ModalConfirmDeletion.svelte';
+	import { goto } from '#lib/paths.js';
+	import SessionMetadataForm from '#lib/SessionMetadataForm.svelte';
+	import { deleteSession, switchSession } from '#lib/sessions.js';
+	import { toasts } from '#lib/toasts.svelte.js';
+	import { uiState } from '#lib/uistate.svelte.js';
 	import { fade } from 'svelte/transition';
 
 	import IconViewExternal from '~icons/ri/arrow-right-up-box-line';
 	import IconSyncDown from '~icons/ri/download-line';
 	import IconUnlink from '~icons/ri/link-unlink-m';
 	import { invalidate } from '$app/navigation';
-	import Account from '$lib/Account.svelte';
-	import { providers } from '$lib/accounts/registry.js';
-	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
-	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import DebugOnly from '$lib/DebugOnly.svelte';
-	import Field from '$lib/Field.svelte';
-	import { formatBytesSize, plural } from '$lib/i18n.js';
-	import { databaseHandle, dependencyURI, tables } from '$lib/idb.svelte.js';
-	import InlineTextInput from '$lib/InlineTextInput.svelte';
-	import InputSelectProtocol from '$lib/InputSelectProtocol.svelte';
-	import Markdown from '$lib/Markdown.svelte';
-	import ModalConfirmDeletion from '$lib/ModalConfirmDeletion.svelte';
-	import { goto } from '$lib/paths.js';
-	import SessionMetadataForm from '$lib/SessionMetadataForm.svelte';
-	import { deleteSession, switchSession } from '$lib/sessions.js';
-	import { toasts } from '$lib/toasts.svelte.js';
-	import { uiState } from '$lib/uistate.svelte.js';
 	import TopbarOpenSession from '$routes/(app)/TopbarOpenSession.svelte';
 
 	const { data } = $props();

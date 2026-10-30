@@ -45,6 +45,15 @@
 
 <script>
 	import { error } from '@sveltejs/kit';
+	import ButtonIcon from '#lib/ButtonIcon.svelte';
+	import { errorMessage } from '#lib/i18n.js';
+	import { dependencyURI, drop, set } from '#lib/idb.svelte.js';
+	import InlineTextInput from '#lib/InlineTextInput.svelte';
+	import { goto, resolve } from '#lib/paths.js';
+	import { removeNamespaceFromMetadataId } from '#lib/schemas/metadata.js';
+	import { toasts } from '#lib/toasts.svelte.js';
+	import { slugify } from '#lib/utils.js';
+	import VirtualList from '#lib/VirtualList.svelte';
 	import { fade } from 'svelte/transition';
 
 	import IconAdd from '~icons/ri/add-line';
@@ -53,15 +62,6 @@
 	import IconSearch from '~icons/ri/search-line';
 	import { invalidate } from '$app/navigation';
 	import { page } from '$app/state';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import { errorMessage } from '$lib/i18n.js';
-	import { dependencyURI, drop, set } from '$lib/idb.svelte.js';
-	import InlineTextInput from '$lib/InlineTextInput.svelte';
-	import { goto, resolve } from '$lib/paths.js';
-	import { removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';
-	import { toasts } from '$lib/toasts.svelte.js';
-	import { slugify } from '$lib/utils.js';
-	import VirtualList from '$lib/VirtualList.svelte';
 
 	const { data, children } = $props();
 

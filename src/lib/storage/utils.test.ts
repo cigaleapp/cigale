@@ -1,10 +1,9 @@
 import 'fake-indexeddb/auto';
 import 'opfs-mock';
 
+import { nukeDatabase } from '#lib/idb.svelte.js';
+import { imageFileId } from '#lib/images.js';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-
-import { nukeDatabase } from '$lib/idb.svelte.js';
-import { imageFileId } from '$lib/images.js';
 
 import { binaryStorage } from './index.js';
 import {

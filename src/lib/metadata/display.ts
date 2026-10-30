@@ -1,13 +1,12 @@
-import type { DatabaseHandle } from '$lib/idb.svelte.js';
-import type { RuntimeValue } from '$lib/schemas/metadata';
+import type { DatabaseHandle } from '#lib/idb.svelte.js';
+import type { RuntimeValue } from '#lib/schemas/metadata.js';
 
+import * as DB from '#lib/database.js';
+import { metadataOptionId } from '#lib/schemas/metadata.js';
+import { round, transformObject, transformObjectAsync } from '#lib/utils.js';
 import { type } from 'arktype';
 import convert from 'convert';
 import * as dates from 'date-fns';
-
-import * as DB from '$lib/database';
-import { metadataOptionId } from '$lib/schemas/metadata';
-import { round, transformObject, transformObjectAsync } from '$lib/utils';
 
 /**
  * Adds valueLabel to each metadata value object when the metadata is an enum.
@@ -80,7 +79,7 @@ export function metadataPrettyValue<Type extends DB.MetadataType>(
 		valueLabel,
 		boundingBoxPrecision = 2,
 	}: {
-		language: import('$lib/i18n.js').Language;
+		language: import('#lib/i18n.js').Language;
 		type: Type;
 		valueLabel?: string | undefined;
 		boundingBoxPrecision?: number | 'unbounded' | undefined;

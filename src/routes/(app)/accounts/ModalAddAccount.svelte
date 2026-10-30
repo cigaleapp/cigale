@@ -1,7 +1,21 @@
 <script lang="ts">
-	import type { AccountConstructor, LoginData } from '$lib/accounts/types.js';
+	import type { AccountConstructor, LoginData } from '#lib/accounts/types.js';
 
 	import { CapacitorHttp } from '@capacitor/core';
+	import KoboToolbox from '#lib/accounts/kobotoolbox.js';
+	import ButtonIcon from '#lib/ButtonIcon.svelte';
+	import EnumButtons from '#lib/EnumButtons.svelte';
+	import Field from '#lib/Field.svelte';
+	import { errorMessage } from '#lib/i18n.js';
+	import { databaseHandle, tables } from '#lib/idb.svelte.js';
+	import { inAppBrowser } from '#lib/inappbrowser.js';
+	import InlineTextInput from '#lib/InlineTextInput.svelte';
+	import LoadingSpinner from '#lib/LoadingSpinner.svelte';
+	import ModalConfirm from '#lib/ModalConfirm.svelte';
+	import Stepper from '#lib/Stepper.svelte';
+	import { toasts } from '#lib/toasts.svelte.js';
+	import { tooltip } from '#lib/tooltips.js';
+	import { orEmpty, safeJSONParse } from '#lib/utils.js';
 	import { ArkErrors, type } from 'arktype';
 	import { fade } from 'svelte/transition';
 
@@ -10,20 +24,6 @@
 	import IconHidePassword from '~icons/ri/eye-close-line';
 	import IconShowPassword from '~icons/ri/eye-line';
 	import IconWarning from '~icons/ri/triangle-line';
-	import KoboToolbox from '$lib/accounts/kobotoolbox.js';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import EnumButtons from '$lib/EnumButtons.svelte';
-	import Field from '$lib/Field.svelte';
-	import { errorMessage } from '$lib/i18n.js';
-	import { databaseHandle, tables } from '$lib/idb.svelte.js';
-	import { inAppBrowser } from '$lib/inappbrowser.js';
-	import InlineTextInput from '$lib/InlineTextInput.svelte';
-	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
-	import ModalConfirm from '$lib/ModalConfirm.svelte';
-	import Stepper from '$lib/Stepper.svelte';
-	import { toasts } from '$lib/toasts.svelte.js';
-	import { tooltip } from '$lib/tooltips.js';
-	import { orEmpty, safeJSONParse } from '$lib/utils.js';
 
 	interface Props {
 		adding: undefined | AccountConstructor;

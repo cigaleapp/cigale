@@ -1,11 +1,12 @@
 <script lang="ts">
+	import ButtonInk from '#lib/ButtonInk.svelte';
+	import ButtonPrimary from '#lib/ButtonPrimary.svelte';
+	import { nukeDatabase } from '#lib/idb.svelte.js';
+	import Logo from '#lib/Logo.svelte';
+	import { goto } from '#lib/paths.js';
+
 	import IconReset from '~icons/ri/loop-left-fill';
 	import { page } from '$app/state';
-	import ButtonInk from '$lib/ButtonInk.svelte';
-	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
-	import { nukeDatabase } from '$lib/idb.svelte';
-	import Logo from '$lib/Logo.svelte';
-	import { goto } from '$lib/paths.js';
 </script>
 
 <main>

@@ -1,4 +1,16 @@
 <script lang="ts">
+	import { percent } from '#lib/i18n.js';
+	import { previewingPrNumber, tables } from '#lib/idb.svelte.js';
+	import { defineKeyboardShortcuts } from '#lib/keyboard.svelte.js';
+	import Logo from '#lib/Logo.svelte';
+	import { IsMobile } from '#lib/mobile.svelte.js';
+	import { goto, resolve } from '#lib/paths.js';
+	import ProgressBar from '#lib/ProgressBar.svelte';
+	import { switchSession } from '#lib/sessions.js';
+	import { isDebugMode } from '#lib/settings.svelte.js';
+	import { tooltip } from '#lib/tooltips.js';
+	import { uiState } from '#lib/uistate.svelte.js';
+	import { clamp } from '#lib/utils.js';
 	import { formatDistanceToNow } from 'date-fns';
 	import { fade } from 'svelte/transition';
 
@@ -16,18 +28,6 @@
 	import IconImportFilled from '~icons/ri/import-fill';
 	import IconImport from '~icons/ri/import-line';
 	import { page } from '$app/state';
-	import { percent } from '$lib/i18n';
-	import { previewingPrNumber, tables } from '$lib/idb.svelte';
-	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
-	import Logo from '$lib/Logo.svelte';
-	import { IsMobile } from '$lib/mobile.svelte.js';
-	import { goto, resolve } from '$lib/paths';
-	import ProgressBar from '$lib/ProgressBar.svelte';
-	import { switchSession } from '$lib/sessions.js';
-	import { isDebugMode } from '$lib/settings.svelte.js';
-	import { tooltip } from '$lib/tooltips.js';
-	import { uiState } from '$lib/uistate.svelte.js';
-	import { clamp } from '$lib/utils.js';
 
 	import DeploymentDetails from './DeploymentDetails.svelte';
 	import ModalSubmitIssue from './ModalSubmitIssue.svelte';

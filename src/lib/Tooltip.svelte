@@ -1,5 +1,5 @@
 <script>
-	import { tooltip } from '$lib/tooltips';
+	import { tooltip } from '#lib/tooltips.js';
 
 	/**
 	 * @typedef Props

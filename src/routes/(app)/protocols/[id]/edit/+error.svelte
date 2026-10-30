@@ -1,6 +1,7 @@
 <script>
+	import Logo from '#lib/Logo.svelte';
+
 	import { page } from '$app/state';
-	import Logo from '$lib/Logo.svelte';
 </script>
 
 <div class="error">

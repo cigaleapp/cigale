@@ -2,7 +2,7 @@ import { type } from 'arktype';
 import { conversions } from 'convert/conversions';
 
 /**
- * @import { ValueOfMap } from '$lib/utils.js';
+ * @import { ValueOfMap } from '#lib/utils.js';
  */
 
 export const NumericUnit = type.enumerated(

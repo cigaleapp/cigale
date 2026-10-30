@@ -1,11 +1,10 @@
 import type { TypedMetadataValue } from './types.js';
-import type { NamespacedMetadataID } from '$lib/schemas/common.js';
+import type { NamespacedMetadataID } from '#lib/schemas/common.js';
 
+import * as DB from '#lib/database.js';
+import { MetadataRecordValue, MetadataRuntimeValue } from '#lib/schemas/metadata.js';
+import { clamp, mapValues, transformObject } from '#lib/utils.js';
 import * as dates from 'date-fns';
-
-import * as DB from '$lib/database';
-import { MetadataRecordValue, MetadataRuntimeValue } from '$lib/schemas/metadata.js';
-import { clamp, mapValues, transformObject } from '$lib/utils';
 
 /**
  * Serialize a metadata value for storing in the database.

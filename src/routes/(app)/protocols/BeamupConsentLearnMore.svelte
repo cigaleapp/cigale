@@ -1,13 +1,13 @@
 <script>
-	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
-	import InlineTextInput from '$lib/InlineTextInput.svelte';
-	import Modal from '$lib/Modal.svelte';
-	import { getSettings, setSetting } from '$lib/settings.svelte';
-	import Switch from '$lib/Switch.svelte';
+	import ButtonPrimary from '#lib/ButtonPrimary.svelte';
+	import InlineTextInput from '#lib/InlineTextInput.svelte';
+	import Modal from '#lib/Modal.svelte';
+	import { getSettings, setSetting } from '#lib/settings.svelte.js';
+	import Switch from '#lib/Switch.svelte';
 
 	/**
 	 * @typedef {object} Props
-	 * @property {typeof import('$lib/schemas/protocols').BeamupSettings.infer} config
+	 * @property {typeof import('#lib/schemas/protocols.js').BeamupSettings.infer} config
 	 * @property {string} protocol
 	 * @property {undefined | (() => void)} [open]
 	 */

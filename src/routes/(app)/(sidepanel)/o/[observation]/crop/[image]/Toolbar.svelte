@@ -1,4 +1,9 @@
 <script lang="ts" module>
+	import { IsMobile } from '#lib/mobile.svelte.js';
+	import { getSettings, toggleSetting } from '#lib/settings.svelte.js';
+	import { tooltip } from '#lib/tooltips.js';
+	import { undo } from '#lib/undo.svelte.js';
+
 	import IconFourPointCrop from '~icons/ri/apps-2-add-line';
 	import IconUndo from '~icons/ri/arrow-go-back-fill';
 	import IconRedo from '~icons/ri/arrow-go-forward-fill';
@@ -8,10 +13,6 @@
 	import IconExpand from '~icons/ri/expand-left-line';
 	import IconToolHand from '~icons/ri/hand';
 	import IconToolDragCrop from '~icons/ri/shape-2-line';
-	import { IsMobile } from '$lib/mobile.svelte';
-	import { getSettings, toggleSetting } from '$lib/settings.svelte.js';
-	import { tooltip } from '$lib/tooltips.js';
-	import { undo } from '$lib/undo.svelte.js';
 
 	type ToolName = (typeof tools)[number]['name'];
 

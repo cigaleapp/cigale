@@ -1,9 +1,9 @@
 <script lang="ts">
-	import type * as DB from '$lib/database.js';
+	import type * as DB from '#lib/database.js';
 
-	import { providers } from '$lib/accounts/registry.js';
-	import CompositeAvatar from '$lib/CompositeAvatar.svelte';
-	import OverflowableText from '$lib/OverflowableText.svelte';
+	import { providers } from '#lib/accounts/registry.js';
+	import CompositeAvatar from '#lib/CompositeAvatar.svelte';
+	import OverflowableText from '#lib/OverflowableText.svelte';
 
 	interface Props {
 		account: DB.Account | undefined;

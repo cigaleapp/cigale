@@ -5,9 +5,10 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 
+	import ButtonIcon from '#lib/ButtonIcon.svelte';
+
 	import IconCollapse from '~icons/ri/fullscreen-exit-line';
 	import IconExpand from '~icons/ri/fullscreen-line';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
 
 	interface Props {
 		expand: boolean;

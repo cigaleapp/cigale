@@ -1,9 +1,8 @@
 import type { BinaryStorageBackend, BinaryStorageLocator } from './types.js';
 
+import { Channel } from '#lib/iterables.js';
+import { pick } from '#lib/utils.js';
 import { nanoid } from 'nanoid';
-
-import { Channel } from '$lib/iterables.js';
-import { pick } from '$lib/utils.js';
 
 import StreamWorker from './opfs-stream-worker.js?worker';
 import { locatorToPath } from './utils.js';

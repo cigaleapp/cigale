@@ -1,8 +1,7 @@
 import { error } from '@sveltejs/kit';
-
-import { databaseHandle, dependencyURI, tables } from '$lib/idb.svelte.js';
-import { metadataOptionsKeyRange } from '$lib/metadata/index.js';
-import { namespacedMetadataId } from '$lib/schemas/metadata.js';
+import { databaseHandle, dependencyURI, tables } from '#lib/idb.svelte.js';
+import { metadataOptionsKeyRange } from '#lib/metadata/index.js';
+import { namespacedMetadataId } from '#lib/schemas/metadata.js';
 
 export async function load({ params, parent, depends }) {
 	const protocol = await parent();
