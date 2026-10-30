@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { marked } from 'marked';
 
-	import { isDebugMode } from '$lib/settings.svelte.js';
+	import { isDebugMode } from '#lib/settings.svelte.js';
 
 	interface Props {
 		source: string;

@@ -1,4 +1,4 @@
-import { lcm, range } from '$lib/utils.js';
+import { lcm, range } from '#lib/utils.js';
 
 export type Layout = (string | null)[][];
 

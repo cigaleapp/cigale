@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { BundleInfo } from '@capgo/capacitor-updater';
-	import type { UpdateBundleMetadata } from '$lib/schemas/update-bundle.js';
+	import type { UpdateBundleMetadata } from '#lib/schemas/update-bundle.js';
 
 	import { App } from '@capacitor/app';
 	import { Capacitor } from '@capacitor/core';
@@ -8,22 +8,22 @@
 	import JSONC from 'tiny-jsonc';
 	import { UAParser } from 'ua-parser-js';
 
+	import lockfile from '#lib/../../bun.lock?raw';
+	import { getCpuThreadsCount, getRamCapacityBytes } from '#lib/hardware-requirements.js';
+	import { formatBytesSize } from '#lib/i18n.js';
+	import { databaseName, databaseRevision } from '#lib/idb.svelte.js';
+	import LoadingText from '#lib/LoadingText.svelte';
+	import Logo from '#lib/Logo.svelte';
+	import OverflowableText from '#lib/OverflowableText.svelte';
+	import { seo } from '#lib/seo.svelte.js';
+	import { isDebugMode } from '#lib/settings.svelte.js';
+	import { safeJSONParse } from '#lib/utils.js';
 	import IconSuccess from '~icons/ri/checkbox-circle-line';
 	import IconError from '~icons/ri/close-circle-line';
 	import IconWarning from '~icons/ri/error-warning-line';
 	import IconPrimary from '~icons/ri/information-line';
 	import IconNeutral from '~icons/ri/quote-text';
-	import { version } from '$app/environment';
-	import lockfile from '$lib/../../bun.lock?raw';
-	import { getCpuThreadsCount, getRamCapacityBytes } from '$lib/hardware-requirements.js';
-	import { formatBytesSize } from '$lib/i18n.js';
-	import { databaseName, databaseRevision } from '$lib/idb.svelte.js';
-	import LoadingText from '$lib/LoadingText.svelte';
-	import Logo from '$lib/Logo.svelte';
-	import OverflowableText from '$lib/OverflowableText.svelte';
-	import { seo } from '$lib/seo.svelte';
-	import { isDebugMode } from '$lib/settings.svelte.js';
-	import { safeJSONParse } from '$lib/utils.js';
+	import { version } from '$app/env';
 
 	import TopbarBack from '../TopbarBack.svelte';
 
@@ -418,7 +418,7 @@
 	</dd>
 </dl>
 
-{#snippet peoplelinks(/** @type {Array<{ name: string; url: string }>} */ people)}
+{#snippet peoplelinks(people: Array<{ name: string; url: string }>)}
 	{#each people.sort(() => Math.random() - 0.5) as { url, name }, i (url || name)}
 		{#if i > 0},
 		{/if}
@@ -431,7 +431,7 @@
 	{/each}
 {/snippet}
 
-{#snippet colorswatch(/** @type {string} */ color, /** @type {import('svelte').Component}*/ Icon)}
+{#snippet colorswatch(color: string, Icon: import('svelte').Component)}
 	<div class="swatch" style:color="var(--fg-{color})" style:background-color="var(--bg-{color})">
 		<Icon />
 	</div>

@@ -9,27 +9,27 @@ import * as Swarpc from 'swarpc';
 import { UAParser } from 'ua-parser-js';
 import { loadLocale } from 'wuchale/load-utils';
 
-import { dev } from '$app/environment';
 // oxlint-disable-next-line import/default
-import { localeFromNavigator } from '$lib/i18n.js';
+import { localeFromNavigator } from '#lib/i18n.js';
 import {
 	databaseHandle,
 	databaseName,
 	databaseRevision,
 	openTransaction,
 	tables,
-} from '$lib/idb.svelte.js';
-import { autoUpdateProtocols } from '$lib/protocols';
-import { getSetting } from '$lib/settings.svelte';
-import { toasts } from '$lib/toasts.svelte';
-import { clamp, fetchHttpRequest, profiler, progressSplitter, switchValue } from '$lib/utils.js';
+} from '#lib/idb.svelte.js';
+import { autoUpdateProtocols } from '#lib/protocols.js';
+import { getSetting } from '#lib/settings.svelte.js';
+import { toasts } from '#lib/toasts.svelte.js';
+import { clamp, fetchHttpRequest, profiler, progressSplitter, switchValue } from '#lib/utils.js';
+import { dev } from '$app/env';
 import { PROCEDURES } from '$worker/procedures.js';
 import WebWorker from '$worker/start.js?worker';
 
 import '@andy0130tw/es-arraybuffer-base64/auto';
 import '@ungap/set-methods';
 
-import { binaryStorage } from '$lib/storage/index.js';
+import { binaryStorage } from '#lib/storage/index.js';
 
 export const ssr = false;
 
@@ -82,10 +82,7 @@ export async function load({ url }) {
 	await profile('Startup', 'Load locale', async () => loadLocale(locale));
 
 	dates.setDefaultOptions({
-		locale: {
-			fr: dateFnsLocales.fr,
-			en: dateFnsLocales.enUS,
-		}[locale],
+		locale: { fr: dateFnsLocales.fr, en: dateFnsLocales.enUS }[locale],
 	});
 
 	setLoadingProgress('translations', 1);
@@ -165,9 +162,7 @@ export async function load({ url }) {
 		setLoadingProgress('database', 1);
 	} catch (e) {
 		console.error(e);
-		error(400, {
-			message: e?.toString() ?? 'Erreur inattendue',
-		});
+		error(400, e?.toString() ?? 'Erreur inattendue');
 	}
 
 	console.time('background things');

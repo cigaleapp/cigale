@@ -4,14 +4,14 @@ import 'urlpattern-polyfill';
 import { setupServer } from 'msw/node';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
 
+import * as DB from '#lib/database.js';
+import { openDatabase } from '#lib/idb.svelte.js';
 import {
 	handlers as kobotoolboxApiMockHandlers,
 	MOCK_SESSION_REMOTEID,
 	MOCK_SESSION_REMOTEID_NOTFOUND_DATA_ID,
 	MOCK_TOKEN,
 } from '$e2e/fixtures/http/kobotoolbox/handlers.js';
-import * as DB from '$lib/database.js';
-import { openDatabase } from '$lib/idb.svelte.js';
 
 import Provider from './kobotoolbox.js';
 

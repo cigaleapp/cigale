@@ -6,17 +6,17 @@
 	import { Debounced } from 'runed';
 	import { fade } from 'svelte/transition';
 
+	import ButtonIcon from '#lib/ButtonIcon.svelte';
+	import ButtonPrimary from '#lib/ButtonPrimary.svelte';
+	import ConfidencePercentage from '#lib/ConfidencePercentage.svelte';
+	import DebugOnly from '#lib/DebugOnly.svelte';
+	import { errorMessage } from '#lib/i18n.js';
+	import LoadingScreen from '#lib/LoadingScreen.svelte';
+	import { corsfixIfLocalhost, readableOn, switchConditions } from '#lib/utils.js';
 	import IconClose from '~icons/ri/arrow-left-s-line';
 	import IconSelected from '~icons/ri/check-line';
 	import IconClear from '~icons/ri/close-line';
 	import IconSearch from '~icons/ri/search-line';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
-	import ConfidencePercentage from '$lib/ConfidencePercentage.svelte';
-	import DebugOnly from '$lib/DebugOnly.svelte';
-	import { errorMessage } from '$lib/i18n';
-	import LoadingScreen from '$lib/LoadingScreen.svelte';
-	import { corsfixIfLocalhost, readableOn, switchConditions } from '$lib/utils';
 
 	let {
 		initially,

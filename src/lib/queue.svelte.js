@@ -1,13 +1,13 @@
-import { classifyImage } from '$lib/classification.svelte.js';
-import { errorMessage, plural } from '$lib/i18n.js';
-import { imageFileId } from '$lib/images.js';
-import { inferBoundingBoxes, processImageFile } from '$lib/import.svelte.js';
-import { Channel } from '$lib/iterables.js';
-import { sendNotification } from '$lib/notifications.js';
-import { importResultsZip } from '$lib/results.svelte.js';
-import { isSidecar } from '$lib/sidecars.js';
-import { uiState } from '$lib/uistate.svelte.js';
-import { isZip, range } from '$lib/utils.js';
+import { classifyImage } from '#lib/classification.svelte.js';
+import { errorMessage, plural } from '#lib/i18n.js';
+import { imageFileId } from '#lib/images.js';
+import { inferBoundingBoxes, processImageFile } from '#lib/import.svelte.js';
+import { Channel } from '#lib/iterables.js';
+import { sendNotification } from '#lib/notifications.js';
+import { importResultsZip } from '#lib/results.svelte.js';
+import { isSidecar } from '#lib/sidecars.js';
+import { uiState } from '#lib/uistate.svelte.js';
+import { isZip, range } from '#lib/utils.js';
 
 /**
  * @type {undefined | ProcessingQueue}

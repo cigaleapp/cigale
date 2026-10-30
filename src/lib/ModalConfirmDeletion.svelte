@@ -1,5 +1,5 @@
 <script>
-	import ModalConfirm from '$lib/ModalConfirm.svelte';
+	import ModalConfirm from '#lib/ModalConfirm.svelte';
 
 	import ButtonSecondary from './ButtonSecondary.svelte';
 	import InlineTextInput from './InlineTextInput.svelte';
@@ -14,7 +14,7 @@
 	 */
 
 	/**
-	 * @type {Props & Pick<import('$lib/Modal.svelte').Props, "key"> &  Partial<Omit<import('$lib/Modal.svelte').Props, keyof Props>>}
+	 * @type {Props & Pick<import('#lib/Modal.svelte').Props, "key"> &  Partial<Omit<import('$lib/Modal.svelte').Props, keyof Props>>}
 	 */
 	let {
 		onconfirm,

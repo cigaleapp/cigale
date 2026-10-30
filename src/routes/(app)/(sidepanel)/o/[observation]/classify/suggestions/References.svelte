@@ -1,13 +1,13 @@
 <script lang="ts">
 	import type { Expandable } from './+page.svelte';
-	import type { Props as CarouselProps } from '$lib/Carousel.svelte';
-	import type { MetadataEnumVariant } from '$lib/database';
+	import type { Props as CarouselProps } from '#lib/Carousel.svelte';
+	import type { MetadataEnumVariant } from '#lib/database.js';
 
-	import Carousel from '$lib/Carousel.svelte';
-	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
-	import Logo from '$lib/Logo.svelte';
-	import { uiState } from '$lib/uistate.svelte.js';
-	import { corsfixIfLocalhost } from '$lib/utils.js';
+	import Carousel from '#lib/Carousel.svelte';
+	import { defineKeyboardShortcuts } from '#lib/keyboard.svelte.js';
+	import Logo from '#lib/Logo.svelte';
+	import { uiState } from '#lib/uistate.svelte.js';
+	import { corsfixIfLocalhost } from '#lib/utils.js';
 
 	import WithExpandButton from '../WithExpandButton.svelte';
 

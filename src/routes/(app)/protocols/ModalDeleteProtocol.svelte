@@ -1,10 +1,10 @@
 <script>
-	import { plural } from '$lib/i18n.js';
-	import { openTransaction, tables } from '$lib/idb.svelte.js';
-	import ModalConfirmDeletion from '$lib/ModalConfirmDeletion.svelte';
-	import { isNamespacedToProtocol } from '$lib/schemas/metadata.js';
-	import { getSetting, setSetting } from '$lib/settings.svelte.js';
-	import { toasts } from '$lib/toasts.svelte.js';
+	import { plural } from '#lib/i18n.js';
+	import { openTransaction, tables } from '#lib/idb.svelte.js';
+	import ModalConfirmDeletion from '#lib/ModalConfirmDeletion.svelte';
+	import { isNamespacedToProtocol } from '#lib/schemas/metadata.js';
+	import { getSetting, setSetting } from '#lib/settings.svelte.js';
+	import { toasts } from '#lib/toasts.svelte.js';
 
 	/**
 	 * @type {{ id: string, open: (() => void) | undefined, ondelete?: () => void }}

@@ -1,9 +1,9 @@
-import type { ZoomState } from './zoom.svelte';
-import type { PinchEvent } from '$lib/touch/gestures.svelte.js';
+import type { ZoomState } from './zoom.svelte.js';
+import type { PinchEvent } from '#lib/touch/gestures.svelte.js';
 
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { Zoom } from './zoom.svelte';
+import { Zoom } from './zoom.svelte.js';
 
 describe('Zoom', () => {
 	let zoom: Zoom;
