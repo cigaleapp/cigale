@@ -10,6 +10,9 @@ version: 27
 updates: automatic
 source: https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/insecta.cigaleprotocol.yaml
 
+media:
+  types: [image, audio]
+
 description: |
   Pour réaliser le protocole INSECTA, vous avez besoin d'un appareil photo, de curiosité et de patience. 
 
@@ -685,6 +688,7 @@ sessionMetadata:
 metadata:
   f_stop:
     label: Ouverture
+    on: [image]
     description: ''
     learnMore: https://fr.wikipedia.org/wiki/Ouverture_(photographie)
     type: float
@@ -697,6 +701,7 @@ metadata:
       exif: FNumber
   focal_length:
     label: Focale
+    on: [image]
     description: Longueur de focale, au format 35mm
     learnMore: https://fr.wikipedia.org/wiki/Distance_focale_%C3%A9quivalente_en_35_mm
     type: float
@@ -708,6 +713,7 @@ metadata:
       exif: FocalLengthIn35mmFilm
   shutter_speed:
     label: Vitesse d'obturation
+    on: [image]
     description: Aussi appelé Durée d'exposition ou Temps de pose. _Shutter speed_ en anglais.
     learnMore: https://fr.wikipedia.org/wiki/Temps_de_pose
     type: float
@@ -725,6 +731,7 @@ metadata:
       exif: ExposureTime
   iso:
     label: Sensibilité
+    on: [image]
     description: ''
     learnMore: https://fr.wikipedia.org/wiki/Sensibilité_ISO
     type: integer
@@ -739,6 +746,7 @@ metadata:
   camera_brand:
     label: ''
     description: ''
+    on: [image]
     type: string
     mergeMethod: none
     required: false
@@ -747,6 +755,7 @@ metadata:
   camera_model:
     label: ''
     description: ''
+    on: [image]
     type: string
     mergeMethod: none
     required: false
