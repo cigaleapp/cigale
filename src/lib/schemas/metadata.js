@@ -16,6 +16,7 @@ import {
 	ProtocolID,
 	UniqueFileTypeSpecifier,
 	URLString,
+	MediaKind,
 } from './common.js';
 import { NaturalRegexExpression, NumberRangeLiteral, RegexExpression } from './constraints.js';
 import { FilepathTemplate, JsonataExpression, TemplatedString } from './expressions.js';

@@ -12,6 +12,7 @@ import {
 	ProtocolID,
 	SingleEntryRecord,
 	URLString,
+	MediaKind,
 } from './common.js';
 import { DarwinCoreProtocolConfig } from './darwincore.js';
 import { FilepathTemplate, TemplatedString } from './expressions.js';
