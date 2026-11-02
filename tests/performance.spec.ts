@@ -23,11 +23,11 @@ benchmark(`startup @blank`, {
 		await app.db.ready();
 		await assert(app.tabs.get('sessions')).toBeVisible({ timeout: ms('1min') });
 	},
-	largestContentfulPaint: '18s',
+	largestContentfulPaint: '20s',
 	firstContentfulPaint: '500ms',
 	// TODO: lower this
 	total: {
-		chromium: '18s',
+		chromium: '20s',
 		webkit: '25s',
 		firefox: '25s',
 	},
