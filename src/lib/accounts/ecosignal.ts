@@ -9,6 +9,7 @@ import type { FetchProgressData } from 'fetch-progress';
 import { Capacitor, CapacitorHttp } from '@capacitor/core';
 import { ArkErrors, type, Type } from 'arktype';
 import { RateLimit } from 'async-sema';
+import { ms } from 'convert';
 import * as dates from 'date-fns';
 import { differenceInSeconds, isPast } from 'date-fns';
 import fetchProgress from 'fetch-progress';
@@ -1711,7 +1712,8 @@ export default class Provider implements Account {
 		for await (const status of poll(
 			this.#fastestPollInterval,
 			async () => this.#fileUploadStatus(batchId, filename),
-			(status) => status.uploaded_chunks >= totalChunks
+			(status, { elapsedMs }) =>
+				status.uploaded_chunks >= totalChunks || elapsedMs > ms('1min')
 		)) {
 			yield {
 				finished: status.uploaded_chunks >= totalChunks,
@@ -1719,6 +1721,12 @@ export default class Provider implements Account {
 				fileUploadId,
 			};
 		}
+
+		yield {
+			fileUploadId,
+			finished: true,
+			doneBytes: sum(chunkSizes.values()),
+		};
 	}
 
 	#conformFilename(filename: string): string {

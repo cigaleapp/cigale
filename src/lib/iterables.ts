@@ -211,14 +211,19 @@ export async function* poll<T>(
 	/** Polling rate in milliseconds */
 	interval: number,
 	ping: () => Promise<T>,
-	stop: (data: T) => boolean
+	stop: (data: T, meta: { tries: number; elapsedMs: number }) => boolean
 ) {
 	let data: T | undefined;
+	let startAt = Date.now();
+	let elapsedMs = 0;
+	let tries = 0;
 
-	while (data === undefined || !stop(data)) {
+	while (data === undefined || !stop(data, { tries, elapsedMs })) {
 		data = await ping();
 		yield data;
 		await sleep(interval);
+		elapsedMs = Date.now() - startAt;
+		tries++;
 	}
 
 	yield data;
