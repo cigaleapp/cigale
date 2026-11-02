@@ -14,7 +14,7 @@
 
 	async function serverName(account: DB.Account) {
 		if (!('domain' in account)) return undefined;
-		if (!domain.account) return undefined;
+		if (!account.domain) return undefined;
 		if (!provider) return;
 		const servers = await provider.servers(databaseHandle());
 		return servers.find((server) => server.domain === account.domain)?.name ?? account.domain;
