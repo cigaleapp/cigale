@@ -214,7 +214,7 @@ export async function* poll<T>(
 	stop: (data: T, meta: { tries: number; elapsedMs: number }) => boolean
 ) {
 	let data: T | undefined;
-	let startAt = Date.now();
+	const startAt = Date.now();
 	let elapsedMs = 0;
 	let tries = 0;
 
