@@ -1709,6 +1709,8 @@ export default class Provider implements Account {
 			if (data.file_upload_id) fileUploadId = data.file_upload_id;
 		}
 
+		console.debug(`Ecosignal: ${filename}: Waiting for ${totalChunks} chunks to be uploaded`);
+
 		for await (const status of poll(
 			this.#fastestPollInterval,
 			async () => this.#fileUploadStatus(batchId, filename),
