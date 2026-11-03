@@ -19,7 +19,7 @@ import {
 	mockProtocolSourceURL,
 	mockUrl,
 } from '$e2e/utils/index.js';
-import { mockOPFSOnWebWorkers } from '$e2e/utils/opfs.js';
+import { mockOPFSOnWebWorkers, restoreOPFS, supportsOpfs } from '$e2e/utils/opfs.js';
 
 import _fullProtocol from '../../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
 import lightProtocol from '../../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
@@ -31,10 +31,19 @@ let collembolaClassifierModel: PredownloadedModel | null = null;
 let arthropodaDetectionModel: PredownloadedModel | null = null;
 
 export async function forEachTest(
-	{ page, context, app }: PlaywrightTestArgs & PlaywrightTestOptions & ExtraTestArgs,
+	{
+		page,
+		context,
+		app,
+		storageState,
+	}: PlaywrightTestArgs & PlaywrightTestOptions & ExtraTestArgs,
 	use: () => Promise<void>,
 	info: TestInfo
 ) {
+	if (storageState && !supportsOpfs(page)) {
+		await restoreOPFS(page, storageState);
+	}
+
 	await context.route('**/*', async (route) => {
 		const request = route.request();
 		if (request.resourceType() !== 'document') {
@@ -132,7 +141,9 @@ export async function forEachTest(
 
 	if (!info.tags.includes('@blank')) {
 		await page.goto('./');
-		await mockOPFSOnWebWorkers(page);
+		if (!supportsOpfs(page)) {
+			await mockOPFSOnWebWorkers(page);
+		}
 		await app.db.ready();
 	}
 

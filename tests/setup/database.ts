@@ -5,6 +5,8 @@ import type { RemovePrefix } from '$lib/utils.js';
 
 import { expect } from '@playwright/test';
 
+import { collectOPFSState, supportsOpfs } from '$e2e/utils/opfs.js';
+
 import lightProtocol from '../../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import { FixturePaths } from '../filepaths.js';
 import { exampleProtocol, test as setup } from '../fixtures.js';
@@ -103,9 +105,14 @@ async function writeStorageState(
 	}, localStorageOverrides);
 
 	mkdirSync(path.dirname(destination), { recursive: true });
+
 	await page.context().storageState({
 		indexedDB: true,
-		opfs: true,
+		opfs: supportsOpfs(page),
 		path: destination,
 	});
+
+	if (!supportsOpfs(page)) {
+		await collectOPFSState(page, filename);
+	}
 }
