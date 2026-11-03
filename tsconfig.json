@@ -7,5 +7,6 @@
 		"target": "es2024",
 		"types": ["$app/types", "vitest/importMeta"]
 	},
-	"include": ["src", "vite.config.js", "playwright.config.js", "tests"]
+	"include": ["src", "vite.config.js", "playwright.config.js", "tests"],
+	"exclude": ["src/service-worker.js"]
 }
