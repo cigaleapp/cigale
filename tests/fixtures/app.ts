@@ -1,14 +1,13 @@
 import type { Locator, Page } from '@playwright/test';
+import type { FixturePaths } from '#e2e/filepaths.js';
+import type { NavigationTab } from '#e2e/utils/navigation.js';
+import type { GalleryCardSpecifier } from '#e2e/utils/observations.js';
 import type * as DB from '#lib/database.js';
 import type { MetadataValue } from '#lib/database.js';
 import type { IDBDatabaseType } from '#lib/idb.svelte.js';
 import type { RuntimeValue } from '#lib/schemas/metadata.js';
 import type { Toast } from '#lib/toasts.svelte.js';
-import type { FixturePaths } from '#e2e/filepaths.js';
-import type { NavigationTab } from '#e2e/utils/navigation.js';
-import type { GalleryCardSpecifier } from '#e2e/utils/observations.js';
 
-import { safeJSONParse } from '#lib/utils.js';
 import { ms } from 'convert';
 
 import {
@@ -23,6 +22,7 @@ import {
 	listTable,
 	metadataSections,
 	modal,
+	safeJSONParse,
 	setSettings,
 	toast,
 	waitForLoadingEnd,
