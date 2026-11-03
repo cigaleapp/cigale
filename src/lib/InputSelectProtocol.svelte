@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { PlaywrightTestIdBaseForDropdownMenu } from '$e2e/testids.js';
+	import type { PlaywrightTestIdBaseForDropdownMenu } from '#e2e/testids.js';
 
 	import ButtonUpdateProtocol from '#lib/ButtonUpdateProtocol.svelte';
 	import DropdownMenu from '#lib/DropdownMenu.svelte';

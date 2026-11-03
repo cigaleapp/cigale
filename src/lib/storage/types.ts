@@ -1,5 +1,5 @@
 import type { BINARY_CONTENT_TABLES } from '#lib/database.js';
-import type { PendingPhotosRootFolders } from '$routes/(app)/capture/pendingstorage.svelte.js';
+import type { PendingPhotosRootFolders } from '#routes/(app)/capture/pendingstorage.svelte.js';
 
 export type BinaryStorageName = 'opfs' | 'capacitor' | 'uninitialized';
 

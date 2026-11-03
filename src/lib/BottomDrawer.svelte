@@ -32,7 +32,7 @@
 	import { BottomSheet } from 'svelte-bottom-sheet';
 
 	import IconShowPanel from '~icons/ri/arrow-up-s-line';
-	import BottombarContent from '$routes/(app)/BottombarContent.svelte';
+	import BottombarContent from '#routes/(app)/BottombarContent.svelte';
 
 	import { mutationobserver } from './mutations.js';
 	import { onswipe } from './touch/swipes.js';

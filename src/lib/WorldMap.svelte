@@ -25,7 +25,7 @@
 	} from '#lib/geolocation.js';
 	import { avg, range, round } from '#lib/utils.js';
 	import IconMapMarker from '~icons/ri/map-pin-2-fill';
-	import { getTheme } from '$routes/+layout.svelte';
+	import { getTheme } from '#routes/+layout.svelte';
 
 	type Point = { longitude: number; latitude: number };
 

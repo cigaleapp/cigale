@@ -24,7 +24,7 @@
 	import IconClose from '~icons/ri/close-line';
 	import { invalidate } from '$app/navigation';
 	import { page } from '$app/state';
-	import ModalSubmitIssue from '$routes/(app)/ModalSubmitIssue.svelte';
+	import ModalSubmitIssue from '#routes/(app)/ModalSubmitIssue.svelte';
 
 	const { children } = $props();
 

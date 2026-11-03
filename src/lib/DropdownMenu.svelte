@@ -57,7 +57,7 @@
 
 <script lang="ts" generics="D = never, SD = never">
 	import type { Props as BottomDrawerProps } from './BottomDrawer.svelte';
-	import type { PlaywrightTestId, PlaywrightTestIdBaseForDropdownMenu } from '$e2e/testids.js';
+	import type { PlaywrightTestId, PlaywrightTestIdBaseForDropdownMenu } from '#e2e/testids.js';
 	import type { Snippet } from 'svelte';
 
 	import { DropdownMenu } from 'bits-ui';

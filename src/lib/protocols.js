@@ -24,7 +24,7 @@ import {
 
 /**
  * @import { Tables } from './database.js';
- * @import { PROCEDURES } from '$worker/procedures.js';
+ * @import { PROCEDURES } from '#worker/procedures.js';
  * @import * as DB from '#lib/database.js'
  */
 
@@ -233,7 +233,7 @@ export async function hasUpgradeAvailable({ version, source, id }) {
  * @param {number} [param0.version]
  * @param {import('#lib/database.js').HTTPRequest} param0.source
  * @param {string} param0.id
- * @param {import('swarpc').SwarpcClient<typeof import('$worker/procedures.js').PROCEDURES>} param0.swarpc
+ * @param {import('swarpc').SwarpcClient<typeof import('#worker//procedures.js').PROCEDURES>} param0.swarpc
  */
 export async function upgradeProtocol({ version, source, id, swarpc }) {
 	if (!source) throw new Error("Le protocole n'a pas de source");

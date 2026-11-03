@@ -74,7 +74,7 @@ export default defineConfig({
 		// to have network-local https via mkcert
 		allowedHosts: ['stealth.local'],
 		cors: {
-			origin: "*"
+			origin: '*',
 		},
 		fs: {
 			allow: ['./bun.lock'],
@@ -135,12 +135,6 @@ export default defineConfig({
 				fallback: process.env.SVELTE_FALLBACK_PAGE || 'index.html',
 			}),
 			prerender: { entries: ['*', '/.well-known/assetlinks.json'] },
-			alias: {
-				$worker: 'src/worker',
-				$locales: 'src/locales',
-				$routes: 'src/routes',
-				$e2e: 'tests',
-			},
 			paths: {
 				base:
 					process.env.BASE_PATH ||

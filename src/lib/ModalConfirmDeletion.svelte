@@ -14,7 +14,7 @@
 	 */
 
 	/**
-	 * @type {Props & Pick<import('#lib/Modal.svelte').Props, "key"> &  Partial<Omit<import('$lib/Modal.svelte').Props, keyof Props>>}
+	 * @type {Props & Pick<import('#lib/Modal.svelte').Props, "key"> &  Partial<Omit<import('#lib//Modal.svelte').Props, keyof Props>>}
 	 */
 	let {
 		onconfirm,

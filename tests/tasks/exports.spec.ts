@@ -3,7 +3,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { ms } from 'convert';
 import JSZip from 'jszip';
 
-import { FixturePaths } from '$e2e/filepaths.js';
+import { FixturePaths } from '#e2e/filepaths.js';
 
 import { assert, test } from '../fixtures.js';
 import { absoluteFixturePath, importPhotos, newSession } from '../utils/index.js';

@@ -1,7 +1,7 @@
 import { mkdir, rm } from 'node:fs/promises';
 import type { ExportedProtocol } from '#lib/schemas/protocols.js';
-import type { ExtraTestArgs } from '$e2e/fixtures.js';
-import type { PredownloadedModel } from '$e2e/utils/index.js';
+import type { ExtraTestArgs } from '#e2e/fixtures.js';
+import type { PredownloadedModel } from '#e2e/utils/index.js';
 
 import {
 	type PlaywrightTestArgs,
@@ -10,7 +10,7 @@ import {
 	type TestInfo,
 } from '@playwright/test';
 
-import { parseNavigatorDefineAnnotations } from '$e2e/annotations.js';
+import { parseNavigatorDefineAnnotations } from '#e2e/annotations.js';
 import {
 	defineNavigatorProperties,
 	dumpDatabase,
@@ -18,8 +18,8 @@ import {
 	mockPredownloadedModels,
 	mockProtocolSourceURL,
 	mockUrl,
-} from '$e2e/utils/index.js';
-import { mockOPFSOnWebWorkers, restoreOPFSState } from '$e2e/utils/opfs.js';
+} from '#e2e/utils/index.js';
+import { mockOPFSOnWebWorkers, restoreOPFSState } from '#e2e/utils/opfs.js';
 
 import _fullProtocol from '../../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
 import lightProtocol from '../../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };

@@ -129,7 +129,7 @@
 {/if}
 
 <style>
-	/*  :global because tooltips also use this, see $lib/tooltips.js */
+	/*  :global because tooltips also use this, see #lib//tooltips.js */
 	:global(kbd.hint) {
 		font-size: var(--size, 0.8em);
 		display: inline-flex;

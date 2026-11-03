@@ -30,7 +30,7 @@ let processingQueue;
 class ProcessingQueue {
 	/**
 	 * @param {object} param0
-	 * @param {import('swarpc').SwarpcClient<typeof import('$worker/procedures.js').PROCEDURES>} param0.swarpc
+	 * @param {import('swarpc').SwarpcClient<typeof import('#worker//procedures.js').PROCEDURES>} param0.swarpc
 	 * @param {Map<string, import("swarpc").CancelablePromise["cancel"]>} [param0.cancellers]
 	 * @param {number} [param0.parallelism]
 	 */
@@ -385,7 +385,7 @@ function assertQueueInitialized(queue) {
 /**
  * Initialize the processing queue. Must be called in a root $effect (during component initialization).
  * @param {object} arg0
- * @param {import('swarpc').SwarpcClient<typeof import('$worker/procedures.js').PROCEDURES>} arg0.swarpc
+ * @param {import('swarpc').SwarpcClient<typeof import('#worker//procedures.js').PROCEDURES>} arg0.swarpc
  * @param {Map<string, import("swarpc").CancelablePromise["cancel"]>} [arg0.cancellers]
  * @param {number} [arg0.parallelism]
  */

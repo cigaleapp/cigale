@@ -13,7 +13,7 @@
 	import IconDeleteAll from '~icons/ri/delete-bin-2-line';
 	import IconDelete from '~icons/ri/delete-bin-6-line';
 	import IconMore from '~icons/ri/more-2-line';
-	import TopbarContent from '$routes/(app)/TopbarContent.svelte';
+	import TopbarContent from '#routes/(app)/TopbarContent.svelte';
 
 	import { PendingStorage } from '../pendingstorage.svelte.js';
 

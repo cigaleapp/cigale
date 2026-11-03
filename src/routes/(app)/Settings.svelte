@@ -40,7 +40,7 @@
 	import Sun from '~icons/ri/sun-line';
 	import IconOffline from '~icons/ri/wifi-off-line';
 	import { version } from '$app/env';
-	import { getTheme } from '$routes/+layout.svelte';
+	import { getTheme } from '#routes/+layout.svelte';
 
 	import ModalChromePersistentStorage, {
 		askForPersistentStorageOnChrome,
