@@ -11,7 +11,7 @@ import {
 	MOCK_SESSION_REMOTEID,
 	MOCK_SESSION_REMOTEID_NOTFOUND_DATA_ID,
 	MOCK_TOKEN,
-} from '$e2e/fixtures/http/kobotoolbox/handlers.js';
+} from '#e2e/fixtures/http/kobotoolbox/handlers.js';
 
 import Provider from './kobotoolbox.js';
 

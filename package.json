@@ -246,6 +246,10 @@
 	},
 	"imports": {
 		"#lib": "./src/lib/index.js",
-		"#lib/*": "./src/lib/*"
+		"#lib/*": "./src/lib/*",
+		"#worker/*": "./src/worker/*",
+		"#locales/*": "./src/locales/*",
+		"#routes/*": "./src/routes/*",
+		"#e2e/*": "./tests/*"
 	}
 }

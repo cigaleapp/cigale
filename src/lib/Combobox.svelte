@@ -66,7 +66,7 @@
 </script>
 
 <script lang="ts" generics="I extends Item, V extends I['key']">
-	import type { PlaywrightTestId } from '$e2e/testids.js';
+	import type { PlaywrightTestId } from '#e2e/testids.js';
 	import type { Snippet } from 'svelte';
 
 	import { watch } from 'runed';

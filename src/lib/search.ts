@@ -73,7 +73,7 @@ export function makeSearcher<TableName extends SearchableTableName>({
 
 export async function recomputeSearchIndex<TableName extends SearchableTableName>(
 	tx: IDBTransactionWithAtLeast<[TableName], 'readwrite' | 'versionchange'>,
-	// we need to pass it cuz importing it in $lib/search would create a circular dep
+	// we need to pass it cuz importing it in #lib//search would create a circular dep
 	tables: typeof Tables,
 	table: TableName,
 	/** null to recompute all objects of the table */

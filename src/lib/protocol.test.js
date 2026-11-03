@@ -366,7 +366,7 @@ describe('compareProtocolWithUpstream', () => {
 			count: async () => 2,
 
 			/**
-			 * @returns {Promise<Array<import('#lib/database').Metadata | import('$lib/database').MetadataEnumVariant & {metadataId: string}>>}
+			 * @returns {Promise<Array<import('#lib/database').Metadata | import('#lib//database').MetadataEnumVariant & {metadataId: string}>>}
 			 */
 			getAll: async (table, _range) => {
 				if (table === 'MetadataOption') {

@@ -1,4 +1,4 @@
-import '$locales/main.loader.svelte.js';
+import '#locales/main.loader.svelte.js';
 
 import { SplashScreen } from '@capacitor/splash-screen';
 import { loadIcons } from '@iconify/svelte';
@@ -23,8 +23,8 @@ import { getSetting } from '#lib/settings.svelte.js';
 import { toasts } from '#lib/toasts.svelte.js';
 import { clamp, fetchHttpRequest, profiler, progressSplitter, switchValue } from '#lib/utils.js';
 import { dev } from '$app/env';
-import { PROCEDURES } from '$worker/procedures.js';
-import WebWorker from '$worker/start.js?worker';
+import { PROCEDURES } from '#worker/procedures.js';
+import WebWorker from '#worker/start.js?worker';
 
 import '@andy0130tw/es-arraybuffer-base64/auto';
 import '@ungap/set-methods';
@@ -113,7 +113,7 @@ export async function load({ url }) {
 			databaseRevision: databaseRevision.toString(),
 			playwright_mock_opfs:
 				localStorage.getItem('playwright_mock_opfs') ?? ('false' as const),
-		} satisfies (typeof import('$worker/procedures').LOCAL_STORAGE)['inferIn'],
+		} satisfies (typeof import('#worker//procedures').LOCAL_STORAGE)['inferIn'],
 		hooks: {
 			success({ procedure, data, duration }) {
 				performance.measure(procedure, {

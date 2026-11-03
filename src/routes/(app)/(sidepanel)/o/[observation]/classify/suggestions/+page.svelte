@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Expandable } from '../WithExpandButton.svelte';
-	import type { PlaywrightTestId } from '$e2e/testids.js';
+	import type { PlaywrightTestId } from '#e2e/testids.js';
 	import type { Attachment } from 'svelte/attachments';
 
 	import { marked } from 'marked';

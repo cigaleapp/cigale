@@ -4,7 +4,7 @@ import type { NeuralBoundingBoxInference, NeuralEnumInference } from '#lib/schem
 
 import { nanoid } from 'nanoid';
 
-import { mockUrl } from '$e2e/utils/core.js';
+import { mockUrl } from '#e2e/utils/core.js';
 
 type ModelConfig =
 	(typeof NeuralEnumInference)['inferIn'] | (typeof NeuralBoundingBoxInference)['inferIn'];

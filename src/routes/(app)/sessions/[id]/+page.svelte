@@ -22,7 +22,7 @@
 	import IconSyncDown from '~icons/ri/download-line';
 	import IconUnlink from '~icons/ri/link-unlink-m';
 	import { invalidate } from '$app/navigation';
-	import TopbarOpenSession from '$routes/(app)/TopbarOpenSession.svelte';
+	import TopbarOpenSession from '#routes/(app)/TopbarOpenSession.svelte';
 
 	const { data } = $props();
 	let { protocol: protocolId, name } = $derived(data.session);
