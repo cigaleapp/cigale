@@ -4,7 +4,6 @@ import 'urlpattern-polyfill';
 
 import type { AppFixture } from './fixtures/app.js';
 import type { ONNXModelsFixture } from './fixtures/onnxmodels.js';
-import type { OPFSTestArg } from './utils/opfs.js';
 import type { NetworkFixture } from '@msw/playwright';
 
 import { defineNetworkFixture } from '@msw/playwright';
@@ -31,7 +30,6 @@ export type ExtraTestArgs = {
 	 * See https://claude.ai/share/9b09b767-2e90-4f9e-b0e5-a4e286000830
 	 */
 	networkWithAssets: import('@msw/playwright').NetworkFixture;
-	opfsState?: OPFSTestArg;
 	storageState:
 		| FixturePaths.Absolute<FixturePaths.StorageStates>
 		| Exclude<import('@playwright/test').BrowserContextOptions['storageState'], string>;
@@ -74,7 +72,6 @@ const _test = base.extend<ExtraTestArgs, { forEachWorker: void }>({
  */
 export const test = _test.extend({
 	storageState: 'tests/fixtures/storage-states/empty.json',
-	opfsState: 'tests/fixtures/opfs-states/empty.json',
 });
 
 /**
@@ -82,7 +79,6 @@ export const test = _test.extend({
  */
 export const testBasic = _test.extend({
 	storageState: 'tests/fixtures/storage-states/basic.json',
-	opfsState: 'tests/fixtures/opfs-states/basic.json',
 });
 
 /**
@@ -90,7 +86,6 @@ export const testBasic = _test.extend({
  */
 export const testKitchensink = _test.extend({
 	storageState: 'tests/fixtures/storage-states/kitchen-sink.json',
-	opfsState: 'tests/fixtures/opfs-states/kitchen-sink.json',
 });
 
 export { lightProtocol as exampleProtocol };
