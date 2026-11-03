@@ -541,3 +541,14 @@ export function absoluteFixturePath(pathname) {
 export function absoluteFixtureFilepath(pathname) {
 	return path.join(path.resolve(import.meta.dirname), '../..', FixturePaths.root, pathname);
 }
+
+/**
+ * @param {string} raw 
+ */
+export function safeJSONParse(raw) {
+	try {
+		return JSON.parse(raw);
+	} catch {
+		return undefined;
+	}
+}
