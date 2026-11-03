@@ -122,7 +122,7 @@ CSS variables:
 			() => page.state[stateKey] === true,
 			(isOpen) => {
 				if (!isOpen) onclose?.();
-				pushState('', { [stateKey]: isOpen });
+				goto('', { shallow: true, state: { [stateKey]: isOpen } });
 			}
 		}
 	>
@@ -145,9 +145,9 @@ CSS variables:
 			page.state[stateKey] === false}
 			style:color-scheme={getColorScheme()}
 			bind:this={modalElement}
-			onclose={() => {
+			onclose={async () => {
 				// Update state when dialog is closed via browser-controlled means (e.g. Esc key)
-				pushState('', { [stateKey]: false });
+				await goto('', { shallow: true, state: { [stateKey]: false } });
 				onclose?.();
 			}}
 			onmousedown={({ target, currentTarget, offsetX, offsetY }) => {
