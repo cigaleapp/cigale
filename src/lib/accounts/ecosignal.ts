@@ -1714,8 +1714,18 @@ export default class Provider implements Account {
 		for await (const status of poll(
 			this.#fastestPollInterval,
 			async () => this.#fileUploadStatus(batchId, filename),
-			(status, { elapsedMs }) =>
-				status.uploaded_chunks >= totalChunks || elapsedMs > ms('1min')
+			(status, { elapsedMs }) => {
+				const timedout = elapsedMs > ms('1min');
+
+				if (timedout) {
+					console.warn(
+						`Ecosignal: ${filename}: still waiting for ${totalChunks} chunks (received ${status.uploaded_chunks}) after ${elapsedMs * 1e-3} seconds, bailing out`
+					);
+					return true;
+				}
+
+				return status.uploaded_chunks >= totalChunks;
+			}
 		)) {
 			yield {
 				finished: status.uploaded_chunks >= totalChunks,
