@@ -1,7 +1,7 @@
 import { classifyImage } from '$lib/classification.svelte.js';
 import { errorMessage, plural } from '$lib/i18n.js';
 import { imageFileId } from '$lib/images.js';
-import { inferBoundingBoxes, processImageFile } from '$lib/import.svelte.js';
+import { inferBoundingBoxes, processImageFile } from '$lib/import/images.svelte.js';
 import { Channel } from '$lib/iterables.js';
 import { sendNotification } from '$lib/notifications.js';
 import { importResultsZip } from '$lib/results.svelte.js';

@@ -16,29 +16,26 @@ import {
 import { toasts } from '$lib/toasts.svelte.js';
 import { uiState } from '$lib/uistate.svelte.js';
 
-import { setExifFields } from './exif.js';
-import { imageLimits } from './inference_utils.js';
-import { serializeMetadataValues } from './metadata/index.js';
-import { newObservation } from './observations.js';
+import { setExifFields } from '../exif.js';
+import { imageLimits } from '../inference_utils.js';
+import { serializeMetadataValues } from '../metadata/index.js';
+import { newObservation } from '../observations.js';
 import {
 	isRawImage,
 	processRawMetadata,
 	RAW_IMAGE_FILE_EXTENSIONS,
 	RAW_IMAGE_MEDIA_TYPES,
 	transcodeRawPhotoToJPEG,
-} from './raw.js';
-import { NeuralBoundingBoxInference } from './schemas/neural.js';
-import { ACCEPTED_SIDECAR_TYPES, processSidecars } from './sidecars.js';
+} from '../raw.js';
+import { NeuralBoundingBoxInference } from '../schemas/neural.js';
+import { ACCEPTED_SIDECAR_TYPES, processSidecars } from '../sidecars.js';
 
 export const ACCEPTED_IMPORT_TYPES = [
 	'image/jpeg',
-	'application/zip',
 	'image/png',
 	'image/tiff',
 	...RAW_IMAGE_MEDIA_TYPES,
 	...RAW_IMAGE_FILE_EXTENSIONS,
-	// Sidecar files
-	...ACCEPTED_SIDECAR_TYPES,
 ];
 
 /**
@@ -108,7 +105,7 @@ export async function processImageFile({ file, id: fileId, sidecars, extraExif }
 		metadata: {},
 	});
 
-	await tables.Observation.add(newObservation(image, uiState.currentSession));
+	await tables.Observation.add(newObservation({ image }, uiState.currentSession));
 
 	// We have to remove the file from the processing files list once the Image database object has been created
 	uiState.processing.removeFile(fileId);
@@ -120,7 +117,7 @@ export async function processImageFile({ file, id: fileId, sidecars, extraExif }
 		sessionId: uiState.currentSession.id,
 		cropMetadataId: uiState.cropMetadataId,
 		file: original,
-		imageFileId: fileId,
+		fileId: fileId,
 		sidecars,
 	}).catch((e) => {
 		console.error(e);

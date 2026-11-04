@@ -58,7 +58,7 @@ export const HTTPRequest = URLString.configure(
 		'self'
 	);
 
-export const Dimensions = type({
+export const ImageDimensions = type({
 	width: 'number > 0',
 	height: 'number > 0',
 }).pipe(({ width, height }) => ({
@@ -66,6 +66,11 @@ export const Dimensions = type({
 	height,
 	aspectRatio: width / height,
 }));
+
+export const AudioDimensions = type({
+	duration: ['number', '@', 'in milliseconds'],
+	sampleRate: ['number', '@', 'in hertz'],
+});
 
 export const MIMEType = type(
 	/^(application|audio|font|example|image|message|model|multipart|text|video|x-\w+)\/\w+$/
