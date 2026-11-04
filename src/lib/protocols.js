@@ -463,7 +463,16 @@ export async function autoUpdateProtocols(db, swarpc) {
 
 	const results = await Promise.allSettled(
 		toUpdate.map(async (protocol) => {
-			const { upToDate, newVersion } = await hasUpgradeAvailable(protocol);
+			// Run the check in the worker so the full protocol file is fetched and
+			// parsed in the worker's isolate instead of the main renderer's. On
+			// resource-constrained WebViews (e.g. Android), parsing an 18MB
+			// protocol file in the main renderer pushes the V8 heap past its
+			// limit and crashes the app.
+			const { upToDate, newVersion } = await swarpc.hasUpgradeAvailable({
+				id: protocol.id,
+				version: protocol.version ?? 0,
+				source: protocol.source,
+			});
 			if (upToDate) {
 				console.debug(`[Protocol auto-update] Protocol ${protocol.id} is up to date`);
 				return;
