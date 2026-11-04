@@ -76,7 +76,7 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
       - name: Check for clutter
-        run: bun knip --reporter github-actions
+        run: bun clutter --reporter github-actions
 
   build:
     name: Build (production)
