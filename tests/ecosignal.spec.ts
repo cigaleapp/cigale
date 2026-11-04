@@ -5,7 +5,7 @@ import { ms } from 'convert';
 
 import { expect, test, testBasic } from './fixtures.js';
 import * as ecosignal from './fixtures/http/ecosignal/handlers.js';
-import { pickFiles } from './utils/core.js';
+import { chooseInDropdown, pickFiles } from './utils/core.js';
 import { goToSessionPage } from './utils/navigation.js';
 import { importProtocol } from './utils/protocols.js';
 import { chooseFirstSession } from './utils/sessions.js';
@@ -133,6 +133,25 @@ testBasic('can upload a session', async ({ page, app, networkWithAssets }) => {
 	await expect(panel).toHaveText(/\sEnvoi terminé\s/, {
 		timeout: ms('1min'),
 	});
+});
+
+test('can download a session', async ({ page, app, networkWithAssets }) => {
+	networkWithAssets.use(...ecosignal.handlers);
+
+	await ecosignal.mockstate.registerMedia('Remote session', ['cyan.jpeg', 'debugsquare.png']);
+
+	await app.tabs.go('accounts');
+	await registerEcosignalAccount({ page, app });
+
+	await app.tabs.go('sessions');
+	await chooseInDropdown(
+		page,
+		page.getByRole('button', { name: "Sur l'appareil" }),
+		'EcoSignal',
+		'Hello World'
+	);
+
+	await chooseFirstSession(page);
 });
 
 async function registerEcosignalAccount({
