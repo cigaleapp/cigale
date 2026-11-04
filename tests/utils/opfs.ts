@@ -3,7 +3,7 @@
 // So we capture it with on our own with .addInitScript and separate JSON files...
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import type { Page } from '@playwright/test';
+import type { BrowserContextOptions, Page } from '@playwright/test';
 import type { FixturePaths } from '$e2e/filepaths.js';
 
 import { absoluteFixturePath } from './core.js';
@@ -26,11 +26,10 @@ type FSEntry =
 			base64: string;
 	  };
 
-type StorageState = {
-	origins: Array<{
-		origin: string;
-		opfs: FSEntry[];
-	}>;
+type _StorageStateNoOpfs = Exclude<BrowserContextOptions['storageState'], undefined | string>;
+
+export type StorageState = Omit<_StorageStateNoOpfs, 'origins'> & {
+	origins: Array<_StorageStateNoOpfs['origins'][number] & { opfs?: FSEntry[] }>;
 };
 
 export function supportsOpfs(page: Page): boolean {

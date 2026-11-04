@@ -2,8 +2,10 @@ import type { TempFilesFixture } from './fixtures/tempfiles.js';
 
 import 'urlpattern-polyfill';
 
+import { readFileSync } from 'node:fs';
 import type { AppFixture } from './fixtures/app.js';
 import type { ONNXModelsFixture } from './fixtures/onnxmodels.js';
+import type { StorageState } from './utils/opfs.js';
 import type { NetworkFixture } from '@msw/playwright';
 
 import { defineNetworkFixture } from '@msw/playwright';
@@ -61,6 +63,22 @@ const _test = base.extend<ExtraTestArgs, { forEachWorker: void }>({
 	},
 	onnxmodels,
 	app,
+	storageState: async ({ browserName, storageState }, use) => {
+		const state: StorageState =
+			typeof storageState === 'string'
+				? JSON.parse(readFileSync(storageState).toString('utf-8'))
+				: storageState;
+
+		// Remove opfs data if we're on webkit
+		if (browserName === 'webkit') {
+			state.origins = state.origins.map((o) => {
+				if ('opfs' in o) delete o.opfs;
+				return o;
+			});
+		}
+
+		await use(state)
+	},
 	forEachWorker: [forEachWorker, { scope: 'worker', auto: true }],
 	forEachTest: [forEachTest, { auto: true }],
 });
