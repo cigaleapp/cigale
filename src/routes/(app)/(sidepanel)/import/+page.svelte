@@ -11,7 +11,7 @@
 	import { promptForFiles } from '$lib/files';
 	import { tables } from '$lib/idb.svelte';
 	import { deleteImage } from '$lib/images';
-	import { ACCEPTED_IMPORT_TYPES } from '$lib/import.svelte';
+	import { ACCEPTED_IMPORT_TYPES } from '$lib/import/index.js';
 	import Logo from '$lib/Logo.svelte';
 	import { goto } from '$lib/paths.js';
 	import { cancelTask, importMore } from '$lib/queue.svelte.js';

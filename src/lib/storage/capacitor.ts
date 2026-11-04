@@ -2,6 +2,7 @@ import type { BinaryStorageBackend, BinaryStorageLocator } from './types.js';
 
 import { Capacitor } from '@capacitor/core';
 import { Directory, Filesystem } from '@capacitor/filesystem';
+import * as mediabunny from 'mediabunny';
 
 import { locatorToPath as _locatorToPath } from './utils.js';
 
@@ -88,6 +89,15 @@ export async function CapacitorFilesystemBackend(): Promise<BinaryStorageBackend
 		},
 		async read(locator, type) {
 			return new File([await this.bytes(locator)], locator.name, { type });
+		},
+		async readChunk(locator, start, end) {
+			// TODO: see if its possible,
+			const all = await this.bytes(locator);
+			return all.slice(start, end);
+		},
+		async mediabunny(locator) {
+			// TODO: see if we can do random access instead of RAM full load
+			return new mediabunny.BufferSource(await this.bytes(locator));
 		},
 		async write(locator, content) {
 			let base64: string;

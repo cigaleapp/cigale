@@ -1,4 +1,5 @@
 import type { BinaryStorageBackend, BinaryStorageLocator } from './types.js';
+import * as mediabunny from 'mediabunny';
 
 import { nanoid } from 'nanoid';
 
@@ -43,6 +44,8 @@ export async function OPFSBackend(): Promise<BinaryStorageBackend<'opfs'>> {
 		return await handle.getFile();
 	}
 
+	const _syncAccessHandles = new Map<string, FileSystemSyncAccessHandle>();
+
 	return {
 		name: 'opfs',
 		async resolvePath(locator) {
@@ -79,6 +82,42 @@ export async function OPFSBackend(): Promise<BinaryStorageBackend<'opfs'>> {
 		},
 		async read(locator) {
 			return getFile(locator);
+		},
+		async readChunk(locator, start, end) {
+			let handle = _syncAccessHandles.get(locatorToPath(locator));
+
+			if (!handle) {
+				const [directory, name] = await walk(locator);
+				handle = await directory
+					.getFileHandle(name)
+					.then((handle) => handle.createSyncAccessHandle());
+			}
+
+			const bytes = new ArrayBuffer(end - start);
+			handle!.read(bytes, { at: start });
+			return bytes;
+		},
+		async mediabunny(locator) {
+			const [directory, name] = await walk(locator);
+			const handle = await directory
+				.getFileHandle(name)
+				.then((handle) => handle.createSyncAccessHandle());
+
+			if (!handle) throw new Error(`Couldn't create sync access handle for ${name}`)
+
+			return new mediabunny.CustomSource({
+				getSize() {
+					return handle.getSize();
+				},
+				async read(start, end) {
+					const bytes = new Uint8Array(end - start);
+					handle.read(bytes, { at: start });
+					return bytes;
+				},
+				dispose() {
+					handle.close()
+				}
+			});
 		},
 		async bytes(locator) {
 			return getFile(locator).then((file) => file.arrayBuffer());

@@ -36,6 +36,10 @@ export const binaryStorage: BinaryStorage = {
 		if (!currentBackend) await initializeBinaryStorage();
 		return currentBackend!.read(...args);
 	},
+	async readChunk(...args) {
+		if (!currentBackend) await initializeBinaryStorage();
+		return currentBackend!.readChunk(...args);
+	},
 	async bytes(...args) {
 		if (!currentBackend) await initializeBinaryStorage();
 		return currentBackend!.bytes(...args);
@@ -65,6 +69,10 @@ export const binaryStorage: BinaryStorage = {
 	async count(...args) {
 		if (!currentBackend) await initializeBinaryStorage();
 		return currentBackend!.count(...args);
+	},
+	async mediabunny(...args) {
+		if (!currentBackend) await initializeBinaryStorage();
+		return currentBackend!.mediabunny(...args);
 	},
 	async create(locator, content, { fixedFilenameCounter = 0 } = {}) {
 		const [stem, ext] = splitFilenameOnExtension(locator.name);

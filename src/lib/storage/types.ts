@@ -19,6 +19,8 @@ export interface BinaryStorageBackend<Name extends BinaryStorageName = BinarySto
 	 */
 	read(locator: BinaryStorageLocator, fallbackContentType: ContentType): Promise<File>;
 
+	readChunk(locator: BinaryStorageLocator, start: number, end: number): Promise<ArrayBuffer>;
+
 	stream(
 		locator: BinaryStorageLocator,
 		/** Size in bytes for each chunk */
@@ -59,6 +61,10 @@ export interface BinaryStorageBackend<Name extends BinaryStorageName = BinarySto
 	 * @returns number of files in the given directory
 	 */
 	count(locator: BinaryStorageLocator<''>): Promise<number>;
+	/**
+	 * @returns a Mediabunny source of the given file
+	 */
+	mediabunny(locator: BinaryStorageLocator): Promise<import('mediabunny').Source>;
 }
 
 export type BinaryStorageLocator<Filename extends string = string> = {

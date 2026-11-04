@@ -40,6 +40,17 @@ type CreateBytesObjectFields<Table extends BinaryTableName> = Pick<
 	'filename' | 'sessionId'
 >;
 
+export function locateFileOfObject<Table extends BinaryTableName>(
+	table: Table,
+	object: CreateBytesObjectFields<Table>
+) {
+	return {
+		area: table,
+		sessionId: 'sessionId' in object ? object.sessionId : undefined,
+		name: object.filename,
+	};
+}
+
 /**
  * Stores bytes in binary storage for a to-be-created database object
  *
@@ -65,11 +76,7 @@ export async function createBytes<Table extends BinaryTableName>(
 		type: string;
 	}
 ): Promise<CreateBytesObjectFields<Table> & { bytes: 'migrated'; size: number }> {
-	const locator = {
-		area: table,
-		sessionId: 'sessionId' in input ? input.sessionId : undefined,
-		name: input.filename,
-	};
+	const locator = locateFileOfObject(input);
 
 	const size = input.bytes.byteLength;
 
@@ -108,11 +115,7 @@ export async function storeBytes<Table extends BinaryTableName>(
 	content: ArrayBuffer
 ): Promise<'migrated'> {
 	await binaryStorage.write(
-		{
-			area: table,
-			sessionId: 'sessionId' in object ? object.sessionId : undefined,
-			name: object.filename,
-		},
+		locateFileOfObject(table, object),
 		new File([content], object.filename, {
 			type: object.contentType,
 		})
@@ -133,11 +136,7 @@ export async function accessBytes<Table extends BinaryTableName>(
 		return object.bytes;
 	}
 
-	const locator = {
-		area: table,
-		sessionId: 'sessionId' in object ? object.sessionId : undefined,
-		name: object.filename,
-	};
+	const locator = locateFileOfObject(table, object);
 
 	console.debug(`accessBytes ${table}`, object, 'at:', await binaryStorage.resolvePath(locator));
 
@@ -162,11 +161,7 @@ export async function* streamBytes<Table extends (typeof BINARY_CONTENT_TABLES)[
 		return;
 	}
 
-	const locator = {
-		area: table,
-		sessionId: 'sessionId' in object ? object.sessionId : undefined,
-		name: object.filename,
-	};
+	const locator = locateFileOfObject(table, object);
 
 	console.debug(`streamBytes ${table}`, object, 'at:', await binaryStorage.resolvePath(locator));
 
@@ -181,11 +176,7 @@ export async function deleteObjectWithBytes<Table extends BinaryTableName>(
 	const object = await db.get(table, id);
 	if (!object) return;
 
-	const locator = {
-		area: table,
-		sessionId: 'sessionId' in object ? object.sessionId : undefined,
-		name: object.filename,
-	};
+	const locator = locateFileOfObject(table, object);
 
 	console.debug(`deleteBytes ${table}`, object, 'at:', await binaryStorage.resolvePath(locator));
 

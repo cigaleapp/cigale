@@ -7,7 +7,7 @@
 	import * as db from '$lib/idb.svelte';
 	import { openTransaction, tables } from '$lib/idb.svelte';
 	import { deleteImage, deleteImageFile, imageFileId } from '$lib/images';
-	import { ACCEPTED_IMPORT_TYPES } from '$lib/import.svelte';
+	import { ACCEPTED_IMPORT_TYPES } from '$lib/import/index.js';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import {
 		deleteMetadataValue,
@@ -55,7 +55,7 @@
 				for (const imageId of obs.images) {
 					const image = await tx.objectStore('Image').get(imageId);
 					if (!image) continue;
-					const obs = newObservation(image, uiState.currentSession);
+					const obs = newObservation({ image }, uiState.currentSession);
 					tx.objectStore('Observation').add(obs);
 					toselect.push(obs.id);
 				}

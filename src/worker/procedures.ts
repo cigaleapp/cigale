@@ -4,7 +4,7 @@ import { type } from 'arktype';
 
 import { Schemas } from '$lib/database.js';
 import { NodeProvenance } from '$lib/file-tree.js';
-import { NamespacedMetadataID } from '$lib/schemas/common.js';
+import { ID, NamespacedMetadataID } from '$lib/schemas/common.js';
 
 export const LOCAL_STORAGE = type({
 	databaseName: 'string',
@@ -58,6 +58,20 @@ export const PROCEDURES = {
 			boxes: type(['number', 'number', 'number', 'number']).array(),
 			scores: 'number[]',
 		}),
+	},
+	importAudioFile: {
+		input: type({
+			/** A free AudioFile ID to be used */
+			id: ID,
+			sessionId: 'string',
+			file: 'File',
+			sidecars: 'File[]'
+		}),
+		progress: type(['number', 'number']),
+		success: type({
+			id: ID,
+			filename: 'string'
+		})
 	},
 	classify: {
 		input: type({

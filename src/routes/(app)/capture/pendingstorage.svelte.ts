@@ -10,7 +10,7 @@ import { getCurrentLocation } from '$lib/geolocation.js';
 import { errorMessage } from '$lib/i18n.js';
 import * as idb from '$lib/idb.svelte.js';
 import { imageFileId } from '$lib/images.js';
-import { processImageFile } from '$lib/import.svelte.js';
+import { processImageFile } from '$lib/import/images.svelte.js';
 import { storeMetadataValue } from '$lib/metadata/index.js';
 import { binaryStorage } from '$lib/storage/index.js';
 import { toasts } from '$lib/toasts.svelte.js';

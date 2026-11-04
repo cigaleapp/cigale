@@ -8,7 +8,7 @@
 	import { gatherToTree } from '$lib/file-tree.js';
 	import { formatBytesSize } from '$lib/i18n.js';
 	import LoadingText, { Loading } from '$lib/LoadingText.svelte';
-	import { ensureNoLoneImages } from '$lib/observations.js';
+	import { ensureNoLoneImagesOrSounds } from '$lib/observations.js';
 	import { toasts } from '$lib/toasts.svelte.js';
 	import { uiState } from '$lib/uistate.svelte.js';
 	import { entries, switchValue } from '$lib/utils.js';
@@ -61,7 +61,7 @@
 			return [];
 		}
 
-		await ensureNoLoneImages();
+		await ensureNoLoneImagesOrSounds();
 
 		const preview = await swarpc.previewResultsZip.once({
 			include: exporter.include,
