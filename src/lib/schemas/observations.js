@@ -1,16 +1,16 @@
 import { type } from 'arktype';
 
-import { Dimensions, ID, MIMEType, References, URLString } from './common.js';
+import { AudioDimensions, ID, ImageDimensions, MIMEType, References, URLString } from './common.js';
 import { MetadataErrors, MetadataValues } from './metadata.js';
 
 export const Image = type({
 	id: /\d+(_\d+)*/,
 	filename: 'string',
 	addedAt: 'string.date.iso.parse',
-	dimensions: Dimensions,
+	dimensions: ImageDimensions,
 	metadata: MetadataValues,
 	metadataErrors: MetadataErrors.default(() => ({})),
-	contentType: /\w+\/\w+/,
+	contentType: MIMEType,
 	fileId: ID.or('null').describe("ID vers l'objet ImageFile associé"),
 	sessionId: ID.describe('ID de la session à laquelle cette image appartient'),
 	/** Si les boîtes englobantes ont été analysées. Pratique en particulier pour savoir s'il faut calculer les boîtes englobantes pour une image qui n'a aucune observation associée (chaque bounding box crée une image) */
@@ -18,6 +18,16 @@ export const Image = type({
 	'remoteUrl?': URLString.describe(
 		"URL où le fichier de l'image est accessible, une fois que (par exemple) la session a été mise en ligne via un compte"
 	),
+});
+
+export const Sound = type({
+	id: /\d+_(\d+)*/,
+	filename: 'string',
+	addedAt: 'string.date.iso.parse',
+	metadata: MetadataValues,
+	metadataErrors: MetadataErrors.default(() => ({})),
+	fileId: ID.describe("ID vers l'objet SoundFile associé"),
+	sessionId: ID.describe('ID de la session à laquelle ce son appartient'),
 });
 
 export const Observation = type({
@@ -28,6 +38,7 @@ export const Observation = type({
 	metadataOverrides: MetadataValues,
 	metadataErrors: MetadataErrors.default(() => ({})),
 	images: References,
+	sounds: References.default(() => []),
 });
 
 export const ImageFile = type({
@@ -39,7 +50,7 @@ export const ImageFile = type({
 	size: 'number = 0',
 	filename: 'string',
 	contentType: MIMEType,
-	dimensions: Dimensions,
+	dimensions: ImageDimensions,
 	sessionId: ID,
 	'remoteId?': 'string#RemoteImageFileID',
 	'remoteUrl?': URLString,
@@ -54,8 +65,22 @@ export const ImagePreviewFile = type({
 	size: 'number = 0',
 	filename: 'string',
 	contentType: MIMEType,
-	dimensions: Dimensions,
+	dimensions: ImageDimensions,
 	sessionId: ID,
 	'remoteId?': 'string#RemoteImageFileID',
+	'remoteUrl?': URLString,
+});
+
+export const AudioFile = type({
+	id: ID,
+	filename: 'string',
+	/** In bytes */
+	size: 'number = 0',
+	/** Analysis was run on the audio file */
+	analyzed: 'boolean = false',
+	contentType: MIMEType,
+	dimensions: AudioDimensions,
+	sessionId: ID,
+	'remoteId?': 'string#RemoteAudioFileID',
 	'remoteUrl?': URLString,
 });

@@ -8,7 +8,7 @@ import {
 	serializeMetadataFullValue,
 } from './metadata/index.js';
 import { uiState } from './uistate.svelte.js';
-import { compareBy, mapValues, nonnull, transformObject } from './utils.js';
+import { compareBy, entries, mapValues, nonnull, transformObject } from './utils.js';
 
 /**
  * @import * as DB from '$lib/database.js'
@@ -151,18 +151,21 @@ export function fallbackObservationLabel(parts) {
 
 /**
  *
- * @param {Pick<typeof import('$lib/database').Schemas.Image.inferIn & DB.Image, "id" | "filename">} image
+ * @param {{image: {id: string, filename: string}} | {sound: {id: string, filename: string}}} source
  * @param {import('$lib/database').Session} session
  * @returns {typeof import('$lib/database').Schemas.Observation.inferIn}
  */
-export function newObservation(image, session) {
+export function newObservation(source, session) {
 	const observationId = generateId('Observation');
+	const [[type, item]] = entries(source);
+
 	return {
 		id: observationId,
 		sessionId: session.id,
-		images: [image.id],
+		images: type === 'image' ? [item.id] : [],
+		sounds: type === 'sound' ? [item.id] : [],
 		addedAt: new Date().toISOString(),
-		label: fallbackObservationLabel([image]),
+		label: fallbackObservationLabel([item]),
 		metadataOverrides: {},
 	};
 }
@@ -171,14 +174,15 @@ export function newObservation(image, session) {
  * If there are any images that are not inside any observation, create an observation with a single image for each
  * @param {import('./idb.svelte').IDBTransactionWithAtLeast<["Observation", "Image"]>} [tx] reuse an existing transaction
  */
-export async function ensureNoLoneImages(tx) {
+export async function ensureNoLoneImagesOrSounds(tx) {
 	const session = uiState.currentSession;
 	const protocol = uiState.currentProtocol;
 	if (!protocol) throw new Error('No protocol selected');
 	if (!session) throw new Error('No session selected');
 
-	await db.openTransaction(['Observation', 'Image'], { tx }, async (tx) => {
+	await db.openTransaction(['Observation', 'Image', 'Sound'], { tx }, async (tx) => {
 		const images = await tx.objectStore('Image').index('sessionId').getAll(session.id);
+		const sounds = await tx.objectStore('Sound').index('sessionId').getAll(session.id);
 		const observations = await tx
 			.objectStore('Observation')
 			.index('sessionId')
@@ -186,11 +190,22 @@ export async function ensureNoLoneImages(tx) {
 
 		for (const image of images) {
 			if (!observations.some((o) => o.images.includes(image.id))) {
-				const newObs = newObservation(image, session);
+				const newObs = newObservation({ image }, session);
 				tx.objectStore('Observation').add(newObs);
 				// Update ui selection so we don't have ghosts in preview side panel
 				uiState.setSelection?.(
 					uiState.selection.map((sel) => (sel === image.id ? newObs.id : sel))
+				);
+			}
+		}
+
+		for (const sound of sounds) {
+			if (!observations.some((o) => o.sounds?.includes(sound.id))) {
+				const newObs = newObservation({ sound }, session);
+				tx.objectStore('Observation').add(newObs);
+				// Update ui selection so we don't have ghosts in preview side panel
+				uiState.setSelection?.(
+					uiState.selection.map((sel) => (sel === sound.id ? newObs.id : sel))
 				);
 			}
 		}

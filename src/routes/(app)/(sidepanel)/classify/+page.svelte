@@ -18,7 +18,7 @@
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
 	import Logo from '$lib/Logo.svelte';
 	import { IsMobile } from '$lib/mobile.svelte.js';
-	import { deleteObservation, ensureNoLoneImages, observationMetadata } from '$lib/observations';
+	import { deleteObservation, ensureNoLoneImagesOrSounds, observationMetadata } from '$lib/observations';
 	import { goto } from '$lib/paths.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { cancelTask, classifyMore } from '$lib/queue.svelte.js';
@@ -189,7 +189,7 @@
 
 	$effect(() => {
 		if (!uiState.setSelection) return;
-		void ensureNoLoneImages();
+		void ensureNoLoneImagesOrSounds();
 	});
 
 	defineKeyboardShortcuts('classification', {

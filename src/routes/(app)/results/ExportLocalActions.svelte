@@ -14,7 +14,7 @@
 	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 	import LoadingText from '$lib/LoadingText.svelte';
 	import { sendNotification } from '$lib/notifications.js';
-	import { ensureNoLoneImages } from '$lib/observations.js';
+	import { ensureNoLoneImagesOrSounds } from '$lib/observations.js';
 	import { toasts } from '$lib/toasts.svelte.js';
 	import { tooltip } from '$lib/tooltips.js';
 	import { uiState } from '$lib/uistate.svelte.js';
@@ -57,7 +57,7 @@
 		void swarpc.syncStoredCorrections(undefined);
 
 		try {
-			await ensureNoLoneImages();
+			await ensureNoLoneImagesOrSounds();
 			uiState.processing.task = 'export';
 			uiState.processing.total = 1;
 			uiState.processing.done = 0;

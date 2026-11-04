@@ -21,7 +21,13 @@ import {
 	namespaceOfMetadataId,
 } from '$lib/schemas/metadata.js';
 import { toasts } from '$lib/toasts.svelte.js';
-import { groupBy, orEmptyObj3, prefixIDBKeyRange, safeJSONParse } from '$lib/utils.js';
+import {
+	groupBy,
+	orEmptyObj3,
+	prefixIDBKeyRange,
+	safeJSONParse,
+	switchConditions,
+} from '$lib/utils.js';
 
 import { resolveMetadataImport } from './imports.js';
 import { httpInferencesToRefresh, inferHttp } from './inference/http.js';
@@ -320,9 +326,11 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 
 	abortSignal?.throwIfAborted();
 	const image = await db.get('Image', subjectId);
+	const sound = await db.get('Sound', subjectId);
 	const observation = await db.get('Observation', subjectId);
 	const session = await db.get('Session', subjectId);
 	const imagesFromImageFile = await db.getAllFromIndex('Image', 'fileId', subjectId);
+	const soundsFromAudioFile = await db.getAllFromIndex('Sound', 'fileId', subjectId);
 
 	abortSignal?.throwIfAborted();
 	if (session) {
@@ -346,6 +354,16 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 		}
 
 		await db.put('Image', image);
+	} else if (sound) {
+		oldValue = sound.metadata[metadataId];
+		processConfidences(newValue, oldValue);
+
+		sound.metadata[metadataId] = newValue;
+		if (clearErrors && sound.metadataErrors?.[metadataId]) {
+			delete sound.metadataErrors[metadataId];
+		}
+
+		await db.put('Sound', sound);
 	} else if (observation) {
 		oldValue = observationMetadata({
 			observation: Tables.Observation.assert(observation),
@@ -365,8 +383,8 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 		}
 
 		await db.put('Observation', observation);
-	} else if (imagesFromImageFile.length > 0) {
-		for (const { id } of imagesFromImageFile) {
+	} else if (imagesFromImageFile.length + soundsFromAudioFile.length > 0) {
+		for (const { id } of [...imagesFromImageFile, ...soundsFromAudioFile]) {
 			await storeMetadataValue({
 				db,
 				sessionId,
@@ -383,7 +401,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 			});
 		}
 	} else {
-		throw new Error(`Aucune image ou observation avec l'ID ${subjectId}`);
+		throw new Error(`Aucun son, image ou observation avec l'ID ${subjectId}`);
 	}
 
 	abortSignal?.throwIfAborted();
@@ -435,7 +453,11 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 
 		if (ses) {
 			protocolId = ses.protocol;
-			const values = image?.metadata ?? observation?.metadataOverrides ?? session?.metadata;
+			const values =
+				sound?.metadata ??
+				image?.metadata ??
+				observation?.metadataOverrides ??
+				session?.metadata;
 
 			const toRefresh = await httpInferencesToRefresh(db, protocolId, {
 				[metadataId]: [safeJSONParse(oldValue?.value), safeJSONParse(newValue.value)],
@@ -478,10 +500,14 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 
 	// Only refresh table state if asked
 	if (sessionId && updateReactiveState) {
-		await refreshTables(
-			sessionId,
-			session ? 'Session' : image || imagesFromImageFile.length ? 'Image' : 'Observation'
-		);
+		const table = switchConditions({
+			Session: session,
+			Image: image || imagesFromImageFile.length > 0,
+			Sound: sound || soundsFromAudioFile.length > 0,
+			Observation: observation,
+		});
+
+		if (table) await refreshTables(sessionId, table);
 	}
 
 	const protocol = protocolId ? await db.get('Protocol', protocolId) : undefined;
