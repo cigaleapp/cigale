@@ -6,6 +6,7 @@
 	import { uiState } from '$lib/uistate.svelte.js';
 	import { switchValue } from '$lib/utils.js';
 
+	import ExportCommonSettings from './ExportCommonSettings.svelte';
 	import ExportGallery from './ExportGallery.svelte';
 	import ExportLocalActions from './ExportLocalActions.svelte';
 	import ExportLocalPreview from './ExportLocalPreview.svelte';
@@ -13,6 +14,7 @@
 	import ExportPlatformsActions from './ExportPlatformsActions.svelte';
 	import ExportPlatformsPreview from './ExportPlatformsPreview.svelte';
 	import ExportPlatformsSettings from './ExportPlatformsSettings.svelte';
+	import { exporter as filesExporter } from './files.svelte.js';
 	import { exporter as remoteExporter } from './platforms.svelte.js';
 
 	interface Props {
@@ -23,6 +25,13 @@
 
 	let exportDestinationTab = $derived<'platforms' | 'local'>(
 		remoteExporter.compatibleAccounts.length > 0 ? 'platforms' : 'local'
+	);
+
+	const exporter = $derived(
+		switchValue(exportDestinationTab, {
+			platforms: remoteExporter,
+			local: filesExporter,
+		})
 	);
 
 	let windowWidth: number | undefined = $state();
@@ -78,6 +87,8 @@
 	<div class="scrollable">
 		<div class="settings-and-gallery">
 			<div class="settings">
+				<ExportCommonSettings {exporter} />
+
 				{#if exportDestinationTab === 'local'}
 					<ExportLocalSettings />
 				{:else}
@@ -85,7 +96,7 @@
 				{/if}
 			</div>
 
-			<ExportGallery />
+			<ExportGallery {exporter} />
 		</div>
 
 		{#if exportDestinationTab === 'local'}
@@ -156,6 +167,8 @@
 		overflow-y: auto;
 		height: 100%;
 		scrollbar-gutter: stable;
+		/** XXX: So that the box shadows of EnumButtons dont clip out on the sides */
+		padding: 0 0.5em;
 	}
 
 	.settings-and-gallery {

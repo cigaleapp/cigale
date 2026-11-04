@@ -141,7 +141,7 @@
 
 	.radio-inputs.horizontal {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+		grid-template-columns: repeat(auto-fit, minmax(var(--option-min-width, 200px), 1fr));
 		gap: 1em;
 	}
 

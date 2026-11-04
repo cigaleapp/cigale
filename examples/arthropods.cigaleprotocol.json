@@ -97673,6 +97673,7 @@
 			"infer": {
 				"exif": "DateTimeOriginal"
 			},
+			"inaturalist": "observed on",
 			"darwincore": {
 				"time": "dwc:eventTime",
 				"date": "dwc:eventDate"
@@ -97693,6 +97694,7 @@
 					"exif": "GPSLongitude"
 				}
 			},
+			"inaturalist": "observed at",
 			"darwincore": {
 				"latitude": "dwc:decimalLatitude",
 				"longitude": "dwc:decimalLongitude",
@@ -97706,6 +97708,7 @@
 			"required": true,
 			"mergeMethod": "union",
 			"groupable": true,
+			"inaturalist": "crop",
 			"infer": {
 				"neural": [
 					{
