@@ -182,7 +182,7 @@ jobs:
       - name: Initialize empty metrics.json (in case no tests wrote it in this shard)
         run: echo "[]" > metrics.json
       - name: Run Playwright tests
-        run: ${{ inputs.env }} bunx playwright test --shard=${{ matrix.shard-index}}/${{ matrix.shard-count }}
+        run: ${{ inputs.env }} bun --bun playwright test --shard=${{ matrix.shard-index}}/${{ matrix.shard-count }}
         env:
           SHARDING: '1'
           JOB_ID: ${{ job.check_run_id }}
