@@ -5,6 +5,13 @@ import { type } from 'arktype';
 
 import { clamp, sign } from '$lib/utils.js';
 
+const Box = type({
+	x: 'number > 0',
+	y: 'number > 0',
+	width: 'number > 0',
+	height: 'number > 0',
+});
+
 /**
  * Calculate bounding rect for an image element that has object-fit: contain. The boundingClientRect is not the same as the actual, displayed image. We use both natural{Width,Height} and client{Width,Height} to calculate the displayed image size.
  * You can also provide the zoom state to take it into account.
@@ -79,12 +86,7 @@ export class NewBoundingBox {
 	 */
 	ready = $derived.by(() => {
 		if (this.createMode === 'clickanddrag') {
-			return type({
-				x: 'number > 0',
-				y: 'number > 0',
-				width: 'number > 0',
-				height: 'number > 0',
-			}).allows(this.clickanddrag);
+			return Box.allows(this.clickanddrag);
 		}
 
 		if (this.createMode == '2point') {
