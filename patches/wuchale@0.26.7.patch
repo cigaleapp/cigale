@@ -1,0 +1,13 @@
+diff --git a/dist/bundlers/vite.js b/dist/bundlers/vite.js
+index 909998e3d68b535c8645804f94df563ea10dc2c4..b69d887d3f69a537107a0f5bb00130d0e437506b 100644
+--- a/dist/bundlers/vite.js
++++ b/dist/bundlers/vite.js
+@@ -54,7 +54,7 @@ export const wuchale = ({ configPath, hmrDelayThreshold = 1000, trimQueryParams
+     return {
+         name: pluginName,
+         async config(_, env) {
+-            inBuild = env.mode === 'build';
++            inBuild = env.command === 'build';
+             conf = await getConfig(configPath);
+             return {
+                 optimizeDeps: { exclude: [...new Set(Object.values(conf.adapters).flatMap(a => a.addImports))] },

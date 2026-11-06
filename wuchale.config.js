@@ -56,6 +56,14 @@ export default defineConfig({
 						'$effect',
 					];
 
+					// Markup (template) strings are UI labels → translate.
+					// Script strings are usually identifiers → only translate inside
+					// the special functions above.
+					const inMarkup = path.some(
+						(scope) => scope.type === 'element' || scope.type === 'attribute'
+					);
+					if (inMarkup) return true;
+
 					return path.some(
 						(scope) => scope.type === 'call' && functions.includes(scope.name)
 					);
