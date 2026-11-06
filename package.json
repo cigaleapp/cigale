@@ -44,7 +44,7 @@
 		"dev:native": "electron-forge start",
 		"add-cap": "bun run scripts/add-capacitor-dependency.ts",
 		"codegen": "bun run scripts/download-google-fonts.js && bun run scripts/generate-json-schemas.js && bun run scripts/codegen-filepath-types.ts && bun run scripts/generate-assetlinks.ts && bun run scripts/generate-protocol-registry.ts",
-		"prebuild": "bun run codegen && bun wuchale --clean --sync",
+		"prebuild": "bun run codegen && bun wuchale --clean",
 		"build": "bun --bun vite build",
 		"preview": "bun --bun vite preview",
 		"prepare": "bun run codegen",
@@ -91,7 +91,7 @@
 		"@jimp/js-jpeg": "^1.6.1",
 		"@msw/playwright": "^0.6.7",
 		"@playwright/test": "^1.62.1",
-		"@sveltejs/adapter-static": "^4.0.0",
+		"@sveltejs/adapter-static": "^4.0.1",
 		"@sveltejs/kit": "^3.1.1",
 		"@sveltejs/load-config": "^0.2.2",
 		"@sveltejs/vite-plugin-svelte": "^7.3.1",
@@ -147,7 +147,7 @@
 		"typescript": "^6.0.3",
 		"typescript-eslint": "^8.71.0",
 		"urlpattern-polyfill": "^10.1.0",
-		"vite": "^8.3.2",
+		"vite": "^8.3.6",
 		"vite-bundle-analyzer": "^1.3.9",
 		"vite-plugin-cross-origin-isolation": "^0.1.6",
 		"vitest": "^4.1.11",
@@ -242,7 +242,8 @@
 		"@types/piexifjs@1.0.0": "patches/@types%2Fpiexifjs@1.0.0.patch",
 		"svelte-bottom-sheet@2.3.0": "patches/svelte-bottom-sheet@2.3.0.patch",
 		"@capacitor-community/camera-preview@8.0.1": "patches/@capacitor-community%2Fcamera-preview@8.0.1.patch",
-		"@capacitor/geolocation@8.2.0": "patches/@capacitor%2Fgeolocation@8.2.0.patch"
+		"@capacitor/geolocation@8.2.0": "patches/@capacitor%2Fgeolocation@8.2.0.patch",
+		"wuchale@0.26.7": "patches/wuchale@0.26.7.patch"
 	},
 	"imports": {
 		"#lib": "./src/lib/index.js",

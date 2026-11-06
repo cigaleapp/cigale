@@ -7,11 +7,15 @@
  * @see https://wuchale.dev/guides/plurals/#usage
  * @param {number} num
  * @param {string[]} candidates
- * @param {(n: number) => number} [rule]
+ * @param {(n: number) => number | string} [rule]
  * @returns {string}
  */
 export function plural(num, candidates, rule = (n) => (n === 1 ? 0 : 1)) {
-	const index = rule(num);
+	// Wuchale rewrites `plural(num, candidates)` to inject a locale string as the 3rd arg
+	// (see wuchale's `pluralPattern` = `{ name: 'plural', args: ['other', 'message', 'locale'] }`).
+	// When the 3rd arg is not a function, fall back to the default rule.
+	const resolveRule = typeof rule === 'function' ? rule : (n) => (n === 1 ? 0 : 1);
+	const index = resolveRule(num);
 	return candidates[index]?.replace('#', Intl.NumberFormat().format(num));
 }
 
