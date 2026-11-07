@@ -5,7 +5,7 @@ import type { RemovePrefix } from '#lib/utils.js';
 
 import { expect } from '@playwright/test';
 
-import { collectOPFSState } from '#e2e/utils/opfs.js';
+import { collectOPFSState } from '#e2e/utils/opfs.ts';
 
 import lightProtocol from '../../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import { FixturePaths } from '../filepaths.js';
