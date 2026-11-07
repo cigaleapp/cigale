@@ -1,5 +1,5 @@
 import type { Locator, Page } from '@playwright/test';
-import type { FixturePaths } from '#e2e/filepaths.js';
+import type { FixturePaths } from '#e2e/filepaths.ts';
 import type { NavigationTab } from '#e2e/utils/navigation.js';
 import type { GalleryCardSpecifier } from '#e2e/utils/observations.js';
 import type * as DB from '#lib/database.js';

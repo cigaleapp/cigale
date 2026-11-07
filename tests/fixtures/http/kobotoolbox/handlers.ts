@@ -5,7 +5,7 @@ import type { HttpRequestResolverExtras, RequestHandlerOptions, ResponseResolver
 
 import { http, HttpResponse } from 'msw';
 
-import { FixturePaths } from '#e2e/filepaths.js';
+import { FixturePaths } from '#e2e/filepaths.ts';
 
 import data5 from './asset-data-limit-5.json' with { type: 'json' };
 import dataOne from './asset-data-single.json' with { type: 'json' };

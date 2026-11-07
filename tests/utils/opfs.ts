@@ -5,7 +5,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import type { Page } from '@playwright/test';
-import type { FixturePaths } from '#e2e/filepaths.js';
+import type { FixturePaths } from '#e2e/filepaths.ts';
 
 import { absoluteFixtureFilepath } from './core.js';
 
