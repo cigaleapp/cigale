@@ -3,7 +3,7 @@ import type { TypedMetadataValue } from './metadata/index.js';
 import type { NamespacedMetadataID } from './schemas/common.js';
 import type { NeuralBoundingBoxInference, NeuralEnumInference } from './schemas/neural.js';
 import type { NeuralModelSelector } from './schemas/sessions.js';
-import type { ZoomState } from '$routes/(app)/(sidepanel)/o/[observation]/crop/[image]/zoom.svelte.js';
+import type { ZoomState } from '#routes/(app)/(sidepanel)/o/[observation]/crop/[image]/zoom.svelte.js';
 
 import { Estimation as ETA } from 'arrival-time';
 import { dequal } from 'dequal';

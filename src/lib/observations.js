@@ -1,4 +1,4 @@
-import { generateId } from '$lib/database.js';
+import { generateId } from '#lib/database.js';
 
 import * as db from './idb.svelte.js';
 import { tables } from './idb.svelte.js';
@@ -11,9 +11,9 @@ import { uiState } from './uistate.svelte.js';
 import { compareBy, mapValues, nonnull, transformObject } from './utils.js';
 
 /**
- * @import * as DB from '$lib/database.js'
- * @import { NamespacedMetadataID } from '$lib/schemas/common.js'
- * @import { TypedMetadataValue } from '$lib/metadata/types.js'
+ * @import * as DB from '#lib/database.js'
+ * @import { NamespacedMetadataID } from '#lib/schemas/common.js'
+ * @import { TypedMetadataValue } from '#lib/metadata/types.js'
  */
 
 /**
@@ -151,9 +151,9 @@ export function fallbackObservationLabel(parts) {
 
 /**
  *
- * @param {Pick<typeof import('$lib/database').Schemas.Image.inferIn & DB.Image, "id" | "filename">} image
- * @param {import('$lib/database').Session} session
- * @returns {typeof import('$lib/database').Schemas.Observation.inferIn}
+ * @param {Pick<typeof import('#lib/database').Schemas.Image.inferIn & DB.Image, "id" | "filename">} image
+ * @param {import('#lib/database.js').Session} session
+ * @returns {typeof import('#lib/database.js').Schemas.Observation.inferIn}
  */
 export function newObservation(image, session) {
 	const observationId = generateId('Observation');

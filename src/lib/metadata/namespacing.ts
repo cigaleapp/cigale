@@ -1,11 +1,11 @@
-import type * as DB from '$lib/database.js';
-import type { NamespacedMetadataID } from '$lib/schemas/common.js';
+import type * as DB from '#lib/database.js';
+import type { NamespacedMetadataID } from '#lib/schemas/common.js';
 
 import {
 	ensureNamespacedMetadataId,
 	removeNamespaceFromMetadataId,
-} from '$lib/schemas/metadata.js';
-import { fromEntries } from '$lib/utils.js';
+} from '#lib/schemas/metadata.js';
+import { fromEntries } from '#lib/utils.js';
 
 import { METADATA_ZERO_VALUE } from './index.js';
 

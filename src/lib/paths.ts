@@ -1,17 +1,17 @@
-import type { Pathname, RouteId, RouteParams } from '$app/types';
+import type { Path, RouteId, RouteParams } from '$app/types';
 
 import * as navigation from '$app/navigation';
 import { resolve } from '$app/paths';
 import { page } from '$app/state';
 
-type ResolveArgs<T extends RouteId | Pathname> = T extends RouteId
+type ResolveArgs<T extends RouteId | Path> = T extends RouteId
 	? RouteParams<T> extends Record<string, never>
 		? [route: T]
 		: [route: T, params: RouteParams<T>]
 	: [route: T];
 
-export async function goto(args: Pathname): Promise<void>;
-export async function goto<T extends RouteId | Pathname>(...args: ResolveArgs<T>) {
+export async function goto(args: Path): Promise<void>;
+export async function goto<T extends RouteId | Path>(...args: ResolveArgs<T>) {
 	await navigation.goto(resolve(...args));
 }
 

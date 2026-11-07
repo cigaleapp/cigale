@@ -24,7 +24,7 @@ Available CSS variables:
 </script>
 
 <script lang="ts">
-	import type { PlaywrightTestId } from '$e2e/testids.js';
+	import type { PlaywrightTestId } from '#e2e/testids.js';
 
 	import LoadingSpinner from './LoadingSpinner.svelte';
 	import { tooltip } from './tooltips.js';

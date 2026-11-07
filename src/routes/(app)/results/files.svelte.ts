@@ -1,8 +1,8 @@
-import type { TreeNode } from '$lib/file-tree.js';
+import type { TreeNode } from '#lib/file-tree.js';
 
-import { parseCropPadding } from '$lib/images';
-import { uiState } from '$lib/uistate.svelte.js';
-import { switchValue } from '$lib/utils.js';
+import { parseCropPadding } from '#lib/images.js';
+import { uiState } from '#lib/uistate.svelte.js';
+import { switchValue } from '#lib/utils.js';
 
 class ExporterFiles {
 	preview: TreeNode | undefined = $state();

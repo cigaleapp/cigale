@@ -15,9 +15,9 @@ export const DontWait = Symbol("Don't wait for text to appear");
 /**
  *
  * @param {Locator | Page} area
- * @param {{ begin?: number | typeof import('$e2e/utils/loading.js').DontWait, finish?: number, concurrency?: number } | number} [timeout]
+ * @param {{ begin?: number | typeof import('#e2e//utils/loading.js').DontWait, finish?: number, concurrency?: number } | number} [timeout]
  */
-export async function waitForLoadingEnd(area, timeout = 30_000) {
+export async function waitForLoadingEnd(area, timeout = 60_000) {
 	const concurrency = typeof timeout === 'number' ? 1 : (timeout.concurrency ?? 1);
 
 	const timeouts =

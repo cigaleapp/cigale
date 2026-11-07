@@ -15,17 +15,17 @@
 		Popup,
 	} from 'svelte-maplibre';
 
-	import IconMapMarker from '~icons/ri/map-pin-2-fill';
-	import { resolveColorVariable } from '$lib/css.js';
-	import { geojsonLineStringFeature, geojsonPolygonFeature } from '$lib/geojson.js';
+	import { resolveColorVariable } from '#lib/css.js';
+	import { geojsonLineStringFeature, geojsonPolygonFeature } from '#lib/geojson.js';
 	import {
 		areaBetweenGeoCoordinates,
 		distanceBetweenGeoCoordinates,
 		lnglat,
 		middleOfGeoCoordinates,
-	} from '$lib/geolocation.js';
-	import { avg, range, round } from '$lib/utils.js';
-	import { getTheme } from '$routes/+layout.svelte';
+	} from '#lib/geolocation.js';
+	import { avg, range, round } from '#lib/utils.js';
+	import IconMapMarker from '~icons/ri/map-pin-2-fill';
+	import { getTheme } from '#routes/+layout.svelte';
 
 	type Point = { longitude: number; latitude: number };
 

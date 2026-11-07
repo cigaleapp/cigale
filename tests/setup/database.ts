@@ -1,11 +1,11 @@
 import { mkdirSync } from 'node:fs';
 import path from 'node:path';
 import type { Page } from '@playwright/test';
-import type { RemovePrefix } from '$lib/utils.js';
+import type { RemovePrefix } from '#lib/utils.js';
 
 import { expect } from '@playwright/test';
 
-import { collectOPFSState } from '$e2e/utils/opfs.js';
+import { collectOPFSState } from '#e2e/utils/opfs.ts';
 
 import lightProtocol from '../../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import { FixturePaths } from '../filepaths.js';

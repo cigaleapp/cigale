@@ -3,8 +3,8 @@ import 'opfs-mock';
 
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
-import { nukeDatabase } from '$lib/idb.svelte.js';
-import { imageFileId } from '$lib/images.js';
+import { nukeDatabase } from '#lib/idb.svelte.js';
+import { imageFileId } from '#lib/images.js';
 
 import { binaryStorage } from './index.js';
 import {

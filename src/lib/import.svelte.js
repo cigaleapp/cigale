@@ -1,20 +1,20 @@
 /**
- * @import { DimensionsInput } from '$lib/database.js';
- * @import { ExifFieldKey } from '$lib/exiffields.js';
+ * @import { DimensionsInput } from '#lib/database.js';
+ * @import { ExifFieldKey } from '#lib/exiffields.js';
  */
 import * as dates from 'date-fns';
 
-import { toRelativeCoords } from '$lib/BoundingBoxes.svelte.js';
-import { processExifData } from '$lib/exif.js';
-import { databaseHandle, tables } from '$lib/idb.svelte.js';
+import { toRelativeCoords } from '#lib/BoundingBoxes.svelte.js';
+import { processExifData } from '#lib/exif.js';
+import { databaseHandle, tables } from '#lib/idb.svelte.js';
 import {
 	errorMessageImageTooLarge,
 	imageId,
 	resizeToMaxSize,
 	storeImageBytes,
-} from '$lib/images.js';
-import { toasts } from '$lib/toasts.svelte.js';
-import { uiState } from '$lib/uistate.svelte.js';
+} from '#lib/images.js';
+import { toasts } from '#lib/toasts.svelte.js';
+import { uiState } from '#lib/uistate.svelte.js';
 
 import { setExifFields } from './exif.js';
 import { imageLimits } from './inference_utils.js';
@@ -151,7 +151,7 @@ export async function processImageFile({ file, id: fileId, sidecars, extraExif }
 }
 
 /**
- * @param {import('swarpc').SwarpcClient<typeof import('$worker/procedures.js').PROCEDURES>} swarpc
+ * @param {import('swarpc').SwarpcClient<typeof import('#worker//procedures.js').PROCEDURES>} swarpc
  * @param {undefined | Map<string, import("swarpc").CancelablePromise["cancel"]>} cancellers
  * @param {string} fileId
  * @returns {Promise<void>}

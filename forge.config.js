@@ -5,7 +5,8 @@ import { MakerSquirrel } from '@electron-forge/maker-squirrel';
 import { MakerZIP } from '@electron-forge/maker-zip';
 import { FusesPlugin } from '@electron-forge/plugin-fuses';
 import { VitePlugin } from '@electron-forge/plugin-vite';
-import { PublisherGithub } from '@electron-forge/publisher-github';
+// Knip says PublisherGitub is not defined... i cant figure out how to shut it up and we don't need PublisherGithub anyways
+// import { PublisherGitHub } from '@electron-forge/publisher-github';
 import { FuseV1Options, FuseVersion } from '@electron/fuses';
 
 const opts = /** @type {const} */ ({ options: { icon: './static/icon.png' } });
@@ -29,12 +30,12 @@ const config = {
 		new MakerDeb(opts),
 		new MakerFlatpak(opts),
 	],
-	publishers: [
-		new PublisherGithub({
-			draft: true,
-			repository: { owner: 'cigaleapp', name: 'cigale' },
-		}),
-	],
+	// publishers: [
+	// 	new PublisherGithub({
+	// 		draft: true,
+	// 		repository: { owner: 'cigaleapp', name: 'cigale' },
+	// 	}),
+	// ],
 	plugins: [
 		new VitePlugin({
 			// `build` can specify multiple entry builds, which can be Main process, Preload scripts, Worker process, etc.

@@ -2,7 +2,7 @@ import type { PermissionStatus } from '@capacitor/geolocation';
 
 import { Geolocation } from '@capacitor/geolocation';
 
-// XXX: no $lib alias here, this file is imported by $lib/exif which is used in $lib/schemas/*
+// XXX: no #lib/ alias here, this file is imported by #lib//exif which is used in #lib//schemas/*
 import { avg, clamp, degToRad, indexOfMin } from './utils.js';
 
 type Point = { latitude: number; longitude: number };

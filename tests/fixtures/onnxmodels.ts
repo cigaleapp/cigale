@@ -1,10 +1,10 @@
 import { execFileSync } from 'node:child_process';
 import type { BrowserContext, Page } from '@playwright/test';
-import type { NeuralBoundingBoxInference, NeuralEnumInference } from '$lib/schemas/neural.js';
+import type { NeuralBoundingBoxInference, NeuralEnumInference } from '#lib/schemas/neural.js';
 
 import { nanoid } from 'nanoid';
 
-import { mockUrl } from '$e2e/utils/core.js';
+import { mockUrl } from '#e2e/utils/core.js';
 
 type ModelConfig =
 	(typeof NeuralEnumInference)['inferIn'] | (typeof NeuralBoundingBoxInference)['inferIn'];

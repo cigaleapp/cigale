@@ -1,9 +1,9 @@
 import type { SelectedBox } from './+page.svelte';
 
-import { toTopLeftCoords } from '$lib/BoundingBoxes.svelte.js';
-import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
-import { toggleSetting } from '$lib/settings.svelte.js';
-import { fromEntries, range, throwError } from '$lib/utils.js';
+import { toTopLeftCoords } from '#lib/BoundingBoxes.svelte.js';
+import { defineKeyboardShortcuts } from '#lib/keyboard.svelte.js';
+import { toggleSetting } from '#lib/settings.svelte.js';
+import { fromEntries, range, throwError } from '#lib/utils.js';
 
 import {
 	currentImages,

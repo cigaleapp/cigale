@@ -1,4 +1,4 @@
-import type { Analysis } from '$lib/schemas/exports.js';
+import type { Analysis } from '#lib/schemas/exports.js';
 
 import { ms } from 'convert';
 
