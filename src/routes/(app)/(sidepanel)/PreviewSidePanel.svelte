@@ -242,7 +242,7 @@
 			<div class="side-by-side">
 				<ButtonSecondary onclick={onimport}>
 					<IconImport />
-					Plus d'images
+					Importer plus
 				</ButtonSecondary>
 				<ButtonSecondary onclick={async () => goto('/(app)/capture')}>
 					<IconCamera />

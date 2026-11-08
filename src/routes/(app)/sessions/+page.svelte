@@ -18,7 +18,7 @@
 	import { getSettings, isDebugMode } from '$lib/settings.svelte.js';
 	import { toasts } from '$lib/toasts.svelte.js';
 	import { uiState } from '$lib/uistate.svelte.js';
-	import { nonnull } from '$lib/utils.js';
+	import { nonnull, sum } from '$lib/utils.js';
 
 	import TopbarHome from '../TopbarHome.svelte';
 	import Cards from './Cards.svelte';
@@ -101,9 +101,14 @@
 						})}
 						thumbnails={async function* ({ id }) {
 							const images = await listByIndex('Image', 'sessionId', id);
+							const sounds = await listByIndex('Sound', 'sessionId', id);
 
 							const firstUniqueFileIds = [
-								...new Set(images.map((image) => image.fileId).filter(nonnull)),
+								...new Set(
+									[...images, ...sounds]
+										.map((image) => image.fileId)
+										.filter(nonnull)
+								),
 							].slice(0, 4);
 
 							for (const fileId of firstUniqueFileIds) {
@@ -119,14 +124,18 @@
 					>
 						{#snippet subtitle({ id, createdAt })}
 							<LoadingText
-								mask="# images"
-								value={async () =>
-									listByIndex('Image', 'sessionId', id).then(
-										(images) => images.length
-									)}
+								mask="# médias"
+								value={async () => {
+									return sum(
+										await Promise.all([
+											countByIndex('Image', 'sessionId', id),
+											countByIndex('Sound', 'sessionId', id),
+										])
+									);
+								}}
 							>
 								{#snippet loaded(count)}
-									{plural(count, ['# image', '# images'])}
+									{plural(count, ['# média', '# médias'])}
 								{/snippet}
 							</LoadingText>
 							· <Datetime parts="date" show="absolute" value={createdAt} />

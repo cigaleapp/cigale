@@ -26,7 +26,6 @@
 			).entries(),
 		].map(([fileId, images]) => ({
 			id: fileId,
-			isAudio: Boolean(idb.tables.AudioFile.getFromState(fileId)),
 			sessionId: images[0].sessionId,
 			addedAt: new Date(avg(images.map((i) => i.addedAt.getTime()))),
 			name: images[0].filename,
@@ -39,7 +38,10 @@
 					options: {},
 				}
 			),
-			data: images,
+			data: {
+				images,
+				isAudio: images.some((image) => image._table === 'Sound'),
+			},
 		}))
 	);
 
@@ -66,14 +68,14 @@
 
 <main class="observations" in:fade={{ duration: 100 }}>
 	<AreaObservations {items} zone="crop">
-		{#snippet item(images, { id: fileId })}
+		{#snippet item({ images, isAudio }, { id: fileId })}
 			<CardImageFile
 				{fileId}
 				{images}
 				boxes="show-all"
 				highlighted={fileId === uiState.imagePreviouslyOpenedInCropper}
 				loadingStatusText="Analyse…"
-				type={images.some((i) => i.isAudio) ? 'audio/x-unknown' : 'image/x-unknown'}
+				type={isAudio ? 'audio/x-unknown' : 'image/x-unknown'}
 				onretry={() => {
 					uiState.erroredImages.delete(fileId);
 					detectMore([fileId]);

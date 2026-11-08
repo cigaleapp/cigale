@@ -408,7 +408,6 @@ export async function countByIndex(tableName, indexName, keyRange = undefined) {
 		{ Index: indexName, 'Key range': displayKeyRange(keyRange) },
 		async () => {
 			const db = await openDatabase();
-			const validator = Tables[tableName];
 			// @ts-ignore
 			return await db.countFromIndex(
 				tableName,

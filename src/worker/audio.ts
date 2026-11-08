@@ -1,17 +1,32 @@
 import { FLAC, Input, MP3, OGG, WAVE, WEBM } from 'mediabunny';
 
+import { generateSpectrogram } from '$lib/audio/spectrogram.js';
 import { processSidecars } from '$lib/sidecars.js';
 import { binaryStorage } from '$lib/storage/index.js';
 import { createBytes, locateFileOfObject } from '$lib/storage/utils.js';
 import { throwError } from '$lib/utils.js';
 import { openDatabase, swarp } from '$worker';
 
-swarp.importAudioFile(async ({ file, sessionId, id: fileId, sidecars }) => {
+const PREVIEW_SPECTROGRAM_MAX_WIDTH = 1024;
+
+swarp.importAudioFile(async ({ file, sessionId, id: fileId, sidecars, decoded }) => {
+	const bytes = await file.arrayBuffer();
+
+	const spectrogramFull = await generateSpectrogram(decoded);
+	const spectrogramPreview = await generateSpectrogram(decoded, {
+		height: PREVIEW_SPECTROGRAM_MAX_WIDTH / (4 / 3),
+		width: PREVIEW_SPECTROGRAM_MAX_WIDTH,
+	});
+
 	const storedFile = await createBytes('AudioFile', {
 		filename: file.name,
 		sessionId,
-		bytes: await file.arrayBuffer(),
+		bytes,
 		type: file.type,
+		images: {
+			full: spectrogramFull,
+			preview: spectrogramPreview,
+		},
 	});
 
 	const locator = locateFileOfObject('AudioFile', storedFile);
@@ -54,5 +69,9 @@ swarp.importAudioFile(async ({ file, sessionId, id: fileId, sidecars }) => {
 
 	input.dispose();
 
-	return { id: fileId, filename: storedFile.filename };
+	return {
+		id: fileId,
+		filename: storedFile.filename,
+		spectrogramUrl: URL.createObjectURL(spectrogramPreview),
+	};
 });

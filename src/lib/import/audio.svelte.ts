@@ -1,6 +1,7 @@
 import type { PROCEDURES } from '$worker/procedures.js';
 import type { SwarpcClient } from 'swarpc';
 
+import { decodeToMono } from '$lib/audio/spectrogram.js';
 import { tables } from '$lib/idb.svelte.js';
 import { imageId } from '$lib/images.js';
 import { uiState } from '$lib/uistate.svelte.js';
@@ -39,12 +40,23 @@ export async function processAudioFile(
 		throw new Error('Aucune session active');
 	}
 
-	const { filename } = await swarpc.importAudioFile({
+	console.time('get bytes');
+	const bytes = await file.arrayBuffer();
+	console.timeEnd('get bytes');
+
+	console.time('decoding audio');
+	const decoded = await decodeToMono(bytes);
+	console.timeEnd('decoding audio');
+
+	const { filename, spectrogramUrl } = await swarpc.importAudioFile({
 		id,
 		file,
 		sidecars,
 		sessionId: uiState.currentSession.id,
+		decoded: decoded,
 	});
+
+	uiState.setPreviewURL(id, spectrogramUrl);
 
 	await tables.Sound.set({
 		id: imageId(id, 1),
