@@ -137,15 +137,26 @@
 		uiState.selection
 			.flatMap((id) => {
 				// Try assuming id === image
-				const image = tables.Image.state.find((i) => [i.fileId, i.id].includes(id));
+				const image = [...tables.Image.state, ...tables.Sound.state].find((img) =>
+					[img.id, img.fileId].includes(id)
+				);
+
 				if (image) return [image];
+
 				// Otherwise, get every observation's image
-				return tables.Observation.state
-					.find((i) => i.id === id)
-					?.images.map((i) => tables.Image.state.find((img) => img.id === i))
-					.filter((img) => img !== undefined);
+				const obs = tables.Observation.state.find((i) => i.id === id);
+				if (!obs) return undefined;
+
+				return [
+					...obs.images
+						.map((i) => tables.Image.getFromState(i))
+						.filter((img) => img !== undefined),
+					...obs.sounds
+						.map((i) => tables.Sound.getFromState(i))
+						.filter((snd) => snd !== undefined),
+				];
 			})
-			.filter((img) => img !== undefined)
+			.filter((media) => media !== undefined)
 	);
 
 	const selectedObservations = $derived(
@@ -160,6 +171,8 @@
 				if (!image.fileId) return undefined;
 				const src = uiState.getPreviewURL(image.fileId);
 				if (!src) return undefined;
+				if (image._table === 'Audio') return { id: image.id, src };
+
 				const box = uiState.cropMetadataValueOf(image)?.value;
 				return {
 					src,

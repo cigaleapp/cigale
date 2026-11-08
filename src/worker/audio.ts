@@ -7,7 +7,7 @@ import { createBytes, locateFileOfObject } from '$lib/storage/utils.js';
 import { throwError } from '$lib/utils.js';
 import { openDatabase, swarp } from '$worker';
 
-const PREVIEW_SPECTROGRAM_MAX_WIDTH = 1024;
+const PREVIEW_SPECTROGRAM_MAX_WIDTH = 512;
 
 swarp.importAudioFile(async ({ file, sessionId, id: fileId, sidecars, decoded }) => {
 	const bytes = await file.arrayBuffer();

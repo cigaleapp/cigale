@@ -15,6 +15,7 @@
 	import IconImage from '~icons/ri/image-2-line';
 	import IconMerge from '~icons/ri/shadow-line';
 	import IconImport from '~icons/ri/upload-2-line';
+	import IconSound from '~icons/ri/volume-up-line';
 	import { page } from '$app/state';
 	import BottomDrawer from '$lib/BottomDrawer.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
@@ -37,7 +38,7 @@
 			src: string;
 			box?: undefined | TopLeftBoundingBox;
 			id: string;
-			dimensions: { width: number; height: number };
+			dimensions?: { width: number; height: number };
 		}>;
 		/** callback to call when the user wants to merge images or observations into a single one. If not set, the merge button is not shown. */
 		onmerge: (() => void) | undefined;
@@ -102,13 +103,17 @@
 
 	const singleImageSelected = $derived(
 		uiState.selection.length === 1
-			? tables.Image.state.find((img) => [img.id, img.fileId].includes(uiState.selection[0]))
+			? [...tables.Image.state, ...tables.Sound.state].find((img) =>
+					[img.id, img.fileId].includes(uiState.selection[0])
+				)
 			: undefined
 	);
 
 	const selectionCounts = $derived({
 		image: uiState.selection.filter((id) =>
-			tables.Image.state.some((img) => [img.id, img.fileId].includes(id))
+			[...tables.Image.state, ...tables.Sound.state].some((img) =>
+				[img.id, img.fileId].includes(id)
+			)
 		).length,
 		observation: uiState.selection.filter((id) =>
 			tables.Observation.state.some((obs) => obs.id === id)
@@ -149,8 +154,11 @@
 				? `Image ${i + 1} de l'observation ${singleObservationSelected.label}`
 				: `Image ${i + 1} de la sélection`}
 
-			<div class="image" style:aspect-ratio={applyBox(dimensions, box).join(' / ')}>
-				{#if box}
+			<div
+				class="image"
+				style:aspect-ratio={dimensions ? applyBox(dimensions, box).join(' / ') : undefined}
+			>
+				{#if box && dimensions}
 					<CroppedImg blurfill {src} {alt} {box} {dimensions} />
 				{:else}
 					<img {src} {alt} />
@@ -177,7 +185,11 @@
 					}}
 				/>
 			{:else if singleImageSelected}
-				<IconImage />
+				{#if singleImageSelected._table === 'Sound'}
+					<IconSound />
+				{:else}
+					<IconImage />
+				{/if}
 				<OverflowableText text={singleImageSelected.filename} />
 			{:else if selectionCounts.image > 0 && selectionCounts.observation > 0}
 				{plural(selectionCounts.all, ['1 élément', '# éléments'])}
@@ -371,6 +383,15 @@
 		height: 50px;
 		border-radius: var(--corner-radius);
 		overflow: hidden;
+
+		&:has(img) {
+			width: 50px;
+		}
+
+		img {
+			object-fit: cover;
+			height: 100%;
+		}
 	}
 
 	.actions {
