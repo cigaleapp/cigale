@@ -9,7 +9,7 @@ import { tables } from './idb.svelte.js';
 import { imageLimits } from './inference_utils.js';
 import { removeFromObservation } from './observations.js';
 import { RAW_IMAGE_MEDIA_TYPES } from './raw.js';
-import { accessBytes, createBytes } from './storage/utils.js';
+import { accessBytes, accessImage, createBytes } from './storage/utils.js';
 import { clamp, throwError } from './utils.js';
 
 /**
@@ -237,7 +237,7 @@ export async function deleteImageOrAudioFile(id, tx, notFoundOk = true) {
 	}
 }
 
-// TODO: increase perf: this function calls deleteImageOrAudioFile, which in turn lists itself all images/sounds of the file to clean up, theres surely a simpler way to do all of this. 
+// TODO: increase perf: this function calls deleteImageOrAudioFile, which in turn lists itself all images/sounds of the file to clean up, theres surely a simpler way to do all of this.
 
 /**
  * Delete an image and clean up dangling image files afterwards
@@ -387,11 +387,21 @@ export async function storeImageBytes({
  */
 export async function loadPreviewImage(id, scope = 'session') {
 	const file = await db.get('ImagePreviewFile', id);
-	if (!file) return;
-	console.debug(`loading preview image ${id}`, file);
-	const bytes = await accessBytes('ImagePreviewFile', file);
-	const blob = new Blob([bytes], { type: file.contentType });
-	uiState.setPreviewURL(id, URL.createObjectURL(blob), scope === 'global');
+	if (file) {
+		console.debug(`loading preview image ${id}`, file);
+		const bytes = await accessBytes('ImagePreviewFile', file);
+		const blob = new Blob([bytes], { type: file.contentType });
+		uiState.setPreviewURL(id, URL.createObjectURL(blob), scope === 'global');
+		return;
+	} else {
+		const file = await db.get('AudioFile', id);
+		if (!file) return;
+		console.log('loading preview img for ', file);
+		const bytes = await accessImage('AudioFile', file, 'preview');
+		console.log('loading preview img bytes is ', bytes);
+		const blob = new Blob([bytes], { type: 'image/png' });
+		uiState.setPreviewURL(id, URL.createObjectURL(blob), scope === 'global');
+	}
 }
 
 // ATTENTION: Changer aussi dans la validation des définitions de protocoles (Ctrl-F pour 1024 dans tout le projet pour être sûr·e de rien louper) si jamais on change ça

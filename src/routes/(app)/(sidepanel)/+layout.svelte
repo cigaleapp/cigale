@@ -6,7 +6,7 @@
 	import { promptForFiles } from '$lib/files';
 	import * as db from '$lib/idb.svelte';
 	import { openTransaction, tables } from '$lib/idb.svelte';
-	import { deleteImageOrSound, deleteImageOrAudioFile, imageFileId } from '$lib/images';
+	import { deleteImageOrAudioFile, deleteImageOrSound, imageFileId } from '$lib/images';
 	import { ACCEPTED_IMPORT_TYPES } from '$lib/import/index.js';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import {
@@ -128,7 +128,8 @@
 	let showSidePanel = $derived(
 		uiState.processing.files.length +
 			tables.Observation.state.length +
-			tables.Image.state.length >
+			tables.Image.state.length +
+			tables.Sound.state.length >
 			0
 	);
 

@@ -65,13 +65,20 @@ export const PROCEDURES = {
 			id: ID,
 			sessionId: 'string',
 			file: 'File',
-			sidecars: 'File[]'
+			sidecars: 'File[]',
+			/** Used to create the spectrogram image. */
+			decoded: {
+				samples: ['instanceof', Float32Array],
+				sampleRate: 'number',
+			},
 		}),
 		progress: type(['number', 'number']),
 		success: type({
 			id: ID,
-			filename: 'string'
-		})
+			filename: 'string',
+			/** A blob URL */
+			spectrogramUrl: 'string'
+		}),
 	},
 	classify: {
 		input: type({

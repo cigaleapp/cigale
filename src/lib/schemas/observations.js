@@ -5,6 +5,7 @@ import { MetadataErrors, MetadataValues } from './metadata.js';
 
 export const Image = type({
 	id: /\w+(_\d+)*/,
+	_table: '"Image" = "Image"',
 	filename: 'string',
 	addedAt: 'string.date.iso.parse',
 	dimensions: ImageDimensions,
@@ -21,6 +22,8 @@ export const Image = type({
 });
 
 export const Sound = type({
+	// TODO: make this automatic ?
+	_table: '"Sound" = "Sound"',
 	id: /\w+_(\d+)*/,
 	filename: 'string',
 	addedAt: 'string.date.iso.parse',

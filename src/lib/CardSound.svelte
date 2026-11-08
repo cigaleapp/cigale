@@ -32,7 +32,7 @@
 	title={sound.filename}
 	type="audio/x-unknown"
 	// TODO: spectrogram of the audio file
-	image={undefined}
+	image={uiState.getPreviewURL(sound.fileId)}
 	dimensions={undefined}
 	selected={uiState.selection.includes(sound.id)}
 	boundingBoxes={[]}
