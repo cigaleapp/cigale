@@ -101,9 +101,12 @@ const MetadataValueFile = table(
 
 const Image = table(['id', 'addedAt', 'sessionId', 'fileId'], ImageSchema);
 
-const Sound = table(['id', 'addedAt', 'sessionId', 'fileId']);
+const Sound = table(['id', 'addedAt', 'sessionId', 'fileId'], SoundSchema);
 
-const Observation = table(['id', 'addedAt', 'sessionId', 'images[]'], ObservationSchema);
+const Observation = table(
+	['id', 'addedAt', 'sessionId', 'images[]', 'sounds[]'],
+	ObservationSchema
+);
 
 const Session = table(['id', 'remoteId'], SessionSchema);
 
@@ -545,4 +548,14 @@ export const idComparator = (a, b) => {
 /**
  * @typedef BeamupCorrection
  * @type {typeof BeamupCorrection.infer}
+ */
+
+/**
+ * @typedef Sound
+ * @type {typeof Sound.infer}
+ */
+
+/**
+ * @typedef AudioFile
+ * @type {typeof AudioFile.infer}
  */

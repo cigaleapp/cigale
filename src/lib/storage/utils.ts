@@ -76,7 +76,7 @@ export async function createBytes<Table extends BinaryTableName>(
 		type: string;
 	}
 ): Promise<CreateBytesObjectFields<Table> & { bytes: 'migrated'; size: number }> {
-	const locator = locateFileOfObject(input);
+	const locator = locateFileOfObject(table, input);
 
 	const size = input.bytes.byteLength;
 

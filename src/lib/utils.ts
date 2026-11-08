@@ -841,6 +841,7 @@ if (import.meta.vitest) {
 	});
 }
 
+
 export function isZip(
 	contentType: string
 ): contentType is 'application/zip' | 'application/x-zip-compressed' | 'application/x-zip' {

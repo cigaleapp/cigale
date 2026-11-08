@@ -8,7 +8,7 @@
 		set: (props: { status?: Status; loadingStatusText?: string }) => void
 	) => Promise<void>;
 
-	type Props = {
+	export interface Props {
 		onclick?: EventHandler;
 		onstacksizeclick?: EventHandler;
 		ondoubleclick?: EventHandler;
@@ -22,6 +22,8 @@
 		stacksize?: number;
 		/**image url */
 		image: string | undefined;
+		/** content type */
+		type?: string;
 		/** status of the image processing */
 		status: Status;
 		/** text to show when status is not `"ok"` */
@@ -34,12 +36,12 @@
 		/** whether this image is highlighted. selected implies highlighted. */
 		highlighted: boolean;
 		/** original dimensions of the image */
-		dimensions: { width: number; height: number | undefined };
+		dimensions?: { width: number; height: number | undefined };
 		/**  what to do with the images' bounding boxes. Either display them all, or crop to the first one. */
 		boxes: 'show-all' | 'apply-first' | 'none';
 		/** array of bounding boxes. Values are between 0 and 1 (relative to the width/height of the image) */
 		boundingBoxes: TopLeftBoundingBox[];
-	};
+	}
 </script>
 
 <script lang="ts">
@@ -48,6 +50,7 @@
 	import IconRetry from '~icons/ri/arrow-go-back-fill';
 	import IconDelete from '~icons/ri/delete-bin-line';
 	import IconImage from '~icons/ri/image-2-line';
+	import IconAudio from '~icons/ri/volume-up-line';
 
 	import AnimatableCheckmark from './AnimatableCheckmark.svelte';
 	import ButtonInk from './ButtonInk.svelte';
@@ -81,8 +84,11 @@
 		boxes,
 		tooltip: tooltipText,
 		id,
+		type = 'image/x-unknown',
 		...rest
 	}: Props & Omit<Record<string, unknown>, keyof Props> = $props();
+
+	const isAudio = $derived(type.startsWith('audio/'));
 
 	const handlers = $derived({
 		onclick,
@@ -221,7 +227,7 @@
 				{/if}
 				<div class="boundingboxes-wrapper" class:has-boxes={boxes === 'show-all'}>
 					{#if image}
-						{#if boxes === 'apply-first' && boundingBoxes.length > 0 && dimensions}
+						{#if boxes === 'apply-first' && boundingBoxes.length > 0 && dimensions?.height}
 							<CroppedImg
 								blurfill
 								{dimensions}
@@ -235,7 +241,11 @@
 						{/if}
 					{:else}
 						<div class="img-placeholder">
-							<IconImage />
+							{#if isAudio}
+								<IconAudio />
+							{:else}
+								<IconImage />
+							{/if}
 						</div>
 					{/if}
 					{#if boxes === 'show-all'}

@@ -6,7 +6,7 @@
 	import { promptForFiles } from '$lib/files';
 	import * as db from '$lib/idb.svelte';
 	import { openTransaction, tables } from '$lib/idb.svelte';
-	import { deleteImage, deleteImageFile, imageFileId } from '$lib/images';
+	import { deleteImageOrSound, deleteImageOrAudioFile, imageFileId } from '$lib/images';
 	import { ACCEPTED_IMPORT_TYPES } from '$lib/import/index.js';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import {
@@ -73,8 +73,8 @@
 				for (const id of uiState.selection) {
 					cancelTask(id, 'Cancelled by user');
 					await deleteObservation(id, { tx, notFoundOk: true, recursive: true });
-					await deleteImageFile(id, tx, true);
-					await deleteImage(id, tx, true);
+					await deleteImageOrAudioFile(id, tx, true);
+					await deleteImageOrSound(id, tx, true);
 				}
 			}
 		);

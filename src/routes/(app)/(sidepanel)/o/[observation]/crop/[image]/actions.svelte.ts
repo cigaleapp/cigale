@@ -15,7 +15,7 @@ import {
 } from '$lib/BoundingBoxes.svelte.js';
 import * as idb from '$lib/idb.svelte.js';
 import {
-	deleteImageFile,
+	deleteImageOrAudioFile,
 	imageIdToFileId,
 	imageId as makeImageId,
 	parseImageId,
@@ -272,7 +272,7 @@ export async function deleteImageFileAndGotoNext() {
 	if (!fileId) return;
 
 	const nextFileIdBeforeDelete = $state.snapshot(adjacentFileIds().nextFileId);
-	await deleteImageFile(fileId);
+	await deleteImageOrAudioFile(fileId);
 
 	if (nextFileIdBeforeDelete) {
 		await goToFile(nextFileIdBeforeDelete);

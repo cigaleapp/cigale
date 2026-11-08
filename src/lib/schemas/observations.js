@@ -4,7 +4,7 @@ import { AudioDimensions, ID, ImageDimensions, MIMEType, References, URLString }
 import { MetadataErrors, MetadataValues } from './metadata.js';
 
 export const Image = type({
-	id: /\d+(_\d+)*/,
+	id: /\w+(_\d+)*/,
 	filename: 'string',
 	addedAt: 'string.date.iso.parse',
 	dimensions: ImageDimensions,
@@ -21,7 +21,7 @@ export const Image = type({
 });
 
 export const Sound = type({
-	id: /\d+_(\d+)*/,
+	id: /\w+_(\d+)*/,
 	filename: 'string',
 	addedAt: 'string.date.iso.parse',
 	metadata: MetadataValues,

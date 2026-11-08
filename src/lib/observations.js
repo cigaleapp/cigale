@@ -2,7 +2,7 @@ import { generateId } from '$lib/database.js';
 
 import * as db from './idb.svelte.js';
 import { tables } from './idb.svelte.js';
-import { deleteImage } from './images.js';
+import { deleteImageOrSound } from './images.js';
 import {
 	mergeMetadataFromImagesAndObservations,
 	serializeMetadataFullValue,
@@ -92,7 +92,7 @@ export async function deleteObservation(
 			if (recursive) {
 				console.debug(`Deleting images of observation ${id}: `, observation.images);
 				for (const imageId of observation.images) {
-					await deleteImage(imageId, tx, notFoundOk);
+					await deleteImageOrSound(imageId, tx, notFoundOk);
 				}
 			}
 
@@ -105,12 +105,14 @@ export async function deleteObservation(
  *  If removing images causes the observation to be empty, it is deleted
  * @param {object} options
  * @param {string} options.observation observation ID
- * @param {string[]} options.images image IDs to remove from the observation
+ * @param {string[]} [options.images] image IDs to remove from the observation
+ * @param {string[]} [options.sounds] sound IDs to remove from the observation
  * @param {import('./idb.svelte.js').IDBTransactionWithAtLeast<["Observation"]>} [options.tx] re-use an ongoing transaction
  */
-export async function removeImagesFromObservation({
+export async function removeFromObservation({
 	observation: observationId,
 	images: imageIds,
+	sounds: soundIds,
 	tx,
 }) {
 	await db.openTransaction(
@@ -119,18 +121,22 @@ export async function removeImagesFromObservation({
 		async (tx) => {
 			const observation = await tx.objectStore('Observation').get(observationId);
 			if (!observation) throw new Error(`Observation ${observationId} not found`);
-			const remaining = observation.images.filter((id) => !imageIds.includes(id));
+			const remainingImages = observation.images.filter((id) => !imageIds?.includes(id));
+			const remainingSounds = observation.images.filter((id) => !soundIds?.includes(id));
 
-			if (remaining.length === 0) {
+			if (remainingImages.length === 0 && remainingSounds.length === 0) {
 				console.debug(
 					`Removing ${imageIds} from ${observationId}: observation would be empty, deleting it`
 				);
 				await tx.objectStore('Observation').delete(observationId);
 			} else {
-				console.debug(`Removing ${imageIds} from ${observationId}: ${remaining} remains`);
+				console.debug(
+					`Removing ${imageIds} from ${observationId}: ${remainingImages} remains`
+				);
 				await tx.objectStore('Observation').put({
 					...observation,
-					images: remaining,
+					images: remainingImages,
+					sounds: remainingSounds,
 				});
 			}
 		}

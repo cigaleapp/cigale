@@ -7,7 +7,7 @@ import { errorMessage, humanFormatName } from './i18n.js';
 import * as db from './idb.svelte.js';
 import { tables } from './idb.svelte.js';
 import { imageLimits } from './inference_utils.js';
-import { removeImagesFromObservation } from './observations.js';
+import { removeFromObservation } from './observations.js';
 import { RAW_IMAGE_MEDIA_TYPES } from './raw.js';
 import { accessBytes, createBytes } from './storage/utils.js';
 import { clamp, throwError } from './utils.js';
@@ -167,16 +167,22 @@ export function imageBufferWasSaved(image) {
  * @param {IDBTransactionWithAtLeast<["Image", "ImageFile", "ImagePreviewFile"]>} [tx]
  * @param {boolean} [notFoundOk=true]
  */
-export async function deleteImageFile(id, tx, notFoundOk = true) {
+export async function deleteImageOrAudioFile(id, tx, notFoundOk = true) {
 	await db.openTransaction(
-		['Image', 'ImageFile', 'ImagePreviewFile', 'Observation'],
+		['Image', 'Sound', 'ImageFile', 'AudioFile', 'ImagePreviewFile', 'Observation'],
 		{ tx, session: uiState.currentSession?.id },
 		async (tx) => {
 			try {
 				const imagesOfFile = await tx.objectStore('Image').index('fileId').getAll(id);
+				const soundsOfFile = await tx.objectStore('Sound').index('fileId').getAll(id);
 
-				tx.objectStore('ImageFile').delete(id);
-				tx.objectStore('ImagePreviewFile').delete(id);
+				try {
+					tx.objectStore('ImageFile').delete(id);
+					tx.objectStore('ImagePreviewFile').delete(id);
+					tx.objectStore('AudioFile').delete(id);
+				} catch {
+					// ok
+				}
 
 				for (const image of imagesOfFile) {
 					tx.objectStore('Image').delete(image.id);
@@ -187,10 +193,27 @@ export async function deleteImageFile(id, tx, notFoundOk = true) {
 						.getAll(image.id);
 
 					for (const obs of observations) {
-						await removeImagesFromObservation({
+						await removeFromObservation({
 							tx,
 							observation: obs.id,
 							images: [image.id],
+						});
+					}
+				}
+
+				for (const sound of soundsOfFile) {
+					tx.objectStore('Sound').delete(sound.id);
+
+					const observations = await tx
+						.objectStore('Observation')
+						.index('sounds')
+						.getAll(sound.id);
+
+					for (const obs of observations) {
+						await removeFromObservation({
+							tx,
+							observation: obs.id,
+							sounds: [sound.id],
 						});
 					}
 				}
@@ -214,22 +237,37 @@ export async function deleteImageFile(id, tx, notFoundOk = true) {
 	}
 }
 
+// TODO: increase perf: this function calls deleteImageOrAudioFile, which in turn lists itself all images/sounds of the file to clean up, theres surely a simpler way to do all of this. 
+
 /**
  * Delete an image and clean up dangling image files afterwards
  * @param {string} id Image ID
  * @param {IDBTransactionWithAtLeast<["Image", "ImageFile", "ImagePreviewFile"]>} [tx]
  * @param {boolean} [notFoundOk=true]
  */
-export async function deleteImage(id, tx, notFoundOk = true) {
+export async function deleteImageOrSound(id, tx, notFoundOk = true) {
 	await db.openTransaction(
-		['Image', 'ImageFile', 'ImagePreviewFile', 'Observation'],
+		['Image', 'ImageFile', 'ImagePreviewFile', 'Observation', 'Sound', 'AudioFile'],
 		{ tx, session: uiState.currentSessionId },
 		async (tx) => {
 			try {
-				await tx.objectStore('Image').delete(id);
+				await tx
+					.objectStore('Image')
+					.delete(id)
+					.catch(() => {});
+
+				await tx
+					.objectStore('Sound')
+					.delete(id)
+					.catch(() => {});
 
 				const otherImages = await tx
 					.objectStore('Image')
+					.index('fileId')
+					.count(imageIdToFileId(id));
+
+				const otherSounds = await tx
+					.objectStore('Sound')
 					.index('fileId')
 					.count(imageIdToFileId(id));
 
@@ -237,16 +275,39 @@ export async function deleteImage(id, tx, notFoundOk = true) {
 					console.debug(
 						`Deleting image ${id}: image file ${imageIdToFileId(id)} is now empty, deleting it too`
 					);
-					await deleteImageFile(imageIdToFileId(id), tx, notFoundOk);
+					await deleteImageOrAudioFile(imageIdToFileId(id), tx, notFoundOk);
 				}
 
-				const observations = await tx.objectStore('Observation').index('images').getAll(id);
+				if (otherSounds === 0) {
+					console.debug(
+						`Deleting sound ${id}: audio file ${imageIdToFileId(id)} is now empty, deleting it too`
+					);
+					await deleteImageOrAudioFile(imageIdToFileId(id), tx, notFoundOk);
+				}
 
-				for (const observation of observations) {
-					await removeImagesFromObservation({
+				const imageObservations = await tx
+					.objectStore('Observation')
+					.index('images')
+					.getAll(id);
+
+				for (const observation of imageObservations) {
+					await removeFromObservation({
 						tx,
 						observation: observation.id,
 						images: [id],
+					});
+				}
+
+				const soundObservations = await tx
+					.objectStore('Observation')
+					.index('sounds')
+					.getAll(id);
+
+				for (const observation of soundObservations) {
+					await removeFromObservation({
+						tx,
+						observation: observation.id,
+						sounds: [id],
 					});
 				}
 			} catch (e) {
