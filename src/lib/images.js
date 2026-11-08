@@ -12,6 +12,7 @@ import { RAW_IMAGE_MEDIA_TYPES } from './raw.js';
 import { accessBytes, accessImage, createBytes } from './storage/utils.js';
 import { clamp, throwError } from './utils.js';
 
+
 /**
  * @import { Image, Protocol } from './database.js';
  * @import { IDBTransactionWithAtLeast } from './idb.svelte';

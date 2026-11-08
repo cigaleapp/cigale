@@ -43,7 +43,7 @@
 
 	let { progress = 0, eta = Infinity, progressbarOnly = false }: Props = $props();
 
-	const hasImages = $derived(tables.Image.state.length > 0);
+	const hasImages = $derived(tables.Image.state.length + tables.Sound.state.length > 0);
 	const hasImagesWithCrops = $derived(
 		tables.Image.state.some((image) => uiState.cropMetadataValueOf(image))
 	);
