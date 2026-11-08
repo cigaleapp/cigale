@@ -1,3 +1,16 @@
+diff --git a/dist/adapter-vanilla/transformer.js b/dist/adapter-vanilla/transformer.js
+index 19ab969096150c4b568670360305d7bb4c8da599..8613af7e6a2dbf6f392911535ef02d679bef2ef7 100644
+--- a/dist/adapter-vanilla/transformer.js
++++ b/dist/adapter-vanilla/transformer.js
+@@ -760,7 +760,7 @@ export class Transformer extends InertVisitors {
+         const initRtTop = this.initRuntime();
+         const start = bodyStart ?? node.start;
+         this.programBodyStart.set(node, start);
+-        if (hasBare && initRtTop) {
++        if (txts.length > 0 && initRtTop) {
+             this.initRuntimeInfo.push([initRtTop, start, null]);
+         }
+         return txts;
 diff --git a/dist/bundlers/vite.js b/dist/bundlers/vite.js
 index 909998e3d68b535c8645804f94df563ea10dc2c4..b69d887d3f69a537107a0f5bb00130d0e437506b 100644
 --- a/dist/bundlers/vite.js
