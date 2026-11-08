@@ -13,7 +13,7 @@
 	import CardImage from '$lib/CardImage.svelte';
 	import CardObservation from '$lib/CardObservation.svelte';
 	import { databaseHandle, tables } from '$lib/idb.svelte.js';
-	import { deleteImage, imageBufferWasSaved, imageIsClassified } from '$lib/images';
+	import { deleteImageOrSound, imageBufferWasSaved, imageIsClassified } from '$lib/images';
 	import { loadModel } from '$lib/inference.js';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
 	import Logo from '$lib/Logo.svelte';
@@ -289,7 +289,7 @@
 							const imageIds = tables.Observation.getFromState(id)?.images ?? [id];
 							imageIds.forEach((id) => cancelTask(id, 'Cancelled by user'));
 							await deleteObservation(id, { notFoundOk: true, recursive: true });
-							await deleteImage(id, undefined, true);
+							await deleteImageOrSound(id, undefined, true);
 						}}
 					/>
 				{:else if image}

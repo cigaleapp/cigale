@@ -16,7 +16,7 @@ import { safeJSONStringify } from './utils.js';
 export async function classifyImage(
 	swarpc: SwarpcClient<typeof PROCEDURES>,
 	id: string,
-	cancellers: Map<string, CancelablePromise['cancel']>
+	cancellers: undefined | Map<string, CancelablePromise['cancel']>
 ) {
 	if (!uiState.currentProtocol) {
 		throw new Error('Aucun protocole sélectionné');

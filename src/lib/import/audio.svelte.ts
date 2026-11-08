@@ -18,18 +18,19 @@ export const ACCEPTED_IMPORT_TYPES = [
 	'audio/flac',
 ];
 
-export async function processAudioFile({
-	swarpc,
-	file,
-	id,
-	sidecars,
-}: {
-	swarpc: SwarpcClient<typeof PROCEDURES>;
-	file: File;
-	/** New, free ImageFile id to use */
-	id: string;
-	sidecars: File[];
-}) {
+export async function processAudioFile(
+	swarpc: SwarpcClient<typeof PROCEDURES>,
+	{
+		file,
+		id,
+		sidecars,
+	}: {
+		file: File;
+		/** New, free ImageFile id to use */
+		id: string;
+		sidecars: File[];
+	}
+) {
 	if (!uiState.currentProtocol) {
 		throw new Error('Aucun protocole sélectionné');
 	}
@@ -53,4 +54,6 @@ export async function processAudioFile({
 		metadata: {},
 		sessionId: uiState.currentSession.id,
 	});
+
+	uiState.processing.removeFile(id);
 }

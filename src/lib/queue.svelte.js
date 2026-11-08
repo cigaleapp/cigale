@@ -9,6 +9,8 @@ import { isSidecar } from '$lib/sidecars.js';
 import { uiState } from '$lib/uistate.svelte.js';
 import { isZip, range } from '$lib/utils.js';
 
+import { processAudioFile } from './import/audio.svelte.js';
+
 /**
  * @type {undefined | ProcessingQueue}
  */
@@ -256,6 +258,8 @@ class ProcessingQueue {
 				const { file, id } = importing;
 				if (isZip(file.type)) {
 					await importResultsZip(file, id);
+				} else if (file.type.startsWith('audio/')) {
+					await processAudioFile(this.swarpc, importing);
 				} else {
 					await processImageFile(importing);
 				}

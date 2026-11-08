@@ -10,15 +10,16 @@
 	import Dropzone from '$lib/Dropzone.svelte';
 	import { promptForFiles } from '$lib/files';
 	import { tables } from '$lib/idb.svelte';
-	import { deleteImage } from '$lib/images';
+	import { deleteImageOrSound } from '$lib/images';
 	import { ACCEPTED_IMPORT_TYPES } from '$lib/import/index.js';
 	import Logo from '$lib/Logo.svelte';
 	import { goto } from '$lib/paths.js';
 	import { cancelTask, importMore } from '$lib/queue.svelte.js';
 	import { uiState } from '$lib/uistate.svelte.js';
 	import { unique } from '$lib/utils';
+	import CardSound from '$lib/CardSound.svelte';
 
-	const allImages = $derived([
+	const allFiles = $derived([
 		...unique(
 			tables.Image.state.map(({ filename, id, addedAt, fileId, sessionId, metadata }) => ({
 				id: fileId ?? id,
@@ -27,11 +28,25 @@
 				metadata,
 				name: filename,
 				virtual: false,
-				data: tables.Image.getFromState(id),
+				data: { image: tables.Image.getFromState(id), sound: undefined },
 			})),
 			// Since id can (and mostly is) fileId, we have to uniquify
 			// by the id because multiple Images can reference the same ImageFile
 			(image) => image.id
+		),
+		...unique(
+			tables.Sound.state.map(({ filename, id, addedAt, fileId, sessionId, metadata }) => ({
+				id: fileId ?? id,
+				addedAt,
+				sessionId,
+				metadata,
+				name: filename,
+				virtual: false,
+				data: { sound: tables.Sound.getFromState(id), image: undefined },
+			})),
+			// Since id can (and mostly is) fileId, we have to uniquify
+			// by the id because multiple Images can reference the same ImageFile
+			(sound) => sound.id
 		),
 		...uiState.processing.files.map(({ name, id, addedAt }) => ({
 			id,
@@ -40,11 +55,11 @@
 			name,
 			metadata: {},
 			virtual: true,
-			data: null,
+			data: { image: undefined, sound: undefined },
 		})),
 	]);
 
-	const empty = $derived(allImages.length === 0);
+	const empty = $derived(allFiles.length === 0);
 </script>
 
 <Dropzone
@@ -53,8 +68,8 @@
 	onfiles={({ files }) => importMore(files)}
 >
 	<main class="observations" class:empty in:fade={{ duration: 100 }}>
-		<AreaObservations items={allImages} zone="import">
-			{#snippet item(image, { id, name })}
+		<AreaObservations items={allFiles} zone="import">
+			{#snippet item({ image, sound }, { id, name })}
 				{#if image}
 					<CardImage
 						boxes="none"
@@ -62,7 +77,16 @@
 						ondelete={async () => {
 							cancelTask(id, 'Cancelled by user');
 							uiState.processing.removeFile(id);
-							await deleteImage(id);
+							await deleteImageOrSound(id);
+						}}
+					/>
+				{:else if sound}
+					<CardSound
+						{sound}
+						ondelete={async () => {
+							cancelTask(id, 'Canceled by user');
+							uiState.processing.removeFile(id);
+							await deleteImageOrSound(id);
 						}}
 					/>
 				{:else}
