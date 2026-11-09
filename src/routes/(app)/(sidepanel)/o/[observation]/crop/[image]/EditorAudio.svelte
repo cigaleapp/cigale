@@ -71,18 +71,14 @@
 </script>
 
 <div class="editor">
-	<div class="playhead" style:--position-percentage="{playhead.positionNormalized * 100}%" />
+	<!-- <div class="playhead" style:--position-percentage="{playhead.positionNormalized * 100}%" /> -->
 
 	<div class="minimap">
-		{#if decodedAudio}
-			<Waveform minimap decoded={decodedAudio} />
-		{/if}
+		<Waveform minimap decoded={decodedAudio} />
 	</div>
 
 	<div class="waveform">
-		{#if decodedAudio}
-			<Waveform decoded={decodedAudio} />
-		{/if}
+		<Waveform decoded={decodedAudio} />
 	</div>
 
 	<div
@@ -104,13 +100,13 @@
 		{/if}
 	</div>
 
-	{#if audioSrc}
+	<div class="player">
 		<AudioPlayer
 			bind:playhead={playhead.position}
 			src={audioSrc}
 			bind:loading={loading.audio}
 		/>
-	{/if}
+	</div>
 </div>
 
 <style>
@@ -119,17 +115,18 @@
 		display: grid;
 		border-right: 1px solid var(--faint);
 		row-rule: 1px solid var(--faint);
-		grid-template-rows: max-content 3fr 3fr max-content;
+		grid-template-rows: max-content 3fr 5fr max-content;
 	}
 
-	.waveform, .minimap {
+	.waveform,
+	.minimap {
 		display: flex;
 		align-items: center;
 	}
 
 	.spectrogram {
-		margin-top: auto;
-		/* flex: 1 1; */
+		/* margin-top: auto; */
+		flex: 1 1;
 		/** Match with spectrogram background */
 		/* background: black; */
 	}

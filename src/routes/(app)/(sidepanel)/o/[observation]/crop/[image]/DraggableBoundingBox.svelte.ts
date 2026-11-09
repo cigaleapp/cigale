@@ -10,7 +10,7 @@ import { clamp, sign } from '$lib/utils.js';
  * You can also provide the zoom state to take it into account.
  */
 export function fittedImageRect(
-	mode: 'contain' | 'cover',
+	mode: 'contain' | 'cover' | 'fill',
 	{
 		naturalWidth,
 		naturalHeight,
@@ -35,8 +35,8 @@ export function fittedImageRect(
 					: [clientWidth, clientWidth / naturalRatio];
 
 			if (zoom) {
-				width *= zoom.scale;
-				height *= zoom.scale;
+				if (zoom.zoomlock !== 'x') width *= zoom.scale;
+				if (zoom.zoomlock !== 'y') height *= zoom.scale;
 			}
 
 			return {
@@ -54,8 +54,8 @@ export function fittedImageRect(
 					: [clientWidth, clientWidth / naturalRatio];
 
 			if (zoom) {
-				width *= zoom.scale;
-				height *= zoom.scale;
+				if (zoom.zoomlock !== 'x') width *= zoom.scale;
+				if (zoom.zoomlock !== 'y') height *= zoom.scale;
 			}
 
 			return {
@@ -63,6 +63,22 @@ export function fittedImageRect(
 				height,
 				x: (zoom?.origin.x ?? 0) + clientLeft + (clientWidth - width) / 2,
 				y: (zoom?.origin.y ?? 0) + clientTop + (clientHeight - height) / 2,
+			};
+		}
+
+		case 'fill': {
+			let [width, height] = [clientWidth, clientHeight];
+
+			if (zoom) {
+				if (zoom.zoomlock !== 'x') width *= zoom.scale;
+				if (zoom.zoomlock !== 'y') height *= zoom.scale;
+			}
+
+			return {
+				width,
+				height,
+				x: (zoom?.origin.x ?? 0) + clientLeft,
+				y: (zoom?.origin.y ?? 0) + clientTop,
 			};
 		}
 	}

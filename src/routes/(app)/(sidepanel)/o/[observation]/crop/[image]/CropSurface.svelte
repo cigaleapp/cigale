@@ -3,7 +3,6 @@
 
 	import { toTopLeftCoords } from '$lib/BoundingBoxes.svelte.js';
 	import { Gestures } from '$lib/touch/gestures.svelte.js';
-	import { uiState } from '$lib/uistate.svelte.js';
 	import { mapValues, overrideStyle, pick } from '$lib/utils.js';
 
 	import {
@@ -24,7 +23,8 @@
 		fileId: string;
 		/** Image source */
 		imageSrc: string | undefined;
-		fit: 'contain' | 'cover';
+		fit: 'contain' | 'cover' | 'fill';
+		zoomlock?: 'x' | 'y';
 	}
 
 	let {
@@ -34,9 +34,13 @@
 		fileId,
 		imageSrc,
 		fit: subjectFitMode,
+		zoomlock,
 	}: Props = $props();
 
-	$inspect('z', zoom.scale)
+	$effect(() => {
+		if (zoomlock) zoom.lock(zoomlock);
+		return () => zoom.releaseLock();
+	});
 
 	const boundingBoxes = $derived(getBoundingBoxes());
 	const focusedImageId = $derived(focusedImage()?.id);
@@ -120,8 +124,7 @@
 		src={imageSrc}
 		alt=""
 		bind:this={imageElement}
-		style:scale={zoom.scale}
-		style:translate="{zoom.origin.x}px {zoom.origin.y}px"
+		style:transform={zoom.cssTransforms()}
 		onload={() => {
 			imageIsLoading = false;
 		}}

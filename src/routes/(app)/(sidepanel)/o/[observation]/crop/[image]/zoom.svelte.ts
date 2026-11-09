@@ -16,6 +16,7 @@ export type ZoomState = typeof INITIAL_STATE;
  * x & y coordinates are in pixels of the resized, post-object-fit but pre-zoom image
  */
 export class Zoom {
+	zoomlock: 'x' | 'y' | undefined = undefined;
 	origin = $state({ x: 0, y: 0 });
 	scale = $state(1);
 	panning = $state(false);
@@ -28,8 +29,33 @@ export class Zoom {
 		},
 	});
 
-	constructor(state?: ZoomState) {
+	constructor(state?: ZoomState, options?: { zoomlock?: 'x' | 'y' }) {
 		if (state) this.restore(state);
+		this.zoomlock = options?.zoomlock;
+	}
+
+	lock(axis: 'x' | 'y') {
+		this.zoomlock = axis;
+	}
+
+	releaseLock() {
+		this.zoomlock = undefined;
+	}
+
+	cssTransforms(): string {
+		let out = '';
+
+		if (this.zoomlock !== 'x') {
+			out += `scaleX(${this.scale}) `;
+			out += `translateX(${this.origin.x}px) `;
+		}
+
+		if (this.zoomlock !== 'y') {
+			out += `scaleY(${this.scale}) `;
+			out += `translateY(${this.origin.y}px) `;
+		}
+
+		return out;
 	}
 
 	capture(): ZoomState {
@@ -128,8 +154,8 @@ export class Zoom {
 			(imageOffsets.height - ((center.clientY - imageBounds.y) / scale) * 2);
 
 		this.scale = scale;
-		this.origin.x += dx;
-		this.origin.y += dy;
+		if (this.zoomlock !== 'x') this.origin.x += dx;
+		if (this.zoomlock !== 'y') this.origin.y += dy;
 	}
 
 	startPanning(at: ClientPoint) {
@@ -150,7 +176,13 @@ export class Zoom {
 	 */
 	pan(to: ClientPoint) {
 		if (!this.panning) return;
-		this.origin.x = this.panStart.zoomOrigin.x + (to.clientX - this.panStart.x);
-		this.origin.y = this.panStart.zoomOrigin.y + (to.clientY - this.panStart.y);
+
+		if (this.zoomlock !== 'x') {
+			this.origin.x = this.panStart.zoomOrigin.x + (to.clientX - this.panStart.x);
+		}
+
+		if (this.zoomlock !== 'y') {
+			this.origin.y = this.panStart.zoomOrigin.y + (to.clientY - this.panStart.y);
+		}
 	}
 }

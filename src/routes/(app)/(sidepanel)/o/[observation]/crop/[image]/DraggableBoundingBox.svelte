@@ -34,7 +34,7 @@
 		disabled?: boolean;
 		zoom: Zoom;
 		imageFileID?: string;
-		subjectFitMode: 'contain' | 'cover';
+		subjectFitMode: 'contain' | 'cover' | 'fill';
 	}
 
 	let {
