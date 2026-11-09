@@ -41,6 +41,8 @@
 		boxes: 'show-all' | 'apply-first' | 'none';
 		/** array of bounding boxes. Values are between 0 and 1 (relative to the width/height of the image) */
 		boundingBoxes: TopLeftBoundingBox[];
+		/** Duration of the media in milliseconds */
+		duration?: number;
 	}
 </script>
 
@@ -50,12 +52,14 @@
 	import IconRetry from '~icons/ri/arrow-go-back-fill';
 	import IconDelete from '~icons/ri/delete-bin-line';
 	import IconImage from '~icons/ri/image-2-line';
+	import IconVideo from '~icons/ri/video-line';
 	import IconAudio from '~icons/ri/volume-up-line';
 
 	import AnimatableCheckmark from './AnimatableCheckmark.svelte';
 	import ButtonInk from './ButtonInk.svelte';
 	import Card from './Card.svelte';
 	import CroppedImg from './CroppedImg.svelte';
+	import { formatDurationStopwatch } from './date.js';
 	import LoadingSpinner from './LoadingSpinner.svelte';
 	import Logo from './Logo.svelte';
 	import { IsMobile } from './mobile.svelte.js';
@@ -77,6 +81,7 @@
 		selectable = true,
 		highlighted,
 		status,
+		duration,
 		statusText,
 		loadingStatusText,
 		stacksize = 1,
@@ -89,6 +94,9 @@
 	}: Props & Omit<Record<string, unknown>, keyof Props> = $props();
 
 	const isAudio = $derived(type.startsWith('audio/'));
+	const isVideo = $derived(type.startsWith('video/'));
+
+	const ContentTypeIcon = $derived(isAudio ? IconAudio : isVideo ? IconVideo : IconImage);
 
 	const handlers = $derived({
 		onclick,
@@ -226,6 +234,14 @@
 					</div>
 				{/if}
 				<div class="boundingboxes-wrapper" class:has-boxes={boxes === 'show-all'}>
+					{#if duration !== undefined}
+						<div class="duration-overlay">
+							<ContentTypeIcon />
+							<code class="duration">
+								{formatDurationStopwatch(duration)}
+							</code>
+						</div>
+					{/if}
 					{#if image}
 						{#if boxes === 'apply-first' && boundingBoxes.length > 0 && dimensions?.height}
 							<CroppedImg
@@ -241,11 +257,7 @@
 						{/if}
 					{:else}
 						<div class="img-placeholder">
-							{#if isAudio}
-								<IconAudio />
-							{:else}
-								<IconImage />
-							{/if}
+							<ContentTypeIcon />
 						</div>
 					{/if}
 					{#if boxes === 'show-all'}
@@ -361,6 +373,29 @@
 	.loading-overlay .text.smol {
 		margin-top: 0.5em;
 		font-size: 1.2rem;
+	}
+
+	.boundingboxes-wrapper {
+		position: relative;
+
+		.duration-overlay {
+			position: absolute;
+			bottom: 0;
+			right: 0;
+			/* No need for bg cuz histograms are always dark in color, will need to change once we also handle videos */
+			/* background: rgb(from var(--card-bg) r g b / 0.5); */
+			padding: 0.5em;
+			color: var(--fg-neutral);
+
+			display: flex;
+			align-items: center;
+			gap: 0.5em;
+			font-size: 0.8em;
+
+			code {
+				font-size: 0.9em;
+			}
+		}
 	}
 
 	img,

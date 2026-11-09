@@ -6,10 +6,7 @@ import { pick } from '$lib/utils.js';
 
 import { binaryStorage } from './index.js';
 
-type BinaryTableName = Exclude<
-	BinaryStorageLocator['area'],
-	`.pending_captures${'' | `/${string}`}`
->;
+type BinaryTableName = (typeof BINARY_CONTENT_TABLES)[number];
 
 /**
  * Get the size in bytes of the given database object
@@ -53,10 +50,10 @@ export function locateFileOfObject<Table extends BinaryTableName>(
 
 export function locateImagesOfObject<Name extends string = string>(
 	base: BinaryStorageLocator<Name>
-) {
+): { full: BinaryStorageLocator<Name>; preview: BinaryStorageLocator<Name> } {
 	return {
-		full: { ...base, name: `${base.name}_spectrogram.png` as const },
-		preview: { ...base, name: `${base.name}_spectrogram_preview.png` as const },
+		full: { ...base, area: '.audio_spectrograms/full' },
+		preview: { ...base, area: '.audio_spectrograms/preview' },
 	};
 }
 
@@ -168,7 +165,7 @@ export async function accessBytes<Table extends BinaryTableName>(
 	return binaryStorage.bytes(locator);
 }
 
-export async function accessImage(
+export async function accessImages(
 	table: 'AudioFile',
 	object: Pick<(typeof Tables.AudioFile)['inferIn' | 'inferOut'], 'sessionId' | 'filename'>,
 	size: 'preview' | 'full'

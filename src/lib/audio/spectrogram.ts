@@ -1,3 +1,17 @@
+import type { CoordinatesDomain } from '$lib/BoundingBoxes.svelte.js';
+import type * as DB from '$lib/database.js';
+
+export const AUDIO_SPECTROGRAM_ROOT_FOLDER = '.audio_spectrograms';
+export type AudioSpectrogramsFolders =
+	| typeof AUDIO_SPECTROGRAM_ROOT_FOLDER
+	| `${typeof AUDIO_SPECTROGRAM_ROOT_FOLDER}/full`
+	| `${typeof AUDIO_SPECTROGRAM_ROOT_FOLDER}/preview`;
+
+const PREVIEW_SPECTROGRAM_DIMENSIONS = {
+	width: 256,
+	height: 342,
+};
+
 interface SpectrogramOptions {
 	/** FFT window size, must be a power of two. Default 2048. */
 	fftSize?: number;
@@ -17,17 +31,22 @@ interface SpectrogramOptions {
 	maxDb?: number;
 }
 
+type SpectrogramInfo = NonNullable<(typeof DB.Schemas.AudioFile)['inferIn']['spectrogram']>;
+
 /**
  * Decode an audio file (mp3, wav, ogg, flac, m4a... whatever the browser supports)
- * and render its spectrogram as a PNG. Runs entirely client-side.
+ * and render its spectrogram as two PNGs: a fullsized one and a preview one that's smaller.
  *
  * @param audioBytes Raw bytes of the audio file.
  * @returns PNG blob
  */
-export async function generateSpectrogram(
+export async function generateSpectrograms(
 	{ samples, sampleRate }: { samples: Float32Array; sampleRate: number },
 	options: SpectrogramOptions = {}
-): Promise<Blob> {
+): Promise<{
+	images: { full: Blob; preview: Blob };
+	info: SpectrogramInfo;
+}> {
 	const fftSize = options.fftSize ?? 2048;
 	if (fftSize < 2 || (fftSize & (fftSize - 1)) !== 0) {
 		throw new Error('fftSize must be a power of two');
@@ -108,8 +127,16 @@ export async function generateSpectrogram(
 		}
 	}
 
-	// 5. Encode as PNG.
-	return encodePng(new ImageData(pixels, width, height));
+	return {
+		// encode as PNG.
+		images: await encodePngs(new ImageData(pixels, width, height)),
+		info: {
+			imageDimensions: { width, height },
+			durationRange: [0, (data.length / sampleRate) * 1e3],
+			frequencyRange: [0, maxFreq],
+			volumeRange: [minDb, maxDb],
+		},
+	};
 }
 
 /* ------------------------------------------------------------------ */
@@ -203,8 +230,39 @@ function buildPalette(): Uint8ClampedArray {
 	return lut;
 }
 
-async function encodePng(image: ImageData) {
-	const canvas = new OffscreenCanvas(image.width, image.height);
-	canvas.getContext('2d')!.putImageData(image, 0, 0);
-	return await canvas.convertToBlob({ type: 'image/png' });
+async function encodePngs(image: ImageData): Promise<{ full: Blob; preview: Blob }> {
+	const preview = PREVIEW_SPECTROGRAM_DIMENSIONS;
+
+	const full = new OffscreenCanvas(image.width, image.height);
+	full.getContext('2d')!.putImageData(image, 0, 0);
+
+	const small = new OffscreenCanvas(preview.width, preview.height);
+	const ctx = small.getContext('2d')!;
+	ctx.imageSmoothingEnabled = true;
+	ctx.imageSmoothingQuality = 'high';
+	ctx.drawImage(full, 0, 0, preview.width, preview.height);
+
+	// Encode both in parallel
+	const [fullBlob, smallBlob] = await Promise.all([
+		full.convertToBlob({ type: 'image/png' }),
+		small.convertToBlob({ type: 'image/png' }),
+	]);
+
+	return { full: fullBlob, preview: smallBlob };
+}
+
+/** Return a scaler that can scale relative bounding boxes on a spectrogram image into time/frequency or pixel boxes */
+export function spectrogramBoundingBoxDomains(spectrogram: SpectrogramInfo) {
+	return {
+		pixels: {
+			x: [0, spectrogram.imageDimensions.width],
+			y: [0, spectrogram.imageDimensions.height],
+		},
+		timeFrequency: {
+			x: spectrogram.durationRange,
+			// Spectrograms represent frequency from bottom to top
+			// but coordinates are from top to bottom (top-left = (0, 0))
+			y: spectrogram.frequencyRange.toReversed() as [number, number],
+		},
+	} satisfies Record<string, CoordinatesDomain>;
 }

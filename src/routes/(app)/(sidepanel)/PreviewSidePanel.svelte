@@ -138,7 +138,7 @@
 			return plural(selectionCounts.all, ['1 élément', '# éléments']);
 		}
 		if (selectionCounts.image > 0) {
-			return plural(selectionCounts.image, ['1 image', '# images']);
+			return plural(selectionCounts.image, ['1 média', '# médias']);
 		}
 		if (selectionCounts.observation > 0) {
 			return plural(selectionCounts.observation, ['1 observation', '# observations']);
@@ -194,7 +194,7 @@
 			{:else if selectionCounts.image > 0 && selectionCounts.observation > 0}
 				{plural(selectionCounts.all, ['1 élément', '# éléments'])}
 			{:else if selectionCounts.image > 0}
-				{plural(selectionCounts.image, ['1 image', '# images'])}
+				{plural(selectionCounts.image, ['1 média', '# médias'])}
 			{:else if selectionCounts.observation > 0}
 				{plural(selectionCounts.observation, ['1 observation', '# observations'])}
 			{:else}

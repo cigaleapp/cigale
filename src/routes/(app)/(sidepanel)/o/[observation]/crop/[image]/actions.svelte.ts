@@ -144,19 +144,6 @@ export async function onCropChange({
 		// in click-and-drag creation mode, auto-skip occurs only when the bounding box did not exist before (since the first creation of the box is much less likely to be the final one)
 		(activeTool().createMode !== 'clickanddrag' || !hasCrop(fileId));
 
-	if (uiState.classificationMetadataId) {
-		const species = image?.metadata[uiState.classificationMetadataId];
-		if (species && !species.manuallyModified) {
-			// Species confidence was inferred, we need to remove it so we can infer it again, since it's inferred on the _cropped_ image
-			await deleteMetadataValue({
-				db: idb.databaseHandle(),
-				sessionId: uiState.currentSessionId,
-				metadataId: uiState.classificationMetadataId,
-				subjectId: image.id,
-			});
-		}
-	}
-
 	let newImageId = '';
 
 	if (imageId) {
@@ -227,26 +214,49 @@ export async function onCropChange({
 			});
 		}
 
-		await idb.tables.Image.set({
-			id: newImageId,
-			sessionId: uiState.currentSessionId,
-			filename: firstImage?.filename ?? '',
-			// eslint-disable-next-line svelte/prefer-svelte-reactivity
-			addedAt: dates.formatISO(firstImage?.addedAt ?? new Date()),
-			contentType: firstImage?.contentType ?? '',
-			dimensions: $state.snapshot(firstImage?.dimensions) ?? { width: 0, height: 0 },
-			fileId,
-			metadata: {
-				[uiState.cropMetadataId]: {
-					value: JSON.stringify(toCenteredCoords(newBoundingBox)),
-					confidence: 1,
-					manuallyModified: true,
-					confirmed: true,
-					alternatives: [],
-					confidences: {},
+		const isAudio = Boolean(await idb.get('AudioFile', fileId));
+
+		if (isAudio) {
+			await idb.tables.Sound.set({
+				id: newImageId,
+				sessionId: uiState.currentSessionId,
+				filename: firstImage?.filename ?? '',
+				// eslint-disable-next-line svelte/prefer-svelte-reactivity
+				addedAt: dates.formatISO(firstImage?.addedAt ?? new Date()),
+				fileId,
+				metadata: {
+					[uiState.cropMetadataId]: {
+						value: JSON.stringify(toCenteredCoords(newBoundingBox)),
+						confidence: 1,
+						manuallyModified: true,
+						confirmed: true,
+						alternatives: [],
+						confidences: {},
+					},
 				},
-			},
-		});
+			});
+		} else {
+			await idb.tables.Image.set({
+				id: newImageId,
+				sessionId: uiState.currentSessionId,
+				filename: firstImage?.filename ?? '',
+				// eslint-disable-next-line svelte/prefer-svelte-reactivity
+				addedAt: dates.formatISO(firstImage?.addedAt ?? new Date()),
+				contentType: firstImage?.contentType ?? '',
+				dimensions: $state.snapshot(firstImage?.dimensions) ?? { width: 0, height: 0 },
+				fileId,
+				metadata: {
+					[uiState.cropMetadataId]: {
+						value: JSON.stringify(toCenteredCoords(newBoundingBox)),
+						confidence: 1,
+						manuallyModified: true,
+						confirmed: true,
+						alternatives: [],
+						confidences: {},
+					},
+				},
+			});
+		}
 	}
 
 	setBoxesListHintShown(false);

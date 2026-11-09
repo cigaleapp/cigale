@@ -293,6 +293,8 @@ export const Schemas = {
 	Account,
 	CustomNeuralNetwork,
 	BeamupCorrection,
+	AudioFile,
+	Sound,
 };
 
 /**
