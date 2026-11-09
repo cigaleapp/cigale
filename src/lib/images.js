@@ -9,9 +9,8 @@ import { tables } from './idb.svelte.js';
 import { imageLimits } from './inference_utils.js';
 import { removeFromObservation } from './observations.js';
 import { RAW_IMAGE_MEDIA_TYPES } from './raw.js';
-import { accessBytes, accessImage, createBytes } from './storage/utils.js';
+import { accessBytes, accessImages, createBytes } from './storage/utils.js';
 import { clamp, throwError } from './utils.js';
-
 
 /**
  * @import { Image, Protocol } from './database.js';
@@ -398,7 +397,7 @@ export async function loadPreviewImage(id, scope = 'session') {
 		const file = await db.get('AudioFile', id);
 		if (!file) return;
 		console.log('loading preview img for ', file);
-		const bytes = await accessImage('AudioFile', file, 'preview');
+		const bytes = await accessImages('AudioFile', file, 'preview');
 		console.log('loading preview img bytes is ', bytes);
 		const blob = new Blob([bytes], { type: 'image/png' });
 		uiState.setPreviewURL(id, URL.createObjectURL(blob), scope === 'global');
@@ -422,12 +421,14 @@ export function errorMessageImageTooLarge() {
 }
 
 /**
- * Resize an image to fit within MAXWIDTH and MAXHEIGHT
+ * Resize an image to fit within the given dimensions
  * @param {object} param0
  * @param {Blob} param0.source
+ * @param {number} [param0.maxWidth] MAXWIDTH by default
+ * @param {number} [param0.maxHeight] keep aspect ratio if not given
  * @returns {Promise<[[number, number], ArrayBuffer]>} [[original width, original height], resized image data]
  */
-export async function resizeToMaxSize({ source }) {
+export async function resizeToMaxSize({ source, maxWidth = MAXWIDTH, maxHeight }) {
 	// For some reason top-level import fails
 	const { resize } = await import('pica-gpu');
 	const originalImage = await createImageBitmap(source).catch((error) => {
@@ -441,29 +442,50 @@ export async function resizeToMaxSize({ source }) {
 	});
 	const { width, height } = originalImage;
 
+	maxHeight ??= Math.round((maxWidth * height) / width);
+
 	if (width * height > imageLimits.maxResolutionInMP * 1e6) {
 		throw new Error(errorMessageImageTooLarge());
 	}
 
-	const originalCanvas = document.createElement('canvas');
-	originalCanvas.width = width;
-	originalCanvas.height = height;
-	originalCanvas.getContext('2d')?.drawImage(originalImage, 0, 0);
+	// If we're on the UI thread, we have access to document canvases and we can use pica-gpu
 
-	const resizedCanvas = document.createElement('canvas');
-	resizedCanvas.width = MAXWIDTH;
-	resizedCanvas.height = MAXHEIGHT(originalImage);
-	resize(originalCanvas, resizedCanvas, {
-		targetWidth: MAXWIDTH,
-		targetHeight: MAXHEIGHT(originalImage),
-		filter: 'mks2013',
-	});
-	return new Promise((resolve) => {
-		resizedCanvas.toBlob((blob) => {
-			if (!blob) throw new Error('Failed to resize image');
-			blob.arrayBuffer().then((buf) => resolve([[width, height], buf]));
-		}, source.type);
-	});
+	if ('document' in self) {
+		const originalCanvas = document.createElement('canvas');
+		originalCanvas.width = width;
+		originalCanvas.height = height;
+		originalCanvas.getContext('2d')?.drawImage(originalImage, 0, 0);
+
+		const resizedCanvas = document.createElement('canvas');
+		resizedCanvas.width = maxWidth;
+		resizedCanvas.height = maxHeight;
+		resize(originalCanvas, resizedCanvas, {
+			targetWidth: maxWidth,
+			targetHeight: maxHeight,
+			filter: 'mks2013',
+		});
+		return new Promise((resolve) => {
+			resizedCanvas.toBlob((blob) => {
+				if (!blob) throw new Error('Failed to resize image');
+				blob.arrayBuffer().then((buf) => resolve([[width, height], buf]));
+			}, source.type);
+		});
+	}
+
+	const original = new OffscreenCanvas(width, height);
+	original.getContext('2d')?.putImageData(originalImage, 0, 0);
+
+	const resized = new OffscreenCanvas(maxWidth, maxHeight);
+	const ctx = resized.getContext('2d');
+	if (!ctx) throw new Error('Couldnt create 2D context on target canvas');
+
+	ctx.imageSmoothingEnabled = true;
+	ctx.imageSmoothingQuality = 'high';
+	ctx.drawImage(original, 0, 0, resized.width, resized.height);
+
+	const blob = await resized.convertToBlob({ type: 'image/png' });
+
+	return [[width, height], await blob.arrayBuffer()];
 }
 
 /**

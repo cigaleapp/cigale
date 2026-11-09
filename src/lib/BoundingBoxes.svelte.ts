@@ -39,27 +39,96 @@ export const FULL_IMAGE_CROPBOX = {
  * @returns scaled coordinates
  */
 export function coordsScaler({ x: xwise, y: ywise }: { x: number; y: number }) {
-	function scaler(box: TopLeftBoundingBox): TopLeftBoundingBox;
-	function scaler(box: CenteredBoundingBox): CenteredBoundingBox;
-	function scaler(box: AnyBoundingBox): AnyBoundingBox {
+	return coordsAffineTransformer({
+		x: [xwise, 0],
+		y: [ywise, 0],
+	});
+}
+
+type CoordinatesRange = [start: number, end: number];
+
+export type CoordinatesDomain = { x: CoordinatesRange; y: CoordinatesRange };
+
+const NORMALIZED_DOMAIN: CoordinatesDomain = { x: [0, 1], y: [0, 1] };
+
+/**
+ * Given two domains, creates a function that can convert coordinates of boxes 
+ * from the first domain into the second.
+ * Pass "null" instead to mean the normalized domain ([0, 1] on both axes)
+ */
+export function coordsDomainTransposer(
+	from: CoordinatesDomain | null,
+	to: CoordinatesDomain | null
+) {
+	from ??= NORMALIZED_DOMAIN;
+	to ??= NORMALIZED_DOMAIN;
+
+	const span = ([start, end]: CoordinatesRange) => end - start;
+	const offset = ([start]: CoordinatesRange) => start;
+
+	const transposeAxis = (from: CoordinatesRange, to: CoordinatesRange) =>
+		[span(to) / span(from), (offset(to) - offset(from)) / span(from)] as const;
+
+	return coordsAffineTransformer({
+		x: transposeAxis(from.x, to.x),
+		y: transposeAxis(from.y, to.y),
+	});
+}
+
+/**
+ * **Given normalized (relative) coordinates**,
+ * Stretch coordinates to make them fit in given ranges
+ * for both axes.
+ * Ranges can be given in reversed order (second number lower than first)
+ * if the range is reversed compared to top-left -> bottom-right order
+ */
+export function coordsFitter(domain: CoordinatesDomain) {
+	return coordsDomainTransposer(null, domain);
+}
+
+/**
+ * Given coordinates within the given ranges,
+ * normalizes them into [0, 1]
+ *
+ * The reverse of coordsFitter()
+ */
+export function coordsNormalizer(domain: CoordinatesDomain) {
+	return coordsDomainTransposer(domain, null);
+}
+
+/**
+ * Define `m` & `p` for both axes.
+ * The returned function will apply `f(c) = m c + p`
+ * for x/y and `f(a) = m a` for width/height
+ */
+function coordsAffineTransformer({
+	x: [m_x, p_x],
+	y: [m_y, p_y],
+}: {
+	x: readonly [scale: number, offset: number];
+	y: readonly [scale: number, offset: number];
+}) {
+	function transform(box: TopLeftBoundingBox): TopLeftBoundingBox;
+	function transform(box: CenteredBoundingBox): CenteredBoundingBox;
+	function transform(box: AnyBoundingBox): AnyBoundingBox {
 		if ('width' in box) {
 			return {
-				x: box.x * xwise,
-				y: box.y * ywise,
-				width: box.width * xwise,
-				height: box.height * ywise,
+				x: box.x * m_x + p_x,
+				y: box.y * m_y + p_y,
+				width: box.width * m_x,
+				height: box.height * m_y,
 			};
 		}
 
 		return {
-			x: box.x * xwise,
-			y: box.y * ywise,
-			w: box.w * xwise,
-			h: box.h * ywise,
+			x: box.x * m_x + p_x,
+			y: box.y * m_y + p_y,
+			w: box.w * m_x,
+			h: box.h * m_y,
 		};
 	}
 
-	return scaler;
+	return transform;
 }
 
 if (import.meta.vitest) {

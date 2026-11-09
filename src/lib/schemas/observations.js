@@ -83,6 +83,15 @@ export const AudioFile = type({
 	analyzed: 'boolean = false',
 	contentType: MIMEType,
 	dimensions: AudioDimensions,
+	spectrogram: {
+		/** In milliseconds */
+		durationRange: ['number.integer >= 0', 'number.integer > 0'],
+		/** In Hertz */
+		frequencyRange: ['number >= 0', 'number> 0'],
+		/** In dBFS */
+		volumeRange: ['number', 'number'],
+		imageDimensions: ImageDimensions,
+	},
 	sessionId: ID,
 	'remoteId?': 'string#RemoteAudioFileID',
 	'remoteUrl?': URLString,

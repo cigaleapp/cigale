@@ -1,3 +1,4 @@
+import type { AudioSpectrogramsFolders } from '$lib/audio/spectrogram.js';
 import type { BINARY_CONTENT_TABLES } from '$lib/database.js';
 import type { PendingPhotosRootFolders } from '$routes/(app)/capture/pendingstorage.svelte.js';
 
@@ -68,7 +69,10 @@ export interface BinaryStorageBackend<Name extends BinaryStorageName = BinarySto
 }
 
 export type BinaryStorageLocator<Filename extends string = string> = {
-	area: (typeof BINARY_CONTENT_TABLES)[number] | PendingPhotosRootFolders;
+	area:
+		| (typeof BINARY_CONTENT_TABLES)[number]
+		| PendingPhotosRootFolders
+		| AudioSpectrogramsFolders;
 	sessionId: string | undefined;
 	/** Use an empty string to denote an entire folder */
 	name: Filename;

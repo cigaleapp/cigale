@@ -3,7 +3,9 @@
 
 	import { page } from '$app/state';
 	import { toTopLeftCoords } from '$lib/BoundingBoxes.svelte.js';
+	import { tables } from '$lib/idb.svelte.js';
 	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
+	import { accessImages } from '$lib/storage/utils.js';
 	import { Gestures } from '$lib/touch/gestures.svelte.js';
 	import { uiState } from '$lib/uistate.svelte.js';
 	import { mapValues, overrideStyle, pick } from '$lib/utils.js';
@@ -27,10 +29,25 @@
 	let { imageIsLoading = $bindable(true), selectedBox, showConfirmedOverlay }: Props = $props();
 
 	const fileId = $derived(page.params.image);
-	const imageSrc = $derived(uiState.getPreviewURL(fileId));
 	const boundingBoxes = $derived(getBoundingBoxes());
 	const focusedImageId = $derived(focusedImage()?.id);
 	const hidingAll = $derived(getHideAll());
+	let imageSrc = $state<string>();
+
+	$effect(() => {
+		if (!fileId) return;
+
+		const audiofile = tables.AudioFile.getFromState(fileId);
+		if (!audiofile) {
+			imageSrc = uiState.getPreviewURL(fileId);
+			return;
+		}
+
+		void (async () => {
+			const bytes = await accessImages('AudioFile', audiofile, 'full');
+			imageSrc = URL.createObjectURL(new Blob([bytes], { type: 'image/png' }));
+		})();
+	});
 
 	let imageElement = $state<HTMLImageElement>();
 
