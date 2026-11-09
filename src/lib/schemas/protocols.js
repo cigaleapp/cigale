@@ -19,10 +19,13 @@ import {
 	Metadata,
 	MetadataGroup,
 	MetadataRecord,
+	MetadataValuesParsed,
 	namespacedMetadataId,
 	SidecarFilepathTemplate,
 } from './metadata.js';
+import { Image, Observation } from './observations.js';
 import { AnalyzedImage, AnalyzedObservation } from './results.js';
+import { Session } from './sessions.js';
 
 export const ExportsFilepathTemplateObservation = FilepathTemplate(
 	type({
@@ -146,6 +149,31 @@ export const Protocol = type({
 		.default(false),
 	'beamup?': BeamupSettings,
 	'remote?': {
+		'inaturalist?': {
+			project: 'number.integer > 0',
+			'observations?': {
+				description: TemplatedString(
+					type({
+						session: Session.omit('metadata').and({
+							metadata: MetadataValuesParsed(NamespacedMetadataID),
+							protocolMetadata: MetadataValuesParsed(ID),
+						}),
+						images: Image.omit('metadata')
+							.and({
+								metadata: MetadataValuesParsed(NamespacedMetadataID),
+								protocolMetadata: MetadataValuesParsed(ID),
+							})
+							.array(),
+						observation: Observation.omit('metadataOverrides').and({
+							metadata: MetadataValuesParsed(NamespacedMetadataID),
+							protocolMetadata: MetadataValuesParsed(ID),
+						}),
+					})
+				)
+					.describe('Description des observations à publier sur le projet iNaturalist')
+					.default(''),
+			},
+		},
 		'ecosignal?': {
 			domains: type
 				.or(URLString, URLString.array(), type.Record('string', URLString))
@@ -281,7 +309,7 @@ export const Protocol = type({
 		"L'ordre dans lequel les métadonnées doivent être présentées dans l'interface utilisateur. Les métadonnées non listées ici seront affichées après toutes celles listées ici"
 	),
 	'crop?': type({
-		padding: type(/^\d+(%|px)$/)
+		padding: type('/^\\d+(%|px)$/')
 			.describe(
 				"Pixels de marge à rajouter autour de la boîte englobante au moment d'exporter les images recadrées. Nombre suivi de 'px' pour un nombre de pixels fixe, ou de '%' pour un pourcentage des dimensions de chaque image."
 			)

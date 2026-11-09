@@ -5,7 +5,7 @@ import { databaseHandle, tables } from '$lib/idb.svelte.js';
 import { uiState } from '$lib/uistate.svelte.js';
 import { switchValue } from '$lib/utils.js';
 
-class ExporterPlatforms {
+export class ExporterPlatforms {
 	compatibleProviders = $derived(
 		providers
 			.list()
@@ -84,6 +84,8 @@ class ExporterPlatforms {
 	aborter = $state(new AbortController());
 
 	state: 'idle' | 'uploading' | 'completed' | 'errored' | 'canceled' = $state('idle');
+
+	cropPadding: `${number}${'px' | '%'}` = $state('0px');
 
 	get abortSignal() {
 		return this.aborter.signal;

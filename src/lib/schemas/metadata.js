@@ -5,6 +5,7 @@ import { EXIF_FIELDS_DETAILS } from '../exiffields.js';
 import { boundingBoxResolver } from '../inference_utils.js';
 import { ensureArray, entries, mapValues, nonnull, transformObject, unique } from '../utils.js';
 import {
+	Clade,
 	ColorHex,
 	DarwinCoreFieldShorthand,
 	FileSize,
@@ -525,6 +526,9 @@ const MetadataBoolean = MetadataBase.omit('kobocollect').and({
 		InferenceConfigs.http('boolean').partial()
 	),
 	'darwincore?': DarwinCoreFieldShorthand,
+	'inaturalist?': {
+		'projectField?': 'string',
+	},
 	'kobocollect?': type.or(
 		{
 			'list?': [
@@ -562,6 +566,9 @@ export const MetadataString = MetadataBase.and({
 	type: '"string"',
 	'default?': MetadataDefault.string,
 	'darwincore?': DarwinCoreFieldShorthand,
+	'inaturalist?': {
+		'projectField?': 'string',
+	},
 	'infer?': type.and(
 		InferenceConfigs.exif.partial(),
 		InferenceConfigs.sidecar(type('string')).partial(),
@@ -589,6 +596,9 @@ export const MetadataInteger = MetadataBase.and({
 		'value?': DarwinCoreFieldShorthand.describe('La valeur numérique'),
 		'unit?': DarwinCoreFieldShorthand.describe("L'unité de la valeur"),
 	}),
+	'inaturalist?': {
+		'projectField?': 'string',
+	},
 	'infer?': type.and(
 		InferenceConfigs.exif.partial(),
 		InferenceConfigs.sidecar(type('number.integer')).partial(),
@@ -606,6 +616,9 @@ export const MetadataFloat = MetadataBase.and({
 		'value?': DarwinCoreFieldShorthand.describe('La valeur numérique'),
 		'unit?': DarwinCoreFieldShorthand.describe("L'unité de la valeur"),
 	}),
+	'inaturalist?': {
+		'projectField?': 'string',
+	},
 	'infer?': type.and(
 		InferenceConfigs.exif.partial(),
 		InferenceConfigs.sidecar(type('number')).partial(),
@@ -630,6 +643,7 @@ export const MetadataDate = MetadataBase.and({
 			"Date & heure complète: yyyy-MM-dd'T'HH:mm:ss"
 		),
 	},
+	'inaturalist?': '"observed on"',
 	'infer?': type.and(
 		InferenceConfigs.capture.partial(),
 		InferenceConfigs.exif.partial(),
@@ -646,6 +660,7 @@ const MetadataLocation = MetadataBase.and({
 		'longitude?': DarwinCoreFieldShorthand.describe('Longitude décimale'),
 		'datum?': DarwinCoreFieldShorthand.describe('Le datum utilisé: WGS84'),
 	},
+	'inaturalist?': '"observed at"',
 	'infer?': type.and(
 		InferenceConfigs.capture.partial(),
 		InferenceConfigs.http('location').partial(),
@@ -683,6 +698,11 @@ const MetadataEnum = MetadataBase.and({
 			"Les liens vers les images de l'option, séparés par ' | '"
 		),
 	},
+	'inaturalist?': {
+		'taxon?': {
+			rank: Clade,
+		},
+	},
 	presentation: type
 		.enumerated('dropdown', 'buttons', 'auto')
 		.describe(
@@ -702,6 +722,7 @@ const MetadataEnum = MetadataBase.and({
 const MetadataBoundingbox = MetadataBase.and({
 	type: '"boundingbox"',
 	'default?': MetadataDefault.boundingbox,
+	'inaturalist?': '"crop"',
 	'darwincore?': {
 		'cx?': DarwinCoreFieldShorthand.describe(
 			'Coordonnée fractionnelle X du centre de la boîte'

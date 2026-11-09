@@ -195,3 +195,33 @@ export const HourRange = type('/^\\d{2}:\\d{2}-\\d{2}:\\d{2}$/').pipe((literal) 
 });
 
 export const DarwinCoreFieldShorthand = type('/^\\w+:\\w+$/');
+
+/** From most generic (kingdom) to most specific */
+export const CLADES = /** @type {const} */ ([
+	'kingdom',
+	'phylum',
+	'subphylum',
+	'superclass',
+	'class',
+	'subclass',
+	'superorder',
+	'order',
+	'suborder',
+	'infraorder',
+	'superfamily',
+	'epifamily',
+	'family',
+	'subfamily',
+	'supertribe',
+	'tribe',
+	'subtribe',
+	'genus',
+	'genushybrid',
+	'species',
+	'hybrid',
+	'subspecies',
+	'variety',
+	'form',
+]);
+
+export const Clade = type.enumerated(...CLADES);

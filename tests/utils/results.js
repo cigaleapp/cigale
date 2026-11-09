@@ -60,8 +60,8 @@ export async function exportResults(page, { cropPadding = '0px', kind = 'cropped
 		await area.getByRole('radio', { name: 'Aucune' }).check();
 	} else if (cropPadding.endsWith('px')) {
 		await area.getByRole('textbox', { name: 'en pixels' }).fill(cropPadding.replace(/px$/, ''));
-	} else if (['5%', '10%'].includes(cropPadding)) {
-		await area.getByRole('radio', { name: cropPadding }).check();
+	// } else if (['5%', '10%'].includes(cropPadding)) {
+	// 	await area.getByRole('radio', { name: cropPadding }).check();
 	} else {
 		await area
 			.getByRole('textbox', { name: "en pourcentage des dimensions de l'image" })

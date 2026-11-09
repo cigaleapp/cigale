@@ -1,19 +1,25 @@
 <script lang="ts">
+	import type { ExporterFiles } from './files.svelte.js';
+	import type { ExporterPlatforms } from './platforms.svelte.js';
 	import type * as DB from '$lib/database.js';
 
 	import { FULL_IMAGE_CROPBOX, toRelativeCoords } from '$lib/BoundingBoxes.svelte.js';
 	import CroppedImg from '$lib/CroppedImg.svelte';
 	import { tables } from '$lib/idb.svelte.js';
+	import { parseCropPadding } from '$lib/images.js';
 	import { uiState } from '$lib/uistate.svelte.js';
 
-	import { exporter } from './files.svelte.js';
+	interface Props {
+		exporter: ExporterPlatforms | ExporterFiles;
+	}
+	const { exporter }: Props = $props();
+
+	const cropPadding = $derived(parseCropPadding(exporter.cropPadding));
 
 	function box(image: DB.Image) {
 		const cropbox = uiState.cropMetadataValueOf(image)?.value ?? FULL_IMAGE_CROPBOX;
 
-		return toRelativeCoords(image.dimensions)(
-			exporter.cropPadding.apply(image.dimensions, cropbox)
-		);
+		return toRelativeCoords(image.dimensions)(cropPadding.apply(image.dimensions, cropbox));
 	}
 </script>
 
