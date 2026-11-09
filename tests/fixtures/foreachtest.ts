@@ -17,7 +17,6 @@ import {
 	getPredownloadedModel,
 	mockPredownloadedModels,
 	mockProtocolSourceURL,
-	mockUrl,
 } from '$e2e/utils/index.js';
 import { mockOPFSOnWebWorkers, restoreOPFSState } from '$e2e/utils/opfs.js';
 
@@ -76,33 +75,6 @@ export async function forEachTest(
 
 	await rm('./tests/results', { recursive: true, force: true });
 	await mkdir('./tests/results', { recursive: true });
-
-	// XXX: 404 all other protocols so that no other built-in protocols appears before the Example: one in the protocols list
-	// TODO: modify newSession/etc in the tests to target lightProtocol by default instead, test failures happened on main and I was doing sth else
-	const ALLOWED_PROTOCOLS = [fullProtocol.source, lightProtocol.source];
-	await mockUrl(
-		page,
-		context,
-		(u) =>
-			Boolean(
-				new URLPattern('https://*/**/*.cigaleprotocol.*').test(u) &&
-				!ALLOWED_PROTOCOLS.some((source) => {
-					if (typeof source !== 'string') return false;
-					const src = new URL(source);
-					return new URLPattern({
-						hostname: src.hostname,
-						pathname: src.pathname.replace(
-							'cigaleapp/cigale/main/',
-							'cigaleapp/cigale/:branch/'
-						),
-					}).test(u);
-				})
-			),
-		{
-			status: 404,
-			body: '',
-		}
-	);
 
 	if (!info.tags.includes('@real-protocol')) {
 		// @ts-expect-error we don't support non-string protocol source values for now

@@ -1,3 +1,7 @@
+import type * as DB from '$lib/database.js';
+import type { Tables } from '$lib/database.js';
+import type { PROCEDURES } from '$worker/procedures.js';
+
 import { Capacitor } from '@capacitor/core';
 import { ArkErrors } from 'arktype';
 import microdiff from 'microdiff';
@@ -7,6 +11,7 @@ import { stringifyWithToplevelOrdering } from './download.js';
 import { promptForFiles } from './files.js';
 import { errorMessage } from './i18n.js';
 import { metadataOptionsOf } from './metadata/index.js';
+import { fetchProtocolRegistry } from './protocols/registry.js';
 import { removeNamespaceFromMetadataId } from './schemas/metadata.js';
 import { ExportedProtocol, isMetadataInProtocol, Protocol } from './schemas/protocols.js';
 import { shareOrDownloadAsFile } from './share.js';
@@ -23,25 +28,20 @@ import {
 } from './utils.js';
 
 /**
- * @import { Tables } from './database.js';
- * @import { PROCEDURES } from '$worker/procedures.js';
- * @import * as DB from '$lib/database.js'
- */
-
-/**
  *
- * @param {string} base base path of the app - import `base` from `$app/paths`
+ * @param base base path of the app - import `base` from `$app/paths`
  */
-export function jsonSchemaURL(base) {
+export function jsonSchemaURL(base: string) {
 	return `${import.meta.env.webOrigin}${base}/protocol.schema.json`;
 }
 
 /**
  * Turn a database-stored protocol into an object suitable for export.
- * @param {import('./idb.svelte.js').DatabaseHandle} db
- * @param {typeof Tables.Protocol.infer} protocol
  */
-export async function toExportedProtocol(db, protocol) {
+export async function toExportedProtocol(
+	db: DatabaseHandle,
+	protocol: typeof Tables.Protocol.infer
+) {
 	const metadataOptions = await metadataOptionsOf(db, protocol.id, null);
 
 	const allMetadataDefs = Object.fromEntries(
@@ -92,12 +92,14 @@ export async function toExportedProtocol(db, protocol) {
 
 /**
  * Exports a protocol by ID into a JSON file, and triggers a download (on computers) or a share (on mobile) of that file.
- * @param {import('./idb.svelte.js').DatabaseHandle} db
- * @param {string} base base path of the app - import `base` from `$app/paths`
- * @param {import("./database").ID} id
- * @param {'json' | 'yaml'} [format='json']
+ * @param base base path of the app - import `base` from `$app/paths`
  */
-export async function exportProtocol(db, base, id, format = 'json') {
+export async function exportProtocol(
+	db: DatabaseHandle,
+	base: string,
+	id: DB.ID,
+	format: 'json' | 'yaml' = 'json'
+) {
 	shareOrDownloadProtocol(
 		base,
 		format,
@@ -110,12 +112,16 @@ export async function exportProtocol(db, base, id, format = 'json') {
 
 /**
  * Downloads a protocol as a JSON file
- * @param {string} base base path of the app - import `base` from `$app/paths`
- * @param {'yaml'|'json'} format
- * @param {typeof import('./schemas/protocols.js').ExportedProtocol.infer} exportedProtocol
+ * @param base base path of the app - import `base` from `$app/paths`
+ * @param format
+ * @param exportedProtocol
  */
-async function shareOrDownloadProtocol(base, format, exportedProtocol) {
-	let jsoned = stringifyWithToplevelOrdering(format, jsonSchemaURL(base), exportedProtocol, [
+async function shareOrDownloadProtocol(
+	base: string,
+	format: 'yaml' | 'json',
+	exportedProtocol: typeof import('./schemas/protocols.js').ExportedProtocol.infer
+) {
+	const jsoned = stringifyWithToplevelOrdering(format, jsonSchemaURL(base), exportedProtocol, [
 		'id',
 		'name',
 		'source',
@@ -136,19 +142,28 @@ async function shareOrDownloadProtocol(base, format, exportedProtocol) {
 /**
  * Imports protocol(s) from JSON file(s).
  * Asks the user to select files, then imports the protocols from those files.
- * @template {{id: string, name: string, version: number|undefined}} Out
- * @template {boolean|undefined} Multiple
- * @param {object} param0
- * @param {Multiple} param0.allowMultiple allow the user to select multiple files
- * @param {() => void} [param0.onInput] callback to call when the user selected files
- * @param {((input: {contents: string, isJSON: boolean}) => Promise<{id: string, name: string, version: number|undefined}>)} param0.importProtocol
- * @returns {Promise<Multiple extends true ? NoInfer<Out>[] : NoInfer<Out>>}
  */
-export async function promptAndImportProtocol({
+export async function promptAndImportProtocol<
+	Out extends { id: string; name: string; version: number | undefined },
+	Multiple extends boolean | undefined,
+>({
 	allowMultiple = false,
 	onInput = () => {},
 	importProtocol,
-}) {
+}: {
+	/**
+	 * allow the user to select multiple files
+	 */
+	allowMultiple: Multiple;
+	/**
+	 * callback to call when the user selected files
+	 */
+	onInput?: () => void;
+	importProtocol: (input: {
+		contents: string;
+		isJSON: boolean;
+	}) => Promise<{ id: string; name: string; version: number | undefined }>;
+}): Promise<Multiple extends true ? NoInfer<Out>[] : NoInfer<Out>> {
 	const files = await promptForFiles({
 		multiple: allowMultiple,
 		// FIXME: figure out why .yaml files are not selectable on mobile even if we include .yaml in the accept string
@@ -159,35 +174,37 @@ export async function promptAndImportProtocol({
 	onInput();
 
 	/** @type {Array<{id: string, name: string, version: number | undefined}>}  */
-	const output = await Promise.all(
-		[...files].map(async (file) => {
-			console.time(`Reading file ${file.name}`);
-			const reader = new FileReader();
-			return new Promise((resolve, reject) => {
-				reader.onload = async () => {
-					if (!reader.result) throw new Error('Fichier vide');
-					if (reader.result instanceof ArrayBuffer) throw new Error('Fichier binaire');
+	const output: Array<{ id: string; name: string; version: number | undefined }> =
+		await Promise.all(
+			[...files].map(async (file) => {
+				console.time(`Reading file ${file.name}`);
+				const reader = new FileReader();
+				return new Promise((resolve, reject) => {
+					reader.onload = async () => {
+						if (!reader.result) throw new Error('Fichier vide');
+						if (reader.result instanceof ArrayBuffer)
+							throw new Error('Fichier binaire');
 
-					console.timeEnd(`Reading file ${file.name}`);
-					try {
-						const result = await importProtocol({
-							contents: reader.result,
-							isJSON: file.name.endsWith('.json'),
-						});
+						console.timeEnd(`Reading file ${file.name}`);
+						try {
+							const result = await importProtocol({
+								contents: reader.result,
+								isJSON: file.name.endsWith('.json'),
+							});
 
-						const { tables } = await import('./idb.svelte.js');
-						await tables.Protocol.refresh(null);
-						await tables.Metadata.refresh(null);
+							const { tables } = await import('./idb.svelte.js');
+							await tables.Protocol.refresh(null);
+							await tables.Metadata.refresh(null);
 
-						resolve(result);
-					} catch (err) {
-						reject(new Error(errorMessage(err)));
-					}
-				};
-				reader.readAsText(file);
-			});
-		})
-	);
+							resolve(result);
+						} catch (err) {
+							reject(new Error(errorMessage(err)));
+						}
+					};
+					reader.readAsText(file);
+				});
+			})
+		);
 
 	return allowMultiple ? output : output[0];
 }
@@ -197,22 +214,32 @@ export async function promptAndImportProtocol({
  * @param {Pick<typeof Schemas.Protocol.infer, 'version'|'source'|'id'>} protocol
  * @returns {Promise< { upToDate: boolean; newVersion: number }>}
  */
-export async function hasUpgradeAvailable({ version, source, id }) {
+export async function hasUpgradeAvailable({
+	version,
+	source,
+	id,
+}: Pick<typeof Schemas.Protocol.infer, 'version' | 'source' | 'id'>): Promise<{
+	upToDate: boolean;
+	newVersion: number;
+}> {
 	if (!source) throw new Error("Le protocole n'a pas de source");
 	if (!version) throw new Error("Le protocole n'a pas de version");
 	if (!id) throw new Error("Le protocole n'a pas d'identifiant");
 
-	const response = await fetchHttpRequest(source, {
-		cachebust: true,
-		headers: {
-			Accept: 'application/json, application/yaml',
-		},
-	});
+	const registry = await fetchProtocolRegistry();
 
-	const protocol = ExportedProtocol.in
-		.pick('id', 'version')
-		.assert(await parseYAMLorJSON(response));
+	const protocol =
+		registry.protocols.find((p) => p.id === id) ??
+		(await fetchHttpRequest(source, {
+			cachebust: true,
+			headers: {
+				Accept: 'application/json, application/yaml',
+			},
+		}).then(async (response) =>
+			ExportedProtocol.in.pick('id', 'version').assert(await parseYAMLorJSON(response))
+		));
 
+	if (!protocol) throw new Error('Protocole introuvable');
 	if (!protocol.version) throw new Error("Le protocole n'a plus de version");
 	if (protocol.id !== id) throw new Error("Le protocole a changé d'identifiant");
 	if (protocol.version > version) {
@@ -235,7 +262,17 @@ export async function hasUpgradeAvailable({ version, source, id }) {
  * @param {string} param0.id
  * @param {import('swarpc').SwarpcClient<typeof import('$worker/procedures.js').PROCEDURES>} param0.swarpc
  */
-export async function upgradeProtocol({ version, source, id, swarpc }) {
+export async function upgradeProtocol({
+	version,
+	source,
+	id,
+	swarpc,
+}: {
+	version?: number;
+	source: import('$lib/database.js').HTTPRequest;
+	id: string;
+	swarpc: import('swarpc').SwarpcClient<typeof import('$worker/procedures.js').PROCEDURES>;
+}) {
 	if (!source) throw new Error("Le protocole n'a pas de source");
 	if (!version) throw new Error("Le protocole n'a pas de version");
 	if (!id) throw new Error("Le protocole n'a pas d'identifiant");
@@ -274,7 +311,11 @@ export async function upgradeProtocol({ version, source, id, swarpc }) {
  * @param {(progress: number) => void | Promise<void>} [options.onProgress]
  * @returns {Promise<import('microdiff').Difference[]>}
  */
-export async function compareProtocolWithUpstream(db, protocolId, { onProgress } = {}) {
+export async function compareProtocolWithUpstream(
+	db: import('./idb.svelte.js').DatabaseHandle,
+	protocolId: import('$lib/database').ID,
+	{ onProgress }: { onProgress?: (progress: number) => void | Promise<void> } = {}
+): Promise<import('microdiff').Difference[]> {
 	const databaseProtocol = await db.get('Protocol', protocolId).then(Protocol.assert);
 
 	await onProgress?.(0);
@@ -398,13 +439,10 @@ export async function compareProtocolWithUpstream(db, protocolId, { onProgress }
 						diffs
 							.filter((d) => diffStartsWith(d.path, pathToOption))
 							.filter((d) => d.path.at(-1) !== '__deleted')
-							.map(
-								(d) =>
-									/** @type {const} */ ([
-										d.path.at(-1)?.toString() ?? '',
-										d.oldValue,
-									])
-							)
+							.map((d) => /** @type {const} */ [
+								d.path.at(-1)?.toString() ?? '',
+								d.oldValue,
+							])
 					),
 				});
 			} else if (type === 'REMOVE') {
@@ -420,13 +458,10 @@ export async function compareProtocolWithUpstream(db, protocolId, { onProgress }
 						diffs
 							.filter((d) => diffStartsWith(d.path, pathToOption))
 							.filter((d) => d.path.at(-1) !== '__deleted')
-							.map(
-								(d) =>
-									/** @type {const} */ ([
-										d.path.at(-1)?.toString() ?? '',
-										d.value,
-									])
-							)
+							.map((d) => /** @type {const} */ [
+								d.path.at(-1)?.toString() ?? '',
+								d.value,
+							])
 					),
 				});
 			}
@@ -443,7 +478,10 @@ export async function compareProtocolWithUpstream(db, protocolId, { onProgress }
  * @param {import('./idb.svelte.js').DatabaseHandle} db
  * @param {import('swarpc').SwarpcClient<typeof PROCEDURES>} swarpc
  */
-export async function autoUpdateProtocols(db, swarpc) {
+export async function autoUpdateProtocols(
+	db: import('./idb.svelte.js').DatabaseHandle,
+	swarpc: import('swarpc').SwarpcClient<typeof PROCEDURES>
+) {
 	const protocols = await db.getAll('Protocol').then((ps) => ps.map((p) => Protocol.assert(p)));
 	const _settings = (await db.get('Settings', 'user')) ?? (await db.get('Settings', 'default'));
 	const settings = _settings ? Schemas.Settings.assert(_settings) : undefined;
@@ -488,7 +526,9 @@ export async function autoUpdateProtocols(db, swarpc) {
  * @param {{metadataOrder?: undefined | string[]}} protocol
  * @returns {import('./utils.js').Comparator< string | { id: string }>}
  */
-export function metadataDefinitionComparator(protocol) {
+export function metadataDefinitionComparator(protocol: {
+	metadataOrder?: undefined | string[];
+}): import('./utils.js').Comparator<string | { id: string }> {
 	if (protocol.metadataOrder) {
 		return compareBy((key) => {
 			if (typeof key !== 'string') key = key.id;
@@ -517,7 +557,7 @@ export function metadataDefinitionComparator(protocol) {
  * @param {DB.Metadata[]} metadata definitions of metadata
  * @returns
  */
-export function defaultClassificationMetadata(protocol, metadata) {
+export function defaultClassificationMetadata(protocol: DB.Protocol, metadata: DB.Metadata[]) {
 	const eligible = metadata
 		.filter((m) => m.type === 'enum')
 		.filter((m) => isMetadataInProtocol(protocol, m.id))
@@ -536,7 +576,7 @@ export function defaultClassificationMetadata(protocol, metadata) {
  * @param {DB.Protocol} protocol
  * @param {DB.Metadata[]} metadata
  */
-export function defaultCropMetadata(protocol, metadata) {
+export function defaultCropMetadata(protocol: DB.Protocol, metadata: DB.Metadata[]) {
 	const boxes = metadata
 		.filter((m) => m.type === 'boundingbox')
 		.filter((m) => isMetadataInProtocol(protocol, m.id));
