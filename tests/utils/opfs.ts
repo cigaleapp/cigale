@@ -1,13 +1,12 @@
 // Playwright won't have support for OPFS in storageState, at least for now
 // see https://github.com/microsoft/playwright/pull/41420
 // So we capture it with on our own with .addInitScript and separate JSON files...
-
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import type { Page } from '@playwright/test';
+import type { BrowserContextOptions, Page } from '@playwright/test';
 import type { FixturePaths } from '$e2e/filepaths.js';
 
-import { absoluteFixtureFilepath } from './core.js';
+import { absoluteFixturePath } from './core.js';
 
 /**
  * Source code of idb-opfs
@@ -16,24 +15,38 @@ const idbopfs = readFileSync('node_modules/idb-opfs/dist/index.mjs', {
 	encoding: 'utf8',
 });
 
-export type OPFSTestArg = FSEntry[] | FixturePaths.Absolute<FixturePaths.OPFSStates>;
+type FSEntry =
+	| {
+			type: 'directory';
+			path: string;
+	  }
+	| {
+			type: 'file';
+			path: string;
+			base64: string;
+	  };
 
-type FSEntry = {
-	filepath: string;
-	type: 'file' | 'empty-folder';
-	base64?: string | undefined;
-	contentType?: string | undefined;
+type _StorageStateNoOpfs = Exclude<BrowserContextOptions['storageState'], undefined | string>;
+
+export type StorageState = Omit<_StorageStateNoOpfs, 'origins'> & {
+	origins: Array<_StorageStateNoOpfs['origins'][number] & { opfs?: FSEntry[] }>;
 };
 
-export async function collectOPFSState(page: Page, destination: FixturePaths.OPFSStates) {
+export function supportsOpfs(page: Page): boolean {
+	const isWebkit = page.context().browser()?.browserType().name() === 'webkit';
+	return !isWebkit;
+}
+
+export async function collectOPFSState(page: Page, destination: FixturePaths.StorageStates) {
+	const origin = new URL(page.url()).origin;
+
 	const tree = await page.evaluate(async () => {
 		async function serializeFile(directory: string, value: File): Promise<FSEntry> {
 			const content = await value.bytes();
 
 			return {
-				filepath: `${directory}/${value.name}`,
+				path: `${directory}/${value.name}`,
 				base64: content.toBase64(),
-				contentType: value.type,
 				type: 'file',
 			};
 		}
@@ -53,12 +66,15 @@ export async function collectOPFSState(page: Page, destination: FixturePaths.OPF
 			// Seems like Chrome does not store content in files themselves but in .crswap equivalents
 
 			for (const [i, entry] of tree.entries()) {
-				if (entry.base64 === '') {
+				if (entry.type === 'file' && entry.base64 === '') {
 					// Try to find the .crswap
-					const crswap = tree.findIndex((e) => e.filepath === entry.filepath + '.crswap');
+					const crswap = tree.findIndex((e) => e.path === entry.path + '.crswap');
 
 					// The entry just is an empty file then
 					if (crswap === undefined) continue;
+
+					if (tree[i].type !== 'file') continue;
+					if (tree[crswap].type !== 'file') throw new Error('non-file crswap entry');
 
 					// Remove the crswap entry and use its contents here
 					tree[i].base64 = tree[crswap].base64;
@@ -72,21 +88,37 @@ export async function collectOPFSState(page: Page, destination: FixturePaths.OPF
 		return await walk('', await navigator.storage.getDirectory());
 	});
 
-	const dest = absoluteFixtureFilepath(destination);
+	const dest = absoluteFixturePath(destination);
+	const existing: StorageState = existsSync(dest)
+		? JSON.parse(readFileSync(dest).toString('utf8'))
+		: { origins: [{ origin }] };
+
+	existing.origins = existing.origins.map((o) =>
+		o.origin === origin ? { ...o, opfs: tree } : o
+	);
+
 	mkdirSync(path.dirname(dest), { recursive: true });
-	writeFileSync(dest, JSON.stringify(tree, null, 2));
+	writeFileSync(dest, JSON.stringify(existing, null, 2));
 }
 
 /**
- * @returns a function to run once the page starts loading web workers
+ * On webkit, OPFS is not supported, so we load the storage state ourselves after opfs has been mocked
  */
-export async function restoreOPFSState(page: Page, input: OPFSTestArg) {
-	// Playwright's Webkit build seems to have OPFS disabled
-	// See https://github.com/microsoft/playwright/issues/18235
+export async function restoreOPFS(
+	page: Page,
+	statefile: FixturePaths.StorageStates | StorageState
+) {
 	const isWebkit = page.context().browser()?.browserType().name() == 'webkit';
 
-	const tree: FSEntry[] =
-		typeof input === 'string' ? JSON.parse(readFileSync(input, { encoding: 'utf8' })) : input;
+	if (!isWebkit) return;
+
+	const state: StorageState =
+		typeof statefile === 'string'
+			? JSON.parse(readFileSync(absoluteFixturePath(statefile)).toString('utf8'))
+			: statefile;
+
+	const origin = new URL(page.url()).origin;
+	const tree = state.origins.find((o) => o.origin === origin)?.opfs ?? [];
 
 	await page.addInitScript(
 		async ({ tree, isWebkit, idbopfs }) => {
@@ -115,7 +147,7 @@ export async function restoreOPFSState(page: Page, input: OPFSTestArg) {
 				root: FileSystemDirectoryHandle,
 				entry: FSEntry
 			): Promise<FileSystemDirectoryHandle | FileSystemFileHandle> {
-				const parents = entry.filepath.split('/');
+				const parents = entry.path.split('/');
 				if (parents.shift() !== '') throw new Error('path doesnt start with /');
 
 				const filename = parents.pop();
@@ -127,7 +159,7 @@ export async function restoreOPFSState(page: Page, input: OPFSTestArg) {
 				while (parents.length > 0)
 					base = await base.getDirectoryHandle(parents.shift()!, { create: true });
 
-				if (entry.type === 'empty-folder')
+				if (entry.type === 'directory')
 					return base.getDirectoryHandle(filename, { create: true });
 				else return base.getFileHandle(filename, { create: true });
 			}
@@ -137,16 +169,13 @@ export async function restoreOPFSState(page: Page, input: OPFSTestArg) {
 				const handle = await _opfsHandleViaAbsolutePath(root, entry);
 
 				if (handle.kind === 'file') {
-					const name = entry.filepath.split('/').at(-1);
+					const name = entry.path.split('/').at(-1);
 					if (!name) throw new Error('File has no name');
+					if (entry.type !== 'file') throw new Error('Handle/entry type mismatch');
 
 					const writable = await handle.createWritable();
 					await writable.write(
-						new File(
-							entry.base64 ? [Uint8Array.fromBase64(entry.base64)] : [],
-							name,
-							entry.contentType ? { type: entry.contentType } : {}
-						)
+						new File(entry.base64 ? [Uint8Array.fromBase64(entry.base64)] : [], name)
 					);
 
 					await writable.close();
@@ -156,6 +185,7 @@ export async function restoreOPFSState(page: Page, input: OPFSTestArg) {
 		{ tree, isWebkit, idbopfs }
 	);
 }
+
 export async function mockOPFSOnWebWorkers(page: Page) {
 	const isWebkit = page.context().browser()?.browserType().name() === 'webkit';
 
