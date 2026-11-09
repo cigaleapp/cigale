@@ -49,12 +49,8 @@
 
 	const previewImage = $derived(images.at(0) ?? sounds.at(0));
 
-	$inspect("pi", previewImage)
-
-	const previewDuration = $derived(
-		previewImage?._table === 'Sound'
-			? tables.AudioFile.getFromState(previewImage.fileId)?.dimensions.duration
-			: undefined
+	const audiofile = $derived(
+		previewImage?.fileId ? tables.AudioFile.getFromState(previewImage.fileId) : undefined
 	);
 </script>
 
@@ -62,8 +58,10 @@
 	id={observation.id}
 	title={observation.label}
 	image={previewImage?.fileId ? uiState.getPreviewURL(previewImage.fileId) : undefined}
-	dimensions={previewImage?._table === "Image" ? previewImage.dimensions : undefined}
-	duration={previewDuration}
+	{audiofile}
+	dimensions={previewImage?._table === 'Image'
+		? previewImage.dimensions
+		: audiofile?.spectrogram.imageDimensions}
 	type={previewImage?._table === 'Sound' ? 'audio/x-unknown' : 'image/x-unknown'}
 	selected={uiState.selection.includes(observation.id)}
 	stacksize={observation.images.length + observation.sounds.length}
@@ -72,7 +70,7 @@
 	{status}
 	{highlighted}
 	{...rest}
-	boundingBoxes={images
+	boundingBoxes={[...images, ...sounds]
 		.map((img) => uiState.cropMetadataValueOf(img)?.value)
 		.filter(nonnull)
 		.map((box) => toTopLeftCoords(box))}

@@ -2,7 +2,7 @@ import type { BinaryStorageLocator } from './types.js';
 import type { BINARY_CONTENT_TABLES, Tables } from '$lib/database.js';
 import type { DatabaseHandle, IDBDatabaseType } from '$lib/idb.svelte.js';
 
-import { pick } from '$lib/utils.js';
+import { pick, replaceLastExtensionOfFilename } from '$lib/utils.js';
 
 import { binaryStorage } from './index.js';
 
@@ -48,12 +48,19 @@ export function locateFileOfObject<Table extends BinaryTableName>(
 	};
 }
 
-export function locateImagesOfObject<Name extends string = string>(
-	base: BinaryStorageLocator<Name>
-): { full: BinaryStorageLocator<Name>; preview: BinaryStorageLocator<Name> } {
+export function locateImagesOfObject(base: BinaryStorageLocator): {
+	full: BinaryStorageLocator;
+	preview: BinaryStorageLocator;
+} {
+	const transform = (area: BinaryStorageLocator['area']) => ({
+		...base,
+		area,
+		name: replaceLastExtensionOfFilename(base.name, '.png'),
+	});
+
 	return {
-		full: { ...base, area: '.audio_spectrograms/full' },
-		preview: { ...base, area: '.audio_spectrograms/preview' },
+		full: transform('.audio_spectrograms/full'),
+		preview: transform('.audio_spectrograms/preview'),
 	};
 }
 
@@ -90,20 +97,22 @@ export async function createBytes<Table extends BinaryTableName>(
 
 	const written = await binaryStorage.create(locator, pick(input, 'type', 'bytes'));
 
+	// Important: we use BinaryStorage.write and NOT .create to ensure
+	// that the image's filename corresponds to the written filename for the object's main file
+	// otherwise it's impossible to retrieve the image file later on with just the object's data
+
 	if (input.images?.full) {
-		await binaryStorage.create(
-			locateImagesOfObject(written).full,
-			// @ts-expect-error blob.type is not typed narrowly enough
-			input.images.preview
-		);
+		await binaryStorage.write(locateImagesOfObject(written).full, {
+			type: input.images.full.type as `image/${string}`,
+			bytes: await input.images.full.arrayBuffer(),
+		});
 	}
 
 	if (input.images?.preview) {
-		await binaryStorage.create(
-			locateImagesOfObject(written).preview,
-			// @ts-expect-error blob.type is not typed narrowly enough
-			input.images.full
-		);
+		await binaryStorage.write(locateImagesOfObject(written).preview, {
+			type: input.images.preview.type as `image/${string}`,
+			bytes: await input.images.preview.arrayBuffer(),
+		});
 	}
 
 	return {

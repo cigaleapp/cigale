@@ -3,6 +3,7 @@
 
 	import { toTopLeftCoords } from '$lib/BoundingBoxes.svelte.js';
 	import * as DB from '$lib/database.js';
+	import { tables } from '$lib/idb.svelte.js';
 	import { isDebugMode } from '$lib/settings.svelte.js';
 	import { uiState } from '$lib/uistate.svelte.js';
 	import { nonnull } from '$lib/utils.js';
@@ -15,11 +16,11 @@
 		images?: DB.Image[];
 		/** all sounds with this fileId */
 		sounds?: DB.Sound[];
-		/** whether this file is highlighted */
-		highlighted?: boolean;
 	}
 
-	const { fileId, sounds, images, highlighted = false, ...rest }: Props = $props();
+	const { fileId, sounds = [], images = [], highlighted = false, ...rest }: Props = $props();
+
+	const medias = $derived([...images, ...sounds]);
 
 	const status = $derived.by(() => {
 		if (uiState.queuedImages.has(fileId)) return 'queued';
@@ -31,29 +32,44 @@
 
 	const tooltip = $derived.by(() => {
 		if (status === 'errored') {
-			return images
+			return medias
 				.map(({ id }) => uiState.erroredImages.get(id))
 				.filter(nonnull)
 				.join('; ');
 		}
 
 		if (isDebugMode())
-			return `${fileId} @ ${images[0]?.addedAt.toISOString()} [${images[0]?.sessionId}]`;
+			return `${fileId} @ ${medias[0]?.addedAt.toISOString()} [${medias[0]?.sessionId}]`;
+	});
+
+	const audiofile = $derived(tables.AudioFile.getFromState(fileId));
+
+	const dimensions = $derived.by(() => {
+		const media = medias.at(0);
+		if (!media) return undefined;
+
+		switch (media._table) {
+			case 'Audio':
+				return audiofile?.spectrogram.imageDimensions;
+			case 'Image':
+				return media.dimensions;
+		}
 	});
 </script>
 
 <CardMedia
 	id={fileId}
-	title={images[0].filename}
+	title={medias[0].filename}
 	image={uiState.getPreviewURL(fileId)}
-	dimensions={images[0].dimensions}
+	{dimensions}
+	{audiofile}
 	selected={uiState.selection.includes(fileId)}
 	boxes="show-all"
 	{tooltip}
 	{status}
 	{highlighted}
 	{...rest}
-	boundingBoxes={images
+	boundingBoxes={medias
 		.map((img) => uiState.cropMetadataValueOf(img)?.value)
 		.filter(nonnull)
 		.map((box) => toTopLeftCoords(box))}

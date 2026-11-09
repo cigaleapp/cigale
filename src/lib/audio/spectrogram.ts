@@ -1,5 +1,6 @@
 import type { CoordinatesDomain } from '$lib/BoundingBoxes.svelte.js';
 import type * as DB from '$lib/database.js';
+import type { DecodedAudioMono } from './decode.js';
 
 export const AUDIO_SPECTROGRAM_ROOT_FOLDER = '.audio_spectrograms';
 export type AudioSpectrogramsFolders =
@@ -7,10 +8,8 @@ export type AudioSpectrogramsFolders =
 	| `${typeof AUDIO_SPECTROGRAM_ROOT_FOLDER}/full`
 	| `${typeof AUDIO_SPECTROGRAM_ROOT_FOLDER}/preview`;
 
-const PREVIEW_SPECTROGRAM_DIMENSIONS = {
-	width: 256,
-	height: 342,
-};
+const PREVIEW_SPECTROGRAM_HEIGHT = 512;
+const FULLSIZE_SPECTROGRAM_HEIGHT = 1080
 
 interface SpectrogramOptions {
 	/** FFT window size, must be a power of two. Default 2048. */
@@ -31,7 +30,7 @@ interface SpectrogramOptions {
 	maxDb?: number;
 }
 
-type SpectrogramInfo = NonNullable<(typeof DB.Schemas.AudioFile)['inferIn']['spectrogram']>;
+type SpectrogramInfo = NonNullable<(typeof DB.Schemas.AudioFile)['inferIn']['analysis']>;
 
 /**
  * Decode an audio file (mp3, wav, ogg, flac, m4a... whatever the browser supports)
@@ -41,7 +40,7 @@ type SpectrogramInfo = NonNullable<(typeof DB.Schemas.AudioFile)['inferIn']['spe
  * @returns PNG blob
  */
 export async function generateSpectrograms(
-	{ samples, sampleRate }: { samples: Float32Array; sampleRate: number },
+	{ samples, sampleRate }: DecodedAudioMono,
 	options: SpectrogramOptions = {}
 ): Promise<{
 	images: { full: Blob; preview: Blob };
@@ -51,7 +50,7 @@ export async function generateSpectrograms(
 	if (fftSize < 2 || (fftSize & (fftSize - 1)) !== 0) {
 		throw new Error('fftSize must be a power of two');
 	}
-	const height = options.height ?? 512;
+	const height = options.height ?? FULLSIZE_SPECTROGRAM_HEIGHT;
 	const minDb = options.minDb ?? -90;
 	const maxDb = options.maxDb ?? 0;
 	const hop = options.hopSize ?? fftSize / 4;
@@ -143,21 +142,6 @@ export async function generateSpectrograms(
 /* Helpers                                                             */
 /* ------------------------------------------------------------------ */
 
-export async function decodeToMono(
-	bytes: ArrayBuffer,
-	targetSampleRate = 44100
-): Promise<{ samples: Float32Array<ArrayBuffer>; sampleRate: number }> {
-	// 1 channel, 1 frame is a dummy; we only use it for decodeAudioData
-	const ctx = new OfflineAudioContext(1, 1, targetSampleRate);
-	const buffer = await ctx.decodeAudioData(bytes.slice(0));
-
-	const mono = new Float32Array(buffer.length);
-	for (let c = 0; c < buffer.numberOfChannels; c++) {
-		const ch = buffer.getChannelData(c);
-		for (let i = 0; i < mono.length; i++) mono[i] += ch[i] / buffer.numberOfChannels;
-	}
-	return { samples: mono, sampleRate: buffer.sampleRate };
-}
 
 /** Returns an in-place radix-2 FFT function for a fixed size. */
 function createFFT(n: number) {
@@ -231,7 +215,10 @@ function buildPalette(): Uint8ClampedArray {
 }
 
 async function encodePngs(image: ImageData): Promise<{ full: Blob; preview: Blob }> {
-	const preview = PREVIEW_SPECTROGRAM_DIMENSIONS;
+	const preview = {
+		height: PREVIEW_SPECTROGRAM_HEIGHT,
+		width: (image.width / image.height) * PREVIEW_SPECTROGRAM_HEIGHT,
+	};
 
 	const full = new OffscreenCanvas(image.width, image.height);
 	full.getContext('2d')!.putImageData(image, 0, 0);

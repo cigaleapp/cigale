@@ -157,7 +157,7 @@ export function fallbackObservationLabel(parts) {
 
 /**
  *
- * @param {{image: {id: string, filename: string}} | {sound: {id: string, filename: string}}} source
+ * @param {Record<"image"|"sound", {id: string, filename: string}>} source
  * @param {import('$lib/database').Session} session
  * @returns {typeof import('$lib/database').Schemas.Observation.inferIn}
  */
@@ -223,15 +223,19 @@ export async function ensureNoLoneImagesOrSounds(tx) {
  * @param {import('./idb.svelte').IDBTransactionWithAtLeast<["Observation", "Image"]>} [tx] reuse an existing transaction
  */
 export async function ensureNoEmptyObservations(tx) {
-	await db.openTransaction(['Observation', 'Image'], { tx }, async (tx) => {
+	await db.openTransaction(['Observation', 'Image', 'Sound'], { tx }, async (tx) => {
 		const observations = await tx.objectStore('Observation').getAll();
 		for (const observation of observations) {
 			const images = await Promise.all(
 				observation.images.map((imageId) => tx.objectStore('Image').get(imageId))
 			);
-			const existing = images.filter(nonnull);
+			const sounds = await Promise.all(
+				observation.images.map((imageId) => tx.objectStore('Image').get(imageId))
+			);
+			const existingImages = images.filter(nonnull);
+			const existingSounds = sounds.filter(nonnull);
 
-			if (existing.length === 0) {
+			if (existingImages.length + existingSounds.length === 0) {
 				console.warn(
 					`Deleting observation ${observation.id} because it has no images`,
 					observation
@@ -242,15 +246,19 @@ export async function ensureNoEmptyObservations(tx) {
 				uiState.erroredImages.delete(observation.id);
 			} else {
 				// If some images exist, but not all, remove the non-existing ones from the observation.
-				if (existing.length !== observation.images.length) {
+				if (
+					existingImages.length !== observation.images.length ||
+					existingSounds.length !== (observation.sounds.length ?? 0)
+				) {
 					tx.objectStore('Observation').put({
 						...observation,
-						images: existing.map(({ id }) => id),
+						images: existingImages.map(({ id }) => id),
+						sounds: existingSounds.map(({ id }) => id),
 					});
 					console.info(
 						`Updating observation ${observation.id} because some of its images were deleted`,
 						observation,
-						existing
+						existingImages
 					);
 				}
 			}

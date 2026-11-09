@@ -85,9 +85,9 @@ export const AudioFile = type({
 	dimensions: AudioDimensions,
 	spectrogram: {
 		/** In milliseconds */
-		durationRange: ['number.integer >= 0', 'number.integer > 0'],
+		durationRange: ['number >= 0', 'number > 0'],
 		/** In Hertz */
-		frequencyRange: ['number >= 0', 'number> 0'],
+		frequencyRange: ['number >= 0', 'number > 0'],
 		/** In dBFS */
 		volumeRange: ['number', 'number'],
 		imageDimensions: ImageDimensions,

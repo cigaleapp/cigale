@@ -4,17 +4,18 @@ import { uiState } from '$lib/uistate.svelte.js';
 
 import { toTopLeftCoords } from './BoundingBoxes.svelte.js';
 import { errorMessage, humanFormatName } from './i18n.js';
-import * as db from './idb.svelte.js';
+import * as idb from './idb.svelte.js';
 import { tables } from './idb.svelte.js';
 import { imageLimits } from './inference_utils.js';
 import { removeFromObservation } from './observations.js';
 import { RAW_IMAGE_MEDIA_TYPES } from './raw.js';
-import { accessBytes, accessImages, createBytes } from './storage/utils.js';
+import { accessBytes, accessImages, createBytes, deleteObjectWithBytes } from './storage/utils.js';
 import { clamp, throwError } from './utils.js';
 
 /**
  * @import { Image, Protocol } from './database.js';
  * @import { IDBTransactionWithAtLeast } from './idb.svelte';
+ * @import * as DB from './database.js';
  */
 
 /**
@@ -168,21 +169,15 @@ export function imageBufferWasSaved(image) {
  * @param {boolean} [notFoundOk=true]
  */
 export async function deleteImageOrAudioFile(id, tx, notFoundOk = true) {
-	await db.openTransaction(
+	const table = (await idb.get('ImageFile', id)) ? 'ImageFile' : 'AudioFile';
+
+	await idb.openTransaction(
 		['Image', 'Sound', 'ImageFile', 'AudioFile', 'ImagePreviewFile', 'Observation'],
 		{ tx, session: uiState.currentSession?.id },
 		async (tx) => {
 			try {
 				const imagesOfFile = await tx.objectStore('Image').index('fileId').getAll(id);
 				const soundsOfFile = await tx.objectStore('Sound').index('fileId').getAll(id);
-
-				try {
-					tx.objectStore('ImageFile').delete(id);
-					tx.objectStore('ImagePreviewFile').delete(id);
-					tx.objectStore('AudioFile').delete(id);
-				} catch {
-					// ok
-				}
 
 				for (const image of imagesOfFile) {
 					tx.objectStore('Image').delete(image.id);
@@ -223,6 +218,11 @@ export async function deleteImageOrAudioFile(id, tx, notFoundOk = true) {
 		}
 	);
 
+	await deleteObjectWithBytes(idb.databaseHandle(), table, id);
+	if (table === 'ImageFile') {
+		await deleteObjectWithBytes(idb.databaseHandle(), 'ImagePreviewFile', id);
+	}
+
 	uiState.erroredImages.delete(id);
 	uiState.loadingImages.delete(id);
 	uiState.queuedImages.delete(id);
@@ -246,7 +246,7 @@ export async function deleteImageOrAudioFile(id, tx, notFoundOk = true) {
  * @param {boolean} [notFoundOk=true]
  */
 export async function deleteImageOrSound(id, tx, notFoundOk = true) {
-	await db.openTransaction(
+	await idb.openTransaction(
 		['Image', 'ImageFile', 'ImagePreviewFile', 'Observation', 'Sound', 'AudioFile'],
 		{ tx, session: uiState.currentSessionId },
 		async (tx) => {
@@ -360,7 +360,7 @@ export async function storeImageBytes({
 		type: contentType,
 	});
 
-	await db.openTransaction(['ImageFile', 'ImagePreviewFile'], { tx }, async (tx) => {
+	await idb.openTransaction(['ImageFile', 'ImagePreviewFile'], { tx }, async (tx) => {
 		await tx.objectStore('ImageFile').put({
 			id,
 			contentType,
@@ -386,7 +386,7 @@ export async function storeImageBytes({
  * @param {'global' | 'session'} [scope] whether to load into global or session preview URLs
  */
 export async function loadPreviewImage(id, scope = 'session') {
-	const file = await db.get('ImagePreviewFile', id);
+	const file = await idb.get('ImagePreviewFile', id);
 	if (file) {
 		console.debug(`loading preview image ${id}`, file);
 		const bytes = await accessBytes('ImagePreviewFile', file);
@@ -394,7 +394,7 @@ export async function loadPreviewImage(id, scope = 'session') {
 		uiState.setPreviewURL(id, URL.createObjectURL(blob), scope === 'global');
 		return;
 	} else {
-		const file = await db.get('AudioFile', id);
+		const file = await idb.get('AudioFile', id);
 		if (!file) return;
 		console.log('loading preview img for ', file);
 		const bytes = await accessImages('AudioFile', file, 'preview');
@@ -490,12 +490,14 @@ export async function resizeToMaxSize({ source, maxWidth = MAXWIDTH, maxHeight }
 
 /**
  *
- * @param {string} imageFileId
- * @param {Image[]} [images] look for images in this array instead of the database
- * @returns {Image[]}
+ * @param {string} fileId
+ * @param {(DB.Image | DB.Sound)[]} [medias] look for medias in this array instead of the database
+ * @returns {(DB.Image|DB.Sound)[]}
  */
-export function imagesOfImageFile(imageFileId, images = undefined) {
-	return (images ?? tables.Image.state).filter((img) => img.fileId === imageFileId);
+export function mediasOfFile(fileId, medias = undefined) {
+	return (medias ?? [...tables.Image.state, ...tables.Sound.state]).filter(
+		(img) => img.fileId === fileId
+	);
 }
 
 if (import.meta.vitest) {
@@ -506,13 +508,13 @@ if (import.meta.vitest) {
 		const images = [sampleImage('1', '1'), sampleImage('2', '1'), sampleImage('3', '2')];
 		const [img1, img2] = images;
 
-		expect(imagesOfImageFile('1', images)).toEqual([img1, img2]);
+		expect(mediasOfFile('1', images)).toEqual([img1, img2]);
 
 		_tablesState.Image = [];
-		expect(imagesOfImageFile('1')).toEqual([]);
+		expect(mediasOfFile('1')).toEqual([]);
 
 		_tablesState.Image = images;
-		expect(imagesOfImageFile('1')).toEqual([img1, img2]);
+		expect(mediasOfFile('1')).toEqual([img1, img2]);
 	});
 }
 

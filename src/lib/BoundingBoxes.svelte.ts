@@ -51,8 +51,27 @@ export type CoordinatesDomain = { x: CoordinatesRange; y: CoordinatesRange };
 
 const NORMALIZED_DOMAIN: CoordinatesDomain = { x: [0, 1], y: [0, 1] };
 
+export function domainFromDimensions(dimensions: {
+	width: number;
+	height: number;
+}): CoordinatesDomain {
+	return {
+		x: [0, dimensions.width],
+		y: [0, dimensions.height],
+	};
+}
+
+export function dimensionsOfDomain(domain: CoordinatesDomain): { width: number; height: number } {
+	const [start, end] = domain.x;
+	const [low, high] = domain.y;
+
+	return {
+		width: end - start,
+		height: high - low,
+	};
+}
 /**
- * Given two domains, creates a function that can convert coordinates of boxes 
+ * Given two domains, creates a function that can convert coordinates of boxes
  * from the first domain into the second.
  * Pass "null" instead to mean the normalized domain ([0, 1] on both axes)
  */
