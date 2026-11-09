@@ -159,10 +159,10 @@
 		setupUndoActions,
 	} from './actions.svelte.js';
 	import Boxes from './Boxes.svelte';
-	import CropSurface from './CropSurface.svelte';
 	import FocusSwitcher from './FocusSwitcher.svelte';
 	import ImmersiveActions from './ImmersiveActions.svelte';
 	import { setupKeyboardShortcuts } from './keyboard.svelte.js';
+	import MediaArea from './MediaArea.svelte';
 	import Toolbar from './Toolbar.svelte';
 	import { Zoom } from './zoom.svelte.js';
 
@@ -304,14 +304,10 @@
 			</div>
 		{/if}
 
-		<!-- TODO: make CropSurface handle its image element resize instead -->
+		<!-- TODO: make MediaArea handle its image element resize instead -->
 		{#key getSettings().cropperSidebarCollapsed}
-			<CropSurface bind:imageIsLoading {showConfirmedOverlay} {selectedBox} />
+			<MediaArea {fileId} bind:imageIsLoading {showConfirmedOverlay} {selectedBox} />
 		{/key}
-
-		{#if audiofile}
-			<AudioPlayer file={audiofile} bind:fileIsLoading={audioIsLoading} />
-		{/if}
 	</main>
 
 	<aside class="toolbar">

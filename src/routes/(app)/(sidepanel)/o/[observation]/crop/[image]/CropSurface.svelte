@@ -1,11 +1,7 @@
 <script lang="ts">
 	import type { SelectedBox } from './+page.svelte';
 
-	import { page } from '$app/state';
 	import { toTopLeftCoords } from '$lib/BoundingBoxes.svelte.js';
-	import { tables } from '$lib/idb.svelte.js';
-	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
-	import { accessImages } from '$lib/storage/utils.js';
 	import { Gestures } from '$lib/touch/gestures.svelte.js';
 	import { uiState } from '$lib/uistate.svelte.js';
 	import { mapValues, overrideStyle, pick } from '$lib/utils.js';
@@ -21,45 +17,30 @@
 	import { activeTool } from './Toolbar.svelte';
 
 	interface Props {
-		imageIsLoading: boolean;
-		audioIsLoading: boolean;
 		selectedBox: SelectedBox;
 		showConfirmedOverlay: () => Promise<void>;
+		imageIsLoading: boolean;
+		/** Where to save bounding boxes & from which file to create new Image/Sound objects */
+		fileId: string;
+		/** Image source */
+		imageSrc: string | undefined;
+		fit: 'contain' | 'cover';
 	}
 
 	let {
 		imageIsLoading = $bindable(true),
-		audioIsLoading,
 		selectedBox,
 		showConfirmedOverlay,
+		fileId,
+		imageSrc,
+		fit: subjectFitMode,
 	}: Props = $props();
 
-	const fileId = $derived(page.params.image);
+	$inspect('z', zoom.scale)
+
 	const boundingBoxes = $derived(getBoundingBoxes());
 	const focusedImageId = $derived(focusedImage()?.id);
 	const hidingAll = $derived(getHideAll());
-	let imageSrc = $state<string>();
-
-	const isAudio = $derived(fileId && tables.AudioFile.state.some((f) => f.id === fileId));
-
-	$effect(() => {
-		if (!fileId) return;
-
-		const audiofile = tables.AudioFile.getFromState(fileId);
-		if (!audiofile) {
-			imageSrc = uiState.getPreviewURL(fileId);
-			return;
-		}
-
-		void (async () => {
-			const bytes = await accessImages('AudioFile', audiofile, 'full');
-			imageSrc = URL.createObjectURL(new Blob([bytes], { type: 'image/png' }));
-		})();
-
-		return () => {
-			URL.revokeObjectURL(imageSrc);
-		};
-	});
 
 	let imageElement = $state<HTMLImageElement>();
 
@@ -76,6 +57,7 @@
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
 	class="crop-surface"
+	style:--crop-surface-fit={subjectFitMode}
 	{@attach (node) => {
 		new Gestures(node, {
 			// TODO: disabled cuz it triggers when grabbing a cropbox to move it around
@@ -133,21 +115,6 @@
 		zoom.update(imageElement, { via: 'wheel', event });
 	}}
 >
-	<div class="behind-image">
-		{#if imageIsLoading}
-			<LoadingSpinner --size="2em" />
-			<p class="loading">Chargement de l'image…</p>
-		{:else if isAudio && audioIsLoading}
-			<LoadingSpinner --size="2em" />
-			<p class="loading">Chargement de l'audio…</p>
-		{:else}
-			<p class="coucou" aria-hidden="true">
-				coucou toi :)
-				<br />
-				passes une bonne journée ! 💖💖
-			</p>
-		{/if}
-	</div>
 	<img
 		pw-testid="crop-subject-image"
 		src={imageSrc}
@@ -164,6 +131,7 @@
 			{...activeTool()}
 			{imageElement}
 			{zoom}
+			{subjectFitMode}
 			imageFileID={fileId}
 			boundingBoxes={mapValues(
 				hidingAll
@@ -207,32 +175,9 @@
 		height: 100%;
 	}
 
-	.behind-image {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-	}
-
-	.behind-image .loading {
-		margin-top: 1em;
-		font-size: 1.2em;
-	}
-
-	.behind-image .coucou {
-		text-align: center;
-		font-size: 0.9em;
-		color: var(--fg-primary);
-	}
-
 	img {
 		width: 100%;
 		height: 100%;
-		object-fit: contain;
+		object-fit: var(--crop-surface-fit, contain);
 	}
 </style>

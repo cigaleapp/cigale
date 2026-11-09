@@ -34,6 +34,7 @@
 		disabled?: boolean;
 		zoom: Zoom;
 		imageFileID?: string;
+		subjectFitMode: 'contain' | 'cover';
 	}
 
 	let {
@@ -48,6 +49,7 @@
 		createMode,
 		zoom,
 		imageFileID,
+		subjectFitMode
 	}: Props = $props();
 
 	// Using a writable $derived here causes the state to not update until onmouseup, idk why
@@ -115,6 +117,7 @@
 
 	const imageRect = $derived(
 		fittedImageRect(
+			subjectFitMode,
 			{ clientHeight, clientWidth, naturalHeight, naturalWidth, clientTop, clientLeft },
 			zoom
 		)

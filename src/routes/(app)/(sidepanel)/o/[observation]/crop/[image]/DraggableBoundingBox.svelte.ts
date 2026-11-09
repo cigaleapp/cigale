@@ -6,10 +6,11 @@ import { type } from 'arktype';
 import { clamp, sign } from '$lib/utils.js';
 
 /**
- * Calculate bounding rect for an image element that has object-fit: contain. The boundingClientRect is not the same as the actual, displayed image. We use both natural{Width,Height} and client{Width,Height} to calculate the displayed image size.
+ * Calculate bounding rect for an image element that has object-fit: <mode>. The boundingClientRect is not the same as the actual, displayed image. We use both natural{Width,Height} and client{Width,Height} to calculate the displayed image size.
  * You can also provide the zoom state to take it into account.
  */
 export function fittedImageRect(
+	mode: 'contain' | 'cover',
 	{
 		naturalWidth,
 		naturalHeight,
@@ -26,22 +27,45 @@ export function fittedImageRect(
 	const naturalRatio = naturalWidth / naturalHeight;
 	const clientRatio = clientWidth / clientHeight;
 
-	let [width, height] =
-		naturalRatio < clientRatio
-			? [clientHeight * naturalRatio, clientHeight]
-			: [clientWidth, clientWidth / naturalRatio];
+	switch (mode) {
+		case 'contain': {
+			let [width, height] =
+				naturalRatio < clientRatio
+					? [clientHeight * naturalRatio, clientHeight]
+					: [clientWidth, clientWidth / naturalRatio];
 
-	if (zoom) {
-		width *= zoom.scale;
-		height *= zoom.scale;
+			if (zoom) {
+				width *= zoom.scale;
+				height *= zoom.scale;
+			}
+
+			return {
+				width,
+				height,
+				x: (zoom?.origin.x ?? 0) + clientLeft + (clientWidth - width) / 2,
+				y: (zoom?.origin.y ?? 0) + clientTop + (clientHeight - height) / 2,
+			};
+		}
+
+		case 'cover': {
+			let [width, height] =
+				naturalRatio > clientRatio
+					? [clientHeight * naturalRatio, clientHeight]
+					: [clientWidth, clientWidth / naturalRatio];
+
+			if (zoom) {
+				width *= zoom.scale;
+				height *= zoom.scale;
+			}
+
+			return {
+				width,
+				height,
+				x: (zoom?.origin.x ?? 0) + clientLeft + (clientWidth - width) / 2,
+				y: (zoom?.origin.y ?? 0) + clientTop + (clientHeight - height) / 2,
+			};
+		}
 	}
-
-	return {
-		width,
-		height,
-		x: (zoom?.origin.x ?? 0) + clientLeft + (clientWidth - width) / 2,
-		y: (zoom?.origin.y ?? 0) + clientTop + (clientHeight - height) / 2,
-	};
 }
 
 export class NewBoundingBox {
