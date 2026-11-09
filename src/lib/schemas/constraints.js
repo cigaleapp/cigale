@@ -223,15 +223,15 @@ const HardwareRequirementCompositeString = (property, kind, convertTo) => {
 	const withUnit = (groupname, unitpattern) =>
 		`(?<${groupname}>${numberPattern}\\s+${unitpattern})`;
 
+	// Each named group must appear exactly once: older V8 (e.g. the Android
+	// WebView) throws "Duplicate capture group name" if a name is reused.
 	const pattern = new RegExp(
-		'^' +
-			[
-				`(?:${withUnit('main', mainUnit)}\\s*@\\s*${withUnit('freq', freqUnit)})`,
-				withUnit('main', mainUnit),
-				withUnit('freq', freqUnit),
-				'\\s*',
-			].join('|') +
-			'$'
+		'^\\s*(?:' +
+			withUnit('main', mainUnit) +
+			'(?:\\s*@\\s*)?' +
+		')?' +
+			withUnit('freq', freqUnit) +
+		'?\\s*$'
 	);
 
 	/**

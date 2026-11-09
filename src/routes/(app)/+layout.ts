@@ -172,14 +172,19 @@ export async function load({ url }) {
 
 	console.time('background things');
 
-	void autoUpdateProtocols(databaseHandle(), swarpc).then((updates) => {
-		if (updates.length === 0) return;
-		toasts.info(
-			updates.length === 1
-				? `Protocole "${updates[0].name}" mis à jour à la v${updates[0].version}`
-				: `${updates.length} protocoles ont été mis à jour: ${updates.map((u) => `"${u.name}"`).join(', ')}`
-		);
-	});
+	// Delay the update check until after startup. It downloads and parses complete
+	// protocol files in the main renderer, which can overlap with the memory-heavy
+	// import of the built-in protocols on resource-constrained WebViews.
+	setTimeout(() => {
+		void autoUpdateProtocols(databaseHandle(), swarpc).then((updates) => {
+			if (updates.length === 0) return;
+			toasts.info(
+				updates.length === 1
+					? `Protocole "${updates[0].name}" mis à jour à la v${updates[0].version}`
+					: `${updates.length} protocoles ont été mis à jour: ${updates.map((u) => `"${u.name}"`).join(', ')}`
+			);
+		});
+	}, 30_000);
 
 	// Start workers in the background so that we can have the UI shown etc but warm them up so that they're ready when needed
 	void swarpc.wakeup(undefined);
@@ -258,11 +263,30 @@ async function loadDefaultProtocol() {
 		const filename = new URL(importUrl).pathname.split('/').at(-1);
 		console.debug(`Importing ${filename} since ${importUrl} not in`, sources);
 		try {
-			const contents = await fetchHttpRequest(importUrl, {
-				onProgress({ total, transferred }) {
-					setLoading('download', transferred / total);
-				},
-			}).then((res) => res.text());
+			// Guard against a stalled network fetch hanging startup forever
+			// (e.g. on a slow software-emulated Android emulator). Without a
+			// timeout, a fetch that never resolves would block load() and the
+			// #loading overlay would never be removed. The timeout is based on
+			// inactivity (reset on each progress event) so a slow but
+			// progressing download is not aborted.
+			const controller = new AbortController();
+			let stallTimer = setTimeout(() => controller.abort(), 60_000);
+			const resetStallTimer = () => {
+				clearTimeout(stallTimer);
+				stallTimer = setTimeout(() => controller.abort(), 60_000);
+			};
+			let contents: string;
+			try {
+				contents = await fetchHttpRequest(importUrl, {
+					onProgress({ total, transferred }) {
+						resetStallTimer();
+						setLoading('download', total > 0 ? transferred / total : 0);
+					},
+					signal: controller.signal,
+				}).then((res) => res.text());
+			} finally {
+				clearTimeout(stallTimer);
+			}
 
 			setLoading('download', 1);
 
