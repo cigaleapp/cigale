@@ -195,8 +195,8 @@ export class UIState {
 
 	cropMetadataId = $derived<NamespacedMetadataID>(this.cropMetadata?.id ?? 'backbone__crop');
 
-	cropMetadataValueOf(image: DB.Image): TypedMetadataValue<'boundingbox'> | undefined {
-		return getMetadataValue(image, 'boundingbox', this.cropMetadataId);
+	cropMetadataValueOf(media: DB.Image | DB.Sound): TypedMetadataValue<'boundingbox'> | undefined {
+		return getMetadataValue(media, 'boundingbox', this.cropMetadataId);
 	}
 
 	/**

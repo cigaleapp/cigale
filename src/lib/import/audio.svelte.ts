@@ -67,5 +67,7 @@ export async function processAudioFile(
 		sessionId: uiState.currentSession.id,
 	});
 
+	await tables.AudioFile.refresh(uiState.currentSessionId);
+
 	uiState.processing.removeFile(id);
 }

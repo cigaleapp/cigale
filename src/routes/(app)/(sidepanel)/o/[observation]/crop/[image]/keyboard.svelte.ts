@@ -6,7 +6,7 @@ import { toggleSetting } from '$lib/settings.svelte.js';
 import { fromEntries, range, throwError } from '$lib/utils.js';
 
 import {
-	currentImages,
+	currentMedias,
 	focusedImage,
 	boundingBoxes as getBoundingBoxes,
 	setFocusedImage,
@@ -23,7 +23,7 @@ import {
 import { switchTool, tools } from './Toolbar.svelte';
 
 const boundingBoxes = $derived(getBoundingBoxes());
-const images = $derived(currentImages());
+const images = $derived(currentMedias());
 
 export function setupKeyboardShortcuts({
 	selectedBox: getSelectedBox,

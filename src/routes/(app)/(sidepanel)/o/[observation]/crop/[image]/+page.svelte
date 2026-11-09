@@ -13,17 +13,19 @@
 	const { sortedFileIds } = $derived(page.data as PageData);
 	const fileId = $derived(page.params.image);
 
-	const images = $derived.by(() => {
+	const medias = $derived.by(() => {
 		if (!fileId) return [];
 
-		return imagesOfImageFile(
+		return mediasOfFile(
 			fileId,
-			idb.tables.Image.state.filter((img) => img.sessionId === uiState.currentSessionId)
+			[...idb.tables.Image.state, ...idb.tables.Sound.state].filter(
+				(img) => img.sessionId === uiState.currentSessionId
+			)
 		);
 	});
 
-	export function currentImages() {
-		return images;
+	export function currentMedias() {
+		return medias;
 	}
 
 	let hideAllBoxes = $state(false);
@@ -59,7 +61,7 @@
 	 */
 	export function boundingBoxes() {
 		return Object.fromEntries(
-			images
+			medias
 				.map(({ id, metadata }) => [id, metadata[uiState.cropMetadataId]?.value])
 				.filter(([, box]) => box !== undefined)
 				.map(([id, box]) => [id, assertIs('boundingbox', box)])
@@ -69,18 +71,16 @@
 	export function hasCrop(imageFileId: string | undefined) {
 		if (!imageFileId) return false;
 
-		return imagesOfImageFile(imageFileId).every(
-			(image) => uiState.cropMetadataId in image.metadata
-		);
+		return mediasOfFile(imageFileId).every((image) => uiState.cropMetadataId in image.metadata);
 	}
 
 	export function hasConfirmedCrop(imageFileId: string | undefined) {
 		if (!imageFileId) return false;
 
-		return imagesOfImageFile(imageFileId).every(imageHasConfirmedCrop);
+		return mediasOfFile(imageFileId).every(imageHasConfirmedCrop);
 	}
 
-	export function imageHasConfirmedCrop(image: DB.Image) {
+	export function imageHasConfirmedCrop(image: DB.Image | DB.Sound) {
 		const value = uiState.cropMetadataValueOf(image);
 		return value?.confirmed;
 	}
@@ -143,7 +143,7 @@
 	import IconReset from '~icons/ri/reset-left-fill';
 	import { page } from '$app/state';
 	import BottomDrawer from '$lib/BottomDrawer.svelte';
-	import { imageIdToFileId, imagesOfImageFile } from '$lib/images.js';
+	import { imageIdToFileId, mediasOfFile } from '$lib/images.js';
 	import { assertIs } from '$lib/metadata/index.js';
 	import { IsMobile } from '$lib/mobile.svelte.js';
 	import { goto } from '$lib/paths.js';
@@ -168,7 +168,7 @@
 
 	const mobile = new IsMobile();
 
-	const firstImage = $derived(images.at(0));
+	const firstImage = $derived(medias.at(0));
 
 	// Controls visibility of the checkmark little centered overlay
 	let showConfirmedOverlay = $state(async () => {});
@@ -208,6 +208,9 @@
 	});
 
 	let imageIsLoading = $state(true);
+	let audioIsLoading = $state(true);
+
+	const audiofile = $derived(fileId ? tables.AudioFile.getFromState(fileId) : undefined);
 
 	watch(
 		() => fileId,
@@ -305,6 +308,10 @@
 		{#key getSettings().cropperSidebarCollapsed}
 			<CropSurface bind:imageIsLoading {showConfirmedOverlay} {selectedBox} />
 		{/key}
+
+		{#if audiofile}
+			<AudioPlayer file={audiofile} bind:fileIsLoading={audioIsLoading} />
+		{/if}
 	</main>
 
 	<aside class="toolbar">

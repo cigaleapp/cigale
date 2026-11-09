@@ -474,6 +474,11 @@ export function splitFilenameOnExtension(filename: string): [string, string] {
 	return [match[1], match[2]];
 }
 
+export function replaceLastExtensionOfFilename(filename: string, newExtension: `.${string}`) {
+	const parts = filename.split('.');
+	return parts.slice(0, -1).join('.') + newExtension;
+}
+
 if (import.meta.vitest) {
 	const { test, expect } = import.meta.vitest;
 	test('splitFilenameOnExtension', () => {
@@ -840,7 +845,6 @@ if (import.meta.vitest) {
 		expect(insideBoundingClientRect({ offsetX: 50, offsetY: 101 }, rect, 2)).toBe(true);
 	});
 }
-
 
 export function isZip(
 	contentType: string

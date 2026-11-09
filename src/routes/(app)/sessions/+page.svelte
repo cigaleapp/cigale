@@ -87,11 +87,13 @@
 							async onclick() {
 								await switchSession(session.id);
 								// Get number of images in the session to decide which tab to open on
-								const imagesCount = await countByIndex(
-									'Image',
-									'sessionId',
-									session.id
+								const imagesCount = sum(
+									await Promise.all([
+										countByIndex('Image', 'sessionId', session.id),
+										countByIndex('Sound', 'sessionId', session.id),
+									])
 								);
+
 								if (imagesCount > 0) {
 									await goto('/(app)/(sidepanel)/import');
 								} else {

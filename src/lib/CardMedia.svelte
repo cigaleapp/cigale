@@ -1,4 +1,6 @@
 <script lang="ts" module>
+	import type * as DB from '$lib/database.js';
+
 	type Status = 'queued' | 'loading' | 'ok' | 'errored';
 
 	type EventHandler = (
@@ -14,6 +16,7 @@
 		ondoubleclick?: EventHandler;
 		ondelete?: EventHandler;
 		onretry?: EventHandler;
+		audiofile?: DB.AudioFile;
 		/** tooltip to show */
 		tooltip?: string | undefined;
 		id: string;
@@ -47,26 +50,27 @@
 </script>
 
 <script lang="ts">
-	import type { TopLeftBoundingBox } from './BoundingBoxes.svelte';
+	import type { TopLeftBoundingBox } from '$lib/BoundingBoxes.svelte';
 
 	import IconRetry from '~icons/ri/arrow-go-back-fill';
 	import IconDelete from '~icons/ri/delete-bin-line';
 	import IconImage from '~icons/ri/image-2-line';
 	import IconVideo from '~icons/ri/video-line';
 	import IconAudio from '~icons/ri/volume-up-line';
-
-	import AnimatableCheckmark from './AnimatableCheckmark.svelte';
-	import ButtonInk from './ButtonInk.svelte';
-	import Card from './Card.svelte';
-	import CroppedImg from './CroppedImg.svelte';
-	import { formatDurationStopwatch } from './date.js';
-	import LoadingSpinner from './LoadingSpinner.svelte';
-	import Logo from './Logo.svelte';
-	import { IsMobile } from './mobile.svelte.js';
-	import OverflowableText from './OverflowableText.svelte';
-	import { tooltip } from './tooltips.js';
-	import { onlongpress } from './touch/longpress.js';
-	import { uiState } from './uistate.svelte.js';
+	import AnimatableCheckmark from '$lib/AnimatableCheckmark.svelte';
+	import { spectrogramBoundingBoxDomains } from '$lib/audio/spectrogram.js';
+	import { coordsFitter } from '$lib/BoundingBoxes.svelte';
+	import ButtonInk from '$lib/ButtonInk.svelte';
+	import Card from '$lib/Card.svelte';
+	import CroppedImg from '$lib/CroppedImg.svelte';
+	import { formatDurationStopwatch } from '$lib/date.js';
+	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
+	import Logo from '$lib/Logo.svelte';
+	import { IsMobile } from '$lib/mobile.svelte.js';
+	import OverflowableText from '$lib/OverflowableText.svelte';
+	import { tooltip } from '$lib/tooltips.js';
+	import { onlongpress } from '$lib/touch/longpress.js';
+	import { uiState } from '$lib/uistate.svelte.js';
 
 	let {
 		onclick,
@@ -81,7 +85,7 @@
 		selectable = true,
 		highlighted,
 		status,
-		duration,
+		audiofile,
 		statusText,
 		loadingStatusText,
 		stacksize = 1,
@@ -95,6 +99,18 @@
 
 	const isAudio = $derived(type.startsWith('audio/'));
 	const isVideo = $derived(type.startsWith('video/'));
+
+	const duration = $derived.by(() => {
+		if (!audiofile) return;
+		if (boxes === 'show-all') return audiofile.dimensions.duration;
+		const box = boundingBoxes.at(0);
+		if (!box) return audiofile.dimensions.duration;
+		const domains = spectrogramBoundingBoxDomains(audiofile.spectrogram);
+		const { x } = coordsFitter(domains.timeFrequency)(box);
+		return x;
+	});
+
+	$inspect('cardmedia', title, 'aud', audiofile, 'd', duration);
 
 	const ContentTypeIcon = $derived(isAudio ? IconAudio : isVideo ? IconVideo : IconImage);
 
@@ -385,7 +401,8 @@
 			/* No need for bg cuz histograms are always dark in color, will need to change once we also handle videos */
 			/* background: rgb(from var(--card-bg) r g b / 0.5); */
 			padding: 0.5em;
-			color: var(--fg-neutral);
+			color: white;
+			z-index: 2;
 
 			display: flex;
 			align-items: center;

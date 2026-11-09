@@ -22,17 +22,25 @@
 
 	interface Props {
 		imageIsLoading: boolean;
+		audioIsLoading: boolean;
 		selectedBox: SelectedBox;
 		showConfirmedOverlay: () => Promise<void>;
 	}
 
-	let { imageIsLoading = $bindable(true), selectedBox, showConfirmedOverlay }: Props = $props();
+	let {
+		imageIsLoading = $bindable(true),
+		audioIsLoading,
+		selectedBox,
+		showConfirmedOverlay,
+	}: Props = $props();
 
 	const fileId = $derived(page.params.image);
 	const boundingBoxes = $derived(getBoundingBoxes());
 	const focusedImageId = $derived(focusedImage()?.id);
 	const hidingAll = $derived(getHideAll());
 	let imageSrc = $state<string>();
+
+	const isAudio = $derived(fileId && tables.AudioFile.state.some((f) => f.id === fileId));
 
 	$effect(() => {
 		if (!fileId) return;
@@ -47,6 +55,10 @@
 			const bytes = await accessImages('AudioFile', audiofile, 'full');
 			imageSrc = URL.createObjectURL(new Blob([bytes], { type: 'image/png' }));
 		})();
+
+		return () => {
+			URL.revokeObjectURL(imageSrc);
+		};
 	});
 
 	let imageElement = $state<HTMLImageElement>();
@@ -125,6 +137,9 @@
 		{#if imageIsLoading}
 			<LoadingSpinner --size="2em" />
 			<p class="loading">Chargement de l'image…</p>
+		{:else if isAudio && audioIsLoading}
+			<LoadingSpinner --size="2em" />
+			<p class="loading">Chargement de l'audio…</p>
 		{:else}
 			<p class="coucou" aria-hidden="true">
 				coucou toi :)

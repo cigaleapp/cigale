@@ -12,7 +12,7 @@
 
 	import {
 		boundingBoxes,
-		currentImages,
+		currentMedias,
 		focusedImage,
 		getHideAll,
 		setFocusedImage,
@@ -27,7 +27,7 @@
 		imageIsLoading: boolean;
 	}
 
-	const firstImage = $derived(currentImages().at(0));
+	const firstImage = $derived(currentMedias().at(0));
 	const fileId = $derived(firstImage?.fileId);
 	const focusedImageId = $derived(focusedImage()?.id);
 	const boxesCount = $derived(Object.keys(boundingBoxes()).length);

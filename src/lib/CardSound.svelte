@@ -2,6 +2,8 @@
 	import type { Props as CardMediaProps } from './CardMedia.svelte';
 	import type * as DB from '$lib/database.js';
 
+	import { spectrogramBoundingBoxDomains } from '$lib/audio/spectrogram.js';
+	import { coordsFitter } from '$lib/BoundingBoxes.svelte.js';
 	import { tables } from '$lib/idb.svelte.js';
 	import { isDebugMode } from '$lib/settings.svelte.js';
 	import { uiState } from '$lib/uistate.svelte.js';
@@ -10,8 +12,6 @@
 
 	interface Props extends CardMediaProps {
 		sound: DB.Sound;
-		/** whether this sound is highlighted*/
-		highlighted?: boolean;
 	}
 	const { sound, highlighted = false, ...rest }: Props = $props();
 
@@ -28,22 +28,21 @@
 			return `${sound.id} @ ${sound.addedAt.toISOString()} [${sound.sessionId}]`;
 	});
 
-	const audiofile = $derived(
-		tables.AudioFile.getFromState(sound.fileId)
-	)
+	const audiofile = $derived(tables.AudioFile.getFromState(sound.fileId));
+
+	const box = $derived(uiState.cropMetadataValueOf(sound));
 </script>
 
 <CardMedia
 	id={sound.id}
 	title={sound.filename}
-	// TODO: take crops into account
-	duration={audiofile?.dimensions.duration}
 	type="audio/x-unknown"
 	// TODO: spectrogram of the audio file
 	image={uiState.getPreviewURL(sound.fileId)}
 	dimensions={audiofile?.spectrogram.imageDimensions}
 	selected={uiState.selection.includes(sound.id)}
-	boundingBoxes={[]}
+	{audiofile}
+	boundingBoxes={box ? [box] : []}
 	boxes="show-all"
 	{tooltip}
 	{status}

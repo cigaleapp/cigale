@@ -36,7 +36,7 @@ import { nonnull } from '$lib/utils.js';
 
 import {
 	adjacentFileIds,
-	currentImages,
+	currentMedias,
 	boundingBoxes as getBoundingBoxes,
 	goToFile,
 	goToNextUnconfirmedFile,
@@ -48,13 +48,13 @@ import { setBoxesListHintShown } from './Boxes.svelte';
 import { activeTool } from './Toolbar.svelte';
 
 const boundingBoxes = $derived(getBoundingBoxes());
-const firstImage = $derived(currentImages().at(0));
+const firstImage = $derived(currentMedias().at(0));
 
 const fileId = $derived(page.params.image);
 
 export function getInitialCrops() {
 	return Object.fromEntries(
-		currentImages().map((image) => {
+		currentMedias().map((image) => {
 			if (!image.metadata[uiState.cropMetadataId]) {
 				return [image.id, undefined];
 			}
@@ -114,7 +114,7 @@ export async function onCropChange({
 	if (!uiState.currentSessionId) return null;
 	if (!fileId) return null;
 
-	const image = imageId ? currentImages().find((img) => img.id === imageId) : undefined;
+	const image = imageId ? currentMedias().find((img) => img.id === imageId) : undefined;
 	if (imageId && !image) {
 		toasts.error(`Impossible de trouver l'image ${imageId} pour la confirmer`);
 		return null;
@@ -134,7 +134,7 @@ export async function onCropChange({
 		// the caller asked for it,
 		flashConfirmedOverlay &&
 		// and this is the last image before the file is considered confirmed
-		currentImages().filter(imageHasConfirmedCrop).length === currentImages().length - 1;
+		currentMedias().filter(imageHasConfirmedCrop).length === currentMedias().length - 1;
 
 	const willAutoskip =
 		// The user has auto-skip enabled
@@ -170,7 +170,7 @@ export async function onCropChange({
 			confirmed: true,
 		});
 	} else if (
-		currentImages().length === 1 &&
+		currentMedias().length === 1 &&
 		firstImage &&
 		!firstImage.metadata[uiState.cropMetadataId]
 	) {
@@ -201,7 +201,7 @@ export async function onCropChange({
 		newImageId = makeImageId(
 			fileId,
 			Math.max(
-				...currentImages()
+				...currentMedias()
 					.map(({ id }) => parseImageId(id).subindex)
 					.filter(nonnull)
 			) + 1
@@ -308,7 +308,7 @@ export async function deleteBoundingBox(
 		});
 	}
 
-	if (currentImages().length === 1) {
+	if (currentMedias().length === 1) {
 		await deleteMetadataValue({
 			db: idb.databaseHandle(),
 			sessionId: uiState.currentSession?.id,
@@ -317,6 +317,7 @@ export async function deleteBoundingBox(
 		});
 	} else {
 		await idb.tables.Image.remove(imageId);
+		await idb.tables.Sound.remove(imageId);
 	}
 
 	await ensureNoEmptyObservations();
@@ -354,7 +355,7 @@ export function setupUndoActions(cropChangeDeps: {
 	});
 }
 
-async function changeCropConfirmedStatus(image: DB.Image, confirmed: boolean) {
+async function changeCropConfirmedStatus(image: DB.Image|DB.Sound, confirmed: boolean) {
 	if (!uiState.currentSessionId) return;
 	if (!uiState.cropMetadataId) return;
 
@@ -418,7 +419,7 @@ export async function revertToInferredCrop(imageId: string) {
 
 const revertableCrops = $derived(
 	Object.fromEntries(
-		currentImages().map((image) => {
+		currentMedias().map((image) => {
 			const initial = initialCrops[image.id]?.value;
 			const current = image.metadata[uiState.cropMetadataId]?.value;
 			return [
@@ -448,12 +449,12 @@ export function canRevertAll() {
 export async function revertAll() {
 	// Either we have no initial crop: reverting means removing all boxes
 	if (Object.values(initialCrops).every((c) => !c)) {
-		for (const { id } of currentImages()) {
+		for (const { id } of currentMedias()) {
 			await deleteBoundingBox(id);
 		}
 	} else {
 		// Or we have at least one: revert all boxes to their initial positions
-		for (const { id } of currentImages()) {
+		for (const { id } of currentMedias()) {
 			await revertToInferredCrop(id);
 		}
 	}
