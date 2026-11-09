@@ -25,7 +25,7 @@ export function renderWaveformSvg(
 
 	const columns = Math.max(1, options.columns ?? 1000);
 	const height = Math.max(1, options.height ?? 200);
-	const color = options.color ?? 'var(--fg-primary)';
+	const color = options.color ?? 'var(--waveform-color)';
 	const background = options.background ?? null;
 	const normalize = options.normalize ?? true;
 

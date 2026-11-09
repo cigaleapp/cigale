@@ -1,32 +1,31 @@
 <script lang="ts">
-	import type * as DB from '$lib/database.js';
-
-	import { databaseHandle } from '$lib/idb.svelte.js';
-	import { resolveObjectWithBytes } from '$lib/storage/utils.js';
-	import { toasts } from '$lib/toasts.svelte.js';
-
 	interface Props {
-		file: DB.AudioFile;
-		loadingFile: boolean;
+		/** blob url of the audio file */
+		src: string;
+		loading: boolean;
+		/** position of the playhead in milliseconds, bind to it */
+		playhead: number;
 	}
 
-	let { file, loadingFile = $bindable(true) }: Props = $props();
-
-	let source = $state<string>();
-
-	async function loadAudio() {
-		const resolved = await resolveObjectWithBytes(databaseHandle(), 'AudioFile', file.id);
-		if (!resolved) {
-			toasts.error(`Fichier ${file.filename} introuvable`);
-			return;
-		}
-
-		if (source) URL.revokeObjectURL(source);
-		source = URL.createObjectURL(new Blob([resolved.bytes]));
-		loadingFile = false;
-	}
+	let { src, loading = $bindable(true), playhead = $bindable() }: Props = $props();
 </script>
 
-{#await loadAudio()}
-	<audio src={source} controls />
-{/await}
+<audio
+	{src}
+	controls
+	bind:currentTime={
+		() => 0,
+		(time) => {
+			playhead = time * 1e3;
+		}
+	}
+	onload={() => {
+		loading = false;
+	}}
+></audio>
+
+<style>
+	audio {
+		width: 100%;
+	}
+</style>

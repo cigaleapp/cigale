@@ -1,6 +1,6 @@
+import type { DecodedAudioMono } from './decode.js';
 import type { CoordinatesDomain } from '$lib/BoundingBoxes.svelte.js';
 import type * as DB from '$lib/database.js';
-import type { DecodedAudioMono } from './decode.js';
 
 export const AUDIO_SPECTROGRAM_ROOT_FOLDER = '.audio_spectrograms';
 export type AudioSpectrogramsFolders =
@@ -9,7 +9,7 @@ export type AudioSpectrogramsFolders =
 	| `${typeof AUDIO_SPECTROGRAM_ROOT_FOLDER}/preview`;
 
 const PREVIEW_SPECTROGRAM_HEIGHT = 512;
-const FULLSIZE_SPECTROGRAM_HEIGHT = 1080
+const FULLSIZE_SPECTROGRAM_HEIGHT = 1080;
 
 interface SpectrogramOptions {
 	/** FFT window size, must be a power of two. Default 2048. */
@@ -122,7 +122,7 @@ export async function generateSpectrograms(
 			pixels[o] = palette[p];
 			pixels[o + 1] = palette[p + 1];
 			pixels[o + 2] = palette[p + 2];
-			pixels[o + 3] = 255;
+			pixels[o + 3] = palette[p + 3];
 		}
 	}
 
@@ -141,7 +141,6 @@ export async function generateSpectrograms(
 /* ------------------------------------------------------------------ */
 /* Helpers                                                             */
 /* ------------------------------------------------------------------ */
-
 
 /** Returns an in-place radix-2 FFT function for a fixed size. */
 function createFFT(n: number) {
@@ -189,17 +188,25 @@ function createFFT(n: number) {
 	};
 }
 
-/** 256-entry RGB lookup table (inferno-like). */
+/** 256-entry RGBA lookup table (inferno-like). */
 function buildPalette(): Uint8ClampedArray {
-	const stops: [number, number, number][] = [
-		[0, 0, 4],
-		[40, 11, 84],
-		[101, 21, 110],
-		[159, 42, 99],
-		[212, 72, 66],
-		[245, 125, 21],
-		[250, 193, 39],
-		[252, 255, 164],
+	const stops: [number, number, number, number][] = [
+		// rgba(0, 0, 4, 0)
+		[0, 0, 4, 0],
+		// rgba(40, 11, 84, 100)
+		[40, 11, 84, 100],
+		// rgba(101, 21, 110, 255)
+		[101, 21, 110, 255],
+		// rgba(159, 42, 99, 255)
+		[159, 42, 99, 255],
+		// rgba(212, 72, 66, 255)
+		[212, 72, 66, 255],
+		// rgba(245, 125, 21, 255)
+		[245, 125, 21, 255],
+		// rgba(250, 193, 39, 255)
+		[250, 193, 39, 255],
+		// rgba(252, 255, 164, 255)
+		[252, 255, 164, 255],
 	];
 	const lut = new Uint8ClampedArray(256 * 3);
 	for (let i = 0; i < 256; i++) {
