@@ -7,11 +7,11 @@
 	import { playhead } from './playhead.svelte.js';
 
 	interface Props {
-		decoded: DecodedAudioMono;
-		minimap?: boolean
+		decoded: undefined | DecodedAudioMono;
+		minimap?: boolean;
 	}
 
-	const { decoded , minimap=false }: Props = $props();
+	const { decoded, minimap = false }: Props = $props();
 
 	// XXX: DONT MERGE
 	// const zoom = {
@@ -27,53 +27,51 @@
 </script>
 
 <div class="waveforms" bind:clientWidth={totalWidth} style:--total-width="{totalWidth}px">
-{#if minimap}
-	<div class="minimap" style:height="50px">
-		<div
-			class="window"
-			style:width="{(1 / zoom.scale) * 100}%"
-			style:left="{totalWidth / 2 - zoom.origin.x / (zoom.scale * totalWidth)}px"
-			// style:left="688.531px"
-			// style:left="calc(598.531px + 90px)"
-			// style:left="calc({-zoom.origin.x}px + 90px)"
-		></div>
+	{#if minimap}
+		<div class="minimap" style:height="50px">
+			<div
+				class="window"
+				style:width="{(1 / zoom.scale) * 100}%"
+				style:left="{totalWidth / 2 - zoom.origin.x / (zoom.scale * totalWidth)}px"
+				// style:left="688.531px"
+				// style:left="calc(598.531px + 90px)"
+				// style:left="calc({-zoom.origin.x}px + 90px)"
+			></div>
 
-		<div class="full">
-			<!-- eslint-ignore-next-line svelte/no-at-html -->
-			{@html renderWaveformSvg(decoded, {
-				height: 50,
-			})}
-		</div>
+			{#if decoded}
+				{const rendered = $derived(renderWaveformSvg(decoded, { height: 50 }))}
 
-		<div class="elapsed" style:width="{playhead.positionNormalized * 100}%">
-			<!-- eslint-ignore-next-line svelte/no-at-html -->
-			{@html renderWaveformSvg(decoded, {
-				height: 50,
-			})}
+				<div class="full">
+					<!-- eslint-ignore-next-line svelte/no-at-html -->
+					{@html rendered}
+				</div>
+
+				<div class="elapsed" style:width="{playhead.positionNormalized * 100}%">
+					<!-- eslint-ignore-next-line svelte/no-at-html -->
+					{@html rendered}
+				</div>
+			{/if}
 		</div>
-	</div>
 	{:else}
+		<div
+			class="waveform"
+			style:height="150px"
+			style:scale="{zoom.scale} 1"
+			style:translate="{zoom.origin.x}px 0"
+		>
+			{#if decoded}
+				{const rendered = $derived(renderWaveformSvg(decoded, { height: 150 }))}
+				<div class="full">
+					<!-- eslint-ignore-next-line svelte/no-at-html -->
+					{@html rendered}
+				</div>
 
-	<div
-		class="waveform"
-		style:height="150px"
-		style:scale="{zoom.scale} 1"
-		style:translate="{zoom.origin.x}px 0"
-	>
-		<div class="full">
-			<!-- eslint-ignore-next-line svelte/no-at-html -->
-			{@html renderWaveformSvg(decoded, {
-				height: 150,
-			})}
+				<div class="elapsed" style:width="{playhead.positionNormalized * 100}%">
+					<!-- eslint-ignore-next-line svelte/no-at-html -->
+					{@html rendered}
+				</div>
+			{/if}
 		</div>
-
-		<div class="elapsed" style:width="{playhead.positionNormalized * 100}%">
-			<!-- eslint-ignore-next-line svelte/no-at-html -->
-			{@html renderWaveformSvg(decoded, {
-				height: 150,
-			})}
-		</div>
-	</div>
 	{/if}
 </div>
 

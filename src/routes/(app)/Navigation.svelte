@@ -43,9 +43,11 @@
 
 	let { progress = 0, eta = Infinity, progressbarOnly = false }: Props = $props();
 
-	const hasImages = $derived(tables.Image.state.length + tables.Sound.state.length > 0);
-	const hasImagesWithCrops = $derived(
-		tables.Image.state.some((image) => uiState.cropMetadataValueOf(image))
+	const hasMedia = $derived(tables.Image.state.length + tables.Sound.state.length > 0);
+	const hasMediaWithCrops = $derived(
+		[...tables.Image.state, ...tables.Sound.state].some((image) =>
+			uiState.cropMetadataValueOf(image)
+		)
 	);
 
 	const isAnalyzingCrops = $derived(
@@ -68,10 +70,8 @@
 	let showingOKInTabTitle = $state(false);
 
 	const importTabDisabled = $derived(!uiState.currentProtocol);
-	const cropTabDisabled = $derived(importTabDisabled || !hasImages || isAnalyzingClassifications);
-	const classifyTabDisabled = $derived(
-		cropTabDisabled || !hasImagesWithCrops || isAnalyzingCrops
-	);
+	const cropTabDisabled = $derived(importTabDisabled || !hasMedia || isAnalyzingClassifications);
+	const classifyTabDisabled = $derived(cropTabDisabled || !hasMediaWithCrops || isAnalyzingCrops);
 	// Never disable it, it's annoying and the fact that you don't go to this tab at first is clear enough
 	// it's called "Results" after all
 	const resultsTabDisabled = false;

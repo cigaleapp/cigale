@@ -304,10 +304,7 @@
 			</div>
 		{/if}
 
-		<!-- TODO: make MediaArea handle its image element resize instead -->
-		{#key getSettings().cropperSidebarCollapsed}
-			<MediaArea {fileId} bind:imageIsLoading {showConfirmedOverlay} {selectedBox} />
-		{/key}
+		<MediaArea {fileId} bind:imageIsLoading {showConfirmedOverlay} {selectedBox} />
 	</main>
 
 	<aside class="toolbar">

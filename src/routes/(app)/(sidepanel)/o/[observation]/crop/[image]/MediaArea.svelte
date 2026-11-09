@@ -1,9 +1,8 @@
-
 <script lang="ts">
 	import type { SelectedBox } from './+page.svelte';
 
 	import { tables } from '$lib/idb.svelte.js';
-	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
+	import { getSettings } from '$lib/settings.svelte.js';
 	import { uiState } from '$lib/uistate.svelte.js';
 
 	import EditorImage from './CropSurface.svelte';
@@ -30,7 +29,7 @@
 </script>
 
 <div class="media-area">
-<!-- FIXME -->
+	<!-- FIXME -->
 	<!-- <div class="behind-image">
 		{#if !audiofile && imageIsLoading}
 			<LoadingSpinner --size="2em" />
@@ -51,13 +50,16 @@
 		{#if audiofile}
 			<EditorAudio file={audiofile} bind:audioIsLoading {...rest} />
 		{:else}
-			<EditorImage
-				fit="contain"
-				imageSrc={uiState.getPreviewURL(fileId)}
-				{fileId}
-				bind:imageIsLoading
-				{...rest}
-			/>
+			<!-- TODO: make MediaArea handle its image element resize instead -->
+			{#key getSettings().cropperSidebarCollapsed}
+				<EditorImage
+					fit="contain"
+					imageSrc={uiState.getPreviewURL(fileId)}
+					{fileId}
+					bind:imageIsLoading
+					{...rest}
+				/>
+			{/key}
 		{/if}
 	</div>
 </div>
