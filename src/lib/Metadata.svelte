@@ -110,9 +110,13 @@
 		}
 	});
 
-	let validation: ArkErrors | unknown = $derived(
+	let validation: ArkErrors | unknown = $state(
 		value?.value !== undefined ? valueValidator?.(value.value) : undefined
 	);
+
+	$effect(() => {
+		validation = value?.value !== undefined ? valueValidator?.(value.value) : undefined;
+	});
 
 	const validationErrors = $derived(validation instanceof ArkErrors ? validation : undefined);
 

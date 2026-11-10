@@ -89,12 +89,15 @@
 	$effect(() => {
 		if (!modalElement) return;
 
-		// Somehow page.state[stateKey] can be undefined sometimes when running under Playwright
+		// page.state is replaced (not merged) on each goto, so a modal's key
+		// becomes undefined when another modal opens or a navigation occurs.
+		// Treat undefined the same as false so stale modals are closed.
 		switch (page.state[stateKey]) {
 			case true:
 				modalElement.showModal();
 				break;
 			case false:
+			case undefined:
 				modalElement.close();
 				break;
 		}
@@ -140,9 +143,7 @@ CSS variables:
 	<Portal to="#modals">
 		<dialog
 			data-key={stateKey}
-			// Somehow page.state[stateKey] can be undefined sometimes
-			aria-hidden={// Somehow page.state[stateKey] can be undefined sometimes
-			page.state[stateKey] === false}
+			aria-hidden={page.state[stateKey] !== true}
 			style:color-scheme={getColorScheme()}
 			bind:this={modalElement}
 			onclose={async () => {
