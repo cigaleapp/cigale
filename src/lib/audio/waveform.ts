@@ -17,10 +17,10 @@ export interface WaveformSvgOptions {
  * WORKER-SAFE: no canvas, no DOM. Takes mono samples (see decodeToMono in
  * decode.ts) and returns a single scalable SVG string
  */
-export function renderWaveformSvg(
+export async function renderWaveformSvg(
 	{ samples }: DecodedAudioMono,
 	options: WaveformSvgOptions = {}
-): string {
+): Promise<string> {
 	if (samples.length === 0) throw new Error('Audio contains no samples');
 
 	const columns = Math.max(1, options.columns ?? 1000);

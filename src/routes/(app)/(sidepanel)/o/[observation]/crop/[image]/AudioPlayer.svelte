@@ -1,16 +1,17 @@
 <script lang="ts">
+	import { watch } from 'runed';
+
 	import IconPause from '~icons/ri/pause-line';
 	import IconPlay from '~icons/ri/play-line';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import { formatDurationShort } from '$lib/date.js';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
-	import ProgressBar from '$lib/ProgressBar.svelte';
+	import { switchValue } from '$lib/utils.js';
 
 	import { playhead } from './playhead.svelte.js';
 
 	interface Props {
 		/** blob url of the audio file */
-		src: string;
+		src: string | undefined;
 		loading: boolean;
 	}
 
@@ -20,7 +21,11 @@
 
 	let element = $state<HTMLAudioElement>();
 
-	let duration = $state(0);
+	let duration = $state(NaN);
+
+	watch([() => src], () => {
+		playing = false;
+	});
 
 	function togglePlayPause() {
 		if (!playing) element?.play();
@@ -28,6 +33,8 @@
 	}
 
 	function formatDuration(ms: number): `${string}:${string}` {
+		if (!Number.isFinite(ms) || Number.isNaN(ms)) return '--:--';
+
 		const mins = (ms * 1e-3) / 60;
 		const secs = (ms * 1e-3) % 60;
 
@@ -35,12 +42,6 @@
 
 		return `${amt(mins)}:${amt(secs)}`;
 	}
-
-	$effect(() => {
-		if (!element) return;
-		if (!playhead.seeking) return;
-		element.currentTime = playhead.position * 1e-3;
-	});
 
 	defineKeyboardShortcuts('cropping', {
 		Space: {
@@ -52,7 +53,23 @@
 
 <audio
 	{src}
+	preload="auto"
 	controls
+	{@attach (node) => {
+		playhead.bindPlayer(node);
+	}}
+	bind:readyState={
+		null,
+		(state) => {
+			loading = switchValue(state, {
+				0: true,
+				1: true,
+				2: true,
+				3: false,
+				4: false,
+			});
+		}
+	}
 	bind:duration={
 		null,
 		(d) => {
@@ -71,7 +88,6 @@
 	}}
 	onpause={() => {
 		playing = false;
-		playhead.seeking = false;
 	}}
 	onended={() => {
 		playing = false;
@@ -81,10 +97,11 @@
 	}}
 ></audio>
 
-<div class="player">
+<div class="player" class:disabled={loading || !src}>
 	<div class="playpause">
 		<ButtonIcon
 			help="Pause / Reprendre"
+			disabled={loading || !src}
 			onclick={() => {
 				togglePlayPause();
 			}}
@@ -131,6 +148,10 @@
 		align-items: center;
 		gap: 1em;
 		color: var(--fg-neutral);
+
+		&.disabled {
+			opacity: 0.5;
+		}
 	}
 
 	.time {

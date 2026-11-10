@@ -1,7 +1,14 @@
+<script lang="ts" module>
+export const cursor = $state({
+	
+})
+</script>
 <script lang="ts">
 	import type { SelectedBox } from './+page.svelte';
 	import type { DecodedAudioMono } from '$lib/audio/decode.js';
 	import type * as DB from '$lib/database.js';
+
+	import { watch } from 'runed';
 
 	import { decodeToMono } from '$lib/audio/decode.js';
 	import { databaseHandle } from '$lib/idb.svelte.js';
@@ -32,27 +39,33 @@
 	let spectrogramSrc = $state<string>();
 	let decodedAudio = $state<DecodedAudioMono>();
 
+	let cursor = $state<null | { time: number; frequency: number }>(null);
+
+	let waveformWidthPx = $state<number>();
+
 	let loading = $state({ spectrogram: true, audio: true });
 
 	$effect(() => {
-		audioIsLoading = loading.spectrogram || loading.audio;
+		audioIsLoading = Object.values(loading).some((v) => v);
 	});
 
-	$effect(() => {
+	watch([() => file.id], () => {
 		void loadSpectrogram();
 	});
 
-	$effect(() => {
+	watch([() => file.id], () => {
 		void loadAudio();
 	});
 
 	async function loadSpectrogram() {
-		const spectrogram = await accessImages('AudioFile', file, 'full');
 		if (spectrogramSrc) URL.revokeObjectURL(spectrogramSrc);
+		spectrogramSrc = undefined;
+		const spectrogram = await accessImages('AudioFile', file, 'full');
 		spectrogramSrc = URL.createObjectURL(new Blob([spectrogram], { type: 'image/png' }));
 	}
 
 	async function loadAudio() {
+		decodedAudio = undefined;
 		loading.audio = true;
 
 		const resolved = await resolveObjectWithBytes(databaseHandle(), 'AudioFile', file.id);
@@ -74,6 +87,20 @@
 	$effect(overrideStyle('html, body', 'overscroll-behavior-x', 'none'));
 
 	const mobile = new IsMobile();
+
+
+
+	const visibleDurationRange = $derived.by(() => {
+		if (!waveformWidthPx) return [0, file.dimensions.duration] as const;
+
+		// Get starting milliseconds from zoom.origin.x and zoom.scale, and convert to milliseconds
+		const startMs =
+			file.dimensions.duration * (0.5 - 0.5 / zoom.scale - zoom.origin.x / waveformWidthPx);
+
+		const durationMs = file.dimensions.duration / zoom.scale;
+
+		return [startMs, startMs + durationMs] as const;
+	});
 </script>
 
 <div class="editor" class:mobile={mobile.current}>
@@ -85,11 +112,11 @@
 		<Waveform decoded={decodedAudio} />
 	</div>
 
-	<div class="audio-position">
+	<div class="audio-position" bind:clientWidth={waveformWidthPx}>
 		<div class="ruler">
 			<Ruler
 				horizontal
-				domain={file.spectrogram.durationRange}
+				domain={visibleDurationRange}
 				label={(value) => {
 					value /= 1000;
 					if (file.dimensions.duration > 60e3)
@@ -104,19 +131,13 @@
 		<div class="aligner"></div>
 	</div>
 
-	<div
-		class="spectrogram"
-
-		// style:max-height="{
-
-		// fittedImageRect("contain", )
-		// file.spectrogram.imageDimensions.height}px"
-	>
+	<div class="spectrogram">
 		{#if spectrogramSrc}
 			<Spectrogram
 				src={spectrogramSrc}
 				{file}
 				bind:loading={loading.spectrogram}
+				bind:cursor
 				{showConfirmedOverlay}
 				{selectedBox}
 			/>
@@ -127,7 +148,9 @@
 		<AudioPlayer src={audioSrc} bind:loading={loading.audio} />
 
 		<div class="infos">
-			<div class="cursor"></div>
+			<div class="cursor">
+				{cursor?.time}
+			</div>
 		</div>
 	</div>
 </div>

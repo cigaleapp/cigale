@@ -17,7 +17,7 @@
 
 	let { source, fit, zoom, children, cursor = $bindable(null) }: Props = $props();
 
-	$inspect('s', source.clientHeight);
+	$inspect('cart', cursor?.x, cursor?.y);
 
 	const sourceRect = $derived(fittedImageRect(fit, source, zoom));
 </script>
@@ -28,7 +28,10 @@
 	style:top="{sourceRect.y}px"
 	style:width="{sourceRect.width}px"
 	style:height="{sourceRect.height}px"
-	onmousemove={e => {
+	onpointerleave={() => {
+		cursor = null;
+	}}
+	onpointermove={(e) => {
 		const rect = e.currentTarget.getBoundingClientRect();
 		cursor = {
 			x: (e.clientX - rect.left) / rect.width,
@@ -36,7 +39,7 @@
 		};
 	}}
 >
-	{@render children()}
+	{@render children?.()}
 </div>
 
 <style>

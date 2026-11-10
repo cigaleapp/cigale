@@ -32,6 +32,8 @@
 		extraMarks: Snippet;
 		/** Invert colors for the subject image */
 		invertColors?: boolean;
+		/** Bindable, read-only. Current position of cursor in normalized values. Null if cursor is not hovering over the area */
+		cursor?: null | { x: number; y: number };
 	}
 
 	let {
@@ -43,7 +45,8 @@
 		fit: subjectFitMode,
 		zoomlock: defaultZoomlock,
 		extraMarks,
-		invertColors
+		invertColors,
+		cursor = $bindable(null),
 	}: Props = $props();
 
 	let zoomlock = $derived(defaultZoomlock);
@@ -153,7 +156,12 @@
 		}}
 	/>
 	{#if imageElement && fileId && !imageIsLoading}
-		<ZoomableMarks source={imageElement} {zoom} fit={subjectFitMode} children={extraMarks} />
+		<ZoomableMarks
+			source={imageElement}
+			{zoom}
+			fit={subjectFitMode}
+			children={extraMarks}
+		/>
 
 		<DraggableBoundingBox
 			{...activeTool()}
