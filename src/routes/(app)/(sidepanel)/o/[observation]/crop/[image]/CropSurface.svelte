@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { SelectedBox } from './+page.svelte';
+	import type { Snippet } from 'svelte';
 
 	import { toTopLeftCoords } from '$lib/BoundingBoxes.svelte.js';
 	import { Gestures } from '$lib/touch/gestures.svelte.js';
@@ -29,6 +30,8 @@
 		zoomlock?: 'x' | 'y';
 		/** Extra content. Position elements in absolute, with percent values for top/left/bottom/right */
 		extraMarks: Snippet;
+		/** Invert colors for the subject image */
+		invertColors?: boolean;
 	}
 
 	let {
@@ -40,6 +43,7 @@
 		fit: subjectFitMode,
 		zoomlock: defaultZoomlock,
 		extraMarks,
+		invertColors
 	}: Props = $props();
 
 	let zoomlock = $derived(defaultZoomlock);
@@ -143,6 +147,7 @@
 		alt=""
 		bind:this={imageElement}
 		style:transform={zoom.cssTransforms()}
+		style:filter={invertColors ? 'invert(1)' : undefined}
 		onload={() => {
 			imageIsLoading = false;
 		}}

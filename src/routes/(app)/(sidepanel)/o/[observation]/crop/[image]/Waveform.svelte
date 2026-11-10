@@ -2,10 +2,10 @@
 	import type { DecodedAudioMono } from '$lib/audio/decode.js';
 
 	import { renderWaveformSvg } from '$lib/audio/waveform.js';
+	import { toTopLeftCoords } from '$lib/BoundingBoxes.svelte.js';
 
-	import { zoom } from './+page.svelte';
+	import { boundingBoxes, zoom } from './+page.svelte';
 	import Playhead from './Playhead.svelte';
-	import { playhead } from './playhead.svelte.js';
 	import Ruler from './Ruler.svelte';
 	import ZoomableMarks from './ZoomableMarks.svelte';
 
@@ -13,6 +13,8 @@
 		decoded: undefined | DecodedAudioMono;
 		minimap?: boolean;
 	}
+
+	const boxes = $derived(Object.values(boundingBoxes()).map((box) => toTopLeftCoords(box)));
 
 	const { decoded, minimap = false }: Props = $props();
 
@@ -34,32 +36,30 @@
 	bind:clientWidth={totalWidth}
 	style:--total-width="{totalWidth}px"
 	style:--zoom-scale={zoom.scale}
-	style:--zoom-origin-x="{zoom.origin.x}px"
+	style:--zoom-x="{zoom.origin.x}px"
 >
 	{#if minimap}
-		<Playhead />
+		<div class="minimap-window"></div>
 
-		<div class="minimap" style:height="50px">
-			<div
-				class="window"
-				// style:width="{(1 / zoom.scale) * 100}%"
-				// style:left="{totalWidth
-				// 	? (0.5 - 0.5 / zoom.scale - zoom.origin.x / totalWidth) * 100
-				// 	: 0}%"
-				// style:left="688.531px"
-				// style:left="calc(598.531px + 90px)"
-				// style:left="calc({-zoom.origin.x}px + 90px)"
-			></div>
+		<div class="minimap">
+			<Playhead />
 
 			{#if decoded}
 				{const rendered = $derived(renderWaveformSvg(decoded, { height: 50 }))}
 
-				<div class="full">
+				<div class="base">
+					<!-- eslint-ignore-next-line svelte/no-at-html -->
+					{@html rendered}
+				</div>
+
+				<div class="visible">
 					<!-- eslint-ignore-next-line svelte/no-at-html -->
 					{@html rendered}
 				</div>
 			{/if}
 		</div>
+
+		<div class="ruler-space"></div>
 	{:else}
 		{#if waveformElement}
 			<ZoomableMarks {zoom} fit="fill" source={waveformElement}>
@@ -81,15 +81,25 @@
 						// columns: Math.round(zoom.scale * 1000),
 					})
 				)}
-				<div class="full">
+				<div class="base">
 					<!-- eslint-ignore-next-line svelte/no-at-html -->
 					{@html rendered}
 				</div>
+
+				{#each boxes as box}
+					<div
+						class="box"
+						style:clip-path={`xywh(${box.x * 100}% 0% ${box.width * 100}% 100%)`}
+					>
+						<!-- eslint-ignore-next-line svelte/no-at-html -->
+						{@html rendered}
+					</div>
+				{/each}
 			{/if}
 		</div>
 
 		<!-- TODO -->
-		<Ruler domain={[-Infinity, Infinity]} />
+		<Ruler domain={[-1, 1]} label={() => ''} />
 	{/if}
 </div>
 
@@ -104,7 +114,11 @@
 	}
 
 	.waveforms:has(.minimap) {
-		padding: 1em 0;
+		height: 75px;
+	}
+
+	.ruler-space {
+		width: 4rem;
 	}
 
 	.waveforms :global(svg) {
@@ -115,48 +129,55 @@
 	.minimap {
 		width: 100%;
 		position: relative;
+		--waveform-color: var(--fg-neutral);
 
-		.full {
+		& > * {
 			position: absolute;
 			inset: 0;
-		}
-
-		.full {
-			--waveform-color: var(--fg-neutral);
-			z-index: 1;
-		}
-
-		/* .elapsed {
-			--waveform-color: var(--fg-neutral);
-			z-index: 2;
-			overflow: clip;
-		} */
-	}
-
-	.waveform {
-		scale: var(--zoom-scale) 1;
-		translate: calc(var(--zoom-origin-x) * var(--zoom-scale)) 0;
-
-		&,
-		.full {
-			height: 100%;
 			display: flex;
 			align-items: center;
 		}
 	}
 
-	.minimap {
-		.window {
-			position: absolute;
-			top: 0;
-			bottom: 0;
-			border: 1px solid white;
+	.waveform {
+		scale: var(--zoom-scale) 1;
+		translate: calc(var(--zoom-x) * var(--zoom-scale)) 0;
 
-			width: calc(1 / var(--zoom-scale) * 100%);
-			left: calc(
-				50% - 50% / var(--zoom-scale) - (var(--zoom-origin-x) / var(--total-width)) * 100%
-			);
+		.box {
+			--waveform-color: var(--fg-primary);
+			background: var(--bg-primary-translucent);
 		}
+	}
+
+	.waveforms:has(.minimap) {
+		--left: calc(50% - 50% / var(--zoom-scale) - (var(--zoom-x) / var(--total-width)) * 100%);
+		--width: calc(1 / var(--zoom-scale) * 100%);
+	}
+
+	.minimap {
+		.base {
+			--waveform-color: var(--gray);
+		}
+
+		.visible {
+			clip-path: xywh(var(--left) 0 var(--width) 100%);
+		}
+	}
+
+	.minimap-window {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		border: 1px solid var(--fg-neutral);
+		z-index: 2;
+
+		transition: opacity 250ms ease;
+		opacity: calc(round(up, var(--zoom-scale) - 1));
+		width: var(--width);
+		left: var(--left);
+
+		/* background: rgb(from var(--bg-primary) r g b / 25%); */
+		backdrop-filter: contrast(500%);
 	}
 
 	/* .waveform {

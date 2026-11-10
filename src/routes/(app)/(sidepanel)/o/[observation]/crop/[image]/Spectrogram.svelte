@@ -1,10 +1,10 @@
 <script lang="ts">
-	import type { SelectedBox } from './+page.svelte';
 	import type * as DB from '$lib/database.js';
+	import type { SelectedBox } from './+page.svelte';
 
-	import { spectrogramBoundingBoxDomains } from '$lib/audio/spectrogram.js';
 	import { getSettings } from '$lib/settings.svelte.js';
-	import { range, round } from '$lib/utils.js';
+	import { round } from '$lib/utils.js';
+	import { getTheme } from '$routes/+layout.svelte';
 
 	import CropSurface from './CropSurface.svelte';
 	import Playhead from './Playhead.svelte';
@@ -19,6 +19,8 @@
 	}
 
 	let { src, file, loading = $bindable(true), ...rest }: Props = $props();
+
+	const theme = getTheme();
 </script>
 
 <div class="spectrogram">
@@ -30,6 +32,7 @@
 			fileId={file.id}
 			imageSrc={src}
 			bind:imageIsLoading={loading}
+			invertColors={theme.effective === 'light'}
 			{...rest}
 		>
 			{#snippet extraMarks()}
@@ -38,7 +41,10 @@
 		</CropSurface>
 	{/key}
 
-	<Ruler domain={file.spectrogram.frequencyRange} />
+	<Ruler
+		domain={file.spectrogram.frequencyRange}
+		label={(value) => (value > 1e3 ? round(value * 1e-3, 1) + 'k' : round(value, 2))}
+	/>
 </div>
 
 <style>

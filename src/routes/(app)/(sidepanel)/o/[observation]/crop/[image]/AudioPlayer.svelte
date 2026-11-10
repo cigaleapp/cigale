@@ -3,17 +3,18 @@
 	import IconPlay from '~icons/ri/play-line';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import { formatDurationShort } from '$lib/date.js';
+	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
+
+	import { playhead } from './playhead.svelte.js';
 
 	interface Props {
 		/** blob url of the audio file */
 		src: string;
 		loading: boolean;
-		/** position of the playhead in milliseconds, bind to it */
-		playhead: number;
 	}
 
-	let { src, loading = $bindable(true), playhead = $bindable() }: Props = $props();
+	let { src, loading = $bindable(true) }: Props = $props();
 
 	let playing = $state(false);
 
@@ -34,6 +35,19 @@
 
 		return `${amt(mins)}:${amt(secs)}`;
 	}
+
+	$effect(() => {
+		if (!element) return;
+		if (!playhead.seeking) return;
+		element.currentTime = playhead.position * 1e-3;
+	});
+
+	defineKeyboardShortcuts('cropping', {
+		Space: {
+			help: 'Pause / Reprendre',
+			do: togglePlayPause,
+		},
+	});
 </script>
 
 <audio
@@ -49,7 +63,7 @@
 	bind:currentTime={
 		() => 0,
 		(time) => {
-			playhead = time * 1e3;
+			playhead.position = time * 1e3;
 		}
 	}
 	onplay={() => {
@@ -57,6 +71,7 @@
 	}}
 	onpause={() => {
 		playing = false;
+		playhead.seeking = false;
 	}}
 	onended={() => {
 		playing = false;
@@ -84,7 +99,7 @@
 
 	<div class="time">
 		<code class="elapsed">
-			{formatDuration(playhead)}
+			{formatDuration(playhead.position)}
 		</code>
 		<span class="separator">/</span>
 		<code class="total">
@@ -92,9 +107,9 @@
 		</code>
 	</div>
 
-	<div class="seekbar">
+	<!-- <div class="seekbar">
 		<ProgressBar alwaysActive progress={playhead / duration} />
-	</div>
+	</div> -->
 	<div class="volume"></div>
 
 	<div class="more-controls"></div>
@@ -115,6 +130,7 @@
 		display: flex;
 		align-items: center;
 		gap: 1em;
+		color: var(--fg-neutral);
 	}
 
 	.time {

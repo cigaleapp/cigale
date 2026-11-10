@@ -106,7 +106,7 @@
 	}
 
 	defineKeyboardShortcuts(keyboardShortcutsCategory, {
-		Space: {
+		Enter: {
 			help: 'Confirmer et passer à la prochaine non confirmée',
 			do: confirmAndNext,
 		},

@@ -6,7 +6,7 @@
 	import ButtonInk from '$lib/ButtonInk.svelte';
 	import ConfidencePercentage from '$lib/ConfidencePercentage.svelte';
 
-	import { focusedImage, zoom } from './+page.svelte';
+	import { currentMedias, focusedImage, zoom } from './+page.svelte';
 	import {
 		canRevertCrop,
 		deleteBoundingBox,
@@ -17,6 +17,7 @@
 
 	const focused = $derived(focusedImage());
 	const confidence = $derived(getInitialCrops()[focused?.id ?? '']?.confidence);
+	const isAudio = $derived(currentMedias().some((media) => media._table === 'Sound'));
 </script>
 
 {#if !zoom.panning && zoom.scale <= 1.2}
@@ -47,7 +48,7 @@
 				<IconDelete />
 				Suppr.
 			</ButtonInk>
-		{:else}
+		{:else if !isAudio}
 			<p>
 				{activeTool().mobileHelp ?? activeTool().help}
 			</p>
