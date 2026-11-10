@@ -94,7 +94,7 @@
 
 	let active = $derived(tools.find(({ name }) => name === activeToolName) || tools[0]);
 
-	export function activeTool() {
+	export function activeTool(): Tool {
 		return active;
 	}
 </script>

@@ -8,15 +8,15 @@
 		value: number | undefined;
 		/**  text to show when hovering the percentage */
 		// eslint-disable-next-line no-unused-vars
-		tooltip: (percent: `${number}%`) => void;
+		tooltip?: (percent: `${number}%`) => void;
 		/**  optional content to put before the percentage, useful to make it under the tooltip activation area */
-		children: import('svelte').Snippet;
+		children?: import('svelte').Snippet;
 		/**  if true, the "--%" fallback will not be shown when value is undefined, and the tooltip will not be activated. Useful when you want to show confidence without drawing attention to the fact that it's missing. */
-		'no-fallback': boolean;
+		'no-fallback'?: boolean;
 		/**  don't pad the number. Can take up less space, but may result in misalignment */
-		compact: boolean;
+		compact?: boolean;
 		/** Show 100% when its 100% */
-		'show-hundred': boolean;
+		'show-hundred'?: boolean;
 	}
 
 	// False positive for no-fallback and show-hundred

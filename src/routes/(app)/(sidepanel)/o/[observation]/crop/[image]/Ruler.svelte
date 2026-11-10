@@ -1,61 +1,134 @@
 <script lang="ts">
-	import { range, round } from '$lib/utils.js';
+	import { range } from '$lib/utils.js';
 
 	interface Props {
 		domain: [number, number];
+		horizontal?: boolean;
+		label?: (value: number) => string;
+		/** In tick-per-px */
+		tickDensity?: number;
+		/** In label-per-tick */
+		labelDensity?: number;
+		/** Number of sub-ticks for every tick */
+		subtickDensity?: number;
 	}
 
-	const { domain }: Props = $props();
+	const {
+		domain,
+		horizontal = false,
+		label = (value) => value.toString(),
+		tickDensity = horizontal ? 1 / 50 : 1 / 20,
+		labelDensity = 1 / 2,
+		subtickDensity = horizontal ? 5 : 3,
+	}: Props = $props();
 
-	const frequenciesSpace = $derived.by(() => {
+	let height = $state<number>();
+	let width = $state<number>();
+
+	const ticks = $derived.by(() => {
+		if (!height) return [];
+
 		const [lo, hi] = domain;
 
-		if (lo === -Infinity && hi === Infinity) {
-			return [lo, 0, 0, 0, hi];
-		}
+		let count = Math.round(tickDensity * (horizontal ? width : height));
 
-		const COUNT = 21;
+		// Prevent last tick AND second-to-last tick from both having a label
+		if (count % (1 / labelDensity) === 0) count++;
 
-		return range(COUNT).map((i) => lo + (i / COUNT) * (hi - lo));
+		return range(count).map((i) => lo + (i / count) * (hi - lo));
 	});
 
-	const unit = $derived(frequenciesSpace.every((freq) => freq >= 1e3) ? 'kHz' : 'Hz');
+	const tickPosition = (index: number, subindex: number) =>
+		(index * subtickDensity + subindex) / ((ticks.length - 1) * subtickDensity);
 </script>
 
-<div class="rule">
+<div class="rule" class:horizontal bind:clientHeight={height} bind:clientWidth={width}>
 	<!-- <div class="unit">{unit}</div> -->
 
-	{#each frequenciesSpace as frequency, i}
-		<div class="mark" class:first={i === 0} class:last={i === frequenciesSpace.length - 1}>
-			{#if i % 2 === 0}
-				{#if !Number.isFinite(frequency)}
-					{frequency.toString().replace('Infinity', '∞')}
-				{:else if frequency >= 1e3}
-					{round(frequency * 1e-3, 1)}k
-					<!-- {unit === 'Hz' ? 'k' : ''} -->
-				{:else}
-					{round(frequency)}
-					<!-- {unit === 'kHz' ? 'm' : ''} -->
-				{/if}
+	{#each ticks as value, i}
+		{const first = i === 0}
+		{const last = $derived(i === ticks.length - 1)}
+
+		<div class="mark" class:first class:last style:--position={tickPosition(i, 0)}>
+			{#if first || last || i % Math.round(1 / labelDensity) === 0}
+				{label(value)}
 			{/if}
 		</div>
+
+		{#if !last}
+			{#each range(subtickDensity) as j}
+				<div class="mark sub" style:--position={tickPosition(i, j + 1)}></div>
+			{/each}
+		{/if}
 	{/each}
 </div>
 
 <style>
 	.rule {
-		display: flex;
-		flex-direction: column-reverse;
-		justify-content: space-between;
-		/* margin-left: -0.5rem; */
 		position: relative;
-		width: 4rem;
-		/* border-left: 1px solid var(--faint); */
+		color: var(--fg-neutral);
+		background: var(--bg-neutral);
+		--mark-size: 1rem;
 
-		.unit {
-			position: absolute;
-			bottom: 0.5rem;
-			right: 0.5rem;
+		&.horizontal {
+			height: 3rem;
+
+			.mark {
+				flex-direction: column;
+				left: calc(var(--position) * 100%);
+				height: 100%;
+				width: 0;
+				overflow: visible;
+				/* top: var(--mark-size); */
+			}
+
+			.mark.last {
+				align-items: end;
+			}
+
+			.mark.first {
+				align-items: start;
+			}
+
+			.mark::before {
+				width: 1px;
+				height: var(--mark-size);
+				margin-bottom: 0.25em;
+			}
+
+			.mark.sub::before {
+				height: calc(var(--mark-size) / 2);
+			}
+		}
+
+		&:not(.horizontal) {
+			width: 4rem;
+
+			.mark {
+				flex-direction: row;
+				bottom: calc(var(--position) * 100%);
+				width: 100%;
+				height: 0;
+				overflow: visible;
+			}
+
+			.mark.first {
+				align-items: end;
+			}
+
+			.mark.last {
+				align-items: start;
+			}
+
+			.mark::before {
+				height: 1px;
+				width: var(--mark-size);
+				margin-right: 0.25em;
+			}
+
+			.mark.sub::before {
+				width: calc(var(--mark-size) / 2);
+			}
 		}
 
 		.mark {
@@ -63,26 +136,18 @@
 			/* font-family: var(--font-mono); */
 			font-size: 0.75rem;
 			font-weight: 200;
+			position: absolute;
+			height: 1px;
+			align-items: center;
 		}
 
 		.mark::before {
 			content: '';
 			display: block;
-			margin-right: 0.25em;
 			width: 1rem;
 			height: 1px;
 			background: var(--fg-neutral);
 			align-self: center;
-		}
-
-		.mark.first::before {
-			align-self: end;
-			margin-bottom: 4px;
-		}
-
-		.mark.last::before {
-			margin-top: 4px;
-			align-self: start;
 		}
 	}
 </style>

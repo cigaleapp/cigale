@@ -31,6 +31,7 @@
 	const fileId = $derived(firstImage?.fileId);
 	const focusedImageId = $derived(focusedImage()?.id);
 	const boxesCount = $derived(Object.keys(boundingBoxes()).length);
+	const audiofile = $derived(tables.AudioFile.getFromState(fileId ?? ''));
 
 	let { selectedBox = $bindable(), imageIsLoading }: Props = $props();
 
@@ -50,11 +51,13 @@
 {#if !imageIsLoading && zoom.scale <= 1.2 && !zoom.panning}
 	<nav class="focus-switcher" class:scrollable bind:this={element} out:fade={{ duration: 100 }}>
 		{#each Object.entries(boundingBoxes()) as [imageId, box], i (imageId)}
-			{const image = $derived(tables.Image.getFromState(imageId))}
-			{const focused = $derived(focusedImageId === image?.id)}
+			{const media = $derived(
+				tables.Image.getFromState(imageId) ?? tables.Sound.getFromState(imageId)
+			)}
+			{const focused = $derived(focusedImageId === media?.id)}
 			{const confidence = $derived(getInitialCrops()[imageId]?.confidence)}
 
-			{#if image?.fileId && firstImage}
+			{#if media?.fileId && firstImage}
 				<div class="with-indicator">
 					<button
 						in:fly|global={{
@@ -75,7 +78,9 @@
 						}}
 					>
 						<CroppedImg
-							dimensions={firstImage.dimensions}
+							dimensions={firstImage._table === 'Audio'
+								? audiofile.spectrogram.imageDimensions
+								: firstImage.dimensions}
 							box={toTopLeftCoords(box)}
 							src={uiState.getPreviewURL(image.fileId)}
 						/>

@@ -68,7 +68,7 @@
 	export function boundingBoxes() {
 		return Object.fromEntries(
 			medias
-				.map(({ id, metadata }) => [id, metadata[uiState.cropMetadataId]?.value])
+				.map(({ id, metadata }) => [id, metadata[uiState.cropMetadataId]?.value] as const)
 				.filter(([, box]) => box !== undefined)
 				.map(([id, box]) => [id, assertIs('boundingbox', box)])
 		);
@@ -184,6 +184,8 @@
 		manual: false,
 	});
 
+	const isAudio = $derived(firstImage?._table === 'Sound');
+
 	const boxesCount = $derived(Object.keys(boundingBoxes()).length);
 
 	seo({ title: `Recadrer ${firstImage?.filename ?? '...'}` });
@@ -196,6 +198,10 @@
 	setupKeyboardShortcuts({
 		selectedBox: () => selectedBox,
 		showConfirmedOverlay: async () => showConfirmedOverlay(),
+	});
+
+	$effect(() => {
+		zoom.setMaxScale(isAudio ? 40 : 10);
 	});
 
 	// TODO: remove, see #1827
@@ -302,7 +308,7 @@
 	]}
 />
 
-<div class="layout">
+<div class="layout" class:audio={isAudio}>
 	<main class="crop-surface">
 		{#if mobile.current}
 			<div class="immersive-actions">
@@ -310,7 +316,11 @@
 			</div>
 		{/if}
 
-		<MediaArea {fileId} bind:imageIsLoading {showConfirmedOverlay} {selectedBox} />
+		<!-- <div class="media-area"> -->
+		{#if fileId}
+			<MediaArea {fileId} bind:imageIsLoading {showConfirmedOverlay} {selectedBox} />
+		{/if}
+		<!-- </div> -->
 	</main>
 
 	<aside class="toolbar">
@@ -347,9 +357,7 @@
 		}
 	}
 
-	.toolbar {
-		position: relative;
-
+	.layout:not(.audio) {
 		@media (max-width: 600px) {
 			position: fixed;
 			left: 0;
@@ -357,6 +365,10 @@
 			bottom: 0;
 			padding-bottom: 0.5rem;
 		}
+	}
+
+	.toolbar {
+		position: relative;
 
 		.focus-switcher {
 			position: absolute;

@@ -17,6 +17,7 @@ export type ZoomState = typeof INITIAL_STATE;
  */
 export class Zoom {
 	zoomlock: 'x' | 'y' | undefined = undefined;
+	maxScale = $state(10);
 	origin = $state({ x: 0, y: 0 });
 	scale = $state(1);
 	panning = $state(false);
@@ -40,6 +41,10 @@ export class Zoom {
 
 	releaseLock() {
 		this.zoomlock = undefined;
+	}
+
+	setMaxScale(max: number) {
+		this.maxScale = max
 	}
 
 	cssTransforms(): string {
@@ -126,7 +131,7 @@ export class Zoom {
 		}
 
 		const previous = this.scale;
-		const scale = Math.min(10, Math.max(1, previous + direction * 2 * speed));
+		const scale = Math.min(this.maxScale, Math.max(1, previous + direction * 2 * speed));
 
 		if (scale <= 1) {
 			this.scale = 1;
@@ -180,11 +185,11 @@ export class Zoom {
 		if (!this.panning) return;
 
 		if (this.zoomlock !== 'x') {
-			this.origin.x = this.panStart.zoomOrigin.x + (to.clientX - this.panStart.x);
+			this.origin.x = this.panStart.zoomOrigin.x + (to.clientX - this.panStart.x) / this.scale;
 		}
 
 		if (this.zoomlock !== 'y') {
-			this.origin.y = this.panStart.zoomOrigin.y + (to.clientY - this.panStart.y);
+			this.origin.y = this.panStart.zoomOrigin.y + (to.clientY - this.panStart.y) / this.scale;
 		}
 	}
 }

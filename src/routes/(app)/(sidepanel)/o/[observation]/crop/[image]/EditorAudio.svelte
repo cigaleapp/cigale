@@ -5,15 +5,19 @@
 
 	import { decodeToMono } from '$lib/audio/decode.js';
 	import { databaseHandle } from '$lib/idb.svelte.js';
+	import { IsMobile } from '$lib/mobile.svelte.js';
 	import { accessImages, resolveObjectWithBytes } from '$lib/storage/utils.js';
 	import { toasts } from '$lib/toasts.svelte.js';
 	import { overrideStyle } from '$lib/utils.js';
 
+	import { zoom } from './+page.svelte';
 	import AudioPlayer from './AudioPlayer.svelte';
 	import { fittedImageRect } from './DraggableBoundingBox.svelte.js';
 	import { playhead } from './playhead.svelte.js';
+	import Ruler from './Ruler.svelte';
 	import Spectrogram from './Spectrogram.svelte';
 	import Waveform from './Waveform.svelte';
+	import ZoomableMarks from './ZoomableMarks.svelte';
 
 	interface Props {
 		selectedBox: SelectedBox;
@@ -68,15 +72,36 @@
 
 	// Disable chrome swipe-to-next/prev page
 	$effect(overrideStyle('html, body', 'overscroll-behavior-x', 'none'));
+
+	const mobile = new IsMobile();
 </script>
 
-<div class="editor">
+<div class="editor" class:mobile={mobile.current}>
 	<div class="minimap">
 		<Waveform minimap decoded={decodedAudio} />
 	</div>
 
 	<div class="waveform">
 		<Waveform decoded={decodedAudio} />
+	</div>
+
+	<div class="audio-position">
+		<div class="ruler">
+			<Ruler
+				horizontal
+				domain={file.spectrogram.durationRange}
+				label={(value) => {
+					value /= 1000;
+					if (file.dimensions.duration > 60e3)
+						return `${Math.floor(value / 60)}:${Math.floor(value % 60)
+							.toString()
+							.padStart(2, '0')}`;
+					return `${Math.floor(value)}s`;
+				}}
+			/>
+		</div>
+
+		<div class="aligner"></div>
 	</div>
 
 	<div
@@ -98,12 +123,12 @@
 		{/if}
 	</div>
 
-	<div class="player">
-		<AudioPlayer
-			bind:playhead={playhead.position}
-			src={audioSrc}
-			bind:loading={loading.audio}
-		/>
+	<div class="bottom">
+		<AudioPlayer src={audioSrc} bind:loading={loading.audio} />
+
+		<div class="infos">
+			<div class="cursor"></div>
+		</div>
 	</div>
 </div>
 
@@ -113,13 +138,36 @@
 		display: grid;
 		border-right: 1px solid var(--faint);
 		row-rule: 1px solid var(--faint);
-		grid-template-rows: max-content 3fr 5fr max-content;
+		grid-template-rows: max-content 3fr max-content 5fr max-content;
+
+		&.mobile {
+			color-scheme: dark;
+		}
+	}
+
+	.audio-position {
+		width: 100%;
+
+		.ruler {
+			position: relative;
+			width: 100%;
+		}
+
+		.aligner {
+			width: 4rem;
+		}
 	}
 
 	.waveform,
-	.minimap {
+	.minimap,
+	.bottom,
+	.audio-position {
 		display: flex;
 		align-items: center;
+	}
+
+	.bottom {
+		justify-content: space-between;
 	}
 
 	.spectrogram {
