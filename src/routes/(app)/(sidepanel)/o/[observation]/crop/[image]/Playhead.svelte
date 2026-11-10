@@ -14,9 +14,27 @@
 		const rect = event.currentTarget.getBoundingClientRect();
 		const x = event.clientX - rect.left;
 		const normalized = x / rect.width;
-		playhead.positionNormalized = normalized;
+		playhead.seek(normalized);
 	}
 </script>
+
+<div
+	class="playhead"
+	class:draggable
+	style:--position-percentage="{playhead.positionNormalized * 100}%"
+	style:opacity={playhead.position === 0 ? 0 : 1}
+	onpointerdown={() => {
+		if (!draggable) return;
+		console.log('seeking');
+		playhead.seeking = true;
+	}}
+>
+	{#if !headless}
+		<div class="head"></div>
+	{/if}
+
+	<div class="neck"></div>
+</div>
 
 {#if draggable}
 	<div
@@ -38,24 +56,6 @@
 	></div>
 {/if}
 
-<div
-	class="playhead"
-	class:draggable
-	style:--position-percentage="{playhead.positionNormalized * 100}%"
-	style:opacity={playhead.position === 0 ? 0 : 1}
-	onpointerdown={() => {
-		if (!draggable) return;
-		console.log('seeking');
-		playhead.seeking = true;
-	}}
->
-	{#if !headless}
-		<div class="head"></div>
-	{/if}
-
-	<div class="neck"></div>
-</div>
-
 <style>
 	.drag-area {
 		position: absolute;
@@ -71,7 +71,7 @@
 		z-index: 30;
 
 		width: 30px;
-		background: rgba(0 0 0 / 75%);
+		/* background: rgba(0 0 0 / 75%); */
 		z-index: 10;
 
 		&.draggable {

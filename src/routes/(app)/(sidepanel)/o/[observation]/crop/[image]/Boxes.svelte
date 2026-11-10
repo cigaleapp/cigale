@@ -39,7 +39,7 @@
 	import SentenceJoin from '$lib/SentenceJoin.svelte';
 	import Tooltip from '$lib/Tooltip.svelte';
 	import { uiState } from '$lib/uistate.svelte.js';
-	import { mapValues } from '$lib/utils.js';
+	import { compareBy, mapValues, round } from '$lib/utils.js';
 
 	import {
 		currentMedias,
@@ -72,6 +72,8 @@
 	const focusedImageId = $derived(focusedImage()?.id);
 	const firstMedia = $derived(medias.at(0));
 
+	const isAudio = $derived(firstMedia?._table === 'Sound');
+
 	const boundsDomain = $derived.by(() => {
 		if (!firstMedia?.fileId) return;
 		switch (firstMedia._table) {
@@ -85,6 +87,27 @@
 				return spectrogramBoundingBoxDomains(audiofile.spectrogram).pixels;
 			}
 		}
+	});
+
+	const audioBoxDimensions = $derived.by(() => {
+		const audiofile = tables.AudioFile.getFromState(firstMedia.fileId);
+		if (!audiofile) return;
+
+		const fitter = coordsFitter(
+			spectrogramBoundingBoxDomains(audiofile.spectrogram).timeFrequency
+		);
+
+		return mapValues(boundingBoxes, (box) => {
+			const { w, y, x } = fitter(box);
+			const mins = round((x * 1e-3) / 60);
+			const secs = round((x * 1e-3) % 60, 2);
+
+			return {
+				timestamp: `${mins.toString().padStart(2, '0')}:${secs < 10 ? '0' : ''}${secs}`,
+				duration: round(w * 1e-3, 2) + 's',
+				frequencyRange: `${round(y * 1e-3, 1)}—${round((y + w) * 1e-3)} kHz`,
+			};
+		});
 	});
 
 	/**
@@ -132,11 +155,14 @@
 	{/if}
 	<section class="boxes">
 		<ul>
-			{#each medias.filter(({ id }) => id in boundingBoxes) as image, i (image.id)}
-				{@const box = boundingBoxes[image.id]}
-				{@const initBox = initialCrops[image.id]}
-				{@const [w, h] = roundedPixelDimensions(box)}
-				{@const isFocused = focusedImageId === image.id}
+			{#each medias
+				.filter(({ id }) => id in boundingBoxes)
+				.toSorted(compareBy((m) => boundingBoxes[m.id].x)) as image, i (image.id)}
+				{const box = $derived(boundingBoxes[image.id])}
+				{const audio = $derived(audioBoxDimensions?.[image.id])}
+				{const initBox = $derived(initialCrops[image.id])}
+				{const [w, h] = $derived(roundedPixelDimensions(box))}
+				{const isFocused = $derived(focusedImageId === image.id)}
 				<li
 					class:unfocused={focusedImageId && focusedImageId !== image.id}
 					class:selected={selectedBox.imageId === image.id}
@@ -151,10 +177,21 @@
 						/>
 					{/if}
 					<div class="text">
-						<p class="index">Boîte #{i + 1}</p>
+						<p class="index">
+							{#if audio}
+								Boîte à <code>{audio.timestamp}</code>
+							{:else}
+								Boîte #{i + 1}
+							{/if}
+						</p>
 						<p class="dimensions">
 							<code>
-								<OverflowableText text="{w}×{h}" />
+								<OverflowableText
+									text={audio
+										? // ? `${audio.duration} · ${audio.frequencyRange}`
+											`${audio.duration}`
+										: `${w}×${h}`}
+								/>
 							</code>
 							<!-- we have a neural-infered value only, put the confidence next to the value -->
 							{#if initBox && !image.metadata[uiState.cropMetadataId].manuallyModified}
@@ -317,11 +354,14 @@
 		overflow: hidden;
 	}
 
+	code {
+		font-size: 0.8em;
+	}
+
 	.boxes li .dimensions {
 		display: flex;
 		align-items: center;
 		gap: 0.5em;
-		font-size: 0.8em;
 
 		&,
 		code {

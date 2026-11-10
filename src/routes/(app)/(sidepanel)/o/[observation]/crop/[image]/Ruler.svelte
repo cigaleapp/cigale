@@ -2,7 +2,7 @@
 	import { range } from '$lib/utils.js';
 
 	interface Props {
-		domain: [number, number];
+		domain: readonly [number, number];
 		horizontal?: boolean;
 		label?: (value: number) => string;
 		/** In tick-per-px */
@@ -26,7 +26,7 @@
 	let width = $state<number>();
 
 	const ticks = $derived.by(() => {
-		if (!height) return [];
+		if (!height || !width) return [];
 
 		const [lo, hi] = domain;
 
@@ -66,9 +66,16 @@
 <style>
 	.rule {
 		position: relative;
-		color: var(--fg-neutral);
+		color: var(--gay);
 		background: var(--bg-neutral);
-		--mark-size: 1rem;
+		--mark-size: 0.75rem;
+
+		transition: color 0.2s;
+
+		&:hover,
+		&:focus-within {
+			color: var(--fg-neutral);
+		}
 
 		&.horizontal {
 			height: 3rem;
@@ -146,7 +153,7 @@
 			display: block;
 			width: 1rem;
 			height: 1px;
-			background: var(--fg-neutral);
+			background: currentColor;
 			align-self: center;
 		}
 	}

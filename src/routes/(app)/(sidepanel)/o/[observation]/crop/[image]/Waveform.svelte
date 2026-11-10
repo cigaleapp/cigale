@@ -16,7 +16,7 @@
 
 	const boxes = $derived(Object.values(boundingBoxes()).map((box) => toTopLeftCoords(box)));
 
-	const { decoded, minimap = false }: Props = $props();
+	let { decoded, minimap = false,}: Props = $props();
 
 	// XXX: DONT MERGE
 	// const zoom = {
@@ -29,6 +29,13 @@
 	let totalWidth = $state<number>();
 
 	let waveformElement = $state<HTMLElement>();
+
+	async function renderWaveform(options: { height: number; columns: number }) {
+		if (!decoded) return;
+
+		return renderWaveformSvg(decoded, options);
+
+	}
 </script>
 
 <div
@@ -39,23 +46,25 @@
 	style:--zoom-x="{zoom.origin.x}px"
 >
 	{#if minimap}
-		<div class="minimap-window"></div>
-
 		<div class="minimap">
+			<div class="minimap-window"></div>
+
 			<Playhead />
 
 			{#if decoded}
-				{const rendered = $derived(renderWaveformSvg(decoded, { height: 50 }))}
+				{#await renderWaveform({ height: 50, columns: 1000 })}
+					Chargement de la forme d'onde…
+				{:then rendered}
+					<div class="base">
+						<!-- eslint-ignore-next-line svelte/no-at-html -->
+						{@html rendered}
+					</div>
 
-				<div class="base">
-					<!-- eslint-ignore-next-line svelte/no-at-html -->
-					{@html rendered}
-				</div>
-
-				<div class="visible">
-					<!-- eslint-ignore-next-line svelte/no-at-html -->
-					{@html rendered}
-				</div>
+					<div class="visible">
+						<!-- eslint-ignore-next-line svelte/no-at-html -->
+						{@html rendered}
+					</div>
+				{/await}
 			{/if}
 		</div>
 
@@ -74,27 +83,24 @@
 			// style:translate="{zoom.origin.x * zoom.scale}px 0"
 		>
 			{#if decoded}
-				{const rendered = $derived(
-					renderWaveformSvg(decoded, {
-						height: 150,
-						columns: 5000,
-						// columns: Math.round(zoom.scale * 1000),
-					})
-				)}
-				<div class="base">
-					<!-- eslint-ignore-next-line svelte/no-at-html -->
-					{@html rendered}
-				</div>
-
-				{#each boxes as box}
-					<div
-						class="box"
-						style:clip-path={`xywh(${box.x * 100}% 0% ${box.width * 100}% 100%)`}
-					>
+				{#await renderWaveform({ height: 150, columns: 5000 })}
+					Chargement de la forme d'onde…
+				{:then rendered}
+					<div class="base">
 						<!-- eslint-ignore-next-line svelte/no-at-html -->
 						{@html rendered}
 					</div>
-				{/each}
+
+					{#each boxes as box}
+						<div
+							class="box"
+							style:clip-path={`xywh(${box.x * 100}% 0% ${box.width * 100}% 100%)`}
+						>
+							<!-- eslint-ignore-next-line svelte/no-at-html -->
+							{@html rendered}
+						</div>
+					{/each}
+				{/await}
 			{/if}
 		</div>
 
@@ -145,7 +151,7 @@
 
 		.box {
 			--waveform-color: var(--fg-primary);
-			background: var(--bg-primary-translucent);
+			background: rgb(from var(--bg-primary) r g b / 25%);
 		}
 	}
 
