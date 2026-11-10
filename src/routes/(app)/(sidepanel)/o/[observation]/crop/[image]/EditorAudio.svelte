@@ -71,8 +71,6 @@
 </script>
 
 <div class="editor">
-	<!-- <div class="playhead" style:--position-percentage="{playhead.positionNormalized * 100}%" /> -->
-
 	<div class="minimap">
 		<Waveform minimap decoded={decodedAudio} />
 	</div>
@@ -129,35 +127,5 @@
 		flex: 1 1;
 		/** Match with spectrogram background */
 		/* background: black; */
-	}
-
-	.editor {
-		position: relative;
-
-		.playhead {
-			position: absolute;
-			left: var(--position-percentage);
-			top: 0;
-			bottom: 0;
-
-			width: 3px;
-			background: var(--fg-primary);
-			z-index: 10;
-
-			/* Triangle at top of playhead bar */
-			&::before {
-				--width: 10px;
-				content: '';
-				position: absolute;
-				top: 0;
-				left: 50%;
-				transform: translateX(-50%);
-				width: 0;
-				height: 0;
-				border-left: var(--width) solid transparent;
-				border-right: var(--width) solid transparent;
-				border-top: var(--width) solid var(--fg-primary);
-			}
-		}
 	}
 </style>

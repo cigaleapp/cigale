@@ -28,7 +28,10 @@ export async function load({ parent }) {
 		uiState.currentSession?.group.crop ?? uiState.currentSession?.group.global;
 	const sortSettings = uiState.currentSession?.sort.crop ?? uiState.currentSession?.sort.global;
 
-	const images = await tables.Image.list('sessionId', uiState.currentSessionId);
+	const images = [
+		...(await tables.Image.list('sessionId', uiState.currentSessionId)),
+		...(await tables.Sound.list('sessionId', uiState.currentSessionId)),
+	];
 
 	if (sortSettings && groupSettings) {
 		const imagesSorter = await galleryEffectiveSorter({

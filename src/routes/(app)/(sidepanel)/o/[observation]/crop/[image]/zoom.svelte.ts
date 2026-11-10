@@ -89,13 +89,7 @@ export class Zoom {
 			| { via: 'keyboard'; key: '+' | '-' }
 	) {
 		// Most logic is thanks to https://stackoverflow.com/a/70251437
-		const imageBounds = element?.getBoundingClientRect();
-		const imageOffsets = element
-			? {
-					height: element.offsetHeight,
-					width: element.offsetWidth,
-				}
-			: undefined;
+		const bounds = element?.getBoundingClientRect();
 
 		let direction = 0;
 		let speed = 0;
@@ -115,47 +109,55 @@ export class Zoom {
 				break;
 			}
 			case 'keyboard': {
+				// No cursor position: zoom around the middle of the image
+				if (bounds) {
+					center = {
+						clientX: bounds.x + bounds.width / 2,
+						clientY: bounds.y + bounds.height / 2,
+					};
+				}
 				speed = this.scale * 0.2;
 				direction = switchValue(data.key, {
 					'+': 1,
 					'-': -1,
 				});
-
 				break;
 			}
 		}
 
-		const scale = this.scale + direction * 2 * speed;
+		const previous = this.scale;
+		const scale = Math.min(10, Math.max(1, previous + direction * 2 * speed));
 
-		if (scale > 10) {
-			this.scale = 10;
-			return;
-		}
-
-		if (scale < 1) {
+		if (scale <= 1) {
 			this.scale = 1;
 			this.origin = { x: 0, y: 0 };
 			return;
 		}
 
-		if (!imageBounds || !imageOffsets) {
+		if (scale === previous) return;
+
+		if (!element || !bounds) {
 			this.scale = scale;
 			return;
 		}
 
-		const dx =
-			direction *
-			speed *
-			(imageOffsets.width - ((center.clientX - imageBounds.x) / scale) * 2);
+		// Transform-origin of the element in its own (untransformed) pixels
+		const [originX, originY] = getComputedStyle(element)
+			.transformOrigin.split(' ')
+			.map(parseFloat);
+		const tx = Number.isFinite(originX) ? originX : element.offsetWidth / 2;
+		const ty = Number.isFinite(originY) ? originY : element.offsetHeight / 2;
 
-		const dy =
-			direction *
-			speed *
-			(imageOffsets.height - ((center.clientY - imageBounds.y) / scale) * 2);
+		// The fixed point of the transform, in client coordinates.
+		// bounds.x = anchor - s * (tx + o) + ... solved for anchor:
+		const anchorX = bounds.x + previous * tx - previous * this.origin.x;
+		const anchorY = bounds.y + previous * ty - previous * this.origin.y;
+
+		const k = 1 / scale - 1 / previous;
 
 		this.scale = scale;
-		if (this.zoomlock !== 'x') this.origin.x += dx;
-		if (this.zoomlock !== 'y') this.origin.y += dy;
+		if (this.zoomlock !== 'x') this.origin.x += (center.clientX - anchorX) * k;
+		if (this.zoomlock !== 'y') this.origin.y += (center.clientY - anchorY) * k;
 	}
 
 	startPanning(at: ClientPoint) {

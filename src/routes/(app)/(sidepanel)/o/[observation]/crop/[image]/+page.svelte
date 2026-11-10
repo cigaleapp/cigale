@@ -43,12 +43,18 @@
 		if (!page.params.observation) return;
 
 		const observation = idb.tables.Observation.getFromState(page.params.observation);
-		return observation?.images.find((i) => imageIdToFileId(i) === fileId);
+		return (
+			observation?.images.find((i) => imageIdToFileId(i) === fileId) ??
+			observation?.sounds.find((s) => imageIdToFileId(s) === fileId)
+		);
 	});
 
 	export function focusedImage() {
 		if (!focusedImageId) return undefined;
-		return idb.tables.Image.getFromState(focusedImageId);
+		return (
+			idb.tables.Image.getFromState(focusedImageId) ??
+			idb.tables.Sound.getFromState(focusedImageId)
+		);
 	}
 
 	export function setFocusedImage(imageId: string | null) {

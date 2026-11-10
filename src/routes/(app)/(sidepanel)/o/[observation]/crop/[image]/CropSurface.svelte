@@ -3,7 +3,7 @@
 
 	import { toTopLeftCoords } from '$lib/BoundingBoxes.svelte.js';
 	import { Gestures } from '$lib/touch/gestures.svelte.js';
-	import { mapValues, overrideStyle, pick } from '$lib/utils.js';
+	import { mapValues, overrideStyle, pick, switchValue } from '$lib/utils.js';
 
 	import {
 		focusedImage,
@@ -14,6 +14,7 @@
 	import { onCropChange } from './actions.svelte.js';
 	import DraggableBoundingBox from './DraggableBoundingBox.svelte';
 	import { activeTool } from './Toolbar.svelte';
+	import ZoomableMarks from './ZoomableMarks.svelte';
 
 	interface Props {
 		selectedBox: SelectedBox;
@@ -24,7 +25,10 @@
 		/** Image source */
 		imageSrc: string | undefined;
 		fit: 'contain' | 'cover' | 'fill';
+		/** Lock zoom along one axis, and along the other axis when doing ctrl+zoom */
 		zoomlock?: 'x' | 'y';
+		/** Extra content. Position elements in absolute, with percent values for top/left/bottom/right */
+		extraMarks: Snippet;
 	}
 
 	let {
@@ -34,8 +38,11 @@
 		fileId,
 		imageSrc,
 		fit: subjectFitMode,
-		zoomlock,
+		zoomlock: defaultZoomlock,
+		extraMarks,
 	}: Props = $props();
+
+	let zoomlock = $derived(defaultZoomlock);
 
 	$effect(() => {
 		if (zoomlock) zoom.lock(zoomlock);
@@ -116,6 +123,17 @@
 		event.preventDefault();
 		if (!imageElement) return;
 
+		if (defaultZoomlock) {
+			// FIXME: switch zoomlocks is weird
+			// surely because zoom.scale needs to be separated into .x and .y
+			// try to do a Adobe Audition-like zoom
+			zoomlock = event.ctrlKey
+				? switchValue(defaultZoomlock, { x: 'y', y: 'x' })
+				: defaultZoomlock;
+
+			zoom.lock(zoomlock);
+		}
+
 		zoom.update(imageElement, { via: 'wheel', event });
 	}}
 >
@@ -130,6 +148,8 @@
 		}}
 	/>
 	{#if imageElement && fileId && !imageIsLoading}
+		<ZoomableMarks source={imageElement} {zoom} fit={subjectFitMode} children={extraMarks} />
+
 		<DraggableBoundingBox
 			{...activeTool()}
 			{imageElement}
@@ -170,7 +190,7 @@
 
 <style>
 	.crop-surface {
-		overflow: hidden;
+		overflow: clip;
 		position: relative;
 		user-select: none;
 		touch-action: none;
