@@ -2,6 +2,7 @@
 	import IconPause from '~icons/ri/pause-line';
 	import IconPlay from '~icons/ri/play-line';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
+	import { formatDurationShort } from '$lib/date.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 
 	interface Props {
@@ -18,15 +19,32 @@
 
 	let element = $state<HTMLAudioElement>();
 
+	let duration = $state(0);
+
 	function togglePlayPause() {
 		if (!playing) element?.play();
 		else element?.pause();
+	}
+
+	function formatDuration(ms: number): `${string}:${string}` {
+		const mins = (ms * 1e-3) / 60;
+		const secs = (ms * 1e-3) % 60;
+
+		const amt = (v: number) => v.toFixed(0).toString().padStart(2, '0');
+
+		return `${amt(mins)}:${amt(secs)}`;
 	}
 </script>
 
 <audio
 	{src}
 	controls
+	bind:duration={
+		null,
+		(d) => {
+			duration = d * 1e3;
+		}
+	}
 	bind:this={element}
 	bind:currentTime={
 		() => 0,
@@ -65,13 +83,17 @@
 	</div>
 
 	<div class="time">
-		<span class="elapsed"></span>
-		<span class="separator"></span>
-		<span class="total"></span>
+		<code class="elapsed">
+			{formatDuration(playhead)}
+		</code>
+		<span class="separator">/</span>
+		<code class="total">
+			{formatDuration(duration)}
+		</code>
 	</div>
 
 	<div class="seekbar">
-		<ProgressBar />
+		<ProgressBar alwaysActive progress={playhead / duration} />
 	</div>
 	<div class="volume"></div>
 
@@ -90,5 +112,27 @@
 	.player {
 		width: 100%;
 		padding: 0.5em;
+		display: flex;
+		align-items: center;
+		gap: 1em;
+	}
+
+	.time {
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
+
+		code {
+			font-size: 0.85rem;
+		}
+
+		.separator {
+			color: var(--gay);
+		}
+	}
+
+	.seekbar {
+		width: 100%;
+		/* --height: 2rem; */
 	}
 </style>
