@@ -142,7 +142,8 @@
 
 		modelAbortController.abort();
 		classifModelLoadingError = undefined;
-		modelAbortController = new AbortController();
+		const controller = new AbortController();
+		modelAbortController = controller;
 
 		try {
 			for (const [i, { metadataId, selector }] of modelLoads.entries()) {
@@ -151,7 +152,7 @@
 					db: databaseHandle(),
 					enableWebGPU: await getSetting('enableWebGPU'),
 					swarpc: data.swarpc,
-					abortSignal: modelAbortController.signal,
+					abortSignal: controller.signal,
 					protocolId,
 					metadataId,
 					selector,
@@ -166,8 +167,13 @@
 		} catch (error) {
 			throw error;
 		} finally {
-			classifmodelLoaded = true;
-			queueClassificationsIfReady();
+			// Only mark as loaded and queue classifications if this load wasn't
+			// superseded by a newer one (i.e. aborted). Otherwise a stale finally
+			// would trigger classifyMore before the models are ready on the worker.
+			if (!controller.signal.aborted) {
+				classifmodelLoaded = true;
+				queueClassificationsIfReady();
+			}
 		}
 	}
 
@@ -177,8 +183,8 @@
 			classifmodelLoaded = false;
 			void loadAllClassifModels()
 				.catch((error) => {
-					classifModelLoadingError = error;
 					if (isAbortError(error)) return;
+					classifModelLoadingError = error;
 					console.error(error);
 					if (error instanceof AggregateError) {
 						console.error(error.errors);
