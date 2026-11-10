@@ -59,7 +59,7 @@ export async function processAudioFile(
 	uiState.setPreviewURL(id, spectrogramUrl);
 
 	await tables.Sound.set({
-		id: imageId(id, 1),
+		id: imageId(id, 0),
 		fileId: id,
 		filename,
 		addedAt: new Date().toISOString(),

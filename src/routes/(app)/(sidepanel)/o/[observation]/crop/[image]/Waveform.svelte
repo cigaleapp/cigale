@@ -16,15 +16,7 @@
 
 	const boxes = $derived(Object.values(boundingBoxes()).map((box) => toTopLeftCoords(box)));
 
-	let { decoded, minimap = false,}: Props = $props();
-
-	// XXX: DONT MERGE
-	// const zoom = {
-	// 	scale: 7.43008,
-	// 	origin: { x: -598.531 },
-	// };
-
-	// height: 150px; scale: 7.43008 1; translate: -598.531px;
+	let { decoded, minimap = false }: Props = $props();
 
 	let totalWidth = $state<number>();
 
@@ -34,7 +26,6 @@
 		if (!decoded) return;
 
 		return renderWaveformSvg(decoded, options);
-
 	}
 </script>
 
@@ -76,12 +67,7 @@
 			</ZoomableMarks>
 		{/if}
 
-		<div
-			class="waveform"
-			bind:this={waveformElement}
-			// style:scale="{zoom.scale} 1"
-			// style:translate="{zoom.origin.x * zoom.scale}px 0"
-		>
+		<div class="waveform" bind:this={waveformElement}>
 			{#if decoded}
 				{#await renderWaveform({ height: 150, columns: 5000 })}
 					Chargement de la forme d'onde…
