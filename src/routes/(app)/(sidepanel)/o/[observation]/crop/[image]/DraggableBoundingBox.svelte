@@ -226,7 +226,7 @@
 />
 
 {#if isDebugMode()}
-	<div class="debug" style:color="red">
+	<div class="debuginfo" style:color="red">
 		<code>
 			{fingers.count} fingers <br />
 			{#snippet point(x: number, y: number)}
@@ -475,7 +475,7 @@
 		outline: 2px dashed red;
 	}
 
-	.debug {
+	.debuginfo {
 		position: absolute;
 		display: inline-block;
 		top: 0;

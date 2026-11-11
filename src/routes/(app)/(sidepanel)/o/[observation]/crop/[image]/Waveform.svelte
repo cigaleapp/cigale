@@ -169,7 +169,8 @@
 		left: var(--left);
 
 		/* background: rgb(from var(--bg-primary) r g b / 25%); */
-		backdrop-filter: contrast(500%);
+
+		cursor: grab;
 	}
 
 	/* .waveform {

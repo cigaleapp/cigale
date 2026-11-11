@@ -13,9 +13,11 @@
 		children: Snippet;
 		/** Bindable, read-only. Current position of cursor in normalized values. Null if cursor is not hovering over the area */
 		cursor?: null | { x: number; y: number };
+		/** Set pointer-events: none */
+		inert?:boolean
 	}
 
-	let { source, fit, zoom, children, cursor = $bindable(null) }: Props = $props();
+	let { source, fit, zoom, children , inert=false, cursor = $bindable(null) }: Props = $props();
 
 	$inspect('cart', cursor?.x, cursor?.y);
 
