@@ -157,6 +157,7 @@
 	/>
 	{#if imageElement && fileId && !imageIsLoading}
 		<ZoomableMarks
+			// inert
 			source={imageElement}
 			{zoom}
 			fit={subjectFitMode}
