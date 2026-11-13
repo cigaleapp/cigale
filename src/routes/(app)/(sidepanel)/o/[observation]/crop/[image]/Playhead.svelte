@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { zoom } from './+page.svelte';
 	import { playhead } from './playhead.svelte.js';
 
 	interface Props {
@@ -39,18 +40,9 @@
 {#if draggable}
 	<div
 		class="drag-area"
-		onpointermove={(event) => {
-			if (!playhead.seeking) return;
-			seek(event);
-		}}
 		onpointerup={(event) => {
+			if (zoom.panning) return;
 			if (!playhead.seeking) seek(event);
-			playhead.seeking = false;
-		}}
-		onpointerleave={() => {
-			playhead.seeking = false;
-		}}
-		onpointercancel={() => {
 			playhead.seeking = false;
 		}}
 	></div>
@@ -60,7 +52,7 @@
 	.drag-area {
 		position: absolute;
 		inset: 0;
-		z-index: 20;
+		z-index: var(--playhead-drag-area-z-index, 20);
 	}
 
 	.playhead {
