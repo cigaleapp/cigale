@@ -1,4 +1,4 @@
-import type { FixturePaths } from '$e2e/filepaths.js';
+import type { FixturePaths } from '#e2e/filepaths.js';
 
 import * as fflate from 'fflate';
 

@@ -47,5 +47,8 @@
 			"query": "repo:${owner}/${repository} state:open no:milestone no:parent-issue"
 		}
 	],
-	"errorLens.excludePatterns": ["**/*.cigaleprotocol.{json,yaml}"]
+	"errorLens.excludePatterns": ["**/*.cigaleprotocol.{json,yaml}"],
+	"[typescript]": {
+		"editor.colorDecorators": false
+	}
 }

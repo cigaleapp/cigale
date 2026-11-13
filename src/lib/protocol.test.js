@@ -5,9 +5,9 @@ import {
 	hasUpgradeAvailable,
 	jsonSchemaURL,
 	toExportedProtocol,
-} from '$lib/protocols.js';
-import { Protocol } from '$lib/schemas/protocols.js';
-import { pick } from '$lib/utils.js';
+} from '#lib/protocols.js';
+import { Protocol } from '#lib/schemas/protocols.js';
+import { pick } from '#lib/utils.js';
 
 import 'fake-indexeddb/auto';
 
@@ -217,7 +217,7 @@ describe('compareProtocolWithUpstream', () => {
 	it('should return empty diffs if the protocol has no source', async () => {
 		const db = {
 			/**
-			 * @returns {Promise<typeof import('$lib/database').Tables.Protocol.inferIn>}
+			 * @returns {Promise<typeof import('#lib/database.js').Tables.Protocol.inferIn>}
 			 */
 			get: async (_table, _id) => ({
 				id: 'protocol1',
@@ -257,7 +257,7 @@ describe('compareProtocolWithUpstream', () => {
 	it('should correctly compare two identical protocols', async () => {
 		const db = {
 			/**
-			 * @returns {Promise<typeof import('$lib/database').Tables.Protocol.inferIn>}
+			 * @returns {Promise<typeof import('#lib/database.js').Tables.Protocol.inferIn>}
 			 */
 			get: async (_table, _id) => ({
 				id: 'protocol1',
@@ -336,7 +336,7 @@ describe('compareProtocolWithUpstream', () => {
 	it('should correctly identify differences between local and remote protocols', async () => {
 		const db = {
 			/**
-			 * @returns {Promise<typeof import('$lib/database').Tables.Protocol.inferIn>}
+			 * @returns {Promise<typeof import('#lib/database.js').Tables.Protocol.inferIn>}
 			 */
 			get: async (_table, _id) => ({
 				id: 'protocol1',
@@ -366,7 +366,7 @@ describe('compareProtocolWithUpstream', () => {
 			count: async () => 2,
 
 			/**
-			 * @returns {Promise<Array<import('$lib/database').Metadata | import('$lib/database').MetadataEnumVariant & {metadataId: string}>>}
+			 * @returns {Promise<Array<import('#lib/database').Metadata | import('#lib//database').MetadataEnumVariant & {metadataId: string}>>}
 			 */
 			getAll: async (table, _range) => {
 				if (table === 'MetadataOption') {
@@ -440,7 +440,7 @@ describe('compareProtocolWithUpstream', () => {
 			text: async () =>
 				JSON.stringify(
 					/**
-					 * @satisfies {typeof import('$lib/schemas/protocols').ExportedProtocol.inferIn}
+					 * @satisfies {typeof import('#lib/schemas/protocols.js').ExportedProtocol.inferIn}
 					 */
 
 					{

@@ -2,8 +2,8 @@ import { Capacitor } from '@capacitor/core';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { millisecondsToSeconds } from 'date-fns';
 
-import { getSettings } from '$lib/settings.svelte.js';
-import { toasts } from '$lib/toasts.svelte.js';
+import { getSettings } from '#lib/settings.svelte.js';
+import { toasts } from '#lib/toasts.svelte.js';
 
 /**
  * Maps actionTypeId to action id to action details (title and callback)

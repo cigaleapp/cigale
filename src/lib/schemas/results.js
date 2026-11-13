@@ -1,13 +1,13 @@
 import { type } from 'arktype';
 
-// Can't use $lib/ in $lib/schemas files, they're susceptible
+// Can't use #lib// in #lib//schemas files, they're susceptible
 // to be imported by non-Vite-managed pre-build scripts (e.g. JSON Schema generation)
 import { transformObject } from '../utils.js';
 import { ID, NamespacedMetadataID, URLString } from './common.js';
 import { MetadataErrors, MetadataRecord, removeNamespaceFromMetadataId } from './metadata.js';
 
 /**
- * @import * as DB from '$lib/database.js';
+ * @import * as DB from '#lib/database.js';
  */
 
 export const AnalyzedImage = type({
@@ -80,9 +80,9 @@ export function withProtocolMetadata(protocol, subject) {
 /**
  * @template {string} KIn
  * @template {string} [KOut=KIn]
- * @param {Record<KIn, Omit<import('$lib/database.js').MetadataValue, 'value'> & { value: null | import('$lib/schemas/metadata.js').RuntimeValue }>} values
+ * @param {Record<KIn, Omit<import('#lib/database.js').MetadataValue, 'value'> & { value: null | import('#lib//schemas/metadata.js').RuntimeValue }>} values
  * @param {(key: KIn) => KOut|undefined} [keyMappper] return undefined to remove an entry
- * @returns {Record<KOut, typeof import('$lib/schemas/metadata.js').MetadataRecordValue.infer>}
+ * @returns {Record<KOut, typeof import('#lib/schemas/metadata.js').MetadataRecordValue.infer>}
  */
 export function toMetadataRecord(values, keyMapper = (x) => x) {
 	/** @param {unknown} value */

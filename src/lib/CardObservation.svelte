@@ -8,12 +8,12 @@
 
 	/**
 	 * @typedef {object} Props
-	 * @property {import('$lib/database').Observation} observation
-	 * @property {import('$lib/database').Image[]} images the images of the observation
+	 * @property {import('#lib/database.js').Observation} observation
+	 * @property {import('#lib/database.js').Image[]} images the images of the observation
 	 * @property {boolean} [highlighted] - whether this image is highlighted
 	 */
 
-	/** @type { Omit< Partial<import('$lib/CardMedia.svelte').Props>, keyof Props> & Props} */
+	/** @type { Omit< Partial<import('#lib/CardMedia.svelte').Props>, keyof Props> & Props} */
 	const { observation, images, highlighted = false, ...rest } = $props();
 
 	const errorMessages = $derived(

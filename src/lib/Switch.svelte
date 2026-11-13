@@ -2,7 +2,7 @@
 	import Check from '~icons/ri/check-line';
 	import Cross from '~icons/ri/close-line';
 
-	import { getSettings } from './settings.svelte';
+	import { getSettings } from './settings.svelte.js';
 
 	/**
 	 * @typedef {object} Props

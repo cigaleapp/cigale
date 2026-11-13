@@ -24,7 +24,7 @@ Available CSS variables:
 	 * @property {boolean} [tight=false] limit the height of the button. also hides keyboard shortcut hint if itll be displayed in a tooltip, and doesn't auto-append a spinner when loading, and {@link loading} is true
 	 * @property {Parameters<typeof tooltip>[1]} [help]
 	 * @property {string} [keyboard] keyboard shortcut hint to display
-	 * @property {import('$e2e/testids.js').PlaywrightTestId|undefined} [testid] add a attribute for Playwright getByTestId to the button
+	 * @property {import('#e2e//testids.js').PlaywrightTestId|undefined} [testid] add a attribute for Playwright getByTestId to the button
 	 * @property {boolean} [aria-pressed]
 	 * @property {string} [aria-label]
 	 * @property {boolean |"always"} [loading] show a loading state while the onlick handler is running. set to "always" to always show the loading state.
@@ -38,10 +38,10 @@ Available CSS variables:
 </script>
 
 <script>
-	import { errorMessage } from '$lib/i18n.js';
-	import { toasts } from '$lib/toasts.svelte.js';
+	import { errorMessage } from '#lib/i18n.js';
+	import { toasts } from '#lib/toasts.svelte.js';
 
-	import { hasPhysicalKeyboard } from './keyboard.svelte';
+	import { hasPhysicalKeyboard } from './keyboard.svelte.js';
 	import KeyboardHint from './KeyboardHint.svelte';
 	import LoadingSpinner from './LoadingSpinner.svelte';
 	import { tooltip } from './tooltips.js';

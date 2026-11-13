@@ -43,7 +43,7 @@
 </script>
 
 <script lang="ts">
-	import type { TopLeftBoundingBox } from './BoundingBoxes.svelte';
+	import type { TopLeftBoundingBox } from './BoundingBoxes.svelte.js';
 
 	import IconRetry from '~icons/ri/arrow-go-back-fill';
 	import IconDelete from '~icons/ri/delete-bin-line';

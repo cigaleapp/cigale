@@ -1,4 +1,4 @@
-import type { Schemas } from '$lib/database.js';
+import type { Schemas } from '#lib/database.js';
 
 type GlobalModalKey =
 	`modal_${'keyboard_shortcuts_help' | 'prepare_for_offline_use' | 'debug_ui_state' | 'submit_report_bug' | 'submit_feature_request' | 'create_custom_neural_network'}`;

@@ -1,4 +1,4 @@
-import type { PROCEDURES } from '$worker/procedures.js';
+import type { PROCEDURES } from '#worker/procedures.js';
 import type { CancelablePromise, SwarpcClient } from 'swarpc';
 
 import { RequestCancelledError } from 'swarpc';

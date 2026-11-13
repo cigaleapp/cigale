@@ -66,15 +66,15 @@
 </script>
 
 <script lang="ts" generics="I extends Item, V extends I['key']">
-	import type { PlaywrightTestId } from '$e2e/testids.js';
+	import type { PlaywrightTestId } from '#e2e/testids.js';
 	import type { Snippet } from 'svelte';
 
 	import { watch } from 'runed';
 	import { SvelteMap } from 'svelte/reactivity';
 
-	import { errorMessage } from '$lib/i18n.js';
-	import { IsMobile } from '$lib/mobile.svelte.js';
-	import { nonnull } from '$lib/utils.js';
+	import { errorMessage } from '#lib/i18n.js';
+	import { IsMobile } from '#lib/mobile.svelte.js';
+	import { nonnull } from '#lib/utils.js';
 
 	import ComboboxDesktop from './ComboboxDesktop.svelte';
 	import ComboboxMobile from './ComboboxMobile.svelte';

@@ -1,12 +1,12 @@
 <script lang="ts">
-	import type { AccountConstructor } from '$lib/accounts/types.js';
+	import type { AccountConstructor } from '#lib/accounts/types.js';
 
-	import { providers } from '$lib/accounts/registry.js';
-	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import { errorMessage } from '$lib/i18n.js';
-	import { databaseHandle, tables } from '$lib/idb.svelte.js';
-	import Logo from '$lib/Logo.svelte';
-	import { toasts } from '$lib/toasts.svelte.js';
+	import { providers } from '#lib/accounts/registry.js';
+	import ButtonSecondary from '#lib/ButtonSecondary.svelte';
+	import { errorMessage } from '#lib/i18n.js';
+	import { databaseHandle, tables } from '#lib/idb.svelte.js';
+	import Logo from '#lib/Logo.svelte';
+	import { toasts } from '#lib/toasts.svelte.js';
 
 	import TopbarBack from '../TopbarBack.svelte';
 	import ModalAddAccount from './ModalAddAccount.svelte';

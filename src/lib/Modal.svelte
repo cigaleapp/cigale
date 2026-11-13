@@ -1,12 +1,3 @@
-<!-- 
-@component
-Show a pop-up dialog, that can be closed via a close button provided by the component, or navigating back in the browser history.
-
-CSS variables:
-- `--modal-width`: The width of the modal. Default is `75vw` on mobile and `50vw` on desktop.
-
-
--->
 <script module>
 	/**
 	 * @param {typeof page} page
@@ -23,10 +14,10 @@ CSS variables:
 	 * @property {`modal_${string}`} key a unique string, used to identify the modal in the page's state.
 	 * @property {string} title the title used in the header
 	 * @property {undefined | (() => void)} [open] a function you can bind to, to open the modal
-	 * @property {undefined | (() => void)} [close] a function you can bind to, to close the modal. Note that the modal includes a close button in the header, you don't _have_ to use this.
+	 * @property {undefined | (() => Promise<void>)} [close] a function you can bind to, to close the modal. Note that the modal includes a close button in the header, you don't _have_ to use this.
 	 * @property {(() => void) | undefined} [onclose] a function that will be called when the modal is closed, either via the close button or by clicking outside the modal
 	 * @property {(() => void) | undefined} [onopen] a function that will be called when the modal is opened
-	 * @property {import('$lib/toasts.svelte.js').ToastPoolNames} [toasts] display toasts from the specified pool in the footer. Also sets the active toast pool while the modal is open.
+	 * @property {import('#lib/toasts.svelte.js').ToastPoolNames} [toasts] display toasts from the specified pool in the footer. Also sets the active toast pool while the modal is open.
 	 * @property {import('svelte').Snippet<[{ close: undefined | (() => void) }]>} children the content of the modal
 	 * @property {import('svelte').Snippet<[{ close: undefined | (() => void) }]>} [footer] the content of the footer
 	 */
@@ -36,10 +27,10 @@ CSS variables:
 	import { Portal } from 'bits-ui';
 	import { ms } from 'convert';
 
+	import { toasts } from '#lib/toasts.svelte.js';
 	import IconClose from '~icons/ri/close-line';
-	import { pushState } from '$app/navigation';
+	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { toasts } from '$lib/toasts.svelte.js';
 
 	import BottomDrawer from './BottomDrawer.svelte';
 	import ButtonIcon from './ButtonIcon.svelte';
@@ -77,7 +68,9 @@ CSS variables:
 				toasts.setCurrentPool(toastsPool);
 				toasts.clear();
 			}
-			pushState('', { [stateKey]: true });
+
+			goto('', { shallow: true, state: { [stateKey]: true } });
+
 			setTimeout(() => {
 				opening = false;
 			}, openingDuration);
@@ -87,7 +80,7 @@ CSS variables:
 				toasts.setCurrentPool('default');
 				toasts.clear();
 			}
-			pushState('', { [stateKey]: false });
+			return goto('', { shallow: true, state: { [stateKey]: false } });
 		};
 	});
 
@@ -96,12 +89,15 @@ CSS variables:
 	$effect(() => {
 		if (!modalElement) return;
 
-		// Somehow page.state[stateKey] can be undefined sometimes when running under Playwright
+		// page.state is replaced (not merged) on each goto, so a modal's key
+		// becomes undefined when another modal opens or a navigation occurs.
+		// Treat undefined the same as false so stale modals are closed.
 		switch (page.state[stateKey]) {
 			case true:
 				modalElement.showModal();
 				break;
 			case false:
+			case undefined:
 				modalElement.close();
 				break;
 		}
@@ -109,6 +105,16 @@ CSS variables:
 
 	const mobile = new IsMobile();
 </script>
+
+<!-- 
+@component
+Show a pop-up dialog, that can be closed via a close button provided by the component, or navigating back in the browser history.
+
+CSS variables:
+- `--modal-width`: The width of the modal. Default is `75vw` on mobile and `50vw` on desktop.
+
+
+-->
 
 {#if mobile.current}
 	<BottomDrawer
@@ -119,7 +125,7 @@ CSS variables:
 			() => page.state[stateKey] === true,
 			(isOpen) => {
 				if (!isOpen) onclose?.();
-				pushState('', { [stateKey]: isOpen });
+				goto('', { shallow: true, state: { [stateKey]: isOpen } });
 			}
 		}
 	>
@@ -137,13 +143,12 @@ CSS variables:
 	<Portal to="#modals">
 		<dialog
 			data-key={stateKey}
-			// Somehow page.state[stateKey] can be undefined sometimes
-			aria-hidden={page.state[stateKey] === false}
+			aria-hidden={page.state[stateKey] !== true}
 			style:color-scheme={getColorScheme()}
 			bind:this={modalElement}
-			onclose={() => {
+			onclose={async () => {
 				// Update state when dialog is closed via browser-controlled means (e.g. Esc key)
-				pushState('', { [stateKey]: false });
+				await goto('', { shallow: true, state: { [stateKey]: false } });
 				onclose?.();
 			}}
 			onmousedown={({ target, currentTarget, offsetX, offsetY }) => {

@@ -1,4 +1,4 @@
-import '$locales/main.loader.svelte.js';
+import '#locales/main.loader.svelte.js';
 
 import { SplashScreen } from '@capacitor/splash-screen';
 import { loadIcons } from '@iconify/svelte';
@@ -9,27 +9,27 @@ import * as Swarpc from 'swarpc';
 import { UAParser } from 'ua-parser-js';
 import { loadLocale } from 'wuchale/load-utils';
 
-import { dev } from '$app/environment';
 // oxlint-disable-next-line import/default
-import { localeFromNavigator } from '$lib/i18n.js';
+import { localeFromNavigator } from '#lib/i18n.js';
 import {
 	databaseHandle,
 	databaseName,
 	databaseRevision,
 	openTransaction,
 	tables,
-} from '$lib/idb.svelte.js';
-import { autoUpdateProtocols } from '$lib/protocols';
-import { getSetting } from '$lib/settings.svelte';
-import { toasts } from '$lib/toasts.svelte';
-import { clamp, fetchHttpRequest, profiler, progressSplitter, switchValue } from '$lib/utils.js';
-import { PROCEDURES } from '$worker/procedures.js';
-import WebWorker from '$worker/start.js?worker';
+} from '#lib/idb.svelte.js';
+import { autoUpdateProtocols } from '#lib/protocols.js';
+import { getSetting } from '#lib/settings.svelte.js';
+import { toasts } from '#lib/toasts.svelte.js';
+import { clamp, fetchHttpRequest, profiler, progressSplitter, switchValue } from '#lib/utils.js';
+import { dev } from '$app/env';
+import { PROCEDURES } from '#worker/procedures.js';
+import WebWorker from '#worker/start.js?worker';
 
 import '@andy0130tw/es-arraybuffer-base64/auto';
 import '@ungap/set-methods';
 
-import { binaryStorage } from '$lib/storage/index.js';
+import { binaryStorage } from '#lib/storage/index.js';
 
 export const ssr = false;
 
@@ -82,10 +82,7 @@ export async function load({ url }) {
 	await profile('Startup', 'Load locale', async () => loadLocale(locale));
 
 	dates.setDefaultOptions({
-		locale: {
-			fr: dateFnsLocales.fr,
-			en: dateFnsLocales.enUS,
-		}[locale],
+		locale: { fr: dateFnsLocales.fr, en: dateFnsLocales.enUS }[locale],
 	});
 
 	setLoadingProgress('translations', 1);
@@ -104,49 +101,55 @@ export async function load({ url }) {
 
 	setLoadingMessage('Initialisation des workers…');
 	setLoadingProgress('workers', 0);
-	if (window && window.swarpc) {
-		window.swarpc.destroy();
-	}
 
-	const swarpc = Swarpc.Client(PROCEDURES, {
-		worker: WebWorker,
-		nodes: parallelism,
-		localStorage: {
-			databaseName,
-			databaseRevision: databaseRevision.toString(),
-			playwright_mock_opfs:
-				localStorage.getItem('playwright_mock_opfs') ?? ('false' as const),
-		} satisfies (typeof import('$worker/procedures').LOCAL_STORAGE)['inferIn'],
-		hooks: {
-			success({ procedure, data, duration }) {
-				performance.measure(procedure, {
-					start: performance.now() - duration,
-					detail: {
-						devtools: {
-							dataType: 'track-entry',
-							track: 'Workers',
-							trackGroup: 'App',
+	// Reuse the existing swarpc client if one was already created by a previous
+	// run of this layout load. SvelteKit v3 runs this load multiple times, and
+	// swarpc keeps a module-level `pendingRequests` map that `destroy()` does
+	// not clean up — destroying and recreating the client on every load leaves
+	// stale entries keyed by dead worker nodeIds, which can make the load
+	// balancer route a request to a terminated worker (falling back to the
+	// service worker, which never answers) and hang the RPC forever.
+	const swarpc =
+		(window && window.swarpc) ||
+		Swarpc.Client(PROCEDURES, {
+			worker: WebWorker,
+			nodes: parallelism,
+			localStorage: {
+				databaseName,
+				databaseRevision: databaseRevision.toString(),
+				playwright_mock_opfs:
+					localStorage.getItem('playwright_mock_opfs') ?? ('false' as const),
+			} satisfies (typeof import('#worker//procedures').LOCAL_STORAGE)['inferIn'],
+			hooks: {
+				success({ procedure, data, duration }) {
+					performance.measure(procedure, {
+						start: performance.now() - duration,
+						detail: {
+							devtools: {
+								dataType: 'track-entry',
+								track: 'Workers',
+								trackGroup: 'App',
+							},
 						},
-					},
-				});
-
-				if (procedure === 'importProtocol') {
-					// We preload icons here instead of in the web worker
-					// so that the service worker can pick up on the fetch call and cache it
-					// > [...] when the **main app thread** makes a network request.
-					// https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerGlobalScope/fetch_event
-					loadIcons(data.iconsToPreload, (loaded, missing) => {
-						console.info(
-							`Preloaded ${loaded.length} icons, ${missing.length} missing:`,
-							missing
-						);
 					});
-				}
-			},
-		},
-	});
 
-	if (window) {
+					if (procedure === 'importProtocol') {
+						// We preload icons here instead of in the web worker
+						// so that the service worker can pick up on the fetch call and cache it
+						// > [...] when the **main app thread** makes a network request.
+						// https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerGlobalScope/fetch_event
+						loadIcons(data.iconsToPreload, (loaded, missing) => {
+							console.info(
+								`Preloaded ${loaded.length} icons, ${missing.length} missing:`,
+								missing
+							);
+						});
+					}
+				},
+			},
+		});
+
+	if (window && !window.swarpc) {
 		window.swarpc = swarpc;
 	}
 
@@ -165,9 +168,7 @@ export async function load({ url }) {
 		setLoadingProgress('database', 1);
 	} catch (e) {
 		console.error(e);
-		error(400, {
-			message: e?.toString() ?? 'Erreur inattendue',
-		});
+		error(400, e?.toString() ?? 'Erreur inattendue');
 	}
 
 	console.time('background things');

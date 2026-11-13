@@ -1,9 +1,9 @@
 import type { AccountConstructor } from './types.js';
-import type * as DB from '$lib/database.js';
-import type { DatabaseHandle } from '$lib/idb.svelte.js';
+import type * as DB from '#lib/database.js';
+import type { DatabaseHandle } from '#lib/idb.svelte.js';
 
-import EcoSignal from '$lib/accounts/ecosignal.js';
-import KoboToolbox from '$lib/accounts/kobotoolbox.js';
+import EcoSignal from '#lib/accounts/ecosignal.js';
+import KoboToolbox from '#lib/accounts/kobotoolbox.js';
 
 type AccountProviders = {
 	kobotoolbox: AccountConstructor<

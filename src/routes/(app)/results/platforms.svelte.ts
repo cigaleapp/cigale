@@ -1,9 +1,9 @@
-import type { Message } from '$lib/ProgressTree.svelte';
+import type { Message } from '#lib/ProgressTree.svelte';
 
-import { providers } from '$lib/accounts/registry.js';
-import { databaseHandle, tables } from '$lib/idb.svelte.js';
-import { uiState } from '$lib/uistate.svelte.js';
-import { switchValue } from '$lib/utils.js';
+import { providers } from '#lib/accounts/registry.js';
+import { databaseHandle, tables } from '#lib/idb.svelte.js';
+import { uiState } from '#lib/uistate.svelte.js';
+import { switchValue } from '#lib/utils.js';
 
 class ExporterPlatforms {
 	compatibleProviders = $derived(

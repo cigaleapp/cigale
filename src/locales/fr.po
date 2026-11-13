@@ -1,11 +1,12 @@
 msgid ""
 msgstr ""
-"Plural-Forms: nplurals=2; plural=n == 1 ? 0 : 1;\n"
 "Source-Language: fr\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3\n"
+"X-Plurals-Order: one, many, other\n"
 
 #: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
 #: src/routes/(app)/PrepareForOffline.svelte
@@ -131,9 +132,11 @@ msgid "C.i.g.a.l.e."
 msgstr "C.i.g.a.l.e."
 
 #: src/lib/ButtonUpdateProtocol.svelte
+#: src/lib/ButtonUpdateProtocol.svelte
 msgid "Ce protocole n'est pas versionné, pour le mettre à jour, supprimer le et importez la nouvelle version"
 msgstr "Ce protocole n'est pas versionné, pour le mettre à jour, supprimer le et importez la nouvelle version"
 
+#: src/lib/ButtonUpdateProtocol.svelte
 #: src/lib/ButtonUpdateProtocol.svelte
 #: src/routes/(app)/protocols/RowProtocol.svelte
 msgid "Ce protocole ne supporte pas la vérification des mises à jour"
@@ -159,8 +162,11 @@ msgstr "Chargement du modèle de recadrage…"
 msgid "Chargement du protocole intégré"
 msgstr "Chargement du protocole intégré"
 
+#: src/lib/Card.svelte
 #: src/lib/CardMedia.svelte
+#: src/lib/LoadingScreen.svelte
 #: src/lib/MetadataInput.svelte
+#: src/lib/ModalPickProtocol.svelte
 #: src/routes/(app)/+layout.ts
 #: src/routes/(app)/DeploymentDetails.svelte
 msgid "Chargement…"
@@ -170,6 +176,7 @@ msgstr "Chargement…"
 msgid "Choisir le protocole"
 msgstr "Choisir le protocole"
 
+#: src/routes/(app)/Settings.svelte
 #: src/routes/(app)/about/+page.svelte
 msgid "Chrome"
 msgstr "Chrome"
@@ -282,10 +289,6 @@ msgstr "Erreur lors de l'extraction des métadonnées EXIF pour {0}"
 msgid "Erreur lors de l'import du protocole distant: {0}"
 msgstr "Erreur lors de l'import du protocole distant: {0}"
 
-#: src/routes/(app)/(sidepanel)/classify/+page.svelte
-msgid "Erreur lors du chargement du modèle de classification"
-msgstr "Erreur lors du chargement du modèle de classification"
-
 #: src/routes/(app)/Navigation.svelte
 msgid "Exporter les résultats"
 msgstr "Exporter les résultats"
@@ -314,7 +317,9 @@ msgstr "Fusionner des observations ou images"
 msgid "Grâce aux bibliothèques"
 msgstr "Grâce aux bibliothèques"
 
+#: src/lib/InputSelectProtocol.svelte
 #: src/routes/(app)/Navigation.svelte
+#: src/routes/(app)/Settings.svelte
 msgid "Gérer les protocoles"
 msgstr "Gérer les protocoles"
 
@@ -399,6 +404,7 @@ msgid "Markdown invalide: {0}"
 msgstr "Markdown invalide: {0}"
 
 #: src/lib/ButtonUpdateProtocol.svelte
+#: src/routes/(app)/Settings.svelte
 msgid "Mettre à jour"
 msgstr "Mettre à jour"
 
@@ -416,6 +422,7 @@ msgid "Nom de l'observation"
 msgstr "Nom de l'observation"
 
 #: src/lib/MetadataInput.svelte
+#: src/routes/(app)/Settings.svelte
 msgid "Non"
 msgstr "Non"
 
@@ -427,6 +434,7 @@ msgstr "Nouvelle observation"
 msgid "Oui, supprimer"
 msgstr "Oui, supprimer"
 
+#: src/routes/(app)/Settings.svelte
 #: src/routes/(app)/about/+page.svelte
 msgid "Parallélisme"
 msgstr "Parallélisme"
@@ -476,6 +484,7 @@ msgstr "Recadrer <0/>"
 msgid "Recadrer les images"
 msgstr "Recadrer les images"
 
+#: src/lib/ButtonUpdateProtocol.svelte
 #: src/lib/ButtonUpdateProtocol.svelte
 msgid "Recherche de mise à jour…"
 msgstr "Recherche de mise à jour…"
@@ -588,9 +597,11 @@ msgid "¯\\_(ツ)_/¯"
 msgstr "¯\\_(ツ)_/¯"
 
 #: src/lib/ButtonUpdateProtocol.svelte
+#: src/routes/(app)/Settings.svelte
 msgid "À jour"
 msgstr "À jour"
 
+#: src/routes/(app)/Settings.svelte
 #: src/routes/(app)/about/+page.svelte
 #: src/routes/(app)/about/+page.svelte
 msgid "À propos"
@@ -657,6 +668,8 @@ msgid "https://elementtype.co/"
 msgstr "https://elementtype.co/"
 
 #. 0: e
+#. 0: e
+#: src/lib/ButtonUpdateProtocol.svelte
 #: src/lib/ButtonUpdateProtocol.svelte
 msgid "Impossible de vérifier les mises à jour: {0}"
 msgstr "Impossible de vérifier les mises à jour: {0}"
@@ -775,6 +788,7 @@ msgid "Nom du fichier"
 msgstr "Nom du fichier"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/suggestions/+page.svelte
+#: src/routes/(app)/ModalSubmitIssue.svelte
 #: src/routes/(app)/protocols/[id]/edit/infos/+page.svelte
 #: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/infos/+page.svelte
 #: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/options/[option]/+page.svelte
@@ -818,6 +832,8 @@ msgstr "Voir {0}"
 msgid "Protocole {0} introuvable"
 msgstr "Protocole {0} introuvable"
 
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/WithExpandButton.svelte
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/+layout.svelte
 #: src/routes/(app)/Settings.svelte
 msgid "Réduire"
 msgstr "Réduire"
@@ -880,18 +896,6 @@ msgstr "Suppprimer tout les éléments de ce groupe"
 #: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/options/[option]/+page.svelte
 msgid "Synonymes"
 msgstr "Synonymes"
-
-#: src/routes/(app)/+layout.svelte
-msgid "L’application a été mise à jour."
-msgstr "L’application a été mise à jour."
-
-#: src/routes/(app)/+layout.svelte
-msgid "Une mise à jour est disponible."
-msgstr "Une mise à jour est disponible."
-
-#: src/routes/(app)/+layout.svelte
-msgid "Recharger"
-msgstr "Recharger"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Appli"
@@ -967,6 +971,7 @@ msgstr "Protocoles <0/>"
 msgid "Sessions"
 msgstr "Sessions"
 
+#: src/routes/(app)/sessions/+page.svelte
 #: src/routes/(app)/sessions/[id]/+page.svelte
 msgid "Ouvrir la session"
 msgstr "Ouvrir la session"
@@ -998,11 +1003,14 @@ msgstr "Session supprimée."
 msgid "Protocole"
 msgstr "Protocole"
 
+#: src/routes/(app)/protocols/[id]/edit/+layout.svelte
 #: src/routes/(app)/sessions/[id]/+page.svelte
 msgid "Métadonnées"
 msgstr "Métadonnées"
 
 #: src/routes/(app)/sessions/[id]/+page.svelte
+#: src/routes/(app)/storage/+page.svelte
+#: src/routes/(app)/storage/+page.svelte
 msgid "ID de la session"
 msgstr "ID de la session"
 
@@ -1044,9 +1052,13 @@ msgstr "La session a été fermée"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/TopbarExtras.svelte
 #: src/routes/(app)/ModalSubmitIssue.svelte
+#: src/routes/(app)/ModalSubmitIssue.svelte
+#: src/routes/(app)/ModalSubmitIssue.svelte
 msgid "Signaler un bug"
 msgstr "Signaler un bug"
 
+#: src/routes/(app)/ModalSubmitIssue.svelte
+#: src/routes/(app)/ModalSubmitIssue.svelte
 #: src/routes/(app)/ModalSubmitIssue.svelte
 msgid "Proposer une fonctionnalité"
 msgstr "Proposer une fonctionnalité"
@@ -1204,6 +1216,7 @@ msgstr "Fichier trop volumineux pour être prévisualisé"
 
 #: src/lib/FilePreview.svelte
 #: src/lib/FilePreview.svelte
+#: src/routes/(app)/sessions/+page.svelte
 msgid "Télécharger"
 msgstr "Télécharger"
 
@@ -1334,18 +1347,6 @@ msgstr "Pour ouvrir ou publier des sessions en ligne"
 #: src/routes/(app)/sessions/+page.svelte
 msgid "Supprimer toutes les sessions"
 msgstr "Supprimer toutes les sessions"
-
-#: src/lib/queue.svelte.js
-msgid "Import des images terminé"
-msgstr "Import des images terminé"
-
-#: src/lib/queue.svelte.js
-msgid "Détection terminée"
-msgstr "Détection terminée"
-
-#: src/lib/queue.svelte.js
-msgid "Classification terminée"
-msgstr "Classification terminée"
 
 #. 0: file.name
 #: src/lib/results.svelte.js
@@ -1484,10 +1485,6 @@ msgid "Retour"
 msgstr "Retour"
 
 #: src/routes/(app)/Navigation.svelte
-msgid "Session"
-msgstr "Session"
-
-#: src/routes/(app)/Navigation.svelte
 msgid "Classifier"
 msgstr "Classifier"
 
@@ -1537,6 +1534,7 @@ msgstr "Connecte-toi sur <0/>"
 msgid "Copie-colle <0>ton token</0> (c'est la partie entre les {0})"
 msgstr "Copie-colle <0>ton token</0> (c'est la partie entre les {0})"
 
+#: src/routes/(app)/accounts/ModalAddAccount.svelte
 #: src/routes/(app)/accounts/ModalAddAccount.svelte
 msgid "Token"
 msgstr "Token"
@@ -1832,6 +1830,7 @@ msgid "Candidats"
 msgstr "Candidats"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/+layout.svelte
+#: src/routes/(app)/sessions/Header.svelte
 msgid "Tous"
 msgstr "Tous"
 
@@ -2035,11 +2034,6 @@ msgstr "{0}: confiance à 25%-50%"
 msgid "{0}: confiance à 0%-25%"
 msgstr "{0}: confiance à 0%-25%"
 
-#. 0: p.id; 1: p.name; 2: p.version ?? '<none>'
-#: src/lib/protocols.js
-msgid "{0} ({1}, v{2})"
-msgstr "{0} ({1}, v{2})"
-
 #. 0: uiState.currentProtocol.id; 1: uiState.currentProtocol.version
 #: src/routes/(app)/ModalSubmitIssue.svelte
 msgid "{0} v{1}"
@@ -2059,18 +2053,6 @@ msgstr "{0} enregistré"
 #: src/lib/CardObservation.svelte
 msgid "{0} sur {1}: {2}"
 msgstr "{0} sur {1}: {2}"
-
-#: src/routes/(app)/about/+page.svelte
-msgid "Roman Shamin"
-msgstr "Roman Shamin"
-
-#: src/routes/(app)/about/+page.svelte
-msgid "Evil Martians"
-msgstr "Evil Martians"
-
-#: src/routes/(app)/about/+page.svelte
-msgid "par"
-msgstr "par"
 
 #. 0: account.username
 #: src/routes/(app)/accounts/RowAccount.svelte
@@ -2159,6 +2141,7 @@ msgid "Plus d'options"
 msgstr "Plus d'options"
 
 #: src/routes/(app)/capture/+page.svelte
+#: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/+layout.svelte
 msgid "Options"
 msgstr "Options"
 
@@ -2336,6 +2319,7 @@ msgid "Sauvegarde…"
 msgstr "Sauvegarde…"
 
 #: src/lib/MetadataInput.svelte
+#: src/routes/(app)/Settings.svelte
 msgid "Oui"
 msgstr "Oui"
 
@@ -2358,10 +2342,6 @@ msgstr "<0/> OK!"
 #: src/routes/(app)/about/+page.svelte
 msgid "(aucun)"
 msgstr "(aucun)"
-
-#: src/routes/(app)/about/+page.svelte
-msgid ", chez"
-msgstr ", chez"
 
 #: src/routes/(app)/capture/+page.svelte
 msgid "<0/> Fini"
@@ -2401,6 +2381,7 @@ msgid "Copié!"
 msgstr "Copié!"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/TopbarExtras.svelte
+#: src/routes/(app)/Settings.svelte
 msgid "Mode debug"
 msgstr "Mode debug"
 
@@ -2637,14 +2618,11 @@ msgstr "Ajout…"
 msgid "Modèles personnalisés"
 msgstr "Modèles personnalisés"
 
-#: src/routes/(app)/(sidepanel)/crop/+layout.svelte
-msgid "Erreur lors du chargement du modèle de détection"
-msgstr "Erreur lors du chargement du modèle de détection"
-
 #: src/routes/(app)/sessions/+page.svelte
 msgid "Créer une session"
 msgstr "Créer une session"
 
+#: src/routes/(app)/sessions/Header.svelte
 #: src/routes/(app)/sessions/Header.svelte
 msgid "Sur l'appareil"
 msgstr "Sur l'appareil"
@@ -2715,11 +2693,6 @@ msgstr "Impossible d'envoyer la notification système."
 #: src/routes/(app)/results/ExportLocalActions.svelte
 msgid "Aucune session active à exporter."
 msgstr "Aucune session active à exporter."
-
-#. 0: filename
-#: src/routes/(app)/results/ExportLocalActions.svelte
-msgid "Impossible d'ajouter les métadonnées EXIF à l'image {0}"
-msgstr "Impossible d'ajouter les métadonnées EXIF à l'image {0}"
 
 #. 0: directoryHandle.name
 #: src/routes/(app)/results/ExportLocalActions.svelte
@@ -2807,6 +2780,7 @@ msgstr "Aucun média"
 msgid "<0/> Identifiants valides"
 msgstr "<0/> Identifiants valides"
 
+#: src/routes/(app)/sessions/+page.svelte
 #: src/routes/(app)/sessions/[id]/+page.svelte
 msgid "Ouvrir"
 msgstr "Ouvrir"
@@ -2940,6 +2914,7 @@ msgstr "Métadonnées des images exportées"
 msgid "Export JSON complet de l'analyse"
 msgstr "Export JSON complet de l'analyse"
 
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
 #: src/routes/(app)/protocols/[id]/edit/exports/+page.js
 msgid "Images recadrées"
 msgstr "Images recadrées"
@@ -3002,11 +2977,6 @@ msgstr "Résultats pour {0}"
 msgid "Protocole {0}"
 msgstr "Protocole {0}"
 
-#. 0: shortId
-#: src/routes/(app)/protocols/[id]/edit/+layout.svelte
-msgid "Métadonnée {0} créée"
-msgstr "Métadonnée {0} créée"
-
 #: src/routes/(app)/protocols/[id]/edit/+layout.svelte
 msgid "L'interface de modification de protocole n'est pas encore peaufinée. Certaines choses ne sont pas encore modifiables ici. Pour les changer, exportez les protocoles, modifiez l'export (fichier JSON) et ré-importez-le"
 msgstr "L'interface de modification de protocole n'est pas encore peaufinée. Certaines choses ne sont pas encore modifiables ici. Pour les changer, exportez les protocoles, modifiez l'export (fichier JSON) et ré-importez-le"
@@ -3031,6 +3001,7 @@ msgstr "Retour aux protocoles"
 msgid "Ajouter une métadonnée"
 msgstr "Ajouter une métadonnée"
 
+#: src/routes/(app)/protocols/[id]/edit/+layout.svelte
 #: src/routes/(app)/protocols/[id]/edit/+layout.svelte
 #: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/+layout.svelte
 msgid "Nom de la métadonnée"
@@ -3192,10 +3163,6 @@ msgstr "URL de téléchargement du protocole"
 msgid "Version actuelle"
 msgstr "Version actuelle"
 
-#: src/routes/(app)/protocols/[id]/edit/versioning/+page.svelte
-msgid "<0/> Dernière version en ligne: <1/> <2>Réétablir</2>"
-msgstr "<0/> Dernière version en ligne: <1/> <2>Réétablir</2>"
-
 #. 1.0: version + 1
 #: src/routes/(app)/protocols/[id]/edit/versioning/+page.svelte
 msgid "<0/> Le protocole local a des modifications non publiées, voir ci-dessous <1>Passer à la v{0}</1>"
@@ -3223,6 +3190,7 @@ msgstr "<0/> Une mise à jour à la v{0} est disponible <1/>"
 msgid "<0/> Différences avec la version publiée"
 msgstr "<0/> Différences avec la version publiée"
 
+#: src/routes/(app)/protocols/[id]/edit/+layout.svelte
 #: src/routes/(app)/protocols/[id]/edit/versioning/+page.svelte
 msgid "Versionnage"
 msgstr "Versionnage"
@@ -3231,6 +3199,8 @@ msgstr "Versionnage"
 msgid "Identifiant de la métadonnée"
 msgstr "Identifiant de la métadonnée"
 
+#: src/routes/(app)/TabSettings.svelte
+#: src/routes/(app)/TabSettings.svelte
 #: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/+layout.svelte
 msgid "Métadonnée"
 msgstr "Métadonnée"
@@ -3239,6 +3209,7 @@ msgstr "Métadonnée"
 msgid "Sélectionnez une option"
 msgstr "Sélectionnez une option"
 
+#: src/lib/Metadata.svelte
 #: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/infos/+page.svelte
 msgid "Obligatoire"
 msgstr "Obligatoire"
@@ -3402,6 +3373,7 @@ msgstr "<0/> Supprimer cette option"
 msgid "Autres noms possibles pour cette option. Permet de trouver l'option en cherchant avec un synonyme."
 msgstr "Autres noms possibles pour cette option. Permet de trouver l'option en cherchant avec un synonyme."
 
+#: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/+layout.svelte
 #: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/options/[option]/+page.svelte
 msgid "Cascades"
 msgstr "Cascades"
@@ -3429,3 +3401,902 @@ msgstr "<0/> Darwin Core"
 #: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
 msgid "Autoriser l'inférence via WebGPU"
 msgstr "Autoriser l'inférence via WebGPU"
+
+#: src/lib/queue.svelte.js
+msgid "1 image importée"
+msgid_plural "# images importées"
+msgstr[0] "1 image importée"
+msgstr[1] "# images importées"
+
+#: src/lib/queue.svelte.js
+msgid "1 image traitée"
+msgid_plural "# images traitées"
+msgstr[0] "1 image traitée"
+msgstr[1] "# images traitées"
+
+#: src/lib/queue.svelte.js
+msgid "1 image classée"
+msgid_plural "# images classées"
+msgstr[0] "1 image classée"
+msgstr[1] "# images classées"
+
+#: src/routes/(app)/+layout.svelte
+msgid "Example debug toast"
+msgstr "Example debug toast"
+
+#. 0: type
+#: src/routes/(app)/+layout.svelte
+msgid "Summon a {0} toast"
+msgstr "Summon a {0} toast"
+
+#: src/routes/(app)/TabSettings.svelte
+msgid "Impossible de choisir ce modèle"
+msgstr "Impossible de choisir ce modèle"
+
+#. 0: formatBytesSize(estimate.usage)
+#: src/routes/(app)/Settings.svelte
+msgid "{0} utilisés"
+msgstr "{0} utilisés"
+
+#: src/routes/(app)/(sidepanel)/+layout.svelte
+msgid "Errored!"
+msgstr "Errored!"
+
+#: src/routes/(app)/(sidepanel)/+layout.svelte
+msgid "Debug image.jpeg"
+msgstr "Debug image.jpeg"
+
+#. 0: account.username; 1: provider.displayName
+#: src/routes/(app)/sessions/Header.svelte
+msgid "{0} sur {1}"
+msgstr "{0} sur {1}"
+
+#: src/routes/(app)/accounts/+page.svelte
+msgid "Impossible de se déconnecter"
+msgstr "Impossible de se déconnecter"
+
+#: src/lib/Datetime.svelte
+msgid "PPpp"
+msgstr "PPpp"
+
+#: src/lib/Datetime.svelte
+msgid "PP"
+msgstr "PP"
+
+#. 0: version
+#. 0: version
+#: src/lib/ButtonUpdateProtocol.svelte
+#: src/lib/ButtonUpdateProtocol.svelte
+msgid "v{0}"
+msgstr "v{0}"
+
+#. 0: version; 1: newVersion
+#: src/lib/ButtonUpdateProtocol.svelte
+msgctxt "Upgrading a protocol. The <0 /> is an icon arrow"
+msgid "v{0} <0/> v{1}"
+msgstr "v{0} <0/> v{1}"
+
+#: src/routes/(app)/about/+page.svelte
+msgid "par <0>Roman Shamin</0>, chez <1>Evil Martians</1>"
+msgstr "par <0>Roman Shamin</0>, chez <1>Evil Martians</1>"
+
+#: src/routes/(app)/capture/+page.svelte
+msgid "Camera is ready"
+msgstr "Camera is ready"
+
+#: src/routes/(app)/capture/+page.svelte
+msgid "Resuming camera"
+msgstr "Resuming camera"
+
+#: src/routes/(app)/capture/+page.svelte
+#: src/routes/(app)/capture/+page.svelte
+#: src/routes/(app)/capture/+page.svelte
+msgid "Timer"
+msgstr "Timer"
+
+#. 0: stateKey
+#: src/lib/Modal.svelte
+msgid "Binding functions to {0} "
+msgstr "Binding functions to {0} "
+
+#. 0: name
+#: src/lib/ModalPickProtocol.svelte
+msgid "{0} logo"
+msgstr "{0} logo"
+
+#. 0: meters
+#: src/lib/WorldMap.svelte
+msgid "{0} m"
+msgstr "{0} m"
+
+#: src/lib/KeyboardShortcuts.svelte
+#: src/lib/KeyboardShortcuts.svelte
+msgid "Digit"
+msgstr "Digit"
+
+#: src/lib/KeyboardShortcuts.svelte
+msgid "Général"
+msgstr "Général"
+
+#: src/routes/(app)/protocols/[id]/edit/+layout.svelte
+msgid "Impossible de créer la métadonnée"
+msgstr "Impossible de créer la métadonnée"
+
+#. 0: labels.item
+#: src/routes/(app)/(sidepanel)/o/[observation]/TopbarExtras.svelte
+msgid "{0} précédente"
+msgstr "{0} précédente"
+
+#. 0: labels.item
+#: src/routes/(app)/(sidepanel)/o/[observation]/TopbarExtras.svelte
+msgid "{0} suivante"
+msgstr "{0} suivante"
+
+#: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/options/+layout.svelte
+msgid "Impossible de créer l'option"
+msgstr "Impossible de créer l'option"
+
+#: src/lib/AnimatableCheckmark.svelte
+msgid "M2 8L5.5 11.5L13 4"
+msgstr "M2 8L5.5 11.5L13 4"
+
+#: src/lib/AreaObservations.svelte
+msgid "Développer le groupe"
+msgstr "Développer le groupe"
+
+#: src/lib/AreaObservations.svelte
+msgid "Réduire le groupe"
+msgstr "Réduire le groupe"
+
+#: src/lib/AreaObservations.svelte
+#: src/routes/(app)/(sidepanel)/classify/+page.svelte
+#: src/routes/(app)/(sidepanel)/crop/+page.svelte
+#: src/routes/(app)/(sidepanel)/import/+page.svelte
+#: src/routes/(app)/(sidepanel)/import/+page.svelte
+msgid "Cancelled by user"
+msgstr "Cancelled by user"
+
+#. 0: newVersion
+#: src/lib/ButtonUpdateProtocol.svelte
+msgid "Le protocole est à jour (v{0}). Cliquer pour vérifier à nouveau"
+msgstr "Le protocole est à jour (v{0}). Cliquer pour vérifier à nouveau"
+
+#. 0: newVersion
+#: src/lib/ButtonUpdateProtocol.svelte
+msgid "Une mise à jour vers la v{0} est disponible"
+msgstr "Une mise à jour vers la v{0} est disponible"
+
+#: src/lib/ComboboxDesktop.svelte
+#: src/lib/ComboboxMobile.svelte
+msgid "Désactivé"
+msgstr "Désactivé"
+
+#: src/lib/ComboboxDesktop.svelte
+msgid "Expanding details isnt available on desktop comboboxes"
+msgstr "Expanding details isnt available on desktop comboboxes"
+
+#: src/lib/ComboboxMobile.svelte
+msgid "Préparation de la recherche…"
+msgstr "Préparation de la recherche…"
+
+#: src/lib/ComboboxMobile.svelte
+msgid "Chargement des options…"
+msgstr "Chargement des options…"
+
+#: src/lib/ComboboxMobile.svelte
+msgid "Aucune option sélectionnée"
+msgstr "Aucune option sélectionnée"
+
+#: src/lib/DropdownMenu.svelte
+msgid "Aucun élément disponible"
+msgstr "Aucun élément disponible"
+
+#: src/lib/FieldURL.svelte
+msgid "HEAD"
+msgstr "HEAD"
+
+#: src/lib/LoadingScreen.svelte
+msgid "Rien à voir ici"
+msgstr "Rien à voir ici"
+
+#: src/lib/Logo.svelte
+msgid "M1020.07 294.532L1283.62 482.788V303.639C1261.34 270.383 1222.2 179.965 1303.91 115.305C1376.19 58.0998 1441.36 108.379 1471.37 133.436L1283.62 303.639V482.788L1217.18 724.197L1471.37 942.764L1308.87 1031.25L1020.07 1188.53L624.147 1067.03L937.818 724.197L696.449 707.796L370.907 724.197L81.6314 534.363L24.7183 279.146L211.153 282.028L1020.07 294.532Z"
+msgstr "M1020.07 294.532L1283.62 482.788V303.639C1261.34 270.383 1222.2 179.965 1303.91 115.305C1376.19 58.0998 1441.36 108.379 1471.37 133.436L1283.62 303.639V482.788L1217.18 724.197L1471.37 942.764L1308.87 1031.25L1020.07 1188.53L624.147 1067.03L937.818 724.197L696.449 707.796L370.907 724.197L81.6314 534.363L24.7183 279.146L211.153 282.028L1020.07 294.532Z"
+
+#: src/lib/Logo.svelte
+msgid "M2184.65 294.532L1921.1 482.788V303.639C1943.38 270.383 1982.52 179.965 1900.81 115.305C1828.53 58.0998 1763.35 108.379 1733.35 133.436L1921.1 303.639V482.788L1987.54 724.197L1733.35 942.764L1895.85 1031.25L2184.65 1188.53L2580.57 1067.03L2266.9 724.197L2508.27 707.796L2833.81 724.197L3123.09 534.363L3180 279.146L2993.56 282.028L2184.65 294.532Z"
+msgstr "M2184.65 294.532L1921.1 482.788V303.639C1943.38 270.383 1982.52 179.965 1900.81 115.305C1828.53 58.0998 1763.35 108.379 1733.35 133.436L1921.1 303.639V482.788L1987.54 724.197L1733.35 942.764L1895.85 1031.25L2184.65 1188.53L2580.57 1067.03L2266.9 724.197L2508.27 707.796L2833.81 724.197L3123.09 534.363L3180 279.146L2993.56 282.028L2184.65 294.532Z"
+
+#: src/lib/Logo.svelte
+msgid "M1293.71 1314.18L1276.49 1635.46H1928.23L1911.01 1314.18H1293.71Z"
+msgstr "M1293.71 1314.18L1276.49 1635.46H1928.23L1911.01 1314.18H1293.71Z"
+
+#: src/lib/Logo.svelte
+msgid "M1602.29 1054.24L1471.37 942.764L1308.87 1031.25L1293.71 1314.18H1911.01L1895.85 1031.25L1733.35 942.764L1602.29 1054.24Z"
+msgstr "M1602.29 1054.24L1471.37 942.764L1308.87 1031.25L1293.71 1314.18H1911.01L1895.85 1031.25L1733.35 942.764L1602.29 1054.24Z"
+
+#: src/lib/Logo.svelte
+msgid "M1276.49 1635.46L1602.36 1988.1L1928.23 1635.46H1276.49Z"
+msgstr "M1276.49 1635.46L1602.36 1988.1L1928.23 1635.46H1276.49Z"
+
+#: src/lib/Logo.svelte
+msgid "M1283.62 482.788L1217.18 724.197L1471.37 942.764L1602.29 1054.24L1733.35 942.764L1987.54 724.197L1921.1 482.788H1283.62Z"
+msgstr "M1283.62 482.788L1217.18 724.197L1471.37 942.764L1602.29 1054.24L1733.35 942.764L1987.54 724.197L1921.1 482.788H1283.62Z"
+
+#: src/lib/Logo.svelte
+msgid "M1283.62 303.639V482.788H1921.1V303.639L1733.35 133.436H1471.37L1283.62 303.639Z"
+msgstr "M1283.62 303.639V482.788H1921.1V303.639L1733.35 133.436H1471.37L1283.62 303.639Z"
+
+#: src/lib/Logo.svelte
+msgid "M1020.07 294.532L1283.62 482.788M1020.07 294.532L211.153 282.028M1020.07 294.532L886.107 524.182M1283.62 482.788L1217.18 724.197M1283.62 482.788L886.107 524.182M1283.62 482.788V303.639M1283.62 482.788H1921.1M1217.18 724.197H937.818M1217.18 724.197L1471.37 942.764M937.818 724.197L696.449 707.796L370.907 724.197M937.818 724.197L637.929 550.025M937.818 724.197L624.147 1067.03L1020.07 1188.53L1308.87 1031.25M370.907 724.197L81.6314 534.363L24.7183 279.146L211.153 282.028M370.907 724.197L211.153 282.028M211.153 282.028L637.929 550.025M637.929 550.025L886.107 524.182M1471.37 942.764L1602.29 1054.24L1733.35 942.764M1471.37 942.764L1308.87 1031.25M1308.87 1031.25L1293.71 1314.18M1276.49 1635.46L1602.36 1988.1L1928.23 1635.46M1276.49 1635.46L1293.71 1314.18M1276.49 1635.46H1928.23M1283.62 303.639L1471.37 133.436M1283.62 303.639C1261.34 270.383 1222.2 179.965 1303.91 115.305C1376.19 58.0998 1441.36 108.379 1471.37 133.436M1471.37 133.436V0.368164M1471.37 133.436H1733.35M1293.71 1314.18H1911.01M2184.65 294.532L1921.1 482.788M2184.65 294.532L2993.56 282.028M2184.65 294.532L2318.61 524.182M1921.1 482.788L1987.54 724.197M1921.1 482.788L2318.61 524.182M1921.1 482.788V303.639M1987.54 724.197H2266.9M1987.54 724.197L1733.35 942.764M2266.9 724.197L2508.27 707.796L2833.81 724.197M2266.9 724.197L2566.79 550.025M2266.9 724.197L2580.57 1067.03L2184.65 1188.53L1895.85 1031.25M2833.81 724.197L3123.09 534.363L3180 279.146L2993.56 282.028M2833.81 724.197L2993.56 282.028M2993.56 282.028L2566.79 550.025M2566.79 550.025L2318.61 524.182M1733.35 942.764L1895.85 1031.25M1895.85 1031.25L1911.01 1314.18M1928.23 1635.46L1911.01 1314.18M1921.1 303.639L1733.35 133.436M1921.1 303.639C1943.38 270.383 1982.52 179.965 1900.81 115.305C1828.53 58.0998 1763.35 108.379 1733.35 133.436M1733.35 133.436V0.368164"
+msgstr "M1020.07 294.532L1283.62 482.788M1020.07 294.532L211.153 282.028M1020.07 294.532L886.107 524.182M1283.62 482.788L1217.18 724.197M1283.62 482.788L886.107 524.182M1283.62 482.788V303.639M1283.62 482.788H1921.1M1217.18 724.197H937.818M1217.18 724.197L1471.37 942.764M937.818 724.197L696.449 707.796L370.907 724.197M937.818 724.197L637.929 550.025M937.818 724.197L624.147 1067.03L1020.07 1188.53L1308.87 1031.25M370.907 724.197L81.6314 534.363L24.7183 279.146L211.153 282.028M370.907 724.197L211.153 282.028M211.153 282.028L637.929 550.025M637.929 550.025L886.107 524.182M1471.37 942.764L1602.29 1054.24L1733.35 942.764M1471.37 942.764L1308.87 1031.25M1308.87 1031.25L1293.71 1314.18M1276.49 1635.46L1602.36 1988.1L1928.23 1635.46M1276.49 1635.46L1293.71 1314.18M1276.49 1635.46H1928.23M1283.62 303.639L1471.37 133.436M1283.62 303.639C1261.34 270.383 1222.2 179.965 1303.91 115.305C1376.19 58.0998 1441.36 108.379 1471.37 133.436M1471.37 133.436V0.368164M1471.37 133.436H1733.35M1293.71 1314.18H1911.01M2184.65 294.532L1921.1 482.788M2184.65 294.532L2993.56 282.028M2184.65 294.532L2318.61 524.182M1921.1 482.788L1987.54 724.197M1921.1 482.788L2318.61 524.182M1921.1 482.788V303.639M1987.54 724.197H2266.9M1987.54 724.197L1733.35 942.764M2266.9 724.197L2508.27 707.796L2833.81 724.197M2266.9 724.197L2566.79 550.025M2266.9 724.197L2580.57 1067.03L2184.65 1188.53L1895.85 1031.25M2833.81 724.197L3123.09 534.363L3180 279.146L2993.56 282.028M2833.81 724.197L2993.56 282.028M2993.56 282.028L2566.79 550.025M2566.79 550.025L2318.61 524.182M1733.35 942.764L1895.85 1031.25M1895.85 1031.25L1911.01 1314.18M1928.23 1635.46L1911.01 1314.18M1921.1 303.639L1733.35 133.436M1921.1 303.639C1943.38 270.383 1982.52 179.965 1900.81 115.305C1828.53 58.0998 1763.35 108.379 1733.35 133.436M1733.35 133.436V0.368164"
+
+#: src/lib/Logo.svelte
+msgid "M1019.82 427.621L1283.38 615.876M1019.82 427.621L210.907 415.116M1019.82 427.621L885.861 657.27M1283.38 615.876L1216.93 857.285M1283.38 615.876L885.861 657.27M1283.38 615.876V436.727M370.661 857.285L696.203 840.884L937.572 857.285L637.683 683.113M370.661 857.285L81.3853 667.452L24.4722 412.234L210.907 415.116M370.661 857.285L210.907 415.116M210.907 415.116L637.683 683.113M637.683 683.113L885.861 657.27M1471.13 1075.85L1602.04 1187.33L1733.1 1075.85M1308.63 1164.34L1293.46 1447.27M1276.25 1768.55L1602.11 2121.19L1927.98 1768.55M1276.25 1768.55L1293.46 1447.27M1276.25 1768.55H1927.98M1283.38 436.727L1471.13 266.524M1283.38 436.727C1261.09 403.471 1221.95 313.053 1303.66 248.394C1375.95 191.188 1441.12 241.468 1471.13 266.524M1471.13 266.524V133.457M1471.13 266.524H1733.1M1293.46 1447.27H1910.76M1920.85 615.876V436.727M1733.1 1075.85L1987.29 857.285H2266.65L2580.33 1200.11L2184.41 1321.62L1895.6 1164.34M1733.1 1075.85L1895.6 1164.34M1895.6 1164.34L1910.76 1447.27M1927.98 1768.55L1910.76 1447.27M1920.85 436.727L1733.1 266.524M1920.85 436.727C1943.13 403.471 1982.27 313.053 1900.57 248.394C1828.28 191.188 1763.11 241.468 1733.1 266.524M1733.1 266.524V133.457M1441.44 492.913L1774.13 825.603M1441.44 825.603L1774.13 492.913"
+msgstr "M1019.82 427.621L1283.38 615.876M1019.82 427.621L210.907 415.116M1019.82 427.621L885.861 657.27M1283.38 615.876L1216.93 857.285M1283.38 615.876L885.861 657.27M1283.38 615.876V436.727M370.661 857.285L696.203 840.884L937.572 857.285L637.683 683.113M370.661 857.285L81.3853 667.452L24.4722 412.234L210.907 415.116M370.661 857.285L210.907 415.116M210.907 415.116L637.683 683.113M637.683 683.113L885.861 657.27M1471.13 1075.85L1602.04 1187.33L1733.1 1075.85M1308.63 1164.34L1293.46 1447.27M1276.25 1768.55L1602.11 2121.19L1927.98 1768.55M1276.25 1768.55L1293.46 1447.27M1276.25 1768.55H1927.98M1283.38 436.727L1471.13 266.524M1283.38 436.727C1261.09 403.471 1221.95 313.053 1303.66 248.394C1375.95 191.188 1441.12 241.468 1471.13 266.524M1471.13 266.524V133.457M1471.13 266.524H1733.1M1293.46 1447.27H1910.76M1920.85 615.876V436.727M1733.1 1075.85L1987.29 857.285H2266.65L2580.33 1200.11L2184.41 1321.62L1895.6 1164.34M1733.1 1075.85L1895.6 1164.34M1895.6 1164.34L1910.76 1447.27M1927.98 1768.55L1910.76 1447.27M1920.85 436.727L1733.1 266.524M1920.85 436.727C1943.13 403.471 1982.27 313.053 1900.57 248.394C1828.28 191.188 1763.11 241.468 1733.1 266.524M1733.1 266.524V133.457M1441.44 492.913L1774.13 825.603M1441.44 825.603L1774.13 492.913"
+
+#: src/lib/Logo.svelte
+msgid "M2287.12 216.089L2096.32 477.812M2287.12 216.089L2902.6 23.8817M2287.12 216.089L2486.62 391.818M2096.32 477.812L2486.62 391.818M2096.32 477.812L2165.89 581.896L2235.46 685.979L2500.58 597.937M2500.58 597.937L2724.48 506.303L3038.6 419.273L2902.6 23.8817M2500.58 597.937L2730.3 338.13M2902.6 23.8817L2730.3 338.13M2730.3 338.13L2486.62 391.818"
+msgstr "M2287.12 216.089L2096.32 477.812M2287.12 216.089L2902.6 23.8817M2287.12 216.089L2486.62 391.818M2096.32 477.812L2486.62 391.818M2096.32 477.812L2165.89 581.896L2235.46 685.979L2500.58 597.937M2500.58 597.937L2724.48 506.303L3038.6 419.273L2902.6 23.8817M2500.58 597.937L2730.3 338.13M2902.6 23.8817L2730.3 338.13M2730.3 338.13L2486.62 391.818"
+
+#: src/lib/Logo.svelte
+msgid "M634.148 1120.58L894.263 1018.69L1210.67 1129.48L1091.64 1271.15L880.093 1522.92L467.133 1554.2L634.148 1120.58Z"
+msgstr "M634.148 1120.58L894.263 1018.69L1210.67 1129.48L1091.64 1271.15L880.093 1522.92L467.133 1554.2L634.148 1120.58Z"
+
+#. 0: i + 1
+#. 0: i + 1
+#. 0: i + 1
+#. 0: i + 1
+#: src/lib/Metadata.svelte
+#: src/lib/MetadataOptionCarousel.svelte
+#: src/lib/charts/Block.svelte
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/CandidateDetailsModal.svelte
+msgid "Image {0}"
+msgstr "Image {0}"
+
+#. 0: i + 1
+#: src/lib/MetadataCombobox.svelte
+msgid "Slide n°{0}"
+msgstr "Slide n°{0}"
+
+#: src/lib/MetadataOptionCarousel.svelte
+msgid "Debug"
+msgstr "Debug"
+
+#: src/lib/MetadataOptionCarousel.svelte
+msgid "Détails"
+msgstr "Détails"
+
+#: src/lib/MetadataInput.svelte
+msgid "Unité"
+msgstr "Unité"
+
+#: src/lib/MetadataInput.svelte
+#: src/lib/MetadataInput.svelte
+msgid "HH:mm"
+msgstr "HH:mm"
+
+#: src/lib/MetadataInput.svelte
+msgid "Le fichier a été enregistré avec succès"
+msgstr "Le fichier a été enregistré avec succès"
+
+#: src/lib/MetadataInput.svelte
+msgid "Fichier introuvable"
+msgstr "Fichier introuvable"
+
+#: src/lib/MorphArrow.svelte
+msgid "M1.39844 15.8231L8.89576 8.3258L22.1662 21.5962L35.4366 8.3258L42.9339 15.8231H64.1324M64.1324 15.8231C64.1324 15.8231 52.9299 8.3258 52.9299 0.56543M64.1324 15.8231C64.1324 15.8231 52.9299 21.5962 52.9299 31.285"
+msgstr "M1.39844 15.8231L8.89576 8.3258L22.1662 21.5962L35.4366 8.3258L42.9339 15.8231H64.1324M64.1324 15.8231C64.1324 15.8231 52.9299 8.3258 52.9299 0.56543M64.1324 15.8231C64.1324 15.8231 52.9299 21.5962 52.9299 31.285"
+
+#: src/lib/Xper3Logo.svelte
+msgid "M13.553,82.365C15.34,83.44 65.007,96.954 103.713,128.154C104.373,128.535 105.032,128.917 105.692,129.298C106.077,129.704 109.153,132.953 110.716,134.16C115.213,138.9 114.642,139.259 119.642,142.417C121.115,145.337 127.187,150.973 129.295,154.622C140.691,174.347 140.781,174.214 146.665,196.436C146.105,198.053 146.162,197.991 146.864,199.5C147.126,201.481 147.388,203.462 147.651,205.443C146.922,207.502 146.91,207.451 147.768,209.506C147.769,216.833 147.77,224.161 147.771,231.488C147.014,234.046 146.694,234.027 147.654,236.56C147.383,239.207 147.113,241.855 146.843,244.502C146.152,246.004 146.088,245.942 146.666,247.562C143.207,264.327 138.913,272.94 125.411,280.326C107.467,290.142 72.343,278.951 59.631,269.275C45.56,258.564 45.827,258.265 44.552,257.411C44.016,255.965 43.88,256.265 41.14,253.761C39.62,251.851 38.627,250.844 38.391,250.606C22.343,234.34 9.275,202.627 4.901,178.258C4.842,177.799 4.165,172.518 4.165,172.518C3.748,168.679 3.608,168.808 1.842,165.493C2.009,134.447 1.941,134.692 1.844,103.496L2.978,102.5C5.217,89.407 3.318,88.497 8.36,83.355C8.782,83.323 8.655,83.188 13.553,82.365Z"
+msgstr "M13.553,82.365C15.34,83.44 65.007,96.954 103.713,128.154C104.373,128.535 105.032,128.917 105.692,129.298C106.077,129.704 109.153,132.953 110.716,134.16C115.213,138.9 114.642,139.259 119.642,142.417C121.115,145.337 127.187,150.973 129.295,154.622C140.691,174.347 140.781,174.214 146.665,196.436C146.105,198.053 146.162,197.991 146.864,199.5C147.126,201.481 147.388,203.462 147.651,205.443C146.922,207.502 146.91,207.451 147.768,209.506C147.769,216.833 147.77,224.161 147.771,231.488C147.014,234.046 146.694,234.027 147.654,236.56C147.383,239.207 147.113,241.855 146.843,244.502C146.152,246.004 146.088,245.942 146.666,247.562C143.207,264.327 138.913,272.94 125.411,280.326C107.467,290.142 72.343,278.951 59.631,269.275C45.56,258.564 45.827,258.265 44.552,257.411C44.016,255.965 43.88,256.265 41.14,253.761C39.62,251.851 38.627,250.844 38.391,250.606C22.343,234.34 9.275,202.627 4.901,178.258C4.842,177.799 4.165,172.518 4.165,172.518C3.748,168.679 3.608,168.808 1.842,165.493C2.009,134.447 1.941,134.692 1.844,103.496L2.978,102.5C5.217,89.407 3.318,88.497 8.36,83.355C8.782,83.323 8.655,83.188 13.553,82.365Z"
+
+#: src/lib/Xper3Logo.svelte
+msgid "M195.618,134.692C198.592,132.344 227.443,109.557 234.712,107.953C239.756,106.841 256.482,98.108 258.324,97.146C298.101,76.379 301.281,82.886 301.783,86.431C302.224,89.555 301.772,157.932 302.033,181.498C302.294,205.013 277.399,240.712 274.215,245.278C273.291,246.602 268.941,251.248 268.647,252.586C267.999,253.29 267.352,253.994 266.704,254.698C265.299,256.049 262.095,259.298 261.697,259.701C260.994,260.351 260.291,261 259.588,261.649C256.175,262.506 245.743,276.956 214.654,282.977C173.474,290.953 164.924,258.448 163.715,256.403C162.975,255.152 162.04,253.569 160.378,238.545C160.965,235.972 161.276,235.977 160.182,233.494L160.178,220.506C161.132,217.46 161.15,217.599 160.346,214.438C162.87,204.905 160.535,170.755 194.165,136.25C195.436,134.98 195.458,135.032 195.618,134.692Z"
+msgstr "M195.618,134.692C198.592,132.344 227.443,109.557 234.712,107.953C239.756,106.841 256.482,98.108 258.324,97.146C298.101,76.379 301.281,82.886 301.783,86.431C302.224,89.555 301.772,157.932 302.033,181.498C302.294,205.013 277.399,240.712 274.215,245.278C273.291,246.602 268.941,251.248 268.647,252.586C267.999,253.29 267.352,253.994 266.704,254.698C265.299,256.049 262.095,259.298 261.697,259.701C260.994,260.351 260.291,261 259.588,261.649C256.175,262.506 245.743,276.956 214.654,282.977C173.474,290.953 164.924,258.448 163.715,256.403C162.975,255.152 162.04,253.569 160.378,238.545C160.965,235.972 161.276,235.977 160.182,233.494L160.178,220.506C161.132,217.46 161.15,217.599 160.346,214.438C162.87,204.905 160.535,170.755 194.165,136.25C195.436,134.98 195.458,135.032 195.618,134.692Z"
+
+#: src/lib/Xper3Logo.svelte
+msgid "M274.577,43.367C275.263,44.052 275.949,44.736 276.634,45.42C278.436,52.701 282.536,57.184 267.674,61.975C266.347,62.403 256.621,65.538 251.586,68.672C250.703,69.221 245.27,72.602 239.683,73.882C235.963,75.182 236.147,75.114 232.696,76.999C229.108,79.186 214.988,85.758 213.691,86.749C212.695,87.131 211.7,87.512 210.704,87.894C210.041,88.233 209.378,88.573 208.715,88.912C208.051,89.25 207.386,89.589 206.721,89.927C205.708,90.577 204.696,91.228 203.683,91.878C199.898,94.632 175.386,105.588 171.402,108.312C166.795,111.461 151.278,111.828 149.503,111.87C147.955,111.159 148.012,111.115 146.439,111.66C116.257,106.85 127.449,89.04 147.305,82.107C148.286,81.765 159.303,75.848 160.34,75.291C161.699,74.591 163.059,73.89 164.418,73.19C166.458,72.427 217.027,48.854 221.595,46.724C249.134,33.887 256.638,34.152 274.577,43.367Z"
+msgstr "M274.577,43.367C275.263,44.052 275.949,44.736 276.634,45.42C278.436,52.701 282.536,57.184 267.674,61.975C266.347,62.403 256.621,65.538 251.586,68.672C250.703,69.221 245.27,72.602 239.683,73.882C235.963,75.182 236.147,75.114 232.696,76.999C229.108,79.186 214.988,85.758 213.691,86.749C212.695,87.131 211.7,87.512 210.704,87.894C210.041,88.233 209.378,88.573 208.715,88.912C208.051,89.25 207.386,89.589 206.721,89.927C205.708,90.577 204.696,91.228 203.683,91.878C199.898,94.632 175.386,105.588 171.402,108.312C166.795,111.461 151.278,111.828 149.503,111.87C147.955,111.159 148.012,111.115 146.439,111.66C116.257,106.85 127.449,89.04 147.305,82.107C148.286,81.765 159.303,75.848 160.34,75.291C161.699,74.591 163.059,73.89 164.418,73.19C166.458,72.427 217.027,48.854 221.595,46.724C249.134,33.887 256.638,34.152 274.577,43.367Z"
+
+#: src/lib/Xper3Logo.svelte
+msgid "M165.688,57.889C156.693,60.977 157.131,61.657 148.724,65.929C148.059,66.268 147.394,66.606 146.73,66.944C145.718,67.595 144.707,68.247 143.695,68.898C140.592,71.097 123.791,78.919 123.754,78.933C122.725,79.573 121.697,80.213 120.669,80.853C119.423,81.786 108.35,87.029 105.496,86.852C101.943,86.633 83.916,86.789 83.457,86.623C56.164,76.751 96.182,59.018 96.617,58.696C96.648,58.673 135.592,35.956 182.6,19.734C200.702,13.487 221.674,19.149 222.406,19.68C235.085,28.874 223.804,32.595 217.406,35.319C185.918,48.726 186.193,49.415 183.289,50.054C177.697,51.286 169.104,57.125 165.688,57.889Z"
+msgstr "M165.688,57.889C156.693,60.977 157.131,61.657 148.724,65.929C148.059,66.268 147.394,66.606 146.73,66.944C145.718,67.595 144.707,68.247 143.695,68.898C140.592,71.097 123.791,78.919 123.754,78.933C122.725,79.573 121.697,80.213 120.669,80.853C119.423,81.786 108.35,87.029 105.496,86.852C101.943,86.633 83.916,86.789 83.457,86.623C56.164,76.751 96.182,59.018 96.617,58.696C96.648,58.673 135.592,35.956 182.6,19.734C200.702,13.487 221.674,19.149 222.406,19.68C235.085,28.874 223.804,32.595 217.406,35.319C185.918,48.726 186.193,49.415 183.289,50.054C177.697,51.286 169.104,57.125 165.688,57.889Z"
+
+#: src/lib/Xper3Logo.svelte
+msgid "M151.507,1.909C155.844,1.907 160.181,1.905 164.518,1.902L165.5,2.848C165.982,3.059 170.862,5.205 171.54,5.461C174.791,7.389 179.521,9.626 172.664,12.83C164.013,16.872 164.256,17.078 161.559,17.649C153.714,19.308 131.53,29.444 129.698,29.918C127.448,30.688 127.412,30.341 125.601,31.879C118.155,35.557 117.461,35.73 116.703,35.92C110.171,38.167 109.795,37.3 104.604,41.884C100.982,43.629 100.966,43.538 100.69,43.747C99.558,43.837 99.799,43.913 97.713,44.904C97.05,45.247 96.387,45.589 95.725,45.932C94.714,46.587 93.703,47.242 92.692,47.897C89.075,50.462 88.891,49.698 85.58,51.659C52.683,71.145 45.87,66.774 38.505,66.809C37.438,66.493 36.372,66.177 35.305,65.861C34.999,65.798 34.694,65.735 34.389,65.672C33.975,65.016 33.562,64.36 33.148,63.705C32.349,62.62 32.42,62.701 32.349,62.62C32.119,62.359 32.057,62.606 31.77,62.264C19.998,48.259 119.735,9.29 129.449,7.366C150.128,3.27 149.715,2.217 151.507,1.909Z"
+msgstr "M151.507,1.909C155.844,1.907 160.181,1.905 164.518,1.902L165.5,2.848C165.982,3.059 170.862,5.205 171.54,5.461C174.791,7.389 179.521,9.626 172.664,12.83C164.013,16.872 164.256,17.078 161.559,17.649C153.714,19.308 131.53,29.444 129.698,29.918C127.448,30.688 127.412,30.341 125.601,31.879C118.155,35.557 117.461,35.73 116.703,35.92C110.171,38.167 109.795,37.3 104.604,41.884C100.982,43.629 100.966,43.538 100.69,43.747C99.558,43.837 99.799,43.913 97.713,44.904C97.05,45.247 96.387,45.589 95.725,45.932C94.714,46.587 93.703,47.242 92.692,47.897C89.075,50.462 88.891,49.698 85.58,51.659C52.683,71.145 45.87,66.774 38.505,66.809C37.438,66.493 36.372,66.177 35.305,65.861C34.999,65.798 34.694,65.735 34.389,65.672C33.975,65.016 33.562,64.36 33.148,63.705C32.349,62.62 32.42,62.701 32.349,62.62C32.119,62.359 32.057,62.606 31.77,62.264C19.998,48.259 119.735,9.29 129.449,7.366C150.128,3.27 149.715,2.217 151.507,1.909Z"
+
+#: src/routes/(app)/Settings.svelte
+#: src/routes/(app)/sessions/Header.svelte
+msgid "Gérer les comptes"
+msgstr "Gérer les comptes"
+
+#: src/routes/(app)/Settings.svelte
+msgid "Thème"
+msgstr "Thème"
+
+#: src/routes/(app)/Settings.svelte
+msgid "Clair"
+msgstr "Clair"
+
+#: src/routes/(app)/Settings.svelte
+msgid "Sombre"
+msgstr "Sombre"
+
+#: src/routes/(app)/Settings.svelte
+msgid "Système"
+msgstr "Système"
+
+#: src/routes/(app)/Settings.svelte
+msgid "Notifications"
+msgstr "Notifications"
+
+#: src/routes/(app)/Settings.svelte
+#: src/routes/(app)/Settings.svelte
+msgid "Langue"
+msgstr "Langue"
+
+#: src/routes/(app)/Settings.svelte
+#: src/routes/(app)/Settings.svelte
+msgid "Français"
+msgstr "Français"
+
+#: src/routes/(app)/Settings.svelte
+#: src/routes/(app)/Settings.svelte
+msgid "English"
+msgstr "English"
+
+#: src/routes/(app)/Settings.svelte
+msgid "Utiliser le GPU"
+msgstr "Utiliser le GPU"
+
+#: src/routes/(app)/Settings.svelte
+msgid "Signalements"
+msgstr "Signalements"
+
+#: src/routes/(app)/Settings.svelte
+msgid "Github"
+msgstr "Github"
+
+#: src/routes/(app)/Settings.svelte
+#: src/routes/(app)/Settings.svelte
+msgid "Anonyme"
+msgstr "Anonyme"
+
+#: src/routes/(app)/Settings.svelte
+msgid "Github (recommandé)"
+msgstr "Github (recommandé)"
+
+#: src/routes/(app)/Settings.svelte
+msgid "Préparation hors-ligne…"
+msgstr "Préparation hors-ligne…"
+
+#: src/routes/(app)/Settings.svelte
+msgid "Raccourcis clavier…"
+msgstr "Raccourcis clavier…"
+
+#: src/routes/(app)/Settings.svelte
+msgid "Gérer le stockage…"
+msgstr "Gérer le stockage…"
+
+#: src/routes/(app)/Settings.svelte
+msgid "Stockage bientôt plein"
+msgstr "Stockage bientôt plein"
+
+#: src/routes/(app)/Settings.svelte
+msgid "Stockage non persistant"
+msgstr "Stockage non persistant"
+
+#: src/routes/(app)/Settings.svelte
+msgid "Vérifier les mises à jour"
+msgstr "Vérifier les mises à jour"
+
+#: src/routes/(app)/Settings.svelte
+msgid "Disponible"
+msgstr "Disponible"
+
+#: src/routes/(app)/Settings.svelte
+msgid "Nouveau .apk"
+msgstr "Nouveau .apk"
+
+#: src/routes/(app)/Settings.svelte
+msgid "App Store"
+msgstr "App Store"
+
+#. 0: version
+#: src/routes/(app)/Settings.svelte
+msgid "Version {0}"
+msgstr "Version {0}"
+
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+msgid "Un autre réseau a déjà ce nom"
+msgstr "Un autre réseau a déjà ce nom"
+
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+msgid "Aucun modèle chargé"
+msgstr "Aucun modèle chargé"
+
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+msgid "Analyse du réseau…"
+msgstr "Analyse du réseau…"
+
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+#: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/(todo)/ModelConfig.svelte
+#: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/(todo)/ModelConfig.svelte
+#: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/(todo)/ModelConfig.svelte
+#: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/(todo)/ModelConfig.svelte
+msgid "CHW"
+msgstr "CHW"
+
+#. 0: d.classmapping.length; 1: expectedClassmappingSize
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+msgid "Le classmapping comporte {0} entrées mais le réseau semble avoir {1} neurones en sortie"
+msgstr "Le classmapping comporte {0} entrées mais le réseau semble avoir {1} neurones en sortie"
+
+#: src/routes/(app)/TabSettings.svelte
+msgid "Ajouter des photos"
+msgstr "Ajouter des photos"
+
+#: src/routes/(app)/TabSettings.svelte
+msgid "Prendre des photos"
+msgstr "Prendre des photos"
+
+#: src/routes/(app)/TabSettings.svelte
+msgid "Trier par…"
+msgstr "Trier par…"
+
+#: src/routes/(app)/TabSettings.svelte
+msgid "Le protocole ne définit aucune métadonnée triable."
+msgstr "Le protocole ne définit aucune métadonnée triable."
+
+#: src/routes/(app)/TabSettings.svelte
+msgid "Regrouper par…"
+msgstr "Regrouper par…"
+
+#: src/routes/(app)/TabSettings.svelte
+msgid "Le protocole ne définit aucune métadonnée groupable."
+msgstr "Le protocole ne définit aucune métadonnée groupable."
+
+#: src/routes/(app)/TabSettings.svelte
+msgid "Précision des groupes"
+msgstr "Précision des groupes"
+
+#: src/routes/(app)/TabSettings.svelte
+#: src/routes/(app)/TabSettings.svelte
+msgid "Modèle d'inférence"
+msgstr "Modèle d'inférence"
+
+#: src/routes/(app)/TabSettings.svelte
+msgid "Le protocole ne définit aucun modèle pour cette métadonnée."
+msgstr "Le protocole ne définit aucun modèle pour cette métadonnée."
+
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid "POST"
+msgstr "POST"
+
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid "Content-Type"
+msgstr "Content-Type"
+
+#. 0: who; 1: body
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid ""
+"From: {0}\n"
+"\n"
+"\n"
+"{1}"
+msgstr ""
+"From: {0}\n"
+"\n"
+"\n"
+"{1}"
+
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid "Error submitting issue:"
+msgstr "Error submitting issue:"
+
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid "Comment reproduire le bug?"
+msgstr "Comment reproduire le bug?"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/Boxes.svelte
+msgid "Supprimer cette image et passer à la suivante"
+msgstr "Supprimer cette image et passer à la suivante"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/Boxes.svelte
+msgid "Revenir au recadrage d'origine pour toutes les boîtes"
+msgstr "Revenir au recadrage d'origine pour toutes les boîtes"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/Boxes.svelte
+msgid "Réafficher les autres boîtes"
+msgstr "Réafficher les autres boîtes"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/Boxes.svelte
+msgid "Masquer les autres boîtes"
+msgstr "Masquer les autres boîtes"
+
+#. 0: roundedPixelDimensions(initBox.value).join(' × '); 1: percent(initBox.confidence)
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/Boxes.svelte
+msgid ""
+"Revenir au recadrage d'origine \n"
+"\t\t\t\t\t\t\t\t\t({0}, {1} de confiance)"
+msgstr ""
+"Revenir au recadrage d'origine \n"
+"\t\t\t\t\t\t\t\t\t({0}, {1} de confiance)"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/Boxes.svelte
+msgid "Recadrage d'origine indisponible"
+msgstr "Recadrage d'origine indisponible"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/Boxes.svelte
+msgid "Pour créer une nouvelle boîte,<wbr /> utilisez les outils"
+msgstr "Pour créer une nouvelle boîte,<wbr /> utilisez les outils"
+
+#: src/routes/(app)/protocols/[id]/edit/+layout.svelte
+#: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/+layout.svelte
+msgid "Informations"
+msgstr "Informations"
+
+#: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/+layout.svelte
+msgid "Inférence"
+msgstr "Inférence"
+
+#: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/+layout.svelte
+msgid "Changer les valeurs d'autres métadonnées en fonction de celle-ci"
+msgstr "Changer les valeurs d'autres métadonnées en fonction de celle-ci"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/WithExpandButton.svelte
+msgid "Agrandir"
+msgstr "Agrandir"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/CropSurface.svelte
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/FocusSwitcher.svelte
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/FocusSwitcher.svelte
+msgid "Main"
+msgstr "Main"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/FocusSwitcher.svelte
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/FocusSwitcher.svelte
+msgid "Glisser-recadrer"
+msgstr "Glisser-recadrer"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/+layout.svelte
+msgid "Afficher en grand"
+msgstr "Afficher en grand"
+
+#. 0: maximumListableCandidates.toLocaleString()
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/+layout.svelte
+msgid "Plus de {0} candidats restants"
+msgstr "Plus de {0} candidats restants"
+
+#: src/routes/(app)/protocols/[id]/edit/+layout.svelte
+msgid "Exports"
+msgstr "Exports"
+
+#: src/routes/(app)/protocols/[id]/edit/+layout.svelte
+msgid "Recadrage"
+msgstr "Recadrage"
+
+#: src/routes/(app)/protocols/[id]/edit/+layout.svelte
+msgid "Nouvelle métadonnée…"
+msgstr "Nouvelle métadonnée…"
+
+#: src/routes/(app)/protocols/[id]/edit/+layout.svelte
+msgid "Déplier"
+msgstr "Déplier"
+
+#: src/routes/(app)/protocols/[id]/edit/+layout.svelte
+msgid "Replier"
+msgstr "Replier"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/Subject.svelte
+msgid "Voir l'image entière"
+msgstr "Voir l'image entière"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/Subject.svelte
+msgid "Voir l'image recadrée"
+msgstr "Voir l'image recadrée"
+
+#. 0: i + 1; 1: images?.length ?? 1
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/suggestions/References.svelte
+msgid "Image de référence {0} sur {1}"
+msgstr "Image de référence {0} sur {1}"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/NarrowableGroupPicker.svelte
+msgid "Groupe de métadonnées"
+msgstr "Groupe de métadonnées"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/NarrowableGroupPicker.svelte
+msgid "Aucun"
+msgstr "Aucun"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/DraggableBoundingBox.svelte
+msgid "Dragging has gone outside change area, bailing out. Target is"
+msgstr "Dragging has gone outside change area, bailing out. Target is"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
+msgid "Recadrages confirmés"
+msgstr "Recadrages confirmés"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
+msgid "Liste des boîtes"
+msgstr "Liste des boîtes"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
+msgid "Revenir aux boîtes d'origine"
+msgstr "Revenir aux boîtes d'origine"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
+msgid "Supprimer l'image"
+msgstr "Supprimer l'image"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/+layout.svelte
+msgid "Observations classifiées"
+msgstr "Observations classifiées"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/+layout.svelte
+msgid "Classifications confirmées"
+msgstr "Classifications confirmées"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/+layout.svelte
+msgid "Mode élimination (beta)"
+msgstr "Mode élimination (beta)"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/+layout.svelte
+msgid "Mode suggestions"
+msgstr "Mode suggestions"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/suggestions/OptionBar.svelte
+msgid "Voir toutes les options"
+msgstr "Voir toutes les options"
+
+#: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/(todo)/ModelConfig.svelte
+msgid "Hauteur-largeur sans batch"
+msgstr "Hauteur-largeur sans batch"
+
+#: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/(todo)/ModelConfig.svelte
+msgid "Hauteur-largeur avec batch*"
+msgstr "Hauteur-largeur avec batch*"
+
+#: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/(todo)/ModelConfig.svelte
+msgid "BCHW"
+msgstr "BCHW"
+
+#: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/(todo)/ModelConfig.svelte
+msgid "Brutes"
+msgstr "Brutes"
+
+#: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/(todo)/ModelConfig.svelte
+msgid "Normalisées"
+msgstr "Normalisées"
+
+#. 0: beamup.origin
+#: src/routes/(app)/protocols/RowProtocol.svelte
+msgid "À {0}"
+msgstr "À {0}"
+
+#. 1.0: newVersion
+#: src/routes/(app)/protocols/[id]/edit/versioning/+page.svelte
+msgid "<0/> Dernière version en ligne: <1>v{0}</1> <2>Réétablir</2>"
+msgstr "<0/> Dernière version en ligne: <1>v{0}</1> <2>Réétablir</2>"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/CandidateDetailsModal.svelte
+msgid "Candidat"
+msgstr "Candidat"
+
+#: src/routes/(app)/protocols/[id]/edit/versioning/ChangesWithRemote.svelte
+#: src/routes/(app)/protocols/[id]/edit/versioning/ChangesWithRemote.svelte
+msgid "REMOVE"
+msgstr "REMOVE"
+
+#: src/routes/(app)/protocols/[id]/edit/versioning/ChangesWithRemote.svelte
+#: src/routes/(app)/protocols/[id]/edit/versioning/ChangesWithRemote.svelte
+msgid "CREATE"
+msgstr "CREATE"
+
+#: src/routes/(app)/protocols/[id]/edit/versioning/ChangesWithRemote.svelte
+#: src/routes/(app)/protocols/[id]/edit/versioning/ChangesWithRemote.svelte
+msgid "CHANGE"
+msgstr "CHANGE"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/TopbarExtras.svelte
+msgid "Marquer comme non-confirmée"
+msgstr "Marquer comme non-confirmée"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/TopbarExtras.svelte
+msgid "Marquer comme confirmée"
+msgstr "Marquer comme confirmée"
+
+#: src/routes/(app)/accounts/ModalAddAccount.svelte
+msgid "Choix du serveur"
+msgstr "Choix du serveur"
+
+#: src/routes/(app)/accounts/ModalAddAccount.svelte
+msgid "Connexion"
+msgstr "Connexion"
+
+#: src/routes/(app)/accounts/ModalAddAccount.svelte
+msgid "Serveur"
+msgstr "Serveur"
+
+#: src/routes/(app)/accounts/ModalAddAccount.svelte
+msgid "Identifiants"
+msgstr "Identifiants"
+
+#: src/routes/(app)/accounts/ModalAddAccount.svelte
+msgid "Cacher le mot de passe"
+msgstr "Cacher le mot de passe"
+
+#: src/routes/(app)/accounts/ModalAddAccount.svelte
+msgid "Montrer le mot de passe"
+msgstr "Montrer le mot de passe"
+
+#. 0: i + 1; 1: singleObservationSelected.label
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
+msgid "Image {0} de l'observation {1}"
+msgstr "Image {0} de l'observation {1}"
+
+#. 0: i + 1
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
+msgid "Image {0} de la sélection"
+msgstr "Image {0} de la sélection"
+
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
+msgid "Sélectionnez une seule observation"
+msgstr "Sélectionnez une seule observation"
+
+#: src/routes/(app)/about/+page.svelte
+msgid "Martian Mono"
+msgstr "Martian Mono"
+
+#: src/routes/(app)/storage/+page.svelte
+msgid "Inclus dans les protocoles"
+msgstr "Inclus dans les protocoles"
+
+#: src/routes/(app)/sessions/Header.svelte
+msgid "Ajouter & supprimer"
+msgstr "Ajouter & supprimer"
+
+#: src/routes/(app)/(sidepanel)/classify/+page.svelte
+#: src/routes/(app)/(sidepanel)/classify/+page.svelte
+#: src/routes/(app)/(sidepanel)/crop/+page.svelte
+#: src/routes/(app)/sessions/+page.svelte
+#: src/routes/(app)/sessions/+page.svelte
+msgid "Ouverture…"
+msgstr "Ouverture…"
+
+#: src/routes/(app)/sessions/+page.svelte
+msgid "Téléchargement…"
+msgstr "Téléchargement…"
+
+#. 0: session.name
+#: src/routes/(app)/sessions/+page.svelte
+msgid "Impossible de télécharger {0}"
+msgstr "Impossible de télécharger {0}"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/+layout@(app).svelte
+msgid "Cette image n'apparaît dans aucune observation"
+msgstr "Cette image n'apparaît dans aucune observation"
+
+#. 0: plural(observationsOfImageFile.length, ['# observation', '# observations'])
+#: src/routes/(app)/(sidepanel)/o/[observation]/+layout@(app).svelte
+msgid "Cette image apparaît dans {0}"
+msgstr "Cette image apparaît dans {0}"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/+layout@(app).svelte
+msgid "Ouvrir une image pour le recadrage"
+msgstr "Ouvrir une image pour le recadrage"
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/+layout@(app).svelte
+msgid "Non disponible pour ce protocole"
+msgstr "Non disponible pour ce protocole"
+
+#. 0: provider.displayName
+#: src/routes/(app)/sessions/[id]/+page.svelte
+msgid "Dé-lier de {0}"
+msgstr "Dé-lier de {0}"
+
+#: src/routes/(app)/sessions/[id]/+page.svelte
+msgid "Dé-lier de la plateforme en ligne"
+msgstr "Dé-lier de la plateforme en ligne"
+
+#: src/routes/(app)/results/ExportLocalActions.svelte
+msgid "Votre navigateur ne supporte pas l'exportation en dossier, utilisez Chrome ou Edge."
+msgstr "Votre navigateur ne supporte pas l'exportation en dossier, utilisez Chrome ou Edge."
+
+#: src/routes/(app)/sessions/Cards.svelte
+msgid "Impossible de charger les sessions distantes"
+msgstr "Impossible de charger les sessions distantes"
+
+#: src/routes/(app)/results/ExportPanel.svelte
+msgid "Montrer le panneau d'export"
+msgstr "Montrer le panneau d'export"
+
+#: src/routes/(app)/results/ExportPanel.svelte
+msgid "Cacher le panneau d'export"
+msgstr "Cacher le panneau d'export"
+
+#. 0: uiState.currentProtocol?.name ?? ''
+#: src/routes/(app)/results/ExportPanel.svelte
+msgid "Aucune plateforme disponible pour le protocole {0}"
+msgstr "Aucune plateforme disponible pour le protocole {0}"
+
+#: src/routes/(app)/results/ExportPlatformsSettings.svelte
+msgid "Envoi…"
+msgstr "Envoi…"
+
+#: src/routes/(app)/results/ExportPlatformsSettings.svelte
+msgid "Pas encore envoyé"
+msgstr "Pas encore envoyé"
+
+#: src/routes/(app)/results/ExportPlatformsSettings.svelte
+msgid "Changer de compte"
+msgstr "Changer de compte"
+
+#: src/routes/(app)/results/ExportPlatformsSettings.svelte
+msgid "Choisir un compte"
+msgstr "Choisir un compte"
+
+#: src/routes/(app)/capture/+page.svelte
+msgid "Désactiver le flash"
+msgstr "Désactiver le flash"
+
+#: src/routes/(app)/capture/+page.svelte
+msgid "Activer le flash"
+msgstr "Activer le flash"
+
+#: src/routes/(app)/capture/+page.svelte
+msgid "Mettre le flash en auto"
+msgstr "Mettre le flash en auto"
+
+#: src/routes/(app)/capture/+page.svelte
+msgid "Mettre le flash en torche"
+msgstr "Mettre le flash en torche"
+
+#: src/routes/(app)/capture/+page.svelte
+msgid "Flash"
+msgstr "Flash"
+
+#: src/routes/(app)/capture/+page.svelte
+msgid "Off"
+msgstr "Off"
+
+#: src/routes/(app)/capture/+page.svelte
+msgid "On"
+msgstr "On"
+
+#: src/routes/(app)/capture/+page.svelte
+msgid "Auto"
+msgstr "Auto"
+
+#: src/routes/(app)/capture/+page.svelte
+msgid "Lampe-torche"
+msgstr "Lampe-torche"
+
+#: src/routes/(app)/capture/gallery/+page.svelte
+msgid "Tout supprimer et recommencer"
+msgstr "Tout supprimer et recommencer"
+
+#: src/routes/(app)/results/ExportLocalSettings.svelte
+msgid "Métadonnées seulement"
+msgstr "Métadonnées seulement"
+
+#: src/routes/(app)/results/ExportLocalSettings.svelte
+msgid "Métadonnées et images recadrées"
+msgstr "Métadonnées et images recadrées"
+
+#: src/routes/(app)/results/ExportLocalSettings.svelte
+msgid "Tout"
+msgstr "Tout"
+
+#: src/routes/(app)/results/ExportLocalSettings.svelte
+msgid "Permet de ré-importer ultérieurement"
+msgstr "Permet de ré-importer ultérieurement"
+
+#: src/routes/(app)/results/ExportLocalSettings.svelte
+msgid "Aucune"
+msgstr "Aucune"

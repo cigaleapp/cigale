@@ -1,7 +1,7 @@
-import type * as DB from '$lib/database.js';
+import type * as DB from '#lib/database.js';
 
-import { METADATA_TYPES } from '$lib/schemas/metadata';
-import { mapEntries } from '$lib/utils';
+import { METADATA_TYPES } from '#lib/schemas/metadata.js';
+import { mapEntries } from '#lib/utils.js';
 
 export const metadatas = {
 	integer: { id: 'metadata_integer', type: 'integer', mergeMethod: 'average', options: [] },

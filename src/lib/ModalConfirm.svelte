@@ -21,7 +21,7 @@
 	 * @property {boolean} [dangerous] convey danger for the confirm button
 	 */
 
-	/** @type {Props & Partial<Omit<import('$lib/Modal.svelte').Props, keyof Props>>} */
+	/** @type {Props & Partial<Omit<import('#lib/Modal.svelte').Props, keyof Props>>} */
 	let {
 		onconfirm,
 		oncancel = undefined,
@@ -85,7 +85,11 @@
 				onclick={async () => {
 					try {
 						await onconfirm?.();
-						close?.();
+						// Await the close so the shallow goto that clears the modal state
+						// finishes before the caller proceeds (e.g. with a real navigation).
+						// Otherwise the two gotos race and the real navigation can be
+						// aborted by SvelteKit's navigation token.
+						await close?.();
 						closed(true);
 						error = '';
 					} catch (error) {

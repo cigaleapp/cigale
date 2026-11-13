@@ -3,9 +3,9 @@
 
 	import { Portal } from 'bits-ui';
 
-	import { IsMobile } from '$lib/mobile.svelte.js';
-	import ProgressBar from '$lib/ProgressBar.svelte';
-	import { uiState } from '$lib/uistate.svelte.js';
+	import { IsMobile } from '#lib/mobile.svelte.js';
+	import ProgressBar from '#lib/ProgressBar.svelte';
+	import { uiState } from '#lib/uistate.svelte.js';
 
 	type Props = {
 		children: Snippet;
