@@ -14,7 +14,7 @@
 	 * @property {`modal_${string}`} key a unique string, used to identify the modal in the page's state.
 	 * @property {string} title the title used in the header
 	 * @property {undefined | (() => void)} [open] a function you can bind to, to open the modal
-	 * @property {undefined | (() => void)} [close] a function you can bind to, to close the modal. Note that the modal includes a close button in the header, you don't _have_ to use this.
+	 * @property {undefined | (() => Promise<void>)} [close] a function you can bind to, to close the modal. Note that the modal includes a close button in the header, you don't _have_ to use this.
 	 * @property {(() => void) | undefined} [onclose] a function that will be called when the modal is closed, either via the close button or by clicking outside the modal
 	 * @property {(() => void) | undefined} [onopen] a function that will be called when the modal is opened
 	 * @property {import('#lib/toasts.svelte.js').ToastPoolNames} [toasts] display toasts from the specified pool in the footer. Also sets the active toast pool while the modal is open.
@@ -80,7 +80,7 @@
 				toasts.setCurrentPool('default');
 				toasts.clear();
 			}
-			goto('', { shallow: true, state: { [stateKey]: false } });
+			return goto('', { shallow: true, state: { [stateKey]: false } });
 		};
 	});
 
