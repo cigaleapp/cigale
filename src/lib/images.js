@@ -4,17 +4,18 @@ import { uiState } from '$lib/uistate.svelte.js';
 
 import { toTopLeftCoords } from './BoundingBoxes.svelte.js';
 import { errorMessage, humanFormatName } from './i18n.js';
-import * as db from './idb.svelte.js';
+import * as idb from './idb.svelte.js';
 import { tables } from './idb.svelte.js';
 import { imageLimits } from './inference_utils.js';
-import { removeImagesFromObservation } from './observations.js';
+import { removeFromObservation } from './observations.js';
 import { RAW_IMAGE_MEDIA_TYPES } from './raw.js';
-import { accessBytes, createBytes } from './storage/utils.js';
+import { accessBytes, accessImages, createBytes, deleteObjectWithBytes } from './storage/utils.js';
 import { clamp, throwError } from './utils.js';
 
 /**
  * @import { Image, Protocol } from './database.js';
  * @import { IDBTransactionWithAtLeast } from './idb.svelte';
+ * @import * as DB from './database.js';
  */
 
 /**
@@ -167,16 +168,16 @@ export function imageBufferWasSaved(image) {
  * @param {IDBTransactionWithAtLeast<["Image", "ImageFile", "ImagePreviewFile"]>} [tx]
  * @param {boolean} [notFoundOk=true]
  */
-export async function deleteImageFile(id, tx, notFoundOk = true) {
-	await db.openTransaction(
-		['Image', 'ImageFile', 'ImagePreviewFile', 'Observation'],
+export async function deleteImageOrAudioFile(id, tx, notFoundOk = true) {
+	const table = (await idb.get('ImageFile', id)) ? 'ImageFile' : 'AudioFile';
+
+	await idb.openTransaction(
+		['Image', 'Sound', 'ImageFile', 'AudioFile', 'ImagePreviewFile', 'Observation'],
 		{ tx, session: uiState.currentSession?.id },
 		async (tx) => {
 			try {
 				const imagesOfFile = await tx.objectStore('Image').index('fileId').getAll(id);
-
-				tx.objectStore('ImageFile').delete(id);
-				tx.objectStore('ImagePreviewFile').delete(id);
+				const soundsOfFile = await tx.objectStore('Sound').index('fileId').getAll(id);
 
 				for (const image of imagesOfFile) {
 					tx.objectStore('Image').delete(image.id);
@@ -187,10 +188,27 @@ export async function deleteImageFile(id, tx, notFoundOk = true) {
 						.getAll(image.id);
 
 					for (const obs of observations) {
-						await removeImagesFromObservation({
+						await removeFromObservation({
 							tx,
 							observation: obs.id,
 							images: [image.id],
+						});
+					}
+				}
+
+				for (const sound of soundsOfFile) {
+					tx.objectStore('Sound').delete(sound.id);
+
+					const observations = await tx
+						.objectStore('Observation')
+						.index('sounds')
+						.getAll(sound.id);
+
+					for (const obs of observations) {
+						await removeFromObservation({
+							tx,
+							observation: obs.id,
+							sounds: [sound.id],
 						});
 					}
 				}
@@ -199,6 +217,11 @@ export async function deleteImageFile(id, tx, notFoundOk = true) {
 			}
 		}
 	);
+
+	await deleteObjectWithBytes(idb.databaseHandle(), table, id);
+	if (table === 'ImageFile') {
+		await deleteObjectWithBytes(idb.databaseHandle(), 'ImagePreviewFile', id);
+	}
 
 	uiState.erroredImages.delete(id);
 	uiState.loadingImages.delete(id);
@@ -214,22 +237,37 @@ export async function deleteImageFile(id, tx, notFoundOk = true) {
 	}
 }
 
+// TODO: increase perf: this function calls deleteImageOrAudioFile, which in turn lists itself all images/sounds of the file to clean up, theres surely a simpler way to do all of this.
+
 /**
  * Delete an image and clean up dangling image files afterwards
  * @param {string} id Image ID
  * @param {IDBTransactionWithAtLeast<["Image", "ImageFile", "ImagePreviewFile"]>} [tx]
  * @param {boolean} [notFoundOk=true]
  */
-export async function deleteImage(id, tx, notFoundOk = true) {
-	await db.openTransaction(
-		['Image', 'ImageFile', 'ImagePreviewFile', 'Observation'],
+export async function deleteImageOrSound(id, tx, notFoundOk = true) {
+	await idb.openTransaction(
+		['Image', 'ImageFile', 'ImagePreviewFile', 'Observation', 'Sound', 'AudioFile'],
 		{ tx, session: uiState.currentSessionId },
 		async (tx) => {
 			try {
-				await tx.objectStore('Image').delete(id);
+				await tx
+					.objectStore('Image')
+					.delete(id)
+					.catch(() => {});
+
+				await tx
+					.objectStore('Sound')
+					.delete(id)
+					.catch(() => {});
 
 				const otherImages = await tx
 					.objectStore('Image')
+					.index('fileId')
+					.count(imageIdToFileId(id));
+
+				const otherSounds = await tx
+					.objectStore('Sound')
 					.index('fileId')
 					.count(imageIdToFileId(id));
 
@@ -237,16 +275,39 @@ export async function deleteImage(id, tx, notFoundOk = true) {
 					console.debug(
 						`Deleting image ${id}: image file ${imageIdToFileId(id)} is now empty, deleting it too`
 					);
-					await deleteImageFile(imageIdToFileId(id), tx, notFoundOk);
+					await deleteImageOrAudioFile(imageIdToFileId(id), tx, notFoundOk);
 				}
 
-				const observations = await tx.objectStore('Observation').index('images').getAll(id);
+				if (otherSounds === 0) {
+					console.debug(
+						`Deleting sound ${id}: audio file ${imageIdToFileId(id)} is now empty, deleting it too`
+					);
+					await deleteImageOrAudioFile(imageIdToFileId(id), tx, notFoundOk);
+				}
 
-				for (const observation of observations) {
-					await removeImagesFromObservation({
+				const imageObservations = await tx
+					.objectStore('Observation')
+					.index('images')
+					.getAll(id);
+
+				for (const observation of imageObservations) {
+					await removeFromObservation({
 						tx,
 						observation: observation.id,
 						images: [id],
+					});
+				}
+
+				const soundObservations = await tx
+					.objectStore('Observation')
+					.index('sounds')
+					.getAll(id);
+
+				for (const observation of soundObservations) {
+					await removeFromObservation({
+						tx,
+						observation: observation.id,
+						sounds: [id],
 					});
 				}
 			} catch (e) {
@@ -299,7 +360,7 @@ export async function storeImageBytes({
 		type: contentType,
 	});
 
-	await db.openTransaction(['ImageFile', 'ImagePreviewFile'], { tx }, async (tx) => {
+	await idb.openTransaction(['ImageFile', 'ImagePreviewFile'], { tx }, async (tx) => {
 		await tx.objectStore('ImageFile').put({
 			id,
 			contentType,
@@ -325,12 +386,22 @@ export async function storeImageBytes({
  * @param {'global' | 'session'} [scope] whether to load into global or session preview URLs
  */
 export async function loadPreviewImage(id, scope = 'session') {
-	const file = await db.get('ImagePreviewFile', id);
-	if (!file) return;
-	console.debug(`loading preview image ${id}`, file);
-	const bytes = await accessBytes('ImagePreviewFile', file);
-	const blob = new Blob([bytes], { type: file.contentType });
-	uiState.setPreviewURL(id, URL.createObjectURL(blob), scope === 'global');
+	const file = await idb.get('ImagePreviewFile', id);
+	if (file) {
+		console.debug(`loading preview image ${id}`, file);
+		const bytes = await accessBytes('ImagePreviewFile', file);
+		const blob = new Blob([bytes], { type: file.contentType });
+		uiState.setPreviewURL(id, URL.createObjectURL(blob), scope === 'global');
+		return;
+	} else {
+		const file = await idb.get('AudioFile', id);
+		if (!file) return;
+		console.log('loading preview img for ', file);
+		const bytes = await accessImages('AudioFile', file, 'preview');
+		console.log('loading preview img bytes is ', bytes);
+		const blob = new Blob([bytes], { type: 'image/png' });
+		uiState.setPreviewURL(id, URL.createObjectURL(blob), scope === 'global');
+	}
 }
 
 // ATTENTION: Changer aussi dans la validation des définitions de protocoles (Ctrl-F pour 1024 dans tout le projet pour être sûr·e de rien louper) si jamais on change ça
@@ -350,12 +421,14 @@ export function errorMessageImageTooLarge() {
 }
 
 /**
- * Resize an image to fit within MAXWIDTH and MAXHEIGHT
+ * Resize an image to fit within the given dimensions
  * @param {object} param0
  * @param {Blob} param0.source
+ * @param {number} [param0.maxWidth] MAXWIDTH by default
+ * @param {number} [param0.maxHeight] keep aspect ratio if not given
  * @returns {Promise<[[number, number], ArrayBuffer]>} [[original width, original height], resized image data]
  */
-export async function resizeToMaxSize({ source }) {
+export async function resizeToMaxSize({ source, maxWidth = MAXWIDTH, maxHeight }) {
 	// For some reason top-level import fails
 	const { resize } = await import('pica-gpu');
 	const originalImage = await createImageBitmap(source).catch((error) => {
@@ -369,39 +442,62 @@ export async function resizeToMaxSize({ source }) {
 	});
 	const { width, height } = originalImage;
 
+	maxHeight ??= Math.round((maxWidth * height) / width);
+
 	if (width * height > imageLimits.maxResolutionInMP * 1e6) {
 		throw new Error(errorMessageImageTooLarge());
 	}
 
-	const originalCanvas = document.createElement('canvas');
-	originalCanvas.width = width;
-	originalCanvas.height = height;
-	originalCanvas.getContext('2d')?.drawImage(originalImage, 0, 0);
+	// If we're on the UI thread, we have access to document canvases and we can use pica-gpu
 
-	const resizedCanvas = document.createElement('canvas');
-	resizedCanvas.width = MAXWIDTH;
-	resizedCanvas.height = MAXHEIGHT(originalImage);
-	resize(originalCanvas, resizedCanvas, {
-		targetWidth: MAXWIDTH,
-		targetHeight: MAXHEIGHT(originalImage),
-		filter: 'mks2013',
-	});
-	return new Promise((resolve) => {
-		resizedCanvas.toBlob((blob) => {
-			if (!blob) throw new Error('Failed to resize image');
-			blob.arrayBuffer().then((buf) => resolve([[width, height], buf]));
-		}, source.type);
-	});
+	if ('document' in self) {
+		const originalCanvas = document.createElement('canvas');
+		originalCanvas.width = width;
+		originalCanvas.height = height;
+		originalCanvas.getContext('2d')?.drawImage(originalImage, 0, 0);
+
+		const resizedCanvas = document.createElement('canvas');
+		resizedCanvas.width = maxWidth;
+		resizedCanvas.height = maxHeight;
+		resize(originalCanvas, resizedCanvas, {
+			targetWidth: maxWidth,
+			targetHeight: maxHeight,
+			filter: 'mks2013',
+		});
+		return new Promise((resolve) => {
+			resizedCanvas.toBlob((blob) => {
+				if (!blob) throw new Error('Failed to resize image');
+				blob.arrayBuffer().then((buf) => resolve([[width, height], buf]));
+			}, source.type);
+		});
+	}
+
+	const original = new OffscreenCanvas(width, height);
+	original.getContext('2d')?.putImageData(originalImage, 0, 0);
+
+	const resized = new OffscreenCanvas(maxWidth, maxHeight);
+	const ctx = resized.getContext('2d');
+	if (!ctx) throw new Error('Couldnt create 2D context on target canvas');
+
+	ctx.imageSmoothingEnabled = true;
+	ctx.imageSmoothingQuality = 'high';
+	ctx.drawImage(original, 0, 0, resized.width, resized.height);
+
+	const blob = await resized.convertToBlob({ type: 'image/png' });
+
+	return [[width, height], await blob.arrayBuffer()];
 }
 
 /**
  *
- * @param {string} imageFileId
- * @param {Image[]} [images] look for images in this array instead of the database
- * @returns {Image[]}
+ * @param {string} fileId
+ * @param {(DB.Image | DB.Sound)[]} [medias] look for medias in this array instead of the database
+ * @returns {(DB.Image|DB.Sound)[]}
  */
-export function imagesOfImageFile(imageFileId, images = undefined) {
-	return (images ?? tables.Image.state).filter((img) => img.fileId === imageFileId);
+export function mediasOfFile(fileId, medias = undefined) {
+	return (medias ?? [...tables.Image.state, ...tables.Sound.state]).filter(
+		(img) => img.fileId === fileId
+	);
 }
 
 if (import.meta.vitest) {
@@ -412,13 +508,13 @@ if (import.meta.vitest) {
 		const images = [sampleImage('1', '1'), sampleImage('2', '1'), sampleImage('3', '2')];
 		const [img1, img2] = images;
 
-		expect(imagesOfImageFile('1', images)).toEqual([img1, img2]);
+		expect(mediasOfFile('1', images)).toEqual([img1, img2]);
 
 		_tablesState.Image = [];
-		expect(imagesOfImageFile('1')).toEqual([]);
+		expect(mediasOfFile('1')).toEqual([]);
 
 		_tablesState.Image = images;
-		expect(imagesOfImageFile('1')).toEqual([img1, img2]);
+		expect(mediasOfFile('1')).toEqual([img1, img2]);
 	});
 }
 

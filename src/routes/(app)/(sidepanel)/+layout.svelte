@@ -6,8 +6,8 @@
 	import { promptForFiles } from '$lib/files';
 	import * as db from '$lib/idb.svelte';
 	import { openTransaction, tables } from '$lib/idb.svelte';
-	import { deleteImage, deleteImageFile, imageFileId } from '$lib/images';
-	import { ACCEPTED_IMPORT_TYPES } from '$lib/import.svelte';
+	import { deleteImageOrAudioFile, deleteImageOrSound, imageFileId } from '$lib/images';
+	import { ACCEPTED_IMPORT_TYPES } from '$lib/import/index.js';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import {
 		deleteMetadataValue,
@@ -55,7 +55,7 @@
 				for (const imageId of obs.images) {
 					const image = await tx.objectStore('Image').get(imageId);
 					if (!image) continue;
-					const obs = newObservation(image, uiState.currentSession);
+					const obs = newObservation({ image }, uiState.currentSession);
 					tx.objectStore('Observation').add(obs);
 					toselect.push(obs.id);
 				}
@@ -73,8 +73,8 @@
 				for (const id of uiState.selection) {
 					cancelTask(id, 'Cancelled by user');
 					await deleteObservation(id, { tx, notFoundOk: true, recursive: true });
-					await deleteImageFile(id, tx, true);
-					await deleteImage(id, tx, true);
+					await deleteImageOrAudioFile(id, tx, true);
+					await deleteImageOrSound(id, tx, true);
 				}
 			}
 		);
@@ -128,7 +128,8 @@
 	let showSidePanel = $derived(
 		uiState.processing.files.length +
 			tables.Observation.state.length +
-			tables.Image.state.length >
+			tables.Image.state.length +
+			tables.Sound.state.length >
 			0
 	);
 
@@ -136,15 +137,26 @@
 		uiState.selection
 			.flatMap((id) => {
 				// Try assuming id === image
-				const image = tables.Image.state.find((i) => [i.fileId, i.id].includes(id));
+				const image = [...tables.Image.state, ...tables.Sound.state].find((img) =>
+					[img.id, img.fileId].includes(id)
+				);
+
 				if (image) return [image];
+
 				// Otherwise, get every observation's image
-				return tables.Observation.state
-					.find((i) => i.id === id)
-					?.images.map((i) => tables.Image.state.find((img) => img.id === i))
-					.filter((img) => img !== undefined);
+				const obs = tables.Observation.state.find((i) => i.id === id);
+				if (!obs) return undefined;
+
+				return [
+					...obs.images
+						.map((i) => tables.Image.getFromState(i))
+						.filter((img) => img !== undefined),
+					...obs.sounds
+						.map((i) => tables.Sound.getFromState(i))
+						.filter((snd) => snd !== undefined),
+				];
 			})
-			.filter((img) => img !== undefined)
+			.filter((media) => media !== undefined)
 	);
 
 	const selectedObservations = $derived(
@@ -159,6 +171,8 @@
 				if (!image.fileId) return undefined;
 				const src = uiState.getPreviewURL(image.fileId);
 				if (!src) return undefined;
+				if (image._table === 'Audio') return { id: image.id, src };
+
 				const box = uiState.cropMetadataValueOf(image)?.value;
 				return {
 					src,

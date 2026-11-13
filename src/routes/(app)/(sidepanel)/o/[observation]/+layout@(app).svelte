@@ -32,12 +32,15 @@
 
 	const observation = $derived(tables.Observation.getFromState(page.params.observation ?? ''));
 	const imageFile = $derived(
-		tables.Image.getFromState(page.params.image ? imageId(page.params.image, 0) : '')
+		tables.Image.getFromState(page.params.image ? imageId(page.params.image, 0) : '') ??
+			tables.Sound.getFromState(page.params.image ? imageId(page.params.image, 0) : '')
 	);
 
 	const observationsOfImageFile = $derived(
 		tables.Observation.state.filter((obs) =>
-			obs.images.some((imageId) => imageIdToFileId(imageId) === page.params.image)
+			[...obs.images, ...obs.sounds].some(
+				(imageId) => imageIdToFileId(imageId) === page.params.image
+			)
 		)
 	);
 
@@ -46,12 +49,15 @@
 			(observationsOfImageFile.length === 1 ? observationsOfImageFile[0] : undefined)
 	);
 
-	const currentImage = $derived(tables.Image.getFromState(fullscreenState.currentImage ?? ''));
+	const currentImage = $derived(
+		tables.Image.getFromState(fullscreenState.currentImage ?? '') ??
+			tables.Sound.getFromState(fullscreenState.currentImage ?? '')
+	);
 
 	const imageToCrop = $derived(
 		imageFile?.id ??
 			currentImage?.fileId ??
-			(observation && observation.images.length === 1
+			(observation && (observation.images.length === 1 || observation.sounds.length === 1)
 				? imageIdToFileId(observation.images[0])
 				: undefined)
 	);

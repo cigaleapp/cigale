@@ -1,13 +1,15 @@
 import { classifyImage } from '$lib/classification.svelte.js';
 import { errorMessage, plural } from '$lib/i18n.js';
 import { imageFileId } from '$lib/images.js';
-import { inferBoundingBoxes, processImageFile } from '$lib/import.svelte.js';
+import { inferBoundingBoxes, processImageFile } from '$lib/import/images.svelte.js';
 import { Channel } from '$lib/iterables.js';
 import { sendNotification } from '$lib/notifications.js';
 import { importResultsZip } from '$lib/results.svelte.js';
 import { isSidecar } from '$lib/sidecars.js';
 import { uiState } from '$lib/uistate.svelte.js';
 import { isZip, range } from '$lib/utils.js';
+
+import { processAudioFile } from './import/audio.svelte.js';
 
 /**
  * @type {undefined | ProcessingQueue}
@@ -256,6 +258,8 @@ class ProcessingQueue {
 				const { file, id } = importing;
 				if (isZip(file.type)) {
 					await importResultsZip(file, id);
+				} else if (file.type.startsWith('audio/')) {
+					await processAudioFile(this.swarpc, importing);
 				} else {
 					await processImageFile(importing);
 				}

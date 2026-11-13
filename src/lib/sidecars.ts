@@ -25,14 +25,15 @@ export async function processSidecars({
 	db,
 	sessionId,
 	cropMetadataId,
-	imageFileId,
+	fileId,
 	file,
 	sidecars,
 }: {
 	db: DatabaseHandle;
 	sessionId: string;
 	cropMetadataId: string;
-	imageFileId: string;
+	/** ImageFile or AudioFile */
+	fileId: string;
 	file: File;
 	sidecars: File[];
 }) {
@@ -181,7 +182,7 @@ export async function processSidecars({
 				metadataId: item.metadataId,
 				sessionId: session.id,
 				type: item.type,
-				subjectId: imageFileId,
+				subjectId: fileId,
 				value: ref,
 			});
 		} else if (item.type === 'boundingbox') {
@@ -197,10 +198,11 @@ export async function processSidecars({
 			if (item.metadataId === cropMetadataId) {
 				// If this is the crop metadata, we create one image per box instead of storing non-optimal boxes as alternatives
 
-				const imageFile = await db.get('ImageFile', imageFileId);
+				const imageFile = await db.get('ImageFile', fileId);
 
 				if (!imageFile) {
-					throw new Error(`ImageFile with id ${imageFileId} not found`);
+					// TODO: support AudioFiles too
+					throw new Error(`ImageFile with id ${fileId} not found`);
 				}
 
 				for (const [i, { score, ...box }] of boxes.entries()) {
@@ -240,7 +242,7 @@ export async function processSidecars({
 					metadataId: item.metadataId,
 					sessionId: session.id,
 					type: item.type,
-					subjectId: imageFileId,
+					subjectId: fileId,
 					value: coords,
 					confidence: score,
 					confidences: others.map(({ score, ...coords }) => ({
@@ -270,7 +272,7 @@ export async function processSidecars({
 				metadataId: item.metadataId,
 				sessionId: session.id,
 				type: item.type,
-				subjectId: imageFileId,
+				subjectId: fileId,
 				value,
 			});
 		}

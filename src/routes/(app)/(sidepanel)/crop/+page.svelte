@@ -5,9 +5,9 @@
 
 	import AreaObservations from '$lib/AreaObservations.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import CardImageFile from '$lib/CardImageFile.svelte';
+	import CardImageFile from '$lib/CardMediaFile.svelte';
 	import * as idb from '$lib/idb.svelte.js';
-	import { deleteImageFile, imageIsAnalyzed } from '$lib/images';
+	import { deleteImageOrAudioFile, imageIsAnalyzed } from '$lib/images';
 	import Logo from '$lib/Logo.svelte';
 	import { mergeMetadataValues } from '$lib/metadata/index.js';
 	import { goto } from '$lib/paths.js';
@@ -19,24 +19,30 @@
 	seo({ title: 'Recadrer' });
 
 	const items = $derived(
-		[...groupBy(idb.tables.Image.state, (img) => img.fileId ?? '').entries()].map(
-			([fileId, images]) => ({
-				id: fileId,
-				sessionId: images[0].sessionId,
-				addedAt: new Date(avg(images.map((i) => i.addedAt.getTime()))),
-				name: images[0].filename,
-				virtual: false,
-				metadata: mergeMetadataValues(
-					images.map((img) => img.metadata),
-					{
-						definitions: idb.tables.Metadata.state,
-						// TODO
-						options: {},
-					}
-				),
-				data: images,
-			})
-		)
+		[
+			...groupBy(
+				[...idb.tables.Image.state, ...idb.tables.Sound.state],
+				(img) => img.fileId ?? ''
+			).entries(),
+		].map(([fileId, images]) => ({
+			id: fileId,
+			sessionId: images[0].sessionId,
+			addedAt: new Date(avg(images.map((i) => i.addedAt.getTime()))),
+			name: images[0].filename,
+			virtual: false,
+			metadata: mergeMetadataValues(
+				images.map((img) => img.metadata),
+				{
+					definitions: idb.tables.Metadata.state,
+					// TODO
+					options: {},
+				}
+			),
+			data: {
+				images,
+				isAudio: images.some((image) => image._table === 'Sound'),
+			},
+		}))
 	);
 
 	$effect(() => {
@@ -62,13 +68,14 @@
 
 <main class="observations" in:fade={{ duration: 100 }}>
 	<AreaObservations {items} zone="crop">
-		{#snippet item(images, { id: fileId })}
+		{#snippet item({ images, isAudio }, { id: fileId })}
 			<CardImageFile
 				{fileId}
 				{images}
 				boxes="show-all"
 				highlighted={fileId === uiState.imagePreviouslyOpenedInCropper}
 				loadingStatusText="Analyse…"
+				type={isAudio ? 'audio/x-unknown' : 'image/x-unknown'}
 				onretry={() => {
 					uiState.erroredImages.delete(fileId);
 					detectMore([fileId]);
@@ -76,7 +83,7 @@
 				ondelete={async () => {
 					cancelTask(fileId, 'Cancelled by user');
 					uiState.processing.removeFile(fileId);
-					await deleteImageFile(fileId);
+					await deleteImageOrAudioFile(fileId);
 				}}
 				onclick={async (_e, set) => {
 					set({ status: 'loading', loadingStatusText: 'Ouverture…' });

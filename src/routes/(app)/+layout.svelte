@@ -68,14 +68,16 @@
 		},
 	};
 
-	const imageFileIds = $derived(tables.Image.state.map((image) => image.fileId).filter(nonnull));
+	const mediaFileIds = $derived(
+		[...tables.Image.state, ...tables.Sound.state].map((image) => image.fileId).filter(nonnull)
+	);
 
 	// Ensure every image has a preview URL at all times
 	watch(
-		() => imageFileIds,
-		(imageFileIds) => {
+		() => mediaFileIds,
+		(mediaFileIds) => {
 			// https://github.com/sveltejs/svelte/issues/9520#issuecomment-1817092724
-			for (const fileId of imageFileIds) {
+			for (const fileId of mediaFileIds) {
 				void (async () => {
 					if (uiState.hasPreviewURL(fileId)) return;
 					await loadPreviewImage(fileId);

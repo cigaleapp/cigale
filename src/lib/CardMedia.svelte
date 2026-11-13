@@ -1,4 +1,6 @@
 <script lang="ts" module>
+	import type * as DB from '$lib/database.js';
+
 	type Status = 'queued' | 'loading' | 'ok' | 'errored';
 
 	type EventHandler = (
@@ -8,12 +10,13 @@
 		set: (props: { status?: Status; loadingStatusText?: string }) => void
 	) => Promise<void>;
 
-	type Props = {
+	export interface Props {
 		onclick?: EventHandler;
 		onstacksizeclick?: EventHandler;
 		ondoubleclick?: EventHandler;
 		ondelete?: EventHandler;
 		onretry?: EventHandler;
+		audiofile?: DB.AudioFile;
 		/** tooltip to show */
 		tooltip?: string | undefined;
 		id: string;
@@ -22,6 +25,8 @@
 		stacksize?: number;
 		/**image url */
 		image: string | undefined;
+		/** content type */
+		type?: string;
 		/** status of the image processing */
 		status: Status;
 		/** text to show when status is not `"ok"` */
@@ -34,32 +39,38 @@
 		/** whether this image is highlighted. selected implies highlighted. */
 		highlighted: boolean;
 		/** original dimensions of the image */
-		dimensions: { width: number; height: number | undefined };
+		dimensions?: { width: number; height: number | undefined };
 		/**  what to do with the images' bounding boxes. Either display them all, or crop to the first one. */
 		boxes: 'show-all' | 'apply-first' | 'none';
 		/** array of bounding boxes. Values are between 0 and 1 (relative to the width/height of the image) */
 		boundingBoxes: TopLeftBoundingBox[];
-	};
+		/** Duration of the media in milliseconds */
+		duration?: number;
+	}
 </script>
 
 <script lang="ts">
-	import type { TopLeftBoundingBox } from './BoundingBoxes.svelte';
+	import type { TopLeftBoundingBox } from '$lib/BoundingBoxes.svelte';
 
 	import IconRetry from '~icons/ri/arrow-go-back-fill';
 	import IconDelete from '~icons/ri/delete-bin-line';
 	import IconImage from '~icons/ri/image-2-line';
-
-	import AnimatableCheckmark from './AnimatableCheckmark.svelte';
-	import ButtonInk from './ButtonInk.svelte';
-	import Card from './Card.svelte';
-	import CroppedImg from './CroppedImg.svelte';
-	import LoadingSpinner from './LoadingSpinner.svelte';
-	import Logo from './Logo.svelte';
-	import { IsMobile } from './mobile.svelte.js';
-	import OverflowableText from './OverflowableText.svelte';
-	import { tooltip } from './tooltips.js';
-	import { onlongpress } from './touch/longpress.js';
-	import { uiState } from './uistate.svelte.js';
+	import IconVideo from '~icons/ri/video-line';
+	import IconAudio from '~icons/ri/volume-up-line';
+	import AnimatableCheckmark from '$lib/AnimatableCheckmark.svelte';
+	import { spectrogramBoundingBoxDomains } from '$lib/audio/spectrogram.js';
+	import { coordsFitter } from '$lib/BoundingBoxes.svelte';
+	import ButtonInk from '$lib/ButtonInk.svelte';
+	import Card from '$lib/Card.svelte';
+	import CroppedImg from '$lib/CroppedImg.svelte';
+	import { formatDurationStopwatch } from '$lib/date.js';
+	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
+	import Logo from '$lib/Logo.svelte';
+	import { IsMobile } from '$lib/mobile.svelte.js';
+	import OverflowableText from '$lib/OverflowableText.svelte';
+	import { tooltip } from '$lib/tooltips.js';
+	import { onlongpress } from '$lib/touch/longpress.js';
+	import { uiState } from '$lib/uistate.svelte.js';
 
 	let {
 		onclick,
@@ -74,6 +85,7 @@
 		selectable = true,
 		highlighted,
 		status,
+		audiofile,
 		statusText,
 		loadingStatusText,
 		stacksize = 1,
@@ -81,8 +93,26 @@
 		boxes,
 		tooltip: tooltipText,
 		id,
+		type = 'image/x-unknown',
 		...rest
 	}: Props & Omit<Record<string, unknown>, keyof Props> = $props();
+
+	const isAudio = $derived(type.startsWith('audio/'));
+	const isVideo = $derived(type.startsWith('video/'));
+
+	const duration = $derived.by(() => {
+		if (!audiofile) return;
+		if (boxes === 'show-all') return audiofile.dimensions.duration;
+		const box = boundingBoxes.at(0);
+		if (!box) return audiofile.dimensions.duration;
+		const domains = spectrogramBoundingBoxDomains(audiofile.spectrogram);
+		const { x } = coordsFitter(domains.timeFrequency)(box);
+		return x;
+	});
+
+	$inspect('cardmedia', title, 'aud', audiofile, 'd', duration);
+
+	const ContentTypeIcon = $derived(isAudio ? IconAudio : isVideo ? IconVideo : IconImage);
 
 	const handlers = $derived({
 		onclick,
@@ -220,8 +250,16 @@
 					</div>
 				{/if}
 				<div class="boundingboxes-wrapper" class:has-boxes={boxes === 'show-all'}>
+					{#if duration !== undefined}
+						<div class="duration-overlay">
+							<ContentTypeIcon />
+							<code class="duration">
+								{formatDurationStopwatch(duration)}
+							</code>
+						</div>
+					{/if}
 					{#if image}
-						{#if boxes === 'apply-first' && boundingBoxes.length > 0 && dimensions}
+						{#if boxes === 'apply-first' && boundingBoxes.length > 0 && dimensions?.height}
 							<CroppedImg
 								blurfill
 								{dimensions}
@@ -235,7 +273,7 @@
 						{/if}
 					{:else}
 						<div class="img-placeholder">
-							<IconImage />
+							<ContentTypeIcon />
 						</div>
 					{/if}
 					{#if boxes === 'show-all'}
@@ -351,6 +389,30 @@
 	.loading-overlay .text.smol {
 		margin-top: 0.5em;
 		font-size: 1.2rem;
+	}
+
+	.boundingboxes-wrapper {
+		position: relative;
+
+		.duration-overlay {
+			position: absolute;
+			bottom: 0;
+			right: 0;
+			/* No need for bg cuz histograms are always dark in color, will need to change once we also handle videos */
+			/* background: rgb(from var(--card-bg) r g b / 0.5); */
+			padding: 0.5em;
+			color: white;
+			z-index: 2;
+
+			display: flex;
+			align-items: center;
+			gap: 0.5em;
+			font-size: 0.8em;
+
+			code {
+				font-size: 0.9em;
+			}
+		}
 	}
 
 	img,

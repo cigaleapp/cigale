@@ -474,6 +474,11 @@ export function splitFilenameOnExtension(filename: string): [string, string] {
 	return [match[1], match[2]];
 }
 
+export function replaceLastExtensionOfFilename(filename: string, newExtension: `.${string}`) {
+	const parts = filename.split('.');
+	return parts.slice(0, -1).join('.') + newExtension;
+}
+
 if (import.meta.vitest) {
 	const { test, expect } = import.meta.vitest;
 	test('splitFilenameOnExtension', () => {
@@ -1624,11 +1629,28 @@ if (import.meta.vitest) {
 
 /**
  * Returns first key whose value is truthy
+ *
+ * @example
+ * ```ts
+ * // Instead of
+ * foo(
+ * 		longCondition1 ? "Foo"
+ *         : longCondition2 ? "Bar"
+ *              : longCondition3 ? "Baz"
+ *                  : "Quux"
+ * )
+ *
+ * // Do
+ * foo(switchConditions({
+ * 		Foo: longCondition1,
+ * 		Bar: longCondition2,
+ * 		Baz: longCondition3,
+ * 		Quux: true
+ * }))
+ * ```
  */
-export function switchConditions<T extends string>(
-	conditions: Record<T, boolean | string | number>
-): T | undefined {
-	return entries(conditions).find(([_, valid]) => valid)?.[0];
+export function switchConditions<T extends string>(conditions: Record<T, unknown>): T | undefined {
+	return entries(conditions).find(([_, valid]) => Boolean(valid))?.[0];
 }
 
 if (import.meta.vitest) {

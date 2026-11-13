@@ -13,17 +13,19 @@
 	const { sortedFileIds } = $derived(page.data as PageData);
 	const fileId = $derived(page.params.image);
 
-	const images = $derived.by(() => {
+	const medias = $derived.by(() => {
 		if (!fileId) return [];
 
-		return imagesOfImageFile(
+		return mediasOfFile(
 			fileId,
-			idb.tables.Image.state.filter((img) => img.sessionId === uiState.currentSessionId)
+			[...idb.tables.Image.state, ...idb.tables.Sound.state].filter(
+				(img) => img.sessionId === uiState.currentSessionId
+			)
 		);
 	});
 
-	export function currentImages() {
-		return images;
+	export function currentMedias() {
+		return medias;
 	}
 
 	let hideAllBoxes = $state(false);
@@ -41,12 +43,18 @@
 		if (!page.params.observation) return;
 
 		const observation = idb.tables.Observation.getFromState(page.params.observation);
-		return observation?.images.find((i) => imageIdToFileId(i) === fileId);
+		return (
+			observation?.images.find((i) => imageIdToFileId(i) === fileId) ??
+			observation?.sounds.find((s) => imageIdToFileId(s) === fileId)
+		);
 	});
 
 	export function focusedImage() {
 		if (!focusedImageId) return undefined;
-		return idb.tables.Image.getFromState(focusedImageId);
+		return (
+			idb.tables.Image.getFromState(focusedImageId) ??
+			idb.tables.Sound.getFromState(focusedImageId)
+		);
 	}
 
 	export function setFocusedImage(imageId: string | null) {
@@ -59,8 +67,8 @@
 	 */
 	export function boundingBoxes() {
 		return Object.fromEntries(
-			images
-				.map(({ id, metadata }) => [id, metadata[uiState.cropMetadataId]?.value])
+			medias
+				.map(({ id, metadata }) => [id, metadata[uiState.cropMetadataId]?.value] as const)
 				.filter(([, box]) => box !== undefined)
 				.map(([id, box]) => [id, assertIs('boundingbox', box)])
 		);
@@ -69,18 +77,16 @@
 	export function hasCrop(imageFileId: string | undefined) {
 		if (!imageFileId) return false;
 
-		return imagesOfImageFile(imageFileId).every(
-			(image) => uiState.cropMetadataId in image.metadata
-		);
+		return mediasOfFile(imageFileId).every((image) => uiState.cropMetadataId in image.metadata);
 	}
 
 	export function hasConfirmedCrop(imageFileId: string | undefined) {
 		if (!imageFileId) return false;
 
-		return imagesOfImageFile(imageFileId).every(imageHasConfirmedCrop);
+		return mediasOfFile(imageFileId).every(imageHasConfirmedCrop);
 	}
 
-	export function imageHasConfirmedCrop(image: DB.Image) {
+	export function imageHasConfirmedCrop(image: DB.Image | DB.Sound) {
 		const value = uiState.cropMetadataValueOf(image);
 		return value?.confirmed;
 	}
@@ -143,7 +149,7 @@
 	import IconReset from '~icons/ri/reset-left-fill';
 	import { page } from '$app/state';
 	import BottomDrawer from '$lib/BottomDrawer.svelte';
-	import { imageIdToFileId, imagesOfImageFile } from '$lib/images.js';
+	import { imageIdToFileId, mediasOfFile } from '$lib/images.js';
 	import { assertIs } from '$lib/metadata/index.js';
 	import { IsMobile } from '$lib/mobile.svelte.js';
 	import { goto } from '$lib/paths.js';
@@ -159,16 +165,16 @@
 		setupUndoActions,
 	} from './actions.svelte.js';
 	import Boxes from './Boxes.svelte';
-	import CropSurface from './CropSurface.svelte';
 	import FocusSwitcher from './FocusSwitcher.svelte';
 	import ImmersiveActions from './ImmersiveActions.svelte';
 	import { setupKeyboardShortcuts } from './keyboard.svelte.js';
+	import MediaArea from './MediaArea.svelte';
 	import Toolbar from './Toolbar.svelte';
 	import { Zoom } from './zoom.svelte.js';
 
 	const mobile = new IsMobile();
 
-	const firstImage = $derived(images.at(0));
+	const firstImage = $derived(medias.at(0));
 
 	// Controls visibility of the checkmark little centered overlay
 	let showConfirmedOverlay = $state(async () => {});
@@ -177,6 +183,8 @@
 		imageId: null,
 		manual: false,
 	});
+
+	const isAudio = $derived(firstImage?._table === 'Sound');
 
 	const boxesCount = $derived(Object.keys(boundingBoxes()).length);
 
@@ -190,6 +198,10 @@
 	setupKeyboardShortcuts({
 		selectedBox: () => selectedBox,
 		showConfirmedOverlay: async () => showConfirmedOverlay(),
+	});
+
+	$effect(() => {
+		zoom.setMaxScale(isAudio ? 40 : 10);
 	});
 
 	// TODO: remove, see #1827
@@ -208,6 +220,9 @@
 	});
 
 	let imageIsLoading = $state(true);
+	let audioIsLoading = $state(true);
+
+	const audiofile = $derived(fileId ? tables.AudioFile.getFromState(fileId) : undefined);
 
 	watch(
 		() => fileId,
@@ -293,7 +308,7 @@
 	]}
 />
 
-<div class="layout">
+<div class="layout" class:audio={isAudio}>
 	<main class="crop-surface">
 		{#if mobile.current}
 			<div class="immersive-actions">
@@ -301,10 +316,11 @@
 			</div>
 		{/if}
 
-		<!-- TODO: make CropSurface handle its image element resize instead -->
-		{#key getSettings().cropperSidebarCollapsed}
-			<CropSurface bind:imageIsLoading {showConfirmedOverlay} {selectedBox} />
-		{/key}
+		<!-- <div class="media-area"> -->
+		{#if fileId}
+			<MediaArea {fileId} bind:imageIsLoading {showConfirmedOverlay} {selectedBox} />
+		{/if}
+		<!-- </div> -->
 	</main>
 
 	<aside class="toolbar">
@@ -341,9 +357,7 @@
 		}
 	}
 
-	.toolbar {
-		position: relative;
-
+	.layout:not(.audio) {
 		@media (max-width: 600px) {
 			position: fixed;
 			left: 0;
@@ -351,6 +365,10 @@
 			bottom: 0;
 			padding-bottom: 0.5rem;
 		}
+	}
+
+	.toolbar {
+		position: relative;
 
 		.focus-switcher {
 			position: absolute;

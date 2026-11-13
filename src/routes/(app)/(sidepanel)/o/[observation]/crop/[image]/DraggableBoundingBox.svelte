@@ -34,6 +34,7 @@
 		disabled?: boolean;
 		zoom: Zoom;
 		imageFileID?: string;
+		subjectFitMode: 'contain' | 'cover' | 'fill';
 	}
 
 	let {
@@ -48,6 +49,7 @@
 		createMode,
 		zoom,
 		imageFileID,
+		subjectFitMode,
 	}: Props = $props();
 
 	// Using a writable $derived here causes the state to not update until onmouseup, idk why
@@ -115,6 +117,7 @@
 
 	const imageRect = $derived(
 		fittedImageRect(
+			subjectFitMode,
 			{ clientHeight, clientWidth, naturalHeight, naturalWidth, clientTop, clientLeft },
 			zoom
 		)
@@ -221,6 +224,38 @@
 		}
 	}}
 />
+
+{#if isDebugMode()}
+	<div class="debuginfo" style:color="red">
+		<code>
+			{fingers.count} fingers <br />
+			{#snippet point(x: number, y: number)}
+				{Math.round(x)} {Math.round(y)}
+			{/snippet}
+			{#snippet bb({ x, y, width, height }: Rect)}
+				({@render point(x, y)}) × [{@render point(width, height)}]
+			{/snippet}
+			{#each Object.entries(boundingBoxesPixels) as [imageId, box] (imageId)}
+				@{imageId.replace(`${page.params.image}_`, '')} {@render bb(box)}<br />
+			{/each}
+			create {newBoundingBox.ready ? 'ready ' : ''}
+			{#if createMode === 'clickanddrag'}
+				{@render bb(newBoundingBox.clickanddrag)}
+				<br /> &nbsp;&nbsp;&nbsp;dir {@render point(
+					newBoundingBox.clickanddrag.dragDirection.x,
+					newBoundingBox.clickanddrag.dragDirection.y
+				)}
+			{:else if createMode === 'off'}
+				off
+			{:else}
+				<br />
+				{#each newBoundingBox.points as { x, y }, i (i)}
+					#{i} {@render point(x, y)} <br />
+				{/each}
+			{/if}
+		</code>
+	</div>
+{/if}
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
@@ -340,35 +375,6 @@
 		}
 	}}
 >
-	{#if isDebugMode()}
-		<code class="debug" style:color="red">
-			{fingers.count} fingers <br />
-			{#snippet point(x: number, y: number)}
-				{Math.round(x)} {Math.round(y)}
-			{/snippet}
-			{#snippet bb({ x, y, width, height }: Rect)}
-				({@render point(x, y)}) × [{@render point(width, height)}]
-			{/snippet}
-			{#each Object.entries(boundingBoxesPixels) as [imageId, box] (imageId)}
-				@{imageId.replace(`${page.params.image}_`, '')} {@render bb(box)}<br />
-			{/each}
-			create {newBoundingBox.ready ? 'ready ' : ''}
-			{#if createMode === 'clickanddrag'}
-				{@render bb(newBoundingBox.clickanddrag)}
-				<br /> &nbsp;&nbsp;&nbsp;dir {@render point(
-					newBoundingBox.clickanddrag.dragDirection.x,
-					newBoundingBox.clickanddrag.dragDirection.y
-				)}
-			{:else if createMode === 'off'}
-				off
-			{:else}
-				<br />
-				{#each newBoundingBox.points as { x, y }, i (i)}
-					#{i} {@render point(x, y)} <br />
-				{/each}
-			{/if}
-		</code>
-	{/if}
 	{#if createMode === '2point' || createMode === '4point'}
 		{#each newBoundingBox.points as { x, y }, i (i)}
 			{#if x !== 0 && y !== 0}
@@ -467,9 +473,18 @@
 
 	.change-area.debug {
 		outline: 2px dashed red;
-		font-size: 0.7rem;
+	}
 
-		.debug {
+	.debuginfo {
+		position: absolute;
+		display: inline-block;
+		top: 0;
+		left: 0;
+		z-index: 10;
+		font-size: 0.7rem;
+		pointer-events: none;
+
+		code {
 			background: rgba(0 0 0 / 0.66);
 		}
 	}

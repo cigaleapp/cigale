@@ -12,13 +12,18 @@
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import CardImage from '$lib/CardImage.svelte';
 	import CardObservation from '$lib/CardObservation.svelte';
+	import CardSound from '$lib/CardSound.svelte';
 	import { databaseHandle, tables } from '$lib/idb.svelte.js';
-	import { deleteImage, imageBufferWasSaved, imageIsClassified } from '$lib/images';
+	import { deleteImageOrSound, imageBufferWasSaved, imageIsClassified } from '$lib/images';
 	import { loadModel } from '$lib/inference.js';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
 	import Logo from '$lib/Logo.svelte';
 	import { IsMobile } from '$lib/mobile.svelte.js';
-	import { deleteObservation, ensureNoLoneImages, observationMetadata } from '$lib/observations';
+	import {
+		deleteObservation,
+		ensureNoLoneImagesOrSounds,
+		observationMetadata,
+	} from '$lib/observations';
 	import { goto } from '$lib/paths.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { cancelTask, classifyMore } from '$lib/queue.svelte.js';
@@ -30,8 +35,10 @@
 
 	type Item = GalleryItem<{
 		image: DB.Image | undefined;
+		sound: DB.Sound | undefined;
 		observation: DB.Observation | undefined;
 		images: DB.Image[];
+		sounds: DB.Sound[];
 	}>;
 
 	seo({ title: 'Classification' });
@@ -50,6 +57,7 @@
 			metadata: observationMetadata({
 				definitions: tables.Metadata.state,
 				images: obs.images.map((id) => tables.Image.getFromState(id)).filter(nonnull),
+				sounds: obs.sounds.map((id) => tables.Sound.getFromState(id)).filter(nonnull),
 				observation: obs,
 			}),
 			virtual: false,
@@ -57,6 +65,7 @@
 				image: undefined,
 				observation: obs,
 				images: obs.images.map((id) => tables.Image.getFromState(id)).filter(nonnull),
+				sounds: obs.sounds.map((id) => tables.Sound.getFromState(id)).filter(nonnull),
 			},
 		}))
 	);
@@ -189,7 +198,7 @@
 
 	$effect(() => {
 		if (!uiState.setSelection) return;
-		void ensureNoLoneImages();
+		void ensureNoLoneImagesOrSounds();
 	});
 
 	defineKeyboardShortcuts('classification', {
@@ -247,11 +256,12 @@
 {:else}
 	<main class="observations" class:empty={!items.length} in:fade={{ duration: 100 }}>
 		<AreaObservations {items} {unroll} zone="classify">
-			{#snippet item({ observation, image, images }, { id })}
+			{#snippet item({ observation, image, sounds, sound, images }, { id })}
 				{#if observation}
 					<CardObservation
 						{observation}
 						{images}
+						{sounds}
 						boxes="apply-first"
 						loadingStatusText="Analyse…"
 						onstacksizeclick={() => {
@@ -289,11 +299,13 @@
 							const imageIds = tables.Observation.getFromState(id)?.images ?? [id];
 							imageIds.forEach((id) => cancelTask(id, 'Cancelled by user'));
 							await deleteObservation(id, { notFoundOk: true, recursive: true });
-							await deleteImage(id, undefined, true);
+							await deleteImageOrSound(id, undefined, true);
 						}}
 					/>
 				{:else if image}
 					<CardImage {image} boxes="apply-first" />
+				{:else if sound}
+					<CardSound {sound} />
 				{/if}
 			{/snippet}
 		</AreaObservations>

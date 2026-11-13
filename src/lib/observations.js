@@ -2,13 +2,13 @@ import { generateId } from '$lib/database.js';
 
 import * as db from './idb.svelte.js';
 import { tables } from './idb.svelte.js';
-import { deleteImage } from './images.js';
+import { deleteImageOrSound } from './images.js';
 import {
 	mergeMetadataFromImagesAndObservations,
 	serializeMetadataFullValue,
 } from './metadata/index.js';
 import { uiState } from './uistate.svelte.js';
-import { compareBy, mapValues, nonnull, transformObject } from './utils.js';
+import { compareBy, entries, mapValues, nonnull, transformObject } from './utils.js';
 
 /**
  * @import * as DB from '$lib/database.js'
@@ -92,7 +92,7 @@ export async function deleteObservation(
 			if (recursive) {
 				console.debug(`Deleting images of observation ${id}: `, observation.images);
 				for (const imageId of observation.images) {
-					await deleteImage(imageId, tx, notFoundOk);
+					await deleteImageOrSound(imageId, tx, notFoundOk);
 				}
 			}
 
@@ -105,12 +105,14 @@ export async function deleteObservation(
  *  If removing images causes the observation to be empty, it is deleted
  * @param {object} options
  * @param {string} options.observation observation ID
- * @param {string[]} options.images image IDs to remove from the observation
+ * @param {string[]} [options.images] image IDs to remove from the observation
+ * @param {string[]} [options.sounds] sound IDs to remove from the observation
  * @param {import('./idb.svelte.js').IDBTransactionWithAtLeast<["Observation"]>} [options.tx] re-use an ongoing transaction
  */
-export async function removeImagesFromObservation({
+export async function removeFromObservation({
 	observation: observationId,
 	images: imageIds,
+	sounds: soundIds,
 	tx,
 }) {
 	await db.openTransaction(
@@ -119,18 +121,22 @@ export async function removeImagesFromObservation({
 		async (tx) => {
 			const observation = await tx.objectStore('Observation').get(observationId);
 			if (!observation) throw new Error(`Observation ${observationId} not found`);
-			const remaining = observation.images.filter((id) => !imageIds.includes(id));
+			const remainingImages = observation.images.filter((id) => !imageIds?.includes(id));
+			const remainingSounds = observation.images.filter((id) => !soundIds?.includes(id));
 
-			if (remaining.length === 0) {
+			if (remainingImages.length === 0 && remainingSounds.length === 0) {
 				console.debug(
 					`Removing ${imageIds} from ${observationId}: observation would be empty, deleting it`
 				);
 				await tx.objectStore('Observation').delete(observationId);
 			} else {
-				console.debug(`Removing ${imageIds} from ${observationId}: ${remaining} remains`);
+				console.debug(
+					`Removing ${imageIds} from ${observationId}: ${remainingImages} remains`
+				);
 				await tx.objectStore('Observation').put({
 					...observation,
-					images: remaining,
+					images: remainingImages,
+					sounds: remainingSounds,
 				});
 			}
 		}
@@ -151,18 +157,21 @@ export function fallbackObservationLabel(parts) {
 
 /**
  *
- * @param {Pick<typeof import('$lib/database').Schemas.Image.inferIn & DB.Image, "id" | "filename">} image
+ * @param {Record<"image"|"sound", {id: string, filename: string}>} source
  * @param {import('$lib/database').Session} session
  * @returns {typeof import('$lib/database').Schemas.Observation.inferIn}
  */
-export function newObservation(image, session) {
+export function newObservation(source, session) {
 	const observationId = generateId('Observation');
+	const [[type, item]] = entries(source);
+
 	return {
 		id: observationId,
 		sessionId: session.id,
-		images: [image.id],
+		images: type === 'image' ? [item.id] : [],
+		sounds: type === 'sound' ? [item.id] : [],
 		addedAt: new Date().toISOString(),
-		label: fallbackObservationLabel([image]),
+		label: fallbackObservationLabel([item]),
 		metadataOverrides: {},
 	};
 }
@@ -171,14 +180,15 @@ export function newObservation(image, session) {
  * If there are any images that are not inside any observation, create an observation with a single image for each
  * @param {import('./idb.svelte').IDBTransactionWithAtLeast<["Observation", "Image"]>} [tx] reuse an existing transaction
  */
-export async function ensureNoLoneImages(tx) {
+export async function ensureNoLoneImagesOrSounds(tx) {
 	const session = uiState.currentSession;
 	const protocol = uiState.currentProtocol;
 	if (!protocol) throw new Error('No protocol selected');
 	if (!session) throw new Error('No session selected');
 
-	await db.openTransaction(['Observation', 'Image'], { tx }, async (tx) => {
+	await db.openTransaction(['Observation', 'Image', 'Sound'], { tx }, async (tx) => {
 		const images = await tx.objectStore('Image').index('sessionId').getAll(session.id);
+		const sounds = await tx.objectStore('Sound').index('sessionId').getAll(session.id);
 		const observations = await tx
 			.objectStore('Observation')
 			.index('sessionId')
@@ -186,11 +196,22 @@ export async function ensureNoLoneImages(tx) {
 
 		for (const image of images) {
 			if (!observations.some((o) => o.images.includes(image.id))) {
-				const newObs = newObservation(image, session);
+				const newObs = newObservation({ image }, session);
 				tx.objectStore('Observation').add(newObs);
 				// Update ui selection so we don't have ghosts in preview side panel
 				uiState.setSelection?.(
 					uiState.selection.map((sel) => (sel === image.id ? newObs.id : sel))
+				);
+			}
+		}
+
+		for (const sound of sounds) {
+			if (!observations.some((o) => o.sounds?.includes(sound.id))) {
+				const newObs = newObservation({ sound }, session);
+				tx.objectStore('Observation').add(newObs);
+				// Update ui selection so we don't have ghosts in preview side panel
+				uiState.setSelection?.(
+					uiState.selection.map((sel) => (sel === sound.id ? newObs.id : sel))
 				);
 			}
 		}
@@ -202,15 +223,19 @@ export async function ensureNoLoneImages(tx) {
  * @param {import('./idb.svelte').IDBTransactionWithAtLeast<["Observation", "Image"]>} [tx] reuse an existing transaction
  */
 export async function ensureNoEmptyObservations(tx) {
-	await db.openTransaction(['Observation', 'Image'], { tx }, async (tx) => {
+	await db.openTransaction(['Observation', 'Image', 'Sound'], { tx }, async (tx) => {
 		const observations = await tx.objectStore('Observation').getAll();
 		for (const observation of observations) {
 			const images = await Promise.all(
 				observation.images.map((imageId) => tx.objectStore('Image').get(imageId))
 			);
-			const existing = images.filter(nonnull);
+			const sounds = await Promise.all(
+				observation.images.map((imageId) => tx.objectStore('Image').get(imageId))
+			);
+			const existingImages = images.filter(nonnull);
+			const existingSounds = sounds.filter(nonnull);
 
-			if (existing.length === 0) {
+			if (existingImages.length + existingSounds.length === 0) {
 				console.warn(
 					`Deleting observation ${observation.id} because it has no images`,
 					observation
@@ -221,15 +246,19 @@ export async function ensureNoEmptyObservations(tx) {
 				uiState.erroredImages.delete(observation.id);
 			} else {
 				// If some images exist, but not all, remove the non-existing ones from the observation.
-				if (existing.length !== observation.images.length) {
+				if (
+					existingImages.length !== observation.images.length ||
+					existingSounds.length !== (observation.sounds.length ?? 0)
+				) {
 					tx.objectStore('Observation').put({
 						...observation,
-						images: existing.map(({ id }) => id),
+						images: existingImages.map(({ id }) => id),
+						sounds: existingSounds.map(({ id }) => id),
 					});
 					console.info(
 						`Updating observation ${observation.id} because some of its images were deleted`,
 						observation,
-						existing
+						existingImages
 					);
 				}
 			}

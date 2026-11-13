@@ -21,7 +21,13 @@ import {
 	namespaceOfMetadataId,
 } from '$lib/schemas/metadata.js';
 import { toasts } from '$lib/toasts.svelte.js';
-import { groupBy, orEmptyObj3, prefixIDBKeyRange, safeJSONParse } from '$lib/utils.js';
+import {
+	groupBy,
+	orEmptyObj3,
+	prefixIDBKeyRange,
+	safeJSONParse,
+	switchConditions,
+} from '$lib/utils.js';
 
 import { resolveMetadataImport } from './imports.js';
 import { httpInferencesToRefresh, inferHttp } from './inference/http.js';
@@ -320,9 +326,11 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 
 	abortSignal?.throwIfAborted();
 	const image = await db.get('Image', subjectId);
+	const sound = await db.get('Sound', subjectId);
 	const observation = await db.get('Observation', subjectId);
 	const session = await db.get('Session', subjectId);
 	const imagesFromImageFile = await db.getAllFromIndex('Image', 'fileId', subjectId);
+	const soundsFromAudioFile = await db.getAllFromIndex('Sound', 'fileId', subjectId);
 
 	abortSignal?.throwIfAborted();
 	if (session) {
@@ -346,6 +354,16 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 		}
 
 		await db.put('Image', image);
+	} else if (sound) {
+		oldValue = sound.metadata[metadataId];
+		processConfidences(newValue, oldValue);
+
+		sound.metadata[metadataId] = newValue;
+		if (clearErrors && sound.metadataErrors?.[metadataId]) {
+			delete sound.metadataErrors[metadataId];
+		}
+
+		await db.put('Sound', sound);
 	} else if (observation) {
 		oldValue = observationMetadata({
 			observation: Tables.Observation.assert(observation),
@@ -365,8 +383,8 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 		}
 
 		await db.put('Observation', observation);
-	} else if (imagesFromImageFile.length > 0) {
-		for (const { id } of imagesFromImageFile) {
+	} else if (imagesFromImageFile.length + soundsFromAudioFile.length > 0) {
+		for (const { id } of [...imagesFromImageFile, ...soundsFromAudioFile]) {
 			await storeMetadataValue({
 				db,
 				sessionId,
@@ -383,7 +401,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 			});
 		}
 	} else {
-		throw new Error(`Aucune image ou observation avec l'ID ${subjectId}`);
+		throw new Error(`Aucun son, image ou observation avec l'ID ${subjectId}`);
 	}
 
 	abortSignal?.throwIfAborted();
@@ -435,7 +453,11 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 
 		if (ses) {
 			protocolId = ses.protocol;
-			const values = image?.metadata ?? observation?.metadataOverrides ?? session?.metadata;
+			const values =
+				sound?.metadata ??
+				image?.metadata ??
+				observation?.metadataOverrides ??
+				session?.metadata;
 
 			const toRefresh = await httpInferencesToRefresh(db, protocolId, {
 				[metadataId]: [safeJSONParse(oldValue?.value), safeJSONParse(newValue.value)],
@@ -478,10 +500,14 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 
 	// Only refresh table state if asked
 	if (sessionId && updateReactiveState) {
-		await refreshTables(
-			sessionId,
-			session ? 'Session' : image || imagesFromImageFile.length ? 'Image' : 'Observation'
-		);
+		const table = switchConditions({
+			Session: session,
+			Image: image || imagesFromImageFile.length > 0,
+			Sound: sound || soundsFromAudioFile.length > 0,
+			Observation: observation,
+		});
+
+		if (table) await refreshTables(sessionId, table);
 	}
 
 	const protocol = protocolId ? await db.get('Protocol', protocolId) : undefined;
@@ -513,23 +539,36 @@ export async function storeMetadataValueConfirmation({
 	updateReactiveState?: boolean;
 }) {
 	const image = await db.get('Image', subjectId);
+	const sound = await db.get('Sound', subjectId);
 	const observation = await db.get('Observation', subjectId);
 	const imagesFromImageFile = await db
 		.getAllFromIndex('Image', 'sessionId', sessionId)
 		.then((imgs) => imgs.filter(({ fileId }) => fileId === subjectId));
+	const soundsFromAudioFile = await db
+		.getAllFromIndex('Sound', 'sessionId', sessionId)
+		.then((snds) => snds.filter(({ fileId }) => fileId === subjectId));
 
-	if (!image && !observation && imagesFromImageFile.length === 0)
+	if (
+		!image &&
+		!sound &&
+		!observation &&
+		imagesFromImageFile.length === 0 &&
+		soundsFromAudioFile.length === 0
+	)
 		throw new Error(`Aucune image ou observation avec l'ID ${subjectId}`);
 
 	console.debug(`Store metadata confirmation for ${metadataId} in ${subjectId}:`, confirmed);
 	if (image) {
 		image.metadata[metadataId].confirmed = confirmed;
 		db.put('Image', image);
+	} else if (sound) {
+		sound.metadata[metadataId].confirmed = confirmed;
+		db.put('Sound', sound);
 	} else if (observation) {
 		observation.metadataOverrides[metadataId].confirmed = confirmed;
 		db.put('Observation', observation);
-	} else if (imagesFromImageFile) {
-		for (const { id } of imagesFromImageFile) {
+	} else {
+		for (const { id } of [...imagesFromImageFile, ...soundsFromAudioFile]) {
 			await storeMetadataValueConfirmation({
 				db,
 				sessionId,
@@ -545,7 +584,11 @@ export async function storeMetadataValueConfirmation({
 	if (sessionId && updateReactiveState) {
 		await refreshTables(
 			sessionId,
-			image || imagesFromImageFile.length ? 'Image' : 'Observation'
+			image || imagesFromImageFile.length
+				? 'Image'
+				: sound || soundsFromAudioFile.length
+					? 'Sound'
+					: 'Observation'
 		);
 	}
 }
@@ -565,13 +608,23 @@ export async function storeMetadataErrors(
 	...errors: Array<typeof DB.Schemas.MetadataError.inferIn>
 ) {
 	const image = await db.get('Image', subjectId);
+	const sound = await db.get('Sound', subjectId);
 	const observation = await db.get('Observation', subjectId);
 	const imagesFromImageFile = await db
 		.getAllFromIndex('Image', 'sessionId', sessionId)
 		.then((imgs) => imgs.filter(({ fileId }) => fileId === subjectId));
+	const soundsFromAudioFile = await db
+		.getAllFromIndex('Sound', 'sessionId', sessionId)
+		.then((snds) => snds.filter(({ fileId }) => fileId === subjectId));
 
-	if (!image && !observation && imagesFromImageFile.length === 0)
-		throw new Error(`Aucune image ou observation avec l'ID ${subjectId}`);
+	if (
+		!image &&
+		!observation &&
+		!sound &&
+		imagesFromImageFile.length === 0 &&
+		soundsFromAudioFile.length === 0
+	)
+		throw new Error(`Aucune image, observation ou son avec l'ID ${subjectId}`);
 
 	const serializedErrors = errors.map((error) => {
 		try {
@@ -588,12 +641,16 @@ export async function storeMetadataErrors(
 		image.metadataErrors ??= {};
 		image.metadataErrors[metadataId] = serializedErrors;
 		db.put('Image', image);
+	} else if (sound) {
+		sound.metadataErrors ??= {};
+		sound.metadataErrors[metadataId] = serializedErrors;
+		db.put('Sound', sound);
 	} else if (observation) {
 		observation.metadataErrors ??= {};
 		observation.metadataErrors[metadataId] = serializedErrors;
 		db.put('Observation', observation);
-	} else if (imagesFromImageFile) {
-		for (const { id } of imagesFromImageFile) {
+	} else {
+		for (const { id } of [...imagesFromImageFile, ...soundsFromAudioFile]) {
 			await storeMetadataErrors(
 				{
 					db,
@@ -634,13 +691,24 @@ export async function deleteMetadataValue({
 	sessionId?: string | undefined;
 }) {
 	const image = await db.get('Image', subjectId);
+	const sound = await db.get('Sound', subjectId);
 	const observation = await db.get('Observation', subjectId);
 	const session = await db.get('Session', subjectId);
 	const imagesFromImageFile = await db
 		.getAllFromIndex('Image', 'sessionId', sessionId)
 		.then((imgs) => imgs.filter(({ fileId }) => fileId === subjectId));
+	const soundsFromAudioFile = await db
+		.getAllFromIndex('Sound', 'sessionId', sessionId)
+		.then((snds) => snds.filter(({ fileId }) => fileId === subjectId));
 
-	if (!image && !observation && !session && imagesFromImageFile.length === 0)
+	if (
+		!image &&
+		!observation &&
+		!session &&
+		!sound &&
+		imagesFromImageFile.length === 0 &&
+		soundsFromAudioFile.length === 0
+	)
 		throw new Error(`Aucune image, observation ou session avec l'ID ${subjectId}`);
 
 	let deletedValue: ArkErrors | typeof MetadataValue.infer | undefined = undefined;
@@ -650,6 +718,10 @@ export async function deleteMetadataValue({
 		deletedValue = MetadataValue(structuredClone(image.metadata[metadataId]));
 		delete image.metadata[metadataId];
 		db.put('Image', image);
+	} else if (sound) {
+		deletedValue = MetadataValue(structuredClone(sound.metadata[metadataId]));
+		delete sound.metadata[metadataId];
+		db.put('Sound', sound);
 	} else if (session) {
 		deletedValue = MetadataValue(structuredClone(session.metadata[metadataId]));
 		delete session.metadata[metadataId];
@@ -670,9 +742,21 @@ export async function deleteMetadataValue({
 					reactive: false,
 				});
 			}
+
+			for (const soundId of observation.sounds) {
+				await deleteMetadataValue({
+					db,
+					sessionId,
+					subjectId: soundId,
+					recursive: false,
+					metadataId,
+					// Don't refresh table state on recursive calls, we just have to do it once
+					reactive: false,
+				});
+			}
 		}
-	} else if (imagesFromImageFile) {
-		for (const { id } of imagesFromImageFile) {
+	} else {
+		for (const { id } of [...imagesFromImageFile, ...soundsFromAudioFile]) {
 			await deleteMetadataValue({
 				db,
 				sessionId,
@@ -691,7 +775,8 @@ export async function deleteMetadataValue({
 		}
 	}
 
-	if (reactive && sessionId) await refreshTables(sessionId, 'Image', 'Observation', 'Session');
+	if (reactive && sessionId)
+		await refreshTables(sessionId, 'Image', 'Sound', 'Observation', 'Session');
 
 	return;
 }

@@ -1,3 +1,4 @@
+import type { AudioSpectrogramsFolders } from '$lib/audio/spectrogram.js';
 import type { BINARY_CONTENT_TABLES } from '$lib/database.js';
 import type { PendingPhotosRootFolders } from '$routes/(app)/capture/pendingstorage.svelte.js';
 
@@ -18,6 +19,8 @@ export interface BinaryStorageBackend<Name extends BinaryStorageName = BinarySto
 	 * @param fallbackContentType some backends don't store content types. for these backends, the returned File will use this value
 	 */
 	read(locator: BinaryStorageLocator, fallbackContentType: ContentType): Promise<File>;
+
+	readChunk(locator: BinaryStorageLocator, start: number, end: number): Promise<ArrayBuffer>;
 
 	stream(
 		locator: BinaryStorageLocator,
@@ -59,10 +62,17 @@ export interface BinaryStorageBackend<Name extends BinaryStorageName = BinarySto
 	 * @returns number of files in the given directory
 	 */
 	count(locator: BinaryStorageLocator<''>): Promise<number>;
+	/**
+	 * @returns a Mediabunny source of the given file
+	 */
+	mediabunny(locator: BinaryStorageLocator): Promise<import('mediabunny').Source>;
 }
 
 export type BinaryStorageLocator<Filename extends string = string> = {
-	area: (typeof BINARY_CONTENT_TABLES)[number] | PendingPhotosRootFolders;
+	area:
+		| (typeof BINARY_CONTENT_TABLES)[number]
+		| PendingPhotosRootFolders
+		| AudioSpectrogramsFolders;
 	sessionId: string | undefined;
 	/** Use an empty string to denote an entire folder */
 	name: Filename;

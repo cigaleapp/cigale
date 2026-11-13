@@ -12,6 +12,7 @@ import {
 	ProtocolID,
 	SingleEntryRecord,
 	URLString,
+	MediaKind,
 } from './common.js';
 import { DarwinCoreProtocolConfig } from './darwincore.js';
 import { FilepathTemplate, TemplatedString } from './expressions.js';
@@ -145,6 +146,9 @@ export const Protocol = type({
 		.describe('Si le protocole a été modifié depuis sa dernière exportation')
 		.default(false),
 	'beamup?': BeamupSettings,
+	media: type({
+		types: MediaKind.array(),
+	}).default(() => ({ types: ['image'] })),
 	'remote?': {
 		'ecosignal?': {
 			domains: type

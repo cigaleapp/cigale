@@ -1,12 +1,10 @@
 <script lang="ts">
 	import type { SelectedBox } from './+page.svelte';
+	import type { Snippet } from 'svelte';
 
-	import { page } from '$app/state';
 	import { toTopLeftCoords } from '$lib/BoundingBoxes.svelte.js';
-	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 	import { Gestures } from '$lib/touch/gestures.svelte.js';
-	import { uiState } from '$lib/uistate.svelte.js';
-	import { mapValues, overrideStyle, pick } from '$lib/utils.js';
+	import { mapValues, overrideStyle, pick, switchValue } from '$lib/utils.js';
 
 	import {
 		focusedImage,
@@ -17,17 +15,47 @@
 	import { onCropChange } from './actions.svelte.js';
 	import DraggableBoundingBox from './DraggableBoundingBox.svelte';
 	import { activeTool } from './Toolbar.svelte';
+	import ZoomableMarks from './ZoomableMarks.svelte';
 
 	interface Props {
-		imageIsLoading: boolean;
 		selectedBox: SelectedBox;
 		showConfirmedOverlay: () => Promise<void>;
+		imageIsLoading: boolean;
+		/** Where to save bounding boxes & from which file to create new Image/Sound objects */
+		fileId: string;
+		/** Image source */
+		imageSrc: string | undefined;
+		fit: 'contain' | 'cover' | 'fill';
+		/** Lock zoom along one axis, and along the other axis when doing ctrl+zoom */
+		zoomlock?: 'x' | 'y';
+		/** Extra content. Position elements in absolute, with percent values for top/left/bottom/right */
+		extraMarks: Snippet;
+		/** Invert colors for the subject image */
+		invertColors?: boolean;
+		/** Bindable, read-only. Current position of cursor in normalized values. Null if cursor is not hovering over the area */
+		cursor?: null | { x: number; y: number };
 	}
 
-	let { imageIsLoading = $bindable(true), selectedBox, showConfirmedOverlay }: Props = $props();
+	let {
+		imageIsLoading = $bindable(true),
+		selectedBox,
+		showConfirmedOverlay,
+		fileId,
+		imageSrc,
+		fit: subjectFitMode,
+		zoomlock: defaultZoomlock,
+		extraMarks,
+		invertColors,
+		cursor = $bindable(null),
+	}: Props = $props();
 
-	const fileId = $derived(page.params.image);
-	const imageSrc = $derived(uiState.getPreviewURL(fileId));
+	let zoomlock = $derived(defaultZoomlock);
+
+	$effect(() => {
+		if (zoomlock) zoom.lock(zoomlock);
+		return () => zoom.releaseLock();
+	});
+
 	const boundingBoxes = $derived(getBoundingBoxes());
 	const focusedImageId = $derived(focusedImage()?.id);
 	const hidingAll = $derived(getHideAll());
@@ -47,6 +75,7 @@
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
 	class="crop-surface"
+	style:--crop-surface-fit={subjectFitMode}
 	{@attach (node) => {
 		new Gestures(node, {
 			// TODO: disabled cuz it triggers when grabbing a cropbox to move it around
@@ -101,37 +130,45 @@
 		event.preventDefault();
 		if (!imageElement) return;
 
+		if (defaultZoomlock) {
+			// FIXME: switch zoomlocks is weird
+			// surely because zoom.scale needs to be separated into .x and .y
+			// try to do a Adobe Audition-like zoom
+			zoomlock = event.ctrlKey
+				? switchValue(defaultZoomlock, { x: 'y', y: 'x' })
+				: defaultZoomlock;
+
+			zoom.lock(zoomlock);
+		}
+
 		zoom.update(imageElement, { via: 'wheel', event });
 	}}
 >
-	<div class="behind-image">
-		{#if imageIsLoading}
-			<LoadingSpinner --size="2em" />
-			<p class="loading">Chargement de l'image…</p>
-		{:else}
-			<p class="coucou" aria-hidden="true">
-				coucou toi :)
-				<br />
-				passes une bonne journée ! 💖💖
-			</p>
-		{/if}
-	</div>
 	<img
 		pw-testid="crop-subject-image"
 		src={imageSrc}
 		alt=""
 		bind:this={imageElement}
-		style:scale={zoom.scale}
-		style:translate="{zoom.origin.x}px {zoom.origin.y}px"
+		style:transform={zoom.cssTransforms()}
+		style:filter={invertColors ? 'invert(1)' : undefined}
 		onload={() => {
 			imageIsLoading = false;
 		}}
 	/>
 	{#if imageElement && fileId && !imageIsLoading}
+		<ZoomableMarks
+			// inert
+			source={imageElement}
+			{zoom}
+			fit={subjectFitMode}
+			children={extraMarks}
+		/>
+
 		<DraggableBoundingBox
 			{...activeTool()}
 			{imageElement}
 			{zoom}
+			{subjectFitMode}
 			imageFileID={fileId}
 			boundingBoxes={mapValues(
 				hidingAll
@@ -167,7 +204,7 @@
 
 <style>
 	.crop-surface {
-		overflow: hidden;
+		overflow: clip;
 		position: relative;
 		user-select: none;
 		touch-action: none;
@@ -175,32 +212,9 @@
 		height: 100%;
 	}
 
-	.behind-image {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-	}
-
-	.behind-image .loading {
-		margin-top: 1em;
-		font-size: 1.2em;
-	}
-
-	.behind-image .coucou {
-		text-align: center;
-		font-size: 0.9em;
-		color: var(--fg-primary);
-	}
-
 	img {
 		width: 100%;
 		height: 100%;
-		object-fit: contain;
+		object-fit: var(--crop-surface-fit, contain);
 	}
 </style>

@@ -1,15 +1,12 @@
 import type { BinaryStorageLocator } from './types.js';
-import type { Tables } from '$lib/database.js';
+import type { BINARY_CONTENT_TABLES, Tables } from '$lib/database.js';
 import type { DatabaseHandle, IDBDatabaseType } from '$lib/idb.svelte.js';
 
-import { pick } from '$lib/utils.js';
+import { pick, replaceLastExtensionOfFilename } from '$lib/utils.js';
 
 import { binaryStorage } from './index.js';
 
-type BinaryTableName = Exclude<
-	BinaryStorageLocator['area'],
-	`.pending_captures${'' | `/${string}`}`
->;
+type BinaryTableName = (typeof BINARY_CONTENT_TABLES)[number];
 
 /**
  * Get the size in bytes of the given database object
@@ -38,7 +35,34 @@ export async function byteSizeOfObject<Table extends BinaryTableName>(
 type CreateBytesObjectFields<Table extends BinaryTableName> = Pick<
 	IDBDatabaseType[Table]['value'],
 	'filename' | 'sessionId'
->;
+> & { images?: { full?: Blob; preview?: Blob } };
+
+export function locateFileOfObject<Table extends BinaryTableName>(
+	table: Table,
+	object: CreateBytesObjectFields<Table>
+) {
+	return {
+		area: table,
+		sessionId: 'sessionId' in object ? object.sessionId : undefined,
+		name: object.filename,
+	};
+}
+
+export function locateImagesOfObject(base: BinaryStorageLocator): {
+	full: BinaryStorageLocator;
+	preview: BinaryStorageLocator;
+} {
+	const transform = (area: BinaryStorageLocator['area']) => ({
+		...base,
+		area,
+		name: replaceLastExtensionOfFilename(base.name, '.png'),
+	});
+
+	return {
+		full: transform('.audio_spectrograms/full'),
+		preview: transform('.audio_spectrograms/preview'),
+	};
+}
 
 /**
  * Stores bytes in binary storage for a to-be-created database object
@@ -65,17 +89,31 @@ export async function createBytes<Table extends BinaryTableName>(
 		type: string;
 	}
 ): Promise<CreateBytesObjectFields<Table> & { bytes: 'migrated'; size: number }> {
-	const locator = {
-		area: table,
-		sessionId: 'sessionId' in input ? input.sessionId : undefined,
-		name: input.filename,
-	};
+	const locator = locateFileOfObject(table, input);
 
 	const size = input.bytes.byteLength;
 
 	console.debug('createBytes', table, input, 'at:', await binaryStorage.resolvePath(locator));
 
 	const written = await binaryStorage.create(locator, pick(input, 'type', 'bytes'));
+
+	// Important: we use BinaryStorage.write and NOT .create to ensure
+	// that the image's filename corresponds to the written filename for the object's main file
+	// otherwise it's impossible to retrieve the image file later on with just the object's data
+
+	if (input.images?.full) {
+		await binaryStorage.write(locateImagesOfObject(written).full, {
+			type: input.images.full.type as `image/${string}`,
+			bytes: await input.images.full.arrayBuffer(),
+		});
+	}
+
+	if (input.images?.preview) {
+		await binaryStorage.write(locateImagesOfObject(written).preview, {
+			type: input.images.preview.type as `image/${string}`,
+			bytes: await input.images.preview.arrayBuffer(),
+		});
+	}
 
 	return {
 		...input,
@@ -108,11 +146,7 @@ export async function storeBytes<Table extends BinaryTableName>(
 	content: ArrayBuffer
 ): Promise<'migrated'> {
 	await binaryStorage.write(
-		{
-			area: table,
-			sessionId: 'sessionId' in object ? object.sessionId : undefined,
-			name: object.filename,
-		},
+		locateFileOfObject(table, object),
 		new File([content], object.filename, {
 			type: object.contentType,
 		})
@@ -133,15 +167,20 @@ export async function accessBytes<Table extends BinaryTableName>(
 		return object.bytes;
 	}
 
-	const locator = {
-		area: table,
-		sessionId: 'sessionId' in object ? object.sessionId : undefined,
-		name: object.filename,
-	};
+	const locator = locateFileOfObject(table, object);
 
 	console.debug(`accessBytes ${table}`, object, 'at:', await binaryStorage.resolvePath(locator));
 
 	return binaryStorage.bytes(locator);
+}
+
+export async function accessImages(
+	table: 'AudioFile',
+	object: Pick<(typeof Tables.AudioFile)['inferIn' | 'inferOut'], 'sessionId' | 'filename'>,
+	size: 'preview' | 'full'
+) {
+	const locator = locateImagesOfObject(locateFileOfObject(table, object));
+	return binaryStorage.bytes(locator[size]);
 }
 
 /**
@@ -162,11 +201,7 @@ export async function* streamBytes<Table extends (typeof BINARY_CONTENT_TABLES)[
 		return;
 	}
 
-	const locator = {
-		area: table,
-		sessionId: 'sessionId' in object ? object.sessionId : undefined,
-		name: object.filename,
-	};
+	const locator = locateFileOfObject(table, object);
 
 	console.debug(`streamBytes ${table}`, object, 'at:', await binaryStorage.resolvePath(locator));
 
@@ -181,16 +216,18 @@ export async function deleteObjectWithBytes<Table extends BinaryTableName>(
 	const object = await db.get(table, id);
 	if (!object) return;
 
-	const locator = {
-		area: table,
-		sessionId: 'sessionId' in object ? object.sessionId : undefined,
-		name: object.filename,
-	};
+	const locator = locateFileOfObject(table, object);
 
 	console.debug(`deleteBytes ${table}`, object, 'at:', await binaryStorage.resolvePath(locator));
 
 	await binaryStorage.delete(locator);
 	await db.delete(table, id);
+
+	if (table === 'AudioFile') {
+		const { full, preview } = locateImagesOfObject(locator);
+		await binaryStorage.delete(full).catch(() => {});
+		await binaryStorage.delete(preview).catch(() => {});
+	}
 }
 
 /**

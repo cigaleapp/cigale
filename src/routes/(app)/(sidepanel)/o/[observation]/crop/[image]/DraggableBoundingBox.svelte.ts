@@ -6,41 +6,68 @@ import { type } from 'arktype';
 import { clamp, sign } from '$lib/utils.js';
 
 /**
- * Calculate bounding rect for an image element that has object-fit: contain. The boundingClientRect is not the same as the actual, displayed image. We use both natural{Width,Height} and client{Width,Height} to calculate the displayed image size.
+ * Calculate bounding rect for an image element that has object-fit: <mode>. The boundingClientRect is not the same as the actual, displayed image. We use both natural{Width,Height} and client{Width,Height} to calculate the displayed image size.
  * You can also provide the zoom state to take it into account.
  */
 export function fittedImageRect(
+	mode: 'contain' | 'cover' | 'fill',
 	{
-		naturalWidth,
-		naturalHeight,
 		clientWidth,
 		clientHeight,
 		clientTop,
 		clientLeft,
-	}: Pick<
-		HTMLImageElement,
-		`${'natural' | 'client'}${'Width' | 'Height'}` | `client${'Top' | 'Left'}`
-	>,
+		naturalWidth = clientWidth,
+		naturalHeight = clientHeight,
+	}: {
+		clientWidth: number;
+		clientHeight: number;
+		clientTop: number;
+		clientLeft: number;
+		naturalWidth?: number;
+		naturalHeight?: number;
+	},
 	zoom: Zoom | undefined
 ) {
 	const naturalRatio = naturalWidth / naturalHeight;
 	const clientRatio = clientWidth / clientHeight;
 
-	let [width, height] =
-		naturalRatio < clientRatio
-			? [clientHeight * naturalRatio, clientHeight]
-			: [clientWidth, clientWidth / naturalRatio];
+	// Size of the displayed image before zoom
+	let width: number;
+	let height: number;
 
-	if (zoom) {
-		width *= zoom.scale;
-		height *= zoom.scale;
+	switch (mode) {
+		case 'contain':
+			[width, height] =
+				naturalRatio < clientRatio
+					? [clientHeight * naturalRatio, clientHeight]
+					: [clientWidth, clientWidth / naturalRatio];
+			break;
+		case 'cover':
+			[width, height] =
+				naturalRatio > clientRatio
+					? [clientHeight * naturalRatio, clientHeight]
+					: [clientWidth, clientWidth / naturalRatio];
+			break;
+		case 'fill':
+			[width, height] = [clientWidth, clientHeight];
+			break;
 	}
+
+	// An axis that is locked has no scale or translate applied (see Zoom.cssTransforms)
+	const scaleX = zoom && zoom.zoomlock !== 'x' ? zoom.scale : 1;
+	const scaleY = zoom && zoom.zoomlock !== 'y' ? zoom.scale : 1;
+	const originX = zoom && zoom.zoomlock !== 'x' ? zoom.origin.x : 0;
+	const originY = zoom && zoom.zoomlock !== 'y' ? zoom.origin.y : 0;
+
+	width *= scaleX;
+	height *= scaleY;
 
 	return {
 		width,
 		height,
-		x: (zoom?.origin.x ?? 0) + clientLeft + (clientWidth - width) / 2,
-		y: (zoom?.origin.y ?? 0) + clientTop + (clientHeight - height) / 2,
+		// The css transform is `scale() translate()`, so the translation is itself scaled
+		x: clientLeft + (clientWidth - width) / 2 + originX * scaleX,
+		y: clientTop + (clientHeight - height) / 2 + originY * scaleY,
 	};
 }
 
