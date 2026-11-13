@@ -20,7 +20,12 @@ export interface WaveformSvgOptions {
 export async function renderWaveformSvg(
 	{ samples }: DecodedAudioMono,
 	options: WaveformSvgOptions = {}
-): Promise<string> {
+): Promise<{
+	image: string;
+	info: {
+		amplitude: { loudest: number; scale: number };
+	};
+}> {
 	if (samples.length === 0) throw new Error('Audio contains no samples');
 
 	const columns = Math.max(1, options.columns ?? 1000);
@@ -75,5 +80,10 @@ export async function renderWaveformSvg(
 		`<path d="${d}" fill="${color}" stroke="${color}" stroke-width="1" ` +
 		`vector-effect="non-scaling-stroke"/></svg>`;
 
-	return svg;
+	return {
+		image: svg,
+		info: {
+			amplitude: { loudest, scale },
+		},
+	};
 }

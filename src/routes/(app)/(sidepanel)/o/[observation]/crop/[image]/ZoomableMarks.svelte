@@ -14,12 +14,10 @@
 		/** Bindable, read-only. Current position of cursor in normalized values. Null if cursor is not hovering over the area */
 		cursor?: null | { x: number; y: number };
 		/** Set pointer-events: none */
-		inert?:boolean
+		inert?: boolean;
 	}
 
-	let { source, fit, zoom, children , inert=false, cursor = $bindable(null) }: Props = $props();
-
-	$inspect('cart', cursor?.x, cursor?.y);
+	let { source, fit, zoom, children, inert = false, cursor = $bindable(null) }: Props = $props();
 
 	const sourceRect = $derived(fittedImageRect(fit, source, zoom));
 </script>
