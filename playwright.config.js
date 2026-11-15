@@ -124,7 +124,7 @@ export default defineConfig({
 		baseURL: dependsOnTarget({
 			live: process.env.BASE_URL,
 			dev: 'http://localhost:5173',
-			built: 'http://localhost:4173',
+			built: 'http://127.0.0.1:4173',
 		}),
 
 		// See https://github.com/microsoft/playwright/issues/16357
@@ -165,7 +165,7 @@ export default defineConfig({
 			reuseExistingServer: true,
 		},
 		built: {
-			command: 'bun run preview',
+			command: 'node node_modules/vite/bin/vite.js preview --host 127.0.0.1',
 			port: 4173,
 			reuseExistingServer: false,
 		},

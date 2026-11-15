@@ -107,7 +107,6 @@
 		"all-contributors-cli": "^6.26.1",
 		"arkenv": "^0.12.3",
 		"braces": "^3.0.3",
-		"bun": "^1.4.2",
 		"discord.js": "^14.27.0",
 		"electron": "^44.5.1",
 		"embla-carousel": "^8.6.0",

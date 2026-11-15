@@ -2,7 +2,6 @@
 
 import { Capacitor } from '@capacitor/core';
 import { ms } from 'convert';
-import fetchProgress from 'fetch-progress';
 import JSONC from 'tiny-jsonc';
 import YAML from 'yaml';
 
@@ -663,6 +662,41 @@ if (import.meta.vitest) {
 	});
 }
 
+/**
+ * Wrap a Response body to report download progress, unlike the `fetch-progress`
+ * package whose error handler swallows read errors (including aborts), leaving
+ * the wrapped stream hanging forever and stalling `res.text()`.
+ */
+function withProgress(
+	response: Response,
+	onProgress: (progress: { total: number; transferred: number }) => void
+): Response {
+	const total = Number(response.headers.get('content-length')) || 0;
+	const reader = response.body!.getReader();
+	let transferred = 0;
+
+	const stream = new ReadableStream({
+		async start(controller) {
+			try {
+				for (;;) {
+					const { done, value } = await reader.read();
+					if (done) break;
+					if (value) {
+						transferred += value.byteLength;
+						onProgress({ total, transferred });
+						controller.enqueue(value);
+					}
+				}
+				controller.close();
+			} catch (error) {
+				controller.error(error);
+			}
+		},
+	});
+
+	return new Response(stream, { headers: response.headers, status: response.status });
+}
+
 export async function fetchHttpRequest(
 	request:
 		| string
@@ -681,7 +715,7 @@ export async function fetchHttpRequest(
 		cachebust: enableCachebusting = false,
 	}: {
 		cacheAs?: '' | 'model';
-		onProgress?: NonNullable<Parameters<typeof fetchProgress>[0]>['onProgress'];
+		onProgress?: (progress: { total: number; transferred: number }) => void;
 		signal?: AbortSignal;
 		headers?: Record<string, string>;
 		cachebust?: boolean;
@@ -705,7 +739,7 @@ export async function fetchHttpRequest(
 		options.headers = { ...headers, ...(options.headers as Record<string, string>) };
 	}
 
-	if (onProgress) return fetch(url, options).then(fetchProgress({ onProgress }));
+	if (onProgress) return fetch(url, options).then((res) => withProgress(res, onProgress));
 
 	return fetch(url, options);
 }

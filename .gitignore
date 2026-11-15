@@ -84,3 +84,7 @@ static/.well-known/assetlinks.json
 ecosignal/
 /static/registry.json
 /src/lib/registry.json
+/android/.idea/appInsightsSettings.xml
+/android/.idea/deploymentTargetSelector.xml
+/android/.kotlin/sessions
+/android/.idea/androidTestResultsUserPreferences.xml
