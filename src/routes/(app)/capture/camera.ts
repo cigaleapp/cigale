@@ -108,16 +108,12 @@ export async function capture(camera: CameraState, storage: PendingStorage) {
 		return;
 	}
 
-	void storage
-		.save(output)
-		.then(async (name) => {
-			// oxlint-disable-next-line promise/no-callback-in-promise
-			await Promise.all(camera.listeners.onsaved.map(async (cb) => cb(name)));
-		})
-		.catch(async () => {
-			// oxlint-disable-next-line promise/no-callback-in-promise
-			await Promise.all(camera.listeners.onsaved.map(async (cb) => cb(undefined)));
-		});
+	const notifyCallbacks = (state: 'ok' | 'fail') => async (value: string | undefined) =>
+		await Promise.all(
+			camera.listeners.onsaved.map(async (cb) => cb(state === 'ok' ? value : undefined))
+		);
+
+	void storage.savePhoto(output).then(notifyCallbacks('ok')).catch(notifyCallbacks('fail'));
 }
 
 export async function waitForCapture(camera: CameraState): Promise<{ name: string }> {

@@ -10,6 +10,8 @@
 
 	import '@layflags/rolling-number';
 
+	import type { MicrophoneState } from './microphone.js';
+
 	import IconSwitchCameraSides from '~icons/ri/camera-switch-line';
 	import IconFinish from '~icons/ri/check-line';
 	import IconQuit from '~icons/ri/close-large-line';
@@ -37,13 +39,14 @@
 	import ModalConfirm from '$lib/ModalConfirm.svelte';
 	import { goto } from '$lib/paths.js';
 	import { isMetadataInProtocol } from '$lib/schemas/protocols.js';
+	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
 	import { getSettings, toggleSetting } from '$lib/settings.svelte.js';
 	import { sfx } from '$lib/sound.js';
 	import { toasts } from '$lib/toasts.svelte.js';
 	import { uiState } from '$lib/uistate.svelte.js';
 	import { afterDelay, cycleValues, orEmpty, switchValue } from '$lib/utils.js';
+	import ModalSubmitIssue from '$routes/(app)/ModalSubmitIssue.svelte';
 
-	import ModalSubmitIssue from '../ModalSubmitIssue.svelte';
 	import {
 		cameraStarted,
 		capture,
@@ -51,10 +54,14 @@
 		startCamera,
 		waitForCapture,
 	} from './camera.js';
+	import { startMicrophone } from './microphone.js';
 	import { PendingStorage } from './pendingstorage.svelte.js';
 	import { displayTimerConfig, Timer } from './timers.svelte.js';
 
 	let submitBugReport = $state<() => void>();
+
+	// TODO: default to whatever the protocol defines
+	let captureType = $state<'sound' | 'photo'>('sound');
 
 	type ShootingPhase =
 		'inert' | 'before-timer' | 'wait-start-timer' | 'timer-running' | 'after-timer' | 'done';
@@ -136,8 +143,17 @@
 		},
 	});
 
-	const ready = $derived(camera.ready);
-	const failure = $derived(camera.failure);
+	let microphone = $state<MicrophoneState>({
+		ready: false,
+		recording: false,
+		failure: '',
+		listeners: {
+			onsaved: [],
+		},
+	});
+
+	const ready = $derived(camera.ready || microphone.ready);
+	const failure = $derived(camera.failure || microphone.failure);
 
 	// The entire page needs to be transparent so that the native preview
 	// (that isn't within the DOM) can be seen through the UI
@@ -157,7 +173,12 @@
 	});
 
 	$effect(() => {
-		if (ready) console.debug('Camera is ready');
+		if (captureType !== 'sound') return;
+		void startMicrophone(microphone);
+	});
+
+	$effect(() => {
+		if (ready) console.debug('Capture device is ready');
 	});
 
 	$effect(() => {
@@ -170,6 +191,7 @@
 
 	$effect(() => {
 		App.addListener('resume', async () => {
+			if (captureType !== 'photo') return;
 			console.debug('Resuming camera');
 			if (await cameraStarted(true)) await CameraPreview.stop();
 			const webPreview = document.getElementById('preview');
@@ -560,8 +582,20 @@
 						>
 					{/each}
 				</div>
-			{:else if uiState.currentSession}
-				<div class="info">{uiState.currentSession.name}</div>
+			{:else}
+				<div class="modes">
+					<SegmentedGroup
+						bind:current={captureType}
+						options={['photo', 'sound'] as const}
+					>
+						{#snippet option_photo()}
+							Photo
+						{/snippet}
+						{#snippet option_sound()}
+							Son
+						{/snippet}
+					</SegmentedGroup>
+				</div>
 			{/if}
 		</section>
 		<section class="quit">
@@ -575,21 +609,25 @@
 		<LoadingScreen {failure} loading={!ready} />
 	</div>
 
-	<!-- https://github.com/capacitor-community/camera-preview#extra-web-installation-steps -->
-	<div
-		id="viewport"
-		{@attach (parent) => {
-			void startCamera(parent, camera);
+	{#if captureType === 'photo'}
+		<!-- https://github.com/capacitor-community/camera-preview#extra-web-installation-steps -->
+		<div
+			id="viewport"
+			{@attach (parent) => {
+				void startCamera(parent, camera);
 
-			return () => {
-				(async () => {
-					if (await cameraStarted(true)) {
-						await CameraPreview.stop();
-					}
-				})();
-			};
-		}}
-	></div>
+				return () => {
+					(async () => {
+						if (await cameraStarted(true)) {
+							await CameraPreview.stop();
+						}
+					})();
+				};
+			}}
+		></div>
+	{:else}
+		<!-- TODO: realtime audio level meter + waveform (or just coarse graph of amplitude history)? -->
+	{/if}
 
 	<section class="floating-messages" pw-testid="floating-messages">
 		{#if floatingMessage}

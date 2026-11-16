@@ -1,6 +1,6 @@
 import type { BinaryStorageBackend, BinaryStorageLocator } from './types.js';
-import * as mediabunny from 'mediabunny';
 
+import * as mediabunny from 'mediabunny';
 import { nanoid } from 'nanoid';
 
 import { Channel } from '$lib/iterables.js';
@@ -70,14 +70,16 @@ export async function OPFSBackend(): Promise<BinaryStorageBackend<'opfs'>> {
 			const [directory, name] = await walk(locator);
 			await directory.removeEntry(name);
 		},
-		async *list(locator) {
-			const [parent, name] = await walk(locator);
-			const directory = await parent.getDirectoryHandle(name).catch(() => undefined);
+		async *list(...locators) {
+			for (const locator of locators) {
+				const [parent, name] = await walk(locator);
+				const directory = await parent.getDirectoryHandle(name).catch(() => undefined);
 
-			if (!directory) return;
+				if (!directory) return;
 
-			for await (const name of directory.keys()) {
-				yield { ...locator, name };
+				for await (const name of directory.keys()) {
+					yield { ...locator, name };
+				}
 			}
 		},
 		async read(locator) {
@@ -103,7 +105,7 @@ export async function OPFSBackend(): Promise<BinaryStorageBackend<'opfs'>> {
 				.getFileHandle(name)
 				.then((handle) => handle.createSyncAccessHandle());
 
-			if (!handle) throw new Error(`Couldn't create sync access handle for ${name}`)
+			if (!handle) throw new Error(`Couldn't create sync access handle for ${name}`);
 
 			return new mediabunny.CustomSource({
 				getSize() {
@@ -115,8 +117,8 @@ export async function OPFSBackend(): Promise<BinaryStorageBackend<'opfs'>> {
 					return bytes;
 				},
 				dispose() {
-					handle.close()
-				}
+					handle.close();
+				},
 			});
 		},
 		async bytes(locator) {

@@ -108,8 +108,8 @@
 		const box = boundingBoxes.at(0);
 		if (!box) return audiofile.dimensions.duration;
 		const domains = spectrogramBoundingBoxDomains(audiofile.spectrogram);
-		const { x } = coordsFitter(domains.timeFrequency)(box);
-		return x;
+		const { width } = coordsFitter(domains.timeFrequency)(box);
+		return width;
 	});
 
 	$inspect('cardmedia', title, 'aud', audiofile, 'd', duration);

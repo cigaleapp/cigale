@@ -135,14 +135,16 @@ export async function CapacitorFilesystemBackend(): Promise<BinaryStorageBackend
 				.then(({ files }) => files.length)
 				.catch(() => 0);
 		},
-		async *list(locator) {
-			const { files } = await Filesystem.readdir({
-				directory: root,
-				path: locatorToPath(locator),
-			}).catch(() => ({ files: [] }));
+		async *list(...locators) {
+			for (const locator of locators) {
+				const { files } = await Filesystem.readdir({
+					directory: root,
+					path: locatorToPath(locator),
+				}).catch(() => ({ files: [] }));
 
-			for (const file of files) {
-				yield { ...locator, name: file.name };
+				for (const file of files) {
+					yield { ...locator, name: file.name };
+				}
 			}
 		},
 		async clear(locator) {

@@ -23,7 +23,7 @@
 	async function load() {
 		if (!uiState.currentSession) return goto('/(app)/sessions');
 		storage = await PendingStorage.open(uiState.currentSession.id);
-		files = await Array.fromAsync(storage.files());
+		files = await Array.fromAsync(storage.photoFiles());
 	}
 
 	const windowDimensions = $state<{ height: number; width: number }>({ height: 0, width: 0 });

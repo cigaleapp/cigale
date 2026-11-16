@@ -35,7 +35,7 @@ export interface BinaryStorageBackend<Name extends BinaryStorageName = BinarySto
 		bytes: ArrayBuffer;
 	}>;
 
-	list(locator: BinaryStorageLocator<''>): AsyncIterable<BinaryStorageLocator>;
+	list(...locators: BinaryStorageLocator<''>[]): AsyncIterable<BinaryStorageLocator>;
 	/**
 	 *
 	 * @param locator where to write the file
