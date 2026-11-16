@@ -543,6 +543,7 @@ const protocol = {
 							ram: '4 GB',
 						},
 						input: {
+							type: "image",
 							height: 224,
 							width: 224,
 							disposition: 'CHW',
@@ -556,12 +557,29 @@ const protocol = {
 							ram: '2 GB',
 						},
 						input: {
+							type: "image",
 							height: 224,
 							width: 224,
 							disposition: 'CHW',
 							normalized: true,
 						},
 					},
+					{
+						name: "BirdNet+ v3.0 preview-3.1",
+						model: "https://zenodo.org/records/20703646/files/BirdNET+_V3.0-preview3.1_Global_11K_FP16.onnx?download=1",
+						requirements: {
+							ram : "2 GB"
+						},
+						input: {
+							type: "audio",
+							batched: true,
+							channels: "mono",
+							normalized: true,
+							precision: "float16",
+							samplerate: "32 kHz",
+
+						}
+					}
 				],
 			},
 		},

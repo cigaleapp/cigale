@@ -1,9 +1,8 @@
 import { type } from 'arktype';
-import { ms } from 'convert';
 import { differenceInMilliseconds, isWithinInterval, setHours, setMinutes } from 'date-fns';
 
-import { clamp, cleanFilepath, safeJSONStringify } from '../utils.js';
-import { TemplatedString } from './expressions.js';
+import { clamp, safeJSONStringify } from '../utils.js';
+import { NumberWithUnitLiteral } from './units.js';
 
 export const ID = type(/^[\w._-]+$/);
 
@@ -152,9 +151,9 @@ export const SingleEntryRecord = (k, v) =>
 		return { key: k.assert(key), value: v.assert(value) };
 	});
 
-export const MillisecondsLiteral = type('/^\\d+(\\.\\d+)?(?<unit>ms|s|min|h)$/').pipe((literal) =>
-	ms(literal)
-);
+export const MillisecondsLiteral = NumberWithUnitLiteral('ms', ['ms', 's', 'min', 'h'], {
+	allowMultiple: true,
+});
 
 export const HourRange = type('/^\\d{2}:\\d{2}-\\d{2}:\\d{2}$/').pipe((literal) => {
 	const [start, end] = literal.split('-');

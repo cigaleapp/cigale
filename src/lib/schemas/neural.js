@@ -4,6 +4,7 @@ import { entries } from '../utils.js';
 import { HTTPRequest, ID } from './common.js';
 import { HardwareRequirements } from './constraints.js';
 import { JsonataExpression } from './expressions.js';
+import { NumberWithUnitLiteral } from './units.js';
 
 export const MODEL_DETECTION_OUTPUT_SHAPES = {
 	cx: { help: 'Centre, X' },
@@ -26,9 +27,26 @@ export const ModelDetectionOutputShape = type.or(
 
 export const ModelDetectionOutputShapes = ModelDetectionOutputShape.array();
 
-export const ModelInput = type({
+export const ModelInputAudio = type({
+	type: '"audio"',
+	samplerate: NumberWithUnitLiteral('Hz', ['Hz', 'kHz']),
+	/** Supports sending multiple tensors at once via a batch size */
+	batched: 'boolean',
+	channels: type.enumerated('mono'),
+	precision: type.enumerated('float32', 'float16'),
+	normalized: [
+		'boolean',
+		'@',
+		'Si les valeurs des samples (amplitudes) doivent être normalisées entre 0 et 1.',
+	],
+});
+
+export const ModelInputImage = type({
+	'type?': '"image"',
 	width: ['number < 1024', '@', "Largeur en pixels du tenseur d'entrée du modèle"],
 	height: ['number < 1024', '@', "Hauteur en pixels du tenseur d'entrée du modèle"],
+	// TODO: switch to a "batched" boolean instead of disposition
+	// and keep disposition for REAL disposition differences (interlaced for example)
 	'disposition?': type(['"CHW"', '@', 'Tenseurs de la forme [3, H, W]']).or(
 		type(['"1CHW"', '@', 'Tenseurs de la forme [1, 3, H, W]'])
 	),
@@ -37,6 +55,9 @@ export const ModelInput = type({
 		'@',
 		'Si les valeurs des pixels doivent être normalisées entre 0 et 1. Sinon, elles sont entre 0 et 255',
 	],
+});
+
+export const ModelInput = type.or(ModelInputAudio, ModelInputImage).and({
 	'name?': [
 		'string',
 		'@',
