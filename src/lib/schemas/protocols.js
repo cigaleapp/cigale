@@ -6,13 +6,13 @@ import {
 	HourRange,
 	HTTPRequest,
 	ID,
+	MediaKind,
 	MillisecondsLiteral,
 	MIMEType,
 	NamespacedMetadataID,
 	ProtocolID,
 	SingleEntryRecord,
 	URLString,
-	MediaKind,
 } from './common.js';
 import { DarwinCoreProtocolConfig } from './darwincore.js';
 import { FilepathTemplate, TemplatedString } from './expressions.js';
@@ -116,9 +116,16 @@ export const CaptureTimersMessageTemplate = TemplatedString(
 
 export const CaptureTimer = type({
 	name: 'string = ""',
+	for: type
+		.enumerated('photo', 'sound')
+		.array()
+		.default(() => ['photo', 'sound']),
 	shoot: type.enumerated('manually', 'on-timer').default('manually'),
 	'every?': MillisecondsLiteral.describe('Répéter le timer tout les ...'),
 	'count?': type('number.integer').describe('Répéter le timer n fois'),
+	'duration?': MillisecondsLiteral.describe(
+		"Durée d'enregistrement (pour l'audio ou les vidéos) dans un tour de timer"
+	),
 	'during?': MillisecondsLiteral,
 	'within?': HourRange.describe(
 		"Contraindre le démarrage et l'arrêt du timer à une plage horaire"

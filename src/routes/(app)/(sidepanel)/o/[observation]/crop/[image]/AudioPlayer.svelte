@@ -35,7 +35,7 @@
 	function formatDuration(ms: number): `${string}:${string}` {
 		if (!Number.isFinite(ms) || Number.isNaN(ms)) return '--:--';
 
-		const mins = (ms * 1e-3) / 60;
+		const mins = Math.floor((ms * 1e-3) / 60);
 		const secs = (ms * 1e-3) % 60;
 
 		const amt = (v: number) => v.toFixed(0).toString().padStart(2, '0');

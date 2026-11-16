@@ -243,7 +243,7 @@ const PALETTES = {
 export function paletteSVGFilter(theme: keyof typeof PALETTES) {
 	const stops = PALETTES[theme];
 	const channel = (i: number) => stops.map((s) => (s[i] / 255).toFixed(4)).join(' ');
-	const alpha = () => stops.map((_, i) => (i <= 1 ? 0 : 1)).join(' ');
+	const alpha = () => stops.map((_, i) => (i === 0 ? 0 : 1)).join(' ');
 
 	return `
 		<svg width="0" height="0" style="position:absolute" aria-hidden="true">

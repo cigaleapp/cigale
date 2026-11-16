@@ -54,7 +54,7 @@
 		startCamera,
 		waitForCapture,
 	} from './camera.js';
-	import { startMicrophone } from './microphone.js';
+	import { record, startMicrophone } from './microphone.js';
 	import { PendingStorage } from './pendingstorage.svelte.js';
 	import { displayTimerConfig, Timer } from './timers.svelte.js';
 
@@ -67,6 +67,8 @@
 		'inert' | 'before-timer' | 'wait-start-timer' | 'timer-running' | 'after-timer' | 'done';
 
 	let shootingPhase = $state<ShootingPhase>('inert');
+
+	let recording = $state<undefined | { finish: () => Promise<void> }>();
 
 	$effect(() => {
 		if (!uiState.currentSession) return;
@@ -241,6 +243,10 @@
 			.filter((m) => m.infer && 'capture' in m.infer && m.infer.capture === selector);
 
 		async function askForPics() {
+			const actualType = structuredClone(captureType);
+
+			captureType = 'photo';
+
 			// Gather all file-type metadata with before-timer capture inference
 			const picsToTake = beforeTimerInferences
 				.filter((m) => m.type === 'file')
@@ -257,6 +263,8 @@
 			await pendingStorage?.unfreezeCount();
 
 			clearFloatingMessage();
+
+			captureType = actualType;
 		}
 
 		if (selector === 'before-timer') await askForPics();
@@ -301,7 +309,11 @@
 		if (selector === 'after-timer') await askForPics();
 	}
 
-	const timers = $derived(uiState.currentProtocol?.capture?.timers ?? []);
+	const timers = $derived(
+		uiState.currentProtocol?.capture?.timers?.filter((timer) =>
+			timer.for.includes(captureType)
+		) ?? []
+	);
 
 	const timerIndex = $derived(uiState.currentSession?.captureModeSelectedTimerIndex);
 
@@ -348,7 +360,19 @@
 	async function shoot() {
 		if (!pendingStorage) return;
 		if (!timer) {
-			await capture(camera, pendingStorage);
+			switch (captureType) {
+				case 'sound': {
+					if (recording) {
+						await recording.finish();
+					} else {
+						recording = await record(microphone, pendingStorage);
+					}
+				}
+				case 'photo': {
+					await capture(camera, pendingStorage);
+				}
+			}
+
 			return;
 		}
 
@@ -582,7 +606,7 @@
 						>
 					{/each}
 				</div>
-			{:else}
+			{:else if shootingPhase === 'inert'}
 				<div class="modes">
 					<SegmentedGroup
 						bind:current={captureType}

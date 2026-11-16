@@ -32,33 +32,31 @@ export async function record(
 	if (!microphone.ready) return;
 
 	await CapacitorAudioRecorder.startRecording({
-		audioSessionMode: AudioSessionMode.Measurement,
+		audioSessionMode: AudioSessionMode.Default,
 	});
+
 	microphone.recording = true;
 
-	const notifyCallbacks = (state: 'ok' | 'fail') => async (value: string | undefined) =>
-		await Promise.all(
-			microphone.listeners.onsaved.map(async (cb) => cb(state === 'ok' ? value : undefined))
-		);
+	const notifyCallbacks = async (value: string | undefined) =>
+		await Promise.all(microphone.listeners.onsaved.map(async (cb) => cb(value)));
 
 	return {
 		async finish() {
 			try {
-				const result = await CapacitorAudioRecorder.stopRecording().finally(() => {
-					microphone.recording = false;
-				});
+				const result = await CapacitorAudioRecorder.stopRecording();
 
 				const output = result.blob ?? result.uri;
 				if (!output) {
 					throw new Error("Impossible de terminer l'enregistrement");
 				}
 
-				await storage
-					.saveAudio(output)
-					.then(notifyCallbacks('ok'))
-					.catch(notifyCallbacks('fail'));
+				const name = await storage.saveAudio(output);
+
+				await notifyCallbacks(name);
 			} catch {
-				await notifyCallbacks('fail')(undefined);
+				await notifyCallbacks(undefined);
+			} finally {
+				microphone.recording = false;
 			}
 		},
 	};
@@ -72,10 +70,47 @@ export async function amplitude(microphone: MicrophoneState) {
 	return value;
 }
 
-export async function waitForRecordFinish(microphone: MicrophoneState) {
-	return new Promise((resolve, reject) => {
-		microphone.listeners.onsaved.push((name) =>
-			name ? resolve({ name }) : reject("Impossible de sauvegarder l'enregistrement")
-		);
-	});
+export class AmplitudeTracker {
+	/** in ms */
+	#pollrate = 100;
+	#historyLength = 5;
+	#interval: undefined | NodeJS.Timeout | number;
+	#history = [] as number[];
+
+	constructor(
+		private state: MicrophoneState,
+		options: {
+			/** in seconds */
+			length?: number;
+			/** in ms */
+			rate?: number;
+		}
+	) {
+		if (options.rate) this.#pollrate = options.rate;
+		if (options.length) this.#historyLength = options.length;
+	}
+
+	get historySamplesCount() {
+		return Math.ceil((this.#historyLength * 1e3) / this.#pollrate);
+	}
+
+	#record(sample: number) {
+		this.#history.splice(0, this.#history.length - this.historySamplesCount);
+		this.#history.push(sample);
+	}
+
+	start() {
+		this.#interval = setInterval(() => {
+			(async () => {
+				if (!this.state.ready) return;
+				const { value } = await CapacitorAudioRecorder.getCurrentAmplitude();
+				this.#record(value);
+			})();
+		}, this.#pollrate);
+	}
+
+	stop() {
+		if (!this.#interval) return;
+		clearTimeout(this.#interval);
+	}
 }
