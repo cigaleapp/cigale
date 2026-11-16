@@ -368,7 +368,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 		oldValue = observationMetadata({
 			observation: Tables.Observation.assert(observation),
 			definitions: [Tables.Metadata.assert(await db.get('Metadata', metadataId))],
-			images: await Promise.all(
+			medias: await Promise.all(
 				observation.images.map(async (img) =>
 					db.get('Image', img).then((i) => Tables.Image.assert(i))
 				)

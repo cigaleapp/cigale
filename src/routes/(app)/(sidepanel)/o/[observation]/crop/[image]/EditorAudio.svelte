@@ -1,8 +1,7 @@
 <script lang="ts" module>
-export const cursor = $state({
-	
-})
+	export const cursor = $state({});
 </script>
+
 <script lang="ts">
 	import type { SelectedBox } from './+page.svelte';
 	import type { DecodedAudioMono } from '$lib/audio/decode.js';
@@ -10,6 +9,7 @@ export const cursor = $state({
 
 	import { watch } from 'runed';
 
+	import AudioPlayer from '$lib/audio/AudioPlayer.svelte';
 	import { decodeToMono } from '$lib/audio/decode.js';
 	import { databaseHandle } from '$lib/idb.svelte.js';
 	import { IsMobile } from '$lib/mobile.svelte.js';
@@ -18,7 +18,6 @@ export const cursor = $state({
 	import { overrideStyle } from '$lib/utils.js';
 
 	import { zoom } from './+page.svelte';
-	import AudioPlayer from './AudioPlayer.svelte';
 	import { fittedImageRect } from './DraggableBoundingBox.svelte.js';
 	import { playhead } from './playhead.svelte.js';
 	import Ruler from './Ruler.svelte';
@@ -88,8 +87,6 @@ export const cursor = $state({
 
 	const mobile = new IsMobile();
 
-
-
 	const visibleDurationRange = $derived.by(() => {
 		if (!waveformWidthPx) return [0, file.dimensions.duration] as const;
 
@@ -145,7 +142,7 @@ export const cursor = $state({
 	</div>
 
 	<div class="bottom">
-		<AudioPlayer src={audioSrc} bind:loading={loading.audio} />
+		<AudioPlayer {playhead} src={audioSrc} bind:loading={loading.audio} />
 
 		<div class="infos">
 			<div class="cursor">

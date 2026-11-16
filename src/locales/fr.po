@@ -94,8 +94,6 @@ msgid "Aucun fichier d'analyse trouvé dans l'export {0}"
 msgstr "Aucun fichier d'analyse trouvé dans l'export {0}"
 
 #: src/lib/InputSelectProtocol.svelte
-#: src/lib/import.svelte.js
-#: src/lib/import.svelte.js
 msgid "Aucun protocole sélectionné"
 msgstr "Aucun protocole sélectionné"
 
@@ -269,11 +267,6 @@ msgstr "Erreur"
 #: src/routes/(app)/+layout.ts
 msgid "Erreur inattendue"
 msgstr "Erreur inattendue"
-
-#. 0: original.name
-#: src/lib/import.svelte.js
-msgid "Erreur lors de l'extraction des métadonnées EXIF pour {0}"
-msgstr "Erreur lors de l'extraction des métadonnées EXIF pour {0}"
 
 #. 0: e
 #. 0: error
@@ -839,13 +832,6 @@ msgstr[1] "# éléments"
 
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
-msgid "1 image"
-msgid_plural "# images"
-msgstr[0] "1 image"
-msgstr[1] "# images"
-
-#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
-#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 msgid "1 observation"
 msgid_plural "# observations"
 msgstr[0] "1 observation"
@@ -1249,15 +1235,6 @@ msgstr "Supprimer cette valeur"
 #: src/lib/MetadataInput.svelte
 msgid "Aucune session active. Impossible d'enregistrer le fichier."
 msgstr "Aucune session active. Impossible d'enregistrer le fichier."
-
-#: src/lib/import.svelte.js
-msgid "Aucun session active"
-msgstr "Aucun session active"
-
-#. 0: original.name
-#: src/lib/import.svelte.js
-msgid "Erreur lors du traitement du/des fichiers annexes associés à {0}"
-msgstr "Erreur lors du traitement du/des fichiers annexes associés à {0}"
 
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
@@ -1892,11 +1869,6 @@ msgstr "Aucun choix effectué pour le moment"
 msgid "Décrire l'observation"
 msgstr "Décrire l'observation"
 
-#. 0: original.name
-#: src/lib/import.svelte.js
-msgid "Erreur lors de l'extraction des métadonnées du fichier RAW {0}"
-msgstr "Erreur lors de l'extraction des métadonnées du fichier RAW {0}"
-
 #: src/lib/ModalPickProtocol.svelte
 msgid "Choisir un protocole pour la session"
 msgstr "Choisir un protocole pour la session"
@@ -2204,10 +2176,6 @@ msgstr "{0} · Session supprimée"
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 msgid "<0/> Appareil photo"
 msgstr "<0/> Appareil photo"
-
-#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
-msgid "<0/> Plus d'images"
-msgstr "<0/> Plus d'images"
 
 #: src/routes/(app)/capture/+page.svelte
 msgid "Voir la photo prise"
@@ -3429,3 +3397,22 @@ msgstr "<0/> Darwin Core"
 #: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
 msgid "Autoriser l'inférence via WebGPU"
 msgstr "Autoriser l'inférence via WebGPU"
+
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
+msgid "1 média"
+msgid_plural "# médias"
+msgstr[0] "1 média"
+msgstr[1] "# médias"
+
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
+msgid "<0/> Importer plus"
+msgstr "<0/> Importer plus"
+
+#: src/routes/(app)/capture/+page.svelte
+msgid "Photo"
+msgstr "Photo"
+
+#: src/routes/(app)/capture/+page.svelte
+msgid "Son"
+msgstr "Son"

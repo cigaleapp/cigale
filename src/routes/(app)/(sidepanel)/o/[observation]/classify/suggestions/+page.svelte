@@ -33,7 +33,7 @@
 	const { data } = $props();
 	const {
 		observation,
-		images,
+		medias,
 		focusedMetadata,
 		metadataDefinitions,
 		allOptions: options,
@@ -52,8 +52,9 @@
 		const metadata = observationMetadata({
 			definitions: metadataDefinitions,
 			observation,
-			images,
+			medias,
 		});
+
 		return getMetadataValue({ metadata }, 'enum', focusedMetadata.id);
 	});
 
@@ -61,7 +62,7 @@
 
 	let expand = $state<Expandable>('none');
 	let layoutTransitions = $state(true);
-	let currentImage = $derived(images[0]);
+	let currentImage = $derived(medias[0]);
 
 	$effect(() => {
 		fullscreenState.currentImage = currentImage.id;
@@ -90,9 +91,9 @@
 		{#if observation}
 			<Subject
 				buttons={layout === 'top-bottom' ? 'top-left' : 'top-right'}
-				{images}
+				{medias}
 				bind:expand
-				bind:currentImage
+				bind:currentMedia={currentImage}
 			/>
 		{/if}
 	</div>

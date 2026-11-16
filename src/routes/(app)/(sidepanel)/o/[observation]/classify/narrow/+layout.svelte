@@ -162,14 +162,14 @@
 			<section class="photo">
 				<Subject
 					buttons="top-left"
-					{images}
+					medias={images}
 					bind:expand={
 						() => (expand === 'subject' ? 'subject' : 'none'),
 						(value) => {
 							expand = value === 'subject' ? 'subject' : 'none';
 						}
 					}
-					bind:currentImage={
+					bind:currentMedia={
 						() =>
 							tables.Image.getFromState(fullscreenState.currentImage ?? '') ??
 							images[0],

@@ -56,7 +56,7 @@
 			name: obs.label,
 			metadata: observationMetadata({
 				definitions: tables.Metadata.state,
-				images: obs.images.map((id) => tables.Image.getFromState(id)).filter(nonnull),
+				medias: obs.images.map((id) => tables.Image.getFromState(id)).filter(nonnull),
 				sounds: obs.sounds.map((id) => tables.Sound.getFromState(id)).filter(nonnull),
 				observation: obs,
 			}),
@@ -101,8 +101,7 @@
 
 	let modelAbortController = new AbortController();
 	let classifmodelLoaded = $state(false);
-	/** @type {Error|undefined}*/
-	let classifModelLoadingError = $state();
+	let classifModelLoadingError = $state<Error | undefined>();
 
 	function queueClassificationsIfReady() {
 		if (!classifmodelLoaded) return;

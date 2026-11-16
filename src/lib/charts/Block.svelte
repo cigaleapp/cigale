@@ -15,7 +15,7 @@
 	import Markdown from '$lib/Markdown.svelte';
 	import { metadataOption } from '$lib/metadata';
 	import { resolveMetadataImport } from '$lib/metadata/imports.js';
-	import { mergeMetadataFromImagesAndObservations } from '$lib/metadata/merging.js';
+	import { mergeMetadataFromMediaAndObservations } from '$lib/metadata/merging.js';
 	import {
 		ensureNamespacedMetadataId,
 		metadataOptionId,
@@ -107,8 +107,8 @@
 			const images = await tables.Image.list('sessionId', id);
 
 			for (const obs of await tables.Observation.list('sessionId', id)) {
-				const merged = mergeMetadataFromImagesAndObservations({
-					images: images.filter((img) => obs.images.includes(img.id)),
+				const merged = mergeMetadataFromMediaAndObservations({
+					medias: images.filter((img) => obs.images.includes(img.id)),
 					observations: [obs],
 					definitions: tables.Metadata.state,
 				});

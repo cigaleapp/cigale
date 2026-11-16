@@ -161,7 +161,9 @@ export async function storeBytes<Table extends BinaryTableName>(
  */
 export async function accessBytes<Table extends BinaryTableName>(
 	table: Table,
-	object: Pick<(typeof Tables)[Table]['inferIn' | 'inferOut'], 'sessionId' | 'filename' | 'bytes'>
+	object: Pick<(typeof Tables)[Table]['inferIn' | 'inferOut'], 'sessionId' | 'filename'> & {
+		bytes?: ArrayBuffer | 'migrated';
+	}
 ): Promise<ArrayBuffer> {
 	if (object.bytes !== 'migrated' && object.bytes !== undefined) {
 		return object.bytes;

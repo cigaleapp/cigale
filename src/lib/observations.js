@@ -4,7 +4,7 @@ import * as db from './idb.svelte.js';
 import { tables } from './idb.svelte.js';
 import { deleteImageOrSound } from './images.js';
 import {
-	mergeMetadataFromImagesAndObservations,
+	mergeMetadataFromMediaAndObservations,
 	serializeMetadataFullValue,
 } from './metadata/index.js';
 import { uiState } from './uistate.svelte.js';
@@ -46,9 +46,9 @@ export async function mergeToObservation(parts) {
 		addedAt: new Date().toISOString(),
 		label: fallbackObservationLabel([...observations, ...images]),
 		metadataOverrides: mapValues(
-			mergeMetadataFromImagesAndObservations({
+			mergeMetadataFromMediaAndObservations({
 				definitions: tables.Metadata.state,
-				images: [],
+				medias: [],
 				observations,
 			}),
 			serializeMetadataFullValue
@@ -272,17 +272,23 @@ export async function ensureNoEmptyObservations(tx) {
  * @param {object} arg0
  * @param {DB.Metadata[]} arg0.definitions
  * @param {Pick<DB.Observation, 'images' | 'metadataOverrides'>} arg0.observation
- * @param {DB.Image[]} arg0.images
+ * @param {(DB.Image|DB.Sound)[]} arg0.medias
  * @param {T} [arg0.filterType] If provided, only return values for metadata of this type
  * @returns {Record<NamespacedMetadataID, TypedMetadataValue<T>>}
  */
-export function observationMetadata({ definitions, observation, images, filterType }) {
-	const metadataFromImages = mergeMetadataFromImagesAndObservations({
+export function observationMetadata({ definitions, observation, medias, filterType }) {
+	const metadataFromImages = mergeMetadataFromMediaAndObservations({
 		definitions: definitions.filter((d) => !filterType || d.type === filterType),
 		observations: [],
-		images: images
-			.filter(({ id }) => observation.images.includes(id))
-			.toSorted(compareBy(({ id }) => observation.images.indexOf(id))),
+		medias: medias
+			.filter(({ id }) => observation.images.includes(id) || observation.sounds.includes(id))
+			.toSorted(
+				compareBy(({ id }) => {
+					const imageIndex = observation.images.indexOf(id);
+					if (imageIndex !== -1) return imageIndex;
+					return observation.sounds.indexOf(id);
+				})
+			),
 	});
 
 	return transformObject(
@@ -336,7 +342,7 @@ if (import.meta.vitest) {
 				observationMetadata({
 					definitions: Object.values(metadatas),
 					observation,
-					images,
+					medias: images,
 				})
 			).toMatchInlineSnapshot(`
 				{

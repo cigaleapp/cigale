@@ -44,12 +44,17 @@ export async function load({ params, depends, parent }) {
 
 	depends(dependencyURI('Observation', observation.id));
 
-	const imagesOfObservation = await tables.Image.getMany(observation.images);
+	const mediaOfObservation = [
+		...(await tables.Image.getMany(observation.images)),
+		...(await tables.Sound.getMany(observation.sounds)),
+	];
+
+	console.log('media', mediaOfObservation);
 
 	return {
 		observation,
 		metadataDefinitions,
-		images: imagesOfObservation,
+		medias: mediaOfObservation,
 		focusedMetadata,
 		allOptions: optionsOfMetadata.options,
 	};

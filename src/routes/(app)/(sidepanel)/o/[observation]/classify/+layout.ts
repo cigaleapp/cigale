@@ -72,7 +72,7 @@ export async function load({ parent, params }) {
 			metadata: observationMetadata({
 				definitions: metadataDefinitions,
 				observation,
-				images: imagesOfAllObservations,
+				medias: imagesOfAllObservations,
 			}),
 		});
 

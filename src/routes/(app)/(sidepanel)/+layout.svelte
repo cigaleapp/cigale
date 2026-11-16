@@ -11,7 +11,7 @@
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import {
 		deleteMetadataValue,
-		mergeMetadataFromImagesAndObservations,
+		mergeMetadataFromMediaAndObservations,
 		storeMetadataValue,
 	} from '$lib/metadata/index.js';
 	import { IsMobile } from '$lib/mobile.svelte.js';
@@ -188,9 +188,9 @@
 		if (!uiState.currentProtocol) return {};
 
 		try {
-			return mergeMetadataFromImagesAndObservations({
+			return mergeMetadataFromMediaAndObservations({
 				definitions: tables.Metadata.state,
-				images: selectedImages,
+				medias: selectedImages,
 				observations: selectedObservations,
 			});
 		} catch (e) {
