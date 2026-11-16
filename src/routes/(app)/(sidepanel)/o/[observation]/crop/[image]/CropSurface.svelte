@@ -30,8 +30,6 @@
 		zoomlock?: 'x' | 'y';
 		/** Extra content. Position elements in absolute, with percent values for top/left/bottom/right */
 		extraMarks: Snippet;
-		/** Invert colors for the subject image */
-		invertColors?: boolean;
 		/** Bindable, read-only. Current position of cursor in normalized values. Null if cursor is not hovering over the area */
 		cursor?: null | { x: number; y: number };
 	}
@@ -45,7 +43,6 @@
 		fit: subjectFitMode,
 		zoomlock: defaultZoomlock,
 		extraMarks,
-		invertColors,
 		cursor = $bindable(null),
 	}: Props = $props();
 
@@ -150,7 +147,6 @@
 		alt=""
 		bind:this={imageElement}
 		style:transform={zoom.cssTransforms()}
-		style:filter={invertColors ? 'invert(1)' : undefined}
 		onload={() => {
 			imageIsLoading = false;
 		}}
@@ -216,5 +212,6 @@
 		width: 100%;
 		height: 100%;
 		object-fit: var(--crop-surface-fit, contain);
+		filter: var(--crop-surface-filter);
 	}
 </style>

@@ -2,13 +2,15 @@
 	import type { Props as CardMediaProps } from './CardMedia.svelte';
 	import type * as DB from '$lib/database.js';
 
-	import { spectrogramBoundingBoxDomains } from '$lib/audio/spectrogram.js';
+	import { paletteSVGFilter, spectrogramBoundingBoxDomains } from '$lib/audio/spectrogram.js';
 	import { coordsFitter } from '$lib/BoundingBoxes.svelte.js';
 	import { tables } from '$lib/idb.svelte.js';
 	import { isDebugMode } from '$lib/settings.svelte.js';
 	import { uiState } from '$lib/uistate.svelte.js';
+	import { getTheme } from '$routes/+layout.svelte';
 
 	import CardMedia from './CardMedia.svelte';
+	import { switchValue } from './utils.js';
 
 	interface Props extends CardMediaProps {
 		sound: DB.Sound;
@@ -31,6 +33,7 @@
 	const audiofile = $derived(tables.AudioFile.getFromState(sound.fileId));
 
 	const box = $derived(uiState.cropMetadataValueOf(sound));
+	const theme = getTheme();
 </script>
 
 <CardMedia

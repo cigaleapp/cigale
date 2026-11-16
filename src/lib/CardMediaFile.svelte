@@ -49,7 +49,7 @@
 		if (!media) return undefined;
 
 		switch (media._table) {
-			case 'Audio':
+			case 'Sound':
 				return audiofile?.spectrogram.imageDimensions;
 			case 'Image':
 				return media.dimensions;

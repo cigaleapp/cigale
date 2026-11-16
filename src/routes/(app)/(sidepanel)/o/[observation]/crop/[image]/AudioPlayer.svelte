@@ -167,9 +167,4 @@
 			color: var(--gay);
 		}
 	}
-
-	.seekbar {
-		width: 100%;
-		/* --height: 2rem; */
-	}
 </style>

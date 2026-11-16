@@ -123,6 +123,7 @@
 	img {
 		width: 100%;
 		height: 100%;
+		filter: var(--img-filter);
 	}
 
 	img.blur {

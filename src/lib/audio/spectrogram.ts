@@ -30,7 +30,7 @@ interface SpectrogramOptions {
 	maxDb?: number;
 }
 
-type SpectrogramInfo = NonNullable<(typeof DB.Schemas.AudioFile)['inferIn']['analysis']>;
+type SpectrogramInfo = NonNullable<(typeof DB.Schemas.AudioFile)['inferIn']['spectrogram']>;
 
 /**
  * Decode an audio file (mp3, wav, ogg, flac, m4a... whatever the browser supports)
@@ -88,7 +88,6 @@ export async function generateSpectrograms(
 	const re = new Float64Array(fftSize);
 	const im = new Float64Array(fftSize);
 	const db = new Float32Array(binCount + 1);
-	const palette = buildPalette();
 
 	// 4. Render one pixel column at a time (no need to keep every frame in memory).
 	const pixels = new Uint8ClampedArray(width * height * 4);
@@ -117,12 +116,12 @@ export async function generateSpectrograms(
 			const level = db[lo] * (1 - t) + db[hi] * t;
 
 			const norm01 = Math.min(1, Math.max(0, (level - minDb) / (maxDb - minDb)));
-			const p = Math.round(norm01 * 255) * 3;
+			const v = Math.round(norm01 * 255);
 			const o = (y * width + x) * 4;
-			pixels[o] = palette[p];
-			pixels[o + 1] = palette[p + 1];
-			pixels[o + 2] = palette[p + 2];
-			pixels[o + 3] = palette[p + 3];
+			pixels[o] = v;
+			pixels[o + 1] = v;
+			pixels[o + 2] = v;
+			pixels[o + 3] = 255;
 		}
 	}
 
@@ -188,37 +187,76 @@ function createFFT(n: number) {
 	};
 }
 
-/** 256-entry RGBA lookup table (inferno-like). */
-function buildPalette(): Uint8ClampedArray {
-	const stops: [number, number, number, number][] = [
-		// rgba(0, 0, 4, 0)
-		[0, 0, 4, 0],
-		// rgba(40, 11, 84, 100)
-		[40, 11, 84, 100],
-		// rgba(101, 21, 110, 255)
-		[101, 21, 110, 255],
-		// rgba(159, 42, 99, 255)
-		[159, 42, 99, 255],
-		// rgba(212, 72, 66, 255)
-		[212, 72, 66, 255],
-		// rgba(245, 125, 21, 255)
-		[245, 125, 21, 255],
-		// rgba(250, 193, 39, 255)
-		[250, 193, 39, 255],
-		// rgba(252, 255, 164, 255)
-		[252, 255, 164, 255],
-	];
-	const lut = new Uint8ClampedArray(256 * 3);
-	for (let i = 0; i < 256; i++) {
-		const pos = (i / 255) * (stops.length - 1);
-		const a = Math.floor(pos);
-		const b = Math.min(a + 1, stops.length - 1);
-		const t = pos - a;
-		for (let c = 0; c < 3; c++) {
-			lut[i * 3 + c] = stops[a][c] * (1 - t) + stops[b][c] * t;
-		}
-	}
-	return lut;
+const PALETTES = {
+	/** Classic magma theme */
+	magma: [
+		[0, 0, 4],
+		[40, 11, 84],
+		[101, 21, 110],
+		[159, 42, 99],
+		[212, 72, 66],
+		[245, 125, 21],
+		[250, 193, 39],
+		[252, 255, 164],
+	],
+
+	/** Magma reversed: light cream → near black. Best light-theme default. */
+	magma_light: [
+		[255, 255, 255],
+		[252, 253, 191],
+		[254, 186, 128],
+		[248, 118, 92],
+		[211, 67, 110],
+		[152, 45, 128],
+		[95, 24, 127],
+		[34, 17, 80],
+		[0, 0, 4],
+	],
+
+	/** Viridis: fine on either theme */
+	viridis: [
+		[68, 1, 84],
+		[70, 51, 126],
+		[54, 92, 141],
+		[39, 127, 142],
+		[31, 161, 135],
+		[74, 194, 109],
+		[159, 218, 58],
+		[253, 231, 37],
+	],
+
+	/** YlGnBu: light-background heatmap */
+	ylgnbu: [
+		[255, 255, 255],
+		[255, 255, 217],
+		[237, 248, 177],
+		[199, 233, 180],
+		[127, 205, 187],
+		[65, 182, 196],
+		[29, 145, 192],
+		[34, 94, 168],
+		[37, 52, 148],
+		[8, 29, 88],
+	],
+} as const;
+
+export function paletteSVGFilter(theme: keyof typeof PALETTES) {
+	const stops = PALETTES[theme];
+	const channel = (i: number) => stops.map((s) => (s[i] / 255).toFixed(4)).join(' ');
+	const alpha = () => stops.map((_, i) => (i <= 1 ? 0 : 1)).join(' ');
+
+	return `
+		<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+			<filter id="spectro-palette" color-interpolation-filters="sRGB">
+				<feComponentTransfer>
+					<feFuncR type="table" tableValues="${channel(0)}" />
+					<feFuncG type="table" tableValues="${channel(1)}" />
+					<feFuncB type="table" tableValues="${channel(2)}" />
+					<feFuncA type="table" tableValues="${alpha()}" />
+				</feComponentTransfer>
+			</filter>
+		</svg>
+	`;
 }
 
 async function encodePngs(image: ImageData): Promise<{ full: Blob; preview: Blob }> {

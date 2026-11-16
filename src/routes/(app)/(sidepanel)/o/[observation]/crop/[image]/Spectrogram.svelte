@@ -2,8 +2,9 @@
 	import type { SelectedBox } from './+page.svelte';
 	import type * as DB from '$lib/database.js';
 
+	import { paletteSVGFilter } from '$lib/audio/spectrogram.js';
 	import { getSettings } from '$lib/settings.svelte.js';
-	import { round } from '$lib/utils.js';
+	import { round, switchValue } from '$lib/utils.js';
 	import { getTheme } from '$routes/+layout.svelte';
 
 	import CropSurface from './CropSurface.svelte';
@@ -32,6 +33,14 @@
 	const [high, low] = $derived(file.spectrogram.frequencyRange);
 </script>
 
+<!-- eslint-disable-next-line svelte/no-at-html -->
+{@html paletteSVGFilter(
+	switchValue(theme.effective, {
+		light: 'ylgnbu',
+		dark: 'magma',
+	})
+)}
+
 <div class="spectrogram">
 	<!-- TODO: make MediaArea handle its image element resize instead -->
 	{#key getSettings().cropperSidebarCollapsed}
@@ -41,11 +50,10 @@
 			fileId={file.id}
 			imageSrc={src}
 			bind:imageIsLoading={loading}
-			invertColors={theme.effective === 'light'}
 			bind:cursor={
 				() => null,
 				(c) => {
-					console.log('cur', c)
+					console.log('cur', c);
 					if (c === null) {
 						cursor = null;
 						return;
@@ -74,5 +82,7 @@
 	.spectrogram {
 		display: flex;
 		height: 100%;
+
+		--crop-surface-filter: url(#spectro-palette);
 	}
 </style>

@@ -58,7 +58,7 @@
 	import IconVideo from '~icons/ri/video-line';
 	import IconAudio from '~icons/ri/volume-up-line';
 	import AnimatableCheckmark from '$lib/AnimatableCheckmark.svelte';
-	import { spectrogramBoundingBoxDomains } from '$lib/audio/spectrogram.js';
+	import { paletteSVGFilter, spectrogramBoundingBoxDomains } from '$lib/audio/spectrogram.js';
 	import { coordsFitter } from '$lib/BoundingBoxes.svelte';
 	import ButtonInk from '$lib/ButtonInk.svelte';
 	import Card from '$lib/Card.svelte';
@@ -71,6 +71,8 @@
 	import { tooltip } from '$lib/tooltips.js';
 	import { onlongpress } from '$lib/touch/longpress.js';
 	import { uiState } from '$lib/uistate.svelte.js';
+	import { switchValue } from '$lib/utils.js';
+	import { getTheme } from '$routes/+layout.svelte';
 
 	let {
 		onclick,
@@ -123,6 +125,7 @@
 	});
 
 	const mobile = new IsMobile();
+	const theme = getTheme();
 
 	const stacked = $derived(stacksize > 1);
 
@@ -157,8 +160,17 @@
 	}
 </script>
 
+<!-- eslint-disable-next-line svelte/no-at-html -->
+{@html paletteSVGFilter(
+	switchValue(theme.effective, {
+		light: 'ylgnbu',
+		dark: 'magma',
+	})
+)}
+
 <article
 	class="observation"
+	class:audio={isAudio}
 	class:selected
 	class:selectable
 	class:highlighted
@@ -259,7 +271,7 @@
 						</div>
 					{/if}
 					{#if image}
-						{#if boxes === 'apply-first' && boundingBoxes.length > 0 && dimensions?.height}
+						{#if boxes === 'apply-first' && boundingBoxes.length > 0 && dimensions}
 							<CroppedImg
 								blurfill
 								{dimensions}
@@ -348,6 +360,10 @@
 		color: var(--fg-primary);
 	}
 
+	.observation.audio {
+		--img-filter: url(#spectro-palette);
+	}
+
 	.main-card {
 		transition: transform calc(var(--transition-duration) / 1.5);
 	}
@@ -398,10 +414,9 @@
 			position: absolute;
 			bottom: 0;
 			right: 0;
-			/* No need for bg cuz histograms are always dark in color, will need to change once we also handle videos */
-			/* background: rgb(from var(--card-bg) r g b / 0.5); */
+			background: rgb(from var(--card-bg) r g b / 0.5);
 			padding: 0.5em;
-			color: white;
+			color: var(--fg-neutral);
 			z-index: 2;
 
 			display: flex;
@@ -413,6 +428,10 @@
 				font-size: 0.9em;
 			}
 		}
+	}
+
+	img {
+		filter: var(--img-filter);
 	}
 
 	img,
