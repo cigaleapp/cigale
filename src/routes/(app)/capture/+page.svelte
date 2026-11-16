@@ -5,12 +5,13 @@
 	import { App } from '@capacitor/app';
 	import { Capacitor } from '@capacitor/core';
 	import { Haptics, ImpactStyle } from '@capacitor/haptics';
+	import { ms } from 'convert';
 	import { onDestroy } from 'svelte';
 	import { fade } from 'svelte/transition';
 
 	import '@layflags/rolling-number';
 
-	import type { MicrophoneState } from './microphone.js';
+	import type { MicrophoneState, RecordingCurrent } from './microphone.js';
 
 	import IconSwitchCameraSides from '~icons/ri/camera-switch-line';
 	import IconFinish from '~icons/ri/check-line';
@@ -26,6 +27,7 @@
 	import IconStartTimer from '~icons/ri/timer-line';
 	import IconSfxOff from '~icons/ri/volume-mute-line';
 	import IconSfxOn from '~icons/ri/volume-up-line';
+	import { page } from '$app/state';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonInk from '$lib/ButtonInk.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
@@ -54,7 +56,7 @@
 		startCamera,
 		waitForCapture,
 	} from './camera.js';
-	import { record, startMicrophone } from './microphone.js';
+	import { record, recordFor, startMicrophone } from './microphone.js';
 	import { PendingStorage } from './pendingstorage.svelte.js';
 	import { displayTimerConfig, Timer } from './timers.svelte.js';
 
@@ -63,12 +65,15 @@
 	// TODO: default to whatever the protocol defines
 	let captureType = $state<'sound' | 'photo'>('sound');
 
+	/** Load camera even if captureType isnt photo. Used when asking for pics at timer start for file session metadata */
+	let forceLoadCamera = $state(false);
+
 	type ShootingPhase =
 		'inert' | 'before-timer' | 'wait-start-timer' | 'timer-running' | 'after-timer' | 'done';
 
 	let shootingPhase = $state<ShootingPhase>('inert');
 
-	let recording = $state<undefined | { finish: () => Promise<void> }>();
+	let recording = $state<undefined | RecordingCurrent>();
 
 	$effect(() => {
 		if (!uiState.currentSession) return;
@@ -161,7 +166,7 @@
 	// (that isn't within the DOM) can be seen through the UI
 	const transparentDocument = $derived(ready && Capacitor.isNativePlatform());
 
-	let pendingStorage = $state<PendingStorage>();
+	let pendingStorage = $state(new PendingStorage());
 	$effect(() => {
 		if (!uiState.currentSessionId) {
 			// No sessions: go back to pick a session first!!!
@@ -177,6 +182,7 @@
 	$effect(() => {
 		if (captureType !== 'sound') return;
 		void startMicrophone(microphone);
+		return () => void recording?.cancel();
 	});
 
 	$effect(() => {
@@ -193,7 +199,7 @@
 
 	$effect(() => {
 		App.addListener('resume', async () => {
-			if (captureType !== 'photo') return;
+			if (!forceLoadCamera && captureType !== 'photo') return;
 			console.debug('Resuming camera');
 			if (await cameraStarted(true)) await CameraPreview.stop();
 			const webPreview = document.getElementById('preview');
@@ -203,12 +209,11 @@
 
 	onDestroy(() => {
 		CameraPreview.stop();
+		void recording?.cancel();
 	});
 
 	let askBeforeQuitting = $state<() => Promise<boolean>>();
 	async function quit() {
-		// Storage not ready yet
-		if (!pendingStorage) return;
 		// Modal not ready yet
 		if (!askBeforeQuitting) return;
 
@@ -223,7 +228,7 @@
 	}
 
 	async function finish() {
-		const allOk = await pendingStorage?.flush({
+		const allOk = await pendingStorage.flush({
 			onProgress({ done, total }) {
 				setFloatingMessage('Import', `${done}/${total} (${percent(done / total)})`);
 			},
@@ -243,28 +248,22 @@
 			.filter((m) => m.infer && 'capture' in m.infer && m.infer.capture === selector);
 
 		async function askForPics() {
-			const actualType = structuredClone(captureType);
-
-			captureType = 'photo';
-
 			// Gather all file-type metadata with before-timer capture inference
 			const picsToTake = beforeTimerInferences
 				.filter((m) => m.type === 'file')
 				.filter((m) => m.accept.includes('image/*'));
 
-			pendingStorage?.freezeCount();
+			pendingStorage.freezeCount();
 
 			for (const metadata of picsToTake) {
 				freezeFloatingMessage('Prendre en photo', metadata.label);
 				const pic = await waitForCapture(camera);
-				await pendingStorage?.flushToMetadata(pic.name, metadata.id);
+				await pendingStorage.flushToMetadata(pic.name, metadata.id);
 			}
 
-			await pendingStorage?.unfreezeCount();
+			await pendingStorage.unfreezeCount();
 
 			clearFloatingMessage();
-
-			captureType = actualType;
 		}
 
 		if (selector === 'before-timer') await askForPics();
@@ -309,13 +308,22 @@
 		if (selector === 'after-timer') await askForPics();
 	}
 
+	async function recordOrCapture(durationMs: number | undefined) {
+		switch (captureType) {
+			case 'photo':
+				return capture(camera, pendingStorage);
+			case 'sound':
+				return recordFor(microphone, pendingStorage, durationMs ?? ms('10s'));
+		}
+	}
+
 	const timers = $derived(
 		uiState.currentProtocol?.capture?.timers?.filter((timer) =>
 			timer.for.includes(captureType)
 		) ?? []
 	);
 
-	const timerIndex = $derived(uiState.currentSession?.captureModeSelectedTimerIndex);
+	const timerIndex = $derived(uiState.currentSession?.captureModeSelectedTimer[captureType]);
 
 	$effect(() => {
 		if (!timer) setShootingPhase('inert');
@@ -335,7 +343,7 @@
 				setFloatingMessage('Timer', t.formatMessage(settings.messages.lap));
 
 				if (settings.shoot === 'on-timer') {
-					await capture(camera, pendingStorage);
+					await recordOrCapture(settings.duration);
 				} else if (getSettings().timerSounds) {
 					sfx('timer-lap');
 				}
@@ -344,7 +352,7 @@
 			},
 			async onfinished(t) {
 				if (settings.shoot === 'on-timer') {
-					await capture(camera, pendingStorage);
+					await recordOrCapture(settings.duration);
 				}
 
 				if (getSettings().timerSounds) sfx('timer-finished');
@@ -633,7 +641,7 @@
 		<LoadingScreen {failure} loading={!ready} />
 	</div>
 
-	{#if captureType === 'photo'}
+	{#if captureType === 'photo' || forceLoadCamera}
 		<!-- https://github.com/capacitor-community/camera-preview#extra-web-installation-steps -->
 		<div
 			id="viewport"
@@ -672,7 +680,7 @@
 		{const canPause = $derived(timer?.started)}
 		{#if canPause}
 			<ButtonInk onclick={() => timer?.togglePause()}>
-				{#if timer.paused}
+				{#if timer?.paused}
 					<IconPlayFill />
 					Reprendre
 				{:else}

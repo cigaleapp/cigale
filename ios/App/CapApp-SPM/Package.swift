@@ -24,6 +24,7 @@ let package = Package(
         .package(name: "CapawesomeCapacitorDeviceInfo", path: "../../../node_modules/@capawesome/capacitor-device-info"),
         .package(name: "CapawesomeCapacitorFilePicker", path: "../../../node_modules/@capawesome/capacitor-file-picker"),
         .package(name: "CapawesomeCapacitorKeepAwake", path: "../../../node_modules/@capawesome/capacitor-keep-awake"),
+        .package(name: "CapgoCapacitorAudioRecorder", path: "../../../node_modules/@capgo/capacitor-audio-recorder"),
         .package(name: "CapgoCapacitorShake", path: "../../../node_modules/@capgo/capacitor-shake"),
         .package(name: "CapgoCapacitorUpdater", path: "../../../node_modules/@capgo/capacitor-updater"),
         .package(name: "CapgoInappbrowser", path: "../../../node_modules/@capgo/inappbrowser")
@@ -46,6 +47,7 @@ let package = Package(
                 .product(name: "CapawesomeCapacitorDeviceInfo", package: "CapawesomeCapacitorDeviceInfo"),
                 .product(name: "CapawesomeCapacitorFilePicker", package: "CapawesomeCapacitorFilePicker"),
                 .product(name: "CapawesomeCapacitorKeepAwake", package: "CapawesomeCapacitorKeepAwake"),
+                .product(name: "CapgoCapacitorAudioRecorder", package: "CapgoCapacitorAudioRecorder"),
                 .product(name: "CapgoCapacitorShake", package: "CapgoCapacitorShake"),
                 .product(name: "CapgoCapacitorUpdater", package: "CapgoCapacitorUpdater"),
                 .product(name: "CapgoInappbrowser", package: "CapgoInappbrowser")

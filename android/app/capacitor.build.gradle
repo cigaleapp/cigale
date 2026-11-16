@@ -21,6 +21,7 @@ dependencies {
     implementation project(':capawesome-capacitor-device-info')
     implementation project(':capawesome-capacitor-file-picker')
     implementation project(':capawesome-capacitor-keep-awake')
+    implementation project(':capgo-capacitor-audio-recorder')
     implementation project(':capgo-capacitor-shake')
     implementation project(':capgo-capacitor-updater')
     implementation project(':capgo-inappbrowser')

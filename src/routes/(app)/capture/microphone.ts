@@ -2,6 +2,8 @@ import type { PendingStorage } from './pendingstorage.svelte.js';
 
 import { AudioSessionMode, CapacitorAudioRecorder } from '@capgo/capacitor-audio-recorder';
 
+import { sleep } from '$lib/utils.js';
+
 export type MicrophoneState = {
 	ready: boolean;
 	failure: string;
@@ -25,11 +27,17 @@ export async function startMicrophone(state: MicrophoneState) {
 	state.ready = true;
 }
 
+export type RecordingCurrent = {
+	finish: () => Promise<void>;
+	cancel: () => Promise<void>;
+};
+
 export async function record(
 	microphone: MicrophoneState,
 	storage: PendingStorage
-): Promise<undefined | { finish: () => Promise<void> }> {
+): Promise<undefined | RecordingCurrent> {
 	if (!microphone.ready) return;
+	if (microphone.recording) return;
 
 	await CapacitorAudioRecorder.startRecording({
 		audioSessionMode: AudioSessionMode.Default,
@@ -59,7 +67,24 @@ export async function record(
 				microphone.recording = false;
 			}
 		},
+		async cancel() {
+			try {
+				await CapacitorAudioRecorder.cancelRecording();
+			} finally {
+				microphone.recording = false;
+			}
+		},
 	};
+}
+
+export async function recordFor(
+	microphone: MicrophoneState,
+	storage: PendingStorage,
+	durationMs: number
+) {
+	const recording = await record(microphone, storage);
+	await sleep(durationMs);
+	return recording?.finish();
 }
 
 export async function amplitude(microphone: MicrophoneState) {

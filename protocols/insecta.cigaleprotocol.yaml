@@ -765,6 +765,7 @@ metadata:
 capture:
   timers:
     - name: Actif
+      for: photo
       shoot: manually
       every: 30s
       during: 20min
@@ -774,6 +775,7 @@ capture:
           - '{{ formatDurationStopwatch (increase total.remainingMs 1000) }}'
           - '{{ laps.doneCount }} pas / {{ decrease laps.totalCount 1 }}'
     - name: Passif
+      for: photo
       shoot: on-timer
       count: 100
       during: 10min
@@ -781,6 +783,12 @@ capture:
         status:
           - '{{ formatDurationStopwatch (increase total.remainingMs 1000) }}'
           - '{{ laps.doneCount }} photos / {{ laps.totalCount }}'
+    - name: Passif
+      for: sound
+      shoot: on-timer
+      every: 5min
+      duration: 1min
+      within: 06:00-20:00
 
 exports:
   images:

@@ -132,7 +132,7 @@ export const Session = type({
 	captureModeSelectedTimerIndex: 'null | number >= 0 = 0',
 	captureModeSelectedTimer: type({
 		sound: 'null | number >= 0 = 0',
-		audio: 'null | number >= 0 = 0',
+		photo: 'null | number >= 0 = 0',
 	}).default(() => ({})),
 	fullscreenClassifier: type({
 		layout: type.enumerated(...FULLSCREEN_CLASSIFY_LAYOUTS),

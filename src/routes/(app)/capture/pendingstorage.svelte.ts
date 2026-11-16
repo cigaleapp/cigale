@@ -1,13 +1,12 @@
 import type { ExifFieldKey } from '$lib/exiffields';
 import type { NamespacedMetadataID } from '$lib/schemas/common';
 import type { BinaryStorageLocator } from '$lib/storage/types.js';
-import type { PROCEDURES } from '$worker/procedures.js';
-import type { SwarpcClient } from 'swarpc';
 
 import { Capacitor } from '@capacitor/core';
 import { Filesystem } from '@capacitor/filesystem';
 import { GPSHelper } from 'piexifjs';
 
+import { page } from '$app/state';
 import { generateId } from '$lib/database.js';
 import { getCurrentLocation } from '$lib/geolocation.js';
 import { errorMessage } from '$lib/i18n.js';
@@ -36,10 +35,7 @@ export class PendingStorage {
 	private frozenCount = false;
 	private audioURIs: string[] = [];
 
-	constructor(
-		private swarpc: SwarpcClient<typeof PROCEDURES>,
-		private sessionId: string
-	) {}
+	constructor(private sessionId: string) {}
 
 	static async open(sessionId: string): Promise<PendingStorage> {
 		console.debug(PendingStorage.logHeader(''), 'opening', sessionId);
@@ -294,29 +290,11 @@ export class PendingStorage {
 			onProgress({ total, done });
 		}
 
-		for (const audioUri of this.audioURIs) {
-			try {
-				await processAudioFile(this.swarpc, {
-					id: imageFileId(),
-					// TODO
-					// extraExif: {},
-					sidecars: [],
-					file,
-				});
-			} catch (error) {
-				console.error("Couldn't process audio file", audioUri, error);
-				hasErrors = true;
-			}
-
-			done++;
-			onProgress({ total, done });
-		}
-
 		for await (const file of this.files('audio')) {
 			let imported = false;
 
 			try {
-				await processAudioFile(this.swarpc, {
+				await processAudioFile(page.data.swarpc, {
 					id: imageFileId(),
 					sidecars: [],
 					file,
