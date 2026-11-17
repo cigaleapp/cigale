@@ -69,6 +69,7 @@
 		border-radius: var(--corner-radius);
 		padding: 0.25em 0.5em;
 		border: 1px solid transparent;
+		color: var(--fg-neutral);
 
 		display: flex;
 		align-items: center;

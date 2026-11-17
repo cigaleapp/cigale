@@ -5,13 +5,14 @@
 	import { App } from '@capacitor/app';
 	import { Capacitor } from '@capacitor/core';
 	import { Haptics, ImpactStyle } from '@capacitor/haptics';
+	import { CapacitorAudioRecorder } from '@capgo/capacitor-audio-recorder';
 	import { ms } from 'convert';
 	import { onDestroy } from 'svelte';
 	import { fade } from 'svelte/transition';
 
 	import '@layflags/rolling-number';
 
-	import type { MicrophoneState, RecordingCurrent } from './microphone.js';
+	import type { MicrophoneState, RecordingCurrent } from './microphone.svelte.js';
 
 	import IconSwitchCameraSides from '~icons/ri/camera-switch-line';
 	import IconFinish from '~icons/ri/check-line';
@@ -27,7 +28,6 @@
 	import IconStartTimer from '~icons/ri/timer-line';
 	import IconSfxOff from '~icons/ri/volume-mute-line';
 	import IconSfxOn from '~icons/ri/volume-up-line';
-	import { page } from '$app/state';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonInk from '$lib/ButtonInk.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
@@ -40,6 +40,7 @@
 	import { storeMetadataValue } from '$lib/metadata/storage.js';
 	import ModalConfirm from '$lib/ModalConfirm.svelte';
 	import { goto } from '$lib/paths.js';
+	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { isMetadataInProtocol } from '$lib/schemas/protocols.js';
 	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
 	import { getSettings, toggleSetting } from '$lib/settings.svelte.js';
@@ -56,7 +57,7 @@
 		startCamera,
 		waitForCapture,
 	} from './camera.js';
-	import { record, recordFor, startMicrophone } from './microphone.js';
+	import { AmplitudeTracker, record, recordFor, startMicrophone } from './microphone.svelte.js';
 	import { PendingStorage } from './pendingstorage.svelte.js';
 	import { displayTimerConfig, Timer } from './timers.svelte.js';
 
@@ -159,7 +160,16 @@
 		},
 	});
 
-	const ready = $derived(camera.ready || microphone.ready);
+	const amplitudeTracker = new AmplitudeTracker(microphone);
+
+	onDestroy(() => {
+		amplitudeTracker.stop();
+	});
+
+	const ready = $derived(
+		captureType === 'photo' || forceLoadCamera ? camera.ready : microphone.ready
+	);
+
 	const failure = $derived(camera.failure || microphone.failure);
 
 	// The entire page needs to be transparent so that the native preview
@@ -181,8 +191,12 @@
 
 	$effect(() => {
 		if (captureType !== 'sound') return;
-		void startMicrophone(microphone);
+		void startMicrophone(microphone, amplitudeTracker);
 		return () => void recording?.cancel();
+	});
+
+	$effect(() => {
+		return () => CapacitorAudioRecorder.cancelRecording();
 	});
 
 	$effect(() => {
@@ -659,6 +673,20 @@
 		></div>
 	{:else}
 		<!-- TODO: realtime audio level meter + waveform (or just coarse graph of amplitude history)? -->
+
+		<div class="audio-monitor">
+			<div class="vu-meter">
+				<!-- < value={(amplitudeTracker.history.at(-1) ?? 0) * 10 * 1e6} max={1e6}
+				></progress> -->
+				<ProgressBar alwaysActive progress={amplitudeTracker.latestSample * 20} />
+			</div>
+
+			<div class="history">
+				{#each amplitudeTracker.history as sample, i (i)}
+					<div class="tick" style:--sample={sample}></div>
+				{/each}
+			</div>
+		</div>
 	{/if}
 
 	<section class="floating-messages" pw-testid="floating-messages">
@@ -1084,6 +1112,41 @@
 
 		&:not([data-transparent='true']) {
 			background: black;
+		}
+	}
+
+	.audio-monitor {
+		display: flex;
+		height: 100%;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		color: var(--fg-neutral);
+		padding: 2rem;
+
+		.history {
+			height: 200px;
+			width: 100%;
+			display: flex;
+			justify-content: end;
+			align-items: end;
+			gap: 5px;
+			overflow: clip;
+		}
+
+		.history .tick {
+			width: 1px;
+			flex-shrink: 0;
+			height: calc(max(1px, var(--sample) * 10 * 100%));
+			background: var(--fg-neutral);
+			border-radius: 1000px;
+		}
+
+		.vu-meter {
+			rotate: -90deg;
+			width: 200px;
+			--height: 100px;
+			--inactive-bg: rgb(from var(--fg-primary) r g b / 25%);
 		}
 	}
 </style>

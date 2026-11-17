@@ -1,19 +1,20 @@
 import type { PendingStorage } from './pendingstorage.svelte.js';
 
+import { Capacitor } from '@capacitor/core';
 import { AudioSessionMode, CapacitorAudioRecorder } from '@capgo/capacitor-audio-recorder';
 
-import { sleep } from '$lib/utils.js';
+import { range, sleep } from '$lib/utils.js';
 
 export type MicrophoneState = {
 	ready: boolean;
 	failure: string;
 	recording: boolean;
 	listeners: {
-		onsaved: Array<(name: string | undefined) => void | Promise<void>>;
+		onsaved: Array<() => void | Promise<void>>;
 	};
 };
 
-export async function startMicrophone(state: MicrophoneState) {
+export async function startMicrophone(state: MicrophoneState, amplitudeTracker: AmplitudeTracker) {
 	state.failure = '';
 	state.ready = false;
 
@@ -21,10 +22,17 @@ export async function startMicrophone(state: MicrophoneState) {
 
 	if (perms.recordAudio !== 'granted') {
 		state.failure = 'Permission non accordée';
+		console.error(perms);
 		return;
 	}
 
 	state.ready = true;
+
+	await CapacitorAudioRecorder.startRecording({
+		audioSessionMode: AudioSessionMode.Measurement,
+	});
+
+	amplitudeTracker.start();
 }
 
 export type RecordingCurrent = {
@@ -38,6 +46,8 @@ export async function record(
 ): Promise<undefined | RecordingCurrent> {
 	if (!microphone.ready) return;
 	if (microphone.recording) return;
+
+	await CapacitorAudioRecorder.cancelRecording().catch(() => {});
 
 	await CapacitorAudioRecorder.startRecording({
 		audioSessionMode: AudioSessionMode.Default,
@@ -66,6 +76,10 @@ export async function record(
 			} finally {
 				microphone.recording = false;
 			}
+
+			await CapacitorAudioRecorder.startRecording({
+				audioSessionMode: AudioSessionMode.Measurement,
+			});
 		},
 		async cancel() {
 			try {
@@ -73,6 +87,10 @@ export async function record(
 			} finally {
 				microphone.recording = false;
 			}
+
+			await CapacitorAudioRecorder.startRecording({
+				audioSessionMode: AudioSessionMode.Measurement,
+			});
 		},
 	};
 }
@@ -98,9 +116,11 @@ export async function amplitude(microphone: MicrophoneState) {
 export class AmplitudeTracker {
 	/** in ms */
 	#pollrate = 100;
-	#historyLength = 5;
+	#historyLength = 50;
 	#interval: undefined | NodeJS.Timeout | number;
-	#history = [] as number[];
+	history = $state<number[]>([]);
+
+	latestSample = $derived(this.history.at(-1) ?? 0);
 
 	constructor(
 		private state: MicrophoneState,
@@ -109,10 +129,11 @@ export class AmplitudeTracker {
 			length?: number;
 			/** in ms */
 			rate?: number;
-		}
+		} = {}
 	) {
 		if (options.rate) this.#pollrate = options.rate;
 		if (options.length) this.#historyLength = options.length;
+		this.history = range(this.historySamplesCount).map((_) => 0);
 	}
 
 	get historySamplesCount() {
@@ -120,13 +141,13 @@ export class AmplitudeTracker {
 	}
 
 	#record(sample: number) {
-		this.#history.splice(0, this.#history.length - this.historySamplesCount);
-		this.#history.push(sample);
+		this.history.splice(0, this.history.length - this.historySamplesCount);
+		this.history.push(sample);
 	}
 
 	start() {
 		this.#interval = setInterval(() => {
-			(async () => {
+			void (async () => {
 				if (!this.state.ready) return;
 				const { value } = await CapacitorAudioRecorder.getCurrentAmplitude();
 				this.#record(value);
