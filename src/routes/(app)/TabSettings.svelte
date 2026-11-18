@@ -45,7 +45,7 @@
 	import { toasts } from '$lib/toasts.svelte.js';
 	import { tooltip } from '$lib/tooltips.js';
 	import { uiState } from '$lib/uistate.svelte.js';
-	import { entries, nonnull, orEmpty } from '$lib/utils.js';
+	import { entries, nonnull, orEmpty, switchValue } from '$lib/utils.js';
 
 	type ModelSelector = (typeof NeuralModelSelector)['infer'];
 
