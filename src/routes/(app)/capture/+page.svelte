@@ -65,7 +65,12 @@
 	let submitBugReport = $state<() => void>();
 
 	// TODO: default to whatever the protocol defines
-	let captureType = $state<'sound' | 'photo'>('sound');
+	let captureType = $derived<'sound' | 'photo'>(
+		switchValue(uiState.currentProtocol?.media.types.at(0) ?? 'image', {
+			image: 'photo',
+			audio: 'sound',
+		})
+	);
 
 	/** Load camera even if captureType isnt photo. Used when asking for pics at timer start for file session metadata */
 	let forceLoadCamera = $state(false);

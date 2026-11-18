@@ -3,8 +3,8 @@
 
 	import IconCamera from '~icons/ri/camera-line';
 	import IconRecorder from '~icons/ri/record-mail-line';
-	import IconImport from '~icons/ri/upload-2-line';
 	import IconWaveform from '~icons/ri/voiceprint-line';
+	import IconImport from '~icons/ri/upload-2-line';
 	import AreaObservations from '$lib/AreaObservations.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import CardImage from '$lib/CardImage.svelte';
@@ -126,7 +126,7 @@
 				<ButtonSecondary onclick={async () => goto('/(app)/capture')}>
 					{#if uiState.acceptedMediaTypes === 'both'}
 						<IconRecorder />
-						Enregistrer images/son
+						Capture d'images ou de son
 					{:else if uiState.acceptedMediaTypes === 'image'}
 						<IconCamera />
 						Prendre des photos

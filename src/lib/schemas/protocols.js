@@ -154,7 +154,7 @@ export const Protocol = type({
 		.default(false),
 	'beamup?': BeamupSettings,
 	media: type({
-		types: MediaKind.array(),
+		types: MediaKind.array().describe("Types de média supportés par le protocole. Mettre en premier le type le plus commun (cela influe par exemple le type sélectionné par défaut dans l'écran de capture: appareil photo ou enregistreur de son)"),
 	}).default(() => ({ types: ['image'] })),
 	'remote?': {
 		'ecosignal?': {

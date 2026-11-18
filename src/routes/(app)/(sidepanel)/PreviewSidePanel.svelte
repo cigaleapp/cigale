@@ -13,8 +13,10 @@
 	import IconFullScreen from '~icons/ri/fullscreen-line';
 	import IconSplit from '~icons/ri/function-line';
 	import IconImage from '~icons/ri/image-2-line';
+	import IconRecorder from '~icons/ri/record-mail-line';
 	import IconMerge from '~icons/ri/shadow-line';
 	import IconImport from '~icons/ri/upload-2-line';
+	import IconWaveform from '~icons/ri/voiceprint-line';
 	import IconSound from '~icons/ri/volume-up-line';
 	import { page } from '$app/state';
 	import BottomDrawer from '$lib/BottomDrawer.svelte';
@@ -257,8 +259,16 @@
 					Importer plus
 				</ButtonSecondary>
 				<ButtonSecondary onclick={async () => goto('/(app)/capture')}>
-					<IconCamera />
-					Appareil photo
+					{#if uiState.acceptedMediaTypes === 'both'}
+						<IconRecorder />
+						Capturer média
+					{:else if uiState.acceptedMediaTypes === 'image'}
+						<IconCamera />
+						Appareil photo
+					{:else if uiState.acceptedMediaTypes === 'audio'}
+						<IconWaveform />
+						Enregistrer son
+					{/if}
 				</ButtonSecondary>
 			</div>
 		{/if}

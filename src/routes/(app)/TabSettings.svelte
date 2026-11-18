@@ -12,10 +12,12 @@
 	import IconCamera from '~icons/ri/camera-line';
 	import IconCheck from '~icons/ri/check-line';
 	import IconInferenceDisabled from '~icons/ri/forbid-2-line';
+	import IconRecorder from '~icons/ri/record-mail-line';
 	import IconSortAsc from '~icons/ri/sort-asc';
 	import IconSortDesc from '~icons/ri/sort-desc';
 	import IconInferenceEnabled from '~icons/ri/sparkling-line';
 	import IconImport from '~icons/ri/upload-2-line';
+	import IconWaveform from '~icons/ri/voiceprint-line';
 	import IconModelCustom from '~icons/ri/wrench-line';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import DropdownMenu from '$lib/DropdownMenu.svelte';
@@ -213,10 +215,18 @@
 					}),
 					...orEmpty(!bottomNavHasCapture, {
 						type: 'clickable' as const,
-						label: 'Prendre des photos',
+						label: switchValue(uiState.acceptedMediaTypes, {
+							both: 'Capturer photos ou son',
+							image: 'Prendre des photos',
+							audio: 'Enregistrer du son',
+						}),
 						data: {
 							direction: null,
-							icon: IconCamera,
+							icon: switchValue(uiState.acceptedMediaTypes, {
+								both: IconRecorder,
+								image: IconCamera,
+								audio: IconWaveform,
+							}),
 						} as ItemExtras,
 						async onclick() {
 							await goto('/(app)/capture');
