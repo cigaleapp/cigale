@@ -723,12 +723,12 @@
 			<div class="vu-meter">
 				<!-- < value={(amplitudeTracker.history.at(-1) ?? 0) * 10 * 1e6} max={1e6}
 				></progress> -->
-				<ProgressBar alwaysActive progress={amplitudeTracker.latestSample * 20} />
+				<ProgressBar alwaysActive progress={amplitudeTracker.latestFrame.amplitude * 20} />
 			</div>
 
 			<div class="history">
-				{#each amplitudeTracker.history as sample, i (i)}
-					<div class="tick" style:--sample={sample}></div>
+				{#each amplitudeTracker.history as { amplitude, recorded }, i (i)}
+					<div class="tick" class:recorded style:--amplitude={amplitude}></div>
 				{/each}
 			</div>
 		</div>
@@ -1191,9 +1191,13 @@
 		.history .tick {
 			width: 1px;
 			flex-shrink: 0;
-			height: calc(max(1px, var(--sample) * 10 * 100%));
+			height: calc(max(1px, var(--amplitude) * 10 * 100%));
 			background: var(--fg-neutral);
 			border-radius: 1000px;
+
+			&.recorded {
+				background: var(--fg-primary);
+			}
 		}
 
 		.vu-meter {

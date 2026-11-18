@@ -43,7 +43,7 @@ swarp.importAudioFile(async ({ file, sessionId, id: fileId, sidecars }, onProgre
 		input,
 
 		output: new Output({
-			// TODO: use flac? but it require's mediabunny's own flac encoder... but it makes for smaller file sizes. 
+			// TODO: use flac? but it require's mediabunny's own flac encoder... but it makes for smaller file sizes.
 			format: new WavOutputFormat(),
 			target: await binaryStorage.mediabunnyTarget(locator),
 		}),
@@ -63,6 +63,21 @@ swarp.importAudioFile(async ({ file, sessionId, id: fileId, sidecars }, onProgre
 				return sample;
 			},
 		},
+
+		tags: (existing) => ({
+			date: new Date(),
+			...existing,
+			// TODO: to put timestamped observation images alongside the audio
+			// images:
+			raw: {
+				// metadata tags for WAV is RIFF INFO block
+				// described in https://www.aelius.com/njh/wavemetatools/doc/riffmci.pdf
+				// page 23 & 24
+				// IARL: geolocation? (Archival Location)
+				ISFT: 'Cigale App (https://github.com/cigaleapp)',
+				
+			},
+		}),
 	});
 
 	conversion.onProgress = onProgress;

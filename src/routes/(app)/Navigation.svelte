@@ -3,7 +3,6 @@
 	import { fade } from 'svelte/transition';
 
 	import IconNext from '~icons/ri/arrow-right-s-fill';
-	import IconCameraFilled from '~icons/ri/camera-fill';
 	import IconCamera from '~icons/ri/camera-line';
 	import IconClassifyFilled from '~icons/ri/checkbox-multiple-fill';
 	import IconClassify from '~icons/ri/checkbox-multiple-line';
@@ -15,6 +14,8 @@
 	import IconResults from '~icons/ri/file-chart-line';
 	import IconImportFilled from '~icons/ri/import-fill';
 	import IconImport from '~icons/ri/import-line';
+	import IconRecorder from '~icons/ri/record-mail-line';
+	import IconWaveform from '~icons/ri/voiceprint-line';
 	import { page } from '$app/state';
 	import { percent } from '$lib/i18n';
 	import { previewingPrNumber, tables } from '$lib/idb.svelte';
@@ -27,7 +28,7 @@
 	import { isDebugMode } from '$lib/settings.svelte.js';
 	import { tooltip } from '$lib/tooltips.js';
 	import { uiState } from '$lib/uistate.svelte.js';
-	import { clamp } from '$lib/utils.js';
+	import { clamp, switchConditions, switchValue } from '$lib/utils.js';
 
 	import DeploymentDetails from './DeploymentDetails.svelte';
 	import ModalSubmitIssue from './ModalSubmitIssue.svelte';
@@ -76,7 +77,7 @@
 	// it's called "Results" after all
 	const resultsTabDisabled = false;
 
-	const importTabOpensCamera = $derived(
+	const importTabOpensCapture = $derived(
 		mobile.current && Boolean(uiState.currentProtocol?.capture)
 	);
 
@@ -372,18 +373,33 @@ Tab bar is only when a session is active
 					<span class="label">Session</span>
 				</a>
 
-				{#if importTabOpensCamera}
+				{#if importTabOpensCapture}
 					<a
 						href={resolve('/capture/')}
-						pw-testid="mobile-goto-camera"
+						pw-testid="mobile-goto-capture"
 						// aria-disabled={!isDebugMode() && importTabDisabled}
 						class:active={page.route.id === '/(app)/capture'}
 					>
-						{#if page.route.id === '/(app)/capture'}
-							<IconCameraFilled />
-						{:else}
-							<IconCamera />
-						{/if}
+						{const types = $derived(uiState.currentProtocol?.media.types ?? [])}
+
+						{const allowed = $derived(
+							switchConditions({
+								both: types.length > 1,
+								audio: types[0] === 'audio',
+								image: types[0] === 'image',
+							})
+						)}
+
+						{const Icon = $derived(
+							switchValue(allowed ?? 'both', {
+								both: IconRecorder,
+								audio: IconWaveform,
+								image: IconCamera,
+							})
+						)}
+
+						<!-- No filled variant since the capture page doesnt show the navbar -->
+						<Icon />
 						<span class="label">Capturer</span>
 					</a>
 				{:else}

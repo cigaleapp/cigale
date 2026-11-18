@@ -103,17 +103,23 @@ export async function amplitude(microphone: MicrophoneState) {
 	return value;
 }
 
+type Frame = {
+	recorded: boolean;
+	amplitude: number;
+};
+
 export class AmplitudeTracker {
 	/** in ms */
 	#pollrate = 100;
 	#historyLength = 50;
 	#interval: undefined | NodeJS.Timeout | number;
-	history = $state<number[]>([]);
+	history = $state<Frame[]>([]);
+	microphone = $state<MicrophoneState>();
 
-	latestSample = $derived(this.history.at(-1) ?? 0);
+	latestFrame = $derived(this.history.at(-1) ?? 0);
 
 	constructor(
-		private state: MicrophoneState,
+		microphone: MicrophoneState,
 		options: {
 			/** in seconds */
 			length?: number;
@@ -121,24 +127,29 @@ export class AmplitudeTracker {
 			rate?: number;
 		} = {}
 	) {
+		this.microphone = microphone;
 		if (options.rate) this.#pollrate = options.rate;
 		if (options.length) this.#historyLength = options.length;
-		this.history = range(this.historySamplesCount).map((_) => 0);
+		this.history = range(this.historySamplesCount).map((_) => ({
+			recorded: false,
+			amplitude: 0,
+		}));
 	}
 
 	get historySamplesCount() {
 		return Math.ceil((this.#historyLength * 1e3) / this.#pollrate);
 	}
 
-	#record(sample: number) {
+	#record(amplitude: number) {
+		if (!this.microphone) return;
 		this.history.splice(0, this.history.length - this.historySamplesCount);
-		this.history.push(sample);
+		this.history.push({ amplitude, recorded: this.microphone.recording });
 	}
 
 	start() {
 		this.#interval = setInterval(() => {
 			void (async () => {
-				if (!this.state.ready) return;
+				if (!this.microphone?.ready) return;
 				const { value } = await CapacitorAudioRecorder.getCurrentAmplitude();
 				this.#record(value);
 			})();
