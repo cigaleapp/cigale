@@ -48,6 +48,14 @@ export function locateFileOfObject<Table extends BinaryTableName>(
 	};
 }
 
+export async function findFreeLocatorForObject<Table extends BinaryTableName>(
+	table: Table,
+	object: CreateBytesObjectFields<Table>
+) {
+	const locator = locateFileOfObject(table, object);
+	return binaryStorage.findFree(locator);
+}
+
 export function locateImagesOfObject(base: BinaryStorageLocator): {
 	full: BinaryStorageLocator;
 	preview: BinaryStorageLocator;

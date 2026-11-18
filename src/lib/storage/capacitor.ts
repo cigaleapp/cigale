@@ -95,9 +95,20 @@ export async function CapacitorFilesystemBackend(): Promise<BinaryStorageBackend
 			const all = await this.bytes(locator);
 			return all.slice(start, end);
 		},
-		async mediabunny(locator) {
+		async mediabunnySource(locator) {
 			// TODO: see if we can do random access instead of RAM full load
 			return new mediabunny.BufferSource(await this.bytes(locator));
+		},
+		async mediabunnyTarget(locator) {
+			// TODO: see if we can do random access instead of RAM full load
+			return new mediabunny.BufferTarget({
+				onFinalize: async (buffer) => {
+					await this.write(locator, {
+						bytes: buffer,
+						type: 'application/octet-stream',
+					});
+				},
+			});
 		},
 		async write(locator, content) {
 			let base64: string;

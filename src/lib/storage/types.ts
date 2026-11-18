@@ -65,7 +65,11 @@ export interface BinaryStorageBackend<Name extends BinaryStorageName = BinarySto
 	/**
 	 * @returns a Mediabunny source of the given file
 	 */
-	mediabunny(locator: BinaryStorageLocator): Promise<import('mediabunny').Source>;
+	mediabunnySource(locator: BinaryStorageLocator): Promise<import('mediabunny').Source>;
+	/**
+	 * @returns a Mediabunny sink of the given file
+	 */
+	mediabunnyTarget(locator: BinaryStorageLocator): Promise<import('mediabunny').Target>;
 }
 
 export type BinaryStorageLocator<Filename extends string = string> = {

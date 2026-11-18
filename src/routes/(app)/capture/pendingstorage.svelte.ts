@@ -127,7 +127,7 @@ export class PendingStorage {
 
 		try {
 			const { name } = await binaryStorage.create(
-				this.locator('audio', this.nextFilename()),
+				this.locator('audio', this.nextFilename('audio')),
 				{
 					type: this.audioContentType,
 					bytes: await data.arrayBuffer(),
@@ -160,7 +160,7 @@ export class PendingStorage {
 
 		try {
 			const { name } = await binaryStorage.create(
-				this.locator('photos', this.nextFilename()),
+				this.locator('photos', this.nextFilename('photos')),
 				{
 					type: this.photosContentType,
 					base64: data,
@@ -209,9 +209,9 @@ export class PendingStorage {
 		});
 
 		for await (const location of binaryStorage.list(this.locator(kind, ''))) {
-			if (!location.name.match(this.filenamePattern)) {
+			if (!location.name.match(this.filenamePattern(kind))) {
 				this.warn(
-					`session's directory contains unrelated file ${JSON.stringify(location.name)} (doesnt match ${this.filenamePattern}), ignoring`
+					`session's directory contains unrelated file ${JSON.stringify(location.name)} (doesnt match ${this.filenamePattern(kind)}), ignoring`
 				);
 
 				continue;
@@ -363,17 +363,35 @@ export class PendingStorage {
 		return 'audio/m4a';
 	}
 
+	private contentType(type: 'audio' | 'photos') {
+		switch (type) {
+			case 'photos':
+				return this.photosContentType;
+			case 'audio':
+				return this.audioContentType;
+		}
+	}
+
+	private fileNamePart(type: 'audio' | 'photos') {
+		switch (type) {
+			case 'photos':
+				return 'IMG';
+			case 'audio':
+				return 'Recording';
+		}
+	}
+
 	/**
 	 * Will receive _2, _3, etc. when using it to write files thanks to BinaryStorage.create
 	 */
-	private nextFilename() {
-		const extension = this.photosContentType.split('/').at(-1)!.toUpperCase();
-		return `IMG.${extension}` as const;
+	private nextFilename(type: 'audio' | 'photos') {
+		const [, ext] = this.contentType(type).split('/', 2);
+		return `${this.fileNamePart(type)}.${ext.toUpperCase()}` as const;
 	}
 
-	private get filenamePattern() {
-		const [, ext] = this.photosContentType.split('/', 2);
-		return new RegExp(`^IMG_(\\d+)\\.${ext.toUpperCase()}$`);
+	private filenamePattern(type: 'audio' | 'photos') {
+		const [, ext] = this.contentType(type).split('/', 2);
+		return new RegExp(`^${this.fileNamePart(type)}_(\\d+)\\.${ext.toUpperCase()}$`);
 	}
 
 	private locator<Name extends string>(

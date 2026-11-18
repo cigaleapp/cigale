@@ -18,7 +18,7 @@ export interface WaveformSvgOptions {
  * decode.ts) and returns a single scalable SVG string
  */
 export async function renderWaveformSvg(
-	{ samples }: DecodedAudioMono,
+	{ data: samples }: DecodedAudioMono,
 	options: WaveformSvgOptions = {}
 ): Promise<{
 	image: string;

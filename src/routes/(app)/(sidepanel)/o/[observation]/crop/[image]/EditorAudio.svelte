@@ -193,6 +193,7 @@
 	.spectrogram {
 		/* margin-top: auto; */
 		flex: 1 1;
+		max-height: 50vh;
 		/** Match with spectrogram background */
 		/* background: black; */
 	}

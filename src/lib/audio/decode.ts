@@ -1,6 +1,9 @@
 export type DecodedAudioMono = {
-	samples: Float32Array<ArrayBuffer>;
+	data: Float32Array<ArrayBuffer>;
+	format: `${'u8' | 's16' | 's32' | 'f32'}${'' | '-planar'}`;
+	numberOfChannels: number;
 	sampleRate: number;
+	timestamp: number;
 };
 
 export async function decodeToMono(
@@ -16,5 +19,12 @@ export async function decodeToMono(
 		const ch = buffer.getChannelData(c);
 		for (let i = 0; i < mono.length; i++) mono[i] += ch[i] / buffer.numberOfChannels;
 	}
-	return { samples: mono, sampleRate: buffer.sampleRate };
+	return {
+		data: mono,
+		sampleRate: buffer.sampleRate,
+		// planar or not doesnt matter since we have a single channel
+		format: 'f32-planar',
+		numberOfChannels: 1,
+		timestamp: 0,
+	};
 }

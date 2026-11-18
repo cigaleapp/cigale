@@ -83,6 +83,8 @@
 		}
 	});
 
+	const sfxEnabled = $derived(getSettings().timerSounds && captureType !== 'sound');
+
 	function setShootingPhase(phase: ShootingPhase) {
 		shootingPhase = phase;
 		if (!uiState.currentSessionId) return;
@@ -171,6 +173,14 @@
 	);
 
 	const failure = $derived(camera.failure || microphone.failure);
+
+	const shooting = $derived(
+		microphone.recording ||
+			(shootingPhase !== 'inert' &&
+				shootingPhase !== 'done' &&
+				timer?.config.shoot === 'manually' &&
+				!timer?.paused)
+	);
 
 	// The entire page needs to be transparent so that the native preview
 	// (that isn't within the DOM) can be seen through the UI
@@ -262,22 +272,28 @@
 			.filter((m) => m.infer && 'capture' in m.infer && m.infer.capture === selector);
 
 		async function askForPics() {
-			// Gather all file-type metadata with before-timer capture inference
-			const picsToTake = beforeTimerInferences
-				.filter((m) => m.type === 'file')
-				.filter((m) => m.accept.includes('image/*'));
+			forceLoadCamera = true;
 
-			pendingStorage.freezeCount();
+			try {
+				// Gather all file-type metadata with before-timer capture inference
+				const picsToTake = beforeTimerInferences
+					.filter((m) => m.type === 'file')
+					.filter((m) => m.accept.includes('image/*'));
 
-			for (const metadata of picsToTake) {
-				freezeFloatingMessage('Prendre en photo', metadata.label);
-				const pic = await waitForCapture(camera);
-				await pendingStorage.flushToMetadata(pic.name, metadata.id);
+				pendingStorage.freezeCount();
+
+				for (const metadata of picsToTake) {
+					freezeFloatingMessage('Prendre en photo', metadata.label);
+					const pic = await waitForCapture(camera);
+					await pendingStorage.flushToMetadata(pic.name, metadata.id);
+				}
+
+				await pendingStorage.unfreezeCount();
+
+				clearFloatingMessage();
+			} finally {
+				forceLoadCamera = false;
 			}
-
-			await pendingStorage.unfreezeCount();
-
-			clearFloatingMessage();
 		}
 
 		if (selector === 'before-timer') await askForPics();
@@ -358,7 +374,7 @@
 
 				if (settings.shoot === 'on-timer') {
 					await recordOrCapture(settings.duration);
-				} else if (getSettings().timerSounds) {
+				} else if (sfxEnabled) {
 					sfx('timer-lap');
 				}
 
@@ -369,7 +385,7 @@
 					await recordOrCapture(settings.duration);
 				}
 
-				if (getSettings().timerSounds) sfx('timer-finished');
+				if (sfxEnabled) sfx('timer-finished');
 				setShootingPhase('after-timer');
 				await Haptics.impact({ style: ImpactStyle.Heavy });
 				await runCaptureInferences('after-timer');
@@ -379,22 +395,28 @@
 		});
 	});
 
+	async function snapPhotoOrToggleRecording() {
+		if (!pendingStorage) return;
+		switch (captureType) {
+			case 'sound': {
+				if (recording) {
+					await recording.finish();
+				} else {
+					recording = await record(microphone, pendingStorage);
+				}
+				break;
+			}
+			case 'photo': {
+				await capture(camera, pendingStorage);
+				break;
+			}
+		}
+	}
+
 	async function shoot() {
 		if (!pendingStorage) return;
 		if (!timer) {
-			switch (captureType) {
-				case 'sound': {
-					if (recording) {
-						await recording.finish();
-					} else {
-						recording = await record(microphone, pendingStorage);
-					}
-				}
-				case 'photo': {
-					await capture(camera, pendingStorage);
-				}
-			}
-
+			await snapPhotoOrToggleRecording();
 			return;
 		}
 
@@ -408,7 +430,7 @@
 				break;
 			}
 			case 'before-timer': {
-				await capture(camera, pendingStorage);
+				await snapPhotoOrToggleRecording();
 				break;
 			}
 			case 'wait-start-timer': {
@@ -416,15 +438,15 @@
 				break;
 			}
 			case 'timer-running': {
-				await capture(camera, pendingStorage);
+				await snapPhotoOrToggleRecording();
 				break;
 			}
 			case 'after-timer': {
-				await capture(camera, pendingStorage);
+				await snapPhotoOrToggleRecording();
 				break;
 			}
 			case 'done': {
-				await capture(camera, pendingStorage);
+				await snapPhotoOrToggleRecording();
 				break;
 			}
 		}
@@ -505,7 +527,7 @@
 									],
 								},
 							}),
-							...orEmpty(Capacitor.isNativePlatform(), {
+							...orEmpty(Capacitor.isNativePlatform() && captureType !== 'sound', {
 								label: "Basculer sur l'autre caméra",
 								type: 'clickable' as const,
 								icon: IconSwitchCameraSides,
@@ -525,7 +547,7 @@
 									);
 								},
 							}),
-							{
+							...orEmpty(captureType !== 'sound', {
 								label: 'Son pour le timer',
 								type: 'selectable',
 								key: 'sfx',
@@ -537,7 +559,7 @@
 								onclick() {
 									toggleSetting('timerSounds');
 								},
-							},
+							}),
 							{
 								label: 'Quitter et garder les photos',
 								type: 'clickable',
@@ -628,9 +650,10 @@
 						>
 					{/each}
 				</div>
-			{:else if shootingPhase === 'inert'}
+			{:else}
 				<div class="modes">
 					<SegmentedGroup
+						disabled={shooting}
 						bind:current={captureType}
 						options={['photo', 'sound'] as const}
 					>
@@ -696,13 +719,6 @@
 			</p>
 		{/if}
 	</section>
-
-	{const shooting = $derived(
-		shootingPhase !== 'inert' &&
-			shootingPhase !== 'done' &&
-			timer?.config.shoot === 'manually' &&
-			!timer?.paused
-	)}
 
 	<section class="floating-action" data-blink={timer?.paused}>
 		{const canPause = $derived(timer?.started)}
@@ -816,8 +832,15 @@
 				></circle>
 
 				{#if !Icon || typeof Icon === 'string'}
-					<circle class="inside" cx="50%" cy="50%" r="37%" fill="var(--color, white)"
-					></circle>
+					<rect
+						class="inside"
+						class:recording={microphone.recording}
+						x="14%"
+						y="14%"
+						width="72%"
+						height="72%"
+						fill="var(--color, white)"
+					></rect>
 				{/if}
 
 				{#if timer?.started}
@@ -1067,10 +1090,19 @@
 			&.lap-progress {
 				transition: 50ms linear;
 			}
+		}
 
-			&.inside {
-				transform-origin: 50% 50%;
-				transition: scale 100ms ease;
+		.shoot-icon .inside {
+			transform-origin: 50% 50%;
+			rx: 50%;
+			transition:
+				scale 100ms ease,
+				rx 100ms ease;
+
+			&.recording {
+				scale: 50%;
+				rx: 10%;
+				--color: red;
 			}
 		}
 

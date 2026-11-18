@@ -1,49 +1,96 @@
-import { FLAC, Input, MP3, OGG, WAVE, WEBM } from 'mediabunny';
+import {
+	BufferSource,
+	Conversion,
+	FLAC,
+	Input,
+	MP3,
+	OGG,
+	Output,
+	WAVE,
+	WavOutputFormat,
+	WEBM,
+} from 'mediabunny';
 
-import { generateSpectrograms } from '$lib/audio/spectrogram.js';
+import { SpectrogramBuilder } from '$lib/audio/spectrogram.js';
 import { processSidecars } from '$lib/sidecars.js';
 import { binaryStorage } from '$lib/storage/index.js';
-import { createBytes, locateFileOfObject } from '$lib/storage/utils.js';
-import { throwError } from '$lib/utils.js';
+import { findFreeLocatorForObject, locateImagesOfObject } from '$lib/storage/utils.js';
 import { openDatabase, swarp } from '$worker';
 
-swarp.importAudioFile(async ({ file, sessionId, id: fileId, sidecars, decoded }) => {
-	const bytes = await file.arrayBuffer();
+const SEEKABLE_FORMATS = ['audio/mp3', 'audio/wav', 'audio/flac'];
 
-	const spectrogram = await generateSpectrograms(decoded);
+swarp.importAudioFile(async ({ file, sessionId, id: fileId, sidecars }, onProgress) => {
+	// const track = await input.getPrimaryAudioTrack()
+	// if(!track) throw new Error(`${file.name} n'a aucune piste audio`)
 
-	const storedFile = await createBytes('AudioFile', {
-		filename: file.name,
+	const locator = await findFreeLocatorForObject('AudioFile', {
+		filename: file.name.toLowerCase().endsWith('.wav') ? file.name : file.name + '.wav',
 		sessionId,
-		bytes,
-		type: file.type,
-		images: spectrogram.images,
 	});
-
-	const locator = locateFileOfObject('AudioFile', storedFile);
 
 	const input = new Input({
-		formats: [WAVE, MP3, OGG, WEBM, FLAC],
-		source: await binaryStorage.mediabunny(locator),
+		formats: [FLAC, MP3, WAVE, OGG, WEBM],
+		source: new BufferSource(await file.arrayBuffer()),
 	});
 
-	const metadata = await input.getMetadataTags();
+	const track = await input.getPrimaryAudioTrack();
+	if (!track) throw new Error('aucune piste audio');
 
-	console.log('metadata is', metadata);
+	const duration = await track.computeDuration();
+	let sampleRate: number | undefined;
+
+	let spectrogramBuilder: SpectrogramBuilder | undefined;
+
+	const conversion = await Conversion.init({
+		input,
+
+		output: new Output({
+			format: new WavOutputFormat(),
+			target: await binaryStorage.mediabunnyTarget(locator),
+		}),
+
+		audio: {
+			numberOfChannels: 1,
+			async process(sample) {
+				sampleRate = sample.sampleRate;
+
+				spectrogramBuilder ??= new SpectrogramBuilder({
+					sampleRate,
+					duration,
+				});
+
+				await spectrogramBuilder.pushAudioSample(sample);
+
+				return sample;
+			},
+		},
+	});
+
+	conversion.onProgress = onProgress;
+	await conversion.execute();
+	const spectrogram = await spectrogramBuilder!.finish();
+
+	const metadata = await input.getMetadataTags();
+	console.info(`${file.name} metadata:`, metadata);
+
+	input.dispose();
+
+	const spectrogramLocators = locateImagesOfObject(locator);
+
+	await binaryStorage.write(spectrogramLocators.full, spectrogram.images.full);
+	await binaryStorage.write(spectrogramLocators.preview, spectrogram.images.preview);
 
 	const db = await openDatabase();
 
 	await db.put('AudioFile', {
 		id: fileId,
-		...storedFile,
-		contentType: file.type,
+		sessionId,
+		filename: locator.name,
+		contentType: 'audio/wav',
 		spectrogram: spectrogram.info,
 		dimensions: {
-			duration:
-				((await input.getDurationFromMetadata()) ?? (await input.computeDuration())) * 1e3,
-			sampleRate:
-				(await input.getPrimaryAudioTrack().then((track) => track?.getSampleRate())) ??
-				throwError(`${file.name} ne contient aucune piste audio`),
+			duration: duration * 1e3,
+			sampleRate: sampleRate!,
 		},
 	});
 
@@ -59,11 +106,9 @@ swarp.importAudioFile(async ({ file, sessionId, id: fileId, sidecars, decoded })
 
 	// TODO: processAudioMetadata({...})
 
-	input.dispose();
-
 	return {
 		id: fileId,
-		filename: storedFile.filename,
+		filename: locator.name,
 		spectrogramUrl: URL.createObjectURL(spectrogram.images.preview),
 	};
 });

@@ -67,17 +67,20 @@ export const PROCEDURES = {
 			file: 'File',
 			sidecars: 'File[]',
 			/** Used to create the spectrogram image. */
-			decoded: {
-				samples: ['instanceof', Float32Array],
-				sampleRate: 'number',
-			},
+			// decoded: {
+			// 	data: ['instanceof', Float32Array],
+			// 	format: '/^(u8|s(16|32)|f32)(-planar)?$/',
+			// 	numberOfChannels: 'number.integer > 0',
+			// 	sampleRate: 'number',
+			// 	timestamp: 'number >= 0',
+			// },
 		}),
-		progress: type(['number', 'number']),
+		progress: type('0 <= number <= 1'),
 		success: type({
 			id: ID,
 			filename: 'string',
 			/** A blob URL */
-			spectrogramUrl: 'string'
+			spectrogramUrl: 'string',
 		}),
 	},
 	classify: {

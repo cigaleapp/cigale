@@ -99,7 +99,7 @@ export async function OPFSBackend(): Promise<BinaryStorageBackend<'opfs'>> {
 			handle!.read(bytes, { at: start });
 			return bytes;
 		},
-		async mediabunny(locator) {
+		async mediabunnySource(locator) {
 			const [directory, name] = await walk(locator);
 			const handle = await directory
 				.getFileHandle(name)
@@ -120,6 +120,28 @@ export async function OPFSBackend(): Promise<BinaryStorageBackend<'opfs'>> {
 					handle.close();
 				},
 			});
+		},
+		async mediabunnyTarget(locator) {
+			const [directory, name] = await walk(locator);
+			const handle = await directory
+				.getFileHandle(name, { create: true })
+				.then((handle) => handle.createSyncAccessHandle());
+
+			if (!handle) throw new Error(`Couldn't create sync access handle for ${name}`);
+
+			return new mediabunny.StreamTarget(
+				new WritableStream({
+					async write({ data, position }) {
+						handle.write(data, { at: position });
+					},
+					close() {
+						handle.close();
+					},
+					abort() {
+						handle.close();
+					},
+				})
+			);
 		},
 		async bytes(locator) {
 			return getFile(locator).then((file) => file.arrayBuffer());

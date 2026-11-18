@@ -40,20 +40,12 @@ export async function processAudioFile(
 		throw new Error('Aucune session active');
 	}
 
-	console.time('get bytes');
-	const bytes = await file.arrayBuffer();
-	console.timeEnd('get bytes');
-
-	console.time('decoding audio');
-	const decoded = await decodeToMono(bytes);
-	console.timeEnd('decoding audio');
 
 	const { filename, spectrogramUrl } = await swarpc.importAudioFile({
 		id,
 		file,
 		sidecars,
 		sessionId: uiState.currentSession.id,
-		decoded: decoded,
 	});
 
 	uiState.setPreviewURL(id, spectrogramUrl);

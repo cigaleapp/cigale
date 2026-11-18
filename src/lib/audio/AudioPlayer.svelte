@@ -2,6 +2,7 @@
 	import type { CenteredBoundingBox } from '$lib/BoundingBoxes.svelte.js';
 
 	import { watch } from 'runed';
+	import { untrack } from 'svelte';
 
 	import IconPause from '~icons/ri/pause-line';
 	import IconPlay from '~icons/ri/play-line';
@@ -61,8 +62,8 @@
 		},
 	});
 
+
 	$effect(() => {
-		if (!box) return;
 		if (!element) return;
 		if (currentTime >= croppedEnd) {
 			element.pause();
@@ -136,7 +137,7 @@
 	</div>
 
 	<div class="time">
-		{#if box.w < 1}
+		{#if croppedEnd < duration}
 			<code class="elapsed">
 				{formatDuration(currentTime)}
 			</code>
