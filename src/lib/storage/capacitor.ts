@@ -4,11 +4,7 @@ import { Capacitor } from '@capacitor/core';
 import { Directory, Filesystem } from '@capacitor/filesystem';
 import * as mediabunny from 'mediabunny';
 
-import { locatorToPath as _locatorToPath } from './utils.js';
-
-function locatorToPath(locator: BinaryStorageLocator) {
-	return ['Cigale', _locatorToPath(locator)].join('/');
-}
+import { locatorToPath } from './utils.js';
 
 export async function CapacitorFilesystemBackend(): Promise<BinaryStorageBackend<'capacitor'>> {
 	if (!Capacitor.isNativePlatform())
@@ -26,53 +22,47 @@ export async function CapacitorFilesystemBackend(): Promise<BinaryStorageBackend
 		debugdir(root)
 	);
 
+	function at(locator: BinaryStorageLocator) {
+		return {
+			directory: root,
+			path: ['Cigale', locatorToPath(locator)].join('/'),
+		};
+	}
+
 	return {
 		name: 'capacitor',
 		async resolvePath(locator) {
-			const result = await Filesystem.getUri({
-				directory: root,
-				path: locatorToPath(locator),
-			});
-
+			const result = await Filesystem.getUri(at(locator));
 			return result.uri;
 		},
 		async exists(locator) {
 			try {
-				const stat = await Filesystem.stat({
-					directory: root,
-					path: locatorToPath(locator),
-				});
-				console.debug('[local fs] exists? yes: ', locatorToPath(locator), stat);
+				// TODO: does getUri also fail if the file doesnt exist? it could be a slightly more performant check than stat maybe
+				const stat = await Filesystem.stat(at(locator));
+				console.debug('[local fs] exists? yes: ', at(locator).path, stat);
 			} catch (error) {
-				console.debug('[local fs] exists? no: ', locatorToPath(locator), error);
+				console.debug('[local fs] exists? no: ', at(locator).path, error);
 				return false;
 			}
 
 			return true;
 		},
 		async delete(locator) {
-			await Filesystem.deleteFile({
-				directory: root,
-				path: locatorToPath(locator),
-			});
+			await Filesystem.deleteFile(at(locator));
 		},
 		async bytes(locator) {
 			try {
-				const file = await Filesystem.readFile({
-					directory: root,
-					path: locatorToPath(locator),
-				});
-
-				const bytes = Uint8Array.fromBase64(file.data as string);
-
-				return bytes.buffer;
+				return await Filesystem.readFile(at(locator))
+					.then((result) => result.data as string)
+					.then((base64) => Uint8Array.fromBase64(base64))
+					.then((bytes) => bytes.buffer);
 			} catch (e) {
-				console.error(`Couldn't read file at ${locatorToPath(locator)}: `, e);
+				console.error(`Couldn't read file at ${at(locator).path}: `, e);
 				console.debug(`Contents at root:`, await debugdir(root));
 				console.debug(`Contents at ${locator.area}`, await debugdir(root, locator.area));
 				console.debug(
-					`Contents at ${locatorToPath({ ...locator, name: '' })}`,
-					await debugdir(root, locatorToPath({ ...locator, name: '' }))
+					`Contents at ${at({ ...locator, name: '' }).path}`,
+					await debugdir(root, at({ ...locator, name: '' }).path)
 				);
 
 				throw e;
@@ -88,7 +78,13 @@ export async function CapacitorFilesystemBackend(): Promise<BinaryStorageBackend
 			return new TextDecoder().decode(bytes);
 		},
 		async read(locator, type) {
-			return new File([await this.bytes(locator)], locator.name, { type });
+			const info = await Filesystem.stat(at(locator)).catch(() => undefined);
+
+			const attrs: FilePropertyBag = { type };
+
+			if (info) attrs.lastModified = info.mtime;
+
+			return new File([await this.bytes(locator)], locator.name, attrs);
 		},
 		async readChunk(locator, start, end) {
 			// TODO: see if its possible,
@@ -124,34 +120,27 @@ export async function CapacitorFilesystemBackend(): Promise<BinaryStorageBackend
 			}
 
 			await Filesystem.writeFile({
-				directory: root,
-				path: locatorToPath(locator),
+				...at(locator),
 				data: base64,
 				recursive: true,
 			});
 		},
 		async size(locator) {
-			const stat = await Filesystem.stat({
-				directory: root,
-				path: locatorToPath(locator),
-			}).catch(() => ({ size: 0 }));
+			const stat = await Filesystem.stat(at(locator)).catch(() => ({ size: 0 }));
 
 			return stat.size;
 		},
 		async count(locator) {
-			return Filesystem.readdir({
-				directory: root,
-				path: locatorToPath(locator),
-			})
+			return Filesystem.readdir(at(locator))
 				.then(({ files }) => files.length)
 				.catch(() => 0);
 		},
 		async *list(...locators) {
 			for (const locator of locators) {
-				const { files } = await Filesystem.readdir({
-					directory: root,
-					path: locatorToPath(locator),
-				}).catch(() => ({ files: [] }));
+				const { files } = await Filesystem.readdir(at(locator)).catch((error) => {
+					console.error('could not read ', at(locator).path, error);
+					return { files: [] };
+				});
 
 				for (const file of files) {
 					yield { ...locator, name: file.name };
@@ -160,8 +149,7 @@ export async function CapacitorFilesystemBackend(): Promise<BinaryStorageBackend
 		},
 		async clear(locator) {
 			await Filesystem.rmdir({
-				directory: root,
-				path: locatorToPath(locator),
+				...at(locator),
 				recursive: true,
 			});
 		},

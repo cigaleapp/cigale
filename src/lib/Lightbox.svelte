@@ -7,29 +7,74 @@
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 
 	interface Props {
-		/** Content shown normally */
-		trigger: Snippet;
+		/**
+		 * Content shown normally
+		 * If your trigger captures click events,
+		 * pass the onclick handler so that there's a way
+		 * to open the lightbox.
+		 */
+		trigger: Snippet<[{ onclick: () => void }]>;
 		/** Content shown when the trigger is clicked */
 		content: Snippet;
+		/** If content of lightbox has any interactive elements.
+		 * Disables closing by clicking on the content. Closing works via:
+		 * - the close button, or
+		 * - a backdrop click, or
+		 * - a click on an element that has [data-lightbox-close-on-click] */
+		interactive?: boolean;
+		/** Called when lightbox is closed */
+		onclose?: () => void;
 	}
 
-	const { trigger, content }: Props = $props();
+	const { trigger, onclose, content, interactive = false }: Props = $props();
 
 	let close = $state<() => void>();
 	let open = $state<() => void>();
+
+	/** Used to not render contents of lightbox when not opened */
+	let opened = $state(false);
+
+	const htmlid = $props.id();
+
+	const htmlids = $derived({
+		content: `${htmlid}-content`,
+	});
 </script>
 
 <Portal to="#app-layout">
 	<dialog
 		onclick={(e) => {
-			console.log('stop propagation', e);
+			// Element and not HTMLElement since we can hit elements inside of an icon (inline SVGs)
+			if (interactive && e.target instanceof Element) {
+				console.log(e.target, e.target.dataset);
+				// Three ways to close the modal by background click:
+				// click on <dialog>,
+				// or click on the content (but not anything INSIDE the content)
+				// or click on anything with the data attribute (see interactive prop docs)
+				const onDialog = e.target === e.currentTarget;
+				const onContentBackground = e.target.id === htmlids.content;
+				const onExplicitlyClosingElement =
+					e.target instanceof HTMLElement && 'lightboxCloseOnClick' in e.target.dataset;
+
+				// If not any of those 3 ways, cancel the close
+				if (!onDialog && !onContentBackground && !onExplicitlyClosingElement) return;
+			}
+
 			e.stopPropagation();
 			close?.();
 		}}
-		closedby="any"
+		closedby={interactive ? 'closerequest' : 'any'}
 		{@attach (node) => {
-			close = () => node.close();
-			open = () => node.showModal();
+			open = () => {
+				opened = true;
+				node.showModal();
+			};
+
+			close = () => {
+				onclose?.();
+				node.close();
+				opened = false;
+			};
 		}}
 	>
 		<div class="close">
@@ -44,8 +89,10 @@
 			</ButtonIcon>
 		</div>
 
-		<div class="contents">
-			{@render content()}
+		<div class="contents" id={htmlids.content}>
+			{#if opened}
+				{@render content()}
+			{/if}
 		</div>
 	</dialog>
 </Portal>
@@ -56,7 +103,11 @@
 		open?.();
 	}}
 >
-	{@render trigger()}
+	{@render trigger({
+		onclick() {
+			open?.();
+		},
+	})}
 </button>
 
 <style>

@@ -1760,3 +1760,18 @@ export function lcm(...args: number[]): number {
 }
 
 export type MaybePromise<T> = T | Promise<T>;
+
+/**
+ * Checks if the given number is neither a NaN nor infinite
+ */
+export function isRegularNumber(value: number): boolean {
+	return !Number.isNaN(value) && Number.isFinite(value);
+}
+
+/**
+ * Provider a fallback if the given number is
+ * either infinite or a NaN
+ */
+export function ensureRegularNumber<T>(value: number, fallback: T): number | T {
+	return isRegularNumber(value) ? value : fallback;
+}

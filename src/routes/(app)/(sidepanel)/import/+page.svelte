@@ -2,11 +2,14 @@
 	import { fade } from 'svelte/transition';
 
 	import IconCamera from '~icons/ri/camera-line';
+	import IconRecorder from '~icons/ri/record-mail-line';
 	import IconImport from '~icons/ri/upload-2-line';
+	import IconWaveform from '~icons/ri/voiceprint-line';
 	import AreaObservations from '$lib/AreaObservations.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import CardImage from '$lib/CardImage.svelte';
 	import CardMedia from '$lib/CardMedia.svelte';
+	import CardSound from '$lib/CardSound.svelte';
 	import Dropzone from '$lib/Dropzone.svelte';
 	import { promptForFiles } from '$lib/files';
 	import { tables } from '$lib/idb.svelte';
@@ -17,7 +20,6 @@
 	import { cancelTask, importMore } from '$lib/queue.svelte.js';
 	import { uiState } from '$lib/uistate.svelte.js';
 	import { unique } from '$lib/utils';
-	import CardSound from '$lib/CardSound.svelte';
 
 	const allFiles = $derived([
 		...unique(
@@ -122,8 +124,16 @@
 					Choisir des fichiers
 				</ButtonSecondary>
 				<ButtonSecondary onclick={async () => goto('/(app)/capture')}>
-					<IconCamera />
-					Prendre des photos
+					{#if uiState.acceptedMediaTypes === 'both'}
+						<IconRecorder />
+						Enregistrer images/son
+					{:else if uiState.acceptedMediaTypes === 'image'}
+						<IconCamera />
+						Prendre des photos
+					{:else if uiState.acceptedMediaTypes === 'audio'}
+						<IconWaveform />
+						Enregistrer du son
+					{/if}
 				</ButtonSecondary>
 			</div>
 		{/if}

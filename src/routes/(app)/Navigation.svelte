@@ -380,18 +380,8 @@ Tab bar is only when a session is active
 						// aria-disabled={!isDebugMode() && importTabDisabled}
 						class:active={page.route.id === '/(app)/capture'}
 					>
-						{const types = $derived(uiState.currentProtocol?.media.types ?? [])}
-
-						{const allowed = $derived(
-							switchConditions({
-								both: types.length > 1,
-								audio: types[0] === 'audio',
-								image: types[0] === 'image',
-							})
-						)}
-
 						{const Icon = $derived(
-							switchValue(allowed ?? 'both', {
+							switchValue(uiState.acceptedMediaTypes ?? 'both', {
 								both: IconRecorder,
 								audio: IconWaveform,
 								image: IconCamera,

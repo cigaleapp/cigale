@@ -11,11 +11,14 @@ export interface WaveformSvgOptions {
 	background?: string | null;
 	/** Scale so the loudest peak touches the edges. Default true. */
 	normalize?: boolean;
+	/** Scale so this value is considered peak. Anything above will be shown as clipped */
+	loudest?: number;
 }
 
 /**
  * WORKER-SAFE: no canvas, no DOM. Takes mono samples (see decodeToMono in
  * decode.ts) and returns a single scalable SVG string
+ * By default, the color is var(--waveform-color)
  */
 export async function renderWaveformSvg(
 	{ data: samples }: DecodedAudioMono,
@@ -53,7 +56,12 @@ export async function renderWaveformSvg(
 		max[x] = hi;
 		loudest = Math.max(loudest, Math.abs(lo), Math.abs(hi));
 	}
-	const scale = normalize && loudest > 0 ? 1 / loudest : 1;
+	const scale =
+		options.loudest && loudest > 0
+			? 1 / options.loudest
+			: normalize && loudest > 0
+				? 1 / loudest
+				: 1;
 
 	// One closed polygon: along the top edge (max) left to right,
 	// then back along the bottom edge (min) right to left.

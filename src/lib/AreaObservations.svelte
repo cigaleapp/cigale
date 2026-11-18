@@ -12,7 +12,10 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 
 -->
 
-<script generics="ItemData">
+<script lang="ts" generics="ItemData">
+	import type { GalleryItem } from '$lib/gallery';
+	import type { GroupSettings, Session, SortSettings } from '$lib/schemas/sessions';
+
 	import { watch } from 'runed';
 	import { SvelteSet } from 'svelte/reactivity';
 	import { fade } from 'svelte/transition';
@@ -41,25 +44,29 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	import { tooltip } from './tooltips.js';
 	import { compareBy, entries } from './utils.js';
 
-	/**
-	 * @import { Session } from '$lib/schemas/sessions';
-	 * @import { GalleryItem } from '$lib/gallery';
-	 * @typedef {Exclude<keyof typeof Session.infer['sort'], 'global'> | 'pending'} Zone
-	 * @typedef {GalleryItem<ItemData>} Item
-	 */
+	type ZoneOrPending = Exclude<keyof (typeof Session.infer)['sort'], 'global'> | 'pending';
+	type Zone = Exclude<ZoneOrPending, 'pending'>;
+	type Item = GalleryItem<ItemData>;
 
-	/**
-	 * @typedef Props
-	 * @type {object}
-	 * @property {Item[]} items
-	 * @property {import('svelte').Snippet<[ItemData, Item]>} item
-	 * @property {string} [highlight] id of the item to highlight (and scroll to)
-	 * @property {Zone} zone the zone where the area is, used to get grouping & sorting settings
-	 * @property {[string, Item[]] | undefined} [unroll] [observation id, inner items] unroll inner cards. Only relevant for items that have multiple cards (i.e. with a stack size > 1)
-	 */
+	interface Props {
+		items: Item[];
+		item: import('svelte').Snippet<[ItemData, Item]>;
+		highlight?: string;
+		zone: ZoneOrPending;
+		unroll?: [string, Item[]] | undefined;
+		sort?: typeof SortSettings.infer | null;
+		group?: typeof GroupSettings.infer | null;
+	}
 
-	/** @type {Props } */
-	let { items, item, zone, highlight, unroll = ['', []] } = $props();
+	let {
+		items,
+		item,
+		zone,
+		highlight,
+		unroll = ['', []],
+		sort: sortSettingsOverride,
+		group: groupSettingsOverride,
+	}: Props = $props();
 
 	const mobile = new IsMobile();
 
@@ -69,19 +76,16 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 
 	/**
 	 * Set of group `sortKey`s that are collapsed
-	 * @type {SvelteSet<string | number>}
 	 */
-	const collapsedGroups = new SvelteSet();
+	const collapsedGroups = new SvelteSet<string | number>();
 
 	watch([() => grouper], () => {
 		// Clear collapsed groups when grouping changes
 		collapsedGroups.clear();
 	});
 
-	/** @type {HTMLElement | undefined} */
-	let imagesContainer = $state();
-	/** @type {DragSelect |undefined} */
-	let dragselect;
+	let imagesContainer = $state<HTMLElement>();
+	let dragselect: DragSelect | undefined;
 
 	watch([() => mobile.current], () => {
 		if (mobile.current) {
@@ -155,11 +159,8 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 
 	/**
 	 * Virtualizes the key for the {#each} block, if needed. See doc for the `virtual` property on `items` prop's type
-	 * @param {object} param0
-	 * @param {string} param0.id
-	 * @param {boolean} [param0.virtual=false]
 	 */
-	function virtualizeKey({ id, virtual = false }) {
+	function virtualizeKey({ id, virtual = false }: { id: string; virtual?: boolean }) {
 		if (!virtual) return id;
 		return `${id}_virtual`;
 	}
@@ -175,20 +176,33 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		});
 	});
 
-	/**
-	 * @type {undefined | null | ((item: Item) => [string|number, string])}
-	 */
-	let grouper = $state();
+	let grouper = $state<null | ((item: Item) => [string | number, string])>();
 
-	const groupingSettings = $derived(
-		// @ts-expect-error zone=pending will make this undefined so itll fallback, this is the expected behavior
-		uiState.currentSession?.group[zone] ??
+	const groupingSettings = $derived.by(() => {
+		// override applies when defined (not undefined). but CAN be defined AND set to null (no grouping, but overrides default grouping), so we only use it if set to anything other than undefined
+		if (groupSettingsOverride !== undefined) return groupSettingsOverride;
+
+		const fallbackSettings = {
+			field: 'none',
+			tolerances: { dates: 'day', decimal: 'unit' },
+		} as const;
+
+		return (
+			// @ts-expect-error zone=pending will make this undefined so itll fallback, this is the expected behavior
+			uiState.currentSession?.group[zone] ??
 			uiState.currentSession?.group.global ??
-			/** @type {const} */ ({ field: 'none', tolerances: { dates: 'day', decimal: 'unit' } })
-	);
+			fallbackSettings
+		);
+	});
 
 	$effect(() => {
-		if (!groupingSettings) return;
+		// Grouping settings not loaded yet
+		if (groupingSettings === undefined) return;
+		// Grouping settings set to "no grouping"
+		if (groupingSettings === null) {
+			grouper = null;
+			return;
+		}
 
 		void galleryItemsGrouper(groupingSettings)
 			.then((result) => {
@@ -201,19 +215,31 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 			});
 	});
 
-	/**
-	 * @type {undefined | ((a: Item, b: Item) => number)}
-	 */
-	let sorter = $state();
+	let sorter = $state<(a: Item, b: Item) => number>();
 
-	const sortingSettings = $derived(
-		uiState.currentSession?.sort[zone] ??
+	const sortingSettings = $derived.by(() => {
+		// override applies when defined (not undefined). but CAN be defined AND set to null (no sorting, but overrides default sorting), so we only use it if set to anything other than undefined
+		if (sortSettingsOverride !== undefined) return sortSettingsOverride;
+
+		const fallbackSettings = { field: 'id', direction: 'asc' } as const;
+
+		return (
+			// zone=pending will make this undefined so itll fallback
+			uiState.currentSession?.sort[zone as Zone] ??
 			uiState.currentSession?.sort.global ??
-			/** @type {const} */ ({ field: 'id', direction: 'asc' })
-	);
+			fallbackSettings
+		);
+	});
 
 	$effect(() => {
-		if (!sortingSettings) return;
+		// Sorting settings not loaded yet
+		if (sortingSettings === undefined) return;
+		// Sorting settings set to "don't sort"
+		if (sortingSettings === null) {
+			// Sorting is stable in JS so this wont affect a pre-sorted items array
+			sorter = () => 0;
+			return;
+		}
 
 		void galleryItemsSorter(sortingSettings)
 			.then((result) => {
@@ -228,29 +254,34 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 
 	/**
 	 * undefined means the items are still being grouped/sorted (e.g. grouper and sorter are not loaded yet)
-	 * @type {undefined | Array<{ label: string, sortKey: string|number, items: Item[] }>}
 	 */
-	const groups = $derived.by(() => {
-		if (grouper === undefined) return undefined;
-		if (sorter === undefined) return undefined;
+	const groups = $derived.by<Array<{ label: string; sortKey: string | number; items: Item[] }>>(
+		() => {
+			if (grouper === undefined) return undefined;
+			if (sorter === undefined) return undefined;
 
-		/** @type {Record<string, {items: Item[], sortKey: string|number}>} */
-		const grouped = {};
+			/** @type {Record<string, {items: Item[], sortKey: string|number}>} */
+			const grouped = {};
 
-		if (grouper) {
-			for (const item of items) {
-				const [sortKey, label] = grouper(item);
-				grouped[label] ??= { items: [], sortKey };
-				grouped[label].items.push(item);
+			if (grouper) {
+				for (const item of items) {
+					const [sortKey, label] = grouper(item);
+					grouped[label] ??= { items: [], sortKey };
+					grouped[label].items.push(item);
+				}
+			} else {
+				grouped[''] = { items, sortKey: 0 };
 			}
-		} else {
-			grouped[''] = { items, sortKey: 0 };
-		}
 
-		return entries(grouped)
-			.map(([label, { items, sortKey }]) => ({ label, sortKey, items: items.sort(sorter) }))
-			.sort(compareBy(({ sortKey }) => sortKey));
-	});
+			return entries(grouped)
+				.map(([label, { items, sortKey }]) => ({
+					label,
+					sortKey,
+					items: items.sort(sorter),
+				}))
+				.sort(compareBy(({ sortKey }) => sortKey));
+		}
+	);
 
 	function roundUnrolledCorners() {
 		const items = [

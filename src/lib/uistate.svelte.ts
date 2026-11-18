@@ -14,7 +14,7 @@ import { tables } from './idb.svelte.js';
 import { getMetadataValue } from './metadata/index.js';
 import { defaultClassificationMetadata, defaultCropMetadata } from './protocols.js';
 import { isMetadataInProtocol } from './schemas/protocols.js';
-import { keys, mapValues, omit, pick, transformObject } from './utils.js';
+import { keys, mapValues, omit, pick, switchConditions, transformObject } from './utils.js';
 
 type NeuralModelSelector = (typeof NeuralModelSelector)['infer'];
 
@@ -172,6 +172,16 @@ export class UIState {
 	currentProtocol: DB.Protocol | undefined = $derived(
 		tables.Protocol.state.find((p) => p.id === this.currentProtocolId)
 	);
+
+	acceptedMediaTypes = $derived.by(() => {
+		const types = this.currentProtocol?.media.types ?? [];
+
+		return switchConditions({
+			both: types.length === 2,
+			audio: types[0] === 'audio',
+			image: types[0] === 'image',
+		});
+	});
 
 	/**
 	 * @deprecated we dont have a single classification metadata anymore

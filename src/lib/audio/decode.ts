@@ -4,6 +4,8 @@ export type DecodedAudioMono = {
 	numberOfChannels: number;
 	sampleRate: number;
 	timestamp: number;
+	/** in seconds */
+	duration: number;
 };
 
 export async function decodeToMono(
@@ -26,5 +28,6 @@ export async function decodeToMono(
 		format: 'f32-planar',
 		numberOfChannels: 1,
 		timestamp: 0,
+		duration: mono.length / buffer.sampleRate,
 	};
 }

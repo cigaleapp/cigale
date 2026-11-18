@@ -22,11 +22,14 @@ import { switchValue } from '$lib/utils.js';
 
 export const PENDING_PHOTOS_ROOT_FOLDER = '.pending_captures';
 
+const SECTIONS = ['exif', 'photos', 'audio'] as const;
+
+type Section = (typeof SECTIONS)[number];
+
+type Kind = Exclude<Section, 'exif'>;
+
 export type PendingPhotosRootFolders =
-	| typeof PENDING_PHOTOS_ROOT_FOLDER
-	| `${typeof PENDING_PHOTOS_ROOT_FOLDER}/exif`
-	| `${typeof PENDING_PHOTOS_ROOT_FOLDER}/photos`
-	| `${typeof PENDING_PHOTOS_ROOT_FOLDER}/audio`;
+	typeof PENDING_PHOTOS_ROOT_FOLDER | `${typeof PENDING_PHOTOS_ROOT_FOLDER}/${Section}`;
 
 // TODO: refactor this, make two private methods for each platform (native or web)'s impl of save/flush/clear/open/countPhotos
 
@@ -66,7 +69,10 @@ export class PendingStorage {
 
 	async refreshCount() {
 		if (this.frozenCount) return;
-		this.count = await binaryStorage.count(this.locator('photos', ''));
+		this.count =
+			(await binaryStorage.count(this.locator('photos', ''))) +
+			(await binaryStorage.count(this.locator('audio', ''))) +
+			this.audioURIs.length;
 	}
 
 	async saveExtraExif(photoName: string) {
@@ -184,16 +190,17 @@ export class PendingStorage {
 		}
 	}
 
-	async delete(filename: string) {
+	async delete(section: Section, filename: string) {
 		if (!this.frozenCount) {
 			// Same reasoning as .save()
 			this.count--;
 		}
 
 		try {
-			await binaryStorage.delete(this.locator('photos', filename));
-			await binaryStorage.delete(this.locator('audio', filename));
-			await binaryStorage.delete(this.locator('exif', `${filename}.json`));
+			await binaryStorage.delete(this.locator(section, filename));
+			if (section !== 'exif') {
+				await binaryStorage.delete(this.locator('exif', `${filename}.json`));
+			}
 		} catch (e) {
 			console.error('Could not delete media', e);
 			// toasts.error(errorMessage(e, 'Impossible de supprimer le média'));
@@ -202,15 +209,13 @@ export class PendingStorage {
 		}
 	}
 
-	async *files(...kinds: Array<'photos' | 'audio'>) {
+	async *files(...kinds: Kind[]) {
 		for (const kind of kinds) {
-
 			const contentType = switchValue(kind, {
 				photos: this.photosContentType,
 				audio: this.audioContentType,
 			});
 			for await (const location of binaryStorage.list(this.locator(kind, ''))) {
-
 				if (!location.name.match(this.filenamePattern(kind))) {
 					this.warn(
 						`session's directory contains unrelated file ${JSON.stringify(location.name)} (doesnt match ${this.filenamePattern(kind)}), ignoring`
@@ -232,13 +237,15 @@ export class PendingStorage {
 					continue;
 				}
 
-				yield await Filesystem.readFile({
-					path: uri,
-				})
+				const info = await Filesystem.stat({ path: uri }).catch(() => undefined);
+
+				const fileattrs: FilePropertyBag = { type: contentType };
+				if (info) fileattrs.lastModified = info.mtime;
+
+				yield await Filesystem.readFile({ path: uri })
 					.then((result) => result.data as string)
 					.then((base64) => Uint8Array.fromBase64(base64))
-					.then((bytes) => new Blob([bytes], { type: contentType }))
-					.then((blob) => new File([blob], filename));
+					.then((bytes) => new File([bytes], filename, fileattrs));
 			}
 		}
 	}
@@ -247,9 +254,7 @@ export class PendingStorage {
 		let sum = 0;
 
 		for await (const location of binaryStorage.list(
-			this.locator('photos', ''),
-			this.locator('audio', ''),
-			this.locator('exif', '')
+			...SECTIONS.map((s) => this.locator(s, ''))
 		)) {
 			sum += await binaryStorage.size(location);
 		}
@@ -286,7 +291,9 @@ export class PendingStorage {
 			}
 
 			if (imported) {
-				await this.delete(file.name).catch((e) => console.error('couldnt delete file', e));
+				await this.delete('photos', file.name).catch((e) =>
+					console.error('couldnt delete file', e)
+				);
 			}
 
 			done++;
@@ -310,12 +317,16 @@ export class PendingStorage {
 			}
 
 			if (imported) {
-				await this.delete(file.name).catch((e) => console.error('couldnt delete file', e));
+				await this.delete('audio', file.name).catch((e) =>
+					console.error('couldnt delete file', e)
+				);
 			}
 
 			done++;
 			onProgress({ total, done });
 		}
+
+		this.audioURIs = [];
 
 		return !hasErrors;
 	}
@@ -348,12 +359,20 @@ export class PendingStorage {
 			value: id,
 		});
 
-		await this.delete(name);
+		await this.delete('exif', name);
 	}
 
 	async clear() {
 		this.log('clearing');
-		await binaryStorage.clear(this.locator(null, ''));
+		for (const section of SECTIONS) {
+			await binaryStorage.clear(this.locator(section, ''));
+		}
+
+		for (const uri of this.audioURIs) {
+			await Filesystem.deleteFile({ path: uri }).catch(console.error);
+		}
+
+		this.audioURIs = [];
 	}
 
 	private get photosContentType(): `image/${string}` {
@@ -366,8 +385,8 @@ export class PendingStorage {
 		return 'audio/m4a';
 	}
 
-	private contentType(type: 'audio' | 'photos') {
-		switch (type) {
+	private contentType(kind: Kind) {
+		switch (kind) {
 			case 'photos':
 				return this.photosContentType;
 			case 'audio':
@@ -375,8 +394,8 @@ export class PendingStorage {
 		}
 	}
 
-	private fileNamePart(type: 'audio' | 'photos') {
-		switch (type) {
+	private fileNamePart(kind: Kind) {
+		switch (kind) {
 			case 'photos':
 				return 'IMG';
 			case 'audio':
@@ -387,22 +406,19 @@ export class PendingStorage {
 	/**
 	 * Will receive _2, _3, etc. when using it to write files thanks to BinaryStorage.create
 	 */
-	private nextFilename(type: 'audio' | 'photos') {
-		const [, ext] = this.contentType(type).split('/', 2);
-		return `${this.fileNamePart(type)}.${ext.toUpperCase()}` as const;
+	private nextFilename(kind: Kind) {
+		const [, ext] = this.contentType(kind).split('/', 2);
+		return `${this.fileNamePart(kind)}.${ext.toUpperCase()}` as const;
 	}
 
-	private filenamePattern(type: 'audio' | 'photos') {
-		const [, ext] = this.contentType(type).split('/', 2);
-		return new RegExp(`^${this.fileNamePart(type)}_(\\d+)\\.${ext.toUpperCase()}$`);
+	private filenamePattern(kind: Kind) {
+		const [, ext] = this.contentType(kind).split('/', 2);
+		return new RegExp(`^${this.fileNamePart(kind)}_(\\d+)\\.${ext.toUpperCase()}$`);
 	}
 
-	private locator<Name extends string>(
-		section: 'photos' | 'exif' | 'audio' | null,
-		name: Name
-	): BinaryStorageLocator<Name> {
+	private locator<Name extends string>(section: Section, name: Name): BinaryStorageLocator<Name> {
 		return {
-			area: section ? `${PENDING_PHOTOS_ROOT_FOLDER}/${section}` : PENDING_PHOTOS_ROOT_FOLDER,
+			area: `${PENDING_PHOTOS_ROOT_FOLDER}/${section}`,
 			sessionId: this.sessionId,
 			name,
 		};

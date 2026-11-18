@@ -471,6 +471,7 @@
 
 <ModalSubmitIssue type="bug" bind:open={submitBugReport} trigger={false} />
 
+<!-- TODO: add other options: finish() (import & quit), quit without clearing -->
 <ModalConfirm
 	key="modal_confirm_cancel_capture"
 	cancel="Ne pas quitter"
@@ -513,12 +514,14 @@
 											data: {},
 											subtext: displayTimerConfig(t),
 											async onclick() {
+												if (!uiState.currentSession) return;
 												timer?.stop();
 												await tables.Session.update(
-													uiState.currentSessionId!,
+													uiState.currentSession.id,
 													'captureModeSelectedTimer',
 													{
-														...getSettings().captureModeSelectedTimer,
+														...uiState.currentSession
+															.captureModeSelectedTimer,
 														[captureType]: i,
 													}
 												);

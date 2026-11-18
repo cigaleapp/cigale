@@ -30,20 +30,20 @@
 		/** status of the image processing */
 		status: Status;
 		/** text to show when status is not `"ok"` */
-		statusText: string;
+		statusText?: string;
 		/** statusText override when status == "loading" */
-		loadingStatusText: string;
+		loadingStatusText?: string;
 		/** whether this image can be selected */
-		selectable: boolean;
-		selected: boolean;
+		selectable?: boolean;
+		selected?: boolean;
 		/** whether this image is highlighted. selected implies highlighted. */
-		highlighted: boolean;
+		highlighted?: boolean;
 		/** original dimensions of the image */
 		dimensions?: { width: number; height: number | undefined };
 		/**  what to do with the images' bounding boxes. Either display them all, or crop to the first one. */
-		boxes: 'show-all' | 'apply-first' | 'none';
+		boxes?: 'show-all' | 'apply-first' | 'none';
 		/** array of bounding boxes. Values are between 0 and 1 (relative to the width/height of the image) */
-		boundingBoxes: TopLeftBoundingBox[];
+		boundingBoxes?: TopLeftBoundingBox[];
 		/** Duration of the media in milliseconds */
 		duration?: number;
 	}
@@ -85,14 +85,14 @@
 		dimensions,
 		selected = false,
 		selectable = true,
-		highlighted,
+		highlighted = false,
 		status,
 		audiofile,
-		statusText,
-		loadingStatusText,
+		statusText = 'Erreur',
+		loadingStatusText = 'Chargement…',
 		stacksize = 1,
 		boundingBoxes = [],
-		boxes,
+		boxes = 'none',
 		tooltip: tooltipText,
 		id,
 		type = 'image/x-unknown',
@@ -111,8 +111,6 @@
 		const { width } = coordsFitter(domains.timeFrequency)(box);
 		return width;
 	});
-
-	$inspect('cardmedia', title, 'aud', audiofile, 'd', duration);
 
 	const ContentTypeIcon = $derived(isAudio ? IconAudio : isVideo ? IconVideo : IconImage);
 
