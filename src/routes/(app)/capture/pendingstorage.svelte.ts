@@ -202,41 +202,44 @@ export class PendingStorage {
 		}
 	}
 
-	async *files(kind: 'photos' | 'audio') {
-		const contentType = switchValue(kind, {
-			photos: this.photosContentType,
-			audio: this.audioContentType,
-		});
+	async *files(...kinds: Array<'photos' | 'audio'>) {
+		for (const kind of kinds) {
 
-		for await (const location of binaryStorage.list(this.locator(kind, ''))) {
-			if (!location.name.match(this.filenamePattern(kind))) {
-				this.warn(
-					`session's directory contains unrelated file ${JSON.stringify(location.name)} (doesnt match ${this.filenamePattern(kind)}), ignoring`
-				);
+			const contentType = switchValue(kind, {
+				photos: this.photosContentType,
+				audio: this.audioContentType,
+			});
+			for await (const location of binaryStorage.list(this.locator(kind, ''))) {
 
-				continue;
+				if (!location.name.match(this.filenamePattern(kind))) {
+					this.warn(
+						`session's directory contains unrelated file ${JSON.stringify(location.name)} (doesnt match ${this.filenamePattern(kind)}), ignoring`
+					);
+
+					continue;
+				}
+
+				yield await binaryStorage.read(location, contentType);
 			}
 
-			yield await binaryStorage.read(location, contentType);
-		}
+			const uris = switchValue(kind, { photos: [], audio: this.audioURIs });
 
-		const uris = switchValue(kind, { photos: [], audio: this.audioURIs });
+			for (const uri of uris) {
+				const filename = uri.split('/').at(-1);
 
-		for (const uri of uris) {
-			const filename = uri.split('/').at(-1);
+				if (!filename) {
+					console.warn(`File URI ${uri} had no filename (no / segments), skipping`);
+					continue;
+				}
 
-			if (!filename) {
-				console.warn(`File URI ${uri} had no filename (no / segments), skipping`);
-				continue;
+				yield await Filesystem.readFile({
+					path: uri,
+				})
+					.then((result) => result.data as string)
+					.then((base64) => Uint8Array.fromBase64(base64))
+					.then((bytes) => new Blob([bytes], { type: contentType }))
+					.then((blob) => new File([blob], filename));
 			}
-
-			yield await Filesystem.readFile({
-				path: uri,
-			})
-				.then((result) => result.data as string)
-				.then((base64) => Uint8Array.fromBase64(base64))
-				.then((bytes) => new Blob([bytes], { type: contentType }))
-				.then((blob) => new File([blob], filename));
 		}
 	}
 

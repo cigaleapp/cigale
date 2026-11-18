@@ -95,16 +95,6 @@ export async function record(
 	};
 }
 
-export async function recordFor(
-	microphone: MicrophoneState,
-	storage: PendingStorage,
-	durationMs: number
-) {
-	const recording = await record(microphone, storage);
-	await sleep(durationMs);
-	return recording?.finish();
-}
-
 export async function amplitude(microphone: MicrophoneState) {
 	if (!microphone.ready) return;
 

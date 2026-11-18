@@ -31,6 +31,7 @@
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonInk from '$lib/ButtonInk.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
+	import DebugOnly from '$lib/DebugOnly.svelte';
 	import DropdownMenu from '$lib/DropdownMenu.svelte';
 	import { geolocationAccuracyToConfidence, getCurrentLocation } from '$lib/geolocation.js';
 	import { percent, plural } from '$lib/i18n.js';
@@ -57,7 +58,7 @@
 		startCamera,
 		waitForCapture,
 	} from './camera.js';
-	import { AmplitudeTracker, record, recordFor, startMicrophone } from './microphone.svelte.js';
+	import { AmplitudeTracker, record, startMicrophone } from './microphone.svelte.js';
 	import { PendingStorage } from './pendingstorage.svelte.js';
 	import { displayTimerConfig, Timer } from './timers.svelte.js';
 
@@ -174,19 +175,11 @@
 
 	const failure = $derived(camera.failure || microphone.failure);
 
-	const shooting = $derived(
-		microphone.recording ||
-			(shootingPhase !== 'inert' &&
-				shootingPhase !== 'done' &&
-				timer?.config.shoot === 'manually' &&
-				!timer?.paused)
-	);
-
 	// The entire page needs to be transparent so that the native preview
 	// (that isn't within the DOM) can be seen through the UI
 	const transparentDocument = $derived(ready && Capacitor.isNativePlatform());
 
-	let pendingStorage = $state(new PendingStorage());
+	let pendingStorage = $state(new PendingStorage(''));
 	$effect(() => {
 		if (!uiState.currentSessionId) {
 			// No sessions: go back to pick a session first!!!
@@ -340,10 +333,20 @@
 
 	async function recordOrCapture(durationMs: number | undefined) {
 		switch (captureType) {
-			case 'photo':
-				return capture(camera, pendingStorage);
-			case 'sound':
-				return recordFor(microphone, pendingStorage, durationMs ?? ms('10s'));
+			case 'photo': {
+				await capture(camera, pendingStorage);
+				break;
+			}
+			case 'sound': {
+				recording = await record(microphone, pendingStorage);
+
+				sleep(durationMs ?? ms('10s')).then(async () => {
+					recording?.finish();
+					recording = undefined;
+				});
+
+				break;
+			}
 		}
 	}
 
@@ -401,6 +404,7 @@
 			case 'sound': {
 				if (recording) {
 					await recording.finish();
+					recording = undefined;
 				} else {
 					recording = await record(microphone, pendingStorage);
 				}
@@ -455,6 +459,14 @@
 	onDestroy(() => {
 		timer?.stop();
 	});
+
+	const shooting = $derived(
+		microphone.recording ||
+			(shootingPhase !== 'inert' &&
+				shootingPhase !== 'done' &&
+				timer?.config.shoot === 'manually' &&
+				!timer?.paused)
+	);
 </script>
 
 <ModalSubmitIssue type="bug" bind:open={submitBugReport} trigger={false} />
@@ -471,6 +483,10 @@
 </ModalConfirm>
 
 <main data-snapping={camera.snapping} data-transparent={transparentDocument}>
+	<div class="debuginfo">
+		<DebugOnly data={{ shootingPhase, timerIndex, timer: timer?.config.name ?? null }} />
+	</div>
+
 	<header class="actions" pw-testid="actions-top">
 		<section class="left">
 			<DropdownMenu
@@ -500,8 +516,11 @@
 												timer?.stop();
 												await tables.Session.update(
 													uiState.currentSessionId!,
-													'captureModeSelectedTimerIndex',
-													i
+													'captureModeSelectedTimer',
+													{
+														...getSettings().captureModeSelectedTimer,
+														[captureType]: i,
+													}
 												);
 												resetShootingPhase();
 												setFloatingMessage('Timer', t.name);
@@ -517,8 +536,11 @@
 												timer?.stop();
 												await tables.Session.update(
 													uiState.currentSessionId!,
-													'captureModeSelectedTimerIndex',
-													null
+													'captureModeSelectedTimer',
+													{
+														...getSettings().captureModeSelectedTimer,
+														[captureType]: null,
+													}
 												);
 												setShootingPhase('inert');
 												setFloatingMessage('Timer', 'Aucun');
@@ -1180,5 +1202,12 @@
 			--height: 100px;
 			--inactive-bg: rgb(from var(--fg-primary) r g b / 25%);
 		}
+	}
+
+	.debuginfo {
+		position: absolute;
+		top: 7rem;
+		left: 0;
+		color: var(--fg-neutral);
 	}
 </style>

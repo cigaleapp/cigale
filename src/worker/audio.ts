@@ -17,8 +17,6 @@ import { binaryStorage } from '$lib/storage/index.js';
 import { findFreeLocatorForObject, locateImagesOfObject } from '$lib/storage/utils.js';
 import { openDatabase, swarp } from '$worker';
 
-const SEEKABLE_FORMATS = ['audio/mp3', 'audio/wav', 'audio/flac'];
-
 swarp.importAudioFile(async ({ file, sessionId, id: fileId, sidecars }, onProgress) => {
 	// const track = await input.getPrimaryAudioTrack()
 	// if(!track) throw new Error(`${file.name} n'a aucune piste audio`)
@@ -45,6 +43,7 @@ swarp.importAudioFile(async ({ file, sessionId, id: fileId, sidecars }, onProgre
 		input,
 
 		output: new Output({
+			// TODO: use flac? but it require's mediabunny's own flac encoder... but it makes for smaller file sizes. 
 			format: new WavOutputFormat(),
 			target: await binaryStorage.mediabunnyTarget(locator),
 		}),

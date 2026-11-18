@@ -23,7 +23,7 @@
 	async function load() {
 		if (!uiState.currentSession) return goto('/(app)/sessions');
 		storage = await PendingStorage.open(uiState.currentSession.id);
-		files = await Array.fromAsync(storage.photoFiles());
+		files = await Array.fromAsync(storage.files("photos", "audio"));
 	}
 
 	const windowDimensions = $state<{ height: number; width: number }>({ height: 0, width: 0 });
@@ -40,7 +40,7 @@
 	</ButtonIcon>
 
 	{#if files}
-		{plural(files.length, ['# photo capturée', '# photos capturées'])}
+		{plural(files.length, ['# média capturé', '# médias capturés'])}
 	{:else}
 		Photos capturées
 	{/if}
