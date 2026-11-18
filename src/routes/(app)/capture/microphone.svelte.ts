@@ -3,6 +3,7 @@ import type { PendingStorage } from './pendingstorage.svelte.js';
 import { Capacitor } from '@capacitor/core';
 import { AudioSessionMode, CapacitorAudioRecorder } from '@capgo/capacitor-audio-recorder';
 
+import { getSetting } from '$lib/settings.svelte.js';
 import { range, sleep } from '$lib/utils.js';
 
 export type MicrophoneState = {
@@ -51,6 +52,7 @@ export async function record(
 
 	await CapacitorAudioRecorder.startRecording({
 		audioSessionMode: AudioSessionMode.Default,
+		format: (await getSetting('audioCaptureUseAAC')) ? 'aac' : 'm4a',
 	});
 
 	microphone.recording = true;

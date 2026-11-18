@@ -1,4 +1,5 @@
 import {
+	ADTS,
 	BufferSource,
 	Conversion,
 	FLAC,
@@ -27,7 +28,7 @@ swarp.importAudioFile(async ({ file, sessionId, id: fileId, sidecars }, onProgre
 	});
 
 	const input = new Input({
-		formats: [FLAC, MP3, WAVE, OGG, WEBM],
+		formats: [ADTS, FLAC, MP3, WAVE, OGG, WEBM],
 		source: new BufferSource(await file.arrayBuffer()),
 	});
 
@@ -75,7 +76,6 @@ swarp.importAudioFile(async ({ file, sessionId, id: fileId, sidecars }, onProgre
 				// page 23 & 24
 				// IARL: geolocation? (Archival Location)
 				ISFT: 'Cigale App (https://github.com/cigaleapp)',
-				
 			},
 		}),
 	});

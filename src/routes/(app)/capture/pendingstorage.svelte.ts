@@ -15,6 +15,7 @@ import { imageFileId } from '$lib/images.js';
 import { processAudioFile } from '$lib/import/audio.svelte.js';
 import { processImageFile } from '$lib/import/images.svelte.js';
 import { storeMetadataValue } from '$lib/metadata/index.js';
+import { getSettings } from '$lib/settings.svelte.js';
 import { binaryStorage } from '$lib/storage/index.js';
 import { toasts } from '$lib/toasts.svelte.js';
 import { uiState } from '$lib/uistate.svelte';
@@ -381,7 +382,9 @@ export class PendingStorage {
 	}
 
 	private get audioContentType(): `audio/${string}` {
-		if (Capacitor.isNativePlatform()) return 'audio/m4a';
+		if (Capacitor.isNativePlatform()) {
+			return getSettings().audioCaptureUseAAC ? 'audio/aac' : 'audio/m4a';
+		}
 		return 'audio/m4a';
 	}
 
@@ -399,7 +402,7 @@ export class PendingStorage {
 			case 'photos':
 				return 'IMG';
 			case 'audio':
-				return 'Recording';
+				return 'Rec';
 		}
 	}
 
@@ -412,8 +415,7 @@ export class PendingStorage {
 	}
 
 	private filenamePattern(kind: Kind) {
-		const [, ext] = this.contentType(kind).split('/', 2);
-		return new RegExp(`^${this.fileNamePart(kind)}_(\\d+)\\.${ext.toUpperCase()}$`);
+		return new RegExp(`^${this.fileNamePart(kind)}_(\\d+)\\.(AAC|M4A)$`);
 	}
 
 	private locator<Name extends string>(section: Section, name: Name): BinaryStorageLocator<Name> {

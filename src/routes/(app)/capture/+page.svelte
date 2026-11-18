@@ -48,7 +48,14 @@
 	import { sfx } from '$lib/sound.js';
 	import { toasts } from '$lib/toasts.svelte.js';
 	import { uiState } from '$lib/uistate.svelte.js';
-	import { afterDelay, cycleValues, orEmpty, switchValue } from '$lib/utils.js';
+	import {
+		afterDelay,
+		cycleValues,
+		orEmpty,
+		sleep,
+		switchConditions,
+		switchValue,
+	} from '$lib/utils.js';
 	import ModalSubmitIssue from '$routes/(app)/ModalSubmitIssue.svelte';
 
 	import {
@@ -64,7 +71,6 @@
 
 	let submitBugReport = $state<() => void>();
 
-	// TODO: default to whatever the protocol defines
 	let captureType = $derived<'sound' | 'photo'>(
 		switchValue(uiState.currentProtocol?.media.types.at(0) ?? 'image', {
 			image: 'photo',
@@ -74,6 +80,22 @@
 
 	/** Load camera even if captureType isnt photo. Used when asking for pics at timer start for file session metadata */
 	let forceLoadCamera = $state(false);
+
+	/** Load microphone even if captureType isnt photo. Used when asking for sounds at timer start for file session metadata */
+	let forceLoadMicrophone = $state(false);
+
+	/** Takes forceLoad{Camera,Microphone} into account */
+	// This is separate from captureType because timers aren't affected by force-loads:
+	// force-loads are mostly caused by capture-type inference of session metadata,
+	// that happens at start/end of timers: a audio timer can still ask for a picture (setting forceLoadCamera to true)
+	// if the protocol has session metadata of type value with accept: image/* and capture: before-timer)
+	// Changing timers when force-loading happends would throw off the currently running timer
+	const effectiveCaptureType = $derived(
+		switchConditions({
+			sound: forceLoadMicrophone,
+			photo: forceLoadCamera,
+		}) ?? captureType
+	);
 
 	type ShootingPhase =
 		'inert' | 'before-timer' | 'wait-start-timer' | 'timer-running' | 'after-timer' | 'done';
@@ -89,7 +111,7 @@
 		}
 	});
 
-	const sfxEnabled = $derived(getSettings().timerSounds && captureType !== 'sound');
+	const sfxEnabled = $derived(getSettings().timerSounds && effectiveCaptureType !== 'sound');
 
 	function setShootingPhase(phase: ShootingPhase) {
 		shootingPhase = phase;
@@ -175,7 +197,7 @@
 	});
 
 	const ready = $derived(
-		captureType === 'photo' || forceLoadCamera ? camera.ready : microphone.ready
+		switchValue(effectiveCaptureType, { photo: camera.ready, sound: microphone.ready })
 	);
 
 	const failure = $derived(camera.failure || microphone.failure);
@@ -198,7 +220,7 @@
 	});
 
 	$effect(() => {
-		if (captureType !== 'sound') return;
+		if (effectiveCaptureType !== 'sound') return;
 		void startMicrophone(microphone, amplitudeTracker);
 		return () => void recording?.cancel();
 	});
@@ -221,7 +243,7 @@
 
 	$effect(() => {
 		App.addListener('resume', async () => {
-			if (!forceLoadCamera && captureType !== 'photo') return;
+			if (effectiveCaptureType !== 'photo') return;
 			console.debug('Resuming camera');
 			if (await cameraStarted(true)) await CameraPreview.stop();
 			const webPreview = document.getElementById('preview');
@@ -337,7 +359,7 @@
 	}
 
 	async function recordOrCapture(durationMs: number | undefined) {
-		switch (captureType) {
+		switch (effectiveCaptureType) {
 			case 'photo': {
 				await capture(camera, pendingStorage);
 				break;
@@ -405,7 +427,7 @@
 
 	async function snapPhotoOrToggleRecording() {
 		if (!pendingStorage) return;
-		switch (captureType) {
+		switch (effectiveCaptureType) {
 			case 'sound': {
 				if (recording) {
 					await recording.finish();
@@ -557,27 +579,30 @@
 									],
 								},
 							}),
-							...orEmpty(Capacitor.isNativePlatform() && captureType !== 'sound', {
-								label: "Basculer sur l'autre caméra",
-								type: 'clickable' as const,
-								icon: IconSwitchCameraSides,
-								closeOnSelect: false,
-								data: {},
-								async onclick() {
-									await CameraPreview.flip();
-									camera.side = cycleValues(['rear', 'front'], camera.side);
-									await refreshSupportedFlashModes(camera);
+							...orEmpty(
+								Capacitor.isNativePlatform() && effectiveCaptureType !== 'sound',
+								{
+									label: "Basculer sur l'autre caméra",
+									type: 'clickable' as const,
+									icon: IconSwitchCameraSides,
+									closeOnSelect: false,
+									data: {},
+									async onclick() {
+										await CameraPreview.flip();
+										camera.side = cycleValues(['rear', 'front'], camera.side);
+										await refreshSupportedFlashModes(camera);
 
-									setFloatingMessage(
-										'Objectif',
-										switchValue(camera.side, {
-											rear: 'Arrière',
-											front: 'Avant',
-										})
-									);
-								},
-							}),
-							...orEmpty(captureType !== 'sound', {
+										setFloatingMessage(
+											'Objectif',
+											switchValue(camera.side, {
+												rear: 'Arrière',
+												front: 'Avant',
+											})
+										);
+									},
+								}
+							),
+							...orEmpty(effectiveCaptureType !== 'sound', {
 								label: 'Son pour le timer',
 								type: 'selectable',
 								key: 'sfx',
@@ -708,7 +733,7 @@
 		<LoadingScreen {failure} loading={!ready} />
 	</div>
 
-	{#if captureType === 'photo' || forceLoadCamera}
+	{#if effectiveCaptureType === 'photo'}
 		<!-- https://github.com/capacitor-community/camera-preview#extra-web-installation-steps -->
 		<div
 			id="viewport"
@@ -724,7 +749,7 @@
 				};
 			}}
 		></div>
-	{:else}
+	{:else if effectiveCaptureType === 'audio'}
 		<!-- TODO: realtime audio level meter + waveform (or just coarse graph of amplitude history)? -->
 
 		<div class="audio-monitor">

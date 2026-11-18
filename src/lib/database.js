@@ -136,6 +136,8 @@ const Settings = table(
 		submitIssuesVia: '"form" | "github" = "form"',
 		cropperSidebarCollapsed: 'boolean = false',
 		timerSounds: 'boolean = true',
+		/** Use the crash-safe AAC format for audio recording instead of M4A */
+		audioCaptureUseAAC: 'boolean = true',
 		beamupPreferences: scope({ ID })
 			.type({
 				'[ID]': {
