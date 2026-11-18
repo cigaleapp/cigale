@@ -259,13 +259,13 @@
 					Importer plus
 				</ButtonSecondary>
 				<ButtonSecondary onclick={async () => goto('/(app)/capture')}>
-					{#if uiState.acceptedMediaTypes === 'both'}
+					{#if uiState.acceptedMediaType === 'both'}
 						<IconRecorder />
 						Capturer média
-					{:else if uiState.acceptedMediaTypes === 'image'}
+					{:else if uiState.acceptedMediaType === 'image'}
 						<IconCamera />
 						Appareil photo
-					{:else if uiState.acceptedMediaTypes === 'audio'}
+					{:else if uiState.acceptedMediaType === 'audio'}
 						<IconWaveform />
 						Enregistrer son
 					{/if}

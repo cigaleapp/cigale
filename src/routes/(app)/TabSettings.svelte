@@ -215,14 +215,14 @@
 					}),
 					...orEmpty(!bottomNavHasCapture, {
 						type: 'clickable' as const,
-						label: switchValue(uiState.acceptedMediaTypes, {
+						label: switchValue(uiState.acceptedMediaType, {
 							both: 'Capturer photos ou son',
 							image: 'Prendre des photos',
 							audio: 'Enregistrer du son',
 						}),
 						data: {
 							direction: null,
-							icon: switchValue(uiState.acceptedMediaTypes, {
+							icon: switchValue(uiState.acceptedMediaType, {
 								both: IconRecorder,
 								image: IconCamera,
 								audio: IconWaveform,

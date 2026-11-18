@@ -173,14 +173,16 @@ export class UIState {
 		tables.Protocol.state.find((p) => p.id === this.currentProtocolId)
 	);
 
-	acceptedMediaTypes = $derived.by(() => {
+	acceptedMediaType = $derived.by(() => {
 		const types = this.currentProtocol?.media.types ?? [];
 
-		return switchConditions({
+		const kind = switchConditions({
 			both: types.length === 2,
 			audio: types[0] === 'audio',
 			image: types[0] === 'image',
 		});
+
+		return kind ?? 'both';
 	});
 
 	/**

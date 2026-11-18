@@ -124,13 +124,13 @@
 					Choisir des fichiers
 				</ButtonSecondary>
 				<ButtonSecondary onclick={async () => goto('/(app)/capture')}>
-					{#if uiState.acceptedMediaTypes === 'both'}
+					{#if uiState.acceptedMediaType === 'both'}
 						<IconRecorder />
 						Capture d'images ou de son
-					{:else if uiState.acceptedMediaTypes === 'image'}
+					{:else if uiState.acceptedMediaType === 'image'}
 						<IconCamera />
 						Prendre des photos
-					{:else if uiState.acceptedMediaTypes === 'audio'}
+					{:else if uiState.acceptedMediaType === 'audio'}
 						<IconWaveform />
 						Enregistrer du son
 					{/if}

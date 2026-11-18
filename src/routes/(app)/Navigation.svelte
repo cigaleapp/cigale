@@ -381,7 +381,7 @@ Tab bar is only when a session is active
 						class:active={page.route.id === '/(app)/capture'}
 					>
 						{const Icon = $derived(
-							switchValue(uiState.acceptedMediaTypes ?? 'both', {
+							switchValue(uiState.acceptedMediaType ?? 'both', {
 								both: IconRecorder,
 								audio: IconWaveform,
 								image: IconCamera,
