@@ -1,8 +1,8 @@
 import type { BinaryStorageLocator } from './types.js';
-import type { Tables } from '$lib/database.js';
-import type { DatabaseHandle, IDBDatabaseType } from '$lib/idb.svelte.js';
+import type { Tables } from '#lib/database.js';
+import type { DatabaseHandle, IDBDatabaseType } from '#lib/idb.svelte.js';
 
-import { pick } from '$lib/utils.js';
+import { pick } from '#lib/utils.js';
 
 import { binaryStorage } from './index.js';
 

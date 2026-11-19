@@ -1,15 +1,24 @@
 <script lang="ts">
-	import type * as DB from '$lib/database.js';
+	import type * as DB from '#lib/database.js';
 
-	import { providers } from '$lib/accounts/registry.js';
-	import CompositeAvatar from '$lib/CompositeAvatar.svelte';
-	import OverflowableText from '$lib/OverflowableText.svelte';
+	import { providers } from '#lib/accounts/registry.js';
+	import CompositeAvatar from '#lib/CompositeAvatar.svelte';
+	import { databaseHandle } from '#lib/idb.svelte.js';
+	import OverflowableText from '#lib/OverflowableText.svelte';
 
 	interface Props {
 		account: DB.Account | undefined;
 	}
 	const { account }: Props = $props();
 	const provider = $derived(account ? providers.get(account.type) : undefined);
+
+	async function serverName(account: DB.Account) {
+		if (!('domain' in account)) return undefined;
+		if (!account.domain) return undefined;
+		if (!provider) return;
+		const servers = await provider.servers(databaseHandle());
+		return servers.find((server) => server.domain === account.domain)?.name ?? account.domain;
+	}
 </script>
 
 <div class="account">
@@ -30,14 +39,13 @@
 				<OverflowableText text={account.displayName} />
 			</div>
 			<div class="provider">
-				<OverflowableText
-					text={[
-						provider?.displayName ?? '(Plateforme inconnue)',
-						'domain' in account ? account.domain : undefined,
-					]
-						.filter(Boolean)
-						.join(' · ')}
-				/>
+				{#await serverName(account) then server}
+					<OverflowableText
+						text={[provider?.displayName ?? '(Plateforme inconnue)', server]
+							.filter(Boolean)
+							.join(' · ')}
+					/>
+				{/await}
 			</div>
 		{:else}
 			Compte introuvable

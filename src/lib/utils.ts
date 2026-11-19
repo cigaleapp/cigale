@@ -1419,7 +1419,7 @@ export function corsfix(url: string | URL): string {
 	}
 
 	return (
-		'https://cigale-cors-proxy-default-data-terra.ai.meso.umontpellier.fr/' +
+		'https://cigale-cors-proxy-biodimedia-data-terra.ai.meso.umontpellier.fr/' +
 		url.toString().replace(/^https?:\/\//, '')
 	);
 }

@@ -1,11 +1,11 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import type { SessionRemoteID } from '$lib/schemas/sessions.js';
+import type { SessionRemoteID } from '#lib/schemas/sessions.js';
 import type { HttpRequestResolverExtras, RequestHandlerOptions, ResponseResolver } from 'msw';
 
 import { http, HttpResponse } from 'msw';
 
-import { FixturePaths } from '$e2e/filepaths.js';
+import { FixturePaths } from '#e2e/filepaths.ts';
 
 import data5 from './asset-data-limit-5.json' with { type: 'json' };
 import dataOne from './asset-data-single.json' with { type: 'json' };
@@ -65,7 +65,7 @@ function get<ExtraParams extends Record<string, unknown> = BaseParams>(
 	...[route, resolver, options]: CorsedHandlerArgs<ExtraParams>
 ) {
 	return http.get<BaseParams & ExtraParams>(
-		'https://cigale-cors-proxy-default-data-terra.ai.meso.umontpellier.fr/:server.kobotoolbox.org' +
+		'https://cigale-cors-proxy-biodimedia-data-terra.ai.meso.umontpellier.fr/:server.kobotoolbox.org' +
 			route,
 		resolver,
 		options
@@ -76,7 +76,7 @@ function post<P extends Record<string, unknown> = BaseParams>(
 	...[route, resolver, options]: CorsedHandlerArgs<P>
 ) {
 	return http.post<BaseParams & P>(
-		'https://cigale-cors-proxy-default-data-terra.ai.meso.umontpellier.fr/:server.kobotoolbox.org' +
+		'https://cigale-cors-proxy-biodimedia-data-terra.ai.meso.umontpellier.fr/:server.kobotoolbox.org' +
 			route,
 		resolver,
 		options

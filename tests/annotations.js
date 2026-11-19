@@ -49,8 +49,15 @@ export function parseNavigatorDefineAnnotations(annotations) {
 }
 
 /**
- *
- * @param {Record<string, unknown>} values
+ * @typedef {string | number | boolean | null} JsonableScalar
+ * @typedef {{[key: string]: Jsonable}} JsonableObject
+ * @typedef {Jsonable[]} JsonableArray
+ * @typedef {JsonableScalar | JsonableObject | JsonableArray} Jsonable
+ */
+
+/**
+ * Settinf a value to "undefined" does not change its value (does nothing, as if it wasnt defined at all)
+ * @param {Record<string, Jsonable|undefined>} values
  * @returns {TestSettings}
  */
 function withNavigatorProperties(values) {
@@ -73,12 +80,14 @@ function withNavigatorProperties(values) {
  * @param {object} values
  * @param {number} [values.threads] sets hardwareConcurrency
  * @param {`${number} GB`} [values.ram] sets deviceMemory
+ * @param {boolean} [values.webgpu] enables/disables webgpu support
  * @returns {TestSettings}
  */
 export function withHardware(values) {
 	return withNavigatorProperties({
 		hardwareConcurrency: values.threads,
 		deviceMemory: values.ram ? Number.parseFloat(values.ram) : undefined,
+		gpu: values.webgpu === false ? null : undefined,
 	});
 }
 

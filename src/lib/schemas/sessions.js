@@ -1,12 +1,12 @@
 import { scope, type } from 'arktype';
 
-// schemas are imported by scripts that are run by Bun directly, so dont use $lib here
+// schemas are imported by scripts that are run by Bun directly, so dont use #lib/ here
 import { keys } from '../utils.js';
 import { ID, NamespacedMetadataID } from './common.js';
 import { MetadataValues } from './metadata.js';
 
 /**
- * @import * as DB from '$lib/database.js';
+ * @import * as DB from '#lib/database.js';
  */
 
 export const SORT_FIELDS = /** @type {const} */ ({

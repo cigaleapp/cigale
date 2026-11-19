@@ -1,6 +1,22 @@
 <script>
 	import { fade } from 'svelte/transition';
 
+	import Badge from '#lib/Badge.svelte';
+	import ButtonIcon from '#lib/ButtonIcon.svelte';
+	import ButtonInk from '#lib/ButtonInk.svelte';
+	import { errorMessage, uppercaseFirst } from '#lib/i18n.js';
+	import IconDatatype from '#lib/IconDatatype.svelte';
+	import { databaseHandle, dependencyURI, tables } from '#lib/idb.svelte.js';
+	import InlineTextInput from '#lib/InlineTextInput.svelte';
+	import MetadataBadges from '#lib/MetadataBadges.svelte';
+	import { goto, resolve, routeIsIn } from '#lib/paths.js';
+	import { exportProtocol } from '#lib/protocols.js';
+	import { namespacedMetadataId, removeNamespaceFromMetadataId } from '#lib/schemas/metadata.js';
+	import { seo } from '#lib/seo.svelte.js';
+	import { toasts } from '#lib/toasts.svelte.js';
+	import { tooltip } from '#lib/tooltips.js';
+	import { uiState } from '#lib/uistate.svelte.js';
+	import { slugify } from '#lib/utils.js';
 	import IconAdd from '~icons/ri/add-line';
 	import IconCollapse from '~icons/ri/arrow-left-double-fill';
 	import IconBack from '~icons/ri/arrow-left-line';
@@ -14,26 +30,9 @@
 	import IconExport from '~icons/ri/share-forward-line';
 	import { invalidate } from '$app/navigation';
 	import { page } from '$app/state';
-	import Badge from '$lib/Badge.svelte';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import ButtonInk from '$lib/ButtonInk.svelte';
-	import { errorMessage, uppercaseFirst } from '$lib/i18n';
-	import IconDatatype from '$lib/IconDatatype.svelte';
-	import { databaseHandle, dependencyURI, tables } from '$lib/idb.svelte.js';
-	import InlineTextInput from '$lib/InlineTextInput.svelte';
-	import MetadataBadges from '$lib/MetadataBadges.svelte';
-	import { resolve, routeIsIn } from '$lib/paths';
-	import { goto } from '$lib/paths.js';
-	import { exportProtocol } from '$lib/protocols';
-	import { namespacedMetadataId, removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';
-	import { seo } from '$lib/seo.svelte.js';
-	import { toasts } from '$lib/toasts.svelte';
-	import { tooltip } from '$lib/tooltips.js';
-	import { uiState } from '$lib/uistate.svelte.js';
-	import { slugify } from '$lib/utils';
 
 	import ModalDeleteProtocol from '../../ModalDeleteProtocol.svelte';
-	import { updater } from './updater.svelte';
+	import { updater } from './updater.svelte.js';
 
 	seo({ title: `Protocole ${page.params.id}` });
 
@@ -50,7 +49,7 @@
 
 	/**
 	 * Available route IDs relative to here.
-	 * @import { ChildRouteId, WithoutPrefix  } from '$lib/utils';
+	 * @import { ChildRouteId, WithoutPrefix  } from '#lib/utils.js';
 	 * @typedef {WithoutPrefix<"metadata/[metadata]", WithPrefix<"/(app)/protocols/[id]/edit">>} ProtocolRouteIds
 	 */
 
@@ -104,7 +103,7 @@
 	}
 
 	/**
-	 * @param {import('$lib/database').Metadata} def
+	 * @param {import('#lib/database.js').Metadata} def
 	 */
 	async function onDeleteMetadata(def) {
 		const metadataOrderBefore = structuredClone(metadataOrder);

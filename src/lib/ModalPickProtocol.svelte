@@ -63,7 +63,7 @@
 </script>
 
 <script lang="ts">
-	import type * as DB from '$lib/database.js';
+	import type * as DB from '#lib/database.js';
 
 	import { fade } from 'svelte/transition';
 

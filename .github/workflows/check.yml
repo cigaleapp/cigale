@@ -76,12 +76,13 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
       - name: Check for clutter
-        run: bun knip --reporter github-actions
+        run: bun clutter --reporter github-actions
 
   build:
     name: Build (production)
     uses: ./.github/workflows/build.yml
     with:
+      base-path: ''
       debug: false
 
   build-github-pages:
@@ -90,7 +91,16 @@ jobs:
     uses: ./.github/workflows/build.yml
     with:
       debug: false
+      base-path: /cigale
       github-pages: true
+
+  build-pr-preview:
+    if: github.event_name == 'pull_request'
+    name: Build (PR Preview)
+    uses: ./.github/workflows/build.yml
+    with:
+      debug: ${{ contains(github.event.pull_request.labels.*.name, 'unminified-preview') }}
+      base-path: /pr-${{ github.event.pull_request.number }}
 
   test:
     needs: lint
@@ -107,6 +117,7 @@ jobs:
     uses: ./.github/workflows/build.yml
     with:
       debug: true
+      base-path: ''
 
   e2e-concurrency:
     name: Compute E2E concurrency bucket
@@ -157,12 +168,13 @@ jobs:
 
   preview:
     if: github.event_name == 'pull_request' && !failure() && !cancelled()
-    needs: [build, build-debug, json-schema]
+    needs: [build-pr-preview, build, json-schema]
     name: PR Preview
     uses: ./.github/workflows/preview.yml
     secrets: inherit
     with:
-      artifact: ${{ contains(github.event.pull_request.labels.*.name, 'unminified-preview') && needs.build-debug.outputs.artifact || needs.build.outputs.artifact }}
+      artifact-web: ${{ needs.build-pr-preview.outputs.artifact }}
+      artifact-apk: ${{ needs.build.outputs.artifact }}
 
   deploy:
     if: github.event_name == 'push' && github.ref_name == 'main'
@@ -258,6 +270,9 @@ jobs:
       DIAWI_TOKEN: ${{ secrets.DIAWI_TOKEN }}
       DEV_DEPLOYMENTS_SSH_PRIVATE_KEY: ${{ secrets.DEV_DEPLOYMENTS_SSH_PRIVATE_KEY }}
       DEV_DEPLOYMENTS_HOST_KEY: ${{ secrets.DEV_DEPLOYMENTS_HOST_KEY }}
+      DATATERRA_DEV_DEPLOYS_BUCKET_KEY_ID: ${{ secrets.DATATERRA_DEV_DEPLOYS_BUCKET_KEY_ID }}
+      DATATERRA_DEV_DEPLOYS_BUCKET_KEY_SECRET: ${{ secrets.DATATERRA_DEV_DEPLOYS_BUCKET_KEY_SECRET }}
+      DATATERRA_DEV_DEPLOYS_BUCKET_NAME: ${{ secrets.DATATERRA_DEV_DEPLOYS_BUCKET_NAME }}
     with:
       push-update: true
       flavor: nightly
@@ -337,7 +352,7 @@ jobs:
       - if: needs.e2e.result == 'failure'
         run: |
           echo "MESSAGE=E2E: ${{ needs.e2e.outputs.failed }} failed, ${{ needs.e2e.outputs.flaky }} flaky, ${{ needs.e2e.outputs.total }} total" >> $GITHUB_ENV
-          echo "URL=https://pleye.gwen.works/${{ github.repository }}/branches/${{ github.event.pull_request.head.ref }}" >> $GITHUB_ENV
+          echo "URL=https://pleye-biodimedia-data-terra.ai.meso.umontpellier.fr/${{ github.repository }}/branches/${{ github.event.pull_request.head.ref }}" >> $GITHUB_ENV
       - if: needs.dont-merge-comment.result == 'failure'
         run: echo "MESSAGE=Code has don't merge comments" >> $GITHUB_ENV
       - if: needs.is-mergeable.result == 'success'

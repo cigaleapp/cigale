@@ -1,7 +1,7 @@
 import tippy from 'sveltejs-tippy';
 import xss from 'xss';
 
-import { hasPhysicalKeyboard } from './keyboard.svelte';
+import { hasPhysicalKeyboard } from './keyboard.svelte.js';
 import { APPLE_GLYPHS, displayPattern } from './KeyboardHint.svelte';
 import { omit } from './utils.js';
 

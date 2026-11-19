@@ -540,6 +540,7 @@ const protocol = {
 						name: 'Arthropodes (~17000 classes)',
 						description: 'Terrestres, France métropolitaine', // TODO
 						...MODELS.classifiers.arthropoda,
+						webgpuReady: true,
 						requirements: {
 							ram: '4 GB',
 						},

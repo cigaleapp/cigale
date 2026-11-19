@@ -1,7 +1,7 @@
-import type * as DB from '$lib/database.js';
-import type { DatabaseHandle } from '$lib/idb.svelte.js';
-import type { NamespacedMetadataID } from '$lib/schemas/common.js';
-import type { MetadataType, RuntimeValue } from '$lib/schemas/metadata.js';
+import type * as DB from '#lib/database.js';
+import type { DatabaseHandle } from '#lib/idb.svelte.js';
+import type { NamespacedMetadataID } from '#lib/schemas/common.js';
+import type { MetadataType, RuntimeValue } from '#lib/schemas/metadata.js';
 
 import { ArkErrors } from 'arktype';
 import convert from 'convert';
@@ -15,14 +15,14 @@ import {
 	differenceInYears,
 } from 'date-fns';
 
-import { distanceBetweenGeoCoordinates } from '$lib/geolocation.js';
+import { distanceBetweenGeoCoordinates } from '#lib/geolocation.js';
 import {
 	ensureNamespacedMetadataId,
 	Granularity,
 	InferenceConfigs,
 	removeNamespaceFromMetadataId,
-} from '$lib/schemas/metadata.js';
-import { entries, mapKeys, safeJSONParse, switchValue, transformObject, zip } from '$lib/utils.js';
+} from '#lib/schemas/metadata.js';
+import { entries, mapKeys, safeJSONParse, switchValue, transformObject, zip } from '#lib/utils.js';
 
 import { resolveMetadataImport } from '../imports.js';
 import { hasRuntimeType } from '../types.js';

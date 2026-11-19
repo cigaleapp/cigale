@@ -1,4 +1,4 @@
-import type { TreeNode } from '$lib/file-tree.js';
+import type { TreeNode } from '#lib/file-tree.js';
 
 export class ExporterFiles {
 	preview: TreeNode | undefined = $state();

@@ -187,11 +187,14 @@ test.describe('correct results.zip', () => {
 		      - text: C'est une photo de l'habitat à proximité
 		    - text: Date
 		    - textbox "Date"
+		    - textbox
 		    - button "Supprimer cette valeur" [disabled]:
 		      - img
 		    - paragraph: Moment où la photo a été prise
 		    - text: Localisation
 		    - combobox
+		    - button "Utiliser la position actuelle":
+		      - img
 		    - button "Supprimer cette valeur" [disabled]:
 		      - img
 		    - paragraph: Endroit où la photo a été prise
@@ -206,12 +209,11 @@ test.describe('correct results.zip', () => {
 		      - link "MapLibre":
 		        - /url: https://maplibre.org/
 		      - text: "| ©"
+		      - link "OpenStreetMap":
+		        - /url: https://www.openstreetmap.org/copyright
+		      - text: contributors ©
 		      - link "CARTO":
 		        - /url: https://carto.com/about-carto/
-		      - text: ", ©"
-		      - link "OpenStreetMap":
-		        - /url: http://www.openstreetmap.org/about/
-		      - text: contributors
 		    - text: Difficulté d'identification
 		    - button "Supprimer cette valeur" [disabled]:
 		      - img

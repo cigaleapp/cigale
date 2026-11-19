@@ -1,9 +1,9 @@
 <script>
-	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import Datetime from '$lib/Datetime.svelte';
-	import { nukeDatabase, previewingPrNumber } from '$lib/idb.svelte';
-	import Markdown from '$lib/Markdown.svelte';
-	import Modal from '$lib/Modal.svelte';
+	import ButtonSecondary from '#lib/ButtonSecondary.svelte';
+	import Datetime from '#lib/Datetime.svelte';
+	import { nukeDatabase, previewingPrNumber } from '#lib/idb.svelte.js';
+	import Markdown from '#lib/Markdown.svelte';
+	import Modal from '#lib/Modal.svelte';
 
 	const buildCommit = import.meta.env.buildCommit;
 
@@ -20,7 +20,7 @@
 	 * @param {"playwright" | "vitest" | "coverage" | "node-modules"} umbrellaDir
 	 */
 	function pageURL(umbrellaDir) {
-		return `https://pr-${previewingPrNumber}-reports.cigale.gwen.works/${umbrellaDir}`;
+		return `https://cigale-dev-biodimedia-data-terra.ai.meso.umontpellier.fr/pr-${previewingPrNumber}-reports/${umbrellaDir}`;
 	}
 
 	/**

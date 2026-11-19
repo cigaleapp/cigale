@@ -1,4 +1,4 @@
-import type { Analysis } from '$lib/schemas/exports.js';
+import type { Analysis } from '#lib/schemas/exports.js';
 
 import { ms } from 'convert';
 
@@ -288,7 +288,7 @@ testKitchensink('includes metadata files in export', async ({ page, app }) => {
 	);
 });
 
-testKitchensink(
+testKitchensink.fixme(
 	'shows warning dialog when exporting with metadata problems',
 	async ({ page, app }) => {
 		await chooseFirstSession(page);

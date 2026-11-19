@@ -2,9 +2,9 @@ import type { ProceduresMap } from 'swarpc';
 
 import { type } from 'arktype';
 
-import { Schemas } from '$lib/database.js';
-import { NodeProvenance } from '$lib/file-tree.js';
-import { NamespacedMetadataID } from '$lib/schemas/common.js';
+import { Schemas } from '#lib/database.js';
+import { NodeProvenance } from '#lib/file-tree.js';
+import { NamespacedMetadataID } from '#lib/schemas/common.js';
 
 export const LOCAL_STORAGE = type({
 	databaseName: 'string',
@@ -30,8 +30,8 @@ export const PROCEDURES = {
 			model: 'TypedArray.Uint8',
 			'classmapping?': 'string | undefined',
 			task: '"classification" | "detection"',
-			'webgpu?': 'boolean',
 			inferenceSessionId: 'string > 1',
+			enableWebGPU: 'boolean = true',
 		}),
 		progress: type('undefined'),
 		success: type('true'),

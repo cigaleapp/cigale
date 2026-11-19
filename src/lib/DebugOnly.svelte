@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { isDebugMode, setSetting } from '$lib/settings.svelte.js';
+	import { isDebugMode, setSetting } from '#lib/settings.svelte.js';
 
 	import ButtonInk from './ButtonInk.svelte';
 

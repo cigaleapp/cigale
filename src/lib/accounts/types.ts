@@ -1,6 +1,6 @@
-import type * as DB from '$lib/database.js';
-import type { DatabaseHandle } from '$lib/idb.svelte.js';
-import type { SessionRemoteID } from '$lib/schemas/sessions.js';
+import type * as DB from '#lib/database.js';
+import type { DatabaseHandle } from '#lib/idb.svelte.js';
+import type { SessionRemoteID } from '#lib/schemas/sessions.js';
 
 export type AuthenticationMethod = 'oauth' | 'token' | 'password';
 

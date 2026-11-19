@@ -9,7 +9,6 @@ import {
 	NamespacedMetadataID,
 	Probability,
 	References,
-	URLString,
 } from './schemas/common.js';
 import {
 	EXIFField,
@@ -33,7 +32,6 @@ import {
 	Observation as ObservationSchema,
 } from './schemas/observations.js';
 import {
-	BeamupSettings,
 	ExportsFilepathTemplateObservation,
 	Protocol as ProtocolSchema,
 } from './schemas/protocols.js';
@@ -86,7 +84,7 @@ const MetadataValueFile = table(
 		// see https://stackoverflow.com/a/46331687/9943464
 		// bug confirmed via Playwright testing
 		// file: 'File',
-		/** @deprecated use $lib/storage/backend.ts:binaryStorage instead */
+		/** @deprecated use #lib//storage/backend.ts:binaryStorage instead */
 		bytes: 'ArrayBuffer | "migrated"',
 		filename: 'string',
 		contentType: MIMEType,
@@ -158,6 +156,7 @@ const Settings = table(
 				by: 'me',
 			},
 		})),
+		enableWebGPU: 'boolean = false',
 		theme: type.enumerated('dark', 'light', 'auto'),
 		gridSize: type.number.pipe((n) => clamp(n, 0.5, 2)),
 		notifications: 'boolean | null = null',

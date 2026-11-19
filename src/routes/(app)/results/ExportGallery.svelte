@@ -3,11 +3,11 @@
 	import type { ExporterPlatforms } from './platforms.svelte.js';
 	import type * as DB from '$lib/database.js';
 
-	import { FULL_IMAGE_CROPBOX, toRelativeCoords } from '$lib/BoundingBoxes.svelte.js';
-	import CroppedImg from '$lib/CroppedImg.svelte';
-	import { tables } from '$lib/idb.svelte.js';
-	import { parseCropPadding } from '$lib/images.js';
-	import { uiState } from '$lib/uistate.svelte.js';
+	import { FULL_IMAGE_CROPBOX, toRelativeCoords } from '#lib/BoundingBoxes.svelte.js';
+	import CroppedImg from '#lib/CroppedImg.svelte';
+	import { tables } from '#lib/idb.svelte.js';
+	import { parseCropPadding } from '#lib/images.js';
+	import { uiState } from '#lib/uistate.svelte.js';
 
 	interface Props {
 		exporter: ExporterPlatforms | ExporterFiles;
