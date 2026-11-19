@@ -472,7 +472,7 @@ if (import.meta.vitest) {
  * @param {string} contentType content type of the image
  * @param {import('./schemas/metadata.js').RuntimeValue<'boundingbox'>} centeredBoundingBox
  * @param {string} [padding] padding to add around the bounding box when cropping images. string of the form "npx" or "n%"
- * @returns {Promise<{ cropped: ArrayBuffer, original: ArrayBuffer }>}
+ * @returns {Promise<{ cropped: ArrayBuffer, original: ArrayBuffer; croppedBlob: Blob  }>}
  */
 export async function cropImage(bytes, contentType, centeredBoundingBox, padding = '0px') {
 	const bitmap = await createImageBitmap(new Blob([bytes], { type: contentType }));
@@ -484,14 +484,12 @@ export async function cropImage(bytes, contentType, centeredBoundingBox, padding
 
 		const canvas = new OffscreenCanvas(croppedBitmap.width, croppedBitmap.height);
 		canvas.getContext('2d')?.drawImage(croppedBitmap, 0, 0);
-		const croppedBytes = await canvas
-			.convertToBlob({
-				type: ['image/png', 'image/jpeg'].includes(contentType) ? contentType : 'image/png',
-			})
-			.then((blob) => blob.arrayBuffer());
+		const croppedBlob = await canvas.convertToBlob({
+			type: ['image/png', 'image/jpeg'].includes(contentType) ? contentType : 'image/png',
+		});
 
 		// @ts-ignore
-		return { cropped: croppedBytes, original: bytes };
+		return { cropped: await croppedBlob.arrayBuffer(), original: bytes, croppedBlob };
 	} catch (error) {
 		throw new Error(
 			`Couldn't crop with ${JSON.stringify({ centeredBoundingBox, padding })}: ${error}`,

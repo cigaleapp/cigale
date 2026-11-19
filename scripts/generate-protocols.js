@@ -476,6 +476,7 @@ const protocol = {
 			sortable: true,
 			groupable: true,
 			infer: { exif: 'DateTimeOriginal' },
+			inaturalist: 'observed on',
 			darwincore: { date: 'dwc:eventDate', time: 'dwc:eventTime' },
 		},
 		[namespaced('shoot_location')]: {
@@ -486,6 +487,7 @@ const protocol = {
 			mergeMethod: 'average',
 			groupable: true,
 			infer: { latitude: { exif: 'GPSLatitude' }, longitude: { exif: 'GPSLongitude' } },
+			inaturalist: 'observed at',
 			darwincore: {
 				latitude: 'dwc:decimalLatitude',
 				longitude: 'dwc:decimalLongitude',
@@ -499,6 +501,7 @@ const protocol = {
 			required: true,
 			mergeMethod: 'union',
 			groupable: true,
+			inaturalist: 'crop',
 			infer: {
 				neural: [
 					{
