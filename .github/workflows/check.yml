@@ -168,12 +168,13 @@ jobs:
 
   preview:
     if: github.event_name == 'pull_request' && !failure() && !cancelled()
-    needs: [build-pr-preview, json-schema]
+    needs: [build-pr-preview, build, json-schema]
     name: PR Preview
     uses: ./.github/workflows/preview.yml
     secrets: inherit
     with:
-      artifact: ${{ needs.build-pr-preview.outputs.artifact }}
+      artifact-web: ${{ needs.build-pr-preview.outputs.artifact }}
+      artifact-apk: ${{ needs.build.outputs.artifact }}
 
   deploy:
     if: github.event_name == 'push' && github.ref_name == 'main'
