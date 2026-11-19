@@ -14,7 +14,7 @@
 	const { device }: Props = $props();
 </script>
 
-{#if !device.recording}
+{#if !device.recording && !device.forceLoadCamera && !device.forceLoadMicrophone}
 	<div class="typeswitch" transition:fade={{ duration: 500 }}>
 		<SegmentedGroup
 			disabled={device.shooting}

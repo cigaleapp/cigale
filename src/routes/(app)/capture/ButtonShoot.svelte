@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { CaptureDevice } from './device.svelte.js';
 
-	import IconAutoShoot from '~icons/ri/cpu-line';
+	import IconAutoShoot from '~icons/ri/scan-line';
 	import IconPlay from '~icons/ri/play-large-line';
 	import IconStartTimer from '~icons/ri/timer-line';
 	import { switchValue } from '$lib/utils.js';

@@ -1,3 +1,6 @@
+import { redirect } from '@sveltejs/kit';
+
+import { resolve } from '$app/paths';
 import { galleryEffectiveSorter } from '$lib/gallery.js';
 import { tables } from '$lib/idb.svelte.js';
 import { imageIdToFileId } from '$lib/images';
@@ -22,7 +25,7 @@ export async function load({ parent }) {
 	// even though uiState.currentSessionId is set.
 	await parent();
 
-	if (!uiState.currentSessionId) throw new Error('Aucune session active');
+	if (!uiState.currentSessionId) redirect(307, resolve('/sessions/'));
 
 	const groupSettings =
 		uiState.currentSession?.group.crop ?? uiState.currentSession?.group.global;

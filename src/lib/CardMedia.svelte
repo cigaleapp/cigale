@@ -88,7 +88,7 @@
 		highlighted = false,
 		status,
 		audiofile,
-		statusText = 'Erreur',
+		statusText = '',
 		loadingStatusText = 'Chargement…',
 		stacksize = 1,
 		boundingBoxes = [],

@@ -1,5 +1,6 @@
-import { error } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 
+import { resolve } from '$app/paths';
 import { galleryEffectiveSorter } from '$lib/gallery.js';
 import { listByIndex, tables } from '$lib/idb.svelte.js';
 import { observationMetadata } from '$lib/observations.js';
@@ -17,7 +18,7 @@ export async function load({ parent, params }) {
 
 	const metadataDefinitions = await tables.Metadata.list();
 
-	if (!uiState.currentSessionId) error(400, 'Aucune session active');
+	if (!uiState.currentSessionId) redirect(307, resolve('/sessions/'));
 
 	const currentSession = await tables.Session.get(uiState.currentSessionId);
 	if (!currentSession) error(404, 'Session active introuvable');
