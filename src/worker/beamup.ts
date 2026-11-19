@@ -3,7 +3,7 @@
 /// <reference lib="esnext" />
 /// <reference lib="webworker" />
 
-import { syncCorrections } from '$lib/beamup.js';
+import { syncCorrections } from '#lib/beamup.js';
 
 import { openDatabase, swarp } from './index.js';
 

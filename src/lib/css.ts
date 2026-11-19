@@ -1,4 +1,4 @@
-import type { Theme } from '$lib/colorscheme.svelte.js';
+import type { Theme } from '#lib/colorscheme.svelte.js';
 
 export function resolveColorVariable(theme: Theme, name: `--${string}`) {
 	// should be a light-dark() expression

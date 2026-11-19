@@ -1,5 +1,5 @@
 <script>
-	import { IsMobile } from '$lib/mobile.svelte.js';
+	import { IsMobile } from '#lib/mobile.svelte.js';
 
 	/**
 	 * @typedef Props

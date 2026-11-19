@@ -1,4 +1,4 @@
-import { goto } from '$lib/paths.js';
+import { goto } from '#lib/paths.js';
 
 export async function load({ params }) {
 	// TODO: remember last tab used ?

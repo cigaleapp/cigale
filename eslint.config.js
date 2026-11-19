@@ -2,6 +2,7 @@ import { fileURLToPath } from 'node:url';
 
 import { includeIgnoreFile } from '@eslint/compat';
 import js from '@eslint/js';
+import { loadConfig } from '@sveltejs/load-config';
 import prettier from 'eslint-config-prettier';
 import depend from 'eslint-plugin-depend';
 import oxlint from 'eslint-plugin-oxlint';
@@ -9,7 +10,7 @@ import svelte from 'eslint-plugin-svelte';
 import globals from 'globals';
 import ts from 'typescript-eslint';
 
-import svelteConfig from './svelte.config.js';
+const svelteConfig = (await loadConfig('./', { traverse: false }))?.config;
 
 const gitignorePath = fileURLToPath(new URL('./.gitignore', import.meta.url));
 

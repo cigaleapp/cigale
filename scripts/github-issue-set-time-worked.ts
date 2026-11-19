@@ -439,17 +439,23 @@ async function requestWakatime({
 			}),
 		{
 			headers: {
-				Authorization: `Basic ${env.WAKATIME_API_KEY}`,
+				Authorization: `Bearer ${env.WAKATIME_API_KEY}`,
 			},
 		}
-	).then((r) => r.text());
+	);
 
-	if (response.includes('Too Many Requests')) {
+	const text = await response.text();
+
+	if (text.includes('Too Many Requests')) {
 		await new Promise((resolve) => setTimeout(resolve, backoff));
 		return requestWakatime({ ...args, backoff: backoff * 3 });
 	}
 
-	return JSON.parse(response);
+	if (!response.ok) {
+		throw new Error(text);
+	}
+
+	return JSON.parse(text);
 }
 
 type IssueFragment<T = unknown> = T & {

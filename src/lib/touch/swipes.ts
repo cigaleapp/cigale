@@ -1,7 +1,7 @@
-import type { MaybeArray } from '$lib/utils.js';
+import type { MaybeArray } from '#lib/utils.js';
 import type { Attachment } from 'svelte/attachments';
 
-import { ensureArray, overrideStyle, switchValue } from '$lib/utils.js';
+import { ensureArray, overrideStyle, switchValue } from '#lib/utils.js';
 
 type Axis = 'horizontal' | 'vertical';
 type Direction = 'up' | 'left' | 'right' | 'down';

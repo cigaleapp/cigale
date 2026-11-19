@@ -1,20 +1,20 @@
 <script>
 	import { fade } from 'svelte/transition';
 
+	import ButtonIcon from '#lib/ButtonIcon.svelte';
+	import Field from '#lib/Field.svelte';
+	import FieldUrl from '#lib/FieldURL.svelte';
+	import InlineTextInput from '#lib/InlineTextInput.svelte';
 	import IconAdd from '~icons/ri/add-line';
 	import IconDescription from '~icons/ri/align-left';
 	import IconAuthors from '~icons/ri/group-line';
 	import IconRemove from '~icons/ri/indeterminate-circle-line';
 	import IconLearnMore from '~icons/ri/information-2-line';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import Field from '$lib/Field.svelte';
-	import FieldUrl from '$lib/FieldURL.svelte';
-	import InlineTextInput from '$lib/InlineTextInput.svelte';
 
 	import { updater } from '../updater.svelte.js';
 
 	/**
-	 * @import { Protocol } from '$lib/database.js';
+	 * @import { Protocol } from '#lib/database.js';
 	 * @typedef { Protocol['authors'][number] } Author
 	 */
 

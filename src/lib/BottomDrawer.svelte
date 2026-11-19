@@ -31,8 +31,8 @@
 	import { Portal } from 'bits-ui';
 	import { BottomSheet } from 'svelte-bottom-sheet';
 
+	import BottombarContent from '#routes/(app)/BottombarContent.svelte';
 	import IconShowPanel from '~icons/ri/arrow-up-s-line';
-	import BottombarContent from '$routes/(app)/BottombarContent.svelte';
 
 	import { mutationobserver } from './mutations.js';
 	import { onswipe } from './touch/swipes.js';
