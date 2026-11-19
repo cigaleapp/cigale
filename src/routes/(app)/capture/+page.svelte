@@ -1,18 +1,9 @@
 <script lang="ts">
-	import type { CameraState } from './camera.js';
-
-	import { CameraPreview } from '@capacitor-community/camera-preview';
-	import { App } from '@capacitor/app';
-	import { Capacitor } from '@capacitor/core';
-	import { Haptics, ImpactStyle } from '@capacitor/haptics';
-	import { CapacitorAudioRecorder } from '@capgo/capacitor-audio-recorder';
-	import { ms } from 'convert';
-	import { onDestroy } from 'svelte';
 	import { fade } from 'svelte/transition';
 
 	import '@layflags/rolling-number';
 
-	import type { MicrophoneState, RecordingCurrent } from './microphone.svelte.js';
+	import type { PageData, PageProps } from './$types.js';
 
 	import IconSwitchCameraSides from '~icons/ri/camera-switch-line';
 	import IconFinish from '~icons/ri/check-line';
@@ -33,467 +24,56 @@
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import DebugOnly from '$lib/DebugOnly.svelte';
 	import DropdownMenu from '$lib/DropdownMenu.svelte';
-	import { geolocationAccuracyToConfidence, getCurrentLocation } from '$lib/geolocation.js';
 	import { percent, plural } from '$lib/i18n.js';
-	import { databaseHandle, tables } from '$lib/idb.svelte.js';
+	import { tables } from '$lib/idb.svelte.js';
 	import LoadingScreen from '$lib/LoadingScreen.svelte';
 	import LoadingText, { Loading } from '$lib/LoadingText.svelte';
-	import { storeMetadataValue } from '$lib/metadata/storage.js';
 	import ModalConfirm from '$lib/ModalConfirm.svelte';
 	import { goto } from '$lib/paths.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
-	import { isMetadataInProtocol } from '$lib/schemas/protocols.js';
 	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
 	import { getSettings, toggleSetting } from '$lib/settings.svelte.js';
-	import { sfx } from '$lib/sound.js';
 	import { toasts } from '$lib/toasts.svelte.js';
-	import { uiState } from '$lib/uistate.svelte.js';
-	import {
-		afterDelay,
-		cycleValues,
-		orEmpty,
-		sleep,
-		switchConditions,
-		switchValue,
-	} from '$lib/utils.js';
+	import { orEmpty, switchValue } from '$lib/utils.js';
 	import ModalSubmitIssue from '$routes/(app)/ModalSubmitIssue.svelte';
 
-	import {
-		cameraStarted,
-		capture,
-		refreshSupportedFlashModes,
-		startCamera,
-		waitForCapture,
-	} from './camera.js';
-	import { AmplitudeTracker, record, startMicrophone } from './microphone.svelte.js';
-	import { PendingStorage } from './pendingstorage.svelte.js';
-	import { displayTimerConfig, Timer } from './timers.svelte.js';
+	import { CaptureDevice } from './device.svelte.js';
+	import { displayTimerConfig } from './timers.svelte.js';
 
 	let submitBugReport = $state<() => void>();
 
-	let captureType = $derived<'sound' | 'photo'>(
-		switchValue(uiState.currentProtocol?.media.types.at(0) ?? 'image', {
-			image: 'photo',
-			audio: 'sound',
-		})
-	);
+	const { data }: PageProps = $props();
+	const device = new CaptureDevice(data.deviceInit);
 
-	/** Load camera even if captureType isnt photo. Used when asking for pics at timer start for file session metadata */
-	let forceLoadCamera = $state(false);
-
-	/** Load microphone even if captureType isnt photo. Used when asking for sounds at timer start for file session metadata */
-	let forceLoadMicrophone = $state(false);
-
-	/** Takes forceLoad{Camera,Microphone} into account */
-	// This is separate from captureType because timers aren't affected by force-loads:
-	// force-loads are mostly caused by capture-type inference of session metadata,
-	// that happens at start/end of timers: a audio timer can still ask for a picture (setting forceLoadCamera to true)
-	// if the protocol has session metadata of type value with accept: image/* and capture: before-timer)
-	// Changing timers when force-loading happends would throw off the currently running timer
-	const effectiveCaptureType = $derived(
-		switchConditions({
-			sound: forceLoadMicrophone,
-			photo: forceLoadCamera,
-		}) ?? captureType
-	);
-
-	type ShootingPhase =
-		'inert' | 'before-timer' | 'wait-start-timer' | 'timer-running' | 'after-timer' | 'done';
-
-	let shootingPhase = $state<ShootingPhase>('inert');
-
-	let recording = $state<undefined | RecordingCurrent>();
-
-	$effect(() => {
-		if (!uiState.currentSession) return;
-		if (shootingPhase === 'inert') {
-			shootingPhase = uiState.currentSession.captureModeShootingPhase;
-		}
-	});
-
-	const sfxEnabled = $derived(getSettings().timerSounds && effectiveCaptureType !== 'sound');
-
-	function setShootingPhase(phase: ShootingPhase) {
-		shootingPhase = phase;
-		if (!uiState.currentSessionId) return;
-		void tables.Session.update(uiState.currentSessionId, 'captureModeShootingPhase', phase);
-	}
-
-	function resetShootingPhase() {
-		// TODO: handle other phases too
-		// we reset when re-opening the page from a state leaves us in a weird UI:
-		// for example, (for now), if we restart the page with a phase set to timer-running,
-		// the Timer instance won't be actually started so itll be weird.
-		// same for after/before phases, the frozen messages wont be shown...
-
-		setShootingPhase(
-			switchValue(shootingPhase, {
-				inert: 'inert', // duh
-				'before-timer': 'inert',
-				'wait-start-timer': 'wait-start-timer',
-				// for timer-running, handle it slightly better by setting it to wait-start-timer instead
-				'timer-running': 'wait-start-timer',
-				'after-timer': 'inert',
-				done: 'inert',
-			})
-		);
-	}
-
-	let floatingMessage = $state('');
-	let floatingMessageFadeout = $state<number>();
-	function setFloatingMessage(category: string, message: string) {
-		if (!message || !category) return;
-
-		if (floatingMessageFadeout) {
-			clearTimeout(floatingMessageFadeout);
-		}
-
-		floatingMessage = `${category}: ${message}`;
-		floatingMessageFadeout = afterDelay('3s', () => {
-			floatingMessage = '';
-		});
-	}
-
-	/**
-	 * Sets a floating message but prevents it from being removed after a timemout
-	 */
-	function freezeFloatingMessage(category: string, message: string) {
-		setFloatingMessage(category, message);
-		if (floatingMessageFadeout) clearTimeout(floatingMessageFadeout);
-	}
-
-	function clearFloatingMessage() {
-		if (floatingMessageFadeout) clearTimeout(floatingMessageFadeout);
-		floatingMessage = '';
-	}
-
-	let camera = $state<CameraState>({
-		ready: false,
-		snapping: false,
-		failure: '',
-		side: 'rear',
-		listeners: {
-			onsaved: [],
-		},
-		flash: {
-			current: 'off',
-			supported: [],
-		},
-	});
-
-	let microphone = $state<MicrophoneState>({
-		ready: false,
-		recording: false,
-		failure: '',
-		listeners: {
-			onsaved: [],
-		},
-	});
-
-	const amplitudeTracker = new AmplitudeTracker(microphone);
-
-	onDestroy(() => {
-		amplitudeTracker.stop();
-	});
-
-	const ready = $derived(
-		switchValue(effectiveCaptureType, { photo: camera.ready, sound: microphone.ready })
-	);
-
-	const failure = $derived(camera.failure || microphone.failure);
-
-	// The entire page needs to be transparent so that the native preview
-	// (that isn't within the DOM) can be seen through the UI
-	const transparentDocument = $derived(ready && Capacitor.isNativePlatform());
-
-	let pendingStorage = $state(new PendingStorage(''));
-	$effect(() => {
-		if (!uiState.currentSessionId) {
-			// No sessions: go back to pick a session first!!!
-			void goto('/(app)/sessions');
-			return;
-		}
-
-		PendingStorage.open(uiState.currentSessionId).then((storage) => {
-			pendingStorage = storage;
-		});
-	});
-
-	$effect(() => {
-		if (effectiveCaptureType !== 'sound') return;
-		void startMicrophone(microphone, amplitudeTracker);
-		return () => void recording?.cancel();
-	});
-
-	$effect(() => {
-		return () => CapacitorAudioRecorder.cancelRecording();
-	});
-
-	$effect(() => {
-		if (ready) console.debug('Capture device is ready');
-	});
-
-	$effect(() => {
-		document.body.dataset.transparent = transparentDocument.toString();
-
-		return () => {
-			document.body.dataset.transparent = 'false';
-		};
-	});
-
-	$effect(() => {
-		App.addListener('resume', async () => {
-			if (effectiveCaptureType !== 'photo') return;
-			console.debug('Resuming camera');
-			if (await cameraStarted(true)) await CameraPreview.stop();
-			const webPreview = document.getElementById('preview');
-			await startCamera(webPreview, camera);
-		});
-	});
-
-	onDestroy(() => {
-		CameraPreview.stop();
-		void recording?.cancel();
-	});
+	$inspect('sto', device.storage.count)
 
 	let askBeforeQuitting = $state<() => Promise<boolean>>();
 	async function quit() {
 		// Modal not ready yet
 		if (!askBeforeQuitting) return;
 
-		if (pendingStorage.count > 0) {
+		if (device.storage.count > 0) {
 			const quitAnyways = await askBeforeQuitting();
 			if (!quitAnyways) return;
 		}
 
-		void pendingStorage.clear();
-		resetShootingPhase();
-		await goto('/(app)/(sidepanel)/import');
+		void device.storage.clear();
+		device.resetShootingPhase();
+		await goto('/import/');
 	}
 
 	async function finish() {
-		const allOk = await pendingStorage.flush({
+		const allOk = await device.storage.flush({
 			onProgress({ done, total }) {
-				setFloatingMessage('Import', `${done}/${total} (${percent(done / total)})`);
+				device.floatingmsg.set('Import', `${done}/${total} (${percent(done / total)})`);
 			},
 		});
 
 		if (allOk) {
-			resetShootingPhase();
-			await goto('/(app)/(sidepanel)/import');
+			device.resetShootingPhase();
+			await goto('/import/');
 		}
 	}
-
-	async function runCaptureInferences(selector: 'before-timer' | 'after-timer') {
-		if (!uiState.currentProtocol) return;
-
-		const beforeTimerInferences = tables.Metadata.state
-			.filter((m) => isMetadataInProtocol(uiState.currentProtocol, m.id))
-			.filter((m) => m.infer && 'capture' in m.infer && m.infer.capture === selector);
-
-		async function askForPics() {
-			forceLoadCamera = true;
-
-			try {
-				// Gather all file-type metadata with before-timer capture inference
-				const picsToTake = beforeTimerInferences
-					.filter((m) => m.type === 'file')
-					.filter((m) => m.accept.includes('image/*'));
-
-				pendingStorage.freezeCount();
-
-				for (const metadata of picsToTake) {
-					freezeFloatingMessage('Prendre en photo', metadata.label);
-					const pic = await waitForCapture(camera);
-					await pendingStorage.flushToMetadata(pic.name, metadata.id);
-				}
-
-				await pendingStorage.unfreezeCount();
-
-				clearFloatingMessage();
-			} finally {
-				forceLoadCamera = false;
-			}
-		}
-
-		if (selector === 'before-timer') await askForPics();
-
-		// Gather all other before-timer capture inferences
-		for (const metadata of beforeTimerInferences) {
-			freezeFloatingMessage('Collecte', metadata.label);
-			switch (metadata.type) {
-				case 'file':
-					continue;
-				case 'date': {
-					await storeMetadataValue({
-						db: databaseHandle(),
-						type: 'date',
-						value: new Date(),
-						metadataId: metadata.id,
-						sessionId: uiState.currentSessionId!,
-						subjectId: uiState.currentSessionId!,
-					});
-					break;
-				}
-				case 'location': {
-					const position = await getCurrentLocation();
-					if (!position) return;
-
-					await storeMetadataValue({
-						db: databaseHandle(),
-						type: 'location',
-						confidence: geolocationAccuracyToConfidence(position.accuracy),
-						value: position,
-						metadataId: metadata.id,
-						sessionId: uiState.currentSessionId!,
-						subjectId: uiState.currentSessionId!,
-					});
-					break;
-				}
-			}
-		}
-
-		clearFloatingMessage();
-
-		if (selector === 'after-timer') await askForPics();
-	}
-
-	async function recordOrCapture(durationMs: number | undefined) {
-		switch (effectiveCaptureType) {
-			case 'photo': {
-				await capture(camera, pendingStorage);
-				break;
-			}
-			case 'sound': {
-				recording = await record(microphone, pendingStorage);
-
-				sleep(durationMs ?? ms('10s')).then(async () => {
-					recording?.finish();
-					recording = undefined;
-				});
-
-				break;
-			}
-		}
-	}
-
-	const timers = $derived(
-		uiState.currentProtocol?.capture?.timers?.filter((timer) =>
-			timer.for.includes(captureType)
-		) ?? []
-	);
-
-	const timerIndex = $derived(uiState.currentSession?.captureModeSelectedTimer[captureType]);
-
-	$effect(() => {
-		if (!timer) setShootingPhase('inert');
-	});
-
-	const timer = $derived.by(() => {
-		const settings = timers[timerIndex ?? -1];
-
-		if (!settings) return;
-		return new Timer(settings, {
-			onstart(t) {
-				setShootingPhase('timer-running');
-				setFloatingMessage('Timer', t.formatMessage(settings.messages.start));
-				void Haptics.impact({ style: ImpactStyle.Heavy });
-			},
-			async onlap(t) {
-				setFloatingMessage('Timer', t.formatMessage(settings.messages.lap));
-
-				if (settings.shoot === 'on-timer') {
-					await recordOrCapture(settings.duration);
-				} else if (sfxEnabled) {
-					sfx('timer-lap');
-				}
-
-				void Haptics.impact({ style: ImpactStyle.Medium });
-			},
-			async onfinished(t) {
-				if (settings.shoot === 'on-timer') {
-					await recordOrCapture(settings.duration);
-				}
-
-				if (sfxEnabled) sfx('timer-finished');
-				setShootingPhase('after-timer');
-				await Haptics.impact({ style: ImpactStyle.Heavy });
-				await runCaptureInferences('after-timer');
-				setFloatingMessage('Timer', t.formatMessage(settings.messages.end));
-				setShootingPhase('done');
-			},
-		});
-	});
-
-	async function snapPhotoOrToggleRecording() {
-		if (!pendingStorage) return;
-		switch (effectiveCaptureType) {
-			case 'sound': {
-				if (recording) {
-					await recording.finish();
-					recording = undefined;
-				} else {
-					recording = await record(microphone, pendingStorage);
-				}
-				break;
-			}
-			case 'photo': {
-				await capture(camera, pendingStorage);
-				break;
-			}
-		}
-	}
-
-	async function shoot() {
-		if (!pendingStorage) return;
-		if (!timer) {
-			await snapPhotoOrToggleRecording();
-			return;
-		}
-
-		switch (shootingPhase) {
-			case 'inert': {
-				setShootingPhase('before-timer');
-				void runCaptureInferences('before-timer').then(() => {
-					setShootingPhase('wait-start-timer');
-					freezeFloatingMessage('Timer', 'En attente du démarrage');
-				});
-				break;
-			}
-			case 'before-timer': {
-				await snapPhotoOrToggleRecording();
-				break;
-			}
-			case 'wait-start-timer': {
-				timer.start();
-				break;
-			}
-			case 'timer-running': {
-				await snapPhotoOrToggleRecording();
-				break;
-			}
-			case 'after-timer': {
-				await snapPhotoOrToggleRecording();
-				break;
-			}
-			case 'done': {
-				await snapPhotoOrToggleRecording();
-				break;
-			}
-		}
-	}
-
-	onDestroy(() => {
-		timer?.stop();
-	});
-
-	const shooting = $derived(
-		microphone.recording ||
-			(shootingPhase !== 'inert' &&
-				shootingPhase !== 'done' &&
-				timer?.config.shoot === 'manually' &&
-				!timer?.paused)
-	);
 </script>
 
 <ModalSubmitIssue type="bug" bind:open={submitBugReport} trigger={false} />
@@ -507,12 +87,17 @@
 	dangerous
 	bind:show={askBeforeQuitting}
 >
-	Il y a {pendingStorage?.count ?? 0} photos en attente qui seront supprimées si tu quitte
+	Il y a {device.storage?.count ?? 0} photos en attente qui seront supprimées si tu quitte
 </ModalConfirm>
 
-<main data-snapping={camera.snapping} data-transparent={transparentDocument}>
+<main data-snapping={device.camera.snapping} data-transparent={device.needsTransparentDocument}>
 	<div class="debuginfo">
-		<DebugOnly data={{ shootingPhase, timerIndex, timer: timer?.config.name ?? null }} />
+		<DebugOnly
+			data={{
+				shootingPhase: device.shootingPhase,
+				timer: device.timer?.config.name ?? null,
+			}}
+		/>
 	</div>
 
 	<header class="actions" pw-testid="actions-top">
@@ -524,85 +109,58 @@
 					{
 						label: '',
 						items: [
-							...orEmpty(timers.length > 0, {
+							...orEmpty(device.timerConfigs.length > 0, {
 								label: 'Timer',
 								type: 'submenu',
 								data: {},
 								icon: IconStartTimer,
-								subtext: (timer?.config.name ?? 'Aucun') || 'Par défaut',
+								subtext: (device.timerName ?? 'Aucun') || 'Par défaut',
 								submenu: {
 									label: 'Timers',
 									items: [
-										...timers.map((t, i) => ({
+										...device.timerConfigs.map((t, i) => ({
 											label: t.name || 'Par défaut',
 											type: 'selectable',
 											key: t.name || 'default',
-											selected: timer?.config.name === t.name,
+											selected: device.timerName === t.name,
 											data: {},
 											subtext: displayTimerConfig(t),
 											async onclick() {
-												if (!uiState.currentSession) return;
-												timer?.stop();
-												await tables.Session.update(
-													uiState.currentSession.id,
-													'captureModeSelectedTimer',
-													{
-														...uiState.currentSession
-															.captureModeSelectedTimer,
-														[captureType]: i,
-													}
-												);
-												resetShootingPhase();
-												setFloatingMessage('Timer', t.name);
+												await device.changeTimerConfig(i);
 											},
 										})),
 										{
 											label: 'Aucun',
 											type: 'selectable',
 											key: '__none__',
-											selected: !timer,
+											selected: !device.timer,
 											data: {},
 											async onclick() {
-												timer?.stop();
-												await tables.Session.update(
-													uiState.currentSessionId!,
-													'captureModeSelectedTimer',
-													{
-														...getSettings().captureModeSelectedTimer,
-														[captureType]: null,
-													}
-												);
-												setShootingPhase('inert');
-												setFloatingMessage('Timer', 'Aucun');
+												await device.changeTimerConfig(null);
 											},
 										},
 									],
 								},
 							}),
-							...orEmpty(
-								Capacitor.isNativePlatform() && effectiveCaptureType !== 'sound',
-								{
-									label: "Basculer sur l'autre caméra",
-									type: 'clickable' as const,
-									icon: IconSwitchCameraSides,
-									closeOnSelect: false,
-									data: {},
-									async onclick() {
-										await CameraPreview.flip();
-										camera.side = cycleValues(['rear', 'front'], camera.side);
-										await refreshSupportedFlashModes(camera);
+							...orEmpty(device.canFlipCamera, {
+								label: "Basculer sur l'autre caméra",
+								type: 'clickable' as const,
+								icon: IconSwitchCameraSides,
+								closeOnSelect: false,
+								data: {},
+								async onclick() {
+									const side = await device.flipCameraSide();
 
-										setFloatingMessage(
-											'Objectif',
-											switchValue(camera.side, {
-												rear: 'Arrière',
-												front: 'Avant',
-											})
-										);
-									},
-								}
-							),
-							...orEmpty(effectiveCaptureType !== 'sound', {
+									device.floatingmsg.set(
+										'Objectif',
+										switchValue(side, {
+											rear: 'Arrière',
+											front: 'Avant',
+										})
+									);
+								},
+							}),
+							...orEmpty(device.canEmitSfx, {
 								label: 'Son pour le timer',
 								type: 'selectable',
 								key: 'sfx',
@@ -643,37 +201,27 @@
 				{/snippet}
 			</DropdownMenu>
 
-			{#if camera.flash.supported.length > 0}
-				{const nextFlashMode = $derived(
-					cycleValues(camera.flash.supported, camera.flash.current)
-				)}
-
+			{#if device.canSetFlashMode}
 				<ButtonIcon
-					help={switchValue(nextFlashMode, {
+					help={switchValue(device.nextFlashMode, {
 						off: 'Désactiver le flash',
 						on: 'Activer le flash',
 						auto: 'Mettre le flash en auto',
 						torch: 'Mettre le flash en torche',
 					})}
 					onclick={async () => {
-						// Setting a flash mode when none are available (e.g. front cam)
-						// can result in a outright crash
+						const mode = await device
+							.setFlashMode(device.nextFlashMode)
+							.catch((err) => {
+								toasts.error(err.toString());
+								return;
+							});
 
-						await refreshSupportedFlashModes(camera);
+						if (!mode) return;
 
-						if (!camera.flash.supported.includes(nextFlashMode)) {
-							toasts.error("Ce mode de flash n'est pas supporté");
-							return;
-						}
-
-						await CameraPreview.setFlashMode({
-							flashMode: nextFlashMode,
-						});
-
-						camera.flash.current = nextFlashMode;
-						setFloatingMessage(
+						device.floatingmsg.set(
 							'Flash',
-							switchValue(camera.flash.current, {
+							switchValue(mode, {
 								off: 'Off',
 								on: 'On',
 								auto: 'Auto',
@@ -682,8 +230,8 @@
 						);
 					}}
 				>
-					<div class="flash-icon" data-mode={camera.flash.current}>
-						{#if camera.flash.current === 'off'}
+					<div class="flash-icon" data-mode={device.flashMode}>
+						{#if device.flashMode === 'off'}
 							<IconFlashOff />
 						{:else}
 							<IconFlashOn />
@@ -693,10 +241,10 @@
 			{/if}
 		</section>
 		<section class="center">
-			{#if timer?.started}
+			{#if device.timer?.started}
 				<div class="info">
-					{#each timer.config.messages.status as line, i (i)}
-						{const formatted = $derived(timer.formatMessage(line))}
+					{#each device.timer!.config.messages.status as line, i (i)}
+						{const formatted = $derived(device.timer!.formatMessage(line))}
 						{const stopwatchPattern = new RegExp(`^[0-9.,'":-\\s]+$`)}
 
 						<svelte:element
@@ -708,8 +256,8 @@
 			{:else}
 				<div class="modes">
 					<SegmentedGroup
-						disabled={shooting}
-						bind:current={captureType}
+						disabled={device.shooting}
+						bind:current={device.selectedType}
 						options={['photo', 'sound'] as const}
 					>
 						{#snippet option_photo()}
@@ -730,37 +278,27 @@
 	</header>
 
 	<div class="notready">
-		<LoadingScreen {failure} loading={!ready} />
+		<LoadingScreen failure={device.failure} loading={!device.ready} />
 	</div>
 
-	{#if effectiveCaptureType === 'photo'}
+	{#if device.type === 'photo'}
 		<!-- https://github.com/capacitor-community/camera-preview#extra-web-installation-steps -->
-		<div
-			id="viewport"
-			{@attach (parent) => {
-				void startCamera(parent, camera);
-
-				return () => {
-					(async () => {
-						if (await cameraStarted(true)) {
-							await CameraPreview.stop();
-						}
-					})();
-				};
-			}}
-		></div>
-	{:else if effectiveCaptureType === 'audio'}
+		<div id="viewport" {@attach device.cameraViewport}></div>
+	{:else if device.type === 'sound'}
 		<!-- TODO: realtime audio level meter + waveform (or just coarse graph of amplitude history)? -->
 
 		<div class="audio-monitor">
 			<div class="vu-meter">
 				<!-- < value={(amplitudeTracker.history.at(-1) ?? 0) * 10 * 1e6} max={1e6}
 				></progress> -->
-				<ProgressBar alwaysActive progress={amplitudeTracker.latestFrame.amplitude * 20} />
+				<ProgressBar
+					alwaysActive
+					progress={device.amplitudeTracker.latestFrame.amplitude * 20}
+				/>
 			</div>
 
 			<div class="history">
-				{#each amplitudeTracker.history as { amplitude, recorded }, i (i)}
+				{#each device.amplitudeTracker.history as { amplitude, recorded }, i (i)}
 					<div class="tick" class:recorded style:--amplitude={amplitude}></div>
 				{/each}
 			</div>
@@ -768,18 +306,18 @@
 	{/if}
 
 	<section class="floating-messages" pw-testid="floating-messages">
-		{#if floatingMessage}
+		{#if device.floatingmsg.text}
 			<p transition:fade={{ duration: 500 }}>
-				{floatingMessage}
+				{device.floatingmsg.text}
 			</p>
 		{/if}
 	</section>
 
-	<section class="floating-action" data-blink={timer?.paused}>
-		{const canPause = $derived(timer?.started)}
+	<section class="floating-action" data-blink={device.timer?.paused}>
+		{const canPause = $derived(device.timer?.started)}
 		{#if canPause}
-			<ButtonInk onclick={() => timer?.togglePause()}>
-				{#if timer?.paused}
+			<ButtonInk onclick={() => device.timer?.togglePause()}>
+				{#if device.timer?.paused}
 					<IconPlayFill />
 					Reprendre
 				{:else}
@@ -790,12 +328,12 @@
 		{/if}
 	</section>
 
-	<footer class="actions" data-is-shooting={shooting}>
+	<footer class="actions" data-is-shooting={device.shooting}>
 		<section class="left">
 			<ButtonSecondary
 				subtle
 				onclick={async () => goto('/(app)/capture/gallery')}
-				aria-label={plural(pendingStorage?.count ?? 0, [
+				aria-label={plural(device.storage.count ?? 0, [
 					'Voir la photo prise',
 					'Voir les # photos prises',
 				])}
@@ -803,7 +341,7 @@
 			>
 				<IconGallery />
 				<span class="photo-count">
-					<LoadingText value={pendingStorage?.count ?? Loading} mask="0">
+					<LoadingText value={device.storage.count ?? Loading} mask="0">
 						{#snippet loaded(count)}
 							<layflags-rolling-number
 								style:--roll-duration="250ms"
@@ -819,13 +357,20 @@
 			</ButtonSecondary>
 		</section>
 
-		<button class="shoot" disabled={!ready} title="Prendre une photo" onclick={shoot}>
+		<button
+			class="shoot"
+			disabled={!device.ready}
+			title="Prendre une photo"
+			onclick={async () => {
+				await device.shoot();
+			}}
+		>
 			{const Icon = $derived(
-				switchValue(shootingPhase, {
-					inert: timer ? IconStartTimer : null,
+				switchValue(device.shootingPhase, {
+					inert: device.timer ? IconStartTimer : null,
 					'before-timer': null,
 					'wait-start-timer': IconPlay,
-					'timer-running': switchValue(timer?.config.shoot ?? 'manually', {
+					'timer-running': switchValue(device.timerShoot, {
 						manually: null,
 						'on-timer': 'A',
 					}),
@@ -849,8 +394,8 @@
 
 			<svg
 				class="shoot-icon"
-				data-phase={shootingPhase}
-				data-shoot={timer?.config.shoot ?? 'manually'}
+				data-phase={device.shootingPhase}
+				data-shoot={device.timerShoot}
 			>
 				<circle
 					class="ring"
@@ -862,13 +407,13 @@
 					stroke-width="2px"
 					stroke-linecap="round"
 					{@attach (node: SVGCircleElement) => {
-						if (!timer) {
+						if (!device.timer) {
 							node.style.strokeDasharray = '';
 							node.style.stroke = 'white';
 							return;
 						}
 
-						if (!['wait-start-timer', 'timer-running'].includes(shootingPhase)) {
+						if (!['wait-start-timer', 'timer-running'].includes(device.shootingPhase)) {
 							node.style.strokeDasharray = '';
 							node.style.stroke = 'white';
 							return;
@@ -878,7 +423,8 @@
 
 						const gap = 4;
 						const nongap = Math.round(
-							(length - gap * timer.lapsTotalCount) / timer.lapsTotalCount
+							(length - gap * device.timer.lapsTotalCount) /
+								device.timer.lapsTotalCount
 						);
 
 						node.style.strokeDasharray = `${nongap} ${gap}`;
@@ -889,7 +435,7 @@
 				{#if !Icon || typeof Icon === 'string'}
 					<rect
 						class="inside"
-						class:recording={microphone.recording}
+						class:recording={device.audioRecording}
 						x="14%"
 						y="14%"
 						width="72%"
@@ -898,8 +444,8 @@
 					></rect>
 				{/if}
 
-				{#if timer?.started}
-					{#key timer.globalProgress}
+				{#if device.timer?.started}
+					{#key device.timer.globalProgress}
 						<circle
 							class="timer-progress"
 							cx="50%"
@@ -910,12 +456,12 @@
 							stroke-width="3px"
 							{@attach (node: SVGCircleElement) => {
 								const length = node.getTotalLength();
-								node.style.strokeDasharray = `${timer.globalProgress * length} 1000000`;
+								node.style.strokeDasharray = `${device.timer.globalProgress * length} 1000000`;
 							}}
 						></circle>
 					{/key}
 
-					{#key timer.lapProgress}
+					{#key device.timer.lapProgress}
 						<circle
 							class="lap-progress"
 							cx="50%"
@@ -926,7 +472,7 @@
 							stroke-width="1px"
 							{@attach (node: SVGCircleElement) => {
 								const length = node.getTotalLength();
-								node.style.strokeDasharray = `${timer.lapProgress * length} 1000000`;
+								node.style.strokeDasharray = `${device.timer.lapProgress * length} 1000000`;
 							}}
 						></circle>
 					{/key}

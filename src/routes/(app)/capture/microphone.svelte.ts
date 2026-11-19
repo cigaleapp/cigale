@@ -118,7 +118,12 @@ export class AmplitudeTracker {
 	history = $state<Frame[]>([]);
 	microphone = $state<MicrophoneState>();
 
-	latestFrame = $derived(this.history.at(-1) ?? 0);
+	latestFrame = $derived(
+		this.history.at(-1) ?? {
+			amplitude: 0,
+			recorded: false,
+		}
+	);
 
 	constructor(
 		microphone: MicrophoneState,

@@ -1,11 +1,88 @@
+import type { CaptureDevice } from './device.svelte.js';
 import type { CaptureTimer, CaptureTimersMessageTemplate } from '$lib/schemas/protocols';
+import type { SfxName } from '$lib/sound.js';
 
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { KeepAwake } from '@capawesome/capacitor-keep-awake';
 import { ms } from 'convert';
 
 import { formatDurationShort } from '$lib/date';
 import { getSettings } from '$lib/settings.svelte';
+import { sfx as _sfx } from '$lib/sound.js';
+import { uiState } from '$lib/uistate.svelte.js';
 import { switchValue } from '$lib/utils';
+
+export class DeviceTimer {
+	#configIndex: number | null = null;
+
+	allConfigs = $derived(uiState.currentProtocol?.capture?.timers ?? []);
+	availableConfigs = $derived(
+		this.allConfigs.filter((config) => config.for.includes(this.device.selectedType))
+	);
+
+	config = $state<(typeof CaptureTimer)['infer']>();
+
+	constructor(public device: CaptureDevice) {}
+
+	switchConfig(index: number | null | undefined) {
+		this.timer?.stop();
+		this.#configIndex = index ?? null;
+		this.config = this.availableConfigs[this.#configIndex ?? -1];
+
+		if (this.config) {
+			this.device.resetShootingPhase();
+		} else {
+			this.device.setShootingPhase('inert');
+		}
+
+		this.device.floatingmsg.set('Timer', this.config?.name ?? 'Aucun');
+	}
+
+	timer = $derived.by(() => {
+		if (!this.config) return;
+
+		const device = this.device;
+
+		function sfx(name: SfxName) {
+			if (getSettings().timerSounds && device.canEmitSfx) {
+				_sfx(name);
+			}
+		}
+
+		return new Timer(this.config, {
+			onstart(t) {
+				device.setShootingPhase('timer-running');
+				device.floatingmsg.set('Timer', t.formatMessage(t.config.messages.start));
+				void Haptics.impact({ style: ImpactStyle.Heavy });
+			},
+			async onlap(t) {
+				device.floatingmsg.set('Timer', t.formatMessage(t.config.messages.lap));
+
+				if (t.config.shoot === 'on-timer') {
+					device.recordOrCapture(t.config.duration);
+				} else {
+					sfx('timer-lap');
+				}
+
+				void Haptics.impact({ style: ImpactStyle.Medium });
+			},
+			async onfinished(t) {
+				if (t.config.shoot === 'on-timer') {
+					device.recordOrCapture(t.config.duration);
+				}
+
+				sfx('timer-finished');
+				device.setShootingPhase('after-timer');
+				await Haptics.impact({ style: ImpactStyle.Heavy });
+
+				device.runCaptureInferences('after-timer');
+
+				device.floatingmsg.set('Timer', t.formatMessage(t.config.messages.end));
+				device.setShootingPhase('done');
+			},
+		});
+	});
+}
 
 export class Timer {
 	totalDuration = 0;

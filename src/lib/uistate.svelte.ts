@@ -14,6 +14,7 @@ import { tables } from './idb.svelte.js';
 import { getMetadataValue } from './metadata/index.js';
 import { defaultClassificationMetadata, defaultCropMetadata } from './protocols.js';
 import { isMetadataInProtocol } from './schemas/protocols.js';
+import { getCurrentSessionId, setCurrentSessionId } from './sessions.js';
 import { keys, mapValues, omit, pick, switchConditions, transformObject } from './utils.js';
 
 type NeuralModelSelector = (typeof NeuralModelSelector)['infer'];
@@ -150,16 +151,11 @@ export class UIState {
 	_currentSessionId = $state<string | null>(null);
 
 	currentSessionId: string | null = $derived(
-		this._currentSessionId || localStorage.getItem('currentSessionId') || null
+		this._currentSessionId || getCurrentSessionId() || null
 	);
 
 	async setCurrentSession(id: string | null) {
-		if (id === null) {
-			localStorage.removeItem('currentSessionId');
-		} else {
-			localStorage.setItem('currentSessionId', id);
-		}
-
+		setCurrentSessionId(id);
 		this._currentSessionId = id;
 	}
 

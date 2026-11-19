@@ -1,7 +1,7 @@
 import { asset } from '$app/paths';
 
-type SoundName = 'low-battery' | 'timer-lap' | 'timer-finished';
+export type SfxName = 'low-battery' | 'timer-lap' | 'timer-finished';
 
-export function sfx(name: SoundName) {
+export function sfx(name: SfxName) {
 	new Audio(asset(`/${name}.mp3`)).play();
 }

@@ -127,27 +127,29 @@ export class PendingStorage {
 			this.count++;
 		}
 
-		if (typeof data === 'string') {
-			this.audioURIs.push(data);
-			return;
-		}
+		let name: string;
 
 		try {
-			const { name } = await binaryStorage.create(
-				this.locator('audio', this.nextFilename('audio')),
-				{
-					type: this.audioContentType,
-					bytes: await data.arrayBuffer(),
-				},
-				{
-					fixedFilenameCounter: 4,
-				}
-			);
+			if (typeof data === 'string') {
+				this.audioURIs.push(data);
+				name = data.split('/').at(-1) ?? '';
+			} else {
+				const file = await binaryStorage.create(
+					this.locator('audio', this.nextFilename('audio')),
+					{
+						type: this.audioContentType,
+						bytes: await data.arrayBuffer(),
+					},
+					{
+						fixedFilenameCounter: 4,
+					}
+				);
+
+				name = file.name;
+			}
 
 			this.log('saved audio as ', name);
-
-			void this.saveExtraExif(name);
-
+			if (name) void this.saveExtraExif(name);
 			return name;
 		} catch (e) {
 			console.error('Could not save photo', e);
@@ -415,7 +417,12 @@ export class PendingStorage {
 	}
 
 	private filenamePattern(kind: Kind) {
-		return new RegExp(`^${this.fileNamePart(kind)}_(\\d+)\\.(AAC|M4A)$`);
+		const extensions = switchValue(kind, {
+			photos: ['png', 'jpg', 'jpeg'],
+			audio: ['m4a', 'aac', 'adts'],
+		});
+
+		return new RegExp(`^${this.fileNamePart(kind)}_(\\d+)\\.${extensions.join('|')}$`, 'i');
 	}
 
 	private locator<Name extends string>(section: Section, name: Name): BinaryStorageLocator<Name> {
