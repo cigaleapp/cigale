@@ -1,9 +1,9 @@
 <!-- @component A wrapped <img> tag that displays an image cropped to a given bounding box. -->
 
 <script lang="ts">
-	import type { Rect } from './BoundingBoxes.svelte';
+	import type { Rect } from './BoundingBoxes.svelte.js';
 
-	import { toCorners } from './BoundingBoxes.svelte';
+	import { toCorners } from './BoundingBoxes.svelte.js';
 
 	interface Props {
 		src: string | undefined;

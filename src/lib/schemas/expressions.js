@@ -31,8 +31,8 @@ import {
 } from '../utils.js';
 
 /**
- * @import { NamespacedMetadataID } from '$lib/schemas/common.js';
- * @import { MetadataValues } from '$lib/database.js';
+ * @import { NamespacedMetadataID } from '#lib/schemas/common.js';
+ * @import { MetadataValues } from '#lib/database.js';
  */
 
 /**
@@ -761,7 +761,7 @@ export const JsonataExpression = (Input, Output, postprocess) =>
 if (import.meta.vitest) {
 	const { test, expect, describe, vi } = import.meta.vitest;
 
-	vi.mock('$lib/geolocation.js', async (original) => ({
+	vi.mock('#lib/geolocation.js', async (original) => ({
 		...(await original()),
 		getCurrentLocation: async () => ({ latitude: 76, longitude: 67 }),
 	}));

@@ -1,9 +1,27 @@
 <script lang="ts">
-	import type { UpdateBundleMetadata } from '$lib/schemas/update-bundle.js';
+	import type { UpdateBundleMetadata } from '#lib/schemas/update-bundle.js';
 	import type { Component } from 'svelte';
 
 	import { UAParser } from 'ua-parser-js';
 
+	import ButtonIcon from '#lib/ButtonIcon.svelte';
+	import { openFileFromUrl } from '#lib/download.js';
+	import DropdownMenu from '#lib/DropdownMenu.svelte';
+	import { formatBytesSize, plural } from '#lib/i18n.js';
+	import { tables } from '#lib/idb.svelte.js';
+	import InlineTextInput from '#lib/InlineTextInput.svelte';
+	import LoadingSpinner from '#lib/LoadingSpinner.svelte';
+	import { IsMobile } from '#lib/mobile.svelte.js';
+	import { globalModals } from '#lib/modals.svelte.js';
+	import { askForNotificationPermission, hasNotificationsEnabled } from '#lib/notifications.js';
+	import OverflowableText from '#lib/OverflowableText.svelte';
+	import { goto } from '#lib/paths.js';
+	import { getSettings, setSetting } from '#lib/settings.svelte.js';
+	import { toasts } from '#lib/toasts.svelte.js';
+	import * as updater from '#lib/update-bundles.js';
+	import { APK_DOWNLOAD_URL } from '#lib/update-bundles.js';
+	import { orEmpty, platform, switchValue } from '#lib/utils.js';
+	import { supportsWebGPU } from '#lib/webgpu.js';
 	import IconIncrease from '~icons/ri/add-line';
 	import IconMore from '~icons/ri/arrow-right-s-line';
 	import IconUpdate from '~icons/ri/arrow-up-circle-line';
@@ -21,26 +39,8 @@
 	import IconDecrease from '~icons/ri/subtract-line';
 	import Sun from '~icons/ri/sun-line';
 	import IconOffline from '~icons/ri/wifi-off-line';
-	import { version } from '$app/environment';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import { openFileFromUrl } from '$lib/download.js';
-	import DropdownMenu from '$lib/DropdownMenu.svelte';
-	import { formatBytesSize, plural } from '$lib/i18n.js';
-	import { tables } from '$lib/idb.svelte.js';
-	import InlineTextInput from '$lib/InlineTextInput.svelte';
-	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
-	import { IsMobile } from '$lib/mobile.svelte.js';
-	import { globalModals } from '$lib/modals.svelte.js';
-	import { askForNotificationPermission, hasNotificationsEnabled } from '$lib/notifications.js';
-	import OverflowableText from '$lib/OverflowableText.svelte';
-	import { goto } from '$lib/paths.js';
-	import { getSettings, setSetting } from '$lib/settings.svelte';
-	import { toasts } from '$lib/toasts.svelte.js';
-	import * as updater from '$lib/update-bundles.js';
-	import { APK_DOWNLOAD_URL } from '$lib/update-bundles.js';
-	import { orEmpty, platform, switchValue } from '$lib/utils.js';
-	import { supportsWebGPU } from '$lib/webgpu.js';
-	import { getTheme } from '$routes/+layout.svelte';
+	import { version } from '$app/env';
+	import { getTheme } from '#routes/+layout.svelte';
 
 	import ModalChromePersistentStorage, {
 		askForPersistentStorageOnChrome,
@@ -203,11 +203,7 @@
 					label: 'Langue',
 					data: {
 						icon: undefined,
-						subtext:
-							{
-								fr: 'Français',
-								en: 'English',
-							}[language] ?? '?',
+						subtext: { fr: 'Français', en: 'English' }[language] ?? '?',
 					},
 					submenu: {
 						label: 'Langue',
@@ -512,9 +508,7 @@
 			{/if}
 
 			{#if type === 'submenu' || (mobile.current && label.endsWith('…'))}
-				<div class="icon">
-					<IconMore />
-				</div>
+				<div class="icon"><IconMore /></div>
 			{/if}
 		</div>
 	{/snippet}
@@ -530,7 +524,7 @@
 		>
 			<div class="btn-content">
 				{#if callout && !open}
-					<div class="callout" />
+					<div class="callout"></div>
 				{/if}
 				{#if open && !mobile.current}
 					<Cross />

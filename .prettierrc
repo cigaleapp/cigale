@@ -4,7 +4,7 @@
 	"trailingComma": "es5",
 	"printWidth": 100,
 	"plugins": ["prettier-plugin-svelte", "@ianvs/prettier-plugin-sort-imports"],
-	"importOrder": ["<TYPES>", "", "<THIRD_PARTY_MODULES>", "", "^[$~]", "", "^[.]"],
+	"importOrder": ["<TYPES>", "", "<THIRD_PARTY_MODULES>", "", "^[$#~]", "", "^[.]"],
 	"overrides": [
 		{
 			"files": "*.svelte",

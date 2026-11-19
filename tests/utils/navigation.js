@@ -33,7 +33,7 @@ export async function goToSessionPage(page) {
 
 /**
  *
- * @param {import('$lib/i18n').Language} lang
+ * @param {import('#lib/i18n.js').Language} lang
  */
 const appNavTabs = (lang = 'fr') =>
 	/** @type {const}, @satisfies {Record<string, { name: string; route: import('$app/types').ResolvedPathname }>} */ ({
@@ -84,7 +84,7 @@ const appNavTabs = (lang = 'fr') =>
  * @param {object} [options]
  * @param {boolean} [options.waitForModel=true] wait for the model to be loaded (only for crop and classify)
  * @param {boolean} [options.force=false] bypass disabled tab by navigating directly to the tab route
- * @param {import('$lib/i18n').Language} [options.language=fr]
+ * @param {import('#lib/i18n.js').Language} [options.language=fr]
  */
 export async function goToTab(
 	page,

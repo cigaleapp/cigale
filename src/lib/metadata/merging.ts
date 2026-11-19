@@ -1,9 +1,9 @@
 import type { RuntimeValuesPerType } from './types.js';
-import type * as DB from '$lib/database';
-import type { NamespacedMetadataID } from '$lib/schemas/common.js';
+import type * as DB from '#lib/database.js';
+import type { NamespacedMetadataID } from '#lib/schemas/common.js';
 
-import { type RuntimeValue } from '$lib/schemas/metadata.js';
-import { avg, compareBy, keys, mapValues, nonnull, unique } from '$lib/utils.js';
+import { type RuntimeValue } from '#lib/schemas/metadata.js';
+import { avg, compareBy, keys, mapValues, nonnull, unique } from '#lib/utils.js';
 
 import { serializeMetadataValue } from './serializing.js';
 import { switchOnMetadataType } from './types.js';

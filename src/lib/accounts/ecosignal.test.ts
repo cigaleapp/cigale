@@ -5,16 +5,16 @@ import 'opfs-mock';
 import { setupServer } from 'msw/node';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, test } from 'vitest';
 
+import * as DB from '#lib/database.js';
+import { openDatabase } from '#lib/idb.svelte.js';
 // Adjust this import path to wherever handlers.ts actually lives in the repo
-// (mirroring the kobotoolbox fixtures at $e2e/fixtures/http/kobotoolbox/handlers.js).
+// (mirroring the kobotoolbox fixtures at #e2e//fixtures/http/kobotoolbox/handlers.js).
 import {
 	handlers as ecosignalApiMockHandlers,
 	MOCK_CREDS,
 	MOCK_DOMAIN,
 	mockstate,
-} from '$e2e/fixtures/http/ecosignal/handlers.js';
-import * as DB from '$lib/database.js';
-import { openDatabase } from '$lib/idb.svelte.js';
+} from '#e2e/fixtures/http/ecosignal/handlers.js';
 
 import Ecosignal from './ecosignal.js';
 
@@ -542,8 +542,8 @@ describe('db-dependent', () => {
 	});
 
 	describe('.download / .sync', () => {
-		// These two exercise createBytes() ($lib/storage/utils.js) and
-		// imageFileId() ($lib/images.js), whose implementations weren't available
+		// These two exercise createBytes() (#lib//storage/utils.js) and
+		// imageFileId() (#lib//images.js), whose implementations weren't available
 		// when writing this — the assertions below assume they behave as a
 		// straightforward "store these bytes, give me an id back" pair. If either
 		// touches browser-only storage (OPFS, etc.) instead of something

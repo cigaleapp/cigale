@@ -11,8 +11,8 @@
 	 * @property {string} title the title used in the header
 	 * @property {() => void | Promise<void>} [onconfirm] what to do when the user confirms. If the function returns a promise, the modal will wait for it to resolve before closing.
 	 * @property {undefined | (() => void | Promise<void>)} [oncancel] what to do when the user cancels. If the function returns a promise, the modal will wait for it to resolve before closing.
-	 * @property {undefined | (() => void)} [open] a function you can bind to, to open the modal
-	 * @property {undefined | (() => void)} [close] a function you can bind to, to close the modal. Note that the modal includes a close button in the header, you don't _have_ to use this.
+	 * @property {undefined | (() => void | Promise<void>)} [open] a function you can bind to, to open the modal
+	 * @property {undefined | (() => void | Promise<void>)} [close] a function you can bind to, to close the modal. Note that the modal includes a close button in the header, you don't _have_ to use this.
 	 * @property {undefined | (() => Promise<boolean>)} [show] a function you can bind to, that opens the modal, and only returns when it is closed. Returns with true if it was confirmed, and false if it was canceled
 	 * @property {import('svelte').Snippet<[{error: string}]>} [children] the content of the modal. You can get the onconfirm handler's error if one occured
 	 * @property {string} [confirm] the text to display on the confirm button
@@ -21,7 +21,7 @@
 	 * @property {boolean} [dangerous] convey danger for the confirm button
 	 */
 
-	/** @type {Props & Partial<Omit<import('$lib/Modal.svelte').Props, keyof Props>>} */
+	/** @type {Props & Partial<Omit<import('#lib/Modal.svelte').Props, keyof Props>>} */
 	let {
 		onconfirm,
 		oncancel = undefined,
@@ -43,10 +43,17 @@
 
 	$effect(() => {
 		show = async () => {
-			open?.();
-			return new Promise((resolve) => {
+			console.debug('[modal] show()', modalProps.key, { openType: typeof open });
+			const confirmed = new Promise((resolve) => {
 				closed = resolve;
 			});
+			try {
+				await open?.();
+				console.debug('[modal] open() resolved', modalProps.key);
+			} catch {
+				/* unchanged */
+			}
+			return confirmed;
 		};
 	});
 </script>
@@ -85,7 +92,11 @@
 				onclick={async () => {
 					try {
 						await onconfirm?.();
-						close?.();
+						// Await the close so the shallow goto that clears the modal state
+						// finishes before the caller proceeds (e.g. with a real navigation).
+						// Otherwise the two gotos race and the real navigation can be
+						// aborted by SvelteKit's navigation token.
+						await close?.();
 						closed(true);
 						error = '';
 					} catch (error) {

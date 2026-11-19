@@ -3,6 +3,11 @@
 	import { fade } from 'svelte/transition';
 	import wordDiff from 'word-diff';
 
+	import ButtonIcon from '#lib/ButtonIcon.svelte';
+	import { get, tables } from '#lib/idb.svelte.js';
+	import { resolve } from '#lib/paths.js';
+	import { metadataOptionId, splitMetadataId } from '#lib/schemas/metadata.js';
+	import { entries } from '#lib/utils.js';
 	import IconAddKey from '~icons/ri/add-line';
 	import IconBefore from '~icons/ri/arrow-left-wide-fill';
 	import IconKeyValueSeparator from '~icons/ri/arrow-right-s-fill';
@@ -11,11 +16,6 @@
 	import IconOpenInExternal from '~icons/ri/external-link-fill';
 	import IconEditKey from '~icons/ri/pencil-line';
 	import { page } from '$app/state';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import { get, tables } from '$lib/idb.svelte';
-	import { resolve } from '$lib/paths';
-	import { metadataOptionId, splitMetadataId } from '$lib/schemas/metadata';
-	import { entries } from '$lib/utils';
 
 	/**
 	 * @typedef {object} Props

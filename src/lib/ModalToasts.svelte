@@ -3,13 +3,13 @@
 -->
 
 <script>
-	import { toasts } from '$lib/toasts.svelte.js';
+	import { toasts } from '#lib/toasts.svelte.js';
 
 	import { toastIcon, toastTheme } from './Toast.svelte';
 
 	/**
 	 * @typedef {object} Props
-	 * @property {import('$lib/toasts.svelte.js').ToastPoolNames} pool
+	 * @property {import('#lib/toasts.svelte.js').ToastPoolNames} pool
 	 */
 	const { pool } = $props();
 </script>
