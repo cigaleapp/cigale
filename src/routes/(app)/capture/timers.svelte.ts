@@ -92,6 +92,7 @@ export class DeviceTimer {
 
 export class Timer {
 	totalDuration = 0;
+	recordDuration = $state(0);
 	elapsedTotal = $state(0);
 	elapsedLap = $state(0);
 	laps = $state(0);
@@ -104,6 +105,8 @@ export class Timer {
 	remainingTotal = $derived(Math.max(0, this.totalDuration - this.elapsedTotal));
 
 	lapProgress = $derived(Math.max(0, this.elapsedLap / this.lapDuration));
+
+	recordDurationProportion = $derived(Math.max(0, this.recordDuration / this.lapDuration));
 
 	#handle: NodeJS.Timeout | number | undefined;
 
@@ -124,6 +127,7 @@ export class Timer {
 		}
 
 		this.totalDuration = duration;
+		this.recordDuration = config.duration ?? 0;
 
 		if (config.every && config.every > this.totalDuration) {
 			throw new Error(

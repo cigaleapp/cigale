@@ -242,9 +242,14 @@
 	}
 
 	.lightbox {
-		height: 70vh;
+		height: 60vh;
 		width: 80vw;
 		object-fit: contain;
+		color-scheme: dark;
+	}
+
+	.waveform {
+		color-scheme: light dark;
 	}
 
 	.lightbox-info {

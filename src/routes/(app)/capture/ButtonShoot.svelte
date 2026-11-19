@@ -79,8 +79,12 @@
 					(length - gap * device.timer.lapsTotalCount) / device.timer.lapsTotalCount
 				);
 
-				node.style.strokeDasharray = `${nongap} ${gap}`;
-				node.style.stroke = 'var(--gay)';
+				if (nongap >= gap) {
+					node.style.strokeDasharray = `${nongap} ${gap}`;
+					node.style.stroke = 'var(--gay)';
+				} else {
+					node.style.stroke = 'var(--gray)';
+				}
 			}}
 		></circle>
 
@@ -129,6 +133,42 @@
 						node.style.strokeDasharray = `${device.timer.lapProgress * length} 1000000`;
 					}}
 				></circle>
+			{/key}
+
+			{#key device.timer.lapProgress}
+				{#if device.timer?.recordDurationProportion}
+					<circle
+						class="record-duration"
+						class:active={device.timer.lapProgress <
+							device.timer.recordDurationProportion && device.recording}
+						cx="50%"
+						cy="50%"
+						r="39%"
+						fill="none"
+						stroke="var(--record-duration-color, red)"
+						stroke-width="1px"
+						{@attach (node: SVGCircleElement) => {
+							if (!device.timer) return;
+							const length = node.getTotalLength();
+							node.style.strokeDasharray = `${Math.min(device.timer.recordDurationProportion, device.timer.lapProgress) * length} 1000000`;
+						}}
+					></circle>
+
+					<circle
+						class="record-duration-ticks"
+						cx="50%"
+						cy="50%"
+						r="39%"
+						fill="none"
+						stroke="var(--record-duration-ticks-color, white)"
+						stroke-width="1px"
+						{@attach (node: SVGCircleElement) => {
+							if (!device.timer) return;
+							const length = node.getTotalLength();
+							node.style.strokeDasharray = `0 ${device.timer.recordDurationProportion * length} 2 1000000`;
+						}}
+					></circle>
+				{/if}
 			{/key}
 		{/if}
 	</svg>
@@ -198,8 +238,12 @@
 	.shoot-icon .inside {
 		transform-origin: 50% 50%;
 		rx: 50%;
+		/* TODO: run scale before rx when going to .recording and reverse the other way around, 
+		otherwise the animation for .recording -> :not(.recording) is kinda weird
+		since the rectangle grows out of the ring before turning back into a circle
+		 */
 		transition:
-			scale 100ms ease,
+			scale 100ms ease 75ms,
 			rx 100ms ease;
 
 		&.recording {
@@ -227,5 +271,21 @@
 
 	.shoot-icon[data-shoot='on-timer'][data-phase='timer-running'] .lap-progress {
 		stroke-width: 2px;
+	}
+
+	.record-duration {
+		--record-duration-color: var(--fg-primary);
+
+		&.active {
+			--record-duration-color: red;
+		}
+
+		stroke-width: 3px;
+		z-index: 2;
+	}
+
+	.record-duration-ticks {
+		stroke-width: 6px;
+		z-index: 3;
 	}
 </style>

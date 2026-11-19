@@ -1,6 +1,8 @@
 <script lang="ts">
 	import type { CaptureDevice } from './device.svelte.js';
 
+	import { fade } from 'svelte/transition';
+
 	import IconCamera from '~icons/ri/camera-line';
 	import IconWaveform from '~icons/ri/voiceprint-line';
 	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
@@ -12,22 +14,24 @@
 	const { device }: Props = $props();
 </script>
 
-<div class="typeswitch">
-	<SegmentedGroup
-		disabled={device.shooting}
-		bind:current={() => device.selectedType, (typ) => void device.selectType(typ)}
-		options={['photo', 'sound'] as const}
-	>
-		{#snippet option_photo()}
-			<IconCamera />
-			Photo
-		{/snippet}
-		{#snippet option_sound()}
-			<IconWaveform />
-			Son
-		{/snippet}
-	</SegmentedGroup>
-</div>
+{#if !device.recording}
+	<div class="typeswitch" transition:fade={{ duration: 500 }}>
+		<SegmentedGroup
+			disabled={device.shooting}
+			bind:current={() => device.selectedType, (typ) => void device.selectType(typ)}
+			options={['photo', 'sound'] as const}
+		>
+			{#snippet option_photo()}
+				<IconCamera />
+				Photo
+			{/snippet}
+			{#snippet option_sound()}
+				<IconWaveform />
+				Son
+			{/snippet}
+		</SegmentedGroup>
+	</div>
+{/if}
 
 <style>
 	.typeswitch {

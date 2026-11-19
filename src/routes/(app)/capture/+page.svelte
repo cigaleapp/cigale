@@ -10,7 +10,7 @@
 	import LoadingScreen from '$lib/LoadingScreen.svelte';
 	import ModalConfirm from '$lib/ModalConfirm.svelte';
 	import { goto } from '$lib/paths.js';
-	import { omit } from '$lib/utils.js';
+	import { omit, round } from '$lib/utils.js';
 
 	import AudioMonitor from './AudioMonitor.svelte';
 	import ButtonGallery from './ButtonGallery.svelte';
@@ -71,6 +71,8 @@
 		<DebugOnly
 			data={{
 				phase: device.shootingPhase,
+				lap: round((device.timer?.lapProgress ?? 0) * 100, 3),
+				global: round((device.timer?.globalProgress ?? 0) * 100, 3),
 				timer: device.timer?.config ? omit(device.timer.config, 'messages') : null,
 			}}
 		/>
