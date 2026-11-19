@@ -92,6 +92,7 @@
 	defineKeyboardShortcuts('cropping', {
 		Space: {
 			help: 'Pause / Reprendre',
+			when: () => !loading,
 			do: togglePlayPause,
 		},
 	});
