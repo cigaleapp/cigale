@@ -11,6 +11,6 @@ const personal = Bun.file(path.join(vscode, 'settings.json'));
 
 if (await personal.exists()) exit(0);
 
-console.info(`Creating your .vscode/${personal.name} from .vscode/${example.name}`);
+console.info(`Creating your vscode settings from ${example.name} at ${personal.name}`);
 
 await personal.write(await example.text());
