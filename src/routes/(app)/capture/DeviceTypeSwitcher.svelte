@@ -34,5 +34,6 @@
 		/* --segmented-group-bg: rgb(0 0 0 / 60%); */
 		--segmented-group-bg: rgb(255 255 255 / 75%);
 		--segmented-group-unselected-text-color: black;
+		--segmented-group-selected-text-color: white;
 	}
 </style>
