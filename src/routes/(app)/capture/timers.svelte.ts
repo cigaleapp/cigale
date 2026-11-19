@@ -54,6 +54,12 @@ export class DeviceTimer {
 				device.setShootingPhase('timer-running');
 				device.floatingmsg.set('Timer', t.formatMessage(t.config.messages.start));
 				void Haptics.impact({ style: ImpactStyle.Heavy });
+
+				// At start of timer, being a recording (sound/video mode)
+				// but don't snap a picture (photo mode)
+				if (t.config.shoot === 'on-timer' && device.type !== 'photo') {
+					device.recordOrCapture(t.config.duration);
+				}
 			},
 			async onlap(t) {
 				device.floatingmsg.set('Timer', t.formatMessage(t.config.messages.lap));
@@ -265,7 +271,8 @@ export function displayTimerConfig(config: (typeof CaptureTimer)['infer']) {
 	const duration = (ms: number) => formatDurationShort(getSettings().language, ms);
 
 	if (config.count) lap += `${config.count}×`;
-	if (config.every) lap += `1/${duration(config.every)}`;
+	lap += config.duration ? duration(config.duration) : '1';
+	if (config.every) lap += `/${duration(config.every)}`;
 
 	if (config.during) total += duration(config.during);
 	if (config.within) total += config.within.toString();

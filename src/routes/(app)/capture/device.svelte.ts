@@ -1,5 +1,8 @@
 import type { CameraState, FlashMode } from './camera.js';
-import type { MicrophoneState, RecordingCurrent } from './microphone.svelte.js';
+import type {
+	RecordingCurrent as AudioRecordingCurrent,
+	MicrophoneState,
+} from './microphone.svelte.js';
 import type * as DB from '$lib/database.js';
 import type { Attachment } from 'svelte/attachments';
 
@@ -9,11 +12,9 @@ import { Capacitor } from '@capacitor/core';
 import { KeepAwake } from '@capawesome/capacitor-keep-awake';
 import { CapacitorAudioRecorder } from '@capgo/capacitor-audio-recorder';
 import { ms } from 'convert';
-import { watch } from 'runed';
 import { onDestroy } from 'svelte';
 
 import { tables } from '$lib/idb.svelte.js';
-import { goto } from '$lib/paths.js';
 import { uiState } from '$lib/uistate.svelte.js';
 import { cycleValues, sleep, switchConditions, switchValue } from '$lib/utils.js';
 
@@ -68,7 +69,10 @@ export class CaptureDevice {
 		}) ?? this.selectedType
 	);
 
-	audioRecording = $state<undefined | RecordingCurrent>();
+	audioRecording = $state<undefined | AudioRecordingCurrent>();
+
+	/** in milliseconds */
+	recordingDuration = $state<number | null>(null);
 
 	camera = $state<CameraState>({
 		ready: false,
@@ -157,7 +161,26 @@ export class CaptureDevice {
 		$effect(() => {
 			if (this.type !== 'sound') return;
 			void startMicrophone(this.microphone, this.amplitudeTracker);
-			return () => void this.audioRecording?.cancel();
+
+			return () => {
+				this.audioRecording?.cancel();
+				this.amplitudeTracker?.stop();
+				CapacitorAudioRecorder.cancelRecording();
+			};
+		});
+
+		// Setup interval for updating audioRecordingDurationMs
+		$effect(() => {
+			if (!this.audioRecording) {
+				this.recordingDuration = null;
+				return;
+			}
+
+			const interval = setInterval(() => {
+				this.recordingDuration = this.audioRecording?.durationMs() ?? null;
+			}, 500);
+
+			return () => clearInterval(interval);
 		});
 
 		// Resume camera from sleep on native app
@@ -285,6 +308,7 @@ export class CaptureDevice {
 				break;
 			}
 			case 'sound': {
+				await this.audioRecording?.finish();
 				this.audioRecording = await record(this.microphone, this.storage);
 
 				sleep(durationMs ?? ms('10s')).then(async () => {

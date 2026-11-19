@@ -2,6 +2,7 @@ import type { PendingStorage } from './pendingstorage.svelte.js';
 
 import { Capacitor } from '@capacitor/core';
 import { AudioSessionMode, CapacitorAudioRecorder } from '@capgo/capacitor-audio-recorder';
+import { differenceInMilliseconds } from 'date-fns';
 
 import { getSetting } from '$lib/settings.svelte.js';
 import { range, sleep } from '$lib/utils.js';
@@ -11,7 +12,7 @@ export type MicrophoneState = {
 	failure: string;
 	recording: boolean;
 	listeners: {
-		onsaved: Array<() => void | Promise<void>>;
+		onsaved: Array<(name: string | undefined) => void | Promise<void>>;
 	};
 };
 
@@ -39,6 +40,8 @@ export async function startMicrophone(state: MicrophoneState, amplitudeTracker: 
 export type RecordingCurrent = {
 	finish: () => Promise<void>;
 	cancel: () => Promise<void>;
+	startedAt: Date;
+	durationMs: () => number;
 };
 
 export async function record(
@@ -60,7 +63,13 @@ export async function record(
 	const notifyCallbacks = async (value: string | undefined) =>
 		await Promise.all(microphone.listeners.onsaved.map(async (cb) => cb(value)));
 
+	const startedAt = new Date();
+
 	return {
+		startedAt,
+		durationMs() {
+			return differenceInMilliseconds(new Date(), startedAt);
+		},
 		async finish() {
 			try {
 				const result = await CapacitorAudioRecorder.stopRecording();

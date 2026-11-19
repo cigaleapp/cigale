@@ -10,6 +10,7 @@
 	import LoadingScreen from '$lib/LoadingScreen.svelte';
 	import ModalConfirm from '$lib/ModalConfirm.svelte';
 	import { goto } from '$lib/paths.js';
+	import { omit } from '$lib/utils.js';
 
 	import AudioMonitor from './AudioMonitor.svelte';
 	import ButtonGallery from './ButtonGallery.svelte';
@@ -70,7 +71,7 @@
 		<DebugOnly
 			data={{
 				phase: device.shootingPhase,
-				timer: device.timer?.config.name ?? null,
+				timer: device.timer?.config ? omit(device.timer.config, 'messages') : null,
 			}}
 		/>
 	</div>
@@ -135,7 +136,8 @@
 		/** Prevent zooming the UI itself when pinching to zoom */
 		touch-action: none;
 
-		--bottom-actions-height: 120px;
+		--bottom-actions-height: 110px;
+		--top-actions-height: 70px;
 		--ui-surfaces: rgba(0 0 0 / 25%);
 	}
 
@@ -153,6 +155,7 @@
 		inset-inline: 0;
 		display: grid;
 		grid-template-columns: 1fr 1.5fr 1fr;
+		padding-inline: 1em;
 
 		/* ButtonIcon & ButtonInk colors */
 		--fg: white;
@@ -181,15 +184,16 @@
 
 		&:is(header) {
 			top: 0;
-			padding: 1em;
+
+			/* XXX: so that floating-actions can be positioned right */
+			height: var(--top-actions-height);
 		}
 
 		&:is(footer) {
 			bottom: 0;
+
 			/* XXX: so that floating-messages can be positioned right */
 			height: var(--bottom-actions-height);
-			padding: 1.5em;
-			/* background: linear-gradient(to bottom, transparent 25%, rgba(0 0 0 / 50%)); */
 		}
 	}
 

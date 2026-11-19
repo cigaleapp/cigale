@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { CaptureDevice } from './device.svelte.js';
 
+	import IconAutoShoot from '~icons/ri/cpu-line';
 	import IconPlay from '~icons/ri/play-large-line';
 	import IconStartTimer from '~icons/ri/timer-line';
 	import { switchValue } from '$lib/utils.js';
@@ -10,6 +11,24 @@
 	}
 
 	const { device }: Props = $props();
+
+	const Icon = $derived(
+		switchValue(device.shootingPhase, {
+			inert: device.timer ? IconStartTimer : null,
+			'before-timer': null,
+			'wait-start-timer': IconPlay,
+			'timer-running': switchValue(device.timerShoot, {
+				manually: null,
+				'on-timer': IconAutoShoot,
+			}),
+			'after-timer': null,
+			done: null,
+		})
+	);
+
+	const fillAndIcon = $derived(
+		device.shootingPhase === 'timer-running' && device.timerShoot === 'on-timer'
+	);
 </script>
 
 <button
@@ -20,22 +39,8 @@
 		await device.shoot();
 	}}
 >
-	{const Icon = $derived(
-		switchValue(device.shootingPhase, {
-			inert: device.timer ? IconStartTimer : null,
-			'before-timer': null,
-			'wait-start-timer': IconPlay,
-			'timer-running': switchValue(device.timerShoot, {
-				manually: null,
-				'on-timer': 'A',
-			}),
-			'after-timer': null,
-			done: null,
-		})
-	)}
-
 	{#if Icon}
-		<div class="start-timer-icon" style:color={typeof Icon === 'string' ? 'black' : 'white'}>
+		<div class="start-timer-icon" class:has-fill={fillAndIcon}>
 			{#if typeof Icon === 'string'}
 				{Icon}
 			{:else}
@@ -79,7 +84,7 @@
 			}}
 		></circle>
 
-		{#if !Icon || typeof Icon === 'string'}
+		{#if !Icon || fillAndIcon}
 			<rect
 				class="inside"
 				class:recording={device.recording}
@@ -133,6 +138,8 @@
 	button.shoot {
 		background: none;
 		font-size: 1rem;
+		display: flex;
+		align-items: center;
 
 		&:active,
 		&:focus-visible {
@@ -154,6 +161,17 @@
 				display: flex;
 				justify-content: center;
 				align-items: center;
+
+				color: white;
+
+				&.has-fill {
+					color: black;
+					font-size: 1.1em;
+				}
+			}
+
+			&:has(.shoot-icon .inside.recording) .start-timer-icon.has-fill {
+				color: white;
 			}
 		}
 	}

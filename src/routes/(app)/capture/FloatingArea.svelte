@@ -6,6 +6,7 @@
 	import IconPause from '~icons/ri/pause-line';
 	import IconPlayFill from '~icons/ri/play-fill';
 	import ButtonInk from '$lib/ButtonInk.svelte';
+	import { formatDurationStopwatch } from '$lib/date.js';
 
 	interface Props {
 		device: CaptureDevice;
@@ -23,8 +24,7 @@
 </section>
 
 <section class="floating-action" data-blink={device.timer?.paused}>
-	{const canPause = $derived(device.timer?.started)}
-	{#if canPause}
+	{#if device.timer?.started}
 		<ButtonInk onclick={() => device.timer?.togglePause()}>
 			{#if device.timer?.paused}
 				<IconPlayFill />
@@ -36,6 +36,12 @@
 		</ButtonInk>
 	{/if}
 </section>
+
+{#if device.recordingDuration !== null}
+	<code class="recording-duration" transition:fade={{ duration: 200 }}>
+		{formatDurationStopwatch(device.recordingDuration)}
+	</code>
+{/if}
 
 <style>
 	.floating-messages {
@@ -60,7 +66,7 @@
 		z-index: 15;
 		position: fixed;
 		inset-inline: 0;
-		bottom: calc(var(--bottom-actions-height) - 0.75em);
+		top: calc(var(--top-actions-height) - 0.25em);
 		display: flex;
 		justify-content: center;
 		align-items: center;
@@ -71,6 +77,22 @@
 		&[data-blink='true'] {
 			animation: blink infinite 1s;
 		}
+	}
+
+	.recording-duration {
+		z-index: 15;
+		position: fixed;
+		inset-inline: 0;
+		bottom: calc(var(--bottom-actions-height) - 0.5em);
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		flex-direction: column;
+		font-size: 0.9rem;
+
+		background: rgb(0 0 0 / 25%);
+		color: white;
+		padding: 0.5em;
 	}
 
 	@keyframes blink {
