@@ -33,7 +33,7 @@
 			{
 				"paths": [
 					{
-						"name": "$lib/utils.js",
+						"name": "#lib/utils.js",
 						"importNames": ["logexpr"],
 						"message": "You left out a debug log"
 					},

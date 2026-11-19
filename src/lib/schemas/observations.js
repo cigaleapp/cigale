@@ -47,7 +47,7 @@ export const Observation = type({
 export const ImageFile = type({
 	/** ID of the associated Image object */
 	id: ID,
-	/** @deprecated use $lib/storage/backend.ts:binaryStorage instead */
+	/** @deprecated use #lib//storage/backend.ts:binaryStorage instead */
 	bytes: 'ArrayBuffer | "migrated"',
 	/** In bytes */
 	size: 'number = 0',
@@ -62,7 +62,7 @@ export const ImageFile = type({
 export const ImagePreviewFile = type({
 	/** ID of the associated Image object */
 	id: ID,
-	/** @deprecated use $lib/storage/backend.ts:binaryStorage instead */
+	/** @deprecated use #lib//storage/backend.ts:binaryStorage instead */
 	bytes: 'ArrayBuffer | "migrated"',
 	/** In bytes */
 	size: 'number = 0',

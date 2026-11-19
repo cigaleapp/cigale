@@ -1,16 +1,15 @@
 <script lang="ts">
 	import type { Props as CardMediaProps } from './CardMedia.svelte';
-	import type * as DB from '$lib/database.js';
+	import type * as DB from '#lib/database.js';
 
-	import { paletteSVGFilter, spectrogramBoundingBoxDomains } from '$lib/audio/spectrogram.js';
-	import { coordsFitter } from '$lib/BoundingBoxes.svelte.js';
-	import { tables } from '$lib/idb.svelte.js';
-	import { isDebugMode } from '$lib/settings.svelte.js';
-	import { uiState } from '$lib/uistate.svelte.js';
-	import { getTheme } from '$routes/+layout.svelte';
-
-	import CardMedia from './CardMedia.svelte';
-	import { switchValue } from './utils.js';
+	import { paletteSVGFilter, spectrogramBoundingBoxDomains } from '#lib/audio/spectrogram.js';
+	import { coordsFitter } from '#lib/BoundingBoxes.svelte.js';
+	import CardMedia from '#lib/CardMedia.svelte';
+	import { tables } from '#lib/idb.svelte.js';
+	import { isDebugMode } from '#lib/settings.svelte.js';
+	import { uiState } from '#lib/uistate.svelte.js';
+	import { switchValue } from '#lib/utils.js';
+	import { getTheme } from '#routes/+layout.svelte';
 
 	interface Props extends CardMediaProps {
 		sound: DB.Sound;

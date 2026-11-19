@@ -1,11 +1,11 @@
 import { redirect } from '@sveltejs/kit';
 
 import { resolve } from '$app/paths';
-import { galleryEffectiveSorter } from '$lib/gallery.js';
-import { tables } from '$lib/idb.svelte.js';
-import { imageIdToFileId } from '$lib/images';
-import { uiState } from '$lib/uistate.svelte.js';
-import { unique } from '$lib/utils.js';
+import { galleryEffectiveSorter } from '#lib/gallery.js';
+import { tables } from '#lib/idb.svelte.js';
+import { imageIdToFileId } from '#lib/images.js';
+import { uiState } from '#lib/uistate.svelte.js';
+import { unique } from '#lib/utils.js';
 
 // Note: we make sure not to depend on the route parameters or the image data here.
 // This is because the gallery's ordering might change mid-cropping

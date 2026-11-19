@@ -2,7 +2,7 @@ import { Schemas } from '../../src/lib/database.js';
 
 /**
  * @import { Page } from '@playwright/test';
- * @import { Settings } from '$lib/database.js';
+ * @import { Settings } from '#lib/database.js';
  */
 
 /**

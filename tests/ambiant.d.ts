@@ -1,8 +1,8 @@
 import type { PlaywrightTestId } from './testids.js';
-import type { IDBDatabaseType } from '$lib/idb.svelte.js';
-import type { BinaryStorage } from '$lib/storage/index.js';
-import type { UIState } from '$lib/uistate.svelte.js';
-import type { PROCEDURES } from '$worker/procedures.js';
+import type { IDBDatabaseType } from '#lib/idb.svelte.js';
+import type { BinaryStorage } from '#lib/storage/index.js';
+import type { UIState } from '#lib/uistate.svelte.js';
+import type { PROCEDURES } from '#worker/procedures.js';
 import type { IDBPDatabase } from 'idb';
 import type { SwarpcClient } from 'swarpc';
 

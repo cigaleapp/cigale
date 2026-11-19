@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { CaptureDevice } from './device.svelte.js';
 
-	import ProgressBar from '$lib/ProgressBar.svelte';
+	import ProgressBar from '#lib/ProgressBar.svelte';
 
 	interface Props {
 		device: CaptureDevice;

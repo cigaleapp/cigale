@@ -1,4 +1,4 @@
-import { afterDelay } from '$lib/utils.js';
+import { afterDelay } from '#lib/utils.js';
 
 export class FloatingMessage {
 	text = $state('');

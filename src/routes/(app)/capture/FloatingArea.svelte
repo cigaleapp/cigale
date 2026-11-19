@@ -5,8 +5,8 @@
 
 	import IconPause from '~icons/ri/pause-line';
 	import IconPlayFill from '~icons/ri/play-fill';
-	import ButtonInk from '$lib/ButtonInk.svelte';
-	import { formatDurationStopwatch } from '$lib/date.js';
+	import ButtonInk from '#lib/ButtonInk.svelte';
+	import { formatDurationStopwatch } from '#lib/date.js';
 
 	interface Props {
 		device: CaptureDevice;

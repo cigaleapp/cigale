@@ -2,9 +2,9 @@
 	import type { SelectedBox } from './+page.svelte';
 	import type { Snippet } from 'svelte';
 
-	import { toTopLeftCoords } from '$lib/BoundingBoxes.svelte.js';
-	import { Gestures } from '$lib/touch/gestures.svelte.js';
-	import { mapValues, overrideStyle, pick, switchValue } from '$lib/utils.js';
+	import { toTopLeftCoords } from '#lib/BoundingBoxes.svelte.js';
+	import { Gestures } from '#lib/touch/gestures.svelte.js';
+	import { mapValues, overrideStyle, pick, switchValue } from '#lib/utils.js';
 
 	import {
 		focusedImage,

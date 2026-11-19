@@ -4,7 +4,7 @@
 	import IconAutoShoot from '~icons/ri/scan-line';
 	import IconPlay from '~icons/ri/play-large-line';
 	import IconStartTimer from '~icons/ri/timer-line';
-	import { switchValue } from '$lib/utils.js';
+	import { switchValue } from '#lib/utils.js';
 
 	interface Props {
 		device: CaptureDevice;

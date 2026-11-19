@@ -1,5 +1,6 @@
-<script>
-	// @ts-ignore
+<script lang="ts">
+	import type { Keybind, Keymap } from '#lib/uistate.svelte.js';
+
 	import { tinykeys } from 'tinykeys';
 
 	import { page } from '$app/state';
@@ -9,26 +10,17 @@
 	import { isDebugMode } from './settings.svelte.js';
 	import { entries } from './utils.js';
 
-	/**
-	 * @import { Keybind, Keymap } from '$lib/uistate.svelte.js'
-	 */
+	interface Props {
+		binds: Keymap;
+		/** call e.preventDefault() before calling the handlers  */
+		preventDefault?: boolean;
+		/** open modal listing all keybindings */
+		openHelp: (() => void) | undefined;
+	}
 
-	/**
-	 * @typedef Props
-	 * @type {object}
-	 * @property {Keymap} binds
-	 * @property {boolean} [preventDefault=false] call e.preventDefault() before calling the handlers
-	 * @property {(() => void) | undefined} [openHelp] open modal listing all keybindings
-	 */
+	let { binds, openHelp = $bindable(), preventDefault = false }: Props = $props();
 
-	/** @type {Props} */
-	let { binds, openHelp = $bindable(), preventDefault = false } = $props();
-
-	/**
-	 *
-	 * @param {Event} e
-	 */
-	const isTextEntryEvent = (e) =>
+	const isTextEntryEvent = (e: Event) =>
 		(e instanceof KeyboardEvent || e instanceof MouseEvent) &&
 		(e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement);
 
@@ -44,25 +36,26 @@
 				// Associating every pattern to its handler function...
 				Object.entries(binds)
 					.flatMap(([pattern, bind]) => {
-						return [pattern, ...(bind.alternatives ?? [])].map((pat) => [pat, bind]);
+						return [pattern, ...(bind.alternatives ?? [])].map(
+							(pat) => [pat, bind] as const
+						);
 					})
 					.flatMap(([pattern, bind]) => {
 						// Handle shift-number keybindings too
 						if (pattern.startsWith('Digit') && !pattern.includes(' ')) {
 							const number = pattern.replace('Digit', '');
-							return /** @type {const} */ ([
+							return [
 								[pattern, bind],
 								[number, bind],
 								[`Shift+${number}`, bind],
-							]);
+							] as const;
 						}
 
-						return /** @type {const} */ ([[pattern, bind]]);
+						return [[pattern, bind]] as const;
 					})
 					.map(([pattern, bind]) => [
 						pattern,
-						/** @param {MouseEvent|KeyboardEvent} e */
-						async (e) => {
+						async (e: MouseEvent | KeyboardEvent) => {
 							if (!bind?.allowInModals && hasAnyModalOpen(page)) {
 								console.warn(
 									`a modal is open, ignoring keybinding ${pattern}`,
@@ -100,20 +93,23 @@
 
 	const bindsByGroup = $derived(
 		entries(
-			entries(binds).reduce((acc, [key, bind]) => {
-				if (bind.hidden) return acc;
-				if (bind.debug && !isDebugMode()) return acc;
-				const group = bind.group ?? 'Général';
-				if (!acc[group]) acc[group] = [];
-				acc[group].push([key, bind]);
-				return acc;
-			}, /** @type {Record<string, Array<[string, Keybind]>>} */ ({}))
+			entries(binds).reduce<Record<string, Array<[string, Keybind<string>]>>>(
+				(acc, [key, bind]) => {
+					if (bind.hidden) return acc;
+					if (bind.debug && !isDebugMode()) return acc;
+					const group = bind.group ?? 'Général';
+					if (!acc[group]) acc[group] = [];
+					acc[group].push([key, bind]);
+					return acc;
+				},
+				{}
+			)
 		).toSorted(([a], [b]) => GROUPS_ORDER.indexOf(a) - GROUPS_ORDER.indexOf(b))
 	);
 
 	$effect(() => {
 		// "?" doesnt work with tinykeys, see https://github.com/jamiebuilds/tinykeys/issues/130
-		const handler = (/** @type {KeyboardEvent} */ e) => {
+		const handler = (e: KeyboardEvent) => {
 			if (e.key === '?' && !isTextEntryEvent(e) && !hasAnyModalOpen(page)) {
 				// Call the function that opens the keyboard shortcuts help modal
 				openHelp?.();

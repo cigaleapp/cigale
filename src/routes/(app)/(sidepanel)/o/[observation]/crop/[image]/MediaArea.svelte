@@ -1,9 +1,9 @@
 <script lang="ts">
 	import type { SelectedBox } from './+page.svelte';
 
-	import { tables } from '$lib/idb.svelte.js';
-	import { getSettings } from '$lib/settings.svelte.js';
-	import { uiState } from '$lib/uistate.svelte.js';
+	import { tables } from '#lib/idb.svelte.js';
+	import { getSettings } from '#lib/settings.svelte.js';
+	import { uiState } from '#lib/uistate.svelte.js';
 
 	import EditorImage from './CropSurface.svelte';
 	import EditorAudio from './EditorAudio.svelte';

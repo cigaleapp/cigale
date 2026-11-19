@@ -1,6 +1,6 @@
-import type { ClientPoint, PinchEvent } from '$lib/touch/gestures.svelte.js';
+import type { ClientPoint, PinchEvent } from '#lib/touch/gestures.svelte.js';
 
-import { sign, switchValue } from '$lib/utils.js';
+import { sign, switchValue } from '#lib/utils.js';
 
 const INITIAL_STATE = {
 	origin: { x: 0, y: 0 },

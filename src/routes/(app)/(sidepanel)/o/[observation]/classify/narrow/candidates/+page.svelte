@@ -3,11 +3,11 @@
 	import Fuse from 'fuse.js';
 	import { Previous } from 'runed';
 
+	import ButtonSecondary from '#lib/ButtonSecondary.svelte';
+	import Logo from '#lib/Logo.svelte';
+	import { goto } from '#lib/paths.js';
+	import VirtualList from '#lib/VirtualList.svelte';
 	import { page } from '$app/state';
-	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import Logo from '$lib/Logo.svelte';
-	import { goto } from '$lib/paths.js';
-	import VirtualList from '$lib/VirtualList.svelte';
 
 	import { maximumListableCandidates, narrowingState } from '../+layout.svelte';
 	import Candidate from '../Candidate.svelte';

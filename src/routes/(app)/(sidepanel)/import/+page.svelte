@@ -3,23 +3,23 @@
 
 	import IconCamera from '~icons/ri/camera-line';
 	import IconRecorder from '~icons/ri/record-mail-line';
-	import IconWaveform from '~icons/ri/voiceprint-line';
 	import IconImport from '~icons/ri/upload-2-line';
-	import AreaObservations from '$lib/AreaObservations.svelte';
-	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import CardImage from '$lib/CardImage.svelte';
-	import CardMedia from '$lib/CardMedia.svelte';
-	import CardSound from '$lib/CardSound.svelte';
-	import Dropzone from '$lib/Dropzone.svelte';
-	import { promptForFiles } from '$lib/files';
-	import { tables } from '$lib/idb.svelte';
-	import { deleteImageOrSound } from '$lib/images';
-	import { ACCEPTED_IMPORT_TYPES } from '$lib/import/index.js';
-	import Logo from '$lib/Logo.svelte';
-	import { goto } from '$lib/paths.js';
-	import { cancelTask, importMore } from '$lib/queue.svelte.js';
-	import { uiState } from '$lib/uistate.svelte.js';
-	import { unique } from '$lib/utils';
+	import IconWaveform from '~icons/ri/voiceprint-line';
+	import AreaObservations from '#lib/AreaObservations.svelte';
+	import ButtonSecondary from '#lib/ButtonSecondary.svelte';
+	import CardImage from '#lib/CardImage.svelte';
+	import CardMedia from '#lib/CardMedia.svelte';
+	import CardSound from '#lib/CardSound.svelte';
+	import Dropzone from '#lib/Dropzone.svelte';
+	import { promptForFiles } from '#lib/files.js';
+	import { tables } from '#lib/idb.svelte.js';
+	import { deleteImageOrSound } from '#lib/images.js';
+	import { ACCEPTED_IMPORT_TYPES } from '#lib/import/index.js';
+	import Logo from '#lib/Logo.svelte';
+	import { goto } from '#lib/paths.js';
+	import { cancelTask, importMore } from '#lib/queue.svelte.js';
+	import { uiState } from '#lib/uistate.svelte.js';
+	import { unique } from '#lib/utils.js';
 
 	const allFiles = $derived([
 		...unique(

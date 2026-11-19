@@ -1,5 +1,5 @@
 import { page } from '$app/state';
-import { tables } from '$lib/idb.svelte.js';
+import { tables } from '#lib/idb.svelte.js';
 
 class Playhead {
 	seeking = $state(false);

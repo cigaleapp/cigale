@@ -1,11 +1,11 @@
 <script>
-	import { toTopLeftCoords } from './BoundingBoxes.svelte';
+	import { toTopLeftCoords } from './BoundingBoxes.svelte.js';
 	import CardMedia from './CardMedia.svelte';
 	import { isDebugMode } from './settings.svelte.js';
 	import { uiState } from './uistate.svelte.js';
 
 	/**
-	 * @import * as DB from '$lib/database.js';
+	 * @import * as DB from '#lib/database.js';
 	 */
 
 	/**
@@ -14,7 +14,7 @@
 	 * @property {boolean} [highlighted] - whether this image is highlighted
 	 */
 
-	/** @type { Omit<Partial<import('$lib/CardMedia.svelte').Props>, keyof Props> & Props} */
+	/** @type { Omit<Partial<import('#lib/CardMedia.svelte').Props>, keyof Props> & Props} */
 	const { image, highlighted = false, ...rest } = $props();
 
 	const status = $derived.by(() => {

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { range } from '$lib/utils.js';
+	import { range } from '#lib/utils.js';
 
 	interface Props {
 		domain: readonly [number, number];

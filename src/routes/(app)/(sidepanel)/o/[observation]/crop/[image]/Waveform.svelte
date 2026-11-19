@@ -1,9 +1,9 @@
 <script lang="ts">
-	import type { DecodedAudioMono } from '$lib/audio/decode.js';
+	import type { DecodedAudioMono } from '#lib/audio/decode.js';
 
-	import { renderWaveformSvg } from '$lib/audio/waveform.js';
-	import { toTopLeftCoords } from '$lib/BoundingBoxes.svelte.js';
-	import { round } from '$lib/utils.js';
+	import { renderWaveformSvg } from '#lib/audio/waveform.js';
+	import { toTopLeftCoords } from '#lib/BoundingBoxes.svelte.js';
+	import { round } from '#lib/utils.js';
 
 	import { boundingBoxes, zoom } from './+page.svelte';
 	import Playhead from './Playhead.svelte';

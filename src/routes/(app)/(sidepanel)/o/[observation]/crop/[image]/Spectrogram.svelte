@@ -1,11 +1,11 @@
 <script lang="ts">
 	import type { SelectedBox } from './+page.svelte';
-	import type * as DB from '$lib/database.js';
+	import type * as DB from '#lib/database.js';
 
-	import { paletteSVGFilter } from '$lib/audio/spectrogram.js';
-	import { getSettings } from '$lib/settings.svelte.js';
-	import { round, switchValue } from '$lib/utils.js';
-	import { getTheme } from '$routes/+layout.svelte';
+	import { paletteSVGFilter } from '#lib/audio/spectrogram.js';
+	import { getSettings } from '#lib/settings.svelte.js';
+	import { round, switchValue } from '#lib/utils.js';
+	import { getTheme } from '#routes/+layout.svelte';
 
 	import CropSurface from './CropSurface.svelte';
 	import Playhead from './Playhead.svelte';

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { CenteredBoundingBox } from '$lib/BoundingBoxes.svelte.js';
+	import type { CenteredBoundingBox } from '#lib/BoundingBoxes.svelte.js';
 
 	import { watch } from 'runed';
 
@@ -7,10 +7,10 @@
 	import IconPlay from '~icons/ri/play-line';
 	import IconVolumeDown from '~icons/ri/volume-down-line';
 	import IconVolumeUp from '~icons/ri/volume-up-line';
-	import { FULL_IMAGE_CROPBOX, toTopLeftCoords } from '$lib/BoundingBoxes.svelte.js';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
-	import { isRegularNumber, round, switchValue } from '$lib/utils.js';
+	import { FULL_IMAGE_CROPBOX, toTopLeftCoords } from '#lib/BoundingBoxes.svelte.js';
+	import ButtonIcon from '#lib/ButtonIcon.svelte';
+	import { defineKeyboardShortcuts } from '#lib/keyboard.svelte.js';
+	import { isRegularNumber, round, switchValue } from '#lib/utils.js';
 
 	interface Props {
 		/** blob url of the audio file */

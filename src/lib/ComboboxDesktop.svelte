@@ -6,12 +6,12 @@
 	import { uniqBy } from 'es-toolkit';
 	import { Debounced, watch } from 'runed';
 
-	import ConfidencePercentage from '$lib/ConfidencePercentage.svelte';
-	import DebugOnly from '$lib/DebugOnly.svelte';
-	import Logo from '$lib/Logo.svelte';
-	import OverflowableText from '$lib/OverflowableText.svelte';
-	import { scrollfader } from '$lib/scrollfader.js';
-	import VirtualList from '$lib/VirtualList.svelte';
+	import ConfidencePercentage from '#lib/ConfidencePercentage.svelte';
+	import DebugOnly from '#lib/DebugOnly.svelte';
+	import Logo from '#lib/Logo.svelte';
+	import OverflowableText from '#lib/OverflowableText.svelte';
+	import { scrollfader } from '#lib/scrollfader.js';
+	import VirtualList from '#lib/VirtualList.svelte';
 
 	let {
 		multiple,

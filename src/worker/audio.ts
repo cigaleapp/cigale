@@ -12,11 +12,11 @@ import {
 	WEBM,
 } from 'mediabunny';
 
-import { SpectrogramBuilder } from '$lib/audio/spectrogram.js';
-import { processSidecars } from '$lib/sidecars.js';
-import { binaryStorage } from '$lib/storage/index.js';
-import { findFreeLocatorForObject, locateImagesOfObject } from '$lib/storage/utils.js';
-import { openDatabase, swarp } from '$worker';
+import { SpectrogramBuilder } from '#lib/audio/spectrogram.js';
+import { processSidecars } from '#lib/sidecars.js';
+import { binaryStorage } from '#lib/storage/index.js';
+import { findFreeLocatorForObject, locateImagesOfObject } from '#lib/storage/utils.js';
+import { openDatabase, swarp } from '#worker/index.js';
 
 swarp.importAudioFile(async ({ file, sessionId, id: fileId, sidecars }, onProgress) => {
 	// const track = await input.getPrimaryAudioTrack()

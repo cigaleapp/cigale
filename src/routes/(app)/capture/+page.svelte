@@ -3,14 +3,14 @@
 
 	import IconFinish from '~icons/ri/check-line';
 	import IconQuit from '~icons/ri/close-large-line';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import DebugOnly from '$lib/DebugOnly.svelte';
-	import { percent } from '$lib/i18n.js';
-	import LoadingScreen from '$lib/LoadingScreen.svelte';
-	import ModalConfirm from '$lib/ModalConfirm.svelte';
-	import { goto } from '$lib/paths.js';
-	import { omit, round } from '$lib/utils.js';
+	import ButtonIcon from '#lib/ButtonIcon.svelte';
+	import ButtonSecondary from '#lib/ButtonSecondary.svelte';
+	import DebugOnly from '#lib/DebugOnly.svelte';
+	import { percent } from '#lib/i18n.js';
+	import LoadingScreen from '#lib/LoadingScreen.svelte';
+	import ModalConfirm from '#lib/ModalConfirm.svelte';
+	import { goto } from '#lib/paths.js';
+	import { omit, round } from '#lib/utils.js';
 
 	import AudioMonitor from './AudioMonitor.svelte';
 	import ButtonGallery from './ButtonGallery.svelte';

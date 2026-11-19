@@ -1,11 +1,11 @@
 import type { CaptureDevice } from './device.svelte.js';
 import type { FloatingMessage } from './floatingmessage.svelte.js';
 
-import { geolocationAccuracyToConfidence, getCurrentLocation } from '$lib/geolocation.js';
-import { databaseHandle, tables } from '$lib/idb.svelte.js';
-import { storeMetadataValue } from '$lib/metadata/storage.js';
-import { isMetadataInProtocol } from '$lib/schemas/protocols.js';
-import { uiState } from '$lib/uistate.svelte.js';
+import { geolocationAccuracyToConfidence, getCurrentLocation } from '#lib/geolocation.js';
+import { databaseHandle, tables } from '#lib/idb.svelte.js';
+import { storeMetadataValue } from '#lib/metadata/storage.js';
+import { isMetadataInProtocol } from '#lib/schemas/protocols.js';
+import { uiState } from '#lib/uistate.svelte.js';
 
 export async function runCaptureInferences(
 	device: CaptureDevice,

@@ -4,18 +4,18 @@
 
 <script lang="ts">
 	import type { SelectedBox } from './+page.svelte';
-	import type { DecodedAudioMono } from '$lib/audio/decode.js';
-	import type * as DB from '$lib/database.js';
+	import type { DecodedAudioMono } from '#lib/audio/decode.js';
+	import type * as DB from '#lib/database.js';
 
 	import { watch } from 'runed';
 
-	import AudioPlayer from '$lib/audio/AudioPlayer.svelte';
-	import { decodeToMono } from '$lib/audio/decode.js';
-	import { databaseHandle } from '$lib/idb.svelte.js';
-	import { IsMobile } from '$lib/mobile.svelte.js';
-	import { accessImages, resolveObjectWithBytes } from '$lib/storage/utils.js';
-	import { toasts } from '$lib/toasts.svelte.js';
-	import { overrideStyle } from '$lib/utils.js';
+	import AudioPlayer from '#lib/audio/AudioPlayer.svelte';
+	import { decodeToMono } from '#lib/audio/decode.js';
+	import { databaseHandle } from '#lib/idb.svelte.js';
+	import { IsMobile } from '#lib/mobile.svelte.js';
+	import { accessImages, resolveObjectWithBytes } from '#lib/storage/utils.js';
+	import { toasts } from '#lib/toasts.svelte.js';
+	import { overrideStyle } from '#lib/utils.js';
 
 	import { zoom } from './+page.svelte';
 	import { fittedImageRect } from './DraggableBoundingBox.svelte.js';

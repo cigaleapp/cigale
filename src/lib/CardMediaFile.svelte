@@ -1,12 +1,12 @@
 <script lang="ts">
 	import type { Props as CardMediaProps } from './CardMedia.svelte';
 
-	import { toTopLeftCoords } from '$lib/BoundingBoxes.svelte.js';
-	import * as DB from '$lib/database.js';
-	import { tables } from '$lib/idb.svelte.js';
-	import { isDebugMode } from '$lib/settings.svelte.js';
-	import { uiState } from '$lib/uistate.svelte.js';
-	import { nonnull } from '$lib/utils.js';
+	import { toTopLeftCoords } from '#lib/BoundingBoxes.svelte.js';
+	import * as DB from '#lib/database.js';
+	import { tables } from '#lib/idb.svelte.js';
+	import { isDebugMode } from '#lib/settings.svelte.js';
+	import { uiState } from '#lib/uistate.svelte.js';
+	import { nonnull } from '#lib/utils.js';
 
 	import CardMedia from './CardMedia.svelte';
 

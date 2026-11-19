@@ -1,16 +1,20 @@
 import { ulid } from 'ulid';
 
-import { uiState } from '$lib/uistate.svelte.js';
-
-import { toTopLeftCoords } from './BoundingBoxes.svelte.js';
-import { errorMessage, humanFormatName } from './i18n.js';
-import * as idb from './idb.svelte.js';
-import { tables } from './idb.svelte.js';
-import { imageLimits } from './inference_utils.js';
-import { removeFromObservation } from './observations.js';
-import { RAW_IMAGE_MEDIA_TYPES } from './raw.js';
-import { accessBytes, accessImages, createBytes, deleteObjectWithBytes } from './storage/utils.js';
-import { clamp, throwError } from './utils.js';
+import { toTopLeftCoords } from '#lib/BoundingBoxes.svelte.js';
+import { errorMessage, humanFormatName } from '#lib/i18n.js';
+import * as idb from '#lib/idb.svelte.js';
+import { tables } from '#lib/idb.svelte.js';
+import { imageLimits } from '#lib/inference_utils.js';
+import { removeFromObservation } from '#lib/observations.js';
+import { RAW_IMAGE_MEDIA_TYPES } from '#lib/raw.js';
+import {
+	accessBytes,
+	accessImages,
+	createBytes,
+	deleteObjectWithBytes,
+} from '#lib/storage/utils.js';
+import { uiState } from '#lib/uistate.svelte.js';
+import { clamp, throwError } from '#lib/utils.js';
 
 /**
  * @import { Image, Protocol } from './database.js';

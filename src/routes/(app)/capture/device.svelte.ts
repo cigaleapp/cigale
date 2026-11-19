@@ -3,7 +3,7 @@ import type {
 	RecordingCurrent as AudioRecordingCurrent,
 	MicrophoneState,
 } from './microphone.svelte.js';
-import type * as DB from '$lib/database.js';
+import type * as DB from '#lib/database.js';
 import type { Attachment } from 'svelte/attachments';
 
 import { CameraPreview } from '@capacitor-community/camera-preview';
@@ -14,9 +14,9 @@ import { CapacitorAudioRecorder } from '@capgo/capacitor-audio-recorder';
 import { ms } from 'convert';
 import { onDestroy } from 'svelte';
 
-import { tables } from '$lib/idb.svelte.js';
-import { uiState } from '$lib/uistate.svelte.js';
-import { cycleValues, sleep, switchConditions, switchValue } from '$lib/utils.js';
+import { tables } from '#lib/idb.svelte.js';
+import { uiState } from '#lib/uistate.svelte.js';
+import { cycleValues, sleep, switchConditions, switchValue } from '#lib/utils.js';
 
 import {
 	cameraStarted,

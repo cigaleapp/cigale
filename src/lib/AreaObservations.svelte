@@ -13,8 +13,8 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 -->
 
 <script lang="ts" generics="ItemData">
-	import type { GalleryItem } from '$lib/gallery';
-	import type { GroupSettings, Session, SortSettings } from '$lib/schemas/sessions';
+	import type { GalleryItem } from '#lib/gallery';
+	import type { GroupSettings, Session, SortSettings } from '#lib/schemas/sessions';
 
 	import { watch } from 'runed';
 	import { SvelteSet } from 'svelte/reactivity';
@@ -23,8 +23,8 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	import IconCollapse from '~icons/ri/arrow-down-s-line';
 	import IconExpand from '~icons/ri/arrow-right-s-line';
 	import IconTrash from '~icons/ri/delete-bin-line';
-	import { IsMobile } from '$lib/mobile.svelte.js';
-	import { uiState } from '$lib/uistate.svelte.js';
+	import { IsMobile } from '#lib/mobile.svelte.js';
+	import { uiState } from '#lib/uistate.svelte.js';
 
 	import ButtonIcon from './ButtonIcon.svelte';
 	import ButtonInk from './ButtonInk.svelte';

@@ -4,10 +4,10 @@
 	import type { CaptureDevice } from './device.svelte.js';
 
 	import IconGallery from '~icons/ri/multi-image-line';
-	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import { plural } from '$lib/i18n.js';
-	import LoadingText, { Loading } from '$lib/LoadingText.svelte';
-	import { goto } from '$lib/paths.js';
+	import ButtonSecondary from '#lib/ButtonSecondary.svelte';
+	import { plural } from '#lib/i18n.js';
+	import LoadingText, { Loading } from '#lib/LoadingText.svelte';
+	import { goto } from '#lib/paths.js';
 
 	interface Props {
 		device: CaptureDevice;

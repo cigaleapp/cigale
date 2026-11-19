@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { NamespacedMetadataID } from './schemas/common.js';
-	import type * as DB from '$lib/database.js';
+	import type * as DB from '#lib/database.js';
 
 	import { dequal } from 'dequal';
 	import { watch } from 'runed';

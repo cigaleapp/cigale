@@ -1,24 +1,23 @@
 <script lang="ts">
 	import type { Expandable } from './WithExpandButton.svelte';
-	import type { Props as CarouselProps } from '$lib/Carousel.svelte';
-	import type * as DB from '$lib/database';
+	import type { Props as CarouselProps } from '#lib/Carousel.svelte';
+	import type * as DB from '#lib/database';
 
 	import { onDestroy } from 'svelte';
 
 	import IconZoomIn from '~icons/ri/zoom-in-line';
 	import IconZoomOut from '~icons/ri/zoom-out-line';
-	import AudioPlayer from '$lib/audio/AudioPlayer.svelte';
-	import { paletteSVGFilter } from '$lib/audio/spectrogram.js';
-	import { FULL_IMAGE_CROPBOX, toTopLeftCoords } from '$lib/BoundingBoxes.svelte';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import Carousel from '$lib/Carousel.svelte';
-	import CroppedImg from '$lib/CroppedImg.svelte';
-	import { tables } from '$lib/idb.svelte.js';
-	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
-	import { accessBytes } from '$lib/storage/utils.js';
-	import { uiState } from '$lib/uistate.svelte.js';
-	import { switchValue } from '$lib/utils.js';
-	import { getTheme } from '$routes/+layout.svelte';
+	import AudioPlayer from '#lib/audio/AudioPlayer.svelte';
+	import { paletteSVGFilter } from '#lib/audio/spectrogram.js';
+	import { FULL_IMAGE_CROPBOX, toTopLeftCoords } from '#lib/BoundingBoxes.svelte.js';
+	import ButtonIcon from '#lib/ButtonIcon.svelte';
+	import Carousel from '#lib/Carousel.svelte';
+	import CroppedImg from '#lib/CroppedImg.svelte';
+	import { defineKeyboardShortcuts } from '#lib/keyboard.svelte.js';
+	import { accessBytes } from '#lib/storage/utils.js';
+	import { uiState } from '#lib/uistate.svelte.js';
+	import { switchValue } from '#lib/utils.js';
+	import { getTheme } from '#routes/+layout.svelte';
 
 	import WithExpandButton from './WithExpandButton.svelte';
 

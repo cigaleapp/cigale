@@ -74,6 +74,17 @@ jobs:
         env:
           BUNDLE_ANALYZER: ${{ matrix.analyzer }}
 
+      # cuz sometimes it's there
+      - name: Copy stats.{json,html} from dist/ to public/
+        run: |
+          if [[ ! -f ./public/stats.json ]]; then
+            cp dist/stats.json public/stats.json || echo dist/stats.json not found
+          fi
+
+          if [[ ! -f ./public/stats.html ]]; then
+            cp dist/stats.html public/stats.html || echo dist/stats.html not found
+          fi
+
       - name: Upload stats.json
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:

@@ -9,13 +9,14 @@
 	import IconStartTimer from '~icons/ri/timer-line';
 	import IconSfxOff from '~icons/ri/volume-mute-line';
 	import IconSfxOn from '~icons/ri/volume-up-line';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import DropdownMenu from '$lib/DropdownMenu.svelte';
-	import { goto } from '$lib/paths.js';
-	import { getSettings, toggleSetting } from '$lib/settings.svelte.js';
-	import { toasts } from '$lib/toasts.svelte.js';
-	import { orEmpty, switchValue } from '$lib/utils.js';
-	import ModalSubmitIssue from '$routes/(app)/ModalSubmitIssue.svelte';
+	import ButtonIcon from '#lib/ButtonIcon.svelte';
+	import DropdownMenu from '#lib/DropdownMenu.svelte';
+	import { goto } from '#lib/paths.js';
+	import { getSettings, toggleSetting } from '#lib/settings.svelte.js';
+	import { toasts } from '#lib/toasts.svelte.js';
+	import { orEmpty, switchValue } from '#lib/utils.js';
+	import ModalSubmitIssue from '#routes/(app)/ModalSubmitIssue.svelte';
+
 	import { displayTimerConfig } from './timers.svelte.js';
 
 	interface Props {

@@ -1,8 +1,8 @@
-import type { Account } from '$lib/accounts/types.js';
-import type { SessionRemoteID } from '$lib/schemas/sessions.js';
+import type { Account } from '#lib/accounts/types.js';
+import type { SessionRemoteID } from '#lib/schemas/sessions.js';
 
-import { formatBytesSize } from '$lib/i18n.js';
-import { tables } from '$lib/idb.svelte.js';
+import { formatBytesSize } from '#lib/i18n.js';
+import { tables } from '#lib/idb.svelte.js';
 
 export async function downloadRemoteSession({
 	session: remoteSession,
@@ -11,7 +11,7 @@ export async function downloadRemoteSession({
 }: {
 	session: { id: SessionRemoteID; filesCount: number; protocol: string };
 	account: Account;
-	mutator: import('$lib/Card.svelte').Mutator;
+	mutator: import('#lib/Card.svelte').Mutator;
 }) {
 	if (!account.id) return;
 

@@ -1,4 +1,4 @@
-import { ACCEPTED_SIDECAR_TYPES } from '$lib/sidecars.js';
+import { ACCEPTED_SIDECAR_TYPES } from '#lib/sidecars.js';
 
 import * as audio from './audio.svelte.js';
 import * as images from './images.svelte.js';

@@ -1,16 +1,16 @@
 import type { CaptureDevice } from './device.svelte.js';
-import type { CaptureTimer, CaptureTimersMessageTemplate } from '$lib/schemas/protocols';
-import type { SfxName } from '$lib/sound.js';
+import type { CaptureTimer, CaptureTimersMessageTemplate } from '#lib/schemas/protocols.js';
+import type { SfxName } from '#lib/sound.js';
 
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { KeepAwake } from '@capawesome/capacitor-keep-awake';
 import { ms } from 'convert';
 
-import { formatDurationShort } from '$lib/date';
-import { getSettings } from '$lib/settings.svelte';
-import { sfx as _sfx } from '$lib/sound.js';
-import { uiState } from '$lib/uistate.svelte.js';
-import { switchValue } from '$lib/utils';
+import { formatDurationShort } from '#lib/date.js';
+import { getSettings } from '#lib/settings.svelte.js';
+import { sfx as _sfx } from '#lib/sound.js';
+import { uiState } from '#lib/uistate.svelte.js';
+import { switchValue } from '#lib/utils.js';
 
 type TimerConfig = (typeof CaptureTimer)['infer'];
 

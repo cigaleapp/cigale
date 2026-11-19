@@ -4,8 +4,8 @@ import { Capacitor } from '@capacitor/core';
 import { AudioSessionMode, CapacitorAudioRecorder } from '@capgo/capacitor-audio-recorder';
 import { differenceInMilliseconds } from 'date-fns';
 
-import { getSetting } from '$lib/settings.svelte.js';
-import { range, sleep } from '$lib/utils.js';
+import { getSetting } from '#lib/settings.svelte.js';
+import { range, sleep } from '#lib/utils.js';
 
 export type MicrophoneState = {
 	ready: boolean;

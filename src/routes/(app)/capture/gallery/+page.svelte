@@ -1,25 +1,27 @@
 <script lang="ts">
+	import type { DecodedAudioMono } from '#lib/audio/decode.js';
+
 	import IconBack from '~icons/ri/arrow-left-s-line';
 	import IconDeleteAll from '~icons/ri/delete-bin-2-line';
 	import IconDelete from '~icons/ri/delete-bin-6-line';
 	import IconMore from '~icons/ri/more-2-line';
-	import AreaObservations from '$lib/AreaObservations.svelte';
-	import AudioPlayer from '$lib/audio/AudioPlayer.svelte';
-	import { decodeToMono, type DecodedAudioMono } from '$lib/audio/decode.js';
-	import { renderWaveformSvg } from '$lib/audio/waveform.js';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import ButtonInk from '$lib/ButtonInk.svelte';
-	import CardMedia from '$lib/CardMedia.svelte';
-	import DebugOnly from '$lib/DebugOnly.svelte';
-	import DropdownMenu from '$lib/DropdownMenu.svelte';
-	import { errorMessage, plural } from '$lib/i18n.js';
-	import Lightbox from '$lib/Lightbox.svelte';
-	import LoadingScreen from '$lib/LoadingScreen.svelte';
-	import Logo from '$lib/Logo.svelte';
-	import { goto } from '$lib/paths.js';
-	import { uiState } from '$lib/uistate.svelte.js';
-	import { compareBy, ensureRegularNumber } from '$lib/utils.js';
-	import TopbarContent from '$routes/(app)/TopbarContent.svelte';
+	import AreaObservations from '#lib/AreaObservations.svelte';
+	import AudioPlayer from '#lib/audio/AudioPlayer.svelte';
+	import { decodeToMono } from '#lib/audio/decode.js';
+	import { renderWaveformSvg } from '#lib/audio/waveform.js';
+	import ButtonIcon from '#lib/ButtonIcon.svelte';
+	import ButtonInk from '#lib/ButtonInk.svelte';
+	import CardMedia from '#lib/CardMedia.svelte';
+	import DebugOnly from '#lib/DebugOnly.svelte';
+	import DropdownMenu from '#lib/DropdownMenu.svelte';
+	import { errorMessage, plural } from '#lib/i18n.js';
+	import Lightbox from '#lib/Lightbox.svelte';
+	import LoadingScreen from '#lib/LoadingScreen.svelte';
+	import Logo from '#lib/Logo.svelte';
+	import { goto } from '#lib/paths.js';
+	import { uiState } from '#lib/uistate.svelte.js';
+	import { compareBy, ensureRegularNumber } from '#lib/utils.js';
+	import TopbarContent from '#routes/(app)/TopbarContent.svelte';
 
 	import { PendingStorage } from '../pendingstorage.svelte.js';
 

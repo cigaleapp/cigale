@@ -4,7 +4,7 @@ import {
 	GeocodeJSONPointFeature,
 	GeocodeJSONProperties,
 	GeoJSONFeatureCollection,
-} from '$lib/geojson.js';
+} from '#lib/geojson.js';
 
 const NominatimResponseSchemas = {
 	Reverse: GeoJSONFeatureCollection(GeocodeJSONPointFeature),

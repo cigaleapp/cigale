@@ -1,5 +1,5 @@
 <script lang="ts" module>
-	import type * as DB from '$lib/database.js';
+	import type * as DB from '#lib/database.js';
 
 	type Status = 'queued' | 'loading' | 'ok' | 'errored';
 
@@ -50,29 +50,29 @@
 </script>
 
 <script lang="ts">
-	import type { TopLeftBoundingBox } from '$lib/BoundingBoxes.svelte';
+	import type { TopLeftBoundingBox } from './BoundingBoxes.svelte.js';
 
 	import IconRetry from '~icons/ri/arrow-go-back-fill';
 	import IconDelete from '~icons/ri/delete-bin-line';
 	import IconImage from '~icons/ri/image-2-line';
 	import IconVideo from '~icons/ri/video-line';
 	import IconAudio from '~icons/ri/volume-up-line';
-	import AnimatableCheckmark from '$lib/AnimatableCheckmark.svelte';
-	import { paletteSVGFilter, spectrogramBoundingBoxDomains } from '$lib/audio/spectrogram.js';
-	import { coordsFitter } from '$lib/BoundingBoxes.svelte';
-	import ButtonInk from '$lib/ButtonInk.svelte';
-	import Card from '$lib/Card.svelte';
-	import CroppedImg from '$lib/CroppedImg.svelte';
-	import { formatDurationStopwatch } from '$lib/date.js';
-	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
-	import Logo from '$lib/Logo.svelte';
-	import { IsMobile } from '$lib/mobile.svelte.js';
-	import OverflowableText from '$lib/OverflowableText.svelte';
-	import { tooltip } from '$lib/tooltips.js';
-	import { onlongpress } from '$lib/touch/longpress.js';
-	import { uiState } from '$lib/uistate.svelte.js';
-	import { switchValue } from '$lib/utils.js';
-	import { getTheme } from '$routes/+layout.svelte';
+	import AnimatableCheckmark from '#lib/AnimatableCheckmark.svelte';
+	import { paletteSVGFilter, spectrogramBoundingBoxDomains } from '#lib/audio/spectrogram.js';
+	import { coordsFitter } from '#lib/BoundingBoxes.svelte';
+	import ButtonInk from '#lib/ButtonInk.svelte';
+	import Card from '#lib/Card.svelte';
+	import CroppedImg from '#lib/CroppedImg.svelte';
+	import { formatDurationStopwatch } from '#lib/date.js';
+	import LoadingSpinner from '#lib/LoadingSpinner.svelte';
+	import Logo from '#lib/Logo.svelte';
+	import { IsMobile } from '#lib/mobile.svelte.js';
+	import OverflowableText from '#lib/OverflowableText.svelte';
+	import { tooltip } from '#lib/tooltips.js';
+	import { onlongpress } from '#lib/touch/longpress.js';
+	import { uiState } from '#lib/uistate.svelte.js';
+	import { switchValue } from '#lib/utils.js';
+	import { getTheme } from '#routes/+layout.svelte';
 
 	let {
 		onclick,

@@ -3,9 +3,9 @@ import type { ShootingPhase } from './device.svelte.js';
 import { redirect } from '@sveltejs/kit';
 
 import { resolve } from '$app/paths';
-import { tables } from '$lib/idb.svelte.js';
-import { getCurrentSessionId } from '$lib/sessions.js';
-import { switchValue } from '$lib/utils.js';
+import { tables } from '#lib/idb.svelte.js';
+import { getCurrentSessionId } from '#lib/sessions.js';
+import { switchValue } from '#lib/utils.js';
 
 export async function load({ parent }) {
 	await parent();

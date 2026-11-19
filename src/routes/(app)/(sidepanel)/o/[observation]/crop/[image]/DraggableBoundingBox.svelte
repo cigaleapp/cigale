@@ -4,12 +4,12 @@
 	import { watch } from 'runed';
 	import { tick } from 'svelte';
 
+	import { coordsScaler, withinBoundingBox } from '#lib/BoundingBoxes.svelte.js';
+	import { imageIdToFileId } from '#lib/images.js';
+	import { isDebugMode } from '#lib/settings.svelte.js';
+	import { Fingers } from '#lib/touch/fingers.svelte.js';
+	import { mapValues } from '#lib/utils.js';
 	import { page } from '$app/state';
-	import { coordsScaler, withinBoundingBox } from '$lib/BoundingBoxes.svelte.js';
-	import { imageIdToFileId } from '$lib/images.js';
-	import { isDebugMode } from '$lib/settings.svelte.js';
-	import { Fingers } from '$lib/touch/fingers.svelte.js';
-	import { mapValues } from '$lib/utils.js';
 
 	import { fittedImageRect, NewBoundingBox } from './DraggableBoundingBox.svelte.js';
 

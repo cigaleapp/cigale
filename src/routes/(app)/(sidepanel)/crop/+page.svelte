@@ -3,18 +3,18 @@
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
 
-	import AreaObservations from '$lib/AreaObservations.svelte';
-	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import CardImageFile from '$lib/CardMediaFile.svelte';
-	import * as idb from '$lib/idb.svelte.js';
-	import { deleteImageOrAudioFile, imageIsAnalyzed } from '$lib/images';
-	import Logo from '$lib/Logo.svelte';
-	import { mergeMetadataValues } from '$lib/metadata/index.js';
-	import { goto } from '$lib/paths.js';
-	import { cancelTask, detectMore } from '$lib/queue.svelte.js';
-	import { seo } from '$lib/seo.svelte';
-	import { uiState } from '$lib/uistate.svelte.js';
-	import { avg, groupBy, nonnull } from '$lib/utils.js';
+	import AreaObservations from '#lib/AreaObservations.svelte';
+	import ButtonSecondary from '#lib/ButtonSecondary.svelte';
+	import CardImageFile from '#lib/CardMediaFile.svelte';
+	import * as idb from '#lib/idb.svelte.js';
+	import { deleteImageOrAudioFile, imageIsAnalyzed } from '#lib/images';
+	import Logo from '#lib/Logo.svelte';
+	import { mergeMetadataValues } from '#lib/metadata/index.js';
+	import { goto } from '#lib/paths.js';
+	import { cancelTask, detectMore } from '#lib/queue.svelte.js';
+	import { seo } from '#lib/seo.svelte';
+	import { uiState } from '#lib/uistate.svelte.js';
+	import { avg, groupBy, nonnull } from '#lib/utils.js';
 
 	seo({ title: 'Recadrer' });
 

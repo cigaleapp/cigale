@@ -11,7 +11,7 @@ const NUMERIC_UNITS = [...conversions.values()].flatMap(
 );
 
 /**
- * @import { ValueOfMap } from '$lib/utils.js';
+ * @import { ValueOfMap } from '#lib/utils.js';
  */
 
 export const NumericUnit = type.enumerated(...NUMERIC_UNITS);

@@ -7,8 +7,8 @@
 </script>
 
 <script lang="ts">
-	import ModalConfirm from '$lib/ModalConfirm.svelte';
-	import { askForNotificationPermission } from '$lib/notifications.js';
+	import ModalConfirm from '#lib/ModalConfirm.svelte';
+	import { askForNotificationPermission } from '#lib/notifications.js';
 </script>
 
 <ModalConfirm

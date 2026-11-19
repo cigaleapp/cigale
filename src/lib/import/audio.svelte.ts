@@ -1,10 +1,10 @@
 import type { PROCEDURES } from '$worker/procedures.js';
 import type { SwarpcClient } from 'swarpc';
 
-import { decodeToMono } from '$lib/audio/decode.js';
-import { tables } from '$lib/idb.svelte.js';
-import { imageId } from '$lib/images.js';
-import { uiState } from '$lib/uistate.svelte.js';
+import { decodeToMono } from '#lib/audio/decode.js';
+import { tables } from '#lib/idb.svelte.js';
+import { imageId } from '#lib/images.js';
+import { uiState } from '#lib/uistate.svelte.js';
 
 /** @see https://en.wikipedia.org/wiki/HTML_audio#Supported_audio_coding_formats */
 export const ACCEPTED_IMPORT_TYPES = [

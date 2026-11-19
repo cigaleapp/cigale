@@ -1,6 +1,6 @@
 import type { DecodedAudioMono } from './decode.js';
-import type { CoordinatesDomain } from '$lib/BoundingBoxes.svelte.js';
-import type * as DB from '$lib/database.js';
+import type { CoordinatesDomain } from '#lib/BoundingBoxes.svelte.js';
+import type * as DB from '#lib/database.js';
 import type { AudioSample } from 'mediabunny';
 
 import { AudioSampleSink } from 'mediabunny';

@@ -3,12 +3,12 @@
 
 	import { fade, fly } from 'svelte/transition';
 
+	import { toTopLeftCoords } from '#lib/BoundingBoxes.svelte.js';
+	import ConfidencePercentage from '#lib/ConfidencePercentage.svelte';
+	import CroppedImg from '#lib/CroppedImg.svelte';
+	import { tables } from '#lib/idb.svelte.js';
+	import { uiState } from '#lib/uistate.svelte.js';
 	import IconAdd from '~icons/ri/add-line';
-	import { toTopLeftCoords } from '$lib/BoundingBoxes.svelte';
-	import ConfidencePercentage from '$lib/ConfidencePercentage.svelte';
-	import CroppedImg from '$lib/CroppedImg.svelte';
-	import { tables } from '$lib/idb.svelte';
-	import { uiState } from '$lib/uistate.svelte';
 
 	import {
 		boundingBoxes,
@@ -19,7 +19,7 @@
 		setHideAll,
 		zoom,
 	} from './+page.svelte';
-	import { getInitialCrops } from './actions.svelte';
+	import { getInitialCrops } from './actions.svelte.js';
 	import { switchTool } from './Toolbar.svelte';
 
 	interface Props {

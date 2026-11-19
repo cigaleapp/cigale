@@ -5,7 +5,7 @@
 
 	import IconCamera from '~icons/ri/camera-line';
 	import IconWaveform from '~icons/ri/voiceprint-line';
-	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
+	import SegmentedGroup from '#lib/SegmentedGroup.svelte';
 
 	interface Props {
 		device: CaptureDevice;
