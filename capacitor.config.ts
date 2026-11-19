@@ -51,6 +51,9 @@ const config: CapacitorConfig = {
 		CapacitorHttp: {
 			enabled: true,
 		},
+		WebViewCrash: {
+			restartOnCrash: true,
+		},
 	},
 	android: {
 		// The app is open source, let's allow anyone to inspect the webview :)
