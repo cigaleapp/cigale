@@ -26,6 +26,7 @@ let package = Package(
         .package(name: "CapawesomeCapacitorKeepAwake", path: "../../../node_modules/@capawesome/capacitor-keep-awake"),
         .package(name: "CapgoCapacitorShake", path: "../../../node_modules/@capgo/capacitor-shake"),
         .package(name: "CapgoCapacitorUpdater", path: "../../../node_modules/@capgo/capacitor-updater"),
+        .package(name: "CapgoCapacitorUploader", path: "../../../node_modules/@capgo/capacitor-uploader"),
         .package(name: "CapgoInappbrowser", path: "../../../node_modules/@capgo/inappbrowser")
     ],
     targets: [
@@ -48,6 +49,7 @@ let package = Package(
                 .product(name: "CapawesomeCapacitorKeepAwake", package: "CapawesomeCapacitorKeepAwake"),
                 .product(name: "CapgoCapacitorShake", package: "CapgoCapacitorShake"),
                 .product(name: "CapgoCapacitorUpdater", package: "CapgoCapacitorUpdater"),
+                .product(name: "CapgoCapacitorUploader", package: "CapgoCapacitorUploader"),
                 .product(name: "CapgoInappbrowser", package: "CapgoInappbrowser")
             ]
         )
