@@ -15,7 +15,7 @@
 <div class="typeswitch">
 	<SegmentedGroup
 		disabled={device.shooting}
-		bind:current={device.selectedType}
+		bind:current={() => device.selectedType, (typ) => void device.selectType(typ)}
 		options={['photo', 'sound'] as const}
 	>
 		{#snippet option_photo()}

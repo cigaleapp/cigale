@@ -127,7 +127,8 @@ export const Session = type({
 	description: 'string',
 	protocol: ID,
 	metadata: MetadataValues,
-	captureModeShootingPhase: "string = 'inert'",
+	captureModeSelectedDeviceType: '"sound" | "photo" | null = null',
+	captureModeShootingPhase: 'string = "inert"',
 	/** @deprecated use captureModeSelectedTimer instead */
 	captureModeSelectedTimerIndex: 'null | number >= 0 = 0',
 	captureModeSelectedTimer: type({

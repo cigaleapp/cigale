@@ -47,13 +47,7 @@ export class CaptureDevice {
 	timerShoot = $derived(this.timer?.config.shoot ?? 'manually');
 
 	shootingPhase = $state<ShootingPhase>('inert');
-
-	selectedType = $derived(
-		switchValue(uiState.currentProtocol?.media.types.at(0) ?? 'image', {
-			image: 'photo',
-			audio: 'sound',
-		})
-	);
+	selectedType = $state<'sound' | 'photo'>('photo');
 
 	/** Load camera even if captureType isnt photo. Used when asking for pics at timer start for file session metadata */
 	forceLoadCamera = $state(false);
@@ -142,11 +136,13 @@ export class CaptureDevice {
 		sessionId: string;
 		startingShootingPhase: ShootingPhase;
 		startingTimers: DB.Session['captureModeSelectedTimer'];
+		startingType: 'sound' | 'photo';
 	}) {
 		this.floatingmsg = new FloatingMessage();
 
 		this.shootingPhase = params.startingShootingPhase;
 		this.changeTimerConfig(params.startingTimers[this.selectedType]);
+		this.selectedType = params.startingType;
 
 		PendingStorage.open(params.sessionId).then((storage) => {
 			this.storage = storage;
@@ -231,6 +227,18 @@ export class CaptureDevice {
 				break;
 			}
 		}
+	}
+
+	async selectType(type: 'sound' | 'photo') {
+		if (!uiState.currentSession) return;
+
+		this.selectedType = type;
+
+		void tables.Session.update(
+			uiState.currentSession.id,
+			'captureModeSelectedDeviceType',
+			type
+		);
 	}
 
 	async changeTimerConfig(index: number | null) {
