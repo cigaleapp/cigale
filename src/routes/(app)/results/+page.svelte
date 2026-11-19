@@ -28,6 +28,11 @@
 	const metadataErrors: Map<NamespacedMetadataID, string[]> = new SvelteMap();
 
 	async function confirmExportIfMetadataErrors() {
+		console.debug('[export-debug]', {
+			errors: [...metadataErrors],
+			showBound: !!confirmExportWithMetadataErrors,
+		});
+
 		const hasErrors = metadataErrors.values().some((errs) => errs.length > 0);
 		if (!hasErrors) return true;
 		return (await confirmExportWithMetadataErrors?.()) ?? true;

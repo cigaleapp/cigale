@@ -13,8 +13,8 @@
 	 * @type {object}
 	 * @property {`modal_${string}`} key a unique string, used to identify the modal in the page's state.
 	 * @property {string} title the title used in the header
-	 * @property {undefined | (() => void)} [open] a function you can bind to, to open the modal
-	 * @property {undefined | (() => void)} [close] a function you can bind to, to close the modal. Note that the modal includes a close button in the header, you don't _have_ to use this.
+	 * @property {undefined | (() => void | Promise<void>)} [open] a function you can bind to, to open the modal
+	 * @property {undefined | (() => void | Promise<void>)} [close] a function you can bind to, to close the modal. Note that the modal includes a close button in the header, you don't _have_ to use this.
 	 * @property {(() => void) | undefined} [onclose] a function that will be called when the modal is closed, either via the close button or by clicking outside the modal
 	 * @property {(() => void) | undefined} [onopen] a function that will be called when the modal is opened
 	 * @property {import('#lib/toasts.svelte.js').ToastPoolNames} [toasts] display toasts from the specified pool in the footer. Also sets the active toast pool while the modal is open.
@@ -69,25 +69,38 @@
 				toasts.clear();
 			}
 
-			goto('', { shallow: true, state: { [stateKey]: true } });
+			console.debug('[modal] open()', stateKey, $state.snapshot(page.state));
+			const navigation = goto('', { shallow: true, state: { [stateKey]: true } }).then(
+				(r) => {
+					console.debug('[modal] goto resolved', stateKey, $state.snapshot(page.state));
+					return r;
+				}
+			);
 
 			setTimeout(() => {
 				opening = false;
 			}, openingDuration);
+
+			return navigation;
 		};
 		close = () => {
 			if (toastsPool) {
 				toasts.setCurrentPool('default');
 				toasts.clear();
 			}
-			goto('', { shallow: true, state: { [stateKey]: false } });
+			return goto('', { shallow: true, state: { [stateKey]: false } });
 		};
 	});
 
 	/** @type {HTMLDialogElement | undefined} */
 	let modalElement = $state();
 	$effect(() => {
+		console.debug(`[modal] effect ${stateKey}`, {
+			hasElement: !!modalElement,
+			mobile: mobile.current,
+		});
 		if (!modalElement) return;
+		console.debug(`[modal] ${stateKey} state =`, page.state[stateKey]);
 
 		// page.state is replaced (not merged) on each goto, so a modal's key
 		// becomes undefined when another modal opens or a navigation occurs.
@@ -97,7 +110,6 @@
 				modalElement.showModal();
 				break;
 			case false:
-			case undefined:
 				modalElement.close();
 				break;
 		}
@@ -125,7 +137,9 @@ CSS variables:
 			() => page.state[stateKey] === true,
 			(isOpen) => {
 				if (!isOpen) onclose?.();
-				goto('', { shallow: true, state: { [stateKey]: isOpen } });
+				if (page.state[stateKey] === true) {
+					goto('', { shallow: true, state: { [stateKey]: isOpen } });
+				}
 			}
 		}
 	>
@@ -143,12 +157,15 @@ CSS variables:
 	<Portal to="#modals">
 		<dialog
 			data-key={stateKey}
-			aria-hidden={page.state[stateKey] !== true}
+			aria-hidden={page.state[stateKey] === false}
 			style:color-scheme={getColorScheme()}
 			bind:this={modalElement}
 			onclose={async () => {
+				console.debug(`[modal] ${stateKey} dialog closed, state =`, page.state[stateKey]);
 				// Update state when dialog is closed via browser-controlled means (e.g. Esc key)
-				await goto('', { shallow: true, state: { [stateKey]: false } });
+				if (page.state[stateKey] === true) {
+					await goto('', { shallow: true, state: { [stateKey]: false } });
+				}
 				onclose?.();
 			}}
 			onmousedown={({ target, currentTarget, offsetX, offsetY }) => {
