@@ -42,7 +42,6 @@ test('allows cancelling classification of an observation', issue(430), async ({ 
 test.describe('full-screen classification view', pr(1071), () => {
 	test.use({
 		storageState: 'tests/fixtures/storage-states/basic.json',
-		opfsState: 'tests/fixtures/opfs-states/basic.json',
 	});
 
 	test.beforeEach(async ({ page, app }) => {

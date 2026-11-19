@@ -5,7 +5,7 @@ import type { RemovePrefix } from '$lib/utils.js';
 
 import { expect } from '@playwright/test';
 
-import { collectOPFSState } from '$e2e/utils/opfs.js';
+import { collectOPFSState, supportsOpfs } from '$e2e/utils/opfs.js';
 
 import lightProtocol from '../../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import { FixturePaths } from '../filepaths.js';
@@ -20,7 +20,7 @@ import {
 	newSession,
 } from '../utils/index.js';
 
-setup.use({ storageState: { cookies: [], origins: [] }, opfsState: [] });
+setup.use({ storageState: { cookies: [], origins: [] } });
 
 setup('empty, basic', async ({ page }) => {
 	await goToProtocolManagement(page);
@@ -84,12 +84,10 @@ setup('kitchensink-protocol', async ({ page, app }) => {
 
 async function writeStates(
 	page: Page,
-	filename: RemovePrefix<'storage-states/', FixturePaths.StorageStates> &
-		RemovePrefix<'opfs-states/', FixturePaths.OPFSStates>,
+	filename: RemovePrefix<'storage-states/', FixturePaths.StorageStates>,
 	overrides: { localStorage?: Record<string, string> } = {}
 ) {
 	await writeStorageState(page, `storage-states/${filename}`, overrides?.localStorage);
-	await collectOPFSState(page, `opfs-states/${filename}`);
 }
 
 async function writeStorageState(
@@ -107,8 +105,14 @@ async function writeStorageState(
 	}, localStorageOverrides);
 
 	mkdirSync(path.dirname(destination), { recursive: true });
+
 	await page.context().storageState({
 		indexedDB: true,
+		opfs: supportsOpfs(page),
 		path: destination,
 	});
+
+	if (!supportsOpfs(page)) {
+		await collectOPFSState(page, filename);
+	}
 }

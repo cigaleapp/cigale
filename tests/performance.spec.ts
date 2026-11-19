@@ -10,7 +10,7 @@ import { assert, expect, test } from './fixtures.js';
 import { mockOPFSOnWebWorkers } from './utils/opfs.js';
 import { collectChromeDevtoolsTrace, emulateNetworkProfile } from './utils/performance.js';
 
-test.use({ storageState: { cookies: [], origins: [] }, opfsState: [] });
+test.use({ storageState: { cookies: [], origins: [] } });
 
 benchmark(`startup @blank`, {
 	async prepare({ page }) {

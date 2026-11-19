@@ -21,7 +21,6 @@ const CROP_METADATA_ID = `${exampleProtocol.id}__crop`;
 test.describe('Cropper view', () => {
 	test.use({
 		storageState: 'tests/fixtures/storage-states/basic.json',
-		opfsState: 'tests/fixtures/opfs-states/basic.json',
 	});
 
 	test.beforeEach(async ({ page, app }, testInfo) => {

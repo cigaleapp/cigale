@@ -2,9 +2,10 @@ import type { TempFilesFixture } from './fixtures/tempfiles.js';
 
 import 'urlpattern-polyfill';
 
+import { readFileSync } from 'node:fs';
 import type { AppFixture } from './fixtures/app.js';
 import type { ONNXModelsFixture } from './fixtures/onnxmodels.js';
-import type { OPFSTestArg } from './utils/opfs.js';
+import type { StorageState } from './utils/opfs.js';
 import type { NetworkFixture } from '@msw/playwright';
 
 import { defineNetworkFixture } from '@msw/playwright';
@@ -31,7 +32,6 @@ export type ExtraTestArgs = {
 	 * See https://claude.ai/share/9b09b767-2e90-4f9e-b0e5-a4e286000830
 	 */
 	networkWithAssets: import('@msw/playwright').NetworkFixture;
-	opfsState?: OPFSTestArg;
 	storageState:
 		| FixturePaths.Absolute<FixturePaths.StorageStates>
 		| Exclude<import('@playwright/test').BrowserContextOptions['storageState'], string>;
@@ -63,6 +63,22 @@ const _test = base.extend<ExtraTestArgs, { forEachWorker: void }>({
 	},
 	onnxmodels,
 	app,
+	storageState: async ({ browserName, storageState }, use) => {
+		const state: StorageState =
+			typeof storageState === 'string'
+				? JSON.parse(readFileSync(storageState).toString('utf-8'))
+				: storageState;
+
+		// Remove opfs data if we're on webkit
+		if (browserName === 'webkit') {
+			state.origins = state.origins.map((o) => {
+				if ('opfs' in o) delete o.opfs;
+				return o;
+			});
+		}
+
+		await use(state)
+	},
 	forEachWorker: [forEachWorker, { scope: 'worker', auto: true }],
 	forEachTest: [forEachTest, { auto: true }],
 });
@@ -74,7 +90,6 @@ const _test = base.extend<ExtraTestArgs, { forEachWorker: void }>({
  */
 export const test = _test.extend({
 	storageState: 'tests/fixtures/storage-states/empty.json',
-	opfsState: 'tests/fixtures/opfs-states/empty.json',
 });
 
 /**
@@ -82,7 +97,6 @@ export const test = _test.extend({
  */
 export const testBasic = _test.extend({
 	storageState: 'tests/fixtures/storage-states/basic.json',
-	opfsState: 'tests/fixtures/opfs-states/basic.json',
 });
 
 /**
@@ -90,7 +104,6 @@ export const testBasic = _test.extend({
  */
 export const testKitchensink = _test.extend({
 	storageState: 'tests/fixtures/storage-states/kitchen-sink.json',
-	opfsState: 'tests/fixtures/opfs-states/kitchen-sink.json',
 });
 
 export { lightProtocol as exampleProtocol };

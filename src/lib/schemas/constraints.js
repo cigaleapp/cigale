@@ -224,14 +224,7 @@ const HardwareRequirementCompositeString = (property, kind, convertTo) => {
 		`(?<${groupname}>${numberPattern}\\s+${unitpattern})`;
 
 	const pattern = new RegExp(
-		'^' +
-			[
-				`(?:${withUnit('main', mainUnit)}\\s*@\\s*${withUnit('freq', freqUnit)})`,
-				withUnit('main', mainUnit),
-				withUnit('freq', freqUnit),
-				'\\s*',
-			].join('|') +
-			'$'
+		`^${withUnit('main', mainUnit)}?(?:\\s*(@\\s*)?${withUnit('freq', freqUnit)})?$`
 	);
 
 	/**

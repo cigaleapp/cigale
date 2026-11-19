@@ -4,7 +4,6 @@ import { chooseFirstSession, setInferenceModels } from './utils/index.js';
 
 test.use({
 	storageState: 'tests/fixtures/storage-states/basic.json',
-	opfsState: 'tests/fixtures/opfs-states/basic.json',
 });
 
 test.beforeEach(async ({ page, app }) => {
