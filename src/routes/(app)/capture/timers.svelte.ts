@@ -118,7 +118,7 @@ export class Timer {
 			onfinished: (t: Timer) => void;
 		}
 	) {
-		const duration = config.during ?? config.within?.duration();
+		const duration = config.during ?? config.within?.remaining();
 
 		if (!duration) {
 			throw new Error(

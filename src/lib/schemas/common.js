@@ -1,5 +1,6 @@
 import { type } from 'arktype';
 import { differenceInMilliseconds, isWithinInterval, setHours, setMinutes } from 'date-fns';
+import * as dates from 'date-fns';
 
 import { clamp, safeJSONStringify } from '../utils.js';
 import { NumberWithUnitLiteral } from './units.js';
@@ -179,7 +180,7 @@ export const HourRange = type('/^\\d{2}:\\d{2}-\\d{2}:\\d{2}$/').pipe((literal) 
 			};
 		},
 		/**
-		 * Duration in milliseconds of the interval
+		 * Total duration in milliseconds of the interval
 		 * This requires a base date (defaults to today)
 		 * Because of potential daylight savings occuring within the interval
 		 * This does assume the timezone does not change within the interval though
@@ -188,6 +189,16 @@ export const HourRange = type('/^\\d{2}:\\d{2}-\\d{2}:\\d{2}$/').pipe((literal) 
 		duration(base) {
 			const { start, end } = this.reify(base ?? new Date());
 			return differenceInMilliseconds(end, start);
+		},
+		/**
+		 * Duration from either now (if we're within the interval) or the start (otherwise)
+		 * to the end of the interval, for today
+		 */
+		remaining() {
+			const { start, end } = this.reify(new Date());
+			const endpoint = dates.closestTo(end, [new Date(), start]);
+			if (!endpoint) throw new Error(`undefined endpoint for HourRange.remaining()`);
+			return differenceInMilliseconds(end, endpoint);
 		},
 		/**
 		 * @param {Date} date
