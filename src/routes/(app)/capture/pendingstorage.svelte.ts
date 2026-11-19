@@ -37,7 +37,6 @@ export type PendingPhotosRootFolders =
 export class PendingStorage {
 	public count = $state(0);
 	private frozenCount = false;
-	private audioURIs: string[] = [];
 
 	constructor(private sessionId: string) {}
 
@@ -72,8 +71,7 @@ export class PendingStorage {
 		if (this.frozenCount) return;
 		this.count =
 			(await binaryStorage.count(this.locator('photos', ''))) +
-			(await binaryStorage.count(this.locator('audio', ''))) +
-			this.audioURIs.length;
+			(await binaryStorage.count(this.locator('audio', '')));
 	}
 
 	async saveExtraExif(photoName: string) {
@@ -131,8 +129,17 @@ export class PendingStorage {
 
 		try {
 			if (typeof data === 'string') {
-				this.audioURIs.push(data);
-				name = data.split('/').at(-1) ?? '';
+				// For capacitor storage, this is the URI
+				const dest = await Promise.resolve(
+					this.locator('audio', this.nextFilename('audio'))
+				)
+					.then(async (loc) => binaryStorage.findFree(loc))
+					.then(async (free) => binaryStorage.resolvePath(free));
+
+				console.debug(`[pending storage] copying audio: ${data} -> ${dest}`);
+				await Filesystem.rename({ from: data, to: dest });
+
+				name = dest.split('/').at(-1) ?? '';
 			} else {
 				const file = await binaryStorage.create(
 					this.locator('audio', this.nextFilename('audio')),
@@ -229,27 +236,6 @@ export class PendingStorage {
 
 				yield await binaryStorage.read(location, contentType);
 			}
-
-			const uris = switchValue(kind, { photos: [], audio: this.audioURIs });
-
-			for (const uri of uris) {
-				const filename = uri.split('/').at(-1);
-
-				if (!filename) {
-					console.warn(`File URI ${uri} had no filename (no / segments), skipping`);
-					continue;
-				}
-
-				const info = await Filesystem.stat({ path: uri }).catch(() => undefined);
-
-				const fileattrs: FilePropertyBag = { type: contentType };
-				if (info) fileattrs.lastModified = info.mtime;
-
-				yield await Filesystem.readFile({ path: uri })
-					.then((result) => result.data as string)
-					.then((base64) => Uint8Array.fromBase64(base64))
-					.then((bytes) => new File([bytes], filename, fileattrs));
-			}
 		}
 	}
 
@@ -329,8 +315,6 @@ export class PendingStorage {
 			onProgress({ total, done });
 		}
 
-		this.audioURIs = [];
-
 		return !hasErrors;
 	}
 
@@ -370,12 +354,6 @@ export class PendingStorage {
 		for (const section of SECTIONS) {
 			await binaryStorage.clear(this.locator(section, ''));
 		}
-
-		for (const uri of this.audioURIs) {
-			await Filesystem.deleteFile({ path: uri }).catch(console.error);
-		}
-
-		this.audioURIs = [];
 	}
 
 	private get photosContentType(): `image/${string}` {

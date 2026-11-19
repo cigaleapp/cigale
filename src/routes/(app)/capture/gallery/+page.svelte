@@ -5,7 +5,7 @@
 	import IconMore from '~icons/ri/more-2-line';
 	import AreaObservations from '$lib/AreaObservations.svelte';
 	import AudioPlayer from '$lib/audio/AudioPlayer.svelte';
-	import { decodeToMono } from '$lib/audio/decode.js';
+	import { decodeToMono, type DecodedAudioMono } from '$lib/audio/decode.js';
 	import { renderWaveformSvg } from '$lib/audio/waveform.js';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonInk from '$lib/ButtonInk.svelte';

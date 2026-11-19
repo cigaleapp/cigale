@@ -130,11 +130,18 @@ export class CaptureDevice {
 	// Gotta stay silent when recording sound!
 	canEmitSfx = $derived(this.type !== 'sound');
 
-	nextFlashMode = $derived(cycleValues(this.camera.flash.supported, this.camera.flash.current));
-
 	flashMode = $derived(this.camera.flash.current);
 
-	canSetFlashMode = $derived(this.camera.flash.supported.length > 0);
+	supportedFlashModes = $derived(
+		switchValue(this.type, {
+			photo: this.camera.flash.supported,
+			sound: [],
+		})
+	);
+
+	nextFlashMode = $derived(cycleValues(this.supportedFlashModes, this.camera.flash.current));
+
+	canSetFlashMode = $derived(this.supportedFlashModes.length > 0);
 
 	constructor(params: {
 		sessionId: string;
@@ -145,7 +152,7 @@ export class CaptureDevice {
 		this.floatingmsg = new FloatingMessage();
 
 		this.shootingPhase = params.startingShootingPhase;
-		this.changeTimerConfig(params.startingTimers[this.selectedType]);
+		this.changeTimerConfig(params.startingTimers);
 		this.selectedType = params.startingType;
 
 		PendingStorage.open(params.sessionId).then((storage) => {
@@ -262,17 +269,27 @@ export class CaptureDevice {
 			'captureModeSelectedDeviceType',
 			type
 		);
+
+		await this.changeTimerConfig({});
 	}
 
-	async changeTimerConfig(index: number | null) {
+	async changeTimerConfig(changes: Partial<Record<'sound' | 'photo', number | null>>) {
 		if (!uiState.currentSession) return;
 
-		this.deviceTimer.switchConfig(index);
-
-		void tables.Session.update(uiState.currentSession.id, 'captureModeSelectedTimer', {
+		const selections = {
 			...uiState.currentSession.captureModeSelectedTimer,
-			[this.selectedType]: index,
-		});
+			...changes,
+		};
+
+		const index = selections[this.selectedType];
+
+		this.deviceTimer.switchConfig(this.selectedType, index);
+
+		void tables.Session.update(
+			uiState.currentSession.id,
+			'captureModeSelectedTimer',
+			selections
+		);
 	}
 
 	setShootingPhase(phase: ShootingPhase) {

@@ -12,21 +12,21 @@ import { sfx as _sfx } from '$lib/sound.js';
 import { uiState } from '$lib/uistate.svelte.js';
 import { switchValue } from '$lib/utils';
 
+type TimerConfig = (typeof CaptureTimer)['infer'];
+
 export class DeviceTimer {
 	#configIndex: number | null = null;
 
 	allConfigs = $derived(uiState.currentProtocol?.capture?.timers ?? []);
-	availableConfigs = $derived(
-		this.allConfigs.filter((config) => config.for.includes(this.device.selectedType))
-	);
-
-	config = $state<(typeof CaptureTimer)['infer']>();
+	availableConfigs = $state<TimerConfig[]>([]);
+	config = $state<TimerConfig>();
 
 	constructor(public device: CaptureDevice) {}
 
-	switchConfig(index: number | null | undefined) {
+	switchConfig(type: 'photo' | 'sound', index: number | null | undefined) {
 		this.timer?.stop();
 		this.#configIndex = index ?? null;
+		this.availableConfigs = this.allConfigs.filter((config) => config.for.includes(type));
 		this.config = this.availableConfigs[this.#configIndex ?? -1];
 
 		if (this.config) {

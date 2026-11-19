@@ -12,7 +12,7 @@
 
 <div class="audio-monitor">
 	<div class="vu-meter">
-		<ProgressBar alwaysActive progress={device.amplitudeTracker.latestFrame.amplitude * 20} />
+		<ProgressBar alwaysActive progress={device.amplitudeTracker.latestFrame.amplitude} />
 	</div>
 
 	<div class="history">
@@ -46,7 +46,7 @@
 	.history .tick {
 		width: 1px;
 		flex-shrink: 0;
-		height: calc(max(1px, var(--amplitude) * 10 * 100%));
+		height: calc(max(1px, var(--amplitude) * 100%));
 		background: var(--fg-neutral);
 		border-radius: 1000px;
 
