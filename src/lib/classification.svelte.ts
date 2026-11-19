@@ -7,6 +7,7 @@ import { databaseHandle, tables } from './idb.svelte.js';
 import { inferenceModelId } from './inference.js';
 import { storeMetadataErrors } from './metadata/storage.js';
 import { metadataDefinitionComparator } from './protocols.js';
+import { resolveObjectBytesIfNotWorker } from './storage/utils.js';
 import { uiState } from './uistate.svelte.js';
 import { safeJSONStringify } from './utils.js';
 
@@ -16,7 +17,7 @@ import { safeJSONStringify } from './utils.js';
 export async function classifyImage(
 	swarpc: SwarpcClient<typeof PROCEDURES>,
 	id: string,
-	cancellers: Map<string, CancelablePromise['cancel']>
+	cancellers: undefined | Map<string, CancelablePromise['cancel']>
 ) {
 	if (!uiState.currentProtocol) {
 		throw new Error('Aucun protocole sélectionné');
@@ -82,10 +83,19 @@ export async function classifyImage(
 			},
 		};
 
+		const image = await tables.Image.get(id);
+		if (!image) throw new Error(`Image ${id} not found`);
+		if (!image.fileId) throw new Error(`Image ${id} has no image file attached`);
+
 		const { cancel, request: done } = swarpc.classify.cancelable({
 			imageId: id,
 			taskSettings,
 			inferenceSessionId,
+			imageBytes: await resolveObjectBytesIfNotWorker(
+				databaseHandle(),
+				'ImageFile',
+				image.fileId
+			),
 			metadataIds: {
 				cropbox: uiState.cropMetadataId,
 				target: metadata.id,
