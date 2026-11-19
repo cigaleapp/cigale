@@ -20,4 +20,8 @@ mkdirSync(dirname(destination), { recursive: true });
 await Bun.file(destination).write(JSON.stringify(filtered, null, 2));
 
 console.info(`Generated ${destination} with ${filtered.length} entries:`);
-console.info(await Bun.file(destination).text());
+filtered.forEach((entry) =>
+	console.info(
+		`- ${entry.target.sha256_cert_fingerprints.join('; ')} (${entry.target.package_name})`
+	)
+);
