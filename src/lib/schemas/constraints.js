@@ -3,7 +3,7 @@ import { convert, MeasureKind } from 'convert';
 import NaturalRegex from 'natural-regex';
 
 import { describeNaturalRegex } from '../natural-regex-tokens.js';
-import { switchValue } from '../utils.js';
+import { ensureRegularNumber, switchValue } from '../utils.js';
 
 /**
  * @import { UnitsByMeasure } from 'convert'
@@ -118,9 +118,8 @@ function findLessComparator(s) {
  */
 function findFloat(s) {
 	const parsed = Number.parseFloat(s.match(reg.float)?.[1]?.replace(',', '.') ?? '');
-	if (Number.isNaN(parsed)) return undefined;
-	if (!Number.isFinite(parsed)) return undefined;
-	return parsed;
+
+	return ensureRegularNumber(parsed, undefined);
 }
 
 /**

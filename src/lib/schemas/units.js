@@ -1,19 +1,33 @@
 import { type } from 'arktype';
+import { convertMany } from 'convert';
 import { conversions } from 'convert/conversions';
+
+// TODO turn ...[...x] into just ...x once Vite build supports Iterator#flatMap
+// see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Iterator/flatMap
+const NUMERIC_UNITS = [...conversions.values()].flatMap(
+	({ units }) =>
+		/** @type {import('convert').Unit[]} */
+		(units.flatMap((unit) => [...unit.names, ...('symbols' in unit ? unit.symbols : [])]))
+);
 
 /**
  * @import { ValueOfMap } from '#lib/utils.js';
  */
 
-export const NumericUnit = type.enumerated(
-	// TODO turn ...[...x] into just ...x once Vite build supports Iterator#flatMap
-	// see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Iterator/flatMap
-	...[...conversions.values()].flatMap(
-		({ units }) =>
-			/** @type {import('convert').Unit[]} */
-			(units.flatMap((unit) => [...unit.names, ...('symbols' in unit ? unit.symbols : [])]))
-	)
-);
+export const NumericUnit = type.enumerated(...NUMERIC_UNITS);
+
+/**
+ * @template {import('convert').Unit} U
+ * @param {U} base
+ * @param {U[]} units
+ * @param {object} [options]
+ * @param {boolean} [options.allowMultiple]
+ * @returns
+ */
+export const NumberWithUnitLiteral = (base, units, { allowMultiple = false } = {}) =>
+	type(
+		`/^((?<number>\\d+(\\.\\d+)?)(?<unit>${units.join('|')})?)${allowMultiple ? '+' : ''}$/`
+	).pipe((literal) => convertMany(literal).to(base));
 
 /**
  *

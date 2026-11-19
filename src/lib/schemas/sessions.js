@@ -127,8 +127,14 @@ export const Session = type({
 	description: 'string',
 	protocol: ID,
 	metadata: MetadataValues,
-	captureModeShootingPhase: "string = 'inert'",
+	captureModeSelectedDeviceType: '"sound" | "photo" | null = null',
+	captureModeShootingPhase: 'string = "inert"',
+	/** @deprecated use captureModeSelectedTimer instead */
 	captureModeSelectedTimerIndex: 'null | number >= 0 = 0',
+	captureModeSelectedTimer: type({
+		sound: 'null | number >= 0 = 0',
+		photo: 'null | number >= 0 = 0',
+	}).default(() => ({})),
 	fullscreenClassifier: type({
 		layout: type.enumerated(...FULLSCREEN_CLASSIFY_LAYOUTS),
 		'focusedMetadata?': NamespacedMetadataID,

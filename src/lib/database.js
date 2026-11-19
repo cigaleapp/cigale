@@ -2,9 +2,9 @@ import { scope, type } from 'arktype';
 
 import { localeFromNavigator } from './i18n.js';
 import {
-	Dimensions,
 	HTTPRequest,
 	ID,
+	ImageDimensions,
 	MIMEType,
 	NamespacedMetadataID,
 	Probability,
@@ -26,10 +26,12 @@ import {
 	ModelInput,
 } from './schemas/neural.js';
 import {
+	AudioFile as AudioFileSchema,
 	ImageFile as ImageFileSchema,
 	ImagePreviewFile as ImagePreviewFileSchema,
 	Image as ImageSchema,
 	Observation as ObservationSchema,
+	Sound as SoundSchema,
 } from './schemas/observations.js';
 import {
 	ExportsFilepathTemplateObservation,
@@ -75,6 +77,8 @@ const ImageFile = table(['id', 'sessionId', 'remoteId'], ImageFileSchema);
 
 const ImagePreviewFile = table(['id', 'sessionId', 'remoteId'], ImagePreviewFileSchema);
 
+const AudioFile = table(['id', 'sessionId', 'remoteId'], AudioFileSchema);
+
 const MetadataValueFile = table(
 	['id', 'sessionId'],
 	type({
@@ -97,7 +101,12 @@ const MetadataValueFile = table(
 
 const Image = table(['id', 'addedAt', 'sessionId', 'fileId'], ImageSchema);
 
-const Observation = table(['id', 'addedAt', 'sessionId', 'images[]'], ObservationSchema);
+const Sound = table(['id', 'addedAt', 'sessionId', 'fileId'], SoundSchema);
+
+const Observation = table(
+	['id', 'addedAt', 'sessionId', 'images[]', 'sounds[]'],
+	ObservationSchema
+);
 
 const Session = table(['id', 'remoteId'], SessionSchema);
 
@@ -127,6 +136,8 @@ const Settings = table(
 		submitIssuesVia: '"form" | "github" = "form"',
 		cropperSidebarCollapsed: 'boolean = false',
 		timerSounds: 'boolean = true',
+		/** Use the crash-safe AAC format for audio recording instead of M4A */
+		audioCaptureUseAAC: 'boolean = true',
 		beamupPreferences: scope({ ID })
 			.type({
 				'[ID]': {
@@ -284,6 +295,8 @@ export const Schemas = {
 	Account,
 	CustomNeuralNetwork,
 	BeamupCorrection,
+	AudioFile,
+	Sound,
 };
 
 /**
@@ -303,8 +316,10 @@ export const NO_REACTIVE_STATE_TABLES = /** @type {const} */ ([
 const SESSION_DEPENDENT_TABLES = /** @type {const} */ ([
 	'ImageFile',
 	'ImagePreviewFile',
+	'AudioFile',
 	'MetadataValueFile',
 	'Image',
+	'Sound',
 	'Observation',
 ]);
 
@@ -314,6 +329,7 @@ const SESSION_DEPENDENT_TABLES = /** @type {const} */ ([
 export const BINARY_CONTENT_TABLES = /** @type {const} */ ([
 	'ImageFile',
 	'ImagePreviewFile',
+	'AudioFile',
 	'MetadataValueFile',
 	'CustomNeuralNetwork',
 ]);
@@ -342,8 +358,10 @@ export function isSessionDependentReactiveTable(name) {
 
 export const Tables = {
 	Image,
+	Sound,
 	ImageFile,
 	ImagePreviewFile,
+	AudioFile,
 	MetadataValueFile,
 	Observation,
 	Session,
@@ -515,10 +533,10 @@ export const idComparator = (a, b) => {
 
 /**
  * @typedef Dimensions
- * @type {typeof Dimensions.infer}
+ * @type {typeof ImageDimensions.infer}
  *
  * @typedef DimensionsInput
- * @type {typeof Dimensions.inferIn}
+ * @type {typeof ImageDimensions.inferIn}
  */
 
 /**
@@ -534,4 +552,14 @@ export const idComparator = (a, b) => {
 /**
  * @typedef BeamupCorrection
  * @type {typeof BeamupCorrection.infer}
+ */
+
+/**
+ * @typedef Sound
+ * @type {typeof Sound.infer}
+ */
+
+/**
+ * @typedef AudioFile
+ * @type {typeof AudioFile.infer}
  */

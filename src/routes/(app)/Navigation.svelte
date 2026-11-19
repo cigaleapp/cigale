@@ -2,20 +2,7 @@
 	import { formatDistanceToNow } from 'date-fns';
 	import { fade } from 'svelte/transition';
 
-	import { percent } from '#lib/i18n.js';
-	import { previewingPrNumber, tables } from '#lib/idb.svelte.js';
-	import { defineKeyboardShortcuts } from '#lib/keyboard.svelte.js';
-	import Logo from '#lib/Logo.svelte';
-	import { IsMobile } from '#lib/mobile.svelte.js';
-	import { goto, resolve } from '#lib/paths.js';
-	import ProgressBar from '#lib/ProgressBar.svelte';
-	import { switchSession } from '#lib/sessions.js';
-	import { isDebugMode } from '#lib/settings.svelte.js';
-	import { tooltip } from '#lib/tooltips.js';
-	import { uiState } from '#lib/uistate.svelte.js';
-	import { clamp } from '#lib/utils.js';
 	import IconNext from '~icons/ri/arrow-right-s-fill';
-	import IconCameraFilled from '~icons/ri/camera-fill';
 	import IconCamera from '~icons/ri/camera-line';
 	import IconClassifyFilled from '~icons/ri/checkbox-multiple-fill';
 	import IconClassify from '~icons/ri/checkbox-multiple-line';
@@ -27,7 +14,21 @@
 	import IconResults from '~icons/ri/file-chart-line';
 	import IconImportFilled from '~icons/ri/import-fill';
 	import IconImport from '~icons/ri/import-line';
+	import IconRecorder from '~icons/ri/record-mail-line';
+	import IconWaveform from '~icons/ri/voiceprint-line';
 	import { page } from '$app/state';
+	import { percent } from '#lib/i18n';
+	import { previewingPrNumber, tables } from '#lib/idb.svelte';
+	import { defineKeyboardShortcuts } from '#lib/keyboard.svelte';
+	import Logo from '#lib/Logo.svelte';
+	import { IsMobile } from '#lib/mobile.svelte.js';
+	import { goto, resolve } from '#lib/paths';
+	import ProgressBar from '#lib/ProgressBar.svelte';
+	import { switchSession } from '#lib/sessions.js';
+	import { isDebugMode } from '#lib/settings.svelte.js';
+	import { tooltip } from '#lib/tooltips.js';
+	import { uiState } from '#lib/uistate.svelte.js';
+	import { clamp, switchConditions, switchValue } from '#lib/utils.js';
 
 	import DeploymentDetails from './DeploymentDetails.svelte';
 	import ModalSubmitIssue from './ModalSubmitIssue.svelte';
@@ -43,9 +44,11 @@
 
 	let { progress = 0, eta = Infinity, progressbarOnly = false }: Props = $props();
 
-	const hasImages = $derived(tables.Image.state.length > 0);
-	const hasImagesWithCrops = $derived(
-		tables.Image.state.some((image) => uiState.cropMetadataValueOf(image))
+	const hasMedia = $derived(tables.Image.state.length + tables.Sound.state.length > 0);
+	const hasMediaWithCrops = $derived(
+		[...tables.Image.state, ...tables.Sound.state].some((image) =>
+			uiState.cropMetadataValueOf(image)
+		)
 	);
 
 	const isAnalyzingCrops = $derived(
@@ -68,15 +71,13 @@
 	let showingOKInTabTitle = $state(false);
 
 	const importTabDisabled = $derived(!uiState.currentProtocol);
-	const cropTabDisabled = $derived(importTabDisabled || !hasImages || isAnalyzingClassifications);
-	const classifyTabDisabled = $derived(
-		cropTabDisabled || !hasImagesWithCrops || isAnalyzingCrops
-	);
+	const cropTabDisabled = $derived(importTabDisabled || !hasMedia || isAnalyzingClassifications);
+	const classifyTabDisabled = $derived(cropTabDisabled || !hasMediaWithCrops || isAnalyzingCrops);
 	// Never disable it, it's annoying and the fact that you don't go to this tab at first is clear enough
 	// it's called "Results" after all
 	const resultsTabDisabled = false;
 
-	const importTabOpensCamera = $derived(
+	const importTabOpensCapture = $derived(
 		mobile.current && Boolean(uiState.currentProtocol?.capture)
 	);
 
@@ -372,18 +373,23 @@ Tab bar is only when a session is active
 					<span class="label">Session</span>
 				</a>
 
-				{#if importTabOpensCamera}
+				{#if importTabOpensCapture}
 					<a
 						href={resolve('/capture/')}
-						pw-testid="mobile-goto-camera"
+						pw-testid="mobile-goto-capture"
 						// aria-disabled={!isDebugMode() && importTabDisabled}
 						class:active={page.route.id === '/(app)/capture'}
 					>
-						{#if page.route.id === '/(app)/capture'}
-							<IconCameraFilled />
-						{:else}
-							<IconCamera />
-						{/if}
+						{const Icon = $derived(
+							switchValue(uiState.acceptedMediaType ?? 'both', {
+								both: IconRecorder,
+								audio: IconWaveform,
+								image: IconCamera,
+							})
+						)}
+
+						<!-- No filled variant since the capture page doesnt show the navbar -->
+						<Icon />
 						<span class="label">Capturer</span>
 					</a>
 				{:else}

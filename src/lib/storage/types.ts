@@ -1,3 +1,4 @@
+import type { AudioSpectrogramsFolders } from '#lib/audio/spectrogram.js';
 import type { BINARY_CONTENT_TABLES } from '#lib/database.js';
 import type { PendingPhotosRootFolders } from '#routes/(app)/capture/pendingstorage.svelte.js';
 
@@ -19,6 +20,8 @@ export interface BinaryStorageBackend<Name extends BinaryStorageName = BinarySto
 	 */
 	read(locator: BinaryStorageLocator, fallbackContentType: ContentType): Promise<File>;
 
+	readChunk(locator: BinaryStorageLocator, start: number, end: number): Promise<ArrayBuffer>;
+
 	stream(
 		locator: BinaryStorageLocator,
 		/** Size in bytes for each chunk */
@@ -32,7 +35,7 @@ export interface BinaryStorageBackend<Name extends BinaryStorageName = BinarySto
 		bytes: ArrayBuffer;
 	}>;
 
-	list(locator: BinaryStorageLocator<''>): AsyncIterable<BinaryStorageLocator>;
+	list(...locators: BinaryStorageLocator<''>[]): AsyncIterable<BinaryStorageLocator>;
 	/**
 	 *
 	 * @param locator where to write the file
@@ -59,10 +62,21 @@ export interface BinaryStorageBackend<Name extends BinaryStorageName = BinarySto
 	 * @returns number of files in the given directory
 	 */
 	count(locator: BinaryStorageLocator<''>): Promise<number>;
+	/**
+	 * @returns a Mediabunny source of the given file
+	 */
+	mediabunnySource(locator: BinaryStorageLocator): Promise<import('mediabunny').Source>;
+	/**
+	 * @returns a Mediabunny sink of the given file
+	 */
+	mediabunnyTarget(locator: BinaryStorageLocator): Promise<import('mediabunny').Target>;
 }
 
 export type BinaryStorageLocator<Filename extends string = string> = {
-	area: (typeof BINARY_CONTENT_TABLES)[number] | PendingPhotosRootFolders;
+	area:
+		| (typeof BINARY_CONTENT_TABLES)[number]
+		| PendingPhotosRootFolders
+		| AudioSpectrogramsFolders;
 	sessionId: string | undefined;
 	/** Use an empty string to denote an entire folder */
 	name: Filename;

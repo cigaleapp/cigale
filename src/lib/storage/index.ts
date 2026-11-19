@@ -36,6 +36,10 @@ export const binaryStorage: BinaryStorage = {
 		if (!currentBackend) await initializeBinaryStorage();
 		return currentBackend!.read(...args);
 	},
+	async readChunk(...args) {
+		if (!currentBackend) await initializeBinaryStorage();
+		return currentBackend!.readChunk(...args);
+	},
 	async bytes(...args) {
 		if (!currentBackend) await initializeBinaryStorage();
 		return currentBackend!.bytes(...args);
@@ -66,7 +70,15 @@ export const binaryStorage: BinaryStorage = {
 		if (!currentBackend) await initializeBinaryStorage();
 		return currentBackend!.count(...args);
 	},
-	async create(locator, content, { fixedFilenameCounter = 0 } = {}) {
+	async mediabunnySource(...args) {
+		if (!currentBackend) await initializeBinaryStorage();
+		return currentBackend!.mediabunnySource(...args);
+	},
+	async mediabunnyTarget(...args) {
+		if (!currentBackend) await initializeBinaryStorage();
+		return currentBackend!.mediabunnyTarget(...args);
+	},
+	async findFree(locator, { fixedFilenameCounter = 0 } = {}) {
 		const [stem, ext] = splitFilenameOnExtension(locator.name);
 
 		const name = (i: number) => ({
@@ -77,7 +89,10 @@ export const binaryStorage: BinaryStorage = {
 					: `${stem}.${ext}`,
 		});
 
-		const chosen = name(await dichotomid(async (i) => !(await this.exists(name(i)))));
+		return name(await dichotomid(async (i) => !(await this.exists(name(i)))));
+	},
+	async create(locator, content, { fixedFilenameCounter = 0 } = {}) {
+		const chosen = await this.findFree(locator, { fixedFilenameCounter });
 
 		await this.write(chosen, content);
 
@@ -106,9 +121,30 @@ async function initializeBinaryStorage() {
 	// }
 }
 
+type FindFreeOptions = {
+	/**
+	 * Always add a trailing _N before the extension part of the filename,
+	 * even if there's no need for it duplicates avoidance.
+	 * Ensures that N has at least the provided number of digits.
+	 *
+	 * This is useful to ensure a consistent file naming scheme (in PendingStorage, for example)
+	 *
+	 * Defaults to 0 (disabled).
+	 */
+	fixedFilenameCounter?: number;
+};
+
 export interface BinaryStorage<
 	Name extends BinaryStorageName = BinaryStorageName,
 > extends BinaryStorageBackend<Name> {
+	/**
+	 * Returns a locator that doesn't exist on disk.
+	 * If the locator points to an existing file, add a _n at the end (with n chosen so that it doesn't exist)
+	 */
+	findFree(
+		locator: BinaryStorageLocator,
+		options?: FindFreeOptions
+	): Promise<BinaryStorageLocator>;
 	/**
 	 * If the file exists, add a _n at the end (with n chosen so that it doesn't exist)
 	 * before writing to avoid duplicates.
@@ -117,18 +153,7 @@ export interface BinaryStorage<
 	create(
 		locator: BinaryStorageLocator,
 		content: BinaryStorageContent,
-		options?: {
-			/**
-			 * Always add a trailing _N before the extension part of the filename,
-			 * even if there's no need for it duplicates avoidance.
-			 * Ensures that N has at least the provided number of digits.
-			 *
-			 * This is useful to ensure a consistent file naming scheme (in PendingStorage, for example)
-			 *
-			 * Defaults to 0 (disabled).
-			 */
-			fixedFilenameCounter?: number;
-		}
+		options?: FindFreeOptions
 	): Promise<BinaryStorageLocator>;
 	/**
 	 * Only write if the file already exists. Otherwise, error out.

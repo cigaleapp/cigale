@@ -4,7 +4,7 @@ import { type } from 'arktype';
 
 import { Schemas } from '#lib/database.js';
 import { NodeProvenance } from '#lib/file-tree.js';
-import { NamespacedMetadataID } from '#lib/schemas/common.js';
+import { ID, NamespacedMetadataID } from '#lib/schemas/common.js';
 
 export const LOCAL_STORAGE = type({
 	databaseName: 'string',
@@ -57,6 +57,30 @@ export const PROCEDURES = {
 		success: type({
 			boxes: type(['number', 'number', 'number', 'number']).array(),
 			scores: 'number[]',
+		}),
+	},
+	importAudioFile: {
+		input: type({
+			/** A free AudioFile ID to be used */
+			id: ID,
+			sessionId: 'string',
+			file: 'File',
+			sidecars: 'File[]',
+			/** Used to create the spectrogram image. */
+			// decoded: {
+			// 	data: ['instanceof', Float32Array],
+			// 	format: '/^(u8|s(16|32)|f32)(-planar)?$/',
+			// 	numberOfChannels: 'number.integer > 0',
+			// 	sampleRate: 'number',
+			// 	timestamp: 'number >= 0',
+			// },
+		}),
+		progress: type('0 <= number <= 1'),
+		success: type({
+			id: ID,
+			filename: 'string',
+			/** A blob URL */
+			spectrogramUrl: 'string',
 		}),
 	},
 	classify: {

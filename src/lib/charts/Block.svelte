@@ -5,6 +5,7 @@
 	import { BarChart, PieChart } from 'layerchart';
 	import { IsInViewport } from 'runed';
 
+	import IconToggleDefinition from '~icons/ri/code-line';
 	import ButtonIcon from '#lib/ButtonIcon.svelte';
 	import Carousel from '#lib/Carousel.svelte';
 	import DebugOnly from '#lib/DebugOnly.svelte';
@@ -12,9 +13,9 @@
 	import LearnMoreLink from '#lib/LearnMoreLink.svelte';
 	import LoadingText, { Loading } from '#lib/LoadingText.svelte';
 	import Markdown from '#lib/Markdown.svelte';
+	import { metadataOption } from '#lib/metadata';
 	import { resolveMetadataImport } from '#lib/metadata/imports.js';
-	import { metadataOption } from '#lib/metadata/index.js';
-	import { mergeMetadataFromImagesAndObservations } from '#lib/metadata/merging.js';
+	import { mergeMetadataFromMediaAndObservations } from '#lib/metadata/merging.js';
 	import {
 		ensureNamespacedMetadataId,
 		metadataOptionId,
@@ -25,7 +26,6 @@
 	import { isDebugMode } from '#lib/settings.svelte.js';
 	import { uiState } from '#lib/uistate.svelte.js';
 	import { clamp, corsfixIfLocalhost, ensureArray, mapKeys } from '#lib/utils.js';
-	import IconToggleDefinition from '~icons/ri/code-line';
 
 	type BlockTypes = (typeof ChartBlock)['infer']['type'];
 	type BlockData<Type extends BlockTypes = BlockTypes> = (typeof ChartBlock)['infer'] & {
@@ -107,8 +107,8 @@
 			const images = await tables.Image.list('sessionId', id);
 
 			for (const obs of await tables.Observation.list('sessionId', id)) {
-				const merged = mergeMetadataFromImagesAndObservations({
-					images: images.filter((img) => obs.images.includes(img.id)),
+				const merged = mergeMetadataFromMediaAndObservations({
+					medias: images.filter((img) => obs.images.includes(img.id)),
 					observations: [obs],
 					definitions: tables.Metadata.state,
 				});

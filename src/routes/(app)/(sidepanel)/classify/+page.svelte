@@ -7,19 +7,20 @@
 	import { SvelteSet } from 'svelte/reactivity';
 	import { fade } from 'svelte/transition';
 
+	import IconLoaded from '~icons/ri/check-line';
 	import AreaObservations from '#lib/AreaObservations.svelte';
 	import ButtonSecondary from '#lib/ButtonSecondary.svelte';
 	import CardImage from '#lib/CardImage.svelte';
 	import CardObservation from '#lib/CardObservation.svelte';
 	import { databaseHandle, tables } from '#lib/idb.svelte.js';
-	import { deleteImage, imageBufferWasSaved, imageIsClassified } from '#lib/images.js';
+	import { deleteImageOrSound, imageBufferWasSaved, imageIsClassified } from '#lib/images.js';
 	import { loadModel } from '#lib/inference.js';
 	import { defineKeyboardShortcuts } from '#lib/keyboard.svelte.js';
 	import Logo from '#lib/Logo.svelte';
 	import { IsMobile } from '#lib/mobile.svelte.js';
 	import {
 		deleteObservation,
-		ensureNoLoneImages,
+		ensureNoLoneImagesOrSounds,
 		observationMetadata,
 	} from '#lib/observations.js';
 	import { goto } from '#lib/paths.js';
@@ -30,12 +31,13 @@
 	import { toasts } from '#lib/toasts.svelte.js';
 	import { uiState } from '#lib/uistate.svelte.js';
 	import { isAbortError, nonnull } from '#lib/utils.js';
-	import IconLoaded from '~icons/ri/check-line';
 
 	type Item = GalleryItem<{
 		image: DB.Image | undefined;
+		sound: DB.Sound | undefined;
 		observation: DB.Observation | undefined;
 		images: DB.Image[];
+		sounds: DB.Sound[];
 	}>;
 
 	seo({ title: 'Classification' });
@@ -53,7 +55,8 @@
 			name: obs.label,
 			metadata: observationMetadata({
 				definitions: tables.Metadata.state,
-				images: obs.images.map((id) => tables.Image.getFromState(id)).filter(nonnull),
+				medias: obs.images.map((id) => tables.Image.getFromState(id)).filter(nonnull),
+				sounds: obs.sounds.map((id) => tables.Sound.getFromState(id)).filter(nonnull),
 				observation: obs,
 			}),
 			virtual: false,
@@ -61,6 +64,7 @@
 				image: undefined,
 				observation: obs,
 				images: obs.images.map((id) => tables.Image.getFromState(id)).filter(nonnull),
+				sounds: obs.sounds.map((id) => tables.Sound.getFromState(id)).filter(nonnull),
 			},
 		}))
 	);
@@ -96,8 +100,7 @@
 
 	let modelAbortController = new AbortController();
 	let classifmodelLoaded = $state(false);
-	/** @type {Error|undefined}*/
-	let classifModelLoadingError = $state();
+	let classifModelLoadingError = $state<Error | undefined>();
 
 	function queueClassificationsIfReady() {
 		if (!classifmodelLoaded) return;
@@ -199,7 +202,7 @@
 
 	$effect(() => {
 		if (!uiState.setSelection) return;
-		void ensureNoLoneImages();
+		void ensureNoLoneImagesOrSounds();
 	});
 
 	defineKeyboardShortcuts('classification', {
@@ -257,11 +260,12 @@
 {:else}
 	<main class="observations" class:empty={!items.length} in:fade={{ duration: 100 }}>
 		<AreaObservations {items} {unroll} zone="classify">
-			{#snippet item({ observation, image, images }, { id })}
+			{#snippet item({ observation, image, sounds, sound, images }, { id })}
 				{#if observation}
 					<CardObservation
 						{observation}
 						{images}
+						{sounds}
 						boxes="apply-first"
 						loadingStatusText="Analyse…"
 						onstacksizeclick={() => {
@@ -299,11 +303,13 @@
 							const imageIds = tables.Observation.getFromState(id)?.images ?? [id];
 							imageIds.forEach((id) => cancelTask(id, 'Cancelled by user'));
 							await deleteObservation(id, { notFoundOk: true, recursive: true });
-							await deleteImage(id, undefined, true);
+							await deleteImageOrSound(id, undefined, true);
 						}}
 					/>
 				{:else if image}
 					<CardImage {image} boxes="apply-first" />
+				{:else if sound}
+					<CardSound {sound} />
 				{/if}
 			{/snippet}
 		</AreaObservations>

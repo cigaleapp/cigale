@@ -6,6 +6,7 @@ import {
 	HourRange,
 	HTTPRequest,
 	ID,
+	MediaKind,
 	MillisecondsLiteral,
 	MIMEType,
 	NamespacedMetadataID,
@@ -115,9 +116,16 @@ export const CaptureTimersMessageTemplate = TemplatedString(
 
 export const CaptureTimer = type({
 	name: 'string = ""',
+	for: type
+		.enumerated('photo', 'sound')
+		.array()
+		.default(() => ['photo', 'sound']),
 	shoot: type.enumerated('manually', 'on-timer').default('manually'),
 	'every?': MillisecondsLiteral.describe('Répéter le timer tout les ...'),
 	'count?': type('number.integer').describe('Répéter le timer n fois'),
+	'duration?': MillisecondsLiteral.describe(
+		"Durée d'enregistrement (pour l'audio ou les vidéos) dans un tour de timer"
+	),
 	'during?': MillisecondsLiteral,
 	'within?': HourRange.describe(
 		"Contraindre le démarrage et l'arrêt du timer à une plage horaire"
@@ -145,6 +153,11 @@ export const Protocol = type({
 		.describe('Si le protocole a été modifié depuis sa dernière exportation')
 		.default(false),
 	'beamup?': BeamupSettings,
+	media: type({
+		types: MediaKind.array().describe(
+			"Types de média supportés par le protocole. Mettre en premier le type le plus commun (cela influe par exemple le type sélectionné par défaut dans l'écran de capture: appareil photo ou enregistreur de son)"
+		),
+	}).default(() => ({ types: ['image', 'audio'] })),
 	'remote?': {
 		'ecosignal?': {
 			domains: type

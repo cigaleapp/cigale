@@ -2,6 +2,11 @@
 	import { Capacitor } from '@capacitor/core';
 	import { FileViewer } from '@capacitor/file-viewer';
 
+	import IconDownloadAsDarwinCore from '~icons/ri/archive-2-line';
+	import IconDownloadAsZip from '~icons/ri/file-zip-line';
+	import IconDownloadAsFolder from '~icons/ri/folder-download-line';
+	import { asset } from '$app/paths';
+	import { page } from '$app/state';
 	import ButtonSecondary from '#lib/ButtonSecondary.svelte';
 	import { downloadAsFile } from '#lib/download.js';
 	import { writeToFilesystem } from '#lib/filesystem.js';
@@ -9,16 +14,11 @@
 	import LoadingSpinner from '#lib/LoadingSpinner.svelte';
 	import LoadingText from '#lib/LoadingText.svelte';
 	import { sendNotification } from '#lib/notifications.js';
-	import { ensureNoLoneImages } from '#lib/observations.js';
+	import { ensureNoLoneImagesOrSounds } from '#lib/observations.js';
 	import { toasts } from '#lib/toasts.svelte.js';
 	import { tooltip } from '#lib/tooltips.js';
 	import { uiState } from '#lib/uistate.svelte.js';
 	import { switchValue } from '#lib/utils.js';
-	import IconDownloadAsDarwinCore from '~icons/ri/archive-2-line';
-	import IconDownloadAsZip from '~icons/ri/file-zip-line';
-	import IconDownloadAsFolder from '~icons/ri/folder-download-line';
-	import { asset } from '$app/paths';
-	import { page } from '$app/state';
 
 	import { exporter } from './files.svelte.js';
 
@@ -57,7 +57,7 @@
 		void swarpc.syncStoredCorrections(undefined);
 
 		try {
-			await ensureNoLoneImages();
+			await ensureNoLoneImagesOrSounds();
 			uiState.processing.task = 'export';
 			uiState.processing.total = 1;
 			uiState.processing.done = 0;

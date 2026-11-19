@@ -1,9 +1,9 @@
 import { type } from 'arktype';
-import { ms } from 'convert';
 import { differenceInMilliseconds, isWithinInterval, setHours, setMinutes } from 'date-fns';
+import * as dates from 'date-fns';
 
-import { clamp, cleanFilepath, safeJSONStringify } from '../utils.js';
-import { TemplatedString } from './expressions.js';
+import { clamp, safeJSONStringify } from '../utils.js';
+import { NumberWithUnitLiteral } from './units.js';
 
 export const ID = type(/^[\w._-]+$/);
 
@@ -58,7 +58,7 @@ export const HTTPRequest = URLString.configure(
 		'self'
 	);
 
-export const Dimensions = type({
+export const ImageDimensions = type({
 	width: 'number > 0',
 	height: 'number > 0',
 }).pipe(({ width, height }) => ({
@@ -66,6 +66,11 @@ export const Dimensions = type({
 	height,
 	aspectRatio: width / height,
 }));
+
+export const AudioDimensions = type({
+	duration: ['number', '@', 'in milliseconds'],
+	sampleRate: ['number', '@', 'in hertz'],
+});
 
 export const MIMEType = type(
 	/^(application|audio|font|example|image|message|model|multipart|text|video|x-\w+)\/\w+$/
@@ -147,9 +152,9 @@ export const SingleEntryRecord = (k, v) =>
 		return { key: k.assert(key), value: v.assert(value) };
 	});
 
-export const MillisecondsLiteral = type('/^\\d+(\\.\\d+)?(?<unit>ms|s|min|h)$/').pipe((literal) =>
-	ms(literal)
-);
+export const MillisecondsLiteral = NumberWithUnitLiteral('ms', ['ms', 's', 'min', 'h'], {
+	allowMultiple: true,
+});
 
 export const HourRange = type('/^\\d{2}:\\d{2}-\\d{2}:\\d{2}$/').pipe((literal) => {
 	const [start, end] = literal.split('-');
@@ -175,7 +180,7 @@ export const HourRange = type('/^\\d{2}:\\d{2}-\\d{2}:\\d{2}$/').pipe((literal) 
 			};
 		},
 		/**
-		 * Duration in milliseconds of the interval
+		 * Total duration in milliseconds of the interval
 		 * This requires a base date (defaults to today)
 		 * Because of potential daylight savings occuring within the interval
 		 * This does assume the timezone does not change within the interval though
@@ -184,6 +189,16 @@ export const HourRange = type('/^\\d{2}:\\d{2}-\\d{2}:\\d{2}$/').pipe((literal) 
 		duration(base) {
 			const { start, end } = this.reify(base ?? new Date());
 			return differenceInMilliseconds(end, start);
+		},
+		/**
+		 * Duration from either now (if we're within the interval) or the start (otherwise)
+		 * to the end of the interval, for today
+		 */
+		remaining() {
+			const { start, end } = this.reify(new Date());
+			const endpoint = dates.closestTo(end, [new Date(), start]);
+			if (!endpoint) throw new Error(`undefined endpoint for HourRange.remaining()`);
+			return differenceInMilliseconds(end, endpoint);
 		},
 		/**
 		 * @param {Date} date
@@ -195,3 +210,5 @@ export const HourRange = type('/^\\d{2}:\\d{2}-\\d{2}:\\d{2}$/').pipe((literal) 
 });
 
 export const DarwinCoreFieldShorthand = type('/^\\w+:\\w+$/');
+
+export const MediaKind = type.enumerated('image', 'audio');

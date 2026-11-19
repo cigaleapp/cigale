@@ -639,7 +639,7 @@ async function prepare({
 				observationMetadata({
 					definitions: metadataDefinitions,
 					observation: obs,
-					images: sessionImages,
+					medias: sessionImages,
 				})
 			)
 		);

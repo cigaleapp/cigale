@@ -4,7 +4,7 @@
 
 CSS variables:
 
-- `--size`: The size of the logo. Default is `1.2em`.
+- `--logo-size` or `--size`: The size of the logo. Default is `1.2em`.
 - `--fill`: The fill color of the logo. Default is `none`.
 - `--stroke`: The stroke color of the logo. Default is `var(--fg-neutral)` for the regular variant and `var(--fg-error)` for the error variant.
 - `--stroke-width`: The stroke width of the logo. Default is `38`.
@@ -91,7 +91,7 @@ CSS variables:
 
 <style>
 	svg {
-		width: calc(var(--size, 1.2em) * 3204 / 2017);
-		height: var(--size, 1.2em);
+		width: calc(var(--logo-size, var(--size, 1.2em)) * 3204 / 2017);
+		height: var(--logo-size, var(--size, 1.2em));
 	}
 </style>

@@ -49,3 +49,21 @@ export async function switchSession(id) {
 		clearMetadataOptionsCache();
 	}
 }
+
+const LOCALSTORAGE_SESSION_ID_KEY = 'currentSessionId';
+
+export function getCurrentSessionId() {
+	return localStorage.getItem(LOCALSTORAGE_SESSION_ID_KEY);
+}
+
+/**
+ *
+ * @param {string|null} id
+ */
+export function setCurrentSessionId(id) {
+	if (id === null) {
+		localStorage.removeItem('currentSessionId');
+	} else {
+		localStorage.setItem('currentSessionId', id);
+	}
+}

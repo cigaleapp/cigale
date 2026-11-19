@@ -1,24 +1,27 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
 
+	import IconCamera from '~icons/ri/camera-line';
+	import IconRecorder from '~icons/ri/record-mail-line';
+	import IconImport from '~icons/ri/upload-2-line';
+	import IconWaveform from '~icons/ri/voiceprint-line';
 	import AreaObservations from '#lib/AreaObservations.svelte';
 	import ButtonSecondary from '#lib/ButtonSecondary.svelte';
 	import CardImage from '#lib/CardImage.svelte';
 	import CardMedia from '#lib/CardMedia.svelte';
+	import CardSound from '#lib/CardSound.svelte';
 	import Dropzone from '#lib/Dropzone.svelte';
 	import { promptForFiles } from '#lib/files.js';
 	import { tables } from '#lib/idb.svelte.js';
-	import { deleteImage } from '#lib/images.js';
-	import { ACCEPTED_IMPORT_TYPES } from '#lib/import.svelte.js';
+	import { deleteImageOrSound } from '#lib/images.js';
+	import { ACCEPTED_IMPORT_TYPES } from '#lib/import/index.js';
 	import Logo from '#lib/Logo.svelte';
 	import { goto } from '#lib/paths.js';
 	import { cancelTask, importMore } from '#lib/queue.svelte.js';
 	import { uiState } from '#lib/uistate.svelte.js';
 	import { unique } from '#lib/utils.js';
-	import IconCamera from '~icons/ri/camera-line';
-	import IconImport from '~icons/ri/upload-2-line';
 
-	const allImages = $derived([
+	const allFiles = $derived([
 		...unique(
 			tables.Image.state.map(({ filename, id, addedAt, fileId, sessionId, metadata }) => ({
 				id: fileId ?? id,
@@ -27,11 +30,25 @@
 				metadata,
 				name: filename,
 				virtual: false,
-				data: tables.Image.getFromState(id),
+				data: { image: tables.Image.getFromState(id), sound: undefined },
 			})),
 			// Since id can (and mostly is) fileId, we have to uniquify
 			// by the id because multiple Images can reference the same ImageFile
 			(image) => image.id
+		),
+		...unique(
+			tables.Sound.state.map(({ filename, id, addedAt, fileId, sessionId, metadata }) => ({
+				id: fileId ?? id,
+				addedAt,
+				sessionId,
+				metadata,
+				name: filename,
+				virtual: false,
+				data: { sound: tables.Sound.getFromState(id), image: undefined },
+			})),
+			// Since id can (and mostly is) fileId, we have to uniquify
+			// by the id because multiple Images can reference the same ImageFile
+			(sound) => sound.id
 		),
 		...uiState.processing.files.map(({ name, id, addedAt }) => ({
 			id,
@@ -40,11 +57,11 @@
 			name,
 			metadata: {},
 			virtual: true,
-			data: null,
+			data: { image: undefined, sound: undefined },
 		})),
 	]);
 
-	const empty = $derived(allImages.length === 0);
+	const empty = $derived(allFiles.length === 0);
 </script>
 
 <Dropzone
@@ -53,8 +70,8 @@
 	onfiles={({ files }) => importMore(files)}
 >
 	<main class="observations" class:empty in:fade={{ duration: 100 }}>
-		<AreaObservations items={allImages} zone="import">
-			{#snippet item(image, { id, name })}
+		<AreaObservations items={allFiles} zone="import">
+			{#snippet item({ image, sound }, { id, name })}
 				{#if image}
 					<CardImage
 						boxes="none"
@@ -62,7 +79,16 @@
 						ondelete={async () => {
 							cancelTask(id, 'Cancelled by user');
 							uiState.processing.removeFile(id);
-							await deleteImage(id);
+							await deleteImageOrSound(id);
+						}}
+					/>
+				{:else if sound}
+					<CardSound
+						{sound}
+						ondelete={async () => {
+							cancelTask(id, 'Canceled by user');
+							uiState.processing.removeFile(id);
+							await deleteImageOrSound(id);
 						}}
 					/>
 				{:else}
@@ -98,8 +124,16 @@
 					Choisir des fichiers
 				</ButtonSecondary>
 				<ButtonSecondary onclick={async () => goto('/(app)/capture')}>
-					<IconCamera />
-					Prendre des photos
+					{#if uiState.acceptedMediaType === 'both'}
+						<IconRecorder />
+						Capture d'images ou de son
+					{:else if uiState.acceptedMediaType === 'image'}
+						<IconCamera />
+						Prendre des photos
+					{:else if uiState.acceptedMediaType === 'audio'}
+						<IconWaveform />
+						Enregistrer du son
+					{/if}
 				</ButtonSecondary>
 			</div>
 		{/if}

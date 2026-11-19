@@ -1,14 +1,98 @@
+import type { CaptureDevice } from './device.svelte.js';
 import type { CaptureTimer, CaptureTimersMessageTemplate } from '#lib/schemas/protocols.js';
+import type { SfxName } from '#lib/sound.js';
 
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { KeepAwake } from '@capawesome/capacitor-keep-awake';
 import { ms } from 'convert';
 
 import { formatDurationShort } from '#lib/date.js';
 import { getSettings } from '#lib/settings.svelte.js';
+import { sfx as _sfx } from '#lib/sound.js';
+import { uiState } from '#lib/uistate.svelte.js';
 import { switchValue } from '#lib/utils.js';
+
+type TimerConfig = (typeof CaptureTimer)['infer'];
+
+export class DeviceTimer {
+	#configIndex: number | null = null;
+
+	allConfigs = $derived(uiState.currentProtocol?.capture?.timers ?? []);
+	availableConfigs = $state<TimerConfig[]>([]);
+	config = $state<TimerConfig>();
+
+	constructor(public device: CaptureDevice) {}
+
+	switchConfig(type: 'photo' | 'sound', index: number | null | undefined) {
+		this.timer?.stop();
+		this.#configIndex = index ?? null;
+		this.availableConfigs = this.allConfigs.filter((config) => config.for.includes(type));
+		this.config = this.availableConfigs[this.#configIndex ?? -1];
+
+		if (this.config) {
+			this.device.resetShootingPhase();
+		} else {
+			this.device.setShootingPhase('inert');
+		}
+
+		this.device.floatingmsg.set('Timer', this.config?.name ?? 'Aucun');
+	}
+
+	timer = $derived.by(() => {
+		if (!this.config) return;
+
+		const device = this.device;
+
+		function sfx(name: SfxName) {
+			if (getSettings().timerSounds && device.canEmitSfx) {
+				_sfx(name);
+			}
+		}
+
+		return new Timer(this.config, {
+			onstart(t) {
+				device.setShootingPhase('timer-running');
+				device.floatingmsg.set('Timer', t.formatMessage(t.config.messages.start));
+				void Haptics.impact({ style: ImpactStyle.Heavy });
+
+				// At start of timer, being a recording (sound/video mode)
+				// but don't snap a picture (photo mode)
+				if (t.config.shoot === 'on-timer' && device.type !== 'photo') {
+					device.recordOrCapture(t.config.duration);
+				}
+			},
+			async onlap(t) {
+				device.floatingmsg.set('Timer', t.formatMessage(t.config.messages.lap));
+
+				if (t.config.shoot === 'on-timer') {
+					device.recordOrCapture(t.config.duration);
+				} else {
+					sfx('timer-lap');
+				}
+
+				void Haptics.impact({ style: ImpactStyle.Medium });
+			},
+			async onfinished(t) {
+				if (t.config.shoot === 'on-timer') {
+					device.recordOrCapture(t.config.duration);
+				}
+
+				sfx('timer-finished');
+				device.setShootingPhase('after-timer');
+				await Haptics.impact({ style: ImpactStyle.Heavy });
+
+				device.runCaptureInferences('after-timer');
+
+				device.floatingmsg.set('Timer', t.formatMessage(t.config.messages.end));
+				device.setShootingPhase('done');
+			},
+		});
+	});
+}
 
 export class Timer {
 	totalDuration = 0;
+	recordDuration = $state(0);
 	elapsedTotal = $state(0);
 	elapsedLap = $state(0);
 	laps = $state(0);
@@ -22,6 +106,8 @@ export class Timer {
 
 	lapProgress = $derived(Math.max(0, this.elapsedLap / this.lapDuration));
 
+	recordDurationProportion = $derived(Math.max(0, this.recordDuration / this.lapDuration));
+
 	#handle: NodeJS.Timeout | number | undefined;
 
 	constructor(
@@ -32,7 +118,7 @@ export class Timer {
 			onfinished: (t: Timer) => void;
 		}
 	) {
-		const duration = config.during ?? config.within?.duration();
+		const duration = config.during ?? config.within?.remaining();
 
 		if (!duration) {
 			throw new Error(
@@ -41,6 +127,7 @@ export class Timer {
 		}
 
 		this.totalDuration = duration;
+		this.recordDuration = config.duration ?? 0;
 
 		if (config.every && config.every > this.totalDuration) {
 			throw new Error(
@@ -188,7 +275,8 @@ export function displayTimerConfig(config: (typeof CaptureTimer)['infer']) {
 	const duration = (ms: number) => formatDurationShort(getSettings().language, ms);
 
 	if (config.count) lap += `${config.count}×`;
-	if (config.every) lap += `1/${duration(config.every)}`;
+	lap += config.duration ? duration(config.duration) : '1';
+	if (config.every) lap += `/${duration(config.every)}`;
 
 	if (config.during) total += duration(config.during);
 	if (config.within) total += config.within.toString();

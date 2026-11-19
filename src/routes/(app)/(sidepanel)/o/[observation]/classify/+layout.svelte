@@ -34,7 +34,7 @@
 		const values = observationMetadata({
 			definitions: [focusedMetadata],
 			observation,
-			images: tables.Image.state.filter((image) => observation.images.includes(image.id)),
+			medias: tables.Image.state.filter((image) => observation.images.includes(image.id)),
 		});
 
 		return values[focusedMetadata.id];

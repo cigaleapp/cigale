@@ -48,7 +48,7 @@ swarp.loadModel(async ({ task, model, classmapping, inferenceSessionId: id, enab
 	}
 
 	const onnx = await ort.InferenceSession.create(model, {
-		logSeverityLevel: 0,
+		// logSeverityLevel: 0,
 		executionProviders:
 			enableWebGPU && (await supportsWebGPU()) ? ['webgpu', 'wasm'] : ['wasm'],
 	});

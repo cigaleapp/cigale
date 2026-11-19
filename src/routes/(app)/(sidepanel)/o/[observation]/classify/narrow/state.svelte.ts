@@ -70,7 +70,7 @@ export class NarrowingState {
 				? observationMetadata({
 						observation: this.observation,
 						definitions: this.definitions,
-						images: tables.Image.state,
+						medias: tables.Image.state,
 					})
 				: {},
 			(id, value) => {

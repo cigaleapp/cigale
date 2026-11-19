@@ -14,7 +14,8 @@ import { tables } from './idb.svelte.js';
 import { getMetadataValue } from './metadata/index.js';
 import { defaultClassificationMetadata, defaultCropMetadata } from './protocols.js';
 import { isMetadataInProtocol } from './schemas/protocols.js';
-import { keys, mapValues, omit, pick, transformObject } from './utils.js';
+import { getCurrentSessionId, setCurrentSessionId } from './sessions.js';
+import { keys, mapValues, omit, pick, switchConditions, transformObject } from './utils.js';
 
 type NeuralModelSelector = (typeof NeuralModelSelector)['infer'];
 
@@ -150,16 +151,11 @@ export class UIState {
 	_currentSessionId = $state<string | null>(null);
 
 	currentSessionId: string | null = $derived(
-		this._currentSessionId || localStorage.getItem('currentSessionId') || null
+		this._currentSessionId || getCurrentSessionId() || null
 	);
 
 	async setCurrentSession(id: string | null) {
-		if (id === null) {
-			localStorage.removeItem('currentSessionId');
-		} else {
-			localStorage.setItem('currentSessionId', id);
-		}
-
+		setCurrentSessionId(id);
 		this._currentSessionId = id;
 	}
 
@@ -172,6 +168,18 @@ export class UIState {
 	currentProtocol: DB.Protocol | undefined = $derived(
 		tables.Protocol.state.find((p) => p.id === this.currentProtocolId)
 	);
+
+	acceptedMediaType = $derived.by(() => {
+		const types = this.currentProtocol?.media.types ?? [];
+
+		const kind = switchConditions({
+			both: types.length === 2,
+			audio: types[0] === 'audio',
+			image: types[0] === 'image',
+		});
+
+		return kind ?? 'both';
+	});
 
 	/**
 	 * @deprecated we dont have a single classification metadata anymore
@@ -195,8 +203,8 @@ export class UIState {
 
 	cropMetadataId = $derived<NamespacedMetadataID>(this.cropMetadata?.id ?? 'backbone__crop');
 
-	cropMetadataValueOf(image: DB.Image): TypedMetadataValue<'boundingbox'> | undefined {
-		return getMetadataValue(image, 'boundingbox', this.cropMetadataId);
+	cropMetadataValueOf(media: DB.Image | DB.Sound): TypedMetadataValue<'boundingbox'> | undefined {
+		return getMetadataValue(media, 'boundingbox', this.cropMetadataId);
 	}
 
 	/**

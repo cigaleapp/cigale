@@ -1,18 +1,31 @@
 <script lang="ts">
 	import type { NamespacedMetadataID } from '#lib/schemas/common.js';
-	import type { NeuralInference } from '#lib/schemas/neural.js';
+	import type { NeuralInference } from '#lib/schemas/neural';
 	import type { Snippet } from 'svelte';
 
 	import { dequal } from 'dequal';
 	import { scale } from 'svelte/transition';
 
+	import IconAdd from '~icons/ri/add-line';
+	import IconSelect from '~icons/ri/arrow-down-s-line';
+	import IconSubmenu from '~icons/ri/arrow-right-s-line';
+	import IconCamera from '~icons/ri/camera-line';
+	import IconCheck from '~icons/ri/check-line';
+	import IconInferenceDisabled from '~icons/ri/forbid-2-line';
+	import IconRecorder from '~icons/ri/record-mail-line';
+	import IconSortAsc from '~icons/ri/sort-asc';
+	import IconSortDesc from '~icons/ri/sort-desc';
+	import IconInferenceEnabled from '~icons/ri/sparkling-line';
+	import IconImport from '~icons/ri/upload-2-line';
+	import IconWaveform from '~icons/ri/voiceprint-line';
+	import IconModelCustom from '~icons/ri/wrench-line';
 	import ButtonIcon from '#lib/ButtonIcon.svelte';
 	import DropdownMenu from '#lib/DropdownMenu.svelte';
 	import { promptForFiles } from '#lib/files.js';
 	import { assertHardwareRequirements } from '#lib/hardware-requirements.js';
 	import { errorMessage } from '#lib/i18n.js';
 	import { tables } from '#lib/idb.svelte.js';
-	import { ACCEPTED_IMPORT_TYPES } from '#lib/import.svelte.js';
+	import { ACCEPTED_IMPORT_TYPES } from '#lib/import/index.js';
 	import { resolveMetadataImport } from '#lib/metadata/namespacing.js';
 	import { IsMobile } from '#lib/mobile.svelte.js';
 	import { globalModals } from '#lib/modals.svelte.js';
@@ -32,18 +45,7 @@
 	import { toasts } from '#lib/toasts.svelte.js';
 	import { tooltip } from '#lib/tooltips.js';
 	import { uiState } from '#lib/uistate.svelte.js';
-	import { entries, nonnull, orEmpty } from '#lib/utils.js';
-	import IconAdd from '~icons/ri/add-line';
-	import IconSelect from '~icons/ri/arrow-down-s-line';
-	import IconSubmenu from '~icons/ri/arrow-right-s-line';
-	import IconCamera from '~icons/ri/camera-line';
-	import IconCheck from '~icons/ri/check-line';
-	import IconInferenceDisabled from '~icons/ri/forbid-2-line';
-	import IconSortAsc from '~icons/ri/sort-asc';
-	import IconSortDesc from '~icons/ri/sort-desc';
-	import IconInferenceEnabled from '~icons/ri/sparkling-line';
-	import IconImport from '~icons/ri/upload-2-line';
-	import IconModelCustom from '~icons/ri/wrench-line';
+	import { entries, nonnull, orEmpty, switchValue } from '#lib/utils.js';
 
 	type ModelSelector = (typeof NeuralModelSelector)['infer'];
 
@@ -213,10 +215,18 @@
 					}),
 					...orEmpty(!bottomNavHasCapture, {
 						type: 'clickable' as const,
-						label: 'Prendre des photos',
+						label: switchValue(uiState.acceptedMediaType, {
+							both: 'Capturer photos ou son',
+							image: 'Prendre des photos',
+							audio: 'Enregistrer du son',
+						}),
 						data: {
 							direction: null,
-							icon: IconCamera,
+							icon: switchValue(uiState.acceptedMediaType, {
+								both: IconRecorder,
+								image: IconCamera,
+								audio: IconWaveform,
+							}),
 						} as ItemExtras,
 						async onclick() {
 							await goto('/(app)/capture');

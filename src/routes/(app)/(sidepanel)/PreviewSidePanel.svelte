@@ -27,8 +27,11 @@
 	import IconFullScreen from '~icons/ri/fullscreen-line';
 	import IconSplit from '~icons/ri/function-line';
 	import IconImage from '~icons/ri/image-2-line';
+	import IconRecorder from '~icons/ri/record-mail-line';
 	import IconMerge from '~icons/ri/shadow-line';
 	import IconImport from '~icons/ri/upload-2-line';
+	import IconWaveform from '~icons/ri/voiceprint-line';
+	import IconSound from '~icons/ri/volume-up-line';
 	import { page } from '$app/state';
 
 	interface Props {
@@ -37,7 +40,7 @@
 			src: string;
 			box?: undefined | TopLeftBoundingBox;
 			id: string;
-			dimensions: { width: number; height: number };
+			dimensions?: { width: number; height: number };
 		}>;
 		/** callback to call when the user wants to merge images or observations into a single one. If not set, the merge button is not shown. */
 		onmerge: (() => void) | undefined;
@@ -102,13 +105,17 @@
 
 	const singleImageSelected = $derived(
 		uiState.selection.length === 1
-			? tables.Image.state.find((img) => [img.id, img.fileId].includes(uiState.selection[0]))
+			? [...tables.Image.state, ...tables.Sound.state].find((img) =>
+					[img.id, img.fileId].includes(uiState.selection[0])
+				)
 			: undefined
 	);
 
 	const selectionCounts = $derived({
 		image: uiState.selection.filter((id) =>
-			tables.Image.state.some((img) => [img.id, img.fileId].includes(id))
+			[...tables.Image.state, ...tables.Sound.state].some((img) =>
+				[img.id, img.fileId].includes(id)
+			)
 		).length,
 		observation: uiState.selection.filter((id) =>
 			tables.Observation.state.some((obs) => obs.id === id)
@@ -133,7 +140,7 @@
 			return plural(selectionCounts.all, ['1 élément', '# éléments']);
 		}
 		if (selectionCounts.image > 0) {
-			return plural(selectionCounts.image, ['1 image', '# images']);
+			return plural(selectionCounts.image, ['1 média', '# médias']);
 		}
 		if (selectionCounts.observation > 0) {
 			return plural(selectionCounts.observation, ['1 observation', '# observations']);
@@ -149,8 +156,11 @@
 				? `Image ${i + 1} de l'observation ${singleObservationSelected.label}`
 				: `Image ${i + 1} de la sélection`}
 
-			<div class="image" style:aspect-ratio={applyBox(dimensions, box).join(' / ')}>
-				{#if box}
+			<div
+				class="image"
+				style:aspect-ratio={dimensions ? applyBox(dimensions, box).join(' / ') : undefined}
+			>
+				{#if box && dimensions}
 					<CroppedImg blurfill {src} {alt} {box} {dimensions} />
 				{:else}
 					<img {src} {alt} />
@@ -177,12 +187,16 @@
 					}}
 				/>
 			{:else if singleImageSelected}
-				<IconImage />
+				{#if singleImageSelected._table === 'Sound'}
+					<IconSound />
+				{:else}
+					<IconImage />
+				{/if}
 				<OverflowableText text={singleImageSelected.filename} />
 			{:else if selectionCounts.image > 0 && selectionCounts.observation > 0}
 				{plural(selectionCounts.all, ['1 élément', '# éléments'])}
 			{:else if selectionCounts.image > 0}
-				{plural(selectionCounts.image, ['1 image', '# images'])}
+				{plural(selectionCounts.image, ['1 média', '# médias'])}
 			{:else if selectionCounts.observation > 0}
 				{plural(selectionCounts.observation, ['1 observation', '# observations'])}
 			{:else}
@@ -242,11 +256,19 @@
 			<div class="side-by-side">
 				<ButtonSecondary onclick={onimport}>
 					<IconImport />
-					Plus d'images
+					Importer plus
 				</ButtonSecondary>
 				<ButtonSecondary onclick={async () => goto('/(app)/capture')}>
-					<IconCamera />
-					Appareil photo
+					{#if uiState.acceptedMediaType === 'both'}
+						<IconRecorder />
+						Capturer média
+					{:else if uiState.acceptedMediaType === 'image'}
+						<IconCamera />
+						Appareil photo
+					{:else if uiState.acceptedMediaType === 'audio'}
+						<IconWaveform />
+						Enregistrer son
+					{/if}
 				</ButtonSecondary>
 			</div>
 		{/if}
@@ -371,6 +393,15 @@
 		height: 50px;
 		border-radius: var(--corner-radius);
 		overflow: hidden;
+
+		&:has(img) {
+			width: 50px;
+		}
+
+		img {
+			object-fit: cover;
+			height: 100%;
+		}
 	}
 
 	.actions {

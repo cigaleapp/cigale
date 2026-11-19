@@ -95,8 +95,6 @@ msgid "Aucun fichier d'analyse trouvé dans l'export {0}"
 msgstr "No analysis file found in export {0}"
 
 #: src/lib/InputSelectProtocol.svelte
-#: src/lib/import.svelte.js
-#: src/lib/import.svelte.js
 msgid "Aucun protocole sélectionné"
 msgstr "No protocol selected"
 
@@ -276,11 +274,6 @@ msgstr "Error"
 #: src/routes/(app)/+layout.ts
 msgid "Erreur inattendue"
 msgstr "Unexpected error"
-
-#. 0: original.name
-#: src/lib/import.svelte.js
-msgid "Erreur lors de l'extraction des métadonnées EXIF pour {0}"
-msgstr "Error while extracting EXIF metadata for {0}"
 
 #. 0: e
 #. 0: error
@@ -855,13 +848,6 @@ msgstr[1] "# elements"
 
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
-msgid "1 image"
-msgid_plural "# images"
-msgstr[0] "1 image"
-msgstr[1] "# images"
-
-#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
-#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 msgid "1 observation"
 msgid_plural "# observations"
 msgstr[0] "1 observation"
@@ -979,12 +965,6 @@ msgstr "Open the session"
 #: src/routes/(app)/sessions/Cards.svelte
 msgid "Protocole indisponible"
 msgstr "Protocol unavailable"
-
-#: src/routes/(app)/sessions/+page.svelte
-msgid "# image"
-msgid_plural "# images"
-msgstr[0] "# image"
-msgstr[1] "# images"
 
 #: src/routes/(app)/sessions/Cards.svelte
 msgid "Créer une nouvelle session"
@@ -1178,10 +1158,6 @@ msgid "Classifier l'image sélectionnée en plein écran"
 msgstr "Classify selected image in full screen"
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/+layout.ts
-msgid "Aucune session active"
-msgstr "No active session"
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/classify/+layout.ts
 msgid "Session active introuvable"
 msgstr "Active session not found"
 
@@ -1262,15 +1238,6 @@ msgstr "Delete this value"
 #: src/lib/MetadataInput.svelte
 msgid "Aucune session active. Impossible d'enregistrer le fichier."
 msgstr "No session is active. Unable to save the file."
-
-#: src/lib/import.svelte.js
-msgid "Aucun session active"
-msgstr "No session is active"
-
-#. 0: original.name
-#: src/lib/import.svelte.js
-msgid "Erreur lors du traitement du/des fichiers annexes associés à {0}"
-msgstr "Error while processing sidecar file(s) associated with {0}"
 
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
@@ -1891,11 +1858,6 @@ msgstr "No choices made yet"
 msgid "Décrire l'observation"
 msgstr "Describe observation"
 
-#. 0: original.name
-#: src/lib/import.svelte.js
-msgid "Erreur lors de l'extraction des métadonnées du fichier RAW {0}"
-msgstr "Could not extract metadata from RAW file {0}"
-
 #: src/lib/ModalPickProtocol.svelte
 msgid "Choisir un protocole pour la session"
 msgstr "Choose a protocol for the session"
@@ -2072,7 +2034,7 @@ msgstr "Log out"
 msgid "{0}: var(--offset);"
 msgstr ""
 
-#. 0: img.filename; 1: i + 1; 2: images.length
+#. 0: img.filename; 1: i + 1; 2: medias.length
 #: src/routes/(app)/(sidepanel)/o/[observation]/classify/Subject.svelte
 msgid "{0} ({1} sur {2})"
 msgstr ""
@@ -2123,24 +2085,24 @@ msgstr "Don't quit"
 msgid "Quitter"
 msgstr "Quit"
 
-#: src/routes/(app)/capture/+page.svelte
+#: src/routes/(app)/capture/ButtonGallery.svelte
 msgid "Voir les photos prises"
 msgstr "See all photos"
 
-#: src/routes/(app)/capture/+page.svelte
+#: src/routes/(app)/capture/ButtonShoot.svelte
 msgid "Prendre une photo"
 msgstr "Take a photo"
 
-#. 0: pendingStorage?.count ?? 0
+#. 0: device.storage?.count ?? 0
 #: src/routes/(app)/capture/+page.svelte
 msgid "Il y a {0} photos en attente qui seront supprimées si tu quitte"
 msgstr "{0} pending photos will be deleted if you quit"
 
-#: src/routes/(app)/capture/+page.svelte
+#: src/routes/(app)/capture/DeviceOptions.svelte
 msgid "Plus d'options"
 msgstr "More options"
 
-#: src/routes/(app)/capture/+page.svelte
+#: src/routes/(app)/capture/DeviceOptions.svelte
 #: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/+layout.svelte
 msgid "Options"
 msgstr "Options"
@@ -2152,12 +2114,6 @@ msgstr "Back to camera"
 #: src/routes/(app)/capture/gallery/+page.svelte
 msgid "Plus"
 msgstr "More"
-
-#: src/routes/(app)/capture/gallery/+page.svelte
-msgid "# photo capturée"
-msgid_plural "# photos capturées"
-msgstr[0] "# photo taken"
-msgstr[1] "# photos taken"
 
 #: src/lib/exif.ts
 msgid "Impossible de modifier les données EXIF"
@@ -2175,10 +2131,6 @@ msgstr "Drag & drop images or a results export (.zip). Or also:"
 msgid "<0/> Choisir des fichiers"
 msgstr "<0/> Choose files"
 
-#: src/routes/(app)/capture/+page.svelte
-msgid "Ce mode de flash n'est pas supporté"
-msgstr "This flash mode isn't supported"
-
 #. 0: sessionId
 #: src/routes/(app)/storage/+page.svelte
 msgid "{0} · Session supprimée"
@@ -2188,11 +2140,7 @@ msgstr "{0} · Session was deleted"
 msgid "<0/> Appareil photo"
 msgstr "<0/> Camera"
 
-#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
-msgid "<0/> Plus d'images"
-msgstr "<0/> More images"
-
-#: src/routes/(app)/capture/+page.svelte
+#: src/routes/(app)/capture/ButtonGallery.svelte
 msgid "Voir la photo prise"
 msgid_plural "Voir les # photos prises"
 msgstr[0] "See the photo you took"
@@ -2216,14 +2164,6 @@ msgstr ""
 
 #: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/Toolbar.svelte
 msgid "Masquer la liste des boîtes"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/CropSurface.svelte
-msgid "Chargement de l'image…"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/CropSurface.svelte
-msgid "coucou toi :) <0/> passes une bonne journée ! 💖💖"
 msgstr ""
 
 #: src/lib/MetadataCascadesTable.svelte
@@ -2359,10 +2299,6 @@ msgstr ""
 msgid "L'identifiant ne doit comporter que des lettres, chiffres, <0/> ou <1/>"
 msgstr ""
 
-#: src/routes/(app)/capture/gallery/+page.svelte
-msgid "Photos capturées"
-msgstr ""
-
 #: src/routes/(app)/(sidepanel)/o/[observation]/+layout@(app).svelte
 msgid "Élimination <0>Beta</0>"
 msgstr ""
@@ -2448,11 +2384,11 @@ msgstr ""
 msgid "Temperature"
 msgstr ""
 
-#: src/routes/(app)/capture/+page.svelte
+#: src/routes/(app)/capture/FloatingArea.svelte
 msgid "<0/> Reprendre"
 msgstr ""
 
-#: src/routes/(app)/capture/+page.svelte
+#: src/routes/(app)/capture/FloatingArea.svelte
 msgid "<0/> Pause"
 msgstr ""
 
@@ -2766,6 +2702,7 @@ msgstr ""
 msgid "Disponible sur {0}"
 msgstr ""
 
+#: src/routes/(app)/sessions/+page.svelte
 #: src/routes/(app)/sessions/+page.svelte
 msgid "# média"
 msgid_plural "# médias"
@@ -3402,6 +3339,17 @@ msgstr ""
 msgid "Autoriser l'inférence via WebGPU"
 msgstr ""
 
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
+msgid "1 média"
+msgid_plural "# médias"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
+msgid "<0/> Importer plus"
+msgstr ""
+
 #: src/lib/queue.svelte.js
 msgid "1 image importée"
 msgid_plural "# images importées"
@@ -3419,122 +3367,6 @@ msgid "1 image classée"
 msgid_plural "# images classées"
 msgstr[0] ""
 msgstr[1] ""
-
-#: src/routes/(app)/+layout.svelte
-msgid "Example debug toast"
-msgstr ""
-
-#. 0: type
-#: src/routes/(app)/+layout.svelte
-msgid "Summon a {0} toast"
-msgstr ""
-
-#: src/routes/(app)/TabSettings.svelte
-msgid "Impossible de choisir ce modèle"
-msgstr ""
-
-#. 0: formatBytesSize(estimate.usage)
-#: src/routes/(app)/Settings.svelte
-msgid "{0} utilisés"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/+layout.svelte
-msgid "Errored!"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/+layout.svelte
-msgid "Debug image.jpeg"
-msgstr ""
-
-#. 0: account.username; 1: provider.displayName
-#: src/routes/(app)/sessions/Header.svelte
-msgid "{0} sur {1}"
-msgstr ""
-
-#: src/routes/(app)/accounts/+page.svelte
-msgid "Impossible de se déconnecter"
-msgstr ""
-
-#: src/lib/Datetime.svelte
-msgid "PPpp"
-msgstr ""
-
-#: src/lib/Datetime.svelte
-msgid "PP"
-msgstr ""
-
-#. 0: version
-#. 0: version
-#: src/lib/ButtonUpdateProtocol.svelte
-#: src/lib/ButtonUpdateProtocol.svelte
-msgid "v{0}"
-msgstr ""
-
-#. 0: version; 1: newVersion
-#: src/lib/ButtonUpdateProtocol.svelte
-msgctxt "Upgrading a protocol. The <0 /> is an icon arrow"
-msgid "v{0} <0/> v{1}"
-msgstr ""
-
-#: src/routes/(app)/about/+page.svelte
-msgid "par <0>Roman Shamin</0>, chez <1>Evil Martians</1>"
-msgstr ""
-
-#: src/routes/(app)/capture/+page.svelte
-msgid "Camera is ready"
-msgstr ""
-
-#: src/routes/(app)/capture/+page.svelte
-msgid "Resuming camera"
-msgstr ""
-
-#: src/routes/(app)/capture/+page.svelte
-#: src/routes/(app)/capture/+page.svelte
-#: src/routes/(app)/capture/+page.svelte
-msgid "Timer"
-msgstr ""
-
-#. 0: stateKey
-#: src/lib/Modal.svelte
-msgid "Binding functions to {0} "
-msgstr ""
-
-#. 0: name
-#: src/lib/ModalPickProtocol.svelte
-msgid "{0} logo"
-msgstr ""
-
-#. 0: meters
-#: src/lib/WorldMap.svelte
-msgid "{0} m"
-msgstr ""
-
-#: src/lib/KeyboardShortcuts.svelte
-#: src/lib/KeyboardShortcuts.svelte
-msgid "Digit"
-msgstr ""
-
-#: src/lib/KeyboardShortcuts.svelte
-msgid "Général"
-msgstr ""
-
-#: src/routes/(app)/protocols/[id]/edit/+layout.svelte
-msgid "Impossible de créer la métadonnée"
-msgstr ""
-
-#. 0: labels.item
-#: src/routes/(app)/(sidepanel)/o/[observation]/TopbarExtras.svelte
-msgid "{0} précédente"
-msgstr ""
-
-#. 0: labels.item
-#: src/routes/(app)/(sidepanel)/o/[observation]/TopbarExtras.svelte
-msgid "{0} suivante"
-msgstr ""
-
-#: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/options/+layout.svelte
-msgid "Impossible de créer l'option"
-msgstr ""
 
 #: src/lib/AnimatableCheckmark.svelte
 msgid "M2 8L5.5 11.5L13 4"
@@ -3566,6 +3398,19 @@ msgstr ""
 msgid "Une mise à jour vers la v{0} est disponible"
 msgstr ""
 
+#. 0: version
+#. 0: version
+#: src/lib/ButtonUpdateProtocol.svelte
+#: src/lib/ButtonUpdateProtocol.svelte
+msgid "v{0}"
+msgstr ""
+
+#. 0: version; 1: newVersion
+#: src/lib/ButtonUpdateProtocol.svelte
+msgctxt "Upgrading a protocol. The <0 /> is an icon arrow"
+msgid "v{0} <0/> v{1}"
+msgstr ""
+
 #: src/lib/ComboboxDesktop.svelte
 #: src/lib/ComboboxMobile.svelte
 msgid "Désactivé"
@@ -3587,12 +3432,29 @@ msgstr ""
 msgid "Aucune option sélectionnée"
 msgstr ""
 
+#: src/lib/Datetime.svelte
+msgid "PPpp"
+msgstr ""
+
+#: src/lib/Datetime.svelte
+msgid "PP"
+msgstr ""
+
 #: src/lib/DropdownMenu.svelte
 msgid "Aucun élément disponible"
 msgstr ""
 
 #: src/lib/FieldURL.svelte
 msgid "HEAD"
+msgstr ""
+
+#: src/lib/KeyboardShortcuts.svelte
+#: src/lib/KeyboardShortcuts.svelte
+msgid "Digit"
+msgstr ""
+
+#: src/lib/KeyboardShortcuts.svelte
+msgid "Général"
 msgstr ""
 
 #: src/lib/LoadingScreen.svelte
@@ -3659,14 +3521,6 @@ msgstr ""
 msgid "Slide n°{0}"
 msgstr ""
 
-#: src/lib/MetadataOptionCarousel.svelte
-msgid "Debug"
-msgstr ""
-
-#: src/lib/MetadataOptionCarousel.svelte
-msgid "Détails"
-msgstr ""
-
 #: src/lib/MetadataInput.svelte
 msgid "Unité"
 msgstr ""
@@ -3684,8 +3538,31 @@ msgstr ""
 msgid "Fichier introuvable"
 msgstr ""
 
+#: src/lib/MetadataOptionCarousel.svelte
+msgid "Debug"
+msgstr ""
+
+#: src/lib/MetadataOptionCarousel.svelte
+msgid "Détails"
+msgstr ""
+
+#. 0: stateKey
+#: src/lib/Modal.svelte
+msgid "Binding functions to {0} "
+msgstr ""
+
+#. 0: name
+#: src/lib/ModalPickProtocol.svelte
+msgid "{0} logo"
+msgstr ""
+
 #: src/lib/MorphArrow.svelte
 msgid "M1.39844 15.8231L8.89576 8.3258L22.1662 21.5962L35.4366 8.3258L42.9339 15.8231H64.1324M64.1324 15.8231C64.1324 15.8231 52.9299 8.3258 52.9299 0.56543M64.1324 15.8231C64.1324 15.8231 52.9299 21.5962 52.9299 31.285"
+msgstr ""
+
+#. 0: meters
+#: src/lib/WorldMap.svelte
+msgid "{0} m"
 msgstr ""
 
 #: src/lib/Xper3Logo.svelte
@@ -3706,6 +3583,65 @@ msgstr ""
 
 #: src/lib/Xper3Logo.svelte
 msgid "M151.507,1.909C155.844,1.907 160.181,1.905 164.518,1.902L165.5,2.848C165.982,3.059 170.862,5.205 171.54,5.461C174.791,7.389 179.521,9.626 172.664,12.83C164.013,16.872 164.256,17.078 161.559,17.649C153.714,19.308 131.53,29.444 129.698,29.918C127.448,30.688 127.412,30.341 125.601,31.879C118.155,35.557 117.461,35.73 116.703,35.92C110.171,38.167 109.795,37.3 104.604,41.884C100.982,43.629 100.966,43.538 100.69,43.747C99.558,43.837 99.799,43.913 97.713,44.904C97.05,45.247 96.387,45.589 95.725,45.932C94.714,46.587 93.703,47.242 92.692,47.897C89.075,50.462 88.891,49.698 85.58,51.659C52.683,71.145 45.87,66.774 38.505,66.809C37.438,66.493 36.372,66.177 35.305,65.861C34.999,65.798 34.694,65.735 34.389,65.672C33.975,65.016 33.562,64.36 33.148,63.705C32.349,62.62 32.42,62.701 32.349,62.62C32.119,62.359 32.057,62.606 31.77,62.264C19.998,48.259 119.735,9.29 129.449,7.366C150.128,3.27 149.715,2.217 151.507,1.909Z"
+msgstr ""
+
+#: src/routes/(app)/+layout.svelte
+msgid "Example debug toast"
+msgstr ""
+
+#. 0: type
+#: src/routes/(app)/+layout.svelte
+msgid "Summon a {0} toast"
+msgstr ""
+
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+msgid "Un autre réseau a déjà ce nom"
+msgstr ""
+
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+msgid "Aucun modèle chargé"
+msgstr ""
+
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+msgid "Analyse du réseau…"
+msgstr ""
+
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+#: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/(todo)/ModelConfig.svelte
+#: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/(todo)/ModelConfig.svelte
+#: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/(todo)/ModelConfig.svelte
+#: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/(todo)/ModelConfig.svelte
+msgid "CHW"
+msgstr ""
+
+#. 0: d.classmapping.length; 1: expectedClassmappingSize
+#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
+msgid "Le classmapping comporte {0} entrées mais le réseau semble avoir {1} neurones en sortie"
+msgstr ""
+
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid "POST"
+msgstr ""
+
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid "Content-Type"
+msgstr ""
+
+#. 0: who; 1: body
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid ""
+"From: {0}\n"
+"\n"
+"\n"
+"{1}"
+msgstr ""
+
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid "Error submitting issue:"
+msgstr ""
+
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid "Comment reproduire le bug?"
 msgstr ""
 
 #: src/routes/(app)/Settings.svelte
@@ -3785,6 +3721,11 @@ msgstr ""
 msgid "Stockage bientôt plein"
 msgstr ""
 
+#. 0: formatBytesSize(estimate.usage)
+#: src/routes/(app)/Settings.svelte
+msgid "{0} utilisés"
+msgstr ""
+
 #: src/routes/(app)/Settings.svelte
 msgid "Stockage non persistant"
 msgstr ""
@@ -3810,29 +3751,8 @@ msgstr ""
 msgid "Version {0}"
 msgstr ""
 
-#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
-msgid "Un autre réseau a déjà ce nom"
-msgstr ""
-
-#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
-msgid "Aucun modèle chargé"
-msgstr ""
-
-#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
-msgid "Analyse du réseau…"
-msgstr ""
-
-#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
-#: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/(todo)/ModelConfig.svelte
-#: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/(todo)/ModelConfig.svelte
-#: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/(todo)/ModelConfig.svelte
-#: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/(todo)/ModelConfig.svelte
-msgid "CHW"
-msgstr ""
-
-#. 0: d.classmapping.length; 1: expectedClassmappingSize
-#: src/routes/(app)/ModalCreateCustomNeuralNetwork.svelte
-msgid "Le classmapping comporte {0} entrées mais le réseau semble avoir {1} neurones en sortie"
+#: src/routes/(app)/TabSettings.svelte
+msgid "Impossible de choisir ce modèle"
 msgstr ""
 
 #: src/routes/(app)/TabSettings.svelte
@@ -3840,7 +3760,15 @@ msgid "Ajouter des photos"
 msgstr ""
 
 #: src/routes/(app)/TabSettings.svelte
+msgid "Capturer photos ou son"
+msgstr ""
+
+#: src/routes/(app)/TabSettings.svelte
 msgid "Prendre des photos"
+msgstr ""
+
+#: src/routes/(app)/TabSettings.svelte
+msgid "Enregistrer du son"
 msgstr ""
 
 #: src/routes/(app)/TabSettings.svelte
@@ -3872,261 +3800,38 @@ msgstr ""
 msgid "Le protocole ne définit aucun modèle pour cette métadonnée."
 msgstr ""
 
-#: src/routes/(app)/ModalSubmitIssue.svelte
-msgid "POST"
+#: src/lib/audio/AudioPlayer.svelte
+#: src/lib/audio/AudioPlayer.svelte
+msgid "Pause / Reprendre"
 msgstr ""
 
-#: src/routes/(app)/ModalSubmitIssue.svelte
-msgid "Content-Type"
+#: src/lib/audio/AudioPlayer.svelte
+msgid "Baisser le volume"
 msgstr ""
 
-#. 0: who; 1: body
-#: src/routes/(app)/ModalSubmitIssue.svelte
-msgid ""
-"From: {0}\n"
-"\n"
-"\n"
-"{1}"
+#: src/lib/audio/AudioPlayer.svelte
+msgid "Augmenter le volume"
 msgstr ""
 
-#: src/routes/(app)/ModalSubmitIssue.svelte
-msgid "Error submitting issue:"
+#: src/routes/(app)/about/+page.svelte
+msgid "Martian Mono"
 msgstr ""
 
-#: src/routes/(app)/ModalSubmitIssue.svelte
-msgid "Comment reproduire le bug?"
+#: src/routes/(app)/about/+page.svelte
+msgid "par <0>Roman Shamin</0>, chez <1>Evil Martians</1>"
 msgstr ""
 
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/Boxes.svelte
-msgid "Supprimer cette image et passer à la suivante"
+#: src/routes/(app)/(sidepanel)/+layout.svelte
+msgid "Errored!"
 msgstr ""
 
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/Boxes.svelte
-msgid "Revenir au recadrage d'origine pour toutes les boîtes"
+#: src/routes/(app)/(sidepanel)/+layout.svelte
+msgid "Debug image.jpeg"
 msgstr ""
 
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/Boxes.svelte
-msgid "Réafficher les autres boîtes"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/Boxes.svelte
-msgid "Masquer les autres boîtes"
-msgstr ""
-
-#. 0: roundedPixelDimensions(initBox.value).join(' × '); 1: percent(initBox.confidence)
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/Boxes.svelte
-msgid ""
-"Revenir au recadrage d'origine \n"
-"\t\t\t\t\t\t\t\t\t({0}, {1} de confiance)"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/Boxes.svelte
-msgid "Recadrage d'origine indisponible"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/Boxes.svelte
-msgid "Pour créer une nouvelle boîte,<wbr /> utilisez les outils"
-msgstr ""
-
-#: src/routes/(app)/protocols/[id]/edit/+layout.svelte
-#: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/+layout.svelte
-msgid "Informations"
-msgstr ""
-
-#: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/+layout.svelte
-msgid "Inférence"
-msgstr ""
-
-#: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/+layout.svelte
-msgid "Changer les valeurs d'autres métadonnées en fonction de celle-ci"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/classify/WithExpandButton.svelte
-msgid "Agrandir"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/CropSurface.svelte
+#: src/routes/(app)/(sidepanel)/+layout.svelte
 #: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/FocusSwitcher.svelte
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/FocusSwitcher.svelte
-msgid "Main"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/FocusSwitcher.svelte
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/FocusSwitcher.svelte
-msgid "Glisser-recadrer"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/+layout.svelte
-msgid "Afficher en grand"
-msgstr ""
-
-#. 0: maximumListableCandidates.toLocaleString()
-#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/+layout.svelte
-msgid "Plus de {0} candidats restants"
-msgstr ""
-
-#: src/routes/(app)/protocols/[id]/edit/+layout.svelte
-msgid "Exports"
-msgstr ""
-
-#: src/routes/(app)/protocols/[id]/edit/+layout.svelte
-msgid "Recadrage"
-msgstr ""
-
-#: src/routes/(app)/protocols/[id]/edit/+layout.svelte
-msgid "Nouvelle métadonnée…"
-msgstr ""
-
-#: src/routes/(app)/protocols/[id]/edit/+layout.svelte
-msgid "Déplier"
-msgstr ""
-
-#: src/routes/(app)/protocols/[id]/edit/+layout.svelte
-msgid "Replier"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/classify/Subject.svelte
-msgid "Voir l'image entière"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/classify/Subject.svelte
-msgid "Voir l'image recadrée"
-msgstr ""
-
-#. 0: i + 1; 1: images?.length ?? 1
-#: src/routes/(app)/(sidepanel)/o/[observation]/classify/suggestions/References.svelte
-msgid "Image de référence {0} sur {1}"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/NarrowableGroupPicker.svelte
-msgid "Groupe de métadonnées"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/NarrowableGroupPicker.svelte
-msgid "Aucun"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/DraggableBoundingBox.svelte
-msgid "Dragging has gone outside change area, bailing out. Target is"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
-msgid "Recadrages confirmés"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
-msgid "Liste des boîtes"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
-msgid "Revenir aux boîtes d'origine"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
-msgid "Supprimer l'image"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/classify/+layout.svelte
-msgid "Observations classifiées"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/classify/+layout.svelte
-msgid "Classifications confirmées"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/classify/+layout.svelte
-msgid "Mode élimination (beta)"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/classify/+layout.svelte
-msgid "Mode suggestions"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/classify/suggestions/OptionBar.svelte
-msgid "Voir toutes les options"
-msgstr ""
-
-#: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/(todo)/ModelConfig.svelte
-msgid "Hauteur-largeur sans batch"
-msgstr ""
-
-#: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/(todo)/ModelConfig.svelte
-msgid "Hauteur-largeur avec batch*"
-msgstr ""
-
-#: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/(todo)/ModelConfig.svelte
-msgid "BCHW"
-msgstr ""
-
-#: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/(todo)/ModelConfig.svelte
-msgid "Brutes"
-msgstr ""
-
-#: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/(todo)/ModelConfig.svelte
-msgid "Normalisées"
-msgstr ""
-
-#. 0: beamup.origin
-#: src/routes/(app)/protocols/RowProtocol.svelte
-msgid "À {0}"
-msgstr ""
-
-#. 1.0: newVersion
-#: src/routes/(app)/protocols/[id]/edit/versioning/+page.svelte
-msgid "<0/> Dernière version en ligne: <1>v{0}</1> <2>Réétablir</2>"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/CandidateDetailsModal.svelte
-msgid "Candidat"
-msgstr ""
-
-#: src/routes/(app)/protocols/[id]/edit/versioning/ChangesWithRemote.svelte
-#: src/routes/(app)/protocols/[id]/edit/versioning/ChangesWithRemote.svelte
-msgid "REMOVE"
-msgstr ""
-
-#: src/routes/(app)/protocols/[id]/edit/versioning/ChangesWithRemote.svelte
-#: src/routes/(app)/protocols/[id]/edit/versioning/ChangesWithRemote.svelte
-msgid "CREATE"
-msgstr ""
-
-#: src/routes/(app)/protocols/[id]/edit/versioning/ChangesWithRemote.svelte
-#: src/routes/(app)/protocols/[id]/edit/versioning/ChangesWithRemote.svelte
-msgid "CHANGE"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/TopbarExtras.svelte
-msgid "Marquer comme non-confirmée"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/TopbarExtras.svelte
-msgid "Marquer comme confirmée"
-msgstr ""
-
-#: src/routes/(app)/accounts/ModalAddAccount.svelte
-msgid "Choix du serveur"
-msgstr ""
-
-#: src/routes/(app)/accounts/ModalAddAccount.svelte
-msgid "Connexion"
-msgstr ""
-
-#: src/routes/(app)/accounts/ModalAddAccount.svelte
-msgid "Serveur"
-msgstr ""
-
-#: src/routes/(app)/accounts/ModalAddAccount.svelte
-msgid "Identifiants"
-msgstr ""
-
-#: src/routes/(app)/accounts/ModalAddAccount.svelte
-msgid "Cacher le mot de passe"
-msgstr ""
-
-#: src/routes/(app)/accounts/ModalAddAccount.svelte
-msgid "Montrer le mot de passe"
+msgid "Audio"
 msgstr ""
 
 #. 0: i + 1; 1: singleObservationSelected.label
@@ -4140,70 +3845,39 @@ msgid "Image {0} de la sélection"
 msgstr ""
 
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
+msgid "<0/> Capturer média"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
+msgid "<0/> Enregistrer son"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 msgid "Sélectionnez une seule observation"
-msgstr ""
-
-#: src/routes/(app)/about/+page.svelte
-msgid "Martian Mono"
-msgstr ""
-
-#: src/routes/(app)/storage/+page.svelte
-msgid "Inclus dans les protocoles"
-msgstr ""
-
-#: src/routes/(app)/sessions/Header.svelte
-msgid "Ajouter & supprimer"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/classify/+page.svelte
-#: src/routes/(app)/(sidepanel)/classify/+page.svelte
-#: src/routes/(app)/(sidepanel)/crop/+page.svelte
-#: src/routes/(app)/sessions/+page.svelte
-#: src/routes/(app)/sessions/+page.svelte
-msgid "Ouverture…"
-msgstr ""
-
-#: src/routes/(app)/sessions/+page.svelte
-msgid "Téléchargement…"
-msgstr ""
-
-#. 0: session.name
-#: src/routes/(app)/sessions/+page.svelte
-msgid "Impossible de télécharger {0}"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/+layout@(app).svelte
-msgid "Cette image n'apparaît dans aucune observation"
-msgstr ""
-
-#. 0: plural(observationsOfImageFile.length, ['# observation', '# observations'])
-#: src/routes/(app)/(sidepanel)/o/[observation]/+layout@(app).svelte
-msgid "Cette image apparaît dans {0}"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/+layout@(app).svelte
-msgid "Ouvrir une image pour le recadrage"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/o/[observation]/+layout@(app).svelte
-msgid "Non disponible pour ce protocole"
-msgstr ""
-
-#. 0: provider.displayName
-#: src/routes/(app)/sessions/[id]/+page.svelte
-msgid "Dé-lier de {0}"
-msgstr ""
-
-#: src/routes/(app)/sessions/[id]/+page.svelte
-msgid "Dé-lier de la plateforme en ligne"
 msgstr ""
 
 #: src/routes/(app)/results/ExportLocalActions.svelte
 msgid "Votre navigateur ne supporte pas l'exportation en dossier, utilisez Chrome ou Edge."
 msgstr ""
 
-#: src/routes/(app)/sessions/Cards.svelte
-msgid "Impossible de charger les sessions distantes"
+#: src/routes/(app)/results/ExportLocalSettings.svelte
+msgid "Métadonnées seulement"
+msgstr ""
+
+#: src/routes/(app)/results/ExportLocalSettings.svelte
+msgid "Métadonnées et images recadrées"
+msgstr ""
+
+#: src/routes/(app)/results/ExportLocalSettings.svelte
+msgid "Tout"
+msgstr ""
+
+#: src/routes/(app)/results/ExportLocalSettings.svelte
+msgid "Permet de ré-importer ultérieurement"
+msgstr ""
+
+#: src/routes/(app)/results/ExportLocalSettings.svelte
+msgid "Aucune"
 msgstr ""
 
 #: src/routes/(app)/results/ExportPanel.svelte
@@ -4235,62 +3909,409 @@ msgstr ""
 msgid "Choisir un compte"
 msgstr ""
 
-#: src/routes/(app)/capture/+page.svelte
+#: src/routes/(app)/(sidepanel)/classify/+page.svelte
+#: src/routes/(app)/(sidepanel)/classify/+page.svelte
+#: src/routes/(app)/(sidepanel)/crop/+page.svelte
+#: src/routes/(app)/sessions/+page.svelte
+#: src/routes/(app)/sessions/+page.svelte
+msgid "Ouverture…"
+msgstr ""
+
+#: src/routes/(app)/sessions/+page.svelte
+msgid "Téléchargement…"
+msgstr ""
+
+#. 0: session.name
+#: src/routes/(app)/sessions/+page.svelte
+msgid "Impossible de télécharger {0}"
+msgstr ""
+
+#: src/routes/(app)/sessions/Cards.svelte
+msgid "Impossible de charger les sessions distantes"
+msgstr ""
+
+#: src/routes/(app)/sessions/Header.svelte
+msgid "Ajouter & supprimer"
+msgstr ""
+
+#. 0: account.username; 1: provider.displayName
+#: src/routes/(app)/sessions/Header.svelte
+msgid "{0} sur {1}"
+msgstr ""
+
+#: src/routes/(app)/capture/DeviceOptions.svelte
 msgid "Désactiver le flash"
 msgstr ""
 
-#: src/routes/(app)/capture/+page.svelte
+#: src/routes/(app)/capture/DeviceOptions.svelte
 msgid "Activer le flash"
 msgstr ""
 
-#: src/routes/(app)/capture/+page.svelte
+#: src/routes/(app)/capture/DeviceOptions.svelte
 msgid "Mettre le flash en auto"
 msgstr ""
 
-#: src/routes/(app)/capture/+page.svelte
+#: src/routes/(app)/capture/DeviceOptions.svelte
 msgid "Mettre le flash en torche"
 msgstr ""
 
-#: src/routes/(app)/capture/+page.svelte
+#: src/routes/(app)/capture/DeviceOptions.svelte
 msgid "Flash"
 msgstr ""
 
-#: src/routes/(app)/capture/+page.svelte
+#: src/routes/(app)/capture/DeviceOptions.svelte
 msgid "Off"
 msgstr ""
 
-#: src/routes/(app)/capture/+page.svelte
+#: src/routes/(app)/capture/DeviceOptions.svelte
 msgid "On"
 msgstr ""
 
-#: src/routes/(app)/capture/+page.svelte
+#: src/routes/(app)/capture/DeviceOptions.svelte
 msgid "Auto"
 msgstr ""
 
-#: src/routes/(app)/capture/+page.svelte
+#: src/routes/(app)/capture/DeviceOptions.svelte
 msgid "Lampe-torche"
+msgstr ""
+
+#: src/routes/(app)/capture/DeviceTypeSwitcher.svelte
+msgid "<0/> Photo"
+msgstr ""
+
+#: src/routes/(app)/capture/DeviceTypeSwitcher.svelte
+msgid "<0/> Son"
+msgstr ""
+
+#. 0: beamup.origin
+#: src/routes/(app)/protocols/RowProtocol.svelte
+msgid "À {0}"
+msgstr ""
+
+#: src/routes/(app)/accounts/+page.svelte
+msgid "Impossible de se déconnecter"
+msgstr ""
+
+#: src/routes/(app)/accounts/ModalAddAccount.svelte
+msgid "Choix du serveur"
+msgstr ""
+
+#: src/routes/(app)/accounts/ModalAddAccount.svelte
+msgid "Connexion"
+msgstr ""
+
+#: src/routes/(app)/accounts/ModalAddAccount.svelte
+msgid "Serveur"
+msgstr ""
+
+#: src/routes/(app)/accounts/ModalAddAccount.svelte
+msgid "Identifiants"
+msgstr ""
+
+#: src/routes/(app)/accounts/ModalAddAccount.svelte
+msgid "Cacher le mot de passe"
+msgstr ""
+
+#: src/routes/(app)/accounts/ModalAddAccount.svelte
+msgid "Montrer le mot de passe"
+msgstr ""
+
+#: src/routes/(app)/storage/+page.svelte
+msgid "Inclus dans les protocoles"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/import/+page.svelte
+msgid "Canceled by user"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/import/+page.svelte
+msgid "<0/> Capture d'images ou de son"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/import/+page.svelte
+msgid "<0/> Enregistrer du son"
+msgstr ""
+
+#: src/routes/(app)/capture/gallery/+page.svelte
+msgid "# média capturé"
+msgid_plural "# médias capturés"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/routes/(app)/capture/gallery/+page.svelte
+msgid "Médias capturés"
 msgstr ""
 
 #: src/routes/(app)/capture/gallery/+page.svelte
 msgid "Tout supprimer et recommencer"
 msgstr ""
 
-#: src/routes/(app)/results/ExportLocalSettings.svelte
-msgid "Métadonnées seulement"
+#. 0: error
+#: src/routes/(app)/capture/gallery/+page.svelte
+msgid "Impossible de générer la forme d'onde: {0}"
 msgstr ""
 
-#: src/routes/(app)/results/ExportLocalSettings.svelte
-msgid "Métadonnées et images recadrées"
+#. 0: provider.displayName
+#: src/routes/(app)/sessions/[id]/+page.svelte
+msgid "Dé-lier de {0}"
 msgstr ""
 
-#: src/routes/(app)/results/ExportLocalSettings.svelte
-msgid "Tout"
+#: src/routes/(app)/sessions/[id]/+page.svelte
+msgid "Dé-lier de la plateforme en ligne"
 msgstr ""
 
-#: src/routes/(app)/results/ExportLocalSettings.svelte
-msgid "Permet de ré-importer ultérieurement"
+#: src/routes/(app)/(sidepanel)/o/[observation]/+layout@(app).svelte
+msgid "Cette image n'apparaît dans aucune observation"
 msgstr ""
 
-#: src/routes/(app)/results/ExportLocalSettings.svelte
-msgid "Aucune"
+#. 0: plural(observationsOfImageFile.length, ['# observation', '# observations'])
+#: src/routes/(app)/(sidepanel)/o/[observation]/+layout@(app).svelte
+msgid "Cette image apparaît dans {0}"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/+layout@(app).svelte
+msgid "Ouvrir une image pour le recadrage"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/+layout@(app).svelte
+msgid "Non disponible pour ce protocole"
+msgstr ""
+
+#. 0: labels.item
+#: src/routes/(app)/(sidepanel)/o/[observation]/TopbarExtras.svelte
+msgid "{0} précédente"
+msgstr ""
+
+#. 0: labels.item
+#: src/routes/(app)/(sidepanel)/o/[observation]/TopbarExtras.svelte
+msgid "{0} suivante"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/TopbarExtras.svelte
+msgid "Marquer comme non-confirmée"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/TopbarExtras.svelte
+msgid "Marquer comme confirmée"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/edit/+layout.svelte
+msgid "Impossible de créer la métadonnée"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/edit/+layout.svelte
+#: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/+layout.svelte
+msgid "Informations"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/edit/+layout.svelte
+msgid "Exports"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/edit/+layout.svelte
+msgid "Recadrage"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/edit/+layout.svelte
+msgid "Nouvelle métadonnée…"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/edit/+layout.svelte
+msgid "Déplier"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/edit/+layout.svelte
+msgid "Replier"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/+layout.svelte
+msgid "Observations classifiées"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/+layout.svelte
+msgid "Classifications confirmées"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/+layout.svelte
+msgid "Mode élimination (beta)"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/+layout.svelte
+msgid "Mode suggestions"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/Subject.svelte
+msgid "Voir l'image entière"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/Subject.svelte
+msgid "Voir l'image recadrée"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/WithExpandButton.svelte
+msgid "Agrandir"
+msgstr ""
+
+#. 1.0: newVersion
+#: src/routes/(app)/protocols/[id]/edit/versioning/+page.svelte
+msgid "<0/> Dernière version en ligne: <1>v{0}</1> <2>Réétablir</2>"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/edit/versioning/ChangesWithRemote.svelte
+#: src/routes/(app)/protocols/[id]/edit/versioning/ChangesWithRemote.svelte
+msgid "REMOVE"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/edit/versioning/ChangesWithRemote.svelte
+#: src/routes/(app)/protocols/[id]/edit/versioning/ChangesWithRemote.svelte
+msgid "CREATE"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/edit/versioning/ChangesWithRemote.svelte
+#: src/routes/(app)/protocols/[id]/edit/versioning/ChangesWithRemote.svelte
+msgid "CHANGE"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/+layout.svelte
+msgid "Afficher en grand"
+msgstr ""
+
+#. 0: maximumListableCandidates.toLocaleString()
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/+layout.svelte
+msgid "Plus de {0} candidats restants"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/CandidateDetailsModal.svelte
+msgid "Candidat"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/NarrowableGroupPicker.svelte
+msgid "Groupe de métadonnées"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/narrow/NarrowableGroupPicker.svelte
+msgid "Aucun"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/suggestions/OptionBar.svelte
+msgid "Voir toutes les options"
+msgstr ""
+
+#. 0: i + 1; 1: images?.length ?? 1
+#: src/routes/(app)/(sidepanel)/o/[observation]/classify/suggestions/References.svelte
+msgid "Image de référence {0} sur {1}"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
+msgid "Recadrages confirmés"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
+msgid "Liste des boîtes"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
+msgid "Revenir aux boîtes d'origine"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
+msgid "Supprimer l'image"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/CropSurface.svelte
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/FocusSwitcher.svelte
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/FocusSwitcher.svelte
+msgid "Main"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/+page.svelte
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/FocusSwitcher.svelte
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/FocusSwitcher.svelte
+msgid "Glisser-recadrer"
+msgstr ""
+
+#. 0: round(y * 1e-3, 1); 1: round((y + w) * 1e-3)
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/Boxes.svelte
+msgid "{0}—{1} kHz"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/Boxes.svelte
+msgid "Supprimer cette image et passer à la suivante"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/Boxes.svelte
+msgid "Revenir au recadrage d'origine pour toutes les boîtes"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/Boxes.svelte
+msgid "Boîte à <0/>"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/Boxes.svelte
+msgid "Réafficher les autres boîtes"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/Boxes.svelte
+msgid "Masquer les autres boîtes"
+msgstr ""
+
+#. 0: roundedPixelDimensions(initBox.value).join(' × '); 1: percent(initBox.confidence)
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/Boxes.svelte
+msgid ""
+"Revenir au recadrage d'origine \n"
+"\t\t\t\t\t\t\t\t\t({0}, {1} de confiance)"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/Boxes.svelte
+msgid "Recadrage d'origine indisponible"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/Boxes.svelte
+msgid "Pour créer une nouvelle boîte,<wbr /> utilisez les outils"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/DraggableBoundingBox.svelte
+msgid "Dragging has gone outside change area, bailing out. Target is"
+msgstr ""
+
+#. 0: file.filename
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/EditorAudio.svelte
+msgid "Fichier {0} introuvable"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/o/[observation]/crop/[image]/Waveform.svelte
+msgid "Chargement de la forme d'onde…"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/+layout.svelte
+msgid "Inférence"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/+layout.svelte
+msgid "Changer les valeurs d'autres métadonnées en fonction de celle-ci"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/(todo)/ModelConfig.svelte
+msgid "Hauteur-largeur sans batch"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/(todo)/ModelConfig.svelte
+msgid "Hauteur-largeur avec batch*"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/(todo)/ModelConfig.svelte
+msgid "BCHW"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/(todo)/ModelConfig.svelte
+msgid "Brutes"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/(todo)/ModelConfig.svelte
+msgid "Normalisées"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/edit/metadata/[metadata]/options/+layout.svelte
+msgid "Impossible de créer l'option"
 msgstr ""

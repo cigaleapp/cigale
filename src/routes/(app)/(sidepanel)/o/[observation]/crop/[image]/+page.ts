@@ -1,3 +1,6 @@
+import { redirect } from '@sveltejs/kit';
+
+import { resolve } from '$app/paths';
 import { galleryEffectiveSorter } from '#lib/gallery.js';
 import { tables } from '#lib/idb.svelte.js';
 import { imageIdToFileId } from '#lib/images.js';
@@ -22,13 +25,16 @@ export async function load({ parent }) {
 	// even though uiState.currentSessionId is set.
 	await parent();
 
-	if (!uiState.currentSessionId) throw new Error('Aucune session active');
+	if (!uiState.currentSessionId) redirect(307, resolve('/sessions/'));
 
 	const groupSettings =
 		uiState.currentSession?.group.crop ?? uiState.currentSession?.group.global;
 	const sortSettings = uiState.currentSession?.sort.crop ?? uiState.currentSession?.sort.global;
 
-	const images = await tables.Image.list('sessionId', uiState.currentSessionId);
+	const images = [
+		...(await tables.Image.list('sessionId', uiState.currentSessionId)),
+		...(await tables.Sound.list('sessionId', uiState.currentSessionId)),
+	];
 
 	if (sortSettings && groupSettings) {
 		const imagesSorter = await galleryEffectiveSorter({

@@ -21,13 +21,13 @@ export const MERGEABLE_METADATA_TYPES: Set<DB.MetadataType> = new Set([
 /**
  * Merge metadata values from images and observations. For every metadata key, the value is taken from the merged values of observation overrides if there exists at least one, otherwise from the merged values of the images.
  */
-export function mergeMetadataFromImagesAndObservations({
+export function mergeMetadataFromMediaAndObservations({
 	definitions,
-	images,
+	medias,
 	observations,
 }: {
 	definitions: DB.Metadata[];
-	images: Pick<DB.Image, 'metadata' | 'id'>[];
+	medias: Pick<DB.Image | DB.Sound, 'metadata' | 'id'>[];
 	observations: DB.Observation[];
 }) {
 	// TODO improve performance by passing a cache
@@ -49,7 +49,7 @@ export function mergeMetadataFromImagesAndObservations({
 	// ).then((entries) => Object.fromEntries(entries));
 
 	const mergedValues = mergeMetadataValues(
-		images.map((img) => img.metadata),
+		medias.map((img) => img.metadata),
 		{ definitions }
 	);
 

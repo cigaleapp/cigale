@@ -157,7 +157,7 @@ describe('PendingStorage', () => {
 			name: 'IMG_0001.JPEG',
 		});
 
-		await storage.save('base64-photo');
+		await storage.savePhoto('base64-photo');
 
 		expect(mockBinaryStorage.create).toHaveBeenCalledWith(
 			{
@@ -181,7 +181,7 @@ describe('PendingStorage', () => {
 		const { PendingStorage } = await importModule();
 		const storage = await PendingStorage.open('session-a');
 
-		await storage.save('base64-photo');
+		await storage.savePhoto('base64-photo');
 
 		expect(storage.count).toBe(0);
 		expect(mockErrorMessage).toHaveBeenCalledWith(
@@ -204,7 +204,7 @@ describe('PendingStorage', () => {
 		mockBinaryStorage.read.mockResolvedValueOnce({ name: 'IMG_0001.PNG', type: 'image/png' });
 		mockBinaryStorage.read.mockResolvedValueOnce({ name: 'IMG_0002.PNG', type: 'image/png' });
 
-		const files = await collect(storage.files());
+		const files = await collect(storage.photoFiles());
 		expect(files).toEqual([
 			{ name: 'IMG_0001.PNG', type: 'image/png' },
 			{ name: 'IMG_0002.PNG', type: 'image/png' },

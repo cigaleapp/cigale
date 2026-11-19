@@ -16,6 +16,8 @@ export type ZoomState = typeof INITIAL_STATE;
  * x & y coordinates are in pixels of the resized, post-object-fit but pre-zoom image
  */
 export class Zoom {
+	zoomlock: 'x' | 'y' | undefined = undefined;
+	maxScale = $state(10);
 	origin = $state({ x: 0, y: 0 });
 	scale = $state(1);
 	panning = $state(false);
@@ -28,8 +30,37 @@ export class Zoom {
 		},
 	});
 
-	constructor(state?: ZoomState) {
+	constructor(state?: ZoomState, options?: { zoomlock?: 'x' | 'y' }) {
 		if (state) this.restore(state);
+		this.zoomlock = options?.zoomlock;
+	}
+
+	lock(axis: 'x' | 'y') {
+		this.zoomlock = axis;
+	}
+
+	releaseLock() {
+		this.zoomlock = undefined;
+	}
+
+	setMaxScale(max: number) {
+		this.maxScale = max
+	}
+
+	cssTransforms(): string {
+		let out = '';
+
+		if (this.zoomlock !== 'x') {
+			out += `scaleX(${this.scale}) `;
+			out += `translateX(${this.origin.x}px) `;
+		}
+
+		if (this.zoomlock !== 'y') {
+			out += `scaleY(${this.scale}) `;
+			out += `translateY(${this.origin.y}px) `;
+		}
+
+		return out;
 	}
 
 	capture(): ZoomState {
@@ -63,13 +94,7 @@ export class Zoom {
 			| { via: 'keyboard'; key: '+' | '-' }
 	) {
 		// Most logic is thanks to https://stackoverflow.com/a/70251437
-		const imageBounds = element?.getBoundingClientRect();
-		const imageOffsets = element
-			? {
-					height: element.offsetHeight,
-					width: element.offsetWidth,
-				}
-			: undefined;
+		const bounds = element?.getBoundingClientRect();
 
 		let direction = 0;
 		let speed = 0;
@@ -89,47 +114,55 @@ export class Zoom {
 				break;
 			}
 			case 'keyboard': {
+				// No cursor position: zoom around the middle of the image
+				if (bounds) {
+					center = {
+						clientX: bounds.x + bounds.width / 2,
+						clientY: bounds.y + bounds.height / 2,
+					};
+				}
 				speed = this.scale * 0.2;
 				direction = switchValue(data.key, {
 					'+': 1,
 					'-': -1,
 				});
-
 				break;
 			}
 		}
 
-		const scale = this.scale + direction * 2 * speed;
+		const previous = this.scale;
+		const scale = Math.min(this.maxScale, Math.max(1, previous + direction * 2 * speed));
 
-		if (scale > 10) {
-			this.scale = 10;
-			return;
-		}
-
-		if (scale < 1) {
+		if (scale <= 1) {
 			this.scale = 1;
 			this.origin = { x: 0, y: 0 };
 			return;
 		}
 
-		if (!imageBounds || !imageOffsets) {
+		if (scale === previous) return;
+
+		if (!element || !bounds) {
 			this.scale = scale;
 			return;
 		}
 
-		const dx =
-			direction *
-			speed *
-			(imageOffsets.width - ((center.clientX - imageBounds.x) / scale) * 2);
+		// Transform-origin of the element in its own (untransformed) pixels
+		const [originX, originY] = getComputedStyle(element)
+			.transformOrigin.split(' ')
+			.map(parseFloat);
+		const tx = Number.isFinite(originX) ? originX : element.offsetWidth / 2;
+		const ty = Number.isFinite(originY) ? originY : element.offsetHeight / 2;
 
-		const dy =
-			direction *
-			speed *
-			(imageOffsets.height - ((center.clientY - imageBounds.y) / scale) * 2);
+		// The fixed point of the transform, in client coordinates.
+		// bounds.x = anchor - s * (tx + o) + ... solved for anchor:
+		const anchorX = bounds.x + previous * tx - previous * this.origin.x;
+		const anchorY = bounds.y + previous * ty - previous * this.origin.y;
+
+		const k = 1 / scale - 1 / previous;
 
 		this.scale = scale;
-		this.origin.x += dx;
-		this.origin.y += dy;
+		if (this.zoomlock !== 'x') this.origin.x += (center.clientX - anchorX) * k;
+		if (this.zoomlock !== 'y') this.origin.y += (center.clientY - anchorY) * k;
 	}
 
 	startPanning(at: ClientPoint) {
@@ -150,7 +183,13 @@ export class Zoom {
 	 */
 	pan(to: ClientPoint) {
 		if (!this.panning) return;
-		this.origin.x = this.panStart.zoomOrigin.x + (to.clientX - this.panStart.x);
-		this.origin.y = this.panStart.zoomOrigin.y + (to.clientY - this.panStart.y);
+
+		if (this.zoomlock !== 'x') {
+			this.origin.x = this.panStart.zoomOrigin.x + (to.clientX - this.panStart.x) / this.scale;
+		}
+
+		if (this.zoomlock !== 'y') {
+			this.origin.y = this.panStart.zoomOrigin.y + (to.clientY - this.panStart.y) / this.scale;
+		}
 	}
 }

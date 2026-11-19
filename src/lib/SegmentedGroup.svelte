@@ -57,7 +57,7 @@
 	}
 
 	.segmented-group {
-		background-color: rgb(from var(--gray) r g b / 20%);
+		background-color: var(--segmented-group-bg, rgb(from var(--gray) r g b / 20%));
 		border-radius: var(--corner-radius);
 		padding: 0.25em 0.5em;
 		gap: 0.5em;
@@ -69,6 +69,7 @@
 		border-radius: var(--corner-radius);
 		padding: 0.25em 0.5em;
 		border: 1px solid transparent;
+		color: var(--fg-neutral);
 
 		display: flex;
 		align-items: center;
@@ -76,6 +77,7 @@
 
 		&:has(input:checked) {
 			background-color: var(--bg-neutral);
+			color: var(--segmented-group-selected-text-color);
 		}
 
 		&:has(input:disabled) {
@@ -85,6 +87,8 @@
 
 		&:not(:has(input:checked)):not(:has(input:disabled)) {
 			cursor: pointer;
+			color: var(--segmented-group-unselected-text-color);
+
 			&:hover,
 			&:focus-within {
 				border-color: var(--gray);
