@@ -22,9 +22,9 @@ import { autoUpdateProtocols } from '#lib/protocols.js';
 import { getSetting } from '#lib/settings.svelte.js';
 import { toasts } from '#lib/toasts.svelte.js';
 import { clamp, fetchHttpRequest, profiler, progressSplitter, switchValue } from '#lib/utils.js';
-import { dev } from '$app/env';
 import { PROCEDURES } from '#worker/procedures.js';
 import WebWorker from '#worker/start.js?worker';
+import { dev } from '$app/env';
 
 import '@andy0130tw/es-arraybuffer-base64/auto';
 import '@ungap/set-methods';

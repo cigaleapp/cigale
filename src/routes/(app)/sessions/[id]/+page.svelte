@@ -18,11 +18,11 @@
 	import { deleteSession, switchSession } from '#lib/sessions.js';
 	import { toasts } from '#lib/toasts.svelte.js';
 	import { uiState } from '#lib/uistate.svelte.js';
+	import TopbarOpenSession from '#routes/(app)/TopbarOpenSession.svelte';
 	import IconViewExternal from '~icons/ri/arrow-right-up-box-line';
 	import IconSyncDown from '~icons/ri/download-line';
 	import IconUnlink from '~icons/ri/link-unlink-m';
 	import { invalidate } from '$app/navigation';
-	import TopbarOpenSession from '#routes/(app)/TopbarOpenSession.svelte';
 
 	const { data } = $props();
 	let { protocol: protocolId, name } = $derived(data.session);

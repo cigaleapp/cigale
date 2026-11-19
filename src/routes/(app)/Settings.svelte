@@ -22,6 +22,7 @@
 	import { APK_DOWNLOAD_URL } from '#lib/update-bundles.js';
 	import { orEmpty, platform, switchValue } from '#lib/utils.js';
 	import { supportsWebGPU } from '#lib/webgpu.js';
+	import { getTheme } from '#routes/+layout.svelte';
 	import IconIncrease from '~icons/ri/add-line';
 	import IconMore from '~icons/ri/arrow-right-s-line';
 	import IconUpdate from '~icons/ri/arrow-up-circle-line';
@@ -40,7 +41,6 @@
 	import Sun from '~icons/ri/sun-line';
 	import IconOffline from '~icons/ri/wifi-off-line';
 	import { version } from '$app/env';
-	import { getTheme } from '#routes/+layout.svelte';
 
 	import ModalChromePersistentStorage, {
 		askForPersistentStorageOnChrome,

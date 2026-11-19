@@ -543,7 +543,7 @@ export function absoluteFixtureFilepath(pathname) {
 }
 
 /**
- * @param {string} raw 
+ * @param {string} raw
  */
 export function safeJSONParse(raw) {
 	try {

@@ -25,8 +25,8 @@
 	import { deleteSession, switchSession } from '#lib/sessions.js';
 	import { byteSizeOfObject, deleteObjectWithBytes } from '#lib/storage/utils.js';
 	import { tooltip } from '#lib/tooltips.js';
-	import IconInfo from '~icons/ri/information-line';
 	import { PendingStorage } from '#routes/(app)/capture/pendingstorage.svelte.js';
+	import IconInfo from '~icons/ri/information-line';
 
 	import TopbarBack from '../TopbarBack.svelte';
 	import Table from './Table.svelte';
