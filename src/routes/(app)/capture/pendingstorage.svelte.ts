@@ -125,35 +125,43 @@ export class PendingStorage {
 			this.count++;
 		}
 
-		let name: string;
+		let bytes: ArrayBuffer;
 
 		try {
 			if (typeof data === 'string') {
-				// For capacitor storage, this is the URI
-				const dest = await Promise.resolve(
-					this.locator('audio', this.nextFilename('audio'))
-				)
-					.then(async (loc) => binaryStorage.findFree(loc))
-					.then(async (free) => binaryStorage.resolvePath(free));
+				// TODO: once we have capacitor backend enabled again
+				// // For capacitor storage, this is the URI
+				// const dest = await Promise.resolve(
+				// 	this.locator('audio', this.nextFilename('audio'))
+				// )
+				// 	.then(async (loc) => binaryStorage.findFree(loc))
+				// 	.then(async (free) => binaryStorage.resolvePath(free));
 
-				console.debug(`[pending storage] copying audio: ${data} -> ${dest}`);
-				await Filesystem.rename({ from: data, to: dest });
+				// console.debug(`[pending storage] copying audio: ${data} -> ${dest}`);
+				// await Filesystem.rename({ from: data, to: dest });
 
-				name = dest.split('/').at(-1) ?? '';
+				// name = dest.split('/').at(-1) ?? '';
+
+				bytes = await Filesystem.readFile({ path: data })
+					.then((result) => result.data as string)
+					.then((base64) => Uint8Array.fromBase64(base64))
+					.then((bytes) => bytes.buffer);
 			} else {
-				const file = await binaryStorage.create(
-					this.locator('audio', this.nextFilename('audio')),
-					{
-						type: this.audioContentType,
-						bytes: await data.arrayBuffer(),
-					},
-					{
-						fixedFilenameCounter: 4,
-					}
-				);
-
-				name = file.name;
+				bytes = await data.arrayBuffer();
 			}
+
+			const file = await binaryStorage.create(
+				this.locator('audio', this.nextFilename('audio')),
+				{
+					type: this.audioContentType,
+					bytes,
+				},
+				{
+					fixedFilenameCounter: 4,
+				}
+			);
+
+			const name = file.name;
 
 			this.log('saved audio as ', name);
 			if (name) void this.saveExtraExif(name);
