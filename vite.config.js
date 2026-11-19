@@ -41,6 +41,10 @@ const env = arkenv(
 	}
 );
 
+if (env.BUNDLE_ANALYZER.length > 0) {
+	console.info('Analyzing bundle with modes', env.BUNDLE_ANALYZER);
+}
+
 const prNumber = process.env.PR_NUMBER ? parseInt(process.env.PR_NUMBER, 10) : undefined;
 
 export default defineConfig({
