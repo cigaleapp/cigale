@@ -81,7 +81,7 @@ capacitor-assets/
 static/.well-known/assetlinks.json
 /IDMYBEE-Andrena.sdd.xml
 
-ecosignal/
+/ecosignal/
 /static/registry.json
 /src/lib/registry.json
 .vscode/settings.json

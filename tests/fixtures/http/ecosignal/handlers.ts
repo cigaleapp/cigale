@@ -1,8 +1,8 @@
-import type EcoSignal from '$e2e/../src/lib/accounts/ecosignal.js';
-import type { FixturePaths } from '$e2e/filepaths.js';
-import type { StrictRequest } from 'msw';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
+import type EcoSignal from '#e2e/../src/lib/accounts/ecosignal.js';
+import type { FixturePaths } from '#e2e/filepaths.js';
+import type { StrictRequest } from 'msw';
 
 import {
 	addMilliseconds,
@@ -13,7 +13,7 @@ import {
 import { http, HttpResponse } from 'msw';
 import { nanoid } from 'nanoid';
 
-import { absoluteFixtureFilepath } from '$e2e/utils/core.js';
+import { absoluteFixtureFilepath } from '#e2e/utils/core.js';
 
 export const MOCK_TOKEN = 'hougreiohgermijogreojigremijogre';
 export const MOCK_CREDS = { username: 'hello', password: 'hahahaha' };
@@ -269,10 +269,10 @@ class State {
 			creator_id: 1,
 			creator_name: 'Hello World',
 			creation_date: new Date().toISOString(),
-			description: "A new session",
+			description: 'A new session',
 			name: collectionName,
-			external_media_url: "",
-			project_url: "",
+			external_media_url: '',
+			project_url: '',
 			uuid: nanoid(),
 			project_ids: [1],
 		});
