@@ -1,4 +1,5 @@
 # yaml-language-server: $schema=../static/protocol.schema.json
+manifest: v1.0
 id: fr.osug.terra-forma-web.entomoscope
 name: Entomoscope
 summary: Analyse de captures de l'Entomoscope

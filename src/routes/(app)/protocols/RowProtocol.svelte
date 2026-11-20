@@ -26,6 +26,10 @@
 		source?: string;
 		version?: number;
 		ondelete: () => void;
+		// eslint-disable-next-line no-unused-vars
+		oninstall: (source: string, onProgress: (p: number) => void) => Promise<void>;
+		installed?: boolean;
+		compatible?: boolean;
 		updates: 'automatic' | 'manual';
 		beamup?: Protocol['beamup'];
 		charts?: Protocol['charts'];
@@ -39,7 +43,10 @@
 		source,
 		version,
 		ondelete,
+		installed = true,
+		oninstall,
 		updates,
+		compatible,
 		beamup,
 		expanded = $bindable(false),
 		charts,
@@ -78,38 +85,59 @@
 				<small><OverflowableText tag="code" text={id} /></small>
 			</section>
 			<section class="actions">
-				<ButtonIcon
-					help="Partager"
-					disabled={!source}
-					onclick={async () => {
-						if (!source) return;
-
-						await shareUrl(
-							new URL(
-								resolve('/(app)/protocols/import/[...url]', {
-									url: source,
-								}),
-								import.meta.env.webOrigin
-							)
-						);
-					}}
-				>
-					<IconExport />
-				</ButtonIcon>
-				{#if version && source}
-					<ButtonUpdateProtocol compact {version} {source} {id} />
+				{#if !installed && source}
+					{#if compatible}
+						<ButtonSecondary
+							loading
+							onclick={async (_, { progress }) => {
+								await oninstall?.(source, progress);
+							}}
+						>
+							Installer
+						</ButtonSecondary>
+					{:else}
+						<ButtonSecondary
+							loading
+							help="Mettre à jour l'app pour installer ce protocole"
+							onclick={() => {}}
+						>
+							Non installable
+						</ButtonSecondary>
+					{/if}
 				{:else}
 					<ButtonIcon
-						crossout
-						onclick={() => {}}
-						help="Ce protocole ne supporte pas la vérification des mises à jour"
+						help="Partager"
+						disabled={!source}
+						onclick={async () => {
+							if (!source) return;
+
+							await shareUrl(
+								new URL(
+									resolve('/(app)/protocols/import/[...url]', {
+										url: source,
+									}),
+									import.meta.env.webOrigin
+								)
+							);
+						}}
 					>
-						<IconUpgrade />
+						<IconExport />
 					</ButtonIcon>
+					{#if version && source}
+						<ButtonUpdateProtocol compact {version} {source} {id} />
+					{:else}
+						<ButtonIcon
+							crossout
+							onclick={() => {}}
+							help="Ce protocole ne supporte pas la vérification des mises à jour"
+						>
+							<IconUpgrade />
+						</ButtonIcon>
+					{/if}
 				{/if}
 			</section>
 		</summary>
-		{#if version && source}
+		{#if version && source && installed}
 			<label class="auto-updates">
 				<Switch
 					value={autoUpdatesEnabled}
@@ -131,7 +159,8 @@
 				</div>
 			</label>
 		{/if}
-		{#if beamup}
+
+		{#if installed && beamup}
 			{let open = $state<() => void>()}
 
 			<BeamupConsentLearnMore config={beamup} protocol={id} bind:open />
@@ -164,33 +193,35 @@
 				</ButtonIcon>
 			</div>
 		{/if}
-		<div class="more-actions">
-			<ButtonSecondary
-				danger
-				disabled={id === uiState.currentProtocolId && uiState.processing.total > 0}
-				onclick={() => {
-					ondelete();
-				}}
-			>
-				<IconDelete />
-				Supprimer
-			</ButtonSecondary>
-			{#if hasUserScopedCharts}
-				<ButtonSecondary onclick={() => goto('/(app)/protocols/[id]/results', { id })}>
-					<IconStats />
-					Stats
-				</ButtonSecondary>
-			{/if}
-			<ButtonSecondary onclick={() => goto('/(app)/protocols/[id]/edit/infos', { id })}>
-				<IconEdit />
-				Modifier
-				<Badge>Beta</Badge>
-			</ButtonSecondary>
 
-			{#if version && source}
-				<ButtonUpdateProtocol {version} {source} {id} />
-			{/if}
-		</div>
+		{#if installed}
+			<div class="more-actions">
+				<ButtonSecondary
+					danger
+					disabled={id === uiState.currentProtocolId && uiState.processing.total > 0}
+					onclick={() => {
+						ondelete();
+					}}
+				>
+					<IconDelete />
+					Supprimer
+				</ButtonSecondary>
+				{#if hasUserScopedCharts}
+					<ButtonSecondary onclick={() => goto('/(app)/protocols/[id]/results', { id })}>
+						<IconStats />
+						Stats
+					</ButtonSecondary>
+				{/if}
+				<ButtonSecondary onclick={() => goto('/(app)/protocols/[id]/infos', { id })}>
+					<IconEdit />
+					Modifier
+					<Badge>Beta</Badge>
+				</ButtonSecondary>
+				{#if version && source}
+					<ButtonUpdateProtocol {version} {source} {id} />
+				{/if}
+			</div>
+		{/if}
 	</details>
 </li>
 

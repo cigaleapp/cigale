@@ -24,7 +24,7 @@
 	import Cards from './Cards.svelte';
 	import { createSession } from './create.js';
 	import { downloadRemoteSession } from './download.js';
-	import HeaderDesktop from './Header.svelte';
+	import Header from './Header.svelte';
 
 	seo({ title: 'Sessions' });
 
@@ -65,11 +65,7 @@
 </TopbarHome>
 
 <main in:fade={{ duration: 100 }}>
-	<!-- {#if mobile.current}
-		<HeaderMobile />
-	{:else} -->
-	<HeaderDesktop />
-	<!-- {/if} -->
+	<Header />
 
 	<section class="sessions" data-scrollable="true">
 		{#if directory.platform === 'local'}

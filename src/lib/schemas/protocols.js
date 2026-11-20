@@ -24,6 +24,28 @@ import {
 } from './metadata.js';
 import { AnalyzedImage, AnalyzedObservation } from './results.js';
 
+export const ProtocolRegistry = type({
+	protocols: type({
+		id: ProtocolID,
+		url: URLString.describe('URL où télécharger le protocole'),
+		name: 'string',
+		'logo?': URLString.or('null'),
+		version: 'number',
+		manifestVersion: [
+			'/^(\\d+)\\.(\\d+)$/',
+			'@',
+			'Version cigaleprotocol utilisée pour déclarer ce protocole. Permet de déterminer si une app cigale donnée peut installer ce protocole-ci',
+		],
+		suggested: 'boolean = true',
+		/** URLs for older versions of the protocol */
+		older: type({
+			version: 'number',
+			manifestVersion: '/^(\\d+)\\.(\\d+)$/',
+			url: URLString,
+		}).array(),
+	}).array(),
+});
+
 export const ExportsFilepathTemplateObservation = FilepathTemplate(
 	type({
 		observation: AnalyzedObservation.omit('images'),
@@ -52,17 +74,6 @@ export const ExportsFilepathTemplateMetadataFile = FilepathTemplate(
 );
 
 export const ANALYSIS_JSON_ZIP_FILEPATH = 'analysis.json';
-
-export const ProtocolRegistry = type({
-	protocols: type({
-		id: ProtocolID,
-		url: URLString.describe('URL où télécharger le protocole'),
-		name: 'string',
-		'logo?': URLString.or('null'),
-		'version?': 'number',
-		suggested: 'boolean = true',
-	}).array(),
-});
 
 export const BeamupSettings = type({
 	origin: URLString.describe("URL de l'instance BeamUp d'où proviennent les données"),
@@ -140,6 +151,7 @@ export const CaptureTimer = type({
 );
 
 export const Protocol = type({
+	manifest: '/^v\\d+\\.\\d+$/ = "v0.0"',
 	id: ProtocolID,
 	dirty: type('boolean')
 		.describe('Si le protocole a été modifié depuis sa dernière exportation')
