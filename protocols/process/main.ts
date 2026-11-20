@@ -1,20 +1,41 @@
-import { writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import type { Option, OptionExtra } from './modules.js';
 
 import { GBIFID, GBIFTaxonomy } from './gbif.js';
+import { IUCN } from './iucn.js';
 import { JessicaJoachim } from './jj.js';
 import { Enrich, Identifier, Names, Specialize, Taxonomy } from './modules.js';
+
+class TestSource implements Names {
+	name = 'test' as const;
+
+	async *scan() {
+		yield { name: 'Allacma fusca', clade: 'species' };
+		yield { name: 'Bombus alpinus', clade: 'species' };
+		yield { name: 'Campanula arvatica', clade: 'species' };
+		yield { name: 'Apis mellifera', clade: 'species' };
+		yield { name: 'Liphistius kanthan', clade: 'species' };
+	}
+}
+
+class All implements Specialize {
+	name = 'all' as const;
+
+	include() {
+		return true;
+	}
+}
 
 await run({
 	metadataId: (clade) => clade,
 	output: { options: 'options', images: 'assets' },
 	modules: {
-		sources: [],
+		sources: [new TestSource()],
 		identifier: new GBIFID(),
 		taxonomies: [new GBIFTaxonomy()],
-		enrich: [new JessicaJoachim()],
-		specializations: [],
+		enrich: [new JessicaJoachim(), new IUCN()],
+		specializations: [new All()],
 	},
 });
 
@@ -71,10 +92,16 @@ async function run(plan: {
 			for (const parent of parents) {
 				parent.id = await plan.modules.identifier.identify(parent);
 
-				options.set(parent.id, parent as Option & { id: string });
+				options.set(parent.id, {
+					...parent,
+					parents: selectHigherClades(parent, parents),
+				} as Option & { id: string });
 			}
 
-			option.parents = parents.map((p) => ({ id: p.id!, clade: p.clade }));
+			options.set(option.id, {
+				...option,
+				parents: parents.map((p) => ({ id: p.id!, clade: p.clade })),
+			});
 		}
 	}
 
@@ -97,33 +124,46 @@ async function run(plan: {
 
 	await Promise.all(
 		plan.modules.specializations.map(async (specializer) => {
-			const specialized = [...options.values()]
-				.filter((option) => specializer.include(option))
-				.map((option) => {
-					const extra = mergeExtras(option);
-					const implicitCascade = Object.fromEntries(
-						(option.parents ?? []).map(
-							(parent) => [plan.metadataId(parent.clade), parent.id] as const
-						)
-					);
+			const specialized = [...options.values()].filter((option) =>
+				specializer.include(option)
+			);
 
-					return {
-						key: option.id,
-						label: option.name,
-						...extra,
-						cascade: {
-							...implicitCascade,
-							...extra.cascade,
-						},
-					};
-				});
+			const clades = new Set(specialized.map((option) => option.clade));
 
-			const output = path.resolve(plan.output.options, `${specializer.name}.jsonl`);
+			for (const clade of clades) {
+				const variants = specialized
+					.filter((option) => option.clade === clade)
+					.map((option) => {
+						const extra = mergeExtras(option);
+						const implicitCascade = Object.fromEntries(
+							(option.parents ?? []).map(
+								(parent) => [plan.metadataId(parent.clade), parent.id] as const
+							)
+						);
 
-			// Output as JSON lines
-			writeFileSync(output, specialized.map((option) => JSON.stringify(option)).join('\n'));
+						return {
+							key: option.id,
+							label: option.name,
+							...extra,
+							cascade: {
+								...implicitCascade,
+								...extra.cascade,
+							},
+						};
+					});
 
-			console.info(`Specialized to ${specializer.name} at ${output}`);
+				const output = path.resolve(
+					plan.output.options,
+					specializer.name,
+					`${clade}.jsonl`
+				);
+
+				// Output as JSON lines
+				mkdirSync(path.dirname(output), { recursive: true });
+				writeFileSync(output, variants.map((option) => JSON.stringify(option)).join('\n'));
+
+				console.info(`Specialized ${clade} with ${specializer.name} to ${output}`);
+			}
 		})
 	);
 }
@@ -174,4 +214,11 @@ function mergeExtras(option: Option): OptionExtra {
 	output.images = [...new Set(option.extras.flatMap(({ extra }) => extra.images ?? []))];
 
 	return output;
+}
+
+function selectHigherClades(option: Option, others: Option[]): Option[] {
+	const order = ['kingdom', 'phylum', 'order', 'class', 'family', 'genus', 'species'];
+	const specificity = (o: Option) => order.indexOf(o.clade);
+
+	return others.filter((o) => specificity(o) > specificity(option));
 }

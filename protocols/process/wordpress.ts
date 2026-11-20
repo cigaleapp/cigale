@@ -106,9 +106,11 @@ export async function fetchPagesViaWordpressAPI(
 		);
 	}
 
-	const data = WordpressPagesResponse(await response.json());
+	const json = await response.json()
+	const data = WordpressPagesResponse(json);
 
 	if (data instanceof ArkErrors) {
+		console.error(json)
 		throw new Error(data.summary);
 	}
 

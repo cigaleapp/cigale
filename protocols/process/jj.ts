@@ -61,7 +61,7 @@ class JessicaJoachimSite extends Datasource<
 
 			const anchors = [...(doc?.getElementById('Listefiches')?.querySelectorAll('a') ?? [])];
 
-			const links = anchors
+			const pages = anchors
 				.map((a) => {
 					const text = cleanedTextContent(a) ?? '';
 					if (!text) return;
@@ -80,14 +80,14 @@ class JessicaJoachimSite extends Datasource<
 				})
 				.filter((e) => e !== undefined);
 
-			return { links };
+			return { pages };
 		},
 
 		page: async ({ link }: { link: string }) => {
 			const { page } = await fetchPagesViaWordpressAPI(
-				new Map(['page', new URL(link)] as const),
+				new Map([['page', new URL(link)] as const]),
 				{
-					origin: this.origin,
+					origin: this.origin.toString(),
 					auth: {
 						username: process.env.WORDPRESS_USERNAME!,
 						password: process.env.WORDPRESS_APP_PASSWORD!,
@@ -227,7 +227,7 @@ export class JessicaJoachim implements Enrich {
 
 		return {
 			priority: 10,
-			extra: await this.jj.request('page', page),
+			extra: await this.jj.request('page', { link: page.link }),
 		};
 	}
 }

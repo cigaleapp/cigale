@@ -11,9 +11,6 @@ type GbifParams = {
 		clade: string;
 		name: string;
 	};
-	iucn: {
-		id: string;
-	};
 };
 
 type GbifResponses = {
@@ -23,17 +20,14 @@ type GbifResponses = {
 		id: string;
 	}>;
 	id: { id: string };
-	iucn: {};
 };
 
-export class GBIF extends Datasource<'parents' | 'id' | 'iucn', GbifParams, GbifResponses> {
+export class GBIF extends Datasource<'parents' | 'id', GbifParams, GbifResponses> {
 	name = 'gbif' as const;
 
 	datasets = {
 		/** GBIF Backbone Taxonomy */
 		backbone: 'd7dddbf4-2cf0-4f39-9b2a-bb099caae36c',
-		/** IUCN Red List of Threatened Species */
-		iucn: '19491596-35ae-4a91-9a98-85cf505f1bd3',
 	};
 
 	baseURL = 'https://api.gbif.org/v2';
@@ -52,7 +46,7 @@ export class GBIF extends Datasource<'parents' | 'id' | 'iucn', GbifParams, Gbif
 					taxonRank: params.clade.toUpperCase(),
 					nameType: 'SCIENTIFIC',
 					searchType: 'EXACT',
-					searchCotent: 'SCIENTIFIC',
+					searchContent: 'SCIENTIFIC',
 					q: params.name,
 					limit: '1',
 				})}`
@@ -105,10 +99,6 @@ export class GBIF extends Datasource<'parents' | 'id' | 'iucn', GbifParams, Gbif
 				id: taxon.taxonID,
 			}));
 		},
-
-		iucn: async ({id}: {id: string}) => {
-
-		}
 	};
 }
 
@@ -122,10 +112,10 @@ export class GBIFID implements Identifier {
 
 	async init() {}
 
-	async identify(option: Option) {
-		if (option.id) return option.id;
-		const { id } = await this.gbif.request('id', option);
-		return id;
+	async identify({ clade, name, id }: Option) {
+		if (id) return id;
+		const result = await this.gbif.request('id', { clade, name });
+		return result.id;
 	}
 }
 
@@ -139,13 +129,13 @@ export class GBIFTaxonomy implements Taxonomy {
 
 	async init() {}
 
-	async parents(option: Option & { id: string }): Promise<Option[]> {
-		if (option.clade === 'kingdom') return [];
+	async parents({ clade, provenance, id }: Option & { id: string }): Promise<Option[]> {
+		if (clade === 'kingdom') return [];
 
-		const parents = await this.gbif.request('parents', option);
+		const parents = await this.gbif.request('parents', { id });
 
 		return parents.map((parent) => ({
-			provenance: option.provenance,
+			provenance,
 			...parent,
 		}));
 	}

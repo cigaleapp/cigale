@@ -1,41 +1,41 @@
 /// <reference types="@types/bun" />
 
+import { addMonths } from 'date-fns';
 import { unzip as _unzip, UnzipOptions, Unzipped, unzipSync } from 'fflate';
 
-import { EMPTY_EXTRA, Enrich, Option } from './modules.js';
+import { Datasource, EMPTY_EXTRA, Enrich, Option } from './modules.js';
 
-export class IUCN implements Enrich {
+// Archive is still using deprecated term threatStatus instead of more recent iucnRedListCategory
+// see https://gbif.github.io/dwc-api/apidocs/src-html/org/gbif/dwc/terms/IucnTerm.html
+// see https://chatgpt.com/c/6b00a15d-ad60-83eb-b618-f943f0c286f1
+const STATUSES = {
+	'Conservation Dependent': 'cd',
+	'Critically Endangered': 'cr',
+	Extinct: 'ex',
+	'Extinct in the wild': 'ew',
+	Endangered: 'en',
+	Vulnerable: 'vu',
+	'Near threatened': 'nt',
+	'Least Concern': 'lc',
+	'Lower Risk': 'lr',
+	'Data deficient': 'dd',
+	'Not evaluated': 'ne',
+} as const;
+
+class IUCNArchive extends Datasource<
+	'get',
+	{ get: { name: string } },
+	{ get: { status: keyof typeof STATUSES | null } }
+> {
 	name = 'iucn' as const;
 
-	archiveURL = 'https://hosted-datasets.gbif.org/datasets/iucn/iucn-latest.zip';
+	dataset: Dataset | undefined;
 
-	dataset:
-		| undefined
-		| {
-				names: Array<{ id: string; name: string }>;
-				statuses: Array<{ id: string; status: string }>;
-		  };
-
-	// Archive is still using deprecated term threatStatus instead of more recent iucnRedListCategory
-	// see https://gbif.github.io/dwc-api/apidocs/src-html/org/gbif/dwc/terms/IucnTerm.html
-	// see https://chatgpt.com/c/6b00a15d-ad60-83eb-b618-f943f0c286f1
-	statuses = {
-		'Conservation Dependent': 'cd',
-		'Critically Endangered': 'cr',
-		Extinct: 'ex',
-		'Extinct in the wild': 'ew',
-		Endangered: 'en',
-		Vulnerable: 'vu',
-		'Near threatened': 'nt',
-		'Least Concern': 'lc',
-		'Lower Risk': 'lr',
-		'Data deficient': 'dd',
-		'Not evaluated': 'ne',
-	};
-
-	constructor() {}
+	async init() {}
 
 	async downloadDataset() {
+		if (this.dataset) return;
+
 		const archive = await fetch(this.archiveURL)
 			.then((response) => response.arrayBuffer())
 			.then((buf) => new Uint8Array(buf));
@@ -49,7 +49,7 @@ export class IUCN implements Enrich {
 			name: metafile.archive.core.files.location,
 			// find <extension> that has iucn:threatStatus
 			status: metafile.archive.extension.find((ext) =>
-				ext.field.some((f) => f['@term'] === 'https://iucn.org/terms/threatStatus')
+				ext.field.some((f) => f['@term'] === 'http://iucn.org/terms/threatStatus')
 			)!.files.location,
 		};
 
@@ -74,12 +74,12 @@ export class IUCN implements Enrich {
 		) =>
 			Buffer.from(raw)
 				.toString('utf8')
-				.split(meta['@linesTerminatedBy'])
+				.split(unescapeBackslashes(meta['@linesTerminatedBy']))
 				.slice(Number.parseInt(meta['@ignoreHeaderLines']))
 				.map((line) =>
 					Object.fromEntries(
 						line
-							.split(meta['@fieldsTerminatedBy'])
+							.split(unescapeBackslashes(meta['@fieldsTerminatedBy']))
 							.map((cell, i) => {
 								const field = meta.field.find((f) => f['@index'] === i.toString());
 								const isID = (meta.id ?? meta.coreid)!['@index'] === i.toString();
@@ -92,7 +92,13 @@ export class IUCN implements Enrich {
 
 								const [key] = column;
 
-								return [key, removeOnBothEnds(cell, meta['@fieldsEnclosedBy'])];
+								return [
+									key,
+									removeOnBothEnds(
+										cell,
+										unescapeBackslashes(meta['@fieldsEnclosedBy'])
+									),
+								];
 							})
 							.filter((value) => value !== undefined)
 					)
@@ -114,20 +120,65 @@ export class IUCN implements Enrich {
 		};
 	}
 
-	async enrich(option: Option) {
-		if (!this.dataset) await this.downloadDataset();
+	archiveURL = 'https://hosted-datasets.gbif.org/datasets/iucn/iucn-latest.zip';
 
-		const byname = this.dataset!.names.find((o) => o.name === option.name);
-		if (!byname) return EMPTY_EXTRA;
+	expirations = {
+		file: (now: Date) => addMonths(now, 1),
+		entry: (now: Date) => addMonths(now, 1),
+	};
 
-		const byid = this.dataset!.statuses.find((o) => o.id === byname.id);
-		if (!byid) return EMPTY_EXTRA;
+	requests = {
+		get: async (option: { name: string }) => {
+			// We do this instead of init() so that we dont even download the dataset if we only get cache hits
+			if (!this.dataset) await this.downloadDataset();
+
+			const byname = this.dataset!.names.find(
+				(o) => 'name' in o && o.name.split(' ').slice(0, 2).join(' ') === option.name
+			);
+			if (!byname) return { status: null };
+
+			const byid = this.dataset!.statuses.find((o) => 'id' in o && o.id === byname.id);
+			if (!byid) return { status: null };
+
+			return {
+				status: byid.status as keyof typeof STATUSES,
+			};
+		},
+	};
+}
+
+type Dataset = {
+	names: Array<{
+		id: string;
+		name: string;
+	}>;
+	statuses: Array<{
+		id: string;
+		status: string;
+	}>;
+};
+
+export class IUCN implements Enrich {
+	name = 'iucn' as const;
+
+	archive: IUCNArchive;
+
+	constructor() {
+		this.archive = new IUCNArchive();
+	}
+
+	async enrich({ name, clade }: Option) {
+		if (clade !== 'species') return EMPTY_EXTRA;
+
+		const { status } = await this.archive.request('get', { name });
+
+		if (!status) return EMPTY_EXTRA;
 
 		return {
 			priority: 2,
 			extra: {
 				cascade: {
-					conservation_status: this.statuses[byid.status as keyof typeof this.statuses],
+					conservation_status: STATUSES[status],
 				},
 			},
 		};
@@ -146,11 +197,15 @@ async function unzip(data: Uint8Array, ...names: string[]) {
 	);
 }
 
-function removeOnBothEnds(subject: string, chars: string) {
+function removeOnBothEnds(subject: string, chars: string): string {
 	if (!chars) return subject;
 	if (subject.startsWith(chars)) subject = subject.slice(chars.length);
 	if (subject.endsWith(chars)) subject = subject.slice(0, -chars.length);
 	return subject;
+}
+
+function unescapeBackslashes(subject: string): string {
+	return subject.replaceAll('\\t', '\t').replaceAll('\\n', '\n').replaceAll('\\r', '\r');
 }
 
 type DarwinCoreMetafile = {

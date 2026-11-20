@@ -26,6 +26,8 @@ export type DatasourceCache<
 	};
 };
 
+const inmemory = new Map<DatasourceName, DatasourceCache>();
+
 export async function tryCache<R, Q extends string>(
 	datasource: DatasourceName,
 	{
@@ -63,9 +65,13 @@ export async function tryCache<R, Q extends string>(
 		);
 	}
 
-	const cache = JSON.parse(readFileSync(filepath).toString(), (key, value) =>
-		key === 'expiresAt' ? new Date(value) : value
-	) as DatasourceCache;
+	const cache =
+		inmemory.get(datasource) ??
+		(JSON.parse(readFileSync(filepath).toString(), (key, value) =>
+			key === 'expiresAt' ? new Date(value) : value
+		) as DatasourceCache);
+
+	inmemory.set(datasource, cache);
 
 	try {
 		if (isPast(cache.expiresAt)) {
@@ -96,7 +102,9 @@ export async function tryCache<R, Q extends string>(
 		);
 
 		const result = await compute().catch((err) => {
-			throw new Error(`${selector.query} ${JSON.stringify(selector.params)} failed: ${err}`);
+			throw new Error(`${selector.query} ${JSON.stringify(selector.params)} failed`, {
+				cause: err,
+			});
 		});
 
 		cache.entries[selector.query] ??= [];
@@ -107,6 +115,7 @@ export async function tryCache<R, Q extends string>(
 		});
 
 		writeFileSync(filepath, JSON.stringify(cache, null, 2));
+		inmemory.set(datasource, cache);
 
 		return result;
 	}
