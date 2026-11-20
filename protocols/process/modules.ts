@@ -1,13 +1,14 @@
 import type * as DB from '#lib/database.js';
 
+import { tryCache } from './caching';
+
 export type DatasourceName = 'gbif' | 'jj' | 'gslides' | 'idmybee';
 
 export type ModuleName =
 	// species names
 	| 'idmybee-species'
 	| 'birdnet'
-	| 'collembola-model'
-	| 'arthropoda-model'
+	| 'irit'
 	// identifiers
 	| 'gbif-id'
 	// taxonomizers
@@ -16,64 +17,68 @@ export type ModuleName =
 	| 'jj'
 	| 'gslides'
 	| 'idmybee'
+	| 'iucn'
 	// specializers
 	| 'birds'
 	| 'insects'
 	| 'collembola'
 	| 'bees';
 
-/** Contents of a datasource's cache */
-export type DatasourceCache<
+/** Handling a request from a module, by first trying to hit the cache, and if it fails, hitting the network/whatever. Response, if it was a cache miss, is saved to cache. */
+export type DataRequests<
 	Query extends string = string,
 	Params extends Record<Query, unknown> = Record<Query, unknown>,
 	Responses extends Record<Query, unknown> = Record<Query, unknown>,
-> = {
-	/** Entire cache needs to be wiped after that date */
-	expiresAt: Date;
-	entries: {
-		[query in Query]: Array<{
-			/** This entry needs to be wiped after that date */
-			expiresAt: Date;
-			params: Params[query];
-			response: Responses[query];
-		}>;
-	};
-};
+> = { [Q in Query]: (params: Params[Q]) => Promise<Responses[Q]> };
 
 /**
  * Defines caching for a single external source, that could be used multiple times by different modules.
  * For example, the GBIF Datasource is both used as a Identifier (GBIF IDs) and as a Taxonomy (we use their taxonomic tree)
  */
-export interface Datasource<
+export abstract class Datasource<
 	Query extends string = string,
 	Params extends Record<Query, unknown> = Record<Query, unknown>,
 	Responses extends Record<Query, unknown> = Record<Query, unknown>,
 > {
 	/** Name of the datasource. Used to construct the path to the cache file. */
-	name: DatasourceName;
+	abstract name: DatasourceName;
 
 	/** Initial loading when the data source is first instantiated. Needs to be idempotent. */
-	init?(): Promise<void>;
+	abstract init(): Promise<void>;
 
-	/** Handling a request from a module, by first trying to hit the cache, and if it fails, hitting the network/whatever. Response, if it was a cache miss, is saved to cache. */
-	request<Q extends Query>(query: Q, params: Params[Q]): Promise<Responses[Q]>;
+	abstract requests: DataRequests<Query, Params, Responses>;
+
+	abstract expirations: {
+		file: (now: Date) => Date;
+		entry: (now: Date, query: Query) => Date;
+	};
+
+	async request<Q extends Query>(query: Q, params: Params[Q]): Promise<Responses[Q]> {
+		await this.init?.();
+
+		return tryCache(this.name, {
+			selector: { query, params },
+			expirations: this.expirations,
+			compute: async () => this.requests[query](params),
+		});
+	}
 }
-
-export type Datasources = Record<DatasourceName, Datasource>;
 
 export interface Module {
 	name: ModuleName;
-	/** Datasources that need to be loaded before using this module (this means calling their .init()) */
-	needs: readonly DatasourceName[];
 }
 
 export type OptionExtra = Omit<(typeof DB.Schemas.MetadataEnumVariant)['inferIn'], 'label' | 'key'>;
+
+export const EMPTY_EXTRA = { priority: 0, extra: {} };
 
 export type Option = {
 	name: string;
 	provenance: string;
 	clade: string;
 	id?: string;
+	/** IDs of parent options in the taxonomy sense */
+	parents?: Array<{ clade: string; id: string }>;
 	extras?: Array<{
 		priority: number;
 		extra: OptionExtra;
@@ -82,26 +87,22 @@ export type Option = {
 
 /** Used as starting points to know what species (& higher taxa) to process */
 export interface Names extends Module {
-	scan(data: Datasources): AsyncIterable<Option>;
+	scan(): AsyncIterable<{ name: string; clade: string }>;
 }
 
 /** Used to put a stable, unambiguous and unique identifier in front of each option (species & higher taxa) */
 export interface Identifier extends Module {
-	identify(data: Datasources, option: Option): string;
+	identify(option: Option): Promise<string>;
 }
 
 /** Used to get higher taxa from lower taxa, starting at species and going all the way to kingdoms */
 export interface Taxonomy extends Module {
-	parent(data: Datasources, option: Option): Promise<Option[]>;
+	parents(option: Option & { id: string }): Promise<Option[]>;
 }
 
 /** Used to register additional info to Option.extras (description, images, learn more links, etc.) */
 export interface Enrich extends Module {
-	priority: number;
-	enrich(
-		data: Datasources,
-		option: Option
-	): Promise<{
+	enrich(option: Option): Promise<{
 		extra: OptionExtra;
 		/** Used to determine which Enrich wins if multiple Enrich provided the same property on this Option */
 		priority: number;
@@ -110,7 +111,7 @@ export interface Enrich extends Module {
 
 /** Used to create subsets of options tailored to a specific use case (insects, birds, etc.) */
 export interface Specialize extends Module {
-	include(data: Datasources, option: Option): Promise<boolean>;
+	include(option: Option): boolean;
 }
 
 /*

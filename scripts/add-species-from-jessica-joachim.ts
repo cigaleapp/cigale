@@ -39,40 +39,6 @@ virtualConsole.on('error', (e) => {
 	console.error(e);
 });
 
-const RichContent = type({ rendered: 'string', raw: 'string' }).pipe((content) => ({
-	raw: new JSDOM(content.raw, {
-		virtualConsole,
-	}),
-	rendered: new JSDOM(content.rendered, {
-		virtualConsole,
-	}),
-}));
-
-const OGImage = type({
-	url: 'string.url.parse',
-	width: 'string.integer.parse | number | ""',
-	height: 'string.integer.parse | number | ""',
-});
-
-const WordpressPage = type({
-	id: 'number',
-	date: 'string.date.iso.parse',
-	date_gmt: 'string.date.iso.parse',
-	modified: 'string.date.iso.parse',
-	modified_gmt: 'string.date.iso.parse',
-	slug: 'string',
-	link: 'string.url.parse',
-	title: RichContent,
-	content: RichContent,
-	excerpt: RichContent,
-	yoast_head_json: {
-		canonical: 'string.url.parse',
-		og_description: 'string = ""',
-		og_image: OGImage.array().default(() => []),
-	},
-});
-
-const WordpressPagesResponse = WordpressPage.array().atLeastLength(1);
 
 const LINKS_TO_AVOID = [
 	// FIXME redirects to an image file
@@ -85,10 +51,6 @@ const LINKS_TO_AVOID = [
 	'https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/chrysomelidae/timarcha-sp/',
 ];
 
-const cleanedTextContent = (node: Element) =>
-	'textContent' in node && typeof node.textContent === 'string'
-		? node.textContent.replaceAll('\r?\n', ' ').trim()
-		: undefined;
 
 const here = import.meta.dirname;
 const protocolPath = path.join(here, '../examples/arthropods.cigaleprotocol.json');
