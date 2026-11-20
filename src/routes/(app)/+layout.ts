@@ -22,8 +22,8 @@ import { autoUpdateProtocols } from '#lib/protocols';
 import { getSetting } from '#lib/settings.svelte';
 import { toasts } from '#lib/toasts.svelte';
 import { profiler, progressSplitter, switchValue } from '#lib/utils.js';
-import { PROCEDURES } from '$worker/procedures.js';
-import WebWorker from '$worker/start.js?worker';
+import { PROCEDURES } from '#worker/procedures.js';
+import WebWorker from '#worker/start.js?worker';
 
 import '@andy0130tw/es-arraybuffer-base64/auto';
 import '@ungap/set-methods';

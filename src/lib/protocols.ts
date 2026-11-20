@@ -1,6 +1,6 @@
 import type * as DB from '#lib/database.js';
 import type { Tables } from '#lib/database.js';
-import type { PROCEDURES } from '$worker/procedures.js';
+import type { PROCEDURES } from '#worker/procedures.js';
 
 import { Capacitor } from '@capacitor/core';
 import { ArkErrors } from 'arktype';
@@ -271,7 +271,7 @@ export async function upgradeProtocol({
 	version?: number;
 	source: import('#lib/database.js').HTTPRequest;
 	id: string;
-	swarpc: import('swarpc').SwarpcClient<typeof import('$worker/procedures.js').PROCEDURES>;
+	swarpc: import('swarpc').SwarpcClient<typeof import('#worker/procedures.js').PROCEDURES>;
 }) {
 	if (!source) throw new Error("Le protocole n'a pas de source");
 	if (!version) throw new Error("Le protocole n'a pas de version");

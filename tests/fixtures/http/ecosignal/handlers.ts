@@ -1,4 +1,4 @@
-import type EcoSignal from '$e2e/../src/lib/accounts/ecosignal.js';
+import type EcoSignal from '#e2e/../src/lib/accounts/ecosignal.js';
 import type { StrictRequest } from 'msw';
 
 import {
