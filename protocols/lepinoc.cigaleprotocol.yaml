@@ -11,7 +11,7 @@ authors:
     email: lepinoc@noe.org
 
 imports:
-  - from: io.github.cigaleapp.arthropods.example
+  - from: io.github.cigaleapp.base.insects
     metadataGroups:
       - taxonomy
     metadata:
