@@ -29,6 +29,7 @@
 		// eslint-disable-next-line no-unused-vars
 		oninstall: (source: string, onProgress: (p: number) => void) => Promise<void>;
 		installed?: boolean;
+		compatible?: boolean;
 		updates: 'automatic' | 'manual';
 		beamup?: Protocol['beamup'];
 		charts?: Protocol['charts'];
@@ -45,6 +46,7 @@
 		installed = true,
 		oninstall,
 		updates,
+		compatible,
 		beamup,
 		expanded = $bindable(false),
 		charts,
@@ -84,14 +86,24 @@
 			</section>
 			<section class="actions">
 				{#if !installed && source}
-					<ButtonSecondary
-						loading
-						onclick={async (_, { progress }) => {
-							await oninstall?.(source, progress);
-						}}
-					>
-						Installer
-					</ButtonSecondary>
+					{#if compatible}
+						<ButtonSecondary
+							loading
+							onclick={async (_, { progress }) => {
+								await oninstall?.(source, progress);
+							}}
+						>
+							Installer
+						</ButtonSecondary>
+					{:else}
+						<ButtonSecondary
+							loading
+							help="Mettre à jour l'app pour installer ce protocole"
+							onclick={() => {}}
+						>
+							Non installable
+						</ButtonSecondary>
+					{/if}
 				{:else}
 					<ButtonIcon
 						help="Partager"

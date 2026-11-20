@@ -1,4 +1,5 @@
 # yaml-language-server: $schema=https://cigaleapp.github.io/cigale/protocol.schema.json
+manifest: v1.0
 id: fr.osug.terra-forma-web.insecta
 name: INSECTA
 summary: Relevé de 20 minutes avec appareil photo

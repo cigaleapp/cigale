@@ -26,6 +26,8 @@ import {
 	range,
 	sum,
 } from './utils.js';
+import { manifestVersionsCompatible } from './protocols/manifestversion.js';
+import type { DatabaseHandle } from './idb.svelte.js';
 
 /**
  *
@@ -209,59 +211,25 @@ export async function promptAndImportProtocol<
 	return allowMultiple ? output : output[0];
 }
 
-/**
- *
- * @param {Pick<typeof Schemas.Protocol.infer, 'version'|'source'|'id'>} protocol
- * @returns {Promise< { upToDate: boolean; newVersion: number }>}
- */
-export async function hasUpgradeAvailable({
-	version,
-	source,
-	id,
-}: Pick<typeof Schemas.Protocol.infer, 'version' | 'source' | 'id'>): Promise<{
-	upToDate: boolean;
-	newVersion: number;
-}> {
-	if (!source) throw new Error("Le protocole n'a pas de source");
-	if (!version) throw new Error("Le protocole n'a pas de version");
-	if (!id) throw new Error("Le protocole n'a pas d'identifiant");
+export async function hasUpgradeAvailable(
+	current: Pick<typeof Schemas.Protocol.infer, 'version' | 'id'>
+) {
+	if (!current.version) throw new Error("Le protocole n'a pas de version");
+	if (!current.id) throw new Error("Le protocole n'a pas d'identifiant");
 
 	const registry = await fetchProtocolRegistry();
+	const entry = registry.protocols.find((p) => p.id === current.id);
 
-	const protocol =
-		registry.protocols.find((p) => p.id === id) ??
-		(await fetchHttpRequest(source, {
-			cachebust: true,
-			headers: {
-				Accept: 'application/json, application/yaml',
-			},
-		}).then(async (response) =>
-			ExportedProtocol.in.pick('id', 'version').assert(await parseYAMLorJSON(response))
-		));
-
-	if (!protocol) throw new Error('Protocole introuvable');
-	if (!protocol.version) throw new Error("Le protocole n'a plus de version");
-	if (protocol.id !== id) throw new Error("Le protocole a changé d'identifiant");
-	if (protocol.version > version) {
-		return {
-			upToDate: false,
-			newVersion: protocol.version,
-		};
-	}
+	if (!entry) throw new Error('Protocole introuvable');
+	if (!entry.version) throw new Error("Le protocole n'a plus de version");
 
 	return {
-		upToDate: true,
-		newVersion: protocol.version,
+		upToDate: entry.version <= current.version,
+		upateIsCompatible: manifestVersionsCompatible(entry.manifestVersion),
+		newVersion: entry.version,
 	};
 }
 
-/**
- * @param {object} param0
- * @param {number} [param0.version]
- * @param {import('#lib/database.js').HTTPRequest} param0.source
- * @param {string} param0.id
- * @param {import('swarpc').SwarpcClient<typeof import('#worker//procedures.js').PROCEDURES>} param0.swarpc
- */
 export async function upgradeProtocol({
 	version,
 	source,
@@ -312,8 +280,8 @@ export async function upgradeProtocol({
  * @returns {Promise<import('microdiff').Difference[]>}
  */
 export async function compareProtocolWithUpstream(
-	db: import('./idb.svelte.js').DatabaseHandle,
-	protocolId: import('#lib/database').ID,
+	db: DatabaseHandle,
+	protocolId: string
 	{ onProgress }: { onProgress?: (progress: number) => void | Promise<void> } = {}
 ): Promise<import('microdiff').Difference[]> {
 	const databaseProtocol = await db.get('Protocol', protocolId).then(Protocol.assert);

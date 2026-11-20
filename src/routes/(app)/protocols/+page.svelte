@@ -94,10 +94,11 @@
 					yield* listAllProtocols(databaseHandle());
 				}}
 			>
-				{#snippet children({ protocol: p, installed })}
+				{#snippet children({ protocol: p, installed, compatible })}
 					<RowProtocol
 						{...p}
 						{installed}
+						{compatible}
 						bind:expanded={
 							() => expandedProtocol === p.id,
 							(expanded) => {

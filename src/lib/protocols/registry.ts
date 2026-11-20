@@ -3,6 +3,8 @@ import type { DatabaseHandle } from '#lib/idb.svelte.js';
 import _rawRegistry from '#lib/registry.json' with { type: 'json' };
 import { ProtocolRegistry } from '#lib/schemas/protocols.js';
 
+import { manifestVersionsCompatible } from './manifestversion';
+
 let PROTOCOLS_REGISTRY: typeof ProtocolRegistry.infer | null = null;
 
 export async function fetchProtocolRegistry() {
@@ -36,6 +38,11 @@ export async function* listAllProtocols(db: DatabaseHandle) {
 	for (const p of registry.protocols) {
 		if (locally.some((l) => l.id === p.id)) continue;
 		if (!p.suggested) continue;
-		yield { installed: false, protocol: { source: p.url, ...p } };
+
+		yield {
+			installed: false,
+			compatible: manifestVersionsCompatible(p.manifestVersion),
+			protocol: { source: p.url, ...p },
+		};
 	}
 }
