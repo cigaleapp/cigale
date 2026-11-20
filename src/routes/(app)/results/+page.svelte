@@ -1,15 +1,15 @@
 <script lang="ts">
-	import type { NamespacedMetadataID } from '$lib/schemas/common.js';
+	import type { NamespacedMetadataID } from '#lib/schemas/common.js';
 
 	import { SvelteMap } from 'svelte/reactivity';
 
-	import Badge from '$lib/Badge.svelte';
-	import Charts from '$lib/charts/Charts.svelte';
-	import Field from '$lib/Field.svelte';
-	import { tables } from '$lib/idb.svelte.js';
-	import ModalConfirm from '$lib/ModalConfirm.svelte';
-	import SessionMetadataForm from '$lib/SessionMetadataForm.svelte';
-	import { uiState } from '$lib/uistate.svelte.js';
+	import Badge from '#lib/Badge.svelte';
+	import Charts from '#lib/charts/Charts.svelte';
+	import Field from '#lib/Field.svelte';
+	import { tables } from '#lib/idb.svelte.js';
+	import ModalConfirm from '#lib/ModalConfirm.svelte';
+	import SessionMetadataForm from '#lib/SessionMetadataForm.svelte';
+	import { uiState } from '#lib/uistate.svelte.js';
 
 	import TopbarOpenSession from '../TopbarOpenSession.svelte';
 	import ExportPanel from './ExportPanel.svelte';
@@ -28,6 +28,11 @@
 	const metadataErrors: Map<NamespacedMetadataID, string[]> = new SvelteMap();
 
 	async function confirmExportIfMetadataErrors() {
+		console.debug('[export-debug]', {
+			errors: [...metadataErrors],
+			showBound: !!confirmExportWithMetadataErrors,
+		});
+
 		const hasErrors = metadataErrors.values().some((errs) => errs.length > 0);
 		if (!hasErrors) return true;
 		return (await confirmExportWithMetadataErrors?.()) ?? true;

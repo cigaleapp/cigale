@@ -1,9 +1,9 @@
-import type { DatabaseHandle } from '$lib/idb.svelte.js';
-import type { NamespacedMetadataID } from '$lib/schemas/common.js';
+import type { DatabaseHandle } from '#lib/idb.svelte.js';
+import type { NamespacedMetadataID } from '#lib/schemas/common.js';
 
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
-import { ExportedProtocol, ProtocolRegistry } from '$lib/schemas/protocols.js';
+import { ExportedProtocol, ProtocolRegistry } from '#lib/schemas/protocols.js';
 
 import { resolveProtocolImports } from './imports.js';
 
@@ -11,7 +11,7 @@ const mocked = vi.hoisted(() => ({
 	registry: undefined as (typeof ProtocolRegistry)['inferIn'] | undefined,
 }));
 
-vi.mock(import('$lib/protocols/registry.js'), async (original) => ({
+vi.mock(import('#lib/protocols/registry.js'), async (original) => ({
 	...(await original()),
 	fetchProtocolRegistry: async () => mocked.registry!,
 }));

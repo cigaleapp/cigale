@@ -84,7 +84,7 @@ const MetadataValueFile = table(
 		// see https://stackoverflow.com/a/46331687/9943464
 		// bug confirmed via Playwright testing
 		// file: 'File',
-		/** @deprecated use $lib/storage/backend.ts:binaryStorage instead */
+		/** @deprecated use #lib//storage/backend.ts:binaryStorage instead */
 		bytes: 'ArrayBuffer | "migrated"',
 		filename: 'string',
 		contentType: MIMEType,

@@ -1,32 +1,36 @@
 <script lang="ts">
-	import type * as DB from '$lib/database.js';
-	import type { GalleryItem } from '$lib/gallery.js';
-	import type { NamespacedMetadataID } from '$lib/schemas/common.js';
+	import type * as DB from '#lib/database.js';
+	import type { GalleryItem } from '#lib/gallery.js';
+	import type { NamespacedMetadataID } from '#lib/schemas/common.js';
 
 	import { watch } from 'runed';
 	import { SvelteSet } from 'svelte/reactivity';
 	import { fade } from 'svelte/transition';
 
+	import AreaObservations from '#lib/AreaObservations.svelte';
+	import ButtonSecondary from '#lib/ButtonSecondary.svelte';
+	import CardImage from '#lib/CardImage.svelte';
+	import CardObservation from '#lib/CardObservation.svelte';
+	import { databaseHandle, tables } from '#lib/idb.svelte.js';
+	import { deleteImage, imageBufferWasSaved, imageIsClassified } from '#lib/images.js';
+	import { loadModel } from '#lib/inference.js';
+	import { defineKeyboardShortcuts } from '#lib/keyboard.svelte.js';
+	import Logo from '#lib/Logo.svelte';
+	import { IsMobile } from '#lib/mobile.svelte.js';
+	import {
+		deleteObservation,
+		ensureNoLoneImages,
+		observationMetadata,
+	} from '#lib/observations.js';
+	import { goto } from '#lib/paths.js';
+	import ProgressBar from '#lib/ProgressBar.svelte';
+	import { cancelTask, classifyMore } from '#lib/queue.svelte.js';
+	import { seo } from '#lib/seo.svelte.js';
+	import { getSetting } from '#lib/settings.svelte.js';
+	import { toasts } from '#lib/toasts.svelte.js';
+	import { uiState } from '#lib/uistate.svelte.js';
+	import { isAbortError, nonnull } from '#lib/utils.js';
 	import IconLoaded from '~icons/ri/check-line';
-	import AreaObservations from '$lib/AreaObservations.svelte';
-	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import CardImage from '$lib/CardImage.svelte';
-	import CardObservation from '$lib/CardObservation.svelte';
-	import { databaseHandle, tables } from '$lib/idb.svelte.js';
-	import { deleteImage, imageBufferWasSaved, imageIsClassified } from '$lib/images';
-	import { loadModel } from '$lib/inference.js';
-	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
-	import Logo from '$lib/Logo.svelte';
-	import { IsMobile } from '$lib/mobile.svelte.js';
-	import { deleteObservation, ensureNoLoneImages, observationMetadata } from '$lib/observations';
-	import { goto } from '$lib/paths.js';
-	import ProgressBar from '$lib/ProgressBar.svelte';
-	import { cancelTask, classifyMore } from '$lib/queue.svelte.js';
-	import { seo } from '$lib/seo.svelte';
-	import { getSetting } from '$lib/settings.svelte.js';
-	import { toasts } from '$lib/toasts.svelte';
-	import { uiState } from '$lib/uistate.svelte.js';
-	import { isAbortError, nonnull } from '$lib/utils.js';
 
 	type Item = GalleryItem<{
 		image: DB.Image | undefined;
@@ -138,7 +142,8 @@
 
 		modelAbortController.abort();
 		classifModelLoadingError = undefined;
-		modelAbortController = new AbortController();
+		const controller = new AbortController();
+		modelAbortController = controller;
 
 		try {
 			for (const [i, { metadataId, selector }] of modelLoads.entries()) {
@@ -147,7 +152,7 @@
 					db: databaseHandle(),
 					enableWebGPU: await getSetting('enableWebGPU'),
 					swarpc: data.swarpc,
-					abortSignal: modelAbortController.signal,
+					abortSignal: controller.signal,
 					protocolId,
 					metadataId,
 					selector,
@@ -162,8 +167,13 @@
 		} catch (error) {
 			throw error;
 		} finally {
-			classifmodelLoaded = true;
-			queueClassificationsIfReady();
+			// Only mark as loaded and queue classifications if this load wasn't
+			// superseded by a newer one (i.e. aborted). Otherwise a stale finally
+			// would trigger classifyMore before the models are ready on the worker.
+			if (!controller.signal.aborted) {
+				classifmodelLoaded = true;
+				queueClassificationsIfReady();
+			}
 		}
 	}
 
@@ -173,8 +183,8 @@
 			classifmodelLoaded = false;
 			void loadAllClassifModels()
 				.catch((error) => {
-					classifModelLoadingError = error;
 					if (isAbortError(error)) return;
+					classifModelLoadingError = error;
 					console.error(error);
 					if (error instanceof AggregateError) {
 						console.error(error.errors);

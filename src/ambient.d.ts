@@ -1,4 +1,4 @@
-import type { PlaywrightTestId } from '$e2e/testids.js';
+import type { PlaywrightTestId } from '#e2e/testids.js';
 
 // Using data-* attributes doesn't work...
 // See https://github.com/sveltejs/svelte/issues/14859

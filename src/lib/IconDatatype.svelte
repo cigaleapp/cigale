@@ -13,7 +13,7 @@
 	import { tooltip } from './tooltips.js';
 
 	/**
-	 * @type {{ type: import('$lib/database').MetadataType, tooltip?: boolean }}
+	 * @type {{ type: import('#lib/database.js').MetadataType, tooltip?: boolean }}
 	 */
 	const { type: kind, tooltip: withTooltip = true } = $props();
 

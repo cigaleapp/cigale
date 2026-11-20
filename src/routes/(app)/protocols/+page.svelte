@@ -2,14 +2,14 @@
 	import { fade } from 'svelte/transition';
 
 	import IconImport from '~icons/ri/download-2-line';
-	import AsyncEach from '$lib/AsyncEach.svelte';
-	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import { plural } from '$lib/i18n';
-	import { databaseHandle } from '$lib/idb.svelte.js';
-	import { promptAndImportProtocol } from '$lib/protocols';
-	import { listAllProtocols } from '$lib/protocols/registry.js';
-	import { toasts } from '$lib/toasts.svelte';
-	import { uiState } from '$lib/uistate.svelte.js';
+	import AsyncEach from '#lib/AsyncEach.svelte';
+	import ButtonSecondary from '#lib/ButtonSecondary.svelte';
+	import { plural } from '#lib/i18n';
+	import { databaseHandle } from '#lib/idb.svelte.js';
+	import { promptAndImportProtocol } from '#lib/protocols';
+	import { listAllProtocols } from '#lib/protocols/registry.js';
+	import { toasts } from '#lib/toasts.svelte';
+	import { uiState } from '#lib/uistate.svelte.js';
 
 	import TopbarBack from '../TopbarBack.svelte';
 	import ModalCreateProtocol from './ModalCreateProtocol.svelte';

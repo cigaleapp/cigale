@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file, on a monthly basis, with a consistent, simple format: month/year heading > type of change heading > list of changes.
 
+## November 2026
+
+### Improvements
+
+- Time-out file uploads after 1min for ecosignal
+- Use server name instead of domain in account lists when possible
+
 ## October 2026
 
 ### Improvements
@@ -23,6 +30,7 @@ All notable changes to this project will be documented in this file, on a monthl
 
 ### Data Updates
 
+- Add Data Terra ecosignal instance to protocols
 - Bump protocol version of protocols/insecta.cigaleprotocol.yaml
 - Bump protocol version of protocols/insecta.cigaleprotocol.yaml [ci skip]
 

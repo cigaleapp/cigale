@@ -9,9 +9,9 @@ import {
 	MOCK_SESSION_REMOTEID,
 	MOCK_SESSION_REMOTEID_NOTFOUND_DATA_ID,
 	MOCK_TOKEN,
-} from '$e2e/fixtures/http/kobotoolbox/handlers.js';
-import * as DB from '$lib/database.js';
-import { openDatabase } from '$lib/idb.svelte.js';
+} from '#e2e/fixtures/http/kobotoolbox/handlers.js';
+import * as DB from '#lib/database.js';
+import { openDatabase } from '#lib/idb.svelte.js';
 
 import Provider from './kobotoolbox.js';
 

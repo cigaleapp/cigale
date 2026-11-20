@@ -1,5 +1,5 @@
-import type * as DB from '$lib/database.js';
-import type { Tables } from '$lib/database.js';
+import type * as DB from '#lib/database.js';
+import type { Tables } from '#lib/database.js';
 import type { PROCEDURES } from '$worker/procedures.js';
 
 import { Capacitor } from '@capacitor/core';
@@ -258,9 +258,9 @@ export async function hasUpgradeAvailable({
 /**
  * @param {object} param0
  * @param {number} [param0.version]
- * @param {import('$lib/database.js').HTTPRequest} param0.source
+ * @param {import('#lib/database.js').HTTPRequest} param0.source
  * @param {string} param0.id
- * @param {import('swarpc').SwarpcClient<typeof import('$worker/procedures.js').PROCEDURES>} param0.swarpc
+ * @param {import('swarpc').SwarpcClient<typeof import('#worker//procedures.js').PROCEDURES>} param0.swarpc
  */
 export async function upgradeProtocol({
 	version,
@@ -269,7 +269,7 @@ export async function upgradeProtocol({
 	swarpc,
 }: {
 	version?: number;
-	source: import('$lib/database.js').HTTPRequest;
+	source: import('#lib/database.js').HTTPRequest;
 	id: string;
 	swarpc: import('swarpc').SwarpcClient<typeof import('$worker/procedures.js').PROCEDURES>;
 }) {
@@ -306,14 +306,14 @@ export async function upgradeProtocol({
  *
  * Compare the in-database protocol with its remote counterpart, output any changes.
  * @param {import('./idb.svelte.js').DatabaseHandle} db
- * @param {import('$lib/database').ID} protocolId
+ * @param {import('#lib/database.js').ID} protocolId
  * @param {object} [options]
  * @param {(progress: number) => void | Promise<void>} [options.onProgress]
  * @returns {Promise<import('microdiff').Difference[]>}
  */
 export async function compareProtocolWithUpstream(
 	db: import('./idb.svelte.js').DatabaseHandle,
-	protocolId: import('$lib/database').ID,
+	protocolId: import('#lib/database').ID,
 	{ onProgress }: { onProgress?: (progress: number) => void | Promise<void> } = {}
 ): Promise<import('microdiff').Difference[]> {
 	const databaseProtocol = await db.get('Protocol', protocolId).then(Protocol.assert);

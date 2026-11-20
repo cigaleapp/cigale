@@ -5,7 +5,8 @@
 
 import { ms } from 'convert';
 
-import { build, files, version } from '$service-worker';
+import { version } from '$app/env';
+import { assets, immutable, prerendered } from '$app/manifest';
 
 // Create a unique cache name for this deployment
 const CACHE = `cache-${version}`;
@@ -18,15 +19,14 @@ const NOMINATIM_API_CACHE = `cache-nominatim-api`;
 // Cache map tiles
 const MAP_TILES_CACHE = `cache-map-tiles`;
 
-const ASSETS = [
-	...build, // the app itself
-	...files, // everything in `static`
-].filter((u) =>
-	// Prevent trying to cache app://-/ URLs when running with Electron
-	/^https?:\/\//.test(u)
-);
+const ASSETS = [...assets, ...immutable, ...prerendered]
+	.map((p) => p.path)
+	.filter((u) =>
+		// Prevent trying to cache app://-/ URLs when running with Electron
+		/^https?:\/\//.test(u)
+	);
 
-const sw = /** @type {ServiceWorkerGlobalScope} */ (self);
+const sw = /** @type {ServiceWorkerGlobalScope} */ (/** @type {unknown} */ (self));
 
 sw.addEventListener('install', (event) => {
 	// Create a new cache and add all files to it
@@ -35,7 +35,7 @@ sw.addEventListener('install', (event) => {
 		await cache.addAll(ASSETS);
 	}
 
-	event.waitUntil(addFilesToCache().then(sw.skipWaiting()));
+	event.waitUntil(addFilesToCache().then(async () => sw.skipWaiting()));
 });
 
 sw.addEventListener('activate', (event) => {
@@ -47,7 +47,7 @@ sw.addEventListener('activate', (event) => {
 		}
 	}
 
-	event.waitUntil(deleteOldCaches().then(sw.clients.claim()));
+	event.waitUntil(deleteOldCaches().then(async () => sw.clients.claim()));
 });
 
 sw.addEventListener('fetch', (/** @type {FetchEvent} */ event) => {
@@ -114,7 +114,7 @@ sw.addEventListener('fetch', (/** @type {FetchEvent} */ event) => {
  *
  * @param {Request} request
  * @param {string} cacheName
- * @param {number} [maxAge] max age in milliseconds for cached entries, if not provided cached entries will never expire (TODO not implemented yet, needs storing the entry's timestamps in IDB, as we cant touch the requests)
+ * @param {number} [_maxAge] max age in milliseconds for cached entries, if not provided cached entries will never expire (TODO not implemented yet, needs storing the entry's timestamps in IDB, as we cant touch the requests)
  */
 async function tryCache(request, cacheName, _maxAge) {
 	const cache = await caches.open(cacheName);

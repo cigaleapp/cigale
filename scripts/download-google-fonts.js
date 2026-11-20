@@ -1,8 +1,16 @@
 import path from 'node:path';
+import { exit } from 'node:process';
 
 import { constructURL, download } from 'google-fonts-helper';
 
-const here = import.meta.dirname;
+const root = path.resolve(import.meta.dir, '..');
+const staticDir = path.join(root, 'static');
+const fontsCSS = path.join(staticDir, 'fonts.css');
+
+if (await Bun.file(fontsCSS).exists()) {
+	console.info(`Skipping fonts download: ${path.relative(root, fontsCSS)} already exists`);
+	exit(0);
+}
 
 const url = constructURL({
 	display: 'swap',
@@ -22,8 +30,8 @@ const url = constructURL({
 console.info('Downloading', url);
 
 await download(url, {
-	outputDir: path.join(here, '../static'),
+	outputDir: staticDir,
 	fontsDir: 'fonts',
-	stylePath: 'fonts.css',
+	stylePath: path.basename(fontsCSS),
 	fontsPath: `${process.env.BASE_PATH ?? ''}/fonts`,
 }).execute();

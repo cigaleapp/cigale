@@ -13,13 +13,13 @@
 	import { useDebounce } from 'runed';
 	import { fade } from 'svelte/transition';
 
+	import * as idb from '#lib/idb.svelte.js';
+	import { createBytes, deleteObjectWithBytes } from '#lib/storage/utils.js';
 	import IconIncrement from '~icons/ri/add-line';
 	import IconCheck from '~icons/ri/check-line';
 	import IconError from '~icons/ri/error-warning-fill';
 	import IconGPS from '~icons/ri/map-pin-line';
 	import IconDecrement from '~icons/ri/subtract-line';
-	import * as idb from '$lib/idb.svelte.js';
-	import { createBytes, deleteObjectWithBytes } from '$lib/storage/utils.js';
 
 	import ButtonIcon from './ButtonIcon.svelte';
 	import ButtonInk from './ButtonInk.svelte';

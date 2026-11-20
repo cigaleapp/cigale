@@ -8,10 +8,14 @@ permissions:
 on:
   workflow_call:
     inputs:
-      artifact:
+      artifact-web:
         required: true
         type: string
         description: The build artifact name to deploy (output from the build workflow)
+      artifact-apk:
+        required: true
+        type: string
+        description: The build artifact name to use for the Android preview APK (output from the build workflow)
     secrets:
       DEV_DEPLOYMENTS_HOST_KEY:
         required: true
@@ -59,7 +63,7 @@ jobs:
       DATATERRA_DEV_DEPLOYS_BUCKET_NAME: ${{ secrets.DATATERRA_DEV_DEPLOYS_BUCKET_NAME }}
     with:
       flavor: preview
-      artifact: ${{ inputs.artifact}}
+      artifact: ${{ inputs.artifact-apk }}
       app-name: Cigale (PR ${{ github.event.number }})
       push-update: false
       notify: ${{ contains(github.event.pull_request.labels.*.name, 'notifications-noisy') }}
@@ -79,7 +83,7 @@ jobs:
     secrets: inherit
     with:
       environment: App preview
-      artifact: ${{ inputs.artifact }}
+      artifact: ${{ inputs.artifact-web }}
       subdomain: pr-${{ github.event.number }}
       artifact-at: /public
       path: /

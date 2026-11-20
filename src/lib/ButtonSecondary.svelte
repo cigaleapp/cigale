@@ -15,7 +15,7 @@ Available CSS variables:
 -->
 
 <script lang="ts" module>
-	import type { PlaywrightTestId } from '$e2e/testids.js';
+	import type { PlaywrightTestId } from '#e2e/testids.js';
 	import type { Snippet } from 'svelte';
 
 	type OnclickSignals = {
@@ -64,14 +64,13 @@ Available CSS variables:
 </script>
 
 <script lang="ts">
-	import { errorMessage } from '$lib/i18n.js';
-	import { toasts } from '$lib/toasts.svelte.js';
-
-	import { hasPhysicalKeyboard } from './keyboard.svelte';
-	import KeyboardHint from './KeyboardHint.svelte';
-	import LoadingSpinner from './LoadingSpinner.svelte';
-	import ProgressBar from './ProgressBar.svelte';
-	import { tooltip } from './tooltips.js';
+	import { errorMessage } from '#lib/i18n.js';
+	import { hasPhysicalKeyboard } from '#lib/keyboard.svelte.js';
+	import KeyboardHint from '#lib/KeyboardHint.svelte';
+	import LoadingSpinner from '#lib/LoadingSpinner.svelte';
+	import ProgressBar from '#lib/ProgressBar.svelte';
+	import { toasts } from '#lib/toasts.svelte.js';
+	import { tooltip } from '#lib/tooltips.js';
 
 	let {
 		children,

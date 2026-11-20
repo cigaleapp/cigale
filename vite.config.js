@@ -2,6 +2,7 @@
 import { execSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 
+import adapter from '@sveltejs/adapter-static';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import arkenv from 'arkenv';
@@ -31,6 +32,10 @@ const env = arkenv(
 		arrayFormat: 'comma',
 	}
 );
+
+if (env.BUNDLE_ANALYZER.length > 0) {
+	console.info('Analyzing bundle with modes', env.BUNDLE_ANALYZER);
+}
 
 const prNumber = process.env.PR_NUMBER ? parseInt(process.env.PR_NUMBER, 10) : undefined;
 
@@ -64,6 +69,9 @@ export default defineConfig({
 		// Custom DNS to network-local IP address
 		// to have network-local https via mkcert
 		allowedHosts: ['stealth.local'],
+		cors: {
+			origin: '*',
+		},
 		fs: {
 			allow: ['./bun.lock'],
 		},
@@ -112,7 +120,27 @@ export default defineConfig({
 		}),
 		// FIXME Wuchale doesnt play well with Vitest for now
 		env.VITEST ? undefined : wuchale(),
-		sveltekit(),
+
+		sveltekit({
+			extensions: ['.svelte', '.svx'],
+			compilerOptions: { experimental: { async: true } },
+			version: { name: process.env.BUILD_COMMIT || 'dev' },
+			adapter: adapter({
+				pages: process.env.ELECTRON_BUILD ? '.vite/build/sveltekit' : 'public',
+				fallback: process.env.SVELTE_FALLBACK_PAGE || 'index.html',
+			}),
+			prerender: { entries: ['*', '/.well-known/assetlinks.json'] },
+			paths: {
+				base:
+					process.env.BASE_PATH ||
+					(process.env.ENVIRONMENT_URL
+						? new URL(process.env.ENVIRONMENT_URL).pathname.replace(
+								/\/index\.html$/,
+								''
+							)
+						: ''),
+			},
+		}),
 		crossOriginIsolation(),
 		env.HTTPS_DEV ? mkcert() : undefined,
 	],
