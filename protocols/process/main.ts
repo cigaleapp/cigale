@@ -28,7 +28,7 @@ await run({
 		sources: [new GoogleDriveSlides(), new IRITModels(), new BirdNetClassmapping()],
 		// sources: [new GoogleDriveSlides()],
 		identifier: new GBIFID(),
-		taxonomies: [new GBIFTaxonomy()],
+		taxonomy: new GBIFTaxonomy(),
 		enrich: [new JessicaJoachim(), new IUCN(), new GoogleSlides()],
 		specializations: [
 			new (class implements Specializer {
@@ -55,7 +55,8 @@ async function run(plan: {
 	modules: {
 		sources: NameProvider[];
 		identifier: Identifier;
-		taxonomies: TaxonomyProvider[];
+		// we only support one because of progress bar computations
+		taxonomy: TaxonomyProvider;
 		enrich: Enricher[];
 		specializations: Specializer[];
 	};
@@ -100,37 +101,30 @@ async function run(plan: {
 
 	logger.info(`Identified ${options.size} names`);
 
-	progress.phase('taxonomy', options.size * plan.modules.taxonomies.length);
+	progress.phase('taxonomy', options.size);
 
 	// Find taxonomies then identify again
+	for (const option of options.values()) {
+		const parents = await plan.modules.taxonomy.parents(option);
 
-	/** Sum of progress total for all taxonomies modules before the one we're currently processing. */
-	let previousTotalProgress = 0;
-	for (const taxonomy of plan.modules.taxonomies) {
-		for (const option of options.values()) {
-			const parents = await taxonomy.parents(option);
+		progress.total = options.size;
+		progress.increment();
 
-			progress.total = previousTotalProgress + options.size;
-			progress.increment();
+		for (const parent of parents) {
+			const id = await plan.modules.identifier.identify(parent);
+			if (!id) continue;
 
-			for (const parent of parents) {
-				const id = await plan.modules.identifier.identify(parent);
-				if (!id) continue;
-
-				options.set(id, {
-					...parent,
-					id,
-					parents: selectHigherClades(parent, parents) as Array<Option & { id: string }>,
-				});
-			}
-
-			options.set(option.id, {
-				...option,
-				parents: parents.map((p) => ({ id: p.id!, clade: p.clade })),
+			options.set(id, {
+				...parent,
+				id,
+				parents: selectHigherClades(parent, parents) as Array<Option & { id: string }>,
 			});
 		}
 
-		previousTotalProgress += progress.done
+		options.set(option.id, {
+			...option,
+			parents: parents.map((p) => ({ id: p.id!, clade: p.clade })),
+		});
 	}
 
 	logger.info(`Found ${options.size - names.size} new taxa from taxonomies`);
