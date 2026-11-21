@@ -2,12 +2,13 @@ import { ArkErrors, type } from 'arktype';
 import { secondsToMilliseconds } from 'date-fns';
 import * as jsdom from 'jsdom';
 import { JSDOM } from 'jsdom';
+import { logger } from './progress';
 
 // Suppress annoying virtual console error we can't do anything about and don't care about
 const virtualConsole = new jsdom.VirtualConsole();
 virtualConsole.on('error', (e) => {
 	if (/Could not parse CSS stylesheet/i.test(e.toString())) return;
-	console.error(e);
+	logger.error(e);
 });
 
 const RichContent = type({ rendered: 'string', raw: 'string' }).pipe((content) => ({
@@ -84,8 +85,8 @@ export async function fetchPagesViaWordpressAPI(
 		const waitTime = retryAfter ? Number(retryAfter) : rateLimitWaitSeconds;
 
 		if (waitTime > 60) {
-			console.error(
-				`⁄ Wait time is quite long (${waitTime}s). Skipping this batch: ${query}. Response was`,
+			logger.error(
+				`wait time is quite long (${waitTime}s). Skipping this batch: ${query}. Response was`,
 				await response.text()
 			);
 			return Object.fromEntries([...pages.keys()].map((key) => [key, undefined]));
@@ -110,7 +111,7 @@ export async function fetchPagesViaWordpressAPI(
 	const data = WordpressPagesResponse(json);
 
 	if (data instanceof ArkErrors) {
-		console.error(json)
+		logger.error(json)
 		throw new Error(data.summary);
 	}
 
@@ -123,7 +124,7 @@ export async function fetchPagesViaWordpressAPI(
 			);
 
 			if (!page) {
-				console.error(
+				logger.error(
 					`Could not find page for ${key} at ${link.toString()}: id=${id}, pathname=${link.pathname}, within: (${data.length})`,
 					data.map((p) => ({ id: p.id, pathname: p.link.pathname }))
 				);

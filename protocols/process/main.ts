@@ -19,13 +19,14 @@ import { GoogleDriveSlides, GoogleSlides } from './gslides.js';
 import { IRITModels } from './irit.js';
 import { IUCN } from './iucn.js';
 import { JessicaJoachim } from './jj.js';
+import { logger, progress } from './progress.js';
 
 await run({
 	metadataId: (clade) => clade,
 	output: { options: 'options', images: 'assets' },
 	modules: {
-		// sources: [new GoogleDriveSlides(), new IRITModels(), new BirdNetClassmapping()],
-		sources: [new GoogleDriveSlides()],
+		sources: [new GoogleDriveSlides(), new IRITModels(), new BirdNetClassmapping()],
+		// sources: [new GoogleDriveSlides()],
 		identifier: new GBIFID(),
 		taxonomies: [new GBIFTaxonomy()],
 		enrich: [new JessicaJoachim(), new IUCN(), new GoogleSlides()],
@@ -60,42 +61,55 @@ async function run(plan: {
 	};
 }) {
 	const removeExitHook = exitHook(() => {
+		progress.stop();
 		writeAllCaches();
 	});
 
 	/** clade:name */
 	const names = new Map<`${string}:${string}`, Option>();
 
+	logger.info(`Listing names from ${plan.modules.sources.length} sources`);
+
 	await Promise.all(
 		plan.modules.sources.map(async (source) => {
-			for await (const { clade, name } of source.scan()) {
+			for await (const option of source.scan()) {
+				const { clade, name } = option;
 				names.set(`${clade}:${name}`, {
-					clade,
-					name,
+					...option,
 					provenance: source.name,
 				});
 			}
+
+			progress.increment();
 		})
 	);
 
-	console.info(`Gathered ${names.size} names`);
+	logger.info(`Gathered ${names.size} names`);
+
+	progress.phase('identify', names.size);
 
 	/** Key is Option.id */
 	const options = new Map<string, Option & { id: string }>();
 
-	for (const name of names.values()) {
-		const id = await plan.modules.identifier.identify(name);
+	for (const option of names.values()) {
+		const id = await plan.modules.identifier.identify(option);
+		progress.increment();
 		if (!id) continue;
-		options.set(id, { ...name, id });
+		options.set(id, { ...option, id });
 	}
 
-	console.info(`Identified names`);
+	logger.info(`Identified ${options.size} names`);
+
+	progress.phase('taxonomy', options.size * plan.modules.taxonomies.length);
 
 	/** Find taxonomies then identify again */
 
+	let done = 0;
 	for (const taxonomy of plan.modules.taxonomies) {
 		for (const option of options.values()) {
 			const parents = await taxonomy.parents(option);
+
+			progress.set(++done);
 
 			for (const parent of parents) {
 				const id = await plan.modules.identifier.identify(parent);
@@ -115,7 +129,9 @@ async function run(plan: {
 		}
 	}
 
-	console.info(`Found ${options.size - names.size} new taxa from taxonomies`);
+	logger.info(`Found ${options.size - names.size} new taxa from taxonomies`);
+
+	progress.phase('enrich', options.size * plan.modules.enrich.length);
 
 	/** Enrich */
 
@@ -124,11 +140,14 @@ async function run(plan: {
 			for (const option of options.values()) {
 				option.extras ??= [];
 				option.extras.push(await enricher.enrich(option));
+				progress.increment();
 			}
 		})
 	);
 
-	console.info(`Enriched options`);
+	logger.info(`Enriched options`);
+
+	progress.phase('specialize', plan.modules.specializations.length);
 
 	/** Specialize */
 
@@ -181,12 +200,17 @@ async function run(plan: {
 					[header, ...variants].map((option) => JSON.stringify(option)).join('\n')
 				);
 
-				console.info(`Specialized ${clade} with ${specializer.name} to ${output}`);
+				logger.info(
+					`Specialized ${clade} with ${specializer.name} to ${path.relative('.', output)}`
+				);
+
+				progress.increment();
 			}
 		})
 	);
 
 	removeExitHook();
+	progress.stop();
 	writeAllCaches();
 }
 

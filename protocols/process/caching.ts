@@ -7,6 +7,7 @@ import { differenceInSeconds, isPast } from 'date-fns';
 import { dequal } from 'dequal';
 
 import { DatasourceName, Option } from './modules';
+import { logger } from './progress';
 
 const BASE_DIR = 'caches';
 
@@ -176,7 +177,7 @@ export async function tryCache<R, Q extends string>(
 		return entry.response as R;
 	} catch (error) {
 		const why = String(error).replace(/^Error: /, '');
-		console.info(
+		logger.info(
 			`${datasource}/${selector.query}`,
 			Object.entries(selector.params)
 				.map(([key, value]) => `${key}=${JSON.stringify(value)}`)
@@ -211,7 +212,7 @@ export async function tryCache<R, Q extends string>(
 
 		const lastWrite = lastWrites.get(datasource);
 		if (!lastWrite || differenceInSeconds(new Date(), lastWrite) >= 30) {
-			console.info(`writing cache to ${path.relative(import.meta.dirname, filepath)}`);
+			logger.info(`writing cache to ${path.relative(import.meta.dirname, filepath)}`);
 			writeFileSync(filepath, JSON.stringify(cache, null, 2));
 			lastWrites.set(datasource, new Date());
 		}

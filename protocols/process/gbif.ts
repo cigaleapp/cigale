@@ -2,6 +2,7 @@ import { type } from 'arktype';
 import { addYears } from 'date-fns';
 
 import { Datasource, Identifier, Option, TaxonomyProvider } from './modules';
+import { logger } from './progress';
 
 export class GBIFID implements Identifier {
 	name = 'gbif-id' as const;
@@ -106,7 +107,7 @@ export class GBIF extends Datasource<'parents' | 'id', GbifParams, GbifResponses
 
 			const data = Response.assert(await response.json());
 			if (!data.results.length) {
-				console.error(
+				logger.error(
 					`${params.clade} "${params.name}" not found in GBIF backbone taxonomy`
 				);
 

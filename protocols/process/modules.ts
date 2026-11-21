@@ -1,6 +1,7 @@
 import type * as DB from '#lib/database.js';
 
 import { ResponseWithFiles, tryCache } from './caching';
+import { bar } from './progress';
 
 export type DatasourceName =
 	'gbif' | 'jj' | 'gslides' | 'idmybee' | 'iucn' | 'birdnet' | `debug-${string}`;
@@ -59,10 +60,6 @@ export abstract class Datasource<
 		entry: (now: Date, query: Query) => Date;
 	};
 
-	log(...args: unknown[]) {
-		
-	}
-
 	async request<Q extends Query>(query: Q, params: Params[Q]): Promise<Responses[Q]> {
 		await this.init?.();
 
@@ -97,7 +94,7 @@ export type Option = {
 
 /** Used as starting points to know what species (& higher taxa) to process */
 export interface NameProvider extends Module {
-	scan(): AsyncIterable<{ name: string; clade: string }>;
+	scan(): AsyncIterable<Omit<Option, 'provenance'>>;
 }
 
 /** Used to put a stable, unambiguous and unique identifier in front of each option (species & higher taxa) */

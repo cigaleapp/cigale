@@ -7,6 +7,7 @@ import Turndown from 'turndown';
 
 import { Datasource, EMPTY_EXTRA, Enricher, OptionExtra } from './modules.js';
 import { fetchPagesViaWordpressAPI } from './wordpress.js';
+import { logger } from './progress.js';
 
 export class JessicaJoachim implements Enricher {
 	name = 'jj' as const;
@@ -230,7 +231,7 @@ class JessicaJoachimSite extends Datasource<
 const virtualConsole = new jsdom.VirtualConsole();
 virtualConsole.on('error', (e) => {
 	if (/Could not parse CSS stylesheet/i.test(e.toString())) return;
-	console.error(e);
+	logger.error(e);
 });
 
 async function fetchAndParseHtml(url: URL | string): Promise<JSDOM['window']['document']> {

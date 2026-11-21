@@ -1,6 +1,7 @@
 import { addYears } from 'date-fns';
 
 import { Datasource, NameProvider } from './modules';
+import { logger } from './progress';
 
 export class BirdNetClassmapping implements NameProvider {
 	name = 'birdnet' as const;
@@ -26,7 +27,7 @@ export class BirdNetClassmapping implements NameProvider {
 			const clade = { 1: 'genus', 2: 'species', 3: 'subspecies' }[wordcount];
 
 			if (!clade) {
-				console.warn(`skipping ${row.sci_name} because its clade is unclear`);
+				logger.warn(`skipping ${row.sci_name} because its clade is unclear`);
 				continue;
 			}
 
