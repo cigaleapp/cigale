@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
-import { isPast } from 'date-fns';
+import { differenceInSeconds, isPast } from 'date-fns';
 import { dequal } from 'dequal';
 
 import { DatasourceName } from './modules';
@@ -27,6 +27,8 @@ export type DatasourceCache<
 };
 
 const inmemory = new Map<DatasourceName, DatasourceCache>();
+
+let lastWrites = new Map<DatasourceName, Date>();
 
 export async function tryCache<R, Q extends string>(
 	datasource: DatasourceName,
@@ -97,10 +99,11 @@ export async function tryCache<R, Q extends string>(
 
 		return entry.response as R;
 	} catch (error) {
-		console.warn(
-			`[cache miss] ${datasource}/${selector.query} ${Object.entries(selector.params)
+		console.info(
+			`${datasource}/${selector.query}`,
+			Object.entries(selector.params)
 				.map(([key, value]) => `${key}=${JSON.stringify(value)}`)
-				.join(' ')}: ${String(error).replace(/^Error: /, '')}`
+				.join(' ')
 		);
 
 		const result = await compute().catch((err) => {
@@ -116,7 +119,13 @@ export async function tryCache<R, Q extends string>(
 			response: result,
 		});
 
-		writeFileSync(filepath, JSON.stringify(cache, null, 2));
+		const lastWrite = lastWrites.get(datasource);
+		if (!lastWrite || differenceInSeconds(new Date(), lastWrite) >= 30) {
+			console.info(`writing cache to ${path.relative(import.meta.dirname, filepath)}`);
+			writeFileSync(filepath, JSON.stringify(cache, null, 2));
+			lastWrites.set(datasource, new Date());
+		}
+
 		inmemory.set(datasource, cache);
 
 		return result;
