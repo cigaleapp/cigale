@@ -1,0 +1,14 @@
+import example from '../../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
+
+import { Names } from './modules';
+
+/** Species names from the classmappings of IRIT models */
+export class IRITModels implements Names {
+	name = 'irit' as const;
+
+	async *scan() {
+		for (const option of example.metadata[`${example.id}__species`].options) {
+			yield { clade: 'species', name: option.label };
+		}
+	}
+}

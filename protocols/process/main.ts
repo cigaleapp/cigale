@@ -2,24 +2,16 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import type { Option, OptionExtra } from './modules.js';
 
+import { BirdNetClassmapping } from './birdnet.js';
 import { GBIFID, GBIFTaxonomy } from './gbif.js';
+import { GoogleDriveSlides, GoogleSlides } from './gslides.js';
+import { IRITModels } from './irit.js';
 import { IUCN } from './iucn.js';
 import { JessicaJoachim } from './jj.js';
 import { Enrich, Identifier, Names, Specialize, Taxonomy } from './modules.js';
 
-class TestSource implements Names {
-	name = 'test' as const;
-
-	async *scan() {
-		yield { name: 'Allacma fusca', clade: 'species' };
-		yield { name: 'Bombus alpinus', clade: 'species' };
-		yield { name: 'Campanula arvatica', clade: 'species' };
-		yield { name: 'Apis mellifera', clade: 'species' };
-		yield { name: 'Liphistius kanthan', clade: 'species' };
-	}
-}
-
 class All implements Specialize {
+	protocolId = 'com.example.all';
 	name = 'all' as const;
 
 	include() {
@@ -31,10 +23,10 @@ await run({
 	metadataId: (clade) => clade,
 	output: { options: 'options', images: 'assets' },
 	modules: {
-		sources: [new TestSource()],
+		sources: [new GoogleDriveSlides(), new IRITModels(), new BirdNetClassmapping()],
 		identifier: new GBIFID(),
 		taxonomies: [new GBIFTaxonomy()],
-		enrich: [new JessicaJoachim(), new IUCN()],
+		enrich: [new JessicaJoachim(), new IUCN(), new GoogleSlides()],
 		specializations: [new All()],
 	},
 });
@@ -78,6 +70,7 @@ async function run(plan: {
 
 	for (const name of names.values()) {
 		const id = await plan.modules.identifier.identify(name);
+		if (!id) continue;
 		options.set(id, { ...name, id });
 	}
 
@@ -90,12 +83,14 @@ async function run(plan: {
 			const parents = await taxonomy.parents(option);
 
 			for (const parent of parents) {
-				parent.id = await plan.modules.identifier.identify(parent);
+				const id = await plan.modules.identifier.identify(parent);
+				if (!id) continue;
 
-				options.set(parent.id, {
+				options.set(id, {
 					...parent,
+					id,
 					parents: selectHigherClades(parent, parents),
-				} as Option & { id: string });
+				});
 			}
 
 			options.set(option.id, {
@@ -137,7 +132,11 @@ async function run(plan: {
 						const extra = mergeExtras(option);
 						const implicitCascade = Object.fromEntries(
 							(option.parents ?? []).map(
-								(parent) => [plan.metadataId(parent.clade), parent.id] as const
+								(parent) =>
+									[
+										`${specializer.protocolId}__${plan.metadataId(parent.clade)}`,
+										parent.id,
+									] as const
 							)
 						);
 
@@ -217,7 +216,17 @@ function mergeExtras(option: Option): OptionExtra {
 }
 
 function selectHigherClades(option: Option, others: Option[]): Option[] {
-	const order = ['kingdom', 'phylum', 'order', 'class', 'family', 'genus', 'species'];
+	const order = [
+		'kingdom',
+		'phylum',
+		'order',
+		'class',
+		'family',
+		'genus',
+		'species',
+		'subspecies',
+	];
+
 	const specificity = (o: Option) => order.indexOf(o.clade);
 
 	return others.filter((o) => specificity(o) > specificity(option));

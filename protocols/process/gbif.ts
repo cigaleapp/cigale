@@ -19,15 +19,18 @@ type GbifResponses = {
 		name: string;
 		id: string;
 	}>;
-	id: { id: string };
+	id: { id: string|null };
 };
 
 export class GBIF extends Datasource<'parents' | 'id', GbifParams, GbifResponses> {
 	name = 'gbif' as const;
 
+	// GBIF changed their main dataset, see https://techdocs.gbif.org/en/data-processing/taxonomy-interpretation#multiple-taxonomy-support
 	datasets = {
-		/** GBIF Backbone Taxonomy */
+		/** @deprecated GBIF Backbone Taxonomy (not updated anymore) */
 		backbone: 'd7dddbf4-2cf0-4f39-9b2a-bb099caae36c',
+		/** Catalogue Of Life eXtended Release (new main GBIF dataset from now on) */
+		colxr: '7ddf754f-d193-4cc9-b351-99906754a03b'
 	};
 
 	baseURL = 'https://api.gbif.org/v2';
@@ -42,7 +45,7 @@ export class GBIF extends Datasource<'parents' | 'id', GbifParams, GbifResponses
 	requests = {
 		id: async (params: GbifParams['id']) => {
 			const response = await fetch(
-				`${this.baseURL}/taxon/search/${this.datasets.backbone}?${new URLSearchParams({
+				`${this.baseURL}/taxon/search/${this.datasets.colxr}?${new URLSearchParams({
 					taxonRank: params.clade.toUpperCase(),
 					nameType: 'SCIENTIFIC',
 					searchType: 'EXACT',
@@ -64,9 +67,11 @@ export class GBIF extends Datasource<'parents' | 'id', GbifParams, GbifResponses
 
 			const data = Response.assert(await response.json());
 			if (!data.results.length) {
-				throw new Error(
+				console.error(
 					`${params.clade} "${params.name}" not found in GBIF backbone taxonomy`
 				);
+
+				return { id: null };
 			}
 
 			const [{ taxonID }] = data.results;
@@ -76,7 +81,7 @@ export class GBIF extends Datasource<'parents' | 'id', GbifParams, GbifResponses
 
 		parents: async (params: GbifParams['parents']) => {
 			const response = await fetch(
-				`${this.baseURL}/taxon/tree/${this.datasets.backbone}/${params.id}`
+				`${this.baseURL}/taxon/tree/${this.datasets.colxr}/${params.id}`
 			);
 
 			if (!response.ok) throw new Error(await response.text());

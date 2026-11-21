@@ -1,12 +1,6 @@
-import path from 'node:path';
 import type { Option } from './modules.js';
-import type { MetadataEnumVariant } from '#lib/schemas/metadata.js';
-import type { ExportedProtocol } from '#lib/schemas/protocols.js';
 
-import arkenv from 'arkenv';
-import { ArkErrors, type } from 'arktype';
-import { Estimation as ETA } from 'arrival-time';
-import { addHours, addMonths, formatDistanceToNowStrict, secondsToMilliseconds } from 'date-fns';
+import { addHours, addMonths } from 'date-fns';
 import * as jsdom from 'jsdom';
 import { JSDOM } from 'jsdom';
 import Turndown from 'turndown';

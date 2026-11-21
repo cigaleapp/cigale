@@ -2,13 +2,14 @@ import type * as DB from '#lib/database.js';
 
 import { tryCache } from './caching';
 
-export type DatasourceName = 'gbif' | 'jj' | 'gslides' | 'idmybee';
+export type DatasourceName = 'gbif' | 'jj' | 'gslides' | 'idmybee' | 'iucn' | 'birdnet';
 
 export type ModuleName =
 	// species names
 	| 'idmybee-species'
 	| 'birdnet'
 	| 'irit'
+	| 'gdrive'
 	// identifiers
 	| 'gbif-id'
 	// taxonomizers
@@ -37,7 +38,7 @@ export type DataRequests<
  */
 export abstract class Datasource<
 	Query extends string = string,
-	Params extends Record<Query, unknown> = Record<Query, unknown>,
+	Params extends Record<Query, Record<string, unknown>> = Record<Query, Record<string, unknown>>,
 	Responses extends Record<Query, unknown> = Record<Query, unknown>,
 > {
 	/** Name of the datasource. Used to construct the path to the cache file. */
@@ -92,7 +93,7 @@ export interface Names extends Module {
 
 /** Used to put a stable, unambiguous and unique identifier in front of each option (species & higher taxa) */
 export interface Identifier extends Module {
-	identify(option: Option): Promise<string>;
+	identify(option: Option): Promise<string | null>;
 }
 
 /** Used to get higher taxa from lower taxa, starting at species and going all the way to kingdoms */
@@ -111,6 +112,9 @@ export interface Enrich extends Module {
 
 /** Used to create subsets of options tailored to a specific use case (insects, birds, etc.) */
 export interface Specialize extends Module {
+	/** The associated protocol ID. Used to namespace the clade metadatas */
+	protocolId: string;
+
 	include(option: Option): boolean;
 }
 

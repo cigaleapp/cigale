@@ -37,7 +37,7 @@ export async function tryCache<R, Q extends string>(
 	}: {
 		selector: {
 			query: Q;
-			params: unknown;
+			params: Record<string, unknown>;
 		};
 		/** What to run if the cache misses */
 		compute: () => Promise<R>;
@@ -98,7 +98,9 @@ export async function tryCache<R, Q extends string>(
 		return entry.response as R;
 	} catch (error) {
 		console.warn(
-			`Cache miss for ${selector.query} ${JSON.stringify(selector.params)}: ${error}`
+			`[cache miss] ${datasource}/${selector.query} ${Object.entries(selector.params)
+				.map(([key, value]) => `${key}=${JSON.stringify(value)}`)
+				.join(' ')}: ${String(error).replace(/^Error: /, '')}`
 		);
 
 		const result = await compute().catch((err) => {
