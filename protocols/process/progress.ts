@@ -60,7 +60,9 @@ class Progress {
 
 		const counter = `${this.done}/${this.total}`;
 
-		process.stdout.write(`${phase} ${percentage} ${bar} ${counter}`);
+		const osc94 = `\x1b]9;4;1;${scaled(100)}\x1b\x5c`;
+
+		process.stdout.write(`${phase} ${percentage} ${bar} ${counter}` + osc94);
 	}
 
 	clear() {
@@ -68,6 +70,7 @@ class Progress {
 	}
 
 	stop() {
+		process.stdout.write(`\x1b]9;4;0\x1b\x5c`);
 		this.clear();
 	}
 }
