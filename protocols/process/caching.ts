@@ -225,6 +225,8 @@ export async function tryCache<R, Q extends string>(
 
 export function writeAllCaches() {
 	for (const [datasource, cache] of inmemory) {
-		writeFileSync(filepathToCache(datasource), JSON.stringify(cache, null, 2));
+		const filepath = filepathToCache(datasource);
+		logger.info(`writing cache to ${path.relative(import.meta.dirname, filepath)}`);
+		writeFileSync(filepath, JSON.stringify(cache, null, 2));
 	}
 }
