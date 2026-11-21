@@ -89,6 +89,10 @@ function fileOnDiskMatches(datasource: string, query: string, { filename, sha1 }
 	return hash.toBase64() === sha1;
 }
 
+function filepathToCache(datasource: string) {
+	return path.join(BASE_DIR, `${datasource}.json`);
+}
+
 export async function tryCache<R, Q extends string>(
 	datasource: DatasourceName,
 	{
@@ -110,7 +114,7 @@ export async function tryCache<R, Q extends string>(
 		};
 	}
 ): Promise<R> {
-	const filepath = path.join(BASE_DIR, `${datasource}.json`);
+	const filepath = filepathToCache(datasource);
 	if (!existsSync(filepath)) {
 		mkdirSync(path.dirname(filepath), { recursive: true });
 		writeFileSync(
@@ -153,7 +157,7 @@ export async function tryCache<R, Q extends string>(
 		const entry = entries[index];
 
 		if (isPast(entry.expiresAt)) {
-			delete cache.entries[index];
+			cache.entries[selector.query].splice(index, 1);
 			throw new Error('entry too old');
 		}
 
@@ -215,5 +219,11 @@ export async function tryCache<R, Q extends string>(
 		inmemory.set(datasource, cache);
 
 		return response;
+	}
+}
+
+export function writeAllCaches() {
+	for (const [datasource, cache] of inmemory) {
+		writeFileSync(filepathToCache(datasource), JSON.stringify(cache, null, 2));
 	}
 }

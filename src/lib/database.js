@@ -14,8 +14,8 @@ import {
 	EXIFField,
 	MetadataEnumVariant,
 	MetadataError,
+	MetadataInDatabase,
 	MetadataMergeMethod,
-	Metadata as MetadataSchema,
 	MetadataType as MetadataTypeSchema,
 	MetadataValue,
 	MetadataValues,
@@ -101,7 +101,8 @@ const Observation = table(['id', 'addedAt', 'sessionId', 'images[]'], Observatio
 
 const Session = table(['id', 'remoteId'], SessionSchema);
 
-const Metadata = table('id', MetadataSchema.omit('options'));
+const Metadata = table('id', MetadataInDatabase);
+
 const MetadataOption = table(
 	['id', 'kobocollectId', '_narrowableIn[]', '_search[]'],
 	MetadataEnumVariant.and({

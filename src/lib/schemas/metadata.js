@@ -687,7 +687,11 @@ const MetadataEnum = MetadataBase.and({
 				'Format CSV. La première ligne doit être le nom des clés. Chaque ligne est transformé en un objet pour être traité par .postprocess',
 			],
 			['"json"', '@', 'Format JSON'],
-			['"json-lines"', '@', 'Un objet au format JSON par ligne du fichier']
+			[
+				'"json-lines"',
+				'@',
+				`Un objet au format JSON par ligne du fichier. La première ligne doit être un header, avec au moins une propriété "count" qui indique le nombre d'options contenues dans le fichier (sans compter la ligne de header)`,
+			]
 		),
 		'postprocess?': JsonataExpression(
 			type({
@@ -720,6 +724,8 @@ const MetadataEnum = MetadataBase.and({
 	// --- Technical fields ---
 	_optionsCount: 'number.integer = 0',
 });
+
+const MetadataEnumInDatabase = MetadataEnum.omit('options');
 
 const MetadataBoundingbox = MetadataBase.and({
 	type: '"boundingbox"',
@@ -805,6 +811,19 @@ export const Metadata = type.or(
 	MetadataDate,
 	MetadataLocation,
 	MetadataEnum,
+	MetadataBoundingbox,
+	MetadataFile,
+	MetadataSurface
+);
+
+export const MetadataInDatabase = type.or(
+	MetadataBoolean,
+	MetadataString,
+	MetadataInteger,
+	MetadataFloat,
+	MetadataDate,
+	MetadataLocation,
+	MetadataEnumInDatabase,
 	MetadataBoundingbox,
 	MetadataFile,
 	MetadataSurface

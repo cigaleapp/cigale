@@ -10,7 +10,10 @@ import type {
 	TaxonomyProvider,
 } from './modules.js';
 
+import exitHook from 'exit-hook';
+
 import { BirdNetClassmapping } from './birdnet.js';
+import { writeAllCaches } from './caching.js';
 import { GBIFID, GBIFTaxonomy } from './gbif.js';
 import { GoogleDriveSlides, GoogleSlides } from './gslides.js';
 import { IRITModels } from './irit.js';
@@ -56,6 +59,10 @@ async function run(plan: {
 		specializations: Specializer[];
 	};
 }) {
+	const removeExitHook = exitHook(() => {
+		writeAllCaches();
+	});
+
 	/** clade:name */
 	const names = new Map<`${string}:${string}`, Option>();
 
@@ -165,14 +172,22 @@ async function run(plan: {
 					`${clade}.jsonl`
 				);
 
+				const header = { count: variants.length };
+
 				// Output as JSON lines
 				mkdirSync(path.dirname(output), { recursive: true });
-				writeFileSync(output, variants.map((option) => JSON.stringify(option)).join('\n'));
+				writeFileSync(
+					output,
+					[header, ...variants].map((option) => JSON.stringify(option)).join('\n')
+				);
 
 				console.info(`Specialized ${clade} with ${specializer.name} to ${output}`);
 			}
 		})
 	);
+
+	removeExitHook();
+	writeAllCaches();
 }
 
 function mergeExtras(option: Option): OptionExtra {

@@ -59,6 +59,10 @@ export abstract class Datasource<
 		entry: (now: Date, query: Query) => Date;
 	};
 
+	log(...args: unknown[]) {
+		
+	}
+
 	async request<Q extends Query>(query: Q, params: Params[Q]): Promise<Responses[Q]> {
 		await this.init?.();
 
