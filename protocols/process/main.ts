@@ -1,6 +1,14 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import type { Option, OptionExtra } from './modules.js';
+import type {
+	Enricher,
+	Identifier,
+	NameProvider,
+	Option,
+	OptionExtra,
+	Specializer,
+	TaxonomyProvider,
+} from './modules.js';
 
 import { BirdNetClassmapping } from './birdnet.js';
 import { GBIFID, GBIFTaxonomy } from './gbif.js';
@@ -8,26 +16,26 @@ import { GoogleDriveSlides, GoogleSlides } from './gslides.js';
 import { IRITModels } from './irit.js';
 import { IUCN } from './iucn.js';
 import { JessicaJoachim } from './jj.js';
-import { Enrich, Identifier, Names, Specialize, Taxonomy } from './modules.js';
-
-class All implements Specialize {
-	protocolId = 'com.example.all';
-	name = 'all' as const;
-
-	include() {
-		return true;
-	}
-}
 
 await run({
 	metadataId: (clade) => clade,
 	output: { options: 'options', images: 'assets' },
 	modules: {
-		sources: [new GoogleDriveSlides(), new IRITModels(), new BirdNetClassmapping()],
+		// sources: [new GoogleDriveSlides(), new IRITModels(), new BirdNetClassmapping()],
+		sources: [new GoogleDriveSlides()],
 		identifier: new GBIFID(),
 		taxonomies: [new GBIFTaxonomy()],
 		enrich: [new JessicaJoachim(), new IUCN(), new GoogleSlides()],
-		specializations: [new All()],
+		specializations: [
+			new (class implements Specializer {
+				protocolId = 'com.example.all';
+				name = 'debug-all' as const;
+
+				include() {
+					return true;
+				}
+			})(),
+		],
 	},
 });
 
@@ -41,11 +49,11 @@ async function run(plan: {
 		images: string;
 	};
 	modules: {
-		sources: Names[];
+		sources: NameProvider[];
 		identifier: Identifier;
-		taxonomies: Taxonomy[];
-		enrich: Enrich[];
-		specializations: Specialize[];
+		taxonomies: TaxonomyProvider[];
+		enrich: Enricher[];
+		specializations: Specializer[];
 	};
 }) {
 	/** clade:name */
@@ -89,7 +97,7 @@ async function run(plan: {
 				options.set(id, {
 					...parent,
 					id,
-					parents: selectHigherClades(parent, parents),
+					parents: selectHigherClades(parent, parents) as Array<Option & { id: string }>,
 				});
 			}
 

@@ -1,9 +1,9 @@
 /// <reference types="@types/bun" />
 
 import { addMonths } from 'date-fns';
-import { unzip as _unzip, UnzipOptions, Unzipped, unzipSync } from 'fflate';
+import { unzip as _unzip, Unzipped } from 'fflate';
 
-import { Datasource, EMPTY_EXTRA, Enrich, Option } from './modules.js';
+import { Datasource, EMPTY_EXTRA, Enricher, Option } from './modules.js';
 
 // Archive is still using deprecated term threatStatus instead of more recent iucnRedListCategory
 // see https://gbif.github.io/dwc-api/apidocs/src-html/org/gbif/dwc/terms/IucnTerm.html
@@ -21,6 +21,44 @@ const STATUSES = {
 	'Data deficient': 'dd',
 	'Not evaluated': 'ne',
 } as const;
+
+export class IUCN implements Enricher {
+	name = 'iucn' as const;
+
+	archive: IUCNArchive;
+
+	constructor() {
+		this.archive = new IUCNArchive();
+	}
+
+	async enrich({ name, clade }: Option) {
+		if (clade !== 'species') return EMPTY_EXTRA;
+
+		const { status } = await this.archive.request('get', { name });
+
+		if (!status) return EMPTY_EXTRA;
+
+		return {
+			priority: 2,
+			extra: {
+				cascade: {
+					conservation_status: STATUSES[status],
+				},
+			},
+		};
+	}
+}
+
+type Dataset = {
+	names: Array<{
+		id: string;
+		name: string;
+	}>;
+	statuses: Array<{
+		id: string;
+		status: string;
+	}>;
+};
 
 class IUCNArchive extends Datasource<
 	'get',
@@ -145,44 +183,6 @@ class IUCNArchive extends Datasource<
 			};
 		},
 	};
-}
-
-type Dataset = {
-	names: Array<{
-		id: string;
-		name: string;
-	}>;
-	statuses: Array<{
-		id: string;
-		status: string;
-	}>;
-};
-
-export class IUCN implements Enrich {
-	name = 'iucn' as const;
-
-	archive: IUCNArchive;
-
-	constructor() {
-		this.archive = new IUCNArchive();
-	}
-
-	async enrich({ name, clade }: Option) {
-		if (clade !== 'species') return EMPTY_EXTRA;
-
-		const { status } = await this.archive.request('get', { name });
-
-		if (!status) return EMPTY_EXTRA;
-
-		return {
-			priority: 2,
-			extra: {
-				cascade: {
-					conservation_status: STATUSES[status],
-				},
-			},
-		};
-	}
 }
 
 async function unzip(data: Uint8Array, ...names: string[]) {

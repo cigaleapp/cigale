@@ -1,9 +1,8 @@
 import example from '../../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
-
-import { Names } from './modules';
+import { NameProvider } from './modules';
 
 /** Species names from the classmappings of IRIT models */
-export class IRITModels implements Names {
+export class IRITModels implements NameProvider {
 	name = 'irit' as const;
 
 	async *scan() {

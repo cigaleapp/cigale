@@ -1,8 +1,8 @@
 import { addYears } from 'date-fns';
 
-import { Datasource, Names } from './modules';
+import { Datasource, NameProvider } from './modules';
 
-export class BirdNetClassmapping implements Names {
+export class BirdNetClassmapping implements NameProvider {
 	name = 'birdnet' as const;
 
 	zenodo: BirdNetZenodo;

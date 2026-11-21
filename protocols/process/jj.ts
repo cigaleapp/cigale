@@ -5,8 +5,35 @@ import * as jsdom from 'jsdom';
 import { JSDOM } from 'jsdom';
 import Turndown from 'turndown';
 
-import { Datasource, EMPTY_EXTRA, Enrich, OptionExtra } from './modules.js';
+import { Datasource, EMPTY_EXTRA, Enricher, OptionExtra } from './modules.js';
 import { fetchPagesViaWordpressAPI } from './wordpress.js';
+
+export class JessicaJoachim implements Enricher {
+	name = 'jj' as const;
+
+	jj: JessicaJoachimSite;
+
+	pages: Page[] | undefined;
+
+	constructor() {
+		this.jj = new JessicaJoachimSite();
+	}
+
+	async enrich(option: Option) {
+		this.pages ??= await this.jj.request('index', {}).then((r) => r.pages);
+
+		const page = this.pages!.find(
+			(link) => link.clade === option.clade && link.name === option.name
+		);
+
+		if (!page) return EMPTY_EXTRA;
+
+		return {
+			priority: 10,
+			extra: await this.jj.request('page', { link: page.link }),
+		};
+	}
+}
 
 type Page = {
 	name: string;
@@ -197,33 +224,6 @@ class JessicaJoachimSite extends Datasource<
 			};
 		},
 	};
-}
-
-export class JessicaJoachim implements Enrich {
-	name = 'jj' as const;
-
-	jj: JessicaJoachimSite;
-
-	pages: Page[] | undefined;
-
-	constructor() {
-		this.jj = new JessicaJoachimSite();
-	}
-
-	async enrich(option: Option) {
-		this.pages ??= await this.jj.request('index', {}).then((r) => r.pages);
-
-		const page = this.pages!.find(
-			(link) => link.clade === option.clade && link.name === option.name
-		);
-
-		if (!page) return EMPTY_EXTRA;
-
-		return {
-			priority: 10,
-			extra: await this.jj.request('page', { link: page.link }),
-		};
-	}
 }
 
 // Suppress annoying virtual console error we can't do anything about and don't care about

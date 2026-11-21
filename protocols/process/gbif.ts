@@ -1,7 +1,46 @@
 import { type } from 'arktype';
 import { addYears } from 'date-fns';
 
-import { Datasource, Identifier, Option, Taxonomy } from './modules';
+import { Datasource, Identifier, Option, TaxonomyProvider } from './modules';
+
+export class GBIFID implements Identifier {
+	name = 'gbif-id' as const;
+	gbif: GBIF;
+
+	constructor() {
+		this.gbif = new GBIF();
+	}
+
+	async init() {}
+
+	async identify({ clade, name, id }: Option) {
+		if (id) return id;
+		const result = await this.gbif.request('id', { clade, name });
+		return result.id;
+	}
+}
+
+export class GBIFTaxonomy implements TaxonomyProvider {
+	name = 'gbif-taxonomy' as const;
+	gbif: GBIF;
+
+	constructor() {
+		this.gbif = new GBIF();
+	}
+
+	async init() {}
+
+	async parents({ clade, provenance, id }: Option & { id: string }): Promise<Option[]> {
+		if (clade === 'kingdom') return [];
+
+		const parents = await this.gbif.request('parents', { id });
+
+		return parents.map((parent) => ({
+			provenance,
+			...parent,
+		}));
+	}
+}
 
 type GbifParams = {
 	parents: {
@@ -19,7 +58,7 @@ type GbifResponses = {
 		name: string;
 		id: string;
 	}>;
-	id: { id: string|null };
+	id: { id: string | null };
 };
 
 export class GBIF extends Datasource<'parents' | 'id', GbifParams, GbifResponses> {
@@ -30,7 +69,7 @@ export class GBIF extends Datasource<'parents' | 'id', GbifParams, GbifResponses
 		/** @deprecated GBIF Backbone Taxonomy (not updated anymore) */
 		backbone: 'd7dddbf4-2cf0-4f39-9b2a-bb099caae36c',
 		/** Catalogue Of Life eXtended Release (new main GBIF dataset from now on) */
-		colxr: '7ddf754f-d193-4cc9-b351-99906754a03b'
+		colxr: '7ddf754f-d193-4cc9-b351-99906754a03b',
 	};
 
 	baseURL = 'https://api.gbif.org/v2';
@@ -105,43 +144,4 @@ export class GBIF extends Datasource<'parents' | 'id', GbifParams, GbifResponses
 			}));
 		},
 	};
-}
-
-export class GBIFID implements Identifier {
-	name = 'gbif-id' as const;
-	gbif: GBIF;
-
-	constructor() {
-		this.gbif = new GBIF();
-	}
-
-	async init() {}
-
-	async identify({ clade, name, id }: Option) {
-		if (id) return id;
-		const result = await this.gbif.request('id', { clade, name });
-		return result.id;
-	}
-}
-
-export class GBIFTaxonomy implements Taxonomy {
-	name = 'gbif-taxonomy' as const;
-	gbif: GBIF;
-
-	constructor() {
-		this.gbif = new GBIF();
-	}
-
-	async init() {}
-
-	async parents({ clade, provenance, id }: Option & { id: string }): Promise<Option[]> {
-		if (clade === 'kingdom') return [];
-
-		const parents = await this.gbif.request('parents', { id });
-
-		return parents.map((parent) => ({
-			provenance,
-			...parent,
-		}));
-	}
 }

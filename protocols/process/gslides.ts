@@ -1,6 +1,5 @@
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import path from 'node:path';
-import type { Names, Option, OptionExtra } from './modules';
+import { readFileSync } from 'node:fs';
+import type { Option } from './modules';
 
 import { addDays } from 'date-fns';
 import { JWT } from 'google-auth-library';
@@ -11,12 +10,13 @@ import odt from 'odt2html';
 import { pdfToPng } from 'pdf-to-png-converter';
 import Turndown from 'turndown';
 
-import { Datasource, EMPTY_EXTRA, Enrich } from './modules';
+import { ResponseWithFiles } from './caching';
+import { Datasource, EMPTY_EXTRA, Enricher, NameProvider, OptionExtra } from './modules';
 
 const ASSETS_URL_BASE =
 	'https://cigale-protocols-biodimedia-data-terra.ai.meso.umontpellier.fr/assets';
 
-export class GoogleDriveSlides implements Names {
+export class GoogleDriveSlides implements NameProvider {
 	name = 'gdrive' as const;
 
 	gdrive: GoogleDrive;
@@ -38,7 +38,7 @@ export class GoogleDriveSlides implements Names {
 	}
 }
 
-export class GoogleSlides implements Enrich {
+export class GoogleSlides implements Enricher {
 	name = 'gslides' as const;
 
 	gdrive: GoogleDrive;
@@ -82,9 +82,7 @@ class GoogleDrive extends Datasource<
 			description: string;
 			learnMore: string;
 			images: Array<{
-				sha1: string;
 				filename: string;
-				// TODO: url
 			}>;
 		};
 	}
@@ -306,57 +304,33 @@ class GoogleDrive extends Datasource<
 			const links = Object.fromEntries(
 				textPages
 					.flatMap((node) => [...node.querySelectorAll('a')])
-					.map((node) => /** @type {const} */ [node.textContent, node.href])
+					.map((node) => [node.textContent, node.href] as const)
 					.filter(([text]) => text && text !== ' ')
 			);
 
 			const learnMore =
 				links.INPN ?? links.LMDI ?? links.GBIF ?? Object.values(links)[0] ?? undefined;
 
-			const finalImages: Array<{
-				sha1: string;
-				filename: string;
-				// TODO:
-			}> = [];
+			const attached: File[] = [];
 
 			for (const [i, image] of images.entries()) {
-				const filename = `${file.name}_${i}.png`;
 				const bytes = await image.getBuffer('image/png');
-				const sha1 = new Uint8Array(32);
-				Bun.SHA1.hash(bytes, sha1);
 
-				mkdirSync('assets', { recursive: true });
-				writeFileSync(path.join('assets', filename), bytes);
-
-				finalImages.push({ sha1: sha1.toBase64(), filename });
-
-				// TODO: handle writing files
-
-				// const oldPhoto = decodePhoto(imagePath);
-
-				// log(`Writing image to ${cc.blue}${imagePath}${cc.reset}`);
-				// image.write(imagePath);
-
-				// imageUrls.push(
-				// 	new URL(
-				// 		'https://raw.githubusercontent.com/cigaleapp/cigale/main/' +
-				// 			path
-				// 				.relative(path.join(filepath, '../..'), imagePath)
-				// 				.replaceAll('\\', '/')
-				// 	)
-				// );
-
-				// False positive
-				// if (protocol.fresh.version && photoChanged(imagePath, oldPhoto)) {
-				// 	imageUrls[i].searchParams.set('v', protocol.fresh.version.toString());
-				// }
+				attached.push(
+					new File([bytes.buffer as ArrayBuffer], `${file.name}_${i}.png`, {
+						type: 'image/png',
+					})
+				);
 			}
 
-			return {
-				description,
-				learnMore,
-				images: finalImages,
-			};
+			return new ResponseWithFiles({
+				files: attached,
+				response: {
+					description,
+					learnMore,
+					images: attached.map((f) => ({ filename: f.name })),
+				},
+			});
 		},
 	};
 }
