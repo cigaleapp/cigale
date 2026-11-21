@@ -9,6 +9,8 @@ import { Datasource, Enricher, MultipleResponses, OptionExtra } from './modules.
 import { logger } from './progress.js';
 import { fetchPagesViaWordpressAPI } from './wordpress.js';
 
+const IGNORED_PAGES = ['https://jessica-joachim.com/?page_id=141560'];
+
 export class JessicaJoachim implements Enricher {
 	name = 'jj' as const;
 
@@ -22,6 +24,7 @@ export class JessicaJoachim implements Enricher {
 
 	async init() {
 		this.index ??= await this.jj.one('index', {}).then((r) => r.pages);
+		this.index = this.index!.filter((p) => !IGNORED_PAGES.includes(p.link));
 	}
 
 	available(option: Option): boolean {
@@ -41,9 +44,9 @@ export class JessicaJoachim implements Enricher {
 
 			for (const { link, extra } of fiches) {
 				const page = this.index!.find((page) => page.link === link)!;
-				const { id } = options.find(this.matchCladedName(page))!;
-				if (!id) continue;
-				yield { id, priority: 10, extra };
+				const opt = options.find(this.matchCladedName(page));
+				if (!opt?.id) continue;
+				yield { id: opt.id, priority: 10, extra };
 			}
 		}
 	}
@@ -91,7 +94,7 @@ class JessicaJoachimSite extends Datasource<
 
 	async init() {}
 
-	chunksize = 80;
+	chunksize = 81;
 
 	requests = {
 		index: async () => {

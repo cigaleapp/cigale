@@ -74,8 +74,10 @@ async function run(plan: {
 
 	await Promise.all(
 		plan.modules.sources.map(async (source) => {
+			let count = 0;
 			for await (const option of source.scan()) {
 				const { clade, name } = option;
+				count++;
 				names.set(`${clade}:${name}`, {
 					...option,
 					provenance: source.name,
@@ -83,6 +85,7 @@ async function run(plan: {
 			}
 
 			progress.increment();
+			logger.info(`Listed ${count} names via ${source.name}`);
 		})
 	);
 
