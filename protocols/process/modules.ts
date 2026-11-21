@@ -3,7 +3,6 @@ import type * as DB from '#lib/database.js';
 import { dequal } from 'dequal';
 
 import { ResponseWithFiles, tryCache } from './caching';
-import { bar } from './progress';
 
 export type DatasourceName =
 	'gbif' | 'jj' | 'gslides' | 'idmybee' | 'iucn' | 'birdnet' | `debug-${string}`;

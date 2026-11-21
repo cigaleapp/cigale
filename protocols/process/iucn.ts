@@ -3,7 +3,7 @@
 import { addMonths } from 'date-fns';
 import { unzip as _unzip, Unzipped } from 'fflate';
 
-import { Datasource, EMPTY_EXTRA, Enricher, Option } from './modules.js';
+import { Datasource, Enricher, MultipleResponses, Option } from './modules.js';
 
 // Archive is still using deprecated term threatStatus instead of more recent iucnRedListCategory
 // see https://gbif.github.io/dwc-api/apidocs/src-html/org/gbif/dwc/terms/IucnTerm.html
@@ -35,12 +35,16 @@ export class IUCN implements Enricher {
 
 	//  TODO: see if we can batch this up
 	async *enrich(options: Option[]) {
-		for (const { id, clade, name } of options) {
+		const queries = options.filter((o) => o.id && o.clade === 'species');
+
+		const statuses = await this.archive.many(
+			'get',
+			queries.map((q) => ({ name: q.name }))
+		);
+
+		for (const { status, name } of statuses) {
+			const id = options.find((opt) => opt.name === name);
 			if (!id) continue;
-			if (clade !== 'species') continue;
-
-			const { status } = await this.archive.one('get', { name });
-
 			if (!status) continue;
 
 			yield {
@@ -57,20 +61,13 @@ export class IUCN implements Enricher {
 }
 
 type Dataset = {
-	names: Array<{
-		id: string;
-		name: string;
-	}>;
-	statuses: Array<{
-		id: string;
-		status: string;
-	}>;
+	byName: Record<string, keyof typeof STATUSES>;
 };
 
 class IUCNArchive extends Datasource<
 	'get',
-	{ get: { name: string } },
-	{ get: { status: keyof typeof STATUSES | null } }
+	{ get: Array<{ name: string }> },
+	{ get: { name: string; status: keyof typeof STATUSES | null } }
 > {
 	name = 'iucn' as const;
 
@@ -149,7 +146,7 @@ class IUCNArchive extends Datasource<
 					)
 				) as Record<C, string>[];
 
-		this.dataset = {
+		const rows = {
 			names: process(metafile.archive.core, data.name, {
 				name: 'scientificName',
 				id: 'id',
@@ -163,6 +160,20 @@ class IUCNArchive extends Datasource<
 				}
 			),
 		};
+
+		const statusesById = new Map(
+			rows.statuses.map((s) => [s.id, s.status as keyof typeof STATUSES])
+		);
+
+		this.dataset = {
+			byName: Object.fromEntries(
+				rows.names.flatMap(({ name, id }) => {
+					const status = statusesById.get(id);
+					if (!status) return [];
+					return [[name, status]];
+				})
+			),
+		};
 	}
 
 	archiveURL = 'https://hosted-datasets.gbif.org/datasets/iucn/iucn-latest.zip';
@@ -173,21 +184,16 @@ class IUCNArchive extends Datasource<
 	};
 
 	requests = {
-		get: async (option: { name: string }) => {
+		get: async (options: Array<{ name: string }>) => {
 			// We do this instead of init() so that we dont even download the dataset if we only get cache hits
 			if (!this.dataset) await this.downloadDataset();
 
-			const byname = this.dataset!.names.find(
-				(o) => 'name' in o && o.name.split(' ').slice(0, 2).join(' ') === option.name
+			return new MultipleResponses(
+				options
+					.map(({ name }) => ({ name, status: this.dataset!.byName[name] }))
+					.filter((o) => o.status !== undefined)
+					.map(({ name, status }) => [{ name }, { name, status }] as const)
 			);
-			if (!byname) return { status: null };
-
-			const byid = this.dataset!.statuses.find((o) => 'id' in o && o.id === byname.id);
-			if (!byid) return { status: null };
-
-			return {
-				status: byid.status as keyof typeof STATUSES,
-			};
 		},
 	};
 }

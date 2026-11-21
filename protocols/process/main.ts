@@ -103,11 +103,12 @@ async function run(plan: {
 
 	progress.phase('taxonomy', options.size);
 
+	const queries = [...options.values()];
+
 	// Find taxonomies then identify again
-	for (const option of options.values()) {
+	for (const option of queries) {
 		const parents = await plan.modules.taxonomy.parents(option);
 
-		progress.total = options.size;
 		progress.increment();
 
 		for (const parent of parents) {
@@ -133,7 +134,7 @@ async function run(plan: {
 
 	/** Enrich */
 
-	const CHUNKSIZE = 1_000;
+	const CHUNKSIZE = 5_000;
 	const opts = [...options.values()];
 	await Promise.all(
 		plan.modules.enrich.map(async (enricher) => {

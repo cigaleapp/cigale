@@ -207,7 +207,7 @@ export async function tryCache<R, Q extends string, P extends DataRequestParams<
 				: selector.paramslist.map((_, i) => ({ i, why: msg }));
 
 		for (const [i, p] of selector.paramslist.entries()) {
-			const { why } = reasons.find((r) => r.i === i)!;
+			const { why } = reasons.find((r) => r.i === i) ?? { why: msg };
 
 			let paramsDisplay = JSON.stringify(p);
 
