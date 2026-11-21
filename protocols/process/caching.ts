@@ -5,8 +5,9 @@ import path from 'node:path';
 
 import { differenceInSeconds, isPast } from 'date-fns';
 import { dequal } from 'dequal';
+import { zip } from 'es-toolkit';
 
-import { DatasourceName, Option } from './modules';
+import { DataRequestParams, DatasourceName, MultipleResponses, Option } from './modules';
 import { logger } from './progress';
 
 const BASE_DIR = 'caches';
@@ -94,7 +95,13 @@ function filepathToCache(datasource: string) {
 	return path.join(BASE_DIR, `${datasource}.json`);
 }
 
-export async function tryCache<R, Q extends string>(
+class CacheMiss extends Error {
+	constructor(public readonly misses: Array<{ i: number; why: string }> = []) {
+		super();
+	}
+}
+
+export async function tryCache<R, Q extends string, P extends DataRequestParams<Q>[Q]>(
 	datasource: DatasourceName,
 	{
 		selector,
@@ -103,10 +110,10 @@ export async function tryCache<R, Q extends string>(
 	}: {
 		selector: {
 			query: Q;
-			params: Record<string, unknown>;
+			paramslist: P[];
 		};
 		/** What to run if the cache misses */
-		compute: () => Promise<R | ResponseWithFiles<R>>;
+		compute: () => Promise<R | MultipleResponses<R, P> | ResponseWithFiles<R>>;
 		expirations: {
 			/** For the entire cache file */
 			file: (now: Date) => Date;
@@ -114,7 +121,7 @@ export async function tryCache<R, Q extends string>(
 			entry: (now: Date, query: Q) => Date;
 		};
 	}
-): Promise<R> {
+): Promise<R[]> {
 	const filepath = filepathToCache(datasource);
 	if (!existsSync(filepath)) {
 		mkdirSync(path.dirname(filepath), { recursive: true });
@@ -151,64 +158,106 @@ export async function tryCache<R, Q extends string>(
 		}
 
 		const entries = cache.entries[selector.query];
-		const index = entries.findIndex((entry) => dequal(entry.params, selector.params));
+		const matches: typeof entries = [];
+		const misses: Array<{ i: number; why: 'entry not found' | (string & {}) }> = [];
+		for (const [i, params] of selector.paramslist.entries()) {
+			const index = entries.findIndex((entry) => dequal(entry.params, params));
 
-		if (index === -1) throw new Error('entry not found');
-
-		const entry = entries[index];
-
-		if (isPast(entry.expiresAt)) {
-			cache.entries[selector.query].splice(index, 1);
-			throw new Error('entry too old');
-		}
-
-		if (entry.files) {
-			const misses = entry.files.filter(
-				(file) => !fileOnDiskMatches(datasource, selector.query, file)
-			);
-
-			if (misses.length > 0) {
-				throw new Error(
-					`some files don't match on disk: ${misses.map((f) => f.filename).join(', ')}`
-				);
+			if (index === -1) {
+				misses.push({ i, why: 'entry not found' });
+				continue;
 			}
+
+			const entry = entries[index];
+
+			if (isPast(entry.expiresAt)) {
+				cache.entries[selector.query].splice(index, 1);
+				misses.push({ i, why: 'entry too old' });
+				continue;
+			}
+
+			if (entry.files) {
+				const fileMisses = entry.files.filter(
+					(file) => !fileOnDiskMatches(datasource, selector.query, file)
+				);
+
+				if (fileMisses.length > 0) {
+					misses.push({
+						i,
+						why: `some files don't match on disk: ${fileMisses.map((f) => f.filename).join(', ')}`,
+					});
+					continue;
+				}
+			}
+
+			matches.push(entry);
 		}
 
-		return entry.response as R;
+		if (misses.length > 0) {
+			throw new CacheMiss(misses);
+		}
+
+		return matches.map((m) => m.response as R);
 	} catch (error) {
-		const why = String(error).replace(/^Error: /, '');
-		logger.info(
-			`${datasource}/${selector.query}`,
-			Object.entries(selector.params)
-				.map(([key, value]) => `${key}=${JSON.stringify(value)}`)
-				.join(' '),
-			why === 'entry not found' ? '' : `  (${why})`
-		);
+		const msg = String(error).replace(/^Error: /, '');
+
+		const reasons =
+			error instanceof CacheMiss
+				? error.misses
+				: selector.paramslist.map((_, i) => ({ i, why: msg }));
+
+		for (const [i, p] of selector.paramslist.entries()) {
+			const { why } = reasons.find((r) => r.i === i)!;
+
+			let paramsDisplay = JSON.stringify(p);
+
+			if (typeof p === 'object' && p !== null) {
+				paramsDisplay = Object.entries(p)
+					.map(([key, value]) => `${key}=${JSON.stringify(value)}`)
+					.join(' ');
+			}
+
+			const bulkMarker =
+				selector.paramslist.length > 1 ? `(${i}/${selector.paramslist.length - 1})` : '';
+
+			logger.info(
+				`${datasource}/${selector.query}` + bulkMarker,
+				paramsDisplay,
+				why === 'entry not found' ? '' : `  (${why})`
+			);
+		}
 
 		const result = await compute().catch((err) => {
-			throw new Error(`${selector.query} ${JSON.stringify(selector.params)} failed`, {
+			throw new Error(`${selector.query} ${JSON.stringify(selector.paramslist)} failed`, {
 				cause: err,
 			});
 		});
 
-		let response: R;
+		/** In the same order as selector.paramslist. Undefined means no result was returned for that param */
+		let responses: Array<R | undefined>;
 		let files: CachedFile[] | undefined;
 
 		if (result instanceof ResponseWithFiles) {
-			response = result.response;
+			responses = [result.response];
 			files = await result.prepareForCache(datasource, selector.query);
+		} else if (result instanceof MultipleResponses) {
+			responses = result.ordered(selector.paramslist);
+			files = undefined;
 		} else {
-			response = result;
+			responses = [result];
 			files = undefined;
 		}
 
 		cache.entries[selector.query] ??= [];
-		cache.entries[selector.query].push({
-			expiresAt: expirations.entry(new Date(), selector.query),
-			params: selector.params,
-			response,
-			files,
-		});
+		for (const [params, response] of zip(selector.paramslist, responses)) {
+			if (!response) continue;
+			cache.entries[selector.query].push({
+				expiresAt: expirations.entry(new Date(), selector.query),
+				params,
+				response,
+				files,
+			});
+		}
 
 		const lastWrite = lastWrites.get(datasource);
 		if (!lastWrite || differenceInSeconds(new Date(), lastWrite) >= 30) {
@@ -219,7 +268,7 @@ export async function tryCache<R, Q extends string>(
 
 		inmemory.set(datasource, cache);
 
-		return response;
+		return responses.filter((r) => r !== undefined);
 	}
 }
 

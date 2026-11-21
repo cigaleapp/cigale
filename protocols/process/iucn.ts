@@ -27,25 +27,32 @@ export class IUCN implements Enricher {
 
 	archive: IUCNArchive;
 
+	chunksize = 1;
+
 	constructor() {
 		this.archive = new IUCNArchive();
 	}
 
-	async enrich({ name, clade }: Option) {
-		if (clade !== 'species') return EMPTY_EXTRA;
+	//  TODO: see if we can batch this up
+	async *enrich(options: Option[]) {
+		for (const { id, clade, name } of options) {
+			if (!id) continue;
+			if (clade !== 'species') continue;
 
-		const { status } = await this.archive.request('get', { name });
+			const { status } = await this.archive.one('get', { name });
 
-		if (!status) return EMPTY_EXTRA;
+			if (!status) continue;
 
-		return {
-			priority: 2,
-			extra: {
-				cascade: {
-					conservation_status: STATUSES[status],
+			yield {
+				id,
+				priority: 2,
+				extra: {
+					cascade: {
+						conservation_status: STATUSES[status],
+					},
 				},
-			},
-		};
+			};
+		}
 	}
 }
 

@@ -6,6 +6,7 @@ import { JWT } from 'google-auth-library';
 import { drive_v3, google } from 'googleapis';
 import { Jimp } from 'jimp';
 import { JSDOM } from 'jsdom';
+// @ts-expect-error untyped module
 import odt from 'odt2html';
 import { pdfToPng } from 'pdf-to-png-converter';
 import Turndown from 'turndown';
@@ -26,7 +27,7 @@ export class GoogleDriveSlides implements NameProvider {
 	}
 
 	async *scan() {
-		const { files } = await this.gdrive.request('files', {});
+		const { files } = await this.gdrive.one('files', {});
 
 		for (const { name } of files) {
 			if (name.endsWith(' sp')) {
@@ -43,28 +44,34 @@ export class GoogleSlides implements Enricher {
 
 	gdrive: GoogleDrive;
 
+	chunksize = 1;
+
 	constructor() {
 		this.gdrive = new GoogleDrive();
 	}
 
-	async enrich({ name, clade }: Option) {
-		if (!['species', 'genus'].includes(clade)) return EMPTY_EXTRA;
+	async *enrich(options: Option[]) {
+		for (const { id, clade, name } of options) {
+			if (!id) continue;
+			if (!['species', 'genus'].includes(clade)) continue;
 
-		const data = await this.gdrive.request('slide', { name, clade });
-		if (!data) return EMPTY_EXTRA;
+			const data = await this.gdrive.one('slide', { name, clade });
+			if (!data) continue;
 
-		return {
-			priority: 3,
-			extra: {
-				description: data.description,
-				learnMore: data.learnMore,
-				images: data.images.map((image) =>
-					new URL(
-						`${ASSETS_URL_BASE}/${this.name}/${encodeURIComponent(image.filename)}`
-					).toString()
-				),
-			} satisfies OptionExtra,
-		};
+			yield {
+				id,
+				priority: 3,
+				extra: {
+					description: data.description,
+					learnMore: data.learnMore,
+					images: data.images.map((image) =>
+						new URL(
+							`${ASSETS_URL_BASE}/${this.name}/${encodeURIComponent(image.filename)}`
+						).toString()
+					),
+				} satisfies OptionExtra,
+			};
+		}
 	}
 }
 
@@ -138,7 +145,7 @@ class GoogleDrive extends Datasource<
 		},
 
 		slide: async ({ name, clade }: { name: string; clade: string }) => {
-			const { files } = await this.request('files', {});
+			const { files } = await this.one('files', {});
 			const filename = clade === 'genus' ? `${name} sp` : name;
 			const file = files.find((f) => f.name.trim() === filename);
 			if (!file) return null;

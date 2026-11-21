@@ -13,7 +13,7 @@ export class BirdNetClassmapping implements NameProvider {
 	}
 
 	async *scan() {
-		for (const row of await this.zenodo.request('classmapping', {
+		for (const row of await this.zenodo.one('classmapping', {
 			record: 'https://zenodo.org/records/20703646',
 			file: 'BirdNET+_V3.0-preview3.1_Global_11K_Labels.csv',
 		})) {

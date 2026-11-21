@@ -16,7 +16,7 @@ export class GBIFID implements Identifier {
 
 	async identify({ clade, name, id }: Option) {
 		if (id) return id;
-		const result = await this.gbif.request('id', { clade, name });
+		const result = await this.gbif.one('id', { clade, name });
 		return result.id;
 	}
 }
@@ -34,7 +34,7 @@ export class GBIFTaxonomy implements TaxonomyProvider {
 	async parents({ clade, provenance, id }: Option & { id: string }): Promise<Option[]> {
 		if (clade === 'kingdom') return [];
 
-		const parents = await this.gbif.request('parents', { id });
+		const parents = await this.gbif.one('parents', { id });
 
 		return parents.map((parent) => ({
 			provenance,

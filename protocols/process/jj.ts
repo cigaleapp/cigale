@@ -5,34 +5,46 @@ import * as jsdom from 'jsdom';
 import { JSDOM } from 'jsdom';
 import Turndown from 'turndown';
 
-import { Datasource, EMPTY_EXTRA, Enricher, OptionExtra } from './modules.js';
-import { fetchPagesViaWordpressAPI } from './wordpress.js';
+import { Datasource, Enricher, MultipleResponses, OptionExtra } from './modules.js';
 import { logger } from './progress.js';
+import { fetchPagesViaWordpressAPI } from './wordpress.js';
 
 export class JessicaJoachim implements Enricher {
 	name = 'jj' as const;
 
 	jj: JessicaJoachimSite;
 
-	pages: Page[] | undefined;
+	index: Page[] | undefined;
 
 	constructor() {
 		this.jj = new JessicaJoachimSite();
 	}
 
-	async enrich(option: Option) {
-		this.pages ??= await this.jj.request('index', {}).then((r) => r.pages);
+	async *enrich(options: Option[]) {
+		this.index ??= await this.jj.one('index', {}).then((r) => r.pages);
 
-		const page = this.pages!.find(
-			(link) => link.clade === option.clade && link.name === option.name
-		);
+		const lookups = this.index!.filter((page) => options.some(this.matchCladedName(page)));
 
-		if (!page) return EMPTY_EXTRA;
+		for (let i = 0; i < options.length; i += this.jj.chunksize) {
+			const chunk = lookups.slice(i, i + this.jj.chunksize);
 
-		return {
-			priority: 10,
-			extra: await this.jj.request('page', { link: page.link }),
-		};
+			const fiches = await this.jj.many(
+				'pages',
+				chunk.map((l) => ({ link: l.link }))
+			);
+
+			for (const { link, extra } of fiches) {
+				const page = this.index!.find((page) => page.link === link)!;
+				const { id } = options.find(this.matchCladedName(page))!;
+				if (!id) continue;
+				yield { id, priority: 10, extra };
+			}
+		}
+	}
+
+	matchCladedName(option: { clade: string; name: string }) {
+		return (item: { clade: string; name: string }) =>
+			item.clade === option.clade && item.name === option.name;
 	}
 }
 
@@ -43,18 +55,14 @@ type Page = {
 };
 
 class JessicaJoachimSite extends Datasource<
-	'index' | 'page',
+	'index' | 'pages',
 	{
 		index: Record<never, never>;
-		page: {
-			link: string;
-		};
+		pages: Array<{ link: string }>;
 	},
 	{
-		index: {
-			pages: Page[];
-		};
-		page: OptionExtra;
+		index: { pages: Page[] };
+		pages: { link: string; extra: OptionExtra };
 	}
 > {
 	name = 'jj' as const;
@@ -65,17 +73,19 @@ class JessicaJoachimSite extends Datasource<
 
 	expirations = {
 		file: (now: Date) => addMonths(now, 6),
-		entry: (now: Date, query: 'index' | 'page') => {
+		entry: (now: Date, query: 'index' | 'pages') => {
 			switch (query) {
 				case 'index':
 					return addHours(now, 6);
-				case 'page':
+				case 'pages':
 					return addMonths(now, 1);
 			}
 		},
 	};
 
 	async init() {}
+
+	chunksize = 80
 
 	requests = {
 		index: async () => {
@@ -105,9 +115,9 @@ class JessicaJoachimSite extends Datasource<
 			return { pages };
 		},
 
-		page: async ({ link }: { link: string }) => {
-			const { page } = await fetchPagesViaWordpressAPI(
-				new Map([['page', new URL(link)] as const]),
+		pages: async (links: Array<{ link: string }>) => {
+			const pages = await fetchPagesViaWordpressAPI(
+				new Map(links.map((l) => [l.link, new URL(l.link)] as const)),
 				{
 					origin: this.origin.toString(),
 					auth: {
@@ -117,112 +127,128 @@ class JessicaJoachimSite extends Datasource<
 				}
 			);
 
-			if (!page) throw new Error('Page not found via wordpress API');
+			const responses = new MultipleResponses<
+				{ link: string; extra: OptionExtra },
+				{ link: string }
+			>();
 
-			const content: HTMLElement = page.content.rendered.window.document.body;
+			for (const [link, page] of Object.entries(pages)) {
+				if (!page) continue;
+				const content: HTMLElement = page.content.rendered.window.document.body;
 
-			if (!content) {
-				throw new Error(`Could not find main content in page at ${page.link.toString()}`);
-			}
+				if (!content) {
+					throw new Error(
+						`Could not find main content in page at ${page.link.toString()}`
+					);
+				}
 
-			// We aren't using yoast's og_image because it often is either poor resolution or not the same as the main content's main image
+				// We aren't using yoast's og_image because it often is either poor resolution or not the same as the main content's main image
 
-			let newImages: URL[] = [
-				...page.content.raw.window.document.body.querySelectorAll('img'),
-			]
-				.map((img) => parseURLSafe(img.src))
-				.filter((src): src is URL => {
-					if (!src) return false;
-					if (isSpecialImage(src)) return false;
-					return true;
+				let newImages: URL[] = [
+					...page.content.raw.window.document.body.querySelectorAll('img'),
+				]
+					.map((img) => parseURLSafe(img.src))
+					.filter((src): src is URL => {
+						if (!src) return false;
+						if (isSpecialImage(src)) return false;
+						return true;
+					});
+
+				if (newImages.length === 0)
+					newImages = [page.yoast_head_json.og_image.at(0)?.url].filter(
+						(x): x is URL => x !== undefined
+					);
+
+				// The images might have a `?resize` query param, remove that
+				newImages.forEach((src) => src.searchParams.delete('resize'));
+
+				const hasImageWithFilename = (filename: string) =>
+					[...content.querySelectorAll(`img[src*="${filename}"]`)].some(
+						(candidate) =>
+							new URL(candidate.getAttribute('src')!).pathname.split('/').pop() ===
+							filename
+					);
+
+				const cascade = {} as Record<string, string | string[]>;
+
+				// Niveau de difficulté
+				for (const [key, niveau] of Object.entries({
+					easy: 'facile',
+					medium: 'moyenne',
+					hard: 'difficile',
+					very_hard: 'tres-difficile',
+				})) {
+					if (hasImageWithFilename(`Id-${niveau}.jpg`)) {
+						cascade.identification_difficulty = key;
+					}
+				}
+
+				// Statut de conservation
+				for (const symbol of ['lc', 'nt', 'vu', 'en', 'cr', 'ex']) {
+					if (hasImageWithFilename(`Statut-${symbol.toUpperCase()}.jpg`)) {
+						cascade.conservation_status = symbol;
+					}
+				}
+
+				const removeAll = (selector: string) =>
+					content.querySelectorAll(selector).forEach((el) => el.remove());
+
+				// First image, keeping it in description would be redundant
+				content.querySelector('img')?.remove();
+				// Text (most likely header) for the removed gallery
+				removeAll('p:has(+ .wp-block-kadence-advancedgallery)');
+				// Gallery (can't be represented in markdown well)
+				removeAll('.wp-block-kadence-advancedgallery');
+				removeAll('.tiled-gallery');
+				removeAll('[id^=gallery-]');
+				removeAll('[id^=gallery-]');
+				// Navigation buttons
+				removeAll('.wp-block-kadence-advancedbtn');
+				removeAll('.wp-block-kadence-tabs');
+				// Style tags, that are dumped as plain text when converting to markdown,
+				// for some reason
+				removeAll('style');
+				// Remove title
+				content.querySelector('h1')?.remove();
+				// Remove year-only bold text, it's usually above a gallery (that is now removed)
+				content.querySelectorAll('strong, h1, h2, h3, h4, h5, h6').forEach((node) => {
+					const text = cleanedTextContent(node) ?? '';
+
+					if (/^20\d\d(-20\d\d)?$/.test(text)) {
+						node.remove();
+					}
 				});
 
-			if (newImages.length === 0)
-				newImages = [page.yoast_head_json.og_image.at(0)?.url].filter(
-					(x): x is URL => x !== undefined
+				content.querySelectorAll('img').forEach((img) => img.remove());
+
+				// Remove links that became empty
+				content.querySelectorAll('a').forEach((node) => {
+					const text = cleanedTextContent(node) ?? '';
+
+					if (!text) {
+						node.remove();
+					}
+
+					if (node.href.startsWith('#')) {
+						node.replaceWith(document.createTextNode(text));
+					}
+				});
+
+				responses.push(
+					{ link },
+					{
+						link,
+						extra: {
+							learnMore: page.yoast_head_json.canonical.toString(),
+							description: htmlToMarkdown(content.innerHTML).trim(),
+							images: newImages.map((u) => u.toString()),
+							cascade,
+						},
+					}
 				);
-
-			// The images might have a `?resize` query param, remove that
-			newImages.forEach((src) => src.searchParams.delete('resize'));
-
-			const hasImageWithFilename = (filename: string) =>
-				[...content.querySelectorAll(`img[src*="${filename}"]`)].some(
-					(candidate) =>
-						new URL(candidate.getAttribute('src')!).pathname.split('/').pop() ===
-						filename
-				);
-
-			const cascade = {} as Record<string, string | string[]>;
-
-			// Niveau de difficulté
-			for (const [key, niveau] of Object.entries({
-				easy: 'facile',
-				medium: 'moyenne',
-				hard: 'difficile',
-				very_hard: 'tres-difficile',
-			})) {
-				if (hasImageWithFilename(`Id-${niveau}.jpg`)) {
-					cascade.identification_difficulty = key;
-				}
 			}
 
-			// Statut de conservation
-			for (const symbol of ['lc', 'nt', 'vu', 'en', 'cr', 'ex']) {
-				if (hasImageWithFilename(`Statut-${symbol.toUpperCase()}.jpg`)) {
-					cascade.conservation_status = symbol;
-				}
-			}
-
-			const removeAll = (selector: string) =>
-				content.querySelectorAll(selector).forEach((el) => el.remove());
-
-			// First image, keeping it in description would be redundant
-			content.querySelector('img')?.remove();
-			// Text (most likely header) for the removed gallery
-			removeAll('p:has(+ .wp-block-kadence-advancedgallery)');
-			// Gallery (can't be represented in markdown well)
-			removeAll('.wp-block-kadence-advancedgallery');
-			removeAll('.tiled-gallery');
-			removeAll('[id^=gallery-]');
-			removeAll('[id^=gallery-]');
-			// Navigation buttons
-			removeAll('.wp-block-kadence-advancedbtn');
-			removeAll('.wp-block-kadence-tabs');
-			// Style tags, that are dumped as plain text when converting to markdown,
-			// for some reason
-			removeAll('style');
-			// Remove title
-			content.querySelector('h1')?.remove();
-			// Remove year-only bold text, it's usually above a gallery (that is now removed)
-			content.querySelectorAll('strong, h1, h2, h3, h4, h5, h6').forEach((node) => {
-				const text = cleanedTextContent(node) ?? '';
-
-				if (/^20\d\d(-20\d\d)?$/.test(text)) {
-					node.remove();
-				}
-			});
-
-			content.querySelectorAll('img').forEach((img) => img.remove());
-
-			// Remove links that became empty
-			content.querySelectorAll('a').forEach((node) => {
-				const text = cleanedTextContent(node) ?? '';
-
-				if (!text) {
-					node.remove();
-				}
-
-				if (node.href.startsWith('#')) {
-					node.replaceWith(document.createTextNode(text));
-				}
-			});
-
-			return {
-				learnMore: page.yoast_head_json.canonical.toString(),
-				description: htmlToMarkdown(content.innerHTML).trim(),
-				images: newImages.map((u) => u.toString()),
-				cascade,
-			};
+			return responses;
 		},
 	};
 }

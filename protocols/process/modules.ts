@@ -1,5 +1,7 @@
 import type * as DB from '#lib/database.js';
 
+import { dequal } from 'dequal';
+
 import { ResponseWithFiles, tryCache } from './caching';
 import { bar } from './progress';
 
@@ -29,14 +31,52 @@ export type ModuleName =
 	// debug stuff
 	| `debug-${string}`;
 
+export class MultipleResponses<R, P> {
+	responses: Array<[P, R]>;
+
+	constructor(init: Array<[P, R]> = []) {
+		this.responses = init;
+	}
+
+	push(params: P, response: R) {
+		this.responses.push([params, response]);
+	}
+
+	ordered(order: P[]): Array<R | undefined> {
+		return order.map((param) => this.responses.find(([p]) => dequal(p, param))?.[1]);
+	}
+}
+
+export type DataRequestParams<Query extends string = string> = Record<Query, unknown>;
+
 /** Handling a request from a module, by first trying to hit the cache, and if it fails, hitting the network/whatever. Response, if it was a cache miss, is saved to cache. */
 export type DataRequests<
 	Query extends string = string,
-	Params extends Record<Query, unknown> = Record<Query, unknown>,
+	Params extends DataRequestParams<Query> = DataRequestParams<Query>,
 	Responses extends Record<Query, unknown> = Record<Query, unknown>,
 > = {
-	[Q in Query]: (params: Params[Q]) => Promise<Responses[Q] | ResponseWithFiles<Responses[Q]>>;
+	[Q in Query]: (
+		params: Params[Q]
+	) => Promise<
+		Params[Q] extends Array<any>
+			? | Responses[Q]
+				| ResponseWithFiles<Responses[Q]>
+				| MultipleResponses<Responses[Q], Params[Q][number]>
+			: Responses[Q] | ResponseWithFiles<Responses[Q]>
+	>;
 };
+
+export type BulkQueries<
+	Query extends string = string,
+	Params extends DataRequestParams<Query> = DataRequestParams<Query>,
+	_Responses extends Record<Query, unknown> = Record<Query, unknown>,
+> = { [Q in Query]: Params[Q] extends any[] ? Q : never }[Query];
+
+export type SingleQueries<
+	Query extends string = string,
+	Params extends DataRequestParams<Query> = DataRequestParams<Query>,
+	_Responses extends Record<Query, unknown> = Record<Query, unknown>,
+> = { [Q in Query]: Params[Q] extends any[] ? never : Q }[Query];
 
 /**
  * Defines caching for a single external source, that could be used multiple times by different modules.
@@ -44,7 +84,7 @@ export type DataRequests<
  */
 export abstract class Datasource<
 	Query extends string = string,
-	Params extends Record<Query, Record<string, unknown>> = Record<Query, Record<string, unknown>>,
+	Params extends DataRequestParams<Query> = DataRequestParams<Query>,
 	Responses extends Record<Query, unknown> = Record<Query, unknown>,
 > {
 	/** Name of the datasource. Used to construct the path to the cache file. */
@@ -60,13 +100,32 @@ export abstract class Datasource<
 		entry: (now: Date, query: Query) => Date;
 	};
 
-	async request<Q extends Query>(query: Q, params: Params[Q]): Promise<Responses[Q]> {
+	async one<Q extends SingleQueries<Query, Params, Responses>>(
+		query: Q,
+		params: Params[Q]
+	): Promise<Responses[Q]> {
+		const [response] = await this._request(query, [params], { bulk: false });
+		return response;
+	}
+
+	async many<Q extends BulkQueries<Query, Params, Responses>>(
+		query: Q,
+		params: Params[Q] extends unknown[] ? Params[Q] : never
+	): Promise<Responses[Q][]> {
+		return this._request(query, params, { bulk: true });
+	}
+
+	async _request<Q extends Query>(
+		query: Q,
+		params: unknown[],
+		{ bulk }: { bulk: boolean }
+	): Promise<Responses[Q][]> {
 		await this.init?.();
 
 		return tryCache(this.name, {
-			selector: { query, params },
+			selector: { query, paramslist: params },
 			expirations: this.expirations,
-			compute: async () => this.requests[query](params),
+			compute: async () => this.requests[query]((bulk ? params : params[0]) as Params[Q]),
 		});
 	}
 }
@@ -109,7 +168,9 @@ export interface TaxonomyProvider extends Module {
 
 /** Used to register additional info to Option.extras (description, images, learn more links, etc.) */
 export interface Enricher extends Module {
-	enrich(option: Option): Promise<{
+	/** A very large chunk is given, to allow the module to do its own chunking */
+	enrich(options: Option[]): AsyncIterable<{
+		id: string;
 		extra: OptionExtra;
 		/** Used to determine which Enrich wins if multiple Enrich provided the same property on this Option */
 		priority: number;

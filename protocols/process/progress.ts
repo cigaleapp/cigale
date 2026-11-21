@@ -21,12 +21,14 @@ class Progress {
 		this.done = 0;
 	}
 
-	increment() {
-		this.done++;
+	increment(by = 1) {
+		if (by < 0) throw new Error(`cant increment by ${by}`);
+		this.done += by;
 		this.redraw();
 	}
 
 	set(progress: number) {
+		if (progress < 0) throw new Error(`cant set progress to ${progress}`);
 		this.done = progress;
 		this.redraw();
 	}
@@ -53,7 +55,7 @@ class Progress {
 		const phase = this.phaseName.slice(0, this.maxPhaseLength).padEnd(this.maxPhaseLength);
 
 		const filled = scaled(width);
-		const empty = width - filled;
+		const empty = Math.max(0, width - filled);
 		const bar = '='.repeat(filled) + ' '.repeat(empty);
 
 		const percentage = `${scaled(100).toString().padStart(3)}%`;

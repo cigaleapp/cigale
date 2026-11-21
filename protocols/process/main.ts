@@ -25,8 +25,8 @@ await run({
 	metadataId: (clade) => clade,
 	output: { options: 'options', images: 'assets' },
 	modules: {
-		sources: [new GoogleDriveSlides(), new IRITModels(), new BirdNetClassmapping()],
-		// sources: [new GoogleDriveSlides()],
+		sources: [new GoogleDriveSlides(), new IRITModels('full'), new BirdNetClassmapping()],
+		// sources: [new IRITModels('light')],
 		identifier: new GBIFID(),
 		taxonomy: new GBIFTaxonomy(),
 		enrich: [new JessicaJoachim(), new IUCN(), new GoogleSlides()],
@@ -62,8 +62,8 @@ async function run(plan: {
 	};
 }) {
 	const removeExitHook = exitHook(() => {
-		progress.stop();
 		writeAllCaches();
+		progress.stop();
 	});
 
 	/** clade:name */
@@ -133,12 +133,22 @@ async function run(plan: {
 
 	/** Enrich */
 
+	const CHUNKSIZE = 1_000;
+	const opts = [...options.values()];
 	await Promise.all(
 		plan.modules.enrich.map(async (enricher) => {
-			for (const option of options.values()) {
-				option.extras ??= [];
-				option.extras.push(await enricher.enrich(option));
-				progress.increment();
+			for (let i = 0; i < options.size; i += CHUNKSIZE) {
+				const chunk = opts.slice(i, i + CHUNKSIZE);
+
+				for await (const { id, ...extra } of enricher.enrich(chunk)) {
+					const option = options.get(id);
+					if (!option) throw new Error(`Option with id ${id} not found!`);
+
+					option.extras ??= [];
+					option.extras.push(extra);
+				}
+
+				progress.increment(chunk.length);
 			}
 		})
 	);
@@ -156,6 +166,9 @@ async function run(plan: {
 			);
 
 			const clades = new Set(specialized.map((option) => option.clade));
+
+			// precomputed total assumes 1 clade per module
+			progress.total += clades.size - 1;
 
 			for (const clade of clades) {
 				const variants = specialized
