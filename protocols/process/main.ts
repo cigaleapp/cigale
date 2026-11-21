@@ -102,14 +102,14 @@ async function run(plan: {
 
 	progress.phase('taxonomy', options.size * plan.modules.taxonomies.length);
 
-	/** Find taxonomies then identify again */
+	// Find taxonomies then identify again
 
-	let done = 0;
 	for (const taxonomy of plan.modules.taxonomies) {
 		for (const option of options.values()) {
 			const parents = await taxonomy.parents(option);
 
-			progress.set(++done);
+			progress.total = options.size;
+			progress.increment();
 
 			for (const parent of parents) {
 				const id = await plan.modules.identifier.identify(parent);
