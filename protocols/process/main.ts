@@ -10,6 +10,7 @@ import type {
 	TaxonomyProvider,
 } from './modules.js';
 
+import { sum, zip } from 'es-toolkit';
 import exitHook from 'exit-hook';
 
 import { BirdNetClassmapping } from './birdnet.js';
@@ -26,7 +27,7 @@ await run({
 	output: { options: 'options', images: 'assets' },
 	modules: {
 		sources: [new GoogleDriveSlides(), new IRITModels('full'), new BirdNetClassmapping()],
-		// sources: [new IRITModels('light')],
+		// sources: [new IRITModels('light'), new GoogleDriveSlides()],
 		identifier: new GBIFID(),
 		taxonomy: new GBIFTaxonomy(),
 		enrich: [new JessicaJoachim(), new IUCN(), new GoogleSlides()],
@@ -129,20 +130,31 @@ async function run(plan: {
 	}
 
 	logger.info(`Found ${options.size - names.size} new taxa from taxonomies`);
-
-	progress.phase('enrich', options.size * plan.modules.enrich.length);
-
 	/** Enrich */
 
+	progress.phase('enrichers', plan.modules.enrich.length);
+
+	const optsPerModule: Array<Option[]> = [];
+
+	for (const enricher of plan.modules.enrich) {
+		await enricher.init();
+		optsPerModule.push([...options.values()].filter((opt) => enricher.available(opt)));
+		progress.increment();
+		logger.info(
+			`Initialized enricher ${enricher.name}: ${optsPerModule.at(-1)!.length} options available`
+		);
+	}
+
+	progress.phase('enrich', sum(optsPerModule.map((opts) => opts.length)));
+
 	const CHUNKSIZE = 5_000;
-	const opts = [...options.values()];
 	await Promise.all(
-		plan.modules.enrich.map(async (enricher) => {
-			for (let i = 0; i < options.size; i += CHUNKSIZE) {
-				const chunk = opts.slice(i, i + CHUNKSIZE);
+		zip(plan.modules.enrich, optsPerModule).map(async ([enricher, options]) => {
+			for (let i = 0; i < options.length; i += CHUNKSIZE) {
+				const chunk = options.slice(i, i + CHUNKSIZE);
 
 				for await (const { id, ...extra } of enricher.enrich(chunk)) {
-					const option = options.get(id);
+					const option = options.find((o) => o.id === id);
 					if (!option) throw new Error(`Option with id ${id} not found!`);
 
 					option.extras ??= [];
@@ -151,6 +163,8 @@ async function run(plan: {
 
 				progress.increment(chunk.length);
 			}
+
+			logger.info(`Finished with enricher ${enricher.name}`);
 		})
 	);
 
@@ -222,8 +236,8 @@ async function run(plan: {
 	);
 
 	removeExitHook();
-	progress.stop();
 	writeAllCaches();
+	progress.stop();
 }
 
 function mergeExtras(option: Option): OptionExtra {

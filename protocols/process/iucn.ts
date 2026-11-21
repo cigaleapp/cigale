@@ -1,5 +1,8 @@
 /// <reference types="@types/bun" />
 
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import path from 'node:path';
+
 import { addMonths } from 'date-fns';
 import { unzip as _unzip, Unzipped } from 'fflate';
 
@@ -26,6 +29,7 @@ export class IUCN implements Enricher {
 	name = 'iucn' as const;
 
 	archive: IUCNArchive;
+	dataset: Dataset | undefined;
 
 	chunksize = 1;
 
@@ -33,18 +37,20 @@ export class IUCN implements Enricher {
 		this.archive = new IUCNArchive();
 	}
 
+	async init() {
+		this.dataset = await this.archive.one('index', {});
+	}
+
+	available(option: Option): boolean {
+		if (option.clade !== 'species') return false;
+		return option.name in this.dataset!.byName;
+	}
+
 	//  TODO: see if we can batch this up
 	async *enrich(options: Option[]) {
-		const queries = options.filter((o) => o.id && o.clade === 'species');
-
-		const statuses = await this.archive.many(
-			'get',
-			queries.map((q) => ({ name: q.name }))
-		);
-
-		for (const { status, name } of statuses) {
-			const id = options.find((opt) => opt.name === name);
+		for (const { name, id } of options) {
 			if (!id) continue;
+			const status = this.dataset!.byName[name];
 			if (!status) continue;
 
 			yield {
@@ -64,117 +70,10 @@ type Dataset = {
 	byName: Record<string, keyof typeof STATUSES>;
 };
 
-class IUCNArchive extends Datasource<
-	'get',
-	{ get: Array<{ name: string }> },
-	{ get: { name: string; status: keyof typeof STATUSES | null } }
-> {
+class IUCNArchive extends Datasource<'index', { index: {} }, { index: Dataset }> {
 	name = 'iucn' as const;
 
-	dataset: Dataset | undefined;
-
 	async init() {}
-
-	async downloadDataset() {
-		if (this.dataset) return;
-
-		const archive = await fetch(this.archiveURL)
-			.then((response) => response.arrayBuffer())
-			.then((buf) => new Uint8Array(buf));
-
-		const metafile = await unzip(archive, 'meta.xml').then(
-			(files) => Bun.XML.parse(files['meta.xml']) as DarwinCoreMetafile
-		);
-
-		const filenames = {
-			// <core> should have the scientificName dwc term
-			name: metafile.archive.core.files.location,
-			// find <extension> that has iucn:threatStatus
-			status: metafile.archive.extension.find((ext) =>
-				ext.field.some((f) => f['@term'] === 'http://iucn.org/terms/threatStatus')
-			)!.files.location,
-		};
-
-		const data = await unzip(archive, filenames.name, filenames.status).then((files) => ({
-			name: files[filenames.name],
-			status: files[filenames.status],
-		}));
-
-		const process = <C extends string>(
-			meta: {
-				'@fieldsTerminatedBy': string;
-				'@linesTerminatedBy': string;
-				'@ignoreHeaderLines': string;
-				'@fieldsEnclosedBy': string;
-				id?: { '@index': string };
-				coreid?: { '@index': string };
-				field: Array<{ '@index': string; '@term': string }>;
-			},
-			raw: Uint8Array,
-			/** Terms to keep (values), and how to name them (keys) */
-			columns: Record<C, string>
-		) =>
-			Buffer.from(raw)
-				.toString('utf8')
-				.split(unescapeBackslashes(meta['@linesTerminatedBy']))
-				.slice(Number.parseInt(meta['@ignoreHeaderLines']))
-				.map((line) =>
-					Object.fromEntries(
-						line
-							.split(unescapeBackslashes(meta['@fieldsTerminatedBy']))
-							.map((cell, i) => {
-								const field = meta.field.find((f) => f['@index'] === i.toString());
-								const isID = (meta.id ?? meta.coreid)!['@index'] === i.toString();
-
-								if (!isID && !field) return;
-								const term = field?.['@term'].split('/').at(-1) ?? 'id';
-
-								const column = Object.entries(columns).find(([, t]) => t === term);
-								if (!column) return;
-
-								const [key] = column;
-
-								return [
-									key,
-									removeOnBothEnds(
-										cell,
-										unescapeBackslashes(meta['@fieldsEnclosedBy'])
-									),
-								];
-							})
-							.filter((value) => value !== undefined)
-					)
-				) as Record<C, string>[];
-
-		const rows = {
-			names: process(metafile.archive.core, data.name, {
-				name: 'scientificName',
-				id: 'id',
-			}),
-			statuses: process(
-				metafile.archive.extension.find((ext) => ext.files.location === filenames.status)!,
-				data.status,
-				{
-					status: 'threatStatus',
-					id: 'id',
-				}
-			),
-		};
-
-		const statusesById = new Map(
-			rows.statuses.map((s) => [s.id, s.status as keyof typeof STATUSES])
-		);
-
-		this.dataset = {
-			byName: Object.fromEntries(
-				rows.names.flatMap(({ name, id }) => {
-					const status = statusesById.get(id);
-					if (!status) return [];
-					return [[name, status]];
-				})
-			),
-		};
-	}
 
 	archiveURL = 'https://hosted-datasets.gbif.org/datasets/iucn/iucn-latest.zip';
 
@@ -184,19 +83,115 @@ class IUCNArchive extends Datasource<
 	};
 
 	requests = {
-		get: async (options: Array<{ name: string }>) => {
-			// We do this instead of init() so that we dont even download the dataset if we only get cache hits
-			if (!this.dataset) await this.downloadDataset();
+		index: async () => {
+			const archive = await fetch(this.archiveURL)
+				.then((response) => response.arrayBuffer())
+				.then((buf) => new Uint8Array(buf));
 
-			return new MultipleResponses(
-				options
-					.map(({ name }) => ({ name, status: this.dataset!.byName[name] }))
-					.filter((o) => o.status !== undefined)
-					.map(({ name, status }) => [{ name }, { name, status }] as const)
+			const metafile = await unzip(archive, 'meta.xml').then(
+				(files) => Bun.XML.parse(files['meta.xml']) as DarwinCoreMetafile
 			);
+
+			const filenames = {
+				// <core> should have the scientificName dwc term
+				name: metafile.archive.core.files.location,
+				// find <extension> that has iucn:threatStatus
+				status: metafile.archive.extension.find((ext) =>
+					ext.field.some((f) => f['@term'] === 'http://iucn.org/terms/threatStatus')
+				)!.files.location,
+			};
+
+			const data = await unzip(archive, filenames.name, filenames.status).then((files) => ({
+				name: files[filenames.name],
+				status: files[filenames.status],
+			}));
+
+			const process = <C extends string>(
+				meta: {
+					'@fieldsTerminatedBy': string;
+					'@linesTerminatedBy': string;
+					'@ignoreHeaderLines': string;
+					'@fieldsEnclosedBy': string;
+					id?: { '@index': string };
+					coreid?: { '@index': string };
+					field: Array<{ '@index': string; '@term': string }>;
+				},
+				raw: Uint8Array,
+				/** Terms to keep (values), and how to name them (keys) */
+				columns: Record<C, string>
+			) =>
+				Buffer.from(raw)
+					.toString('utf8')
+					.split(unescapeBackslashes(meta['@linesTerminatedBy']))
+					.slice(Number.parseInt(meta['@ignoreHeaderLines']))
+					.map((line) =>
+						Object.fromEntries(
+							line
+								.split(unescapeBackslashes(meta['@fieldsTerminatedBy']))
+								.map((cell, i) => {
+									const field = meta.field.find(
+										(f) => f['@index'] === i.toString()
+									);
+									const isID =
+										(meta.id ?? meta.coreid)!['@index'] === i.toString();
+
+									if (!isID && !field) return;
+									const term = field?.['@term'].split('/').at(-1) ?? 'id';
+
+									const column = Object.entries(columns).find(
+										([, t]) => t === term
+									);
+									if (!column) return;
+
+									const [key] = column;
+
+									return [
+										key,
+										removeOnBothEnds(
+											cell,
+											unescapeBackslashes(meta['@fieldsEnclosedBy'])
+										),
+									];
+								})
+								.filter((value) => value !== undefined)
+						)
+					) as Record<C, string>[];
+
+			const rows = {
+				names: process(metafile.archive.core, data.name, {
+					name: 'scientificName',
+					id: 'id',
+				}),
+				statuses: process(
+					metafile.archive.extension.find(
+						(ext) => ext.files.location === filenames.status
+					)!,
+					data.status,
+					{
+						status: 'threatStatus',
+						id: 'id',
+					}
+				),
+			};
+
+			const statusesById = new Map(
+				rows.statuses.map((s) => [s.id, s.status as keyof typeof STATUSES])
+			);
+
+			return {
+				byName: Object.fromEntries(
+					rows.names.flatMap(({ name, id }) => {
+						const status = statusesById.get(id);
+						if (!status) return [];
+						return [[name.split(' ').slice(0, 2).join(' '), status]];
+					})
+				),
+			};
 		},
 	};
 }
+
+function cleanupName(name: string) {}
 
 async function unzip(data: Uint8Array, ...names: string[]) {
 	return new Promise<Unzipped>((res, rej) =>

@@ -30,12 +30,16 @@ export class GoogleDriveSlides implements NameProvider {
 		const { files } = await this.gdrive.one('files', {});
 
 		for (const { name } of files) {
-			if (name.endsWith(' sp')) {
-				yield { clade: 'genus', name: name.replace(/ sp$/, '').trim() };
-			} else {
-				yield { clade: 'species', name };
-			}
+			yield parseFilename(name);
 		}
+	}
+}
+
+function parseFilename(name: string) {
+	if (name.endsWith(' sp')) {
+		return { clade: 'genus', name: name.replace(/ sp$/, '').trim() };
+	} else {
+		return { clade: 'species', name };
 	}
 }
 
@@ -46,8 +50,22 @@ export class GoogleSlides implements Enricher {
 
 	chunksize = 1;
 
+	availableTaxons: Array<{ clade: string; name: string }> = [];
+
 	constructor() {
 		this.gdrive = new GoogleDrive();
+	}
+
+	async init() {
+		this.availableTaxons = await this.gdrive
+			.one('files', {})
+			.then(({ files }) => files.map((f) => parseFilename(f.name)));
+	}
+
+	available(option: Option): boolean {
+		return this.availableTaxons.some(
+			(tx) => tx.clade === option.clade && tx.name === option.name
+		);
 	}
 
 	async *enrich(options: Option[]) {

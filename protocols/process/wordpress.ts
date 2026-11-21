@@ -1,7 +1,8 @@
 import { ArkErrors, type } from 'arktype';
-import { secondsToMilliseconds } from 'date-fns';
+import { hoursToSeconds, secondsToMilliseconds } from 'date-fns';
 import * as jsdom from 'jsdom';
 import { JSDOM } from 'jsdom';
+
 import { logger } from './progress';
 
 // Suppress annoying virtual console error we can't do anything about and don't care about
@@ -84,7 +85,7 @@ export async function fetchPagesViaWordpressAPI(
 		const retryAfter = response.headers.get('Retry-After');
 		const waitTime = retryAfter ? Number(retryAfter) : rateLimitWaitSeconds;
 
-		if (waitTime > 60) {
+		if (waitTime > hoursToSeconds(4)) {
 			logger.error(
 				`wait time is quite long (${waitTime}s). Skipping this batch: ${query}. Response was`,
 				await response.text()
@@ -92,6 +93,7 @@ export async function fetchPagesViaWordpressAPI(
 			return Object.fromEntries([...pages.keys()].map((key) => [key, undefined]));
 		}
 
+		logger.warn(`rate limit from wordpress api, retrying in ${waitTime}s ${query}`);
 		await new Promise((resolve) => setTimeout(resolve, secondsToMilliseconds(waitTime)));
 
 		return fetchPagesViaWordpressAPI(pages, {
@@ -107,11 +109,11 @@ export async function fetchPagesViaWordpressAPI(
 		);
 	}
 
-	const json = await response.json()
+	const json = await response.json();
 	const data = WordpressPagesResponse(json);
 
 	if (data instanceof ArkErrors) {
-		logger.error(json)
+		logger.error(json);
 		throw new Error(data.summary);
 	}
 

@@ -20,9 +20,15 @@ export class JessicaJoachim implements Enricher {
 		this.jj = new JessicaJoachimSite();
 	}
 
-	async *enrich(options: Option[]) {
+	async init() {
 		this.index ??= await this.jj.one('index', {}).then((r) => r.pages);
+	}
 
+	available(option: Option): boolean {
+		return this.index!.some(this.matchCladedName(option));
+	}
+
+	async *enrich(options: Option[]) {
 		const lookups = this.index!.filter((page) => options.some(this.matchCladedName(page)));
 
 		for (let i = 0; i < options.length; i += this.jj.chunksize) {
@@ -85,7 +91,7 @@ class JessicaJoachimSite extends Datasource<
 
 	async init() {}
 
-	chunksize = 80
+	chunksize = 80;
 
 	requests = {
 		index: async () => {

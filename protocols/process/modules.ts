@@ -167,6 +167,12 @@ export interface TaxonomyProvider extends Module {
 
 /** Used to register additional info to Option.extras (description, images, learn more links, etc.) */
 export interface Enricher extends Module {
+	/** Initialize */
+	init(): Promise<void>;
+
+	/** Check if the enricher can enrich this option or not (before sending it to enrich()) */
+	available(option: Option): boolean;
+
 	/** A very large chunk is given, to allow the module to do its own chunking */
 	enrich(options: Option[]): AsyncIterable<{
 		id: string;

@@ -99,6 +99,14 @@ class CacheMiss extends Error {
 	constructor(public readonly misses: Array<{ i: number; why: string }> = []) {
 		super();
 	}
+
+	static entireBatch(batchsize: number, why: string) {
+		return new CacheMiss(Array.from({ length: batchsize }).map((_, i) => ({ i, why })));
+	}
+
+	why(i: number): string | undefined {
+		return this.misses.find((m) => m.i === i)?.why;
+	}
 }
 
 export async function tryCache<R, Q extends string, P extends DataRequestParams<Q>[Q]>(
@@ -148,13 +156,15 @@ export async function tryCache<R, Q extends string, P extends DataRequestParams<
 	inmemory.set(datasource, cache);
 
 	try {
+		const pcount = selector.paramslist.length;
+
 		if (isPast(cache.expiresAt)) {
 			unlinkSync(filepath);
-			throw new Error('cache too old');
+			throw CacheMiss.entireBatch(pcount, 'cache too old');
 		}
 
 		if (!(selector.query in cache.entries)) {
-			throw new Error('no entries for query');
+			throw CacheMiss.entireBatch(pcount, 'no entries for query');
 		}
 
 		const entries = cache.entries[selector.query];
@@ -199,16 +209,13 @@ export async function tryCache<R, Q extends string, P extends DataRequestParams<
 
 		return matches.map((m) => m.response as R);
 	} catch (error) {
-		const msg = String(error).replace(/^Error: /, '');
-
-		const reasons =
-			error instanceof CacheMiss
-				? error.misses
-				: selector.paramslist.map((_, i) => ({ i, why: msg }));
+		if (!(error instanceof CacheMiss)) {
+			throw new Error(`Error while retrieving cached value`, {
+				cause: error,
+			});
+		}
 
 		for (const [i, p] of selector.paramslist.entries()) {
-			const { why } = reasons.find((r) => r.i === i) ?? { why: msg };
-
 			let paramsDisplay = JSON.stringify(p);
 
 			if (typeof p === 'object' && p !== null) {
@@ -223,7 +230,9 @@ export async function tryCache<R, Q extends string, P extends DataRequestParams<
 			logger.info(
 				`${datasource}/${selector.query}` + bulkMarker,
 				paramsDisplay,
-				why === 'entry not found' ? '' : `  (${why})`
+				error.why(i) === 'entry not found'
+					? ''
+					: `  (${error.why(i) ?? 'found but part of partial chunk match'})`
 			);
 		}
 
