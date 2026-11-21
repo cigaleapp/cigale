@@ -104,11 +104,13 @@ async function run(plan: {
 
 	// Find taxonomies then identify again
 
+	/** Sum of progress total for all taxonomies modules before the one we're currently processing. */
+	let previousTotalProgress = 0;
 	for (const taxonomy of plan.modules.taxonomies) {
 		for (const option of options.values()) {
 			const parents = await taxonomy.parents(option);
 
-			progress.total = options.size;
+			progress.total = previousTotalProgress + options.size;
 			progress.increment();
 
 			for (const parent of parents) {
@@ -127,6 +129,8 @@ async function run(plan: {
 				parents: parents.map((p) => ({ id: p.id!, clade: p.clade })),
 			});
 		}
+
+		previousTotalProgress += progress.done
 	}
 
 	logger.info(`Found ${options.size - names.size} new taxa from taxonomies`);
