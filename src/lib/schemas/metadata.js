@@ -506,11 +506,6 @@ const MetadataBase = type({
 	groupable: type('boolean')
 		.describe('Si la métadonnée peut être utilisée pour grouper des images ou observations')
 		.default(false),
-	// TODO move to the type: '"enum"' only branch
-	'options?': MetadataEnumVariant.array()
-		.pipe((opts) => unique(opts, (o) => o.key))
-		.pipe((opts) => opts.map((opt, index) => ({ index, ...opt })))
-		.describe('Les options valides. Uniquement utile pour une métadonnée de type "enum"'),
 	learnMore: URLString.describe(
 		'Un lien pour en apprendre plus sur ce que cette métadonnée décrit'
 	).optional(),
@@ -683,6 +678,37 @@ const MetadataEnum = MetadataBase.and({
 			"Les liens vers les images de l'option, séparés par ' | '"
 		),
 	},
+	'externalOptions?': type({
+		at: URLString.describe('Où télécharger les options'),
+		format: type.or(
+			[
+				'"csv"',
+				'@',
+				'Format CSV. La première ligne doit être le nom des clés. Chaque ligne est transformé en un objet pour être traité par .postprocess',
+			],
+			['"json"', '@', 'Format JSON'],
+			[
+				'"json-lines"',
+				'@',
+				`Un objet au format JSON par ligne du fichier. La première ligne doit être un header, avec au moins une propriété "count" qui indique le nombre d'options contenues dans le fichier (sans compter la ligne de header)`,
+			]
+		),
+		'postprocess?': JsonataExpression(
+			type({
+				lineNumber: 'number.integer > 0',
+				totalLines: 'number.integer > 0',
+				raw: 'string',
+				line: 'unknown',
+			}),
+			MetadataEnumVariant
+		),
+	}).describe(
+		"Utile quand il y a beaucoup d'options et que les lister explicitement dans le fichier manifeste directement serait impraticable"
+	),
+	'options?': MetadataEnumVariant.array()
+		.pipe((opts) => unique(opts, (o) => o.key))
+		.pipe((opts) => opts.map((opt, index) => ({ index, ...opt })))
+		.describe('Les options valides. Uniquement utile pour une métadonnée de type "enum"'),
 	presentation: type
 		.enumerated('dropdown', 'buttons', 'auto')
 		.describe(
@@ -698,6 +724,8 @@ const MetadataEnum = MetadataBase.and({
 	// --- Technical fields ---
 	_optionsCount: 'number.integer = 0',
 });
+
+const MetadataEnumInDatabase = MetadataEnum.omit('options');
 
 const MetadataBoundingbox = MetadataBase.and({
 	type: '"boundingbox"',
@@ -783,6 +811,19 @@ export const Metadata = type.or(
 	MetadataDate,
 	MetadataLocation,
 	MetadataEnum,
+	MetadataBoundingbox,
+	MetadataFile,
+	MetadataSurface
+);
+
+export const MetadataInDatabase = type.or(
+	MetadataBoolean,
+	MetadataString,
+	MetadataInteger,
+	MetadataFloat,
+	MetadataDate,
+	MetadataLocation,
+	MetadataEnumInDatabase,
 	MetadataBoundingbox,
 	MetadataFile,
 	MetadataSurface
