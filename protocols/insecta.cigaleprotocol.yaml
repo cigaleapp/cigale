@@ -7,7 +7,7 @@ logo: https://cigale-cors-proxy-biodimedia-data-terra.ai.meso.umontpellier.fr/st
 authors:
   - name: Maxime Cauchoix
 
-version: 27
+version: 28
 updates: automatic
 source: https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/insecta.cigaleprotocol.yaml
 

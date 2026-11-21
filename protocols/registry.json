@@ -1,25 +1,37 @@
 {
-	"$schema": "https://cigaleapp.github.io/cigale/registry.schema.json",
+	"$schema": "../static/registry.schema.json",
 	"protocols": [
 		{
-			"name": "Example: arthropodes",
-			"id": "io.github.cigaleapp.arthropods.example",
-			"url": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json"
+			"name": "Environnement (base)",
+			"version": 1,
+			"manifestVersion": "1.0",
+			"older": [],
+			"id": "io.github.cigaleapp.base.environment",
+			"url": "http://localhost:3000/bases/environment.cigaleprotocol.yaml"
 		},
 		{
-			"name": "IDmyBee",
-			"id": "io.github.cigaleapp.idmybee",
-			"url": "https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/idmybee.cigaleprotocol.json"
+			"name": "Insectes (base)",
+			"version": 1,
+			"manifestVersion": "1.0",
+			"older": [],
+			"id": "io.github.cigaleapp.base.insects",
+			"url": "http://localhost:3000/bases/insects.cigaleprotocol.yaml"
 		},
 		{
 			"name": "INSECTA",
+			"manifestVersion": "1.0",
+			"version": 28,
+			"older": [],
 			"id": "fr.osug.terra-forma-web.insecta",
-			"url": "https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/insecta.cigaleprotocol.yaml"
+			"url": "http://localhost:3000/insecta.cigaleprotocol.yaml"
 		},
 		{
 			"name": "Entomoscope",
+			"manifestVersion": "1.0",
+			"version": 11,
+			"older": [],
 			"id": "fr.osug.terra-forma-web.entomoscope",
-			"url": "https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/entomoscope.cigaleprotocol.yaml"
+			"url": "http://localhost:3000/entomoscope.cigaleprotocol.yaml"
 		}
 	]
 }

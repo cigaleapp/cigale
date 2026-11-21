@@ -1,7 +1,8 @@
 import type { DatabaseHandle } from '#lib/idb.svelte.js';
 
-import _rawRegistry from '#lib/registry.json' with { type: 'json' };
+import _rawRegistry from '#lib/../../protocols/registry.json' with { type: 'json' };
 import { ProtocolRegistry } from '#lib/schemas/protocols.js';
+import { compareBy } from '#lib/utils.ts';
 
 import { manifestVersionsCompatible } from './manifestversion';
 
@@ -16,6 +17,21 @@ export async function fetchProtocolRegistry() {
 	PROTOCOLS_REGISTRY ??= ProtocolRegistry.assert(_rawRegistry);
 
 	return PROTOCOLS_REGISTRY;
+}
+
+export async function lookupMostRecentCompatibleProtocol(id: string): Promise<URL> {
+	const registry = await fetchProtocolRegistry();
+	const entry = registry.protocols.find((p) => p.id === id);
+	if (!entry) throw new Error(`Protocol ${id} not in registry`);
+	if (manifestVersionsCompatible(entry.manifestVersion)) return new URL(entry.url);
+
+	const older = entry.older
+		.toSorted(compareBy((e) => -e.version))
+		.find((e) => manifestVersionsCompatible(e.manifestVersion));
+
+	if (!older) throw new Error("Mettez à jour l'app pour installer ce protocole");
+
+	return new URL(older.url);
 }
 
 /**

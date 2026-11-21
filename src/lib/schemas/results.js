@@ -67,11 +67,6 @@ export function withProtocolMetadata(protocol, subject) {
 				return [removeNamespaceFromMetadataId(namespaced), value];
 			}
 
-			const imp = protocol.importedMetadata.find((m) => m.source === namespaced);
-			if (imp) {
-				return [removeNamespaceFromMetadataId(imp.target), value];
-			}
-
 			return undefined;
 		}),
 	};

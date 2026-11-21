@@ -4,7 +4,7 @@ import { type } from 'arktype';
 
 import { Schemas } from '#lib/database.js';
 import { NodeProvenance } from '#lib/file-tree.js';
-import { NamespacedMetadataID } from '#lib/schemas/common.js';
+import { ID, NamespacedMetadataID } from '#lib/schemas/common.js';
 
 export const LOCAL_STORAGE = type({
 	databaseName: 'string',
@@ -85,28 +85,16 @@ export const PROCEDURES = {
 	},
 	importProtocol: {
 		input: type({
-			contents: 'string',
-			/** Optimize parsing by ensuring content is JSONC and not just YAML */
-			isJSON: 'boolean = false',
+			url: 'string.url',
 		}),
 		progress: type({
+			protocol: 'string',
 			done: 'number >= 0',
 			total: 'number > 0',
-			phase: type.enumerated(
-				'parsing',
-				'filtering-builtin-metadata',
-				'input-validation',
-				'write-protocol',
-				'write-metadata',
-				'write-metadata-options',
-				'output-validation'
-			),
+			phase: 'string',
 			'detail?': 'string',
 		}),
 		success: type({
-			id: 'string',
-			name: 'string',
-			'version?': 'number | undefined',
 			iconsToPreload: 'string[]',
 		}),
 	},

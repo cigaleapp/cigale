@@ -5,7 +5,7 @@ name: Entomoscope
 summary: Analyse de captures de l'Entomoscope
 
 updates: automatic
-version: 10
+version: 11
 source: https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/entomoscope.cigaleprotocol.yaml
 
 description: Protocole de collecte d'images d'insectes via l'Entomoscope
@@ -16,7 +16,7 @@ authors:
   - name: Maxime Cauchoix
 
 imports:
-  - from: io.github.cigaleapp.arthropods.example
+  - from: io.github.cigaleapp.base.insects
     metadataGroups:
       - taxonomy
     metadata:

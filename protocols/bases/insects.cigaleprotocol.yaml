@@ -2,7 +2,7 @@
 
 manifest: v1.0
 id: io.github.cigaleapp.base.insects
-name: Arthropodes (base)
+name: Insectes (base)
 
 version: 1
 updates: automatic
@@ -57,7 +57,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions: 
-      at: https://cigale-protocols-biodimedia-data-terra.ai.meso.umontpellier.fr/options/insects/species.jsonl
+      at: http://localhost:3000/process/options/debug-all/species.jsonl
       format: json-lines
     infer:
       neural: []
@@ -79,7 +79,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions: 
-      at: https://cigale-protocols-biodimedia-data-terra.ai.meso.umontpellier.fr/options/insects/kingdom.jsonl
+      at: http://localhost:3000/process/options/debug-all/kingdom.jsonl
       format: json-lines
       
   phylum:
@@ -91,7 +91,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions: 
-      at: https://cigale-protocols-biodimedia-data-terra.ai.meso.umontpellier.fr/options/insects/phylum.jsonl
+      at: http://localhost:3000/process/options/debug-all/phylum.jsonl
       format: json-lines
 
   class:
@@ -103,7 +103,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions: 
-      at: https://cigale-protocols-biodimedia-data-terra.ai.meso.umontpellier.fr/options/insects/class.jsonl
+      at: http://localhost:3000/process/options/debug-all/class.jsonl
       format: json-lines
 
   order:
@@ -115,7 +115,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: https://cigale-protocols-biodimedia-data-terra.ai.meso.umontpellier.fr/options/insects/order.jsonl
+      at: http://localhost:3000/process/options/debug-all/order.jsonl
       format: json-lines
 
   family:
@@ -127,7 +127,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: https://cigale-protocols-biodimedia-data-terra.ai.meso.umontpellier.fr/options/insects/family.jsonl
+      at: http://localhost:3000/process/options/debug-all/family.jsonl
       format: json-lines
 
   genus:
@@ -139,7 +139,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: https://cigale-protocols-biodimedia-data-terra.ai.meso.umontpellier.fr/options/insects/genus.jsonl
+      at: http://localhost:3000/process/options/debug-all/genus.jsonl
       format: json-lines
 
   identification_difficulty:

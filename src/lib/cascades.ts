@@ -4,12 +4,10 @@ import type { NamespacedMetadataID } from './schemas/common.js';
 import type { RuntimeValue } from './schemas/metadata.js';
 
 import { Tables } from './database.js';
-import { resolveMetadataImport } from './metadata/imports.js';
+import { resolveMetadataId } from './metadata/namespacing.js';
 import { metadataOption } from './metadata/storage.js';
 import {
-	ensureNamespacedMetadataId,
 	metadataOptionId,
-	namespacedMetadataId,
 	namespaceOfMetadataId,
 	parseMetadataOptionId,
 } from './schemas/metadata.js';
@@ -69,7 +67,14 @@ export async function computeCascades({
 	value: RuntimeValue;
 	confidences:
 		DB.MetadataValue['confidences'] | Array<{ value: RuntimeValue; confidence: number }>;
-}) {
+}): Promise<
+	{
+		metadataId: NamespacedMetadataID;
+		value: string;
+		confidence: number;
+		confidences: { value: string; confidence: number }[];
+	}[]
+> {
 	const protocolId = namespaceOfMetadataId(metadataId);
 	if (!protocolId) {
 		throw new Error(`Metadata ${metadataId} is not namespaced, cannot cascade`);
@@ -104,7 +109,7 @@ export async function computeCascades({
 			options.filter(nonnull).flatMap(({ cascade, confidence }) => {
 				return entries(cascade).flatMap(([metadataId, values]) =>
 					ensureArray(values).map((value) => ({
-						optionId: metadataOptionId(metadataId, value),
+						optionId: metadataOptionId(metadataId as string, value),
 						confidence,
 					}))
 				);
@@ -118,19 +123,15 @@ export async function computeCascades({
 		// cascades that lead to that option
 		const groupedByMetadata = groupBy(
 			groupedByOption.entries(),
-			([optionId]) =>
-				resolveMetadataImport(
-					protocol,
-					ensureNamespacedMetadataId(
-						parseMetadataOptionId(optionId).metadataId,
-						protocolId
-					)
-				),
+			([optionId]) => resolveMetadataId(protocol, parseMetadataOptionId(optionId).metadataId),
 			([optionId, confidences]) => /** @type {const} */ ({
 				value: parseMetadataOptionId(optionId).key,
 				confidence: sum(confidences),
 			})
 		);
+
+		// For cascades that aren't part of this protocol
+		groupedByMetadata.delete(undefined);
 
 		// Return a list of data ready for storeMetadataValue() for every cascaded metadata
 		return [...groupedByMetadata.entries()].map(([metadataId, options]) => {
@@ -139,7 +140,7 @@ export async function computeCascades({
 			);
 
 			return {
-				metadataId,
+				metadataId: metadataId!,
 				value,
 				confidence,
 				confidences,
@@ -171,7 +172,8 @@ export async function cascadeLabels({
 	const labels: Record<NamespacedMetadataID, DB.MetadataEnumVariant[]> = {};
 
 	for (const [metadataId, values] of Object.entries(option.cascade ?? {})) {
-		const id = resolveMetadataImport(protocol, namespacedMetadataId(protocolId, metadataId));
+		const id = resolveMetadataId(protocol, metadataId);
+		if (!id) continue;
 
 		const options = await Promise.all(
 			ensureArray(values).map(async (key) => metadataOption(db, id, key))

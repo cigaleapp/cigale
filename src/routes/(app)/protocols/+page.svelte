@@ -1,15 +1,15 @@
 <script>
 	import { fade } from 'svelte/transition';
 
-	import IconImport from '~icons/ri/download-2-line';
 	import AsyncEach from '#lib/AsyncEach.svelte';
 	import ButtonSecondary from '#lib/ButtonSecondary.svelte';
 	import { plural } from '#lib/i18n';
-	import { databaseHandle } from '#lib/idb.svelte.js';
+	import { databaseHandle, tables } from '#lib/idb.svelte.js';
 	import { promptAndImportProtocol } from '#lib/protocols';
 	import { listAllProtocols } from '#lib/protocols/registry.js';
 	import { toasts } from '#lib/toasts.svelte';
 	import { uiState } from '#lib/uistate.svelte.js';
+	import IconImport from '~icons/ri/download-2-line';
 
 	import TopbarBack from '../TopbarBack.svelte';
 	import ModalCreateProtocol from './ModalCreateProtocol.svelte';
@@ -110,8 +110,7 @@
 						oninstall={async (source, onProgress) => {
 							await data.swarpc.importProtocol.once(
 								{
-									contents: await fetch(source).then((r) => r.text()),
-									isJSON: source.endsWith('.json'),
+									url: source,
 								},
 								({ done, total }) => {
 									onProgress?.(done / total);
@@ -119,6 +118,8 @@
 							);
 
 							await uiState.processing.finish();
+							await tables.Protocol.refresh();
+							await tables.Metadata.refresh();
 							reloadProtocols++;
 						}}
 						ondelete={() => {

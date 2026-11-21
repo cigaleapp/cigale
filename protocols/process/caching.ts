@@ -5,7 +5,7 @@ import path from 'node:path';
 
 import { differenceInSeconds, isPast } from 'date-fns';
 import { dequal } from 'dequal';
-import { zip } from 'es-toolkit';
+import { at, zip } from 'es-toolkit';
 
 import { DataRequestParams, DatasourceName, MultipleResponses, Option } from './modules';
 import { logger } from './progress';
@@ -95,8 +95,11 @@ function filepathToCache(datasource: string) {
 	return path.join(BASE_DIR, `${datasource}.json`);
 }
 
-class CacheMiss extends Error {
-	constructor(public readonly misses: Array<{ i: number; why: string }> = []) {
+class CacheMiss<D> extends Error {
+	constructor(
+		public readonly misses: Array<{ i: number; why: string }> = [],
+		public readonly matches: Array<{ i: number; data: D }> = []
+	) {
 		super();
 	}
 
@@ -104,8 +107,22 @@ class CacheMiss extends Error {
 		return new CacheMiss(Array.from({ length: batchsize }).map((_, i) => ({ i, why })));
 	}
 
-	why(i: number): string | undefined {
-		return this.misses.find((m) => m.i === i)?.why;
+	miss(i: number) {
+		return this.misses.find((m) => m.i === i);
+	}
+
+	has(i: number): boolean {
+		return this.misses.some((m) => m.i === i);
+	}
+
+	get(i: number): { status: 'miss'; why: string } | { status: 'match'; data: D } {
+		const match = this.matches.find((m) => m.i === i);
+		if (match) return { status: 'match', data: match.data };
+
+		const miss = this.misses.find((m) => m.i === i);
+		if (miss) return { status: 'miss', why: miss.why };
+
+		return { status: 'miss', why: 'no cache miss reason given' };
 	}
 }
 
@@ -120,8 +137,8 @@ export async function tryCache<R, Q extends string, P extends DataRequestParams<
 			query: Q;
 			paramslist: P[];
 		};
-		/** What to run if the cache misses */
-		compute: () => Promise<R | MultipleResponses<R, P> | ResponseWithFiles<R>>;
+		/** What to run if the cache misses. Paramslist could be a subset of selector.paramslist if there was a partial cache match  */
+		compute: (paramslist: P[]) => Promise<R | MultipleResponses<R, P> | ResponseWithFiles<R>>;
 		expirations: {
 			/** For the entire cache file */
 			file: (now: Date) => Date;
@@ -168,7 +185,7 @@ export async function tryCache<R, Q extends string, P extends DataRequestParams<
 		}
 
 		const entries = cache.entries[selector.query];
-		const matches: typeof entries = [];
+		const matches: Array<{ i: number; data: R }> = [];
 		const misses: Array<{ i: number; why: 'entry not found' | (string & {}) }> = [];
 		for (const [i, params] of selector.paramslist.entries()) {
 			const index = entries.findIndex((entry) => dequal(entry.params, params));
@@ -200,14 +217,14 @@ export async function tryCache<R, Q extends string, P extends DataRequestParams<
 				}
 			}
 
-			matches.push(entry);
+			matches.push({ i, data: entry.response as R });
 		}
 
 		if (misses.length > 0) {
-			throw new CacheMiss(misses);
+			throw new CacheMiss(misses, matches);
 		}
 
-		return matches.map((m) => m.response as R);
+		return matches.map((m) => m.data);
 	} catch (error) {
 		if (!(error instanceof CacheMiss)) {
 			throw new Error(`Error while retrieving cached value`, {
@@ -216,6 +233,9 @@ export async function tryCache<R, Q extends string, P extends DataRequestParams<
 		}
 
 		for (const [i, p] of selector.paramslist.entries()) {
+			const miss = error.miss(i);
+			if (!miss) continue;
+
 			let paramsDisplay = JSON.stringify(p);
 
 			if (typeof p === 'object' && p !== null) {
@@ -230,13 +250,16 @@ export async function tryCache<R, Q extends string, P extends DataRequestParams<
 			logger.info(
 				`${datasource}/${selector.query}` + bulkMarker,
 				paramsDisplay,
-				error.why(i) === 'entry not found'
-					? ''
-					: `  (${error.why(i) ?? 'found but part of partial chunk match'})`
+				miss.why === 'entry not found' ? '' : `  (${miss.why})`
 			);
 		}
 
-		const result = await compute().catch((err) => {
+		const paramssubset = at(
+			selector.paramslist,
+			error.misses.map((m) => m.i)
+		);
+
+		const result = await compute(paramssubset).catch((err) => {
 			throw new Error(`${selector.query} ${JSON.stringify(selector.paramslist)} failed`, {
 				cause: err,
 			});
@@ -258,7 +281,7 @@ export async function tryCache<R, Q extends string, P extends DataRequestParams<
 		}
 
 		cache.entries[selector.query] ??= [];
-		for (const [params, response] of zip(selector.paramslist, responses)) {
+		for (const [params, response] of zip(paramssubset, responses)) {
 			if (!response) continue;
 			cache.entries[selector.query].push({
 				expiresAt: expirations.entry(new Date(), selector.query),

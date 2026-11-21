@@ -85,7 +85,9 @@ export async function fetchPagesViaWordpressAPI(
 		const retryAfter = response.headers.get('Retry-After');
 		const waitTime = retryAfter ? Number(retryAfter) : rateLimitWaitSeconds;
 
-		if (waitTime > hoursToSeconds(4)) {
+		// XXX: DONT MERGE
+		// if (waitTime > hoursToSeconds(4)) {
+		if (waitTime > 12) {
 			logger.error(
 				`wait time is quite long (${waitTime}s). Skipping this batch: ${query}. Response was`,
 				await response.text()
@@ -93,7 +95,9 @@ export async function fetchPagesViaWordpressAPI(
 			return Object.fromEntries([...pages.keys()].map((key) => [key, undefined]));
 		}
 
-		logger.warn(`rate limit from wordpress api, retrying in ${waitTime}s ${query}`);
+		logger.warn(
+			`rate limit from wordpress api (http ${response.status}), retrying in ${waitTime}s`
+		);
 		await new Promise((resolve) => setTimeout(resolve, secondsToMilliseconds(waitTime)));
 
 		return fetchPagesViaWordpressAPI(pages, {

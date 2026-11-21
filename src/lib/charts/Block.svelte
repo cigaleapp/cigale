@@ -12,8 +12,7 @@
 	import LearnMoreLink from '#lib/LearnMoreLink.svelte';
 	import LoadingText, { Loading } from '#lib/LoadingText.svelte';
 	import Markdown from '#lib/Markdown.svelte';
-	import { resolveMetadataImport } from '#lib/metadata/imports.js';
-	import { metadataOption } from '#lib/metadata/index.js';
+	import { metadataOption, resolveMetadataId } from '#lib/metadata/index.js';
 	import { mergeMetadataFromImagesAndObservations } from '#lib/metadata/merging.js';
 	import {
 		ensureNamespacedMetadataId,
@@ -175,10 +174,7 @@
 		const protocol = await tables.Protocol.get(protocolId!);
 		if (!protocol) return;
 
-		const id = resolveMetadataImport(
-			protocol,
-			ensureNamespacedMetadataId(block.metadata, protocolId)
-		);
+		const id = resolveMetadataId(protocol, block.metadata)
 
 		return await get('MetadataOption', metadataOptionId(id, result.toString()));
 	}

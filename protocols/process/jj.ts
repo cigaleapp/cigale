@@ -9,7 +9,10 @@ import { Datasource, Enricher, MultipleResponses, OptionExtra } from './modules.
 import { logger } from './progress.js';
 import { fetchPagesViaWordpressAPI } from './wordpress.js';
 
-const IGNORED_PAGES = ['https://jessica-joachim.com/?page_id=141560'];
+const IGNORED_PAGES = [
+	'https://jessica-joachim.com/?page_id=141560',
+	'https://jessica-joachim.com/insectes/hymenopteres/gasteruptiidae/gasteruption-genre/',
+];
 
 export class JessicaJoachim implements Enricher {
 	name = 'jj' as const;

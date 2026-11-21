@@ -33,7 +33,7 @@ await run({
 		enrich: [new JessicaJoachim(), new IUCN(), new GoogleSlides()],
 		specializations: [
 			new (class implements Specializer {
-				protocolId = 'com.example.all';
+				protocolId = 'io.github.cigaleapp.base.insects';
 				name = 'debug-all' as const;
 
 				include() {
@@ -128,7 +128,7 @@ async function run(plan: {
 
 		options.set(option.id, {
 			...option,
-			parents: parents.map((p) => ({ id: p.id!, clade: p.clade })),
+			parents: selectHigherClades(option, parents) as Array<Option & { id: string }>,
 		});
 	}
 

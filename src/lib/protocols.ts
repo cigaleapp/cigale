@@ -1,3 +1,4 @@
+import type { DatabaseHandle } from './idb.svelte.js';
 import type * as DB from '#lib/database.js';
 import type { Tables } from '#lib/database.js';
 import type { PROCEDURES } from '#worker/procedures.js';
@@ -11,9 +12,10 @@ import { stringifyWithToplevelOrdering } from './download.js';
 import { promptForFiles } from './files.js';
 import { errorMessage } from './i18n.js';
 import { metadataOptionsOf } from './metadata/index.js';
+import { manifestVersionsCompatible } from './protocols/manifestversion.js';
 import { fetchProtocolRegistry } from './protocols/registry.js';
 import { removeNamespaceFromMetadataId } from './schemas/metadata.js';
-import { ExportedProtocol, isMetadataInProtocol, Protocol } from './schemas/protocols.js';
+import { ExportedProtocol, Protocol } from './schemas/protocols.js';
 import { shareOrDownloadAsFile } from './share.js';
 import {
 	compareBy,
@@ -26,8 +28,6 @@ import {
 	range,
 	sum,
 } from './utils.js';
-import { manifestVersionsCompatible } from './protocols/manifestversion.js';
-import type { DatabaseHandle } from './idb.svelte.js';
 
 /**
  *
@@ -281,7 +281,7 @@ export async function upgradeProtocol({
  */
 export async function compareProtocolWithUpstream(
 	db: DatabaseHandle,
-	protocolId: string
+	protocolId: string,
 	{ onProgress }: { onProgress?: (progress: number) => void | Promise<void> } = {}
 ): Promise<import('microdiff').Difference[]> {
 	const databaseProtocol = await db.get('Protocol', protocolId).then(Protocol.assert);
@@ -528,7 +528,7 @@ export function metadataDefinitionComparator(protocol: {
 export function defaultClassificationMetadata(protocol: DB.Protocol, metadata: DB.Metadata[]) {
 	const eligible = metadata
 		.filter((m) => m.type === 'enum')
-		.filter((m) => isMetadataInProtocol(protocol, m.id))
+		.filter((m) => protocol.metadata.includes(m.id))
 		.sort(metadataDefinitionComparator(protocol));
 
 	return (
@@ -547,7 +547,7 @@ export function defaultClassificationMetadata(protocol: DB.Protocol, metadata: D
 export function defaultCropMetadata(protocol: DB.Protocol, metadata: DB.Metadata[]) {
 	const boxes = metadata
 		.filter((m) => m.type === 'boundingbox')
-		.filter((m) => isMetadataInProtocol(protocol, m.id));
+		.filter((m) => protocol.metadata.includes(m.id));
 
 	return boxes.find((m) => m.infer && 'neural' in m.infer) ?? boxes.at(0);
 }

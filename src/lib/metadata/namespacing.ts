@@ -1,10 +1,7 @@
 import type * as DB from '#lib/database.js';
 import type { NamespacedMetadataID } from '#lib/schemas/common.js';
 
-import {
-	ensureNamespacedMetadataId,
-	removeNamespaceFromMetadataId,
-} from '#lib/schemas/metadata.js';
+import { isNamespacedToProtocol, removeNamespaceFromMetadataId } from '#lib/schemas/metadata.js';
 import { fromEntries } from '#lib/utils.js';
 
 import { METADATA_ZERO_VALUE } from './index.js';
@@ -14,71 +11,37 @@ import { METADATA_ZERO_VALUE } from './index.js';
  */
 export function protocolMetadataValues(
 	area: 'session' | 'observations+images',
-	protocol: Pick<DB.Protocol, 'id' | 'metadata' | 'importedMetadata' | 'sessionMetadata'>,
+	protocol: Pick<DB.Protocol, 'id' | 'metadata' | 'sessionMetadata'>,
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	values: { [x: string]: any }
 ) {
 	return fromEntries(
 		protocol.metadata
-			.filter((key) => {
-				const isSessionMetadata = protocol.sessionMetadata.includes(key);
-				const isSessionwideImport = protocol.importedMetadata.some(
-					(imp) => [imp.source, imp.target].includes(key) && imp.sessionwide
-				);
-
-				return Boolean(isSessionMetadata || isSessionwideImport) === (area === 'session');
+			.filter((id) => {
+				if (!protocol.metadata.includes(id)) return false;
+				const sessionwide = protocol.sessionMetadata.includes(id);
+				return sessionwide === (area === 'session');
 			})
-			.map((key) => resolveMetadataImport(protocol, key))
-			.map((key) => [removeNamespaceFromMetadataId(key), values[key] ?? METADATA_ZERO_VALUE])
+			.map((id) => [removeNamespaceFromMetadataId(id), values[id] ?? METADATA_ZERO_VALUE])
 	);
 }
 
 /**
- * Resolves the actual ID (namespaced key) of a metadata from a protocol
+ * Get a full metadata id from a non-namespaced one.
+ * If already namespaced, returns undefined unless the
+ * namespaced metadata is in the protocol
+ * If not namespaced, finds the metadata
+ * in the given protocol that matches
+ * when ignoring namespaces
  */
-export function resolveMetadataImport(
-	protocol: Pick<DB.Protocol, 'importedMetadata'>,
-	metadataId: NamespacedMetadataID
-): NamespacedMetadataID {
-	return (
-		protocol.importedMetadata?.find((imp) => [imp.target, imp.source].includes(metadataId))
-			?.source ?? metadataId
-	);
-}
-
-/**
- * Like {@link resolveMetadataImport}, but `metadataId` is allowed
- * to be namespace-less: in that case, the provided protocol's ID
- * is used as a fallback namespace before resolving imports
- */
-export function resolveMetadataImportBare(
-	protocol: Pick<DB.Protocol, 'importedMetadata' | 'id'>,
+export function resolveMetadataId(
+	protocol: Pick<DB.Protocol, 'metadata' | 'id'>,
 	key: string
-): NamespacedMetadataID {
-	return resolveMetadataImport(protocol, ensureNamespacedMetadataId(key, protocol.id));
-}
+): NamespacedMetadataID | undefined {
+	if (isNamespacedToProtocol(null, key)) {
+		if (!protocol.metadata.includes(key)) return;
+		return key;
+	}
 
-if (import.meta.vitest) {
-	const { test, expect } = import.meta.vitest;
-
-	test('resolveMetadataImportBare', () => {
-		const protocol = {
-			id: 'root',
-			importedMetadata: [
-				{
-					sessionwide: false,
-					source: 'another__foo',
-					target: 'root__baz',
-				},
-				{
-					sessionwide: true,
-					source: 'another__bar',
-					target: 'root__bar',
-				},
-			],
-		} as const;
-
-		expect(resolveMetadataImportBare(protocol, 'bar')).toBe('another__bar');
-		expect(resolveMetadataImportBare(protocol, 'baz')).toBe('another__foo');
-	});
+	return protocol.metadata.find((id) => removeNamespaceFromMetadataId(id) === key);
 }

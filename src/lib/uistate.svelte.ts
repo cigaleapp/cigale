@@ -13,7 +13,6 @@ import { isSessionDependentReactiveTable, Tables } from './database.js';
 import { tables } from './idb.svelte.js';
 import { getMetadataValue } from './metadata/index.js';
 import { defaultClassificationMetadata, defaultCropMetadata } from './protocols.js';
-import { isMetadataInProtocol } from './schemas/protocols.js';
 import { keys, mapValues, omit, pick, sleep, transformObject } from './utils.js';
 
 type NeuralModelSelector = (typeof NeuralModelSelector)['infer'];
@@ -273,7 +272,7 @@ export class UIState {
 		if (!protocol) return [];
 		const inferenceMetadata = tables.Metadata.state
 			.filter((m) => m.type === 'enum')
-			.filter((m) => isMetadataInProtocol(protocol, m.id))
+			.filter((m) => protocol.metadata.includes(m.id))
 			.filter((m) => m.infer && 'neural' in m.infer);
 		return inferenceMetadata;
 	});

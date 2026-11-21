@@ -10,7 +10,6 @@ import { Tables } from '#lib/database.js';
 import { compareBy, entries, mapValues, orEmpty, orEmpty2, sum, switchValue } from '#lib/utils.js';
 
 import { addValueLabels, metadataPrettyValue } from './metadata/display.js';
-import { resolveMetadataImport } from './metadata/namespacing.js';
 import {
 	BUILTIN_DARWINCORE_NAMESPACES,
 	BUILTIN_EXTRA_FIELDS,
@@ -42,7 +41,6 @@ export async function darwinCoreArchive({
 	const metadataDefs = await Promise.all(
 		protocol.metadata
 			.toSorted(compareBy((id) => protocol.metadataOrder?.indexOf(id)))
-			.map((id) => resolveMetadataImport(protocol, id))
 			.map((m) => db.get('Metadata', m))
 	).then((defs) =>
 		defs
@@ -289,26 +287,19 @@ type Column<Scope extends DarwinCoreFileScope> =
 	  };
 
 export function fileLayout<Scope extends DarwinCoreFileScope>(
-	protocol: Pick<
-		DB.Protocol,
-		'importedMetadata' | 'darwincore' | 'sessionMetadata' | 'metadataOrder'
-	>,
+	protocol: Pick<DB.Protocol, 'darwincore' | 'sessionMetadata' | 'metadataOrder'>,
 	metadata: DB.Metadata[],
 	file: { includes: string[]; scope: Scope }
 ): Array<Column<Scope>> {
 	if (!protocol.darwincore) return [];
-
-	const sessionMetadataIds = protocol.sessionMetadata.map((id) =>
-		resolveMetadataImport(protocol, id)
-	);
 
 	return [
 		{ name: 'sessionId', source: 'id' as const },
 		...metadata
 			.filter((m) =>
 				switchValue(file.scope, {
-					session: sessionMetadataIds.includes(m.id),
-					image: !sessionMetadataIds.includes(m.id),
+					session: protocol.sessionMetadata.includes(m.id),
+					image: !protocol.sessionMetadata.includes(m.id),
 					media: false,
 				})
 			)

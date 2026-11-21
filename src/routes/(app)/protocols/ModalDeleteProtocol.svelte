@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { plural } from '#lib/i18n.js';
 	import { openTransaction, tables } from '#lib/idb.svelte.js';
-	import { importedProtocols } from '#lib/metadata/imports.js';
 	import ModalConfirmDeletion from '#lib/ModalConfirmDeletion.svelte';
 	import { isNamespacedToProtocol } from '#lib/schemas/metadata.js';
 	import { getSetting, setSetting } from '#lib/settings.svelte.js';
@@ -29,7 +28,7 @@
 	function dependentProtocols(childProtocol: string, seen = new Set<string>()) {
 		for (const p of tables.Protocol.state) {
 			if (seen.has(p.id)) continue;
-			if (importedProtocols(p).has(childProtocol)) {
+			if (p.imports.some((imp) => imp.from === childProtocol)) {
 				seen.add(p.id);
 				dependentProtocols(p.id, seen);
 			}

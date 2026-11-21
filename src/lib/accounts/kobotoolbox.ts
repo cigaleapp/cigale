@@ -9,7 +9,6 @@ import { RateLimit } from 'async-sema';
 import * as date from 'date-fns';
 
 import { generateId, Schemas } from '#lib/database.js';
-import { resolveMetadataImport } from '#lib/metadata/imports.js';
 import { protocolMetadataValues } from '#lib/metadata/namespacing.js';
 import { serializeMetadataFullValue } from '#lib/metadata/serializing.js';
 import { metadataOptionsKeyRange } from '#lib/metadata/storage.js';
@@ -363,7 +362,7 @@ export default class Provider implements Account {
 		for (const metadataId of protocol.sessionMetadata) {
 			done++;
 			const def = await this.db
-				.get('Metadata', resolveMetadataImport(protocol, metadataId))
+				.get('Metadata', metadataId)
 				.then((raw) => (raw ? Schemas.Metadata.assert(raw) : undefined));
 
 			if (!def) continue;
@@ -433,7 +432,7 @@ export default class Provider implements Account {
 
 		for (const id of protocol.sessionMetadata) {
 			const def = await this.db
-				.get('Metadata', resolveMetadataImport(protocol, id))
+				.get('Metadata', id)
 				.then((raw) => (raw ? Schemas.Metadata.assert(raw) : undefined));
 
 			if (!def) continue;

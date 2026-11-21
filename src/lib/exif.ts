@@ -18,7 +18,7 @@ import {
 } from './geolocation.js';
 import { errorMessage } from './i18n.js';
 import * as db from './idb.svelte.js';
-import { resolveMetadataImport, storeMetadataValue } from './metadata/index.js';
+import { storeMetadataValue } from './metadata/index.js';
 import { toasts } from './toasts.svelte.js';
 import { byteString, byteStringToArray, entries, throwError, transformObject } from './utils.js';
 
@@ -44,9 +44,7 @@ export async function processExifData({
 	if (!protocol) {
 		throw new Error(`Protocole ${session.protocol} introuvable`);
 	}
-	const metadataOfProtocol = await db.tables.Metadata.getMany(
-		protocol.metadata.map((key) => resolveMetadataImport(protocol, key))
-	);
+	const metadataOfProtocol = await db.tables.Metadata.getMany(protocol.metadata);
 
 	const metadataFromExif = {} as Record<NamespacedMetadataID, DB.MetadataValue>;
 

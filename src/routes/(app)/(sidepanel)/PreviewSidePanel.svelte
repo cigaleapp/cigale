@@ -82,14 +82,10 @@
 	const definitions = $derived.by(() => {
 		const protocol = uiState.currentProtocol;
 		if (!protocol) return [];
-		return [
-			...protocol.importedMetadata
-				.filter((imp) => !imp.sessionwide)
-				.map((imp) => tables.Metadata.getFromState(imp.source)),
-			...protocol.metadata
-				.filter((id) => !protocol.sessionMetadata.includes(id))
-				.map((id) => tables.Metadata.getFromState(id)),
-		]
+
+		return protocol.metadata
+			.filter((id) => !protocol.sessionMetadata.includes(id))
+			.map((id) => tables.Metadata.getFromState(id))
 			.filter((m) => m !== undefined)
 			.toSorted(metadataDefinitionComparator(protocol));
 	});

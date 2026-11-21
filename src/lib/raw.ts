@@ -8,7 +8,6 @@ import { GPSHelper } from 'piexifjs';
 
 import { apertureValueToFNumber, coerceExifValue } from './exif.js';
 import { openDatabase, tables } from './idb.svelte.js';
-import { resolveMetadataImport } from './metadata/namespacing.js';
 import { storeMetadataValue } from './metadata/storage.js';
 import { InferenceConfigs } from './schemas/metadata.js';
 
@@ -149,9 +148,7 @@ export async function processRawMetadata(
 		throw new Error(`Protocol with id ${session.protocol} not found`);
 	}
 
-	const metadataDefs = await tables.Metadata.getMany(
-		protocol.metadata.map((key) => resolveMetadataImport(protocol, key))
-	);
+	const metadataDefs = await tables.Metadata.getMany(protocol.metadata);
 
 	const images = await tables.Image.list('fileId', imageFileId);
 
