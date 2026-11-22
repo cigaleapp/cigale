@@ -22,7 +22,6 @@
 	import { storeMetadataValue } from '#lib/metadata/storage.js';
 	import ModalConfirm from '#lib/ModalConfirm.svelte';
 	import { goto } from '#lib/paths.js';
-	import { isMetadataInProtocol } from '#lib/schemas/protocols.js';
 	import { getSettings, toggleSetting } from '#lib/settings.svelte.js';
 	import { sfx } from '#lib/sound.js';
 	import { toasts } from '#lib/toasts.svelte.js';
@@ -215,7 +214,7 @@
 		if (!uiState.currentProtocol) return;
 
 		const beforeTimerInferences = tables.Metadata.state
-			.filter((m) => isMetadataInProtocol(uiState.currentProtocol, m.id))
+			.filter((m) => uiState.currentProtocol.metadata.includes(m.id))
 			.filter((m) => m.infer && 'capture' in m.infer && m.infer.capture === selector);
 
 		async function askForPics() {

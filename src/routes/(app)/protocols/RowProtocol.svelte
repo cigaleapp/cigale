@@ -1,20 +1,20 @@
 <script lang="ts">
 	import type { Protocol } from '#lib/database.js';
 
-	import Badge from '#lib/Badge.svelte';
 	import ButtonIcon from '#lib/ButtonIcon.svelte';
 	import ButtonSecondary from '#lib/ButtonSecondary.svelte';
 	import ButtonUpdateProtocol from '#lib/ButtonUpdateProtocol.svelte';
+	import { errorMessage } from '#lib/i18n.js';
 	import OverflowableText from '#lib/OverflowableText.svelte';
 	import { goto, resolve } from '#lib/paths.js';
 	import { getSettings, setSetting } from '#lib/settings.svelte.js';
 	import { shareUrl } from '#lib/share.js';
 	import Switch from '#lib/Switch.svelte';
+	import { toasts } from '#lib/toasts.svelte.js';
 	import { uiState } from '#lib/uistate.svelte.js';
 	import IconUpgrade from '~icons/ri/arrow-up-circle-line';
 	import IconDelete from '~icons/ri/delete-bin-line';
 	import IconLearnMore from '~icons/ri/information-line';
-	import IconEdit from '~icons/ri/pencil-line';
 	import IconStats from '~icons/ri/pie-chart-2-line';
 	import IconExport from '~icons/ri/share-forward-line';
 
@@ -31,8 +31,8 @@
 		installed?: boolean;
 		compatible?: boolean;
 		updates: 'automatic' | 'manual';
-		beamup?: Protocol['beamup'];
-		charts?: Protocol['charts'];
+		beamup?: Protocol['beamup'] | undefined;
+		charts?: Protocol['charts'] | undefined;
 
 		expanded?: boolean;
 	}
@@ -90,7 +90,11 @@
 						<ButtonSecondary
 							loading
 							onclick={async (_, { progress }) => {
-								await oninstall?.(source, progress);
+								await oninstall?.(source, progress).catch((err) =>
+									toasts.error(
+										errorMessage(err, `Impossible d'installer ${name}`)
+									)
+								);
 							}}
 						>
 							Installer
@@ -212,11 +216,11 @@
 						Stats
 					</ButtonSecondary>
 				{/if}
-				<ButtonSecondary onclick={() => goto('/(app)/protocols/[id]/infos', { id })}>
+				<!-- <ButtonSecondary onclick={() => goto('/(app)/protocols/[id]/infos', { id })}>
 					<IconEdit />
 					Modifier
 					<Badge>Beta</Badge>
-				</ButtonSecondary>
+				</ButtonSecondary> -->
 				{#if version && source}
 					<ButtonUpdateProtocol {version} {source} {id} />
 				{/if}

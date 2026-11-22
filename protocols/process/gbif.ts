@@ -1,11 +1,12 @@
 import { type } from 'arktype';
 import { addYears } from 'date-fns';
 
-import { Datasource, Identifier, Option, TaxonomyProvider } from './modules';
+import { Datasource } from './datasource';
+import { Enricher, IdentifierProvider, Option, OptionExtra, TaxonomyProvider } from './modules';
 import { logger } from './progress';
 
-export class GBIFID implements Identifier {
-	name = 'gbif-id' as const;
+export class CoLXR implements IdentifierProvider {
+	name = 'colxr' as const;
 	gbif: GBIF;
 
 	constructor() {
@@ -16,8 +17,8 @@ export class GBIFID implements Identifier {
 
 	async identify({ clade, name, id }: Option) {
 		if (id) return id;
-		const result = await this.gbif.one('id', { clade, name });
-		return result.id;
+		const { firstResult } = await this.gbif.one('search', { clade, name });
+		return firstResult?.id ?? null;
 	}
 }
 
@@ -31,40 +32,101 @@ export class GBIFTaxonomy implements TaxonomyProvider {
 
 	async init() {}
 
-	async parents({ clade, provenance, id }: Option & { id: string }): Promise<Option[]> {
+	async parents({ clade, provenance, name }: Option & { id: string }): Promise<Option[]> {
 		if (clade === 'kingdom') return [];
 
-		const parents = await this.gbif.one('parents', { id });
+		// re-use search so that its cached
+		// we could also use gbif.one("taxon") but this would mean
+		// not making use of the cached search result
+		// if we don't use the enricher (that does need gbif.one("taxon"))
+		const { firstResult } = await this.gbif.one('search', { clade, name });
 
-		return parents.map((parent) => ({
+		if (!firstResult) throw new Error('not in gbif');
+
+		return firstResult.parents.map((parent) => ({
 			provenance,
 			...parent,
 		}));
 	}
 }
 
+export class GBIFTaxonInfo implements Enricher {
+	name = 'gbif-taxon' as const;
+	gbif: GBIF;
+
+	constructor() {
+		this.gbif = new GBIF();
+	}
+
+	async init() {}
+
+	available(): boolean {
+		return true;
+	}
+
+	async *enrich(options: Option[]) {
+		for (const { id } of options) {
+			if (!id) continue;
+			const data = await this.gbif.one('taxon', { id });
+			if (!data) continue;
+
+			yield {
+				id,
+				priority: 0,
+				extra: {
+					learnMore: `https://gbif.org/taxon/${data.taxonID}`,
+					// TODO: use iNat API instead, see file://./main.ts
+					// TODO: add license info (see #2315)
+					images: data.images.slice(0, 5).map((m) => m.identifier),
+					synonyms: [
+						...data.vernacularNames
+							.filter(
+								(name) => name.language && ['eng', 'fra'].includes(name.language)
+							)
+							.map((name) => name.vernacularName),
+						...data.homotypicSynonyms.map((syn) => syn.scientificName),
+					],
+				},
+			};
+		}
+	}
+}
+
 type GbifParams = {
-	parents: {
-		id: string;
-	};
-	id: {
+	search: {
 		clade: string;
 		name: string;
 	};
-	info: { id: string };
+	taxon: { id: string };
 };
 
 type GbifResponses = {
-	parents: Array<{
-		clade: string;
-		name: string;
-		id: string;
-	}>;
-	id: { id: string | null };
-	info: {};
+	search: {
+		firstResult: null | {
+			id: string;
+			clade: string;
+			parents: Array<{ id: string; clade: string; name: string }>;
+		};
+	};
+	taxon: {
+		images: Array<{
+			identifier: string;
+			type: 'StillImage';
+			license?: string;
+			created?: Date;
+			title?: string;
+			creator?: string;
+			source?: string;
+			remarks?: string;
+		}>;
+		vernacularNames: Array<{ language?: string; vernacularName: string }>;
+		homotypicSynonyms: Array<{ scientificName: string }>;
+		taxonID: string;
+		identifiers: Array<{ scope?: string; title?: string; id?: string; url?: string }>;
+	};
 };
 
-export class GBIF extends Datasource<'parents' | 'id' | 'info', GbifParams, GbifResponses> {
+export class GBIF extends Datasource<'search' | 'taxon', GbifParams, GbifResponses> {
 	name = 'gbif' as const;
 
 	// GBIF changed their main dataset, see https://techdocs.gbif.org/en/data-processing/taxonomy-interpretation#multiple-taxonomy-support
@@ -85,7 +147,7 @@ export class GBIF extends Datasource<'parents' | 'id' | 'info', GbifParams, Gbif
 	async init() {}
 
 	requests = {
-		id: async (params: GbifParams['id']) => {
+		search: async (params: GbifParams['search']) => {
 			const response = await fetch(
 				`${this.baseURL}/taxon/search/${this.datasets.colxr}?${new URLSearchParams({
 					taxonRank: params.clade.toUpperCase(),
@@ -104,6 +166,11 @@ export class GBIF extends Datasource<'parents' | 'id' | 'info', GbifParams, Gbif
 					taxonID: 'string',
 					scientificName: 'string',
 					taxonRank: 'string',
+					classification: type({
+						taxonID: 'string',
+						scientificName: 'string',
+						taxonRank: 'string',
+					}).array(),
 				}).array(),
 			});
 
@@ -113,40 +180,27 @@ export class GBIF extends Datasource<'parents' | 'id' | 'info', GbifParams, Gbif
 					`${params.clade} "${params.name}" not found in GBIF backbone taxonomy`
 				);
 
-				return { id: null };
+				return { firstResult: null };
 			}
 
-			const [{ taxonID }] = data.results;
+			const [result] = data.results;
 
-			return { id: taxonID };
+			if (!result) return { firstResult: null };
+
+			return {
+				firstResult: {
+					id: result.taxonID,
+					clade: result.taxonRank.toLowerCase(),
+					parents: result.classification.map((taxon) => ({
+						id: taxon.taxonID,
+						clade: taxon.taxonRank.toLowerCase(),
+						name: taxon.scientificName,
+					})),
+				},
+			} satisfies GbifResponses['search'];
 		},
 
-		parents: async (params: GbifParams['parents']) => {
-			const response = await fetch(
-				`${this.baseURL}/taxon/tree/${this.datasets.colxr}/${params.id}`
-			);
-
-			if (!response.ok) throw new Error(await response.text());
-
-			const Response = type({
-				taxonID: 'string',
-				scientificName: 'string',
-				taxonRank: 'string',
-				// label: 'string',
-				taxonomicStatus: 'string',
-				children: 'number.integer',
-				species: 'number.integer',
-			}).array();
-
-			const data = Response.assert(await response.json());
-
-			return data.map((taxon) => ({
-				clade: taxon.taxonRank.toLowerCase(),
-				name: taxon.scientificName,
-				id: taxon.taxonID,
-			}));
-		},
-		info: async (params: GbifParams['info']) => {
+		taxon: async (params: GbifParams['taxon']) => {
 			const response = await fetch(
 				`${this.baseURL}/taxon/${this.datasets.colxr}/${params.id}/info`
 			);
@@ -156,6 +210,7 @@ export class GBIF extends Datasource<'parents' | 'id' | 'info', GbifParams, Gbif
 			const Response = type({
 				taxonID: 'string',
 				'scientificNameAuthorship?': 'string',
+				taxonRank: 'string',
 				taxonomicStatus: type.enumerated(
 					'ACCEPTED',
 					'PROVISIONALLY_ACCEPTED',
@@ -164,7 +219,7 @@ export class GBIF extends Datasource<'parents' | 'id' | 'info', GbifParams, Gbif
 					'MISAPPLIED',
 					'BARE_NAME'
 				),
-				environment: type(
+				'environment?': type(
 					'string' as type.cast<
 						(string & {}) | 'marine' | 'freshwater' | 'terrestrial' | 'brackish'
 					>
@@ -194,6 +249,7 @@ export class GBIF extends Datasource<'parents' | 'id' | 'info', GbifParams, Gbif
 				}).partial(),
 				'vernacularNames?': type({
 					vernacularName: 'string',
+					/** The language of the vernacular name (ISO 639-2 code) */
 					'language?': 'string',
 					'locality?': 'string',
 					'remarks?': 'string',
@@ -208,7 +264,7 @@ export class GBIF extends Datasource<'parents' | 'id' | 'info', GbifParams, Gbif
 						| 'InteractiveResource'
 						| 'Text'
 					>,
-					'create?': "string.date.iso",
+					'created?': 'string.date.iso.parse',
 					'title?': 'string',
 					'creator?': 'string',
 					'license?': 'string',
@@ -217,9 +273,9 @@ export class GBIF extends Datasource<'parents' | 'id' | 'info', GbifParams, Gbif
 				}).array(),
 				'distributions?': type({
 					/** The identifier for the dataset */
-					datasetKey: 'string.uuid',
+					'datasetKey?': 'string.uuid',
 					/** The unique identifier for this taxon (dwc:taxonID) */
-					taxonID: 'string',
+					'taxonID?': 'string',
 					/** A CURIE identifier (scope:id) for the named area (dwc:locationID), where the scope indicates the gazetteer. Supported gazetteers: ISO (2-letter country codes), TDWG (World Geographical Scheme for Recording Plant Distributions), TEOW (Terrestrial Ecoregions of the World), LONGHURST (Longhurst biogeographical provinces), FAO (FAO fishing areas), WGSRPD (TDWG regions). See https://github.com/CatalogueOfLife/coldp/blob/master/README.md#areaid */
 					'locationID?': 'string',
 					/** The specific description of the place (dwc:locality). The verbatim name of the area as used in the source. */
@@ -262,6 +318,24 @@ export class GBIF extends Datasource<'parents' | 'id' | 'info', GbifParams, Gbif
 					'url?': 'string.url',
 				}).array(),
 			});
+
+			const data = Response.assert(await response.json());
+
+			const { vernacularNames = [], synonyms = {}, media = [], identifiers = [] } = data;
+
+			type Image = GbifResponses['taxon']['images'][number];
+			return {
+				taxonID: data.taxonID,
+				identifiers,
+				vernacularNames: vernacularNames.map((vn) => ({
+					vernacularName: vn.vernacularName,
+					language: vn.language,
+				})),
+				images: media.filter((m): m is Image => m.type === 'StillImage'),
+				homotypicSynonyms: (synonyms.homotypic ?? [])
+					.filter((s) => s.taxonRank === data.taxonRank)
+					.map(({ scientificName }) => ({ scientificName })),
+			} satisfies GbifResponses['taxon'];
 		},
 	};
 }

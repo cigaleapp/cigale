@@ -1,6 +1,7 @@
 import { addYears } from 'date-fns';
 
-import { Datasource, NameProvider } from './modules';
+import { Datasource } from './datasource';
+import { NameProvider } from './modules';
 import { logger } from './progress';
 
 export class BirdNetClassmapping implements NameProvider {

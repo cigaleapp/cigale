@@ -79,13 +79,37 @@ class Progress {
 
 export const progress = new Progress();
 
-// TODO: colors
+const colors = {
+	yellow: '\x1b[33m',
+	red: '\x1b[31m',
+	dim: '\x1b[2m',
+	reset: '\x1b[0m',
+};
+
+function colorize(parts: unknown[], color: string): unknown[] {
+	return parts.map((p) => (typeof p === 'string' ? `${color}${p}${colors.reset}` : p));
+}
+
 class Logger {
+	lastTimedLog: number | undefined;
+
 	warn(...parts: unknown[]) {
-		progress.log(...parts);
+		progress.log(...colorize(parts, colors.yellow));
 	}
 	error(...parts: unknown[]) {
-		progress.log(...parts);
+		progress.log(...colorize(parts, colors.red));
+	}
+	/** logger.info with timing info (diff with last logger.timed call) */
+	timed(...parts: unknown[]) {
+		if (!this.lastTimedLog) {
+			this.lastTimedLog = performance.now();
+			progress.log(...parts);
+			return;
+		}
+
+		const diff = performance.now() - this.lastTimedLog;
+		progress.log(`${colors.dim}+${formatDuration(diff)}${colors.reset}`, ...parts);
+		this.lastTimedLog = performance.now();
 	}
 	info(...parts: unknown[]) {
 		progress.log(...parts);
@@ -96,3 +120,14 @@ class Logger {
 }
 
 export const logger = new Logger();
+
+/** Formats a duration in ms: <1s → "123ms", <1min → "1.23s", <1h → "2m 34s", else → "1h 5m" */
+function formatDuration(ms: number): string {
+	if (ms < 1000) return `${Math.round(ms)}ms`;
+	const s = ms / 1000;
+	if (s < 60) return `${s.toFixed(2)}s`;
+	const m = Math.floor(s / 60);
+	if (m < 60) return `${m}m ${Math.round(s % 60)}s`;
+	const h = Math.floor(m / 60);
+	return `${h}h ${m % 60}m`;
+}

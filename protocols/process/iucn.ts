@@ -1,12 +1,10 @@
 /// <reference types="@types/bun" />
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import path from 'node:path';
-
 import { addMonths } from 'date-fns';
 import { unzip as _unzip, Unzipped } from 'fflate';
 
-import { Datasource, Enricher, MultipleResponses, Option } from './modules.js';
+import { Enricher, Option } from './modules.js';
+import { Datasource } from './datasource.js';
 
 // Archive is still using deprecated term threatStatus instead of more recent iucnRedListCategory
 // see https://gbif.github.io/dwc-api/apidocs/src-html/org/gbif/dwc/terms/IucnTerm.html

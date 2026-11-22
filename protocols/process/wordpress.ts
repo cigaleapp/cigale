@@ -47,16 +47,25 @@ const WordpressPage = type({
 
 const WordpressPagesResponse = WordpressPage.array().atLeastLength(1);
 
+export class RateLimitTimeoutError extends Error {
+	constructor(message: string) {
+		super(message);
+		this.name = 'RateLimitTimeoutError';
+	}
+}
+
 export async function fetchPagesViaWordpressAPI(
 	pages: Map<string, URL>,
 	{
 		origin,
 		auth,
 		rateLimitWaitSeconds = 12,
+		maxWaitTime = hoursToSeconds(4),
 	}: {
 		origin: string;
 		auth: { username: string; password: string };
 		rateLimitWaitSeconds?: number;
+		maxWaitTime?: number;
 	}
 ): Promise<Record<string, undefined | typeof WordpressPage.infer>> {
 	const query = new URLSearchParams(
@@ -85,14 +94,14 @@ export async function fetchPagesViaWordpressAPI(
 		const retryAfter = response.headers.get('Retry-After');
 		const waitTime = retryAfter ? Number(retryAfter) : rateLimitWaitSeconds;
 
-		// XXX: DONT MERGE
-		// if (waitTime > hoursToSeconds(4)) {
-		if (waitTime > 12) {
+		if (waitTime > maxWaitTime) {
 			logger.error(
-				`wait time is quite long (${waitTime}s). Skipping this batch: ${query}. Response was`,
+				`wait time is quite long (${waitTime}s). Giving up on this batch: ${query}. Response was`,
 				await response.text()
 			);
-			return Object.fromEntries([...pages.keys()].map((key) => [key, undefined]));
+			throw new RateLimitTimeoutError(
+				`Rate limit wait time ${waitTime}s exceeds maxWaitTime ${maxWaitTime}s`
+			);
 		}
 
 		logger.warn(
@@ -104,6 +113,7 @@ export async function fetchPagesViaWordpressAPI(
 			origin,
 			auth,
 			rateLimitWaitSeconds: rateLimitWaitSeconds * Math.E,
+			maxWaitTime,
 		});
 	}
 

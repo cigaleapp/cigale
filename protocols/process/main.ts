@@ -2,7 +2,7 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import type {
 	Enricher,
-	Identifier,
+	IdentifierProvider,
 	NameProvider,
 	Option,
 	OptionExtra,
@@ -15,7 +15,7 @@ import exitHook from 'exit-hook';
 
 import { BirdNetClassmapping } from './birdnet.js';
 import { writeAllCaches } from './caching.js';
-import { GBIFID, GBIFTaxonomy } from './gbif.js';
+import { CoLXR, GBIFTaxonInfo, GBIFTaxonomy } from './gbif.js';
 import { GoogleDriveSlides, GoogleSlides } from './gslides.js';
 import { IRITModels } from './irit.js';
 import { IUCN } from './iucn.js';
@@ -28,9 +28,10 @@ await run({
 	modules: {
 		sources: [new GoogleDriveSlides(), new IRITModels('full'), new BirdNetClassmapping()],
 		// sources: [new IRITModels('light'), new GoogleDriveSlides()],
-		identifier: new GBIFID(),
+		identifier: new CoLXR(),
 		taxonomy: new GBIFTaxonomy(),
-		enrich: [new JessicaJoachim(), new IUCN(), new GoogleSlides()],
+		// TODO: add iNat for photos when we have access to the API: find out if we can get the first 5 featured images that inat shows at e.g. https://www.inaturalist.org/taxa/51702-Coccinella-septempunctata. using gbif media seems too unreliable, theres plenty of images that arent photos of the species
+		enrich: [new JessicaJoachim(), new IUCN(), new GoogleSlides(), new GBIFTaxonInfo()],
 		specializations: [
 			new (class implements Specializer {
 				protocolId = 'io.github.cigaleapp.base.insects';
@@ -55,7 +56,7 @@ async function run(plan: {
 	};
 	modules: {
 		sources: NameProvider[];
-		identifier: Identifier;
+		identifier: IdentifierProvider;
 		// we only support one because of progress bar computations
 		taxonomy: TaxonomyProvider;
 		enrich: Enricher[];
@@ -70,7 +71,7 @@ async function run(plan: {
 	/** clade:name */
 	const names = new Map<`${string}:${string}`, Option>();
 
-	logger.info(`Listing names from ${plan.modules.sources.length} sources`);
+	logger.timed(`Listing names from ${plan.modules.sources.length} sources`);
 
 	await Promise.all(
 		plan.modules.sources.map(async (source) => {
@@ -85,11 +86,15 @@ async function run(plan: {
 			}
 
 			progress.increment();
-			logger.info(`Listed ${count} names via ${source.name}`);
 		})
 	);
 
-	logger.info(`Gathered ${names.size} names`);
+	logger.timed(
+		`Gathered ${names.size} names:\n` +
+			[...Map.groupBy(names.values(), (opt) => opt.provenance)]
+				.map(([source, names]) => `- ${source}: ${names.length} names`)
+				.join('\n')
+	);
 
 	progress.phase('identify', names.size);
 
@@ -103,7 +108,7 @@ async function run(plan: {
 		options.set(id, { ...option, id });
 	}
 
-	logger.info(`Identified ${options.size} names`);
+	logger.timed(`Identified ${options.size} names`);
 
 	progress.phase('taxonomy', options.size);
 
@@ -132,7 +137,7 @@ async function run(plan: {
 		});
 	}
 
-	logger.info(`Found ${options.size - names.size} new taxa from taxonomies`);
+	logger.timed(`Found ${options.size - names.size} new taxa from taxonomies`);
 	/** Enrich */
 
 	progress.phase('enrichers', plan.modules.enrich.length);
@@ -143,13 +148,18 @@ async function run(plan: {
 		await enricher.init();
 		optsPerModule.push([...options.values()].filter((opt) => enricher.available(opt)));
 		progress.increment();
-		logger.info(
-			`Initialized enricher ${enricher.name}: ${optsPerModule.at(-1)!.length} options available`
-		);
 	}
+
+	logger.timed(
+		`Initialized ${plan.modules.enrich.length} enrichers:\n` +
+			zip(plan.modules.enrich, optsPerModule)
+				.map(([enricher, options]) => `- ${enricher.name}: ${options.length} available`)
+				.join('\n')
+	);
 
 	progress.phase('enrich', sum(optsPerModule.map((opts) => opts.length)));
 
+	let enriched = new Set<string>();
 	const CHUNKSIZE = 5_000;
 	await Promise.all(
 		zip(plan.modules.enrich, optsPerModule).map(async ([enricher, options]) => {
@@ -162,6 +172,8 @@ async function run(plan: {
 
 					option.extras ??= [];
 					option.extras.push(extra);
+
+					if (Object.keys(extra) > 0) enriched.add(id);
 				}
 
 				progress.increment(chunk.length);
@@ -171,14 +183,17 @@ async function run(plan: {
 		})
 	);
 
-	logger.info(`Enriched options`);
+	logger.timed(`Enriched ${enriched.size} options`);
 
 	progress.phase('specialize', plan.modules.specializations.length);
 
 	/** Specialize */
 
+	const outputs = new Map<string, Map<string, string>>();
 	await Promise.all(
 		plan.modules.specializations.map(async (specializer) => {
+			const output = new Map<string, string>();
+
 			const specialized = [...options.values()].filter((option) =>
 				specializer.include(option)
 			);
@@ -214,7 +229,7 @@ async function run(plan: {
 						};
 					});
 
-				const output = path.resolve(
+				const filepath = path.resolve(
 					plan.output.options,
 					specializer.name,
 					`${clade}.jsonl`
@@ -223,19 +238,38 @@ async function run(plan: {
 				const header = { count: variants.length };
 
 				// Output as JSON lines
-				mkdirSync(path.dirname(output), { recursive: true });
+				mkdirSync(path.dirname(filepath), { recursive: true });
 				writeFileSync(
-					output,
+					filepath,
 					[header, ...variants].map((option) => JSON.stringify(option)).join('\n')
 				);
 
-				logger.info(
-					`Specialized ${clade} with ${specializer.name} to ${path.relative('.', output)}`
-				);
+				output.set(clade, filepath);
 
 				progress.increment();
 			}
+
+			outputs.set(specializer.name, output);
 		})
+	);
+
+	logger.timed(
+		`Specialized into ${outputs.size} sets:\n` +
+			[...outputs]
+				.map(
+					([sp, files]) =>
+						`- ${sp}: wrote ${files.size} clades (${[...files.keys()].join(', ')})`
+				)
+				.join('\n')
+	);
+
+	logger.info(
+		`Wrote ${sum([...outputs].map(([, files]) => files.size))} files:\n` +
+			[...outputs]
+				.flatMap(([sp, files]) =>
+					[...files].map(([, filepath]) => `- ${filepath} (from ${sp})`)
+				)
+				.join('\n')
 	);
 
 	removeExitHook();
@@ -282,11 +316,13 @@ function mergeExtras(option: Option): OptionExtra {
 		})
 	);
 
-	// Synonyms & images (no priorities there! should we have some? maybe for the images order?)
+	// Synonyms & images: higher-priority extras first
 
-	output.synonyms = [...new Set(option.extras.flatMap(({ extra }) => extra.synonyms ?? []))];
+	const byPriority = [...option.extras].sort((a, b) => b.priority - a.priority);
 
-	output.images = [...new Set(option.extras.flatMap(({ extra }) => extra.images ?? []))];
+	output.synonyms = byPriority.flatMap(({ extra }) => extra.synonyms ?? []);
+
+	output.images = byPriority.flatMap(({ extra }) => extra.images ?? []);
 
 	return output;
 }
@@ -305,5 +341,5 @@ function selectHigherClades(option: Option, others: Option[]): Option[] {
 
 	const specificity = (o: Option) => order.indexOf(o.clade);
 
-	return others.filter((o) => specificity(o) > specificity(option));
+	return others.filter((o) => specificity(o) < specificity(option));
 }

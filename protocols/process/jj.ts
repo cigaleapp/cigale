@@ -5,9 +5,10 @@ import * as jsdom from 'jsdom';
 import { JSDOM } from 'jsdom';
 import Turndown from 'turndown';
 
-import { Datasource, Enricher, MultipleResponses, OptionExtra } from './modules.js';
+import { Datasource, MultipleResponses } from './datasource.js';
+import { Enricher, OptionExtra } from './modules.js';
 import { logger } from './progress.js';
-import { fetchPagesViaWordpressAPI } from './wordpress.js';
+import { fetchPagesViaWordpressAPI, RateLimitTimeoutError } from './wordpress.js';
 
 const IGNORED_PAGES = [
 	'https://jessica-joachim.com/?page_id=141560',
@@ -45,7 +46,9 @@ export class JessicaJoachim implements Enricher {
 				chunk.map((l) => ({ link: l.link }))
 			);
 
-			for (const { link, extra } of fiches) {
+			for (const fiche of fiches) {
+				if (!fiche) continue;
+				const { link, extra } = fiche;
 				const page = this.index!.find((page) => page.link === link)!;
 				const opt = options.find(this.matchCladedName(page));
 				if (!opt?.id) continue;
@@ -74,7 +77,7 @@ class JessicaJoachimSite extends Datasource<
 	},
 	{
 		index: { pages: Page[] };
-		pages: { link: string; extra: OptionExtra };
+		pages: { link: string; extra: OptionExtra } | undefined;
 	}
 > {
 	name = 'jj' as const;
@@ -128,16 +131,25 @@ class JessicaJoachimSite extends Datasource<
 		},
 
 		pages: async (links: Array<{ link: string }>) => {
-			const pages = await fetchPagesViaWordpressAPI(
-				new Map(links.map((l) => [l.link, new URL(l.link)] as const)),
-				{
-					origin: this.origin.toString(),
-					auth: {
-						username: process.env.WORDPRESS_USERNAME!,
-						password: process.env.WORDPRESS_APP_PASSWORD!,
-					},
+			const queries = new Map(links.map((l) => [l.link, new URL(l.link)] as const));
+
+			const pages = await fetchPagesViaWordpressAPI(queries, {
+				// XXX: DONT MERGE
+				maxWaitTime: 12,
+				origin: this.origin.toString(),
+				auth: {
+					username: process.env.WORDPRESS_USERNAME!,
+					password: process.env.WORDPRESS_APP_PASSWORD!,
+				},
+			}).catch((e) => {
+				if (e instanceof RateLimitTimeoutError) {
+					logger.warn(`rate limit timeout reached, skipping pages batch`);
+					return undefined;
 				}
-			);
+				throw e;
+			});
+
+			if (!pages) return undefined;
 
 			const responses = new MultipleResponses<
 				{ link: string; extra: OptionExtra },

@@ -9,6 +9,7 @@ import { NamespacedMetadataID } from '#lib/schemas/common.js';
 import {
 	ensureNamespacedMetadataId,
 	MetadataEnumVariant,
+	MetadataInDatabase,
 	metadataOptionId,
 } from '#lib/schemas/metadata.js';
 import { ExportedProtocol } from '#lib/schemas/protocols.js';
@@ -39,6 +40,8 @@ export async function importProtocol(
 			const url = await lookupMostRecentCompatibleProtocol(id);
 			await importProtocol(db, url, options);
 		}
+
+		await importSingleProtocol(db, url, options);
 	}
 }
 
@@ -87,11 +90,15 @@ export async function importSingleProtocol(
 	progress.phase('metadata', metadatas.size);
 
 	for (const [id, metadata] of metadatas) {
-		if (metadata.type === 'enum' && metadata.options) {
-			delete metadata.options;
-		}
+		await db.put(
+			'Metadata',
+			// TODO: remove this whole .from() thing once #2312 is resolved
+			MetadataInDatabase.in.merge({ '+': 'delete' }).from({
+				id,
+				...metadata,
+			})
+		);
 
-		await db.put('Metadata', { ...metadata, id });
 		progress.increment();
 	}
 
@@ -137,6 +144,7 @@ export async function importSingleProtocol(
 		};
 
 		if (metadata.options) {
+			debugger;
 			for (const option of metadata.options) {
 				await storeOption(option);
 				progress.increment();

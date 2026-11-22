@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import type { Option } from './modules';
 
-import { addDays } from 'date-fns';
+import { addDays, addWeeks } from 'date-fns';
 import { JWT } from 'google-auth-library';
 import { drive_v3, google } from 'googleapis';
 import { Jimp } from 'jimp';
@@ -11,8 +11,8 @@ import odt from 'odt2html';
 import { pdfToPng } from 'pdf-to-png-converter';
 import Turndown from 'turndown';
 
-import { ResponseWithFiles } from './caching';
-import { Datasource, EMPTY_EXTRA, Enricher, NameProvider, OptionExtra } from './modules';
+import {  Enricher, NameProvider, OptionExtra } from './modules';
+import { Datasource, ResponseWithFiles } from './datasource';
 
 const ASSETS_URL_BASE =
 	'https://cigale-protocols-biodimedia-data-terra.ai.meso.umontpellier.fr/assets';
@@ -121,7 +121,7 @@ class GoogleDrive extends Datasource<
 	drive: drive_v3.Drive;
 
 	expirations = {
-		file: (now: Date) => addDays(now, 1),
+		file: (now: Date) => addWeeks(now, 1),
 		entry: (now: Date) => addDays(now, 1),
 	};
 

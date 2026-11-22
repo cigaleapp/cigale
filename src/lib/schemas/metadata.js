@@ -725,7 +725,7 @@ const MetadataEnum = MetadataBase.and({
 	_optionsCount: 'number.integer = 0',
 });
 
-const MetadataEnumInDatabase = MetadataEnum.omit('options');
+const MetadataEnumInDatabase = MetadataEnum.omit('options')
 
 const MetadataBoundingbox = MetadataBase.and({
 	type: '"boundingbox"',
