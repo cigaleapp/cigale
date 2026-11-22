@@ -4,8 +4,9 @@
 	"type": "module",
 	"packageManager": "bun@1.4.2",
 	"scripts": {
-		"start": "bun run server.ts",
-		"regenerate": "bun run main.ts"
+		"start": "bun run lib/server.ts",
+		"regenerate": "bun run main.ts",
+		"generate:types": "bun run scripts/generate-types.ts"
 	},
 	"dependencies": {
 		"arktype": "^2.2.7",

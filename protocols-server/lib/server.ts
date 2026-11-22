@@ -103,7 +103,7 @@ function regenerate(): boolean {
 		return false;
 	}
 	regenStatus = { state: 'running', startedAt: new Date().toISOString() };
-	regenProcess = Bun.spawn(['bun', 'run', path.join(import.meta.dir, 'main.ts')], {
+	regenProcess = Bun.spawn(['bun', 'run', path.join(import.meta.dir, '..', 'main.ts')], {
 		cwd: DATA_DIR,
 		stdout: 'inherit',
 		stderr: 'inherit',
@@ -145,20 +145,23 @@ const server = Bun.serve({
 		}
 
 		// Static file serving: /process/options/... and /process/assets/...
-		// Also serve /options/... and /assets/... directly for flexibility.
-		const staticPrefixes = ['/process/', '/options/', '/assets/'];
-		for (const prefix of staticPrefixes) {
-			if (pathname.startsWith(prefix)) {
-				const relative = pathname.slice(prefix.length);
-				const filePath = resolveUnderDataDir(relative);
-				if (!filePath) {
-					return new Response('Forbidden', { status: 403 });
-				}
-				if (!existsSync(filePath) || !statSync(filePath).isFile()) {
-					return new Response('Not found', { status: 404 });
-				}
-				return serveFile(filePath, req);
+		// (the canonical URLs used by the protocol YAMLs), plus /options/...
+		// and /assets/... as shorter aliases. All resolve under DATA_DIR.
+		let relative: string | null = null;
+		if (pathname.startsWith('/process/')) {
+			relative = pathname.slice('/process/'.length);
+		} else if (pathname.startsWith('/options/') || pathname.startsWith('/assets/')) {
+			relative = pathname.slice(1);
+		}
+		if (relative !== null) {
+			const filePath = resolveUnderDataDir(relative);
+			if (!filePath) {
+				return new Response('Forbidden', { status: 403 });
 			}
+			if (!existsSync(filePath) || !statSync(filePath).isFile()) {
+				return new Response('Not found', { status: 404 });
+			}
+			return serveFile(filePath, req);
 		}
 
 		return new Response('Not found', { status: 404 });

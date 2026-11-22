@@ -146,8 +146,8 @@ jobs:
         run: |
           echo "Waiting for options regeneration to complete..."
           for i in $(seq 1 120); do
-            status=$(curl -fsS "$APP_URL/api/regenerate" | jq -r '.status')
-            echo "[$i/120] status: $status"
+            status=$(curl -fsS "$APP_URL/api/regenerate" | jq -r '.state')
+            echo "[$i/120] state: $status"
             if [ "$status" = "done" ] || [ "$status" = "error" ]; then
               break
             fi

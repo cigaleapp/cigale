@@ -1,5 +1,5 @@
 import { IDMyBeeSpecies } from './idmybee';
-import { CladedName, matchCladedName, Option, Specializer } from './modules';
+import { CladedName, matchCladedName, Option, Specializer } from '../lib/modules';
 
 export const PROTOCOL_ID = 'io.gihtub.cigaleapp.base.bees' as const;
 type PROTOCOL_ID = typeof PROTOCOL_ID;

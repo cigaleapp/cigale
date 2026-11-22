@@ -1,6 +1,6 @@
-import type * as DB from '#lib/database.js';
+import { readFileSync, writeFileSync } from 'node:fs';
 
-import type { Metadata } from '#lib/schemas/metadata.js';
+import { MetadataEnumVariant } from './types';
 
 export type ModuleName =
 	// species names
@@ -34,7 +34,7 @@ export interface Module {
 	name: ModuleName;
 }
 
-export type OptionExtra = Omit<(typeof DB.Schemas.MetadataEnumVariant)['inferIn'], 'label' | 'key'>;
+export type OptionExtra = Omit<MetadataEnumVariant, 'label' | 'key'>;
 
 export type Option = {
 	name: string;
@@ -112,10 +112,50 @@ export interface MetadataProvider extends Module {
 }
 
 export type CladedName = { clade: string; name: string };
+
 export function matchCladedName({ clade, name }: CladedName): (other: CladedName) => boolean {
 	return (other) => other.clade === clade && other.name === name;
 }
 
+export async function writeMetadataToProtocol(
+	id: string,
+	...metadata: Array<typeof Metadata.inferIn>
+) {
+	const found = await findProtocolManifest(id);
+	if (!found) throw new Error(`No manifest file found for ${id}`);
+
+	const { manifest, filepath } = found;
+	const outpath = filepath.replace(/\.yaml$/, '.json');
+
+	writeFileSync(
+		outpath,
+		JSON.stringify(
+			{
+				...manifest,
+				metadata: {
+					...manifest.metadata,
+					...Object.fromEntries(metadata.map((m) => [m.id, m] as const)),
+				},
+			},
+			null,
+			2
+		)
+	);
+
+	return outpath;
+}
+
+async function findProtocolManifest(id: string) {
+	for await (const manifestfile of new Bun.Glob('**/*.cigaleprotocol.yaml').scan({
+		absolute: true,
+		cwd: '../protocols',
+	})) {
+		const raw = readFileSync(manifestfile).toString();
+		const manifest = Bun.YAML.parse(raw) as typeof ExportedProtocol.inferIn;
+
+		if (manifest.id === id) return { filepath: manifestfile, manifest };
+	}
+}
 /*
 
 process is:

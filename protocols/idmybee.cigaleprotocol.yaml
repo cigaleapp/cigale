@@ -1,0 +1,36 @@
+# yaml-language-server: $schema=../static/protocol.schema.json
+manifest: v1.0
+id: io.github.cigaleapp.idmybee
+
+version: 1
+updates: automatic
+source: http://localhost:3000/idmybee.cigaleprotocol.json
+
+name: IDmyBee
+summary: Identification d'andrènes par élimination
+description: Un protocole pour identifier des abeilles genre Andrena via des descripteurs, avec pré-élimination par classification par inférence de Morphogroupes
+logo: https://cigaleapp.github.io/cigale/logos/idmybee.png
+
+authors: []
+
+imports:
+  - from: io.github.cigaleapp.base.bees
+    metadataGroups:
+      - andrena
+      - taxonomy
+    metadata:
+      - crop
+      - shoot_date
+      - shoot_location
+      - identification_difficulty
+      - conservation_status
+
+metadata: {}
+
+exports:
+  images:
+    cropped: cropped/{{ observation.number }}_{{ image.filename }}
+    original: original/{{ observation.number }}_{{ image.filename }}
+  metadata:
+    json: analysis.json
+    csv: metadata.csv

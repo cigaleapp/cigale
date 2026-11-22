@@ -11,6 +11,10 @@ RUN bun install --production
 COPY protocols-server/ ./
 COPY examples/arthropods.cigaleprotocol.json examples/arthropods.light.cigaleprotocol.json examples/old-arthropods.cigaleprotocol.json /examples/
 
+# protocol-types.ts is gitignored — generate it from the protocol schema.
+COPY static/protocol.schema.json ./static/
+RUN bun run generate:types
+
 # Generated options/assets/caches live on the mounted PVC
 ENV DATA_DIR=/data
 RUN mkdir -p /data && chown -R bun:bun /data
@@ -19,4 +23,4 @@ EXPOSE 3000
 
 USER bun
 
-CMD ["bun", "run", "server.ts"]
+CMD ["bun", "run", "lib/server.ts"]

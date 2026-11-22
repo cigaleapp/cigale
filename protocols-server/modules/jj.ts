@@ -1,14 +1,14 @@
-import type { Option } from './modules.js';
+import type { Option } from '../lib/modules.js';
 
 import { addHours, addMonths } from 'date-fns';
 import * as jsdom from 'jsdom';
 import { JSDOM } from 'jsdom';
 import Turndown from 'turndown';
 
-import { Datasource, MultipleResponses } from './datasource.js';
-import { Enricher, matchCladedName, OptionExtra } from './modules.js';
-import { logger } from './progress.js';
-import { fetchPagesViaWordpressAPI, RateLimitTimeoutError } from './wordpress.js';
+import { Datasource, MultipleResponses } from '../lib/datasource.js';
+import { Enricher, matchCladedName, OptionExtra } from '../lib/modules.js';
+import { logger } from '../lib/progress.js';
+import { fetchPagesViaWordpressAPI, RateLimitTimeoutError } from '../lib/wordpress.js';
 
 const IGNORED_PAGES = [
 	'https://jessica-joachim.com/?page_id=141560',

@@ -1,6 +1,6 @@
-import example from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
-import light from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
-import { NameProvider } from './modules.js';
+import example from '../../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
+import light from '../../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
+import { NameProvider } from '../lib/modules.js';
 
 /** Species names from the classmappings of IRIT models */
 export class IRITModels implements NameProvider {
@@ -24,4 +24,3 @@ export class IRITModels implements NameProvider {
 		}
 	}
 }
-

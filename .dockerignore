@@ -9,3 +9,6 @@
 # Re-include the example protocol JSONs (imported at runtime by insects.ts/irit.ts)
 !examples/
 !examples/*.cigaleprotocol.json
+
+# Re-include the protocol schema (used to generate protocol-types.ts at build time)
+!static/protocol.schema.json

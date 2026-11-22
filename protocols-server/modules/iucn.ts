@@ -3,8 +3,8 @@
 import { addMonths } from 'date-fns';
 import { unzip as _unzip, Unzipped } from 'fflate';
 
-import { Enricher, Option } from './modules.js';
-import { Datasource } from './datasource.js';
+import { Enricher, Option } from '../lib/modules.js';
+import { Datasource } from '../lib/datasource.js';
 
 // Archive is still using deprecated term threatStatus instead of more recent iucnRedListCategory
 // see https://gbif.github.io/dwc-api/apidocs/src-html/org/gbif/dwc/terms/IucnTerm.html

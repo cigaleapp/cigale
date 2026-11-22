@@ -7,15 +7,15 @@
 			"manifestVersion": "1.0",
 			"older": [],
 			"id": "io.github.cigaleapp.entomoscope",
-			"url": "http://localhost:3000/entomoscope.cigaleprotocol.yaml"
+			"url": "https://cigale-protocols-biodimedia-data-terra.ai.meso.umontpellier.fr/entomoscope.cigaleprotocol.yaml"
 		},
 		{
 			"name": "IDmyBee",
-			"version": 27,
-			"manifestVersion": "0.0",
+			"version": 1,
+			"manifestVersion": "1.0",
 			"older": [],
 			"id": "io.github.cigaleapp.idmybee",
-			"url": "https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/idmybee.cigaleprotocol.json"
+			"url": "https://cigale-protocols-biodimedia-data-terra.ai.meso.umontpellier.fr/idmybee.cigaleprotocol.json"
 		},
 		{
 			"name": "INSECTA",
@@ -23,7 +23,7 @@
 			"manifestVersion": "1.0",
 			"older": [],
 			"id": "io.github.cigaleapp.insecta",
-			"url": "http://localhost:300/insecta.cigaleprotocol.yaml"
+			"url": "https://cigale-protocols-biodimedia-data-terra.ai.meso.umontpellier.fr/insecta.cigaleprotocol.yaml"
 		},
 		{
 			"name": "Relevé opportuniste",
@@ -31,7 +31,15 @@
 			"manifestVersion": "1.0",
 			"older": [],
 			"id": "fr.osug.terra-forma-web.opportunistic",
-			"url": "http://localhost:3000/opportunistic.cigaleprotocol.yaml"
+			"url": "https://cigale-protocols-biodimedia-data-terra.ai.meso.umontpellier.fr/opportunistic.cigaleprotocol.yaml"
+		},
+		{
+			"name": "Abeilles (base)",
+			"version": 1,
+			"manifestVersion": "1.0",
+			"older": [],
+			"id": "io.github.cigaleapp.base.bees",
+			"url": "https://cigale-protocols-biodimedia-data-terra.ai.meso.umontpellier.fr/bases/bees.cigaleprotocol.json"
 		},
 		{
 			"name": "Oiseaux (base)",
@@ -39,7 +47,7 @@
 			"manifestVersion": "1.0",
 			"older": [],
 			"id": "io.github.cigaleapp.base.birds",
-			"url": "http://localhost:3000/bases/birds.cigaleprotocol.yaml"
+			"url": "https://cigale-protocols-biodimedia-data-terra.ai.meso.umontpellier.fr/bases/birds.cigaleprotocol.yaml"
 		},
 		{
 			"name": "Collemboles (base)",
@@ -47,7 +55,7 @@
 			"manifestVersion": "1.0",
 			"older": [],
 			"id": "io.github.cigaleapp.base.collembola",
-			"url": "http://localhost:3000/bases/collembola.cigaleprotocol.yaml"
+			"url": "https://cigale-protocols-biodimedia-data-terra.ai.meso.umontpellier.fr/bases/collembola.cigaleprotocol.yaml"
 		},
 		{
 			"name": "Environnement (base)",
@@ -55,7 +63,7 @@
 			"manifestVersion": "1.0",
 			"older": [],
 			"id": "io.github.cigaleapp.base.environment",
-			"url": "http://localhost:3000/bases/environment.cigaleprotocol.yaml"
+			"url": "https://cigale-protocols-biodimedia-data-terra.ai.meso.umontpellier.fr/bases/environment.cigaleprotocol.yaml"
 		},
 		{
 			"name": "Insectes (base)",
@@ -63,7 +71,7 @@
 			"manifestVersion": "1.0",
 			"older": [],
 			"id": "io.github.cigaleapp.base.insects",
-			"url": "http://localhost:3000/bases/insects.cigaleprotocol.yaml"
+			"url": "https://cigale-protocols-biodimedia-data-terra.ai.meso.umontpellier.fr/bases/insects.cigaleprotocol.yaml"
 		}
 	]
 }

@@ -1,8 +1,8 @@
 import { addYears } from 'date-fns';
 
-import { Datasource } from './datasource.js';
-import { NameProvider } from './modules.js';
-import { logger } from './progress.js';
+import { Datasource } from '../lib/datasource.js';
+import { NameProvider } from '../lib/modules.js';
+import { logger } from '../lib/progress.js';
 
 export class BirdNetClassmapping implements NameProvider {
 	name = 'birdnet' as const;

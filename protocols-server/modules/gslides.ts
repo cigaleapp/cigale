@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import type { CladedName, Option } from './modules.js';
+import type { CladedName, Option } from '../lib/modules.js';
 
 import { addDays, addWeeks } from 'date-fns';
 import { JWT } from 'google-auth-library';
@@ -11,8 +11,8 @@ import odt from 'odt2html';
 import { pdfToPng } from 'pdf-to-png-converter';
 import Turndown from 'turndown';
 
-import { Datasource, ResponseWithFiles } from './datasource.js';
-import { Enricher, matchCladedName, NameProvider, OptionExtra } from './modules.js';
+import { Datasource, ResponseWithFiles } from '../lib/datasource.js';
+import { Enricher, matchCladedName, NameProvider, OptionExtra } from '../lib/modules.js';
 
 const ASSETS_URL_BASE = 'http://localhost:3000/assets';
 

@@ -1,12 +1,7 @@
-import { match } from 'node:assert';
-
 import { addMonths } from 'date-fns';
 
-import type { Metadata } from '#lib/schemas/metadata.js';
-import { ensureArray, nonnull, slugify } from './utils.js';
-
 import { PROTOCOL_ID } from './bees.js';
-import { Datasource } from './datasource.js';
+import { Datasource } from '../lib/datasource.js';
 import {
 	CladedName,
 	Enricher,
@@ -14,8 +9,10 @@ import {
 	MetadataProvider,
 	NameProvider,
 	Option,
-} from './modules.js';
-import { logger } from './progress.js';
+} from '../lib/modules.js';
+import { logger } from '../lib/progress.js';
+import { Metadata } from '../lib/types.js';
+import { ensureArray, nonnull, slugify } from '../lib/utils.js';
 import { Character, MediaObject, Xper3 } from './xper3.js';
 
 type BeesMetadataID = `${typeof PROTOCOL_ID}__${string}`;
@@ -174,7 +171,7 @@ export class IDMyBeeDescriptors extends WithSDD implements MetadataProvider {
 
 	charactersByKey = new Map<string, { label: string; kind: 'categorical' | 'quantitative' }>();
 
-	media = new Map<string, MediaObject>()
+	media = new Map<string, MediaObject>();
 
 	async *list() {
 		await this.init();
@@ -232,7 +229,7 @@ export class IDMyBeeDescriptors extends WithSDD implements MetadataProvider {
 		} as const;
 	}
 
-	async buildCategorical(label: string): Promise<typeof Metadata.inferIn | undefined> {
+	async buildCategorical(label: string): Promise<Metadata | undefined> {
 		const character = await this.dataset.one('categoricalCharacter', { label });
 		if (!character) return;
 
@@ -256,7 +253,7 @@ export class IDMyBeeDescriptors extends WithSDD implements MetadataProvider {
 		};
 	}
 
-	async buildQuantitative(label: string): Promise<typeof Metadata.inferIn | undefined> {
+	async buildQuantitative(label: string): Promise<Metadata | undefined> {
 		const character = await this.dataset.one('quantitativeCharacter', { label });
 		if (!character) return;
 
