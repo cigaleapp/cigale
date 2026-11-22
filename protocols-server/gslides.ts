@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import type { Option } from './modules.js';
+import type { CladedName, Option } from './modules.js';
 
 import { addDays, addWeeks } from 'date-fns';
 import { JWT } from 'google-auth-library';
@@ -12,11 +12,9 @@ import { pdfToPng } from 'pdf-to-png-converter';
 import Turndown from 'turndown';
 
 import { Datasource, ResponseWithFiles } from './datasource.js';
-import { Enricher, NameProvider, OptionExtra } from './modules.js';
-import { logger } from './progress.js';
+import { Enricher, matchCladedName, NameProvider, OptionExtra } from './modules.js';
 
-const ASSETS_URL_BASE =
-	'http://localhost:3000/assets';
+const ASSETS_URL_BASE = 'http://localhost:3000/assets';
 
 export class GoogleDriveSlides implements NameProvider {
 	name = 'gdrive' as const;
@@ -30,13 +28,16 @@ export class GoogleDriveSlides implements NameProvider {
 	async *scan() {
 		const { files } = await this.gdrive.one('files', {});
 
-		for (const { name } of files) {
-			yield parseFilename(name);
+		for (const file of files) {
+			const name = parseFilename(file.name);
+			if (name) yield name;
 		}
 	}
 }
 
-function parseFilename(name: string) {
+function parseFilename(name: string): CladedName | undefined {
+	if (name === 'A-BASE') return undefined;
+
 	if (name.endsWith(' sp')) {
 		return { clade: 'genus', name: name.replace(/ sp$/, '').trim() };
 	} else {
@@ -51,22 +52,23 @@ export class GoogleSlides implements Enricher {
 
 	chunksize = 1;
 
-	availableTaxons: Array<{ clade: string; name: string }> = [];
+	availableTaxons: Array<CladedName> = [];
 
 	constructor() {
 		this.gdrive = new GoogleDrive();
 	}
 
 	async init() {
-		this.availableTaxons = await this.gdrive
-			.one('files', {})
-			.then(({ files }) => files.map((f) => parseFilename(f.name)));
+		const { files } = await this.gdrive.one('files', {});
+		for (const { name } of files) {
+			const parsed = parseFilename(name);
+			if (!parsed) continue;
+			this.availableTaxons.push(parsed);
+		}
 	}
 
-	available(option: Option): boolean {
-		return this.availableTaxons.some(
-			(tx) => tx.clade === option.clade && tx.name === option.name
-		);
+	available({ clade, name }: Option): boolean {
+		return this.availableTaxons.some(matchCladedName({ clade, name }));
 	}
 
 	async *enrich(options: Option[]) {
@@ -157,8 +159,7 @@ class GoogleDrive extends Datasource<
 				response.data.files
 					?.filter((f) => Boolean(f.name))
 					.sort((a, b) => a.name!.localeCompare(b.name!))
-					.map((f) => ({ name: f.name!.trim(), id: f.id! }))
-					.filter((f) => f.name !== 'A-BASE') ?? [];
+					.map((f) => ({ name: f.name!.trim(), id: f.id! })) ?? [];
 
 			return { files };
 		},

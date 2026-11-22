@@ -1,0 +1,11 @@
+# Exclude everything by default
+*
+
+# Re-include the protocols-server source
+!protocols-server/
+!protocols-server/*.ts
+!protocols-server/package.json
+
+# Re-include the example protocol JSONs (imported at runtime by insects.ts/irit.ts)
+!examples/
+!examples/*.cigaleprotocol.json

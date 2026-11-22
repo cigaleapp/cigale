@@ -2,8 +2,8 @@ import { match } from 'node:assert';
 
 import { addMonths } from 'date-fns';
 
-import { Metadata } from '#lib/schemas/metadata.js';
-import { ensureArray, nonnull, slugify } from '#lib/utils.js';
+import type { Metadata } from '#lib/schemas/metadata.js';
+import { ensureArray, nonnull, slugify } from './utils.js';
 
 import { PROTOCOL_ID } from './bees.js';
 import { Datasource } from './datasource.js';
@@ -173,6 +173,8 @@ export class IDMyBeeDescriptors extends WithSDD implements MetadataProvider {
 	addTo = ['io.github.cigaleapp.base.bees'];
 
 	charactersByKey = new Map<string, { label: string; kind: 'categorical' | 'quantitative' }>();
+
+	media = new Map<string, MediaObject>()
 
 	async *list() {
 		await this.init();

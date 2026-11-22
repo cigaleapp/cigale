@@ -1,9 +1,10 @@
 import { addMonths } from 'date-fns';
 import { XMLParser } from 'fast-xml-parser';
 
-import { ensureArray } from '#lib/utils.ts';
-
 import { Datasource, DatasourceName, MultipleResponses } from './datasource';
+import { parseTaxonLabel } from './idmybee';
+import { CladedName, matchCladedName } from './modules';
+import { ensureArray } from './utils';
 
 export class Xper3 extends Datasource<
 	| 'characters'
@@ -21,10 +22,7 @@ export class Xper3 extends Datasource<
 		character: { $id: `c${string}` };
 		categoricalCharacter: { label: string };
 		quantitativeCharacter: { label: string };
-		codedDescriptions: Array<{
-			clade: string;
-			name: string;
-		}>;
+		codedDescriptions: CladedName[];
 		summaryDataOfCharacter: {
 			label: string;
 		};
@@ -87,6 +85,13 @@ export class Xper3 extends Datasource<
 			};
 		},
 
+		character: async ({ $id }: { $id: string }) => {
+			return [
+				...ensureArray(this.dataset.Characters.QuantitativeCharacter),
+				...ensureArray(this.dataset.Characters.CategoricalCharacter),
+			].find((ch) => ch.$id === $id);
+		},
+
 		taxa: async () => {
 			return {
 				taxa: this.dataset.TaxonNames.TaxonName,
@@ -111,7 +116,7 @@ export class Xper3 extends Datasource<
 			);
 		},
 
-		codedDescriptions: async (species: Array<{ clade: string; name: string }>) => {
+		codedDescriptions: async (species: CladedName[]) => {
 			const response = new MultipleResponses<
 				{ clade: string; name: string; description: CodedDescription },
 				{ clade: string; name: string }
@@ -120,8 +125,8 @@ export class Xper3 extends Datasource<
 			for (const sp of species) {
 				if (sp.clade !== 'species') continue;
 
-				const taxon = this.dataset.TaxonNames.TaxonName.find(
-					(tx) => tx.Representation.Label === sp.name
+				const taxon = this.dataset.TaxonNames.TaxonName.find((tx) =>
+					matchCladedName(sp)(parseTaxonLabel(tx.Representation.Label))
 				);
 
 				if (!taxon) continue;

@@ -1,0 +1,26 @@
+{
+	"name": "protocols-server",
+	"private": true,
+	"type": "module",
+	"packageManager": "bun@1.4.2",
+	"scripts": {
+		"start": "bun run server.ts",
+		"regenerate": "bun run main.ts"
+	},
+	"dependencies": {
+		"arktype": "^2.2.7",
+		"date-fns": "^4.4.0",
+		"dequal": "^2.0.3",
+		"es-toolkit": "^1.52.0",
+		"exit-hook": "^5.1.0",
+		"fast-xml-parser": "^5.11.2",
+		"fflate": "^0.8.3",
+		"google-auth-library": "^11.1.0",
+		"googleapis": "^178.0.0",
+		"jimp": "1.6.0",
+		"jsdom": "^30.0.1",
+		"odt2html": "^1.0.1",
+		"pdf-to-png-converter": "^4.2.1",
+		"turndown": "^7.2.4"
+	}
+}

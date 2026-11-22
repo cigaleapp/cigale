@@ -1,7 +1,6 @@
 import type * as DB from '#lib/database.js';
 
-import { Metadata } from '#lib/schemas/metadata.js';
-import { ExportedProtocol } from '#lib/schemas/protocols.js';
+import type { Metadata } from '#lib/schemas/metadata.js';
 
 export type ModuleName =
 	// species names

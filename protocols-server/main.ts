@@ -1,4 +1,5 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import type {
 	Enricher,
@@ -32,7 +33,7 @@ await run({
 	modules: {
 		sources: [
 			new GoogleDriveSlides(),
-			new IRITModels('full'),
+			// new IRITModels('full'),
 			new BirdNetClassmapping(),
 			new IDMyBeeSpecies(),
 		],
@@ -111,12 +112,12 @@ async function run(plan: {
 	/** Key is Option.id */
 	const options = new Map<string, Option & { id: string }>();
 
-	for (const option of names.values()) {
+	await distributeOverThreads([...names.values()], async (option) => {
 		const id = await plan.modules.identifier.identify(option);
 		progress.increment();
-		if (!id) continue;
+		if (!id) return;
 		options.set(id, { ...option, id });
-	}
+	});
 
 	logger.timed(`Identified ${options.size} names`);
 
@@ -124,8 +125,7 @@ async function run(plan: {
 
 	const queries = [...options.values()];
 
-	// Find taxonomies then identify again
-	for (const option of queries) {
+	await distributeOverThreads(queries, async (option) => {
 		const parents = await plan.modules.taxonomy.parents(option);
 
 		progress.increment();
@@ -145,7 +145,7 @@ async function run(plan: {
 			...option,
 			parents: selectHigherClades(option, parents) as Array<Option & { id: string }>,
 		});
-	}
+	});
 
 	logger.timed(`Found ${options.size - names.size} new taxa from taxonomies`);
 	/** Enrich */
@@ -395,4 +395,23 @@ function selectHigherClades(option: Option, others: Option[]): Option[] {
 	const specificity = (o: Option) => CLADES.indexOf(o.clade);
 
 	return others.filter((o) => specificity(o) < specificity(option));
+}
+
+async function distributeOverThreads<T>(all: T[], compute: (item: T) => Promise<void>) {
+	const cpuThreads = os.cpus().length;
+
+	const batchsize = Math.ceil(all.length / cpuThreads);
+
+	const indexRanges = Array.from({ length: cpuThreads }).map((_, i) => [
+		i * batchsize,
+		Math.min((i + 1) * batchsize, all.length),
+	]);
+
+	await Promise.all(
+		indexRanges.map(async ([start, end]) => {
+			for (let i = start; i < end; i++) {
+				await compute(all[i]);
+			}
+		})
+	);
 }
