@@ -49,7 +49,7 @@
 						onInput: signals.loadingStarted,
 						importProtocol: data.swarpc.importProtocol,
 					})
-						.catch((e) => toasts.error(e))
+						.catch((e) => toasts.error(null, e))
 						.then((ps) => {
 							if (!ps || typeof ps === 'string' || ps.length === 0) return;
 							if (ps.length === 1)

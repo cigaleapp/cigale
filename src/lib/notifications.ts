@@ -23,7 +23,7 @@ export async function askForNotificationPermission() {
 		try {
 			const status = await LocalNotifications.requestPermissions();
 			if (status.display !== 'granted') {
-				toasts.error('Vous avez refusé les notifications.');
+				toasts.error(null, 'Vous avez refusé les notifications.');
 			}
 		} catch (e) {
 			console.error('Local notification permission request failed', e);
@@ -33,7 +33,7 @@ export async function askForNotificationPermission() {
 	}
 
 	if (!('Notification' in window)) {
-		toasts.error('Votre navigateur ne supporte pas les notifications système.');
+		toasts.error(null, 'Votre navigateur ne supporte pas les notifications système.');
 		return;
 	}
 
@@ -46,7 +46,7 @@ export async function askForNotificationPermission() {
 		}
 	} else if (Notification.permission === 'denied') {
 		toasts.error(
-			'Vous avez refusé les notifications système. Veuillez changer cela dans les paramètres de votre navigateur.'
+			null, 'Vous avez refusé les notifications système. Veuillez changer cela dans les paramètres de votre navigateur.'
 		);
 	}
 }
@@ -152,13 +152,13 @@ export async function sendNotification(
 			});
 		} catch (e) {
 			console.error('Failed to send local notification', e);
-			toasts.error("Impossible d'envoyer la notification système.");
+			toasts.error(null, "Impossible d'envoyer la notification système.");
 		}
 		return;
 	}
 
 	if (!('Notification' in window)) {
-		toasts.error('Votre navigateur ne supporte pas les notifications système.');
+		toasts.error(null, 'Votre navigateur ne supporte pas les notifications système.');
 		return;
 	}
 

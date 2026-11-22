@@ -119,7 +119,7 @@
 						label="Nom du dossier à créer"
 						onblur={(folder, setValue) => {
 							if (!folder.trim()) {
-								toasts.error('Le nom du dossier ne peut pas être vide.');
+								toasts.error(null, 'Le nom du dossier ne peut pas être vide.');
 								return;
 							}
 							setValue('');

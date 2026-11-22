@@ -23,7 +23,7 @@
 
 		const { id, exports } = data.protocol;
 		if (!exports) {
-			toasts.error("Aucune configuration d'exports trouvée pour ce protocole.");
+			toasts.error(null, "Aucune configuration d'exports trouvée pour ce protocole.");
 			return;
 		}
 

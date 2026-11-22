@@ -37,12 +37,12 @@ export function updater(changes) {
 			await changes(option, value);
 		} catch (err) {
 			if (err instanceof ArkErrors) {
-				toasts.error(`Valeur invalide : ${err.summary}`);
+				toasts.error(null, `Valeur invalide : ${err.summary}`);
 			}
 		}
 
 		await set('MetadataOption', option).catch((err) => {
-			toasts.error(`Impossible de sauvegarder : ${errorMessage(err)}`);
+			toasts.error(null, `Impossible de sauvegarder : ${errorMessage(err)}`);
 		});
 
 		await invalidate(

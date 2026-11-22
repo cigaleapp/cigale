@@ -38,7 +38,7 @@ Available CSS variables:
 </script>
 
 <script>
-	import { errorMessage } from '#lib/i18n.js';
+
 	import { toasts } from '#lib/toasts.svelte.js';
 
 	import { hasPhysicalKeyboard } from './keyboard.svelte.js';
@@ -130,7 +130,7 @@ Available CSS variables:
 				if (onclicksuccess) toasts.success(onclicksuccess);
 			} catch (e) {
 				if (errorprefix) {
-					toasts.error(errorMessage(e, errorprefix));
+					toasts.error(e, errorprefix);
 				}
 				console.error(e);
 			} finally {

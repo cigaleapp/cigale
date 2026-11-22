@@ -2,7 +2,6 @@
 	import ButtonPrimary from '#lib/ButtonPrimary.svelte';
 	import ButtonSecondary from '#lib/ButtonSecondary.svelte';
 	import Field from '#lib/Field.svelte';
-	import { errorMessage } from '#lib/i18n.js';
 	import { tables } from '#lib/idb.svelte.js';
 	import InlineTextInput from '#lib/InlineTextInput.svelte';
 	import Modal from '#lib/Modal.svelte';
@@ -93,7 +92,7 @@
 					});
 					await goto('/(app)/protocols/[id]/edit/infos', { id: newProtocol.id });
 				} catch (error) {
-					toasts.error(errorMessage(error));
+					toasts.error(error);
 				}
 			}}
 		>

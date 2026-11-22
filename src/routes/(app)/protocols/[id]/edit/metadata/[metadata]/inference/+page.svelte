@@ -91,7 +91,7 @@
 							onblur={async ({ currentTarget }) => {
 								const newExif = EXIFField(currentTarget.value);
 								if (newExif instanceof ArkErrors) {
-									toasts.error(`Champ EXIF invalide: ${newExif.summary}`);
+									toasts.error(null, `Champ EXIF invalide: ${newExif.summary}`);
 									return;
 								}
 

@@ -4,7 +4,7 @@
 	import ButtonInk from '#lib/ButtonInk.svelte';
 	import CardMedia from '#lib/CardMedia.svelte';
 	import DropdownMenu from '#lib/DropdownMenu.svelte';
-	import { errorMessage, plural } from '#lib/i18n.js';
+	import { plural } from '#lib/i18n.js';
 	import Lightbox from '#lib/Lightbox.svelte';
 	import LoadingScreen from '#lib/LoadingScreen.svelte';
 	import { goto } from '#lib/paths.js';
@@ -131,7 +131,7 @@
 			<LoadingScreen empty />
 		{/if}
 	{:catch error}
-		<LoadingScreen failure={errorMessage(error)} />
+		<LoadingScreen failure={error} />
 	{/await}
 </main>
 

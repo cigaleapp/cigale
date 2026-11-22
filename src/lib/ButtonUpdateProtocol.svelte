@@ -80,7 +80,7 @@
 							onupgrade?.(version);
 						})
 						.catch((e) => {
-							toasts.error(`Impossible de mettre à jour le protocole: ${e}`);
+							toasts.error(null, `Impossible de mettre à jour le protocole: ${e}`);
 						})
 						.finally(() => {
 							upgrading = false;

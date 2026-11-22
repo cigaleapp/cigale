@@ -16,7 +16,6 @@ import {
 	geolocationAccuracyToConfidence,
 	gpsDilutionOfPrecisionToConfidence,
 } from './geolocation.js';
-import { errorMessage } from './i18n.js';
 import * as db from './idb.svelte.js';
 import { resolveMetadataImport, storeMetadataValue } from './metadata/index.js';
 import { toasts } from './toasts.svelte.js';
@@ -137,9 +136,7 @@ export async function processExifData({
 		console.warn(e);
 		if (file.type === 'image/jpeg') {
 			console.warn(e);
-			toasts.warn(
-				errorMessage(e, `Impossible d'extraire les métadonnées EXIF de ${file.name}`)
-			);
+			toasts.warn(e, `Impossible d'extraire les métadonnées EXIF de ${file.name}`);
 		}
 		return {};
 	}
@@ -386,7 +383,7 @@ export function setExifFields(bytes: ArrayBuffer, changes: Partial<Record<ExifFi
 		const outputstr = piexif.insert(piexif.dump(exifDict), bytestring);
 		return byteStringToArray(outputstr);
 	} catch (error) {
-		toasts.warn(errorMessage(error, 'Impossible de modifier les données EXIF'));
+		toasts.warn(error, 'Impossible de modifier les données EXIF');
 		return new Uint8Array(bytes);
 	}
 }

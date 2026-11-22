@@ -590,7 +590,7 @@ export const TemplatedString = (Input, postprocess) =>
 						// @ts-ignore
 						return postprocess ? postprocess(rendered) : rendered;
 					} catch (error) {
-						throw new Error(errorMessage(error, `Template de ${where}`), {
+						throw new Error(`Template de ${where}`, {
 							cause: error,
 						});
 					}
