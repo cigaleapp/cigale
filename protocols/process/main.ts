@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import type {
 	Enricher,
@@ -14,9 +14,11 @@ import { sum, zip } from 'es-toolkit';
 import exitHook from 'exit-hook';
 
 import { BirdNetClassmapping } from './birdnet.js';
+import { Birds } from './birds.js';
 import { writeAllCaches } from './caching.js';
 import { CoLXR, GBIFTaxonInfo, GBIFTaxonomy } from './gbif.js';
 import { GoogleDriveSlides, GoogleSlides } from './gslides.js';
+import { Collembola, Insects } from './insects.js';
 import { IRITModels } from './irit.js';
 import { IUCN } from './iucn.js';
 import { JessicaJoachim } from './jj.js';
@@ -26,22 +28,13 @@ await run({
 	metadataId: (clade) => clade,
 	output: { options: 'options', images: 'assets' },
 	modules: {
-		sources: [new GoogleDriveSlides(), new IRITModels('full'), new BirdNetClassmapping()],
-		// sources: [new IRITModels('light'), new GoogleDriveSlides()],
+		// sources: [new GoogleDriveSlides(), new IRITModels('full'), new BirdNetClassmapping()],
+		sources: [new IRITModels('light'), new GoogleDriveSlides()],
 		identifier: new CoLXR(),
 		taxonomy: new GBIFTaxonomy(),
 		// TODO: add iNat for photos when we have access to the API: find out if we can get the first 5 featured images that inat shows at e.g. https://www.inaturalist.org/taxa/51702-Coccinella-septempunctata. using gbif media seems too unreliable, theres plenty of images that arent photos of the species
 		enrich: [new JessicaJoachim(), new IUCN(), new GoogleSlides(), new GBIFTaxonInfo()],
-		specializations: [
-			new (class implements Specializer {
-				protocolId = 'io.github.cigaleapp.base.insects';
-				name = 'debug-all' as const;
-
-				include() {
-					return true;
-				}
-			})(),
-		],
+		specializations: [new Birds(), new Insects(), new Collembola()],
 	},
 });
 
@@ -73,6 +66,7 @@ async function run(plan: {
 
 	logger.timed(`Listing names from ${plan.modules.sources.length} sources`);
 
+	const nameCountsBySource = new Map<string, number>();
 	await Promise.all(
 		plan.modules.sources.map(async (source) => {
 			let count = 0;
@@ -85,14 +79,15 @@ async function run(plan: {
 				});
 			}
 
+			nameCountsBySource.set(source.name, count);
 			progress.increment();
 		})
 	);
 
 	logger.timed(
 		`Gathered ${names.size} names:\n` +
-			[...Map.groupBy(names.values(), (opt) => opt.provenance)]
-				.map(([source, names]) => `- ${source}: ${names.length} names`)
+			[...nameCountsBySource]
+				.map(([source, count]) => `- ${source}: ${count} names`)
 				.join('\n')
 	);
 
@@ -173,7 +168,7 @@ async function run(plan: {
 					option.extras ??= [];
 					option.extras.push(extra);
 
-					if (Object.keys(extra) > 0) enriched.add(id);
+					if (Object.keys(extra.extra).length > 0) enriched.add(id);
 				}
 
 				progress.increment(chunk.length);
@@ -193,6 +188,8 @@ async function run(plan: {
 	await Promise.all(
 		plan.modules.specializations.map(async (specializer) => {
 			const output = new Map<string, string>();
+
+			await specializer.init();
 
 			const specialized = [...options.values()].filter((option) =>
 				specializer.include(option)
@@ -263,11 +260,34 @@ async function run(plan: {
 				.join('\n')
 	);
 
+	const longestFilepath = Math.max(
+		...[...outputs].flatMap(([, files]) =>
+			[...files].map(([, f]) => path.relative('.', f).length)
+		)
+	);
+
 	logger.info(
 		`Wrote ${sum([...outputs].map(([, files]) => files.size))} files:\n` +
 			[...outputs]
 				.flatMap(([sp, files]) =>
-					[...files].map(([, filepath]) => `- ${filepath} (from ${sp})`)
+					[...files]
+						.map(([, filepath]) => {
+							const header = JSON.parse(
+								readFileSync(filepath).toString().split('\n').at(0)!
+							);
+
+							return { ...header, filepath };
+						})
+						.sort((a, b) => -(a.count - b.count))
+						.map(({ filepath, count }) =>
+							[
+								'-',
+								count.toString().padStart(6),
+								'entries in',
+								path.relative('.', filepath).padEnd(longestFilepath),
+								`(from ${sp})`,
+							].join(' ')
+						)
 				)
 				.join('\n')
 	);

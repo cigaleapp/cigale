@@ -11,8 +11,9 @@ import odt from 'odt2html';
 import { pdfToPng } from 'pdf-to-png-converter';
 import Turndown from 'turndown';
 
-import {  Enricher, NameProvider, OptionExtra } from './modules';
 import { Datasource, ResponseWithFiles } from './datasource';
+import { Enricher, NameProvider, OptionExtra } from './modules';
+import { logger } from './progress';
 
 const ASSETS_URL_BASE =
 	'https://cigale-protocols-biodimedia-data-terra.ai.meso.umontpellier.fr/assets';

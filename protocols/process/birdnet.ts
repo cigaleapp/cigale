@@ -48,7 +48,7 @@ type ZenodoFile = {
 	file: string;
 };
 
-class BirdNetZenodo extends Datasource<
+export class BirdNetZenodo extends Datasource<
 	'classmapping',
 	{ classmapping: ZenodoFile },
 	{ classmapping: Array<{ idx: number; sci_name: string }> }

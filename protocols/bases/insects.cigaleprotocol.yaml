@@ -30,21 +30,21 @@ metadataGroups:
 metadata:
   crop:
     type: boundingbox
-    label: ""
+    label: ''
     required: true
-    description: ""
+    description: ''
     mergeMethod: union
     groupable: true
     infer:
       neural: []
       # TODO
       #   - input:
-      #       height: 
-      #       normalized: 
-      #       width: 
-      #     model: 
+      #       height:
+      #       normalized:
+      #       width:
+      #     model:
       #     output:
-      #       normalized: 
+      #       normalized:
       #       shape:
       #         -
       #     webgpuReady: false
@@ -56,18 +56,18 @@ metadata:
     description: ''
     mergeMethod: max
     groupable: true
-    externalOptions: 
-      at: http://localhost:3000/process/options/debug-all/species.jsonl
+    externalOptions:
+      at: http://localhost:3000/process/options/insects/species.jsonl
       format: json-lines
     infer:
       neural: []
         # TODO
-        # - classmapping: 
+        # - classmapping:
         #   input:
-        #     height: 
-        #     normalized: 
-        #     width: 
-        #   model: 
+        #     height:
+        #     normalized:
+        #     width:
+        #   model:
         #   webgpuReady: false
 
   kingdom:
@@ -78,10 +78,10 @@ metadata:
     description: ''
     mergeMethod: max
     groupable: true
-    externalOptions: 
-      at: http://localhost:3000/process/options/debug-all/kingdom.jsonl
+    externalOptions:
+      at: http://localhost:3000/process/options/insects/kingdom.jsonl
       format: json-lines
-      
+
   phylum:
     type: enum
     group: taxonomy
@@ -90,8 +90,8 @@ metadata:
     description: ''
     mergeMethod: max
     groupable: true
-    externalOptions: 
-      at: http://localhost:3000/process/options/debug-all/phylum.jsonl
+    externalOptions:
+      at: http://localhost:3000/process/options/insects/phylum.jsonl
       format: json-lines
 
   class:
@@ -102,8 +102,8 @@ metadata:
     description: ''
     mergeMethod: max
     groupable: true
-    externalOptions: 
-      at: http://localhost:3000/process/options/debug-all/class.jsonl
+    externalOptions:
+      at: http://localhost:3000/process/options/insects/class.jsonl
       format: json-lines
 
   order:
@@ -115,7 +115,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: http://localhost:3000/process/options/debug-all/order.jsonl
+      at: http://localhost:3000/process/options/insects/order.jsonl
       format: json-lines
 
   family:
@@ -127,7 +127,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: http://localhost:3000/process/options/debug-all/family.jsonl
+      at: http://localhost:3000/process/options/insects/family.jsonl
       format: json-lines
 
   genus:
@@ -139,7 +139,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: http://localhost:3000/process/options/debug-all/genus.jsonl
+      at: http://localhost:3000/process/options/insects/genus.jsonl
       format: json-lines
 
   identification_difficulty:

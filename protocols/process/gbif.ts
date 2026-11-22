@@ -43,9 +43,10 @@ export class GBIFTaxonomy implements TaxonomyProvider {
 
 		if (!firstResult) throw new Error('not in gbif');
 
-		return firstResult.parents.map((parent) => ({
+		return firstResult.parents.map(({ clade, ...rest }) => ({
 			provenance,
-			...parent,
+			clade: clade.toLowerCase(),
+			...rest,
 		}));
 	}
 }
@@ -165,7 +166,7 @@ export class GBIF extends Datasource<'search' | 'taxon', GbifParams, GbifRespons
 				results: type({
 					taxonID: 'string',
 					scientificName: 'string',
-					taxonRank: 'string',
+					taxonRank: 'string.lower',
 					classification: type({
 						taxonID: 'string',
 						scientificName: 'string',
@@ -210,7 +211,7 @@ export class GBIF extends Datasource<'search' | 'taxon', GbifParams, GbifRespons
 			const Response = type({
 				taxonID: 'string',
 				'scientificNameAuthorship?': 'string',
-				taxonRank: 'string',
+				taxonRank: 'string.lower',
 				taxonomicStatus: type.enumerated(
 					'ACCEPTED',
 					'PROVISIONALLY_ACCEPTED',
@@ -230,13 +231,13 @@ export class GBIF extends Datasource<'search' | 'taxon', GbifParams, GbifRespons
 					homotypic: type({
 						taxonID: 'string',
 						scientificName: 'string',
-						taxonRank: 'string',
+						taxonRank: 'string.lower',
 					}).array(),
 					/** Heterotypic (taxonomic) synonyms based on different type specimens, grouped by their common basionym. Each inner list represents a homotypic group of names considered synonymous for taxonomic reasons. */
 					heterotypic: type({
 						taxonID: 'string',
 						scientificName: 'string',
-						taxonRank: 'string',
+						taxonRank: 'string.lower',
 					})
 						.array()
 						.array(),
@@ -244,7 +245,7 @@ export class GBIF extends Datasource<'search' | 'taxon', GbifParams, GbifRespons
 					misapplied: type({
 						taxonID: 'string',
 						scientificName: 'string',
-						taxonRank: 'string',
+						taxonRank: 'string.lower',
 					}).array(),
 				}).partial(),
 				'vernacularNames?': type({

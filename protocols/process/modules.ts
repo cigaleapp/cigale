@@ -36,7 +36,7 @@ export type Option = {
 	clade: string;
 	id?: string;
 	/** IDs of parent options in the taxonomy sense */
-	parents?: Array<{ clade: string; id: string }>;
+	parents?: Array<{ clade: string; name: string; id: string }>;
 	extras?: Array<{
 		priority: number;
 		extra: OptionExtra;
@@ -79,6 +79,8 @@ export interface Enricher extends Module {
 export interface Specializer extends Module {
 	/** The associated protocol ID. Used to namespace the clade metadatas */
 	protocolId: string;
+
+	init(): Promise<void>;
 
 	include(option: Option): boolean;
 }
