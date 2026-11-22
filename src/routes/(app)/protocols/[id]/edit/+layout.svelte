@@ -98,7 +98,7 @@
 				toasts.success(`Métadonnée ${shortId} créée`);
 			});
 		} catch (error) {
-			toasts.error(errorMessage(error, 'Impossible de créer la métadonnée'));
+			toasts.error(error, 'Impossible de créer la métadonnée');
 		}
 	}
 
@@ -190,7 +190,7 @@
 					<ButtonInk
 						onclick={async () => {
 							await exportProtocol(databaseHandle(), resolve('/'), id).catch((e) =>
-								toasts.error(e)
+								toasts.error(null, e)
 							);
 						}}
 					>

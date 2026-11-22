@@ -104,7 +104,7 @@ export async function capture(camera: CameraState, storage: PendingStorage) {
 	}, 100);
 
 	if (!storage) {
-		toasts.error("Le stockage n'est pas encore prêt, veuillez rééssayer");
+		toasts.error(null, "Le stockage n'est pas encore prêt, veuillez rééssayer");
 		return;
 	}
 

@@ -64,7 +64,7 @@
 				// modelLoadingError = error;
 				if (isAbortError(error)) return;
 				console.error(error);
-				toasts.error('Erreur lors du chargement du modèle de détection');
+				toasts.error(null, 'Erreur lors du chargement du modèle de détection');
 			})
 			.then(() => {
 				modelLoaded = true;

@@ -189,7 +189,7 @@
 					if (error instanceof AggregateError) {
 						console.error(error.errors);
 					}
-					toasts.error('Erreur lors du chargement du modèle de classification');
+					toasts.error(null, 'Erreur lors du chargement du modèle de classification');
 				})
 				.finally(() => {
 					queueClassificationsIfReady();
@@ -292,7 +292,7 @@
 								imageIds.forEach((id) => uiState.erroredImages.delete(id));
 								classifyMore(imageIds);
 							} else {
-								toasts.error(`L'observation ${id} est vide`);
+								toasts.error(null, `L'observation ${id} est vide`);
 							}
 						}}
 						ondelete={async () => {

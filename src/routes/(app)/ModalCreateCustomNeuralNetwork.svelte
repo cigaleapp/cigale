@@ -11,7 +11,7 @@
 	import Field from '#lib/Field.svelte';
 	import FieldURL from '#lib/FieldURL.svelte';
 	import { promptForFiles } from '#lib/files.js';
-	import { errorMessage, formatBytesSize, uppercaseFirst } from '#lib/i18n.js';
+	import { formatBytesSize, uppercaseFirst } from '#lib/i18n.js';
 	import { tables } from '#lib/idb.svelte.js';
 	import InlineTextInput from '#lib/InlineTextInput.svelte';
 	import LoadingScreen from '#lib/LoadingScreen.svelte';
@@ -621,7 +621,7 @@
 					classmappingUrl = undefined;
 					data = { ...DEFAULT_DATA };
 				} catch (e) {
-					toasts.error(errorMessage(e));
+					toasts.error(e);
 				}
 			}}
 		>

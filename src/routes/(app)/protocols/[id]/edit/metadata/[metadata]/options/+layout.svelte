@@ -110,7 +110,7 @@
 				option: key,
 			});
 		} catch (error) {
-			toasts.error(errorMessage(error, "Impossible de créer l'option"));
+			toasts.error(error, "Impossible de créer l'option");
 		}
 	}
 </script>

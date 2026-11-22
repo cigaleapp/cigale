@@ -115,7 +115,7 @@
 			(['warn', 'error', 'info', 'debug', 'success'] as const).map((type) => {
 				const toastFns = {
 					warn: () => toasts.warn(/* @wc-ignore */ 'Example warning toast'),
-					error: () => toasts.error(/* @wc-ignore */ 'Example error toast'),
+					error: () => toasts.error(null, /* @wc-ignore */ 'Example error toast'),
 					info: () => toasts.info(/* @wc-ignore */ 'Example info toast'),
 					debug: () => toasts.add('debug', /* @wc-ignore */ 'Example debug toast'),
 					success: () => toasts.success(/* @wc-ignore */ 'Example success toast'),

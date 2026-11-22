@@ -130,7 +130,7 @@ Available CSS variables:
 				if (onclicksuccess) toasts.success(onclicksuccess);
 			} catch (e) {
 				if (errorprefix) {
-					toasts.error(errorMessage(e, errorprefix));
+					toasts.error(e, errorprefix);
 				}
 				console.error(e);
 			} finally {

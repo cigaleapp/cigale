@@ -1,6 +1,7 @@
 import { minutesToMilliseconds } from 'date-fns';
 import { nanoid } from 'nanoid';
 
+import { errorMessage } from './i18n.js';
 import { entries, mapValues } from './utils.js';
 
 /**
@@ -216,12 +217,15 @@ class Toasts {
 	/**
 	 * Displays an error toast.
 	 * @template T
-	 * @param {any} message
+	 * @param {unknown} [error] the error to display; when omitted, `message` is shown as-is
+	 * @param {string} [message] message to display alongside the error, or the message itself when no error is given
 	 * @param {ToastOptions<T>} [options]
 	 * @returns {string | undefined}
 	 */
-	error(message, options) {
-		return this.add('error', message?.toString() ?? 'Erreur inattendue', {
+	error(error, message, options) {
+		const displayMessage =
+			error != null ? errorMessage(error, message) : message?.toString() ?? 'Erreur inattendue';
+		return this.add('error', displayMessage, {
 			...options,
 			lifetime: options?.lifetime ?? 'inferred',
 		});
