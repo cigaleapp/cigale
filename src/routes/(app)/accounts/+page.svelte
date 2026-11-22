@@ -3,7 +3,6 @@
 
 	import { providers } from '#lib/accounts/registry.js';
 	import ButtonSecondary from '#lib/ButtonSecondary.svelte';
-	import { errorMessage } from '#lib/i18n.js';
 	import { databaseHandle, tables } from '#lib/idb.svelte.js';
 	import Logo from '#lib/Logo.svelte';
 	import { toasts } from '#lib/toasts.svelte.js';
@@ -60,7 +59,7 @@
 						try {
 							await acct.logout();
 						} catch (e) {
-							toasts.warn(errorMessage(e, 'Impossible de se déconnecter'));
+							toasts.warn(e, 'Impossible de se déconnecter');
 						}
 
 						await tables.Account.remove(account.id);
