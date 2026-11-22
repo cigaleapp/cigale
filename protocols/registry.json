@@ -3,10 +3,10 @@
 	"protocols": [
 		{
 			"name": "Entomoscope",
-			"version": 11,
+			"version": 1,
 			"manifestVersion": "1.0",
 			"older": [],
-			"id": "fr.osug.terra-forma-web.entomoscope",
+			"id": "io.github.cigaleapp.entomoscope",
 			"url": "http://localhost:3000/entomoscope.cigaleprotocol.yaml"
 		},
 		{
@@ -15,15 +15,15 @@
 			"manifestVersion": "0.0",
 			"older": [],
 			"id": "io.github.cigaleapp.idmybee",
-			"url": "http://localhost:3000/idmybee.cigaleprotocol.json"
+			"url": "https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/idmybee.cigaleprotocol.json"
 		},
 		{
 			"name": "INSECTA",
-			"version": 28,
+			"version": 1,
 			"manifestVersion": "1.0",
 			"older": [],
-			"id": "fr.osug.terra-forma-web.insecta",
-			"url": "http://localhost:3000/insecta.cigaleprotocol.yaml"
+			"id": "io.github.cigaleapp.insecta",
+			"url": "http://localhost:300/insecta.cigaleprotocol.yaml"
 		},
 		{
 			"name": "Relevé opportuniste",

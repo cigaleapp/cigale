@@ -1,8 +1,8 @@
 import type * as DB from '#lib/database.js';
 
-import example from '../../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
-import light from '../../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
-import { Option, Specializer } from './modules';
+import example from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
+import light from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
+import { Option, Specializer } from './modules.js';
 
 export class Insects implements Specializer {
 	name = 'insects' as const;

@@ -9,7 +9,7 @@ authors:
 
 version: 1
 updates: automatic
-source: https://localhost:300/insecta.cigaleprotocol.yaml
+source: http://localhost:300/insecta.cigaleprotocol.yaml
 
 description: |
   Pour réaliser le protocole INSECTA, vous avez besoin d'un appareil photo, de curiosité et de patience. 

@@ -11,6 +11,7 @@ class Progress {
 
 	log(...parts: unknown[]) {
 		this.clear();
+		// eslint-disable-next-line no-console
 		console.log(...parts);
 		this.draw();
 	}

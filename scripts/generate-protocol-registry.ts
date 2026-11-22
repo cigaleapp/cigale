@@ -8,27 +8,13 @@ import YAML from 'yaml';
 
 const root = path.dirname(import.meta.dir);
 
-// CLI: bun run scripts/generate-local-registry.ts [directory] [baseUrl]
-const [dirArg, baseUrlArg] = process.argv.slice(2);
+// CLI: bun run scripts/generate-local-registry.ts [directory]
+const [dirArg] = process.argv.slice(2);
 const directory = path.join(root, dirArg ?? 'protocols');
-const baseUrl = baseUrlArg ?? 'http://localhost:3000/';
 const outPath = path.join(directory, 'registry.json');
 mkdirSync(path.dirname(outPath), { recursive: true });
 
-// Precompute id → file path so idToUrl is a simple lookup
-const idToFile = new Map();
-for (const entry of new Bun.Glob('**/*.cigaleprotocol.{json,yaml}').scanSync({ cwd: directory })) {
-	const file = path.join(directory, entry);
-	const parsed = YAML.parse(await Bun.file(file).text());
-	idToFile.set(parsed.id, file);
-}
-
 await writeRegistry({
-	idToUrl: (id) => {
-		const file = idToFile.get(id);
-		if (!file) throw new Error(`No protocol file found for id ${id}`);
-		return new URL(path.relative(directory, file).replaceAll('\\', '/'), baseUrl).toString();
-	},
 	directory,
 	filter: () => true,
 	outPath,
@@ -45,12 +31,10 @@ await writeRegistry({
  * @param outPath Where to write the registry (defaults to `registry.json` in `directory`)
  */
 export async function writeRegistry({
-	idToUrl,
 	directory,
 	filter,
 	outPath,
 }: {
-	idToUrl: (id: string) => string;
 	directory: string;
 	filter: (id: string) => boolean;
 	outPath?: string;
@@ -74,7 +58,7 @@ export async function writeRegistry({
 			manifestVersion,
 			older: [],
 			id: parsed.id,
-			url: idToUrl(parsed.id),
+			url: parsed.source,
 		});
 	}
 

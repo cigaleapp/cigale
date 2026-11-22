@@ -1,9 +1,9 @@
 import { type } from 'arktype';
 import { addYears } from 'date-fns';
 
-import { Datasource } from './datasource';
-import { Enricher, IdentifierProvider, Option, OptionExtra, TaxonomyProvider } from './modules';
-import { logger } from './progress';
+import { Datasource } from './datasource.js';
+import { Enricher, IdentifierProvider, Option, OptionExtra, TaxonomyProvider } from './modules.js';
+import { logger } from './progress.js';
 
 export class CoLXR implements IdentifierProvider {
 	name = 'colxr' as const;

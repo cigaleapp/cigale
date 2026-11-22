@@ -3,7 +3,7 @@ import { hoursToSeconds, secondsToMilliseconds } from 'date-fns';
 import * as jsdom from 'jsdom';
 import { JSDOM } from 'jsdom';
 
-import { logger } from './progress';
+import { logger } from './progress.js';
 
 // Suppress annoying virtual console error we can't do anything about and don't care about
 const virtualConsole = new jsdom.VirtualConsole();

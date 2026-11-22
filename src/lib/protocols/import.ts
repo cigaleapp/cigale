@@ -8,7 +8,9 @@ import { lookupMostRecentCompatibleProtocol } from '#lib/protocols/registry.js';
 import { NamespacedMetadataID } from '#lib/schemas/common.js';
 import {
 	ensureNamespacedMetadataId,
+	Metadata,
 	MetadataEnumVariant,
+	MetadataGroup,
 	MetadataInDatabase,
 	metadataOptionId,
 } from '#lib/schemas/metadata.js';
@@ -16,7 +18,13 @@ import { ExportedProtocol } from '#lib/schemas/protocols.js';
 import { recomputeSearchIndex } from '#lib/search.ts';
 import { entries, mapKeys, parseYAMLorJSON } from '#lib/utils.ts';
 
-export class DependsOnOtherProtocolError extends Error {
+type ProgressCallback = (protocol: string, phase: string, done: number, total: number) => void;
+
+type MetadataGroupInDatabase = typeof MetadataGroup.inferIn;
+
+type MetadataInManifest = Omit<typeof Metadata.inferIn, 'id'>;
+
+class DependsOnOtherProtocolError extends Error {
 	constructor(public protocolIds: string[]) {
 		super();
 	}
@@ -26,7 +34,7 @@ export async function importProtocol(
 	db: DatabaseHandle,
 	url: string | URL,
 	options: {
-		onProgress: (protocol: string, phase: string, done: number, total: number) => void;
+		onProgress: ProgressCallback;
 	}
 ) {
 	try {
@@ -49,7 +57,7 @@ export async function importSingleProtocol(
 	db: DatabaseHandle,
 	url: string | URL,
 	options: {
-		onProgress: (protocol: string, phase: string, done: number, total: number) => void;
+		onProgress: ProgressCallback;
 	}
 ) {
 	const progress = new Progress(url.toString());
@@ -59,16 +67,66 @@ export async function importSingleProtocol(
 	// const url = await lookupMostRecentCompatibleProtocol(id);
 
 	progress.phase('get-manifest', 1);
+	const manifest = await fetchManifest(url);
+	progress.increment();
+
+	progress.phase('check-imports', manifest.imports?.length ?? 1);
+	await checkImports(db, manifest, progress);
+
+	const namespaced = (bare: string) => ensureNamespacedMetadataId(bare, manifest.id);
+
+	const metadatas = buildMetadatas(manifest);
+
+	progress.phase('metadata-options', 0);
+	await countEnumOptions(metadatas, progress);
+
+	for (const [id, metadata] of metadatas) {
+		if (metadata.type !== 'enum') continue;
+
+		await storeEnumOptions(db, id, metadata, progress);
+	}
+
+	progress.phase('metadata', metadatas.size);
+
+	for (const [id, metadata] of metadatas) {
+		await storeMetadata(db, id, metadata);
+		progress.increment();
+	}
+
+	progress.phase('resolve-imported-items', manifest.imports?.length ?? 1);
+	const { metadataGroups, importedMetadata, importedSessionMetadata } =
+		await resolveImportedItems(db, manifest);
+
+	const allMetadataKeys = [...metadatas.keys(), ...importedMetadata, ...importedSessionMetadata];
+
+	const sessionMetadataKeys = [
+		...Object.keys(manifest.sessionMetadata ?? {}).map(namespaced),
+		...importedSessionMetadata,
+	];
+
+	progress.phase('protocol', 1);
+	await storeProtocol(db, manifest, {
+		metadataGroups,
+		metadata: allMetadataKeys,
+		sessionMetadata: sessionMetadataKeys,
+		metadataOrder: manifest.metadataOrder?.map(namespaced) ?? allMetadataKeys,
+	});
+	progress.increment();
+}
+
+async function fetchManifest(url: string | URL): Promise<ExportedProtocol> {
 	const manifest = await fetch(url)
 		.then((response) => parseYAMLorJSON(response))
 		.then((parsed) => ExportedProtocol.in(parsed));
-	progress.increment();
 
 	if (manifest instanceof ArkErrors) {
 		throw new Error(manifest.summary);
 	}
 
-	progress.phase('check-imports', manifest.imports?.length ?? 1);
+	return manifest;
+}
+
+async function checkImports(db: DatabaseHandle, manifest: ExportedProtocol, progress: Progress) {
 	const imports = new Set((manifest.imports ?? []).map((imp) => imp.from));
 	const missing = new Set<string>();
 	for (const id of imports) {
@@ -80,34 +138,21 @@ export async function importSingleProtocol(
 	if (missing.size > 0) {
 		throw new DependsOnOtherProtocolError([...missing]);
 	}
+}
 
+function buildMetadatas(manifest: ExportedProtocol): Map<NamespacedMetadataID, MetadataInManifest> {
 	const namespaced = (bare: string) => ensureNamespacedMetadataId(bare, manifest.id);
 
-	const metadatas = new Map(
+	return new Map(
 		entries(mapKeys({ ...manifest.metadata, ...(manifest.sessionMetadata ?? {}) }, namespaced))
 	);
+}
 
-	progress.phase('metadata', metadatas.size);
+const ExternalOptionsHeader = type({
+	count: 'number',
+});
 
-	for (const [id, metadata] of metadatas) {
-		await db.put(
-			'Metadata',
-			// TODO: remove this whole .from() thing once #2312 is resolved
-			MetadataInDatabase.in.merge({ '+': 'delete' }).from({
-				id,
-				...metadata,
-			})
-		);
-
-		progress.increment();
-	}
-
-	progress.phase('metadata-options', 0);
-
-	const ExternalOptionsHeader = type({
-		count: 'number',
-	});
-
+async function countEnumOptions(metadatas: Map<string, MetadataInManifest>, progress: Progress) {
 	for (const metadata of metadatas.values()) {
 		if (metadata.type !== 'enum') continue;
 
@@ -125,50 +170,76 @@ export async function importSingleProtocol(
 			}
 		}
 	}
+}
 
-	for (const [id, metadata] of metadatas) {
-		if (metadata.type !== 'enum') continue;
+async function storeEnumOptions(
+	db: DatabaseHandle,
+	id: NamespacedMetadataID,
+	metadata: Extract<MetadataInManifest, { type: 'enum' }>,
+	progress: Progress
+) {
+	// TODO: _narrowableIn, searcher
 
-		// TODO: _narrowableIn, searcher
+	const storeOption = async (option: typeof MetadataEnumVariant.inferIn) => {
+		const optionId = metadataOptionId(id, option.key);
+		const tx = db.transaction(['MetadataOption'], 'readwrite');
+		await tx.objectStore('MetadataOption').put({
+			id: optionId,
+			metadataId: id,
+			...option,
+		});
 
-		const storeOption = async (option: typeof MetadataEnumVariant.inferIn) => {
-			const optionId = metadataOptionId(id, option.key);
-			const tx = db.transaction(['MetadataOption'], 'readwrite');
-			await tx.objectStore('MetadataOption').put({
-				id: optionId,
-				metadataId: id,
-				...option,
-			});
+		await recomputeSearchIndex(tx, Tables, 'MetadataOption', optionId);
+	};
 
-			await recomputeSearchIndex(tx, Tables, 'MetadataOption', optionId);
-		};
-
-		if (metadata.options) {
-			debugger;
-			for (const option of metadata.options) {
-				await storeOption(option);
-				progress.increment();
-			}
-		}
-
-		if (metadata.externalOptions) {
-			for await (const object of streamJsonl(metadata.externalOptions.at)) {
-				if (ExternalOptionsHeader.allows(object)) continue;
-
-				const option = MetadataEnumVariant.assert(object);
-				await storeOption(option);
-
-				progress.increment();
-			}
+	if (metadata.options) {
+		for (const option of metadata.options) {
+			await storeOption(option);
+			progress.increment();
 		}
 	}
 
-	progress.phase('resolve-imported-items', manifest.imports?.length ?? 1);
+	if (metadata.externalOptions) {
+		for await (const object of streamJsonl(metadata.externalOptions.at)) {
+			if (ExternalOptionsHeader.allows(object)) continue;
 
+			const option = MetadataEnumVariant.assert(object);
+			await storeOption(option);
+
+			progress.increment();
+		}
+	}
+}
+
+async function storeMetadata(
+	db: DatabaseHandle,
+	id: NamespacedMetadataID,
+	metadata: MetadataInManifest
+) {
+	await db.put(
+		'Metadata',
+		// TODO: remove this whole .from() thing once #2312 is resolved
+		MetadataInDatabase.in.merge({ '+': 'delete' }).from({
+			id,
+			...metadata,
+		})
+	);
+}
+
+async function resolveImportedItems(
+	db: DatabaseHandle,
+	manifest: ExportedProtocol
+): Promise<{
+	metadataGroups: Array<MetadataGroupInDatabase>;
+	importedMetadata: Set<NamespacedMetadataID>;
+	importedSessionMetadata: Set<NamespacedMetadataID>;
+}> {
 	const importedMetadata = new Set<NamespacedMetadataID>();
 	const importedSessionMetadata = new Set<NamespacedMetadataID>();
 
-	const metadataGroups = entries(manifest.metadataGroups ?? {}).map(([id, group]) => ({
+	const metadataGroups: Array<MetadataGroupInDatabase> = entries(
+		manifest.metadataGroups ?? {}
+	).map(([id, group]) => ({
 		id,
 		...group,
 	}));
@@ -206,32 +277,29 @@ export async function importSingleProtocol(
 				if (p.sessionMetadata?.includes(mid)) importedSessionMetadata.add(mid);
 			}
 		}
-
-		progress.increment();
 	}
 
-	const allMetadataKeys = [...metadatas.keys(), ...importedMetadata, ...importedSessionMetadata];
+	return { metadataGroups, importedMetadata, importedSessionMetadata };
+}
 
-	const sessionMetadataKeys = [
-		...Object.keys(manifest.sessionMetadata ?? {}).map(namespaced),
-		...importedSessionMetadata,
-	];
-
-	progress.phase('protocol', 1);
-
+async function storeProtocol(
+	db: DatabaseHandle,
+	manifest: ExportedProtocol,
+	overrides: {
+		metadataGroups: Array<MetadataGroupInDatabase>;
+		metadata: NamespacedMetadataID[];
+		sessionMetadata: NamespacedMetadataID[];
+		metadataOrder: NamespacedMetadataID[];
+	}
+) {
 	await db.put('Protocol', {
 		...manifest,
-		metadataGroups,
-		metadata: allMetadataKeys,
-		sessionMetadata: sessionMetadataKeys,
-		metadataOrder: manifest.metadataOrder?.map(namespaced) ?? allMetadataKeys,
+		...overrides,
 	});
-
-	progress.increment();
 }
 
 class Progress {
-	#cb: (protocol: string, phase: string, done: number, total: number) => void;
+	#cb: ProgressCallback;
 
 	constructor(
 		public protocolId: string,
@@ -242,7 +310,7 @@ class Progress {
 		this.#cb = () => {};
 	}
 
-	bind(cb: (protocol: string, phase: string, done: number, total: number) => void) {
+	bind(cb: ProgressCallback) {
 		this.#cb = cb;
 	}
 

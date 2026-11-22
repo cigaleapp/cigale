@@ -1,10 +1,14 @@
 import type * as DB from '#lib/database.js';
 
+import { Metadata } from '#lib/schemas/metadata.js';
+import { ExportedProtocol } from '#lib/schemas/protocols.js';
+
 export type ModuleName =
 	// species names
 	| 'idmybee-species'
 	| 'birdnet'
 	| 'irit'
+	| 'irit-andrena'
 	| 'gdrive'
 	// identifiers
 	| 'colxr'
@@ -16,11 +20,14 @@ export type ModuleName =
 	| 'idmybee'
 	| 'iucn'
 	| 'gbif-taxon'
+	| 'idmybee-descriptions'
 	// specializers
 	| 'birds'
 	| 'insects'
 	| 'collembola'
 	| 'bees'
+	// metadata builders
+	| 'idmybee-characters'
 	// debug stuff
 	| `debug-${string}`;
 
@@ -83,6 +90,31 @@ export interface Specializer extends Module {
 	init(): Promise<void>;
 
 	include(option: Option): boolean;
+}
+
+/**
+ * Used to bulk-create metadatas in a protocol.
+ */
+export interface MetadataProvider extends Module {
+	init(): Promise<void>;
+
+	/** List keys of metadata to create */
+	list(): AsyncIterable<string>;
+
+	/** Create the metadata from its key, or undefined if there's no metadata to create after all */
+	build(key: string): Promise<typeof Metadata.inferIn | undefined>;
+
+	/**
+	 * List of protocol IDs to add the metadatas to.
+	 * Manifest files will be searched for in **.cigaleprotocol.yaml,
+	 * and a .json will be generated alongside the manifest files, with the built metadata added
+	 */
+	addTo: string[];
+}
+
+export type CladedName = { clade: string; name: string };
+export function matchCladedName({ clade, name }: CladedName): (other: CladedName) => boolean {
+	return (other) => other.clade === clade && other.name === name;
 }
 
 /*

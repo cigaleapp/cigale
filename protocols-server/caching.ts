@@ -14,7 +14,7 @@ import {
 	pathToAsset,
 	ResponseWithFiles,
 } from './datasource';
-import { logger } from './progress';
+import { logger } from './progress.js';
 
 const BASE_DIR = 'caches';
 

@@ -3,14 +3,14 @@ import path from 'node:path';
 
 import { dequal } from 'dequal';
 
-import { tryCache } from './caching';
+import { tryCache } from './caching.js';
 
 export function pathToAsset(datasource: string, query: string, filename: string) {
 	return path.join('assets', datasource, query, filename);
 }
 
 export type DatasourceName =
-	'gbif' | 'jj' | 'gslides' | 'idmybee' | 'iucn' | 'birdnet' | `debug-${string}`;
+	'gbif' | 'jj' | 'gslides' | 'idmybee' | 'andrena-model' | 'iucn' | 'birdnet' | `debug-${string}`;
 
 /**
  * Defines caching for a single external source, that could be used multiple times by different modules.

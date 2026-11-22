@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import type { Option } from './modules';
+import type { Option } from './modules.js';
 
 import { addDays, addWeeks } from 'date-fns';
 import { JWT } from 'google-auth-library';
@@ -11,9 +11,9 @@ import odt from 'odt2html';
 import { pdfToPng } from 'pdf-to-png-converter';
 import Turndown from 'turndown';
 
-import { Datasource, ResponseWithFiles } from './datasource';
-import { Enricher, NameProvider, OptionExtra } from './modules';
-import { logger } from './progress';
+import { Datasource, ResponseWithFiles } from './datasource.js';
+import { Enricher, NameProvider, OptionExtra } from './modules.js';
+import { logger } from './progress.js';
 
 const ASSETS_URL_BASE =
 	'http://localhost:3000/assets';

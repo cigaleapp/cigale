@@ -6,7 +6,7 @@ import { JSDOM } from 'jsdom';
 import Turndown from 'turndown';
 
 import { Datasource, MultipleResponses } from './datasource.js';
-import { Enricher, OptionExtra } from './modules.js';
+import { Enricher, matchCladedName, OptionExtra } from './modules.js';
 import { logger } from './progress.js';
 import { fetchPagesViaWordpressAPI, RateLimitTimeoutError } from './wordpress.js';
 
@@ -32,11 +32,11 @@ export class JessicaJoachim implements Enricher {
 	}
 
 	available(option: Option): boolean {
-		return this.index!.some(this.matchCladedName(option));
+		return this.index!.some(matchCladedName(option));
 	}
 
 	async *enrich(options: Option[]) {
-		const lookups = this.index!.filter((page) => options.some(this.matchCladedName(page)));
+		const lookups = this.index!.filter((page) => options.some(matchCladedName(page)));
 
 		for (let i = 0; i < options.length; i += this.jj.chunksize) {
 			const chunk = lookups.slice(i, i + this.jj.chunksize);
@@ -50,16 +50,11 @@ export class JessicaJoachim implements Enricher {
 				if (!fiche) continue;
 				const { link, extra } = fiche;
 				const page = this.index!.find((page) => page.link === link)!;
-				const opt = options.find(this.matchCladedName(page));
+				const opt = options.find(matchCladedName(page));
 				if (!opt?.id) continue;
 				yield { id: opt.id, priority: 10, extra };
 			}
 		}
-	}
-
-	matchCladedName(option: { clade: string; name: string }) {
-		return (item: { clade: string; name: string }) =>
-			item.clade === option.clade && item.name === option.name;
 	}
 }
 

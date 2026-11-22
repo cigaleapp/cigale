@@ -27,6 +27,7 @@
 		"scripts/issue-creator-discord-bot.ts",
 		// TODO add to a CI workflow
 		"scripts/generate-contributing-tables.js",
+		"protocols-server/server.ts",
 		"src/electron/main.{d.ts,js}",
 		"forge.env.d.ts",
 		"vite.electron*.config.js",

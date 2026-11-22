@@ -1,6 +1,6 @@
 import manifestVersion from './current-version.json' with { type: 'json' };
 
-export const MANIFEST_VERSION = {
+const MANIFEST_VERSION = {
 	...manifestVersion,
 	toString() {
 		return `${this.major}.${this.minor}`;

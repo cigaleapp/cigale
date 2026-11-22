@@ -226,16 +226,3 @@ metadata:
     infer:
       latitude: { exif: GPSLatitude }
       longitude: { exif: GPSLongitude }
-
-exports:
-  metadata:
-    csv: metadata.csv
-    json: analysis.json
-
-  images:
-    mtime: shoot_date
-    cropped: Cropped/{{ fallback image.protocolMetadata.species.valueLabel "(Unknown)" }}_obs{{ observation.number }}_{{ sequence }}.{{ extension image.filename }}
-    original: Original/{{ fallback image.protocolMetadata.species.valueLabel "(Unknown)" }}_obs{{ observation.number }}_{{ sequence }}.{{ extension image.filename }}
-
-beamup:
-  origin: https://beamup.gwen.works

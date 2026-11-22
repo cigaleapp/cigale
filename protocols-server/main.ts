@@ -10,7 +10,7 @@ import type {
 	TaxonomyProvider,
 } from './modules.js';
 
-import { sum, zip } from 'es-toolkit';
+import { omit, sum, zip } from 'es-toolkit';
 import exitHook from 'exit-hook';
 
 import { BirdNetClassmapping } from './birdnet.js';
@@ -18,6 +18,7 @@ import { Birds } from './birds.js';
 import { writeAllCaches } from './caching.js';
 import { CoLXR, GBIFTaxonInfo, GBIFTaxonomy } from './gbif.js';
 import { GoogleDriveSlides, GoogleSlides } from './gslides.js';
+import { IDMyBeeDescriptions, IDMyBeeSpecies } from './idmybee.js';
 import { Collembola, Insects } from './insects.js';
 import { IRITModels } from './irit.js';
 import { IUCN } from './iucn.js';
@@ -28,15 +29,30 @@ await run({
 	metadataId: (clade) => clade,
 	output: { options: 'options', images: 'assets' },
 	modules: {
-		// sources: [new GoogleDriveSlides(), new IRITModels('full'), new BirdNetClassmapping()],
-		sources: [new IRITModels('light'), new GoogleDriveSlides()],
+		// XXX: DONT MERGE
+		// sources: [
+		// 	new GoogleDriveSlides(),
+		// 	new IRITModels('full'),
+		// 	new BirdNetClassmapping(),
+		// 	new IDMyBeeSpecies(),
+		// ],
+		sources: [new IRITModels('light'), new GoogleDriveSlides(), new IDMyBeeSpecies()],
 		identifier: new CoLXR(),
 		taxonomy: new GBIFTaxonomy(),
 		// TODO: add iNat for photos when we have access to the API: find out if we can get the first 5 featured images that inat shows at e.g. https://www.inaturalist.org/taxa/51702-Coccinella-septempunctata. using gbif media seems too unreliable, theres plenty of images that arent photos of the species
-		enrich: [new JessicaJoachim(), new IUCN(), new GoogleSlides(), new GBIFTaxonInfo()],
-		specializations: [new Birds(), new Insects(), new Collembola()],
+		enrich: [
+			new JessicaJoachim(),
+			new IUCN(),
+			new GoogleSlides(),
+			new GBIFTaxonInfo(),
+			new IDMyBeeDescriptions(),
+		],
+		specializations: [new Birds(), new Insects(), new Collembola(), new Bees()],
 	},
 });
+
+/** Ordered from least specific to most specific */
+const CLADES = ['kingdom', 'phylum', 'order', 'class', 'family', 'genus', 'species', 'subspecies'];
 
 async function run(plan: {
 	/** Construct metadata ID from the clade name. */
@@ -191,9 +207,16 @@ async function run(plan: {
 
 			await specializer.init();
 
-			const specialized = [...options.values()].filter((option) =>
-				specializer.include(option)
+			const specialized = [...options.values().filter((opt) => specializer.include(opt))];
+
+			// Also include options that are parent of an included one
+			// this prevents broken taxonomy cascades
+			const includedParents = new Set(
+				[...specialized.values()].flatMap(({ parents = [] }) => parents.map((p) => p.id))
 			);
+			for (const id of includedParents) {
+				specialized.push(options.get(id)!);
+			}
 
 			const clades = new Set(specialized.map((option) => option.clade));
 
@@ -297,69 +320,59 @@ async function run(plan: {
 	progress.stop();
 }
 
-function mergeExtras(option: Option): OptionExtra {
-	if (!option.extras) return {};
+function mergeExtras({ extras }: Option): OptionExtra {
+	if (!extras) return {};
 
-	const keys = new Set<keyof OptionExtra>(
-		option.extras.flatMap(({ extra }) => Object.keys(extra) as Array<keyof OptionExtra>)
-	);
-
-	// Resolve which extra (index) to use for every key
-
-	const output = Object.fromEntries(
-		[...keys].map((key) => {
-			// Find greatest priority extra that has the key
-			const { extra } = (option.extras ?? [])
-				.filter(({ extra }) => key in extra)
-				.sort((a, b) => -(b.priority - a.priority))
-				.at(0)!;
-
-			return [key, extra[key]] as const;
-		})
-	);
-
-	// Cascades
-
-	const allCascadeKeys = new Set(
-		option.extras.flatMap(({ extra }) => Object.keys(extra.cascade ?? {}))
-	);
-
-	output.cascade = Object.fromEntries(
-		[...allCascadeKeys].map((key) => {
-			// Find greatest priority extra that has the key
-			const { extra } = (option.extras ?? [])
-				.filter(({ extra }) => extra.cascade && key in extra.cascade)
-				.sort((a, b) => -(b.priority - a.priority))
-				.at(0)!;
-
-			return [key, extra.cascade![key]!] as const;
-		})
-	);
-
-	// Synonyms & images: higher-priority extras first
-
-	const byPriority = [...option.extras].sort((a, b) => b.priority - a.priority);
-
-	output.synonyms = byPriority.flatMap(({ extra }) => extra.synonyms ?? []);
-
-	output.images = byPriority.flatMap(({ extra }) => extra.images ?? []);
-
-	return output;
+	return {
+		...prioritizedShallowMergeObjects(extras, (ex) => ex),
+		cascade: prioritizedShallowMergeObjects(extras, (ex) => ex.cascade),
+		narrowerWeights: prioritizedShallowMergeObjects(extras, (ex) => ex.narrowerWeights),
+		synonyms: prioritizedShallowMergeArrays(extras, (ex) => ex.synonyms),
+		images: prioritizedShallowMergeArrays(extras, (ex) => ex.images),
+	};
 }
 
-function selectHigherClades(option: Option, others: Option[]): Option[] {
-	const order = [
-		'kingdom',
-		'phylum',
-		'order',
-		'class',
-		'family',
-		'genus',
-		'species',
-		'subspecies',
-	];
+function prioritizedShallowMergeObjects<V extends Record<string, unknown>>(
+	extras: NonNullable<Option['extras']>,
+	value: (extra: OptionExtra) => V | undefined
+): V {
+	const allCascadeKeys = new Set(
+		extras.flatMap(({ extra }) => Object.keys(value(extra)) as Array<keyof V>)
+	);
 
-	const specificity = (o: Option) => order.indexOf(o.clade);
+	return Object.fromEntries(
+		[...allCascadeKeys].map((propkey) => {
+			// Find greatest priority extra that has the key
+			const { extra } = (extras ?? [])
+				.filter(({ extra }) => {
+					const v = value(extra);
+					if (!v) return false;
+					return propkey in v;
+				})
+				.sort((a, b) => -(b.priority - a.priority))
+				.at(0)!;
+
+			return [propkey, value(extra)![propkey]!] as const;
+		})
+	);
+}
+
+// TODO: support non-scalars too?
+function prioritizedShallowMergeArrays<V extends Array<string | boolean | number>>(
+	extras: NonNullable<Option['extras']>,
+	value: (extra: OptionExtra) => V | undefined
+): V {
+	return [...extras]
+		.sort((a, b) => b.priority - a.priority)
+		.flatMap(({ extra }) => value(extra) ?? []);
+}
+
+type OptionExtraKeysMatching<T> = {
+	[K in keyof OptionExtra]: NonNullable<OptionExtra[K]> extends T ? K : never;
+}[keyof OptionExtra];
+
+function selectHigherClades(option: Option, others: Option[]): Option[] {
+	const specificity = (o: Option) => CLADES.indexOf(o.clade);
 
 	return others.filter((o) => specificity(o) < specificity(option));
 }

@@ -467,12 +467,7 @@ export const MetadataPatternConstraint = type.or();
  */
 
 const MetadataBase = type({
-	id: NamespacedMetadataID.describe(
-		'Identifiant unique pour la métadonnée. On conseille de mettre une partie qui vous identifie dans cet identifiant, car il doit être globalement unique. Par exemple, mon-organisation.ma-métadonnée'
-	),
-	'inheritedFrom?': ProtocolID.describe(
-		"Si cette métadonnée est héritée d'un autre protocole, indique de quel protocole elle est héritée"
-	),
+	id: ID.describe('Identifiant pour la métadonnée'),
 	label: ['string', '@', 'Nom de la métadonnée'],
 	'kobocollect?': [
 		'string | string[]',
@@ -492,9 +487,11 @@ const MetadataBase = type({
 	mergeMethod: MetadataMergeMethod.configure(
 		"Méthode utiliser pour fusionner plusieurs différentes valeurs d'une métadonnée. Notamment utilisé pour calculer la valeur d'une métadonnée sur une Observation à partir de ses images",
 		'self'
-	),
-	required: ['boolean', '@', 'Si la métadonnée est obligatoire'],
-	description: ['string', '@', 'Description, pour aider à comprendre la métadonnée'],
+	).default('none'),
+	required: type('boolean').describe('Si la métadonnée est obligatoire').default(false),
+	description: type('string')
+		.describe('Description, pour aider à comprendre la métadonnée')
+		.default(''),
 	images: URLString.array()
 		.describe(
 			"Liste d'images illustrant cette métadonnée. Utile pour aider les utilisateurs à comprendre ce que représente la métadonnée"
@@ -684,9 +681,13 @@ const MetadataEnum = MetadataBase.and({
 			[
 				'"csv"',
 				'@',
-				'Format CSV. La première ligne doit être le nom des clés. Chaque ligne est transformé en un objet pour être traité par .postprocess',
+				'Format CSV. La première ligne doit être le nom des clés. Chaque ligne est transformé en un objet pour être traité par .postprocess.',
 			],
-			['"json"', '@', 'Format JSON'],
+			[
+				'"txt"',
+				'@',
+				'Format texte simple. Il faut ensuite adapter en un objet option avec .postprocess.',
+			],
 			[
 				'"json-lines"',
 				'@',
@@ -695,10 +696,22 @@ const MetadataEnum = MetadataBase.and({
 		),
 		'postprocess?': JsonataExpression(
 			type({
-				lineNumber: 'number.integer > 0',
-				totalLines: 'number.integer > 0',
-				raw: 'string',
-				line: 'unknown',
+				lineIndex: [
+					'number.integer >= 0',
+					'@',
+					"Index de la ligne actuelle (commence à 0, en sachant que la première ligne n'est pas donnée à postprocess sauf pour txt (csv: c'est le header, json-lines: c'est l'objet header avec .count))",
+				],
+				totalCount: [
+					'undefined | number.integer > 0',
+					'@',
+					"Nombre total d'objets à traiter. Undefined pour txt.",
+				],
+				raw: ['string', '@', 'La ligne du fichier, verbatim'],
+				line: [
+					'unknown',
+					'@',
+					'La ligne du fichier, parsée en un objet. Undefined pour txt, Object avec les clés du header pour csv et JSON parsé pour json-lines',
+				],
 			}),
 			MetadataEnumVariant.or('undefined')
 		).describe(
@@ -818,18 +831,22 @@ export const Metadata = type.or(
 	MetadataSurface
 );
 
-export const MetadataInDatabase = type.or(
-	MetadataBoolean,
-	MetadataString,
-	MetadataInteger,
-	MetadataFloat,
-	MetadataDate,
-	MetadataLocation,
-	MetadataEnumInDatabase,
-	MetadataBoundingbox,
-	MetadataFile,
-	MetadataSurface
-);
+export const MetadataInDatabase = type
+	.or(
+		MetadataBoolean,
+		MetadataString,
+		MetadataInteger,
+		MetadataFloat,
+		MetadataDate,
+		MetadataLocation,
+		MetadataEnumInDatabase,
+		MetadataBoundingbox,
+		MetadataFile,
+		MetadataSurface
+	)
+	.merge({
+		id: NamespacedMetadataID,
+	});
 
 export const MetadataGroup = type({
 	id: ID.brand('MetadataGroup'),
