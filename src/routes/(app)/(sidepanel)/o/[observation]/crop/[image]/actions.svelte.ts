@@ -379,7 +379,8 @@ export async function revertToInferredCrop(imageId: string) {
 	// On subsequent crops, the user's crop will be the main value and the neural network's crop will be in the alternatives.
 	if (!initialCrop) {
 		toasts.error(
-			null, `L'image ${imageId} n'a pas de recadrage alternatif, impossible de revenir au recadrage d'origine`
+			null,
+			`L'image ${imageId} n'a pas de recadrage alternatif, impossible de revenir au recadrage d'origine`
 		);
 		return;
 	}

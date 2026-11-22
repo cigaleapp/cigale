@@ -248,7 +248,9 @@ class Toasts {
 	 */
 	error(error, message, options) {
 		const displayMessage =
-			error != null ? errorMessage(error, message) : message?.toString() ?? 'Erreur inattendue';
+			error != null
+				? errorMessage(error, message)
+				: (message?.toString() ?? 'Erreur inattendue');
 		return this.add('error', displayMessage, {
 			...options,
 			lifetime: options?.lifetime ?? 'inferred',

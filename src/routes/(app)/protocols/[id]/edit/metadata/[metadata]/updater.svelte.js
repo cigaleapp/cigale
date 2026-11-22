@@ -28,7 +28,8 @@ export function updater(changes) {
 			await changes(metadata, value);
 		} catch (err) {
 			toasts.error(
-				null, `Valeur invalide : ${err instanceof ArkErrors ? err.summary : errorMessage(err)}`
+				null,
+				`Valeur invalide : ${err instanceof ArkErrors ? err.summary : errorMessage(err)}`
 			);
 			return;
 		}

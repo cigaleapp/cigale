@@ -166,7 +166,8 @@
 										if (response.status >= 400) {
 											await browser.close();
 											toasts.error(
-												null, 'Impossible de récupérer le token : échec de la requête'
+												null,
+												'Impossible de récupérer le token : échec de la requête'
 											);
 										}
 
@@ -176,7 +177,8 @@
 										if (data instanceof ArkErrors) {
 											await browser.close();
 											toasts.error(
-												null, 'Impossible de récupérer le token : réponse invalide'
+												null,
+												'Impossible de récupérer le token : réponse invalide'
 											);
 											console.error('Invalid token response', {
 												response,

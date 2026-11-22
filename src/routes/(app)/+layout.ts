@@ -314,7 +314,8 @@ async function loadDefaultProtocol() {
 		} catch (error) {
 			console.error(error);
 			toasts.error(
-				null, `Impossible de charger le protocole ${filename}. Vérifiez votre connexion Internet ou essayez de recharger la page.`
+				null,
+				`Impossible de charger le protocole ${filename}. Vérifiez votre connexion Internet ou essayez de recharger la page.`
 			);
 		}
 	}

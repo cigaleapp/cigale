@@ -289,7 +289,10 @@ describe('PendingStorage', () => {
 		await storage.delete('IMG_0001.PNG');
 
 		expect(storage.count).toBe(0);
-		expect(mockToastError).toHaveBeenCalledWith(deleteError, 'Impossible de supprimer la photo');
+		expect(mockToastError).toHaveBeenCalledWith(
+			deleteError,
+			'Impossible de supprimer la photo'
+		);
 	});
 
 	it('clears the session folder', async () => {

@@ -125,7 +125,8 @@ export async function processImageFile({ file, id: fileId, sidecars, extraExif }
 	}).catch((e) => {
 		console.error(e);
 		toasts.error(
-			null, `Erreur lors du traitement du/des fichiers annexes associés à ${original.name}`
+			null,
+			`Erreur lors du traitement du/des fichiers annexes associés à ${original.name}`
 		);
 	});
 
@@ -133,7 +134,8 @@ export async function processImageFile({ file, id: fileId, sidecars, extraExif }
 		await processRawMetadata(uiState.currentSession.id, fileId, rawMetadata).catch((e) => {
 			console.error(e);
 			toasts.error(
-				null, `Erreur lors de l'extraction des métadonnées du fichier RAW ${original.name}`
+				null,
+				`Erreur lors de l'extraction des métadonnées du fichier RAW ${original.name}`
 			);
 		});
 	}
@@ -146,7 +148,10 @@ export async function processImageFile({ file, id: fileId, sidecars, extraExif }
 		extra: extraExif ?? {},
 	}).catch((error) => {
 		console.error(error);
-		toasts.error(null, `Erreur lors de l'extraction des métadonnées EXIF pour ${original.name}`);
+		toasts.error(
+			null,
+			`Erreur lors de l'extraction des métadonnées EXIF pour ${original.name}`
+		);
 	});
 }
 

@@ -194,7 +194,7 @@
 										console.error(e);
 										toasts.error(
 											`Impossible de télécharger ${session.name}`,
-												e
+											e
 										);
 
 										return undefined;

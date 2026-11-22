@@ -56,7 +56,8 @@ export async function importResultsZip(file, id) {
 	if (analysis === undefined) {
 		uiState.processing.removeFile(id);
 		toasts.error(
-			null, `Le fichier d'analyse de ${file.name} n'est pas au format JSON ou est corrompu`
+			null,
+			`Le fichier d'analyse de ${file.name} n'est pas au format JSON ou est corrompu`
 		);
 		return;
 	}
@@ -92,7 +93,8 @@ export async function importResultsZip(file, id) {
 	} else if (uiState.currentSession.protocol !== session.protocol) {
 		uiState.processing.removeFile(id);
 		toasts.error(
-			null, `Le fichier d'analyse de ${file.name} a été exporté avec le protocole ${session.protocol}, mais le protocole de la session est ${uiState.currentSession.protocol}`
+			null,
+			`Le fichier d'analyse de ${file.name} a été exporté avec le protocole ${session.protocol}, mais le protocole de la session est ${uiState.currentSession.protocol}`
 		);
 		return;
 	} else {
@@ -116,7 +118,8 @@ export async function importResultsZip(file, id) {
 			(f) => !files.find((file) => file.id === f.id)
 		);
 		toasts.error(
-			null, `Aucune image trouvée dans l'export ${file.name}. L'export doit contenir les images originales, pas seulement les images recadrées`
+			null,
+			`Aucune image trouvée dans l'export ${file.name}. L'export doit contenir les images originales, pas seulement les images recadrées`
 		);
 		return;
 	}

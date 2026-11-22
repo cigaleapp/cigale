@@ -46,7 +46,8 @@ export async function askForNotificationPermission() {
 		}
 	} else if (Notification.permission === 'denied') {
 		toasts.error(
-			null, 'Vous avez refusé les notifications système. Veuillez changer cela dans les paramètres de votre navigateur.'
+			null,
+			'Vous avez refusé les notifications système. Veuillez changer cela dans les paramètres de votre navigateur.'
 		);
 	}
 }
