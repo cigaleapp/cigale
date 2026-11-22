@@ -7,7 +7,7 @@ name: Environnement (base)
 version: 1
 updates: automatic
 
-source: https://cigale-protocols-biodimedia-data-terra.ai.meso.umontpellier.fr/bases/environment.cigaleprotocol.yaml
+source: http://localhost:3000/bases/environment.cigaleprotocol.yaml
 
 description: Protocole de base pour documenter l'environement des observations
 

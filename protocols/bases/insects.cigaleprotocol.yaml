@@ -7,7 +7,7 @@ name: Insectes (base)
 version: 1
 updates: automatic
 
-source: https://cigale-protocols-biodimedia-data-terra.ai.meso.umontpellier.fr/bases/insects.cigaleprotocol.yaml
+source: http://localhost:3000/bases/insects.cigaleprotocol.yaml
 
 description: Protocole de base pour les insectes
 

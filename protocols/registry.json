@@ -2,6 +2,54 @@
 	"$schema": "../static/registry.schema.json",
 	"protocols": [
 		{
+			"name": "Entomoscope",
+			"version": 11,
+			"manifestVersion": "1.0",
+			"older": [],
+			"id": "fr.osug.terra-forma-web.entomoscope",
+			"url": "http://localhost:3000/entomoscope.cigaleprotocol.yaml"
+		},
+		{
+			"name": "IDmyBee",
+			"version": 27,
+			"manifestVersion": "0.0",
+			"older": [],
+			"id": "io.github.cigaleapp.idmybee",
+			"url": "http://localhost:3000/idmybee.cigaleprotocol.json"
+		},
+		{
+			"name": "INSECTA",
+			"version": 28,
+			"manifestVersion": "1.0",
+			"older": [],
+			"id": "fr.osug.terra-forma-web.insecta",
+			"url": "http://localhost:3000/insecta.cigaleprotocol.yaml"
+		},
+		{
+			"name": "Relevé opportuniste",
+			"version": 1,
+			"manifestVersion": "1.0",
+			"older": [],
+			"id": "fr.osug.terra-forma-web.opportunistic",
+			"url": "http://localhost:3000/opportunistic.cigaleprotocol.yaml"
+		},
+		{
+			"name": "Oiseaux (base)",
+			"version": 1,
+			"manifestVersion": "1.0",
+			"older": [],
+			"id": "io.github.cigaleapp.base.birds",
+			"url": "http://localhost:3000/bases/birds.cigaleprotocol.yaml"
+		},
+		{
+			"name": "Collemboles (base)",
+			"version": 1,
+			"manifestVersion": "1.0",
+			"older": [],
+			"id": "io.github.cigaleapp.base.collembola",
+			"url": "http://localhost:3000/bases/collembola.cigaleprotocol.yaml"
+		},
+		{
 			"name": "Environnement (base)",
 			"version": 1,
 			"manifestVersion": "1.0",
@@ -16,22 +64,6 @@
 			"older": [],
 			"id": "io.github.cigaleapp.base.insects",
 			"url": "http://localhost:3000/bases/insects.cigaleprotocol.yaml"
-		},
-		{
-			"name": "INSECTA",
-			"manifestVersion": "1.0",
-			"version": 28,
-			"older": [],
-			"id": "fr.osug.terra-forma-web.insecta",
-			"url": "http://localhost:3000/insecta.cigaleprotocol.yaml"
-		},
-		{
-			"name": "Entomoscope",
-			"manifestVersion": "1.0",
-			"version": 11,
-			"older": [],
-			"id": "fr.osug.terra-forma-web.entomoscope",
-			"url": "http://localhost:3000/entomoscope.cigaleprotocol.yaml"
 		}
 	]
 }

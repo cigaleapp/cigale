@@ -700,10 +700,12 @@ const MetadataEnum = MetadataBase.and({
 				raw: 'string',
 				line: 'unknown',
 			}),
-			MetadataEnumVariant
+			MetadataEnumVariant.or('undefined')
+		).describe(
+			"Appliquer un traitement à chaque option. Renvoyer undefined revient à ne pas rajouter l'option"
 		),
 	}).describe(
-		"Utile quand il y a beaucoup d'options et que les lister explicitement dans le fichier manifeste directement serait impraticable"
+		"Utile quand il y a beaucoup d'options et que les lister explicitement dans le fichier manifeste directement serait impraticable. Si une option a la même clé (.key) dans .options et .externalOptions, c'est celle .options qui est utilisé (pratique pour définir des overrides spécifiques à ce protocole)"
 	),
 	'options?': MetadataEnumVariant.array()
 		.pipe((opts) => unique(opts, (o) => o.key))
@@ -725,7 +727,7 @@ const MetadataEnum = MetadataBase.and({
 	_optionsCount: 'number.integer = 0',
 });
 
-const MetadataEnumInDatabase = MetadataEnum.omit('options')
+const MetadataEnumInDatabase = MetadataEnum.omit('options');
 
 const MetadataBoundingbox = MetadataBase.and({
 	type: '"boundingbox"',

@@ -16,7 +16,7 @@ import { Enricher, NameProvider, OptionExtra } from './modules';
 import { logger } from './progress';
 
 const ASSETS_URL_BASE =
-	'https://cigale-protocols-biodimedia-data-terra.ai.meso.umontpellier.fr/assets';
+	'http://localhost:3000/assets';
 
 export class GoogleDriveSlides implements NameProvider {
 	name = 'gdrive' as const;
