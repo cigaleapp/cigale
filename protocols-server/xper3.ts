@@ -11,6 +11,7 @@ export class Xper3 extends Datasource<
 	| 'quantitativeCharacter'
 	| 'character'
 	| 'codedDescriptions'
+	| 'mediaObjects'
 	| 'taxa'
 	| 'summaryDataOfCharacter',
 	{
@@ -34,9 +35,10 @@ export class Xper3 extends Datasource<
 		categoricalCharacter: undefined | CategoricalCharacter;
 		quantitativeCharacter: undefined | QuantitativeCharacter;
 		character: undefined | Character;
-		codedDescriptions: { name: string; description: CodedDescription } | undefined;
+		codedDescriptions:
+			{ clade: string; name: string; description: CodedDescription } | undefined;
 		summaryDataOfCharacter: undefined | { summaryData: SingleSummaryData[] };
-		mediaObjects: { objects: MediaObject };
+		mediaObjects: { objects: MediaObject[] };
 	}
 > {
 	constructor(
@@ -91,6 +93,12 @@ export class Xper3 extends Datasource<
 			};
 		},
 
+		mediaObjects: async () => {
+			return {
+				objects: this.dataset.MediaObjects.MediaObject,
+			};
+		},
+
 		categoricalCharacter: async ({ label }: { label: string }) => {
 			return ensureArray(this.dataset.Characters.CategoricalCharacter).find(
 				(c) => c.Representation.Label === label
@@ -105,7 +113,7 @@ export class Xper3 extends Datasource<
 
 		codedDescriptions: async (species: Array<{ clade: string; name: string }>) => {
 			const response = new MultipleResponses<
-				{ name: string; description: CodedDescription },
+				{ clade: string; name: string; description: CodedDescription },
 				{ clade: string; name: string }
 			>();
 
@@ -122,10 +130,7 @@ export class Xper3 extends Datasource<
 				);
 				if (!description) continue;
 
-				response.push(sp, {
-					name: sp.name,
-					description,
-				});
+				response.push(sp, { ...sp, description });
 			}
 
 			return response;

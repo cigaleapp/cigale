@@ -1,5 +1,5 @@
 import { BirdNetClassmapping } from './birdnet.js';
-import { matchCladedName, Option, Specializer } from './modules.js';
+import { CladedName, matchCladedName, Option, Specializer } from './modules.js';
 
 export class Birds implements Specializer {
 	name = 'birds' as const;
@@ -8,7 +8,7 @@ export class Birds implements Specializer {
 	birdnet: BirdNetClassmapping;
 
 	/** Include eveyrthing from the birdnet model even if its not a bird */
-	explicit = new Set<{ clade: string; name: string }>();
+	explicit: CladedName[] = [];
 
 	constructor() {
 		this.birdnet = new BirdNetClassmapping();
@@ -16,13 +16,13 @@ export class Birds implements Specializer {
 
 	async init() {
 		for await (const { name, clade } of this.birdnet.scan()) {
-			this.explicit.add({ name, clade });
+			this.explicit.push({ name, clade });
 		}
 	}
 
 	include({ name, clade, parents = [] }: Option): boolean {
 		return (
-			this.explicit.has({ name, clade }) ||
+			this.explicit.some(matchCladedName({ name, clade })) ||
 			parents.some(matchCladedName({ clade: 'class', name: 'Aves' }))
 		);
 	}

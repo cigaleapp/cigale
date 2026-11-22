@@ -13,6 +13,7 @@ import type {
 import { omit, sum, zip } from 'es-toolkit';
 import exitHook from 'exit-hook';
 
+import { Bees } from './bees.js';
 import { BirdNetClassmapping } from './birdnet.js';
 import { Birds } from './birds.js';
 import { writeAllCaches } from './caching.js';
@@ -29,14 +30,12 @@ await run({
 	metadataId: (clade) => clade,
 	output: { options: 'options', images: 'assets' },
 	modules: {
-		// XXX: DONT MERGE
-		// sources: [
-		// 	new GoogleDriveSlides(),
-		// 	new IRITModels('full'),
-		// 	new BirdNetClassmapping(),
-		// 	new IDMyBeeSpecies(),
-		// ],
-		sources: [new IRITModels('light'), new GoogleDriveSlides(), new IDMyBeeSpecies()],
+		sources: [
+			new GoogleDriveSlides(),
+			new IRITModels('full'),
+			new BirdNetClassmapping(),
+			new IDMyBeeSpecies(),
+		],
 		identifier: new CoLXR(),
 		taxonomy: new GBIFTaxonomy(),
 		// TODO: add iNat for photos when we have access to the API: find out if we can get the first 5 featured images that inat shows at e.g. https://www.inaturalist.org/taxa/51702-Coccinella-septempunctata. using gbif media seems too unreliable, theres plenty of images that arent photos of the species
@@ -50,9 +49,6 @@ await run({
 		specializations: [new Birds(), new Insects(), new Collembola(), new Bees()],
 	},
 });
-
-/** Ordered from least specific to most specific */
-const CLADES = ['kingdom', 'phylum', 'order', 'class', 'family', 'genus', 'species', 'subspecies'];
 
 async function run(plan: {
 	/** Construct metadata ID from the clade name. */
@@ -85,6 +81,8 @@ async function run(plan: {
 	const nameCountsBySource = new Map<string, number>();
 	await Promise.all(
 		plan.modules.sources.map(async (source) => {
+			progress.start(source.name);
+
 			let count = 0;
 			for await (const option of source.scan()) {
 				const { clade, name } = option;
@@ -95,6 +93,7 @@ async function run(plan: {
 				});
 			}
 
+			progress.finish(source.name);
 			nameCountsBySource.set(source.name, count);
 			progress.increment();
 		})
@@ -155,11 +154,16 @@ async function run(plan: {
 
 	const optsPerModule: Array<Option[]> = [];
 
-	for (const enricher of plan.modules.enrich) {
-		await enricher.init();
-		optsPerModule.push([...options.values()].filter((opt) => enricher.available(opt)));
-		progress.increment();
-	}
+	// for (const enricher of plan.modules.enrich) {
+	await Promise.all(
+		plan.modules.enrich.map(async (enricher) => {
+			progress.start(enricher.name);
+			await enricher.init();
+			optsPerModule.push([...options.values()].filter((opt) => enricher.available(opt)));
+			progress.finish(enricher.name);
+			progress.increment();
+		})
+	);
 
 	logger.timed(
 		`Initialized ${plan.modules.enrich.length} enrichers:\n` +
@@ -174,6 +178,8 @@ async function run(plan: {
 	const CHUNKSIZE = 5_000;
 	await Promise.all(
 		zip(plan.modules.enrich, optsPerModule).map(async ([enricher, options]) => {
+			progress.start(enricher.name);
+
 			for (let i = 0; i < options.length; i += CHUNKSIZE) {
 				const chunk = options.slice(i, i + CHUNKSIZE);
 
@@ -190,7 +196,7 @@ async function run(plan: {
 				progress.increment(chunk.length);
 			}
 
-			logger.info(`Finished with enricher ${enricher.name}`);
+			progress.finish(enricher.name);
 		})
 	);
 
@@ -203,6 +209,7 @@ async function run(plan: {
 	const outputs = new Map<string, Map<string, string>>();
 	await Promise.all(
 		plan.modules.specializations.map(async (specializer) => {
+			progress.start(specializer.name);
 			const output = new Map<string, string>();
 
 			await specializer.init();
@@ -270,6 +277,7 @@ async function run(plan: {
 			}
 
 			outputs.set(specializer.name, output);
+			progress.finish(specializer.name);
 		})
 	);
 
@@ -337,7 +345,7 @@ function prioritizedShallowMergeObjects<V extends Record<string, unknown>>(
 	value: (extra: OptionExtra) => V | undefined
 ): V {
 	const allCascadeKeys = new Set(
-		extras.flatMap(({ extra }) => Object.keys(value(extra)) as Array<keyof V>)
+		extras.flatMap(({ extra }) => Object.keys(value(extra) ?? {}) as Array<keyof V>)
 	);
 
 	return Object.fromEntries(
@@ -372,6 +380,18 @@ type OptionExtraKeysMatching<T> = {
 }[keyof OptionExtra];
 
 function selectHigherClades(option: Option, others: Option[]): Option[] {
+	/** Ordered from least specific to most specific */
+	const CLADES = [
+		'kingdom',
+		'phylum',
+		'order',
+		'class',
+		'family',
+		'genus',
+		'species',
+		'subspecies',
+	];
+
 	const specificity = (o: Option) => CLADES.indexOf(o.clade);
 
 	return others.filter((o) => specificity(o) < specificity(option));

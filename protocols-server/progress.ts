@@ -7,6 +7,8 @@ class Progress {
 
 	lastWrite: number | undefined;
 
+	ongoing: string[] = [];
+
 	constructor() {}
 
 	log(...parts: unknown[]) {
@@ -32,6 +34,16 @@ class Progress {
 		if (progress < 0) throw new Error(`cant set progress to ${progress}`);
 		this.done = progress;
 		this.redraw();
+	}
+
+	/** Add to this.ongoing */
+	start(task: string) {
+		this.ongoing.push(task);
+	}
+
+	/** Remove to this.ongoing */
+	finish(task: string) {
+		this.ongoing = this.ongoing.filter((t) => t !== task);
 	}
 
 	redraw() {
@@ -63,9 +75,13 @@ class Progress {
 
 		const counter = `${this.done}/${this.total}`;
 
+		const tasks = this.ongoing.join(', ');
+
 		const osc94 = `\x1b]9;4;1;${scaled(100)}\x1b\x5c`;
 
-		process.stdout.write(`${phase} ${percentage} ${bar} ${counter}` + osc94);
+		process.stdout.write(
+			`${phase} ${percentage} ${bar} ${counter}` + (tasks ? `: ${tasks}` : '') + osc94
+		);
 	}
 
 	clear() {

@@ -10,7 +10,7 @@ export function pathToAsset(datasource: string, query: string, filename: string)
 }
 
 export type DatasourceName =
-	'gbif' | 'jj' | 'gslides' | 'idmybee' | 'andrena-model' | 'iucn' | 'birdnet' | `debug-${string}`;
+	'gbif' | 'jj' | 'gslides' | 'idmybee' | 'andrena-morphogroups' | 'iucn' | 'birdnet' | `debug-${string}`;
 
 /**
  * Defines caching for a single external source, that could be used multiple times by different modules.

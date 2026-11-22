@@ -1,18 +1,27 @@
+import { match } from 'node:assert';
+
+import { addMonths } from 'date-fns';
+
 import { Metadata } from '#lib/schemas/metadata.js';
 import { ensureArray, nonnull, slugify } from '#lib/utils.js';
 
 import { PROTOCOL_ID } from './bees.js';
 import { Datasource } from './datasource.js';
-import { Enricher, MetadataProvider, NameProvider, Option } from './modules.js';
+import {
+	CladedName,
+	Enricher,
+	matchCladedName,
+	MetadataProvider,
+	NameProvider,
+	Option,
+} from './modules.js';
 import { logger } from './progress.js';
 import { Character, MediaObject, Xper3 } from './xper3.js';
 
+type BeesMetadataID = `${typeof PROTOCOL_ID}__${string}`;
+
 export abstract class WithSDD {
 	dataset: Xper3;
-
-	supportsClade(clade: string) {
-		return ['subspecies', 'species'].includes(clade);
-	}
 
 	constructor() {
 		const sddurl = process.env.IDMYBEE_SDD_URL;
@@ -32,24 +41,23 @@ export abstract class WithSDD {
 export class IDMyBeeDescriptions extends WithSDD implements Enricher {
 	name = 'idmybee-descriptions' as const;
 
-	names = new Set<string>();
+	species: CladedName[] = [];
 	media = new Map<`m${string}`, MediaObject>();
 
 	async init() {
-		await this.init();
 		const { taxa } = await this.dataset.one('taxa', {});
 		for (const taxon of taxa) {
-			this.names.add(taxon.Representation.Label);
+			this.species.push(parseTaxonLabel(taxon.Representation.Label));
 		}
-		const { media } = await this.dataset.one('mediaObjects', {});
-		for (const object of media) {
+
+		const { objects } = await this.dataset.one('mediaObjects', {});
+		for (const object of objects) {
 			this.media.set(object.$id, object);
 		}
 	}
 
-	available(option: Option) {
-		if (!this.supportsClade(option.clade)) return;
-		return this.names.has(option.name);
+	available({ clade, name }: Option) {
+		return this.species.some(matchCladedName({ clade, name }));
 	}
 
 	async *enrich(options: Option[]) {
@@ -60,14 +68,16 @@ export class IDMyBeeDescriptions extends WithSDD implements Enricher {
 			options.map(({ clade, name }) => ({ clade, name }))
 		);
 
-		for (const { name, description } of descriptions.filter(nonnull)) {
-			const taxon = taxa.find((tx) => tx.Representation.Label === name);
+		for (const { name, clade, description } of descriptions.filter(nonnull)) {
+			const taxon = taxa.find((tx) =>
+				matchCladedName({ clade, name })(parseTaxonLabel(tx.Representation.Label))
+			);
+
 			if (!taxon) continue;
 
-			const option = options.find(
-				(opt) => this.supportsClade(opt.clade) && opt.name === name
-			);
+			const option = options.find(matchCladedName({ clade, name }));
 			if (!option) continue;
+			if (!option.id) continue;
 
 			const summaries = [
 				...(description.SummaryData.Categorical ?? []),
@@ -79,8 +89,8 @@ export class IDMyBeeDescriptions extends WithSDD implements Enricher {
 				.map(({ $ref }) => this.media.get($ref))
 				.filter(nonnull);
 
-			const cascade: Record<`${PROTOCOL_ID}__${string}`, string | string[]> = {};
-			const narrowerWeights: Record<`${PROTOCOL_ID}__${string}`, number> = {};
+			const cascade: Record<BeesMetadataID, string | string[]> = {};
+			const narrowerWeights: Record<BeesMetadataID, number> = {};
 
 			for (const summary of summaries) {
 				const character = await this.dataset.one('character', { $id: summary.$ref });
@@ -157,7 +167,7 @@ export class IDMyBeeSpecies extends WithSDD implements NameProvider {
 	}
 }
 
-export class IDMyBeeCharacters extends WithSDD implements MetadataProvider {
+export class IDMyBeeDescriptors extends WithSDD implements MetadataProvider {
 	name = 'idmybee-characters' as const;
 
 	addTo = ['io.github.cigaleapp.base.bees'];
@@ -213,6 +223,8 @@ export class IDMyBeeCharacters extends WithSDD implements MetadataProvider {
 			required: false,
 			description: noPlaceholder(Detail) ?? '',
 			images: ensureArray(MediaObject ?? [])
+				.map(({ $ref }) => this.media.get($ref))
+				.filter(nonnull)
 				.map(googledriveThumbnailUrl)
 				.filter(nonnull),
 		} as const;
@@ -233,6 +245,8 @@ export class IDMyBeeCharacters extends WithSDD implements MetadataProvider {
 					description: noPlaceholder(Detail) ?? '',
 					key: slug($uniqueid),
 					images: ensureArray(MediaObject ?? [])
+						.map(({ $ref }) => this.media.get($ref))
+						.filter(nonnull)
 						.map(googledriveThumbnailUrl)
 						.filter(nonnull),
 				})
@@ -261,28 +275,64 @@ export class IDMyBeeCharacters extends WithSDD implements MetadataProvider {
 	}
 }
 
-class AndrenaModel extends Datasource<
-	'classmapping',
-	{ classmapping: {} },
-	{ classmapping: { classes: string[] } }
+class AndrenaMorphogroups extends Datasource<
+	// 'classmapping',
+	// { classmapping: {} },
+	// { classmapping: { classes: string[] } }
+	'mapping',
+	{ mapping: {} },
+	{
+		mapping: {
+			mapping: Array<{ genus: string; subname: string; species: string; groups: string[] }>;
+		};
+	}
 > {
-	name = 'andrena-model' as const;
+	name = 'andrena-morphogroups' as const;
+
+	// 'https://huggingface.co/edgaremy/andrena-classifier/resolve/main/class-mapping-grouped.txt?download=true';
 
 	url =
-		'https://huggingface.co/edgaremy/andrena-classifier/resolve/main/class-mapping-grouped.txt?download=true';
+		'https://huggingface.co/api/resolve-cache/models/edgaremy/andrena-classifier/193b4ac01dbb37d71ff68a5530ff102257ea9e31/species_to_morphogroups.csv?download=true';
 
 	async init() {}
 
+	expirations = {
+		file: (now: Date) => addMonths(now, 6),
+		entry: (now: Date) => addMonths(now, 6),
+	};
+
 	requests = {
-		classmapping: async () => {
+		// classmapping: async () => {
+		// 	const response = await fetch(this.url);
+		// 	const text = await response.text();
+		// 	if (!response.ok) throw new Error(text);
+		// 	return {
+		// 		classes: text
+		// 			.split(/\r?\n/)
+		// 			.map((line) => line.trim())
+		// 			.filter(Boolean),
+		// 	};
+		// },
+
+		mapping: async () => {
 			const response = await fetch(this.url);
 			const text = await response.text();
 			if (!response.ok) throw new Error(text);
+
+			const lines = text.split(/\r?\n/).filter((line) => line.trim());
+
 			return {
-				classes: text
-					.split(/\r?\n/)
-					.map((line) => line.trim())
-					.filter(Boolean),
+				mapping: lines
+					// TODO: allow other genera?
+					// .filter((line) => line.split(',').length - 1 >= 3)
+					.filter((line) => line.startsWith('Andrena,'))
+					.map((line) => line.split(',').filter(Boolean))
+					.map(([genus, subname, ...groups]) => ({
+						genus,
+						subname,
+						groups,
+						species: `${genus} ${subname}`,
+					})),
 			};
 		},
 	};
@@ -310,8 +360,8 @@ export function parseTaxonLabel(label: string) {
 		throw new Error(`Unexpected taxon label format: ${label}`);
 	}
 	return {
-		clade: match.groups.subgenus ? 'subspecies' : 'species',
-		name: label,
+		clade: 'species',
+		name: `${match.groups.genus} ${match.groups.species}`,
 	};
 }
 
