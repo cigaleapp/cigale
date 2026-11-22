@@ -170,7 +170,7 @@ export const MetadataValue = type({
 	}),
 });
 
-export const MetadataValueParsed = MetadataValue.omit('value').and({
+export const MetadataValueParsed = MetadataValue.merge({
 	value: MetadataRuntimeValueAny,
 });
 
@@ -197,7 +197,7 @@ const JSONSchemaCompatibleRuntimeValue = type.or(
 	MetadataRuntimeValue.surface
 );
 
-export const MetadataRecordValue = MetadataValue.omit('value', 'alternatives').and({
+export const MetadataRecordValue = MetadataValue.merge({
 	value: [JSONSchemaCompatibleRuntimeValue, '@', 'Valeur de la métadonnée'],
 	alternatives: type(
 		JSONSchemaCompatibleRuntimeValue.array(),
@@ -511,7 +511,7 @@ const MetadataBase = type({
 	).optional(),
 });
 
-const MetadataBoolean = MetadataBase.omit('kobocollect').and({
+const MetadataBoolean = MetadataBase.merge({
 	type: '"boolean"',
 	'default?': MetadataDefault.boolean,
 	'infer?': type.and(

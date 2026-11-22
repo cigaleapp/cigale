@@ -136,7 +136,7 @@ swarp.generateResultsExport(
 				const image = imagesFromDatabase.find((i) => i.id === imageId);
 				if (!image) continue;
 
-				const metadata = MetadataValues.assert({
+				const metadata = MetadataValues.from({
 					...image.metadata,
 					...observation.metadataOverrides,
 				});
@@ -219,7 +219,7 @@ swarp.generateResultsExport(
 			content: stringifyWithToplevelOrdering(
 				'json',
 				jsonSchemaURL.toString(),
-				Analysis.assert({
+				Analysis.from({
 					session: {
 						...session,
 						metadata: toMetadataRecord(sessionMetadata),

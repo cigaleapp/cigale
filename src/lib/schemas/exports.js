@@ -9,13 +9,11 @@ export const Analysis = type({
 	observations: type
 		.Record('string', AnalyzedObservation)
 		.describe("Associe l'ID d'une observation à son label et les valeurs de ses métadonnées"),
-	session: Session.omit('metadata')
-		.and({
-			metadata: MetadataRecord(NamespacedMetadataID),
-			// TODO(2026-02-17): remove the default in a little while
-			protocolMetadata: MetadataRecord(ID).default(() => ({})),
-		})
-		.describe("La session d'analyse"),
+	session: Session.merge({
+		metadata: MetadataRecord(NamespacedMetadataID),
+		// TODO(2026-02-17): remove the default in a little while
+		protocolMetadata: MetadataRecord(ID).default(() => ({})),
+	}).describe("La session d'analyse"),
 	files: type
 		.Record('string', 'string')
 		.describe(

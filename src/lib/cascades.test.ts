@@ -25,7 +25,7 @@ const mockMetadata = (id: string, type: DB.MetadataType = 'enum') =>
 const mockOption = (metadataId: string, i: number) => ({
 	metadataId: namespacedMetadataId('mockproto', metadataId),
 	id: metadataOptionId(namespacedMetadataId('mockproto', metadataId), i.toString()),
-	...Schemas.MetadataEnumVariant.in.assert({
+	...Schemas.MetadataEnumVariant.in.from({
 		description: '',
 		key: i.toString(),
 		label: `Option ${i}`,

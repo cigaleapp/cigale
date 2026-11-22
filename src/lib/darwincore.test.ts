@@ -61,7 +61,7 @@ const mockMetadatas = [
 ];
 
 const mockProtocol = {
-	darwincore: DarwinCoreProtocolConfig.assert({
+	darwincore: DarwinCoreProtocolConfig.from({
 		eml: {
 			language: 'English',
 			title: 'Foo',

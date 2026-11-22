@@ -66,23 +66,18 @@ export async function toExportedProtocol(
 		)
 	);
 
-	return ExportedProtocol.assert({
+	return ExportedProtocol.from({
 		...omit(protocol, 'dirty'),
 		exports: {
-			...protocol.exports,
-			...(protocol.exports
-				? {
-						metadata: {
-							csv: protocol.exports.metadata.csv,
-							json: protocol.exports.metadata.json,
-							files: protocol.exports.metadata.files.toJSON(),
-						},
-						images: {
-							cropped: protocol.exports.images.cropped.toJSON(),
-							original: protocol.exports.images.original.toJSON(),
-						},
-					}
-				: {}),
+			metadata: {
+				csv: protocol.exports.metadata.csv,
+				json: protocol.exports.metadata.json,
+				files: protocol.exports.metadata.files.toJSON(),
+			},
+			images: {
+				cropped: protocol.exports.images.cropped.toJSON(),
+				original: protocol.exports.images.original.toJSON(),
+			},
 		},
 		metadata: pick(
 			allMetadataDefs,

@@ -30,35 +30,33 @@ export const BUILTIN_EXTRA_FIELDS = {
 
 export const DarwinCoreFieldPayload = {
 	session: type({
-		session: Session.omit('metadata').and({
+		session: Session.merge({
 			metadata: MetadataValuesParsed(NamespacedMetadataID),
 			protocolMetadata: MetadataValuesParsed(ID),
 		}),
 	}),
 
 	image: type({
-		session: Session.omit('metadata').and({
+		session: Session.merge({
 			metadata: MetadataValuesParsed(NamespacedMetadataID),
 			protocolMetadata: MetadataValuesParsed(ID),
 		}),
-		image: Image.omit('metadata').and({
+		image: Image.merge({
 			metadata: MetadataValuesParsed(NamespacedMetadataID),
 			protocolMetadata: MetadataValuesParsed(ID),
 		}),
 	}),
 
 	media: type({
-		session: Session.omit('metadata').and({
+		session: Session.merge({
 			metadata: MetadataValuesParsed(NamespacedMetadataID),
 			protocolMetadata: MetadataValuesParsed(ID),
 		}),
 		file: ImageFile,
-		images: Image.omit('metadata')
-			.and({
-				metadata: MetadataValuesParsed(NamespacedMetadataID),
-				protocolMetadata: MetadataValuesParsed(ID),
-			})
-			.array(),
+		images: Image.merge({
+			metadata: MetadataValuesParsed(NamespacedMetadataID),
+			protocolMetadata: MetadataValuesParsed(ID),
+		}).array(),
 	}),
 };
 

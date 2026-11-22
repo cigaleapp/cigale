@@ -1,6 +1,5 @@
 import { type } from 'arktype';
 
-import { mapKeys, omit, orEmptyObj2 } from '../utils.js';
 import { Charts } from './charts.js';
 import {
 	HourRange,
@@ -10,18 +9,11 @@ import {
 	MIMEType,
 	NamespacedMetadataID,
 	ProtocolID,
-	SingleEntryRecord,
 	URLString,
 } from './common.js';
 import { DarwinCoreProtocolConfig } from './darwincore.js';
 import { FilepathTemplate, TemplatedString } from './expressions.js';
-import {
-	Metadata,
-	MetadataGroup,
-	MetadataRecord,
-	namespacedMetadataId,
-	SidecarFilepathTemplate,
-} from './metadata.js';
+import { Metadata, MetadataGroup, MetadataRecord, SidecarFilepathTemplate } from './metadata.js';
 import { AnalyzedImage, AnalyzedObservation } from './results.js';
 
 export const ProtocolRegistry = type({
@@ -305,13 +297,7 @@ export const Protocol = type({
 		.optional(),
 });
 
-export const ExportedProtocol = Protocol.omit(
-	'metadata',
-	'sessionMetadata',
-	'metadataGroups',
-	'metadataOrder',
-	'dirty'
-).in.and({
+export const ExportedProtocol = Protocol.omit('dirty').in.merge({
 	'$schema?': 'string',
 	'metadataGroups?': type.Record(
 		ID,

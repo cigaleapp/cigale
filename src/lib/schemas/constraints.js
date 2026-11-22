@@ -304,7 +304,7 @@ if (import.meta.vitest) {
 
 	describe('HardwareRequirements', () => {
 		test('complex case', () => {
-			const reqs = HardwareRequirements.assert({
+			const reqs = HardwareRequirements.from({
 				cpu: '8 threads @ 2.1 GHz',
 				ram: '4 GB @ 500 MHz',
 				vram: '1 GHz',
@@ -345,7 +345,7 @@ if (import.meta.vitest) {
 		});
 
 		test('just a ram & threads limit', () => {
-			const reqs = HardwareRequirements.assert({
+			const reqs = HardwareRequirements.from({
 				cpu: '4 threads',
 				ram: '4 GB',
 			});

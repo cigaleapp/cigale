@@ -1,27 +1,19 @@
-import type * as DB from '#lib/database.js';
 import type { DatabaseHandle } from '#lib/idb.svelte.js';
 
 import { ArkErrors, type } from 'arktype';
-import JSONC from 'tiny-jsonc';
-import YAML from 'yaml';
 
 import { Tables } from '#lib/database.js';
 import { streamJsonl } from '#lib/jsonl.ts';
-import {
-	fetchProtocolRegistry,
-	lookupMostRecentCompatibleProtocol,
-} from '#lib/protocols/registry.js';
+import { lookupMostRecentCompatibleProtocol } from '#lib/protocols/registry.js';
 import { NamespacedMetadataID } from '#lib/schemas/common.js';
 import {
 	ensureNamespacedMetadataId,
 	MetadataEnumVariant,
-	MetadataGroup,
-	MetadataInDatabase,
 	metadataOptionId,
 } from '#lib/schemas/metadata.js';
 import { ExportedProtocol } from '#lib/schemas/protocols.js';
 import { recomputeSearchIndex } from '#lib/search.ts';
-import { entries, mapKeys, nonnull, omit, parseYAMLorJSON } from '#lib/utils.ts';
+import { entries, mapKeys, parseYAMLorJSON } from '#lib/utils.ts';
 
 export class DependsOnOtherProtocolError extends Error {
 	constructor(public protocolIds: string[]) {
@@ -135,7 +127,7 @@ export async function importSingleProtocol(
 		const storeOption = async (option: typeof MetadataEnumVariant.inferIn) => {
 			const optionId = metadataOptionId(id, option.key);
 			const tx = db.transaction(['MetadataOption'], 'readwrite');
-			await tx.store.put({
+			await tx.objectStore('MetadataOption').put({
 				id: optionId,
 				metadataId: id,
 				...option,
