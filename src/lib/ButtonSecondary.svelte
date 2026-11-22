@@ -38,7 +38,7 @@ Available CSS variables:
 </script>
 
 <script>
-	import { errorMessage } from '#lib/i18n.js';
+
 	import { toasts } from '#lib/toasts.svelte.js';
 
 	import { hasPhysicalKeyboard } from './keyboard.svelte.js';

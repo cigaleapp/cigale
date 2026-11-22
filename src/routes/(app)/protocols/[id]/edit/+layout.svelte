@@ -4,7 +4,7 @@
 	import Badge from '#lib/Badge.svelte';
 	import ButtonIcon from '#lib/ButtonIcon.svelte';
 	import ButtonInk from '#lib/ButtonInk.svelte';
-	import { errorMessage, uppercaseFirst } from '#lib/i18n.js';
+	import { uppercaseFirst } from '#lib/i18n.js';
 	import IconDatatype from '#lib/IconDatatype.svelte';
 	import { databaseHandle, dependencyURI, tables } from '#lib/idb.svelte.js';
 	import InlineTextInput from '#lib/InlineTextInput.svelte';

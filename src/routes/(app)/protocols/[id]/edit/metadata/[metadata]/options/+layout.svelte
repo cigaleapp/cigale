@@ -48,7 +48,7 @@
 	import { fade } from 'svelte/transition';
 
 	import ButtonIcon from '#lib/ButtonIcon.svelte';
-	import { errorMessage } from '#lib/i18n.js';
+
 	import { dependencyURI, drop, set } from '#lib/idb.svelte.js';
 	import InlineTextInput from '#lib/InlineTextInput.svelte';
 	import { goto, resolve } from '#lib/paths.js';
