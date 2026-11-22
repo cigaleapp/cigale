@@ -88,9 +88,29 @@ if (import.meta.vitest) {
 	});
 }
 
+const MAX_LENGTH = 2_000;
+
+/**
+ * Truncates a message to MAX_LENGTH characters, appending an ellipsis and
+ * logging a warning when truncated.
+ * @param {string} result
+ * @param {unknown} originalError
+ * @returns {string}
+ */
+function truncate(result, originalError) {
+	if (result.length > MAX_LENGTH) {
+		result = result.slice(0, MAX_LENGTH - 2) + '…';
+		console.warn('Truncated error message', {
+			message: result,
+			originalError,
+		});
+	}
+	return result;
+}
+
 /**
  * Extracts a display message from a single error value, stripping any
- * leading `Error: ` prefix.
+ * leading `Error: ` prefix and truncating to MAX_LENGTH.
  * @param {unknown} value
  * @returns {string}
  */
@@ -113,7 +133,7 @@ function errorPart(value) {
 		result = result.slice('Error: '.length);
 	}
 
-	return result;
+	return truncate(result, value);
 }
 
 /**
@@ -132,19 +152,9 @@ export function errorMessage(error, prefix = '') {
 		cause = cause instanceof Error ? cause.cause : undefined;
 	}
 
-	const MAX_LENGTH = 2_000;
-
 	result = prefix ? `${prefix}: ${result}` : result;
 
-	if (result.length > MAX_LENGTH) {
-		result = result.slice(0, MAX_LENGTH - 2) + '…';
-		console.warn('Truncated error message', {
-			message: result,
-			originalError: error,
-		});
-	}
-
-	return result;
+	return truncate(result, error);
 }
 
 if (import.meta.vitest) {
@@ -164,6 +174,13 @@ if (import.meta.vitest) {
 			cause: new Error('cause error', { cause: new Error('nested cause') }),
 		});
 		expect(errorMessage(errorWithNestedCause)).toBe('main error: cause error: nested cause');
+
+		// Each part is truncated to MAX_LENGTH (2000) characters, and the
+		// joined result is truncated again as a whole
+		const longMessage = 'a'.repeat(2_500);
+		expect(errorMessage(new Error(longMessage))).toBe('a'.repeat(1_998) + '…');
+		const longCause = new Error('main', { cause: new Error(longMessage) });
+		expect(errorMessage(longCause)).toBe(`main: ${'a'.repeat(1_992)}…`);
 	});
 }
 
