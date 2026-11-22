@@ -89,31 +89,47 @@ if (import.meta.vitest) {
 }
 
 /**
+ * Extracts a display message from a single error value, stripping any
+ * leading `Error: ` prefix.
+ * @param {unknown} value
+ * @returns {string}
+ */
+function errorPart(value) {
+	const defaultMessage = 'Erreur inattendue';
+
+	let result = value?.toString() || defaultMessage;
+
+	if (value instanceof Error) {
+		if ('message' in value && value.message) {
+			result = value.message || defaultMessage;
+		}
+	} else if (value && typeof value === 'object') {
+		if ('message' in value) {
+			result = value.message?.toString() || defaultMessage;
+		}
+	}
+
+	while (result.startsWith('Error: ')) {
+		result = result.slice('Error: '.length);
+	}
+
+	return result;
+}
+
+/**
  *
  * @param {unknown} error
  * @param {string} [prefix]
  * @returns {string}
  */
 export function errorMessage(error, prefix = '') {
-	const defaultMessage = 'Erreur inattendue';
+	let result = errorPart(error);
 
-	let result = error?.toString() || defaultMessage;
-
-	if (error instanceof Error) {
-		if ('message' in error && error.message) {
-			result = error.message || defaultMessage;
-		}
-		if ('cause' in error && error.cause) {
-			result = errorMessage(error.cause);
-		}
-	} else if (error && typeof error === 'object') {
-		if ('message' in error) {
-			result = error.message?.toString() || defaultMessage;
-		}
-	}
-
-	while (result.startsWith('Error: ')) {
-		result = result.slice('Error: '.length);
+	// Join nested causes with ": " until there's no more cause
+	let cause = error instanceof Error ? error.cause : undefined;
+	while (cause) {
+		result = `${result}: ${errorPart(cause)}`;
+		cause = cause instanceof Error ? cause.cause : undefined;
 	}
 
 	const MAX_LENGTH = 2_000;
@@ -141,9 +157,13 @@ if (import.meta.vitest) {
 		expect(errorMessage(undefined)).toBe('Erreur inattendue');
 		expect(errorMessage(new Error('test'), 'prefix')).toBe('prefix: test');
 
-		// TODO: Not sure if climbing up to the cause is a good idea
+		// Nested causes are joined with ": " until there's no more cause
 		const errorWithCause = new Error('main error', { cause: new Error('cause error') });
-		expect(errorMessage(errorWithCause)).toBe('cause error');
+		expect(errorMessage(errorWithCause)).toBe('main error: cause error');
+		const errorWithNestedCause = new Error('main error', {
+			cause: new Error('cause error', { cause: new Error('nested cause') }),
+		});
+		expect(errorMessage(errorWithNestedCause)).toBe('main error: cause error: nested cause');
 	});
 }
 

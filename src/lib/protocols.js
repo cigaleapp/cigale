@@ -181,7 +181,7 @@ export async function promptAndImportProtocol({
 
 						resolve(result);
 					} catch (err) {
-						reject(new Error(errorMessage(err)));
+						reject(err);
 					}
 				};
 				reader.readAsText(file);
