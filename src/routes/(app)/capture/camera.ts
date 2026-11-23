@@ -4,7 +4,6 @@ import { CameraPreview } from '@capacitor-community/camera-preview';
 import { Capacitor } from '@capacitor/core';
 
 import { getCurrentLocation } from '#lib/geolocation.js';
-import { errorMessage } from '#lib/i18n.js';
 import { toasts } from '#lib/toasts.svelte.js';
 
 const ALL_FLASH_MODES = ['off', 'auto', 'on', 'torch'] as const;
@@ -12,7 +11,7 @@ export type FlashMode = (typeof ALL_FLASH_MODES)[number];
 
 export type CameraState = {
 	ready: boolean;
-	failure: string;
+	failure: unknown;
 	side: 'rear' | 'front';
 	/** Stays true for a small duration while a pic is being saved */
 	snapping: boolean;
@@ -63,7 +62,7 @@ export async function startCamera(webElement: HTMLElement | null, state: CameraS
 	})
 		.catch((e) => {
 			console.error('Couldnt start camera', e);
-			state.failure = errorMessage(e);
+			state.failure = e;
 			state.ready = false;
 			state.flash.supported = [];
 			state.flash.current = 'off';
@@ -104,7 +103,7 @@ export async function capture(camera: CameraState, storage: PendingStorage) {
 	}, 100);
 
 	if (!storage) {
-		toasts.error("Le stockage n'est pas encore prêt, veuillez rééssayer");
+		toasts.error(null, "Le stockage n'est pas encore prêt, veuillez rééssayer");
 		return;
 	}
 

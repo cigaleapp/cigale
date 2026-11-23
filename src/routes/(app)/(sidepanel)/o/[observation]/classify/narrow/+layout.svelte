@@ -116,6 +116,7 @@
 					case '/(app)/(sidepanel)/o/[observation]/classify/narrow/describe': {
 						if (tooManyRemainingCandidates) {
 							toasts.error(
+								null,
 								`Impossible de lister les candidats, il y en a plus de ${maximumListableCandidates.toLocaleString()}`
 							);
 							return;

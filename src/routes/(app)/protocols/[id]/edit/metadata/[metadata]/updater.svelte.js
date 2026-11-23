@@ -28,6 +28,7 @@ export function updater(changes) {
 			await changes(metadata, value);
 		} catch (err) {
 			toasts.error(
+				null,
 				`Valeur invalide : ${err instanceof ArkErrors ? err.summary : errorMessage(err)}`
 			);
 			return;
@@ -38,7 +39,7 @@ export function updater(changes) {
 		}
 
 		await tables.Metadata.set(metadata).catch((err) => {
-			toasts.error(`Impossible de sauvegarder : ${errorMessage(err)}`);
+			toasts.error(null, `Impossible de sauvegarder : ${errorMessage(err)}`);
 		});
 
 		await invalidate(

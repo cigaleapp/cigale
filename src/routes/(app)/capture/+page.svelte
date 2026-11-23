@@ -516,7 +516,7 @@
 						await refreshSupportedFlashModes(camera);
 
 						if (!camera.flash.supported.includes(nextFlashMode)) {
-							toasts.error("Ce mode de flash n'est pas supporté");
+							toasts.error(null, "Ce mode de flash n'est pas supporté");
 							return;
 						}
 

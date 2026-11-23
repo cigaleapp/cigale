@@ -50,19 +50,19 @@ export const ACCEPTED_IMPORT_TYPES = [
  */
 export async function processImageFile({ file, id: fileId, sidecars, extraExif }) {
 	if (!uiState.currentProtocol) {
-		toasts.error('Aucun protocole sélectionné');
+		toasts.error(null, 'Aucun protocole sélectionné');
 		return;
 	}
 
 	if (!uiState.currentSession) {
-		toasts.error('Aucun session active');
+		toasts.error(null, 'Aucun session active');
 		return;
 	}
 
 	let originalBytes = await file.arrayBuffer();
 
 	if (originalBytes.byteLength > imageLimits.maxMemoryUsageInMB * Math.pow(2, 20)) {
-		toasts.error(errorMessageImageTooLarge());
+		toasts.error(null, errorMessageImageTooLarge());
 		return;
 	}
 
@@ -125,6 +125,7 @@ export async function processImageFile({ file, id: fileId, sidecars, extraExif }
 	}).catch((e) => {
 		console.error(e);
 		toasts.error(
+			null,
 			`Erreur lors du traitement du/des fichiers annexes associés à ${original.name}`
 		);
 	});
@@ -133,6 +134,7 @@ export async function processImageFile({ file, id: fileId, sidecars, extraExif }
 		await processRawMetadata(uiState.currentSession.id, fileId, rawMetadata).catch((e) => {
 			console.error(e);
 			toasts.error(
+				null,
 				`Erreur lors de l'extraction des métadonnées du fichier RAW ${original.name}`
 			);
 		});
@@ -146,7 +148,10 @@ export async function processImageFile({ file, id: fileId, sidecars, extraExif }
 		extra: extraExif ?? {},
 	}).catch((error) => {
 		console.error(error);
-		toasts.error(`Erreur lors de l'extraction des métadonnées EXIF pour ${original.name}`);
+		toasts.error(
+			null,
+			`Erreur lors de l'extraction des métadonnées EXIF pour ${original.name}`
+		);
 	});
 }
 
@@ -158,7 +163,7 @@ export async function processImageFile({ file, id: fileId, sidecars, extraExif }
  */
 export async function inferBoundingBoxes(swarpc, cancellers, fileId) {
 	if (!uiState.currentProtocol) {
-		toasts.error('Aucun protocole sélectionné');
+		toasts.error(null, 'Aucun protocole sélectionné');
 		return;
 	}
 

@@ -7,7 +7,6 @@ import { GPSHelper } from 'piexifjs';
 
 import { generateId } from '#lib/database.js';
 import { getCurrentLocation } from '#lib/geolocation.js';
-import { errorMessage } from '#lib/i18n.js';
 import * as idb from '#lib/idb.svelte.js';
 import { imageFileId } from '#lib/images.js';
 import { processImageFile } from '#lib/import.svelte.js';
@@ -135,7 +134,7 @@ export class PendingStorage {
 			return name;
 		} catch (e) {
 			console.error('Could not save photo', e);
-			toasts.error(errorMessage(e, 'Impossible de sauvgarder la photo'));
+			toasts.error(e, 'Impossible de sauvgarder la photo');
 			if (!this.frozenCount) this.count--;
 		} finally {
 			await this.refreshCount();
@@ -153,7 +152,7 @@ export class PendingStorage {
 			await binaryStorage.delete(this.locator('exif', `${filename}.json`));
 		} catch (e) {
 			console.error('Could not delete photo', e);
-			toasts.error(errorMessage(e, 'Impossible de supprimer la photo'));
+			toasts.error(e, 'Impossible de supprimer la photo');
 		} finally {
 			await this.refreshCount();
 		}
@@ -212,7 +211,7 @@ export class PendingStorage {
 			} catch (error) {
 				hasErrors = true;
 				console.error("Couldn't process image file", file, error);
-				toasts.error(errorMessage(error, `Impossible d'importer ${file.name}`));
+				toasts.error(error, `Impossible d'importer ${file.name}`);
 			}
 
 			if (imported) {

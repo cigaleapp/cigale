@@ -652,6 +652,7 @@
 
 									if (!uiState.currentSessionId) {
 										toasts.error(
+											null,
 											"Aucune session active. Impossible d'enregistrer le fichier."
 										);
 										savingFile = false;

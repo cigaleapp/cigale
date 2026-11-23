@@ -28,7 +28,7 @@ export function updater(changes) {
 			needsUpdate = result !== false;
 		} catch (err) {
 			if (err instanceof ArkErrors) {
-				toasts.error(`Valeur invalide : ${err.summary}`);
+				toasts.error(null, `Valeur invalide : ${err.summary}`);
 				return;
 			}
 
@@ -38,7 +38,7 @@ export function updater(changes) {
 		if (!needsUpdate) return;
 
 		await tables.Protocol.set(protocol).catch((err) => {
-			toasts.error(`Impossible de sauvegarder : ${errorMessage(err)}`);
+			toasts.error(null, `Impossible de sauvegarder : ${errorMessage(err)}`);
 		});
 
 		await invalidate(dependencyURI('Protocol', page.params.id));

@@ -88,27 +88,44 @@ if (import.meta.vitest) {
 	});
 }
 
+const MAX_LENGTH = 2_000;
+
 /**
- *
- * @param {unknown} error
- * @param {string} [prefix]
+ * Truncates a message to MAX_LENGTH characters, appending an ellipsis and
+ * logging a warning when truncated.
+ * @param {string} result
+ * @param {unknown} originalError
  * @returns {string}
  */
-export function errorMessage(error, prefix = '') {
+function truncate(result, originalError) {
+	if (result.length > MAX_LENGTH) {
+		result = result.slice(0, MAX_LENGTH - 2) + '…';
+		console.warn('Truncated error message', {
+			message: result,
+			originalError,
+		});
+	}
+	return result;
+}
+
+/**
+ * Extracts a display message from a single error value, stripping any
+ * leading `Error: ` prefix and truncating to MAX_LENGTH.
+ * @param {unknown} value
+ * @returns {string}
+ */
+function errorPart(value) {
 	const defaultMessage = 'Erreur inattendue';
 
-	let result = error?.toString() || defaultMessage;
+	let result = value?.toString() || defaultMessage;
 
-	if (error instanceof Error) {
-		if ('message' in error && error.message) {
-			result = error.message || defaultMessage;
+	if (value instanceof Error) {
+		if ('message' in value && value.message) {
+			result = value.message || defaultMessage;
 		}
-		if ('cause' in error && error.cause) {
-			result = errorMessage(error.cause);
-		}
-	} else if (error && typeof error === 'object') {
-		if ('message' in error) {
-			result = error.message?.toString() || defaultMessage;
+	} else if (value && typeof value === 'object') {
+		if ('message' in value) {
+			result = value.message?.toString() || defaultMessage;
 		}
 	}
 
@@ -116,19 +133,28 @@ export function errorMessage(error, prefix = '') {
 		result = result.slice('Error: '.length);
 	}
 
-	const MAX_LENGTH = 2_000;
+	return truncate(result, value);
+}
+
+/**
+ *
+ * @param {unknown} error
+ * @param {string} [prefix]
+ * @returns {string}
+ */
+export function errorMessage(error, prefix = '') {
+	let result = errorPart(error);
+
+	// Join nested causes with ": " until there's no more cause
+	let cause = error instanceof Error ? error.cause : undefined;
+	while (cause) {
+		result = `${result}: ${errorPart(cause)}`;
+		cause = cause instanceof Error ? cause.cause : undefined;
+	}
 
 	result = prefix ? `${prefix}: ${result}` : result;
 
-	if (result.length > MAX_LENGTH) {
-		result = result.slice(0, MAX_LENGTH - 2) + '…';
-		console.warn('Truncated error message', {
-			message: result,
-			originalError: error,
-		});
-	}
-
-	return result;
+	return truncate(result, error);
 }
 
 if (import.meta.vitest) {
@@ -141,9 +167,20 @@ if (import.meta.vitest) {
 		expect(errorMessage(undefined)).toBe('Erreur inattendue');
 		expect(errorMessage(new Error('test'), 'prefix')).toBe('prefix: test');
 
-		// TODO: Not sure if climbing up to the cause is a good idea
+		// Nested causes are joined with ": " until there's no more cause
 		const errorWithCause = new Error('main error', { cause: new Error('cause error') });
-		expect(errorMessage(errorWithCause)).toBe('cause error');
+		expect(errorMessage(errorWithCause)).toBe('main error: cause error');
+		const errorWithNestedCause = new Error('main error', {
+			cause: new Error('cause error', { cause: new Error('nested cause') }),
+		});
+		expect(errorMessage(errorWithNestedCause)).toBe('main error: cause error: nested cause');
+
+		// Each part is truncated to MAX_LENGTH (2000) characters, and the
+		// joined result is truncated again as a whole
+		const longMessage = 'a'.repeat(2_500);
+		expect(errorMessage(new Error(longMessage))).toBe('a'.repeat(1_998) + '…');
+		const longCause = new Error('main', { cause: new Error(longMessage) });
+		expect(errorMessage(longCause)).toBe(`main: ${'a'.repeat(1_992)}…`);
 	});
 }
 

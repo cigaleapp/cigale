@@ -5,7 +5,7 @@
 	import { providers } from '#lib/accounts/registry.js';
 	import ButtonIcon from '#lib/ButtonIcon.svelte';
 	import Datetime from '#lib/Datetime.svelte';
-	import { errorMessage, plural } from '#lib/i18n.js';
+	import { plural } from '#lib/i18n.js';
 	import { countByIndex, databaseHandle, listByIndex, tables } from '#lib/idb.svelte.js';
 	import { loadPreviewImage } from '#lib/images.js';
 	import { defineKeyboardShortcuts } from '#lib/keyboard.svelte.js';
@@ -189,10 +189,8 @@
 									}).catch((e) => {
 										console.error(e);
 										toasts.error(
-											errorMessage(
-												`Impossible de télécharger ${session.name}`,
-												e
-											)
+											`Impossible de télécharger ${session.name}`,
+											e
 										);
 
 										return undefined;

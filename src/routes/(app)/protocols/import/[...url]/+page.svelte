@@ -47,7 +47,7 @@
 		const raw = await fetch(toImport)
 			.then((res) => res.text())
 			.catch((e) => {
-				toasts.error(`Erreur lors de l'import du protocole distant: ${e}`);
+				toasts.error(null, `Erreur lors de l'import du protocole distant: ${e}`);
 				return null;
 			});
 
@@ -59,7 +59,7 @@
 			await tables.Metadata.refresh(null);
 			await goto('/protocols/');
 		} catch (error) {
-			toasts.error(`Erreur lors de l'import du protocole distant: ${error}`);
+			toasts.error(null, `Erreur lors de l'import du protocole distant: ${error}`);
 		} finally {
 			importing = false;
 		}

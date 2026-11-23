@@ -4,7 +4,7 @@
 	import Badge from '#lib/Badge.svelte';
 	import ButtonIcon from '#lib/ButtonIcon.svelte';
 	import ButtonInk from '#lib/ButtonInk.svelte';
-	import { errorMessage, uppercaseFirst } from '#lib/i18n.js';
+	import { uppercaseFirst } from '#lib/i18n.js';
 	import IconDatatype from '#lib/IconDatatype.svelte';
 	import { databaseHandle, dependencyURI, tables } from '#lib/idb.svelte.js';
 	import InlineTextInput from '#lib/InlineTextInput.svelte';
@@ -98,7 +98,7 @@
 				toasts.success(`Métadonnée ${shortId} créée`);
 			});
 		} catch (error) {
-			toasts.error(errorMessage(error, 'Impossible de créer la métadonnée'));
+			toasts.error(error, 'Impossible de créer la métadonnée');
 		}
 	}
 
@@ -190,7 +190,7 @@
 					<ButtonInk
 						onclick={async () => {
 							await exportProtocol(databaseHandle(), resolve('/'), id).catch((e) =>
-								toasts.error(e)
+								toasts.error(null, e)
 							);
 						}}
 					>

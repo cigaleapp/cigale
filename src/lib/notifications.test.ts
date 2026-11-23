@@ -81,7 +81,7 @@ describe('notifications', () => {
 		await askForNotificationPermission();
 
 		expect(mockRequestPermissions).toHaveBeenCalledTimes(1);
-		expect(mockToastError).toHaveBeenCalledWith('Vous avez refusé les notifications.');
+		expect(mockToastError).toHaveBeenCalledWith(null, 'Vous avez refusé les notifications.');
 	});
 
 	it('reports native permission request failures without throwing', async () => {
@@ -120,6 +120,7 @@ describe('notifications', () => {
 		await askForNotificationPermission();
 
 		expect(mockToastError).toHaveBeenCalledWith(
+			null,
 			'Votre navigateur ne supporte pas les notifications système.'
 		);
 	});
@@ -210,6 +211,7 @@ describe('notifications', () => {
 		await sendNotification('Hello', { body: 'World' });
 
 		expect(mockToastError).toHaveBeenCalledWith(
+			null,
 			'Votre navigateur ne supporte pas les notifications système.'
 		);
 	});
@@ -228,6 +230,7 @@ describe('notifications', () => {
 			expect.any(Error)
 		);
 		expect(mockToastError).toHaveBeenCalledWith(
+			null,
 			"Impossible d'envoyer la notification système."
 		);
 		consoleErrorSpy.mockRestore();

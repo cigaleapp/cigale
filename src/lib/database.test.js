@@ -82,10 +82,7 @@ describe('filepath templates', () => {
 		// This way, we can also get rid of expectRendered and use template.render directly, making code clearer
 		// @ts-expect-error
 		expect(() => template.render(filepathMockData)).toThrowErrorMatchingInlineSnapshot(`
-			[Error: Template de : Parse error on line 1:
-			{{sequence}
-			----------^
-			Expecting 'CLOSE_RAW_BLOCK', 'CLOSE', 'CLOSE_UNESCAPED', 'OPEN_SEXPR', 'CLOSE_SEXPR', 'ID', 'OPEN_BLOCK_PARAMS', 'STRING', 'NUMBER', 'BOOLEAN', 'UNDEFINED', 'NULL', 'DATA', 'SEP', got 'INVALID']
+			[Error: Template de ]
 		`);
 	});
 

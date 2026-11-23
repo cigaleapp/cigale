@@ -15,7 +15,6 @@ const mockBinaryStorage = {
 };
 const mockProcessImageFile = vi.fn();
 const mockImageFileId = vi.fn();
-const mockErrorMessage = vi.fn();
 const mockToastError = vi.fn();
 
 vi.mock('@capacitor/core', () => ({
@@ -56,11 +55,6 @@ vi.mock('#lib/import.svelte.js', () => ({
 
 vi.mock('#lib/images.js', () => ({
 	imageFileId: mockImageFileId,
-}));
-
-vi.mock('#lib/i18n.js', () => ({
-	errorMessage: mockErrorMessage,
-	localeFromNavigator: vi.fn(() => 'fr'),
 }));
 
 vi.mock('#lib/toasts.svelte.js', () => ({
@@ -120,7 +114,6 @@ describe('PendingStorage', () => {
 		mockBinaryStorage.clear.mockResolvedValue(undefined);
 		mockProcessImageFile.mockResolvedValue(undefined);
 		mockImageFileId.mockReturnValue('generated-image-id');
-		mockErrorMessage.mockImplementation((_error, message) => message);
 	});
 
 	it('opens a storage and lists sessions', async () => {
@@ -184,11 +177,7 @@ describe('PendingStorage', () => {
 		await storage.save('base64-photo');
 
 		expect(storage.count).toBe(0);
-		expect(mockErrorMessage).toHaveBeenCalledWith(
-			saveError,
-			'Impossible de sauvgarder la photo'
-		);
-		expect(mockToastError).toHaveBeenCalledWith('Impossible de sauvgarder la photo');
+		expect(mockToastError).toHaveBeenCalledWith(saveError, 'Impossible de sauvgarder la photo');
 	});
 
 	it('filters unrelated files when reading and sums size across entries', async () => {
@@ -300,8 +289,10 @@ describe('PendingStorage', () => {
 		await storage.delete('IMG_0001.PNG');
 
 		expect(storage.count).toBe(0);
-		expect(mockErrorMessage).toHaveBeenCalledWith(deleteError, expect.any(String));
-		expect(mockToastError).toHaveBeenCalledWith(expect.any(String));
+		expect(mockToastError).toHaveBeenCalledWith(
+			deleteError,
+			'Impossible de supprimer la photo'
+		);
 	});
 
 	it('clears the session folder', async () => {

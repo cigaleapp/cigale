@@ -181,7 +181,7 @@
 			});
 		} catch (e) {
 			console.error(e);
-			toasts.error(e);
+			toasts.error(null, e);
 			return {};
 		}
 	});

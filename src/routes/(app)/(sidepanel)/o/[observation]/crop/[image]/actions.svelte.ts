@@ -116,7 +116,7 @@ export async function onCropChange({
 
 	const image = imageId ? currentImages().find((img) => img.id === imageId) : undefined;
 	if (imageId && !image) {
-		toasts.error(`Impossible de trouver l'image ${imageId} pour la confirmer`);
+		toasts.error(null, `Impossible de trouver l'image ${imageId} pour la confirmer`);
 		return null;
 	}
 
@@ -379,6 +379,7 @@ export async function revertToInferredCrop(imageId: string) {
 	// On subsequent crops, the user's crop will be the main value and the neural network's crop will be in the alternatives.
 	if (!initialCrop) {
 		toasts.error(
+			null,
 			`L'image ${imageId} n'a pas de recadrage alternatif, impossible de revenir au recadrage d'origine`
 		);
 		return;

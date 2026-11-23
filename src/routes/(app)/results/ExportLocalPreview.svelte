@@ -57,7 +57,7 @@
 
 	async function previewZipContents(): Promise<TreeNode> {
 		if (!uiState.currentSessionId) {
-			toasts.error('Aucune session active à prévisualiser.');
+			toasts.error(null, 'Aucune session active à prévisualiser.');
 			return [];
 		}
 

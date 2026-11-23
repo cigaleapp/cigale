@@ -193,15 +193,15 @@ export async function promptAndImportProtocol<
 							await tables.Protocol.refresh(null);
 							await tables.Metadata.refresh(null);
 
-							resolve(result);
-						} catch (err) {
-							reject(new Error(errorMessage(err)));
-						}
-					};
-					reader.readAsText(file);
-				});
-			})
-		);
+						resolve(result);
+					} catch (err) {
+						reject(err);
+					}
+				};
+				reader.readAsText(file);
+			});
+		})
+	);
 
 	return allowMultiple ? output : output[0];
 }

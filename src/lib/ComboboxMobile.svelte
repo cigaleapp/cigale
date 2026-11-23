@@ -10,7 +10,6 @@
 	import ButtonPrimary from '#lib/ButtonPrimary.svelte';
 	import ConfidencePercentage from '#lib/ConfidencePercentage.svelte';
 	import DebugOnly from '#lib/DebugOnly.svelte';
-	import { errorMessage } from '#lib/i18n.js';
 	import LoadingScreen from '#lib/LoadingScreen.svelte';
 	import { corsfixIfLocalhost, readableOn, switchConditions } from '#lib/utils.js';
 	import IconClose from '~icons/ri/arrow-left-s-line';
@@ -265,7 +264,7 @@
 						<LoadingScreen empty="Aucun résultat" />
 					{/each}
 				{:catch error}
-					<LoadingScreen failure={errorMessage(error)} />
+					<LoadingScreen failure={error} />
 				{/await}
 			{:else}
 				{#each items.toSorted(sorter) as option (option.key)}

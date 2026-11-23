@@ -49,7 +49,7 @@
 		exporter.exporting = exportFormat;
 
 		if (!uiState.currentSessionId) {
-			toasts.error('Aucune session active à exporter.');
+			toasts.error(null, 'Aucune session active à exporter.');
 			exporter.exporting = false;
 			return;
 		}
@@ -155,7 +155,7 @@
 			}
 		} catch (error) {
 			console.error(error);
-			toasts.error(`Erreur lors de l'exportation des résultats: ${error}`);
+			toasts.error(null, `Erreur lors de l'exportation des résultats: ${error}`);
 		} finally {
 			exporter.exporting = false;
 		}

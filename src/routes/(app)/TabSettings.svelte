@@ -10,7 +10,6 @@
 	import DropdownMenu from '#lib/DropdownMenu.svelte';
 	import { promptForFiles } from '#lib/files.js';
 	import { assertHardwareRequirements } from '#lib/hardware-requirements.js';
-	import { errorMessage } from '#lib/i18n.js';
 	import { tables } from '#lib/idb.svelte.js';
 	import { ACCEPTED_IMPORT_TYPES } from '#lib/import.svelte.js';
 	import { IsMobile } from '#lib/mobile.svelte.js';
@@ -74,7 +73,7 @@
 					await uiState.selectNeuralModel(selector, metadata);
 				} catch (error) {
 					console.error(error);
-					toasts.error(errorMessage(error, 'Impossible de choisir ce modèle'));
+					toasts.error(error, 'Impossible de choisir ce modèle');
 				}
 			},
 		};

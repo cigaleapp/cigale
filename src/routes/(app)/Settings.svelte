@@ -417,6 +417,7 @@
 							const downloaded = await updater.download(updateBundle);
 							if (!downloaded) {
 								toasts.error(
+									null,
 									'Impossible de télécharger la mise à jour. Veuillez rééssayer plus tard.'
 								);
 								return;
@@ -424,7 +425,9 @@
 
 							await updater
 								.install(downloaded)
-								.catch(() => toasts.error("Impossible d'installer la mise à jour"));
+								.catch(() =>
+									toasts.error(null, "Impossible d'installer la mise à jour")
+								);
 						} finally {
 							updating = false;
 						}
