@@ -168,12 +168,12 @@ const server = Bun.serve({
 	},
 });
 
-console.log(`protocols-server listening on port ${PORT}, data dir: ${DATA_DIR}`);
+console.info(`protocols-server listening on port ${PORT}, data dir: ${DATA_DIR}`);
 
 // Re-generate options on (re)start so that restarting the container app
 // (e.g. via `hfctl apps restart`) triggers a fresh pipeline run.
 if (process.env.AUTO_REGENERATE !== 'false') {
 	if (regenerate()) {
-		console.log('Auto-regeneration started on startup');
+		console.info('Auto-regeneration started on startup');
 	}
 }

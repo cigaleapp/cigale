@@ -1,6 +1,6 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 
-import { MetadataEnumVariant } from './types';
+import { MetadataEnumVariant } from './types.js';
 
 export type ModuleName =
 	// species names

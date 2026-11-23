@@ -1,4 +1,4 @@
-import { ExportedProtocol } from '../protocol-types';
+import { ExportedProtocol } from '../protocol-types.js';
 
 export type { ExportedProtocol };
 

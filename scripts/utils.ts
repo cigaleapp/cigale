@@ -4,16 +4,6 @@ import { Estimation as ETA } from 'arrival-time';
 import { formatDistanceToNowStrict, isValid as isValidDate } from 'date-fns';
 import { Octokit } from 'octokit';
 
-/**
- * Semi-open range [start=0, end)
- */
-export function range(startOrEnd: number, end: number | undefined = undefined) {
-	if (end === undefined) {
-		return Array.from({ length: startOrEnd }, (_, i) => i);
-	}
-	return Array.from({ length: end - startOrEnd }, (_, i) => i + startOrEnd);
-}
-
 // ANSI control sequences
 class CC {
 	static clearline = '\x1b[2K';
@@ -25,10 +15,6 @@ class CC {
 	static yellow = '\x1b[33m';
 	static cyan = '\x1b[36m';
 	static green = '\x1b[32m';
-}
-
-export function yellow(text: string): string {
-	return `${CC.yellow}${text}${CC.reset}`;
 }
 
 export function cyan(text: string): string {
@@ -62,12 +48,6 @@ export function align<T extends string | number>(num: T, total: T | T[]): string
 	} else {
 		return num.toString().padEnd(maxlen);
 	}
-}
-
-export function chunkBySize<T>(by: number, items: T[]): T[][] {
-	return new Array(Math.ceil(items.length / by))
-		.fill([])
-		.map((_, i) => items.slice(i * by, (i + 1) * by));
 }
 
 let gh: undefined | Octokit;

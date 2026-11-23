@@ -13,7 +13,7 @@ import {
 	MultipleResponses,
 	pathToAsset,
 	ResponseWithFiles,
-} from './datasource';
+} from './datasource.js';
 import { logger } from './progress.js';
 
 const BASE_DIR = 'caches';

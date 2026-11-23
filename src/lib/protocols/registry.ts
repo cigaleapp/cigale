@@ -4,7 +4,7 @@ import _rawRegistry from '#lib/../../protocols/registry.json' with { type: 'json
 import { ProtocolRegistry } from '#lib/schemas/protocols.js';
 import { compareBy } from '#lib/utils.ts';
 
-import { manifestVersionsCompatible } from './manifestversion';
+import { manifestVersionsCompatible } from './manifestversion.js';
 
 let PROTOCOLS_REGISTRY: typeof ProtocolRegistry.infer | null = null;
 

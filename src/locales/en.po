@@ -14,7 +14,6 @@ msgstr ""
 msgid "<0/> Chargement…"
 msgstr "<0/> Loading…"
 
-#: src/routes/(app)/protocols/+page.svelte
 #: src/routes/(app)/sessions/Header.svelte
 msgid "<0/> Créer"
 msgstr "<0/> Create"
@@ -158,9 +157,8 @@ msgstr "Loading classification model"
 msgid "Chargement du modèle de recadrage…"
 msgstr "Loading cropping model…"
 
-#: src/routes/(app)/+layout.ts
-msgid "Chargement du protocole intégré"
-msgstr "Loading built-in protocol"
+#~ msgid "Chargement du protocole intégré"
+#~ msgstr "Loading built-in protocol"
 
 #: src/lib/Card.svelte
 #: src/lib/CardMedia.svelte
@@ -910,39 +908,29 @@ msgstr "Redo"
 msgid "Initialisation de la base de données…"
 msgstr "Initializing database…"
 
-#: src/routes/(app)/+layout.ts
-msgid "Chargement des données intégrées…"
-msgstr "Loading built-in data…"
+#~ msgid "Chargement des données intégrées…"
+#~ msgstr "Loading built-in data…"
 
-#: src/routes/(app)/+layout.ts
-msgid "Analyse"
-msgstr "Analysis"
+#~ msgid "Analyse"
+#~ msgstr "Analysis"
 
-#: src/routes/(app)/+layout.ts
-msgid "Filtrage des métadonnées intégrées"
-msgstr "Filtering built-in metadata"
+#~ msgid "Filtrage des métadonnées intégrées"
+#~ msgstr "Filtering built-in metadata"
 
-#: src/routes/(app)/+layout.ts
-msgid "Validation"
-msgstr "Validation"
+#~ msgid "Validation"
+#~ msgstr "Validation"
 
-#: src/routes/(app)/+layout.ts
-msgid "Écriture du protocole"
-msgstr "Writing protocol"
+#~ msgid "Écriture du protocole"
+#~ msgstr "Writing protocol"
 
-#. 0: detail
-#: src/routes/(app)/+layout.ts
-msgid "Écriture de la métadonnée<br>{0}"
-msgstr "Writing metadata<br>{0}"
+#~ msgid "Écriture de la métadonnée<br>{0}"
+#~ msgstr "Writing metadata<br>{0}"
 
-#. 0: detail
-#: src/routes/(app)/+layout.ts
-msgid "Écriture des options de la métadonnée<br>{0}"
-msgstr "Writing metadata's options<br>{0}"
+#~ msgid "Écriture des options de la métadonnée<br>{0}"
+#~ msgstr "Writing metadata's options<br>{0}"
 
-#: src/routes/(app)/+layout.ts
-msgid "Post-validation"
-msgstr "Post-validation"
+#~ msgid "Post-validation"
+#~ msgstr "Post-validation"
 
 #: src/lib/results.svelte.js
 msgid "Importation dans une nouvelle session"
@@ -1124,9 +1112,8 @@ msgstr "Auto-update"
 msgid "Via {0}"
 msgstr "Via {0}"
 
-#: src/routes/(app)/protocols/RowProtocol.svelte
-msgid "<0/> Modifier <1>Beta</1>"
-msgstr "<0/> Edit <1>Beta</1>"
+#~ msgid "<0/> Modifier <1>Beta</1>"
+#~ msgstr "<0/> Edit <1>Beta</1>"
 
 #: src/lib/AreaObservations.svelte
 msgid "Impossible de regrouper avec les paramètres choisis"
@@ -1281,15 +1268,11 @@ msgstr "No selection"
 msgid "Utiliser une autre unité"
 msgstr "Use another unit"
 
-#. 0: filename
-#: src/routes/(app)/+layout.ts
-msgid "Chargement du protocole {0}"
-msgstr "Loading protocol {0}"
+#~ msgid "Chargement du protocole {0}"
+#~ msgstr "Loading protocol {0}"
 
-#. 0: filename
-#: src/routes/(app)/+layout.ts
-msgid "Impossible de charger le protocole {0}. Vérifiez votre connexion Internet ou essayez de recharger la page."
-msgstr "Could not load protocol {0}. Check your interner connection or try reloading the page."
+#~ msgid "Impossible de charger le protocole {0}. Vérifiez votre connexion Internet ou essayez de recharger la page."
+#~ msgstr "Could not load protocol {0}. Check your interner connection or try reloading the page."
 
 #: src/routes/(app)/results/+page.svelte
 msgid "Vérifier les métadonnées"
@@ -1432,7 +1415,6 @@ msgstr ""
 #: src/routes/(app)/+layout.ts
 #: src/routes/(app)/+layout.ts
 #: src/routes/(app)/+layout.ts
-#: src/routes/(app)/+layout.ts
 msgid "Startup"
 msgstr ""
 
@@ -1464,9 +1446,8 @@ msgstr "App"
 msgid "Initialize database"
 msgstr ""
 
-#: src/routes/(app)/+layout.ts
-msgid "Load built-in protocols"
-msgstr ""
+#~ msgid "Load built-in protocols"
+#~ msgstr ""
 
 #. 0: updates[0].name; 1: updates[0].version
 #: src/routes/(app)/+layout.ts
@@ -4293,4 +4274,38 @@ msgstr ""
 
 #: src/routes/(app)/results/ExportLocalSettings.svelte
 msgid "Aucune"
+msgstr ""
+
+#: src/lib/toasts.svelte.js
+msgid "Avertissement inattendu"
+msgstr ""
+
+#: src/lib/ButtonUpdateProtocol.svelte
+msgid "Mettre à jour l'app avant de mettre à jour le protocole"
+msgstr ""
+
+#: src/routes/(app)/+layout.svelte
+msgid "Example error toast"
+msgstr ""
+
+#. 0: tables.Protocol.getFromState(id)?.name ?? id
+#: src/routes/(app)/protocols/ModalDeleteProtocol.svelte
+msgid "La suppression du protocole {0}"
+msgstr ""
+
+#. 0: name
+#: src/routes/(app)/protocols/RowProtocol.svelte
+msgid "Impossible d'installer {0}"
+msgstr ""
+
+#: src/routes/(app)/protocols/RowProtocol.svelte
+msgid "Installer"
+msgstr ""
+
+#: src/routes/(app)/protocols/RowProtocol.svelte
+msgid "Mettre à jour l'app pour installer ce protocole"
+msgstr ""
+
+#: src/routes/(app)/protocols/RowProtocol.svelte
+msgid "Non installable"
 msgstr ""

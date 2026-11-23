@@ -1,10 +1,10 @@
 import { addMonths } from 'date-fns';
 import { XMLParser } from 'fast-xml-parser';
 
-import { Datasource, DatasourceName, MultipleResponses } from '../lib/datasource';
-import { parseTaxonLabel } from './idmybee';
-import { CladedName, matchCladedName } from '../lib/modules';
-import { ensureArray } from '../lib/utils';
+import { Datasource, DatasourceName, MultipleResponses } from '../lib/datasource.js';
+import { parseTaxonLabel } from './idmybee.js';
+import { CladedName, matchCladedName } from '../lib/modules.js';
+import { ensureArray } from '../lib/utils.js';
 
 export class Xper3 extends Datasource<
 	| 'characters'

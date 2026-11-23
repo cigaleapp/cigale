@@ -1,14 +1,14 @@
-import { run } from './lib/generator';
-import { Bees } from './modules/bees';
-import { BirdNetClassmapping } from './modules/birdnet';
-import { Birds } from './modules/birds';
-import { CoLXR, GBIFTaxonInfo, GBIFTaxonomy } from './modules/gbif';
-import { GoogleDriveSlides, GoogleSlides } from './modules/gslides';
-import { IDMyBeeDescriptions, IDMyBeeDescriptors, IDMyBeeSpecies } from './modules/idmybee';
-import { Collembola, Insects } from './modules/insects';
-import { IRITModels } from './modules/irit';
-import { IUCN } from './modules/iucn';
-import { JessicaJoachim } from './modules/jj';
+import { run } from './lib/generator.js';
+import { Bees } from './modules/bees.js';
+import { BirdNetClassmapping } from './modules/birdnet.js';
+import { Birds } from './modules/birds.js';
+import { CoLXR, GBIFTaxonInfo, GBIFTaxonomy } from './modules/gbif.js';
+import { GoogleDriveSlides, GoogleSlides } from './modules/gslides.js';
+import { IDMyBeeDescriptions, IDMyBeeDescriptors, IDMyBeeSpecies } from './modules/idmybee.js';
+import { Collembola, Insects } from './modules/insects.js';
+import { IRITModels } from './modules/irit.js';
+import { IUCN } from './modules/iucn.js';
+import { JessicaJoachim } from './modules/jj.js';
 
 if (import.meta.main) {
 	await generate();
