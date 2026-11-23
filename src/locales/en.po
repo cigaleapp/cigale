@@ -4294,3 +4294,11 @@ msgstr ""
 #: src/routes/(app)/results/ExportLocalSettings.svelte
 msgid "Aucune"
 msgstr ""
+
+#: src/lib/toasts.svelte.js
+msgid "Avertissement inattendu"
+msgstr ""
+
+#: src/routes/(app)/+layout.svelte
+msgid "Example error toast"
+msgstr ""
