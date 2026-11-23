@@ -9,7 +9,6 @@ RUN bun install --production
 # Copy the server code. The example protocol JSONs are imported at runtime via
 # `../examples/...` (relative to /app), so they must live at /examples/.
 COPY protocols-server/ ./
-COPY examples/arthropods.cigaleprotocol.json examples/arthropods.light.cigaleprotocol.json examples/old-arthropods.cigaleprotocol.json /examples/
 
 # protocol-types.ts is gitignored — generate it from the protocol schema.
 COPY static/protocol.schema.json ./static/

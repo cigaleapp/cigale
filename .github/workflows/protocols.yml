@@ -76,6 +76,17 @@ jobs:
             type=sha,prefix=sha-
             type=raw,value=latest,enable={{is_default_branch}}
 
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version-file: .bun-version
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      # needed for the docker image
+      - name: Generate JSON schemas
+        run: bun run scripts/generate-json-schemas.ts
+
       - name: Build and push image
         if: steps.changes.outputs.protocols == 'true' || github.event_name == 'workflow_dispatch'
         uses: docker/build-push-action@v6
