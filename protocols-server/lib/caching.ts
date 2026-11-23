@@ -1,6 +1,6 @@
 /// <reference types="@types/bun" />
 
-import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, renameSync, unlinkSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
 import { differenceInSeconds, isPast } from 'date-fns';
@@ -171,6 +171,46 @@ export function writeAllCaches() {
 		const filepath = filepathToCache(datasource);
 		logger.info(`writing cache to ${path.relative(import.meta.dirname, filepath)}`);
 		writeFileSync(filepath, JSON.stringify(cache, null, 2));
+	}
+	writeCacheStatsFile();
+}
+
+/** Per-query entry counts for a cache */
+export function cacheStats(cache: DatasourceCache): {
+	datasource: string;
+	expiresAt: string;
+	queries: Record<string, number>;
+	totalEntries: number;
+} {
+	const queries: Record<string, number> = {};
+	let totalEntries = 0;
+	for (const [query, entries] of Object.entries(cache.entries)) {
+		queries[query] = entries.length;
+		totalEntries += entries.length;
+	}
+	return {
+		datasource: cache.datasource,
+		expiresAt: cache.expiresAt.toISOString(),
+		totalEntries,
+		queries,
+	};
+}
+
+/**
+ * Cache stats file: written to CACHE_STATS_FILE (default: cache-stats.json in
+ * the CWD) whenever a cache is written, so the server can expose it via
+ * GET /api/caches without parsing the (potentially huge) cache files.
+ */
+const CACHE_STATS_FILE = process.env.CACHE_STATS_FILE ?? 'cache-stats.json';
+
+function writeCacheStatsFile() {
+	try {
+		const stats = [...inmemory.values()].map(cacheStats);
+		const tmp = `${CACHE_STATS_FILE}.tmp`;
+		writeFileSync(tmp, JSON.stringify({ updatedAt: new Date().toISOString(), datasources: stats }, null, 2));
+		renameSync(tmp, CACHE_STATS_FILE);
+	} catch (err) {
+		logger.error(`Failed to write cache stats file ${CACHE_STATS_FILE}:`, err);
 	}
 }
 
@@ -452,5 +492,6 @@ async function writeCacheThrottled({
 		logger.info(`writing cache to ${path.relative(import.meta.dirname, filepath)}`);
 		writeFileSync(filepath, JSON.stringify(cache, null, 2));
 		lastWrites.set(datasource, new Date());
+		writeCacheStatsFile();
 	}
 }

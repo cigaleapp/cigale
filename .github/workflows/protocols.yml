@@ -8,12 +8,14 @@ on:
   pull_request:
     paths:
       - protocols-server/**
+      - protocols/**
       - examples/*.cigaleprotocol.json
       - .github/workflows/protocols.yml
   push:
     branches: [main]
     paths:
       - protocols-server/**
+      - protocols/**
       - examples/*.cigaleprotocol.json
       - .github/workflows/protocols.yml
 
@@ -51,6 +53,7 @@ jobs:
           filters: |
             protocols:
               - 'protocols-server/**'
+              - 'protocols/**'
               - 'examples/*.cigaleprotocol.json'
               - '.github/workflows/protocols.yml'
 

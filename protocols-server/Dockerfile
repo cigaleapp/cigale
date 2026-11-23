@@ -14,8 +14,19 @@ COPY protocols-server/ ./
 COPY static/protocol.schema.json ./static/
 RUN bun run generate:types
 
+# Protocol manifests (YAML only; the .json ones are generated at runtime by the
+# metadatabuilders and written next to the YAMLs). Served at the root level by
+# the server, so they must live at /protocols/ and be writable by the bun user.
+COPY protocols/ /protocols/
+RUN chown -R bun:bun /protocols
+
 # Generated options/assets/caches live on the mounted PVC
 ENV DATA_DIR=/data
+# Write a progress snapshot file (progress.json) during regeneration,
+# exposed via GET /api/regenerate
+ENV PROGRESS_FILE=true
+# Mutating API routes (POST /api/regenerate, DELETE /api/caches/...) require
+# the API_PASSWORD env var, set at deploy time (e.g. via hfctl).
 RUN mkdir -p /data && chown -R bun:bun /data
 
 EXPOSE 3000

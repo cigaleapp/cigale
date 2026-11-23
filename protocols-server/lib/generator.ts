@@ -17,7 +17,7 @@ import exitHook from 'exit-hook';
 
 import { writeAllCaches } from './caching.js';
 import { writeMetadataToProtocol } from './modules.js';
-import { logger, progress } from './progress.js';
+import { logger, progress, startProgressFile, stopProgressFile } from './progress.js';
 import { Metadata } from './types.js';
 
 export async function run(plan: {
@@ -47,8 +47,11 @@ export async function run(plan: {
 }) {
 	const removeExitHook = exitHook(() => {
 		writeAllCaches();
+		stopProgressFile();
 		progress.stop();
 	});
+
+	startProgressFile();
 
 	/** clade:name */
 	const names = new Map<`${string}:${string}`, Option>();
@@ -401,6 +404,7 @@ export async function run(plan: {
 
 	removeExitHook();
 	writeAllCaches();
+	stopProgressFile();
 	progress.stop();
 }
 

@@ -1,4 +1,5 @@
-import { startServer } from './lib/server.js';
+import { existsSync, writeFileSync } from 'node:fs';
+import { startServer } from './server/server.js';
 import { run } from './lib/generator.js';
 import { Arthropods, Springtails } from './specializations/arthropods.js';
 import { Bees } from './specializations/bees.js';
@@ -17,6 +18,14 @@ import { IUCN } from './modules/iucn.js';
 import { JessicaJoachim } from './modules/jj.js';
 
 if (import.meta.main) {
+	// Materialize the Google service account key from the environment when
+	// present (gdrive.ts reads it from the CWD). Never overwrites an existing
+	// file, so a mounted key takes precedence.
+	const googleDriveKey = process.env.GOOGLE_DRIVE_KEY;
+	if (googleDriveKey && !existsSync('google-drive-key.json')) {
+		writeFileSync('google-drive-key.json', googleDriveKey);
+	}
+
 	const args = process.argv.slice(2);
 	if (args.includes('--serve')) {
 		// Server mode: start the HTTP server, with an initial regeneration
