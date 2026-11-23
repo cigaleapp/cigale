@@ -9,6 +9,17 @@ All notable changes to this project will be documented in this file, on a monthl
 - Time-out file uploads after 1min for ecosignal
 - Use server name instead of domain in account lists when possible
 
+### Bug Fixes
+
+- Fix i18n transform pipeline and plural crash after SvelteKit v3 bump
+- Fix log for setup-dev-env script
+- Fix modals
+- Fix remaining E2E test failures after SvelteKit v3 bump
+- Fix safeJSONParse import in E2E tests
+- Fix use of $app/navigation:pushState
+- Fix wuchale runtime not injected for files with only nested strings
+- Reuse the swarpc client across layout loads to fix stuck detection
+
 ## October 2026
 
 ### Improvements
