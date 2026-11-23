@@ -1,5 +1,7 @@
 import { existsSync, writeFileSync } from 'node:fs';
+import path from 'node:path';
 import { startServer } from './server/server.js';
+import { DATA_DIR } from './server/config.js';
 import { run } from './lib/generator.js';
 import { Arthropods, Springtails } from './specializations/arthropods.js';
 import { Bees } from './specializations/bees.js';
@@ -19,11 +21,13 @@ import { JessicaJoachim } from './modules/jj.js';
 
 if (import.meta.main) {
 	// Materialize the Google service account key from the environment when
-	// present (gdrive.ts reads it from the CWD). Never overwrites an existing
-	// file, so a mounted key takes precedence.
+	// present (gdrive.ts reads it from the CWD, which is DATA_DIR for the
+	// regeneration process). Never overwrites an existing file, so a mounted
+	// key takes precedence.
 	const googleDriveKey = process.env.GOOGLE_DRIVE_KEY;
-	if (googleDriveKey && !existsSync('google-drive-key.json')) {
-		writeFileSync('google-drive-key.json', googleDriveKey);
+	const keyPath = path.join(DATA_DIR, 'google-drive-key.json');
+	if (googleDriveKey && !existsSync(keyPath)) {
+		writeFileSync(keyPath, googleDriveKey);
 	}
 
 	const args = process.argv.slice(2);
