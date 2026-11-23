@@ -85,7 +85,7 @@ jobs:
 
       # needed for the docker image
       - name: Generate JSON schemas
-        run: bun run scripts/generate-json-schemas.ts
+        run: bun run scripts/generate-json-schemas.js
 
       - name: Build and push image
         if: steps.changes.outputs.protocols == 'true' || github.event_name == 'workflow_dispatch'
