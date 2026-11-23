@@ -18,9 +18,9 @@ import {
 	openTransaction,
 	tables,
 } from '#lib/idb.svelte.js';
-import { autoUpdateProtocols } from '#lib/protocols';
-import { getSetting } from '#lib/settings.svelte';
-import { toasts } from '#lib/toasts.svelte';
+import { autoUpdateProtocols } from '#lib/protocols.js';
+import { getSetting } from '#lib/settings.svelte.js';
+import { toasts } from '#lib/toasts.svelte.js';
 import { profiler, progressSplitter, switchValue } from '#lib/utils.js';
 import { PROCEDURES } from '#worker/procedures.js';
 import WebWorker from '#worker/start.js?worker';
@@ -118,7 +118,7 @@ export async function load({ url }) {
 				databaseRevision: databaseRevision.toString(),
 				playwright_mock_opfs:
 					localStorage.getItem('playwright_mock_opfs') ?? ('false' as const),
-			} satisfies (typeof import('#worker//procedures').LOCAL_STORAGE)['inferIn'],
+			} satisfies (typeof import('#worker/procedures').LOCAL_STORAGE)['inferIn'],
 			hooks: {
 				success({ procedure, data, duration }) {
 					performance.measure(procedure, {

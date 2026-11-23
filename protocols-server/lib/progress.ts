@@ -1,3 +1,7 @@
+/// <reference types="@types/bun" />
+
+import { minutesToMilliseconds } from 'date-fns';
+
 class Progress {
 	total = 0;
 	done = 0;
@@ -6,6 +10,8 @@ class Progress {
 	maxPhaseLength = 10;
 
 	lastWrite: number | undefined;
+	lastDrawnStep = -1;
+	lastDrawnAt: number | undefined;
 
 	ongoing: string[] = [];
 
@@ -15,13 +21,14 @@ class Progress {
 		this.clear();
 		// eslint-disable-next-line no-console
 		console.log(...parts);
-		this.draw();
+		if (colorsSupported) this.draw();
 	}
 
 	phase(phase: string, total: number) {
 		this.phaseName = phase;
 		this.total = total;
 		this.done = 0;
+		this.lastDrawnStep = -1;
 	}
 
 	increment(by = 1) {
@@ -49,59 +56,105 @@ class Progress {
 	redraw() {
 		if (!this.redrawDue()) return;
 		this.draw();
-		this.lastWrite = performance.now();
+
+		this.lastDrawnStep = this.progress(this.refreshCount);
+		this.lastDrawnAt = performance.now();
+	}
+
+	/** Additional refreshes distributed evenly along the progress */
+	get refreshCount() {
+		return colorsSupported ? 1 : 10;
+	}
+
+	get refreshEveryMs() {
+		return colorsSupported ? 50 : minutesToMilliseconds(10);
 	}
 
 	redrawDue() {
+		if (this.progress(this.refreshCount) !== this.lastDrawnStep) return true;
+
 		if (!this.lastWrite) return true;
+
 		const elapsed = performance.now() - this.lastWrite;
-		return elapsed > 50;
+
+		return elapsed > this.refreshEveryMs;
+	}
+
+	progress(max: number) {
+		return this.total ? Math.floor((this.done / this.total) * max) : 0;
+	}
+
+	/**
+	 * Get a progress percentage, rounded
+	 */
+	get percentage() {
+		return this.progress(100);
 	}
 
 	draw() {
 		this.clear();
 		const width = 30;
 
-		const scaled = (max: number) =>
-			this.total ? Math.floor((this.done / this.total) * max) : 0;
-
 		const phase = this.phaseName.slice(0, this.maxPhaseLength).padEnd(this.maxPhaseLength);
 
-		const filled = scaled(width);
+		const filled = this.progress(width);
 		const empty = Math.max(0, width - filled);
 		const bar = '='.repeat(filled) + ' '.repeat(empty);
 
-		const percentage = `${scaled(100).toString().padStart(3)}%`;
+		const percentage = `${this.percentage.toString().padStart(3)}%`;
 
 		const counter = `${this.done}/${this.total}`;
 
 		const tasks = this.ongoing.join(', ');
 
-		const osc94 = `\x1b]9;4;1;${scaled(100)}\x1b\x5c`;
+		const osc94 = colorsSupported ? `\x1b]9;4;1;${this.percentage}\x1b\x5c` : '';
+
+		// non-TTY: each update is its own line (no in-place redraw)
+		const eol = colorsSupported ? '' : '\n';
+
+		// non-TTY: prefix with a short timestamp so log lines are time-ordered
+		const timestamp = colorsSupported ? '' : `${new Date().toTimeString().slice(0, 8)} `;
 
 		process.stdout.write(
-			`${phase} ${percentage} ${bar} ${counter}` + (tasks ? `: ${tasks}` : '') + osc94
+			`${timestamp}${phase} ${percentage} ${bar} ${counter}` +
+				(tasks ? `: ${tasks}` : '') +
+				osc94 +
+				eol
 		);
 	}
 
 	clear() {
-		process.stdout.write('\x1b[1K\r');
+		if (colorsSupported) process.stdout.write('\x1b[1K\r');
 	}
 
 	stop() {
-		process.stdout.write(`\x1b]9;4;0\x1b\x5c`);
+		if (colorsSupported) process.stdout.write(`\x1b]9;4;0\x1b\x5c`);
 		this.clear();
 	}
 }
 
 export const progress = new Progress();
 
-const colors = {
-	yellow: '\x1b[33m',
-	red: '\x1b[31m',
-	dim: '\x1b[2m',
-	reset: '\x1b[0m',
-};
+/**
+ * Colors (and terminal escape sequences) are only used when the output is a
+ * TTY and the user hasn't opted out via NO_COLOR. On CI, PaaS logs, etc. the
+ * output stays plain and readable.
+ */
+const colorsSupported = process.stdout.isTTY === true && !('NO_COLOR' in process.env);
+
+const colors = colorsSupported
+	? {
+			yellow: '\x1b[33m',
+			red: '\x1b[31m',
+			dim: '\x1b[2m',
+			reset: '\x1b[0m',
+		}
+	: {
+			yellow: '',
+			red: '',
+			dim: '',
+			reset: '',
+		};
 
 function colorize(parts: unknown[], color: string): unknown[] {
 	return parts.map((p) => (typeof p === 'string' ? `${color}${p}${colors.reset}` : p));

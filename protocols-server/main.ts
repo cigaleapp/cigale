@@ -1,5 +1,6 @@
 import { run } from './lib/generator';
 import { Bees } from './modules/bees';
+import { BirdNetClassmapping } from './modules/birdnet';
 import { Birds } from './modules/birds';
 import { CoLXR, GBIFTaxonInfo, GBIFTaxonomy } from './modules/gbif';
 import { GoogleDriveSlides, GoogleSlides } from './modules/gslides';
@@ -22,7 +23,7 @@ export async function generate() {
 				new GoogleDriveSlides(),
 				// new IRITModels('full'),
 				// new BirdNetClassmapping(),
-				new IRITModels('light'),
+				// new IRITModels('light'),
 				new IDMyBeeSpecies(),
 			],
 			identifier: new CoLXR(),

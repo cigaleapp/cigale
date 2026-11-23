@@ -20,10 +20,6 @@ import { entries, mapKeys, parseYAMLorJSON } from '#lib/utils.ts';
 
 type ProgressCallback = (protocol: string, phase: string, done: number, total: number) => void;
 
-type MetadataGroupInDatabase = typeof MetadataGroup.inferIn;
-
-type MetadataInManifest = Omit<typeof Metadata.inferIn, 'id'>;
-
 class DependsOnOtherProtocolError extends Error {
 	constructor(public protocolIds: string[]) {
 		super();
@@ -53,6 +49,10 @@ export async function importProtocol(
 	}
 }
 
+type MetadataGroupInDatabase = typeof MetadataGroup.inferIn;
+
+type MetadataInManifest = (typeof ExportedProtocol.inferIn)['metadata'][string];
+
 export async function importSingleProtocol(
 	db: DatabaseHandle,
 	url: string | URL,
@@ -63,9 +63,6 @@ export async function importSingleProtocol(
 	const progress = new Progress(url.toString());
 	progress.bind(options.onProgress);
 
-	// progress.phase('lookup', 1);
-	// const url = await lookupMostRecentCompatibleProtocol(id);
-
 	progress.phase('get-manifest', 1);
 	const manifest = await fetchManifest(url);
 	progress.increment();
@@ -75,7 +72,7 @@ export async function importSingleProtocol(
 
 	const namespaced = (bare: string) => ensureNamespacedMetadataId(bare, manifest.id);
 
-	const metadatas = buildMetadatas(manifest);
+	const metadatas = metadatasOfManifest(manifest);
 
 	progress.phase('metadata-options', 0);
 	await countEnumOptions(metadatas, progress);
@@ -83,7 +80,7 @@ export async function importSingleProtocol(
 	for (const [id, metadata] of metadatas) {
 		if (metadata.type !== 'enum') continue;
 
-		await storeEnumOptions(db, id, metadata, progress);
+		await installEnumOptions(db, id, metadata, progress);
 	}
 
 	progress.phase('metadata', metadatas.size);
@@ -140,7 +137,7 @@ async function checkImports(db: DatabaseHandle, manifest: ExportedProtocol, prog
 	}
 }
 
-function buildMetadatas(manifest: ExportedProtocol): Map<NamespacedMetadataID, MetadataInManifest> {
+function metadatasOfManifest(manifest: ExportedProtocol): Map<NamespacedMetadataID, MetadataInManifest> {
 	const namespaced = (bare: string) => ensureNamespacedMetadataId(bare, manifest.id);
 
 	return new Map(
@@ -172,13 +169,13 @@ async function countEnumOptions(metadatas: Map<string, MetadataInManifest>, prog
 	}
 }
 
-async function storeEnumOptions(
+async function installEnumOptions(
 	db: DatabaseHandle,
 	id: NamespacedMetadataID,
 	metadata: Extract<MetadataInManifest, { type: 'enum' }>,
 	progress: Progress
 ) {
-	// TODO: _narrowableIn, searcher
+	// TODO: _narrowableIn
 
 	const storeOption = async (option: typeof MetadataEnumVariant.inferIn) => {
 		const optionId = metadataOptionId(id, option.key);
