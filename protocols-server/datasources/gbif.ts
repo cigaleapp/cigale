@@ -101,7 +101,7 @@ export class GBIF extends Datasource<'search' | 'taxon', GbifParams, GbifRespons
 			const data = Response.assert(await response.json());
 			if (!data.results.length) {
 				logger.error(
-					`${params.clade} "${params.name}" not found in GBIF backbone taxonomy`
+					`${params.clade} "${params.name}" not found in ${params.dataset} dataset`
 				);
 
 				return { firstResult: null };
