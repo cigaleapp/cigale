@@ -1,15 +1,15 @@
 # yaml-language-server: $schema=../../static/protocol.schema.json
 
 manifest: v1.0
-id: io.github.cigaleapp.base.insects
-name: Insectes (base)
+id: io.github.cigaleapp.base.springtails
+name: Collemboles (base)
 
 version: 1
 updates: automatic
 
-source: http://localhost:3000/bases/insects.cigaleprotocol.yaml
+source: http://localhost:3000/bases/collembola.cigaleprotocol.yaml
 
-description: Protocole de base pour les insectes
+description: Protocole de base pour les collemboles
 
 authors:
   - name: GBIF Contributors
@@ -57,7 +57,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: http://localhost:3000/process/options/insects/species.jsonl
+      at: http://localhost:3000/process/options/collembola/species.jsonl
       format: json-lines
     infer:
       neural: []
@@ -79,7 +79,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: http://localhost:3000/process/options/insects/kingdom.jsonl
+      at: http://localhost:3000/process/options/collembola/kingdom.jsonl
       format: json-lines
 
   phylum:
@@ -91,7 +91,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: http://localhost:3000/process/options/insects/phylum.jsonl
+      at: http://localhost:3000/process/options/collembola/phylum.jsonl
       format: json-lines
 
   class:
@@ -103,7 +103,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: http://localhost:3000/process/options/insects/class.jsonl
+      at: http://localhost:3000/process/options/collembola/class.jsonl
       format: json-lines
 
   order:
@@ -115,7 +115,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: http://localhost:3000/process/options/insects/order.jsonl
+      at: http://localhost:3000/process/options/collembola/order.jsonl
       format: json-lines
 
   family:
@@ -127,7 +127,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: http://localhost:3000/process/options/insects/family.jsonl
+      at: http://localhost:3000/process/options/collembola/family.jsonl
       format: json-lines
 
   genus:
@@ -139,7 +139,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: http://localhost:3000/process/options/insects/genus.jsonl
+      at: http://localhost:3000/process/options/collembola/genus.jsonl
       format: json-lines
 
   identification_difficulty:
@@ -226,4 +226,3 @@ metadata:
     infer:
       latitude: { exif: GPSLatitude }
       longitude: { exif: GPSLongitude }
-

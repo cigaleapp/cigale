@@ -4,6 +4,7 @@ import { entries } from '../utils.js';
 import { HTTPRequest, ID } from './common.js';
 import { HardwareRequirements } from './constraints.js';
 import { JsonataExpression } from './expressions.js';
+import { NetworkStreamedLines } from './network.js';
 
 export const MODEL_DETECTION_OUTPUT_SHAPES = {
 	cx: { help: 'Centre, X' },
@@ -94,15 +95,11 @@ export const NeuralBoundingBoxInference = ModelSettingsCommon.and({
 
 export const NeuralEnumInference = ModelSettingsCommon.and({
 	'output?': ModelOutputEnum,
-	classmapping: HTTPRequest.describe(
-		"Fichier texte contenant une clé d'option de la métadonnée par ligne, dans le même ordre que les neurones de sortie du modèle."
-	).or(
-		type(
-			'string[]',
-			'@',
-			"Liste de clés d'options de la métadonnée, dans le même ordre que les neurones de sortie du modèle"
-		)
-	),
+	classmapping: NetworkStreamedLines(type('string')),
+	classes: type
+		.enumerated('labels', 'keys', 'extraKeys')
+		.describe('À quoi le classmapping fait référence par rapport aux options de la métadonnée')
+		.default('keys'),
 });
 
 /**

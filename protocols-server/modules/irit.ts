@@ -1,36 +1,88 @@
-import { NameProvider } from '../lib/modules.js';
-import { ExportedProtocol } from '../lib/types.js';
+import { addMonths } from 'date-fns';
 
-/** Species names from the classmappings of IRIT models */
-export class IRITModels implements NameProvider {
-	name = 'irit' as const;
+import { Option } from '../lib/modules.js';
+import { ClassmappingNameProvider, NeuralNetworkDatasource } from './neural.js';
 
-	constructor(public corpus: 'full' | 'light') {}
+export class SmallCollemboles extends ClassmappingNameProvider<{ speciesName: string }> {
+	name = 'small-collemboles' as const;
+	model = new SmallCollembolesModel();
 
-	baseUrl =
-		'https://raw.githubusercontent.com/cigaleapp/cigale/4765709abf053f607ff8e5a040b29ff3aca7edbc';
+	option(line: { speciesName: string }) {
+		return { clade: 'species', name: line.speciesName };
+	}
+}
 
-	get protocol() {
-		switch (this.corpus) {
-			case 'full':
-				return `${this.baseUrl}/examples/arthropods.cigaleprotocol.json`;
-			case 'light':
-				return `${this.baseUrl}/examples/arthropods.light.cigaleprotocol.json`;
+export class FrenchArthro extends ClassmappingNameProvider<{
+	speciesName: string;
+	gbifKey: string;
+}> {
+	name = 'frencharthro' as const;
+	model = new FrenchArthroModel();
+
+	option(line: { speciesName: string; gbifKey: string }) {
+		return {
+			clade: 'species',
+			name: line.speciesName,
+			extras: [
+				{
+					priority: 1,
+					extra: {
+						extraKeys: [line.gbifKey],
+					},
+				},
+			],
+		} satisfies Omit<Option, 'provenance'>;
+	}
+}
+
+export class SmallCollembolesModel extends NeuralNetworkDatasource<{ speciesName: string }> {
+	name = 'small-collemboles' as const;
+
+	url = 'https://raw.githubusercontent.com/edgaremy/small-collomboles/main/class_mapping.txt';
+
+	expiration = (now: Date) => addMonths(now, 1);
+
+	parseClassmappingLine(line: string) {
+		return { speciesName: line };
+	}
+}
+
+export class FrenchArthroModel extends NeuralNetworkDatasource<{
+	gbifKey: string;
+	speciesName: string;
+}> {
+	csvKeys: undefined | string[];
+
+	name = 'frencharthro' as const;
+
+	url =
+		'https://huggingface.co/edgaremy/convnextv2_base.frencharthro-24k/resolve/main/class-names.csv';
+
+	expiration = (now: Date) => addMonths(now, 1);
+
+	parseClassmappingLine(line: string): { gbifKey: string; speciesName: string } | undefined {
+		const cells = line.split(',');
+		if (!this.csvKeys) {
+			this.csvKeys = cells;
+			return;
 		}
+
+		return {
+			speciesName: this.byColumn(cells, 'speciesName'),
+			gbifKey: this.byColumn(cells, 'speciesKey'),
+		};
 	}
 
-	async *scan() {
-		const protocol = (await fetch(this.protocol).then((res) => res.json())) as ExportedProtocol;
-		const options = protocol.metadata[`${protocol.id}__species`].options;
+	byColumn(row: string[], column: string) {
+		if (!this.csvKeys) throw new Error(`CSV file has no header`);
 
-		if (!options) {
+		const index = this.csvKeys.indexOf(column);
+		if (index === -1) {
 			throw new Error(
-				`${this.protocol} doesnt have options declared for its species metadata`
+				`CSV classmapping has no ${column} column. Check header: ${JSON.stringify(this.csvKeys)}`
 			);
 		}
 
-		for (const { label } of options) {
-			yield { clade: 'species', name: label };
-		}
+		return row[index];
 	}
 }

@@ -1,15 +1,15 @@
 # yaml-language-server: $schema=../../static/protocol.schema.json
 
 manifest: v1.0
-id: io.github.cigaleapp.base.collembola
-name: Collemboles (base)
+id: io.github.cigaleapp.base.arthropods
+name: Arthropodes (base)
 
 version: 1
 updates: automatic
 
-source: http://localhost:3000/bases/collembola.cigaleprotocol.yaml
+source: http://localhost:3000/bases/arthropods.cigaleprotocol.yaml
 
-description: Protocole de base pour les collemboles
+description: Protocole de base pour les arthropodes
 
 authors:
   - name: GBIF Contributors
@@ -57,18 +57,12 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: http://localhost:3000/process/options/collembola/species.jsonl
+      at: http://localhost:3000/process/options/insects/species.jsonl
       format: json-lines
     infer:
-      neural: []
-        # TODO
-        # - classmapping:
-        #   input:
-        #     height:
-        #     normalized:
-        #     width:
-        #   model:
-        #   webgpuReady: false
+      neural:
+        - name: FrenchArthro
+          model: https://huggingface.co/cigaleapp/built-in-protocols/resolve/main/classifier-arthropoda.onnx?download=true
 
   kingdom:
     type: enum
@@ -79,7 +73,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: http://localhost:3000/process/options/collembola/kingdom.jsonl
+      at: http://localhost:3000/process/options/insects/kingdom.jsonl
       format: json-lines
 
   phylum:
@@ -91,7 +85,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: http://localhost:3000/process/options/collembola/phylum.jsonl
+      at: http://localhost:3000/process/options/insects/phylum.jsonl
       format: json-lines
 
   class:
@@ -103,7 +97,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: http://localhost:3000/process/options/collembola/class.jsonl
+      at: http://localhost:3000/process/options/insects/class.jsonl
       format: json-lines
 
   order:
@@ -115,7 +109,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: http://localhost:3000/process/options/collembola/order.jsonl
+      at: http://localhost:3000/process/options/insects/order.jsonl
       format: json-lines
 
   family:
@@ -127,7 +121,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: http://localhost:3000/process/options/collembola/family.jsonl
+      at: http://localhost:3000/process/options/insects/family.jsonl
       format: json-lines
 
   genus:
@@ -139,7 +133,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: http://localhost:3000/process/options/collembola/genus.jsonl
+      at: http://localhost:3000/process/options/insects/genus.jsonl
       format: json-lines
 
   identification_difficulty:

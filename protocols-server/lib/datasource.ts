@@ -10,7 +10,21 @@ export function pathToAsset(datasource: string, query: string, filename: string)
 }
 
 export type DatasourceName =
-	'gbif' | 'jj' | 'gslides' | 'idmybee' | 'andrena-morphogroups' | 'iucn' | 'birdnet' | `debug-${string}`;
+	| 'gbif'
+	| 'jj'
+	| 'gslides'
+	| 'idmybee'
+	| 'andrena-morphogroups'
+	| 'iucn'
+	| 'birdnet'
+	| 'frencharthro' 
+	| 'small-collemboles'
+	| `debug-${string}`;
+
+export type DatasourceExpirations<Query extends string> = {
+	file: (now: Date) => Date;
+	entry: (now: Date, query: Query) => Date;
+};
 
 /**
  * Defines caching for a single external source, that could be used multiple times by different modules.
@@ -29,10 +43,7 @@ export abstract class Datasource<
 
 	abstract requests: DataRequests<Query, Params, Responses>;
 
-	abstract expirations: {
-		file: (now: Date) => Date;
-		entry: (now: Date, query: Query) => Date;
-	};
+	abstract expirations: DatasourceExpirations<Query>;
 
 	async one<Q extends SingleQueries<Query, Params, Responses>>(
 		query: Q,
@@ -128,7 +139,9 @@ export type DataRequests<
 		params: Params[Q]
 	) => Promise<
 		Params[Q] extends Array<any>
-			? Responses[Q] | ResponseWithFiles<Responses[Q]> | MultipleResponses<Responses[Q], Params[Q][number]>
+			? | Responses[Q]
+				| ResponseWithFiles<Responses[Q]>
+				| MultipleResponses<Responses[Q], Params[Q][number]>
 			: Responses[Q] | ResponseWithFiles<Responses[Q]>
 	>;
 };

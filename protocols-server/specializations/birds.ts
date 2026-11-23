@@ -1,4 +1,4 @@
-import { BirdNetClassmapping } from './birdnet.js';
+import { BirdNetClassmapping } from '../modules/birdnet.js';
 import { CladedName, matchCladedName, Option, Specializer } from '../lib/modules.js';
 
 export class Birds implements Specializer {

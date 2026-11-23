@@ -19,6 +19,7 @@ import {
 } from './common.js';
 import { NaturalRegexExpression, NumberRangeLiteral, RegexExpression } from './constraints.js';
 import { FilepathTemplate, JsonataExpression, TemplatedString } from './expressions.js';
+import { NetworkStreamedLines } from './network.js';
 import {
 	MODEL_DETECTION_OUTPUT_SHAPES,
 	NeuralBoundingBoxInference,
@@ -68,7 +69,7 @@ export const METADATA_TYPES = /** @type {const} */ ({
 		help: 'un fichier, représenté par une référence à un MetadataFile, qui est exporté séparément',
 	},
 	surface: {
-		help: 'surface',
+		label: 'surface',
 		help: 'Un ensemble de points GPS formant une surface',
 	},
 });
@@ -262,6 +263,12 @@ export const MetadataMergeMethod = type.or(
 export const MetadataEnumVariant = type({
 	key: [ID, '@', 'Identifiant unique pour cette option'],
 	label: ['string', '@', "Nom de l'option, affichable dans une interface utilisateur"],
+	extraKeys: type('string')
+		.array()
+		.describe(
+			'Autres identifiants pour cette option. Utile après un changement de clés (les sessions existantes avant le changement fonctionneront toujours si les ancienne clés sont renseignées ici), et sert aussi pour les classmapping (inférence avec réseau neuronal)'
+		)
+		.default(() => []),
 	'kobocollect?': [
 		'string | string[]',
 		'@',
@@ -663,7 +670,7 @@ const MetadataSurface = MetadataBase.and({
 	),
 });
 
-const MetadataEnum = MetadataBase.and({
+export const MetadataEnum = MetadataBase.and({
 	type: '"enum"',
 	'default?': MetadataDefault.enum,
 	'darwincore?': {
@@ -675,49 +682,7 @@ const MetadataEnum = MetadataBase.and({
 			"Les liens vers les images de l'option, séparés par ' | '"
 		),
 	},
-	'externalOptions?': type({
-		at: URLString.describe('Où télécharger les options'),
-		format: type.or(
-			[
-				'"csv"',
-				'@',
-				'Format CSV. La première ligne doit être le nom des clés. Chaque ligne est transformé en un objet pour être traité par .postprocess.',
-			],
-			[
-				'"txt"',
-				'@',
-				'Format texte simple. Il faut ensuite adapter en un objet option avec .postprocess.',
-			],
-			[
-				'"json-lines"',
-				'@',
-				`Un objet au format JSON par ligne du fichier. La première ligne doit être un header, avec au moins une propriété "count" qui indique le nombre d'options contenues dans le fichier (sans compter la ligne de header)`,
-			]
-		),
-		'postprocess?': JsonataExpression(
-			type({
-				lineIndex: [
-					'number.integer >= 0',
-					'@',
-					"Index de la ligne actuelle (commence à 0, en sachant que la première ligne n'est pas donnée à postprocess sauf pour txt (csv: c'est le header, json-lines: c'est l'objet header avec .count))",
-				],
-				totalCount: [
-					'undefined | number.integer > 0',
-					'@',
-					"Nombre total d'objets à traiter. Undefined pour txt.",
-				],
-				raw: ['string', '@', 'La ligne du fichier, verbatim'],
-				line: [
-					'unknown',
-					'@',
-					'La ligne du fichier, parsée en un objet. Undefined pour txt, Object avec les clés du header pour csv et JSON parsé pour json-lines',
-				],
-			}),
-			MetadataEnumVariant.or('undefined')
-		).describe(
-			"Appliquer un traitement à chaque option. Renvoyer undefined revient à ne pas rajouter l'option"
-		),
-	}).describe(
+	'externalOptions?': NetworkStreamedLines(MetadataEnumVariant.or('undefined')).describe(
 		"Utile quand il y a beaucoup d'options et que les lister explicitement dans le fichier manifeste directement serait impraticable. Si une option a la même clé (.key) dans .options et .externalOptions, c'est celle .options qui est utilisé (pratique pour définir des overrides spécifiques à ce protocole)"
 	),
 	'options?': MetadataEnumVariant.array()

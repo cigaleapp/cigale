@@ -1,4 +1,4 @@
-import { IDMyBeeSpecies } from './idmybee.js';
+import { IDMyBeeSpecies } from '../modules/idmybee.js';
 import { CladedName, matchCladedName, Option, Specializer } from '../lib/modules.js';
 
 export const PROTOCOL_ID = 'io.gihtub.cigaleapp.base.bees' as const;

@@ -25,7 +25,7 @@ description: |
   Prenez les meilleures photos possibles, et, si possible, n'hésitez pas à en prendre deux ou trois sous différents angles pour un même individu afin de faciliter son identification.
 
 imports:
-  - from: io.github.cigaleapp.base.insects
+  - from: io.github.cigaleapp.base.arthropods
     metadataGroups:
       - taxonomy
     metadata:

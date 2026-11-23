@@ -72,12 +72,16 @@ export async function tryCache<R, Q extends string, P extends DataRequestParams<
 	}
 ): Promise<R[]> {
 	const filepath = await ensureCacheFile({ datasource, fileExpiration: expirations.file });
-	const cache = await loadCacheFromDisk({ datasource, filepath });
+	let cache = await loadCacheFromDisk({ datasource, filepath });
 
 	try {
 		if (isPast(cache.expiresAt)) {
-			unlinkSync(filepath);
-			throw CacheMiss.entireBatch(selector.paramslist.length, 'cache too old');
+			await onCacheFileExpired({
+				datasource,
+				filepath,
+				expirations,
+				paramslist: selector.paramslist,
+			});
 		}
 
 		return await lookupCache<R, Q, P>({ cache, datasource, selector });
@@ -86,6 +90,10 @@ export async function tryCache<R, Q extends string, P extends DataRequestParams<
 			throw new Error(`Error while retrieving cached value`, {
 				cause: error,
 			});
+		}
+
+		if (error.cacheChanged) {
+			cache = inmemory.get(datasource)!;
 		}
 
 		logMisses({ datasource, selector, error });
@@ -127,6 +135,37 @@ export async function tryCache<R, Q extends string, P extends DataRequestParams<
 	}
 }
 
+export async function onCacheFileExpired<Q extends string>({
+	datasource,
+	filepath,
+	paramslist,
+	expirations,
+}: {
+	datasource: DatasourceName;
+	filepath: string;
+	paramslist: unknown[];
+	expirations: {
+		/** For the entire cache file */
+		file: (now: Date) => Date;
+		/** For a single entry */
+		entry: (now: Date, query: Q) => Date;
+	};
+}) {
+	unlinkSync(filepath);
+
+	inmemory.set(datasource, {
+		expiresAt: expirations.file(new Date()),
+		datasource,
+		entries: {},
+	});
+
+	const error = CacheMiss.entireBatch(paramslist.length, 'cache too old');
+
+	error.cacheChanged = true;
+
+	throw error;
+}
+
 export function writeAllCaches() {
 	for (const [datasource, cache] of inmemory) {
 		const filepath = filepathToCache(datasource);
@@ -163,6 +202,8 @@ class CacheMiss<D> extends Error {
 	) {
 		super();
 	}
+
+	cacheChanged = false;
 
 	static entireBatch(batchsize: number, why: string) {
 		return new CacheMiss(Array.from({ length: batchsize }).map((_, i) => ({ i, why })));

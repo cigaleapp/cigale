@@ -1,12 +1,17 @@
 import { run } from './lib/generator.js';
-import { Bees } from './modules/bees.js';
+import { Arthropods, Springtails } from './specializations/arthropods.js';
+import { Bees } from './specializations/bees.js';
 import { BirdNetClassmapping } from './modules/birdnet.js';
-import { Birds } from './modules/birds.js';
-import { CoLXR, GBIFTaxonInfo, GBIFTaxonomy } from './modules/gbif.js';
+import { Birds } from './specializations/birds.js';
+import { CoLXR, GBIFOldBackboneIDs, GBIFTaxonInfo, GBIFTaxonomy } from './modules/gbif.js';
 import { GoogleDriveSlides, GoogleSlides } from './modules/gslides.js';
-import { IDMyBeeDescriptions, IDMyBeeDescriptors, IDMyBeeSpecies } from './modules/idmybee.js';
-import { Collembola, Insects } from './modules/insects.js';
-import { IRITModels } from './modules/irit.js';
+import {
+	AndrenaMorphogroups,
+	IDMyBeeDescriptions,
+	IDMyBeeDescriptors,
+	IDMyBeeSpecies,
+} from './modules/idmybee.js';
+import { FrenchArthro, SmallCollemboles } from './modules/irit.js';
 import { IUCN } from './modules/iucn.js';
 import { JessicaJoachim } from './modules/jj.js';
 
@@ -21,9 +26,9 @@ export async function generate() {
 		modules: {
 			sources: [
 				new GoogleDriveSlides(),
-				// new IRITModels('full'),
-				// new BirdNetClassmapping(),
-				// new IRITModels('light'),
+				new FrenchArthro(),
+				new BirdNetClassmapping(),
+				new SmallCollemboles(),
 				new IDMyBeeSpecies(),
 			],
 			identifier: new CoLXR(),
@@ -35,8 +40,10 @@ export async function generate() {
 				new GoogleSlides(),
 				new GBIFTaxonInfo(),
 				new IDMyBeeDescriptions(),
+				new AndrenaMorphogroups(),
+				new GBIFOldBackboneIDs(),
 			],
-			specializations: [new Birds(), new Insects(), new Collembola(), new Bees()],
+			specializations: [new Birds(), new Arthropods(), new Springtails(), new Bees()],
 			metadatabuilders: [new IDMyBeeDescriptors()],
 		},
 	});

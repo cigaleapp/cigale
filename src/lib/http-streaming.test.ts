@@ -3,7 +3,13 @@ import type { Server } from 'node:http';
 
 import { afterAll, afterEach, beforeAll, describe, expect, test, vi } from 'vitest';
 
-import { streamJsonl } from './jsonl.js';
+import { httpStreamLines } from './http-streaming.js';
+
+async function* streamJsonl(url: string, options?: { signal?: AbortSignal; chunkSize?: number }) {
+	for await (const line of httpStreamLines(url, {}, options)) {
+		yield JSON.parse(line);
+	}
+}
 
 // A deterministic in-memory JSONL payload mimicking the real files: a
 // `{"count": N}` header, then N lines of ~2.4 KiB each with multi-byte
@@ -13,6 +19,7 @@ const SAMPLE_LINES: unknown[] = Array.from({ length: 100 }, (_, i) => ({
 	name: `Espèce n°${i} — éèàçü`,
 	description: `Description détaillée de l'espèce ${i}. `.repeat(60),
 }));
+
 const SAMPLE_FILE = new TextEncoder().encode(
 	[
 		JSON.stringify({ count: SAMPLE_LINES.length }),
@@ -98,7 +105,7 @@ function mockFetch(file: string) {
 	);
 }
 
-describe('streamJsonl', () => {
+describe('JSON lines', () => {
 	// The sample payload is ~240 KiB of ~2.4 KiB lines. 16 KiB chunks force
 	// ~15 successive range requests, with lines split across chunk boundaries.
 	const CHUNK_SIZE = 16 * 1024;

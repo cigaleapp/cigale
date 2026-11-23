@@ -23,5 +23,8 @@
 		"odt2html": "^1.0.1",
 		"pdf-to-png-converter": "^4.2.1",
 		"turndown": "^7.2.4"
+	},
+	"devDependencies": {
+		"@types/turndown": "^5.0.6"
 	}
 }

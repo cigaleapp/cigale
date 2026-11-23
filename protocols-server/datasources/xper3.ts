@@ -2,7 +2,7 @@ import { addMonths } from 'date-fns';
 import { XMLParser } from 'fast-xml-parser';
 
 import { Datasource, DatasourceName, MultipleResponses } from '../lib/datasource.js';
-import { parseTaxonLabel } from './idmybee.js';
+import { parseTaxonLabel } from '../modules/idmybee.js';
 import { CladedName, matchCladedName } from '../lib/modules.js';
 import { ensureArray } from '../lib/utils.js';
 

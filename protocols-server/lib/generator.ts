@@ -30,12 +30,18 @@ export async function run(plan: {
 		images: string;
 	};
 	modules: {
+		/** Where to get taxon names from */
 		sources: NameProvider[];
+		/** How to put a unique identifier on a taxon */
 		identifier: IdentifierProvider;
 		// we only support one because of progress bar computations
+		/** How to find the taxonomical parents of a taxon */
 		taxonomy: TaxonomyProvider;
+		/** Ways to add additional info on the taxon */
 		enrich: Enricher[];
+		/** Ways to select some taxa and turn them into options for enum metadata */
 		specializations: Specializer[];
+		/** Ways to create new metadata for protocols */
 		metadatabuilders: MetadataProvider[];
 	};
 }) {
@@ -82,12 +88,25 @@ export async function run(plan: {
 	/** Key is Option.id */
 	const options = new Map<string, Option & { id: string }>();
 
-	await distributeOverThreads([...names.values()], async (option) => {
+	/** Failure counts by worker */
+	const failures = new Map<number, number>();
+	await distributeOverThreads([...names.values()], async (option, worker) => {
 		const id = await plan.modules.identifier.identify(option);
 		progress.increment();
-		if (!id) return;
+
+		if (!id) {
+			failures.set(worker, (failures.get(worker) ?? 0) + 1);
+			progress.ongoing = [
+				`${sum([...failures.values()])} failures`,
+				`${option.clade} ${option.name} not found`,
+			];
+			return;
+		}
+
 		options.set(id, { ...option, id });
 	});
+
+	progress.ongoing = [];
 
 	logger.timed(`Identified ${options.size} names with ${plan.modules.identifier.name}`);
 
@@ -226,7 +245,9 @@ export async function run(plan: {
 			const metadatas: Metadata[] = [];
 
 			for (const key of keys) {
-				metadatas.push(await builder.build(key));
+				const metadata = await builder.build(key);
+				if (!metadata) continue;
+				metadatas.push(metadata);
 				progress.increment();
 			}
 
@@ -392,6 +413,7 @@ function mergeExtras({ extras }: Option): OptionExtra {
 		narrowerWeights: prioritizedShallowMergeObjects(extras, (ex) => ex.narrowerWeights),
 		synonyms: prioritizedShallowMergeArrays(extras, (ex) => ex.synonyms),
 		images: prioritizedShallowMergeArrays(extras, (ex) => ex.images),
+		extraKeys: prioritizedShallowMergeArrays(extras, (ex) => ex.extraKeys),
 	};
 }
 
@@ -448,7 +470,10 @@ function selectHigherClades(option: Option, others: Option[]): Option[] {
 	return others.filter((o) => specificity(o) < specificity(option));
 }
 
-async function distributeOverThreads<T>(all: T[], compute: (item: T) => Promise<void>) {
+async function distributeOverThreads<T>(
+	all: T[],
+	compute: (item: T, workerIndex: number) => Promise<void>
+) {
 	const cpuThreads = os.cpus().length;
 
 	const batchsize = Math.ceil(all.length / cpuThreads);
@@ -459,9 +484,9 @@ async function distributeOverThreads<T>(all: T[], compute: (item: T) => Promise<
 	]);
 
 	await Promise.all(
-		indexRanges.map(async ([start, end]) => {
+		indexRanges.map(async ([start, end], workerIndex) => {
 			for (let i = start; i < end; i++) {
-				await compute(all[i]);
+				await compute(all[i], workerIndex);
 			}
 		})
 	);

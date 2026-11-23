@@ -104,7 +104,7 @@ const Session = table(['id', 'remoteId'], SessionSchema);
 const Metadata = table('id', MetadataInDatabase);
 
 const MetadataOption = table(
-	['id', 'kobocollectId', '_narrowableIn[]', '_search[]'],
+	['id', 'kobocollectId', 'label', '_narrowableIn[]', '_search[]'],
 	MetadataEnumVariant.and({
 		id: [/\w+__\w+:\w+/, '@', 'ID of the form namespaced_metadata_id:key'],
 		metadataId: NamespacedMetadataID,

@@ -1,7 +1,5 @@
-import { addMonths } from 'date-fns';
-
-import { PROTOCOL_ID } from './bees.js';
-import { Datasource } from '../lib/datasource.js';
+import { AndrenaModel, AndrenaModelClassmapping, WithSDD } from '../datasources/idmybee.js';
+import { Character, MediaObject } from '../datasources/xper3.js';
 import {
 	CladedName,
 	Enricher,
@@ -13,27 +11,9 @@ import {
 import { logger } from '../lib/progress.js';
 import { Metadata } from '../lib/types.js';
 import { ensureArray, nonnull, slugify } from '../lib/utils.js';
-import { Character, MediaObject, Xper3 } from './xper3.js';
+import { PROTOCOL_ID } from '../specializations/bees.js';
 
 type BeesMetadataID = `${typeof PROTOCOL_ID}__${string}`;
-
-export abstract class WithSDD {
-	dataset: Xper3;
-
-	constructor() {
-		const sddurl = process.env.IDMYBEE_SDD_URL;
-		if (!sddurl)
-			throw new Error(
-				`IDMyBee needs the SDD URL, set environment variable IDMYBEE_SDD_URL to the SDD (XML file)`
-			);
-
-		this.dataset = new Xper3('idmybee', new URL(sddurl));
-	}
-
-	async init() {
-		await this.dataset.init();
-	}
-}
 
 export class IDMyBeeDescriptions extends WithSDD implements Enricher {
 	name = 'idmybee-descriptions' as const;
@@ -274,67 +254,44 @@ export class IDMyBeeDescriptors extends WithSDD implements MetadataProvider {
 	}
 }
 
-class AndrenaMorphogroups extends Datasource<
-	// 'classmapping',
-	// { classmapping: {} },
-	// { classmapping: { classes: string[] } }
-	'mapping',
-	{ mapping: {} },
-	{
-		mapping: {
-			mapping: Array<{ genus: string; subname: string; species: string; groups: string[] }>;
-		};
-	}
-> {
+export class AndrenaMorphogroups implements Enricher {
 	name = 'andrena-morphogroups' as const;
+	model = new AndrenaModel();
+	classes: AndrenaModelClassmapping | undefined;
 
-	// 'https://huggingface.co/edgaremy/andrena-classifier/resolve/main/class-mapping-grouped.txt?download=true';
+	async init() {
+		if (this.classes) return;
 
-	url =
-		'https://huggingface.co/api/resolve-cache/models/edgaremy/andrena-classifier/193b4ac01dbb37d71ff68a5530ff102257ea9e31/species_to_morphogroups.csv?download=true';
+		const { lines } = await this.model.one('classmapping', {});
+		this.classes = lines;
+	}
 
-	async init() {}
+	available({ clade, name }: Option): boolean {
+		if (clade !== 'species') return false;
+		return this.classes!.some((c) => c.species === name);
+	}
 
-	expirations = {
-		file: (now: Date) => addMonths(now, 6),
-		entry: (now: Date) => addMonths(now, 6),
-	};
+	async *enrich(options: Option[]) {
+		await this.init();
 
-	requests = {
-		// classmapping: async () => {
-		// 	const response = await fetch(this.url);
-		// 	const text = await response.text();
-		// 	if (!response.ok) throw new Error(text);
-		// 	return {
-		// 		classes: text
-		// 			.split(/\r?\n/)
-		// 			.map((line) => line.trim())
-		// 			.filter(Boolean),
-		// 	};
-		// },
+		for (const { id, name, clade } of options) {
+			if (!id) continue;
+			if (clade !== 'species') continue;
 
-		mapping: async () => {
-			const response = await fetch(this.url);
-			const text = await response.text();
-			if (!response.ok) throw new Error(text);
+			const entry = this.classes!.find((c) => c.species === name);
+			if (!entry) continue;
 
-			const lines = text.split(/\r?\n/).filter((line) => line.trim());
-
-			return {
-				mapping: lines
-					// TODO: allow other genera?
-					// .filter((line) => line.split(',').length - 1 >= 3)
-					.filter((line) => line.startsWith('Andrena,'))
-					.map((line) => line.split(',').filter(Boolean))
-					.map(([genus, subname, ...groups]) => ({
-						genus,
-						subname,
-						groups,
-						species: `${genus} ${subname}`,
-					})),
+			yield {
+				id,
+				priority: 10,
+				extra: {
+					cascade: {
+						[`${PROTOCOL_ID}__morphogroup`]: entry.groups,
+					},
+				},
 			};
-		},
-	};
+		}
+	}
 }
 
 function characterMetadataKey(character: Character) {

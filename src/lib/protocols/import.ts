@@ -3,12 +3,14 @@ import type { DatabaseHandle } from '#lib/idb.svelte.js';
 import { ArkErrors, type } from 'arktype';
 
 import { Tables } from '#lib/database.js';
+import { httpStreamLines } from '#lib/http-streaming.ts';
 import { streamJsonl } from '#lib/jsonl.ts';
 import { lookupMostRecentCompatibleProtocol } from '#lib/protocols/registry.js';
 import { NamespacedMetadataID } from '#lib/schemas/common.js';
 import {
 	ensureNamespacedMetadataId,
 	Metadata,
+	MetadataEnum,
 	MetadataEnumVariant,
 	MetadataGroup,
 	MetadataInDatabase,
@@ -16,7 +18,7 @@ import {
 } from '#lib/schemas/metadata.js';
 import { ExportedProtocol } from '#lib/schemas/protocols.js';
 import { recomputeSearchIndex } from '#lib/search.ts';
-import { entries, mapKeys, parseYAMLorJSON } from '#lib/utils.ts';
+import { entries, mapKeys, parseYAMLorJSON, switchValue } from '#lib/utils.ts';
 
 type ProgressCallback = (protocol: string, phase: string, done: number, total: number) => void;
 
@@ -137,7 +139,9 @@ async function checkImports(db: DatabaseHandle, manifest: ExportedProtocol, prog
 	}
 }
 
-function metadatasOfManifest(manifest: ExportedProtocol): Map<NamespacedMetadataID, MetadataInManifest> {
+function metadatasOfManifest(
+	manifest: ExportedProtocol
+): Map<NamespacedMetadataID, MetadataInManifest> {
 	const namespaced = (bare: string) => ensureNamespacedMetadataId(bare, manifest.id);
 
 	return new Map(
@@ -197,10 +201,66 @@ async function installEnumOptions(
 	}
 
 	if (metadata.externalOptions) {
-		for await (const object of streamJsonl(metadata.externalOptions.at)) {
-			if (ExternalOptionsHeader.allows(object)) continue;
+		const { format, postprocess } = MetadataEnum.get('externalOptions').from(
+			metadata.externalOptions
+		)!;
 
-			const option = MetadataEnumVariant.assert(object);
+		let total: number | undefined;
+		const csv = {
+			keys: [] as string[],
+			separator: switchValue(format, {
+				'csv-commas': ',',
+				'csv-semicolons': ';',
+				txt: '',
+				'json-lines': '',
+			}),
+		};
+
+		let i = -1;
+		for await (const line of httpStreamLines(metadata.externalOptions.at)) {
+			i++;
+
+			let object: unknown;
+
+			switch (format) {
+				case 'csv-commas':
+				case 'csv-semicolons': {
+					if (!line.trim()) continue;
+					const cells = line.trim().split(csv.separator);
+					if (csv.keys.length === 0) {
+						csv.keys = cells;
+						continue;
+					}
+
+					object = Object.fromEntries(cells.map((cell, i) => [csv.keys[i], cell]));
+					break;
+				}
+				case 'txt': {
+					object = undefined;
+					break;
+				}
+				case 'json-lines': {
+					object = JSON.parse(line);
+					if (ExternalOptionsHeader.allows(object)) {
+						total = object.count;
+						continue;
+					}
+					break;
+				}
+			}
+
+			let output = object;
+
+			if (postprocess) {
+				output = await postprocess.evaluate({
+					lineIndex: i,
+					totalCount: total,
+					raw: line,
+					line: object,
+				});
+			}
+
+			const option = MetadataEnumVariant.assert(output);
 			await storeOption(option);
 
 			progress.increment();

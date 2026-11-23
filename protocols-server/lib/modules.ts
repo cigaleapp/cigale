@@ -1,13 +1,14 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 
-import { MetadataEnumVariant } from './types.js';
+import { ExportedProtocol, Metadata, MetadataEnumVariant } from './types.js';
 
 export type ModuleName =
 	// species names
 	| 'idmybee-species'
 	| 'birdnet'
-	| 'irit'
-	| 'irit-andrena'
+	| 'frencharthro'
+	| 'small-collemboles'
+	| 'andrena-model'
 	| 'gdrive'
 	// identifiers
 	| 'colxr'
@@ -19,11 +20,13 @@ export type ModuleName =
 	| 'idmybee'
 	| 'iucn'
 	| 'gbif-taxon'
+	| 'gbif-old-id'
 	| 'idmybee-descriptions'
+	| 'andrena-morphogroups'
 	// specializers
 	| 'birds'
-	| 'insects'
-	| 'collembola'
+	| 'arthropods'
+	| 'springtails'
 	| 'bees'
 	// metadata builders
 	| 'idmybee-characters'
@@ -101,7 +104,7 @@ export interface MetadataProvider extends Module {
 	list(): AsyncIterable<string>;
 
 	/** Create the metadata from its key, or undefined if there's no metadata to create after all */
-	build(key: string): Promise<typeof Metadata.inferIn | undefined>;
+	build(key: string): Promise<Metadata | undefined>;
 
 	/**
 	 * List of protocol IDs to add the metadatas to.
@@ -113,14 +116,15 @@ export interface MetadataProvider extends Module {
 
 export type CladedName = { clade: string; name: string };
 
-export function matchCladedName({ clade, name }: CladedName): (other: CladedName) => boolean {
-	return (other) => other.clade === clade && other.name === name;
+export function compareCladedNames(a: CladedName, b: CladedName): boolean {
+	return a.clade === b.clade && a.name === b.name;
 }
 
-export async function writeMetadataToProtocol(
-	id: string,
-	...metadata: Array<typeof Metadata.inferIn>
-) {
+export function matchCladedName(subject: CladedName): (other: CladedName) => boolean {
+	return (other) => compareCladedNames(subject, other);
+}
+
+export async function writeMetadataToProtocol(id: string, ...metadata: Metadata[]) {
 	const found = await findProtocolManifest(id);
 	if (!found) throw new Error(`No manifest file found for ${id}`);
 
@@ -151,7 +155,7 @@ async function findProtocolManifest(id: string) {
 		cwd: '../protocols',
 	})) {
 		const raw = readFileSync(manifestfile).toString();
-		const manifest = Bun.YAML.parse(raw) as typeof ExportedProtocol.inferIn;
+		const manifest = Bun.YAML.parse(raw) as ExportedProtocol;
 
 		if (manifest.id === id) return { filepath: manifestfile, manifest };
 	}
