@@ -1,4 +1,4 @@
-import { Subprocess } from 'bun';
+import { Server, Subprocess } from 'bun';
 import { existsSync, statSync } from 'node:fs';
 import path from 'node:path';
 
@@ -121,59 +121,63 @@ function regenerate(): boolean {
 	return true;
 }
 
-const server = Bun.serve({
-	port: PORT,
-	async fetch(req) {
-		const url = new URL(req.url);
-		const pathname = url.pathname;
+export function startServer(): Server {
+	const server = Bun.serve({
+		port: PORT,
+		async fetch(req) {
+			const url = new URL(req.url);
+			const pathname = url.pathname;
 
-		// Health check
-		if (pathname === '/health') {
-			return Response.json({ ok: true });
-		}
-
-		// Regeneration API
-		if (pathname === '/api/regenerate' && req.method === 'POST') {
-			if (!regenerate()) {
-				return Response.json({ error: 'Regeneration already in progress' }, { status: 409 });
+			// Health check
+			if (pathname === '/health') {
+				return Response.json({ ok: true });
 			}
-			return Response.json({ started: true });
-		}
 
-		if (pathname === '/api/regenerate' && req.method === 'GET') {
-			return Response.json(regenStatus);
-		}
-
-		// Static file serving: /process/options/... and /process/assets/...
-		// (the canonical URLs used by the protocol YAMLs), plus /options/...
-		// and /assets/... as shorter aliases. All resolve under DATA_DIR.
-		let relative: string | null = null;
-		if (pathname.startsWith('/process/')) {
-			relative = pathname.slice('/process/'.length);
-		} else if (pathname.startsWith('/options/') || pathname.startsWith('/assets/')) {
-			relative = pathname.slice(1);
-		}
-		if (relative !== null) {
-			const filePath = resolveUnderDataDir(relative);
-			if (!filePath) {
-				return new Response('Forbidden', { status: 403 });
+			// Regeneration API
+			if (pathname === '/api/regenerate' && req.method === 'POST') {
+				if (!regenerate()) {
+					return Response.json({ error: 'Regeneration already in progress' }, { status: 409 });
+				}
+				return Response.json({ started: true });
 			}
-			if (!existsSync(filePath) || !statSync(filePath).isFile()) {
-				return new Response('Not found', { status: 404 });
+
+			if (pathname === '/api/regenerate' && req.method === 'GET') {
+				return Response.json(regenStatus);
 			}
-			return serveFile(filePath, req);
+
+			// Static file serving: /process/options/... and /process/assets/...
+			// (the canonical URLs used by the protocol YAMLs), plus /options/...
+			// and /assets/... as shorter aliases. All resolve under DATA_DIR.
+			let relative: string | null = null;
+			if (pathname.startsWith('/process/')) {
+				relative = pathname.slice('/process/'.length);
+			} else if (pathname.startsWith('/options/') || pathname.startsWith('/assets/')) {
+				relative = pathname.slice(1);
+			}
+			if (relative !== null) {
+				const filePath = resolveUnderDataDir(relative);
+				if (!filePath) {
+					return new Response('Forbidden', { status: 403 });
+				}
+				if (!existsSync(filePath) || !statSync(filePath).isFile()) {
+					return new Response('Not found', { status: 404 });
+				}
+				return serveFile(filePath, req);
+			}
+
+			return new Response('Not found', { status: 404 });
+		},
+	});
+
+	console.info(`protocols-server listening on port ${PORT}, data dir: ${DATA_DIR}`);
+
+	// Re-generate options on (re)start so that restarting the container app
+	// (e.g. via `hfctl apps restart`) triggers a fresh pipeline run.
+	if (process.env.AUTO_REGENERATE !== 'false') {
+		if (regenerate()) {
+			console.info('Auto-regeneration started on startup');
 		}
-
-		return new Response('Not found', { status: 404 });
-	},
-});
-
-console.info(`protocols-server listening on port ${PORT}, data dir: ${DATA_DIR}`);
-
-// Re-generate options on (re)start so that restarting the container app
-// (e.g. via `hfctl apps restart`) triggers a fresh pipeline run.
-if (process.env.AUTO_REGENERATE !== 'false') {
-	if (regenerate()) {
-		console.info('Auto-regeneration started on startup');
 	}
+
+	return server;
 }

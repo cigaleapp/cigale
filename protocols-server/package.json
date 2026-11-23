@@ -4,7 +4,7 @@
 	"type": "module",
 	"packageManager": "bun@1.4.2",
 	"scripts": {
-		"start": "bun run lib/server.ts",
+		"start": "bun run main.ts --serve",
 		"regenerate": "bun run main.ts",
 		"generate:types": "bun run scripts/generate-types.ts"
 	},

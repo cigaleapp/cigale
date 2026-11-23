@@ -22,4 +22,4 @@ EXPOSE 3000
 
 USER bun
 
-CMD ["bun", "run", "lib/server.ts"]
+CMD ["bun", "run", "main.ts", "--serve"]

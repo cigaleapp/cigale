@@ -55,11 +55,9 @@ jobs:
               - '.github/workflows/protocols.yml'
 
       - name: Set up Docker Buildx
-        if: steps.changes.outputs.protocols == 'true' || github.event_name == 'workflow_dispatch'
         uses: docker/setup-buildx-action@v3
 
       - name: Log in to GHCR
-        if: (steps.changes.outputs.protocols == 'true' || github.event_name == 'workflow_dispatch') && github.event_name != 'pull_request'
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
@@ -67,7 +65,6 @@ jobs:
           password: ${{ github.token }}
 
       - name: Extract Docker metadata
-        if: steps.changes.outputs.protocols == 'true' || github.event_name == 'workflow_dispatch'
         id: meta
         uses: docker/metadata-action@v5
         with:
@@ -75,6 +72,7 @@ jobs:
           tags: |
             type=sha,prefix=sha-
             type=raw,value=latest,enable={{is_default_branch}}
+            type=ref,event=branch
 
       - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
         with:
@@ -93,7 +91,6 @@ jobs:
         with:
           context: .
           file: protocols-server/Dockerfile
-          # XXX: DONT MERGE
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -118,7 +115,7 @@ jobs:
       - name: Setup hfctl
         uses: nudibranches-tech/setup-hfctl@v1
         with:
-          service-account: ${{ secrets.HYPERFLUID_SERVICE_ACCOUNT }}
+          service-account: ${{ secrets.DATATERRA_HF_SERVICE_ACCOUNT }}
 
       - name: Update app image
         if: env.IMAGE != ''

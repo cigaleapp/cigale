@@ -1,3 +1,4 @@
+import { startServer } from './lib/server.js';
 import { run } from './lib/generator.js';
 import { Arthropods, Springtails } from './specializations/arthropods.js';
 import { Bees } from './specializations/bees.js';
@@ -16,7 +17,19 @@ import { IUCN } from './modules/iucn.js';
 import { JessicaJoachim } from './modules/jj.js';
 
 if (import.meta.main) {
-	await generate();
+	const args = process.argv.slice(2);
+	if (args.includes('--serve')) {
+		// Server mode: start the HTTP server, with an initial regeneration
+		// unless --no-regenerate is passed (or AUTO_REGENERATE=false).
+		if (args.includes('--no-regenerate')) {
+			process.env.AUTO_REGENERATE = 'false';
+		}
+		startServer();
+	} else {
+		// One-shot mode (default): run the pipeline once and exit. Useful for
+		// debugging, and what the server spawns for /api/regenerate.
+		await generate();
+	}
 }
 
 export async function generate() {
