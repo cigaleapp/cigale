@@ -72,15 +72,18 @@ console.log('Waiting for options regeneration to complete...');
 
 // Expose the regeneration progress as a GitHub check run, updated on every
 // poll.
-const checkRunId = JSON.parse(ghApi('POST', `repos/${repo}/check-runs`, {
-	name: 'Regeneration progress',
-	head_sha: sha,
-	details_url: serverUrl,
-	output: {
-		title: 'Regenerating options',
-		summary: 'Waiting for regeneration to start...',
-	},
-})).id as number;
+const checkRunId = JSON.parse(
+	ghApi('POST', `repos/${repo}/check-runs`, {
+		name: 'Regeneration progress',
+		head_sha: sha,
+		details_url: serverUrl,
+		status: 'requested',
+		output: {
+			title: 'Regenerating options',
+			summary: 'Waiting for regeneration to start...',
+		},
+	})
+).id as number;
 
 let status = '';
 let current = false;
@@ -89,6 +92,7 @@ for (let i = 0; i < totalWaitMinutes * 6; i++) {
 	if (state === null) {
 		console.log('Server not ready (503); waiting...');
 		ghApi('PATCH', `repos/${repo}/check-runs/${checkRunId}`, {
+			status: 'pending',
 			output: {
 				title: 'Waiting for server to be ready',
 				summary: 'The server is not responding yet (HTTP 503).',
@@ -104,14 +108,16 @@ for (let i = 0; i < totalWaitMinutes * 6; i++) {
 		const tasks = p?.ongoing.join(', ');
 		console.log(`${p?.percentage ?? 0}% ${p?.phase ?? ''}: ${tasks ?? ''}`);
 		ghApi('PATCH', `repos/${repo}/check-runs/${checkRunId}`, {
+			status: 'in_progress',
 			output: {
-				title: `Regenerating: ${p?.phase ?? ''} (${p?.percentage ?? 0}%)`,
+				title: `Regenerating: ${p?.phase ?? ''} (${p?.percentage ?? 0}%, ~${p?.eta ?? '?'} remaining): ${tasks}`,
 				summary: `**${p?.percentage ?? 0}%** — ${p?.phase ?? ''}${tasks ? ` — ${tasks}` : ''} (ETA: ${p?.eta ?? '?'})`,
 			},
 		});
 	} else {
 		console.log(`No new run yet (last run started: ${state.startedAt ?? 'never'}); waiting...`);
 		ghApi('PATCH', `repos/${repo}/check-runs/${checkRunId}`, {
+			status: 'waiting',
 			output: {
 				title: 'Waiting for regeneration to start',
 				summary: `The app has not started a new regeneration run since the job began (last run: ${state.startedAt ?? 'none'}).`,
