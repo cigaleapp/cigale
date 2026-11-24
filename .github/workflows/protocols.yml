@@ -104,7 +104,22 @@ jobs:
     # XXX: DONT MERGE
     # if: github.event_name != 'pull_request' && github.event_name == 'schedule'
 
+    permissions:
+      contents: read
+      checks: write
+
     steps:
+      - name: Record job start time
+        id: jobstart
+        run: echo "started_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_OUTPUT"
+
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version-file: .bun-version
+
       - name: Setup hfctl
         uses: nudibranches-tech/setup-hfctl@v1
         with:
@@ -139,27 +154,10 @@ jobs:
           PROTOCOLS_APP_URL: ${{ secrets.PROTOCOLS_APP_URL }}
 
       - name: Wait for regeneration to finish
-        run: |
-          echo "Waiting for options regeneration to complete..."
-          for i in $(seq 1 $TOTAL_WAIT_MINUTES); do
-            state=$(curl -fsS "$SERVER_URL/api/regenerate")
-            status=$(echo $state | jq -r .state)
-            progress=$(echo $state | jq -r .progress.percentage)
-            phase=$(echo $state | jq -r .progress.phase)
-            tasks=$(echo $state | jq -r '.progress.ongoing | join(", ")')
-            echo "$progress% $phase: $tasks"
-            if [ "$status" = "done" ] || [ "$status" = "error" ]; then
-              break
-            fi
-            sleep 60
-          done
-          echo "Final status:"
-          curl -fsS "$SERVER_URL/api/regenerate" | jq .
-          logs_url=$(curl -fsS "$SERVER_URL/api/regenerate" | jq .logs_url)
-          echo "Logs:"
-          curl -fsS "$logs_url"
+        run: bun run protocols-server/scripts/wait-regeneration.ts
         env:
           SERVER_URL: ${{ steps.app.outputs.url }}
+          JOB_STARTED_AT: ${{ steps.jobstart.outputs.started_at }}
           TOTAL_WAIT_MINUTES: 120
 
       - name: Show recent logs

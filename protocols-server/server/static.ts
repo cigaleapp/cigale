@@ -1,6 +1,5 @@
 import { statSync } from 'node:fs';
 import path from 'node:path';
-import { DATA_DIR, PROTOCOLS_DIR, STATIC_DIR } from './config.js';
 
 const MIME: Record<string, string> = {
 	'.jsonl': 'application/x-ndjson',
@@ -82,50 +81,17 @@ export function serveFile(filePath: string, req: Request): Response {
 	});
 }
 
+// Resolve a request path under `root`, preventing path traversal.
 // Hidden files and directories (dot-prefixed path segments, e.g. .secrets/)
 // are never served or listed.
-function hasHiddenSegment(requestPath: string): boolean {
-	return requestPath.split('/').some((seg) => seg.startsWith('.'));
-}
-
-// Resolve a request path under DATA_DIR, preventing path traversal.
-export function resolveUnderDataDir(requestPath: string): string | null {
+export function resolveUnder(root: string, requestPath: string): string | null {
 	const decoded = decodeURIComponent(requestPath);
-	if (hasHiddenSegment(decoded)) {
+	if (decoded.split('/').some((seg) => seg.startsWith('.'))) {
 		return null;
 	}
-	const resolved = path.resolve(DATA_DIR, '.' + path.posix.normalize('/' + decoded));
-	const dataRoot = path.resolve(DATA_DIR);
-	if (resolved !== dataRoot && !resolved.startsWith(dataRoot + path.sep)) {
-		return null;
-	}
-	return resolved;
-}
-
-// Resolve a request path under PROTOCOLS_DIR, preventing path traversal.
-export function resolveUnderProtocolsDir(requestPath: string): string | null {
-	const decoded = decodeURIComponent(requestPath);
-	if (hasHiddenSegment(decoded)) {
-		return null;
-	}
-	const resolved = path.resolve(PROTOCOLS_DIR, '.' + path.posix.normalize('/' + decoded));
-	const root = path.resolve(PROTOCOLS_DIR);
-	if (resolved !== root && !resolved.startsWith(root + path.sep)) {
-		return null;
-	}
-	return resolved;
-}
-
-// Resolve a request path under the repo's static/ dir (JSON schemas),
-// preventing path traversal.
-export function resolveUnderStaticDir(requestPath: string): string | null {
-	const decoded = decodeURIComponent(requestPath);
-	if (hasHiddenSegment(decoded)) {
-		return null;
-	}
-	const resolved = path.resolve(STATIC_DIR, '.' + path.posix.normalize('/' + decoded));
-	const root = path.resolve(STATIC_DIR);
-	if (resolved !== root && !resolved.startsWith(root + path.sep)) {
+	const resolved = path.resolve(root, '.' + path.posix.normalize('/' + decoded));
+	const rootResolved = path.resolve(root);
+	if (resolved !== rootResolved && !resolved.startsWith(rootResolved + path.sep)) {
 		return null;
 	}
 	return resolved;
