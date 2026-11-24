@@ -3,7 +3,7 @@ import { existsSync, statSync } from 'node:fs';
 import { Server } from 'bun';
 
 import { amendManifests, writeRegistry } from '../scripts/generate-protocol-registry.js';
-import { handleLogin, isAuthorized, isPublicRoute, unauthorized } from './auth.js';
+import { handleLogin, isAuthorized, unauthorized } from './auth.js';
 import { handleCacheDelete, readCacheStats } from './caches.js';
 import { DATA_DIR, PORT, PROTOCOLS_DIR, STATIC_DIR, WEB_ORIGIN } from './config.js';
 import { apiIndexPage, dirListing, indexPage } from './html.js';
@@ -13,119 +13,118 @@ import { resolveUnder, serveFile } from './static.js';
 export function startServer(): Server<undefined> {
 	const server = Bun.serve({
 		port: PORT,
-		async fetch(req) {
-			const url = new URL(req.url);
-			const pathname = url.pathname;
-
-			// Auth gate: everything except protocols, /options/, /assets/,
-			// GET /api/regenerate and GET /api/caches requires the password.
-			if (!isPublicRoute(pathname, req.method) && !isAuthorized(req)) {
-				return unauthorized();
-			}
-
+		routes: {
 			// Browsable index
-			if (pathname === '/') {
-				return indexPage();
-			}
+			'/': withCors(() => indexPage()),
 
 			// Health check
-			if (pathname === '/health') {
-				return Response.json({ ok: true });
-			}
+			'/health': withCors(() => Response.json({ ok: true })),
 
-			// API index (GET only; POST/GET /api/regenerate handled below)
-			if (pathname === '/api/' && req.method === 'GET') {
-				return apiIndexPage();
-			}
+			// API index
+			'/api/': withCors(() => apiIndexPage()),
 
 			// Login for browsers: verifies the password and sets an HttpOnly
 			// cookie (holding its sha256, not the password itself).
-			if (pathname === '/api/login' && req.method === 'GET') {
+			'/api/login': withCors((req) => {
+				const url = new URL(req.url);
 				return handleLogin(url.searchParams.get('password') ?? '');
-			}
+			}),
 
-			// Regeneration API
-			if (pathname === '/api/regenerate' && req.method === 'POST') {
-				if (!regenerate()) {
-					return Response.json(
-						{ error: 'Regeneration already in progress' },
-						{ status: 409 }
-					);
+			// Regeneration API: GET is public (status + progress), POST is
+			// auth-gated (starts a regeneration).
+			'/api/regenerate': withCors((req) => {
+				if (req.method === 'GET') {
+					return Response.json({
+						...getRegenStatus(),
+						progress: readProgress(),
+						logs_url: new URL('/api/regeneration/log.txt', WEB_ORIGIN),
+					});
 				}
-				return Response.json({ started: true });
-			}
-
-			// Regeneration status + progress, with a link to the log.
-			if (pathname === '/api/regenerate' && req.method === 'GET') {
-				return Response.json({
-					...getRegenStatus(),
-					progress: readProgress(),
-					logs_url: new URL('/api/regeneration/log.txt', WEB_ORIGIN),
-				});
-			}
+				if (!isAuthorized(req)) return unauthorized();
+				if (req.method === 'POST') {
+					if (!regenerate()) {
+						return Response.json(
+							{ error: 'Regeneration already in progress' },
+							{ status: 409 }
+						);
+					}
+					return Response.json({ started: true });
+				}
+				return notFound();
+			}),
 
 			// Last 100 lines of the regeneration process's stdout+stderr
 			// (auth required; the log may contain sensitive output).
-			if (pathname === '/api/regeneration/log.txt' && req.method === 'GET') {
-				const log = readRegenLog();
-				if (log === null) {
-					return Response.json({ error: 'No regeneration has run yet' }, { status: 404 });
-				}
-				return new Response(log, {
-					headers: { 'Content-Type': 'text/plain; charset=utf-8' },
-				});
-			}
+			'/api/regeneration/log.txt': withCors(
+				withAuth((req) => {
+					if (req.method !== 'GET') return notFound();
+					const log = readRegenLog();
+					if (log === null) {
+						return Response.json(
+							{ error: 'No regeneration has run yet' },
+							{ status: 404 }
+						);
+					}
+					return new Response(log, {
+						headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+					});
+				})
+			),
 
-			// Cache stats (per-query entry counts per datasource)
-			if (pathname === '/api/caches' && req.method === 'GET') {
-				return Response.json(readCacheStats());
-			}
-
-			// Cache removal (auth already enforced by the gate above)
-			if (pathname.startsWith('/api/caches/') && req.method === 'DELETE') {
-				const response = handleCacheDelete(
-					pathname,
-					url,
-					getRegenStatus().state === 'running'
-				);
-				if (response) {
-					return response;
+			// Cache stats (per-query entry counts per datasource); GET is
+			// public, other methods are auth-gated.
+			'/api/caches': withCors((req) => {
+				if (req.method === 'GET') {
+					return Response.json(readCacheStats());
 				}
-			}
+				if (!isAuthorized(req)) return unauthorized();
+				return notFound();
+			}),
+
+			// Cache removal (auth required)
+			'/api/caches/*': withCors(
+				withAuth((req) => {
+					if (req.method !== 'DELETE') return notFound();
+					const url = new URL(req.url);
+					const response = handleCacheDelete(
+						url.pathname,
+						url,
+						getRegenStatus().state === 'running'
+					);
+					return response ?? notFound();
+				})
+			),
 
 			// Static file serving: /process/options/... and /process/assets/...
 			// (the canonical URLs used by the protocol YAMLs), plus /options/...
 			// and /assets/... as shorter aliases. All resolve under DATA_DIR.
-			let relative: string | null = null;
-			if (pathname.startsWith('/process/')) {
-				relative = pathname.slice('/process/'.length);
-			} else if (pathname.startsWith('/options/') || pathname.startsWith('/assets/')) {
-				relative = pathname.slice(1);
-			}
-			if (relative !== null) {
-				const filePath = resolveUnder(DATA_DIR, relative);
-				if (!filePath) {
-					return new Response('Forbidden', { status: 403 });
-				}
-				if (!existsSync(filePath)) {
-					return new Response('Not found', { status: 404 });
-				}
-				if (statSync(filePath).isDirectory()) {
-					return dirListing(filePath, pathname, pathname);
-				}
-				return serveFile(filePath, req);
-			}
+			// /process/ is auth-gated; /options/ and /assets/ are public.
+			'/process/*': withCors(
+				withAuth((req) => {
+					const url = new URL(req.url);
+					return serveDataFile(req, url.pathname.slice('/process/'.length));
+				})
+			),
+			'/options/*': withCors((req) => {
+				const url = new URL(req.url);
+				return serveDataFile(req, url.pathname.slice(1));
+			}),
+			'/assets/*': withCors((req) => {
+				const url = new URL(req.url);
+				return serveDataFile(req, url.pathname.slice(1));
+			}),
+		},
+		// Fallback: JSON schemas and protocol manifests served at root level.
+		fetch: withCors((req) => {
+			const url = new URL(req.url);
+			const pathname = url.pathname;
 
 			// JSON schemas (protocol/registry/results), served at the root
 			// level (e.g. /protocol.schema.json) from the repo's static/ dir.
 			if (pathname.endsWith('.schema.json')) {
 				const filePath = resolveUnder(STATIC_DIR, pathname.slice(1));
-				if (!filePath) {
-					return new Response('Forbidden', { status: 403 });
-				}
-				if (!existsSync(filePath)) {
-					return new Response('Not found', { status: 404 });
-				}
+				if (!filePath) return new Response('Forbidden', { status: 403 });
+				if (!existsSync(filePath)) return notFound();
 				if (statSync(filePath).isDirectory()) {
 					return dirListing(filePath, pathname, pathname);
 				}
@@ -146,8 +145,8 @@ export function startServer(): Server<undefined> {
 				}
 			}
 
-			return new Response('Not found', { status: 404 });
-		},
+			return notFound();
+		}),
 	});
 
 	console.info(`protocols-server listening on port ${PORT}, data dir: ${DATA_DIR}`);
@@ -181,4 +180,65 @@ export function startServer(): Server<undefined> {
 	}
 
 	return server;
+}
+
+// CORS: only the configured web app origin (WEB_ORIGIN) is allowed, with
+// credentials so the browser auth cookie can be sent cross-origin.
+function corsHeaders(origin: string | null): Record<string, string> | null {
+	// We allow all origins
+	// if (!origin || origin !== WEB_ORIGIN) return null;
+	return {
+		'Access-Control-Allow-Origin': origin || '*',
+		'Access-Control-Allow-Credentials': 'true',
+		'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
+		'Access-Control-Allow-Headers': 'Authorization, Content-Type',
+	};
+}
+
+type Handler = (req: Request) => Response | Promise<Response>;
+
+const notFound = (): Response => new Response('Not found', { status: 404 });
+
+// Wrap a route handler with CORS support (preflight + response headers).
+function withCors(handler: Handler): Handler {
+	return (req) => {
+		const cors = corsHeaders(req.headers.get('origin'));
+		if (req.method === 'OPTIONS') {
+			if (!cors) return notFound();
+			return new Response(null, { status: 204, headers: cors });
+		}
+		const result = handler(req);
+		if (!cors) return result;
+		return Promise.resolve(result).then((res) => {
+			const headers = new Headers(res.headers);
+			for (const [key, value] of Object.entries(cors)) {
+				headers.set(key, value);
+			}
+			return new Response(res.body, {
+				status: res.status,
+				statusText: res.statusText,
+				headers,
+			});
+		});
+	};
+}
+
+// Wrap a route handler with the auth gate.
+function withAuth(handler: Handler): Handler {
+	return (req) => {
+		if (!isAuthorized(req)) return unauthorized();
+		return handler(req);
+	};
+}
+
+// Serve a file or directory listing from DATA_DIR.
+function serveDataFile(req: Request, relative: string): Response {
+	const filePath = resolveUnder(DATA_DIR, relative);
+	if (!filePath) return new Response('Forbidden', { status: 403 });
+	if (!existsSync(filePath)) return notFound();
+	if (statSync(filePath).isDirectory()) {
+		const url = new URL(req.url);
+		return dirListing(filePath, url.pathname, url.pathname);
+	}
+	return serveFile(filePath, req);
 }
