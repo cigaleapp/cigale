@@ -159,6 +159,7 @@ jobs:
           SERVER_URL: ${{ steps.app.outputs.url }}
           JOB_STARTED_AT: ${{ steps.jobstart.outputs.started_at }}
           TOTAL_WAIT_MINUTES: 120
+          GH_TOKEN: ${{ github.token }}
 
       - name: Show recent logs
         if: always()
