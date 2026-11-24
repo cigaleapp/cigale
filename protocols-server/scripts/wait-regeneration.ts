@@ -53,8 +53,11 @@ function ghApi(method: 'POST' | 'PATCH', path: string, body: unknown): string {
 	});
 }
 
-async function fetchStatus(): Promise<RegenState> {
+// Returns null when the server answers 503 (e.g. still restarting); the
+// caller keeps waiting in that case.
+async function fetchStatus(): Promise<RegenState | null> {
 	const res = await fetch(`${serverUrl}/api/regenerate`);
+	if (res.status === 503) return null;
 	if (!res.ok) throw new Error(`GET /api/regenerate failed: ${res.status} ${res.statusText}`);
 	return (await res.json()) as RegenState;
 }
@@ -81,8 +84,19 @@ const checkRunId = JSON.parse(ghApi('POST', `repos/${repo}/check-runs`, {
 
 let status = '';
 let current = false;
-for (let i = 0; i < totalWaitMinutes; i++) {
+for (let i = 0; i < totalWaitMinutes * 6; i++) {
 	const state = await fetchStatus();
+	if (state === null) {
+		console.log('Server not ready (503); waiting...');
+		ghApi('PATCH', `repos/${repo}/check-runs/${checkRunId}`, {
+			output: {
+				title: 'Waiting for server to be ready',
+				summary: 'The server is not responding yet (HTTP 503).',
+			},
+		});
+		await sleep(10_000);
+		continue;
+	}
 	status = state.state;
 	current = isCurrent(state.startedAt);
 	if (current) {
@@ -105,11 +119,22 @@ for (let i = 0; i < totalWaitMinutes; i++) {
 		});
 	}
 	if (current && (status === 'done' || status === 'error')) break;
-	await sleep(60_000);
+	await sleep(10_000);
 }
 
 console.log('Final status:');
 const final = await fetchStatus();
+if (final === null) {
+	ghApi('PATCH', `repos/${repo}/check-runs/${checkRunId}`, {
+		status: 'completed',
+		conclusion: 'failure',
+		output: {
+			title: 'Server did not become ready',
+			summary: 'The server kept returning HTTP 503 until the wait time expired.',
+		},
+	});
+	process.exit(1);
+}
 console.log(JSON.stringify(final, null, 2));
 status = final.state;
 current = isCurrent(final.startedAt);
