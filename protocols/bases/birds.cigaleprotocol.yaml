@@ -61,14 +61,38 @@ metadata:
       format: json-lines
     infer:
       neural: []
-        # TODO
-        # - classmapping:
-        #   input:
-        #     height:
-        #     normalized:
-        #     width:
-        #   model:
-        #   webgpuReady: false
+        # TODO: add once we have audio support (see #2299)
+        # - name: BirdNet+ 3 DP3.1
+        #   model: https://zenodo.org/records/20703646/files/BirdNET+_V3.0-preview3.1_Global_11K_FP16.onnx?download=1
+        #   # this one is a bit big, theres also a pruned version
+        #   requirements:
+        #     ram: 4 GB
+        #   # TODO: use the classmapping's ids via extraKeys once we know that they'll be stable
+        #   # cuz we rely on them being stable cuz options generation and classmapping installation are
+        #   # done very separately (classmapping is installed at model loading time, and options generation relies
+        #   # on protocols-server + the user updating the protocol)
+        #   classes: labels
+        #   classmapping:
+        #     at: https://zenodo.org/records/20703646/files/BirdNET+_V3.0-preview3.1_Global_11K_Labels.csv?download=1
+        #     format: csv-semicolons
+        #     postprocess: |
+        #       {
+        #         "neuron": $number(line.idx),
+        #         "value": line.sci_name
+        #       }
+
+        # - name: BirdNet+ 3 DP3.1 Pruned
+        #   model: https://zenodo.org/records/20703646/files/BirdNET+_V3.0-preview3.1_Global_11K_FP16_pruned.onnx?download=1
+        #   classes: labels
+        #   classmapping:
+        #     at: https://zenodo.org/records/20703646/files/BirdNET+_V3.0-preview3.1_Global_11K_Labels.csv?download=1
+        #     format: csv-semicolons
+        #     postprocess: |
+        #       {
+        #         "neuron": $number(line.idx),
+        #         "value": line.sci_name
+        #       }
+
 
   kingdom:
     type: enum

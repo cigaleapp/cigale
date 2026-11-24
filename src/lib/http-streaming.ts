@@ -1,3 +1,85 @@
+import type { NetworkStreamedLinesConfig } from './schemas/network.js';
+import type { Type } from 'arktype';
+
+import { ArkErrors } from 'arktype';
+
+import { NetworkStreamedLines, NetworkStreamedLinesHeader } from './schemas/network.js';
+import { switchValue } from './utils.ts';
+
+interface StreamRequestInit extends RequestInit {
+	chunkSize?: number;
+	/** Fall back to a regular request that loads the entire response if range requests are not supported by the server */
+	fallback?: boolean;
+}
+
+export async function* httpStreamProcessLines<Schema extends Type>(
+	schema: Schema,
+	config: NetworkStreamedLinesConfig<Schema>,
+	init?: StreamRequestInit
+): AsyncIterable<StreamedLine<Schema['infer'], { object: unknown }>> {
+	const { at, postprocess, format } = NetworkStreamedLines(schema).from(config);
+
+	let total: number | undefined;
+	const csv = {
+		keys: [] as string[],
+		separator: switchValue(format, {
+			'csv-commas': ',',
+			'csv-semicolons': ';',
+			txt: '',
+			'json-lines': '',
+		}),
+	};
+
+	for await (const line of httpStreamLines(at, init)) {
+		let object: unknown;
+
+		switch (format) {
+			case 'csv-commas':
+			case 'csv-semicolons': {
+				if (!line.text.trim()) continue;
+				const cells = line.text.trim().split(csv.separator);
+				if (csv.keys.length === 0) {
+					csv.keys = cells;
+					continue;
+				}
+
+				object = Object.fromEntries(cells.map((cell, i) => [csv.keys[i], cell]));
+				break;
+			}
+			case 'txt': {
+				object = undefined;
+				break;
+			}
+			case 'json-lines': {
+				object = JSON.parse(line.text);
+				if (NetworkStreamedLinesHeader.allows(object)) {
+					total = object.count;
+
+					continue;
+				}
+				break;
+			}
+		}
+
+		try {
+			if (postprocess) {
+				const parsed = await postprocess.evaluate({
+					lineIndex: line.index,
+					totalCount: total,
+					raw: line.text,
+					line: object,
+				});
+
+				yield line.with({ parsed });
+			} else {
+				yield line.with({ parsed: schema.assert(object) });
+			}
+		} catch (error) {
+			yield line.with({ error, context: { object } });
+		}
+	}
+}
+
 /**
  * Stream a HTTP response line by line, using successive HTTP range requests.
  *
@@ -12,29 +94,30 @@
  */
 export async function* httpStreamLines(
 	input: string | URL | Request,
-	init: RequestInit = {},
-	options?: {
-		chunkSize?: number;
-		signal?: AbortSignal;
-		/** Fall back to a regular request that loads the entire response if range requests are not supported by the server */
-		fallback?: boolean;
-	}
-): AsyncGenerator<string> {
-	const chunkSize = options?.chunkSize ?? 256 * 1024;
+	{ chunkSize = 256 * 1024, fallback, ...init }: StreamRequestInit = {}
+): AsyncGenerator<StreamedLine> {
 	const decoder = new TextDecoder();
 	let offset = 0;
 	let carry = '';
 	const headers = new Headers(init.headers);
 
+	// Do a HEAD request to get the content length for progress information
+	const head = await fetch(input, { ...init, method: 'HEAD' });
+	let total: number | undefined;
+	total = Number.parseInt(head.headers.get('Content-Length') || '');
+	if (!total || Number.isNaN(total) || !Number.isFinite(total)) {
+		total = undefined;
+	}
+
+	let lineIndex = -1;
+
 	while (true) {
 		headers.set('Range', `bytes=${offset}-${offset + chunkSize - 1}`);
-
-		if (options?.signal) init.signal = options.signal;
 
 		const response = await fetch(input, { ...init, headers });
 		if (response.status === 416) break; // past the end of the file
 		if (response.status !== 206) {
-			if (!options?.fallback) {
+			if (!fallback) {
 				throw new Error(
 					`Server does not support range requests for ${input}: ${response.status} ${response.statusText}`
 				);
@@ -43,9 +126,14 @@ export async function* httpStreamLines(
 			const full = await fetch(input, init);
 			const text = await full.text();
 			if (!full.ok) throw new Error(text);
+			const lines = text.split(/\r?\n/);
 
-			for (const line of text.split(/\r?\n/)) {
-				yield line;
+			for (const [lineIndex, line] of lines.entries()) {
+				yield new StreamedLine({
+					line,
+					lineIndex,
+					progress: { total: lines.length, current: lineIndex },
+				});
 			}
 		}
 
@@ -58,7 +146,16 @@ export async function* httpStreamLines(
 		carry = lines.pop() ?? '';
 		for (const raw of lines) {
 			const line = raw.replace(/\r$/, '').trim();
-			if (line) yield line;
+			if (!line) continue;
+
+			yield new StreamedLine({
+				line,
+				lineIndex: ++lineIndex,
+				progress: {
+					total,
+					current: offset,
+				},
+			});
 		}
 
 		offset += chunkSize;
@@ -66,5 +163,71 @@ export async function* httpStreamLines(
 
 	// Flush a final line if the file didn't end with a newline.
 	const final = carry.replace(/\r$/, '').trim();
-	if (final) yield final;
+	if (!final) return;
+	yield new StreamedLine({
+		line: final,
+		lineIndex: ++lineIndex,
+		progress: { total, current: total },
+	});
 }
+
+class StreamedLine<Parsed = unknown, Context = unknown> {
+	line: string;
+	error: unknown;
+	context: Context | undefined;
+	parsed: Parsed | undefined;
+	/** Total bytes count for the file this streamed line is a part of */
+	totalBytes: number | undefined;
+	offsetBytes: number | undefined;
+	index: number;
+
+	constructor(private init: StreamedLineInit<Parsed, Context>) {
+		this.line = init.line;
+		this.index = init.lineIndex;
+		this.error = init.error;
+		this.context = init.context;
+		this.parsed = init.parsed;
+		this.totalBytes = init.progress?.total;
+		this.offsetBytes = init.progress?.current;
+	}
+
+	with<P extends Parsed, C extends Context>(
+		init: Partial<StreamedLineInit<P, C>>
+	): StreamedLine<P, C> {
+		// @ts-expect-error when instance is just constructed, context and parsed could
+		// still be of type Parsed or Context, but we rectify that just bellow
+		// by explicitly assigning even when the new init doesnt specify parsed/context
+		const instance = new StreamedLine<P, C>({ ...this.init, ...init });
+		instance.context = init.context;
+		instance.parsed = init.parsed;
+		return instance;
+	}
+
+	get text() {
+		return this.line;
+	}
+
+	toString() {
+		return this.line;
+	}
+
+	get progressInFile() {
+		if (this.totalBytes === undefined) return undefined;
+		if (this.offsetBytes === undefined) return undefined;
+
+		return this.offsetBytes / this.totalBytes;
+	}
+}
+
+type StreamedLineInit<Parsed, Context> = {
+	line: string;
+	error?: unknown;
+	context?: Context | undefined;
+	parsed?: Parsed | undefined;
+	/** Index of the line in the file */
+	lineIndex: number;
+	progress?: {
+		total?: number | undefined;
+		current?: number | undefined;
+	};
+};

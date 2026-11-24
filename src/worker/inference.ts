@@ -23,7 +23,7 @@ interface InferenceSession {
 	onnx: import('onnxruntime-web/webgpu').InferenceSession;
 	id: string;
 	task: string;
-	classmapping?: string[];
+	classmapping?: Array<string | null>;
 }
 
 type InferenceTask = (typeof PROCEDURES.loadModel.input.infer)['task'];
@@ -58,7 +58,7 @@ swarp.loadModel(async ({ task, model, classmapping, inferenceSessionId: id, enab
 	const session: InferenceSession = { id, task, onnx };
 
 	if (classmapping) {
-		session.classmapping = classmapping.split(/\r?\n/).filter(Boolean);
+		session.classmapping = classmapping;
 	}
 
 	inferenceSessions.set(id, session);
@@ -164,7 +164,7 @@ swarp.classify(async ({ imageId, metadataIds, taskSettings, inferenceSessionId }
 		image: img,
 		model: onnx,
 		abortSignal: tools.abortSignal,
-		debug: inferenceSessionId.includes('|custom|'),
+		debug: inferenceSessionId?.includes('|custom|'),
 	});
 
 	const results = scores
@@ -174,6 +174,7 @@ swarp.classify(async ({ imageId, metadataIds, taskSettings, inferenceSessionId }
 		}))
 		.sort(compareBy('score'))
 		.reverse()
+		.filter(({ key }) => Boolean(key))
 		.slice(0, 100);
 
 	tools.abortSignal?.throwIfAborted();

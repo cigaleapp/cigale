@@ -2,7 +2,7 @@
 manifest: v1.0
 id: io.github.cigaleapp.idmybee
 
-version: 1
+version: 28
 updates: automatic
 source: http://localhost:3000/idmybee.cigaleprotocol.json
 

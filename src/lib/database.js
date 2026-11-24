@@ -104,9 +104,21 @@ const Session = table(['id', 'remoteId'], SessionSchema);
 const Metadata = table('id', MetadataInDatabase);
 
 const MetadataOption = table(
-	['id', 'kobocollectId', 'label', '_narrowableIn[]', '_search[]'],
+	[
+		'id',
+		'kobocollectId',
+		'namespacedLabel',
+		'namespacedExtraKeys[]',
+		'_narrowableIn[]',
+		'_search[]',
+	],
 	MetadataEnumVariant.and({
-		id: [/\w+__\w+:\w+/, '@', 'ID of the form namespaced_metadata_id:key'],
+		/** ID of the form namespaced_metadata_id:key */
+		id: '/^\\w+__\\w+:\\w+$/',
+		/** label, prefixed by namespaced_metadata_id: */
+		namespacedLabel: '/^\\w+__\\w+:.+$/',
+		/** extraKeys, prefixed by namespaced_metadata_id: */
+		namespacedExtraKeys: '/^\\w+__\\w+:.+$/[]',
 		metadataId: NamespacedMetadataID,
 		/** For search purposes: to search for something, we get all keys of that index and do a fuzzy search on them */
 		_search: ['string[]', '=', () => []],

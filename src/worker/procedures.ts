@@ -28,7 +28,11 @@ export const PROCEDURES = {
 	loadModel: {
 		input: type({
 			model: 'TypedArray.Uint8',
-			'classmapping?': 'string | undefined',
+			/**
+			 * Keys of the enum metadata we'll infer to. Null values means
+			 * that this class is not supported by the metadata.
+			 */
+			classmapping: 'undefined | (string|null)[]',
 			task: '"classification" | "detection"',
 			inferenceSessionId: 'string > 1',
 			enableWebGPU: 'boolean = true',

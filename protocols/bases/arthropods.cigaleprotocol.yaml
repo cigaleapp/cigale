@@ -57,12 +57,28 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: http://localhost:3000/process/options/insects/species.jsonl
+      at: http://localhost:3000/process/options/arthropods/species.jsonl
       format: json-lines
     infer:
       neural:
         - name: FrenchArthro
           model: https://huggingface.co/cigaleapp/built-in-protocols/resolve/main/classifier-arthropoda.onnx?download=true
+          classes: extraKeys # for now, the classmapping has old GBIF backbone IDs so they're in extraKeys
+          classmapping:
+            at: https://huggingface.co/edgaremy/convnextv2_base.frencharthro-24k/resolve/main/class-names.csv
+            format: csv-commas
+            postprocess: |
+              {
+                "value": line.speciesKey
+              }
+
+        - name: Small collemboles
+          model: TODO
+          classes: labels
+          classmapping:
+            at: https://raw.githubusercontent.com/edgaremy/small-collomboles/main/class_mapping.txt
+            format: txt
+
 
   kingdom:
     type: enum
@@ -73,7 +89,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: http://localhost:3000/process/options/insects/kingdom.jsonl
+      at: http://localhost:3000/process/options/arthropods/kingdom.jsonl
       format: json-lines
 
   phylum:
@@ -85,7 +101,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: http://localhost:3000/process/options/insects/phylum.jsonl
+      at: http://localhost:3000/process/options/arthropods/phylum.jsonl
       format: json-lines
 
   class:
@@ -97,7 +113,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: http://localhost:3000/process/options/insects/class.jsonl
+      at: http://localhost:3000/process/options/arthropods/class.jsonl
       format: json-lines
 
   order:
@@ -109,7 +125,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: http://localhost:3000/process/options/insects/order.jsonl
+      at: http://localhost:3000/process/options/arthropods/order.jsonl
       format: json-lines
 
   family:
@@ -121,7 +137,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: http://localhost:3000/process/options/insects/family.jsonl
+      at: http://localhost:3000/process/options/arthropods/family.jsonl
       format: json-lines
 
   genus:
@@ -133,7 +149,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: http://localhost:3000/process/options/insects/genus.jsonl
+      at: http://localhost:3000/process/options/arthropods/genus.jsonl
       format: json-lines
 
   identification_difficulty:

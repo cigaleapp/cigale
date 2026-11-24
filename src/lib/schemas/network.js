@@ -29,7 +29,7 @@ export const NetworkStreamedLines = (Output) =>
 			[
 				'"json-lines"',
 				'@',
-				`Un objet au format JSON par ligne du fichier. La première ligne doit être un header, avec au moins une propriété "count" qui indique le nombre d'options contenues dans le fichier (sans compter la ligne de header)`,
+				`Un objet au format JSON par ligne du fichier. La première ligne doit être un header, avec au moins une propriété "count" qui indique le nombre de lignes contenues dans le fichier (sans compter la ligne de header)`,
 			]
 		),
 		'postprocess?': JsonataExpression(
@@ -56,3 +56,10 @@ export const NetworkStreamedLines = (Output) =>
 			"Appliquer un traitement à chaque option. Renvoyer undefined revient à ne pas rajouter l'option"
 		),
 	});
+
+export const NetworkStreamedLinesHeader = type({ count: 'number.integer >= 0' });
+
+/**
+ * @template {import('arktype').Type} Schema
+ * @typedef {ReturnType<typeof NetworkStreamedLines<Schema>>['inferIn']} NetworkStreamedLinesConfig
+ */

@@ -28,11 +28,21 @@ import {
 import { NumericUnit } from './units.js';
 
 /**
- * @param {string} metadataId
+ * @param {NamespacedMetadataID} metadataId
  * @param {RuntimeValue<"enum">} key
  */
 export function metadataOptionId(metadataId, key) {
-	return `${metadataId}:${key}`;
+	return namespaceToMetadataOptionInDB(metadataId, key.toString());
+}
+
+/**
+ *
+ * @template {string} [S=string]
+ * @param {NamespacedMetadataID} metadataId
+ * @param {S} rest
+ */
+export function namespaceToMetadataOptionInDB(metadataId, rest) {
+	return /** @type {const} */ (`${metadataId}:${rest}`);
 }
 
 /**
