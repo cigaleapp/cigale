@@ -135,7 +135,7 @@ export async function tryCache<R, Q extends string, P extends DataRequestParams<
 	}
 }
 
-export async function onCacheFileExpired<Q extends string>({
+async function onCacheFileExpired<Q extends string>({
 	datasource,
 	filepath,
 	paramslist,
@@ -175,10 +175,10 @@ export function writeAllCaches() {
 	writeCacheStatsFile();
 }
 
-export type EntryCounts = { total: number; stale: number; fresh: number };
+type EntryCounts = { total: number; stale: number; fresh: number };
 
 /** Per-query entry counts for a cache */
-export function cacheStats(cache: DatasourceCache): {
+function cacheStats(cache: DatasourceCache): {
 	datasource: string;
 	expiresAt: string;
 	queries: Record<string, EntryCounts>;

@@ -68,7 +68,7 @@ function isCurrent(startedAt: string | undefined): boolean {
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-console.log('Waiting for options regeneration to complete...');
+console.info('Waiting for options regeneration to complete...');
 
 // Expose the regeneration progress as a GitHub check run, updated on every
 // poll.
@@ -90,7 +90,7 @@ let current = false;
 for (let i = 0; i < totalWaitMinutes * 6; i++) {
 	const state = await fetchStatus();
 	if (state === null) {
-		console.log('Server not ready (503); waiting...');
+		console.info('Server not ready (503); waiting...');
 		ghApi('PATCH', `repos/${repo}/check-runs/${checkRunId}`, {
 			status: 'queued',
 			output: {
@@ -106,7 +106,7 @@ for (let i = 0; i < totalWaitMinutes * 6; i++) {
 	if (current) {
 		const p = state.progress;
 		const tasks = p?.ongoing.join(', ');
-		console.log(`${p?.percentage ?? 0}% ${p?.phase ?? ''}: ${tasks ?? ''}`);
+		console.info(`${p?.percentage ?? 0}% ${p?.phase ?? ''}: ${tasks ?? ''}`);
 		ghApi('PATCH', `repos/${repo}/check-runs/${checkRunId}`, {
 			status: 'in_progress',
 			output: {
@@ -115,7 +115,7 @@ for (let i = 0; i < totalWaitMinutes * 6; i++) {
 			},
 		});
 	} else {
-		console.log(`No new run yet (last run started: ${state.startedAt ?? 'never'}); waiting...`);
+		console.info(`No new run yet (last run started: ${state.startedAt ?? 'never'}); waiting...`);
 		ghApi('PATCH', `repos/${repo}/check-runs/${checkRunId}`, {
 			status: 'queued',
 			output: {
@@ -128,7 +128,7 @@ for (let i = 0; i < totalWaitMinutes * 6; i++) {
 	await sleep(10_000);
 }
 
-console.log('Final status:');
+console.info('Final status:');
 const final = await fetchStatus();
 if (final === null) {
 	ghApi('PATCH', `repos/${repo}/check-runs/${checkRunId}`, {
@@ -141,14 +141,14 @@ if (final === null) {
 	});
 	process.exit(1);
 }
-console.log(JSON.stringify(final, null, 2));
+console.info(JSON.stringify(final, null, 2));
 status = final.state;
 current = isCurrent(final.startedAt);
 
-console.log('Logs:');
+console.info('Logs:');
 const logsRes = await fetch(final.logs_url);
 if (!logsRes.ok) throw new Error(`GET ${final.logs_url} failed: ${logsRes.status}`);
-console.log(await logsRes.text());
+console.info(await logsRes.text());
 
 let conclusion: 'success' | 'failure';
 let title: string;

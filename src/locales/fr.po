@@ -4315,3 +4315,11 @@ msgstr "Mettre à jour l'app pour installer ce protocole"
 #: src/routes/(app)/protocols/RowProtocol.svelte
 msgid "Non installable"
 msgstr "Non installable"
+
+#: src/lib/http-streaming.ts
+msgid "Content-Length"
+msgstr "Content-Length"
+
+#: src/lib/http-streaming.ts
+msgid "Range"
+msgstr "Range"

@@ -21,8 +21,8 @@ if (import.meta.main) {
 	if (baseUrl) {
 		const amended = amendManifests(directory, baseUrl);
 		if (amended.length > 0) {
-			console.log(`Amended ${amended.length} protocol manifest(s) to use ${baseUrl}:`);
-			for (const file of amended) console.log(`  - ${file}`);
+			console.info(`Amended ${amended.length} protocol manifest(s) to use ${baseUrl}:`);
+			for (const file of amended) console.info(`  - ${file}`);
 		}
 	}
 
@@ -35,7 +35,7 @@ if (import.meta.main) {
 		outPath,
 	});
 
-	console.log(`Generated protocol registry at ${registryPath}`);
+	console.info(`Generated protocol registry at ${registryPath}`);
 }
 
 // The registry schema lives in the repo's static/ dir (copied to /app/static

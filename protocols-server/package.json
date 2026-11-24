@@ -6,7 +6,8 @@
 	"scripts": {
 		"start": "bun run main.ts --serve",
 		"regenerate": "bun run main.ts",
-		"generate:types": "bun run scripts/generate-types.ts"
+		"generate:types": "bun run scripts/generate-types.ts",
+		"wait-server-regen": "bun run scripts/wait-regeneration.ts"
 	},
 	"dependencies": {
 		"@arkenv/core": "^1.0.0-rc.4",

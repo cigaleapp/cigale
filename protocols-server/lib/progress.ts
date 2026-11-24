@@ -4,9 +4,9 @@ import { renameSync, unlinkSync, writeFileSync } from 'node:fs';
 import * as eta from 'arrival-time';
 import { minutesToMilliseconds } from 'date-fns';
 
-import { PROGRESS_FILE_ENABLED, PROGRESS_FILE_REFRESH_MS } from '../server/config.ts';
+import config from '../server/config.ts';
 
-export type ProgressSnapshot = {
+type ProgressSnapshot = {
 	phase: string;
 	total: number;
 	done: number;
@@ -105,10 +105,10 @@ class Progress {
 	}
 
 	progressFileWriteDue() {
-		if (!PROGRESS_FILE_ENABLED) return false;
+		if (!config.PROGRESS_FILE_ENABLED) return false;
 		if (!this.lastProgressFileWrite) return true;
 		const diff = performance.now() - this.lastProgressFileWrite;
-		return diff > PROGRESS_FILE_REFRESH_MS;
+		return diff > config.PROGRESS_FILE_REFRESH_MS;
 	}
 
 	progress(max: number) {
@@ -249,8 +249,8 @@ export const logger = new Logger();
  */
 const progressFilePath = process.env.PROGRESS_FILE_PATH ?? 'progress.json';
 
-export function writeProgressFile(snapshot: ProgressSnapshot) {
-	if (!PROGRESS_FILE_ENABLED) return;
+function writeProgressFile(snapshot: ProgressSnapshot) {
+	if (!config.PROGRESS_FILE_ENABLED) return;
 
 	try {
 		const tmp = `${progressFilePath}.tmp`;

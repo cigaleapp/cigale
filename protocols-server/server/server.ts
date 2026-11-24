@@ -158,10 +158,10 @@ export function startServer(): Server<undefined> {
 	try {
 		const amended = amendManifests(config.PROTOCOLS_DIR, config.WEB_ORIGIN);
 		if (amended.length > 0) {
-			console.log(
+			console.info(
 				`Amended ${amended.length} protocol manifest(s) to use ${config.WEB_ORIGIN}:`
 			);
-			for (const file of amended) console.log(`  - ${file}`);
+			for (const file of amended) console.info(`  - ${file}`);
 		}
 		const registryPath = writeRegistry({
 			directory: config.PROTOCOLS_DIR,
@@ -169,7 +169,7 @@ export function startServer(): Server<undefined> {
 				config.WEB_ORIGIN.replace(/\/+$/, '') + url.pathname + url.search,
 			filter: () => true,
 		});
-		console.log(`Generated protocol registry at ${registryPath}`);
+		console.info(`Generated protocol registry at ${registryPath}`);
 	} catch (err) {
 		console.error('Failed to amend manifests / generate protocol registry:', err);
 	}

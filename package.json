@@ -241,7 +241,6 @@
 		"wuchale@0.26.7": "patches/wuchale@0.26.7.patch"
 	},
 	"imports": {
-		"#lib": "./src/lib/index.js",
 		"#lib/*": "./src/lib/*",
 		"#worker/*": "./src/worker/*",
 		"#locales/*": "./src/locales/*",

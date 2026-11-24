@@ -33,7 +33,7 @@ export type ModuleName =
 	// debug stuff
 	| `debug-${string}`;
 
-export interface Module {
+interface Module {
 	name: ModuleName;
 }
 

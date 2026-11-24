@@ -1,44 +1,50 @@
 {
 	"$schema": "./node_modules/knip/schema.json",
-	"ignore": [
-		"src/lib/schemas/*",
-		"src/lib/utils.ts",
-		"src/lib/Checkbox.svelte",
-		"src/lib/FloatingButton.svelte",
-		"src/lib/UnsavedChangesIndicator.svelte",
-		"src/locales/**/*.js",
-		"tests/reporters/pleye.js",
-		"src/**/\\(todo\\)/*",
-		// Imports gitignored graphql-env.d.ts which we don't bother
-		// generating in package's prepare script
-		"scripts/upload-taxa-to-ecosignal.ts",
-	],
-	"ignoreDependencies": [
-		"@iconify-json/.+",
-		"@sveltejs/vite-plugin-svelte-inspector",
-		"@capacitor/assets",
-		"baseline-browser-mapping",
-		"caniuse-lite",
-		"@electron-forge/publisher-github",
-	],
-	"ignoreUnresolved": ["#lib/../../bun.lock?raw"],
-	"entry": [
-		"scripts/issue-creator-server.ts",
-		"scripts/issue-creator-discord-bot.ts",
-		// TODO add to a CI workflow
-		"scripts/generate-contributing-tables.js",
-		"scripts/add-metadata-from-xper3.ts",
-		"scripts/create-idmybee-protocol.ts",
-		"src/electron/main.{d.ts,js}",
-		"forge.env.d.ts",
-		"vite.electron*.config.js",
-		"wuchale.config.js",
-		"tests/*.spec.{js,ts}",
-		"tests/setup/*.ts",
-		"tests/tasks/*.spec.{js,ts}",
-	],
-	"ignoreBinaries": ["uv"],
-	"paths": {
-		"~icons/*": ["node_modules/unplugin-icons/types/svelte5.d.ts"],
+	"workspaces": {
+		".": {
+			"entry": [
+				"scripts/issue-creator-server.ts",
+				"scripts/issue-creator-discord-bot.ts",
+				// TODO add to a CI workflow
+				"scripts/generate-contributing-tables.js",
+				"scripts/add-metadata-from-xper3.ts",
+				"scripts/create-idmybee-protocol.ts",
+				"src/electron/main.{d.ts,js}",
+				"forge.env.d.ts",
+				"vite.electron*.config.js",
+				"wuchale.config.js",
+				"tests/*.spec.{js,ts}",
+				"tests/setup/*.ts",
+				"tests/tasks/*.spec.{js,ts}",
+			],
+			"ignore": [
+				"src/lib/schemas/*",
+				"src/lib/utils.ts",
+				"src/lib/Checkbox.svelte",
+				"src/lib/FloatingButton.svelte",
+				"src/lib/UnsavedChangesIndicator.svelte",
+				"src/locales/**/*.js",
+				"tests/reporters/pleye.js",
+				"src/**/\\(todo\\)/*",
+				// Imports gitignored graphql-env.d.ts which we don't bother
+				// generating in package's prepare script
+				"scripts/upload-taxa-to-ecosignal.ts",
+			],
+			"ignoreDependencies": [
+				"@iconify-json/.+",
+				"@sveltejs/vite-plugin-svelte-inspector",
+				"@capacitor/assets",
+				"baseline-browser-mapping",
+				"caniuse-lite",
+				"@electron-forge/publisher-github",
+				"@arkenv/core",
+			],
+			"ignoreUnresolved": ["#lib/../../bun.lock?raw"],
+			"ignoreBinaries": ["uv"],
+			"paths": {
+				"~icons/*": ["node_modules/unplugin-icons/types/svelte5.d.ts"],
+			},
+		},
+		"protocols-server": {},
 	},
 }

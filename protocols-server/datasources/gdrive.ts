@@ -314,7 +314,7 @@ function folderIdFromUrl(url: string) {
 /**
  * Semi-open range [start=0, end)
  */
-export function range(startOrEnd: number, end?: number): number[] {
+function range(startOrEnd: number, end?: number): number[] {
 	if (end === undefined) {
 		return Array.from({ length: startOrEnd }, (_, i) => i);
 	}

@@ -4309,3 +4309,11 @@ msgstr ""
 #: src/routes/(app)/protocols/RowProtocol.svelte
 msgid "Non installable"
 msgstr ""
+
+#: src/lib/http-streaming.ts
+msgid "Content-Length"
+msgstr ""
+
+#: src/lib/http-streaming.ts
+msgid "Range"
+msgstr ""

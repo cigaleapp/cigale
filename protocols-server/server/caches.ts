@@ -3,20 +3,12 @@ import path from 'node:path';
 
 import { dequal } from 'dequal';
 
+import { DatasourceCache } from '../lib/caching.ts';
 import config from './config.ts';
 
 // --- Cache file mutation (DELETE /api/caches/...) ---
 // The server is a separate process from the regeneration child, so removal
 // operates directly on the cache JSON files under DATA_DIR/caches/.
-
-export type CacheFile = {
-	expiresAt: string;
-	datasource: string;
-	entries: Record<
-		string,
-		Array<{ expiresAt: string; params: unknown; response: unknown; files?: unknown[] }>
-	>;
-};
 
 function cacheFilePath(datasource: string): string | null {
 	const resolved = path.resolve(
@@ -31,7 +23,7 @@ function cacheFilePath(datasource: string): string | null {
 	return resolved;
 }
 
-function readCacheFile(filepath: string): CacheFile {
+function readCacheFile(filepath: string): DatasourceCache {
 	return JSON.parse(readFileSync(filepath, 'utf8'));
 }
 
