@@ -6,7 +6,7 @@ import path from 'node:path';
 import type { ExportedProtocol } from '../protocol-types.js';
 import type { ProtocolRegistry } from '../registry-types.js';
 
-import { LOCAL_DEV_ORIGIN } from '../server/config.js';
+import config from '../server/config.js';
 
 const root = path.dirname(import.meta.dir); // protocols-server/
 
@@ -58,13 +58,13 @@ function schemaPath(): string {
 export function amendManifests(directory: string, baseUrl: string): string[] {
 	if (!baseUrl) return [];
 	const target = baseUrl.replace(/\/+$/, '');
-	if (target === LOCAL_DEV_ORIGIN) return [];
+	if (target === config.LOCAL_DEV_ORIGIN) return [];
 	const glob = new Bun.Glob('**/*.cigaleprotocol.{json,yaml}');
 	const amended: string[] = [];
 	for (const entry of glob.scanSync({ cwd: directory })) {
 		const file = path.join(directory, entry);
 		const text = readFileSync(file, 'utf8');
-		const out = text.replaceAll(LOCAL_DEV_ORIGIN, target);
+		const out = text.replaceAll(config.LOCAL_DEV_ORIGIN, target);
 		if (out !== text) {
 			writeFileSync(file, out);
 			amended.push(entry);
@@ -127,7 +127,7 @@ export function writeRegistry({
 		JSON.stringify(
 			{
 				$schema: transformSource
-					? transformSource(new URL('/registry.schema.json', LOCAL_DEV_ORIGIN))
+					? transformSource(new URL('/registry.schema.json', config.LOCAL_DEV_ORIGIN))
 					: path.relative(path.dirname(out), schemaPath()).replaceAll('\\', '/'),
 				protocols: [...protocols.values()],
 			},

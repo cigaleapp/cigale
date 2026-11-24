@@ -1,7 +1,7 @@
 import { existsSync, readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 
-import { PROTOCOLS_DIR, STATIC_DIR } from './config.js';
+import config from './config.ts';
 
 // --- Browsing (simple HTML, no CSS) ---
 
@@ -73,22 +73,24 @@ ${rows}
 
 // Index of the browsable areas.
 export function indexPage(): Response {
+	const scan = new Bun.Glob('**/*.cigaleprotocol.{json,yaml}').scanSync({
+		cwd: config.PROTOCOLS_DIR,
+	});
+
 	// Protocol manifests are served at the root level (e.g.
 	// /entomoscope.cigaleprotocol.yaml, /bases/bees.cigaleprotocol.json).
-	const protocolFiles = existsSync(PROTOCOLS_DIR)
-		? [...new Bun.Glob('**/*.cigaleprotocol.{json,yaml}').scanSync({ cwd: PROTOCOLS_DIR })]
-				.map((f) => f.replaceAll('\\', '/'))
-				.sort()
+	const protocolFiles = existsSync(config.PROTOCOLS_DIR)
+		? [...scan].map((f) => f.replaceAll('\\', '/')).sort()
 		: [];
 	const sizeOf = (f: string) => {
 		try {
-			return statSync(path.join(PROTOCOLS_DIR, f)).size;
+			return statSync(path.join(config.PROTOCOLS_DIR, f)).size;
 		} catch {
 			return null;
 		}
 	};
-	const registrySize = existsSync(path.join(PROTOCOLS_DIR, 'registry.json'))
-		? statSync(path.join(PROTOCOLS_DIR, 'registry.json')).size
+	const registrySize = existsSync(path.join(config.PROTOCOLS_DIR, 'registry.json'))
+		? statSync(path.join(config.PROTOCOLS_DIR, 'registry.json')).size
 		: null;
 	const protocolRows = protocolFiles
 		.map((f) => {
@@ -100,14 +102,14 @@ export function indexPage(): Response {
 		.join('\n');
 	const registrySizeLabel =
 		registrySize === null ? '' : ` <span class="size">(${formatBytes(registrySize)})</span>`;
-	const schemaFiles = existsSync(STATIC_DIR)
-		? readdirSync(STATIC_DIR)
+	const schemaFiles = existsSync(config.STATIC_DIR)
+		? readdirSync(config.STATIC_DIR)
 				.filter((f) => f.endsWith('.schema.json'))
 				.sort()
 		: [];
 	const schemaRows = schemaFiles
 		.map((f) => {
-			const size = statSync(path.join(STATIC_DIR, f)).size;
+			const size = statSync(path.join(config.STATIC_DIR, f)).size;
 			return `<li><a href="/${f}">${escapeHtml(f)}</a> <span class="size">(${formatBytes(size)})</span></li>`;
 		})
 		.join('\n');

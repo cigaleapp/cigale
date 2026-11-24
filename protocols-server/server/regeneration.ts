@@ -3,7 +3,7 @@ import path from 'node:path';
 
 import { Subprocess } from 'bun';
 
-import { DATA_DIR, LOG_MAX_LINES, PROGRESS_FILE } from './config.js';
+import config from './config.ts';
 
 export type RegenStatus = {
 	state: 'idle' | 'running' | 'done' | 'error';
@@ -31,8 +31,8 @@ export function readRegenLog(): string | null {
 
 function appendLogLine(line: string) {
 	regenLog.push(line);
-	if (regenLog.length > LOG_MAX_LINES) {
-		regenLog.splice(0, regenLog.length - LOG_MAX_LINES);
+	if (regenLog.length > config.LOG_MAX_LINES) {
+		regenLog.splice(0, regenLog.length - config.LOG_MAX_LINES);
 	}
 }
 
@@ -74,7 +74,7 @@ function pipeToLog(
 // snapshot to this file when PROGRESS_FILE=true.
 export function readProgress(): unknown {
 	try {
-		return JSON.parse(readFileSync(PROGRESS_FILE, 'utf8'));
+		return JSON.parse(readFileSync(config.PROGRESS_FILE, 'utf8'));
 	} catch {
 		return null;
 	}
@@ -88,7 +88,7 @@ export function regenerate(): boolean {
 	regenStatus = { state: 'running', startedAt };
 	regenLog = [];
 	regenProcess = Bun.spawn(['bun', 'run', path.join(import.meta.dir, '..', 'main.ts')], {
-		cwd: DATA_DIR,
+		cwd: config.DATA_DIR,
 		stdout: 'pipe',
 		stderr: 'pipe',
 		env: { ...process.env },

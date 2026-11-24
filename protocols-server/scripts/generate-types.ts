@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');
 // Repo layout: <repo>/static/. Container layout: /app/static/.
-const staticDir = [join(root, '..', 'static'), join(root, 'static')].find((p) => existsSync(p));
+const staticDir = [join(root, '..', 'static'), join(root, 'static')].find((p) => existsSync(p))!;
 if (!staticDir) throw new Error('static/ dir not found');
 
 // Composition keywords that change a node's semantics — don't close those.

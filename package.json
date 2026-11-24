@@ -149,6 +149,7 @@
 	},
 	"dependencies": {
 		"@andy0130tw/es-arraybuffer-base64": "^1.1.2-browser.0",
+		"@arkenv/core": "^1.0.0-rc.4",
 		"@capacitor-community/camera-preview": "^8.0.1",
 		"@capacitor/android": "^8.5.2",
 		"@capacitor/app": "^8.1.1",

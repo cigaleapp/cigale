@@ -1,7 +1,9 @@
 import { existsSync, readFileSync, renameSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+
 import { dequal } from 'dequal';
-import { CACHE_STATS_FILE, DATA_DIR } from './config.js';
+
+import config from './config.ts';
 
 // --- Cache file mutation (DELETE /api/caches/...) ---
 // The server is a separate process from the regeneration child, so removal
@@ -10,12 +12,19 @@ import { CACHE_STATS_FILE, DATA_DIR } from './config.js';
 export type CacheFile = {
 	expiresAt: string;
 	datasource: string;
-	entries: Record<string, Array<{ expiresAt: string; params: unknown; response: unknown; files?: unknown[] }>>;
+	entries: Record<
+		string,
+		Array<{ expiresAt: string; params: unknown; response: unknown; files?: unknown[] }>
+	>;
 };
 
 function cacheFilePath(datasource: string): string | null {
-	const resolved = path.resolve(DATA_DIR, 'caches', '.' + path.posix.normalize('/' + datasource) + '.json');
-	const root = path.resolve(DATA_DIR, 'caches');
+	const resolved = path.resolve(
+		config.DATA_DIR,
+		'caches',
+		'.' + path.posix.normalize('/' + datasource) + '.json'
+	);
+	const root = path.resolve(config.DATA_DIR, 'caches');
 	if (resolved !== root && !resolved.startsWith(root + path.sep)) {
 		return null;
 	}
@@ -37,7 +46,7 @@ function updateCacheStats(datasource: string, filepath: string | null) {
 	try {
 		const stats: { updatedAt: string; datasources: Array<Record<string, unknown>> } = (() => {
 			try {
-				return JSON.parse(readFileSync(CACHE_STATS_FILE, 'utf8'));
+				return JSON.parse(readFileSync(config.CACHE_STATS_FILE, 'utf8'));
 			} catch {
 				return { updatedAt: new Date().toISOString(), datasources: [] };
 			}
@@ -46,7 +55,8 @@ function updateCacheStats(datasource: string, filepath: string | null) {
 			? (() => {
 					const cache = readCacheFile(filepath);
 					const now = new Date();
-					const queries: Record<string, { total: number; stale: number; fresh: number }> = {};
+					const queries: Record<string, { total: number; stale: number; fresh: number }> =
+						{};
 					const totalEntries = { total: 0, stale: 0, fresh: 0 };
 					for (const [query, entries] of Object.entries(cache.entries)) {
 						const counts = { total: entries.length, stale: 0, fresh: 0 };
@@ -71,9 +81,9 @@ function updateCacheStats(datasource: string, filepath: string | null) {
 		stats.datasources = stats.datasources.filter((d) => d.datasource !== datasource);
 		if (entry) stats.datasources.push(entry);
 		stats.updatedAt = new Date().toISOString();
-		const tmp = `${CACHE_STATS_FILE}.tmp`;
+		const tmp = `${config.CACHE_STATS_FILE}.tmp`;
 		writeFileSync(tmp, JSON.stringify(stats, null, 2));
-		renameSync(tmp, CACHE_STATS_FILE);
+		renameSync(tmp, config.CACHE_STATS_FILE);
 	} catch (err) {
 		console.error('Failed to update cache stats file:', err);
 	}
@@ -83,7 +93,7 @@ function updateCacheStats(datasource: string, filepath: string | null) {
 // this file whenever a cache is written.
 export function readCacheStats(): unknown {
 	try {
-		return JSON.parse(readFileSync(CACHE_STATS_FILE, 'utf8'));
+		return JSON.parse(readFileSync(config.CACHE_STATS_FILE, 'utf8'));
 	} catch {
 		return null;
 	}
@@ -95,7 +105,11 @@ export function readCacheStats(): unknown {
 //   DELETE /api/caches/:datasource/:query?k=v -> entries whose params match
 //     the given params (each value JSON-decoded when possible, otherwise kept
 //     as a string)
-export function handleCacheDelete(pathname: string, url: URL, isRegenRunning: boolean): Response | null {
+export function handleCacheDelete(
+	pathname: string,
+	url: URL,
+	isRegenRunning: boolean
+): Response | null {
 	if (!pathname.startsWith('/api/caches/')) {
 		return null;
 	}
@@ -149,15 +163,18 @@ export function handleCacheDelete(pathname: string, url: URL, isRegenRunning: bo
 		if (typeof entryParams !== 'object' || entryParams === null || Array.isArray(entryParams)) {
 			return dequal(entryParams, params);
 		}
-		return Object.entries(params).every(
-			([k, v]) => dequal((entryParams as Record<string, unknown>)[k], v)
+		return Object.entries(params).every(([k, v]) =>
+			dequal((entryParams as Record<string, unknown>)[k], v)
 		);
 	};
 	const before = cache.entries[query].length;
 	cache.entries[query] = cache.entries[query].filter((entry) => !matches(entry.params));
 	const removed = before - cache.entries[query].length;
 	if (removed === 0) {
-		return Response.json({ error: `No entries matching ${JSON.stringify(params)}` }, { status: 404 });
+		return Response.json(
+			{ error: `No entries matching ${JSON.stringify(params)}` },
+			{ status: 404 }
+		);
 	}
 	writeCacheFile(filepath, cache);
 	updateCacheStats(datasource, filepath);
