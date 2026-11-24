@@ -1,52 +1,82 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 
-export const PORT = Number(process.env.PORT ?? 3000);
-export const DATA_DIR = process.env.DATA_DIR ?? '.';
-export const LOCAL_DEV_ORIGIN = process.env.LOCAL_DEV_ORIGIN ?? 'http://localhost:3000';
-// Origin of the public web app. Used at startup to rewrite the hardcoded
-// `http://localhost:3000` references in the protocol manifests and to build
-// the protocol registry URLs.
-export const WEB_ORIGIN = process.env.WEB_ORIGIN ?? LOCAL_DEV_ORIGIN;
-if (!process.env.WEB_ORIGIN) {
+import arkenv, { type } from '@arkenv/core';
+
+const env = arkenv({
+	PORT: 'number.port',
+	DATA_DIR: 'string = "."',
+	LOCAL_DEV_ORIGIN: 'string.url = "http://localhost:3000"',
+
+	/**
+	 * Origin of the public web app. Used at startup to rewrite the hardcoded
+	 * `http://localhost:3000` references in the protocol manifests and to build
+	 * the protocol registry URLs.
+	 */
+	'WEB_ORIGIN?': 'string.url',
+
+	/**
+	 * Protocol manifests (yaml) + generated .json live here. In the container this
+	 * resolves to /protocols (server code is at /app/server); locally to <repo>/protocols.
+	 */
+	PROTOCOLS_DIR: type.string.default(() => findAtRoot('protocols')!),
+
+	/**
+	 * JSON schemas (protocol/registry/results). Locally this resolves to
+	 * <repo>/static; in the container the server code is at /app and the schemas
+	 * are copied to /app/static, so try both layouts.
+	 */
+	STATIC_DIR: type.string.default(() => findAtRoot('static')!),
+
+	/**
+	 * The regeneration process (spawned with cwd: DATA_DIR) writes a progress
+	 * snapshot to this file when PROGRESS_FILE=true.
+	 */
+	'PROGRESS_FILE?': 'string',
+
+	/**
+	 * The regeneration process writes cache stats (per-query entry counts) to
+	 * this file whenever a cache is written.
+	 */
+	'CACHE_STATS_FILE?': 'string',
+
+	/**
+	 * Simple accountless password auth: the password is set via the API_PASSWORD
+	 * env var. API clients send it as `Authorization: Bearer <password>`.
+	 * Browsers use a cookie: GET /api/login?password=... verifies the password
+	 * and sets an HttpOnly cookie holding its sha256 (not the password itself).
+	 */
+	API_PASSWORD: 'string > 0',
+
+	AUTH_COOKIE: 'string = "api_password"',
+	LOG_MAX_LINES: 'number.integer >= 0 = 100',
+	PROGRESS_FILE_REFRESH_MS: 'number.integer > 500 = 10000',
+	PROGRESS_FILE_ENABLED: 'boolean',
+	ASSETS_URL_BASE: 'string.url',
+	JJ_RATELIMIT_MAX_WAIT_SECONDS: 'number.integer > 0 = 60',
+});
+
+if (!env.WEB_ORIGIN) {
 	console.warn(
-		`WEB_ORIGIN env var not set, falling back to ${LOCAL_DEV_ORIGIN}. THIS WILL NOT WORK IN PROD!`
+		`WEB_ORIGIN env var not set, falling back to ${env.LOCAL_DEV_ORIGIN}. THIS WILL NOT WORK IN PROD!`
 	);
 }
 
-// Protocol manifests (yaml) + generated .json live here. In the container this
-// resolves to /protocols (server code is at /app/server); locally to <repo>/protocols.
-export const PROTOCOLS_DIR =
-	process.env.PROTOCOLS_DIR ?? path.join(import.meta.dir, '..', '..', 'protocols');
+const WEB_ORIGIN = env.WEB_ORIGIN ?? env.LOCAL_DEV_ORIGIN;
 
-// JSON schemas (protocol/registry/results). Locally this resolves to
-// <repo>/static; in the container the server code is at /app and the schemas
-// are copied to /app/static, so try both layouts.
-export const STATIC_DIR =
-	[
-		path.join(import.meta.dir, '..', 'static'),
-		path.join(import.meta.dir, '..', '..', 'static'),
-	].find((p) => existsSync(p)) ?? path.join(import.meta.dir, '..', '..', 'static');
+export default {
+	...env,
+	WEB_ORIGIN,
+	PROGRESS_FILE: env.CACHE_STATS_FILE ?? path.join(env.DATA_DIR, 'progress.json'),
+	CACHE_STATS_FILE: env.PROGRESS_FILE ?? path.join(env.DATA_DIR, 'cache-stats.json'),
+	ASSETS_URL_BASE: env.ASSETS_URL_BASE ?? `${WEB_ORIGIN}/assets`,
+};
 
-// The regeneration process (spawned with cwd: DATA_DIR) writes a progress
-// snapshot to this file when PROGRESS_FILE=true.
-export const PROGRESS_FILE = path.join(DATA_DIR, 'progress.json');
-
-// The regeneration process writes cache stats (per-query entry counts) to
-// this file whenever a cache is written.
-export const CACHE_STATS_FILE = path.join(DATA_DIR, 'cache-stats.json');
-
-// Simple accountless password auth: the password is set via the API_PASSWORD
-// env var. API clients send it as `Authorization: Bearer <password>`.
-// Browsers use a cookie: GET /api/login?password=... verifies the password
-// and sets an HttpOnly cookie holding its sha256 (not the password itself).
-export const API_PASSWORD = process.env.API_PASSWORD;
-export const AUTH_COOKIE = 'api_password';
-
-export const LOG_MAX_LINES = Number.parseInt(process.env.LOG_MAX_LINES ?? '100');
-
-export const PROGRESS_FILE_REFRESH_MS = Number(process.env.PROGRESS_FILE_REFRESH_MS ?? 10_000);
-
-export const PROGRESS_FILE_ENABLED = process.env.PROGRESS_FILE === 'true';
-
-export const ASSETS_URL_BASE = `${WEB_ORIGIN}/assets`;
+function findAtRoot(filepath: string) {
+	return [
+		// Local dev
+		path.join(import.meta.dir, '..', '..', filepath),
+		// Server container
+		path.join(import.meta.dir, '..', filepath),
+	].find((p) => existsSync(p));
+}

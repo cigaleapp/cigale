@@ -7,6 +7,7 @@ import { Datasource, MultipleResponses } from '../lib/datasource.ts';
 import { OptionExtra } from '../lib/modules.ts';
 import { logger } from '../lib/progress.ts';
 import { fetchPagesViaWordpressAPI, RateLimitTimeoutError } from '../lib/wordpress.ts';
+import { JJ_RATELIMIT_MAX_WAIT_SECONDS } from '../server/config.ts';
 
 export type Page = {
 	name: string;
@@ -79,8 +80,7 @@ export class JessicaJoachimSite extends Datasource<
 			const queries = new Map(links.map((l) => [l.link, new URL(l.link)] as const));
 
 			const pages = await fetchPagesViaWordpressAPI(queries, {
-				// XXX: DONT MERGE
-				maxWaitTime: 12,
+				maxWaitTime: JJ_RATELIMIT_MAX_WAIT_SECONDS,
 				origin: this.origin.toString(),
 				auth: {
 					username: process.env.WORDPRESS_USERNAME!,
