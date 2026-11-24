@@ -11,6 +11,11 @@ source: http://localhost:3000/bases/springtails.cigaleprotocol.yaml
 
 description: Protocole de base pour les collemboles
 
+imports:
+  - from: io.github.cigaleapp.base.arthropods
+    metadata:
+      - crop
+
 authors:
   - name: GBIF Contributors
     email: info@gbif.org
@@ -28,27 +33,6 @@ metadataGroups:
     # TODO: order here!
 
 metadata:
-  crop:
-    type: boundingbox
-    label: ''
-    required: true
-    description: ''
-    mergeMethod: union
-    groupable: true
-    infer:
-      neural: []
-      # TODO
-      #   - input:
-      #       height:
-      #       normalized:
-      #       width:
-      #     model:
-      #     output:
-      #       normalized:
-      #       shape:
-      #         -
-      #     webgpuReady: false
-
   species:
     type: enum
     label: Espèce
@@ -62,7 +46,12 @@ metadata:
     infer:
       neural:
         - name: Small collemboles
-          model: TODO
+          model: https://huggingface.co/cigaleapp/built-in-protocols/resolve/main/classifier-collembola.onnx?download=true
+          input:
+            height: 224
+            width: 224
+            normalized: true
+            disposition: 1CHW
           classes: labels
           classmapping:
             at: https://raw.githubusercontent.com/edgaremy/small-collomboles/main/class_mapping.txt

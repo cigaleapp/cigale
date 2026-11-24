@@ -36,18 +36,28 @@ metadata:
     mergeMethod: union
     groupable: true
     infer:
-      neural: []
-      # TODO
-      #   - input:
-      #       height:
-      #       normalized:
-      #       width:
-      #     model:
-      #     output:
-      #       normalized:
-      #       shape:
-      #         -
-      #     webgpuReady: false
+      neural:
+        - name: ArthroNat+flatbug YOLO11 Nano
+          model: https://huggingface.co/edgaremy/arthropod-detector/resolve/main/yolo11n_ArthroNat%2Bflatbug.onnx?download=true
+          input:
+            height: 640
+            width: 640
+            normalized: true
+            disposition: 1CHW
+          output:
+            normalized: false
+            shape: [sx, sy, ex, ey, score, _]
+          webgpuReady: false
+        - name: ArthroNat+flatbug YOLO11 Large
+          model: https://huggingface.co/edgaremy/arthropod-detector/resolve/main/yolo11n_ArthroNat%2Bflatbug.onnx?download=true
+          input:
+            height: 640
+            width: 640
+            normalized: true
+            disposition: 1CHW
+          output:
+            normalized: false
+            shape: [sx, sy, ex, ey, score, _]
 
   species:
     type: enum
