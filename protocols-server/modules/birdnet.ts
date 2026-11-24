@@ -1,6 +1,4 @@
-import { addYears } from 'date-fns';
-
-import { Datasource } from '../lib/datasource.js';
+import { BirdNetZenodo } from '../lib/birdnet.js';
 import { NameProvider } from '../lib/modules.js';
 import { logger } from '../lib/progress.js';
 
@@ -38,65 +36,18 @@ export class BirdNetClassmapping implements NameProvider {
 				yield { clade: 'family', name };
 			}
 
-			yield { clade, name };
+			yield {
+				clade,
+				name,
+				extras: [
+					{
+						priority: 1,
+						extra: {
+							extraKeys: [`birdnet:${row.id}`],
+						},
+					},
+				],
+			};
 		}
-	}
-}
-
-type ZenodoFile = {
-	record: `https://zenodo.org/records/${number}`;
-	file: string;
-};
-
-export class BirdNetZenodo extends Datasource<
-	'classmapping',
-	{ classmapping: ZenodoFile },
-	{ classmapping: Array<{ idx: number; sci_name: string }> }
-> {
-	name = 'birdnet' as const;
-
-	expirations = {
-		file: (now: Date) => addYears(now, 1),
-		entry: (now: Date) => addYears(now, 1),
-	};
-
-	async init() {}
-
-	requests = {
-		classmapping: async ({ record, file }: ZenodoFile) => {
-			const response = await fetch(`${record}/files/${file}?download=1`);
-			const text = await response.text();
-			if (!response.ok) throw new Error(text);
-
-			return [...parseCsv(text, 'idx', 'sci_name')].map((row) => ({
-				...row,
-				idx: Number.parseInt(row.idx),
-			}));
-		},
-	};
-}
-
-function* parseCsv<C extends string>(
-	text: string,
-	/** Column names to keep */
-	...columns: C[]
-): Iterable<Record<C, string>> {
-	const [header, ...rows] = text.split('\n');
-
-	const sep = header.includes(';') ? ';' : ',';
-
-	const index = header
-		.split(sep)
-		.map((name, i) => ({ name, i }))
-		.filter((cell) => columns.includes(cell.name as C));
-
-	for (const row of rows) {
-		if (!row.trim()) continue;
-
-		const cells = row.trim().split(sep);
-
-		yield Object.fromEntries(
-			index.map((column) => [column.name, cells[column.i]] as const)
-		) as Record<C, string>;
 	}
 }
