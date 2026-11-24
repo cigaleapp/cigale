@@ -119,6 +119,7 @@ jobs:
       - name: Setup hfctl
         uses: nudibranches-tech/setup-hfctl@v1
         with:
+          console-url: https://data-terra.ai.meso.umontpellier.fr
           service-account: ${{ secrets.DATATERRA_HF_SERVICE_ACCOUNT }}
 
       - name: Update app image

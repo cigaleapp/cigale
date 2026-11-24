@@ -1,6 +1,6 @@
 /// <reference types="@types/bun" />
 
-import { existsSync, mkdirSync, readFileSync, renameSync, unlinkSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, renameSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
 import { differenceInSeconds, isPast } from 'date-fns';
@@ -183,6 +183,8 @@ export function cacheStats(cache: DatasourceCache): {
 	expiresAt: string;
 	queries: Record<string, EntryCounts>;
 	totalEntries: EntryCounts;
+	/** Size of the cache file on disk in bytes (null when the file is missing) */
+	sizeBytes: number | null;
 } {
 	const queries: Record<string, EntryCounts> = {};
 	const totalEntries: EntryCounts = { total: 0, stale: 0, fresh: 0 };
@@ -197,11 +199,13 @@ export function cacheStats(cache: DatasourceCache): {
 		totalEntries.stale += counts.stale;
 		totalEntries.fresh += counts.fresh;
 	}
+	const filepath = filepathToCache(cache.datasource);
 	return {
 		datasource: cache.datasource,
 		expiresAt: cache.expiresAt.toISOString(),
 		totalEntries,
 		queries,
+		sizeBytes: existsSync(filepath) ? statSync(filepath).size : null,
 	};
 }
 

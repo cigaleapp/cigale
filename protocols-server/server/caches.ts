@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, renameSync, unlinkSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, renameSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { dequal } from 'dequal';
 import { CACHE_STATS_FILE, DATA_DIR } from './config.js';
@@ -64,6 +64,7 @@ function updateCacheStats(datasource: string, filepath: string | null) {
 						expiresAt: cache.expiresAt,
 						totalEntries,
 						queries,
+						sizeBytes: existsSync(filepath) ? statSync(filepath).size : null,
 					};
 				})()
 			: null;

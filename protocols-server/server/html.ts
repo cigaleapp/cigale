@@ -1,4 +1,5 @@
-import { existsSync, readdirSync } from 'node:fs';
+import { existsSync, readdirSync, statSync } from 'node:fs';
+import path from 'node:path';
 
 import { PROTOCOLS_DIR } from './config.js';
 
@@ -6,6 +7,20 @@ import { PROTOCOLS_DIR } from './config.js';
 
 function escapeHtml(s: string): string {
 	return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+/** Human-readable byte size: 512B, 12.3KB, 4.5MB, 1.2GB */
+function formatBytes(bytes: number): string {
+	if (bytes < 1024) return `${bytes}B`;
+	const units = ['KB', 'MB', 'GB', 'TB'];
+	let value = bytes;
+	let unit = 'B';
+	for (const u of units) {
+		if (value < 1024) break;
+		value /= 1024;
+		unit = u;
+	}
+	return `${value >= 100 ? Math.round(value) : value.toFixed(1)}${unit}`;
 }
 
 function htmlPage(title: string, body: string): Response {
@@ -25,13 +40,18 @@ export function dirListing(dir: string, linkBase: string, title: string): Respon
 	const base = linkBase.endsWith('/') ? linkBase : linkBase + '/';
 	const entries = readdirSync(dir, { withFileTypes: true })
 		.filter((e) => !e.name.startsWith('.'))
-		.map((e) => ({ name: e.name, isDir: e.isDirectory() }))
+		.map((e) => ({
+			name: e.name,
+			isDir: e.isDirectory(),
+			size: e.isDirectory() ? null : statSync(path.join(dir, e.name)).size,
+		}))
 		.sort((a, b) => (a.isDir === b.isDir ? a.name.localeCompare(b.name) : a.isDir ? -1 : 1));
 	const rows = entries
 		.map((e) => {
 			const href = `${base}${encodeURIComponent(e.name)}${e.isDir ? '/' : ''}`;
 			const label = e.isDir ? `${e.name}/` : e.name;
-			return `<li><a href="${escapeHtml(href)}">${escapeHtml(label)}</a></li>`;
+			const size = e.size === null ? '' : ` <span class="size">(${formatBytes(e.size)})</span>`;
+			return `<li><a href="${escapeHtml(href)}">${escapeHtml(label)}</a>${size}</li>`;
 		})
 		.join('\n');
 	// Parent link: strip the last path segment (e.g. /options/ -> /, /assets/img/ -> /assets/).
@@ -55,9 +75,25 @@ export function indexPage(): Response {
 				.map((f) => f.replaceAll('\\', '/'))
 				.sort()
 		: [];
+	const sizeOf = (f: string) => {
+		try {
+			return statSync(path.join(PROTOCOLS_DIR, f)).size;
+		} catch {
+			return null;
+		}
+	};
+	const registrySize = existsSync(path.join(PROTOCOLS_DIR, 'registry.json'))
+		? statSync(path.join(PROTOCOLS_DIR, 'registry.json')).size
+		: null;
 	const protocolRows = protocolFiles
-		.map((f) => `<li><a href="/${f}">${escapeHtml(f)}</a></li>`)
+		.map((f) => {
+			const size = sizeOf(f);
+			const sizeLabel = size === null ? '' : ` <span class="size">(${formatBytes(size)})</span>`;
+			return `<li><a href="/${f}">${escapeHtml(f)}</a>${sizeLabel}</li>`;
+		})
 		.join('\n');
+	const registrySizeLabel =
+		registrySize === null ? '' : ` <span class="size">(${formatBytes(registrySize)})</span>`;
 	const body = `<h1>protocols-server</h1>
 <ul>
 <li><a href="/api/">API</a></li>
@@ -68,7 +104,7 @@ export function indexPage(): Response {
 </ul>
 <h2>Protocols</h2>
 <ul>
-<li><a href="/registry.json">registry.json</a></li>
+<li><a href="/registry.json">registry.json</a>${registrySizeLabel}</li>
 ${protocolRows}
 </ul>`;
 	return htmlPage('protocols-server', body);
