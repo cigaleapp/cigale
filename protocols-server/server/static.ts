@@ -1,6 +1,6 @@
 import { statSync } from 'node:fs';
 import path from 'node:path';
-import { DATA_DIR, PROTOCOLS_DIR } from './config.js';
+import { DATA_DIR, PROTOCOLS_DIR, STATIC_DIR } from './config.js';
 
 const MIME: Record<string, string> = {
 	'.jsonl': 'application/x-ndjson',
@@ -110,6 +110,21 @@ export function resolveUnderProtocolsDir(requestPath: string): string | null {
 	}
 	const resolved = path.resolve(PROTOCOLS_DIR, '.' + path.posix.normalize('/' + decoded));
 	const root = path.resolve(PROTOCOLS_DIR);
+	if (resolved !== root && !resolved.startsWith(root + path.sep)) {
+		return null;
+	}
+	return resolved;
+}
+
+// Resolve a request path under the repo's static/ dir (JSON schemas),
+// preventing path traversal.
+export function resolveUnderStaticDir(requestPath: string): string | null {
+	const decoded = decodeURIComponent(requestPath);
+	if (hasHiddenSegment(decoded)) {
+		return null;
+	}
+	const resolved = path.resolve(STATIC_DIR, '.' + path.posix.normalize('/' + decoded));
+	const root = path.resolve(STATIC_DIR);
 	if (resolved !== root && !resolved.startsWith(root + path.sep)) {
 		return null;
 	}

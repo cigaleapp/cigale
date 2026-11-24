@@ -1,7 +1,7 @@
 import { existsSync, readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 
-import { PROTOCOLS_DIR } from './config.js';
+import { PROTOCOLS_DIR, STATIC_DIR } from './config.js';
 
 // --- Browsing (simple HTML, no CSS) ---
 
@@ -94,6 +94,17 @@ export function indexPage(): Response {
 		.join('\n');
 	const registrySizeLabel =
 		registrySize === null ? '' : ` <span class="size">(${formatBytes(registrySize)})</span>`;
+	const schemaFiles = existsSync(STATIC_DIR)
+		? readdirSync(STATIC_DIR)
+				.filter((f) => f.endsWith('.schema.json'))
+				.sort()
+		: [];
+	const schemaRows = schemaFiles
+		.map((f) => {
+			const size = statSync(path.join(STATIC_DIR, f)).size;
+			return `<li><a href="/${f}">${escapeHtml(f)}</a> <span class="size">(${formatBytes(size)})</span></li>`;
+		})
+		.join('\n');
 	const body = `<h1>protocols-server</h1>
 <ul>
 <li><a href="/api/">API</a></li>
@@ -106,6 +117,10 @@ export function indexPage(): Response {
 <ul>
 <li><a href="/registry.json">registry.json</a>${registrySizeLabel}</li>
 ${protocolRows}
+</ul>
+<h2>Schemas</h2>
+<ul>
+${schemaRows}
 </ul>`;
 	return htmlPage('protocols-server', body);
 }

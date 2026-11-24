@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import path from 'node:path';
 
 export const PORT = Number(process.env.PORT ?? 3000);
@@ -11,6 +12,14 @@ export const WEB_ORIGIN = process.env.WEB_ORIGIN ?? 'http://localhost:3000';
 // resolves to /protocols (server code is at /app/server); locally to <repo>/protocols.
 export const PROTOCOLS_DIR =
 	process.env.PROTOCOLS_DIR ?? path.join(import.meta.dir, '..', '..', 'protocols');
+
+// JSON schemas (protocol/registry/results). Locally this resolves to
+// <repo>/static; in the container the server code is at /app and the schemas
+// are copied to /app/static, so try both layouts.
+export const STATIC_DIR = [
+	path.join(import.meta.dir, '..', 'static'),
+	path.join(import.meta.dir, '..', '..', 'static'),
+].find((p) => existsSync(p)) ?? path.join(import.meta.dir, '..', '..', 'static');
 
 // The regeneration process (spawned with cwd: DATA_DIR) writes a progress
 // snapshot to this file when PROGRESS_FILE=true.
@@ -26,3 +35,5 @@ export const CACHE_STATS_FILE = path.join(DATA_DIR, 'cache-stats.json');
 // and sets an HttpOnly cookie holding its sha256 (not the password itself).
 export const API_PASSWORD = process.env.API_PASSWORD;
 export const AUTH_COOKIE = 'api_password';
+
+export const LOG_MAX_LINES = Number.parseInt(process.env.LOG_MAX_LINES ?? '100');

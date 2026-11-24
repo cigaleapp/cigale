@@ -128,7 +128,7 @@ export function writeRegistry({
 		JSON.stringify(
 			{
 				$schema: transformSource
-					? transformSource(new URL('/registry.json', LOCAL_ORIGIN))
+					? transformSource(new URL('/registry.schema.json', LOCAL_ORIGIN))
 					: path.relative(path.dirname(out), schemaPath()).replaceAll('\\', '/'),
 				protocols: [...protocols.values()],
 			},

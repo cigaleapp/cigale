@@ -11,9 +11,8 @@ RUN bun install --production
 COPY protocols-server/ ./
 
 # protocol-types.ts is gitignored — generate it from the protocol schema.
-# registry.schema.json is referenced by the $schema field of the registry.json
-# generated at startup, so it must be present in the container too.
-COPY static/protocol.schema.json static/registry.schema.json ./static/
+# The schemas are also served at /schemas/... by the server.
+COPY static/*.schema.json ./static/
 RUN bun run generate:types
 
 # Protocol manifests (YAML only; the .json ones are generated at runtime by the

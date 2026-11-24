@@ -89,9 +89,11 @@ export class JessicaJoachimSite extends Datasource<
 			}).catch((e) => {
 				if (e instanceof RateLimitTimeoutError) {
 					logger.warn(`rate limit timeout reached, skipping pages batch`);
-					return undefined;
+				} else {
+					logger.error(e);
 				}
-				throw e;
+
+				return undefined;
 			});
 
 			if (!pages) return undefined;

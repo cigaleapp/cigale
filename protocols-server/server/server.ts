@@ -8,7 +8,12 @@ import { handleCacheDelete, readCacheStats } from './caches.js';
 import { DATA_DIR, PORT, PROTOCOLS_DIR, WEB_ORIGIN } from './config.js';
 import { apiIndexPage, dirListing, indexPage } from './html.js';
 import { getRegenStatus, readProgress, readRegenLog, regenerate } from './regeneration.js';
-import { resolveUnderDataDir, resolveUnderProtocolsDir, serveFile } from './static.js';
+import {
+	resolveUnderDataDir,
+	resolveUnderProtocolsDir,
+	resolveUnderStaticDir,
+	serveFile,
+} from './static.js';
 
 export function startServer(): Server {
 	if (!process.env.WEB_ORIGIN) {
@@ -109,6 +114,22 @@ export function startServer(): Server {
 			}
 			if (relative !== null) {
 				const filePath = resolveUnderDataDir(relative);
+				if (!filePath) {
+					return new Response('Forbidden', { status: 403 });
+				}
+				if (!existsSync(filePath)) {
+					return new Response('Not found', { status: 404 });
+				}
+				if (statSync(filePath).isDirectory()) {
+					return dirListing(filePath, pathname, pathname);
+				}
+				return serveFile(filePath, req);
+			}
+
+			// JSON schemas (protocol/registry/results), served at the root
+			// level (e.g. /protocol.schema.json) from the repo's static/ dir.
+			if (pathname.endsWith('.schema.json')) {
+				const filePath = resolveUnderStaticDir(pathname.slice(1));
 				if (!filePath) {
 					return new Response('Forbidden', { status: 403 });
 				}

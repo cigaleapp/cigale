@@ -1,7 +1,9 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
+
 import { Subprocess } from 'bun';
-import { DATA_DIR, PROGRESS_FILE } from './config.js';
+
+import { DATA_DIR, LOG_MAX_LINES, PROGRESS_FILE } from './config.js';
 
 export type RegenStatus = {
 	state: 'idle' | 'running' | 'done' | 'error';
@@ -15,7 +17,6 @@ let regenStatus: RegenStatus = { state: 'idle' };
 
 // Rolling buffer of the last lines of the regeneration process's
 // stdout+stderr, exposed via GET /api/regeneration/log.txt.
-const LOG_MAX_LINES = 100;
 let regenLog: string[] = [];
 
 export function getRegenStatus(): RegenStatus {
@@ -42,7 +43,7 @@ function appendLogLine(line: string) {
 function pipeToLog(
 	stream: ReadableStream<Uint8Array>,
 	prefix: string,
-	target: { write(chunk: Uint8Array): unknown },
+	target: { write(chunk: Uint8Array): unknown }
 ): Promise<void> {
 	const decoder = new TextDecoder();
 	let pending = '';
