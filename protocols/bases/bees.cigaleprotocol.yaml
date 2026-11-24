@@ -17,6 +17,11 @@ description: Protocole de base pour les abeilles
 authors:
   - name: IDmyBee authors
 
+imports:
+  - from: io.github.cigaleapp.base.arthropods
+    metadata:
+      - crop
+
 metadataGroups:
   taxonomy:
     name: Taxonomie
@@ -28,27 +33,6 @@ metadataGroups:
     description: Spécifique aux abeilles sauvages, du groupe Andrena
 
 metadata:
-  crop:
-    type: boundingbox
-    label: ''
-    required: true
-    description: ''
-    mergeMethod: union
-    groupable: true
-    infer:
-      neural: []
-      # TODO
-      #   - input:
-      #       height:
-      #       normalized:
-      #       width:
-      #     model:
-      #     output:
-      #       normalized:
-      #       shape:
-      #         -
-      #     webgpuReady: false
-
   morphogroup:
     type: enum
     label: Morphogroupe
@@ -95,18 +79,8 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: http://localhost:3000/options/birds/species.jsonl
-      format: json-lines
-    infer:
-      neural: []
-        # TODO
-        # - classmapping:
-        #   input:
-        #     height:
-        #     normalized:
-        #     width:
-        #   model:
-        #   webgpuReady: false
+      - at: http://localhost:3000/options/birds/species.jsonl
+        format: json-lines
 
   kingdom:
     type: enum
@@ -117,8 +91,8 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: http://localhost:3000/options/birds/kingdom.jsonl
-      format: json-lines
+      - at: http://localhost:3000/options/birds/kingdom.jsonl
+        format: json-lines
 
   phylum:
     type: enum
@@ -129,8 +103,8 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: http://localhost:3000/options/birds/phylum.jsonl
-      format: json-lines
+      - at: http://localhost:3000/options/birds/phylum.jsonl
+        format: json-lines
 
   class:
     type: enum
@@ -141,8 +115,8 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: http://localhost:3000/options/birds/class.jsonl
-      format: json-lines
+      - at: http://localhost:3000/options/birds/class.jsonl
+        format: json-lines
 
   order:
     type: enum
@@ -153,8 +127,8 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: http://localhost:3000/options/birds/order.jsonl
-      format: json-lines
+      - at: http://localhost:3000/options/birds/order.jsonl
+        format: json-lines
 
   family:
     type: enum
@@ -165,8 +139,8 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: http://localhost:3000/options/birds/family.jsonl
-      format: json-lines
+      - at: http://localhost:3000/options/birds/family.jsonl
+        format: json-lines
 
   genus:
     type: enum
@@ -177,8 +151,8 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: http://localhost:3000/options/birds/genus.jsonl
-      format: json-lines
+      - at: http://localhost:3000/options/birds/genus.jsonl
+        format: json-lines
 
   identification_difficulty:
     type: enum

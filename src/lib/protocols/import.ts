@@ -157,8 +157,8 @@ async function countEnumOptions(metadatas: Map<string, MetadataInManifest>, prog
 			progress.total += metadata.options.length;
 		}
 
-		if (metadata.externalOptions) {
-			for await (const line of httpStreamLines(metadata.externalOptions.at)) {
+		for (const config of metadata.externalOptions ?? []) {
+			for await (const line of httpStreamLines(config.at)) {
 				if (!line.totalBytes) continue;
 				progress.total += line.totalBytes;
 				break;
@@ -198,13 +198,14 @@ async function installEnumOptions(
 		}
 	}
 
-	if (metadata.externalOptions) {
-		for await (const line of httpStreamProcessLines(
-			MetadataEnumVariant,
-			metadata.externalOptions
-		)) {
+	for (const config of metadata.externalOptions ?? []) {
+		for await (const line of httpStreamProcessLines(MetadataEnumVariant, config)) {
 			if (!line.parsed) {
-				console.error(`Couldn't import metadata option on line ${i + 1}`, line.error, line);
+				console.error(
+					`Couldn't import metadata option on line ${line.index + 1} of ${config.at}`,
+					line.error,
+					line
+				);
 				continue;
 			}
 

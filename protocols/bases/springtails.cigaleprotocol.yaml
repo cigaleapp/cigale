@@ -41,8 +41,8 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: http://localhost:3000/process/options/springtails/species.jsonl
-      format: json-lines
+      - at: http://localhost:3000/process/options/springtails/species.jsonl
+        format: json-lines
     infer:
       neural:
         - name: Small collemboles
@@ -66,8 +66,8 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: http://localhost:3000/process/options/springtails/kingdom.jsonl
-      format: json-lines
+      - at: http://localhost:3000/process/options/springtails/kingdom.jsonl
+        format: json-lines
 
   phylum:
     type: enum
@@ -78,8 +78,8 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: http://localhost:3000/process/options/springtails/phylum.jsonl
-      format: json-lines
+      - at: http://localhost:3000/process/options/springtails/phylum.jsonl
+        format: json-lines
 
   class:
     type: enum
@@ -90,8 +90,8 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: http://localhost:3000/process/options/springtails/class.jsonl
-      format: json-lines
+      - at: http://localhost:3000/process/options/springtails/class.jsonl
+        format: json-lines
 
   order:
     type: enum
@@ -102,8 +102,8 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: http://localhost:3000/process/options/springtails/order.jsonl
-      format: json-lines
+      - at: http://localhost:3000/process/options/springtails/order.jsonl
+        format: json-lines
 
   family:
     type: enum
@@ -114,8 +114,8 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: http://localhost:3000/process/options/springtails/family.jsonl
-      format: json-lines
+      - at: http://localhost:3000/process/options/springtails/family.jsonl
+        format: json-lines
 
   genus:
     type: enum
@@ -126,8 +126,8 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: http://localhost:3000/process/options/springtails/genus.jsonl
-      format: json-lines
+      - at: http://localhost:3000/process/options/springtails/genus.jsonl
+        format: json-lines
 
   identification_difficulty:
     type: enum

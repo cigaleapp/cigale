@@ -692,9 +692,11 @@ export const MetadataEnum = MetadataBase.and({
 			"Les liens vers les images de l'option, séparés par ' | '"
 		),
 	},
-	'externalOptions?': NetworkStreamedLines(MetadataEnumVariant.or('undefined')).describe(
-		"Utile quand il y a beaucoup d'options et que les lister explicitement dans le fichier manifeste directement serait impraticable. Si une option a la même clé (.key) dans .options et .externalOptions, c'est celle .options qui est utilisé (pratique pour définir des overrides spécifiques à ce protocole)"
-	),
+	'externalOptions?': NetworkStreamedLines(MetadataEnumVariant.or('undefined'))
+		.array()
+		.describe(
+			"Utile quand il y a beaucoup d'options et que les lister explicitement dans le fichier manifeste directement serait impraticable. Si une option a la même clé (.key) dans .options et .externalOptions, c'est celle .options qui est utilisé (pratique pour définir des overrides spécifiques à ce protocole)"
+		),
 	'options?': MetadataEnumVariant.array()
 		.pipe((opts) => unique(opts, (o) => o.key))
 		.pipe((opts) => opts.map((opt, index) => ({ index, ...opt })))
