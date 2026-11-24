@@ -4,7 +4,7 @@ import path from 'node:path';
 import arkenv, { type } from '@arkenv/core';
 
 const env = arkenv({
-	PORT: 'number.port',
+	PORT: 'number.port = 3000',
 	DATA_DIR: 'string = "."',
 	LOCAL_DEV_ORIGIN: 'string.url = "http://localhost:3000"',
 
@@ -46,13 +46,13 @@ const env = arkenv({
 	 * Browsers use a cookie: GET /api/login?password=... verifies the password
 	 * and sets an HttpOnly cookie holding its sha256 (not the password itself).
 	 */
-	API_PASSWORD: 'string > 0',
+	'API_PASSWORD?': 'string > 0',
 
 	AUTH_COOKIE: 'string = "api_password"',
 	LOG_MAX_LINES: 'number.integer >= 0 = 100',
 	PROGRESS_FILE_REFRESH_MS: 'number.integer > 500 = 10000',
-	PROGRESS_FILE_ENABLED: 'boolean',
-	ASSETS_URL_BASE: 'string.url',
+	PROGRESS_FILE_ENABLED: 'boolean = false',
+	'ASSETS_URL_BASE?': 'string.url',
 	JJ_RATELIMIT_MAX_WAIT_SECONDS: 'number.integer > 0 = 60',
 });
 
