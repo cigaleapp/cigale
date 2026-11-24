@@ -10,7 +10,6 @@ import microdiff from 'microdiff';
 import { idComparator, Schemas } from './database.js';
 import { stringifyWithToplevelOrdering } from './download.js';
 import { promptForFiles } from './files.js';
-import { errorMessage } from './i18n.js';
 import { metadataOptionsOf } from './metadata/index.js';
 import { manifestVersionsCompatible } from './protocols/manifestversion.js';
 import { fetchProtocolRegistry } from './protocols/registry.js';

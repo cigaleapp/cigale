@@ -3,11 +3,11 @@ import { JSDOM } from 'jsdom';
 import * as jsdom from 'jsdom';
 import Turndown from 'turndown';
 
-import { Datasource, MultipleResponses } from '../lib/datasource.ts';
+import { Datasource, MultipleResponses, NoParams } from '../lib/datasource.ts';
 import { OptionExtra } from '../lib/modules.ts';
 import { logger } from '../lib/progress.ts';
 import { fetchPagesViaWordpressAPI, RateLimitTimeoutError } from '../lib/wordpress.ts';
-import { JJ_RATELIMIT_MAX_WAIT_SECONDS } from '../server/config.ts';
+import config from '../server/config.ts';
 
 export type Page = {
 	name: string;
@@ -18,7 +18,7 @@ export type Page = {
 export class JessicaJoachimSite extends Datasource<
 	'index' | 'pages',
 	{
-		index: Record<never, never>;
+		index: NoParams;
 		pages: Array<{ link: string }>;
 	},
 	{
@@ -80,11 +80,11 @@ export class JessicaJoachimSite extends Datasource<
 			const queries = new Map(links.map((l) => [l.link, new URL(l.link)] as const));
 
 			const pages = await fetchPagesViaWordpressAPI(queries, {
-				maxWaitTime: JJ_RATELIMIT_MAX_WAIT_SECONDS,
+				maxWaitTime: config.JJ_RATELIMIT_MAX_WAIT_SECONDS,
 				origin: this.origin.toString(),
 				auth: {
-					username: process.env.WORDPRESS_USERNAME!,
-					password: process.env.WORDPRESS_APP_PASSWORD!,
+					username: config.WORDPRESS_USERNAME,
+					password: config.WORDPRESS_APP_PASSWORD,
 				},
 			}).catch((e) => {
 				if (e instanceof RateLimitTimeoutError) {
@@ -232,8 +232,6 @@ virtualConsole.on('error', (e) => {
 });
 
 async function fetchAndParseHtml(url: URL | string): Promise<JSDOM['window']['document']> {
-	let html: string;
-
 	const response = await fetch(url);
 	if (!response.ok) {
 		if (response.status === 429) {
@@ -245,7 +243,7 @@ async function fetchAndParseHtml(url: URL | string): Promise<JSDOM['window']['do
 		);
 	}
 
-	html = await response.text();
+	const html = await response.text();
 
 	return new JSDOM(html, { virtualConsole }).window.document;
 }

@@ -64,7 +64,6 @@ Available CSS variables:
 </script>
 
 <script lang="ts">
-	import { errorMessage } from '#lib/i18n.js';
 	import { hasPhysicalKeyboard } from '#lib/keyboard.svelte.js';
 	import KeyboardHint from '#lib/KeyboardHint.svelte';
 	import LoadingSpinner from '#lib/LoadingSpinner.svelte';

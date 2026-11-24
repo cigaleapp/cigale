@@ -148,7 +148,7 @@ export async function run(plan: {
 	const optsPerModule = new Map<string, Option[]>();
 
 	await Promise.all(
-		plan.modules.enrich.map(async (enricher, i) => {
+		plan.modules.enrich.map(async (enricher) => {
 			progress.start(enricher.name);
 			await enricher.init();
 
@@ -171,7 +171,7 @@ export async function run(plan: {
 
 	progress.phase('enrich', sum([...optsPerModule].map(([, opts]) => opts.length)));
 
-	let enriched = new Set<string>();
+	const enriched = new Set<string>();
 	const CHUNKSIZE = 5_000;
 	await Promise.all(
 		plan.modules.enrich.map(async (enricher) => {
@@ -229,9 +229,7 @@ export async function run(plan: {
 
 	progress.phase(
 		'metadata',
-		sum(
-			[...metadatasToAdd].map(([name, { protocols, keys }]) => protocols.length + keys.length)
-		)
+		sum([...metadatasToAdd].map(([, { protocols, keys }]) => protocols.length + keys.length))
 	);
 
 	const written = new Map<[filepath: string, builder: string], number>();

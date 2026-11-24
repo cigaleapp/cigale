@@ -2,7 +2,6 @@ import { promptForFiles } from '#lib/files.js';
 import { satisfiesHardwareRequirements } from '#lib/hardware-requirements.js';
 import { databaseHandle, tables } from '#lib/idb.svelte.js';
 import { resolveDefaults } from '#lib/metadata/defaults.js';
-import { metadataUsedByProtocol } from '#lib/metadata/imports.js';
 import { pickProtocol } from '#lib/ModalPickProtocol.svelte';
 import { goto } from '#lib/paths.js';
 import { defaultClassificationMetadata, defaultCropMetadata } from '#lib/protocols.js';
@@ -78,7 +77,7 @@ export async function createSession() {
 						await Promise.all(
 							tables.Metadata.state
 								.filter((metadata) =>
-									metadataUsedByProtocol(selectedProtocol, metadata.id)
+									selectedProtocol.metadata.includes(metadata.id)
 								)
 								.map(async (metadata) => {
 									if (!metadata.infer) return;

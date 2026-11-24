@@ -1,6 +1,6 @@
 import type { DatabaseHandle } from '#lib/idb.svelte.js';
 
-import { ArkErrors, type } from 'arktype';
+import { ArkErrors } from 'arktype';
 
 import { Tables } from '#lib/database.js';
 import { httpStreamLines, httpStreamProcessLines } from '#lib/http-streaming.ts';
@@ -8,8 +8,6 @@ import { lookupMostRecentCompatibleProtocol } from '#lib/protocols/registry.js';
 import { NamespacedMetadataID } from '#lib/schemas/common.js';
 import {
 	ensureNamespacedMetadataId,
-	Metadata,
-	MetadataEnum,
 	MetadataEnumVariant,
 	MetadataGroup,
 	MetadataInDatabase,
@@ -18,7 +16,7 @@ import {
 } from '#lib/schemas/metadata.js';
 import { ExportedProtocol } from '#lib/schemas/protocols.js';
 import { recomputeSearchIndex } from '#lib/search.ts';
-import { entries, mapKeys, parseYAMLorJSON, switchValue } from '#lib/utils.ts';
+import { entries, mapKeys, parseYAMLorJSON } from '#lib/utils.ts';
 
 type ProgressCallback = (protocol: string, phase: string, done: number, total: number) => void;
 
@@ -55,7 +53,7 @@ type MetadataGroupInDatabase = typeof MetadataGroup.inferIn;
 
 type MetadataInManifest = (typeof ExportedProtocol.inferIn)['metadata'][string];
 
-export async function importSingleProtocol(
+async function importSingleProtocol(
 	db: DatabaseHandle,
 	url: string | URL,
 	options: {

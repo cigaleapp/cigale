@@ -1,10 +1,10 @@
 import { addMonths } from 'date-fns';
 import { XMLParser } from 'fast-xml-parser';
 
-import { Datasource, DatasourceName, MultipleResponses } from '../lib/datasource.js';
-import { parseTaxonLabel } from '../modules/idmybee.js';
+import { Datasource, DatasourceName, MultipleResponses, NoParams } from '../lib/datasource.js';
 import { CladedName, matchCladedName } from '../lib/modules.js';
 import { ensureArray } from '../lib/utils.js';
+import { parseTaxonLabel } from '../modules/idmybee.js';
 
 export class Xper3 extends Datasource<
 	| 'characters'
@@ -16,9 +16,9 @@ export class Xper3 extends Datasource<
 	| 'taxa'
 	| 'summaryDataOfCharacter',
 	{
-		characters: {};
-		taxa: {};
-		mediaObjects: {};
+		characters: NoParams;
+		taxa: NoParams;
+		mediaObjects: NoParams;
 		character: { $id: `c${string}` };
 		categoricalCharacter: { label: string };
 		quantitativeCharacter: { label: string };

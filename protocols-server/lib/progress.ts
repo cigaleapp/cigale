@@ -35,8 +35,7 @@ class Progress {
 
 	log(...parts: unknown[]) {
 		this.clear();
-		// eslint-disable-next-line no-console
-		console.log(...parts);
+		console.info(...parts);
 		if (colorsSupported) this.draw();
 	}
 

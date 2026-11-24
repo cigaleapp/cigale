@@ -1,4 +1,4 @@
-import { Datasource, DatasourceName } from '../lib/datasource.ts';
+import { Datasource, DatasourceName, NoParams } from '../lib/datasource.ts';
 import { ModuleName, NameProvider, Option, Specializer } from '../lib/modules.ts';
 
 export abstract class ClassmappingSpecializer<Line> implements Specializer {
@@ -39,7 +39,7 @@ export abstract class ClassmappingNameProvider<Line> implements NameProvider {
 
 export abstract class NeuralNetworkDatasource<ClassmappingLine> extends Datasource<
 	'classmapping',
-	{ classmapping: {} },
+	{ classmapping: NoParams },
 	{ classmapping: { lines: ClassmappingLine[] } }
 > {
 	abstract name: DatasourceName;

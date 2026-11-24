@@ -1,11 +1,8 @@
 import type { DatabaseHandle } from '#lib/idb.svelte.js';
 import type { NamespacedMetadataID } from '#lib/schemas/common.js';
 
-import { type } from 'arktype';
-
-import { httpStreamLines, httpStreamProcessLines } from '#lib/http-streaming.ts';
+import { httpStreamProcessLines } from '#lib/http-streaming.ts';
 import { namespaceToMetadataOptionInDB } from '#lib/schemas/metadata.js';
-import { NetworkStreamedLines } from '#lib/schemas/network.js';
 import { ClassmappingLineParsed, NeuralEnumInference } from '#lib/schemas/neural.js';
 import { compareBy, switchValue } from '#lib/utils.ts';
 
@@ -44,7 +41,7 @@ export async function loadClassmapping(
 				: [line.parsed.ref, line.parsed.value, line.parsed.neuron];
 
 		if (ref === 'keys') {
-			classes.set(index, value)
+			classes.set(index, value);
 			continue;
 		}
 
@@ -62,11 +59,11 @@ export async function loadClassmapping(
 				`Classmapping line ${value} doesn't match with any option's ${ref}, yielding null to mean this value is unsupported`
 			);
 
-			classes.set(index, null)
+			classes.set(index, null);
 			continue;
 		}
 
-		classes.set(index, option.key)
+		classes.set(index, option.key);
 	}
 
 	return [...classes].sort(compareBy(([i]) => i)).map(([, key]) => key);

@@ -17,7 +17,7 @@ export type DatasourceName =
 	| 'andrena-morphogroups'
 	| 'iucn'
 	| 'birdnet'
-	| 'frencharthro' 
+	| 'frencharthro'
 	| 'small-collemboles'
 	| `debug-${string}`;
 
@@ -138,7 +138,7 @@ export type DataRequests<
 	[Q in Query]: (
 		params: Params[Q]
 	) => Promise<
-		Params[Q] extends Array<any>
+		Params[Q] extends unknown[]
 			? | Responses[Q]
 				| ResponseWithFiles<Responses[Q]>
 				| MultipleResponses<Responses[Q], Params[Q][number]>
@@ -150,10 +150,12 @@ export type BulkQueries<
 	Query extends string = string,
 	Params extends DataRequestParams<Query> = DataRequestParams<Query>,
 	_Responses extends Record<Query, unknown> = Record<Query, unknown>,
-> = { [Q in Query]: Params[Q] extends any[] ? Q : never }[Query];
+> = { [Q in Query]: Params[Q] extends unknown[] ? Q : never }[Query];
 
 export type SingleQueries<
 	Query extends string = string,
 	Params extends DataRequestParams<Query> = DataRequestParams<Query>,
 	_Responses extends Record<Query, unknown> = Record<Query, unknown>,
-> = { [Q in Query]: Params[Q] extends any[] ? never : Q }[Query];
+> = { [Q in Query]: Params[Q] extends unknown[] ? never : Q }[Query];
+
+export type NoParams = Record<never, never>;

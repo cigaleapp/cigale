@@ -39,7 +39,7 @@
 				"@electron-forge/publisher-github",
 				"@arkenv/core",
 			],
-			"ignoreUnresolved": ["#lib/../../bun.lock?raw"],
+			"ignoreUnresolved": ["#lib/../../bun.lock?raw", "./graphql-env.js"],
 			"ignoreBinaries": ["uv"],
 			"paths": {
 				"~icons/*": ["node_modules/unplugin-icons/types/svelte5.d.ts"],

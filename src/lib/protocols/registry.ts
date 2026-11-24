@@ -17,11 +17,10 @@ const PROTOCOLS_REGISTRIES = new Map<URL, typeof ProtocolRegistry.infer>();
 const EXTRA_REGISTRY_URLS: URL[] = [];
 
 /**
- * The default registry URL, resolved lazily from the `PROTOCOL_REGISTRY_URL`
- * env var (defaults to `${WEB_ORIGIN}/registry.json`). Cached so the same
- * `URL` instance is used as the Map key on every call.
+ * The default registry URL, resolved from the `PROTOCOL_REGISTRY_URL`
+ * env var, or the production default
  */
-let defaultRegistryUrl: URL = new URL(
+const defaultRegistryUrl: URL = new URL(
 	import.meta.env.protocolRegistryUrl ??
 		'https://cigale-protocols-biodimedia-data-terra.ai.meso.umontpellier.fr/registry.json'
 );

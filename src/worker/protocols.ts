@@ -3,18 +3,8 @@
 /// <reference lib="esnext" />
 /// <reference lib="webworker" />
 
-import type { PROCEDURES } from './procedures.js';
-
-import JSONC from 'tiny-jsonc';
-import YAML from 'yaml';
-
-import { Tables } from '#lib/database.js';
 import { compareProtocolWithUpstream } from '#lib/protocols.js';
-import { importProtocol, importSingleProtocol } from '#lib/protocols/import.js';
-import { metadataOptionId, namespacedMetadataId } from '#lib/schemas/metadata.js';
-import { ExportedProtocol } from '#lib/schemas/protocols.js';
-import { recomputeSearchIndex } from '#lib/search.js';
-import { entries, keys, omit, orEmptyObj, pick, prefixIDBKeyRange } from '#lib/utils.js';
+import { importProtocol } from '#lib/protocols/import.js';
 
 import { openDatabase, swarp } from './index.js';
 

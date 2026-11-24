@@ -5,17 +5,17 @@ import { JWT } from 'google-auth-library';
 import { drive_v3, google } from 'googleapis';
 import { Jimp } from 'jimp';
 import { JSDOM } from 'jsdom';
-// @ts-ignore untyped module
+// @ts-expect-error untyped module
 import odt from 'odt2html';
 import { pdfToPng } from 'pdf-to-png-converter';
 import Turndown from 'turndown';
 
-import { Datasource, ResponseWithFiles } from '../lib/datasource.js';
+import { Datasource, NoParams, ResponseWithFiles } from '../lib/datasource.js';
 
 export class GoogleDrive extends Datasource<
 	'files' | 'slide',
 	{
-		files: {};
+		files: NoParams;
 		slide: { name: string; clade: string };
 	},
 	{
@@ -192,7 +192,7 @@ export class GoogleDrive extends Datasource<
 				.then((images) =>
 					images.map((image) => {
 						const { width, height } = image.bitmap;
-						let cropbox = {
+						const cropbox = {
 							start: { x: 0, y: 0, found: false },
 							end: { x: width, y: height, found: false },
 						};

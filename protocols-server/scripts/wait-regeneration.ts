@@ -85,8 +85,8 @@ const checkRunId = JSON.parse(
 	})
 ).id as number;
 
-let status = '';
-let current = false;
+let status: string;
+let current: boolean;
 for (let i = 0; i < totalWaitMinutes * 6; i++) {
 	const state = await fetchStatus();
 	if (state === null) {
@@ -115,7 +115,9 @@ for (let i = 0; i < totalWaitMinutes * 6; i++) {
 			},
 		});
 	} else {
-		console.info(`No new run yet (last run started: ${state.startedAt ?? 'never'}); waiting...`);
+		console.info(
+			`No new run yet (last run started: ${state.startedAt ?? 'never'}); waiting...`
+		);
 		ghApi('PATCH', `repos/${repo}/check-runs/${checkRunId}`, {
 			status: 'queued',
 			output: {

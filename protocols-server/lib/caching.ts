@@ -1,6 +1,14 @@
 /// <reference types="@types/bun" />
 
-import { existsSync, mkdirSync, readFileSync, renameSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
+import {
+	existsSync,
+	mkdirSync,
+	readFileSync,
+	renameSync,
+	statSync,
+	unlinkSync,
+	writeFileSync,
+} from 'node:fs';
 import path from 'node:path';
 
 import { differenceInSeconds, isPast } from 'date-fns';
@@ -46,7 +54,7 @@ export type DatasourceCache<
 
 const inmemory = new Map<DatasourceName, DatasourceCache>();
 
-let lastWrites = new Map<DatasourceName, Date>();
+const lastWrites = new Map<DatasourceName, Date>();
 
 export async function tryCache<R, Q extends string, P extends DataRequestParams<Q>[Q]>(
 	datasource: DatasourceName,
@@ -220,7 +228,10 @@ function writeCacheStatsFile() {
 	try {
 		const stats = [...inmemory.values()].map(cacheStats);
 		const tmp = `${CACHE_STATS_FILE}.tmp`;
-		writeFileSync(tmp, JSON.stringify({ updatedAt: new Date().toISOString(), datasources: stats }, null, 2));
+		writeFileSync(
+			tmp,
+			JSON.stringify({ updatedAt: new Date().toISOString(), datasources: stats }, null, 2)
+		);
 		renameSync(tmp, CACHE_STATS_FILE);
 	} catch (err) {
 		logger.error(`Failed to write cache stats file ${CACHE_STATS_FILE}:`, err);

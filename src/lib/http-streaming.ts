@@ -1,8 +1,6 @@
 import type { NetworkStreamedLinesConfig } from './schemas/network.js';
 import type { Type } from 'arktype';
 
-import { ArkErrors } from 'arktype';
-
 import { NetworkStreamedLines, NetworkStreamedLinesHeader } from './schemas/network.js';
 import { switchValue } from './utils.ts';
 
@@ -139,11 +137,12 @@ export async function* httpStreamLines(
 
 		const buffer =
 			carry + decoder.decode(new Uint8Array(await response.arrayBuffer()), { stream: true });
-		carry = '';
 
 		const lines = buffer.split('\n');
+
 		// The final element is a partial line that continues in the next request.
 		carry = lines.pop() ?? '';
+
 		for (const raw of lines) {
 			const line = raw.replace(/\r$/, '').trim();
 			if (!line) continue;
@@ -166,7 +165,7 @@ export async function* httpStreamLines(
 	if (!final) return;
 	yield new StreamedLine({
 		line: final,
-		lineIndex: ++lineIndex,
+		lineIndex: lineIndex + 1,
 		progress: { total, current: total },
 	});
 }

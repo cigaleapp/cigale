@@ -1,7 +1,7 @@
 import { addMonths } from 'date-fns';
 import * as fflate from 'fflate';
 
-import { Datasource } from '../lib/datasource.ts';
+import { Datasource, NoParams } from '../lib/datasource.ts';
 
 export type IUCNDataset = {
 	byName: Record<string, keyof typeof STATUSES>;
@@ -26,7 +26,7 @@ export const STATUSES = {
 	'Not evaluated': 'ne',
 } as const;
 
-export class IUCNArchive extends Datasource<'index', { index: {} }, { index: IUCNDataset }> {
+export class IUCNArchive extends Datasource<'index', { index: NoParams }, { index: IUCNDataset }> {
 	name = 'iucn' as const;
 
 	async init() {}

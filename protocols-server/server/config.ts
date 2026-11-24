@@ -8,6 +8,9 @@ const env = arkenv({
 	DATA_DIR: 'string = "."',
 	LOCAL_DEV_ORIGIN: 'string.url = "http://localhost:3000"',
 
+	WORDPRESS_USERNAME: 'string = ""',
+	WORDPRESS_APP_PASSWORD: 'string = ""',
+
 	/**
 	 * Origin of the public web app. Used at startup to rewrite the hardcoded
 	 * `http://localhost:3000` references in the protocol manifests and to build
