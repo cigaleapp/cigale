@@ -1,4 +1,4 @@
-import { BirdNetZenodo } from '../lib/birdnet.js';
+import { BirdNetZenodo } from '../datasources/birdnet.js';
 import { NameProvider } from '../lib/modules.js';
 import { logger } from '../lib/progress.js';
 

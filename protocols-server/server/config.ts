@@ -16,10 +16,11 @@ export const PROTOCOLS_DIR =
 // JSON schemas (protocol/registry/results). Locally this resolves to
 // <repo>/static; in the container the server code is at /app and the schemas
 // are copied to /app/static, so try both layouts.
-export const STATIC_DIR = [
-	path.join(import.meta.dir, '..', 'static'),
-	path.join(import.meta.dir, '..', '..', 'static'),
-].find((p) => existsSync(p)) ?? path.join(import.meta.dir, '..', '..', 'static');
+export const STATIC_DIR =
+	[
+		path.join(import.meta.dir, '..', 'static'),
+		path.join(import.meta.dir, '..', '..', 'static'),
+	].find((p) => existsSync(p)) ?? path.join(import.meta.dir, '..', '..', 'static');
 
 // The regeneration process (spawned with cwd: DATA_DIR) writes a progress
 // snapshot to this file when PROGRESS_FILE=true.
@@ -37,3 +38,7 @@ export const API_PASSWORD = process.env.API_PASSWORD;
 export const AUTH_COOKIE = 'api_password';
 
 export const LOG_MAX_LINES = Number.parseInt(process.env.LOG_MAX_LINES ?? '100');
+
+export const PROGRESS_FILE_REFRESH_MS = Number(process.env.PROGRESS_FILE_REFRESH_MS ?? 10_000);
+
+export const PROGRESS_FILE_ENABLED = process.env.PROGRESS_FILE === 'true';

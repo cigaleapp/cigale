@@ -1,8 +1,19 @@
 /// <reference types="@types/bun" />
-import { renameSync, writeFileSync } from 'node:fs';
+import { renameSync, unlinkSync, writeFileSync } from 'node:fs';
 
 import * as eta from 'arrival-time';
 import { minutesToMilliseconds } from 'date-fns';
+
+import { PROGRESS_FILE_ENABLED, PROGRESS_FILE_REFRESH_MS } from '../server/config.ts';
+
+export type ProgressSnapshot = {
+	phase: string;
+	total: number;
+	done: number;
+	percentage: number;
+	ongoing: string[];
+	eta: string;
+};
 
 class Progress {
 	total = 0;
@@ -12,6 +23,7 @@ class Progress {
 	maxPhaseLength = 10;
 
 	lastWrite: number | undefined;
+	lastProgressFileWrite: number | undefined;
 	lastDrawnStep = -1;
 	lastDrawnAt: number | undefined;
 
@@ -92,6 +104,13 @@ class Progress {
 		return elapsed > this.refreshEveryMs;
 	}
 
+	progressFileWriteDue() {
+		if (!PROGRESS_FILE_ENABLED) return false;
+		if (!this.lastProgressFileWrite) return true;
+		const diff = performance.now() - this.lastProgressFileWrite;
+		return diff > PROGRESS_FILE_REFRESH_MS;
+	}
+
 	progress(max: number) {
 		return this.total ? Math.floor((this.done / this.total) * max) : 0;
 	}
@@ -104,7 +123,7 @@ class Progress {
 	}
 
 	/** Everything this class stores, for external consumers (e.g. the progress file) */
-	snapshot() {
+	snapshot(): ProgressSnapshot {
 		return {
 			phase: this.phaseName,
 			total: this.total,
@@ -147,6 +166,11 @@ class Progress {
 		);
 
 		this.lastWrite = performance.now();
+
+		if (this.progressFileWriteDue()) {
+			writeProgressFile(this.snapshot());
+			this.lastProgressFileWrite = performance.now();
+		}
 	}
 
 	clear() {
@@ -223,18 +247,16 @@ export const logger = new Logger();
  * PROGRESS_FILE_REFRESH_MS (default: 10s), so the server can expose it via
  * GET /api/regenerate. Writes are atomic (write to .tmp, then rename).
  */
-const progressFileEnabled = process.env.PROGRESS_FILE === 'true';
 const progressFilePath = process.env.PROGRESS_FILE_PATH ?? 'progress.json';
-const progressFileRefreshMs = Number(process.env.PROGRESS_FILE_REFRESH_MS ?? 10_000);
 
-let progressFileTimer: ReturnType<typeof setInterval> | undefined;
+export function writeProgressFile(snapshot: ProgressSnapshot) {
+	if (!PROGRESS_FILE_ENABLED) return;
 
-function writeProgressFile() {
 	try {
 		const tmp = `${progressFilePath}.tmp`;
 		writeFileSync(
 			tmp,
-			JSON.stringify({ ...progress.snapshot(), updatedAt: new Date().toISOString() }, null, 2)
+			JSON.stringify({ ...snapshot, updatedAt: new Date().toISOString() }, null, 2)
 		);
 		renameSync(tmp, progressFilePath);
 	} catch (err) {
@@ -242,20 +264,9 @@ function writeProgressFile() {
 	}
 }
 
-/** Start writing the progress file (no-op unless PROGRESS_FILE=true) */
-export function startProgressFile() {
-	if (!progressFileEnabled || progressFileTimer) return;
-	writeProgressFile();
-	progressFileTimer = setInterval(writeProgressFile, progressFileRefreshMs);
-	progressFileTimer.unref?.();
-}
-
-/** Stop writing the progress file and write a final snapshot */
-export function stopProgressFile() {
-	if (!progressFileTimer) return;
-	clearInterval(progressFileTimer);
-	progressFileTimer = undefined;
-	writeProgressFile();
+/** Clear the progress file */
+export function clearProgressFile() {
+	unlinkSync(progressFilePath);
 }
 
 /** Formats a duration in ms: <1s → "123ms", <1min → "1.23s", <1h → "2m 34s", else → "1h 5m" */

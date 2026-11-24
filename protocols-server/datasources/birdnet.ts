@@ -1,6 +1,6 @@
 import { addYears } from 'date-fns';
 
-import { Datasource } from './datasource.ts';
+import { Datasource } from '../lib/datasource.ts';
 
 type ZenodoFile = {
 	record: `https://zenodo.org/records/${number}`;
