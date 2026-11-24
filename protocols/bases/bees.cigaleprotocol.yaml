@@ -38,14 +38,14 @@ metadata:
     label: Morphogroupe
     group: andrena
     externalOptions:
-      at: https://huggingface.co/edgaremy/andrena-classifier/resolve/main/class-mapping-grouped.txt?download=true
-      format: txt
-      postprocess: |
-        {
-          "key": raw,
-          "index": lineIndex,
-          "label": $contains(raw, "gpe") ? $replace(raw, "gpe", "Groupe") : $titlecase(raw)
-        }
+      - at: https://huggingface.co/edgaremy/andrena-classifier/resolve/main/class-mapping-grouped.txt?download=true
+        format: txt
+        postprocess: |
+          {
+            "key": "andrena " & raw,
+            "index": lineIndex,
+            "label": $contains(raw, "gpe") ? $replace(raw, "gpe", "Groupe") : $titlecase(raw)
+          }
     infer:
       neural:
         - name: ConvNextV2 Tiny
@@ -54,6 +54,7 @@ metadata:
           classmapping:
             at: https://huggingface.co/edgaremy/andrena-classifier/resolve/main/class-mapping-grouped.txt?download=true
             format: txt
+            postprocess: '"andrena " & raw'
           input:
             height: 384
             width: 384
