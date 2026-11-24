@@ -1,12 +1,14 @@
 import { existsSync, statSync } from 'node:fs';
+
 import { Server } from 'bun';
-import { PORT, DATA_DIR, PROTOCOLS_DIR, WEB_ORIGIN } from './config.js';
-import { serveFile, resolveUnderDataDir, resolveUnderProtocolsDir } from './static.js';
-import { indexPage, apiIndexPage, dirListing } from './html.js';
-import { isAuthorized, unauthorized, isPublicRoute, handleLogin } from './auth.js';
-import { readCacheStats, handleCacheDelete } from './caches.js';
-import { getRegenStatus, readProgress, regenerate, readRegenLog } from './regeneration.js';
+
 import { amendManifests, writeRegistry } from '../scripts/generate-protocol-registry.js';
+import { handleLogin, isAuthorized, isPublicRoute, unauthorized } from './auth.js';
+import { handleCacheDelete, readCacheStats } from './caches.js';
+import { DATA_DIR, PORT, PROTOCOLS_DIR, WEB_ORIGIN } from './config.js';
+import { apiIndexPage, dirListing, indexPage } from './html.js';
+import { getRegenStatus, readProgress, readRegenLog, regenerate } from './regeneration.js';
+import { resolveUnderDataDir, resolveUnderProtocolsDir, serveFile } from './static.js';
 
 export function startServer(): Server {
 	if (!process.env.WEB_ORIGIN) {
@@ -50,7 +52,10 @@ export function startServer(): Server {
 			// Regeneration API
 			if (pathname === '/api/regenerate' && req.method === 'POST') {
 				if (!regenerate()) {
-					return Response.json({ error: 'Regeneration already in progress' }, { status: 409 });
+					return Response.json(
+						{ error: 'Regeneration already in progress' },
+						{ status: 409 }
+					);
 				}
 				return Response.json({ started: true });
 			}
@@ -60,7 +65,7 @@ export function startServer(): Server {
 				return Response.json({
 					...getRegenStatus(),
 					progress: readProgress(),
-					log: '/api/regeneration/log.txt',
+					logs_url: new URL('/api/regeneration/log.txt', WEB_ORIGIN),
 				});
 			}
 
@@ -83,7 +88,11 @@ export function startServer(): Server {
 
 			// Cache removal (auth already enforced by the gate above)
 			if (pathname.startsWith('/api/caches/') && req.method === 'DELETE') {
-				const response = handleCacheDelete(pathname, url, getRegenStatus().state === 'running');
+				const response = handleCacheDelete(
+					pathname,
+					url,
+					getRegenStatus().state === 'running'
+				);
 				if (response) {
 					return response;
 				}

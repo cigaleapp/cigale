@@ -109,7 +109,8 @@ jobs:
     name: Restart app and regenerate
     runs-on: ubuntu-latest
     needs: build-image
-    if: github.event_name != 'pull_request' && (needs.build-image.outputs.image != '' || github.event_name == 'schedule')
+    # XXX: DONT MERGE
+    # if: github.event_name != 'pull_request' && (needs.build-image.outputs.image != '' || github.event_name == 'schedule')
 
     env:
       IMAGE: ${{ needs.build-image.outputs.image }}
@@ -142,7 +143,7 @@ jobs:
           if [ -n "$PROTOCOLS_APP_URL" ]; then
             url="$PROTOCOLS_APP_URL"
           else
-            url=$(hfctl -e "$HF_ENV" apps get "$HF_APP" -o json | jq -r .endpoint
+            url=$(hfctl -e "$HF_ENV" apps get "$HF_APP" -o json | jq -r .endpoint)
           fi
           if [ -z "$url" ]; then
             echo "::error::Could not determine the public URL of app $HF_APP. Set the PROTOCOLS_APP_URL secret."
@@ -170,9 +171,9 @@ jobs:
           done
           echo "Final status:"
           curl -fsS "$SERVER_URL/api/regenerate" | jq .
-          logs_route=$(curl -fsS "$SERVER_URL/api/regenerate" | jq .log)
+          logs_url=$(curl -fsS "$SERVER_URL/api/regenerate" | jq .logs_url)
           echo "Logs:"
-          curl -fsS "$SERVER_URL$logs_route"
+          curl -fsS "$logs_url"
         env:
           SERVER_URL: ${{ steps.app.outputs.url }}
           TOTAL_WAIT_MINUTES: 120

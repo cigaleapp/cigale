@@ -62,7 +62,7 @@ export function writeRegistry({
 	outPath,
 }: {
 	directory: string;
-	transformSource: (u: URL) => URL | string;
+	transformSource: undefined | ((u: URL) => URL | string);
 	filter: (id: string) => boolean;
 	outPath?: string;
 }): string {
@@ -79,7 +79,9 @@ export function writeRegistry({
 		if (!filter(parsed.id)) continue;
 
 		const manifestVersion = (parsed.manifest ?? 'v0.0').replace(/^v/, '');
-		const sourceUrl = new URL(typeof parsed.source === 'string' ? parsed.source : parsed.source.url);
+		const sourceUrl = new URL(
+			typeof parsed.source === 'string' ? parsed.source : parsed.source.url
+		);
 
 		protocols.set(parsed.id, {
 			name: parsed.name,
@@ -87,7 +89,7 @@ export function writeRegistry({
 			manifestVersion,
 			older: [],
 			id: parsed.id,
-			url: transformSource(sourceUrl).toString(),
+			url: (transformSource?.(sourceUrl) ?? sourceUrl).toString(),
 		});
 	}
 
@@ -96,7 +98,9 @@ export function writeRegistry({
 		out,
 		JSON.stringify(
 			{
-				$schema: path.relative(path.dirname(out), schemaPath()).replaceAll('\\', '/'),
+				$schema: transformSource
+					? transformSource(new URL('/registry.json', LOCAL_ORIGIN))
+					: path.relative(path.dirname(out), schemaPath()).replaceAll('\\', '/'),
 				protocols: [...protocols.values()],
 			},
 			null,

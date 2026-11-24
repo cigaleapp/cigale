@@ -175,18 +175,27 @@ export function writeAllCaches() {
 	writeCacheStatsFile();
 }
 
+export type EntryCounts = { total: number; stale: number; fresh: number };
+
 /** Per-query entry counts for a cache */
 export function cacheStats(cache: DatasourceCache): {
 	datasource: string;
 	expiresAt: string;
-	queries: Record<string, number>;
-	totalEntries: number;
+	queries: Record<string, EntryCounts>;
+	totalEntries: EntryCounts;
 } {
-	const queries: Record<string, number> = {};
-	let totalEntries = 0;
+	const queries: Record<string, EntryCounts> = {};
+	const totalEntries: EntryCounts = { total: 0, stale: 0, fresh: 0 };
 	for (const [query, entries] of Object.entries(cache.entries)) {
-		queries[query] = entries.length;
-		totalEntries += entries.length;
+		const counts: EntryCounts = { total: entries.length, stale: 0, fresh: 0 };
+		for (const entry of entries) {
+			if (isPast(entry.expiresAt)) counts.stale++;
+			else counts.fresh++;
+		}
+		queries[query] = counts;
+		totalEntries.total += counts.total;
+		totalEntries.stale += counts.stale;
+		totalEntries.fresh += counts.fresh;
 	}
 	return {
 		datasource: cache.datasource,

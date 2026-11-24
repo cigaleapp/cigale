@@ -1,4 +1,6 @@
-import { readdirSync } from 'node:fs';
+import { existsSync, readdirSync } from 'node:fs';
+
+import { PROTOCOLS_DIR } from './config.js';
 
 // --- Browsing (simple HTML, no CSS) ---
 
@@ -46,6 +48,16 @@ ${rows}
 
 // Index of the browsable areas.
 export function indexPage(): Response {
+	// Protocol manifests are served at the root level (e.g.
+	// /entomoscope.cigaleprotocol.yaml, /bases/bees.cigaleprotocol.json).
+	const protocolFiles = existsSync(PROTOCOLS_DIR)
+		? [...new Bun.Glob('**/*.cigaleprotocol.{json,yaml}').scanSync({ cwd: PROTOCOLS_DIR })]
+				.map((f) => f.replaceAll('\\', '/'))
+				.sort()
+		: [];
+	const protocolRows = protocolFiles
+		.map((f) => `<li><a href="/${f}">${escapeHtml(f)}</a></li>`)
+		.join('\n');
 	const body = `<h1>protocols-server</h1>
 <ul>
 <li><a href="/api/">API</a></li>
@@ -53,6 +65,11 @@ export function indexPage(): Response {
 <li><a href="/assets/">assets/</a></li>
 <li><a href="/process/">process/</a></li>
 <li><a href="/bases/">protocols/bases/</a></li>
+</ul>
+<h2>Protocols</h2>
+<ul>
+<li><a href="/registry.json">registry.json</a></li>
+${protocolRows}
 </ul>`;
 	return htmlPage('protocols-server', body);
 }

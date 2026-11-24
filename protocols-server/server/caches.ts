@@ -45,11 +45,19 @@ function updateCacheStats(datasource: string, filepath: string | null) {
 		const entry = filepath
 			? (() => {
 					const cache = readCacheFile(filepath);
-					const queries: Record<string, number> = {};
-					let totalEntries = 0;
+					const now = new Date();
+					const queries: Record<string, { total: number; stale: number; fresh: number }> = {};
+					const totalEntries = { total: 0, stale: 0, fresh: 0 };
 					for (const [query, entries] of Object.entries(cache.entries)) {
-						queries[query] = entries.length;
-						totalEntries += entries.length;
+						const counts = { total: entries.length, stale: 0, fresh: 0 };
+						for (const entry of entries) {
+							if (new Date(entry.expiresAt) < now) counts.stale++;
+							else counts.fresh++;
+						}
+						queries[query] = counts;
+						totalEntries.total += counts.total;
+						totalEntries.stale += counts.stale;
+						totalEntries.fresh += counts.fresh;
 					}
 					return {
 						datasource: cache.datasource,
