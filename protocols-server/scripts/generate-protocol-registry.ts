@@ -11,6 +11,34 @@ const root = path.dirname(import.meta.dir); // protocols-server/
 // The dev origin hardcoded in the protocol manifests.
 const LOCAL_ORIGIN = 'http://localhost:3000';
 
+// CLI: bun run protocols-server/scripts/generate-protocol-registry.ts [directory] [base url]
+if (import.meta.main) {
+	const [dirArg, baseUrlArg] = process.argv.slice(2);
+	const baseUrl = baseUrlArg ?? process.env.WEB_ORIGIN;
+	const directory = dirArg ? path.resolve(dirArg) : path.join(root, '..', 'protocols');
+	const outPath = path.join(directory, 'registry.json');
+	mkdirSync(path.dirname(outPath), { recursive: true });
+
+	if (baseUrl) {
+		const amended = amendManifests(directory, baseUrl);
+		if (amended.length > 0) {
+			console.log(`Amended ${amended.length} protocol manifest(s) to use ${baseUrl}:`);
+			for (const file of amended) console.log(`  - ${file}`);
+		}
+	}
+
+	const registryPath = writeRegistry({
+		directory,
+		transformSource: baseUrl
+			? (url) => baseUrl.replace(/\/+$/, '') + url.pathname + url.search
+			: undefined,
+		filter: () => true,
+		outPath,
+	});
+
+	console.log(`Generated protocol registry at ${registryPath}`);
+}
+
 // The registry schema lives in the repo's static/ dir (copied to /app/static
 // in the container). Repo layout: <repo>/static/. Container layout: /app/static/.
 function schemaPath(): string {
@@ -29,6 +57,7 @@ function schemaPath(): string {
  * repo root, where WEB_ORIGIN is unset).
  */
 export function amendManifests(directory: string, baseUrl: string): string[] {
+	if (!baseUrl) return [];
 	const target = baseUrl.replace(/\/+$/, '');
 	if (target === LOCAL_ORIGIN) return [];
 	const glob = new Bun.Glob('**/*.cigaleprotocol.{json,yaml}');
@@ -108,26 +137,4 @@ export function writeRegistry({
 		)
 	);
 	return out;
-}
-
-// CLI: bun run protocols-server/scripts/generate-protocol-registry.ts [directory] [base url]
-if (import.meta.main) {
-	const [dirArg, baseUrlArg] = process.argv.slice(2);
-	const baseUrl = baseUrlArg ?? process.env.WEB_ORIGIN ?? LOCAL_ORIGIN;
-	const directory = dirArg ? path.resolve(dirArg) : path.join(root, '..', 'protocols');
-	const outPath = path.join(directory, 'registry.json');
-	mkdirSync(path.dirname(outPath), { recursive: true });
-
-	const amended = amendManifests(directory, baseUrl);
-	if (amended.length > 0) {
-		console.log(`Amended ${amended.length} protocol manifest(s) to use ${baseUrl}:`);
-		for (const file of amended) console.log(`  - ${file}`);
-	}
-	const registryPath = writeRegistry({
-		directory,
-		transformSource: (url) => baseUrl.replace(/\/+$/, '') + url.pathname + url.search,
-		filter: () => true,
-		outPath,
-	});
-	console.log(`Generated protocol registry at ${registryPath}`);
 }
