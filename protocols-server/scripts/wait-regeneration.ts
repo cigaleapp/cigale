@@ -77,7 +77,7 @@ const checkRunId = JSON.parse(
 		name: 'Regeneration progress',
 		head_sha: sha,
 		details_url: serverUrl,
-		status: 'requested',
+		status: 'queued',
 		output: {
 			title: 'Regenerating options',
 			summary: 'Waiting for regeneration to start...',
@@ -92,7 +92,7 @@ for (let i = 0; i < totalWaitMinutes * 6; i++) {
 	if (state === null) {
 		console.log('Server not ready (503); waiting...');
 		ghApi('PATCH', `repos/${repo}/check-runs/${checkRunId}`, {
-			status: 'pending',
+			status: 'queued',
 			output: {
 				title: 'Waiting for server to be ready',
 				summary: 'The server is not responding yet (HTTP 503).',
@@ -117,7 +117,7 @@ for (let i = 0; i < totalWaitMinutes * 6; i++) {
 	} else {
 		console.log(`No new run yet (last run started: ${state.startedAt ?? 'never'}); waiting...`);
 		ghApi('PATCH', `repos/${repo}/check-runs/${checkRunId}`, {
-			status: 'waiting',
+			status: 'queued',
 			output: {
 				title: 'Waiting for regeneration to start',
 				summary: `The app has not started a new regeneration run since the job began (last run: ${state.startedAt ?? 'none'}).`,
