@@ -16,7 +16,7 @@ authors:
   - name: Maxime Cauchoix
 
 imports:
-  - from: io.github.cigaleapp.base.insects
+  - from: io.github.cigaleapp.base.arthropods
     metadataGroups:
       - taxonomy
     metadata:

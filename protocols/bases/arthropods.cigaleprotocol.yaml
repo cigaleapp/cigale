@@ -63,6 +63,11 @@ metadata:
       neural:
         - name: FrenchArthro
           model: https://huggingface.co/cigaleapp/built-in-protocols/resolve/main/classifier-arthropoda.onnx?download=true
+          input:
+            height: 224
+            width: 224
+            normalized: true
+            disposition: 1CHW
           classes: extraKeys # for now, the classmapping has old GBIF backbone IDs so they're in extraKeys
           classmapping:
             at: https://huggingface.co/edgaremy/convnextv2_base.frencharthro-24k/resolve/main/class-names.csv
@@ -73,12 +78,16 @@ metadata:
               }
 
         - name: Small collemboles
-          model: TODO
+          model: https://huggingface.co/cigaleapp/built-in-protocols/resolve/main/classifier-collembola.onnx?download=true
+          input:
+            height: 224
+            width: 224
+            normalized: true
+            disposition: 1CHW
           classes: labels
           classmapping:
             at: https://raw.githubusercontent.com/edgaremy/small-collomboles/main/class_mapping.txt
             format: txt
-
 
   kingdom:
     type: enum
