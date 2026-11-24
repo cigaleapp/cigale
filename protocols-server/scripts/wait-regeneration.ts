@@ -47,7 +47,7 @@ type RegenState = {
 // All API bodies are passed as JSON on stdin so that values containing
 // special characters (%, —, quotes, ...) never go through a shell.
 function ghApi(method: 'POST' | 'PATCH', path: string, body: unknown): string {
-	return execFileSync('gh', ['-X', method, path, '--input', '-'], {
+	return execFileSync('gh', ['api', '-X', method, path, '--input', '-'], {
 		encoding: 'utf8',
 		input: JSON.stringify(body),
 	});
