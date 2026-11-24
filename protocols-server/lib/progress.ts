@@ -1,7 +1,8 @@
 /// <reference types="@types/bun" />
-
-import { minutesToMilliseconds } from 'date-fns';
 import { renameSync, writeFileSync } from 'node:fs';
+
+import * as eta from 'arrival-time';
+import { minutesToMilliseconds } from 'date-fns';
 
 class Progress {
 	total = 0;
@@ -16,6 +17,8 @@ class Progress {
 
 	ongoing: string[] = [];
 
+	eta = new eta.Estimation();
+
 	constructor() {}
 
 	log(...parts: unknown[]) {
@@ -25,22 +28,30 @@ class Progress {
 		if (colorsSupported) this.draw();
 	}
 
+	updateEta() {
+		this.eta.update(this.done, this.total);
+	}
+
 	phase(phase: string, total: number) {
 		this.phaseName = phase;
 		this.total = total;
 		this.done = 0;
 		this.lastDrawnStep = -1;
+		this.eta.reset();
+		this.updateEta();
 	}
 
 	increment(by = 1) {
 		if (by < 0) throw new Error(`cant increment by ${by}`);
 		this.done += by;
+		this.updateEta();
 		this.redraw();
 	}
 
 	set(progress: number) {
 		if (progress < 0) throw new Error(`cant set progress to ${progress}`);
 		this.done = progress;
+		this.updateEta();
 		this.redraw();
 	}
 
@@ -100,10 +111,7 @@ class Progress {
 			done: this.done,
 			percentage: this.percentage,
 			ongoing: [...this.ongoing],
-			lastWrite: this.lastWrite,
-			lastDrawnStep: this.lastDrawnStep,
-			lastDrawnAt: this.lastDrawnAt,
-			maxPhaseLength: this.maxPhaseLength,
+			eta: formatDuration(this.eta.estimate()),
 		};
 	}
 
@@ -137,6 +145,8 @@ class Progress {
 				osc94 +
 				eol
 		);
+
+		this.lastWrite = performance.now();
 	}
 
 	clear() {
@@ -222,7 +232,10 @@ let progressFileTimer: ReturnType<typeof setInterval> | undefined;
 function writeProgressFile() {
 	try {
 		const tmp = `${progressFilePath}.tmp`;
-		writeFileSync(tmp, JSON.stringify({ ...progress.snapshot(), updatedAt: new Date().toISOString() }, null, 2));
+		writeFileSync(
+			tmp,
+			JSON.stringify({ ...progress.snapshot(), updatedAt: new Date().toISOString() }, null, 2)
+		);
 		renameSync(tmp, progressFilePath);
 	} catch (err) {
 		logger.error(`Failed to write progress file ${progressFilePath}:`, err);
