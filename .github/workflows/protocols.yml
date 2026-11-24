@@ -38,9 +38,6 @@ jobs:
       contents: read
       packages: write
 
-    outputs:
-      image: ${{ steps.image.outputs.image }}
-
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -100,20 +97,12 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Set image output
-        if: steps.changes.outputs.protocols == 'true' || github.event_name == 'workflow_dispatch'
-        id: image
-        run: echo "image=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${{ steps.meta.outputs.version }}" >> "$GITHUB_OUTPUT"
-
   deploy:
     name: Restart app and regenerate
     runs-on: ubuntu-latest
     needs: build-image
     # XXX: DONT MERGE
-    # if: github.event_name != 'pull_request' && (needs.build-image.outputs.image != '' || github.event_name == 'schedule')
-
-    env:
-      IMAGE: ${{ needs.build-image.outputs.image }}
+    # if: github.event_name != 'pull_request' && github.event_name == 'schedule'
 
     steps:
       - name: Setup hfctl
@@ -122,13 +111,7 @@ jobs:
           console-url: https://data-terra.ai.meso.umontpellier.fr
           service-account: ${{ secrets.DATATERRA_HF_SERVICE_ACCOUNT }}
 
-      - name: Update app image
-        if: env.IMAGE != ''
-        run: |
-          hfctl -e "$HF_ENV" apps update "$HF_APP" --image "$IMAGE" --wait
-
       - name: Restart app
-        if: env.IMAGE == ''
         run: |
           hfctl -e "$HF_ENV" apps restart "$HF_APP"
 
