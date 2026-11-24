@@ -9,6 +9,8 @@ import * as DB from '#lib/database.js';
 import { metadataOptionId } from '#lib/schemas/metadata.js';
 import { round, transformObject, transformObjectAsync } from '#lib/utils.js';
 
+import { findMetadataOption } from './options.ts';
+
 /**
  * Adds valueLabel to each metadata value object when the metadata is an enum.
  */
@@ -26,7 +28,7 @@ export async function addValueLabels<V extends DB.MetadataValue>(
 
 		const opt = metadataOptions
 			? metadataOptions[key]?.[value.value.toString()]
-			: await db.get('MetadataOption', metadataOptionId(key, value.value));
+			: findMetadataOption(db, key, value.value);
 
 		if (opt?.label) {
 			return [key, { ...value, valueLabel: opt.label }];

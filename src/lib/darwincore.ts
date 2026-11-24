@@ -10,6 +10,7 @@ import { Tables } from '#lib/database.js';
 import { compareBy, entries, mapValues, orEmpty, orEmpty2, sum, switchValue } from '#lib/utils.js';
 
 import { addValueLabels, metadataPrettyValue } from './metadata/display.js';
+import { findMetadataOption } from './metadata/options.js';
 import {
 	BUILTIN_DARWINCORE_NAMESPACES,
 	BUILTIN_EXTRA_FIELDS,
@@ -383,14 +384,13 @@ export function fileLayout<Scope extends DarwinCoreFileScope>(
 							) => MaybePromise<string | number>
 						) =>
 							it(field, async (v, db) => {
-								const opt = await db.get(
-									'MetadataOption',
-									metadataOptionId(def.id, v.value)
+								const opt = await findMetadataOption(
+									db,
+									def.id,
+									v.value.toString()
 								);
 
-								if (!opt) return '';
-
-								return computation(Tables.MetadataOption.assert(opt));
+								return opt ? computation(opt) : '';
 							});
 
 						const out = [];

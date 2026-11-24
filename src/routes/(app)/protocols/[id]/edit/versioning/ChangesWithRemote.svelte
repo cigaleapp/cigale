@@ -4,9 +4,10 @@
 	import wordDiff from 'word-diff';
 
 	import ButtonIcon from '#lib/ButtonIcon.svelte';
-	import { get, tables } from '#lib/idb.svelte.js';
+	import { databaseHandle, get, tables } from '#lib/idb.svelte.js';
+	import { findMetadataOption } from '#lib/metadata/options.ts';
 	import { resolve } from '#lib/paths.js';
-	import { metadataOptionId, splitMetadataId } from '#lib/schemas/metadata.js';
+	import { splitMetadataId } from '#lib/schemas/metadata.js';
 	import { entries } from '#lib/utils.js';
 	import IconAddKey from '~icons/ri/add-line';
 	import IconBefore from '~icons/ri/arrow-left-wide-fill';
@@ -94,7 +95,7 @@
 		path[0] === 'metadata' ? tables.Metadata.getFromState(path[1].toString()) : undefined}
 	{@const option =
 		metadata && path[2] === 'options' && optionKey
-			? get('MetadataOption', metadataOptionId(metadata.id, optionKey))
+			? findMetadataOption(databaseHandle(), metadata.id, optionKey)
 			: undefined}
 
 	{#each path as piece, i (i)}

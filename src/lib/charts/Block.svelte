@@ -14,6 +14,7 @@
 	import Markdown from '#lib/Markdown.svelte';
 	import { metadataOption, resolveMetadataId } from '#lib/metadata/index.js';
 	import { mergeMetadataFromImagesAndObservations } from '#lib/metadata/merging.js';
+	import { findMetadataOption } from '#lib/metadata/options.ts';
 	import {
 		metadataOptionId,
 		removeNamespaceFromMetadataId,
@@ -174,8 +175,9 @@
 		if (!protocol) return;
 
 		const id = resolveMetadataId(protocol, block.metadata);
+		if (!id) return;
 
-		return await get('MetadataOption', metadataOptionId(id, result.toString()));
+		return await findMetadataOption(databaseHandle(), id, result.toString());
 	}
 </script>
 

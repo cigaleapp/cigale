@@ -13,7 +13,6 @@ import {
 	NamespacedMetadataID,
 	NamespacedMetadataOptionID,
 	Probability,
-	ProtocolID,
 	UniqueFileTypeSpecifier,
 	URLString,
 } from './common.js';
@@ -26,35 +25,6 @@ import {
 	NeuralEnumInference,
 } from './neural.js';
 import { NumericUnit } from './units.js';
-
-/**
- * @param {NamespacedMetadataID} metadataId
- * @param {RuntimeValue<"enum">} key
- */
-export function metadataOptionId(metadataId, key) {
-	return namespaceToMetadataOptionInDB(metadataId, key.toString());
-}
-
-/**
- *
- * @template {string} [S=string]
- * @param {NamespacedMetadataID} metadataId
- * @param {S} rest
- */
-export function namespaceToMetadataOptionInDB(metadataId, rest) {
-	return /** @type {const} */ (`${metadataId}:${rest}`);
-}
-
-/**
- * @param {string} optionId
- */
-export function parseMetadataOptionId(optionId) {
-	const parts = optionId.split(':');
-	if (parts.length < 2) throw new Error(`Invalid metadata option ID: ${optionId}`);
-	const metadataId = parts.slice(0, -1).join(':');
-	const key = parts[parts.length - 1];
-	return { metadataId, key };
-}
 
 /**
  * @satisfies { Record<string, {label: string, help: string}> }

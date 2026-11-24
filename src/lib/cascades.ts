@@ -1,17 +1,18 @@
-import type * as DB from './database.js';
-import type { DatabaseHandle } from './idb.svelte.js';
-import type { NamespacedMetadataID } from './schemas/common.js';
-import type { RuntimeValue } from './schemas/metadata.js';
+import type * as DB from '#lib/database.js';
+import type { DatabaseHandle } from '#lib/idb.svelte.js';
+import type { NamespacedMetadataID } from '#lib/schemas/common.js';
+import type { RuntimeValue } from '#lib/schemas/metadata.js';
 
-import { Tables } from './database.js';
-import { resolveMetadataId } from './metadata/namespacing.js';
-import { metadataOption } from './metadata/storage.js';
+import { Tables } from '#lib/database.js';
+import { resolveMetadataId } from '#lib/metadata/namespacing.js';
 import {
+	findMetadataOption,
 	metadataOptionId,
-	namespaceOfMetadataId,
 	parseMetadataOptionId,
-} from './schemas/metadata.js';
-import { ensureArray, entries, groupBy, nonnull, sum } from './utils.js';
+} from '#lib/metadata/options.js';
+import { metadataOption } from '#lib/metadata/storage.js';
+import { ensureNamespacedMetadataId, namespaceOfMetadataId } from '#lib/schemas/metadata.js';
+import { ensureArray, entries, groupBy, nonnull, sum } from '#lib/utils.js';
 
 /**
  * Get all metadata the given MetadataValue cascades into
@@ -62,7 +63,7 @@ export async function computeCascades({
 	confidences: _confidences,
 }: {
 	db: DatabaseHandle;
-	metadataId: string;
+	metadataId: NamespacedMetadataID;
 	confidence: number;
 	value: RuntimeValue;
 	confidences:
@@ -96,26 +97,35 @@ export async function computeCascades({
 		// List of { value, confidence }, that includes the main value as well as the alternatives
 		[{ value, confidence }, ...confidences].map(async ({ confidence, value }) => {
 			// Get the cascades for the corresponding metadata option
-			const option = await db.get('MetadataOption', metadataOptionId(metadataId, value));
+			const option = await findMetadataOption(db, metadataId, value);
 			if (!option?.cascade) return undefined;
 			const { cascade } = option;
 			return { cascade, confidence };
 		})
-	).then((options) => {
+	).then(async (options) => {
 		// Combine all cascades that lead to the same metadata option, and sum their confidences
 		const groupedByOption = groupBy(
 			// Get a list of { option id, confidence } for every cascaded value,
 			// the confidence coming from the value that triggers it
-			options.filter(nonnull).flatMap(({ cascade, confidence }) => {
-				return entries(cascade).flatMap(([metadataId, values]) =>
-					ensureArray(values).map((value) => ({
-						optionId: metadataOptionId(metadataId as string, value),
-						confidence,
-					}))
-				);
-			}),
-			(c) => c.optionId,
-			(c) => c.confidence
+			await Promise.all(
+				options.filter(nonnull).flatMap(({ cascade, confidence }) =>
+					entries(cascade).flatMap(([metadataId, values]) =>
+						ensureArray(values).map(async (value) => {
+							const id = resolveMetadataId(protocol, metadataId);
+							if (!id) return;
+							const option = await findMetadataOption(db, id, value);
+							if (!option) return;
+
+							return {
+								optionId: option.id,
+								confidence,
+							};
+						})
+					)
+				)
+			),
+			(c) => c?.optionId,
+			(c) => c?.confidence ?? 0
 		);
 
 		// Combine all options of a same metadataId into alternatives.
@@ -123,11 +133,17 @@ export async function computeCascades({
 		// cascades that lead to that option
 		const groupedByMetadata = groupBy(
 			groupedByOption.entries(),
-			([optionId]) => resolveMetadataId(protocol, parseMetadataOptionId(optionId).metadataId),
-			([optionId, confidences]) => /** @type {const} */ ({
-				value: parseMetadataOptionId(optionId).key,
-				confidence: sum(confidences),
-			})
+			([optionId]) => {
+				if (!optionId) return;
+				return resolveMetadataId(protocol, parseMetadataOptionId(optionId).metadataId);
+			},
+			([optionId, confidences]) => {
+				if (!optionId) return;
+				return {
+					value: parseMetadataOptionId(optionId).key,
+					confidence: sum(confidences),
+				};
+			}
 		);
 
 		// For cascades that aren't part of this protocol
@@ -135,9 +151,9 @@ export async function computeCascades({
 
 		// Return a list of data ready for storeMetadataValue() for every cascaded metadata
 		return [...groupedByMetadata.entries()].map(([metadataId, options]) => {
-			const [{ value, confidence }, ...confidences] = options.toSorted(
-				({ confidence: a }, { confidence: b }) => b - a
-			);
+			const [{ value, confidence }, ...confidences] = options
+				.filter(nonnull)
+				.toSorted(({ confidence: a }, { confidence: b }) => b - a);
 
 			return {
 				metadataId: metadataId!,

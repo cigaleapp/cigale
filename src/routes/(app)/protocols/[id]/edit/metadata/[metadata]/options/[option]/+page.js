@@ -1,8 +1,9 @@
 import { error } from '@sveltejs/kit';
 
-import { databaseHandle, get, tables } from '#lib/idb.svelte.js';
+import { databaseHandle, tables } from '#lib/idb.svelte.js';
 import { metadataOptionsKeyRange, metadataOptionsOf } from '#lib/metadata/index.js';
-import { metadataOptionId, namespacedMetadataId } from '#lib/schemas/metadata.js';
+import { findMetadataOption } from '#lib/metadata/options.js';
+import { namespacedMetadataId } from '#lib/schemas/metadata.js';
 import { entries } from '#lib/utils.js';
 
 export async function load({ parent, params }) {
@@ -10,9 +11,10 @@ export async function load({ parent, params }) {
 
 	const { protocol, metadata } = await parent();
 
-	const option = await get(
-		'MetadataOption',
-		metadataOptionId(namespacedMetadataId(params.id, params.metadata), params.option)
+	const option = await findMetadataOption(
+		databaseHandle(),
+		namespacedMetadataId(params.id, params.metadata),
+		params.option
 	);
 
 	if (!option) error(404, 'Option not found');
@@ -26,7 +28,7 @@ export async function load({ parent, params }) {
 			/** @type {import('#lib/database.js').MetadataEnumVariant | undefined} */
 			let option = undefined;
 			if (metadata.type === 'enum') {
-				option = await get('MetadataOption', metadataOptionId(fullMetadataId, value));
+				option = await findMetadataOption(db, fullMetadataId, value);
 			}
 
 			return {
