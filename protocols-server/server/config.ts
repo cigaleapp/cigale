@@ -3,10 +3,16 @@ import path from 'node:path';
 
 export const PORT = Number(process.env.PORT ?? 3000);
 export const DATA_DIR = process.env.DATA_DIR ?? '.';
+export const LOCAL_DEV_ORIGIN = process.env.LOCAL_DEV_ORIGIN ?? 'http://localhost:3000';
 // Origin of the public web app. Used at startup to rewrite the hardcoded
 // `http://localhost:3000` references in the protocol manifests and to build
 // the protocol registry URLs.
-export const WEB_ORIGIN = process.env.WEB_ORIGIN ?? 'http://localhost:3000';
+export const WEB_ORIGIN = process.env.WEB_ORIGIN ?? LOCAL_DEV_ORIGIN;
+if (!process.env.WEB_ORIGIN) {
+	console.warn(
+		`WEB_ORIGIN env var not set, falling back to ${LOCAL_DEV_ORIGIN}. THIS WILL NOT WORK IN PROD!`
+	);
+}
 
 // Protocol manifests (yaml) + generated .json live here. In the container this
 // resolves to /protocols (server code is at /app/server); locally to <repo>/protocols.
@@ -42,3 +48,5 @@ export const LOG_MAX_LINES = Number.parseInt(process.env.LOG_MAX_LINES ?? '100')
 export const PROGRESS_FILE_REFRESH_MS = Number(process.env.PROGRESS_FILE_REFRESH_MS ?? 10_000);
 
 export const PROGRESS_FILE_ENABLED = process.env.PROGRESS_FILE === 'true';
+
+export const ASSETS_URL_BASE = `${WEB_ORIGIN}/assets`;

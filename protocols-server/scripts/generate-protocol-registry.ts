@@ -6,10 +6,9 @@ import path from 'node:path';
 import type { ExportedProtocol } from '../protocol-types.js';
 import type { ProtocolRegistry } from '../registry-types.js';
 
-const root = path.dirname(import.meta.dir); // protocols-server/
+import { LOCAL_DEV_ORIGIN } from '../server/config.js';
 
-// The dev origin hardcoded in the protocol manifests.
-const LOCAL_ORIGIN = 'http://localhost:3000';
+const root = path.dirname(import.meta.dir); // protocols-server/
 
 // CLI: bun run protocols-server/scripts/generate-protocol-registry.ts [directory] [base url]
 if (import.meta.main) {
@@ -51,21 +50,21 @@ function schemaPath(): string {
 }
 
 /**
- * Rewrite the hardcoded `http://localhost:3000` references in the protocol
+ * Rewrite the hardcoded `LOCAL_DEV_ORIGIN` references in the protocol
  * manifests to `baseUrl`. Returns the relative paths of the amended files.
- * A no-op when `baseUrl` is `http://localhost:3000` (e.g. codegen from the
+ * A no-op when `baseUrl` is `LOCAL_DEV_ORIGIN` (e.g. codegen from the
  * repo root, where WEB_ORIGIN is unset).
  */
 export function amendManifests(directory: string, baseUrl: string): string[] {
 	if (!baseUrl) return [];
 	const target = baseUrl.replace(/\/+$/, '');
-	if (target === LOCAL_ORIGIN) return [];
+	if (target === LOCAL_DEV_ORIGIN) return [];
 	const glob = new Bun.Glob('**/*.cigaleprotocol.{json,yaml}');
 	const amended: string[] = [];
 	for (const entry of glob.scanSync({ cwd: directory })) {
 		const file = path.join(directory, entry);
 		const text = readFileSync(file, 'utf8');
-		const out = text.replaceAll(LOCAL_ORIGIN, target);
+		const out = text.replaceAll(LOCAL_DEV_ORIGIN, target);
 		if (out !== text) {
 			writeFileSync(file, out);
 			amended.push(entry);
@@ -128,7 +127,7 @@ export function writeRegistry({
 		JSON.stringify(
 			{
 				$schema: transformSource
-					? transformSource(new URL('/registry.schema.json', LOCAL_ORIGIN))
+					? transformSource(new URL('/registry.schema.json', LOCAL_DEV_ORIGIN))
 					: path.relative(path.dirname(out), schemaPath()).replaceAll('\\', '/'),
 				protocols: [...protocols.values()],
 			},

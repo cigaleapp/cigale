@@ -10,12 +10,7 @@ import { apiIndexPage, dirListing, indexPage } from './html.js';
 import { getRegenStatus, readProgress, readRegenLog, regenerate } from './regeneration.js';
 import { resolveUnder, serveFile } from './static.js';
 
-export function startServer(): Server {
-	if (!process.env.WEB_ORIGIN) {
-		console.warn(
-			`WEB_ORIGIN env var not set, falling back to http://localhost:3000. THIS WILL NOT WORK IN PROD!`
-		);
-	}
+export function startServer(): Server<undefined> {
 	const server = Bun.serve({
 		port: PORT,
 		async fetch(req) {
@@ -157,7 +152,7 @@ export function startServer(): Server {
 
 	console.info(`protocols-server listening on port ${PORT}, data dir: ${DATA_DIR}`);
 
-	// At startup, rewrite the hardcoded http://localhost:3000 references in
+	// At startup, rewrite the hardcoded LOCAL_DEV_ORIGIN references in
 	// the protocol manifests to WEB_ORIGIN, then regenerate the protocol
 	// registry. Done before the auto-regenerate so the regenerated .json
 	// manifests inherit the amended URLs.

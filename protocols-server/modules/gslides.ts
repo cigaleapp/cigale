@@ -2,16 +2,7 @@ import type { CladedName, Option } from '../lib/modules.js';
 
 import { GoogleDrive } from '../datasources/gdrive.js';
 import { Enricher, matchCladedName, NameProvider, OptionExtra } from '../lib/modules.js';
-
-const WEB_ORIGIN = process.env.WEB_ORIGIN ?? 'http://localhost:3000';
-
-if (!process.env.WEB_ORIGIN) {
-	console.warn(
-		`WEB_ORIGIN env var not set, falling back to http://localhost:3000. THIS WILL NOT WORK IN PROD!`
-	);
-}
-
-const ASSETS_URL_BASE = `${WEB_ORIGIN}/assets`;
+import { ASSETS_URL_BASE } from '../server/config.js';
 
 export class GoogleDriveSlides implements NameProvider {
 	name = 'gdrive' as const;
