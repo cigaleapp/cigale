@@ -7,7 +7,7 @@ name: Collemboles (base)
 version: 1
 updates: automatic
 
-source: http://localhost:3000/bases/collembola.cigaleprotocol.yaml
+source: http://localhost:3000/bases/springtails.cigaleprotocol.yaml
 
 description: Protocole de base pour les collemboles
 

@@ -2,3 +2,4 @@ caches/
 options/
 assets/
 /protocol-types.ts
+/registry-types.ts

@@ -82,9 +82,18 @@ export function serveFile(filePath: string, req: Request): Response {
 	});
 }
 
+// Hidden files and directories (dot-prefixed path segments, e.g. .secrets/)
+// are never served or listed.
+function hasHiddenSegment(requestPath: string): boolean {
+	return requestPath.split('/').some((seg) => seg.startsWith('.'));
+}
+
 // Resolve a request path under DATA_DIR, preventing path traversal.
 export function resolveUnderDataDir(requestPath: string): string | null {
 	const decoded = decodeURIComponent(requestPath);
+	if (hasHiddenSegment(decoded)) {
+		return null;
+	}
 	const resolved = path.resolve(DATA_DIR, '.' + path.posix.normalize('/' + decoded));
 	const dataRoot = path.resolve(DATA_DIR);
 	if (resolved !== dataRoot && !resolved.startsWith(dataRoot + path.sep)) {
@@ -96,6 +105,9 @@ export function resolveUnderDataDir(requestPath: string): string | null {
 // Resolve a request path under PROTOCOLS_DIR, preventing path traversal.
 export function resolveUnderProtocolsDir(requestPath: string): string | null {
 	const decoded = decodeURIComponent(requestPath);
+	if (hasHiddenSegment(decoded)) {
+		return null;
+	}
 	const resolved = path.resolve(PROTOCOLS_DIR, '.' + path.posix.normalize('/' + decoded));
 	const root = path.resolve(PROTOCOLS_DIR);
 	if (resolved !== root && !resolved.startsWith(root + path.sep)) {

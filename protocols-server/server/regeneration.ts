@@ -13,8 +13,60 @@ export type RegenStatus = {
 let regenProcess: Subprocess | null = null;
 let regenStatus: RegenStatus = { state: 'idle' };
 
+// Rolling buffer of the last lines of the regeneration process's
+// stdout+stderr, exposed via GET /api/regeneration/log.txt.
+const LOG_MAX_LINES = 100;
+let regenLog: string[] = [];
+
 export function getRegenStatus(): RegenStatus {
 	return regenStatus;
+}
+
+// The last LOG_MAX_LINES lines of the most recent (or current) regeneration
+// run, or null when no run has happened yet.
+export function readRegenLog(): string | null {
+	return regenLog.length > 0 ? regenLog.join('\n') + '\n' : null;
+}
+
+function appendLogLine(line: string) {
+	regenLog.push(line);
+	if (regenLog.length > LOG_MAX_LINES) {
+		regenLog.splice(0, regenLog.length - LOG_MAX_LINES);
+	}
+}
+
+// Feed a stream of the child's output into the log buffer, splitting on
+// newlines and keeping a partial-line carry-over between chunks. The raw
+// bytes are also passed through to the server's own stdout/stderr so the
+// container logs keep showing the regeneration output as before.
+function pipeToLog(
+	stream: ReadableStream<Uint8Array>,
+	prefix: string,
+	target: { write(chunk: Uint8Array): unknown },
+): Promise<void> {
+	const decoder = new TextDecoder();
+	let pending = '';
+	const reader = stream.getReader();
+	return (async () => {
+		for (;;) {
+			const { done, value } = await reader.read();
+			if (done) break;
+			target.write(value);
+			pending += decoder.decode(value, { stream: true });
+			const lines = pending.split('\n');
+			pending = lines.pop() ?? '';
+			for (const line of lines) {
+				appendLogLine(prefix + line);
+			}
+		}
+		// Flush any trailing bytes (e.g. a multi-byte char split across chunks).
+		pending += decoder.decode();
+		if (pending !== '') {
+			appendLogLine(prefix + pending);
+		}
+	})().catch((err) => {
+		console.error('Failed to read regeneration process output:', err);
+	});
 }
 
 // The regeneration process (spawned with cwd: DATA_DIR) writes a progress
@@ -33,13 +85,19 @@ export function regenerate(): boolean {
 	}
 	const startedAt = new Date().toISOString();
 	regenStatus = { state: 'running', startedAt };
+	regenLog = [];
 	regenProcess = Bun.spawn(['bun', 'run', path.join(import.meta.dir, '..', 'main.ts')], {
 		cwd: DATA_DIR,
-		stdout: 'inherit',
-		stderr: 'inherit',
+		stdout: 'pipe',
+		stderr: 'pipe',
 		env: { ...process.env },
 	});
-	regenProcess.exited.then((code) => {
+	const stdoutDone = pipeToLog(regenProcess.stdout, '', process.stdout);
+	const stderrDone = pipeToLog(regenProcess.stderr, '[stderr] ', process.stderr);
+	regenProcess.exited.then(async (code) => {
+		// Wait for the output to be fully drained so the log is complete
+		// before the status flips to done/error.
+		await Promise.all([stdoutDone, stderrDone]);
 		regenStatus = {
 			state: code === 0 ? 'done' : 'error',
 			exitCode: code,

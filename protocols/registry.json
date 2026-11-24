@@ -11,7 +11,7 @@
 		},
 		{
 			"name": "IDmyBee",
-			"version": 1,
+			"version": 28,
 			"manifestVersion": "1.0",
 			"older": [],
 			"id": "io.github.cigaleapp.idmybee",
@@ -34,6 +34,14 @@
 			"url": "http://localhost:3000/opportunistic.cigaleprotocol.yaml"
 		},
 		{
+			"name": "Arthropodes (base)",
+			"version": 1,
+			"manifestVersion": "1.0",
+			"older": [],
+			"id": "io.github.cigaleapp.base.arthropods",
+			"url": "http://localhost:3000/bases/arthropods.cigaleprotocol.yaml"
+		},
+		{
 			"name": "Abeilles (base)",
 			"version": 1,
 			"manifestVersion": "1.0",
@@ -50,14 +58,6 @@
 			"url": "http://localhost:3000/bases/birds.cigaleprotocol.yaml"
 		},
 		{
-			"name": "Collemboles (base)",
-			"version": 1,
-			"manifestVersion": "1.0",
-			"older": [],
-			"id": "io.github.cigaleapp.base.collembola",
-			"url": "http://localhost:3000/bases/collembola.cigaleprotocol.yaml"
-		},
-		{
 			"name": "Environnement (base)",
 			"version": 1,
 			"manifestVersion": "1.0",
@@ -66,12 +66,12 @@
 			"url": "http://localhost:3000/bases/environment.cigaleprotocol.yaml"
 		},
 		{
-			"name": "Insectes (base)",
+			"name": "Collemboles (base)",
 			"version": 1,
 			"manifestVersion": "1.0",
 			"older": [],
-			"id": "io.github.cigaleapp.base.insects",
-			"url": "http://localhost:3000/bases/insects.cigaleprotocol.yaml"
+			"id": "io.github.cigaleapp.base.springtails",
+			"url": "http://localhost:3000/bases/collembola.cigaleprotocol.yaml"
 		}
 	]
 }

@@ -1,4 +1,5 @@
 import { createHash, timingSafeEqual } from 'node:crypto';
+
 import { API_PASSWORD, AUTH_COOKIE } from './config.js';
 
 function passwordHash(pw: string): Buffer {
@@ -40,20 +41,16 @@ export function unauthorized(): Response {
 	);
 }
 
-// Public (no auth): protocol manifests, /options/, /assets/, GET
-// /api/regenerate (status), GET /api/caches (stats) and /api/login.
-// Everything else (/, /health, /api/, /process/, POST /api/regenerate,
-// DELETE /api/caches/...) requires the API password.
 export function isPublicRoute(pathname: string, method: string): boolean {
 	if (pathname === '/api/regenerate' && method === 'GET') return true;
+	if (pathname === '/api/regeneration' && method === 'GET') return true;
 	if (pathname === '/api/caches' && method === 'GET') return true;
 	if (pathname === '/api/login') return true;
 	if (pathname.startsWith('/options/') || pathname.startsWith('/assets/')) return true;
 	const protectedPaths =
-		pathname === '/' ||
-		pathname === '/health' ||
-		pathname === '/api/' ||
 		pathname === '/api/regenerate' ||
+		pathname === '/api/regeneration' ||
+		pathname === '/api/regeneration/log.txt' ||
 		pathname === '/api/caches' ||
 		pathname.startsWith('/api/caches/') ||
 		pathname.startsWith('/process/');
@@ -71,5 +68,8 @@ export function handleLogin(password: string): Response {
 			headers: { 'Set-Cookie': cookie, 'Content-Type': 'text/plain' },
 		});
 	}
-	return new Response('Invalid password', { status: 401, headers: { 'Content-Type': 'text/plain' } });
+	return new Response('Invalid password', {
+		status: 401,
+		headers: { 'Content-Type': 'text/plain' },
+	});
 }

@@ -1,13 +1,19 @@
 import { existsSync, statSync } from 'node:fs';
 import { Server } from 'bun';
-import { PORT, DATA_DIR } from './config.js';
+import { PORT, DATA_DIR, PROTOCOLS_DIR, WEB_ORIGIN } from './config.js';
 import { serveFile, resolveUnderDataDir, resolveUnderProtocolsDir } from './static.js';
 import { indexPage, apiIndexPage, dirListing } from './html.js';
 import { isAuthorized, unauthorized, isPublicRoute, handleLogin } from './auth.js';
 import { readCacheStats, handleCacheDelete } from './caches.js';
-import { getRegenStatus, readProgress, regenerate } from './regeneration.js';
+import { getRegenStatus, readProgress, regenerate, readRegenLog } from './regeneration.js';
+import { amendManifests, writeRegistry } from '../scripts/generate-protocol-registry.js';
 
 export function startServer(): Server {
+	if (!process.env.WEB_ORIGIN) {
+		console.warn(
+			`WEB_ORIGIN env var not set, falling back to http://localhost:3000. THIS WILL NOT WORK IN PROD!`
+		);
+	}
 	const server = Bun.serve({
 		port: PORT,
 		async fetch(req) {
@@ -15,7 +21,8 @@ export function startServer(): Server {
 			const pathname = url.pathname;
 
 			// Auth gate: everything except protocols, /options/, /assets/,
-			// GET /api/regenerate and GET /api/caches requires the password.
+			// GET /api/regenerate, GET /api/regeneration and GET /api/caches
+			// requires the password.
 			if (!isPublicRoute(pathname, req.method) && !isAuthorized(req)) {
 				return unauthorized();
 			}
@@ -51,6 +58,27 @@ export function startServer(): Server {
 
 			if (pathname === '/api/regenerate' && req.method === 'GET') {
 				return Response.json({ ...getRegenStatus(), progress: readProgress() });
+			}
+
+			// Last 100 lines of the regeneration process's stdout+stderr
+			// (auth required; the log may contain sensitive output).
+			if (pathname === '/api/regeneration/log.txt' && req.method === 'GET') {
+				const log = readRegenLog();
+				if (log === null) {
+					return Response.json({ error: 'No regeneration has run yet' }, { status: 404 });
+				}
+				return new Response(log, {
+					headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+				});
+			}
+
+			// Regeneration status + progress, with a link to the log.
+			if (pathname === '/api/regeneration' && req.method === 'GET') {
+				return Response.json({
+					...getRegenStatus(),
+					progress: readProgress(),
+					log: '/api/regeneration/log.txt',
+				});
 			}
 
 			// Cache stats (per-query entry counts per datasource)
@@ -108,6 +136,26 @@ export function startServer(): Server {
 	});
 
 	console.info(`protocols-server listening on port ${PORT}, data dir: ${DATA_DIR}`);
+
+	// At startup, rewrite the hardcoded http://localhost:3000 references in
+	// the protocol manifests to WEB_ORIGIN, then regenerate the protocol
+	// registry. Done before the auto-regenerate so the regenerated .json
+	// manifests inherit the amended URLs.
+	try {
+		const amended = amendManifests(PROTOCOLS_DIR, WEB_ORIGIN);
+		if (amended.length > 0) {
+			console.log(`Amended ${amended.length} protocol manifest(s) to use ${WEB_ORIGIN}:`);
+			for (const file of amended) console.log(`  - ${file}`);
+		}
+		const registryPath = writeRegistry({
+			directory: PROTOCOLS_DIR,
+			transformSource: (url) => WEB_ORIGIN.replace(/\/+$/, '') + url.pathname + url.search,
+			filter: () => true,
+		});
+		console.log(`Generated protocol registry at ${registryPath}`);
+	} catch (err) {
+		console.error('Failed to amend manifests / generate protocol registry:', err);
+	}
 
 	// Re-generate options on (re)start so that restarting the container app
 	// (e.g. via `hfctl apps restart`) triggers a fresh pipeline run.

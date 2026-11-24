@@ -22,6 +22,7 @@ ${body}
 export function dirListing(dir: string, linkBase: string, title: string): Response {
 	const base = linkBase.endsWith('/') ? linkBase : linkBase + '/';
 	const entries = readdirSync(dir, { withFileTypes: true })
+		.filter((e) => !e.name.startsWith('.'))
 		.map((e) => ({ name: e.name, isDir: e.isDirectory() }))
 		.sort((a, b) => (a.isDir === b.isDir ? a.name.localeCompare(b.name) : a.isDir ? -1 : 1));
 	const rows = entries
@@ -63,6 +64,8 @@ export function apiIndexPage(): Response {
 <li><a href="/health">GET /health</a></li>
 <li><a href="/api/regenerate">GET /api/regenerate</a> (status + progress)</li>
 <li>POST /api/regenerate (start regeneration) <em>[auth]</em></li>
+<li><a href="/api/regeneration">GET /api/regeneration</a> (status + progress + log link)</li>
+<li><a href="/api/regeneration/log.txt">GET /api/regeneration/log.txt</a> (last 100 lines of the regeneration process's stdout+stderr) <em>[auth]</em></li>
 <li><a href="/api/caches">GET /api/caches</a> (cache stats)</li>
 <li>DELETE /api/caches/:datasource (entire datasource) <em>[auth]</em></li>
 <li>DELETE /api/caches/:datasource/:query (entire query) <em>[auth]</em></li>

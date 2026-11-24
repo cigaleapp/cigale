@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 
 import { addDays, addWeeks } from 'date-fns';
 import { JWT } from 'google-auth-library';
@@ -54,7 +54,17 @@ export class GoogleDrive extends Datasource<
 	constructor() {
 		super();
 
-		const keys = JSON.parse(readFileSync('google-drive-key.json').toString()) as {
+		// Use the key file if present, otherwise the GOOGLE_DRIVE_KEY env var.
+		const keyPath = '.secrets/google-drive-key.json';
+		const keyJson = existsSync(keyPath)
+			? readFileSync(keyPath).toString()
+			: process.env.GOOGLE_DRIVE_KEY;
+		if (!keyJson) {
+			throw new Error(
+				`No Google Drive key found: neither ${keyPath} nor the GOOGLE_DRIVE_KEY env var is available`
+			);
+		}
+		const keys = JSON.parse(keyJson) as {
 			client_email: string;
 			private_key: string;
 		};

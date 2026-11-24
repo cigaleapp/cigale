@@ -1,20 +1,15 @@
 /// <reference types="@types/bun" />
 
 import { execSync } from 'node:child_process';
-import { readFileSync, unlinkSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { existsSync } from 'node:fs';
-
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');
-// Repo layout: <repo>/static/protocol.schema.json. Container layout: /app/static/.
-const schemaPath = [join(root, '..', 'static', 'protocol.schema.json'), join(root, 'static', 'protocol.schema.json')].find(
-	(p) => existsSync(p)
-);
-if (!schemaPath) throw new Error('protocol.schema.json not found');
-const schema = JSON.parse(readFileSync(schemaPath, 'utf8'));
+// Repo layout: <repo>/static/. Container layout: /app/static/.
+const staticDir = [join(root, '..', 'static'), join(root, 'static')].find((p) => existsSync(p));
+if (!staticDir) throw new Error('static/ dir not found');
 
 // Composition keywords that change a node's semantics — don't close those.
 const COMPOSITION = new Set(['anyOf', 'oneOf', 'allOf', 'not', 'if', 'then', 'else']);
@@ -22,7 +17,7 @@ const COMPOSITION = new Set(['anyOf', 'oneOf', 'allOf', 'not', 'if', 'then', 'el
 // Recursively:
 //  1. Convert `patternProperties` into `additionalProperties`. QuickType
 //     doesn't support `patternProperties` (it falls back to `unknown` values),
-//     but it does support `additionalProperties`. Every node in this schema
+//     but it does support `additionalProperties`. Every node in these schemas
 //     has at most one pattern key, so the conversion is lossless for typing.
 //  2. Close plain object nodes by adding `additionalProperties: false` when
 //     unspecified. JSON Schema objects are open by default, which QuickType
@@ -49,16 +44,24 @@ function convert(node: any) {
 		for (const v of Object.values(node)) convert(v);
 	}
 }
-convert(schema);
+function generateTypes(schemaName: string, outName: string, topLevel: string) {
+	const schemaPath = join(staticDir, schemaName);
+	if (!existsSync(schemaPath)) throw new Error(`${schemaName} not found`);
+	const schema = JSON.parse(readFileSync(schemaPath, 'utf8'));
+	convert(schema);
 
-const tmpPath = join(root, '.protocol.schema.tmp.json');
-writeFileSync(tmpPath, JSON.stringify(schema, null, 2));
+	const tmpPath = join(root, `.${schemaName.replace('.json', '')}.tmp.json`);
+	writeFileSync(tmpPath, JSON.stringify(schema, null, 2));
 
-try {
-	execSync(
-		`bunx quicktype -o protocol-types.ts --src-lang schema "${tmpPath}" --top-level ExportedProtocol --no-runtime-typecheck`,
-		{ cwd: root, stdio: 'inherit' }
-	);
-} finally {
-	unlinkSync(tmpPath);
+	try {
+		execSync(
+			`bunx quicktype -o ${outName} --src-lang schema "${tmpPath}" --top-level ${topLevel} --no-runtime-typecheck`,
+			{ cwd: root, stdio: 'inherit' }
+		);
+	} finally {
+		unlinkSync(tmpPath);
+	}
 }
+
+generateTypes('protocol.schema.json', 'protocol-types.ts', 'ExportedProtocol');
+generateTypes('registry.schema.json', 'registry-types.ts', 'ProtocolRegistry');
