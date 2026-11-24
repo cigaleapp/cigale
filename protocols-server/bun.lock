@@ -6,6 +6,7 @@
       "name": "protocols-server",
       "dependencies": {
         "arktype": "^2.2.7",
+        "arrival-time": "^1.0.6",
         "date-fns": "^4.4.0",
         "dequal": "^2.0.3",
         "es-toolkit": "^1.52.0",
@@ -155,6 +156,8 @@
     "arkregex": ["arkregex@0.0.15", "", { "dependencies": { "@ark/util": "0.56.9" } }, "sha512-mu9vS4b8kTipqr2AfVIL1NYhGH47CZgPdYFzB762lu4/dsxm7hmNsN3ayDahcM9OhepOpTQc+W744yh4KE+mAw=="],
 
     "arktype": ["arktype@2.2.10", "", { "dependencies": { "@ark/schema": "0.56.9", "@ark/util": "0.56.9", "arkregex": "0.0.15" } }, "sha512-xfum3++1RGjULFBeeXph3XrejEhAfswZlpH/V5m324j8aZ/53tHUd8OPCXE1v5iU/2UEkn/ZDFUT0Exkjv96xA=="],
+
+    "arrival-time": ["arrival-time@1.0.6", "", {}, "sha512-iWdmcH/sGHt2z8On3QWqj55vh7NBnx9AEvrK99m84Eyik4+30g50+ZlcszwAT8541eDwvkDBTy8CgDHEYBtetw=="],
 
     "await-to-js": ["await-to-js@3.0.0", "", {}, "sha512-zJAaP9zxTcvTHRlejau3ZOY4V7SRpiByf3/dxx2uyKxxor19tpmpV2QRsTKikckwhaPmr2dVpxxMr7jOCYVp5g=="],
 

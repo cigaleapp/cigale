@@ -10,6 +10,7 @@
 	},
 	"dependencies": {
 		"arktype": "^2.2.7",
+		"arrival-time": "^1.0.6",
 		"date-fns": "^4.4.0",
 		"dequal": "^2.0.3",
 		"es-toolkit": "^1.52.0",
