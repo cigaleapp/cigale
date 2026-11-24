@@ -6,7 +6,11 @@ import { PROTOCOLS_DIR, STATIC_DIR } from './config.js';
 // --- Browsing (simple HTML, no CSS) ---
 
 function escapeHtml(s: string): string {
-	return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+	return s
+		.replace(/&/g, '&amp;')
+		.replace(/</g, '&lt;')
+		.replace(/>/g, '&gt;')
+		.replace(/"/g, '&quot;');
 }
 
 /** Human-readable byte size: 512B, 12.3KB, 4.5MB, 1.2GB */
@@ -50,7 +54,8 @@ export function dirListing(dir: string, linkBase: string, title: string): Respon
 		.map((e) => {
 			const href = `${base}${encodeURIComponent(e.name)}${e.isDir ? '/' : ''}`;
 			const label = e.isDir ? `${e.name}/` : e.name;
-			const size = e.size === null ? '' : ` <span class="size">(${formatBytes(e.size)})</span>`;
+			const size =
+				e.size === null ? '' : ` <span class="size">(${formatBytes(e.size)})</span>`;
 			return `<li><a href="${escapeHtml(href)}">${escapeHtml(label)}</a>${size}</li>`;
 		})
 		.join('\n');
@@ -88,7 +93,8 @@ export function indexPage(): Response {
 	const protocolRows = protocolFiles
 		.map((f) => {
 			const size = sizeOf(f);
-			const sizeLabel = size === null ? '' : ` <span class="size">(${formatBytes(size)})</span>`;
+			const sizeLabel =
+				size === null ? '' : ` <span class="size">(${formatBytes(size)})</span>`;
 			return `<li><a href="/${f}">${escapeHtml(f)}</a>${sizeLabel}</li>`;
 		})
 		.join('\n');
@@ -111,7 +117,6 @@ export function indexPage(): Response {
 <li><a href="/options/">options/</a></li>
 <li><a href="/assets/">assets/</a></li>
 <li><a href="/process/">process/</a></li>
-<li><a href="/bases/">protocols/bases/</a></li>
 </ul>
 <h2>Protocols</h2>
 <ul>
