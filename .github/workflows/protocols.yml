@@ -152,7 +152,7 @@ jobs:
 
       - name: Wait for regeneration to finish
         working-directory: protocols-server
-        run: bun run wait-regeneration.ts
+        run: bun run wait-server-regen
         env:
           SERVER_URL: ${{ steps.app.outputs.url }}
           JOB_STARTED_AT: ${{ steps.jobstart.outputs.started_at }}
