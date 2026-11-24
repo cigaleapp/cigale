@@ -43,13 +43,11 @@ export function unauthorized(): Response {
 
 export function isPublicRoute(pathname: string, method: string): boolean {
 	if (pathname === '/api/regenerate' && method === 'GET') return true;
-	if (pathname === '/api/regeneration' && method === 'GET') return true;
 	if (pathname === '/api/caches' && method === 'GET') return true;
 	if (pathname === '/api/login') return true;
 	if (pathname.startsWith('/options/') || pathname.startsWith('/assets/')) return true;
 	const protectedPaths =
 		pathname === '/api/regenerate' ||
-		pathname === '/api/regeneration' ||
 		pathname === '/api/regeneration/log.txt' ||
 		pathname === '/api/caches' ||
 		pathname.startsWith('/api/caches/') ||

@@ -11,7 +11,7 @@
 !examples/*.cigaleprotocol.json
 
 # Re-include the protocol schema (used to generate protocol-types.ts at build time)
-!static/protocol.schema.json
+!static/*.schema.json
 
 # Re-include the protocol YAML manifests (served at the root level by the server).
 # Only the YAML sources are baked in — the .cigaleprotocol.json manifests are

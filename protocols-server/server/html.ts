@@ -62,9 +62,8 @@ export function apiIndexPage(): Response {
 	const body = `<h1>API</h1>
 <ul>
 <li><a href="/health">GET /health</a></li>
-<li><a href="/api/regenerate">GET /api/regenerate</a> (status + progress)</li>
+<li><a href="/api/regenerate">GET /api/regenerate</a> (status + progress + log link)</li>
 <li>POST /api/regenerate (start regeneration) <em>[auth]</em></li>
-<li><a href="/api/regeneration">GET /api/regeneration</a> (status + progress + log link)</li>
 <li><a href="/api/regeneration/log.txt">GET /api/regeneration/log.txt</a> (last 100 lines of the regeneration process's stdout+stderr) <em>[auth]</em></li>
 <li><a href="/api/caches">GET /api/caches</a> (cache stats)</li>
 <li>DELETE /api/caches/:datasource (entire datasource) <em>[auth]</em></li>

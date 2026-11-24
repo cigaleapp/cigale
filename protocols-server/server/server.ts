@@ -21,8 +21,7 @@ export function startServer(): Server {
 			const pathname = url.pathname;
 
 			// Auth gate: everything except protocols, /options/, /assets/,
-			// GET /api/regenerate, GET /api/regeneration and GET /api/caches
-			// requires the password.
+			// GET /api/regenerate and GET /api/caches requires the password.
 			if (!isPublicRoute(pathname, req.method) && !isAuthorized(req)) {
 				return unauthorized();
 			}
@@ -56,8 +55,13 @@ export function startServer(): Server {
 				return Response.json({ started: true });
 			}
 
+			// Regeneration status + progress, with a link to the log.
 			if (pathname === '/api/regenerate' && req.method === 'GET') {
-				return Response.json({ ...getRegenStatus(), progress: readProgress() });
+				return Response.json({
+					...getRegenStatus(),
+					progress: readProgress(),
+					log: '/api/regeneration/log.txt',
+				});
 			}
 
 			// Last 100 lines of the regeneration process's stdout+stderr
@@ -69,15 +73,6 @@ export function startServer(): Server {
 				}
 				return new Response(log, {
 					headers: { 'Content-Type': 'text/plain; charset=utf-8' },
-				});
-			}
-
-			// Regeneration status + progress, with a link to the log.
-			if (pathname === '/api/regeneration' && req.method === 'GET') {
-				return Response.json({
-					...getRegenStatus(),
-					progress: readProgress(),
-					log: '/api/regeneration/log.txt',
 				});
 			}
 

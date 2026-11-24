@@ -71,7 +71,7 @@
 			"manifestVersion": "1.0",
 			"older": [],
 			"id": "io.github.cigaleapp.base.springtails",
-			"url": "http://localhost:3000/bases/collembola.cigaleprotocol.yaml"
+			"url": "http://localhost:3000/bases/springtails.cigaleprotocol.yaml"
 		}
 	]
 }
