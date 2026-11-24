@@ -1,22 +1,86 @@
 import type { DatabaseHandle } from '#lib/idb.svelte.js';
 
-import _rawRegistry from '#lib/../../protocols/registry.json' with { type: 'json' };
 import { ProtocolRegistry } from '#lib/schemas/protocols.js';
 import { compareBy } from '#lib/utils.ts';
 
 import { manifestVersionsCompatible } from './manifestversion.js';
 
-let PROTOCOLS_REGISTRY: typeof ProtocolRegistry.infer | null = null;
+/**
+ * Cache of fetched registries, keyed by registry URL.
+ */
+const PROTOCOLS_REGISTRIES = new Map<URL, typeof ProtocolRegistry.infer>();
 
-export async function fetchProtocolRegistry() {
-	// const registryUrl = Capacitor.isNativePlatform()
-	// 	? `${import.meta.env.webOrigin}/registry.json`
-	// 	: `${base}/registry.json`;
+/**
+ * Additional registry URLs the user can add manually. Each is fetched and
+ * merged into the combined registry.
+ */
+const EXTRA_REGISTRY_URLS: URL[] = [];
 
-	// PROTOCOLS_REGISTRY ??= ProtocolRegistry.assert(await fetch(registryUrl).then((r) => r.json()));
-	PROTOCOLS_REGISTRY ??= ProtocolRegistry.assert(_rawRegistry);
+/**
+ * The default registry URL, resolved lazily from the `PROTOCOL_REGISTRY_URL`
+ * env var (defaults to `${WEB_ORIGIN}/registry.json`). Cached so the same
+ * `URL` instance is used as the Map key on every call.
+ */
+let defaultRegistryUrl: URL = new URL(
+	import.meta.env.protocolRegistryUrl ??
+		'https://cigale-protocols-biodimedia-data-terra.ai.meso.umontpellier.fr/registry.json'
+);
 
-	return PROTOCOLS_REGISTRY;
+/**
+ * Registers an additional registry URL to fetch and merge into the combined
+ * registry. Call this before the first `fetchProtocolRegistry()` call.
+ */
+export function addRegistryUrl(url: string | URL) {
+	const parsed = new URL(url);
+	if (!EXTRA_REGISTRY_URLS.some((u) => u.href === parsed.href)) {
+		EXTRA_REGISTRY_URLS.push(parsed);
+	}
+}
+
+/**
+ * Fetches all registries (each cached by URL) and merges them into a single
+ * registry. Protocols sharing an `id` are deduplicated — the first registry
+ * wins. A registry that fails to fetch is skipped; an error is thrown only
+ * if no registry could be fetched.
+ */
+export async function fetchProtocolRegistry(): Promise<typeof ProtocolRegistry.infer> {
+	const urls = [defaultRegistryUrl, ...EXTRA_REGISTRY_URLS];
+	const results = await Promise.allSettled(
+		urls.map(async (url) => {
+			let registry = PROTOCOLS_REGISTRIES.get(url);
+			if (!registry) {
+				const response = await fetch(url);
+				if (!response.ok) {
+					throw new Error(`Failed to fetch registry from ${url}: ${response.status}`);
+				}
+				registry = ProtocolRegistry.assert(await response.json());
+				PROTOCOLS_REGISTRIES.set(url, registry);
+			}
+			return registry;
+		})
+	);
+
+	const seen = new Set<string>();
+	const protocols = [];
+	let fetchedAny = false;
+	for (const result of results) {
+		if (result.status === 'rejected') {
+			console.warn('Failed to fetch protocol registry:', result.reason);
+			continue;
+		}
+		fetchedAny = true;
+		for (const protocol of result.value.protocols) {
+			if (seen.has(protocol.id)) continue;
+			seen.add(protocol.id);
+			protocols.push(protocol);
+		}
+	}
+
+	if (!fetchedAny) {
+		throw new Error('Failed to fetch any protocol registry');
+	}
+
+	return { protocols };
 }
 
 export async function lookupMostRecentCompatibleProtocol(id: string): Promise<URL> {

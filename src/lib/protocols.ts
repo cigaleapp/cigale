@@ -193,15 +193,15 @@ export async function promptAndImportProtocol<
 							await tables.Protocol.refresh(null);
 							await tables.Metadata.refresh(null);
 
-						resolve(result);
-					} catch (err) {
-						reject(err);
-					}
-				};
-				reader.readAsText(file);
-			});
-		})
-	);
+							resolve(result);
+						} catch (err) {
+							reject(err);
+						}
+					};
+					reader.readAsText(file);
+				});
+			})
+		);
 
 	return allowMultiple ? output : output[0];
 }
@@ -242,27 +242,17 @@ export async function upgradeProtocol({
 
 	const { tables } = await import('./idb.svelte.js');
 
-	const response = await fetchHttpRequest(source, {
-		cachebust: true,
-		headers: {
-			Accept: 'application/json, application/yaml',
-		},
-	});
-
-	const result = await swarpc.importProtocol({
-		contents: await response.text(),
-		isJSON: new URL(response.url).pathname.endsWith('.json'),
-	});
+	const result = await swarpc.importProtocol({ url: source });
 
 	tables.Protocol.refresh(null);
 	tables.Metadata.refresh(null);
 
-	const { version: newVersion, ...rest } = result;
+	const newVersion = tables.Protocol.getFromState(id)?.version;
 
 	if (newVersion === undefined)
 		throw new Error("Le protocole a été importé mais n'a plus de version");
 
-	return { version: newVersion, ...rest };
+	return { version: newVersion };
 }
 
 /**
@@ -474,7 +464,11 @@ export async function autoUpdateProtocols(
 				`[Protocol auto-update] Upgrading protocol ${protocol.id} from v${protocol.version} to v${newVersion}`
 			);
 
-			return await upgradeProtocol({ ...protocol, swarpc });
+			if (!protocol.source) return;
+
+			const { version } = await upgradeProtocol({ ...protocol, swarpc });
+
+			return { version, name: protocol.name };
 		})
 	);
 

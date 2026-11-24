@@ -27,6 +27,7 @@ const env = arkenv(
 		DEBUG: type('string|boolean').pipe(Boolean).default(false),
 		/** Required for mobile app, since window.location.origin returns localhost */
 		WEB_ORIGIN: 'string.url = "https://cigaleapp.github.io"',
+		'PROTOCOL_REGISTRY_URL?': 'string.url',
 	},
 	{
 		arrayFormat: 'comma',
@@ -83,6 +84,9 @@ export default defineConfig({
 		),
 		'import.meta.env.previewingPrNumber': prNumber ?? 'null',
 		'import.meta.env.webOrigin': JSON.stringify(env.WEB_ORIGIN),
+		'import.meta.env.protocolRegistryUrl': env.PROTOCOL_REGISTRY_URL
+			? JSON.stringify(env.PROTOCOL_REGISTRY_URL)
+			: 'undefined',
 		'import.meta.env.androidNativeCodeVersion': JSON.stringify(
 			readFileSync('android/.native-code-version', {
 				encoding: 'utf8',
