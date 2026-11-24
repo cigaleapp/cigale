@@ -66,7 +66,10 @@ metadata:
       neural:
         - name: ConvNextV2 Tiny
           model: https://huggingface.co/edgaremy/andrena-classifier/resolve/main/convnextv2_tiny.andrena-grouped.onnx?download=true
-          classmapping: 'https://huggingface.co/edgaremy/andrena-classifier/resolve/main/class-mapping-grouped.txt?download=true'
+          classes: keys
+          classmapping:
+            at: https://huggingface.co/edgaremy/andrena-classifier/resolve/main/class-mapping-grouped.txt?download=true
+            format: txt
           input:
             height: 384
             width: 384
@@ -92,7 +95,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: http://localhost:3000/process/options/birds/species.jsonl
+      at: http://localhost:3000/options/birds/species.jsonl
       format: json-lines
     infer:
       neural: []
@@ -114,7 +117,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: http://localhost:3000/process/options/birds/kingdom.jsonl
+      at: http://localhost:3000/options/birds/kingdom.jsonl
       format: json-lines
 
   phylum:
@@ -126,7 +129,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: http://localhost:3000/process/options/birds/phylum.jsonl
+      at: http://localhost:3000/options/birds/phylum.jsonl
       format: json-lines
 
   class:
@@ -138,7 +141,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: http://localhost:3000/process/options/birds/class.jsonl
+      at: http://localhost:3000/options/birds/class.jsonl
       format: json-lines
 
   order:
@@ -150,7 +153,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: http://localhost:3000/process/options/birds/order.jsonl
+      at: http://localhost:3000/options/birds/order.jsonl
       format: json-lines
 
   family:
@@ -162,7 +165,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: http://localhost:3000/process/options/birds/family.jsonl
+      at: http://localhost:3000/options/birds/family.jsonl
       format: json-lines
 
   genus:
@@ -174,7 +177,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      at: http://localhost:3000/process/options/birds/genus.jsonl
+      at: http://localhost:3000/options/birds/genus.jsonl
       format: json-lines
 
   identification_difficulty:
