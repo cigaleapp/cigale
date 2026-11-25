@@ -67,7 +67,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      - at: http://localhost:3000/process/options/arthropods/species.jsonl
+      - at: http://localhost:3000/options/arthropods/species.jsonl
         format: json-lines
     infer:
       neural:
@@ -108,7 +108,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      - at: http://localhost:3000/process/options/arthropods/kingdom.jsonl
+      - at: http://localhost:3000/options/arthropods/kingdom.jsonl
         format: json-lines
 
   phylum:
@@ -120,7 +120,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      - at: http://localhost:3000/process/options/arthropods/phylum.jsonl
+      - at: http://localhost:3000/options/arthropods/phylum.jsonl
         format: json-lines
 
   class:
@@ -132,7 +132,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      - at: http://localhost:3000/process/options/arthropods/class.jsonl
+      - at: http://localhost:3000/options/arthropods/class.jsonl
         format: json-lines
 
   order:
@@ -144,7 +144,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      - at: http://localhost:3000/process/options/arthropods/order.jsonl
+      - at: http://localhost:3000/options/arthropods/order.jsonl
         format: json-lines
 
   family:
@@ -156,7 +156,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      - at: http://localhost:3000/process/options/arthropods/family.jsonl
+      - at: http://localhost:3000/options/arthropods/family.jsonl
         format: json-lines
 
   genus:
@@ -168,7 +168,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      - at: http://localhost:3000/process/options/arthropods/genus.jsonl
+      - at: http://localhost:3000/options/arthropods/genus.jsonl
         format: json-lines
 
   identification_difficulty:
