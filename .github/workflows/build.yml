@@ -99,7 +99,18 @@ jobs:
         run: bun run build
       - name: Determine artifact name
         id: artifact
-        run: echo "name=build-${{ case(inputs.debug, 'debug', 'production') }}-${{ github.sha }}-${{ case(inputs.github-pages, 'ghpages', '') }}" >> $GITHUB_OUTPUT
+        run: |
+          # Derive a short, slash-free tag from the base path so builds with
+          # different base paths (e.g. '' vs /pr-2310) get distinct artifact
+          # names. Without this, upload-artifact v7 treats same-name uploads as
+          # new versions of one artifact and download-artifact fetches the
+          # latest version, so the APK could embed the /pr-xxxx build and 404
+          # on every asset.
+          base_tag="root"
+          if [[ -n "$BASE_PATH" ]]; then
+            base_tag="${BASE_PATH#/}"
+          fi
+          echo "name=build-${{ case(inputs.debug, 'debug', 'production') }}-${{ github.sha }}-${base_tag}-${{ case(inputs.github-pages, 'ghpages', '') }}" >> $GITHUB_OUTPUT
       - name: Upload build as artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
