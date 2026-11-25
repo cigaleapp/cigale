@@ -31,7 +31,9 @@ const env = arkenv(
 		DEBUG: type('string|boolean').pipe(Boolean).default(false),
 		/** Required for mobile app, since window.location.origin returns localhost */
 		WEB_ORIGIN: 'string.url = "https://cigaleapp.github.io"',
-		PROTOCOL_REGISTRY_URLS: type('string.url[]').default(() => []),
+		PROTOCOL_REGISTRY_URLS: type('string.url[]').default(() => [
+			'https://cigale-protocols-biodimedia-data-terra.ai.meso.umontpellier.fr/registry.json',
+		]),
 	},
 	{
 		arrayFormat: 'comma',
@@ -84,7 +86,7 @@ export default defineConfig({
 		'import.meta.env.buildCommit': JSON.stringify(env.BUILD_COMMIT),
 		'import.meta.env.previewingPrNumber': JSON.stringify(env.PR_NUMBER),
 		'import.meta.env.webOrigin': JSON.stringify(env.WEB_ORIGIN),
-		'import.meta.env.protocolRegistryUrl': JSON.stringify(env.PROTOCOL_REGISTRY_URLS),
+		'import.meta.env.protocolRegistryUrls': JSON.stringify(JSON.stringify(env.PROTOCOL_REGISTRY_URLS)),
 		'import.meta.env.androidNativeCodeVersion': JSON.stringify(
 			readFileSync('android/.native-code-version', {
 				encoding: 'utf8',

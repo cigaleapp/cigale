@@ -10,29 +10,35 @@ import { manifestVersionsCompatible } from './manifestversion.js';
  */
 const PROTOCOLS_REGISTRIES = new Map<URL, typeof ProtocolRegistry.infer>();
 
-/**
- * Additional registry URLs the user can add manually. Each is fetched and
- * merged into the combined registry.
- */
-const EXTRA_REGISTRY_URLS: URL[] = [];
-
-/**
- * The default registry URL, resolved from the `PROTOCOL_REGISTRY_URL`
- * env var, or the production default
- */
-const defaultRegistryUrl: URL = new URL(
-	import.meta.env.protocolRegistryUrl ??
-		'https://cigale-protocols-biodimedia-data-terra.ai.meso.umontpellier.fr/registry.json'
+let REGISTRY_URLS: URL[] = JSON.parse(import.meta.env.protocolRegistryUrls ?? '[]').map(
+	(u: string) => new URL(u)
 );
 
-/**
- * Registers an additional registry URL to fetch and merge into the combined
- * registry. Call this before the first `fetchProtocolRegistry()` call.
- */
-export function addRegistryUrl(url: string | URL) {
-	const parsed = new URL(url);
-	if (!EXTRA_REGISTRY_URLS.some((u) => u.href === parsed.href)) {
-		EXTRA_REGISTRY_URLS.push(parsed);
+export function addProtocolRegistry(
+	url: URL | string,
+	{
+		priority = -Infinity,
+	}: {
+		/** Where to place the registry URL in the array: in case of protocol ID conflicts, the later URLs take precedence. Pass Infinity to make it more important than all the others already present, and -Ininity for less priority than all already present */
+		priority?: number;
+	} = {}
+) {
+	switch (priority) {
+		case Infinity: {
+			REGISTRY_URLS.push(new URL(url));
+			break;
+		}
+		case -Infinity: {
+			REGISTRY_URLS.unshift(new URL(url));
+			break;
+		}
+		default: {
+			REGISTRY_URLS = [
+				...REGISTRY_URLS.slice(0, priority),
+				new URL(url),
+				...REGISTRY_URLS.slice(priority),
+			];
+		}
 	}
 }
 
@@ -42,10 +48,9 @@ export function addRegistryUrl(url: string | URL) {
  * wins. A registry that fails to fetch is skipped; an error is thrown only
  * if no registry could be fetched.
  */
-export async function fetchProtocolRegistry(): Promise<typeof ProtocolRegistry.infer> {
-	const urls = [defaultRegistryUrl, ...EXTRA_REGISTRY_URLS];
+export async function fetchProtocolRegistries(): Promise<typeof ProtocolRegistry.infer> {
 	const results = await Promise.allSettled(
-		urls.map(async (url) => {
+		REGISTRY_URLS.map(async (url) => {
 			let registry = PROTOCOLS_REGISTRIES.get(url);
 			if (!registry) {
 				const response = await fetch(url);
@@ -83,7 +88,7 @@ export async function fetchProtocolRegistry(): Promise<typeof ProtocolRegistry.i
 }
 
 export async function lookupMostRecentCompatibleProtocol(id: string): Promise<URL> {
-	const registry = await fetchProtocolRegistry();
+	const registry = await fetchProtocolRegistries();
 	const entry = registry.protocols.find((p) => p.id === id);
 	if (!entry) throw new Error(`Protocol ${id} not in registry`);
 	if (manifestVersionsCompatible(entry.manifestVersion)) return new URL(entry.url);
@@ -109,7 +114,7 @@ export async function* listAllProtocols(db: DatabaseHandle) {
 		yield { protocol: p, installed: true };
 	}
 
-	const registry = await fetchProtocolRegistry().catch((e) => {
+	const registry = await fetchProtocolRegistries().catch((e) => {
 		console.error("Couldn't fetch protocol registry", e);
 		return { protocols: [] };
 	});

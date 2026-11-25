@@ -19,7 +19,7 @@ const mocked = vi.hoisted(() => ({
 
 vi.mock(import('#lib/protocols/registry.js'), async (original) => ({
 	...(await original()),
-	fetchProtocolRegistry: async () => mocked.registry!,
+	fetchProtocolRegistries: async () => mocked.registry!,
 }));
 
 function mockRegistry(registry: (typeof ProtocolRegistry)['inferIn']) {

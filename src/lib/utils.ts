@@ -1425,6 +1425,7 @@ export function corsfix(url: string | URL): string {
 }
 
 export function isLocalhost() {
+	if (Capacitor.isNativePlatform()) return false;
 	return location.hostname === 'localhost';
 }
 

@@ -21,13 +21,14 @@ import {
 import { autoUpdateProtocols } from '#lib/protocols.js';
 import { getSetting } from '#lib/settings.svelte.js';
 import { toasts } from '#lib/toasts.svelte.js';
-import { profiler, progressSplitter, switchValue } from '#lib/utils.js';
+import { isLocalhost, profiler, progressSplitter, switchValue } from '#lib/utils.js';
 import { PROCEDURES } from '#worker/procedures.js';
 import WebWorker from '#worker/start.js?worker';
 
 import '@andy0130tw/es-arraybuffer-base64/auto';
 import '@ungap/set-methods';
 
+import { addProtocolRegistry } from '#lib/protocols/registry.js';
 import { binaryStorage } from '#lib/storage/index.js';
 
 export const ssr = false;
@@ -165,6 +166,12 @@ export async function load({ url }) {
 	} catch (e) {
 		console.error(e);
 		error(400, e?.toString() ?? 'Erreur inattendue');
+	}
+
+	if (isLocalhost()) {
+		addProtocolRegistry('http://localhost:3000', {
+			priority: Infinity,
+		});
 	}
 
 	console.time('background things');
