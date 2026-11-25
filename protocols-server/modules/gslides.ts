@@ -2,7 +2,7 @@ import type { CladedName, Option } from '../lib/modules.js';
 
 import { GoogleDrive } from '../datasources/gdrive.js';
 import { Enricher, matchCladedName, NameProvider, OptionExtra } from '../lib/modules.js';
-import { ASSETS_URL_BASE } from '../server/config.js';
+import config from '../server/config.js';
 
 export class GoogleDriveSlides implements NameProvider {
 	name = 'gdrive' as const;
@@ -75,7 +75,7 @@ export class GoogleSlides implements Enricher {
 					learnMore: data.learnMore,
 					images: data.images.map((image) =>
 						new URL(
-							`${ASSETS_URL_BASE}/${this.name}/${encodeURIComponent(image.filename)}`
+							`${config.ASSETS_URL_BASE}/${this.name}/${encodeURIComponent(image.filename)}`
 						).toString()
 					),
 				} satisfies OptionExtra,
