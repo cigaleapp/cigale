@@ -168,7 +168,7 @@ jobs:
 
   preview:
     if: github.event_name == 'pull_request' && !failure() && !cancelled()
-    needs: [build-pr-preview, build, json-schema]
+    needs: [build-pr-preview, build]
     name: PR Preview
     uses: ./.github/workflows/preview.yml
     secrets: inherit
