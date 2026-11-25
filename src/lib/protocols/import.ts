@@ -11,11 +11,14 @@ import {
 	MetadataEnumVariant,
 	MetadataGroup,
 	MetadataInDatabase,
-	metadataOptionId,
-	namespaceToMetadataOptionInDB,
 } from '#lib/schemas/metadata.js';
 import { ExportedProtocol } from '#lib/schemas/protocols.js';
 import { recomputeSearchIndex } from '#lib/search.ts';
+import {
+
+	metadataOptionId,
+	namespaceToMetadataOptionInDB,
+} from '#lib/metadata/options.js';
 import { entries, mapKeys, parseYAMLorJSON } from '#lib/utils.ts';
 
 type ProgressCallback = (protocol: string, phase: string, done: number, total: number) => void;

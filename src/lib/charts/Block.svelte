@@ -14,9 +14,11 @@
 	import Markdown from '#lib/Markdown.svelte';
 	import { metadataOption, resolveMetadataId } from '#lib/metadata/index.js';
 	import { mergeMetadataFromImagesAndObservations } from '#lib/metadata/merging.js';
-	import { findMetadataOption } from '#lib/metadata/options.ts';
-	import {
+	import { findMetadataOption, 
+
 		metadataOptionId,
+	} from '#lib/metadata/options.ts';
+	import {
 		removeNamespaceFromMetadataId,
 		splitMetadataId,
 	} from '#lib/schemas/metadata.js';

@@ -10,7 +10,7 @@ import { Tables } from '#lib/database.js';
 import { compareBy, entries, mapValues, orEmpty, orEmpty2, sum, switchValue } from '#lib/utils.js';
 
 import { addValueLabels, metadataPrettyValue } from './metadata/display.js';
-import { findMetadataOption } from './metadata/options.js';
+import { findMetadataOption, metadataOptionId  } from './metadata/options.js';
 import {
 	BUILTIN_DARWINCORE_NAMESPACES,
 	BUILTIN_EXTRA_FIELDS,
@@ -18,7 +18,6 @@ import {
 	DarwinCoreFileScope,
 } from './schemas/darwincore.js';
 import { TemplatedString } from './schemas/expressions.js';
-import { metadataOptionId } from './schemas/metadata.js';
 import { withProtocolMetadata } from './schemas/results.js';
 import { XmlNode } from './xml.js';
 import { createZipArchive } from './zip.js';

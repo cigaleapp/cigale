@@ -2,7 +2,7 @@ import type { DatabaseHandle } from '#lib/idb.svelte.js';
 import type { NamespacedMetadataID } from '#lib/schemas/common.js';
 
 import { httpStreamProcessLines } from '#lib/http-streaming.ts';
-import { namespaceToMetadataOptionInDB } from '#lib/schemas/metadata.js';
+import { namespaceToMetadataOptionInDB } from '#lib/metadata/options.js';
 import { ClassmappingLineParsed, NeuralEnumInference } from '#lib/schemas/neural.js';
 import { compareBy, switchValue } from '#lib/utils.ts';
 

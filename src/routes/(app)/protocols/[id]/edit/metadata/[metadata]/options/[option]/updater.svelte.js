@@ -2,10 +2,12 @@ import { ArkErrors } from 'arktype';
 
 import { errorMessage } from '#lib/i18n.js';
 import { databaseHandle, dependencyURI, get, set } from '#lib/idb.svelte.js';
-import { findMetadataOption } from '#lib/metadata/options.ts';
+import { findMetadataOption, 
+
+	metadataOptionId,
+} from '#lib/metadata/options.ts';
 import {
 	ensureNamespacedMetadataId,
-	metadataOptionId,
 	namespacedMetadataId,
 } from '#lib/schemas/metadata.js';
 import { toasts } from '#lib/toasts.svelte.js';
