@@ -27,10 +27,8 @@ export async function findMetadataOption(
 }
 
 export function parseMetadataOptionId(optionId: string) {
-	const parts = optionId.split(':');
-	if (parts.length < 2) throw new Error(`Invalid metadata option ID: ${optionId}`);
-	const metadataId = parts.slice(0, -1).join(':');
-	const key = parts[parts.length - 1];
+	const [metadataId, ...keyparts] = optionId.split(':');
+	const key = keyparts.join(':');
 	return { metadataId, key };
 }
 

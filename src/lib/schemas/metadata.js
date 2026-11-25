@@ -241,7 +241,7 @@ export const MetadataMergeMethod = type.or(
 );
 
 export const MetadataEnumVariant = type({
-	key: [ID, '@', 'Identifiant unique pour cette option'],
+	key: ['string', '@', 'Identifiant unique pour cette option'],
 	label: ['string', '@', "Nom de l'option, affichable dans une interface utilisateur"],
 	extraKeys: type('string')
 		.array()
@@ -285,7 +285,7 @@ export const MetadataEnumVariant = type({
 		)
 		.default(() => ({})),
 	'cascade?': type
-		.Record(ID, ID.array().or(ID))
+		.Record(ID, type('string[] | string'))
 		.pipe((record) => mapValues(record, ensureArray))
 		.describe(
 			"Objet contenant pour clés des identifiants d'autres métadonnées, et pour valeurs la ou les valeur(s) à assigner à cette métadonnée si cette option est choisie. Si il y en a plusieurs, une des options est choisie comme valeur de la métadonnée en question, et les autres sont mises en tant qu'alternatives, avec une confiance de 1."

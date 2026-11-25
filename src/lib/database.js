@@ -7,6 +7,7 @@ import {
 	ID,
 	MIMEType,
 	NamespacedMetadataID,
+	NamespacedMetadataOptionID,
 	Probability,
 	References,
 } from './schemas/common.js';
@@ -114,11 +115,11 @@ const MetadataOption = table(
 	],
 	MetadataEnumVariant.and({
 		/** ID of the form namespaced_metadata_id:key */
-		id: '/^\\w+__\\w+:\\w+$/',
+		id: NamespacedMetadataOptionID,
 		/** label, prefixed by namespaced_metadata_id: */
-		namespacedLabel: '/^\\w+__\\w+:.+$/',
+		namespacedLabel: NamespacedMetadataOptionID,
 		/** extraKeys, prefixed by namespaced_metadata_id: */
-		namespacedExtraKeys: '/^\\w+__\\w+:.+$/[]',
+		namespacedExtraKeys: NamespacedMetadataOptionID.array(),
 		metadataId: NamespacedMetadataID,
 		/** For search purposes: to search for something, we get all keys of that index and do a fuzzy search on them */
 		_search: ['string[]', '=', () => []],

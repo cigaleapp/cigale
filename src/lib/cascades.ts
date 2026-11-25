@@ -5,13 +5,9 @@ import type { RuntimeValue } from '#lib/schemas/metadata.js';
 
 import { Tables } from '#lib/database.js';
 import { resolveMetadataId } from '#lib/metadata/namespacing.js';
-import {
-	findMetadataOption,
-	metadataOptionId,
-	parseMetadataOptionId,
-} from '#lib/metadata/options.js';
+import { findMetadataOption, parseMetadataOptionId } from '#lib/metadata/options.js';
 import { metadataOption } from '#lib/metadata/storage.js';
-import { ensureNamespacedMetadataId, namespaceOfMetadataId } from '#lib/schemas/metadata.js';
+import { namespaceOfMetadataId } from '#lib/schemas/metadata.js';
 import { ensureArray, entries, groupBy, nonnull, sum } from '#lib/utils.js';
 
 /**
