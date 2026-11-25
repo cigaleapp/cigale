@@ -17,7 +17,7 @@ export async function findMetadataOption(
 		(await db.get('MetadataOption', metadataOptionId(metadata, key))) ??
 		(await db.getFromIndex(
 			'MetadataOption',
-			'extraKeys',
+			'namespacedExtraKeys',
 			namespaceToMetadataOptionInDB(metadata, key)
 		));
 
