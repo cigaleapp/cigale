@@ -82,7 +82,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      - at: http://localhost:3000/options/birds/species.jsonl
+      - at: http://localhost:3000/options/bees/species.jsonl
         format: json-lines
 
   kingdom:
@@ -94,7 +94,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      - at: http://localhost:3000/options/birds/kingdom.jsonl
+      - at: http://localhost:3000/options/bees/kingdom.jsonl
         format: json-lines
 
   phylum:
@@ -106,7 +106,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      - at: http://localhost:3000/options/birds/phylum.jsonl
+      - at: http://localhost:3000/options/bees/phylum.jsonl
         format: json-lines
 
   class:
@@ -118,7 +118,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      - at: http://localhost:3000/options/birds/class.jsonl
+      - at: http://localhost:3000/options/bees/class.jsonl
         format: json-lines
 
   order:
@@ -130,7 +130,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      - at: http://localhost:3000/options/birds/order.jsonl
+      - at: http://localhost:3000/options/bees/order.jsonl
         format: json-lines
 
   family:
@@ -142,7 +142,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      - at: http://localhost:3000/options/birds/family.jsonl
+      - at: http://localhost:3000/options/bees/family.jsonl
         format: json-lines
 
   genus:
@@ -154,7 +154,7 @@ metadata:
     mergeMethod: max
     groupable: true
     externalOptions:
-      - at: http://localhost:3000/options/birds/genus.jsonl
+      - at: http://localhost:3000/options/bees/genus.jsonl
         format: json-lines
 
   identification_difficulty:
