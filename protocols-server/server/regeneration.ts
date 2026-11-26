@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
 import { Subprocess } from 'bun';
+import { ms } from 'convert';
 
 import config from './config.ts';
 
@@ -78,6 +79,34 @@ export function readProgress(): unknown {
 	} catch {
 		return null;
 	}
+}
+
+/**
+ * Sends SIGINT to the ongoing regen process
+ * and waits for it to exit.
+ */
+export async function cancelRegeneration(): Promise<boolean> {
+	if (!regenProcess) return false;
+
+	regenProcess.kill('SIGINT');
+
+	const maxWaitMs = ms('1min');
+
+	for (let waited = 0; waited < maxWaitMs; waited += 500) {
+		await new Promise((res) => setTimeout(res, 500));
+		if (regenProcess.killed) return true;
+	}
+
+	// Force kill
+
+	regenProcess.kill();
+
+	for (let waited = 0; waited < maxWaitMs; waited += 500) {
+		await new Promise((res) => setTimeout(res, 500));
+		if (regenProcess.killed) return true;
+	}
+
+	return false;
 }
 
 export function regenerate(): boolean {

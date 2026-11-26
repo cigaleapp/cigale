@@ -7,7 +7,13 @@ import { handleLogin, isAuthorized, unauthorized } from './auth.js';
 import { handleCacheDelete, readCacheStats } from './caches.js';
 import config from './config.js';
 import { apiIndexPage, dirListing, indexPage } from './html.js';
-import { getRegenStatus, readProgress, readRegenLog, regenerate } from './regeneration.js';
+import {
+	cancelRegeneration,
+	getRegenStatus,
+	readProgress,
+	readRegenLog,
+	regenerate,
+} from './regeneration.js';
 import { resolveUnder, serveFile } from './static.js';
 
 export function startServer(): Server<undefined> {
@@ -52,6 +58,16 @@ export function startServer(): Server<undefined> {
 				}
 				return notFound();
 			}),
+
+			'/api/regeneration/cancel': {
+				POST: withCors(
+					withAuth(async () => {
+						return Response.json({
+							canceled: await cancelRegeneration(),
+						});
+					})
+				),
+			},
 
 			// Last 100 lines of the regeneration process's stdout+stderr
 			// (auth required; the log may contain sensitive output).

@@ -8,6 +8,7 @@
         "@arkenv/core": "^1.0.0-rc.4",
         "arktype": "^2.2.7",
         "arrival-time": "^1.0.6",
+        "convert": "^8.2.0",
         "date-fns": "^4.4.0",
         "dequal": "^2.0.3",
         "es-toolkit": "^1.52.0",
@@ -183,6 +184,8 @@
     "commander": ["commander@2.9.0", "", { "dependencies": { "graceful-readlink": ">= 1.0.0" } }, "sha512-bmkUukX8wAOjHdN26xj5c4ctEV22TQ7dQYhSmuckKhToXrkUn0iIaolHdIxYYqD55nhpSPA9zPQ1yP57GdXP2A=="],
 
     "config-chain": ["config-chain@1.1.13", "", { "dependencies": { "ini": "^1.3.4", "proto-list": "~1.2.1" } }, "sha512-qj+f8APARXHrM0hraqXYb2/bOVSV4PvJQlNZ/DVj0QrmNM2q2euizkeuVckQ57J+W0mRH6Hvi+k50M4Jul2VRQ=="],
+
+    "convert": ["convert@8.2.0", "", {}, "sha512-iq5DPgzBtBL4YNbsvZPoSKdNIaUNODC+c2wnpJtnvgMtv1bZKki6usIlCB7vFHrYMHbNnPHOrATODW3DvyoG2w=="],
 
     "css-tree": ["css-tree@3.2.1", "", { "dependencies": { "mdn-data": "2.27.1", "source-map-js": "^1.2.1" } }, "sha512-X7sjQzceUhu1u7Y/ylrRZFU2FS6LRiFVp6rKLPg23y3x3c3DOKAwuXGDp+PAGjh6CSnCjYeAul8pcT8bAl+lSA=="],
 
