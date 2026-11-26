@@ -31,11 +31,11 @@
 	/**
 	 * Protocols that use this protocol
 	 */
-	const protocolsUsingProtocol = new SvelteSet<string>();
+	let protocolsUsingProtocol = $state<string[]>([]);
 
 	$effect(() => {
 		if (!open || !removingProtocol) {
-			protocolsUsingProtocol.clear();
+			protocolsUsingProtocol = [];
 			return;
 		}
 
@@ -44,7 +44,7 @@
 				databaseHandle(),
 				removingProtocol.id
 			)) {
-				protocolsUsingProtocol.add(dependant);
+				protocolsUsingProtocol.push(dependant);
 			}
 		})();
 	});
@@ -56,7 +56,7 @@
 	key="modal_delete_protocol"
 	typeToConfirm={removingProtocol?.name}
 	consequences={[
-		[...protocolsUsingProtocol].map(
+		...protocolsUsingProtocol.map(
 			(id) => `La suppression du protocole ${tables.Protocol.getFromState(id)?.name ?? id}`
 		),
 		plural(sessionsUsingProtocol.length, [
