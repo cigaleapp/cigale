@@ -94,6 +94,8 @@
 										'# protocoles importés',
 									])
 								);
+
+							reloadProtocols++;
 						});
 				}}
 			>
@@ -128,19 +130,22 @@
 					{@render row(entry)}
 				{/each}
 
-				{#if usable.length > 0}
+				{#if unusable.length > 0}
+					<p style:font-size="1.1em" style:display="flex" style:align-items="center">
+						<em>Protocoles de base</em>
+						<small style:margin-left="auto">Servent à d'autres protocoles</small>
+					</p>
+				{/if}
+
+				{#each unusable as entry}
+					{@render row(entry)}
+				{/each}
+
+				{#if notinstalled.length > 0 && installed.length > 0}
 					<hr />
 				{/if}
 
 				{#each notinstalled as entry}
-					{@render row(entry)}
-				{/each}
-
-				{#if unusable.length > 0}
-					<hr />
-				{/if}
-
-				{#each unusable as entry}
 					{@render row(entry)}
 				{/each}
 

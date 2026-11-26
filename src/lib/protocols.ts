@@ -175,11 +175,14 @@ export async function promptAndImportProtocol<
 					if (!reader.result) throw new Error('Fichier vide');
 					if (reader.result instanceof ArrayBuffer) throw new Error('Fichier binaire');
 
+					const url = URL.createObjectURL(
+						new Blob([reader.result], { type: 'text/plain' })
+					);
+
 					console.timeEnd(`Reading file ${file.name}`);
+
 					try {
-						const result = await importProtocol({
-							url: URL.createObjectURL(new Blob([reader.result], 'text/plain')),
-						});
+						const result = await importProtocol({ url });
 
 						const { tables } = await import('./idb.svelte.js');
 						await tables.Protocol.refresh(null);
@@ -188,6 +191,8 @@ export async function promptAndImportProtocol<
 						resolve(result);
 					} catch (err) {
 						reject(err);
+					} finally {
+						URL.revokeObjectURL(url);
 					}
 				};
 				reader.readAsText(file);

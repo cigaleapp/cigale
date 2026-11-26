@@ -4,7 +4,7 @@ id: io.github.cigaleapp.idmybee
 
 version: 28
 updates: automatic
-source: http://localhost:3000/idmybee.cigaleprotocol.json
+source: http://localhost:3000/idmybee.cigaleprotocol.yaml
 
 name: IDmyBee
 summary: Identification d'andrènes par élimination
