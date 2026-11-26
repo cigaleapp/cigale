@@ -96,6 +96,9 @@
 								);
 
 							reloadProtocols++;
+						})
+						.finally(() => {
+							signals.loadingEnded();
 						});
 				}}
 			>
@@ -163,23 +166,26 @@
 							}
 						}
 						oninstall={async (source, onProgress) => {
-							await data.swarpc.importProtocol.once(
-								{
-									url: source,
-								},
-								({ done, total, ...rest }) => {
-									console.log(done, total, rest);
-									onProgress?.(done / total);
-									uiState.processing.task = 'install-protocol';
-									uiState.processing.done = done;
-									uiState.processing.total = total;
-								}
-							);
+							try {
+								await data.swarpc.importProtocol.once(
+									{
+										url: source,
+									},
+									({ done, total, ...rest }) => {
+										console.log(done, total, rest);
+										onProgress?.(done / total);
+										uiState.processing.task = 'install-protocol';
+										uiState.processing.done = done;
+										uiState.processing.total = total;
+									}
+								);
 
-							await uiState.processing.finish();
-							await tables.Protocol.refresh(null);
-							await tables.Metadata.refresh(null);
-							reloadProtocols++;
+								await tables.Protocol.refresh(null);
+								await tables.Metadata.refresh(null);
+							} finally {
+								reloadProtocols++;
+								await uiState.processing.finish();
+							}
 						}}
 						ondelete={() => {
 							removingProtocol = p.id;
