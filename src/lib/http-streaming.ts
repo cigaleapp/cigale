@@ -86,17 +86,17 @@ export async function* httpStreamProcessLines<Schema extends Type>(
  * line, in order, until the file is exhausted.
  *
  * @param url the URL to stream
- * @param options.chunkSize maximum bytes to fetch per range request. Defaults to 256 KiB (256 * 1024)
+ * @param options.chunkSize maximum bytes to fetch per range request.
  * @param options.signal an AbortSignal to cancel the stream
  * @yields unknown the parsed JSON of each line
  */
 export async function* httpStreamLines(
 	input: string | URL | Request,
-	{ chunkSize = 256 * 1024, fallback, onProgress, ...init }: StreamRequestInit = {}
+	{ chunkSize = 1024 * 1024, fallback, ...init }: StreamRequestInit = {}
 ): AsyncGenerator<StreamedLine> {
 	const decoder = new TextDecoder();
+	const encoder = new TextEncoder();
 	let offset = 0;
-	let doneBytes = 0;
 	let carry = '';
 	const headers = new Headers(init.headers);
 
@@ -109,12 +109,41 @@ export async function* httpStreamLines(
 	}
 
 	let lineIndex = -1;
+	// Total bytes consumed so far, including line terminators.
+	let byteOffset = 0;
+	// byteOffset at the last emitted line. Empty lines' bytes are absorbed into
+	// the next emitted line so the sum of all byteSize values equals the total.
+	let lastEmitOffset = 0;
+	let lastEmitted: StreamedLine | undefined;
+
+	// Emit complete lines from a chunk of raw (untrimmed) lines. Each line is
+	// followed by a '\n' terminator in the file unless `terminated` is false
+	// (the final line of the file). Empty lines are skipped, but their bytes
+	// are counted so the running byteOffset stays accurate.
+	function* emit(rawLines: string[], terminated: boolean): Generator<StreamedLine> {
+		for (const raw of rawLines) {
+			const lineStart = byteOffset;
+			byteOffset += encoder.encode(terminated ? raw + '\n' : raw).length;
+			const line = raw.replace(/\r$/, '').trim();
+			if (!line) continue;
+
+			const byteSize = byteOffset - lastEmitOffset;
+			lastEmitOffset = byteOffset;
+			const emitted = new StreamedLine({
+				line,
+				lineIndex: ++lineIndex,
+				byteSize,
+				progress: { total, current: lineStart },
+			});
+			lastEmitted = emitted;
+			yield emitted;
+		}
+	}
 
 	while (true) {
 		headers.set('Range', `bytes=${offset}-${offset + chunkSize - 1}`);
 
 		const response = await fetch(input, { ...init, headers });
-		await onProgress?.(offset + chunkSize, total);
 		if (response.status === 416) break; // past the end of the file
 		if (response.status !== 206) {
 			if (!fallback) {
@@ -123,18 +152,13 @@ export async function* httpStreamLines(
 				);
 			}
 
-			const full = await fetch(input, init);
-			const text = await full.text();
-			if (!full.ok) throw new Error(text);
-			const lines = text.split(/\r?\n/);
-
-			for (const [lineIndex, line] of lines.entries()) {
-				yield new StreamedLine({
-					line,
-					lineIndex,
-					progress: { total: lines.length, current: lineIndex },
-				});
-			}
+			// The server ignored the Range header and returned the whole file.
+			const text = await response.text();
+			if (!response.ok) throw new Error(text);
+			const lines = text.split('\n');
+			carry = lines.pop() ?? '';
+			yield* emit(lines, true);
+			break;
 		}
 
 		const buffer =
@@ -145,31 +169,21 @@ export async function* httpStreamLines(
 		// The final element is a partial line that continues in the next request.
 		carry = lines.pop() ?? '';
 
-		for (const raw of lines) {
-			const line = raw.replace(/\r$/, '').trim();
-			if (!line) continue;
-
-			yield new StreamedLine({
-				line,
-				lineIndex: ++lineIndex,
-				progress: {
-					total,
-					current: offset,
-				},
-			});
-		}
+		yield* emit(lines, true);
 
 		offset += chunkSize;
 	}
 
 	// Flush a final line if the file didn't end with a newline.
-	const final = carry.replace(/\r$/, '').trim();
-	if (!final) return;
-	yield new StreamedLine({
-		line: final,
-		lineIndex: lineIndex + 1,
-		progress: { total, current: total },
-	});
+	if (carry) {
+		yield* emit([carry], false);
+	}
+
+	// Absorb any trailing bytes (e.g. a whitespace-only final line) into the
+	// last emitted line so the sum of byteSize values equals the total.
+	if (lastEmitted && byteOffset > lastEmitOffset) {
+		lastEmitted.setByteSize(lastEmitted.byteSize! + (byteOffset - lastEmitOffset));
+	}
 }
 
 class StreamedLine<Parsed = unknown, Context = unknown> {
@@ -193,6 +207,12 @@ class StreamedLine<Parsed = unknown, Context = unknown> {
 		this.totalBytes = init.progress?.total;
 		this.offsetBytes = init.progress?.current;
 		this.byteSize = init.byteSize;
+	}
+
+	/** Sets the byte size, keeping the stored init in sync so `.with()` inherits it. */
+	setByteSize(byteSize: number) {
+		this.byteSize = byteSize;
+		this.init.byteSize = byteSize;
 	}
 
 	with<P extends Parsed, C extends Context>(

@@ -9,6 +9,7 @@
 	import { promptAndImportProtocol } from '#lib/protocols.js';
 	import { listAllProtocols } from '#lib/protocols/registry.js';
 	import { uninstallProtocol } from '#lib/protocols/uninstall.ts';
+	import { Protocol } from '#lib/schemas/protocols.js';
 	import { isDebugMode } from '#lib/settings.svelte.js';
 	import { toasts } from '#lib/toasts.svelte.js';
 	import { uiState } from '#lib/uistate.svelte.js';
@@ -110,16 +111,40 @@
 
 	<ul class="protocols" pw-testid="protocols-list">
 		{#key reloadProtocols}
-			<AsyncEach
-				key={(p) => p.protocol.id}
-				items={async function* () {
-					yield* listAllProtocols(databaseHandle());
-				}}
-			>
-				{#snippet loading()}
-					<LoadingScreen loading="Chargement des protocoles…" />
-				{/snippet}
-				{#snippet children({ protocol: p, installed, compatible })}
+			{#await Array.fromAsync(listAllProtocols(databaseHandle()))}
+				<LoadingScreen loading="Chargement des protocoles…" />
+			{:then protocols}
+				{const installed = $derived(protocols.filter((p) => p.installed))}
+
+				{const notinstalled = $derived(protocols.filter((p) => !p.installed))}
+
+				{const usable = $derived(installed.filter((p) => Protocol.from(p.protocol).usable))}
+
+				{const unusable = $derived(
+					installed.filter((p) => !Protocol.from(p.protocol).usable)
+				)}
+
+				{#each usable as entry}
+					{@render row(entry)}
+				{/each}
+
+				{#if usable.length > 0}
+					<hr />
+				{/if}
+
+				{#each notinstalled as entry}
+					{@render row(entry)}
+				{/each}
+
+				{#if unusable.length > 0}
+					<hr />
+				{/if}
+
+				{#each unusable as entry}
+					{@render row(entry)}
+				{/each}
+
+				{#snippet row({ protocol: p, installed, compatible })}
 					<RowProtocol
 						{...p}
 						{installed}
@@ -157,7 +182,9 @@
 						}}
 					/>
 				{/snippet}
-			</AsyncEach>
+			{:catch error}
+				<LoadingScreen failure={error} />
+			{/await}
 		{/key}
 	</ul>
 </main>

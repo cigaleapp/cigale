@@ -217,17 +217,9 @@ async function installEnumOptions(
 		}
 	}
 
-	/** Maps .at to done bytes */
-	const progresses = new Map<string, number>();
 	for (const config of metadata.externalOptions ?? []) {
-		progresses.set(config.at, 0);
-		for await (const line of httpStreamProcessLines(MetadataEnumVariant, config, {
-			async onProgress(doneBytes) {
-				const old = progresses.get(config.at)!;
-				await incrementProgress(doneBytes - old);
-				progresses.set(config.at, doneBytes);
-			},
-		})) {
+		for await (const line of httpStreamProcessLines(MetadataEnumVariant, config)) {
+			await incrementProgress(line.byteSize ?? 0);
 			if (!line.parsed) {
 				console.error(
 					`Couldn't import metadata option on line ${line.index + 1} of ${config.at}`,

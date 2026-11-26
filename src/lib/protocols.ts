@@ -12,7 +12,7 @@ import { stringifyWithToplevelOrdering } from './download.js';
 import { promptForFiles } from './files.js';
 import { metadataOptionsOf } from './metadata/index.js';
 import { manifestVersionsCompatible } from './protocols/manifestversion.js';
-import { fetchProtocolRegistries } from './protocols/registry.js';
+import { fetchProtocolsFromRegistries } from './protocols/registry.js';
 import { removeNamespaceFromMetadataId } from './schemas/metadata.js';
 import { ExportedProtocol, Protocol } from './schemas/protocols.js';
 import { shareOrDownloadAsFile } from './share.js';
@@ -204,8 +204,8 @@ export async function hasUpgradeAvailable(
 	if (!current.version) throw new Error("Le protocole n'a pas de version");
 	if (!current.id) throw new Error("Le protocole n'a pas d'identifiant");
 
-	const registry = await fetchProtocolRegistries();
-	const entry = registry.protocols.find((p) => p.id === current.id);
+	const protocols = await fetchProtocolsFromRegistries();
+	const entry = protocols.find((p) => p.id === current.id);
 
 	if (!entry) throw new Error('Protocole introuvable');
 	if (!entry.version) throw new Error("Le protocole n'a plus de version");

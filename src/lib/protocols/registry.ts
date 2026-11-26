@@ -5,14 +5,33 @@ import { compareBy } from '#lib/utils.ts';
 
 import { manifestVersionsCompatible } from './manifestversion.js';
 
+type Registry = typeof ProtocolRegistry.infer;
+
 /**
  * Cache of fetched registries, keyed by registry URL.
  */
-const PROTOCOLS_REGISTRIES = new Map<URL, typeof ProtocolRegistry.infer>();
+const REGISTRIES = new Map<URL, Registry>();
 
 let REGISTRY_URLS: URL[] = JSON.parse(import.meta.env.protocolRegistryUrls ?? '[]').map(
 	(u: string) => new URL(u)
 );
+
+async function fetchRegistries() {
+	return await Promise.allSettled(
+		REGISTRY_URLS.map(async (url) => {
+			let registry = REGISTRIES.get(url);
+			if (!registry) {
+				const response = await fetch(url);
+				if (!response.ok) {
+					throw new Error(`Failed to fetch registry from ${url}: ${response.status}`);
+				}
+				registry = ProtocolRegistry.assert(await response.json());
+				REGISTRIES.set(url, registry);
+			}
+			return registry;
+		})
+	);
+}
 
 /**
  * Fetches all registries (each cached by URL) and merges them into a single
@@ -20,22 +39,8 @@ let REGISTRY_URLS: URL[] = JSON.parse(import.meta.env.protocolRegistryUrls ?? '[
  * wins. A registry that fails to fetch is skipped; an error is thrown only
  * if no registry could be fetched.
  */
-export async function fetchProtocolRegistries(): Promise<typeof ProtocolRegistry.infer> {
-	const results = await Promise.allSettled(
-		REGISTRY_URLS.map(async (url) => {
-			let registry = PROTOCOLS_REGISTRIES.get(url);
-			if (!registry) {
-				const response = await fetch(url);
-				if (!response.ok) {
-					throw new Error(`Failed to fetch registry from ${url}: ${response.status}`);
-				}
-				registry = ProtocolRegistry.assert(await response.json());
-				PROTOCOLS_REGISTRIES.set(url, registry);
-			}
-			return registry;
-		})
-	);
-
+export async function fetchProtocolsFromRegistries(): Promise<Registry['protocols']> {
+	const results = await fetchRegistries();
 	const seen = new Set<string>();
 	const protocols = [];
 	let fetchedAny = false;
@@ -58,12 +63,14 @@ export async function fetchProtocolRegistries(): Promise<typeof ProtocolRegistry
 		throw new Error('Failed to fetch any protocol registry');
 	}
 
-	return { protocols };
+	return protocols;
 }
 
 export async function lookupMostRecentCompatibleProtocol(id: string): Promise<URL> {
-	const registry = await fetchProtocolRegistries();
-	const entry = registry.protocols.find((p) => p.id === id);
+	const protocols = await fetchProtocolsFromRegistries();
+	console.debug(`[registry] looking up protocol ${id} within`, protocols);
+
+	const entry = protocols.find((p) => p.id === id);
 	if (!entry) throw new Error(`Protocol ${id} not in registry`);
 	if (manifestVersionsCompatible(entry.manifestVersion)) return new URL(entry.url);
 
@@ -76,11 +83,6 @@ export async function lookupMostRecentCompatibleProtocol(id: string): Promise<UR
 	return new URL(older.url);
 }
 
-/**
- * All protocols from registry
- * and any protocol that was installed
- * but is not listed in it
- */
 export async function* listAllProtocols(db: DatabaseHandle) {
 	const locally = await db.getAll('Protocol');
 
@@ -88,12 +90,12 @@ export async function* listAllProtocols(db: DatabaseHandle) {
 		yield { protocol: p, installed: true };
 	}
 
-	const registry = await fetchProtocolRegistries().catch((e) => {
+	const protocols = await fetchProtocolsFromRegistries().catch((e) => {
 		console.error("Couldn't fetch protocol registry", e);
-		return { protocols: [] };
+		return [];
 	});
 
-	for (const p of registry.protocols) {
+	for (const p of protocols) {
 		if (locally.some((l) => l.id === p.id)) continue;
 		if (!p.suggested) continue;
 

@@ -183,7 +183,7 @@
 
 <ModalCreateCustomNeuralNetwork />
 
-<ModalPickProtocol />
+<ModalPickProtocol show="usable-only" />
 
 <Modal
 	key="modal_debug_ui_state"
