@@ -11,11 +11,12 @@
 
 	interface Props {
 		children: Snippet;
+		actions?: Snippet;
 		/** Home by default */
 		to?: Path;
 	}
 
-	const { children, to = '/sessions/' }: Props = $props();
+	const { children, actions, to = '/sessions/' }: Props = $props();
 </script>
 
 <TopbarContent>
@@ -33,6 +34,8 @@
 	</div>
 
 	<div class="actions">
+		{@render actions?.()}
+
 		<ModalSubmitIssue type="bug" />
 	</div>
 </TopbarContent>

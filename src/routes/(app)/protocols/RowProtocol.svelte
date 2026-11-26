@@ -16,10 +16,10 @@
 	import { uiState } from '#lib/uistate.svelte.js';
 	import IconUpgrade from '~icons/ri/arrow-up-circle-line';
 	import IconDelete from '~icons/ri/delete-bin-line';
+	import IconInstall from '~icons/ri/download-2-line';
 	import IconLearnMore from '~icons/ri/information-line';
 	import IconStats from '~icons/ri/pie-chart-2-line';
 	import IconExport from '~icons/ri/share-forward-line';
-	import IconInstall from '~icons/ri/download-2-line'
 
 	import BeamupConsentLearnMore from './BeamupConsentLearnMore.svelte';
 
@@ -86,7 +86,7 @@
 		<summary>
 			<section class="logo">
 				{#if logo}
-					<img src={logo} alt={`${name} logo`} />
+					<img src={logo.toString()} alt={`${name} logo`} />
 				{:else}
 					<Logo />
 				{/if}
@@ -110,9 +110,9 @@
 					{#if compatible}
 						<ButtonSecondary
 							loading
-							help="Installer"
 							onclick={async (_, sig) => {
 								sig.loadingStarted();
+								sig.setText("0%")
 
 								try {
 									await oninstall?.(source, (progress) => {
@@ -125,8 +125,8 @@
 								}
 							}}
 						>
-						<IconInstall /> 
-							<!-- Installer -->
+							<!-- <IconInstall /> -->
+							Installer
 							<!-- {#if version}
 								<span class="version-to-install">
 									v{version}
@@ -278,18 +278,24 @@
 	}
 
 	.logo {
-		--size: 2rem;
+		--size: 1.2rem;
 		height: 3rem;
 		width: 3rem;
 		display: flex;
 		justify-content: center;
 		align-items: center;
 		flex-shrink: 0;
-	}
-	.logo img {
+		background: var(--bg2-neutral);
 		border-radius: 50%;
-		object-fit: cover;
 		overflow: clip;
+
+		& > :global(*) {
+			margin-top: 0.125rem;
+		}
+	}
+
+	.logo img {
+		object-fit: cover;
 		height: 100%;
 		width: 100%;
 	}
@@ -313,7 +319,7 @@
 
 	details {
 		padding: 1em;
-		border-radius: var(--corner-radius);
+		border-radius: var(--row-corner-radius, var(--corner-radius));
 	}
 
 	details:is(:hover, :focus-visible) {
@@ -331,7 +337,6 @@
 
 	summary {
 		display: flex;
-		justify-content: space-between;
 		gap: 1em;
 		width: 100%;
 
@@ -339,9 +344,8 @@
 			display: none;
 		}
 
-		.text {
-			width: 60%;
-
+		.actions {
+			margin-left: auto;
 		}
 	}
 
@@ -370,6 +374,8 @@
 	.id {
 		margin-top: 1em;
 		text-align: center;
-		font-size: 0.8rem;
+		font-size: 0.7rem;
+		word-wrap: break-word;
+		word-break: break-all;
 	}
 </style>
