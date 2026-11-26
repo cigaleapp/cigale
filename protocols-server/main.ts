@@ -37,6 +37,7 @@ export async function generate() {
 		metadataId: (clade) => clade,
 		output: { options: 'options', images: 'assets' },
 		modules: {
+			metadatabuilders: [new IDMyBeeDescriptors()],
 			sources: [
 				new GoogleDriveSlides(),
 				new FrenchArthro(),
@@ -57,7 +58,6 @@ export async function generate() {
 				new GBIFOldBackboneIDs(),
 			],
 			specializations: [new Birds(), new Arthropods(), new Springtails(), new Bees()],
-			metadatabuilders: [new IDMyBeeDescriptors()],
 		},
 	});
 }

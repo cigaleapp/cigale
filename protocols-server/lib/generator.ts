@@ -30,6 +30,8 @@ export async function run(plan: {
 		images: string;
 	};
 	modules: {
+		/** Ways to create new metadata for protocols */
+		metadatabuilders: MetadataProvider[];
 		/** Where to get taxon names from */
 		sources: NameProvider[];
 		/** How to put a unique identifier on a taxon */
@@ -41,8 +43,6 @@ export async function run(plan: {
 		enrich: Enricher[];
 		/** Ways to select some taxa and turn them into options for enum metadata */
 		specializations: Specializer[];
-		/** Ways to create new metadata for protocols */
-		metadatabuilders: MetadataProvider[];
 	};
 }) {
 	const removeExitHook = exitHook(() => {
@@ -50,6 +50,81 @@ export async function run(plan: {
 		clearProgressFile();
 		progress.stop();
 	});
+
+	progress.phase('metadata', plan.modules.metadatabuilders.length);
+
+	const metadatasToAdd = new Map<string, { protocols: string[]; keys: string[] }>();
+
+	await Promise.all(
+		plan.modules.metadatabuilders.map(async (builder) => {
+			progress.start(builder.name);
+
+			await builder.init();
+
+			metadatasToAdd.set(builder.name, {
+				protocols: builder.addTo,
+				keys: await Array.fromAsync(builder.list()),
+			});
+
+			progress.finish(builder.name);
+			progress.increment();
+		})
+	);
+
+	logger.timed(
+		`Will write metadata to ${metadatasToAdd.size} protocols:\n` +
+			[...metadatasToAdd]
+				.map(([builder, { keys }]) => `- ${builder}: ${keys.length} new metadata`)
+				.join('\n')
+	);
+
+	progress.phase(
+		'metadata',
+		sum([...metadatasToAdd].map(([, { protocols, keys }]) => protocols.length + keys.length))
+	);
+
+	const written = new Map<[filepath: string, builder: string], number>();
+	await Promise.all(
+		plan.modules.metadatabuilders.map(async (builder) => {
+			progress.start(builder.name);
+
+			const entry = metadatasToAdd.get(builder.name);
+			if (!entry) throw new Error(`No entries for ${builder.name}`);
+
+			const { keys, protocols } = entry;
+			const metadatas: Metadata[] = [];
+
+			for (const key of keys) {
+				const metadata = await builder.build(key);
+				if (!metadata) continue;
+				metadatas.push(metadata);
+				progress.increment();
+			}
+
+			for (const protocol of protocols) {
+				const filepath = await writeMetadataToProtocol(protocol, ...metadatas);
+				written.set([filepath, builder.name], metadatas.length);
+				progress.increment();
+			}
+
+			progress.finish(builder.name);
+		})
+	);
+
+	logger.timed(
+		`Wrote additional metadata to protocols:\n` +
+			[...Map.groupBy([...written], ([filepath]) => filepath)]
+				.map(([[filepath], entries]) => {
+					const total = sum(entries.map(([, count]) => count));
+
+					const byBuilder = entries.map(
+						([[, builder], count]) => `${count} from ${builder}`
+					);
+
+					return `- ${path.relative('.', filepath)}: ${total} metadatas added (${byBuilder.join(', ')})`;
+				})
+				.join('\n')
+	);
 
 	/** clade:name */
 	const names = new Map<`${string}:${string}`, Option>();
@@ -199,81 +274,6 @@ export async function run(plan: {
 	);
 
 	logger.timed(`Enriched ${enriched.size} options`);
-
-	progress.phase('metadata', plan.modules.metadatabuilders.length);
-
-	const metadatasToAdd = new Map<string, { protocols: string[]; keys: string[] }>();
-
-	await Promise.all(
-		plan.modules.metadatabuilders.map(async (builder) => {
-			progress.start(builder.name);
-
-			await builder.init();
-
-			metadatasToAdd.set(builder.name, {
-				protocols: builder.addTo,
-				keys: await Array.fromAsync(builder.list()),
-			});
-
-			progress.finish(builder.name);
-			progress.increment();
-		})
-	);
-
-	logger.timed(
-		`Will write metadata to ${metadatasToAdd.size} protocols:\n` +
-			[...metadatasToAdd]
-				.map(([builder, { keys }]) => `- ${builder}: ${keys.length} new metadata`)
-				.join('\n')
-	);
-
-	progress.phase(
-		'metadata',
-		sum([...metadatasToAdd].map(([, { protocols, keys }]) => protocols.length + keys.length))
-	);
-
-	const written = new Map<[filepath: string, builder: string], number>();
-	await Promise.all(
-		plan.modules.metadatabuilders.map(async (builder) => {
-			progress.start(builder.name);
-
-			const entry = metadatasToAdd.get(builder.name);
-			if (!entry) throw new Error(`No entries for ${builder.name}`);
-
-			const { keys, protocols } = entry;
-			const metadatas: Metadata[] = [];
-
-			for (const key of keys) {
-				const metadata = await builder.build(key);
-				if (!metadata) continue;
-				metadatas.push(metadata);
-				progress.increment();
-			}
-
-			for (const protocol of protocols) {
-				const filepath = await writeMetadataToProtocol(protocol, ...metadatas);
-				written.set([filepath, builder.name], metadatas.length);
-				progress.increment();
-			}
-
-			progress.finish(builder.name);
-		})
-	);
-
-	logger.timed(
-		`Wrote additional metadata to protocols:\n` +
-			[...Map.groupBy([...written], ([filepath]) => filepath)]
-				.map(([[filepath], entries]) => {
-					const total = sum(entries.map(([, count]) => count));
-
-					const byBuilder = entries.map(
-						([[, builder], count]) => `${count} from ${builder}`
-					);
-
-					return `- ${path.relative('.', filepath)}: ${total} metadatas added (${byBuilder.join(', ')})`;
-				})
-				.join('\n')
-	);
 
 	progress.phase('specialize', plan.modules.specializations.length);
 
