@@ -12,7 +12,7 @@ export function pathToAsset(datasource: string, query: string, filename: string)
 export type DatasourceName =
 	| 'gbif'
 	| 'jj'
-	| 'gslides'
+	| 'gdrive'
 	| 'idmybee'
 	| 'andrena-morphogroups'
 	| 'iucn'

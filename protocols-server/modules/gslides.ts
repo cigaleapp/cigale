@@ -73,11 +73,7 @@ export class GoogleSlides implements Enricher {
 				extra: {
 					description: data.description,
 					learnMore: data.learnMore,
-					images: data.images.map((image) =>
-						new URL(
-							`${config.ASSETS_URL_BASE}/${this.name}/${encodeURIComponent(image.filename)}`
-						).toString()
-					),
+					images: data.images.map((image) => image.url),
 				} satisfies OptionExtra,
 			};
 		}

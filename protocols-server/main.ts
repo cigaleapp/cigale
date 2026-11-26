@@ -1,9 +1,5 @@
-import { startServer } from './server/server.js';
 import { run } from './lib/generator.js';
-import { Arthropods, Springtails } from './specializations/arthropods.js';
-import { Bees } from './specializations/bees.js';
 import { BirdNetClassmapping } from './modules/birdnet.js';
-import { Birds } from './specializations/birds.js';
 import { CoLXR, GBIFOldBackboneIDs, GBIFTaxonInfo, GBIFTaxonomy } from './modules/gbif.js';
 import { GoogleDriveSlides, GoogleSlides } from './modules/gslides.js';
 import {
@@ -15,6 +11,10 @@ import {
 import { FrenchArthro, SmallCollemboles } from './modules/irit.js';
 import { IUCN } from './modules/iucn.js';
 import { JessicaJoachim } from './modules/jj.js';
+import { startServer } from './server/server.js';
+import { Arthropods, Springtails } from './specializations/arthropods.js';
+import { Bees } from './specializations/bees.js';
+import { Birds } from './specializations/birds.js';
 
 if (import.meta.main) {
 	const args = process.argv.slice(2);

@@ -9,7 +9,7 @@ source: http://localhost:3000/idmybee.cigaleprotocol.yaml
 name: IDmyBee
 summary: Identification d'andrènes par élimination
 description: Un protocole pour identifier des abeilles genre Andrena via des descripteurs, avec pré-élimination par classification par inférence de Morphogroupes
-logo: https://cigaleapp.github.io/cigale/logos/idmybee.png
+logo: https://cigale-cors-proxy-biodimedia-data-terra.ai.meso.umontpellier.fr/www.idmybee.com/uploads/1/2/7/0/127042967/logo3fb2_orig.png
 
 authors: []
 

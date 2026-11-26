@@ -11,6 +11,7 @@ import { pdfToPng } from 'pdf-to-png-converter';
 import Turndown from 'turndown';
 
 import { Datasource, NoParams, ResponseWithFiles } from '../lib/datasource.js';
+import config from '../server/config.js';
 
 export class GoogleDrive extends Datasource<
 	'files' | 'slide',
@@ -26,12 +27,12 @@ export class GoogleDrive extends Datasource<
 			description: string;
 			learnMore: string;
 			images: Array<{
-				filename: string;
+				url: string;
 			}>;
 		};
 	}
 > {
-	name = 'gslides' as const;
+	name = 'gdrive' as const;
 
 	folderId = folderIdFromUrl(
 		'https://drive.google.com/drive/folders/1Ms9yPFd5kt1OYUx-6gwe8nlz2EGhJBLd'
@@ -288,7 +289,9 @@ export class GoogleDrive extends Datasource<
 				response: {
 					description,
 					learnMore,
-					images: attached.map((f) => ({ filename: f.name })),
+					images: attached.map((file) => ({
+						url: `${config.ASSETS_URL_BASE}/${this.name}/slide/${file.name}`,
+					})),
 				},
 			});
 		},
