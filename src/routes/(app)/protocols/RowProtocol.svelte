@@ -19,6 +19,7 @@
 	import IconLearnMore from '~icons/ri/information-line';
 	import IconStats from '~icons/ri/pie-chart-2-line';
 	import IconExport from '~icons/ri/share-forward-line';
+	import IconInstall from '~icons/ri/download-2-line'
 
 	import BeamupConsentLearnMore from './BeamupConsentLearnMore.svelte';
 
@@ -97,17 +98,19 @@
 							help="Protocole modifié par rapport à la version publiée"
 						/>
 					{/if} -->
-					{name}
+					<OverflowableText text={name} />
 				</h3>
-				<span class="describe">
+				<!-- <span class="describe">
 					<OverflowableText text={summary || description || ''} />
-				</span>
+				</span> -->
+				<p>{summary}</p>
 			</section>
 			<section class="actions">
 				{#if !installed && source}
 					{#if compatible}
 						<ButtonSecondary
 							loading
+							help="Installer"
 							onclick={async (_, sig) => {
 								sig.loadingStarted();
 
@@ -122,12 +125,13 @@
 								}
 							}}
 						>
-							Installer
-							{#if version}
+						<IconInstall /> 
+							<!-- Installer -->
+							<!-- {#if version}
 								<span class="version-to-install">
 									v{version}
 								</span>
-							{/if}
+							{/if} -->
 						</ButtonSecondary>
 					{:else}
 						<ButtonSecondary
@@ -269,6 +273,8 @@
 <style>
 	li {
 		width: 100%;
+		max-width: 600px;
+		font-size: 0.9rem;
 	}
 
 	.logo {
@@ -278,6 +284,7 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
+		flex-shrink: 0;
 	}
 	.logo img {
 		border-radius: 50%;
@@ -326,13 +333,15 @@
 		display: flex;
 		justify-content: space-between;
 		gap: 1em;
+		width: 100%;
 
 		&::marker {
 			display: none;
 		}
 
 		.text {
-			width: 70%;
+			width: 60%;
+
 		}
 	}
 

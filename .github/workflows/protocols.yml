@@ -149,16 +149,16 @@ jobs:
           echo "App URL: $url"
         env:
           PROTOCOLS_APP_URL: ${{ secrets.PROTOCOLS_APP_URL }}
-          
-          - name: Wait for regeneration to finish
-          working-directory: protocols-server
-          run: bun run wait-server-regen
-          env:
-            SERVER_URL: ${{ steps.app.outputs.url }}
-            SERVER_PASSWORD: ${{ secrets.DATATERRA_PROTOCOLS_SERVER_PASSWORD }}
-            JOB_STARTED_AT: ${{ steps.jobstart.outputs.started_at }}
-            TOTAL_WAIT_MINUTES: 120
-            GH_TOKEN: ${{ github.token }}
+
+      - name: Wait for regeneration to finish
+        working-directory: protocols-server
+        run: bun run wait-server-regen
+        env:
+          SERVER_URL: ${{ steps.app.outputs.url }}
+          SERVER_PASSWORD: ${{ secrets.DATATERRA_PROTOCOLS_SERVER_PASSWORD }}
+          JOB_STARTED_AT: ${{ steps.jobstart.outputs.started_at }}
+          TOTAL_WAIT_MINUTES: 120
+          GH_TOKEN: ${{ github.token }}
 
       - name: Show recent logs
         if: always()
