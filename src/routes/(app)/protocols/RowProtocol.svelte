@@ -4,13 +4,15 @@
 	import ButtonIcon from '#lib/ButtonIcon.svelte';
 	import ButtonSecondary from '#lib/ButtonSecondary.svelte';
 	import ButtonUpdateProtocol from '#lib/ButtonUpdateProtocol.svelte';
-	import { errorMessage } from '#lib/i18n.js';
+	import { errorMessage, percent } from '#lib/i18n.js';
+	import Logo from '#lib/Logo.svelte';
 	import OverflowableText from '#lib/OverflowableText.svelte';
 	import { goto, resolve } from '#lib/paths.js';
 	import { getSettings, setSetting } from '#lib/settings.svelte.js';
 	import { shareUrl } from '#lib/share.js';
 	import Switch from '#lib/Switch.svelte';
 	import { toasts } from '#lib/toasts.svelte.js';
+	import Tooltip from '#lib/Tooltip.svelte';
 	import { uiState } from '#lib/uistate.svelte.js';
 	import IconUpgrade from '~icons/ri/arrow-up-circle-line';
 	import IconDelete from '~icons/ri/delete-bin-line';
@@ -23,6 +25,10 @@
 	interface Props extends Partial<Protocol> {
 		id: string;
 		name: string;
+		logo?: URL | null | string;
+		summary?: string;
+		description?: string;
+		authors?: Array<{ name: string; email: string }>;
 		source?: string;
 		version?: number;
 		ondelete: () => void;
@@ -43,6 +49,10 @@
 		source,
 		version,
 		ondelete,
+		summary,
+		logo,
+		description,
+		authors,
 		installed = true,
 		oninstall,
 		updates,
@@ -73,6 +83,13 @@
 <li>
 	<details open={expanded}>
 		<summary>
+			<section class="logo">
+				{#if logo}
+					<img src={logo} alt={`${name} logo`} />
+				{:else}
+					<Logo />
+				{/if}
+			</section>
 			<section class="text">
 				<h3>
 					<!-- {#if dirty}
@@ -82,22 +99,35 @@
 					{/if} -->
 					{name}
 				</h3>
-				<small><OverflowableText tag="code" text={id} /></small>
+				<span class="describe">
+					<OverflowableText text={summary || description || ''} />
+				</span>
 			</section>
 			<section class="actions">
 				{#if !installed && source}
 					{#if compatible}
 						<ButtonSecondary
 							loading
-							onclick={async (_, { progress }) => {
-								await oninstall?.(source, progress).catch((err) =>
-									toasts.error(
-										errorMessage(err, `Impossible d'installer ${name}`)
-									)
-								);
+							onclick={async (_, sig) => {
+								sig.loadingStarted();
+
+								try {
+									await oninstall?.(source, (progress) => {
+										sig.setText(percent(progress));
+									});
+								} catch (err) {
+									toasts.error(err, `Impossible d'installer ${name}`);
+								} finally {
+									sig.loadingEnded();
+								}
 							}}
 						>
 							Installer
+							{#if version}
+								<span class="version-to-install">
+									v{version}
+								</span>
+							{/if}
 						</ButtonSecondary>
 					{:else}
 						<ButtonSecondary
@@ -141,6 +171,7 @@
 				{/if}
 			</section>
 		</summary>
+
 		{#if version && source && installed}
 			<label class="auto-updates">
 				<Switch
@@ -226,12 +257,38 @@
 				{/if}
 			</div>
 		{/if}
+
+		<section class="id">
+			<Tooltip text="Identifiant du protocole"
+				><OverflowableText tag="code" text={id} /></Tooltip
+			>
+		</section>
 	</details>
 </li>
 
 <style>
 	li {
 		width: 100%;
+	}
+
+	.logo {
+		--size: 2rem;
+		height: 3rem;
+		width: 3rem;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+	.logo img {
+		border-radius: 50%;
+		object-fit: cover;
+		overflow: clip;
+		height: 100%;
+		width: 100%;
+	}
+
+	.version-to-install {
+		color: var(--gay);
 	}
 
 	.actions,
@@ -299,5 +356,11 @@
 	.more-actions {
 		margin-top: 1em;
 		justify-content: center;
+	}
+
+	.id {
+		margin-top: 1em;
+		text-align: center;
+		font-size: 0.8rem;
 	}
 </style>

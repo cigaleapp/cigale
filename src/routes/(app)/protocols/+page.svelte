@@ -3,11 +3,14 @@
 
 	import AsyncEach from '#lib/AsyncEach.svelte';
 	import ButtonSecondary from '#lib/ButtonSecondary.svelte';
-	import { plural } from '#lib/i18n';
+	import { plural } from '#lib/i18n.js';
 	import { databaseHandle, tables } from '#lib/idb.svelte.js';
-	import { promptAndImportProtocol } from '#lib/protocols';
+	import LoadingScreen from '#lib/LoadingScreen.svelte';
+	import { promptAndImportProtocol } from '#lib/protocols.js';
 	import { listAllProtocols } from '#lib/protocols/registry.js';
-	import { toasts } from '#lib/toasts.svelte';
+	import { uninstallProtocol } from '#lib/protocols/uninstall.ts';
+	import { isDebugMode } from '#lib/settings.svelte.js';
+	import { toasts } from '#lib/toasts.svelte.js';
 	import { uiState } from '#lib/uistate.svelte.js';
 	import IconImport from '~icons/ri/download-2-line';
 
@@ -51,6 +54,21 @@
 	<header>
 		<h1>Protocoles</h1>
 		<section class="actions">
+			{#if isDebugMode()}
+				<ButtonSecondary
+					danger
+					loading
+					onclick={async () => {
+						for (const { id } of tables.Protocol.state) {
+							await uninstallProtocol(databaseHandle(), id);
+						}
+
+						reloadProtocols++;
+					}}
+				>
+					Tout désinstaller
+				</ButtonSecondary>
+			{/if}
 			<ButtonSecondary
 				loading
 				onclick={async (_, signals) => {
@@ -62,11 +80,15 @@
 						.catch((e) => toasts.error(null, e))
 						.then((ps) => {
 							if (!ps || typeof ps === 'string' || ps.length === 0) return;
-							if (ps.length === 1)
-								toasts.success(`Protocole “${ps[0].name}” importé`);
+							const names = new Map(
+								ps.map((p) => [p.id, tables.Protocol.getFromState(p.id)?.name])
+							);
+
+							if (names.size === 1)
+								toasts.success(`Protocole “${names.get(ps[0].id)}” importé`);
 							else
 								toasts.success(
-									plural(ps.length, [
+									plural(names.size, [
 										'Protocole importé',
 										'# protocoles importés',
 									])
@@ -94,6 +116,9 @@
 					yield* listAllProtocols(databaseHandle());
 				}}
 			>
+				{#snippet loading()}
+					<LoadingScreen loading="Chargement des protocoles…" />
+				{/snippet}
 				{#snippet children({ protocol: p, installed, compatible })}
 					<RowProtocol
 						{...p}
@@ -112,14 +137,18 @@
 								{
 									url: source,
 								},
-								({ done, total }) => {
+								({ done, total, ...rest }) => {
+									console.log(done, total, rest);
 									onProgress?.(done / total);
+									uiState.processing.task = 'install-protocol';
+									uiState.processing.done = done;
+									uiState.processing.total = total;
 								}
 							);
 
 							await uiState.processing.finish();
-							await tables.Protocol.refresh();
-							await tables.Metadata.refresh();
+							await tables.Protocol.refresh(null);
+							await tables.Metadata.refresh(null);
 							reloadProtocols++;
 						}}
 						ondelete={() => {
@@ -154,6 +183,7 @@
 		list-style-position: inside;
 		padding-left: 0;
 		padding: 0;
+		--loading-screen-min-height: 60vh;
 	}
 
 	header {

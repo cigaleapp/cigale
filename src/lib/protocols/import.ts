@@ -4,6 +4,7 @@ import { ArkErrors } from 'arktype';
 
 import { Tables } from '#lib/database.js';
 import { httpStreamLines, httpStreamProcessLines } from '#lib/http-streaming.ts';
+import { metadataOptionId, namespaceToMetadataOptionInDB } from '#lib/metadata/options.js';
 import { lookupMostRecentCompatibleProtocol } from '#lib/protocols/registry.js';
 import { NamespacedMetadataID } from '#lib/schemas/common.js';
 import {
@@ -14,18 +15,22 @@ import {
 } from '#lib/schemas/metadata.js';
 import { ExportedProtocol } from '#lib/schemas/protocols.js';
 import { recomputeSearchIndex } from '#lib/search.ts';
-import {
-
-	metadataOptionId,
-	namespaceToMetadataOptionInDB,
-} from '#lib/metadata/options.js';
 import { entries, mapKeys, parseYAMLorJSON } from '#lib/utils.ts';
 
-type ProgressCallback = (protocol: string, phase: string, done: number, total: number) => void;
+type ProgressCallback = (
+	protocol: string,
+	phase: string,
+	done: number,
+	total: number
+) => Promise<void>;
 
 class DependsOnOtherProtocolError extends Error {
 	constructor(public protocolIds: string[]) {
 		super();
+	}
+
+	get message() {
+		return `depends on ${this.protocolIds.join(', ')}`;
 	}
 }
 
@@ -37,18 +42,23 @@ export async function importProtocol(
 	}
 ) {
 	try {
-		await importSingleProtocol(db, url, options);
+		// the await is important here otherwise the error slips through without
+		// being caught by the try-catch since we return the promise , which the
+		// caller will resolve, instead of resolving it right here
+		return await importSingleProtocol(db, url, options);
 	} catch (error) {
 		if (!(error instanceof DependsOnOtherProtocolError)) {
 			throw new Error(`Could not import protocol at ${url}`, { cause: error });
 		}
 
+		const childurl = url;
 		for (const id of error.protocolIds) {
+			console.info(`protocol ${childurl} depends on ${id}, importing it`);
 			const url = await lookupMostRecentCompatibleProtocol(id);
 			await importProtocol(db, url, options);
 		}
 
-		await importSingleProtocol(db, url, options);
+		return importSingleProtocol(db, url, options);
 	}
 }
 
@@ -66,34 +76,36 @@ async function importSingleProtocol(
 	const progress = new Progress(url.toString());
 	progress.bind(options.onProgress);
 
-	progress.phase('get-manifest', 1);
+	await progress.phase('get-manifest', 1);
 	const manifest = await fetchManifest(url);
-	progress.increment();
+	await progress.increment();
 
-	progress.phase('check-imports', manifest.imports?.length ?? 1);
+	await progress.phase('check-imports', manifest.imports?.length ?? 1);
 	await checkImports(db, manifest, progress);
 
 	const namespaced = (bare: string) => ensureNamespacedMetadataId(bare, manifest.id);
 
 	const metadatas = metadatasOfManifest(manifest);
 
-	progress.phase('metadata-options', 0);
-	await countEnumOptions(metadatas, progress);
+	await progress.phase('metadata-options', 0);
+	await countEnumOptions(metadatas, (add) => {
+		progress.total += add;
+	});
 
 	for (const [id, metadata] of metadatas) {
 		if (metadata.type !== 'enum') continue;
 
-		await installEnumOptions(db, id, metadata, progress);
+		await installEnumOptions(db, id, metadata, async (by) => progress.increment(by));
 	}
 
-	progress.phase('metadata', metadatas.size);
+	await progress.phase('metadata', metadatas.size);
 
 	for (const [id, metadata] of metadatas) {
 		await storeMetadata(db, id, metadata);
-		progress.increment();
+		await progress.increment();
 	}
 
-	progress.phase('resolve-imported-items', manifest.imports?.length ?? 1);
+	await progress.phase('resolve-imported-items', manifest.imports?.length ?? 1);
 	const { metadataGroups, importedMetadata, importedSessionMetadata } =
 		await resolveImportedItems(db, manifest);
 
@@ -104,14 +116,17 @@ async function importSingleProtocol(
 		...importedSessionMetadata,
 	];
 
-	progress.phase('protocol', 1);
+	await progress.phase('protocol', 1);
 	await storeProtocol(db, manifest, {
 		metadataGroups,
 		metadata: allMetadataKeys,
 		sessionMetadata: sessionMetadataKeys,
 		metadataOrder: manifest.metadataOrder?.map(namespaced) ?? allMetadataKeys,
 	});
-	progress.increment();
+
+	await progress.increment();
+
+	return manifest;
 }
 
 async function fetchManifest(url: string | URL): Promise<ExportedProtocol> {
@@ -150,18 +165,21 @@ function metadatasOfManifest(
 	);
 }
 
-async function countEnumOptions(metadatas: Map<string, MetadataInManifest>, progress: Progress) {
+async function countEnumOptions(
+	metadatas: Map<string, MetadataInManifest>,
+	addToTotal: (add: number) => void
+) {
 	for (const metadata of metadatas.values()) {
 		if (metadata.type !== 'enum') continue;
 
 		if (metadata.options) {
-			progress.total += metadata.options.length;
+			addToTotal(metadata.options.length);
 		}
 
 		for (const config of metadata.externalOptions ?? []) {
 			for await (const line of httpStreamLines(config.at)) {
 				if (!line.totalBytes) continue;
-				progress.total += line.totalBytes;
+				addToTotal(line.totalBytes);
 				break;
 			}
 		}
@@ -172,7 +190,7 @@ async function installEnumOptions(
 	db: DatabaseHandle,
 	id: NamespacedMetadataID,
 	metadata: Extract<MetadataInManifest, { type: 'enum' }>,
-	progress: Progress
+	incrementProgress: (by: number) => Promise<void>
 ) {
 	// TODO: _narrowableIn
 
@@ -195,12 +213,21 @@ async function installEnumOptions(
 	if (metadata.options) {
 		for (const option of metadata.options) {
 			await storeOption(option);
-			progress.increment();
+			await incrementProgress(1);
 		}
 	}
 
+	/** Maps .at to done bytes */
+	const progresses = new Map<string, number>();
 	for (const config of metadata.externalOptions ?? []) {
-		for await (const line of httpStreamProcessLines(MetadataEnumVariant, config)) {
+		progresses.set(config.at, 0);
+		for await (const line of httpStreamProcessLines(MetadataEnumVariant, config, {
+			async onProgress(doneBytes) {
+				const old = progresses.get(config.at)!;
+				await incrementProgress(doneBytes - old);
+				progresses.set(config.at, doneBytes);
+			},
+		})) {
 			if (!line.parsed) {
 				console.error(
 					`Couldn't import metadata option on line ${line.index + 1} of ${config.at}`,
@@ -311,26 +338,26 @@ class Progress {
 		public done = 0,
 		public total = 0
 	) {
-		this.#cb = () => {};
+		this.#cb = async () => {};
 	}
 
 	bind(cb: ProgressCallback) {
 		this.#cb = cb;
 	}
 
-	phase(phase: string, total: number) {
+	async phase(phase: string, total: number) {
 		this.done = 0;
 		this.phaseName = phase;
 		this.total = total;
-		this.update();
+		await this.update();
 	}
 
-	increment(by = 1) {
+	async increment(by = 1) {
 		this.done += by;
-		this.update();
+		await this.update();
 	}
 
-	update() {
-		this.#cb(this.protocolId, this.phaseName, this.done, this.total);
+	async update() {
+		await this.#cb(this.protocolId, this.phaseName, this.done, this.total);
 	}
 }

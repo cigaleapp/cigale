@@ -99,6 +99,7 @@ export const PROCEDURES = {
 			'detail?': 'string',
 		}),
 		success: type({
+			id: 'string',
 			iconsToPreload: 'string[]',
 		}),
 	},

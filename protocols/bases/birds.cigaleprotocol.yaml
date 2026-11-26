@@ -9,6 +9,8 @@ updates: automatic
 
 source: http://localhost:3000/bases/birds.cigaleprotocol.yaml
 
+usable: false
+summary: Protocole de base pour les oiseaux
 description: Protocole de base pour les oiseaux
 
 authors:

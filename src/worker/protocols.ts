@@ -15,13 +15,14 @@ swarp.importProtocol(async ({ url }, onProgress) => {
 	// TODO: iconsToPreload? or maybe we dont really need it? idk
 	const db = await openDatabase();
 
-	await importProtocol(db, url, {
-		onProgress(protocol, phase, done, total) {
-			onProgress?.({ protocol, phase, done, total });
+	const manifest = await importProtocol(db, url, {
+		async onProgress(protocol, phase, done, total) {
+			await onProgress?.({ protocol, phase, done, total });
 		},
 	});
 
 	return {
+		id: manifest.id,
 		iconsToPreload: [...iconsToPreload],
 	};
 });

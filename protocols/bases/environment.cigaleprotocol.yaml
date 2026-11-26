@@ -9,6 +9,8 @@ updates: automatic
 
 source: http://localhost:3000/bases/environment.cigaleprotocol.yaml
 
+usable: false
+summary: Protocole de base pour documenter l'environement des observations
 description: Protocole de base pour documenter l'environement des observations
 
 authors:

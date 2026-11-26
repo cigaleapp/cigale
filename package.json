@@ -59,6 +59,7 @@
 		"lint": "bunx oxlint && bunx eslint",
 		"lintfix": "bunx oxlint --fix && bunx eslint --fix",
 		"commit": "gitmoji -c",
+		"protocolregistry:start": "bunx serve --cors protocols",
 		"test": "vitest --coverage.enabled true",
 		"test:ui": "vitest --ui",
 		"test:watch": "vitest",

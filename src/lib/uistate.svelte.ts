@@ -76,7 +76,9 @@ export class UIState {
 			loadingImages: Array.from(this.loadingImages),
 			queuedImages: Array.from(this.queuedImages),
 			keybinds: mapValues(this.keybinds, (bind) =>
-				transformObject(bind, (key, value) => (key === 'do' ? undefined : [key, value]))
+				transformObject(bind, (key, value) =>
+					value instanceof Function ? undefined : [key, value]
+				)
 			),
 			currentSessionId: this.currentSessionId,
 			currentSession: this.currentSession ? omit(this.currentSession, 'metadata') : null,

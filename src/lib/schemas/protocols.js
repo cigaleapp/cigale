@@ -23,6 +23,7 @@ export const ProtocolRegistry = type({
 		name: 'string',
 		'logo?': URLString.or('null'),
 		version: 'number',
+		'summary?': 'string',
 		manifestVersion: [
 			'/^(\\d+)\\.(\\d+)$/',
 			'@',
@@ -129,6 +130,11 @@ export const CaptureTimer = type({
 export const Protocol = type({
 	manifest: '/^v\\d+\\.\\d+$/ = "v0.0"',
 	id: ProtocolID,
+	usable: type('boolean')
+		.describe(
+			"Si le protocole est destiné à être utilisé. Souvent le cas, mais pas pour les protocoles qui ne servent qu'à être importé par d'autres, par exemple"
+		)
+		.default(true),
 	dirty: type('boolean')
 		.describe('Si le protocole a été modifié depuis sa dernière exportation')
 		.default(false),

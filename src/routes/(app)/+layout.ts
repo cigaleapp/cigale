@@ -169,7 +169,7 @@ export async function load({ url }) {
 	}
 
 	if (isLocalhost()) {
-		addProtocolRegistry('http://localhost:3000', {
+		addProtocolRegistry('http://localhost:3000/registry.json', {
 			priority: Infinity,
 		});
 	}

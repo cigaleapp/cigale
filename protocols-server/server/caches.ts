@@ -6,72 +6,65 @@ import { dequal } from 'dequal';
 import { DatasourceCache } from '../lib/caching.ts';
 import config from './config.ts';
 
-// --- Cache file mutation (DELETE /api/caches/...) ---
-// The server is a separate process from the regeneration child, so removal
-// operates directly on the cache JSON files under DATA_DIR/caches/.
+type CacheStats = {
+	updatedAt: string;
+	files: Record<string, CacheFileStat>;
+};
 
-function cacheFilePath(datasource: string): string | null {
-	const resolved = path.resolve(
-		config.DATA_DIR,
-		'caches',
-		'.' + path.posix.normalize('/' + datasource) + '.json'
-	);
-	const root = path.resolve(config.DATA_DIR, 'caches');
-	if (resolved !== root && !resolved.startsWith(root + path.sep)) {
-		return null;
-	}
-	return resolved;
-}
+type CacheFileStat = {
+	datasource: string;
+	expiresAt: string | Date;
+	sizeBytes: number | null;
+	totalEntries: CacheEntryCounts;
+	queries: Record<string, CacheEntryCounts>;
+};
 
-function readCacheFile(filepath: string): DatasourceCache {
-	return JSON.parse(readFileSync(filepath, 'utf8'));
-}
-
-function writeCacheFile(filepath: string, cache: unknown) {
-	const tmp = `${filepath}.tmp`;
-	writeFileSync(tmp, JSON.stringify(cache, null, 2));
-	renameSync(tmp, filepath);
-}
+type CacheEntryCounts = { total: number; stale: number; fresh: number };
 
 // Recompute this datasource's entry in cache-stats.json after a mutation.
 function updateCacheStats(datasource: string, filepath: string | null) {
 	try {
-		const stats: { updatedAt: string; datasources: Array<Record<string, unknown>> } = (() => {
+		const stats: CacheStats = (() => {
 			try {
 				return JSON.parse(readFileSync(config.CACHE_STATS_FILE, 'utf8'));
 			} catch {
 				return { updatedAt: new Date().toISOString(), datasources: [] };
 			}
 		})();
-		const entry = filepath
-			? (() => {
-					const cache = readCacheFile(filepath);
-					const now = new Date();
-					const queries: Record<string, { total: number; stale: number; fresh: number }> =
-						{};
-					const totalEntries = { total: 0, stale: 0, fresh: 0 };
-					for (const [query, entries] of Object.entries(cache.entries)) {
-						const counts = { total: entries.length, stale: 0, fresh: 0 };
-						for (const entry of entries) {
-							if (new Date(entry.expiresAt) < now) counts.stale++;
-							else counts.fresh++;
-						}
-						queries[query] = counts;
-						totalEntries.total += counts.total;
-						totalEntries.stale += counts.stale;
-						totalEntries.fresh += counts.fresh;
-					}
-					return {
-						datasource: cache.datasource,
-						expiresAt: cache.expiresAt,
-						totalEntries,
-						queries,
-						sizeBytes: existsSync(filepath) ? statSync(filepath).size : null,
-					};
-				})()
-			: null;
-		stats.datasources = stats.datasources.filter((d) => d.datasource !== datasource);
-		if (entry) stats.datasources.push(entry);
+
+		if (filepath) {
+			const cache = readCacheFile(filepath);
+			const now = new Date();
+			const queries: Record<string, CacheEntryCounts> = {};
+			const totalEntries = { total: 0, stale: 0, fresh: 0 };
+
+			for (const [query, entries] of Object.entries(cache.entries)) {
+				const counts = { total: entries.length, stale: 0, fresh: 0 };
+				for (const entry of entries) {
+					if (new Date(entry.expiresAt) < now) counts.stale++;
+					else counts.fresh++;
+				}
+				queries[query] = counts;
+				totalEntries.total += counts.total;
+				totalEntries.stale += counts.stale;
+				totalEntries.fresh += counts.fresh;
+			}
+
+			stats.files[filepath] = {
+				datasource: cache.datasource,
+				expiresAt: cache.expiresAt,
+				sizeBytes: existsSync(filepath) ? statSync(filepath).size : null,
+				totalEntries,
+				queries,
+			};
+		} else {
+			const found = Object.entries(stats.files).find(
+				([, entry]) => entry.datasource === datasource
+			);
+
+			if (found) delete stats.files[found[0]];
+		}
+
 		stats.updatedAt = new Date().toISOString();
 		const tmp = `${config.CACHE_STATS_FILE}.tmp`;
 		writeFileSync(tmp, JSON.stringify(stats, null, 2));
@@ -171,4 +164,27 @@ export function handleCacheDelete(
 	writeCacheFile(filepath, cache);
 	updateCacheStats(datasource, filepath);
 	return Response.json({ removed: `${datasource}/${query}`, count: removed, params });
+}
+
+function cacheFilePath(datasource: string): string | null {
+	const resolved = path.resolve(
+		config.DATA_DIR,
+		'caches',
+		'.' + path.posix.normalize('/' + datasource) + '.json'
+	);
+	const root = path.resolve(config.DATA_DIR, 'caches');
+	if (resolved !== root && !resolved.startsWith(root + path.sep)) {
+		return null;
+	}
+	return resolved;
+}
+
+function readCacheFile(filepath: string): DatasourceCache {
+	return JSON.parse(readFileSync(filepath, 'utf8'));
+}
+
+function writeCacheFile(filepath: string, cache: unknown) {
+	const tmp = `${filepath}.tmp`;
+	writeFileSync(tmp, JSON.stringify(cache, null, 2));
+	renameSync(tmp, filepath);
 }

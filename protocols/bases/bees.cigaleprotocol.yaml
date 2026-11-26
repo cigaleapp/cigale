@@ -12,6 +12,8 @@ updates: automatic
 # so the protocol's source is the generated .json based on this manifest yaml file
 source: http://localhost:3000/bases/bees.cigaleprotocol.json
 
+usable: false
+summary: Protocole de base pour les abeilles
 description: Protocole de base pour les abeilles
 
 authors:

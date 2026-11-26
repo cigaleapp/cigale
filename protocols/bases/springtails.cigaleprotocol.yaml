@@ -9,6 +9,8 @@ updates: automatic
 
 source: http://localhost:3000/bases/springtails.cigaleprotocol.yaml
 
+usable: false
+summary: Protocole de base pour les collemboles
 description: Protocole de base pour les collemboles
 
 imports:

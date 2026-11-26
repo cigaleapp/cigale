@@ -14,34 +14,6 @@ let REGISTRY_URLS: URL[] = JSON.parse(import.meta.env.protocolRegistryUrls ?? '[
 	(u: string) => new URL(u)
 );
 
-export function addProtocolRegistry(
-	url: URL | string,
-	{
-		priority = -Infinity,
-	}: {
-		/** Where to place the registry URL in the array: in case of protocol ID conflicts, the later URLs take precedence. Pass Infinity to make it more important than all the others already present, and -Ininity for less priority than all already present */
-		priority?: number;
-	} = {}
-) {
-	switch (priority) {
-		case Infinity: {
-			REGISTRY_URLS.push(new URL(url));
-			break;
-		}
-		case -Infinity: {
-			REGISTRY_URLS.unshift(new URL(url));
-			break;
-		}
-		default: {
-			REGISTRY_URLS = [
-				...REGISTRY_URLS.slice(0, priority),
-				new URL(url),
-				...REGISTRY_URLS.slice(priority),
-			];
-		}
-	}
-}
-
 /**
  * Fetches all registries (each cached by URL) and merges them into a single
  * registry. Protocols sharing an `id` are deduplicated — the first registry
@@ -67,7 +39,9 @@ export async function fetchProtocolRegistries(): Promise<typeof ProtocolRegistry
 	const seen = new Set<string>();
 	const protocols = [];
 	let fetchedAny = false;
-	for (const result of results) {
+	// Since later elements in the registry urls array take precedence,
+	// and we use a seen set, we need to iterate in reverse
+	for (const result of results.toReversed()) {
 		if (result.status === 'rejected') {
 			console.warn('Failed to fetch protocol registry:', result.reason);
 			continue;
@@ -128,5 +102,33 @@ export async function* listAllProtocols(db: DatabaseHandle) {
 			compatible: manifestVersionsCompatible(p.manifestVersion),
 			protocol: { source: p.url, ...p },
 		};
+	}
+}
+
+export function addProtocolRegistry(
+	url: URL | string,
+	{
+		priority = -Infinity,
+	}: {
+		/** Where to place the registry URL in the array: in case of protocol ID conflicts, the later URLs take precedence. Pass Infinity to make it more important than all the others already present, and -Ininity for less priority than all already present */
+		priority?: number;
+	} = {}
+) {
+	switch (priority) {
+		case Infinity: {
+			REGISTRY_URLS.push(new URL(url));
+			break;
+		}
+		case -Infinity: {
+			REGISTRY_URLS.unshift(new URL(url));
+			break;
+		}
+		default: {
+			REGISTRY_URLS = [
+				...REGISTRY_URLS.slice(0, priority),
+				new URL(url),
+				...REGISTRY_URLS.slice(priority),
+			];
+		}
 	}
 }

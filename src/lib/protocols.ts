@@ -140,7 +140,7 @@ async function shareOrDownloadProtocol(
  * Asks the user to select files, then imports the protocols from those files.
  */
 export async function promptAndImportProtocol<
-	Out extends { id: string; name: string; version: number | undefined },
+	Out extends { id: string },
 	Multiple extends boolean | undefined,
 >({
 	allowMultiple = false,
@@ -155,10 +155,7 @@ export async function promptAndImportProtocol<
 	 * callback to call when the user selected files
 	 */
 	onInput?: () => void;
-	importProtocol: (input: {
-		contents: string;
-		isJSON: boolean;
-	}) => Promise<{ id: string; name: string; version: number | undefined }>;
+	importProtocol: (input: { url: string }) => Promise<unknown>;
 }): Promise<Multiple extends true ? NoInfer<Out>[] : NoInfer<Out>> {
 	const files = await promptForFiles({
 		multiple: allowMultiple,
@@ -169,38 +166,34 @@ export async function promptAndImportProtocol<
 
 	onInput();
 
-	/** @type {Array<{id: string, name: string, version: number | undefined}>}  */
-	const output: Array<{ id: string; name: string; version: number | undefined }> =
-		await Promise.all(
-			[...files].map(async (file) => {
-				console.time(`Reading file ${file.name}`);
-				const reader = new FileReader();
-				return new Promise((resolve, reject) => {
-					reader.onload = async () => {
-						if (!reader.result) throw new Error('Fichier vide');
-						if (reader.result instanceof ArrayBuffer)
-							throw new Error('Fichier binaire');
+	const output = await Promise.all(
+		[...files].map(async (file) => {
+			console.time(`Reading file ${file.name}`);
+			const reader = new FileReader();
+			return new Promise<{ id: string }>((resolve, reject) => {
+				reader.onload = async () => {
+					if (!reader.result) throw new Error('Fichier vide');
+					if (reader.result instanceof ArrayBuffer) throw new Error('Fichier binaire');
 
-						console.timeEnd(`Reading file ${file.name}`);
-						try {
-							const result = await importProtocol({
-								contents: reader.result,
-								isJSON: file.name.endsWith('.json'),
-							});
+					console.timeEnd(`Reading file ${file.name}`);
+					try {
+						const result = await importProtocol({
+							url: URL.createObjectURL(new Blob([reader.result], 'text/plain')),
+						});
 
-							const { tables } = await import('./idb.svelte.js');
-							await tables.Protocol.refresh(null);
-							await tables.Metadata.refresh(null);
+						const { tables } = await import('./idb.svelte.js');
+						await tables.Protocol.refresh(null);
+						await tables.Metadata.refresh(null);
 
-							resolve(result);
-						} catch (err) {
-							reject(err);
-						}
-					};
-					reader.readAsText(file);
-				});
-			})
-		);
+						resolve(result);
+					} catch (err) {
+						reject(err);
+					}
+				};
+				reader.readAsText(file);
+			});
+		})
+	);
 
 	return allowMultiple ? output : output[0];
 }

@@ -92,10 +92,11 @@ export async function* httpStreamProcessLines<Schema extends Type>(
  */
 export async function* httpStreamLines(
 	input: string | URL | Request,
-	{ chunkSize = 256 * 1024, fallback, ...init }: StreamRequestInit = {}
+	{ chunkSize = 256 * 1024, fallback, onProgress, ...init }: StreamRequestInit = {}
 ): AsyncGenerator<StreamedLine> {
 	const decoder = new TextDecoder();
 	let offset = 0;
+	let doneBytes = 0;
 	let carry = '';
 	const headers = new Headers(init.headers);
 
@@ -113,6 +114,7 @@ export async function* httpStreamLines(
 		headers.set('Range', `bytes=${offset}-${offset + chunkSize - 1}`);
 
 		const response = await fetch(input, { ...init, headers });
+		await onProgress?.(offset + chunkSize, total);
 		if (response.status === 416) break; // past the end of the file
 		if (response.status !== 206) {
 			if (!fallback) {
@@ -178,6 +180,8 @@ class StreamedLine<Parsed = unknown, Context = unknown> {
 	/** Total bytes count for the file this streamed line is a part of */
 	totalBytes: number | undefined;
 	offsetBytes: number | undefined;
+	/** Size in bytes of this line */
+	byteSize: number | undefined;
 	index: number;
 
 	constructor(private init: StreamedLineInit<Parsed, Context>) {
@@ -188,6 +192,7 @@ class StreamedLine<Parsed = unknown, Context = unknown> {
 		this.parsed = init.parsed;
 		this.totalBytes = init.progress?.total;
 		this.offsetBytes = init.progress?.current;
+		this.byteSize = init.byteSize;
 	}
 
 	with<P extends Parsed, C extends Context>(
@@ -225,6 +230,7 @@ type StreamedLineInit<Parsed, Context> = {
 	parsed?: Parsed | undefined;
 	/** Index of the line in the file */
 	lineIndex: number;
+	byteSize?: number | undefined;
 	progress?: {
 		total?: number | undefined;
 		current?: number | undefined;

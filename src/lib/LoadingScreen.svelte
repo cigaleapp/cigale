@@ -54,6 +54,7 @@
 		gap: 1rem;
 
 		height: 100%;
+		min-height: var(--loading-screen-min-height);
 		width: 100%;
 
 		--size: 5rem; /* Logo size */

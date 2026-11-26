@@ -1,9 +1,11 @@
 <script lang="ts">
+	import { SvelteSet } from 'svelte/reactivity';
+
 	import { plural } from '#lib/i18n.js';
-	import { openTransaction, tables } from '#lib/idb.svelte.js';
+	import { databaseHandle, tables } from '#lib/idb.svelte.js';
 	import ModalConfirmDeletion from '#lib/ModalConfirmDeletion.svelte';
-	import { isNamespacedToProtocol } from '#lib/schemas/metadata.js';
-	import { getSetting, setSetting } from '#lib/settings.svelte.js';
+	import { dependentProtocols } from '#lib/protocols/dependencies.ts';
+	import { uninstallProtocol } from '#lib/protocols/uninstall.ts';
 	import { toasts } from '#lib/toasts.svelte.js';
 
 	interface Props {
@@ -22,27 +24,30 @@
 	/**
 	 * Sessions that use this protocol
 	 */
-	const sessionsUsingProtocol = $derived(tables.Session.state.filter((s) => s.protocol === id));
-
-	// eslint-disable-next-line svelte/prefer-svelte-reactivity
-	function dependentProtocols(childProtocol: string, seen = new Set<string>()) {
-		for (const p of tables.Protocol.state) {
-			if (seen.has(p.id)) continue;
-			if (p.imports.some((imp) => imp.from === childProtocol)) {
-				seen.add(p.id);
-				dependentProtocols(p.id, seen);
-			}
-		}
-
-		return seen;
-	}
+	const sessionsUsingProtocol = $derived(
+		tables.Session.state.filter((s) => [...protocolsUsingProtocol, id].includes(s.protocol))
+	);
 
 	/**
 	 * Protocols that use this protocol
 	 */
-	const protocolsUsingProtocol = $derived(
-		removingProtocol ? [...dependentProtocols(removingProtocol.id)] : []
-	);
+	const protocolsUsingProtocol = new SvelteSet<string>();
+
+	$effect(() => {
+		if (!open || !removingProtocol) {
+			protocolsUsingProtocol.clear();
+			return;
+		}
+
+		void (async () => {
+			for (const dependant of await dependentProtocols(
+				databaseHandle(),
+				removingProtocol.id
+			)) {
+				protocolsUsingProtocol.add(dependant);
+			}
+		})();
+	});
 </script>
 
 <ModalConfirmDeletion
@@ -51,39 +56,17 @@
 	key="modal_delete_protocol"
 	typeToConfirm={removingProtocol?.name}
 	consequences={[
+		[...protocolsUsingProtocol].map(
+			(id) => `La suppression du protocole ${tables.Protocol.getFromState(id)?.name ?? id}`
+		),
 		plural(sessionsUsingProtocol.length, [
 			"L'impossibilité d'utiliser 1 session",
 			"L'impossibilité d'utiliser # sessions",
 		]),
-		...protocolsUsingProtocol.map(
-			(id) => `La suppression du protocole ${tables.Protocol.getFromState(id)?.name ?? id}`
-		),
 	]}
 	onconfirm={async () => {
-		await openTransaction(['Protocol', 'Metadata', 'MetadataOption'], {}, async (tx) => {
-			if (!removingProtocol) return;
-
-			tx.objectStore('Protocol').delete(removingProtocol.id);
-			protocolsUsingProtocol.forEach((p) => tx.objectStore('Protocol').delete(p));
-
-			const toRemove = removingProtocol.metadata.filter(
-				(id) => removingProtocol && isNamespacedToProtocol(removingProtocol.id, id)
-			);
-
-			const options = await tx.objectStore('MetadataOption').getAll();
-
-			for (const metadata of toRemove) {
-				tx.objectStore('Metadata').delete(metadata);
-				options
-					.filter((o) => o.id.startsWith(`${metadata}:`))
-					.forEach((o) => tx.objectStore('MetadataOption').delete(o.id));
-			}
-		});
-
-		const autoUpdates = await getSetting('autoUpdateProtocols');
-		delete autoUpdates[id];
-		await setSetting('autoUpdateProtocols', autoUpdates);
-
+		if (!removingProtocol) return;
+		await uninstallProtocol(db, removingProtocol.id);
 		toasts.success('Protocole supprimé');
 		ondelete?.();
 	}}

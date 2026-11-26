@@ -143,6 +143,11 @@ export async function sendNotification(
 					{
 						title,
 						body: options.body ?? '',
+						// Asks for a "set timers and alarams" permissions otherwise.
+						// for now we don't need it.
+						// Maybe for passive timers with time range (within),
+						// we'll need it tho? (for like, reminders 5 mins before or something)
+						isExactNotification: false,
 						// Needs to be a Java (signed, 32-bit) Int, so max. 2^(32-1)
 						id: millisecondsToSeconds(Date.now()),
 						// TODO: put an actual icon here
