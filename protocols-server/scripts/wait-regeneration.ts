@@ -17,6 +17,7 @@ const jobStartedAt = process.env.JOB_STARTED_AT;
 const repo = process.env.GITHUB_REPOSITORY;
 const sha = process.env.GITHUB_SHA;
 const totalWaitMinutes = Number(process.env.TOTAL_WAIT_MINUTES ?? 120);
+const serverPassword = process.env.SERVER_PASSWORD;
 
 if (!serverUrl) throw new Error('SERVER_URL is required');
 if (!jobStartedAt) throw new Error('JOB_STARTED_AT is required');
@@ -148,7 +149,11 @@ status = final.state;
 current = isCurrent(final.startedAt);
 
 console.info('Logs:');
-const logsRes = await fetch(final.logs_url);
+const logsRes = await fetch(final.logs_url, {
+	headers: {
+		Authorization: `Bearer ${serverPassword}`,
+	},
+});
 if (!logsRes.ok) throw new Error(`GET ${final.logs_url} failed: ${logsRes.status}`);
 console.info(await logsRes.text());
 
