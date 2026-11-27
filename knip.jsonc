@@ -7,7 +7,6 @@
 				"scripts/issue-creator-discord-bot.ts",
 				// TODO add to a CI workflow
 				"scripts/generate-contributing-tables.js",
-				"scripts/add-metadata-from-xper3.ts",
 				"scripts/create-idmybee-protocol.ts",
 				"src/electron/main.{d.ts,js}",
 				"forge.env.d.ts",
