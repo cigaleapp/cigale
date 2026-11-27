@@ -1,0 +1,1 @@
+import{n as e}from"../chunks/COiEfhsA.js";import{Kt as t}from"../chunks/DMBIL8Qk.js";import{t as n}from"../chunks/1j5kYmK0.js";var r=e({load:()=>i});async function i(){return{db:await t()}}export{n as component,r as universal};

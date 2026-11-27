@@ -1,0 +1,2 @@
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["./KbgSx_3t.js","./DKoKL3MK.js"])))=>i.map(i=>d[i]);
+import{s as e}from"./DKoKL3MK.js";import{t}from"./CCMZs0eX.js";var n=e(`App`,{web:()=>t(()=>import(`./KbgSx_3t.js`).then(e=>new e.AppWeb),__vite__mapDeps([0,1]),import.meta.url)});export{n as t};

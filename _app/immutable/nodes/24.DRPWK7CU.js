@@ -1,0 +1,1 @@
+import"../chunks/CkztHyVL.js";import{J as e,X as t,m as n,tn as r}from"../chunks/BgCa3QkA.js";import{t as i}from"../chunks/BZHTsTfb.js";var a=t(`<button>feur</button>`);function o(t){i(t,{items:[{label:`Feur`,items:[{key:`item`,label:`Item`}]}],trigger:(t,i=r)=>{var o=a();n(o,()=>({...i()})),e(t,o)},$$slots:{trigger:!0}})}export{o as component};
