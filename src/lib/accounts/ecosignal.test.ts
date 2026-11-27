@@ -51,13 +51,14 @@ test('.compatibleWith', () => {
 
 describe('#sessionPage', () => {
 	// Pure: no network or db access, so no msw/mockstate/fake-indexeddb needed.
-	// resolveMetadataImportBare('crop', 'with.ecosignal') → 'with.ecosignal__crop'
-	// when the protocol has no importedMetadata, per namespacing.ts.
+	// resolveMetadataId(protocol, 'crop') → 'with.ecosignal__crop' when the
+	// protocol has a matching metadata entry, per namespacing.ts.
 
 	test('builds the dashboard URL for a linked session', () => {
 		const provider = createProvider();
 		const protocol = {
 			id: 'with.ecosignal',
+			metadata: ['with.ecosignal__crop'],
 			remote: { ecosignal: { domains: MOCK_DOMAIN, project: 7, crop: 'crop' } },
 		} as never;
 		const session = { remoteId: '/api/v1/collections/42' } as never;
@@ -288,7 +289,11 @@ describe('db-dependent', () => {
 	 * exact schema in protocols.js (domains, project, crop are required; sites,
 	 * label, confirmedStatus are optional/defaulted). */
 	async function setupProtocols(
-		...protocols: Array<Pick<(typeof DB.Schemas.Protocol)['inferIn'], 'id' | 'remote'>>
+		...protocols: Array<
+			Pick<(typeof DB.Schemas.Protocol)['inferIn'], 'id' | 'remote'> & {
+				metadata?: string[];
+			}
+		>
 	) {
 		const db = await openDatabase();
 		for (const p of protocols) {
@@ -297,7 +302,7 @@ describe('db-dependent', () => {
 				name: `Testing protocol #${p.id}`,
 				description: '',
 				authors: [],
-				metadata: [],
+				metadata: p.metadata ?? [],
 			});
 		}
 		return db;
@@ -447,6 +452,7 @@ describe('db-dependent', () => {
 		const protocolNoSites = {
 			id: 'with.ecosignal',
 			name: 'Test protocol',
+			metadata: ['with.ecosignal__crop'],
 			sessionMetadata: [],
 			remote: { ecosignal: { domains: MOCK_DOMAIN, project: 1, crop: 'crop' } },
 		} as never;
@@ -511,6 +517,7 @@ describe('db-dependent', () => {
 			const protocolWithSites = {
 				id: 'with.ecosignal',
 				name: 'Test protocol',
+				metadata: ['with.ecosignal__crop', 'with.ecosignal__siteName'],
 				sessionMetadata: [],
 				remote: {
 					ecosignal: {
@@ -609,6 +616,7 @@ describe('db-dependent', () => {
 				{ id: 'not.ecosignal' },
 				{
 					id: 'with.ecosignal',
+					metadata: ['with.ecosignal__crop'],
 					remote: { ecosignal: { domains: MOCK_DOMAIN, project: 1, crop: 'crop' } },
 				}
 			);
@@ -643,6 +651,7 @@ describe('db-dependent', () => {
 		test('.sync replaces stale local data for an already-downloaded session', async () => {
 			await setupProtocols({
 				id: 'with.ecosignal',
+				metadata: ['with.ecosignal__crop'],
 				remote: { ecosignal: { domains: MOCK_DOMAIN, project: 1, crop: 'crop' } },
 			});
 			seedDownloadableCollection();

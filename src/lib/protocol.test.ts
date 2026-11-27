@@ -19,7 +19,7 @@ const mocked = vi.hoisted(() => ({
 
 vi.mock(import('#lib/protocols/registry.js'), async (original) => ({
 	...(await original()),
-	fetchProtocolRegistries: async () => mocked.registry!,
+	fetchProtocolsFromRegistries: async () => mocked.registry!.protocols,
 }));
 
 function mockRegistry(registry: (typeof ProtocolRegistry)['inferIn']) {
@@ -152,9 +152,10 @@ test('toExportedProtocol', async () => {
 	expect(exported).toEqual({
 		...pick(protocol, 'id', 'name', 'version', 'description', 'authors', 'updates'),
 		summary: '',
-		importedMetadata: [],
-		importedMetadataGroups: [],
-		metadataGroups: {},
+		manifest: 'v0.0',
+		imports: [],
+		metadataGroups: [],
+		usable: true,
 		sessionMetadata: {
 			protocol1__meta3: {
 				label: 'Metadata 3',
@@ -312,7 +313,12 @@ describe('compareProtocolWithUpstream', () => {
 					summary: '',
 					version: 1,
 					updates: 'automatic',
+					manifest: 'v0.0',
+					imports: [],
+					metadataGroups: [],
+					usable: true,
 					metadata: {},
+					sessionMetadata: {},
 					authors: [],
 					description: 'A test protocol',
 					source: 'https://example.com/protocol.json',
@@ -462,6 +468,11 @@ describe('compareProtocolWithUpstream', () => {
 						summary: '',
 						version: 2,
 						updates: 'automatic',
+						manifest: 'v0.0',
+						imports: [],
+						metadataGroups: [],
+						usable: true,
+						sessionMetadata: {},
 						crop: {
 							padding: '0px',
 						},
@@ -701,17 +712,22 @@ describe('hasUpgradeAvailable', () => {
 					name: '',
 					url: 'https://example.com/protocol.json',
 					suggested: true,
+					manifestVersion: '1.0',
+					older: [],
 				},
 			],
 		});
 
 		const result = await hasUpgradeAvailable({
 			version: 1,
-			source: 'https://example.com/protocol.json',
 			id: 'mon-protocole',
 		});
 
-		expect(result).toEqual({ upToDate: false, newVersion: 2 });
+		expect(result).toEqual({
+			upToDate: false,
+			upateIsCompatible: true,
+			newVersion: 2,
+		});
 	});
 
 	test('should return upToDate: true if the version is the same', async () => {
@@ -722,42 +738,33 @@ describe('hasUpgradeAvailable', () => {
 					version: 1,
 					name: '',
 					url: 'https://example.com/protocol.json',
+					manifestVersion: '1.0',
+					older: [],
 				},
 			],
 		});
 
 		const result = await hasUpgradeAvailable({
 			version: 1,
-			source: 'https://example.com/protocol.json',
 			id: 'mon-protocole',
 		});
 
-		expect(result).toEqual({ upToDate: true, newVersion: 1 });
+		expect(result).toEqual({
+			upToDate: true,
+			upateIsCompatible: true,
+			newVersion: 1,
+		});
 	});
 
-	test('should throw an error if the protocol ID is different', async () => {
+	test('should throw an error if the protocol is not in the registry', async () => {
 		mockRegistry({ protocols: [] });
-
-		const fetch = vi.fn(async (url) => ({
-			url,
-			text: async () =>
-				JSON.stringify({
-					version: 2,
-					id: 'autre-protocole',
-				}),
-		}));
-
-		vi.stubGlobal('fetch', fetch);
 
 		await expect(
 			hasUpgradeAvailable({
 				version: 1,
-				source: 'https://example.com/protocol.json',
 				id: 'mon-protocole',
 			})
-		).rejects.toThrowErrorMatchingInlineSnapshot(
-			`[Error: Le protocole a changé d'identifiant]`
-		);
+		).rejects.toThrowErrorMatchingInlineSnapshot(`[Error: Protocole introuvable]`);
 	});
 
 	test('should throw an error if the remote protocol has no version', async () => {
@@ -767,6 +774,9 @@ describe('hasUpgradeAvailable', () => {
 					url: 'https://example.com/protocol.json',
 					name: '',
 					id: 'mon-protocole',
+					version: 0,
+					manifestVersion: '1.0',
+					older: [],
 				},
 			],
 		});
@@ -774,21 +784,9 @@ describe('hasUpgradeAvailable', () => {
 		await expect(
 			hasUpgradeAvailable({
 				version: 1,
-				source: 'https://example.com/protocol.json',
 				id: 'mon-protocole',
 			})
 		).rejects.toThrowErrorMatchingInlineSnapshot(`[Error: Le protocole n'a plus de version]`);
-	});
-
-	test('should throw an error if the protocol has no source', async () => {
-		await expect(
-			// @ts-expect-error testing an error case
-			hasUpgradeAvailable({
-				version: 1,
-				source: undefined,
-				id: 'mon-protocole',
-			})
-		).rejects.toThrowErrorMatchingInlineSnapshot(`[Error: Le protocole n'a pas de source]`);
 	});
 
 	test('should throw an error if the local protocol has no version', async () => {
