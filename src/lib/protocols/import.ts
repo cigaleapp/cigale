@@ -15,14 +15,7 @@ import {
 } from '#lib/schemas/metadata.js';
 import { ExportedProtocol } from '#lib/schemas/protocols.js';
 import { recomputeSearchIndex } from '#lib/search.ts';
-import { entries, mapKeys, parseYAMLorJSON } from '#lib/utils.ts';
-
-type ProgressCallback = (
-	protocol: string,
-	phase: string,
-	done: number,
-	total: number
-) => Promise<void>;
+import { entries, mapKeys, parseYAMLorJSON, progressSplitter } from '#lib/utils.ts';
 
 class DependsOnOtherProtocolError extends Error {
 	constructor(public protocolIds: string[]) {
@@ -324,12 +317,15 @@ async function storeProtocol(
 class Progress {
 	#cb: ProgressCallback;
 
+	progresses = new Map<ProtocolImportPhase, [done: number, total: number]>();
+
 	constructor(
 		public protocolId: string,
-		public phaseName = '',
+		public phaseName: ProtocolImportPhase = 'start',
 		public done = 0,
 		public total = 0
 	) {
+		this.progresses.set(phaseName, [done, total]);
 		this.#cb = async () => {};
 	}
 
@@ -337,7 +333,7 @@ class Progress {
 		this.#cb = cb;
 	}
 
-	async phase(phase: string, total: number) {
+	async phase(phase: ProtocolImportPhase, total: number) {
 		this.done = 0;
 		this.phaseName = phase;
 		this.total = total;
@@ -349,11 +345,50 @@ class Progress {
 		await this.update();
 	}
 
-	async update() {
-		const progress = this.done / this.total;
-		if (Number.isNaN(progress)) return;
-		if (!Number.isFinite(progress)) return;
+	progressPhasesLayout = [
+		'start',
+		0,
+		'get-manifest',
+		0.02,
+		'check-imports',
+		0.02,
+		'metadata-options',
+		0.6,
+		'metadata',
+		0.3,
+		'resolve-imported-items',
+		0.01,
+		'protocol',
+		0.05,
+	] satisfies Array<number | ProtocolImportPhase>;
 
-		await this.#cb(this.protocolId, this.phaseName, this.done, this.total);
+	get globalProgress() {
+		const progress = this.done / this.total;
+		if (Number.isNaN(progress)) return 0;
+		if (!Number.isFinite(progress)) return 0;
+		const splitter = progressSplitter(...this.progressPhasesLayout);
+		return splitter(this.phaseName, progress);
+	}
+
+	async update() {
+		await this.#cb(this.protocolId, this.phaseName, this.globalProgress, 1);
 	}
 }
+
+type ProgressCallback = (
+	protocol: string,
+	phase: ProtocolImportPhase,
+	/** Global done count accross all phases */
+	done: number,
+	/** Global total count accross all phases */
+	total: number
+) => Promise<void>;
+
+export type ProtocolImportPhase =
+	| 'start'
+	| 'get-manifest'
+	| 'check-imports'
+	| 'metadata-options'
+	| 'metadata'
+	| 'resolve-imported-items'
+	| 'protocol';
