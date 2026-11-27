@@ -89,7 +89,7 @@ export const PROCEDURES = {
 	},
 	importProtocol: {
 		input: type({
-			url: 'string.url',
+			url: 'string.url | URL',
 		}),
 		progress: type({
 			protocol: 'string',

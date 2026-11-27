@@ -4,14 +4,16 @@
 
 	import { providers } from '#lib/accounts/registry.js';
 	import ButtonIcon from '#lib/ButtonIcon.svelte';
+	import ButtonSecondary from '#lib/ButtonSecondary.svelte';
 	import Datetime from '#lib/Datetime.svelte';
 	import { plural } from '#lib/i18n.js';
 	import { countByIndex, databaseHandle, listByIndex, tables } from '#lib/idb.svelte.js';
 	import { loadPreviewImage } from '#lib/images.js';
 	import { defineKeyboardShortcuts } from '#lib/keyboard.svelte.js';
+	import LoadingScreen from '#lib/LoadingScreen.svelte';
 	import LoadingText from '#lib/LoadingText.svelte';
 	import { IsMobile } from '#lib/mobile.svelte.js';
-	import { goto } from '#lib/paths.js';
+	import { goto, } from '#lib/paths.js';
 	import { seo } from '#lib/seo.svelte.js';
 	import { switchSession } from '#lib/sessions.js';
 	import { getSettings, isDebugMode } from '#lib/settings.svelte.js';
@@ -64,164 +66,179 @@
 	{/snippet}
 </TopbarHome>
 
-<main in:fade={{ duration: 100 }}>
-	<Header />
+{#if tables.Session.state.length === 0 && tables.Protocol.state.length === 0}
+	<main in:fade={{ duration: 100 }}>
+		<LoadingScreen>
+			{#snippet empty()}
+				Aucun protocole n'est installé
+				<ButtonSecondary loading onclick={async () => goto('/(app)/protocols')}>
+					Installer
+				</ButtonSecondary>
+			{/snippet}
+		</LoadingScreen>
+	</main>
+{:else}
+	<main in:fade={{ duration: 100 }}>
+		<Header />
 
-	<section class="sessions" data-scrollable="true">
-		{#if directory.platform === 'local'}
-			<div class="cards" in:fade={{ duration: 200 }}>
-				{#key directory}
-					<Cards
-						create={createSession}
-						sessions={tables.Session.state.filter(
-							(ses) => !directory.protocol || ses.protocol === directory.protocol
-						)}
-						card={(session) => ({
-							highlighted: uiState.currentSessionId === session.id,
-							tooltip: 'Ouvrir la session',
-							loading: 'Ouverture…',
-							async onclick() {
-								await switchSession(session.id);
-								// Get number of images in the session to decide which tab to open on
-								const imagesCount = await countByIndex(
-									'Image',
-									'sessionId',
-									session.id
-								);
-								if (imagesCount > 0) {
-									await goto('/(app)/(sidepanel)/import');
-								} else {
-									await goto('/(app)/sessions/[id]', session);
-								}
-							},
-						})}
-						thumbnails={async function* ({ id }) {
-							const images = await listByIndex('Image', 'sessionId', id);
-
-							const firstUniqueFileIds = [
-								...new Set(images.map((image) => image.fileId).filter(nonnull)),
-							].slice(0, 4);
-
-							for (const fileId of firstUniqueFileIds) {
-								if (uiState.hasPreviewURL(fileId)) {
-									yield uiState.getPreviewURL(fileId)!;
-									continue;
-								}
-
-								await loadPreviewImage(fileId, 'global');
-								yield uiState.getPreviewURL(fileId)!;
-							}
-						}}
-					>
-						{#snippet subtitle({ id, createdAt })}
-							<LoadingText
-								mask="# images"
-								value={async () =>
-									listByIndex('Image', 'sessionId', id).then(
-										(images) => images.length
-									)}
-							>
-								{#snippet loaded(count)}
-									{plural(count, ['# image', '# images'])}
-								{/snippet}
-							</LoadingText>
-							· <Datetime parts="date" show="absolute" value={createdAt} />
-						{/snippet}
-					</Cards>
-				{/key}
-			</div>
-		{:else if account}
-			{#key directory}
+		<section class="sessions" data-scrollable="true">
+			{#if directory.platform === 'local'}
 				<div class="cards" in:fade={{ duration: 200 }}>
-					<Cards
-						cache={{
-							key: `${directory.platform}:${directory.account}`,
-							entries: sessionsCache,
-						}}
-						sessions={async function* (cursor: string | undefined) {
-							for await (const session of account.sessions({
-								cursor,
-								protocol: directory.protocol,
-							})) {
-								if ('total' in session) {
-									yield session;
-									continue;
+					{#key directory}
+						<Cards
+							create={createSession}
+							sessions={tables.Session.state.filter(
+								(ses) => !directory.protocol || ses.protocol === directory.protocol
+							)}
+							card={(session) => ({
+								highlighted: uiState.currentSessionId === session.id,
+								tooltip: 'Ouvrir la session',
+								loading: 'Ouverture…',
+								async onclick() {
+									await switchSession(session.id);
+									// Get number of images in the session to decide which tab to open on
+									const imagesCount = await countByIndex(
+										'Image',
+										'sessionId',
+										session.id
+									);
+									if (imagesCount > 0) {
+										await goto('/(app)/(sidepanel)/import');
+									} else {
+										await goto('/(app)/sessions/[id]', session);
+									}
+								},
+							})}
+							thumbnails={async function* ({ id }) {
+								const images = await listByIndex('Image', 'sessionId', id);
+
+								const firstUniqueFileIds = [
+									...new Set(images.map((image) => image.fileId).filter(nonnull)),
+								].slice(0, 4);
+
+								for (const fileId of firstUniqueFileIds) {
+									if (uiState.hasPreviewURL(fileId)) {
+										yield uiState.getPreviewURL(fileId)!;
+										continue;
+									}
+
+									await loadPreviewImage(fileId, 'global');
+									yield uiState.getPreviewURL(fileId)!;
 								}
-
-								const local = tables.Session.state.find(
-									(s) => s.remoteId === session.id
-								);
-
-								yield {
-									...session,
-									local,
-									downloaded: Boolean(local),
-								};
-							}
-						}}
-						thumbnails={async function* (session) {
-							if (!session.thumbnails.length) return;
-
-							const yielded = new Set<string>();
-
-							for (const thumb of session.thumbnails) {
-								const url = await account.thumbnail(thumb);
-								if (!yielded.has(thumb.href)) yield url.href;
-								yielded.add(thumb.href);
-								if (yielded.size >= 4) break;
-							}
-						}}
-						card={(session) => ({
-							tooltip: isDebugMode()
-								? `id: ${session.id}; local: ${session.local?.id}`
-								: session.local
-									? 'Ouvrir'
-									: 'Télécharger',
-							loading: session.local ? 'Ouverture…' : 'Téléchargement…',
-							highlighted: false,
-							async onclick(_, mutator) {
-								let id = session.local?.id;
-								if (!session.local) {
-									id = await downloadRemoteSession({
-										account,
-										session,
-										mutator,
-									}).catch((e) => {
-										console.error(e);
-										toasts.error(
-											`Impossible de télécharger ${session.name}`,
-											e
-										);
-
-										return undefined;
-									});
-								}
-								if (!id) return;
-								await switchSession(id);
-								await goto('/(app)/(sidepanel)/import');
-							},
-						})}
-					>
-						{#snippet subtitle({ submittedAt, mediaCount = 0, submittedBy })}
-							{#if providers.get(directory.platform)?.capabilities.includes('media')}
-								{#if mediaCount}
-									{plural(mediaCount, ['# média', '# médias'])}
-								{:else}
-									Aucun média
-								{/if}
-								·
-							{/if}
-							<Datetime parts="date" show="absolute" value={submittedAt} />
-							{#if submittedBy}
-								· par {submittedBy}
-							{/if}
-						{/snippet}
-					</Cards>
+							}}
+						>
+							{#snippet subtitle({ id, createdAt })}
+								<LoadingText
+									mask="# images"
+									value={async () =>
+										listByIndex('Image', 'sessionId', id).then(
+											(images) => images.length
+										)}
+								>
+									{#snippet loaded(count)}
+										{plural(count, ['# image', '# images'])}
+									{/snippet}
+								</LoadingText>
+								· <Datetime parts="date" show="absolute" value={createdAt} />
+							{/snippet}
+						</Cards>
+					{/key}
 				</div>
-			{/key}
-		{/if}
-	</section>
-</main>
+			{:else if account}
+				{#key directory}
+					<div class="cards" in:fade={{ duration: 200 }}>
+						<Cards
+							cache={{
+								key: `${directory.platform}:${directory.account}`,
+								entries: sessionsCache,
+							}}
+							sessions={async function* (cursor: string | undefined) {
+								for await (const session of account.sessions({
+									cursor,
+									protocol: directory.protocol,
+								})) {
+									if ('total' in session) {
+										yield session;
+										continue;
+									}
+
+									const local = tables.Session.state.find(
+										(s) => s.remoteId === session.id
+									);
+
+									yield {
+										...session,
+										local,
+										downloaded: Boolean(local),
+									};
+								}
+							}}
+							thumbnails={async function* (session) {
+								if (!session.thumbnails.length) return;
+
+								const yielded = new Set<string>();
+
+								for (const thumb of session.thumbnails) {
+									const url = await account.thumbnail(thumb);
+									if (!yielded.has(thumb.href)) yield url.href;
+									yielded.add(thumb.href);
+									if (yielded.size >= 4) break;
+								}
+							}}
+							card={(session) => ({
+								tooltip: isDebugMode()
+									? `id: ${session.id}; local: ${session.local?.id}`
+									: session.local
+										? 'Ouvrir'
+										: 'Télécharger',
+								loading: session.local ? 'Ouverture…' : 'Téléchargement…',
+								highlighted: false,
+								async onclick(_, mutator) {
+									let id = session.local?.id;
+									if (!session.local) {
+										id = await downloadRemoteSession({
+											account,
+											session,
+											mutator,
+										}).catch((e) => {
+											console.error(e);
+											toasts.error(
+												`Impossible de télécharger ${session.name}`,
+												e
+											);
+
+											return undefined;
+										});
+									}
+									if (!id) return;
+									await switchSession(id);
+									await goto('/(app)/(sidepanel)/import');
+								},
+							})}
+						>
+							{#snippet subtitle({ submittedAt, mediaCount = 0, submittedBy })}
+								{#if providers
+									.get(directory.platform)
+									?.capabilities.includes('media')}
+									{#if mediaCount}
+										{plural(mediaCount, ['# média', '# médias'])}
+									{:else}
+										Aucun média
+									{/if}
+									·
+								{/if}
+								<Datetime parts="date" show="absolute" value={submittedAt} />
+								{#if submittedBy}
+									· par {submittedBy}
+								{/if}
+							{/snippet}
+						</Cards>
+					</div>
+				{/key}
+			{/if}
+		</section>
+	</main>
+{/if}
 
 <style>
 	main {
@@ -230,6 +247,7 @@
 		grid-template-rows: max-content 1fr;
 		gap: 1rem;
 		padding: 0 1.2rem;
+		--loading-screen-min-height: 80vh;
 	}
 
 	section.sessions {

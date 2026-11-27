@@ -350,6 +350,10 @@ class Progress {
 	}
 
 	async update() {
+		const progress = this.done / this.total;
+		if (Number.isNaN(progress)) return;
+		if (!Number.isFinite(progress)) return;
+
 		await this.#cb(this.protocolId, this.phaseName, this.done, this.total);
 	}
 }

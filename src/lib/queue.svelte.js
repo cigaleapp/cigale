@@ -51,6 +51,8 @@ class ProcessingQueue {
 		});
 
 		$effect(() => {
+			// Floods the logs in that case...
+			if (uiState.processing.total > 1_000) return;
 			this.log(null, 'Progress is', uiState.processing.done, '/', uiState.processing.total);
 		});
 	}

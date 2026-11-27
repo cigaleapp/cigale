@@ -155,10 +155,12 @@
 					{@render row(entry)}
 				{/each}
 
-				<section class="divider">
-					<hr />
-					<h2>Non installés</h2>
-				</section>
+				{#if installed.length > 0}
+					<section class="divider">
+						<hr />
+						<h2>Non installés</h2>
+					</section>
+				{/if}
 
 				{#each notinstalled as entry (entry.protocol.id)}
 					{@render row(entry)}
@@ -188,7 +190,6 @@
 										url: source,
 									},
 									({ done, total, ...rest }) => {
-										console.log(done, total, rest);
 										onProgress?.(done / total);
 										uiState.processing.task = 'install-protocol';
 										uiState.processing.done = done;
