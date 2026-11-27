@@ -6,4 +6,4 @@ export type MetadataEnumVariant = NonNullable<
 	ExportedProtocol['metadata'][string]['options']
 >[number];
 
-export type Metadata = ExportedProtocol['metadata'][string] & { id: string };
+export type Metadata = ExportedProtocol['metadata'][string] & { key: string };

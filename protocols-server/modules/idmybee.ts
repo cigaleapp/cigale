@@ -193,7 +193,7 @@ export class IDMyBeeDescriptors extends WithSDD implements MetadataProvider {
 		const { Label, Detail, MediaObject } = character.Representation;
 
 		return {
-			id: characterMetadataKey(character),
+			key: characterMetadataKey(character),
 			label: Label,
 			group: 'andrena',
 			mergeMethod: 'none',

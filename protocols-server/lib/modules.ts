@@ -1,5 +1,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 
+import { omit } from 'es-toolkit';
+
 import { ExportedProtocol, Metadata, MetadataEnumVariant } from './types.js';
 
 export type ModuleName =
@@ -138,7 +140,7 @@ export async function writeMetadataToProtocol(id: string, ...metadata: Metadata[
 				...manifest,
 				metadata: {
 					...manifest.metadata,
-					...Object.fromEntries(metadata.map((m) => [m.id, m] as const)),
+					...Object.fromEntries(metadata.map((m) => [m.key, omit(m, ['key'])] as const)),
 				},
 			},
 			null,

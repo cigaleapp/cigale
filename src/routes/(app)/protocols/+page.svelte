@@ -197,6 +197,9 @@
 
 								await tables.Protocol.refresh(null);
 								await tables.Metadata.refresh(null);
+							} catch (e) {
+								console.error(e)
+								toasts.error(e, `Impossible d'installer ${source}`);
 							} finally {
 								reloadProtocols++;
 								await uiState.processing.finish();
