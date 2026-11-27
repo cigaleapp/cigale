@@ -156,15 +156,17 @@
 					{@render row(entry)}
 				{/each}
 
-				{#if notinstalled.length > 0 && installed.length > 0}
-					<section class="divider">
-						<hr />
-						<h2>Non installés</h2>
-					</section>
-				{/if}
+				<section class="divider">
+					<hr />
+					<h2>Non installés</h2>
+				</section>
 
 				{#each notinstalled as entry}
 					{@render row(entry)}
+				{:else}
+					<li class="empty">
+						<LoadingScreen empty="Tout est installé!" />
+					</li>
 				{/each}
 
 				{#snippet row({ protocol: p, installed, compatible })}
@@ -198,7 +200,7 @@
 								await tables.Protocol.refresh(null);
 								await tables.Metadata.refresh(null);
 							} catch (e) {
-								console.error(e)
+								console.error(e);
 								toasts.error(e, `Impossible d'installer ${source}`);
 							} finally {
 								reloadProtocols++;
@@ -300,5 +302,10 @@
 	hr {
 		border: none;
 		border-top: 1px solid var(--gray);
+	}
+
+	li.empty {
+		--loading-screen-min-height: 12rem;
+		height: var(--loading-screen-min-height);
 	}
 </style>
