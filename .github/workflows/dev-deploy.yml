@@ -10,10 +10,6 @@ env:
 on:
   workflow_call:
     secrets:
-      DEV_DEPLOYMENTS_SSH_PRIVATE_KEY:
-        required: true
-      DEV_DEPLOYMENTS_HOST_KEY:
-        required: true
       DATATERRA_DEV_DEPLOYS_BUCKET_KEY_ID:
         required: true
       DATATERRA_DEV_DEPLOYS_BUCKET_KEY_SECRET:
@@ -31,7 +27,7 @@ on:
       environment-url-append:
         type: string
         description: Suffix to append to the environment URL
-        default: ''
+        default: ""
       subdomain:
         type: string
         description: Subdomain of the dev deployments domain to upload to
@@ -43,7 +39,7 @@ on:
       artifact-at:
         type: string
         description: Path inside the artifact to upload. Must start with a slash. Defaults to root of the artifact. Must begin WITH a slash and NOT end with a slash.
-        default: ''
+        default: ""
       path:
         type: string
         description: Path to put the contents at. Must start with a slash
@@ -51,7 +47,7 @@ on:
       file:
         type: string
         description: File to be renamed to index.html before uploading.
-        default: 'index.html'
+        default: "index.html"
       clear:
         type: boolean
         default: true
@@ -72,9 +68,12 @@ jobs:
     # name: Deploy to cigale-dev-biodimedia-data-terra.ai.meso.umontpellier.fr/${{ inputs.subdomain }}${{ inputs.path }}
     name: ${{ inputs.job }}
     environment:
-      name: '${{ github.event.pull_request.number || github.ref_name }}: ${{ inputs.environment }}'
+      name: "${{ github.event.pull_request.number || github.ref_name }}: ${{ inputs.environment }}"
       url: https://cigale-dev-biodimedia-data-terra.ai.meso.umontpellier.fr/${{ inputs.subdomain }}${{ inputs.path }}${{ inputs.environment-url-append }}
     steps:
+      - name: Setup Rclone
+        uses: AnimMouse/setup-rclone@v1
+
       - name: Get the archive
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
@@ -99,54 +98,6 @@ jobs:
 
           echo Injected live-check comment into to-upload/index.html:
           tail -n 3 to-upload/index.html
-      - name: Create SSH identity
-        env:
-          PRIVATE_KEY: ${{ secrets.DEV_DEPLOYMENTS_SSH_PRIVATE_KEY }}
-          USERNAME: cigale
-          HOST_KEY: ${{ secrets.DEV_DEPLOYMENTS_HOST_KEY }}
-        run: |
-          key=~/.ssh/dev-deployments-key
-
-          echo Recreating keypair from private key...
-          mkdir -p $(dirname $key)
-          echo "$PRIVATE_KEY" > $key
-          chmod 600 $key
-          ssh-keygen -f $key -y > $key.pub
-          echo Public key is $(cat $key.pub)
-
-          cat <<EOF > ~/.ssh/config
-            Host dev-deployments
-              HostName $HOST
-              User $USERNAME
-              IdentityFile $key
-          EOF
-          echo Wrote config file: $(cat ~/.ssh/config)
-
-          echo Adding server host key to known_hosts...
-          echo "$HOST $HOST_KEY" >> ~/.ssh/known_hosts
-
-          echo Setting up SSH connection to server...
-          ssh -vT dev-deployments "echo OK"
-      - name: Transfer to server over SSH
-        env:
-          CLEAR: ${{ inputs.clear }}
-        run: |
-          set -x
-          path="www/${{ inputs.subdomain }}${{ inputs.path }}"
-          rsync_flags="-avz --progress"
-
-          if [[ "$CLEAR" == "true" ]]; then
-            # Clean directory
-            ssh dev-deployments "rm -rf $path"
-          fi
-
-          ssh dev-deployments "mkdir -p $path"
-
-          # Upload
-          rsync $rsync_flags to-upload/ "dev-deployments:$path"
-
-      - name: Setup Rclone
-        uses: AnimMouse/setup-rclone@v1
 
       - name: Upload to Data Terra S3 bucket
         env:
