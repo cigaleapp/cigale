@@ -189,7 +189,7 @@
 									{
 										url: source,
 									},
-									({ done, total, ...rest }) => {
+									({ done, total }) => {
 										onProgress?.(done / total);
 										uiState.processing.task = 'install-protocol';
 										uiState.processing.done = done;
