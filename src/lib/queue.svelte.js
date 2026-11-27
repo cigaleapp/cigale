@@ -29,6 +29,12 @@ let processingQueue;
 
 class ProcessingQueue {
 	/**
+	 * Used to prevent flooding of the console
+	 * @type {undefined|number}
+	 */
+	#lastProgressLog = undefined;
+
+	/**
 	 * @param {object} param0
 	 * @param {import('swarpc').SwarpcClient<typeof import('#worker//procedures.js').PROCEDURES>} param0.swarpc
 	 * @param {Map<string, import("swarpc").CancelablePromise["cancel"]>} [param0.cancellers]
@@ -51,9 +57,9 @@ class ProcessingQueue {
 		});
 
 		$effect(() => {
-			// Floods the logs in that case...
-			if (uiState.processing.total > 1_000) return;
+			if (this.#lastProgressLog && performance.now() - this.#lastProgressLog < 1_000) return;
 			this.log(null, 'Progress is', uiState.processing.done, '/', uiState.processing.total);
+			this.#lastProgressLog = performance.now();
 		});
 	}
 
