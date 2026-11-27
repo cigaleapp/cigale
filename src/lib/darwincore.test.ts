@@ -10,8 +10,8 @@ import {
 	fileLayout,
 } from './darwincore.js';
 import { nukeDatabase, openDatabase } from './idb.svelte.js';
+import { metadataOptionId } from './metadata/options.js';
 import { DarwinCoreProtocolConfig } from './schemas/darwincore.js';
-import { metadataOptionId } from './schemas/metadata.js';
 
 beforeEach(() => {
 	nukeDatabase();
