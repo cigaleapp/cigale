@@ -2,7 +2,6 @@ import type { CladedName, Option } from '../lib/modules.js';
 
 import { GoogleDrive } from '../datasources/gdrive.js';
 import { Enricher, matchCladedName, NameProvider, OptionExtra } from '../lib/modules.js';
-import config from '../server/config.js';
 
 export class GoogleDriveSlides implements NameProvider {
 	name = 'gdrive' as const;

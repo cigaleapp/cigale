@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
 
-	import AsyncEach from '#lib/AsyncEach.svelte';
 	import ButtonIcon from '#lib/ButtonIcon.svelte';
 	import ButtonSecondary from '#lib/ButtonSecondary.svelte';
 	import { plural } from '#lib/i18n.js';
@@ -141,7 +140,7 @@
 					installed.filter((p) => !Protocol.from(p.protocol).usable)
 				)}
 
-				{#each usable as entry}
+				{#each usable as entry (entry.protocol.id)}
 					{@render row(entry)}
 				{/each}
 
@@ -152,7 +151,7 @@
 					</section>
 				{/if}
 
-				{#each unusable as entry}
+				{#each unusable as entry (entry.protocol.id)}
 					{@render row(entry)}
 				{/each}
 
@@ -161,7 +160,7 @@
 					<h2>Non installés</h2>
 				</section>
 
-				{#each notinstalled as entry}
+				{#each notinstalled as entry (entry.protocol.id)}
 					{@render row(entry)}
 				{:else}
 					<li class="empty">

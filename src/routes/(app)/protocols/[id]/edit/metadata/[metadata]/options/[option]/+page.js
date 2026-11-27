@@ -28,7 +28,7 @@ export async function load({ parent, params }) {
 			/** @type {import('#lib/database.js').MetadataEnumVariant | undefined} */
 			let option = undefined;
 			if (metadata.type === 'enum') {
-				option = await findMetadataOption(db, fullMetadataId, value);
+				option = await findMetadataOption(databaseHandle(), fullMetadataId, value);
 			}
 
 			return {

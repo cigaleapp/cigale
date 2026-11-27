@@ -4,7 +4,7 @@
 	import ButtonIcon from '#lib/ButtonIcon.svelte';
 	import ButtonSecondary from '#lib/ButtonSecondary.svelte';
 	import ButtonUpdateProtocol from '#lib/ButtonUpdateProtocol.svelte';
-	import { errorMessage, percent } from '#lib/i18n.js';
+	import {  percent } from '#lib/i18n.js';
 	import Logo from '#lib/Logo.svelte';
 	import OverflowableText from '#lib/OverflowableText.svelte';
 	import { goto, resolve } from '#lib/paths.js';
@@ -16,7 +16,6 @@
 	import { uiState } from '#lib/uistate.svelte.js';
 	import IconUpgrade from '~icons/ri/arrow-up-circle-line';
 	import IconDelete from '~icons/ri/delete-bin-line';
-	import IconInstall from '~icons/ri/download-2-line';
 	import IconLearnMore from '~icons/ri/information-line';
 	import IconStats from '~icons/ri/pie-chart-2-line';
 	import IconExport from '~icons/ri/share-forward-line';
@@ -28,8 +27,6 @@
 		name: string;
 		logo?: URL | null | string;
 		summary?: string;
-		description?: string;
-		authors?: Array<{ name: string; email: string }>;
 		source?: string;
 		version?: number;
 		ondelete: () => void;
@@ -52,8 +49,8 @@
 		ondelete,
 		summary,
 		logo,
-		description,
-		authors,
+		// TODO: use authors
+		// authors,
 		installed = true,
 		oninstall,
 		updates,

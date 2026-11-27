@@ -239,7 +239,7 @@ export async function upgradeProtocol({
 
 	const { tables } = await import('./idb.svelte.js');
 
-	const result = await swarpc.importProtocol({ url: source });
+	await swarpc.importProtocol({ url: source });
 
 	tables.Protocol.refresh(null);
 	tables.Metadata.refresh(null);

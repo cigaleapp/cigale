@@ -45,7 +45,7 @@
 		if (!toImport) return;
 
 		try {
-			await swarpc.importProtocol({ url });
+			await swarpc.importProtocol({ url: toImport });
 			await tables.Protocol.refresh(null);
 			await tables.Metadata.refresh(null);
 			await goto('/protocols/');

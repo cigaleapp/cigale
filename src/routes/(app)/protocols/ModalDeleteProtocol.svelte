@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { SvelteSet } from 'svelte/reactivity';
-
 	import { plural } from '#lib/i18n.js';
 	import { databaseHandle, tables } from '#lib/idb.svelte.js';
 	import ModalConfirmDeletion from '#lib/ModalConfirmDeletion.svelte';
@@ -66,7 +64,7 @@
 	]}
 	onconfirm={async () => {
 		if (!removingProtocol) return;
-		await uninstallProtocol(db, removingProtocol.id);
+		await uninstallProtocol(databaseHandle(), removingProtocol.id);
 		toasts.success('Protocole supprimé');
 		ondelete?.();
 	}}

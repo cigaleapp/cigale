@@ -10,6 +10,7 @@
 	};
 
 	interface Props {
+		// eslint-disable-next-line no-unused-vars
 		onclick: (e: MouseEvent, signals: OnclickSignals) => void | Promise<void>;
 		children: import('svelte').Snippet;
 		submits?: boolean;

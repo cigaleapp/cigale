@@ -8,7 +8,7 @@ import * as dates from 'date-fns';
 import * as DB from '#lib/database.js';
 import { round, transformObject, transformObjectAsync } from '#lib/utils.js';
 
-import { findMetadataOption, metadataOptionId  } from './options.ts';
+import { findMetadataOption } from './options.ts';
 
 /**
  * Adds valueLabel to each metadata value object when the metadata is an enum.

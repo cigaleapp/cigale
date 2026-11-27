@@ -10,7 +10,7 @@ import { Tables } from '#lib/database.js';
 import { compareBy, entries, mapValues, orEmpty, orEmpty2, sum, switchValue } from '#lib/utils.js';
 
 import { addValueLabels, metadataPrettyValue } from './metadata/display.js';
-import { findMetadataOption, metadataOptionId  } from './metadata/options.js';
+import { findMetadataOption } from './metadata/options.js';
 import {
 	BUILTIN_DARWINCORE_NAMESPACES,
 	BUILTIN_EXTRA_FIELDS,

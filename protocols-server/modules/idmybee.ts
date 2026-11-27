@@ -122,7 +122,7 @@ export class IDMyBeeDescriptions extends WithSDD implements Enricher {
 						mediaObjects
 							.filter((m) => m.Author !== undefined)
 							.map((m) => [googledriveThumbnailUrl(m), m.Author!])
-							.filter(([key, value]) => key !== undefined)
+							.filter(([key]) => key !== undefined)
 					),
 				},
 			};
@@ -364,14 +364,4 @@ function constraintsToRange(
 	}
 
 	return undefined;
-}
-
-function formatMorphogroupKey(name: string) {
-	return name.replaceAll(' ', '_').toLowerCase();
-}
-
-function formatMorphogroupLabel(key: string) {
-	let out = key.replaceAll('_', ' ').replace(/^gpe /, 'Groupe ');
-	out = out[0].toUpperCase() + out.slice(1);
-	return out;
 }

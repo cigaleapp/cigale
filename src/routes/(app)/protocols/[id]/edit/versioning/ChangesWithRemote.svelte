@@ -4,7 +4,7 @@
 	import wordDiff from 'word-diff';
 
 	import ButtonIcon from '#lib/ButtonIcon.svelte';
-	import { databaseHandle, get, tables } from '#lib/idb.svelte.js';
+	import { databaseHandle,  tables } from '#lib/idb.svelte.js';
 	import { findMetadataOption } from '#lib/metadata/options.ts';
 	import { resolve } from '#lib/paths.js';
 	import { splitMetadataId } from '#lib/schemas/metadata.js';
