@@ -1,15 +1,136 @@
-import _rawRegistry from '#lib/registry.json' with { type: 'json' };
+import type { DatabaseHandle } from '#lib/idb.svelte.js';
+
 import { ProtocolRegistry } from '#lib/schemas/protocols.js';
+import { compareBy } from '#lib/utils.ts';
 
-let PROTOCOLS_REGISTRY: typeof ProtocolRegistry.infer | null = null;
+import { manifestVersionsCompatible } from './manifestversion.js';
 
-export async function fetchProtocolRegistry() {
-	// const registryUrl = Capacitor.isNativePlatform()
-	// 	? `${import.meta.env.webOrigin}/registry.json`
-	// 	: `${base}/registry.json`;
+type Registry = typeof ProtocolRegistry.infer;
 
-	// PROTOCOLS_REGISTRY ??= ProtocolRegistry.assert(await fetch(registryUrl).then((r) => r.json()));
-	PROTOCOLS_REGISTRY ??= ProtocolRegistry.assert(_rawRegistry);
+/**
+ * Cache of fetched registries, keyed by registry URL.
+ */
+const REGISTRIES = new Map<URL, Registry>();
 
-	return PROTOCOLS_REGISTRY;
+let REGISTRY_URLS: URL[] = JSON.parse(import.meta.env.protocolRegistryUrls ?? '[]').map(
+	(u: string) => new URL(u)
+);
+
+async function fetchRegistries() {
+	return await Promise.allSettled(
+		REGISTRY_URLS.map(async (url) => {
+			let registry = REGISTRIES.get(url);
+			if (!registry) {
+				const response = await fetch(url);
+				if (!response.ok) {
+					throw new Error(`Failed to fetch registry from ${url}: ${response.status}`);
+				}
+				registry = ProtocolRegistry.assert(await response.json());
+				REGISTRIES.set(url, registry);
+			}
+			return registry;
+		})
+	);
+}
+
+/**
+ * Fetches all registries (each cached by URL) and merges them into a single
+ * registry. Protocols sharing an `id` are deduplicated — the first registry
+ * wins. A registry that fails to fetch is skipped; an error is thrown only
+ * if no registry could be fetched.
+ */
+export async function fetchProtocolsFromRegistries(): Promise<Registry['protocols']> {
+	const results = await fetchRegistries();
+	const seen = new Set<string>();
+	const protocols = [];
+	let fetchedAny = false;
+	// Since later elements in the registry urls array take precedence,
+	// and we use a seen set, we need to iterate in reverse
+	for (const result of results.toReversed()) {
+		if (result.status === 'rejected') {
+			console.warn('Failed to fetch protocol registry:', result.reason);
+			continue;
+		}
+		fetchedAny = true;
+		for (const protocol of result.value.protocols) {
+			if (seen.has(protocol.id)) continue;
+			seen.add(protocol.id);
+			protocols.push(protocol);
+		}
+	}
+
+	if (!fetchedAny) {
+		throw new Error('Failed to fetch any protocol registry');
+	}
+
+	return protocols;
+}
+
+export async function lookupMostRecentCompatibleProtocol(id: string): Promise<URL> {
+	const protocols = await fetchProtocolsFromRegistries();
+	console.debug(`[registry] looking up protocol ${id} within`, protocols);
+
+	const entry = protocols.find((p) => p.id === id);
+	if (!entry) throw new Error(`Protocol ${id} not in registry`);
+	if (manifestVersionsCompatible(entry.manifestVersion)) return new URL(entry.url);
+
+	const older = entry.older
+		.toSorted(compareBy((e) => -e.version))
+		.find((e) => manifestVersionsCompatible(e.manifestVersion));
+
+	if (!older) throw new Error("Mettez à jour l'app pour installer ce protocole");
+
+	return new URL(older.url);
+}
+
+export async function* listAllProtocols(db: DatabaseHandle) {
+	const locally = await db.getAll('Protocol');
+
+	for (const p of locally) {
+		yield { protocol: p, installed: true };
+	}
+
+	const protocols = await fetchProtocolsFromRegistries().catch((e) => {
+		console.error("Couldn't fetch protocol registry", e);
+		return [];
+	});
+
+	for (const p of protocols) {
+		if (locally.some((l) => l.id === p.id)) continue;
+		if (!p.suggested) continue;
+
+		yield {
+			installed: false,
+			compatible: manifestVersionsCompatible(p.manifestVersion),
+			protocol: { source: p.url, ...p },
+		};
+	}
+}
+
+export function addProtocolRegistry(
+	url: URL | string,
+	{
+		priority = -Infinity,
+	}: {
+		/** Where to place the registry URL in the array: in case of protocol ID conflicts, the later URLs take precedence. Pass Infinity to make it more important than all the others already present, and -Ininity for less priority than all already present */
+		priority?: number;
+	} = {}
+) {
+	switch (priority) {
+		case Infinity: {
+			REGISTRY_URLS.push(new URL(url));
+			break;
+		}
+		case -Infinity: {
+			REGISTRY_URLS.unshift(new URL(url));
+			break;
+		}
+		default: {
+			REGISTRY_URLS = [
+				...REGISTRY_URLS.slice(0, priority),
+				new URL(url),
+				...REGISTRY_URLS.slice(priority),
+			];
+		}
+	}
 }

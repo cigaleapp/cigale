@@ -13,37 +13,18 @@ import {
 	NamespacedMetadataID,
 	NamespacedMetadataOptionID,
 	Probability,
-	ProtocolID,
 	UniqueFileTypeSpecifier,
 	URLString,
 } from './common.js';
 import { NaturalRegexExpression, NumberRangeLiteral, RegexExpression } from './constraints.js';
 import { FilepathTemplate, JsonataExpression, TemplatedString } from './expressions.js';
+import { NetworkStreamedLines } from './network.js';
 import {
 	MODEL_DETECTION_OUTPUT_SHAPES,
 	NeuralBoundingBoxInference,
 	NeuralEnumInference,
 } from './neural.js';
 import { NumericUnit } from './units.js';
-
-/**
- * @param {string} metadataId
- * @param {RuntimeValue<"enum">} key
- */
-export function metadataOptionId(metadataId, key) {
-	return `${metadataId}:${key}`;
-}
-
-/**
- * @param {string} optionId
- */
-export function parseMetadataOptionId(optionId) {
-	const parts = optionId.split(':');
-	if (parts.length < 2) throw new Error(`Invalid metadata option ID: ${optionId}`);
-	const metadataId = parts.slice(0, -1).join(':');
-	const key = parts[parts.length - 1];
-	return { metadataId, key };
-}
 
 /**
  * @satisfies { Record<string, {label: string, help: string}> }
@@ -68,7 +49,7 @@ export const METADATA_TYPES = /** @type {const} */ ({
 		help: 'un fichier, représenté par une référence à un MetadataFile, qui est exporté séparément',
 	},
 	surface: {
-		help: 'surface',
+		label: 'surface',
 		help: 'Un ensemble de points GPS formant une surface',
 	},
 });
@@ -170,7 +151,7 @@ export const MetadataValue = type({
 	}),
 });
 
-export const MetadataValueParsed = MetadataValue.omit('value').and({
+export const MetadataValueParsed = MetadataValue.merge({
 	value: MetadataRuntimeValueAny,
 });
 
@@ -197,7 +178,7 @@ const JSONSchemaCompatibleRuntimeValue = type.or(
 	MetadataRuntimeValue.surface
 );
 
-export const MetadataRecordValue = MetadataValue.omit('value', 'alternatives').and({
+export const MetadataRecordValue = MetadataValue.merge({
 	value: [JSONSchemaCompatibleRuntimeValue, '@', 'Valeur de la métadonnée'],
 	alternatives: type(
 		JSONSchemaCompatibleRuntimeValue.array(),
@@ -260,8 +241,14 @@ export const MetadataMergeMethod = type.or(
 );
 
 export const MetadataEnumVariant = type({
-	key: [ID, '@', 'Identifiant unique pour cette option'],
+	key: ['string', '@', 'Identifiant unique pour cette option'],
 	label: ['string', '@', "Nom de l'option, affichable dans une interface utilisateur"],
+	extraKeys: type('string')
+		.array()
+		.describe(
+			'Autres identifiants pour cette option. Utile après un changement de clés (les sessions existantes avant le changement fonctionneront toujours si les ancienne clés sont renseignées ici), et sert aussi pour les classmapping (inférence avec réseau neuronal)'
+		)
+		.default(() => []),
 	'kobocollect?': [
 		'string | string[]',
 		'@',
@@ -298,7 +285,7 @@ export const MetadataEnumVariant = type({
 		)
 		.default(() => ({})),
 	'cascade?': type
-		.Record(ID, ID.array().or(ID))
+		.Record(ID, type('string[] | string'))
 		.pipe((record) => mapValues(record, ensureArray))
 		.describe(
 			"Objet contenant pour clés des identifiants d'autres métadonnées, et pour valeurs la ou les valeur(s) à assigner à cette métadonnée si cette option est choisie. Si il y en a plusieurs, une des options est choisie comme valeur de la métadonnée en question, et les autres sont mises en tant qu'alternatives, avec une confiance de 1."
@@ -467,12 +454,7 @@ export const MetadataPatternConstraint = type.or();
  */
 
 const MetadataBase = type({
-	id: NamespacedMetadataID.describe(
-		'Identifiant unique pour la métadonnée. On conseille de mettre une partie qui vous identifie dans cet identifiant, car il doit être globalement unique. Par exemple, mon-organisation.ma-métadonnée'
-	),
-	'inheritedFrom?': ProtocolID.describe(
-		"Si cette métadonnée est héritée d'un autre protocole, indique de quel protocole elle est héritée"
-	),
+	id: ID.describe('Identifiant pour la métadonnée'),
 	label: ['string', '@', 'Nom de la métadonnée'],
 	'kobocollect?': [
 		'string | string[]',
@@ -492,9 +474,11 @@ const MetadataBase = type({
 	mergeMethod: MetadataMergeMethod.configure(
 		"Méthode utiliser pour fusionner plusieurs différentes valeurs d'une métadonnée. Notamment utilisé pour calculer la valeur d'une métadonnée sur une Observation à partir de ses images",
 		'self'
-	),
-	required: ['boolean', '@', 'Si la métadonnée est obligatoire'],
-	description: ['string', '@', 'Description, pour aider à comprendre la métadonnée'],
+	).default('none'),
+	required: type('boolean').describe('Si la métadonnée est obligatoire').default(false),
+	description: type('string')
+		.describe('Description, pour aider à comprendre la métadonnée')
+		.default(''),
 	images: URLString.array()
 		.describe(
 			"Liste d'images illustrant cette métadonnée. Utile pour aider les utilisateurs à comprendre ce que représente la métadonnée"
@@ -506,17 +490,12 @@ const MetadataBase = type({
 	groupable: type('boolean')
 		.describe('Si la métadonnée peut être utilisée pour grouper des images ou observations')
 		.default(false),
-	// TODO move to the type: '"enum"' only branch
-	'options?': MetadataEnumVariant.array()
-		.pipe((opts) => unique(opts, (o) => o.key))
-		.pipe((opts) => opts.map((opt, index) => ({ index, ...opt })))
-		.describe('Les options valides. Uniquement utile pour une métadonnée de type "enum"'),
 	learnMore: URLString.describe(
 		'Un lien pour en apprendre plus sur ce que cette métadonnée décrit'
 	).optional(),
 });
 
-const MetadataBoolean = MetadataBase.omit('kobocollect').and({
+const MetadataBoolean = MetadataBase.merge({
 	type: '"boolean"',
 	'default?': MetadataDefault.boolean,
 	'infer?': type.and(
@@ -671,7 +650,7 @@ const MetadataSurface = MetadataBase.and({
 	),
 });
 
-const MetadataEnum = MetadataBase.and({
+export const MetadataEnum = MetadataBase.and({
 	type: '"enum"',
 	'default?': MetadataDefault.enum,
 	'darwincore?': {
@@ -683,6 +662,15 @@ const MetadataEnum = MetadataBase.and({
 			"Les liens vers les images de l'option, séparés par ' | '"
 		),
 	},
+	'externalOptions?': NetworkStreamedLines(MetadataEnumVariant.or('undefined'))
+		.array()
+		.describe(
+			"Utile quand il y a beaucoup d'options et que les lister explicitement dans le fichier manifeste directement serait impraticable. Si une option a la même clé (.key) dans .options et .externalOptions, c'est celle .options qui est utilisé (pratique pour définir des overrides spécifiques à ce protocole)"
+		),
+	'options?': MetadataEnumVariant.array()
+		.pipe((opts) => unique(opts, (o) => o.key))
+		.pipe((opts) => opts.map((opt, index) => ({ index, ...opt })))
+		.describe('Les options valides. Uniquement utile pour une métadonnée de type "enum"'),
 	presentation: type
 		.enumerated('dropdown', 'buttons', 'auto')
 		.describe(
@@ -698,6 +686,8 @@ const MetadataEnum = MetadataBase.and({
 	// --- Technical fields ---
 	_optionsCount: 'number.integer = 0',
 });
+
+const MetadataEnumInDatabase = MetadataEnum.omit('options');
 
 const MetadataBoundingbox = MetadataBase.and({
 	type: '"boundingbox"',
@@ -787,6 +777,23 @@ export const Metadata = type.or(
 	MetadataFile,
 	MetadataSurface
 );
+
+export const MetadataInDatabase = type
+	.or(
+		MetadataBoolean,
+		MetadataString,
+		MetadataInteger,
+		MetadataFloat,
+		MetadataDate,
+		MetadataLocation,
+		MetadataEnumInDatabase,
+		MetadataBoundingbox,
+		MetadataFile,
+		MetadataSurface
+	)
+	.merge({
+		id: NamespacedMetadataID,
+	});
 
 export const MetadataGroup = type({
 	id: ID.brand('MetadataGroup'),

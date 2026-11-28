@@ -1,20 +1,22 @@
 <script lang="ts">
 	import type { Protocol } from '#lib/database.js';
 
-	import Badge from '#lib/Badge.svelte';
 	import ButtonIcon from '#lib/ButtonIcon.svelte';
 	import ButtonSecondary from '#lib/ButtonSecondary.svelte';
 	import ButtonUpdateProtocol from '#lib/ButtonUpdateProtocol.svelte';
+	import { percent } from '#lib/i18n.js';
+	import Logo from '#lib/Logo.svelte';
 	import OverflowableText from '#lib/OverflowableText.svelte';
 	import { goto, resolve } from '#lib/paths.js';
 	import { getSettings, setSetting } from '#lib/settings.svelte.js';
 	import { shareUrl } from '#lib/share.js';
 	import Switch from '#lib/Switch.svelte';
+	import { toasts } from '#lib/toasts.svelte.js';
+	import Tooltip from '#lib/Tooltip.svelte';
 	import { uiState } from '#lib/uistate.svelte.js';
 	import IconUpgrade from '~icons/ri/arrow-up-circle-line';
 	import IconDelete from '~icons/ri/delete-bin-line';
 	import IconLearnMore from '~icons/ri/information-line';
-	import IconEdit from '~icons/ri/pencil-line';
 	import IconStats from '~icons/ri/pie-chart-2-line';
 	import IconExport from '~icons/ri/share-forward-line';
 
@@ -23,12 +25,18 @@
 	interface Props extends Partial<Protocol> {
 		id: string;
 		name: string;
+		logo?: URL | null | string;
+		summary?: string;
 		source?: string;
 		version?: number;
 		ondelete: () => void;
+		// eslint-disable-next-line no-unused-vars
+		oninstall: (source: string, onProgress: (p: number) => void) => Promise<void>;
+		installed?: boolean;
+		compatible?: boolean;
 		updates: 'automatic' | 'manual';
-		beamup?: Protocol['beamup'];
-		charts?: Protocol['charts'];
+		beamup?: Protocol['beamup'] | undefined;
+		charts?: Protocol['charts'] | undefined;
 
 		expanded?: boolean;
 	}
@@ -39,7 +47,14 @@
 		source,
 		version,
 		ondelete,
+		summary,
+		logo,
+		// TODO: use authors
+		// authors,
+		installed = true,
+		oninstall,
 		updates,
+		compatible,
 		beamup,
 		expanded = $bindable(false),
 		charts,
@@ -63,9 +78,16 @@
 	);
 </script>
 
-<li>
+<li >
 	<details open={expanded}>
 		<summary>
+			<section class="logo">
+				{#if logo}
+					<img src={logo.toString()} alt={`${name} logo`} />
+				{:else}
+					<Logo />
+				{/if}
+			</section>
 			<section class="text">
 				<h3>
 					<!-- {#if dirty}
@@ -73,43 +95,85 @@
 							help="Protocole modifié par rapport à la version publiée"
 						/>
 					{/if} -->
-					{name}
+					<OverflowableText text={name} />
 				</h3>
-				<small><OverflowableText tag="code" text={id} /></small>
+				<!-- <span class="describe">
+					<OverflowableText text={summary || description || ''} />
+				</span> -->
+				<p>{summary}</p>
 			</section>
 			<section class="actions">
-				<ButtonIcon
-					help="Partager"
-					disabled={!source}
-					onclick={async () => {
-						if (!source) return;
+				{#if !installed && source}
+					{#if compatible}
+						<ButtonSecondary
+							loading
+							onclick={async (_, sig) => {
+								sig.loadingStarted();
+								sig.setText('0%');
 
-						await shareUrl(
-							new URL(
-								resolve('/(app)/protocols/import/[...url]', {
-									url: source,
-								}),
-								import.meta.env.webOrigin
-							)
-						);
-					}}
-				>
-					<IconExport />
-				</ButtonIcon>
-				{#if version && source}
-					<ButtonUpdateProtocol compact {version} {source} {id} />
+								try {
+									await oninstall?.(source, (progress) => {
+										sig.setText(percent(progress));
+									});
+								} catch (err) {
+									toasts.error(err, `Impossible d'installer ${name}`);
+								} finally {
+									sig.loadingEnded();
+								}
+							}}
+						>
+							<!-- <IconInstall /> -->
+							Installer
+							<!-- {#if version}
+								<span class="version-to-install">
+									v{version}
+								</span>
+							{/if} -->
+						</ButtonSecondary>
+					{:else}
+						<ButtonSecondary
+							loading
+							help="Mettre à jour l'app pour installer ce protocole"
+							onclick={() => {}}
+						>
+							Non installable
+						</ButtonSecondary>
+					{/if}
 				{:else}
 					<ButtonIcon
-						crossout
-						onclick={() => {}}
-						help="Ce protocole ne supporte pas la vérification des mises à jour"
+						help="Partager"
+						disabled={!source}
+						onclick={async () => {
+							if (!source) return;
+
+							await shareUrl(
+								new URL(
+									resolve('/(app)/protocols/import/[...url]', {
+										url: source,
+									}),
+									import.meta.env.webOrigin
+								)
+							);
+						}}
 					>
-						<IconUpgrade />
+						<IconExport />
 					</ButtonIcon>
+					{#if version && source}
+						<ButtonUpdateProtocol compact {version} {source} {id} />
+					{:else}
+						<ButtonIcon
+							crossout
+							onclick={() => {}}
+							help="Ce protocole ne supporte pas la vérification des mises à jour"
+						>
+							<IconUpgrade />
+						</ButtonIcon>
+					{/if}
 				{/if}
 			</section>
 		</summary>
-		{#if version && source}
+
+		{#if version && source && installed}
 			<label class="auto-updates">
 				<Switch
 					value={autoUpdatesEnabled}
@@ -131,7 +195,8 @@
 				</div>
 			</label>
 		{/if}
-		{#if beamup}
+
+		{#if installed && beamup}
 			{let open = $state<() => void>()}
 
 			<BeamupConsentLearnMore config={beamup} protocol={id} bind:open />
@@ -164,39 +229,76 @@
 				</ButtonIcon>
 			</div>
 		{/if}
-		<div class="more-actions">
-			<ButtonSecondary
-				danger
-				disabled={id === uiState.currentProtocolId && uiState.processing.total > 0}
-				onclick={() => {
-					ondelete();
-				}}
-			>
-				<IconDelete />
-				Supprimer
-			</ButtonSecondary>
-			{#if hasUserScopedCharts}
-				<ButtonSecondary onclick={() => goto('/(app)/protocols/[id]/results', { id })}>
-					<IconStats />
-					Stats
-				</ButtonSecondary>
-			{/if}
-			<ButtonSecondary onclick={() => goto('/(app)/protocols/[id]/edit/infos', { id })}>
-				<IconEdit />
-				Modifier
-				<Badge>Beta</Badge>
-			</ButtonSecondary>
 
-			{#if version && source}
-				<ButtonUpdateProtocol {version} {source} {id} />
-			{/if}
-		</div>
+		{#if installed}
+			<div class="more-actions">
+				<ButtonSecondary
+					danger
+					disabled={id === uiState.currentProtocolId && uiState.processing.total > 0}
+					onclick={() => {
+						ondelete();
+					}}
+				>
+					<IconDelete />
+					Supprimer
+				</ButtonSecondary>
+				{#if hasUserScopedCharts}
+					<ButtonSecondary onclick={() => goto('/(app)/protocols/[id]/results', { id })}>
+						<IconStats />
+						Stats
+					</ButtonSecondary>
+				{/if}
+				<!-- <ButtonSecondary onclick={() => goto('/(app)/protocols/[id]/infos', { id })}>
+					<IconEdit />
+					Modifier
+					<Badge>Beta</Badge>
+				</ButtonSecondary> -->
+				{#if version && source}
+					<ButtonUpdateProtocol {version} {source} {id} />
+				{/if}
+			</div>
+		{/if}
+
+		<section class="id">
+			<Tooltip text="Identifiant du protocole"
+				><OverflowableText tag="code" text={id} /></Tooltip
+			>
+		</section>
 	</details>
 </li>
 
 <style>
 	li {
 		width: 100%;
+		max-width: 600px;
+		font-size: 0.9rem;
+	}
+
+	.logo {
+		--size: 1.2rem;
+		height: 3rem;
+		width: 3rem;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		flex-shrink: 0;
+		background: var(--bg2-neutral);
+		border-radius: 50%;
+		overflow: clip;
+
+		& > :global(*) {
+			margin-top: 0.125rem;
+		}
+	}
+
+	.logo img {
+		object-fit: cover;
+		height: 100%;
+		width: 100%;
+	}
+
+	.version-to-install {
+		color: var(--gay);
 	}
 
 	.actions,
@@ -214,7 +316,7 @@
 
 	details {
 		padding: 1em;
-		border-radius: var(--corner-radius);
+		border-radius: var(--row-corner-radius, var(--corner-radius));
 	}
 
 	details:is(:hover, :focus-visible) {
@@ -232,15 +334,15 @@
 
 	summary {
 		display: flex;
-		justify-content: space-between;
 		gap: 1em;
+		width: 100%;
 
 		&::marker {
 			display: none;
 		}
 
-		.text {
-			width: 70%;
+		.actions {
+			margin-left: auto;
 		}
 	}
 
@@ -264,5 +366,13 @@
 	.more-actions {
 		margin-top: 1em;
 		justify-content: center;
+	}
+
+	.id {
+		margin-top: 1em;
+		text-align: center;
+		font-size: 0.7rem;
+		word-wrap: break-word;
+		word-break: break-all;
 	}
 </style>

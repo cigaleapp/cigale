@@ -23,7 +23,6 @@ import {
 import { toasts } from '#lib/toasts.svelte.js';
 import { groupBy, orEmptyObj3, prefixIDBKeyRange, safeJSONParse } from '#lib/utils.js';
 
-import { resolveMetadataImport } from './imports.js';
 import { httpInferencesToRefresh, inferHttp } from './inference/http.js';
 import { serializeMetadataValue } from './serializing.js';
 
@@ -32,8 +31,8 @@ function metadataOptionDatabaseKey(protocolId: string, metadataId: string, optio
 	return `${ensureNamespacedMetadataId(metadataId, protocolId)}:${optionKey}`;
 }
 
-export function metadataIdOfOption(protocol: DB.Protocol, optionDatabaseId: string) {
-	return resolveMetadataImport(protocol, optionDatabaseId.split(':')[0] as NamespacedMetadataID);
+export function metadataIdOfOption(_protocol: DB.Protocol, optionDatabaseId: string) {
+	return optionDatabaseId.split(':')[0] as NamespacedMetadataID;
 }
 
 /**
@@ -87,7 +86,7 @@ export async function metadataOption(
 export async function metadataOptionsOf(
 	db: DatabaseHandle,
 	protocolId: string,
-	metadataId: string | string[] | null
+	metadataId: NamespacedMetadataID | NamespacedMetadataID[] | null
 ) {
 	function arrayAndMap<Prop extends string, K extends string, V>(prop: Prop, map: Map<K, V[]>) {
 		// @ts-expect-error does not include [prop] yet
@@ -104,12 +103,10 @@ export async function metadataOptionsOf(
 	if (!protocol) return arrayAndMap('byMetadata', options);
 
 	let metadatas = Array.isArray(metadataId)
-		? metadataId.map((id) => ensureNamespacedMetadataId(id, protocolId))
+		? metadataId
 		: typeof metadataId === 'string'
-			? [ensureNamespacedMetadataId(metadataId, protocolId)]
+			? [metadataId]
 			: protocol.metadata;
-
-	metadatas = metadatas.map((id) => resolveMetadataImport(protocol, id));
 
 	for (const m of metadatas) {
 		const cached = METADATA_OPTIONS_CACHE.get(m);

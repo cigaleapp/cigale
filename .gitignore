@@ -82,6 +82,7 @@ static/.well-known/assetlinks.json
 /IDMYBEE-Andrena.sdd.xml
 
 ecosignal/
-/static/registry.json
-/src/lib/registry.json
+/protocols/registry.json
+/local/registry.json
 .vscode/settings.json
+/protocols/registry.json

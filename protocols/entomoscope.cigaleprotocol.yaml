@@ -1,11 +1,12 @@
 # yaml-language-server: $schema=../static/protocol.schema.json
-id: fr.osug.terra-forma-web.entomoscope
+manifest: v1.0
+id: io.github.cigaleapp.entomoscope
 name: Entomoscope
 summary: Analyse de captures de l'Entomoscope
 
 updates: automatic
-version: 10
-source: https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/entomoscope.cigaleprotocol.yaml
+version: 1
+source: http://localhost:3000/entomoscope.cigaleprotocol.yaml
 
 description: Protocole de collecte d'images d'insectes via l'Entomoscope
 
@@ -15,7 +16,7 @@ authors:
   - name: Maxime Cauchoix
 
 imports:
-  - from: io.github.cigaleapp.arthropods.example
+  - from: io.github.cigaleapp.base.arthropods
     metadataGroups:
       - taxonomy
     metadata:

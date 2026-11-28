@@ -27,7 +27,7 @@ on:
       environment-url-append:
         type: string
         description: Suffix to append to the environment URL
-        default: ''
+        default: ""
       subdomain:
         type: string
         description: Subdomain of the dev deployments domain to upload to
@@ -39,7 +39,7 @@ on:
       artifact-at:
         type: string
         description: Path inside the artifact to upload. Must start with a slash. Defaults to root of the artifact. Must begin WITH a slash and NOT end with a slash.
-        default: ''
+        default: ""
       path:
         type: string
         description: Path to put the contents at. Must start with a slash
@@ -47,7 +47,7 @@ on:
       file:
         type: string
         description: File to be renamed to index.html before uploading.
-        default: 'index.html'
+        default: "index.html"
       clear:
         type: boolean
         default: true
@@ -68,7 +68,7 @@ jobs:
     # name: Deploy to cigale-dev-biodimedia-data-terra.ai.meso.umontpellier.fr/${{ inputs.subdomain }}${{ inputs.path }}
     name: ${{ inputs.job }}
     environment:
-      name: '${{ github.event.pull_request.number || github.ref_name }}: ${{ inputs.environment }}'
+      name: "${{ github.event.pull_request.number || github.ref_name }}: ${{ inputs.environment }}"
       url: https://cigale-dev-biodimedia-data-terra.ai.meso.umontpellier.fr/${{ inputs.subdomain }}${{ inputs.path }}${{ inputs.environment-url-append }}
     steps:
       - name: Setup Rclone

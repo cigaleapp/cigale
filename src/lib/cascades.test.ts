@@ -7,7 +7,8 @@ import { beforeEach, describe, expect, test } from 'vitest';
 import { cascadeLabels, computeCascades } from './cascades.js';
 import { Schemas } from './database.js';
 import { openDatabase } from './idb.svelte.js';
-import { metadataOptionId, namespacedMetadataId } from './schemas/metadata.js';
+import { metadataOptionId, namespaceToMetadataOptionInDB } from './metadata/options.js';
+import { namespacedMetadataId } from './schemas/metadata.js';
 
 const mockMetadata = (id: string, type: DB.MetadataType = 'enum') =>
 	Schemas.Metadata.in.assert({
@@ -22,16 +23,21 @@ const mockMetadata = (id: string, type: DB.MetadataType = 'enum') =>
 		groupable: false,
 	});
 
-const mockOption = (metadataId: string, i: number) => ({
-	metadataId: namespacedMetadataId('mockproto', metadataId),
-	id: metadataOptionId(namespacedMetadataId('mockproto', metadataId), i.toString()),
-	...Schemas.MetadataEnumVariant.in.assert({
-		description: '',
-		key: i.toString(),
-		label: `Option ${i}`,
-		synonyms: [],
-	}),
-});
+const mockOption = (metadataId: string, i: number) => {
+	const id = namespacedMetadataId('mockproto', metadataId);
+	return {
+		metadataId: id,
+		id: metadataOptionId(id, i.toString()),
+		namespacedLabel: namespaceToMetadataOptionInDB(id, `Option ${i}`),
+		namespacedExtraKeys: [],
+		...Schemas.MetadataEnumVariant.in.from({
+			description: '',
+			key: i.toString(),
+			label: `Option ${i}`,
+			synonyms: [],
+		}),
+	};
+};
 
 beforeEach(async () => {
 	const db = await openDatabase();

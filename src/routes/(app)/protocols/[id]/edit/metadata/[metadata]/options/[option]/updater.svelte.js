@@ -1,10 +1,13 @@
 import { ArkErrors } from 'arktype';
 
 import { errorMessage } from '#lib/i18n.js';
-import { dependencyURI, get, set } from '#lib/idb.svelte.js';
+import { databaseHandle, dependencyURI, get, set } from '#lib/idb.svelte.js';
+import { findMetadataOption, 
+
+	metadataOptionId,
+} from '#lib/metadata/options.ts';
 import {
 	ensureNamespacedMetadataId,
-	metadataOptionId,
 	namespacedMetadataId,
 } from '#lib/schemas/metadata.js';
 import { toasts } from '#lib/toasts.svelte.js';
@@ -23,12 +26,10 @@ export function updater(changes) {
 		if (!page.params.option) return;
 		if (!page.params.id) return;
 
-		const option = await get(
-			'MetadataOption',
-			metadataOptionId(
-				ensureNamespacedMetadataId(page.params.metadata, page.params.id),
-				page.params.option
-			)
+		const option = await findMetadataOption(
+			databaseHandle(),
+			ensureNamespacedMetadataId(page.params.metadata, page.params.id),
+			page.params.option
 		);
 
 		if (!option) return;

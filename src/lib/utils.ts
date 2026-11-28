@@ -715,8 +715,10 @@ export async function fetchHttpRequest(
  * - JSONC (if the url pathname ends with .json)
  * - YAML (otherwise)
  */
-export async function parseYAMLorJSON(response: Response): Promise<unknown> {
-	if (new URL(response.url).pathname.endsWith('.json')) {
+export async function parseYAMLorJSON(response: Response | File): Promise<unknown> {
+	const filepath = response instanceof File ? response.name : new URL(response.url).pathname;
+
+	if (filepath.endsWith('.json')) {
 		return JSONC.parse(await response.text());
 	}
 
@@ -1425,6 +1427,7 @@ export function corsfix(url: string | URL): string {
 }
 
 export function isLocalhost() {
+	if (Capacitor.isNativePlatform()) return false;
 	return location.hostname === 'localhost';
 }
 

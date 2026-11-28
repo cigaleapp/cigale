@@ -76,6 +76,15 @@
 	import Modal from './Modal.svelte';
 	import OverflowableText from './OverflowableText.svelte';
 	import { goto } from './paths.js';
+
+	interface Props {
+		/** Usable-only: dont show protocols with usable:false */
+		show: 'usable-only' | 'all';
+	}
+
+	const { show }: Props = $props();
+
+	const protocols = $derived(tables.Protocol.state.filter((p) => show === 'all' || p.usable));
 </script>
 
 <Modal
@@ -95,7 +104,7 @@
 			{/if}
 
 			<div class="choices" role="menu" in:fade={{ duration: 200 }}>
-				{#each tables.Protocol.state as { id, name, logo, version, summary, description } (id)}
+				{#each protocols as { id, name, logo, version, summary, description } (id)}
 					<button
 						role="menuitem"
 						aria-label={name}

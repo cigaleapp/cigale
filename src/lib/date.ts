@@ -115,19 +115,23 @@ export function formatDistanceToNowShortParts(
 	locale: string,
 	date: Interval | Date | number
 ): string[] {
-	return new DurationFormat(locale, { style: 'narrow' })
-		.formatToParts(
-			intervalToDuration(
-				date instanceof Date || typeof date === 'number'
-					? {
-							start: Date.now(),
-							end: date,
-						}
-					: date
+	try {
+		return new DurationFormat(locale, { style: 'narrow' })
+			.formatToParts(
+				intervalToDuration(
+					date instanceof Date || typeof date === 'number'
+						? {
+								start: Date.now(),
+								end: date,
+							}
+						: date
+				)
 			)
-		)
-		.map((part) => part.value)
-		.filter((value) => value.trim());
+			.map((part) => part.value)
+			.filter((value) => value.trim());
+	} catch {
+		return [];
+	}
 }
 
 if (import.meta.vitest) {

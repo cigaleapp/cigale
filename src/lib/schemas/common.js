@@ -2,8 +2,7 @@ import { type } from 'arktype';
 import { ms } from 'convert';
 import { differenceInMilliseconds, isWithinInterval, setHours, setMinutes } from 'date-fns';
 
-import { clamp, cleanFilepath, safeJSONStringify } from '../utils.js';
-import { TemplatedString } from './expressions.js';
+import { clamp, safeJSONStringify } from '../utils.js';
 
 export const ID = type(/^[\w._-]+$/);
 
@@ -15,7 +14,7 @@ export const NamespacedMetadataID = type('/^([\\w.-]+)__([\\w._-]+)$/').describe
 	'Identifiant de métadonnée avec namespace, sous la forme "protocolId__metadataId"'
 );
 
-export const NamespacedMetadataOptionID = type('/^([\\w.-]+)__([\\w._-]+):([\\w._-]+)$/').describe(
+export const NamespacedMetadataOptionID = type('/^([\\w.-]+)__([\\w._-]+):.+$/').describe(
 	'Identifiant d\'option métadonnée avec namespace, sous la forme "protocolId__metadataId:optionKey"'
 );
 

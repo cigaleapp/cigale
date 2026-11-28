@@ -7,10 +7,10 @@
 	import Logo from './Logo.svelte';
 
 	interface Props {
-		loading?: boolean | string | undefined;
+		loading?: boolean | string | undefined | Snippet;
 		/** A string is shown as-is; any other truthy value is formatted with `errorMessage`. */
 		failure?: unknown;
-		empty?: boolean | string | undefined;
+		empty?: boolean | string | undefined | Snippet;
 		children?: Snippet;
 	}
 
@@ -33,12 +33,20 @@
 {:else if loading}
 	<div class="loading" in:fade={{ duration: 200 }}>
 		<Logo loading />
-		{fallbackString(loading, 'Chargement…')}
+		{#if typeof loading === 'function'}
+			{@render loading()}
+		{:else}
+			{fallbackString(loading, 'Chargement…')}
+		{/if}
 	</div>
 {:else if empty}
 	<div class="empty" in:fade={{ duration: 200 }}>
 		<Logo variant="empty" />
-		{fallbackString(empty, 'Rien à voir ici')}
+		{#if typeof empty === 'function'}
+			{@render empty()}
+		{:else}
+			{fallbackString(empty, 'Rien à voir ici')}
+		{/if}
 	</div>
 {:else if children}
 	{@render children()}
@@ -54,6 +62,7 @@
 		gap: 1rem;
 
 		height: 100%;
+		min-height: var(--loading-screen-min-height);
 		width: 100%;
 
 		--size: 5rem; /* Logo size */

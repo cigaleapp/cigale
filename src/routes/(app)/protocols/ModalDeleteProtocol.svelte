@@ -1,15 +1,18 @@
-<script>
+<script lang="ts">
 	import { plural } from '#lib/i18n.js';
-	import { openTransaction, tables } from '#lib/idb.svelte.js';
+	import { databaseHandle, tables } from '#lib/idb.svelte.js';
 	import ModalConfirmDeletion from '#lib/ModalConfirmDeletion.svelte';
-	import { isNamespacedToProtocol } from '#lib/schemas/metadata.js';
-	import { getSetting, setSetting } from '#lib/settings.svelte.js';
+	import { dependentProtocols } from '#lib/protocols/dependencies.ts';
+	import { uninstallProtocol } from '#lib/protocols/uninstall.ts';
 	import { toasts } from '#lib/toasts.svelte.js';
 
-	/**
-	 * @type {{ id: string, open: (() => void) | undefined, ondelete?: () => void }}
-	 */
-	let { id, open = $bindable(), ondelete } = $props();
+	interface Props {
+		id: string;
+		open: (() => void) | undefined;
+		ondelete?: () => void;
+	}
+
+	let { id, open = $bindable(), ondelete }: Props = $props();
 
 	/**
 	 * Protocol we're confirming deletion for
@@ -19,7 +22,30 @@
 	/**
 	 * Sessions that use this protocol
 	 */
-	const sessionsUsingProtocol = $derived(tables.Session.state.filter((s) => s.protocol === id));
+	const sessionsUsingProtocol = $derived(
+		tables.Session.state.filter((s) => [...protocolsUsingProtocol, id].includes(s.protocol))
+	);
+
+	/**
+	 * Protocols that use this protocol
+	 */
+	let protocolsUsingProtocol = $state<string[]>([]);
+
+	$effect(() => {
+		if (!open || !removingProtocol) {
+			protocolsUsingProtocol = [];
+			return;
+		}
+
+		void (async () => {
+			for (const dependant of await dependentProtocols(
+				databaseHandle(),
+				removingProtocol.id
+			)) {
+				protocolsUsingProtocol.push(dependant);
+			}
+		})();
+	});
 </script>
 
 <ModalConfirmDeletion
@@ -28,35 +54,17 @@
 	key="modal_delete_protocol"
 	typeToConfirm={removingProtocol?.name}
 	consequences={[
+		...protocolsUsingProtocol.map(
+			(id) => `La suppression du protocole ${tables.Protocol.getFromState(id)?.name ?? id}`
+		),
 		plural(sessionsUsingProtocol.length, [
 			"L'impossibilité d'utiliser 1 session",
 			"L'impossibilité d'utiliser # sessions",
 		]),
 	]}
 	onconfirm={async () => {
-		await openTransaction(['Protocol', 'Metadata', 'MetadataOption'], {}, async (tx) => {
-			if (!removingProtocol) return;
-
-			tx.objectStore('Protocol').delete(removingProtocol.id);
-
-			const toRemove = removingProtocol.metadata.filter(
-				(id) => removingProtocol && isNamespacedToProtocol(removingProtocol.id, id)
-			);
-
-			const options = await tx.objectStore('MetadataOption').getAll();
-
-			for (const metadata of toRemove) {
-				tx.objectStore('Metadata').delete(metadata);
-				options
-					.filter((o) => o.id.startsWith(`${metadata}:`))
-					.forEach((o) => tx.objectStore('MetadataOption').delete(o.id));
-			}
-		});
-
-		const autoUpdates = await getSetting('autoUpdateProtocols');
-		delete autoUpdates[id];
-		await setSetting('autoUpdateProtocols', autoUpdates);
-
+		if (!removingProtocol) return;
+		await uninstallProtocol(databaseHandle(), removingProtocol.id);
 		toasts.success('Protocole supprimé');
 		ondelete?.();
 	}}

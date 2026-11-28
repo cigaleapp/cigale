@@ -49,12 +49,15 @@ async function filepathTypesDeclarations(
 	decls: Record<string, Pattern[]>
 ): Promise<string[]> {
 	return await Promise.all(
-		Object.entries(decls).map(
-			async ([typeName, globs]) =>
-				`export type ${typeName} = ${await Promise.all(
-					globs.map(async (glob) => filepathTypeExpression(root, glob))
-				).then((exprs) => exprs.join(' | '))};`
-		)
+		Object.entries(decls).map(async ([typeName, globs]) => {
+			const expr = await Promise.all(
+				globs.map(async (glob) => filepathTypeExpression(root, glob))
+			).then((exprs) => exprs.join(' | '));
+
+			// console.info(`Scanned ${typeName} @ ${root || '/'}:\n\t${expr}`);
+
+			return `export type ${typeName} = ${expr};`;
+		})
 	);
 }
 
@@ -101,7 +104,7 @@ Bun.file(path.join(projectRoot, 'tests', 'filepaths.ts')).write(
 			Protocols: '*.{json,yaml}',
 		})),
 		...(await namespacedDeclarations('RealPaths', '', {
-			Protocols: 'protocols/*.{json,yaml}',
+			Protocols: 'protocols/**/*.cigaleprotocol.{json,yaml}',
 		})),
 	].join('\n')
 );

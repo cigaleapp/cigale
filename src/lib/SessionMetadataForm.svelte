@@ -27,16 +27,7 @@
 	const protocol = $derived(tables.Protocol.getFromState(session.protocol));
 
 	const metadataDefs = $derived(
-		protocol
-			? tables.Metadata.state.filter((m) =>
-					[
-						...protocol.sessionMetadata,
-						...protocol.importedMetadata
-							.filter((imp) => imp.sessionwide)
-							.map((imp) => imp.source),
-					].includes(m.id)
-				)
-			: []
+		protocol ? tables.Metadata.state.filter((m) => protocol.sessionMetadata.includes(m.id)) : []
 	);
 
 	watch([() => refreshDefaults], () => {

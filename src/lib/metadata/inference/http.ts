@@ -24,7 +24,7 @@ import {
 } from '#lib/schemas/metadata.js';
 import { entries, mapKeys, safeJSONParse, switchValue, transformObject, zip } from '#lib/utils.js';
 
-import { resolveMetadataImport } from '../imports.js';
+import { resolveMetadataId } from '../namespacing.js';
 import { hasRuntimeType } from '../types.js';
 
 export async function inferHttp(
@@ -43,18 +43,15 @@ export async function inferHttp(
 
 	if (settings instanceof ArkErrors) return;
 
-	const payload = transformObject(values, (key, { value, ...rest }) => {
-		if (
-			!settings.needs.some(
-				(need) =>
-					key ===
-					resolveMetadataImport(protocol, ensureNamespacedMetadataId(need, protocolId))
-			)
-		)
-			return;
+	const payload = transformObject(values, (id, { value, ...rest }) => {
+		// Exclude metadata that arent part of the protocol
+		if (!protocol.metadata.includes(id)) return;
+
+		// Exclude metadata that arent marked as dependencies
+		if (!settings.needs.some((need) => resolveMetadataId(protocol, need) === id)) return;
 
 		return [
-			removeNamespaceFromMetadataId(key),
+			removeNamespaceFromMetadataId(id),
 			{ ...rest, value: safeJSONParse(value) ?? value },
 		];
 	});
@@ -100,7 +97,7 @@ export async function httpInferencesToRefresh(
 	const protocol = await db.get('Protocol', protocolId);
 
 	for (const id of protocol?.metadata ?? []) {
-		const metadata = await db.get('Metadata', resolveMetadataImport(protocol, id));
+		const metadata = await db.get('Metadata', id);
 		if (!metadata) continue;
 
 		// Greatly improves performance (as opposed to shouldRefreshHttpInference that does a arktype check)

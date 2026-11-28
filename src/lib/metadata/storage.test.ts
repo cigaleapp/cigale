@@ -1,7 +1,8 @@
 import type { DatabaseHandle } from '#lib/idb.svelte.js';
 
 import { openDatabase } from '#lib/idb.svelte.js';
-import { metadataOptionId, MetadataType, namespacedMetadataId } from '#lib/schemas/metadata.js';
+import { metadataOptionId } from '#lib/metadata/options.js';
+import { MetadataType, namespacedMetadataId } from '#lib/schemas/metadata.js';
 
 import 'fake-indexeddb/auto';
 

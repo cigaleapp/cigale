@@ -9,7 +9,9 @@ import type { SwarpcClient } from 'swarpc';
 import * as ort from 'onnxruntime-web/webgpu';
 
 import { assertHardwareRequirements } from './hardware-requirements.js';
+import { databaseHandle } from './idb.svelte.js';
 import { loadToTensor, output2BB, preprocessTensor } from './inference_utils.js';
+import { loadClassmapping } from './neural/classmapping.js';
 import { HardwareRequirements } from './schemas/constraints.js';
 import { accessBytes } from './storage/utils.js';
 import { fetchHttpRequest, progressSplitter } from './utils.js';
@@ -155,20 +157,15 @@ export async function loadModel({
 					.then((response) => response.arrayBuffer())
 					.then((buffer) => new Uint8Array(buffer));
 
-	/** @type {string | undefined} */
-	let classmapping: string | undefined = undefined;
+	let classmapping: Array<string | null> | undefined = undefined;
 	if ('classmapping' in config && config.classmapping) {
-		if (Array.isArray(config.classmapping)) {
-			classmapping = config.classmapping.join('\n');
-		} else {
-			classmapping = await fetchHttpRequest(config.classmapping, {
-				signal: abortSignal,
-				cacheAs: 'model',
-				onProgress({ transferred, total }) {
-					onProgress(splitProgress('classmapping', transferred / total));
+		classmapping = await (
+			loadClassmapping(databaseHandle(), metadataId, config, {
+				onProgress(done, total) {
+					onProgress(splitProgress('classmapping', done / total));
 				},
-			}).then((res) => res.text());
-		}
+			})
+		);
 	}
 
 	const loaded = await swarpc.loadModel.broadcast.once.orThrow({

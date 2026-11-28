@@ -26,7 +26,7 @@
 	<ButtonIcon
 		help="Fermer la session"
 		onclick={async () => {
-			await goto('/sessions/');
+			await goto('/(app)/sessions/');
 			await switchSession(null);
 		}}
 	>

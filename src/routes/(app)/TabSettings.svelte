@@ -12,7 +12,6 @@
 	import { assertHardwareRequirements } from '#lib/hardware-requirements.js';
 	import { tables } from '#lib/idb.svelte.js';
 	import { ACCEPTED_IMPORT_TYPES } from '#lib/import.svelte.js';
-	import { resolveMetadataImport } from '#lib/metadata/namespacing.js';
 	import { IsMobile } from '#lib/mobile.svelte.js';
 	import { globalModals } from '#lib/modals.svelte.js';
 	import { goto } from '#lib/paths.js';
@@ -118,7 +117,6 @@
 	const metadataOfProtocol = $derived(
 		protocol
 			? protocol.metadata
-					.map((key) => resolveMetadataImport(protocol, key))
 					.map((id) => tables.Metadata.getFromState(id))
 					.filter(nonnull)
 					.sort(compareMetadataDefs)

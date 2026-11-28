@@ -1,5 +1,4 @@
 /// <reference types="vitest" />
-import { execSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 
 import adapter from '@sveltejs/adapter-static';
@@ -17,6 +16,11 @@ import { wuchale } from 'wuchale/vite';
 
 const env = arkenv(
 	{
+		PR_NUMBER: 'string.integer.parse | null = null',
+		BASE_PATH: '"" | /^\\// = ""',
+		BUILD_COMMIT: 'string = "dev"',
+		ELECTRON_BUILD: 'boolean = false',
+		SVELTE_FALLBACK_PAGE: 'string = "index.html"',
 		GITHUB_ACTIONS: 'boolean = false',
 		BUNDLE_ANALYZER: type
 			.enumerated('json', 'server', 'static')
@@ -27,14 +31,9 @@ const env = arkenv(
 		DEBUG: type('string|boolean').pipe(Boolean).default(false),
 		/** Required for mobile app, since window.location.origin returns localhost */
 		WEB_ORIGIN: 'string.url = "https://cigaleapp.github.io"',
-		BUILTIN_PROTOCOLS: type('string.url')
-			.array()
-			.default(() => [
-				'https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/insecta.cigaleprotocol.yaml',
-				'https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/entomoscope.cigaleprotocol.yaml',
-				'https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json',
-				'https://raw.githubusercontent.com/cigaleapp/cigale/main/protocols/idmybee.cigaleprotocol.json',
-			]),
+		PROTOCOL_REGISTRY_URLS: type('string.url[]').default(() => [
+			'https://cigale-protocols-biodimedia-data-terra.ai.meso.umontpellier.fr/registry.json',
+		]),
 	},
 	{
 		arrayFormat: 'comma',
@@ -44,8 +43,6 @@ const env = arkenv(
 if (env.BUNDLE_ANALYZER.length > 0) {
 	console.info('Analyzing bundle with modes', env.BUNDLE_ANALYZER);
 }
-
-const prNumber = process.env.PR_NUMBER ? parseInt(process.env.PR_NUMBER, 10) : undefined;
 
 export default defineConfig({
 	legacy: {
@@ -86,12 +83,10 @@ export default defineConfig({
 	},
 	define: {
 		'import.meta.vitest': 'undefined',
-		'import.meta.env.buildCommit': JSON.stringify(
-			execSync('git rev-parse HEAD').toString().trim()
-		),
-		'import.meta.env.previewingPrNumber': prNumber ?? 'null',
-		'import.meta.env.builtinProtocols': JSON.stringify(env.BUILTIN_PROTOCOLS),
+		'import.meta.env.buildCommit': JSON.stringify(env.BUILD_COMMIT),
+		'import.meta.env.previewingPrNumber': JSON.stringify(env.PR_NUMBER),
 		'import.meta.env.webOrigin': JSON.stringify(env.WEB_ORIGIN),
+		'import.meta.env.protocolRegistryUrls': JSON.stringify(JSON.stringify(env.PROTOCOL_REGISTRY_URLS)),
 		'import.meta.env.androidNativeCodeVersion': JSON.stringify(
 			readFileSync('android/.native-code-version', {
 				encoding: 'utf8',
@@ -127,29 +122,24 @@ export default defineConfig({
 			compiler: 'svelte',
 			defaultClass: 'icon',
 		}),
+
 		// FIXME Wuchale doesnt play well with Vitest for now
 		env.VITEST ? undefined : wuchale(),
 
 		sveltekit({
 			extensions: ['.svelte', '.svx'],
 			compilerOptions: { experimental: { async: true } },
-			version: { name: process.env.BUILD_COMMIT || 'dev' },
+			version: { name: env.BUILD_COMMIT },
 			adapter: adapter({
-				pages: process.env.ELECTRON_BUILD ? '.vite/build/sveltekit' : 'public',
-				fallback: process.env.SVELTE_FALLBACK_PAGE || 'index.html',
+				pages: env.ELECTRON_BUILD ? '.vite/build/sveltekit' : 'public',
+				fallback: env.SVELTE_FALLBACK_PAGE,
 			}),
 			prerender: { entries: ['*', '/.well-known/assetlinks.json'] },
 			paths: {
-				base:
-					process.env.BASE_PATH ||
-					(process.env.ENVIRONMENT_URL
-						? new URL(process.env.ENVIRONMENT_URL).pathname.replace(
-								/\/index\.html$/,
-								''
-							)
-						: ''),
+				base: env.BASE_PATH,
 			},
 		}),
+
 		crossOriginIsolation(),
 		env.HTTPS_DEV ? mkcert() : undefined,
 	],

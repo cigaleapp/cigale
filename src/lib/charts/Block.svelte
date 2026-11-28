@@ -8,19 +8,14 @@
 	import ButtonIcon from '#lib/ButtonIcon.svelte';
 	import Carousel from '#lib/Carousel.svelte';
 	import DebugOnly from '#lib/DebugOnly.svelte';
-	import { databaseHandle, get, tables } from '#lib/idb.svelte.js';
+	import { databaseHandle, tables } from '#lib/idb.svelte.js';
 	import LearnMoreLink from '#lib/LearnMoreLink.svelte';
 	import LoadingText, { Loading } from '#lib/LoadingText.svelte';
 	import Markdown from '#lib/Markdown.svelte';
-	import { resolveMetadataImport } from '#lib/metadata/imports.js';
-	import { metadataOption } from '#lib/metadata/index.js';
+	import { metadataOption, resolveMetadataId } from '#lib/metadata/index.js';
 	import { mergeMetadataFromImagesAndObservations } from '#lib/metadata/merging.js';
-	import {
-		ensureNamespacedMetadataId,
-		metadataOptionId,
-		removeNamespaceFromMetadataId,
-		splitMetadataId,
-	} from '#lib/schemas/metadata.js';
+	import { findMetadataOption } from '#lib/metadata/options.ts';
+	import { removeNamespaceFromMetadataId, splitMetadataId } from '#lib/schemas/metadata.js';
 	import { toMetadataRecord } from '#lib/schemas/results.js';
 	import { isDebugMode } from '#lib/settings.svelte.js';
 	import { uiState } from '#lib/uistate.svelte.js';
@@ -175,12 +170,10 @@
 		const protocol = await tables.Protocol.get(protocolId!);
 		if (!protocol) return;
 
-		const id = resolveMetadataImport(
-			protocol,
-			ensureNamespacedMetadataId(block.metadata, protocolId)
-		);
+		const id = resolveMetadataId(protocol, block.metadata);
+		if (!id) return;
 
-		return await get('MetadataOption', metadataOptionId(id, result.toString()));
+		return await findMetadataOption(databaseHandle(), id, result.toString());
 	}
 </script>
 

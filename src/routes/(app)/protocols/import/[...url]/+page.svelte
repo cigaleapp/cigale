@@ -43,18 +43,9 @@
 	}}
 	onconfirm={async () => {
 		if (!toImport) return;
-		importing = true;
-		const raw = await fetch(toImport)
-			.then((res) => res.text())
-			.catch((e) => {
-				toasts.error(null, `Erreur lors de l'import du protocole distant: ${e}`);
-				return null;
-			});
-
-		if (!raw) return;
 
 		try {
-			await swarpc.importProtocol({ contents: raw });
+			await swarpc.importProtocol({ url: toImport });
 			await tables.Protocol.refresh(null);
 			await tables.Metadata.refresh(null);
 			await goto('/protocols/');

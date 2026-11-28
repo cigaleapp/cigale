@@ -1,24 +1,29 @@
-<script>
+<script lang="ts">
 	import LoadingSpinner from './LoadingSpinner.svelte';
 	import { tooltip } from './tooltips.js';
 
-	/**
-	 * @typedef Props
-	 * @type {object}
-	 * @property {(e: MouseEvent) => void|Promise<void>} onclick
-	 * @property {import('svelte').Snippet} children
-	 * @property {boolean} [submits] whether this button submits a form
-	 * @property {string} help
-	 * @property {string} [keyboard] keyboard shortcut hint to display in the help tooltip
-	 * @property {boolean} [disabled]
-	 * @property {boolean} [crossout] draw a diagonal line through the button's content
-	 * @property {boolean} [dangerous] style the button to indicate a dangerous action
-	 * @property {() => void} [preload] function to call on mouseover, useful for preloading the next page in a navigation button for instance
-	 * @property {boolean} [loading] whether to show a loading state (disable the button and show a spinner, while the onclick handler is running)
-	 * @property {Partial<import('#lib/tooltips.js').TooltipParameters>} [tooltipParams] additional params for the tooltip
-	 */
+	type OnclickSignals = {
+		/** Marks the beginning of the loading state. */
+		loadingStarted: () => void;
+		/** Marks the end of the loading state. */
+		loadingEnded: () => void;
+	};
 
-	/** @type {Props & Record<string, unknown>} */
+	interface Props {
+		// eslint-disable-next-line no-unused-vars
+		onclick: (e: MouseEvent, signals: OnclickSignals) => void | Promise<void>;
+		children: import('svelte').Snippet;
+		submits?: boolean;
+		help: string;
+		keyboard?: string;
+		disabled?: boolean;
+		crossout?: boolean;
+		dangerous?: boolean;
+		preload?: () => void;
+		loading?: boolean;
+		tooltipParams?: Partial<import('#lib/tooltips.js').TooltipParameters>;
+	}
+
 	let {
 		children,
 		onclick,
@@ -32,7 +37,7 @@
 		tooltipParams = {},
 		loading: showLoading,
 		...rest
-	} = $props();
+	}: Props & Record<string, unknown> = $props();
 
 	let loading = $state(false);
 </script>
@@ -43,7 +48,14 @@
 		if (disabled) return;
 		loading = true;
 		try {
-			await onclick(e);
+			await onclick(e, {
+				loadingStarted: () => {
+					loading = true;
+				},
+				loadingEnded: () => {
+					loading = false;
+				},
+			});
 		} finally {
 			loading = false;
 		}

@@ -47,7 +47,6 @@
 	import { databaseHandle } from '#lib/idb.svelte.js';
 	import LearnMoreLink from '#lib/LearnMoreLink.svelte';
 	import Markdown from '#lib/Markdown.svelte';
-	import { resolveMetadataImport } from '#lib/metadata/namespacing.js';
 	import { serializeMetadataValue } from '#lib/metadata/serializing.js';
 	import { metadataIdOfOption, metadataOption } from '#lib/metadata/storage.js';
 	import MetadataCascadesTable from '#lib/MetadataCascadesTable.svelte';
@@ -141,8 +140,7 @@
 			tables: Tables,
 			table: 'MetadataOption',
 			max: 30,
-			filter: (id) =>
-				metadataIdOfOption(protocol, id) === resolveMetadataImport(protocol, definition.id),
+			filter: (id) => metadataIdOfOption(protocol, id) === definition.id,
 		});
 
 		for await (const result of searcher(query)) {

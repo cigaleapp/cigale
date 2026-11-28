@@ -183,7 +183,7 @@
 
 <ModalCreateCustomNeuralNetwork />
 
-<ModalPickProtocol />
+<ModalPickProtocol show="usable-only" />
 
 <Modal
 	key="modal_debug_ui_state"
@@ -220,7 +220,8 @@
 		class:padded={!page.route.id?.includes('/(sidepanel)') &&
 			!page.route.id?.includes('protocols/[id]/') &&
 			page.route.id !== '/(app)/capture' &&
-			page.route.id !== '/(app)/sessions'}
+			page.route.id !== '/(app)/sessions' &&
+			page.route.id !== '/(app)/protocols'}
 	>
 		{@render children?.()}
 	</div>

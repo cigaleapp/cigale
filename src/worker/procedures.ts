@@ -28,7 +28,11 @@ export const PROCEDURES = {
 	loadModel: {
 		input: type({
 			model: 'TypedArray.Uint8',
-			'classmapping?': 'string | undefined',
+			/**
+			 * Keys of the enum metadata we'll infer to. Null values means
+			 * that this class is not supported by the metadata.
+			 */
+			classmapping: 'undefined | (string|null)[]',
 			task: '"classification" | "detection"',
 			inferenceSessionId: 'string > 1',
 			enableWebGPU: 'boolean = true',
@@ -85,28 +89,17 @@ export const PROCEDURES = {
 	},
 	importProtocol: {
 		input: type({
-			contents: 'string',
-			/** Optimize parsing by ensuring content is JSONC and not just YAML */
-			isJSON: 'boolean = false',
+			source: 'string.url | URL | File',
 		}),
 		progress: type({
+			protocol: 'string',
 			done: 'number >= 0',
 			total: 'number > 0',
-			phase: type.enumerated(
-				'parsing',
-				'filtering-builtin-metadata',
-				'input-validation',
-				'write-protocol',
-				'write-metadata',
-				'write-metadata-options',
-				'output-validation'
-			),
+			phase: 'string',
 			'detail?': 'string',
 		}),
 		success: type({
 			id: 'string',
-			name: 'string',
-			'version?': 'number | undefined',
 			iconsToPreload: 'string[]',
 		}),
 	},

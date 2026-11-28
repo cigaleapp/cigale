@@ -7,6 +7,7 @@ import {
 	ID,
 	MIMEType,
 	NamespacedMetadataID,
+	NamespacedMetadataOptionID,
 	Probability,
 	References,
 } from './schemas/common.js';
@@ -14,8 +15,8 @@ import {
 	EXIFField,
 	MetadataEnumVariant,
 	MetadataError,
+	MetadataInDatabase,
 	MetadataMergeMethod,
-	Metadata as MetadataSchema,
 	MetadataType as MetadataTypeSchema,
 	MetadataValue,
 	MetadataValues,
@@ -101,11 +102,24 @@ const Observation = table(['id', 'addedAt', 'sessionId', 'images[]'], Observatio
 
 const Session = table(['id', 'remoteId'], SessionSchema);
 
-const Metadata = table('id', MetadataSchema.omit('options'));
+const Metadata = table('id', MetadataInDatabase);
+
 const MetadataOption = table(
-	['id', 'kobocollectId', '_narrowableIn[]', '_search[]'],
+	[
+		'id',
+		'kobocollectId',
+		'namespacedLabel',
+		'namespacedExtraKeys[]',
+		'_narrowableIn[]',
+		'_search[]',
+	],
 	MetadataEnumVariant.and({
-		id: [/\w+__\w+:\w+/, '@', 'ID of the form namespaced_metadata_id:key'],
+		/** ID of the form namespaced_metadata_id:key */
+		id: NamespacedMetadataOptionID,
+		/** label, prefixed by namespaced_metadata_id: */
+		namespacedLabel: NamespacedMetadataOptionID,
+		/** extraKeys, prefixed by namespaced_metadata_id: */
+		namespacedExtraKeys: NamespacedMetadataOptionID.array(),
 		metadataId: NamespacedMetadataID,
 		/** For search purposes: to search for something, we get all keys of that index and do a fuzzy search on them */
 		_search: ['string[]', '=', () => []],

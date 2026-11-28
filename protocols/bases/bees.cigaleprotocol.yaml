@@ -1,0 +1,243 @@
+# yaml-language-server: $schema=../../static/protocol.schema.json
+
+manifest: v1.0
+id: io.github.cigaleapp.base.bees
+name: Abeilles (base)
+
+version: 1
+updates: automatic
+
+# this yaml file doesnt include most metadata since they're generated from
+# IDmyBee's Andrena Xper3 SDD
+# so the protocol's source is the generated .json based on this manifest yaml file
+source: http://localhost:3000/bases/bees.cigaleprotocol.json
+
+usable: false
+summary: Protocole de base pour les abeilles
+description: Protocole de base pour les abeilles
+
+authors:
+  - name: IDmyBee authors
+
+imports:
+  - from: io.github.cigaleapp.base.arthropods
+    metadata:
+      - crop
+
+metadataGroups:
+  taxonomy:
+    name: Taxonomie
+    description: Classification taxonomique de l'espèce
+    # TODO: order here!
+
+  andrena:
+    name: Andrènes
+    description: Spécifique aux abeilles sauvages, du groupe Andrena
+
+metadata:
+  morphogroup:
+    type: enum
+    label: Morphogroupe
+    group: andrena
+    externalOptions:
+      - at: https://huggingface.co/edgaremy/andrena-classifier/resolve/main/class-mapping-grouped.txt?download=true
+        format: txt
+        postprocess: |
+          {
+            "key": "andrena " & raw,
+            "index": lineIndex,
+            "label": $contains(raw, "gpe") ? $replace(raw, "gpe", "Groupe") : $titlecase(raw)
+          }
+    infer:
+      neural:
+        - name: ConvNextV2 Tiny
+          model: https://huggingface.co/edgaremy/andrena-classifier/resolve/main/convnextv2_tiny.andrena-grouped.onnx?download=true
+          classes: keys
+          classmapping:
+            at: https://huggingface.co/edgaremy/andrena-classifier/resolve/main/class-mapping-grouped.txt?download=true
+            format: txt
+            postprocess: '"andrena " & raw'
+          input:
+            height: 384
+            width: 384
+            normalized: true
+            disposition: 1CHW
+            name: input0
+          webgpuReady: false
+          output:
+            select: |
+              (
+                $plausible := neurons[score >= 0.01].key[];
+
+                "gpe wilkella-argentata" in $plausible
+                ? $append($plausible, ["gpe wilkella", "gpe argentata"])
+                : $plausible
+              )
+
+  species:
+    type: enum
+    label: Espèce
+    required: true
+    description: ''
+    mergeMethod: max
+    groupable: true
+    externalOptions:
+      - at: http://localhost:3000/options/bees/species.jsonl
+        format: json-lines
+
+  kingdom:
+    type: enum
+    group: taxonomy
+    label: Règne
+    required: true
+    description: ''
+    mergeMethod: max
+    groupable: true
+    externalOptions:
+      - at: http://localhost:3000/options/bees/kingdom.jsonl
+        format: json-lines
+
+  phylum:
+    type: enum
+    group: taxonomy
+    label: Phylum
+    required: true
+    description: ''
+    mergeMethod: max
+    groupable: true
+    externalOptions:
+      - at: http://localhost:3000/options/bees/phylum.jsonl
+        format: json-lines
+
+  class:
+    type: enum
+    group: taxonomy
+    label: Classe
+    required: true
+    description: ''
+    mergeMethod: max
+    groupable: true
+    externalOptions:
+      - at: http://localhost:3000/options/bees/class.jsonl
+        format: json-lines
+
+  order:
+    type: enum
+    group: taxonomy
+    label: Ordre
+    required: true
+    description: ''
+    mergeMethod: max
+    groupable: true
+    externalOptions:
+      - at: http://localhost:3000/options/bees/order.jsonl
+        format: json-lines
+
+  family:
+    type: enum
+    group: taxonomy
+    label: Famille
+    required: true
+    description: ''
+    mergeMethod: max
+    groupable: true
+    externalOptions:
+      - at: http://localhost:3000/options/bees/family.jsonl
+        format: json-lines
+
+  genus:
+    type: enum
+    group: taxonomy
+    label: Genre
+    required: true
+    description: ''
+    mergeMethod: max
+    groupable: true
+    externalOptions:
+      - at: http://localhost:3000/options/bees/genus.jsonl
+        format: json-lines
+
+  identification_difficulty:
+    type: enum
+    label: Difficulté didentification
+    description: Niveau de difficulté pour identifier l'espèce
+    required: false
+    mergeMethod: average
+    groupable: true
+    sortable: true
+    options:
+      - key: easy
+        label: Facile
+        color: '#367517'
+        icon: ri:emotion-laugh-line
+      - key: medium
+        label: Moyenne
+        color: '#e8e819'
+        icon: ri:emotion-happy-line
+      - key: hard
+        label: Difficile
+        color: '#dd8808'
+        icon: ri:emotion-normal-line
+      - key: very_hard
+        label: Très difficile
+        color: '#cd3c28'
+        icon: ri:emotion-unhappy-line
+
+  conservation_status:
+    type: enum
+    label: Statut de conservation
+    description: Statut de conservation IUCN de l'espèce
+    required: false
+    mergeMethod: average
+    groupable: true
+    sortable: true
+    options:
+      - key: ex
+        label: EX
+        description: Éteint (“Extinct”)
+        color: '#000000'
+      - key: ew
+        label: EW
+        description: Éteint à l’état sauvage (“Extinct in the Wild”)
+        color: '#3a3a3a'
+      - key: cr
+        label: CR
+        description: En danger critique d’extinction (“Critically Endangered”)
+        color: '#cd3030'
+      - key: en
+        label: EN
+        description: En danger (“Endangered”)
+        color: '#cd6630'
+      - key: vu
+        label: VU
+        description: Vulnérable (“Vulnerable”)
+        color: '#cd9a00'
+      - key: nt
+        label: NT
+        description: Quasi menacé (“Near Threatened”)
+        color: '#006666'
+      - key: lc
+        label: LC
+        description: Préoccupation mineure (“Least Concern”)
+        color: '#16ca85'
+
+  shoot_date:
+    type: date
+    label: Date
+    description: Moment de l'observation
+    required: false
+    mergeMethod: average
+    sortable: true
+    groupable: true
+    infer: { exif: DateTimeOriginal }
+
+  shoot_location:
+    type: location
+    label: Localisation
+    description: Endroit de l'observation
+    required: false
+    mergeMethod: average
+    groupable: true
+    infer:
+      latitude: { exif: GPSLatitude }
+      longitude: { exif: GPSLongitude }

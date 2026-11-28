@@ -1,6 +1,5 @@
 import { type } from 'arktype';
 
-import { mapKeys, omit, orEmptyObj2 } from '../utils.js';
 import { Charts } from './charts.js';
 import {
 	HourRange,
@@ -10,19 +9,35 @@ import {
 	MIMEType,
 	NamespacedMetadataID,
 	ProtocolID,
-	SingleEntryRecord,
 	URLString,
 } from './common.js';
 import { DarwinCoreProtocolConfig } from './darwincore.js';
 import { FilepathTemplate, TemplatedString } from './expressions.js';
-import {
-	Metadata,
-	MetadataGroup,
-	MetadataRecord,
-	namespacedMetadataId,
-	SidecarFilepathTemplate,
-} from './metadata.js';
+import { Metadata, MetadataGroup, MetadataRecord, SidecarFilepathTemplate } from './metadata.js';
 import { AnalyzedImage, AnalyzedObservation } from './results.js';
+
+export const ProtocolRegistry = type({
+	protocols: type({
+		id: ProtocolID,
+		url: URLString.describe('URL où télécharger le protocole'),
+		name: 'string',
+		'logo?': URLString.or('null'),
+		version: 'number',
+		'summary?': 'string',
+		manifestVersion: [
+			'/^(\\d+)\\.(\\d+)$/',
+			'@',
+			'Version cigaleprotocol utilisée pour déclarer ce protocole. Permet de déterminer si une app cigale donnée peut installer ce protocole-ci',
+		],
+		suggested: 'boolean = true',
+		/** URLs for older versions of the protocol */
+		older: type({
+			version: 'number',
+			manifestVersion: '/^(\\d+)\\.(\\d+)$/',
+			url: URLString,
+		}).array(),
+	}).array(),
+});
 
 export const ExportsFilepathTemplateObservation = FilepathTemplate(
 	type({
@@ -53,41 +68,14 @@ export const ExportsFilepathTemplateMetadataFile = FilepathTemplate(
 
 export const ANALYSIS_JSON_ZIP_FILEPATH = 'analysis.json';
 
-export const ProtocolRegistry = type({
-	protocols: type({
-		id: ProtocolID,
-		url: URLString.describe('URL où télécharger le protocole'),
-		name: 'string',
-		'logo?': URLString.or('null'),
-		'version?': 'number',
-		suggested: 'boolean = true',
-	}).array(),
-});
-
 export const BeamupSettings = type({
 	origin: URLString.describe("URL de l'instance BeamUp d'où proviennent les données"),
 });
 
-const ItemsImportSpec = type
-	.or(
-		ID.describe('Clé de métadonnée à importer, sans le namespace'),
-		SingleEntryRecord(ID, ID).describe('Import avec renommage. ')
-	)
-	.pipe((spec) =>
-		typeof spec === 'string'
-			? { source: spec, target: spec }
-			: { source: spec.value, target: spec.key }
-	)
-	.array()
-	.describe(
-		"Clés (sans le namespace) de métadonnées à hériter du protocole spécifié dans 'from'. List de simples clés, ou d'objet avec une seule paire, de la forme { cible: source } où source est la clé dans le protocole duquel on importe, et cible est la clé que l'on donne à cette métadonnée dans le protocole courant (les deux sont sans namespace). Astuce: en YAML, quand on décrit une liste, les {} autour des objets sont optionnels. Par exemple: metadata: [a, b: b_source, c] ou - a↵ - b: b_source↵ - c importera la métadonnée 'a', la métadonnée 'b_source' renommée en 'b', et la métadonnée 'c' du protocole spécifié dans 'from'."
-	)
-	.default(() => []);
-
 export const ProtocolImport = type({
 	from: ProtocolID.describe('ID du protocole duquel importer'),
-	sessionMetadata: ItemsImportSpec,
-	metadata: ItemsImportSpec,
+	sessionMetadata: ID.array().default(() => []),
+	metadata: ID.array().default(() => []),
 	metadataGroups: ID.brand('MetadataGroup')
 		.array()
 		.default(() => []),
@@ -140,7 +128,13 @@ export const CaptureTimer = type({
 );
 
 export const Protocol = type({
+	manifest: '/^v\\d+\\.\\d+$/ = "v0.0"',
 	id: ProtocolID,
+	usable: type('boolean')
+		.describe(
+			"Si le protocole est destiné à être utilisé. Souvent le cas, mais pas pour les protocoles qui ne servent qu'à être importé par d'autres, par exemple"
+		)
+		.default(true),
 	dirty: type('boolean')
 		.describe('Si le protocole a été modifié depuis sa dernière exportation')
 		.default(false),
@@ -223,28 +217,12 @@ export const Protocol = type({
 		'timers?': CaptureTimer.array(),
 	},
 	'charts?': Charts.array(),
-	importedMetadata: type({
-		sessionwide: [
-			'boolean',
-			'@',
-			"True si la métadonnée s'importe en tant que sessionMetadata plutôt que metadata classique",
-		],
-		source: NamespacedMetadataID.describe(
-			"ID de la métadonnée dans le protocole d'où elle est importée, avec namespace"
-		),
-		target: NamespacedMetadataID.describe(
-			'ID de la métadonnée dans le protocole courant, avec namespace'
-		),
-	})
-		.array()
-
-		.describe("Toutes les métadonnées importées depuis d'autres protocoles")
-		.default(() => []),
+	imports: ProtocolImport.array().default(() => []),
 	metadata: NamespacedMetadataID.array().describe(
-		"Toutes les métadonnées du protocole (qu'elles soient associées aux sessions ou aux observations/images)"
+		"Toutes les métadonnées du protocole (qu'elles soient associées aux sessions ou aux observations/images), y compris celle importées"
 	),
 	sessionMetadata: NamespacedMetadataID.array()
-		.describe('Métadonnées associées à la session entière')
+		.describe('Métadonnées associées à la session entière, y compris celles importées')
 		.default(() => []),
 	metadataGroups: MetadataGroup.array()
 		.describe("Permet de grouper les métadonnées dans l'interface utilisateur")
@@ -325,116 +303,27 @@ export const Protocol = type({
 		.optional(),
 });
 
-export const ExportedProtocol = Protocol.omit(
-	'metadata',
-	'sessionMetadata',
-	'metadataGroups',
-	'metadataOrder',
-	'dirty',
-	'importedMetadata'
-)
-	.in.and({
-		'$schema?': 'string',
-		imports: ProtocolImport.array().default(() => []),
-		'metadataGroups?': type.Record(
-			ID,
-			MetadataGroup.in
-				.omit('id')
-				.describe("Permet de grouper les métadonnées dans l'interface utilisateur")
-		),
-		'metadataOrder?': ID.array().describe(
-			"L'ordre dans lequel les métadonnées doivent être présentées dans l'interface utilisateur. Les métadonnées non listées ici seront affichées après toutes celles listées ici"
-		),
-		metadata: type.Record(
-			ID,
-			Metadata.in.omit('id').describe('Métadonnées associées aux observations/imagess')
-		),
-		'sessionMetadata?': type.Record(
-			ID,
-			Metadata.in.omit('id').describe('Métadonnées associées à la session entière')
-		),
-	})
-	.pipe((protocol) => ({
-		...omit(protocol, 'imports'),
-		...orEmptyObj2('metadataOrder', protocol.metadataOrder, (order) =>
-			order.map((key) => namespacedMetadataId(protocol.id, key))
-		),
-		metadataGroups: mapKeys(protocol.metadataGroups ?? {}, (key) =>
-			MetadataGroup.get('id').assert(key)
-		),
-		importedMetadataGroups: protocol.imports.flatMap(({ from, metadataGroups }) =>
-			metadataGroups.map((id) => ({ from, id }))
-		),
-		importedMetadata: protocol.imports.flatMap(({ from, metadata, sessionMetadata }) => [
-			...metadata.map(({ source, target }) => ({
-				sessionwide: false,
-				source: namespacedMetadataId(from, source),
-				target: namespacedMetadataId(protocol.id, target),
-			})),
-			...sessionMetadata.map(({ source, target }) => ({
-				sessionwide: true,
-				source: namespacedMetadataId(from, source),
-				target: namespacedMetadataId(protocol.id, target),
-			})),
-		]),
-		metadata: mapKeys(protocol.metadata, (key) => namespacedMetadataId(protocol.id, key)),
-		sessionMetadata: mapKeys(protocol.sessionMetadata ?? {}, (key) =>
-			namespacedMetadataId(protocol.id, key)
-		),
-	}));
+export const ExportedProtocol = Protocol.omit('dirty').in.merge({
+	'$schema?': 'string',
+	'metadataGroups?': type.Record(
+		ID,
+		MetadataGroup.in
+			.omit('id')
+			.describe("Permet de grouper les métadonnées dans l'interface utilisateur")
+	),
+	'metadataOrder?': ID.array().describe(
+		"L'ordre dans lequel les métadonnées doivent être présentées dans l'interface utilisateur. Les métadonnées non listées ici seront affichées après toutes celles listées ici"
+	),
+	metadata: type.Record(
+		ID,
+		Metadata.in.omit('id').describe('Métadonnées associées aux observations/imagess')
+	),
+	'sessionMetadata?': type.Record(
+		ID,
+		Metadata.in.omit('id').describe('Métadonnées associées à la session entière')
+	),
+});
 
 /**
  * @typedef {typeof ExportedProtocol.inferOut} ExportedProtocol
  */
-
-/**
- * Returns whether the given metadata ID is in the given protocol
- * (either directly a metadata of the protocol, or the source/target of an imported metadata)
- * @param {Pick<typeof Protocol.infer, "metadata" | "importedMetadata">} protocol
- * @param {NamespacedMetadataID} metadataId
- *
- */
-export function isMetadataInProtocol(protocol, metadataId) {
-	return [
-		...protocol.metadata,
-		...protocol.importedMetadata.flatMap(({ source, target }) => [source, target]),
-	].includes(metadataId);
-}
-
-if (import.meta.vitest) {
-	const { test, expect, describe } = import.meta.vitest;
-
-	describe('isMetadataInProtocol', () => {
-		/** @type {Pick<typeof Protocol.infer, "metadata" | "importedMetadata">} */
-		const protocol = {
-			metadata: ['proto__color', 'proto__size'],
-			importedMetadata: [
-				{ sessionwide: false, source: 'other__shape', target: 'proto__shape' },
-			],
-		};
-
-		test('returns true for a direct metadata', () => {
-			expect(isMetadataInProtocol(protocol, 'proto__color')).toBe(true);
-			expect(isMetadataInProtocol(protocol, 'proto__size')).toBe(true);
-		});
-
-		test('returns true for the source of an imported metadata', () => {
-			expect(isMetadataInProtocol(protocol, 'other__shape')).toBe(true);
-		});
-
-		test('returns true for the target of an imported metadata', () => {
-			expect(isMetadataInProtocol(protocol, 'proto__shape')).toBe(true);
-		});
-
-		test('returns false for an unrelated metadata', () => {
-			expect(isMetadataInProtocol(protocol, 'proto__weight')).toBe(false);
-			expect(isMetadataInProtocol(protocol, 'other__color')).toBe(false);
-		});
-
-		test('returns false with empty protocol', () => {
-			expect(isMetadataInProtocol({ metadata: [], importedMetadata: [] }, 'any__id')).toBe(
-				false
-			);
-		});
-	});
-}

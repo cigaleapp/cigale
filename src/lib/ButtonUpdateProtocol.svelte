@@ -51,7 +51,7 @@
 
 {#if version && source}
 	{#key checkagain}
-		{#await hasUpgradeAvailable({ id, version, source })}
+		{#await hasUpgradeAvailable({ id, version })}
 			{#if customButton}
 				{@render customButton({
 					onclick: () => {},
@@ -68,10 +68,12 @@
 					{/if}
 				</Btn>
 			{/if}
-		{:then { upToDate, newVersion }}
+		{:then { upToDate, newVersion, updateIsCompatible }}
 			{@const onclick = async () => {
 				if (upToDate) {
 					checkagain = Date.now();
+				} else if (!updateIsCompatible) {
+					toasts.error("Mettre à jour l'app avant de mettre à jour le protocole");
 				} else {
 					upgrading = true;
 					await upgradeProtocol({ version, source, id, swarpc })

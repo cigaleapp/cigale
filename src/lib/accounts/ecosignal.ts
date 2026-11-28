@@ -20,7 +20,7 @@ import { generateId, Schemas, Tables } from '#lib/database.js';
 import { imageFileId, imageId, parseImageId } from '#lib/images.js';
 import { boundingBoxResolver } from '#lib/inference_utils.js';
 import { Channel, concurrently, poll } from '#lib/iterables.js';
-import { resolveMetadataImport, resolveMetadataImportBare } from '#lib/metadata/namespacing.js';
+import { resolveMetadataId } from '#lib/metadata/namespacing.js';
 import {
 	metadataRecordToSerialized,
 	serializeMetadataFullValue,
@@ -424,7 +424,7 @@ export default class Provider implements Account {
 			openedAt: new Date().toISOString(),
 			metadata: metadataRecordToSerialized(
 				collection.description.meta?.metadata ?? {},
-				(key) => resolveMetadataImportBare(protocol, key)
+				(key) => resolveMetadataId(protocol, key)
 			),
 			neuralModels: {},
 			group: {
@@ -598,7 +598,7 @@ export default class Provider implements Account {
 							addedAt: image.creation_date.toISOString(),
 							metadataOverrides: metadataRecordToSerialized(
 								image.note?.meta?.metadata ?? {},
-								(key) => resolveMetadataImportBare(protocol, key)
+								(key) => resolveMetadataId(protocol, key)
 							),
 							images: image.annotations.map((ann) =>
 								imageId(image.file.id, ann.annotation_id)
@@ -624,7 +624,7 @@ export default class Provider implements Account {
 								metadata: {
 									...metadataRecordToSerialized(
 										ann.comments?.meta?.metadata ?? {},
-										(key) => resolveMetadataImportBare(protocol, key)
+										(key) => resolveMetadataId(protocol, key)
 									),
 									[cropMetadataId]: serializeMetadataFullValue({
 										...box,
@@ -1352,8 +1352,7 @@ export default class Provider implements Account {
 
 	async #uploadableFileMetadataDefinitions(protocol: DB.Protocol) {
 		const defs = [] as Array<DB.Metadata & { type: 'file'; ecosignal: { label: string } }>;
-		for (const _id of protocol.sessionMetadata) {
-			const id = resolveMetadataImport(protocol, _id);
+		for (const id of protocol.sessionMetadata) {
 			const rawdef = await this.db.get('Metadata', id);
 			if (!rawdef) continue;
 			if (rawdef.type !== 'file') continue;
@@ -1847,7 +1846,7 @@ export default class Provider implements Account {
 			throw new Error(`Le protocole ${protocol.id} ne supporte pas les sessions EcoSignal`);
 
 		const metadataId = (key: string | undefined) =>
-			key ? resolveMetadataImportBare(protocol, key) : undefined;
+			key ? resolveMetadataId(protocol, key) : undefined;
 
 		const domains = ensureArray(config.domains);
 

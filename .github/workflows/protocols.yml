@@ -1,182 +1,166 @@
-name: Example protocols
+name: Protocols server
 
 on:
   schedule:
-    # Runs at 00:00 UTC every Monday
+    # Runs at 00:00 UTC every Monday and Thursday (same as the old workflow)
     - cron: 0 0 * * 1,4
   workflow_dispatch:
   pull_request:
     paths:
-      - scripts/generate-protocols.js
-      - scripts/add-species-from-jessica-joachim.ts
-      - scripts/add-species-from-google-slides.js
-      - scripts/add-taxonomic-parents-from-gbif.js
-      - scripts/add-metadata-from-xper3.ts
-      - scripts/create-idmybee-protocol.ts
-      - scripts/utils.ts
+      - protocols-server/**
+      - protocols/**
       - .github/workflows/protocols.yml
   push:
-    branches:
-      - renovate/googleapis-*
-      - renovate/google-auth-library-*
-      - renovate/rss-parser-*
-      - renovate/jsdom-*
-      - renovate/pdf-to-png-converter-*
-      - renovate/odt2html-*
-      - renovate/turndown-*
-      - renovate/marked-*
+    branches: [main]
+    paths:
+      - protocols-server/**
+      - protocols/**
+      - .github/workflows/protocols.yml
 
 concurrency:
-  group: regenerate-example-protocols
+  group: protocols-server
   cancel-in-progress: true
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: cigaleapp/protocols-server
+  HF_ENV: biodimedia
+  HF_APP: cigale-protocols
+
 jobs:
-  check:
-    name: Skip?
+  build-image:
+    name: Build and push image
     runs-on: ubuntu-latest
-    # Early skip when conditions can be eval'd directly with github action expressions:
-    # - PR is draft
-    # - PR has a bypass:protocol-regen label
-    if: github.event.pull_request.draft == false && !contains(github.event.pull_request.labels.*.name, 'bypass:protocol-regen')
-    outputs:
-      skip: ${{ !steps.changes.outputs.any_changed }}
+
+    permissions:
+      contents: read
+      packages: write
+
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
+      - name: Check out repository
+        uses: actions/checkout@v4
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
-        with:
-          bun-version-file: .bun-version
-
-      - name: Get paths to check changes for
-        id: paths
-        env:
-          workflow_ref: ${{ github.workflow_ref }}
-        run: |
-          # We sadly don't have yq, so a JS script will have to do
-
-          bun - <<'EOS' >> $GITHUB_OUTPUT
-            const path = process.env.workflow_ref
-              .split('@').at(0)
-              .split('/').slice(2).join('/')
-
-            const workflow = await import(`./${path}`)
-
-            console.log('files<<EOF')
-            console.log(workflow.on.pull_request.paths.join('\n'))
-            console.log('EOF')
-          EOS
-      - name: Compute changes with last push
+      - name: Check for relevant changes
+        if: github.event_name == 'pull_request' || github.event_name == 'push'
         id: changes
-        uses: tj-actions/changed-files@9426d40962ed5378910ee2e21d5f8c6fcbf2dd96 # v47.0.6
+        uses: dorny/paths-filter@v4
         with:
-          since_last_remote_commit: true
-          files: ${{ steps.paths.outputs.files }}
-      - name: Log summary to list changed files
-        run: |
-          echo "Changed files: ${{ steps.changes.outputs.all_changed_files }}" >> $GITHUB_STEP_SUMMARY
-          echo "Any changed: ${{ steps.changes.outputs.any_changed }}"  >> $GITHUB_STEP_SUMMARY
+          filters: |
+            protocols:
+              - 'protocols-server/**'
+              - 'protocols/**'
+              - '.github/workflows/protocols.yml'
 
-  regenerate:
-    needs: check
-    if: needs.check.outputs.skip != 'true'
-    name: Regenerate
-    runs-on: ubuntu-latest
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-    env:
-      GH_TOKEN: ${{ github.token }}
-
-    steps:
-      # For some reason, it's not available in job-level env ?
-      - name: Get checkrun id
-        run: |
-          echo "GH_CHECK_RUN_ID=${{ job.check_run_id }}" >> $GITHUB_ENV
-
-      - name: Checkout repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
         with:
-          ssh-key: ${{ secrets.AUTOCOMMITS_DEPLOY_KEY }}
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
 
-      - name: Setup Node.js
-        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,prefix=sha-
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=${{ github.ref_name }},enable=true
+
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
         with:
           bun-version-file: .bun-version
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
-      - name: Initialize protocol
-        run: bun run scripts/generate-protocols.js
+      # needed for the docker image
+      - name: Generate JSON schemas
+        run: bun run scripts/generate-json-schemas.js
 
-      - name: Add metadata from Xper3
-        run: bun run scripts/add-metadata-from-xper3.ts
-        env:
-          IDMYBEE_ANDRENA_SDD_URL: ${{ secrets.IDMYBEE_ANDRENA_SDD_URL }}
-
-      - name: Add species descriptions from JJ
-        run: bun run scripts/add-species-from-jessica-joachim.ts species
-        env:
-          WORDPRESS_USERNAME: ${{ secrets.WORDPRESS_USERNAME }}
-          WORDPRESS_APP_PASSWORD: ${{ secrets.WORDPRESS_APP_PASSWORD }}
-
-      - name: Set google-drive-key.json
-        uses: mobiledevops/secret-to-file-action@085a45b601133564d1311589e82b5b136d0839bb # v2.0.0
+      - name: Build and push image
+        if: steps.changes.outputs.protocols == 'true' || github.event_name == 'workflow_dispatch'
+        uses: docker/build-push-action@v6
         with:
-          base64-encoded-secret: ${{ secrets.GOOGLE_DRIVE_KEY_BASE64 }}
-          filename: google-drive-key.json
-          is-executable: false
-          working-directory: ./
+          context: .
+          file: protocols-server/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
-      - name: Add data from Google Slides folder
-        run: bun run scripts/add-species-from-google-slides.js
+  deploy:
+    name: Restart app and regenerate
+    runs-on: ubuntu-latest
+    needs: build-image
+    # XXX: DONT MERGE
+    # if: github.event_name != 'pull_request' && github.event_name == 'schedule'
 
-      - name: Unset google-drive-key.json
-        run: rm google-drive-key.json
+    permissions:
+      contents: read
+      checks: write
 
-      - name: Add data from GBIF
-        run: bun run scripts/add-taxonomic-parents-from-gbif.ts
+    steps:
+      - name: Record job start time
+        id: jobstart
+        run: echo "started_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_OUTPUT"
 
-      - name: Add genus descriptions from JJ
-        run: bun run scripts/add-species-from-jessica-joachim.ts genus
-        env:
-          WORDPRESS_USERNAME: ${{ secrets.WORDPRESS_USERNAME }}
-          WORDPRESS_APP_PASSWORD: ${{ secrets.WORDPRESS_APP_PASSWORD }}
+      - name: Check out repository
+        uses: actions/checkout@v4
 
-      - name: Create IDmyBee protocol
-        run: bun run scripts/create-idmybee-protocol.ts
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version-file: .bun-version
 
-      - name: Clean old protocol
-        run: rm examples/old-*.json
+      - name: Setup hfctl
+        uses: nudibranches-tech/setup-hfctl@v1
+        with:
+          console-url: https://data-terra.ai.meso.umontpellier.fr
+          service-account: ${{ secrets.DATATERRA_HF_SERVICE_ACCOUNT }}
 
-      - name: Format generated protocols
-        run: bun x prettier --write examples/*.cigaleprotocol.json
-
-      - name: Mark custom checkrun as finished
-        run: bun --eval "
-          import { emitCheckrun } from './scripts/utils.js';
-          await emitCheckrun('protocols', 'completed', 'Finishing', 'All done!');"
-
-      - name: Setup diffing that ignores version and learnMore fields
-        run: git config diff.example-protocols.textconv "$textconv"
-        env:
-          textconv: jq 'del(.version) | del(.learnMore)' $1
-
-      - name: Pull in case main has changed since we started
-        if: github.event_name == 'push' && github.ref_name == 'main'
-        run: git pull origin main --rebase --autostash
-
-      - name: Check for changes
-        id: status
+      - name: Restart app
         run: |
-          git diff || true
-          echo "changed=$(git diff --quiet && echo false || echo true)" >> $GITHUB_OUTPUT
+          hfctl -e "$HF_ENV" apps restart "$HF_APP"
 
-      - name: Commit changes
-        if: steps.status.outputs.changed == 'true'
-        uses: stefanzweifel/git-auto-commit-action@4a55954c782fc1ea30b9056cd3e7a2b40ca8887d # v7.2.0
-        with:
-          commit_message: 🍱 Regenerate example protocols
-          file_pattern: '*.cigaleprotocol.json examples/*.cigaleprotocol.images/*'
+      - name: Wait for app to be ready
+        run: |
+          hfctl -e "$HF_ENV" apps get "$HF_APP" --watch --wait-timeout 300
+
+      - name: Resolve app URL
+        id: app
+        run: |
+          # Prefer an explicit URL if one is configured; otherwise read the
+          # public route from the app status.
+          if [ -n "$PROTOCOLS_APP_URL" ]; then
+            url="$PROTOCOLS_APP_URL"
+          else
+            url=$(hfctl -e "$HF_ENV" apps get "$HF_APP" -o json | jq -r .endpoint)
+          fi
+          if [ -z "$url" ]; then
+            echo "::error::Could not determine the public URL of app $HF_APP. Set the PROTOCOLS_APP_URL secret."
+            exit 1
+          fi
+          echo "url=${url%/}" >> "$GITHUB_OUTPUT"
+          echo "App URL: $url"
+        env:
+          PROTOCOLS_APP_URL: ${{ secrets.PROTOCOLS_APP_URL }}
+
+      - name: Wait for regeneration to finish
+        working-directory: protocols-server
+        run: bun run wait-server-regen
+        env:
+          SERVER_URL: ${{ steps.app.outputs.url }}
+          SERVER_PASSWORD: ${{ secrets.DATATERRA_PROTOCOLS_SERVER_PASSWORD }}
+          JOB_STARTED_AT: ${{ steps.jobstart.outputs.started_at }}
+          TOTAL_WAIT_MINUTES: 120
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Show recent logs
+        if: always()
+        run: |
+          hfctl -e "$HF_ENV" apps logs "$HF_APP" --tail 50 || true

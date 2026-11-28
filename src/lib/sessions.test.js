@@ -139,8 +139,9 @@ describe('deleteSession', () => {
 			    "description": "Test Protocol",
 			    "dirty": false,
 			    "id": "com.example.test.protocol",
-			    "importedMetadata": [],
+			    "imports": [],
 			    "learnMore": "https://example.com",
+			    "manifest": "v0.0",
 			    "metadata": [
 			      "com.example.test.protocol__date",
 			      "com.example.test.protocol__location",
@@ -151,6 +152,7 @@ describe('deleteSession', () => {
 			    "sessionMetadata": [],
 			    "summary": "",
 			    "updates": "manual",
+			    "usable": true,
 			  },
 			]
 		`);

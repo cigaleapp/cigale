@@ -1,0 +1,237 @@
+# yaml-language-server: $schema=../../static/protocol.schema.json
+
+manifest: v1.0
+id: io.github.cigaleapp.base.springtails
+name: Collemboles (base)
+
+version: 1
+updates: automatic
+
+source: http://localhost:3000/bases/springtails.cigaleprotocol.yaml
+
+usable: false
+summary: Protocole de base pour les collemboles
+description: Protocole de base pour les collemboles
+
+authors:
+  - name: GBIF Contributors
+    email: info@gbif.org
+  - name: Jessica Joachim
+    email: tifaeriis@gmail.com
+  - name: Gwenn Le Bihan
+    email: gwenn.lebihan7@gmail.com
+  - name: Maxime Cauchoix
+  - name: Léo Chekir
+
+metadataGroups:
+  taxonomy:
+    name: Taxonomie
+    description: Classification taxonomique de l'espèce
+    # TODO: order here!
+
+metadata:
+  crop:
+    type: boundingbox
+    label: ''
+    required: true
+    description: ''
+    mergeMethod: union
+    groupable: true
+    infer:
+      neural:
+        - name: ArthroNat+flatbug YOLO11 Nano
+          model: https://huggingface.co/edgaremy/arthropod-detector/resolve/main/yolo11n_ArthroNat%2Bflatbug.onnx?download=true
+          input:
+            height: 640
+            width: 640
+            normalized: true
+            disposition: 1CHW
+          output:
+            normalized: false
+            shape: [sx, sy, ex, ey, score, _]
+          webgpuReady: false
+
+  species:
+    type: enum
+    label: Espèce
+    required: true
+    description: ''
+    mergeMethod: max
+    groupable: true
+    externalOptions:
+      - at: http://localhost:3000/options/springtails/species.jsonl
+        format: json-lines
+    infer:
+      neural:
+        - name: Small collemboles
+          model: https://huggingface.co/cigaleapp/built-in-protocols/resolve/main/classifier-collembola.onnx?download=true
+          input:
+            height: 224
+            width: 224
+            normalized: true
+            disposition: 1CHW
+          classes: labels
+          classmapping:
+            at: https://raw.githubusercontent.com/edgaremy/small-collomboles/main/class_mapping.txt
+            format: txt
+            postprocess: |
+              {
+                "value": raw
+              }
+
+  kingdom:
+    type: enum
+    group: taxonomy
+    label: Règne
+    required: true
+    description: ''
+    mergeMethod: max
+    groupable: true
+    externalOptions:
+      - at: http://localhost:3000/options/springtails/kingdom.jsonl
+        format: json-lines
+
+  phylum:
+    type: enum
+    group: taxonomy
+    label: Phylum
+    required: true
+    description: ''
+    mergeMethod: max
+    groupable: true
+    externalOptions:
+      - at: http://localhost:3000/options/springtails/phylum.jsonl
+        format: json-lines
+
+  class:
+    type: enum
+    group: taxonomy
+    label: Classe
+    required: true
+    description: ''
+    mergeMethod: max
+    groupable: true
+    externalOptions:
+      - at: http://localhost:3000/options/springtails/class.jsonl
+        format: json-lines
+
+  order:
+    type: enum
+    group: taxonomy
+    label: Ordre
+    required: true
+    description: ''
+    mergeMethod: max
+    groupable: true
+    externalOptions:
+      - at: http://localhost:3000/options/springtails/order.jsonl
+        format: json-lines
+
+  family:
+    type: enum
+    group: taxonomy
+    label: Famille
+    required: true
+    description: ''
+    mergeMethod: max
+    groupable: true
+    externalOptions:
+      - at: http://localhost:3000/options/springtails/family.jsonl
+        format: json-lines
+
+  genus:
+    type: enum
+    group: taxonomy
+    label: Genre
+    required: true
+    description: ''
+    mergeMethod: max
+    groupable: true
+    externalOptions:
+      - at: http://localhost:3000/options/springtails/genus.jsonl
+        format: json-lines
+
+  identification_difficulty:
+    type: enum
+    label: Difficulté didentification
+    description: Niveau de difficulté pour identifier l'espèce
+    required: false
+    mergeMethod: average
+    groupable: true
+    sortable: true
+    options:
+      - key: easy
+        label: Facile
+        color: '#367517'
+        icon: ri:emotion-laugh-line
+      - key: medium
+        label: Moyenne
+        color: '#e8e819'
+        icon: ri:emotion-happy-line
+      - key: hard
+        label: Difficile
+        color: '#dd8808'
+        icon: ri:emotion-normal-line
+      - key: very_hard
+        label: Très difficile
+        color: '#cd3c28'
+        icon: ri:emotion-unhappy-line
+
+  conservation_status:
+    type: enum
+    label: Statut de conservation
+    description: Statut de conservation IUCN de l'espèce
+    required: false
+    mergeMethod: average
+    groupable: true
+    sortable: true
+    options:
+      - key: ex
+        label: EX
+        description: Éteint (“Extinct”)
+        color: '#000000'
+      - key: ew
+        label: EW
+        description: Éteint à l’état sauvage (“Extinct in the Wild”)
+        color: '#3a3a3a'
+      - key: cr
+        label: CR
+        description: En danger critique d’extinction (“Critically Endangered”)
+        color: '#cd3030'
+      - key: en
+        label: EN
+        description: En danger (“Endangered”)
+        color: '#cd6630'
+      - key: vu
+        label: VU
+        description: Vulnérable (“Vulnerable”)
+        color: '#cd9a00'
+      - key: nt
+        label: NT
+        description: Quasi menacé (“Near Threatened”)
+        color: '#006666'
+      - key: lc
+        label: LC
+        description: Préoccupation mineure (“Least Concern”)
+        color: '#16ca85'
+
+  shoot_date:
+    type: date
+    label: Date
+    description: Moment de l'observation
+    required: false
+    mergeMethod: average
+    sortable: true
+    groupable: true
+    infer: { exif: DateTimeOriginal }
+
+  shoot_location:
+    type: location
+    label: Localisation
+    description: Endroit de l'observation
+    required: false
+    mergeMethod: average
+    groupable: true
+    infer:
+      latitude: { exif: GPSLatitude }
+      longitude: { exif: GPSLongitude }
