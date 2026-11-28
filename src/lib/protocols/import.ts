@@ -317,11 +317,11 @@ async function storeProtocol(
 class Progress {
 	#cb: ProgressCallback;
 
-	progresses = new Map<ProtocolImportPhase, [done: number, total: number]>();
+	progresses = new Map<ImportPhase, [done: number, total: number]>();
 
 	constructor(
 		public protocolId: string,
-		public phaseName: ProtocolImportPhase = 'start',
+		public phaseName: ImportPhase = 'start',
 		public done = 0,
 		public total = 0
 	) {
@@ -333,7 +333,7 @@ class Progress {
 		this.#cb = cb;
 	}
 
-	async phase(phase: ProtocolImportPhase, total: number) {
+	async phase(phase: ImportPhase, total: number) {
 		this.done = 0;
 		this.phaseName = phase;
 		this.total = total;
@@ -360,7 +360,7 @@ class Progress {
 		0.01,
 		'protocol',
 		0.05,
-	] satisfies Array<number | ProtocolImportPhase>;
+	] satisfies Array<number | ImportPhase>;
 
 	get globalProgress() {
 		const progress = this.done / this.total;
@@ -377,14 +377,14 @@ class Progress {
 
 type ProgressCallback = (
 	protocol: string,
-	phase: ProtocolImportPhase,
+	phase: ImportPhase,
 	/** Global done count accross all phases */
 	done: number,
 	/** Global total count accross all phases */
 	total: number
 ) => Promise<void>;
 
-export type ProtocolImportPhase =
+type ImportPhase =
 	| 'start'
 	| 'get-manifest'
 	| 'check-imports'
