@@ -52,14 +52,16 @@ export async function importProtocol(
 			timeout: ms('2min'),
 		});
 
+		const entry = page
+			.getByRole('main')
+			.getByRole('listitem')
+			.getByRole('code')
+			.getByText(protocolData.id);
+
+		await expect(entry).toBeVisible({ timeout: ms('10s') });
+
 		await expect
-			.soft(
-				page
-					.getByRole('main')
-					.getByRole('listitem')
-					.getByRole('code')
-					.getByText(protocolData.id)
-			)
-			.toBeVisible({ timeout: ms('10s') });
+			.soft(entry.getByRole('button', { name: 'Installer' }))
+			.not.toBeVisible({ timeout: ms('10s') });
 	}
 }

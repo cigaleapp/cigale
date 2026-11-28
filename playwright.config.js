@@ -158,7 +158,7 @@ export default defineConfig({
 
 	/* Run your local dev server before starting the tests */
 	webServer: dependsOnTarget({
-		live: undefined,
+		live: [],
 		dev: [
 			{
 				command: 'bun run dev',
