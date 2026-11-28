@@ -137,7 +137,7 @@ jobs:
 
   e2e:
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'speedy-e2e') && !contains(github.event.pull_request.labels.*.name, 'bypass:e2e') }}
-    needs: [build-debug, json-schema, lint, test, e2e-concurrency]
+    needs: [build-debug, lint, test, e2e-concurrency]
     name: E2E
     concurrency:
       group: playwright-${{ needs.e2e-concurrency.outputs.bucket }}
