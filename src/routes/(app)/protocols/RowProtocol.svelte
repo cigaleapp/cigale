@@ -4,7 +4,7 @@
 	import ButtonIcon from '#lib/ButtonIcon.svelte';
 	import ButtonSecondary from '#lib/ButtonSecondary.svelte';
 	import ButtonUpdateProtocol from '#lib/ButtonUpdateProtocol.svelte';
-	import {  percent } from '#lib/i18n.js';
+	import { percent } from '#lib/i18n.js';
 	import Logo from '#lib/Logo.svelte';
 	import OverflowableText from '#lib/OverflowableText.svelte';
 	import { goto, resolve } from '#lib/paths.js';
@@ -78,7 +78,7 @@
 	);
 </script>
 
-<li>
+<li >
 	<details open={expanded}>
 		<summary>
 			<section class="logo">
@@ -109,7 +109,7 @@
 							loading
 							onclick={async (_, sig) => {
 								sig.loadingStarted();
-								sig.setText("0%")
+								sig.setText('0%');
 
 								try {
 									await oninstall?.(source, (progress) => {

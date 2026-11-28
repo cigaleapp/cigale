@@ -23,7 +23,7 @@ setup.use({ storageState: { cookies: [], origins: [] }, opfsState: [] });
 
 setup('empty, basic', async ({ page }) => {
 	await goToProtocolManagement(page);
-	await importProtocol(page, 'examples/arthropods.light.cigaleprotocol.json', (p) => {
+	await importProtocol(page, 'protocols/insecta.cigaleprotocol.yaml', (p) => {
 		p.updates = 'manual';
 	});
 
@@ -39,7 +39,9 @@ setup('empty, basic', async ({ page }) => {
 
 setup('kitchensink-protocol', async ({ page, app }) => {
 	await goToProtocolManagement(page);
-	await importProtocol(page, 'examples/kitchensink.cigaleprotocol.yaml');
+	await importProtocol(page, 'protocols/kitchensink.cigaleprotocol.yaml', (p) => {
+		p.updates = 'manual';
+	});
 
 	await page
 		.getByRole('listitem')

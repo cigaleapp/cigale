@@ -456,14 +456,27 @@ export async function clickInDropdown(page, trigger, ...option) {
  * Clicks the trigger, wait for a filechooser even and sets the files.
  * Filepaths are relative to {@link FixturePaths.root}
  * @param {Locator} trigger
- * @param {...(string & {}) | FixturePaths.Any} files
+ * @param {Array<(string & {}) | FixturePaths.Any> | File[]} files
  */
 export async function pickFiles(trigger, ...files) {
 	const filepicker = trigger.page().waitForEvent('filechooser');
 	await trigger.click();
-	await filepicker.then((picker) =>
-		picker.setFiles(files.map((f) => `${FixturePaths.root}/${f}`))
+	const picker = await filepicker;
+
+	const fileobjects = files.filter((f) => f instanceof File);
+	const filenames = files.filter((f) => typeof f === 'string');
+
+	await picker.setFiles(
+		await Promise.all(
+			fileobjects.map(async (f) => ({
+				name: f.name,
+				mimeType: f.type,
+				buffer: Buffer.from(await f.arrayBuffer()),
+			}))
+		)
 	);
+
+	await picker.setFiles(filenames.map((f) => `${FixturePaths.root}/${f}`));
 }
 
 /**

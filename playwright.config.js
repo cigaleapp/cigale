@@ -159,16 +159,30 @@ export default defineConfig({
 	/* Run your local dev server before starting the tests */
 	webServer: dependsOnTarget({
 		live: undefined,
-		dev: {
-			command: 'bun run dev',
-			port: 5173,
-			reuseExistingServer: true,
-		},
-		built: {
-			command: 'bun run preview',
-			port: 4173,
-			reuseExistingServer: false,
-		},
+		dev: [
+			{
+				command: 'bun run dev',
+				port: 5173,
+				reuseExistingServer: true,
+			},
+			{
+				command: 'bun run protocolregistry:start',
+				port: 3000,
+				reuseExistingServer: true,
+			},
+		],
+		built: [
+			{
+				command: 'bun run preview',
+				port: 4173,
+				reuseExistingServer: false,
+			},
+			{
+				command: 'bun run protocolregistry:start',
+				port: 3000,
+				reuseExistingServer: false,
+			},
+		],
 	}),
 });
 

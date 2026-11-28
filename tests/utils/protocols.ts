@@ -6,7 +6,8 @@ import { expect } from '@playwright/test';
 import { ms } from 'convert';
 import YAML from 'yaml';
 
-import { ExamplePaths, RealPaths } from '../filepaths.js';
+import { RealPaths } from '../filepaths.js';
+import { pickFiles } from './core.js';
 
 /**
  * Must already be on the /protocols management page
@@ -16,22 +17,10 @@ import { ExamplePaths, RealPaths } from '../filepaths.js';
  */
 export async function importProtocol(
 	page: Page,
-	protocol:
-		| ExamplePaths.Absolute<ExamplePaths.Protocols>
-		| RealPaths.Absolute<RealPaths.Protocols>
-		| typeof ExportedProtocol.inferIn,
+	protocol: RealPaths.Absolute<RealPaths.Protocols> | typeof ExportedProtocol.inferIn,
 	tweaks?: (protocol: typeof ExportedProtocol.inferIn) => void,
 	options: { wait?: boolean } = { wait: true }
 ) {
-	const utf8 = new TextEncoder();
-	const fileChooser = page.waitForEvent('filechooser');
-
-	const importButton = page.getByRole('button', {
-		name: 'Importer',
-	});
-
-	await importButton.click();
-
 	let protocolData: typeof ExportedProtocol.inferIn;
 	if (typeof protocol === 'string' && protocol.endsWith('.json')) {
 		protocolData = JSON.parse(readFileSync(protocol, 'utf-8'));
@@ -43,27 +32,19 @@ export async function importProtocol(
 
 	tweaks?.(protocolData);
 
-	async function setFile(name: string, mime: string, content: string) {
-		await fileChooser.then((chooser) =>
-			chooser.setFiles({
-				name,
-				mimeType: mime,
-				buffer: Buffer.from(utf8.encode(content)),
-			})
-		);
+	let file: File;
+	if (typeof protocol === 'string' && protocol.endsWith('.json')) {
+		file = new File([JSON.stringify(protocolData)], protocol, { type: 'application/json' });
+	} else if (typeof protocol === 'string') {
+		file = new File([YAML.stringify(protocolData)], protocol, { type: 'application/x-yaml' });
+	} else {
+		file = new File([JSON.stringify(protocolData)], `${protocolData.id}.cigaleprotocol.json`, {
+			type: 'application/json',
+		});
 	}
 
-	if (typeof protocol === 'string' && protocol.endsWith('.json')) {
-		await setFile(protocol, 'application/json', JSON.stringify(protocolData));
-	} else if (typeof protocol === 'string') {
-		await setFile(protocol, 'application/x-yaml', YAML.stringify(protocolData));
-	} else {
-		await setFile(
-			`${protocolData.id}.cigaleprotocol.json`,
-			'application/json',
-			JSON.stringify(protocolData)
-		);
-	}
+	const importButton = page.getByRole('button', { name: 'Importer' });
+	await pickFiles(importButton, file);
 
 	if (options.wait) {
 		await expect.soft(importButton).toBeDisabled();
