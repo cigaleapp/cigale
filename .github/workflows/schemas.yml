@@ -41,5 +41,4 @@ jobs:
           json_schema: static/protocol.schema.json
           json_schema_version: draft-2020-12
           files: |
-            examples/*.cigaleprotocol.{yaml,json}
-            protocols/*.cigaleprotocol.{yaml,json}
+            **/*.cigaleprotocol.{yaml,json}
