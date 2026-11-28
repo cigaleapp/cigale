@@ -1,3 +1,5 @@
+import { Capacitor } from '@capacitor/core';
+
 /**
  *
  * @param {object} [param0 ]
@@ -10,6 +12,9 @@ export async function promptForFiles({ accept = '', multiple = false } = {}) {
 	input.type = 'file';
 	if (accept) input.accept = typeof accept === 'string' ? accept : accept.join(',');
 	if (multiple) input.multiple = true;
+	// TODO: is this necessary? it was like this in 
+	// promptForFiles()'s call for importing protocols
+	if (Capacitor.isNativePlatform()) input.accept = '*';
 
 	return new Promise((resolve) => {
 		input.addEventListener('change', (event) => {

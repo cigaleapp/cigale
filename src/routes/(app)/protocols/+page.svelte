@@ -3,7 +3,8 @@
 
 	import ButtonIcon from '#lib/ButtonIcon.svelte';
 	import ButtonSecondary from '#lib/ButtonSecondary.svelte';
-	import { plural } from '#lib/i18n.js';
+	import { promptForFiles } from '#lib/files.js';
+	import { percent, plural } from '#lib/i18n.js';
 	import { databaseHandle, tables } from '#lib/idb.svelte.js';
 	import LoadingScreen from '#lib/LoadingScreen.svelte';
 	import { IsMobile } from '#lib/mobile.svelte.js';
@@ -43,31 +44,29 @@
 		signals: {
 			loadingStarted: () => void;
 			loadingEnded: () => void;
+			setText?: (text: string) => void;
 		}
 	) {
-		await promptAndImportProtocol({
-			allowMultiple: true,
-			onInput: signals.loadingStarted,
-			importProtocol: data.swarpc.importProtocol,
-		})
-			.catch((e) => toasts.error(null, e))
-			.then((ps) => {
-				if (!ps || typeof ps === 'string' || ps.length === 0) return;
-				const names = new Map(
-					ps.map((p) => [p.id, tables.Protocol.getFromState(p.id)?.name])
-				);
+		const files = await promptForFiles({
+			multiple: true,
+			accept: '.json,.yaml,application/json',
+		});
 
-				if (names.size === 1) toasts.success(`Protocole “${names.get(ps[0].id)}” importé`);
-				else
-					toasts.success(
-						plural(names.size, ['Protocole importé', '# protocoles importés'])
-					);
+		signals.loadingStarted();
 
-				reloadProtocols++;
-			})
-			.finally(() => {
-				signals.loadingEnded();
+		for (const file of files) {
+			const result = await data.swarpc.importProtocol({ source: file }, ({ done, total }) => {
+				uiState.processing.task = 'install-protocol';
+				uiState.processing.done = done;
+				uiState.processing.total = total;
+				signals.setText?.(percent(done / total));
 			});
+
+			toasts.success(`Protocole ${result.id} importé`);
+		}
+
+		reloadProtocols++;
+		signals.loadingEnded();
 	}
 </script>
 
@@ -113,8 +112,12 @@
 				{/if}
 				{#if !mobile.current}
 					<ButtonSecondary loading onclick={importFromFiles}>
-						<IconImport />
-						Importer
+						{#snippet children({ loading })}
+							{#if !loading}
+								<IconImport />
+							{/if}
+							Importer
+						{/snippet}
 					</ButtonSecondary>
 				{/if}
 				<!-- <ButtonSecondary onclick={() => openProtocolCreation?.()}>

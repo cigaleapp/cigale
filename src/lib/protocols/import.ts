@@ -29,7 +29,7 @@ class DependsOnOtherProtocolError extends Error {
 
 export async function importProtocol(
 	db: DatabaseHandle,
-	url: string | URL,
+	source: string | URL | File,
 	options: {
 		onProgress: ProgressCallback;
 	}
@@ -38,20 +38,19 @@ export async function importProtocol(
 		// the await is important here otherwise the error slips through without
 		// being caught by the try-catch since we return the promise , which the
 		// caller will resolve, instead of resolving it right here
-		return await importSingleProtocol(db, url, options);
+		return await importSingleProtocol(db, source, options);
 	} catch (error) {
 		if (!(error instanceof DependsOnOtherProtocolError)) {
-			throw new Error(`Could not import protocol at ${url}`, { cause: error });
+			throw new Error(`Could not import protocol ${source}`, { cause: error });
 		}
 
-		const childurl = url;
 		for (const id of error.protocolIds) {
-			console.info(`protocol ${childurl} depends on ${id}, importing it`);
+			console.info(`protocol ${source} depends on ${id}, importing it`);
 			const url = await lookupMostRecentCompatibleProtocol(id);
 			await importProtocol(db, url, options);
 		}
 
-		return importSingleProtocol(db, url, options);
+		return importSingleProtocol(db, source, options);
 	}
 }
 
@@ -61,16 +60,16 @@ type MetadataInManifest = (typeof ExportedProtocol.inferIn)['metadata'][string];
 
 async function importSingleProtocol(
 	db: DatabaseHandle,
-	url: string | URL,
+	source: string | URL | File,
 	options: {
 		onProgress: ProgressCallback;
 	}
 ) {
-	const progress = new Progress(url.toString());
+	const progress = new Progress(source);
 	progress.bind(options.onProgress);
 
 	await progress.phase('get-manifest', 1);
-	const manifest = await fetchManifest(url);
+	const manifest = await fetchManifest(source);
 	await progress.increment();
 
 	await progress.phase('check-imports', manifest.imports?.length ?? 1);
@@ -122,8 +121,8 @@ async function importSingleProtocol(
 	return manifest;
 }
 
-async function fetchManifest(url: string | URL): Promise<ExportedProtocol> {
-	const manifest = await fetch(url)
+async function fetchManifest(input: string | URL | File): Promise<ExportedProtocol> {
+	const manifest = await (input instanceof File ? Promise.resolve(input) : fetch(input))
 		.then((response) => parseYAMLorJSON(response))
 		.then((parsed) => ExportedProtocol.in(parsed));
 
@@ -316,17 +315,17 @@ async function storeProtocol(
 
 class Progress {
 	#cb: ProgressCallback;
-
-	progresses = new Map<ImportPhase, [done: number, total: number]>();
+	protocolId: string;
 
 	constructor(
-		public protocolId: string,
+		protocolSource: string | URL | File,
 		public phaseName: ImportPhase = 'start',
 		public done = 0,
 		public total = 0
 	) {
-		this.progresses.set(phaseName, [done, total]);
 		this.#cb = async () => {};
+		this.protocolId =
+			protocolSource instanceof File ? protocolSource.name : protocolSource.toString();
 	}
 
 	bind(cb: ProgressCallback) {

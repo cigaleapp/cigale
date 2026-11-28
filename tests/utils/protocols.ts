@@ -36,7 +36,7 @@ export async function importProtocol(
 	if (typeof protocol === 'string' && protocol.endsWith('.json')) {
 		file = new File([JSON.stringify(protocolData)], protocol, { type: 'application/json' });
 	} else if (typeof protocol === 'string') {
-		file = new File([YAML.stringify(protocolData)], protocol, { type: 'application/x-yaml' });
+		file = new File([YAML.stringify(protocolData)], protocol, { type: 'application/yaml' });
 	} else {
 		file = new File([JSON.stringify(protocolData)], `${protocolData.id}.cigaleprotocol.json`, {
 			type: 'application/json',
@@ -55,8 +55,7 @@ export async function importProtocol(
 		const entry = page
 			.getByRole('main')
 			.getByRole('listitem')
-			.getByRole('code')
-			.getByText(protocolData.id);
+			.filter({ has: page.getByRole('heading', { name: protocolData.name }) });
 
 		await expect(entry).toBeVisible({ timeout: ms('10s') });
 

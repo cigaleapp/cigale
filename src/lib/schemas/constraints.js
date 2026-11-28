@@ -300,7 +300,7 @@ if (import.meta.vitest) {
 			const reqs = HardwareRequirements.from({
 				cpu: '8 threads @ 2.1 GHz',
 				ram: '4 GB @ 500 MHz',
-				vram: '1 GHz',
+				vram: '@ 1 GHz',
 			});
 
 			expect(reqs).toMatchObject({

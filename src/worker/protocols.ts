@@ -8,14 +8,14 @@ import { importProtocol } from '#lib/protocols/import.js';
 
 import { openDatabase, swarp } from './index.js';
 
-swarp.importProtocol(async ({ url }, onProgress) => {
+swarp.importProtocol(async ({ source }, onProgress) => {
 	// ri:* icons to preload from Iconify API. See MetadataEnumVariant's "icon" field.
 	const iconsToPreload = new Set<string>();
 
 	// TODO: iconsToPreload? or maybe we dont really need it? idk
 	const db = await openDatabase();
 
-	const manifest = await importProtocol(db, url, {
+	const manifest = await importProtocol(db, source, {
 		async onProgress(protocol, phase, done, total) {
 			await onProgress?.({ protocol, phase, done, total });
 		},
