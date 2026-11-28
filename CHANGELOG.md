@@ -20,6 +20,10 @@ All notable changes to this project will be documented in this file, on a monthl
 - Fix wuchale runtime not injected for files with only nested strings
 - Reuse the swarpc client across layout loads to fix stuck detection
 
+### Translation Updates
+
+- Refresh translation files
+
 ## October 2026
 
 ### Improvements
