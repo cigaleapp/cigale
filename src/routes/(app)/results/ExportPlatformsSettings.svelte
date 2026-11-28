@@ -27,10 +27,10 @@
 			</ButtonSecondary>
 		</Field>
 	{:else}
-		<Field label={exporter.uploading ? 'Envoi…' : 'Pas encore envoyé'}>
+		<Field label={exporter.uploading ? 'Envoi…' : 'En ligne'}>
 			<ButtonSecondary disabled onclick={() => {}}>
 				<IconOpenExternal />
-				Voir
+				Pas encore envoyé
 			</ButtonSecondary>
 		</Field>
 	{/if}
