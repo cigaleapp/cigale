@@ -1,0 +1,547 @@
+# yaml-language-server: $schema=https://cigaleapp.github.io/cigale/protocol.schema.json
+manifest: v1.0
+id: io.github.cigaleapp.examples.springtails
+name: Collemboles (exemple)
+summary: Example de protocole pour les collemboles
+authors:
+  - name: Maxime Cauchoix
+  - name: Gwenn Le Bihan
+
+version: 1
+updates: automatic
+source: http://localhost:3000/examples/springtails.cigaleprotocol.yaml
+
+description: |
+  Pour réaliser le protocole INSECTA, vous avez besoin d'un appareil photo, de curiosité et de patience. 
+
+  Choisissez un habitat qui vous semble homogène et imaginez une ligne d'environ 20 mètres que vous parcourrez à la vitesse d'un pas toutes les 30 secondes, pendant 20 minutes. 
+
+  À chaque pas, arrêtez-vous et observez les arthropodes qui vous entourent dans un rayon de 50 cm. Prenez en photo tous les individus que vous pouvez observer. 
+
+  Entre deux individus d'une même espèce, prenez une photo du ciel afin de pouvoir les traiter comme deux observations distinctes une fois rentré·e chez vous. 
+
+  Si, à l'un de vos pas, vous rencontrez un groupe d'individus qui semblent tous appartenir à la même espèce (ex. : pucerons, fourmis), une photo d'un individu par espèce présente est suffisante. 
+
+  Prenez les meilleures photos possibles, et, si possible, n'hésitez pas à en prendre deux ou trois sous différents angles pour un même individu afin de faciliter son identification.
+
+imports:
+  - from: io.github.cigaleapp.base.springtails
+    metadataGroups:
+      - taxonomy
+    metadata:
+      - species
+      - identification_difficulty
+      - conservation_status
+      - shoot_date
+      - shoot_location
+      - crop
+  - from: io.github.cigaleapp.base.environment
+    sessionMetadata:
+      - weather_condition
+      - habitat
+
+crop:
+  metadata: crop
+
+beamup:
+  origin: https://cigale-beamup-biodimedia-data-terra.ai.meso.umontpellier.fr
+
+remote:
+  ecosignal:
+    project: 1
+    # pour savoir si une image sans boîtes a été envoyée depuis Cigale (donc à ne pas ré-analyser)
+    label: cigale/observation
+    # pour savoir sur quelle métadonnée stocker les coordonnées des annotations
+    crop: crop
+    # quel status ecosignal correspond à une annotation confirmée
+    confirmedStatus: Accepted
+
+    domains:
+      Data Terra: https://ecosignal-frontend-biodimedia-data-terra.ai.meso.umontpellier.fr
+      VPS de Gwenn (temporaire): https://ecosignal.gwen.works
+
+    sites:
+      create: true
+      protect: true
+      name:
+        metadata: site_code
+        fallback: Non renseigné
+      location:
+        metadata: start_at
+        fallback: FRA
+
+  kobocollect:
+    # form: https://kf.kobotoolbox.org/#/forms/aTocGmTVNFFtuTAbtcgsEK/
+    form: https://kf.kobotoolbox.org/#/forms/a3kVqAFEJwnHFcFc7PpWj4/
+    title: |
+      {{ titlecase survey.Code_projet }} de {{ 
+        slice (metadata session 'transect_code') 12 999 
+      }} à {{ 
+        formatDate
+          (
+            parseDate
+              (slice (metadata session 'transect_code') 0 12)
+              "yyyyMMddHHmm"
+          )
+          "HH:mm"
+      }}
+    thumbnails:
+      - Prendre_une_photo_du_milieu
+      - Prenez_une_photo_du_milieu
+      - Prenez_une_photo_du_arriv_e_du_transect
+      - Prenez_une_photo_du_e_d_part_du_transect
+
+metadataOrder:
+  # Session
+  - date
+  - site_code
+  - habitat_photo
+  - soil_photo_start
+  - habitat_comment
+  - transect_code
+  - wind_speed
+  - shadow_temperature
+  - grass_height
+  - incline
+  - incline_exposure
+  - on_path
+  - start_at
+  - end_at
+  - soil_photo_end
+  - distance
+  - camera_type
+  - comment
+  # Observations
+  - species
+  - genus
+  - family
+  - order
+  - class
+  - phylum
+  - kingdom
+  - shoot_location
+  - shoot_date
+  - conservation_status
+  - identification_difficulty
+
+sessionMetadata:
+  date:
+    type: date
+    label: Date de début
+    kobocollect:
+      [Bonjour_Pour_r_aliser_le_pro, Bonjour_Pour_r_ali_tualiser_votre_relev, Date du transect]
+    mergeMethod: none
+    required: true
+    description: ''
+    darwincore:
+      date: dwc:eventDate
+      time: dwc:eventTime
+    infer:
+      capture: before-timer
+
+  site_code:
+    type: string
+    label: Code du site
+    description: Dépend du projet. Si vous ne faites pas le protocole dans le cadre d'un projet spécifique le nom de la commune ou de tout autre repère spatial est suffisant
+    mergeMethod: none
+    required: false
+    # TODO:  dwc:locationID vs dwc:fieldNumber ?
+    darwincore: dwc:fieldNumber
+    # kobocollect: Code du site # defaults to matching by label
+
+
+  habitat_photo:
+    type: file
+    label: Photo du milieu
+    kobocollect: Prenez une photo du milieu
+    ecosignal:
+      label: cigale/habitat
+    description: Prenez une photo qui représente bien l'endroit où vous allez effectuer l'inventaire photographique.
+    mergeMethod: none
+    required: false
+    accept:
+      - image/*
+    size:
+      maximum: 10 MB
+    infer:
+      capture: before-timer
+
+  soil_photo_start:
+    type: file
+    label: Sol au départ
+    kobocollect: Prenez une photo du sol au point de départ du transect
+    ecosignal:
+      label: cigale/soil at start
+    description: Prenez une photo du sol au point de départ du transect. Le téléphone/appareil doit être parallèle au sol, à hauteur d'hanche (environ 1 m du sol) afin d'analyser la communauté de plante
+    mergeMethod: none
+    required: false
+    accept:
+      - image/*
+    size:
+      maximum: 10 MB
+    infer:
+      capture: before-timer
+
+  habitat_comment:
+    type: string
+    label: Commentaire sur le lieu
+    kobocollect: Commentaire ou remarque sur le milieu
+    required: false
+    mergeMethod: none
+    description: ''
+
+  transect_code:
+    type: string
+    label: Code du transect
+    description: |
+      Le code du transect est composé de la date, de l'heure, et de vos initiales. Par exemple, un transect réalisé par Martin Galli le 07/12/2023 à 14h50 s'écrira : 202312071450MG
+    mergeMethod: none
+    required: true
+    pattern: year, month, day, hours, minutes, uppercase letter minimum 2 times
+    default: |
+      {{ formatDate (metadata session "date") "yyyyMMddHHmm" }}
+
+  wind_speed:
+    type: float
+    label: Vitesse du vent
+    description: Si il y a du vent mais que sa vitesse est trop faible pour être détectée par votre anémomètre, indiquez 1 km/h
+    # TODO: once https://github.com/jonahsnider/convert/issues/497 is resolved
+    # implement speed units and use them here
+    display:
+      suffix: km/h
+    mergeMethod: average
+    required: false
+    range: 1..30
+
+  shadow_temperature:
+    type: float
+    label: Température à l'ombre
+    kobocollect: Température à l'ombre (°C)
+    unit: celsius
+    description: Il faut s'assurer que la température mesurée soit bien celle de l'air à l'ombre et qu'elle soit influencé le moins possible par le soleil, par le sol ou par votre température corporelle. Si vous n'avez pas de thermomètre utilisez la température prédite par la météo locale
+    mergeMethod: average
+    required: true
+    range: x ≥ 13
+
+  grass_height:
+    type: float
+    label: Hauteur de la strate herbacée
+    kobocollect: Hauteur de la strate herbacée (cm)
+    unit: cm
+    description: Estimez la hauteur de l'herbe sur votre transect. Si elle n'est pas constante estimez une moyenne sur les 20m du parcours prévu.
+    mergeMethod: average
+    required: true
+    range: x ≤ 180
+
+  incline:
+    type: float
+    label: Pente
+    unit: deg
+    description: Mesuré avec une application clinomètre, long côté du téléphone positionné parallèlement à la pente
+    mergeMethod: average
+    required: false
+    range: 0..90
+
+  # TODO: verif si c bien ça la trad anglaise
+  incline_exposure:
+    type: float
+    label: Exposition (orientation) de la pente
+    kobocollect: Exposition
+    unit: deg
+    description: Mesuré avec une application boussole, pointée vers le bas de la pente
+    mergeMethod: average
+    required: false
+    range: 0..360
+
+  on_path:
+    type: boolean
+    label: Chemin
+    description: Le transect est-il réalisé depuis un chemin?
+    kobocollect:
+      list: Le transect est-il réalisé depuis un chemin ?
+      true: oui
+      false: non
+    mergeMethod: average
+    required: false
+
+  start_at:
+    type: location
+    label: Point de départ
+    description: |
+      Dès que vous avez réussi à vous géolocaliser, c'est parti pour 20 minutes de safari macrophotographique! Laissez ou prenez un point de repère pour retrouver votre point de départ. Vous pouvez mettre le téléphone en veille et revenir sur ce questionnaire à la fin des 20min pour indiquer votre point d'arrivée et les 3 dernières questions. N'oubliez pas de lancer un chronomètre
+    mergeMethod: none
+    required: true
+    darwincore:
+      # TODO average them instead of just using the start
+      # TODO: introduce uncertainty for privacy?
+      # dwc:coordinateUncertaintyInMeters / dwc:coordinatePrecision
+      latitude: dwc:decimalLatitude
+      longitude: dwc:decimalLongitude
+      datum: dwc:geodeticDatum
+    infer:
+      capture: before-timer
+
+  end_at:
+    type: location
+    label: Point d'arrivée
+    description: Les 20min sont écoulées. Enregistrez la localisation de votre point d'arrivé.
+    mergeMethod: none
+    required: true
+    infer:
+      capture: after-timer
+
+  soil_photo_end:
+    type: file
+    label: Sol à l'arrivée
+    kobocollect: Prenez une photo du sol au point d'arrivée du transect
+    ecosignal:
+      label: cigale/soil at end
+    description: La photo doit être parallèle au sol, à hauteur d'hanche (environ 1 m du sol) afin d'analyser la communauté de plante
+    required: false
+    mergeMethod: none
+    accept:
+      - image/*
+    size:
+      maximum: 10 MB
+    infer:
+      capture: after-timer
+
+  distance:
+    type: float
+    label: Distance parcourue
+    kobocollect: Distance totale parcourue (m)
+    unit: m
+    required: true
+    mergeMethod: average
+    darwincore:
+      value: dwc:sampleSizeValue
+      unit: dwc:sampleSizeUnit
+    description: En revenant sur vos pas. Estimez en enjambées de 1 m la distance exact parcourue entre le point d'arrivée et le point de départ.
+    range: x > 0
+    # TODO: cascade from a surface-type metadata made from start_at and end_at, by taking its hypot
+
+  camera_type:
+    type: enum
+    label: Type d'appareil photo
+    kobocollect: Quel type d'appareil photo avez vous utilisez?
+    description: ''
+    required: true
+    mergeMethod: none
+    options:
+      - key: smartphone
+        label: Smartphone
+      - key: with_macro
+        kobocollect: reflex_ou_hybride_avec_objectif_macro_et
+        label: Reflex ou hybride avec objectif macro et flash
+      - key: compact
+        label: Compact
+      - key: without_macro
+        kobocollect: reflex_ou_hybride_sans_objectif_macro
+        label: Reflex ou hybride sans objectif macro
+      - key: other
+        kobocollect: autres
+        label: Autre
+
+  comment:
+    type: string
+    required: false
+    description: ''
+    label: Remarque ou commentaire
+    mergeMethod: none
+    darwincore: dwc:fieldNotes
+
+metadata:
+  f_stop:
+    label: Ouverture
+    description: ''
+    learnMore: https://fr.wikipedia.org/wiki/Ouverture_(photographie)
+    type: float
+    mergeMethod: average
+    required: false
+    range: x >= 0
+    display:
+      prefix: f/
+    infer:
+      exif: FNumber
+  focal_length:
+    label: Focale
+    description: Longueur de focale, au format 35mm
+    learnMore: https://fr.wikipedia.org/wiki/Distance_focale_%C3%A9quivalente_en_35_mm
+    type: float
+    unit: mm
+    range: x >= 0
+    mergeMethod: average
+    required: false
+    infer:
+      exif: FocalLengthIn35mmFilm
+  shutter_speed:
+    label: Vitesse d'obturation
+    description: Aussi appelé Durée d'exposition ou Temps de pose. _Shutter speed_ en anglais.
+    learnMore: https://fr.wikipedia.org/wiki/Temps_de_pose
+    type: float
+    unit: seconds
+    display:
+      format: $fraction(1, value)
+      parse: |
+        $contains(value, "/")
+          ? 1 / $number($split(value, "/")[1])
+          : $number(value)
+    range: x >= 0
+    mergeMethod: average
+    required: false
+    infer:
+      exif: ExposureTime
+  iso:
+    label: Sensibilité
+    description: ''
+    learnMore: https://fr.wikipedia.org/wiki/Sensibilité_ISO
+    type: integer
+    mergeMethod: average
+    range: x >= 0
+    display:
+      prefix: 'ISO '
+    required: false
+    infer:
+      exif: ISOSpeedRatings
+
+  camera_brand:
+    label: ''
+    description: ''
+    type: string
+    mergeMethod: none
+    required: false
+    infer:
+      exif: Make
+  camera_model:
+    label: ''
+    description: ''
+    type: string
+    mergeMethod: none
+    required: false
+    infer:
+      exif: Model
+
+capture:
+  timers:
+    - name: Actif
+      shoot: manually
+      every: 30s
+      during: 20min
+      messages:
+        lap: Faire un pas en avant
+        status:
+          - '{{ formatDurationStopwatch (increase total.remainingMs 1000) }}'
+          - '{{ laps.doneCount }} pas / {{ decrease laps.totalCount 1 }}'
+    - name: Passif
+      shoot: on-timer
+      count: 100
+      during: 10min
+      messages:
+        status:
+          - '{{ formatDurationStopwatch (increase total.remainingMs 1000) }}'
+          - '{{ laps.doneCount }} photos / {{ laps.totalCount }}'
+
+exports:
+  images:
+    mtime: shoot_date
+    cropped: Cropped/{{ fallback image.protocolMetadata.species.valueLabel "(Unknown)" }}_obs{{ observation.number }}_{{ sequence }}.{{ extension image.filename }}
+    original: Original/{{ fallback image.protocolMetadata.species.valueLabel "(Unknown)" }}_obs{{ observation.number }}_{{ sequence }}.{{ extension image.filename }}
+  metadata:
+    csv: metadata.csv
+    files: Files/{{ sequence }}-{{ metadataKey }}.{{ extension filename }}
+
+darwincore:
+  eml:
+    language: fr
+    title: Inventaire photographique d'insectes
+    taxonomy:
+      description: Insectes de la faune française métropolitaine
+      rank:
+        class: Insecta
+    geography:
+      description: France métropolitaine
+    license: CC-BY-SA-4.0
+
+  fields:
+    session:
+      # dwc:samplingEffort: $metadata(session, "distance") & " m by foot"
+      dwc:samplingEffort: '{{ session.protocolMetadata.distance.value }} m by foot'
+      # this is technically in the observation rowtype but oh well
+      # dwc:eventType: '"Transect"'
+      dwc:eventType: Transect
+      eco:targetTaxonomicScope: Insecta
+
+    image:
+      # dc:type: '"StillImage"'
+      dc:type: StillImage
+      # TODO: dc:references: use images/learnMore of species option ?
+      # dwc:basisOfRecord: '"HumanObservation"'
+      dwc:basisOfRecord: HumanObservation
+      # dwc:occurrenceID: $metadata(session, "id") & ":" & $metadata(observation, "id")
+      dwc:occurenceID: '{{ session.id }}:{{ image.id }}'
+      # TODO: ensure this is correct (INSECTA doesnt keep empty photos right?)
+      # dwc:occurrenceStatus: '"present"'
+      dwc:occurenceStatus: present
+      # TODO: do this but switch to jsonata expressions first... kinda annoying to do with handlebars
+      # dwc:associatedMedia: "{{ join () }}"
+      # dwc:discipline: '"Entomology | Taxonomy"'
+      dwc:discipline: Entomology | Taxonomy
+      dwc:taxonRank: |
+        {{#if image.protocolMetadata.species }}
+          species
+        {{else if image.protocolMetadata.genus }}
+          genus
+        {{else if image.protocolMetadata.family }}
+          family
+        {{else if image.protocolMetadata.order }}
+          order
+        {{else}}
+          kingdom
+        {{/if}}
+
+    media:
+      # Note: most of these arent actually recognized by GBIF i think?
+      # TODO: https://ac.tdwg.org/termlist/#ac_furtherInformationURL ?
+      dc:publisher: EcoSignal
+      dwc:individualCount: '{{ images.length }}'
+
+      # do we add dwc:individualCount ?
+
+charts:
+  - scope: both
+    layout:
+      - [unique_species]
+      - [order, iucn]
+    blocks:
+      unique_species:
+        type: figure
+        title: Espèces uniques
+        compute: $count($distinct(observations.metadata.species.value))
+      order:
+        type: partition
+        title: Ordres
+        needs: [order]
+        compute: |
+          $distinct(observations.metadata.order.valueLabel)@$label.(
+            {
+              "label": $label,
+              "value": $count(observations[metadata.order.valueLabel = $label])
+            }
+          )
+      iucn:
+        type: partition
+        title: Statut IUCN
+        needs: [conservation_status]
+        compute: |
+          (
+            $labels := observations.metadata.conservation_status{ value: $distinct(valueLabel) };
+            $colors := observations.metadata.conservation_status{ value: $distinct(valueColor) };
+
+            $distinct(observations.metadata.conservation_status.value)@$key.(
+              {
+                "label": $lookup($labels, $key),
+                "color": $lookup($colors, $key),
+                "value": $count(observations[metadata.conservation_status.value = $key])
+              }
+            );
+          )

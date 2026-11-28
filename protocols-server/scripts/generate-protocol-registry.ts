@@ -117,7 +117,7 @@ export function writeRegistry({
 			manifestVersion,
 			logo: parsed.logo,
 			summary: parsed.summary,
-			suggested: parsed.usable ?? true,
+			suggested: (parsed.usable ?? true) && !parsed.id.includes('.examples.'),
 			older: [],
 			id: parsed.id,
 			url: (transformSource?.(sourceUrl) ?? sourceUrl).toString(),

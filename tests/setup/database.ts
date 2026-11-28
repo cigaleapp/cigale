@@ -23,7 +23,7 @@ setup.use({ storageState: { cookies: [], origins: [] }, opfsState: [] });
 
 setup('empty, basic', async ({ page }) => {
 	await goToProtocolManagement(page);
-	await importProtocol(page, 'protocols/insecta.cigaleprotocol.yaml', (p) => {
+	await importProtocol(page, 'protocols/examples/springtails.cigaleprotocol.yaml', (p) => {
 		p.updates = 'manual';
 	});
 
