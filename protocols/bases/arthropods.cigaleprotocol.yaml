@@ -100,6 +100,10 @@ metadata:
           classmapping:
             at: https://raw.githubusercontent.com/edgaremy/small-collomboles/main/class_mapping.txt
             format: txt
+            postprocess: |
+              {
+                "value": raw
+              }
 
   kingdom:
     type: enum

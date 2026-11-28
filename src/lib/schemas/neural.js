@@ -1,7 +1,7 @@
 import { type } from 'arktype';
 
 import { entries } from '../utils.js';
-import { HTTPRequest, ID } from './common.js';
+import { HTTPRequest, URLString, ID } from './common.js';
 import { HardwareRequirements } from './constraints.js';
 import { JsonataExpression } from './expressions.js';
 import { NetworkStreamedLines } from './network.js';
@@ -102,9 +102,19 @@ export const ClassmappingLineParsed = type.or('string', {
 
 export const NeuralEnumInference = ModelSettingsCommon.and({
 	'output?': ModelOutputEnum,
-	classmapping: NetworkStreamedLines(ClassmappingLineParsed).describe(
-		`Récupération du classmapping du modèle. postprocess permet de traiter les lignes du classmapping: on peut soit renvoyer une string, soit un objet avec .value, ref: "labels" | "keys" | "extraKeys" (à quoi fait référence .value dans les options de la métadonnée, optionnel) et neuron: n >= 0, l'index (commençant à 0) du neurone de la couche de sortie à laquelle correspond cette classe. Pratique si le fichier ne les donne pas dans l'ordre (optionnel)`
-	),
+	classmapping: NetworkStreamedLines(ClassmappingLineParsed)
+		.describe(
+			`Récupération du classmapping du modèle. postprocess permet de traiter les lignes du classmapping: on peut soit renvoyer une string, soit un objet avec .value, ref: "labels" | "keys" | "extraKeys" (à quoi fait référence .value dans les options de la métadonnée, optionnel) et neuron: n >= 0, l'index (commençant à 0) du neurone de la couche de sortie à laquelle correspond cette classe. Pratique si le fichier ne les donne pas dans l'ordre (optionnel)`
+		)
+		.or(
+			type(URLString).pipe((url) =>
+				NetworkStreamedLines(ClassmappingLineParsed).from({
+					at: url,
+					format: 'txt',
+					postprocess: '{ "value": raw }',
+				})
+			)
+		),
 	classes: ClassmappingRef.describe(
 		`À quoi le classmapping fait référence par rapport aux options de la métadonnée. Si classmapping.postprocess renvoie des objets, et que ref n'est pas précisé, c'est cette valeur qui est utilisée`
 	).default('keys'),

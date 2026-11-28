@@ -13,11 +13,6 @@ usable: false
 summary: Protocole de base pour les collemboles
 description: Protocole de base pour les collemboles
 
-imports:
-  - from: io.github.cigaleapp.base.arthropods
-    metadata:
-      - crop
-
 authors:
   - name: GBIF Contributors
     email: info@gbif.org
@@ -35,6 +30,27 @@ metadataGroups:
     # TODO: order here!
 
 metadata:
+  crop:
+    type: boundingbox
+    label: ''
+    required: true
+    description: ''
+    mergeMethod: union
+    groupable: true
+    infer:
+      neural:
+        - name: ArthroNat+flatbug YOLO11 Nano
+          model: https://huggingface.co/edgaremy/arthropod-detector/resolve/main/yolo11n_ArthroNat%2Bflatbug.onnx?download=true
+          input:
+            height: 640
+            width: 640
+            normalized: true
+            disposition: 1CHW
+          output:
+            normalized: false
+            shape: [sx, sy, ex, ey, score, _]
+          webgpuReady: false
+
   species:
     type: enum
     label: Espèce
@@ -58,6 +74,10 @@ metadata:
           classmapping:
             at: https://raw.githubusercontent.com/edgaremy/small-collomboles/main/class_mapping.txt
             format: txt
+            postprocess: |
+              {
+                "value": raw
+              }
 
   kingdom:
     type: enum
